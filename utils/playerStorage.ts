@@ -952,7 +952,7 @@ export const updatePlayer = async (id: string, updates: Partial<Player>, current
 export const findPlayerByCredentials = async (email: string, password: string): Promise<Player | null> => {
   try {
     console.log('🔍 Поиск пользователя по учетным данным:', email);
-    console.log('🔗 Подключение к Supabase:', supabase.supabaseUrl);
+    console.log('🔗 Подключение к Supabase URL настроено');
     
     // Сначала проверим, есть ли вообще пользователи в базе
     const { data: countData, error: countError } = await supabase
@@ -1942,7 +1942,7 @@ export const migrateAllImagesToStorage = async (): Promise<void> => {
 export const checkDatabaseStatus = async (): Promise<void> => {
   try {
     console.log('🔍 Проверка состояния базы данных Supabase...');
-    console.log('🔗 URL Supabase:', supabase.supabaseUrl);
+    console.log('🔗 URL Supabase настроен');
     
     // Проверяем подключение к таблице players
     const { data, error } = await supabase
