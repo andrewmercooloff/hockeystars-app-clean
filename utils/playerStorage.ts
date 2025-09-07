@@ -240,11 +240,27 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     friendRequestsCount: 0,
     giftRequestsCount: 0,
     exerciseStats: (() => {
-      if (supabasePlayer.exercise_stats && supabasePlayer.exercise_stats !== '{}' && supabasePlayer.exercise_stats !== 'null') {
+      if (supabasePlayer.exercise_stats && 
+          supabasePlayer.exercise_stats !== '{}' && 
+          supabasePlayer.exercise_stats !== 'null' && 
+          supabasePlayer.exercise_stats !== 'undefined' &&
+          typeof supabasePlayer.exercise_stats === 'string') {
         try {
-          return JSON.parse(supabasePlayer.exercise_stats);
+          const parsed = JSON.parse(supabasePlayer.exercise_stats);
+          // Проверяем, что результат парсинга - это объект с нужными полями
+          if (parsed && typeof parsed === 'object' && 
+              Array.isArray(parsed.completions) && 
+              typeof parsed.totalCompletions === 'number') {
+            return parsed;
+          }
+          // Если структура неправильная, возвращаем дефолт без ошибки
+          return { completions: [], totalCompletions: 0 };
         } catch (error) {
-          console.error('Ошибка парсинга exercise_stats:', error);
+          // Логируем только первый раз для каждого игрока
+          if (!supabasePlayer._exercise_stats_error_logged) {
+            console.warn(`⚠️ Некорректные данные exercise_stats для игрока ${supabasePlayer.name || supabasePlayer.id}: "${supabasePlayer.exercise_stats}"`);
+            supabasePlayer._exercise_stats_error_logged = true;
+          }
           return { completions: [], totalCompletions: 0 };
         }
       }
@@ -2110,5 +2126,103 @@ export const getExerciseRankings = async (): Promise<{ exerciseId: string; total
   } catch (error) {
     console.error('❌ Ошибка получения рейтинга упражнений:', error);
     return [];
+  }
+};
+
+// Поиск игрока по email
+export const getPlayerByEmail = async (email: string): Promise<Player | null> => {
+  try {
+    console.log('🔍 Поиск игрока по email:', email);
+    
+    const { data, error } = await supabase
+      .from('players')
+      .select('*')
+      .eq('email', email.toLowerCase().trim())
+      .limit(1);
+    
+    if (error) {
+      console.error('❌ Ошибка поиска игрока по email:', error);
+      return null;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('👤 Игрок с email не найден:', email);
+      return null;
+    }
+    
+    const supabasePlayer = data[0];
+    const player = convertSupabaseToPlayer(supabasePlayer);
+    
+    console.log('✅ Игрок найден по email:', player.name);
+    return player;
+  } catch (error) {
+    console.error('❌ Ошибка поиска игрока по email:', error);
+    return null;
+  }
+};
+
+// Поиск игрока по телефону
+export const getPlayerByPhone = async (phone: string): Promise<Player | null> => {
+  try {
+    console.log('🔍 Поиск игрока по телефону:', phone);
+    
+    const { data, error } = await supabase
+      .from('players')
+      .select('*')
+      .eq('phone', phone.trim())
+      .limit(1);
+    
+    if (error) {
+      console.error('❌ Ошибка поиска игрока по телефону:', error);
+      return null;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('👤 Игрок с телефоном не найден:', phone);
+      return null;
+    }
+    
+    const supabasePlayer = data[0];
+    const player = convertSupabaseToPlayer(supabasePlayer);
+    
+    console.log('✅ Игрок найден по телефону:', player.name);
+    return player;
+  } catch (error) {
+    console.error('❌ Ошибка поиска игрока по телефону:', error);
+    return null;
+  }
+};
+
+// Создание нового игрока в базе данных
+export const createPlayer = async (playerData: Player): Promise<Player | null> => {
+  try {
+    console.log('👤 Создаем нового игрока:', playerData.name);
+    
+    // Конвертируем данные игрока в формат Supabase
+    const supabaseData = convertPlayerToSupabase(playerData);
+    
+    const { data, error } = await supabase
+      .from('players')
+      .insert([supabaseData])
+      .select('*')
+      .single();
+    
+    if (error) {
+      console.error('❌ Ошибка создания игрока:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.error('❌ Нет данных после создания игрока');
+      return null;
+    }
+    
+    const createdPlayer = convertSupabaseToPlayer(data);
+    console.log('✅ Игрок создан успешно:', createdPlayer.name);
+    return createdPlayer;
+    
+  } catch (error) {
+    console.error('❌ Ошибка создания игрока:', error);
+    return null;
   }
 };

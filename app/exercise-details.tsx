@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { completeExercise, getExerciseCompletionCount, loadCurrentUser, Player } from '../utils/playerStorage';
+import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player } from '../utils/playerStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -1958,7 +1958,18 @@ export default function ExerciseDetailsScreen() {
       const success = await completeExercise(currentUser.id, exerciseId as string);
       
       if (success) {
+        // Обновляем счетчик локально
         setCompletionCount(prev => prev + 1);
+        
+        // Получаем обновленные данные игрока из базы
+        const updatedPlayer = await getPlayerById(currentUser.id);
+        if (updatedPlayer) {
+          // Обновляем текущего пользователя в AsyncStorage
+          await saveCurrentUser(updatedPlayer);
+          setCurrentUser(updatedPlayer);
+          console.log('✅ Данные пользователя обновлены в AsyncStorage');
+        }
+        
         Alert.alert(
           'Отлично!',
           'Упражнение отмечено как выполненное',

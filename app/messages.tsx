@@ -209,7 +209,7 @@ export default function MessagesScreen() {
                   
                   <View style={styles.chatInfo}>
                     <View style={styles.chatHeader}>
-                      <Text style={styles.chatName}>{chat.player.name}</Text>
+                      <Text style={styles.chatName}>{chat.player.name?.toUpperCase()}</Text>
                       {chat.lastMessage && (
                         <Text style={styles.chatTime}>
                           {formatTime(chat.lastMessage.timestamp)}

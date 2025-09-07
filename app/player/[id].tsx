@@ -33,7 +33,7 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarItemManager from '../../components/StarItemManager';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearAllFriendRequests, createFriendRequestNotification, debugFriendRequests, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearAllFriendRequests, createFriendRequestNotification, debugFriendRequests, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 
 const iceBg = require('../../assets/images/led.jpg');
@@ -662,7 +662,19 @@ export default function PlayerProfile() {
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
-      setPlayer(refreshedPlayer);
+        setPlayer(refreshedPlayer);
+        
+        // Если редактируем свой собственный профиль, обновляем также currentUser в AsyncStorage
+        if (currentUser.id === player.id) {
+          setCurrentUser(refreshedPlayer);
+          // Сохраняем обновленные данные в AsyncStorage
+          try {
+            await saveCurrentUser(refreshedPlayer);
+            console.log('✅ Данные текущего пользователя обновлены в AsyncStorage');
+          } catch (error) {
+            console.error('❌ Ошибка обновления currentUser в AsyncStorage:', error);
+          }
+        }
       }
       
       // Обновляем состояние команд
@@ -676,6 +688,12 @@ export default function PlayerProfile() {
       
       setIsEditing(false);
       showCustomAlert('Успешно', 'Данные игрока обновлены', 'success');
+      
+      // Принудительно обновляем все экраны, которые могут показывать данные пользователя
+      if (currentUser.id === player.id) {
+        // Перенаправляем с параметром обновления для LogoHeader
+        router.replace(`/player/${player.id}?refresh=${Date.now()}`);
+      }
       
     } catch (error) {
       console.error('❌ handleSave: общая ошибка сохранения:', error);
@@ -880,9 +898,16 @@ export default function PlayerProfile() {
                   <TextInput
                     style={[styles.editInput, { fontSize: 28, fontFamily: 'Gilroy-Bold', color: '#fff', textAlign: 'center', marginBottom: 5 }]}
                     value={editData.name || player.name || ''}
-                    onChangeText={(text) => setEditData({...editData, name: text})}
-                    placeholder="Имя Фамилия"
+                    onChangeText={(text) => {
+                      // Фильтруем только латинские буквы, пробелы и дефисы
+                      const latinOnly = text.replace(/[^a-zA-Z\s\-]/g, '');
+                      // Преобразуем в верхний регистр
+                      const upperCaseText = latinOnly.toUpperCase();
+                      setEditData({...editData, name: upperCaseText});
+                    }}
+                    placeholder="NAME SURNAME"
                     placeholderTextColor="#888"
+                    autoCapitalize="characters"
                   />
                 ) : (
                 <Text style={styles.playerName}>{player.name?.toUpperCase()}</Text>
@@ -2287,12 +2312,12 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1, 
+    borderColor: 'rgba(255, 68, 68, 0.3)', 
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -2724,12 +2749,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   teamsSection: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1, 
+    borderColor: 'rgba(255, 68, 68, 0.3)', 
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

@@ -204,7 +204,7 @@ export default function ChatScreen() {
                 style={styles.headerAvatar}
               />
               <View style={styles.headerText}>
-                <Text style={styles.headerName}>{otherPlayer.name}</Text>
+                <Text style={styles.headerName}>{otherPlayer.name?.toUpperCase()}</Text>
                 <Text style={styles.headerStatus}>
                   {otherPlayer.status === 'player' ? 'Игрок' : 
                    otherPlayer.status === 'coach' ? 'Тренер' : 
@@ -230,7 +230,7 @@ export default function ChatScreen() {
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Ionicons name="chatbubble-outline" size={48} color="#fff" />
-                  <Text style={styles.emptyText}>Начните разговор с {otherPlayer.name}</Text>
+                  <Text style={styles.emptyText}>Начните разговор с {otherPlayer.name?.toUpperCase()}</Text>
                 </View>
               ) : !loading ? (
                 messages.map((message) => {

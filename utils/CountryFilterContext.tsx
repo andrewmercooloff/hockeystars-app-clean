@@ -36,5 +36,3 @@ export const CountryFilterProvider: React.FC<CountryFilterProviderProps> = ({ ch
     </CountryFilterContext.Provider>
   );
 };
-
-

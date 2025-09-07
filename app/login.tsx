@@ -1,28 +1,35 @@
 import { Ionicons } from '@expo/vector-icons';
 
 import { useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ImageBackground,
+    Keyboard,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View
 } from 'react-native';
 import CustomAlert from '../components/CustomAlert';
-import { findPlayerByCredentials, saveCurrentUser } from '../utils/playerStorage';
+import { findPlayerByCredentials, saveCurrentUser, getPlayerByPhone, createPlayer } from '../utils/playerStorage';
+import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
 export default function LoginScreen() {
   const router = useRouter();
-  const usernameRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
+  const codeRef = useRef<TextInput>(null);
+  const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    phone: '',
+    code: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [canResend, setCanResend] = useState(false);
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -42,147 +49,407 @@ export default function LoginScreen() {
     }, 100);
   };
 
-  // Упрощенные обработчики ввода для кросс-платформенной работы (включая Web)
-  const handleUsernameChange = (text: string) => {
-    setFormData({ ...formData, username: text });
+  const handleAlertClose = () => {
+    // Если это успешное уведомление о входе - идем на главную
+    if (alert.type === 'success' && alert.title === 'С возвращением!') {
+      closeAlertAndGoHome();
+    } else {
+      // Во всех остальных случаях просто закрываем алерт
+      closeAlert();
+    }
   };
 
-  const handlePasswordChange = (text: string) => {
-    setFormData({ ...formData, password: text });
+  // Обработчики ввода для SMS авторизации
+  const handlePhoneChange = (text: string) => {
+    setFormData({ ...formData, phone: text.trim() });
   };
 
-  // Убраны дополнительные эффекты/синхронизации, несовместимые с Web
+  const handleCodeChange = (text: string) => {
+    // Разрешаем только цифры и ограничиваем до 6 символов
+    const numericCode = text.replace(/[^0-9]/g, '').slice(0, 6);
+    setFormData({ ...formData, code: numericCode });
+  };
 
-  const handleLogin = async () => {
-    const { username, password } = formData;
-    if (!username || !password) {
+  // Таймер для повторной отправки
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(prev => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [resendTimer]);
+
+  // Отправка кода на телефон
+  const handleSendCode = async () => {
+    const { phone } = formData;
+
+    if (!phone.trim()) {
       setAlert({
         visible: true,
         title: 'Ошибка',
-        message: 'Пожалуйста, заполните все поля',
+        message: 'Пожалуйста, введите номер телефона',
         type: 'error'
       });
       return;
     }
 
-    try {
-      const player = await findPlayerByCredentials(username, password);
-      
-      if (player) {
-        // Сохраняем текущего пользователя
-        await saveCurrentUser(player);
-        
-        setAlert({
-          visible: true,
-          title: 'Успешно!',
-          message: `Добро пожаловать, ${player.name}!`,
-          type: 'success'
-        });
-      } else {
-        setAlert({
-          visible: true,
-          title: 'Ошибка',
-          message: 'Неверный логин или пароль',
-          type: 'error'
-        });
-      }
-    } catch (error) {
-      console.error('Ошибка входа:', error);
+    // Проверка формата телефона - обязательный знак +
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
       setAlert({
         visible: true,
         title: 'Ошибка',
-        message: 'Не удалось войти в систему',
+        message: 'Пожалуйста, введите корректный номер телефона с кодом страны (например: +1234567890)',
         type: 'error'
       });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      console.log('📱 Отправляем код на:', phone);
+      
+      // Генерируем код
+      const code = generateVerificationCode();
+      
+      // Сохраняем код в базе данных
+      const savedCode = await saveVerificationCode(phone, code);
+      if (!savedCode) {
+        throw new Error('Не удалось сохранить код');
+      }
+      
+      // Отправляем SMS с кодом
+      const smsSent = await sendVerificationSMS(phone, code);
+      if (!smsSent) {
+        throw new Error('Не удалось отправить SMS');
+      }
+      
+      setStep('code');
+      
+      // Запускаем таймер на 60 секунд
+      setResendTimer(60);
+      setCanResend(false);
+      
+      // Скрываем клавиатуру и показываем уведомление с задержкой
+      Keyboard.dismiss();
+      
+      setTimeout(() => {
+        setAlert({
+          visible: true,
+          title: 'Код отправлен!',
+          message: 'Проверьте SMS на вашем телефоне и введите код подтверждения',
+          type: 'success'
+        });
+      }, 200);
+      
+      setTimeout(() => {
+        codeRef.current?.focus();
+      }, 100);
+      
+    } catch (error) {
+      console.error('❌ Ошибка отправки кода:', error);
+      setAlert({
+        visible: true,
+        title: 'Ошибка',
+        message: 'Не удалось отправить код. Попробуйте еще раз.',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Повторная отправка кода
+  const handleResendCode = async () => {
+    if (!canResend) return;
+    
+    setLoading(true);
+    try {
+      const code = generateVerificationCode();
+      const savedCode = await saveVerificationCode(formData.phone, code);
+      
+      if (!savedCode) {
+        throw new Error('Не удалось сохранить код');
+      }
+      
+      const smsSent = await sendVerificationSMS(formData.phone, code);
+      if (!smsSent) {
+        throw new Error('Не удалось отправить SMS');
+      }
+      
+      // Запускаем таймер на 60 секунд
+      setResendTimer(60);
+      setCanResend(false);
+      
+      setAlert({
+        visible: true,
+        title: 'Код отправлен!',
+        message: 'Проверьте SMS на вашем телефоне и введите код подтверждения',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('❌ Ошибка повторной отправки кода:', error);
+      setAlert({
+        visible: true,
+        title: 'Ошибка',
+        message: error instanceof Error ? error.message : 'Не удалось отправить код повторно',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Проверка кода и вход
+  const handleVerifyCode = async () => {
+    const { phone, code } = formData;
+
+    if (!code.trim() || code.length !== 6) {
+      setAlert({
+        visible: true,
+        title: 'Ошибка',
+        message: 'Пожалуйста, введите 6-значный код',
+        type: 'error'
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      console.log('🔍 Проверяем код для:', phone);
+      
+      // Проверяем код
+      const verification = await verifyCode(phone, code);
+      
+      if (!verification.success) {
+        setAlert({
+          visible: true,
+          title: 'Ошибка',
+          message: verification.message,
+          type: 'error'
+        });
+        return;
+      }
+      
+      // Ищем пользователя по телефону
+      const user = await getPlayerByPhone(phone);
+      
+      // Если пользователь не найден - ошибка (нужна регистрация)
+      if (!user) {
+        setAlert({
+          visible: true,
+          title: 'Пользователь не найден',
+          message: 'Аккаунт с таким номером телефона не существует. Пожалуйста, зарегистрируйтесь.',
+          type: 'error'
+        });
+        setStep('phone'); // Возвращаемся к вводу телефона
+        return;
+      }
+      
+      // Пользователь найден - входим в систему
+      await saveCurrentUser(user);
+      
+      setAlert({
+        visible: true,
+        title: 'С возвращением!',
+        message: `Добро пожаловать обратно, ${user.name}!`,
+        type: 'success'
+      });
+      
+      setTimeout(closeAlertAndGoHome, 1500);
+      
+    } catch (error) {
+      console.error('❌ Ошибка проверки кода:', error);
+      setAlert({
+        visible: true,
+        title: 'Ошибка',
+        message: 'Произошла ошибка при проверке кода',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.hockeyRinkContainer}>
-        <ImageBackground source={iceBg} style={styles.hockeyRink} resizeMode="cover">
-          {/* Внутренняя граница хоккейной коробки */}
-          <View style={styles.innerBorder} />
-          
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.hockeyRinkContainer}>
+          <ImageBackground source={iceBg} style={styles.hockeyRink} resizeMode="cover">
+            {/* Внутренняя граница хоккейной коробки */}
+            <View style={styles.innerBorder} />
+            
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
 
               
               {/* Заголовок формы */}
               <View style={styles.modalHeader}>
                 <Ionicons name="log-in" size={40} color="#FF4444" />
-                <Text style={styles.modalTitle}>Вход в систему</Text>
+                <Text style={styles.modalTitle}>
+                  {step === 'phone' ? 'Вход в систему' : 'Код подтверждения'}
+                </Text>
               </View>
               
               {/* Сообщение */}
               <Text style={styles.modalMessage}>
-                Войдите в свой аккаунт, чтобы получить доступ к полному функционалу приложения
+                {step === 'phone' 
+                  ? 'Введите номер телефона для получения кода подтверждения'
+                  : 'Введите 6-значный код, отправленный на ваш телефон'
+                }
               </Text>
               
-              {/* Логин */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Логин</Text>
-                <TextInput
-                  ref={usernameRef}
-                  style={styles.input}
-                  value={formData.username}
-                  onChangeText={handleUsernameChange}
-                  placeholder="Введите логин"
-                  placeholderTextColor="#888"
-                  autoCapitalize="none"
-                  autoComplete="username"
-                  textContentType="username"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  enablesReturnKeyAutomatically={true}
-                  clearButtonMode="while-editing"
-                  onSubmitEditing={() => passwordRef.current?.focus()}
-                />
-              </View>
-
-              {/* Пароль */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Пароль</Text>
-                <TextInput
-                  ref={passwordRef}
-                  style={styles.input}
-                  value={formData.password}
-                  onChangeText={handlePasswordChange}
-                  placeholder="Введите пароль"
-                  placeholderTextColor="#888"
-                  secureTextEntry={true}
-                  autoComplete="password"
-                  textContentType="password"
-                  autoCorrect={false}
-                  returnKeyType="done"
-                  blurOnSubmit={true}
-                  enablesReturnKeyAutomatically={true}
-                  clearButtonMode="while-editing"
-                  onSubmitEditing={handleLogin}
-                />
-              </View>
+              {step === 'phone' ? (
+                // Шаг 1: Ввод телефона
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    ref={phoneRef}
+                    style={styles.input}
+                    value={formData.phone}
+                    onChangeText={handlePhoneChange}
+                    placeholder="+1234567890"
+                    placeholderTextColor="#888"
+                    autoCapitalize="none"
+                    autoComplete="tel"
+                    textContentType="telephoneNumber"
+                    keyboardType="phone-pad"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    blurOnSubmit={true}
+                    enablesReturnKeyAutomatically={true}
+                    clearButtonMode="while-editing"
+                    onSubmitEditing={handleSendCode}
+                    editable={!loading}
+                  />
+                </View>
+              ) : (
+                // Шаг 2: Ввод кода подтверждения
+                <>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Код подтверждения</Text>
+                    <TextInput
+                      ref={codeRef}
+                      style={[styles.input, styles.codeInput]}
+                      value={formData.code}
+                      onChangeText={handleCodeChange}
+                      placeholder="000000"
+                      placeholderTextColor="#888"
+                      keyboardType="number-pad"
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                      textContentType="oneTimeCode"
+                      returnKeyType="done"
+                      blurOnSubmit={true}
+                      enablesReturnKeyAutomatically={true}
+                      onSubmitEditing={handleVerifyCode}
+                      editable={!loading}
+                    />
+                  </View>
+                  
+                  {/* Показываем телефон для справки */}
+                  <Text style={styles.emailHint}>
+                    Код отправлен на: {formData.phone}
+                  </Text>
+                  
+                  {/* Кнопка повторной отправки */}
+                  <TouchableOpacity 
+                    style={[styles.resendButton, (!canResend || loading) && styles.resendButtonDisabled]} 
+                    onPress={handleResendCode}
+                    disabled={!canResend || loading}
+                  >
+                    <Text style={[styles.resendButtonText, (!canResend || loading) && styles.resendButtonTextDisabled]}>
+                      {resendTimer > 0 ? `Повторить через ${resendTimer}с` : 'Отправить код повторно'}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
 
               {/* Кнопки */}
               <View style={styles.modalButtons}>
-                <TouchableOpacity style={styles.modalButton} onPress={handleLogin}>
-                  <Ionicons name="log-in" size={20} color="#fff" />
-                  <Text style={styles.modalButtonText}>Войти</Text>
-                </TouchableOpacity>
-                
+                {step === 'phone' ? (
+                  <TouchableOpacity 
+                    style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
+                    onPress={handleSendCode}
+                    disabled={loading}
+                  >
+                    <Ionicons 
+                      name={loading ? "hourglass" : "phone-portrait"} 
+                      size={20} 
+                      color="#fff" 
+                    />
+                    <Text style={styles.modalButtonText}>
+                      {loading ? 'Отправляем...' : 'Получить код'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <>
+                    <TouchableOpacity 
+                      style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
+                      onPress={handleVerifyCode}
+                      disabled={loading}
+                    >
+                      <Ionicons 
+                        name={loading ? "hourglass" : "checkmark-circle"} 
+                        size={20} 
+                        color="#fff" 
+                      />
+                      <Text style={styles.modalButtonText}>
+                        {loading ? 'Проверяем...' : 'Подтвердить'}
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={[styles.modalButton, styles.modalButtonSecondary]} 
+                      onPress={() => {
+                        setStep('phone');
+                        setFormData({ ...formData, code: '' });
+                      }}
+                      disabled={loading}
+                    >
+                      <Ionicons name="arrow-back" size={20} color="#FF4444" />
+                      <Text style={[styles.modalButtonText, styles.modalButtonTextSecondary]}>
+                        Назад
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+
+              {/* Кнопка регистрации - показываем только на первом шаге */}
+              {step === 'phone' && (
                 <TouchableOpacity 
-                  style={[styles.modalButton, styles.modalButtonSecondary]} 
+                  style={styles.registerButton} 
                   onPress={() => router.push('/register')}
+                  disabled={loading}
                 >
                   <Ionicons name="person-add" size={20} color="#FF4444" />
-                  <Text style={[styles.modalButtonText, styles.modalButtonTextSecondary]}>Регистрация</Text>
+                  <Text style={styles.registerButtonText}>
+                    Регистрация
+                  </Text>
                 </TouchableOpacity>
-              </View>
+              )}
 
               {/* Кнопка отмены */}
               <TouchableOpacity 
                 style={styles.modalCancelButton} 
                 onPress={() => router.back()}
+                disabled={loading}
               >
                 <Text style={styles.modalCancelText}>Отмена</Text>
               </TouchableOpacity>
@@ -197,10 +464,11 @@ export default function LoginScreen() {
         title={alert.title}
         message={alert.message}
         type={alert.type}
-        onConfirm={alert.type === 'success' ? closeAlertAndGoHome : closeAlert}
+        onConfirm={handleAlertClose}
         confirmText="OK"
       />
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -329,12 +597,73 @@ const styles = StyleSheet.create({
   },
   modalCancelButton: {
     alignItems: 'center',
-    padding: 10,
+    padding: 8,
+    marginTop: 5,
   },
   modalCancelText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#888',
+  },
+  codeInput: {
+    textAlign: 'center',
+    fontSize: 24,
+    fontFamily: 'Gilroy-Bold',
+    letterSpacing: 8,
+    color: '#fff',
+  },
+  emailHint: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  modalButtonDisabled: {
+    opacity: 0.6,
+  },
+  registerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#FF4444',
+  },
+  registerButtonText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#FF4444',
+    marginLeft: 8,
+  },
+  resendButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  resendButtonDisabled: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: '#666',
+  },
+  resendButtonText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Medium',
+    color: '#4CAF50',
+    textAlign: 'center',
+  },
+  resendButtonTextDisabled: {
+    color: '#666',
   },
 
 }); 

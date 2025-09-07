@@ -98,7 +98,7 @@ const LogoHeader = () => {
             fontFamily: 'Gilroy-Regular',
             marginTop: 2,
           }}>
-            {currentUser?.name || 'Пользователь'}
+{(currentUser?.name || 'Пользователь').toUpperCase()}
           </Text>
         )}
       </TouchableOpacity>

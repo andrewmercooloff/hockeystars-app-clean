@@ -1,22 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import {
-    Dimensions,
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import { getExerciseCompletionCount, getExerciseRankings, loadCurrentUser } from '../utils/playerStorage';
-import { exercisesData as importedExercisesData, categories as importedCategories } from '../utils/exercisesData';
-
-const { width } = Dimensions.get('window');
-
 // Типы для упражнений
-interface Exercise {
+export interface Exercise {
   id: string;
   title: string;
   description: string;
@@ -27,7 +10,7 @@ interface Exercise {
 }
 
 // Данные упражнений
-const exercisesData: Exercise[] = [
+export const exercisesData: Exercise[] = [
   // Выносливость
   {
     id: '1',
@@ -315,36 +298,36 @@ const exercisesData: Exercise[] = [
     description: 'Расставить 5-6 конусов и быстро касаться их рукой в случайном порядке. 3 подхода по 30 секунд.',
     category: 'Ловкость',
     duration: '12 мин',
-    difficulty: 'Продвинутый',
+    difficulty: 'Средний',
   },
   {
     id: '36',
-    title: 'Змейка между конусами',
-    description: 'Бег змейкой между конусами, расставленными в линию. 5 проходов с максимальной скоростью.',
+    title: 'Слалом между конусами',
+    description: 'Быстрый бег между конусами с резкими поворотами. 5 проходов туда-обратно.',
     category: 'Ловкость',
-    duration: '15 мин',
+    duration: '10 мин',
     difficulty: 'Средний',
   },
   {
     id: '37',
-    title: 'Быстрые касания ногами',
-    description: 'Быстрые касания конусов ногами в случайном порядке. 3 подхода по 45 секунд.',
+    title: 'Прыжки с поворотами',
+    description: 'Прыжки на месте с поворотами на 90, 180, 360 градусов. 3 подхода по 10 прыжков каждого типа.',
+    category: 'Ловкость',
+    duration: '12 мин',
+    difficulty: 'Продвинутый',
+  },
+  {
+    id: '38',
+    title: 'Координация рук и ног',
+    description: 'Одновременные движения руками и ногами в разных направлениях. 5 минут различных комбинаций.',
     category: 'Ловкость',
     duration: '15 мин',
     difficulty: 'Продвинутый',
   },
   {
-    id: '38',
-    title: 'Прыжки с поворотами',
-    description: 'Прыжки на месте с поворотами на 90-180 градусов. 3 подхода по 20 прыжков.',
-    category: 'Ловкость',
-    duration: '12 мин',
-    difficulty: 'Средний',
-  },
-  {
     id: '39',
-    title: 'Быстрые передачи мяча',
-    description: 'Передачи теннисного мяча между руками с максимальной скоростью. 3 подхода по 1 минуте.',
+    title: 'Реакция на сигнал',
+    description: 'Быстрые движения в разные стороны по звуковому или визуальному сигналу. 3 подхода по 2 минуты.',
     category: 'Ловкость',
     duration: '10 мин',
     difficulty: 'Средний',
@@ -567,442 +550,9 @@ const exercisesData: Exercise[] = [
   }
 ];
 
-const categories = ['Выносливость', 'Взрывная скорость', 'Разминка', 'Растяжка', 'Ловкость', 'Сила', 'Баланс', 'Скоростная выносливость', 'Восстановление'];
+export const getExerciseTitle = (exerciseId: string): string => {
+  const exercise = exercisesData.find(e => e.id === exerciseId);
+  return exercise ? exercise.title : `Упражнение #${exerciseId}`;
+};
 
-export default function ExercisesScreen() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [exerciseRankings, setExerciseRankings] = useState<{ exerciseId: string; totalCompletions: number }[]>([]);
-  const [userCompletions, setUserCompletions] = useState<Record<string, number>>({});
-  const router = useRouter();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await loadCurrentUser();
-        if (user) {
-          setCurrentUser(user);
-          // Загружаем рейтинг упражнений
-          loadExerciseRankings();
-          // Загружаем личные выполнения для игроков
-          if (user.status === 'player') {
-            loadUserCompletions(user.id);
-          }
-        } else {
-          // Убираем дублирующееся сообщение об ошибке - пользователь и так попадает на вход
-          router.replace('/login');
-          return;
-        }
-      } catch (error) {
-        console.error('Ошибка проверки авторизации:', error);
-        router.replace('/login');
-        return;
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkAuth();
-  }, [router]);
-
-  const loadExerciseRankings = async () => {
-    try {
-      const rankings = await getExerciseRankings();
-      setExerciseRankings(rankings);
-    } catch (error) {
-      console.error('Ошибка загрузки рейтинга упражнений:', error);
-    }
-  };
-
-  const loadUserCompletions = async (userId: string) => {
-    try {
-      const completions: Record<string, number> = {};
-      // Загружаем количество выполнений для каждого упражнения
-      for (const exercise of exercisesData) {
-        const count = await getExerciseCompletionCount(userId, exercise.id);
-        if (count > 0) {
-          completions[exercise.id] = count;
-        }
-      }
-      setUserCompletions(completions);
-    } catch (error) {
-      console.error('Ошибка загрузки личных выполнений:', error);
-    }
-  };
-
-  // Дополнительная проверка при фокусе на экран
-  useFocusEffect(
-    React.useCallback(() => {
-      let isActive = true;
-      const verifyAuthOnFocus = async () => {
-        try {
-          const user = await loadCurrentUser();
-          if (!user) {
-            if (isActive) {
-              setCurrentUser(null);
-              router.replace('/login');
-            }
-            return;
-          }
-          if (isActive) {
-            setCurrentUser(user);
-          }
-        } catch (e) {
-          if (isActive) {
-            setCurrentUser(null);
-            router.replace('/login');
-          }
-        }
-      };
-      verifyAuthOnFocus();
-      return () => { isActive = false; };
-    }, [router])
-  );
-
-  // Показываем загрузку пока проверяем авторизацию
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ImageBackground
-          source={require('../assets/images/led.jpg')}
-          style={styles.backgroundImage}
-          resizeMode="cover"
-        >
-          <View style={styles.overlay}>
-            <View style={styles.pageHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.pageTitle}>Упражнения</Text>
-            </View>
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Проверка авторизации...</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-    );
-  }
-
-  // Если пользователь не авторизован, не показываем контент
-  if (!currentUser) {
-    return null;
-  }
-
-  // Получаем отфильтрованные упражнения и сортируем их по популярности
-  const filteredExercises = selectedCategory
-    ? importedExercisesData.filter(exercise => exercise.category === selectedCategory)
-    : importedExercisesData;
-
-  // Сортируем упражнения по количеству выполнений (популярности)
-  const sortedExercises = [...filteredExercises].sort((a, b) => {
-    const aRanking = exerciseRankings.find(r => r.exerciseId === a.id);
-    const bRanking = exerciseRankings.find(r => r.exerciseId === b.id);
-    const aCount = aRanking ? aRanking.totalCompletions : 0;
-    const bCount = bRanking ? bRanking.totalCompletions : 0;
-    return bCount - aCount; // Сортировка по убыванию
-  });
-
-  // Функция для получения количества выполнений упражнения
-  const getExerciseCompletions = (exerciseId: string): number => {
-    const ranking = exerciseRankings.find(r => r.exerciseId === exerciseId);
-    return ranking ? ranking.totalCompletions : 0;
-  };
-
-  const handleExercisePress = (exercise: Exercise) => {
-    // Переходим на страницу с подробным описанием упражнения
-    router.push({
-      pathname: '/exercise-details',
-      params: { exerciseId: exercise.id }
-    });
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Начинающий': return '#4CAF50';
-      case 'Средний': return '#FF9800';
-      case 'Продвинутый': return '#F44336';
-      default: return '#888';
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require('../assets/images/led.jpg')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        <View style={styles.overlay}>
-          {/* Заголовок страницы */}
-          <View style={styles.pageHeader}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.pageTitle}>Упражнения</Text>
-          </View>
-          
-          {/* Фильтры по категориям */}
-          <View style={styles.categoriesContainer}>
-            <View style={styles.categoriesContent}>
-              {importedCategories.map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.categoryButton,
-                    selectedCategory === category && styles.categoryButtonActive
-                  ]}
-                  onPress={() => setSelectedCategory(
-                    selectedCategory === category ? null : category
-                  )}
-                >
-                  <Text style={[
-                    styles.categoryText,
-                    selectedCategory === category && styles.categoryTextActive
-                  ]}>
-                    {category}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Список упражнений */}
-          <ScrollView style={styles.exercisesContainer}>
-                        {sortedExercises.map((exercise) => {
-              const userCompletionCount = userCompletions[exercise.id] || 0;
-              return (
-              <TouchableOpacity
-                key={exercise.id}
-                style={styles.exerciseCard}
-                onPress={() => handleExercisePress(exercise)}
-              >
-                <View style={styles.exerciseHeader}>
-                  <View style={styles.exerciseTitleContainer}>
-                  <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-                    <View style={styles.badgesContainer}>
-                      {(() => {
-                        const totalCompletions = getExerciseCompletions(exercise.id);
-                        return totalCompletions > 0 && (
-                          <View style={styles.totalCompletionsBadge}>
-                            <Text style={styles.totalCompletionsText}>{totalCompletions}</Text>
-                          </View>
-                        );
-                      })()}
-                    </View>
-                  </View>
-                  <View style={[
-                    styles.difficultyBadge,
-                    { backgroundColor: getDifficultyColor(exercise.difficulty) }
-                  ]}>
-                    <Text style={styles.difficultyText}>{exercise.difficulty}</Text>
-                  </View>
-                </View>
-                
-                <Text style={styles.exerciseDescription} numberOfLines={2}>
-                  {exercise.description}
-                </Text>
-                
-                <View style={styles.exerciseFooter}>
-                  <View style={styles.exerciseInfo}>
-                    <Ionicons name="time-outline" size={16} color="#888" />
-                    <Text style={styles.exerciseInfoText}>{exercise.duration}</Text>
-                  </View>
-                  
-                  <View style={styles.exerciseInfo}>
-                    <Ionicons name="fitness-outline" size={16} color="#888" />
-                    <Text style={styles.exerciseInfoText}>{exercise.category}</Text>
-                  </View>
-                </View>
-                
-                {/* Убираем красную стрелочку */}
-              </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  backgroundImage: {
-    flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontFamily: 'Gilroy-Bold',
-    marginBottom: 4,
-  },
-  pageHeader: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  pageTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontFamily: 'Gilroy-Bold',
-    flex: 1,
-  },
-  categoriesContainer: {
-    marginTop: 0,
-    marginBottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Затемненный фон на всю ширину
-    paddingVertical: 10,
-    paddingHorizontal: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  categoriesContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 4, // Уменьшаем отступ снизу
-    flexDirection: 'row', // Горизонтальное расположение
-    flexWrap: 'wrap', // Перенос на новую строку если не помещается
-    gap: 6, // Уменьшаем отступы между кнопками
-  },
-  categoryButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    height: 28,
-    borderRadius: 6,
-    marginRight: 0,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  categoryButtonActive: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
-  },
-  categoryText: {
-    color: '#fff',
-    fontSize: 14, // Уменьшаем размер шрифта для компактности
-    fontFamily: 'Gilroy-Regular',
-  },
-  categoryTextActive: {
-    color: '#fff',
-    fontFamily: 'Gilroy-Bold',
-  },
-  exercisesContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
-  exerciseCard: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Полупрозрачный черный фон для лучшей читаемости
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  exerciseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  exerciseTitleContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  exerciseTitle: {
-    fontSize: 18,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
-    flex: 1,
-    marginRight: 12,
-  },
-  badgesContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginRight: 16,
-  },
-  totalCompletionsBadge: {
-    backgroundColor: '#FF4444',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  totalCompletionsText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-  },
-
-  difficultyBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  difficultyText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-  },
-  exerciseDescription: {
-    fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
-    color: '#ccc',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  exerciseFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  exerciseInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  exerciseInfoText: {
-    color: '#888',
-    fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
-    marginLeft: 6,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 10,
-    padding: 20,
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Gilroy-Bold',
-  },
-  // Убираем неиспользуемые стили для стрелочки
-});
+export const categories = ['Выносливость', 'Взрывная скорость', 'Разминка', 'Растяжка', 'Ловкость', 'Сила', 'Баланс', 'Скоростная выносливость', 'Восстановление'];

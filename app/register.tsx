@@ -2,29 +2,31 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Alert,
     Image,
     ImageBackground,
+    Keyboard,
     Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View
 } from 'react-native';
 import CustomAlert from '../components/CustomAlert';
-import { addPlayer, saveCurrentUser, Team } from '../utils/playerStorage';
+import { addPlayer, saveCurrentUser, Team, createPlayer } from '../utils/playerStorage';
+import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    phone: '',
     name: '',
     status: '' as 'player' | 'coach' | 'scout' | 'star' | '',
     birthDate: '',
@@ -37,6 +39,11 @@ export default function RegisterScreen() {
     weight: '', // вес
     avatar: null as string | null
   });
+  const [step, setStep] = useState<'form' | 'verification'>('form');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [canResend, setCanResend] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<Team[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(2008, 0, 1)); // 1 января 2008
@@ -55,6 +62,29 @@ export default function RegisterScreen() {
     secondaryText: 'Дополнительно'
   });
 
+  // Таймер для повторной отправки
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(prev => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [resendTimer]);
+
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
     setAlert({
       visible: true,
@@ -70,6 +100,19 @@ export default function RegisterScreen() {
       cancelText: 'Отмена',
       secondaryText: 'Дополнительно'
     });
+  };
+
+  const handleAlertClose = () => {
+    // Если это успешное завершение регистрации - идем на главную
+    if (alert.type === 'success' && alert.title === 'Добро пожаловать!') {
+      setAlert(prev => ({ ...prev, visible: false }));
+      setTimeout(() => {
+        router.push('/');
+      }, 100);
+    } else {
+      // Во всех остальных случаях просто закрываем алерт
+      setAlert(prev => ({ ...prev, visible: false }));
+    }
   };
 
   const pickImage = async () => {
@@ -176,52 +219,161 @@ export default function RegisterScreen() {
     }
   };
 
-  const handleRegister = async () => {
+  // Отправка кода подтверждения
+  const handleSendCode = async () => {
     // Проверяем, что все обязательные поля заполнены
-    if (!formData.username || !formData.password || !formData.name || !formData.status || !formData.country) {
+    if (!formData.phone || !formData.name || !formData.status || !formData.country) {
       showAlert('Ошибка', 'Пожалуйста, заполните все обязательные поля', 'error');
+      return;
+    }
+
+    // Проверка формата телефона - обязательный знак +
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      showAlert('Ошибка', 'Пожалуйста, введите корректный номер телефона с кодом страны (например: +1234567890)', 'error');
       return;
     }
 
     // Дополнительные проверки в зависимости от статуса
     if (formData.status === 'player' && (!formData.birthDate || !formData.position)) {
-      showAlert('Ошибка', 'Для игрока заполните дату рождения и позицию', 'error');
+      showAlert('Ошибка', 'Пожалуйста, заполните все поля', 'error');
       return;
     }
 
     if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
-      showAlert('Ошибка', 'Для звезды заполните дату рождения и позицию', 'error');
+      showAlert('Ошибка', 'Пожалуйста, заполните все поля', 'error');
       return;
     }
 
+    setLoading(true);
+
     try {
-      // Добавляем игрока в хранилище
+      // Генерируем и отправляем код
+      const code = generateVerificationCode();
+      const savedCode = await saveVerificationCode(formData.phone, code);
+      
+      if (!savedCode) {
+        throw new Error('Не удалось сохранить код');
+      }
+      
+      const smsSent = await sendVerificationSMS(formData.phone, code);
+      if (!smsSent) {
+        throw new Error('Не удалось отправить SMS');
+      }
+      
+      setStep('verification');
+      
+      // Запускаем таймер для повторной отправки (60 секунд)
+      setResendTimer(60);
+      setCanResend(false);
+      
+      // Скрываем клавиатуру и показываем уведомление с задержкой
+      Keyboard.dismiss();
+      
+      setTimeout(() => {
+        showAlert(
+          'Код отправлен!', 
+          'Проверьте SMS на вашем телефоне и введите код подтверждения', 
+          'success'
+        );
+      }, 200);
+      
+    } catch (error) {
+      console.error('❌ Ошибка отправки кода:', error);
+      showAlert('Ошибка', 'Не удалось отправить код. Попробуйте еще раз.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Подтверждение кода и регистрация
+  // Повторная отправка кода
+  const handleResendCode = async () => {
+    if (!canResend) return;
+    
+    setLoading(true);
+    try {
+      const code = generateVerificationCode();
+      const savedCode = await saveVerificationCode(formData.phone, code);
+      
+      if (!savedCode) {
+        throw new Error('Не удалось сохранить код');
+      }
+      
+      const smsSent = await sendVerificationSMS(formData.phone, code);
+      if (!smsSent) {
+        throw new Error('Не удалось отправить SMS');
+      }
+      
+      // Запускаем таймер снова
+      setResendTimer(60);
+      setCanResend(false);
+      
+      showAlert('Код отправлен повторно!', 'Новый код отправлен на ваш номер телефона', 'success');
+    } catch (error) {
+      console.error('❌ Ошибка повторной отправки:', error);
+      showAlert('Ошибка', 'Не удалось отправить код повторно', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyAndRegister = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      showAlert('Ошибка', 'Пожалуйста, введите 6-значный код', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Проверяем код
+      const verification = await verifyCode(formData.phone, verificationCode);
+      
+      if (!verification.success) {
+        showAlert('Ошибка', verification.message, 'error');
+        return;
+      }
+      
+      // Создаем игрока в базе данных
       const playerData = {
-        email: formData.username, // Используем username как email для входа
-        password: formData.password,
+        id: Date.now().toString(),
+        phone: formData.phone,
         name: formData.name,
         status: formData.status,
-        birthDate: formData.birthDate || '', // Делаем необязательным
+        birthDate: formData.birthDate || '',
         country: formData.country,
-        team: '', // Команды будут добавляться в профиле
-        position: formData.position || '', // Делаем необязательным
+        team: formData.team || '',
+        position: formData.position || '',
         grip: formData.grip || '',
         height: formData.height || '',
         weight: formData.weight || '',
-        number: formData.number || '', // Добавляем номер игрока
-        avatar: formData.avatar || 'new_player', // Используем avatar для профиля
-        age: 0, // Добавляем возраст по умолчанию
+        number: formData.number || '',
+        avatar: formData.avatar || '',
+        age: 0,
+        city: '',
+        goals: '',
+        assists: '',
+        games: '',
+        pullUps: '',
+        pushUps: '',
+        plankTime: '',
+        sprint100m: '',
+        longJump: ''
       };
       
-      const newPlayer = await addPlayer(playerData);
+      const newPlayer = await createPlayer(playerData);
       
-      // Автоматически входим в систему
-      await saveCurrentUser(newPlayer);
+      if (newPlayer) {
+        await saveCurrentUser(newPlayer);
+      } else {
+        // Fallback - сохраняем локально
+        await saveCurrentUser(playerData);
+      }
       
-      // Показываем успешное сообщение
       showAlert(
-        'Успешно!', 
-        'Игрок зарегистрирован! Теперь вы появитесь на главном экране.',
+        'Добро пожаловать!', 
+        'Регистрация успешно завершена! Добро пожаловать в HockeyStars!',
         'success',
         () => {
           setAlert(prev => ({ ...prev, visible: false }));
@@ -230,9 +382,12 @@ export default function RegisterScreen() {
           }, 100);
         }
       );
+      
     } catch (error) {
-      console.error('Ошибка регистрации:', error);
-      showAlert('Ошибка', 'Не удалось зарегистрировать игрока', 'error');
+      console.error('❌ Ошибка регистрации:', error);
+      showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -241,11 +396,12 @@ export default function RegisterScreen() {
 
   return (
     <ImageBackground source={iceBg} style={styles.container} resizeMode="cover">
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
-
-        
-        <View style={styles.formContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.formContainer}>
 
           
           <Text style={styles.title}>Регистрация</Text>
@@ -313,37 +469,23 @@ export default function RegisterScreen() {
             </View>
           </View>
           
-          {/* Логин */}
+          {/* Телефон */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Логин</Text>
+            <Text style={styles.label}>Номер телефона</Text>
             <TextInput
               style={styles.input}
-              value={formData.username}
-              onChangeText={(text) => setFormData({...formData, username: text})}
-              placeholder="Придумайте логин"
+              value={formData.phone}
+              onChangeText={(text) => setFormData({...formData, phone: text.trim()})}
+                    placeholder="+1234567890"
               placeholderTextColor="#888"
               autoCapitalize="none"
-              autoComplete="username"
-              textContentType="username"
+              autoComplete="tel"
+              textContentType="telephoneNumber"
+              keyboardType="phone-pad"
               autoCorrect={false}
             />
           </View>
 
-          {/* Пароль */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Пароль</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.password}
-              onChangeText={(text) => setFormData({...formData, password: text})}
-              placeholder="Придумайте пароль"
-              placeholderTextColor="#888"
-              secureTextEntry={true}
-              autoComplete="password"
-              textContentType="password"
-              autoCorrect={false}
-            />
-          </View>
 
           {/* Имя */}
           <View style={styles.inputContainer}>
@@ -351,11 +493,20 @@ export default function RegisterScreen() {
             <TextInput
               style={styles.input}
               value={formData.name}
-              onChangeText={(text) => setFormData({...formData, name: text.toUpperCase()})}
+              onChangeText={(text) => {
+                // Фильтруем только латинские буквы, пробелы и дефисы
+                const latinOnly = text.replace(/[^a-zA-Z\s\-]/g, '');
+                // Преобразуем в верхний регистр
+                const upperCaseText = latinOnly.toUpperCase();
+                setFormData({...formData, name: upperCaseText});
+              }}
               placeholder="ВВЕДИТЕ ВАШЕ ИМЯ"
               placeholderTextColor="#888"
               autoCapitalize="characters"
             />
+            <Text style={styles.hintText}>
+              Только латинские буквы (A-Z)
+            </Text>
           </View>
 
           {/* Дата рождения - для игроков и звезд */}
@@ -518,14 +669,90 @@ export default function RegisterScreen() {
             </View>
           </View>
 
-          {/* Кнопка регистрации */}
-          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-            <Ionicons name="person-add" size={20} color="#fff" />
-            <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
-          </TouchableOpacity>
+          {/* Кнопки */}
+          {step === 'form' ? (
+            <TouchableOpacity 
+              style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+              onPress={handleSendCode}
+              disabled={loading}
+            >
+              <Ionicons 
+                name={loading ? "hourglass" : "mail"} 
+                size={20} 
+                color="#fff" 
+              />
+              <Text style={styles.registerButtonText}>
+                {loading ? 'Отправляем код...' : 'Получить код подтверждения'}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <>
+              {/* Поле для ввода кода */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Код подтверждения</Text>
+                <TextInput
+                  style={[styles.input, styles.codeInput]}
+                  value={verificationCode}
+                  onChangeText={(text) => setVerificationCode(text.replace(/[^0-9]/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  placeholderTextColor="#888"
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                  textContentType="oneTimeCode"
+                />
+                <Text style={styles.emailHint}>
+                  Код отправлен на: {formData.phone}
+                </Text>
+                
+                {/* Кнопка повторной отправки */}
+                <TouchableOpacity 
+                  style={[styles.resendButton, (!canResend || loading) && styles.resendButtonDisabled]} 
+                  onPress={handleResendCode}
+                  disabled={!canResend || loading}
+                >
+                  <Text style={[styles.resendButtonText, (!canResend || loading) && styles.resendButtonTextDisabled]}>
+                    {resendTimer > 0 ? `Повторить через ${resendTimer}с` : 'Отправить код повторно'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Кнопка подтверждения */}
+              <TouchableOpacity 
+                style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+                onPress={handleVerifyAndRegister}
+                disabled={loading}
+              >
+                <Ionicons 
+                  name={loading ? "hourglass" : "checkmark-circle"} 
+                  size={20} 
+                  color="#fff" 
+                />
+                <Text style={styles.registerButtonText}>
+                  {loading ? 'Проверяем...' : 'Завершить регистрацию'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Кнопка "Назад" */}
+              <TouchableOpacity 
+                style={[styles.registerButton, styles.backButton]} 
+                onPress={() => {
+                  setStep('form');
+                  setVerificationCode('');
+                }}
+                disabled={loading}
+              >
+                <Ionicons name="arrow-back" size={20} color="#FF4444" />
+                <Text style={[styles.registerButtonText, styles.backButtonText]}>
+                  Вернуться к форме
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
 
 
-        </View>
+          </View>
+        </TouchableWithoutFeedback>
       </ScrollView>
       
       {/* DateTimePicker */}
@@ -575,7 +802,7 @@ export default function RegisterScreen() {
         title={alert.title}
         message={alert.message}
         type={alert.type}
-        onConfirm={alert.onConfirm}
+        onConfirm={alert.onConfirm || handleAlertClose}
         onCancel={alert.onCancel}
         onSecondary={alert.onSecondary}
         showCancel={alert.showCancel}
@@ -775,6 +1002,64 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     marginLeft: 8,
+  },
+  registerButtonDisabled: {
+    opacity: 0.6,
+  },
+  codeInput: {
+    textAlign: 'center',
+    fontSize: 24,
+    fontFamily: 'Gilroy-Bold',
+    letterSpacing: 8,
+    color: '#fff',
+  },
+  emailHint: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  resendButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  resendButtonDisabled: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: '#666',
+  },
+  resendButtonText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Medium',
+    color: '#4CAF50',
+    textAlign: 'center',
+  },
+  resendButtonTextDisabled: {
+    color: '#666',
+  },
+  backButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: '#FF4444',
+  },
+  backButtonText: {
+    color: '#FF4444',
+  },
+  hintText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    textAlign: 'left',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 
 }); 
