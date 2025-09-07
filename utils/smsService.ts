@@ -1,22 +1,22 @@
 // SMS Service - React Native Compatible (using Twilio)
 // Note: Twilio не работает напрямую в React Native, используем fetch API
-import Constants from 'expo-constants';
+import 'dotenv/config';
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 // Функция отправки SMS через Twilio API
 export const sendSMSViaTwilio = async (phoneNumber: string, code: string): Promise<boolean> => {
   try {
     console.log('📱 Отправляем SMS через Twilio API');
     
-    const accountSid = Constants.expoConfig?.extra?.twilioAccountSid;
-    const authToken = Constants.expoConfig?.extra?.twilioAuthToken;
-    const fromNumber = Constants.expoConfig?.extra?.twilioFromNumber;
-    
-    if (!accountSid || !authToken || !fromNumber) {
-      console.log('❌ Twilio credentials не найдены в конфигурации Expo');
+    if (!accountSid || !authToken || !twilioPhoneNumber) {
+      console.log('❌ Twilio credentials не найдены в .env');
       return false;
     }
     
-    console.log('✅ Twilio credentials найдены в конфигурации');
+    console.log('✅ Twilio credentials найдены в .env');
 
     // Форматируем номер телефона (добавляем +375 для Беларуси, если нужно)
     const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -31,11 +31,11 @@ export const sendSMSViaTwilio = async (phoneNumber: string, code: string): Promi
     const message = `Hockeystars code: ${code}`;
 
     // Формируем тело запроса вручную для React Native совместимости
-    const body = `From=${encodeURIComponent(fromNumber)}&To=${encodeURIComponent(formattedPhone)}&Body=${encodeURIComponent(message)}`;
+    const body = `From=${encodeURIComponent(twilioPhoneNumber)}&To=${encodeURIComponent(formattedPhone)}&Body=${encodeURIComponent(message)}`;
     
     console.log('📤 Отправляем запрос в Twilio:');
     console.log('   URL:', `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`);
-    console.log('   From:', fromNumber);
+    console.log('   From:', twilioPhoneNumber);
     console.log('   To:', formattedPhone);
     console.log('   Body:', message);
     console.log('   Body (encoded):', body);
