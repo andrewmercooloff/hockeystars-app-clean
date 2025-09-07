@@ -36,4 +36,3 @@ export const YearFilterProvider: React.FC<YearFilterProviderProps> = ({ children
     </YearFilterContext.Provider>
   );
 };
-

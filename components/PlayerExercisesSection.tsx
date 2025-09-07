@@ -1,41 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getExerciseTitle } from '../utils/exercisesData';
 import { ExerciseCompletion, getPlayerExerciseStats, Player, PlayerExerciseStats } from '../utils/playerStorage';
-
-// Импортируем данные упражнений для получения названий
-const exercisesData = [
-  { id: '1', title: 'Интервальный бег' },
-  { id: '2', title: 'Берпи с прыжком' },
-  { id: '3', title: 'Велосипед' },
-  { id: '4', title: 'Планка' },
-  { id: '5', title: 'Отжимания' },
-  { id: '6', title: 'Приседания' },
-  { id: '7', title: 'Прыжки на скакалке' },
-  { id: '8', title: 'Подтягивания' },
-  { id: '9', title: 'Бег на месте' },
-  { id: '10', title: 'Махи гирей' },
-  { id: '11', title: 'Выпады' },
-  { id: '12', title: 'Альпинист' },
-  { id: '13', title: 'Джампинг Джекс' },
-  { id: '14', title: 'Скручивания' },
-  { id: '15', title: 'Супермен' },
-  { id: '16', title: 'Гребля на тренажере' },
-  { id: '17', title: 'Плавание' },
-  { id: '18', title: 'Эллиптический тренажер' },
-  { id: '19', title: 'Степ-ап' },
-  { id: '20', title: 'Кроссфит комплекс' },
-  { id: '21', title: 'Спринты' },
-  { id: '22', title: 'Прыжки в длину' },
-  { id: '23', title: 'Прыжки на ящик' },
-  { id: '24', title: 'Взрывные отжимания' },
-  { id: '25', title: 'Медбол броски' }
-];
-
-const getExerciseTitle = (exerciseId: string): string => {
-  const exercise = exercisesData.find(e => e.id === exerciseId);
-  return exercise ? exercise.title : `Упражнение #${exerciseId}`;
-};
 
 interface PlayerExercisesSectionProps {
   player: Player;
@@ -48,7 +15,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   useEffect(() => {
     loadExerciseStats();
-  }, [player.id]);
+  }, [player.id, player.exerciseStats]); // Добавляем зависимость от exerciseStats
 
   const loadExerciseStats = async () => {
     try {
@@ -81,15 +48,14 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
   if (!exerciseStats || exerciseStats.totalCompletions === 0) {
     return (
       <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Ionicons name="fitness-outline" size={24} color="#FF4444" />
-          <Text style={styles.sectionTitle}>Упражнения</Text>
-        </View>
         <View style={styles.emptyState}>
-          <Ionicons name="barbell-outline" size={48} color="#666" />
-          <Text style={styles.emptyStateText}>
-            {isOwnProfile ? 'Вы ещё не выполнили ни одного упражнения' : 'Игрок ещё не выполнил ни одного упражнения'}
-          </Text>
+          <Text style={styles.sectionTitle}>Упражнения</Text>
+          <View style={styles.emptyStateContent}>
+            <Ionicons name="barbell-outline" size={48} color="#666" />
+            <Text style={styles.emptyStateText}>
+              {isOwnProfile ? 'Вы ещё не выполнили ни одного упражнения' : 'Игрок ещё не выполнил ни одного упражнения'}
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -111,9 +77,9 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
       return (
       <View style={styles.section}>
-        {/* Топ упражнений в едином блоке */}
-        <View style={styles.exercisesBlock}>
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Упражнения</Text>
+        </View>
         {sortedCompletions.map((completion, index) => (
           <View key={completion.exerciseId} style={styles.exerciseItem}>
             <View style={styles.exerciseRank}>
@@ -127,7 +93,6 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
             </View>
           </View>
         ))}
-        </View>
       </View>
     );
 }
@@ -136,12 +101,21 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 10,
     marginBottom: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 68, 68, 0.3)',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#FF4444',
-    marginBottom: 16,
   },
   loadingText: {
     color: '#888',
@@ -151,8 +125,15 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   emptyState: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 68, 68, 0.3)',
+  },
+  emptyStateContent: {
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: 20,
   },
   emptyStateText: {
     color: '#888',
@@ -163,9 +144,7 @@ const styles = StyleSheet.create({
     maxWidth: 250,
   },
   exercisesBlock: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: 12,
-    padding: 16,
+    // Убираем лишние стили, так как они теперь в section
   },
   exerciseItem: {
     flexDirection: 'row',

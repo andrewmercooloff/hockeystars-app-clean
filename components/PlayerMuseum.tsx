@@ -315,12 +315,12 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
