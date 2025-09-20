@@ -37,7 +37,7 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarItemManager from '../../components/StarItemManager';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, notifyFriendsAboutVideo } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -642,6 +642,23 @@ export default function PlayerProfile() {
         setPastTeams(pastTeams);
       }
       
+      // Отправляем уведомление друзьям о добавлении видео (если есть новые видео)
+      if (goalsText && goalsText.trim() && currentUser.id === player.id) {
+        try {
+          const videoUrls = goalsText.split('\n').filter(url => url.trim());
+          if (videoUrls.length > 0) {
+            await notifyFriendsAboutVideo(currentUser.id, currentUser.name, {
+              videoUrl: videoUrls[0], // Берем первое видео
+              videoId: `video_${Date.now()}`,
+              title: 'Новое видео в профиле',
+              description: `Добавлено ${videoUrls.length} видео`
+            });
+          }
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомления о видео:', error);
+        }
+      }
+
       setIsEditing(false);
       showCustomAlert('Успешно', 'Данные игрока обновлены', 'success');
       
@@ -1520,6 +1537,8 @@ export default function PlayerProfile() {
 
                 setGalleryPhotos(newPhotos);
               }}
+              playerId={player.id}
+              playerName={player.name}
             />
 
             {/* Нормативы - показываем только игрокам (не тренерам) */}

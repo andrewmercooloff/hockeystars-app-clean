@@ -36,9 +36,25 @@ const getItemTypeName = (type: string) => {
   }
 };
 
+// Функция для получения иконки уведомления
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case 'stats_change': return 'trending-up';
+    case 'normative_change': return 'fitness';
+    case 'photo_added': return 'camera';
+    case 'video_added': return 'videocam';
+    case 'gift_received': return 'gift';
+    case 'exercise_completed': return 'checkmark-circle';
+    case 'friend_request': return 'person-add';
+    case 'message': return 'chatbubble';
+    case 'gift_request': return 'gift-outline';
+    default: return 'notifications';
+  }
+};
+
 interface NotificationItem {
   id: string;
-  type: 'friend_request' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite';
+  type: 'friend_request' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'normative_change' | 'photo_added' | 'video_added' | 'gift_received' | 'exercise_completed' | 'message';
   title: string;
   message: string;
   timestamp: number;

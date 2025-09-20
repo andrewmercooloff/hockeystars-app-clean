@@ -2632,12 +2632,12 @@ export const trackNormativeChanges = (oldPlayer: Player, newPlayer: Player): Nor
   return changes;
 };
 
-// Функция для отправки уведомлений друзьям о изменениях
-export const notifyFriendsAboutChanges = async (
-  playerId: string, 
-  playerName: string, 
-  statChanges: StatChange[], 
-  normativeChanges: NormativeChange[]
+// Функция для отправки уведомлений друзьям о разных типах активности
+export const notifyFriendsAboutActivity = async (
+  playerId: string,
+  playerName: string,
+  activityType: 'stats_change' | 'photo_added' | 'video_added' | 'gift_received' | 'exercise_completed',
+  activityData: any
 ): Promise<void> => {
   try {
     // Получаем список друзей игрока
@@ -2654,34 +2654,62 @@ export const notifyFriendsAboutChanges = async (
 
     // Создаем уведомления для каждого друга
     const notifications = friends.map(friend => {
-      // Формируем детальное сообщение об изменениях
-      const changesText = [...statChanges, ...normativeChanges]
-        .map(change => {
-          const fieldNames: { [key: string]: string } = {
-            'goals': 'голов',
-            'assists': 'передач', 
-            'games': 'игр',
-            'pullUps': 'подтягиваний',
-            'pushUps': 'отжиманий',
-            'plankTime': 'планки',
-            'sprint100m': 'стометровки',
-            'longJump': 'прыжка в длину',
-            'jumpRope': 'скакалки'
-          };
-          const fieldName = fieldNames[change.field] || change.field;
-          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-          return `${fieldName}: ${changeText}`;
-        })
-        .join(', ');
+      let title = '';
+      let message = '';
+
+      switch (activityType) {
+        case 'stats_change':
+          const changesText = activityData.changes
+            .map((change: any) => {
+              const fieldNames: { [key: string]: string } = {
+                'goals': 'голов',
+                'assists': 'передач', 
+                'games': 'игр',
+                'pullUps': 'подтягиваний',
+                'pushUps': 'отжиманий',
+                'plankTime': 'планки',
+                'sprint100m': 'стометровки',
+                'longJump': 'прыжка в длину',
+                'jumpRope': 'скакалки'
+              };
+              const fieldName = fieldNames[change.field] || change.field;
+              const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+              return `${fieldName}: ${changeText}`;
+            })
+            .join(', ');
+          title = 'Изменения в статистике';
+          message = `${playerName} обновил: ${changesText}`;
+          break;
+
+        case 'photo_added':
+          title = 'Новое фото';
+          message = `${playerName} добавил новое фото`;
+          break;
+
+        case 'video_added':
+          title = 'Новое видео';
+          message = `${playerName} добавил новое видео`;
+          break;
+
+        case 'gift_received':
+          title = 'Получен подарок';
+          message = `${playerName} получил подарок от звезды`;
+          break;
+
+        case 'exercise_completed':
+          title = 'Упражнение выполнено';
+          message = `${playerName} выполнил упражнение: ${activityData.exerciseName || 'упражнение'}`;
+          break;
+      }
 
       return {
         id: generateUUID(),
         user_id: friend.id,
-        type: 'stats_change',
-        title: 'Изменения в статистике',
-        message: `${playerName} обновил: ${changesText}`,
+        type: activityType,
+        title,
+        message,
         data: {
-          changes: [...statChanges, ...normativeChanges],
+          ...activityData,
           changedPlayerId: playerId,
           changedPlayerName: playerName
         },
@@ -2690,34 +2718,29 @@ export const notifyFriendsAboutChanges = async (
       };
     });
     
-    // Добавляем уведомление для самого игрока, чтобы он мог видеть свои изменения
-    const selfChangesText = [...statChanges, ...normativeChanges]
-      .map(change => {
-        const fieldNames: { [key: string]: string } = {
-          'goals': 'голов',
-          'assists': 'передач', 
-          'games': 'игр',
-          'pullUps': 'подтягиваний',
-          'pushUps': 'отжиманий',
-          'plankTime': 'планки',
-          'sprint100m': 'стометровки',
-          'longJump': 'прыжка в длину',
-          'jumpRope': 'скакалки'
-        };
-        const fieldName = fieldNames[change.field] || change.field;
-        const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-        return `${fieldName}: ${changeText}`;
-      })
-      .join(', ');
-
+    // Добавляем уведомление для самого игрока
     const selfNotification = {
       id: generateUUID(),
       user_id: playerId,
-      type: 'stats_change',
-      title: 'Ваша статистика обновлена',
-      message: `Вы обновили: ${selfChangesText}`,
+      type: activityType,
+      title: activityType === 'stats_change' ? 'Ваша статистика обновлена' : 'Ваша активность',
+      message: activityType === 'stats_change' ? 
+        `Вы обновили: ${activityData.changes?.map((change: any) => {
+          const fieldNames: { [key: string]: string } = {
+            'goals': 'голов', 'assists': 'передач', 'games': 'игр',
+            'pullUps': 'подтягиваний', 'pushUps': 'отжиманий', 'plankTime': 'планки',
+            'sprint100m': 'стометровки', 'longJump': 'прыжка в длину', 'jumpRope': 'скакалки'
+          };
+          const fieldName = fieldNames[change.field] || change.field;
+          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+          return `${fieldName}: ${changeText}`;
+        }).join(', ') || ''}` :
+        `Вы ${activityType === 'photo_added' ? 'добавили фото' : 
+          activityType === 'video_added' ? 'добавили видео' :
+          activityType === 'gift_received' ? 'получили подарок' :
+          activityType === 'exercise_completed' ? `выполнили упражнение: ${activityData.exerciseName || 'упражнение'}` : 'обновили активность'}`,
       data: {
-        changes: [...statChanges, ...normativeChanges],
+        ...activityData,
         changedPlayerId: playerId,
         changedPlayerName: playerName
       },
@@ -2732,7 +2755,7 @@ export const notifyFriendsAboutChanges = async (
     }
     
     // Сохраняем уведомления в базу данных
-    console.log('💾 Сохраняем уведомления в базу данных...');
+    console.log('💾 Сохраняем уведомления о активности в базу данных...');
     console.log('💾 Количество уведомлений для сохранения:', notifications.length);
     
     for (const notification of notifications) {
@@ -2755,8 +2778,63 @@ export const notifyFriendsAboutChanges = async (
       }
     }
     
-    console.log(`📢 Отправлено ${notifications.length} уведомлений о изменениях статистики`);
+    console.log(`📢 Отправлено ${notifications.length} уведомлений о активности`);
   } catch (error) {
-    console.error('❌ Ошибка отправки уведомлений о изменениях:', error);
+    console.error('❌ Ошибка отправки уведомлений о активности:', error);
   }
+};
+
+// Функция для отправки уведомлений друзьям о изменениях (для обратной совместимости)
+export const notifyFriendsAboutChanges = async (
+  playerId: string, 
+  playerName: string, 
+  statChanges: StatChange[], 
+  normativeChanges: NormativeChange[]
+): Promise<void> => {
+  // Используем новую универсальную функцию
+  await notifyFriendsAboutActivity(playerId, playerName, 'stats_change', {
+    changes: [...statChanges, ...normativeChanges]
+  });
+};
+
+// Функции для отправки уведомлений о разных типах активности
+
+// Уведомление о добавлении фото
+export const notifyFriendsAboutPhoto = async (playerId: string, playerName: string, photoData: any) => {
+  await notifyFriendsAboutActivity(playerId, playerName, 'photo_added', {
+    photoUrl: photoData.photoUrl,
+    photoId: photoData.photoId,
+    description: photoData.description
+  });
+};
+
+// Уведомление о добавлении видео
+export const notifyFriendsAboutVideo = async (playerId: string, playerName: string, videoData: any) => {
+  await notifyFriendsAboutActivity(playerId, playerName, 'video_added', {
+    videoUrl: videoData.videoUrl,
+    videoId: videoData.videoId,
+    title: videoData.title,
+    description: videoData.description
+  });
+};
+
+// Уведомление о получении подарка
+export const notifyFriendsAboutGift = async (playerId: string, playerName: string, giftData: any) => {
+  await notifyFriendsAboutActivity(playerId, playerName, 'gift_received', {
+    giftType: giftData.giftType,
+    giftName: giftData.giftName,
+    fromPlayer: giftData.fromPlayer,
+    fromPlayerName: giftData.fromPlayerName
+  });
+};
+
+// Уведомление о выполнении упражнения
+export const notifyFriendsAboutExercise = async (playerId: string, playerName: string, exerciseData: any) => {
+  await notifyFriendsAboutActivity(playerId, playerName, 'exercise_completed', {
+    exerciseId: exerciseData.exerciseId,
+    exerciseName: exerciseData.exerciseName,
+    duration: exerciseData.duration,
+    calories: exerciseData.calories,
+    difficulty: exerciseData.difficulty
+  });
 };

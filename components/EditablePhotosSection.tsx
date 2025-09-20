@@ -13,6 +13,7 @@ import {
     View,
 } from 'react-native';
 import { uploadGalleryPhoto } from '../utils/uploadImage';
+import { notifyFriendsAboutPhoto } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -21,12 +22,16 @@ interface EditablePhotosSectionProps {
   photos?: string[];
   isEditing?: boolean;
   onPhotosChange?: (photos: string[]) => void;
+  playerId?: string;
+  playerName?: string;
 }
 
 export default function EditablePhotosSection({ 
   photos = [], 
   isEditing = false,
-  onPhotosChange 
+  onPhotosChange,
+  playerId,
+  playerName
 }: EditablePhotosSectionProps) {
 
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -97,6 +102,19 @@ export default function EditablePhotosSection({
                                    if (uploadedUrl) {
                     newPhotos.unshift(uploadedUrl);
                     onPhotosChange?.(newPhotos);
+                    
+                    // Отправляем уведомление друзьям о добавлении фото
+                    if (playerId && playerName) {
+                      try {
+                        await notifyFriendsAboutPhoto(playerId, playerName, {
+                          photoUrl: uploadedUrl,
+                          photoId: `photo_${Date.now()}`,
+                          description: 'Новое фото в галерее'
+                        });
+                      } catch (error) {
+                        console.error('❌ Ошибка отправки уведомления о фото:', error);
+                      }
+                    }
                   }
                  
                  uploadedCount++;
@@ -147,6 +165,19 @@ export default function EditablePhotosSection({
 
                            if (uploadedUrl) {
                 newPhotos.unshift(uploadedUrl);
+                
+                // Отправляем уведомление друзьям о добавлении фото
+                if (playerId && playerName) {
+                  try {
+                    await notifyFriendsAboutPhoto(playerId, playerName, {
+                      photoUrl: uploadedUrl,
+                      photoId: `photo_${Date.now()}_${i}`,
+                      description: 'Новое фото в галерее'
+                    });
+                  } catch (error) {
+                    console.error('❌ Ошибка отправки уведомления о фото:', error);
+                  }
+                }
               }
            }
            
@@ -204,6 +235,19 @@ export default function EditablePhotosSection({
                    if (uploadedUrl) {
             const newPhotos = [uploadedUrl, ...photos];
             onPhotosChange?.(newPhotos);
+            
+            // Отправляем уведомление друзьям о добавлении фото
+            if (playerId && playerName) {
+              try {
+                await notifyFriendsAboutPhoto(playerId, playerName, {
+                  photoUrl: uploadedUrl,
+                  photoId: `photo_${Date.now()}_camera`,
+                  description: 'Новое фото с камеры'
+                });
+              } catch (error) {
+                console.error('❌ Ошибка отправки уведомления о фото:', error);
+              }
+            }
           }
          
          setIsUploading(false);
