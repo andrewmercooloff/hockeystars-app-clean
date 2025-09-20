@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
+import { LanguageProvider } from '../contexts/LanguageContext';
 import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import * as SplashScreen from 'expo-splash-screen';
@@ -284,9 +285,10 @@ export default function RootLayout() {
   }
 
   return (
-    <YearFilterProvider>
-      <CountryFilterProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+    <LanguageProvider>
+      <YearFilterProvider>
+        <CountryFilterProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
           <Tabs
           screenOptions={{
             headerStyle: { backgroundColor: '#000', height: 128 },
@@ -521,8 +523,9 @@ export default function RootLayout() {
         />
 
           </Tabs>
-        </GestureHandlerRootView>
-      </CountryFilterProvider>
-    </YearFilterProvider>
+          </GestureHandlerRootView>
+        </CountryFilterProvider>
+      </YearFilterProvider>
+    </LanguageProvider>
   );
 }
