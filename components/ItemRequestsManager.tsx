@@ -10,6 +10,7 @@ import {
     View
 } from 'react-native';
 import { supabase } from '../utils/supabase';
+import { notifyFriendsAboutGift } from '../utils/playerStorage';
 
 interface ItemRequest {
   id: string;
@@ -138,6 +139,34 @@ const ItemRequestsManager: React.FC<ItemRequestsManagerProps> = ({ starId, onReq
         console.error('Ошибка добавления в музей:', museumError);
         Alert.alert('Предупреждение', 'Запрос принят, но не удалось добавить подарок в музей игрока');
         return;
+      }
+
+      // Отправляем уведомление друзьям о получении подарка
+      try {
+        // Получаем данные игрока-получателя
+        const { data: playerData, error: playerError } = await supabase
+          .from('players')
+          .select('name')
+          .eq('id', requesterId)
+          .single();
+
+        // Получаем данные звезды-отправителя
+        const { data: starData, error: starError } = await supabase
+          .from('players')
+          .select('name')
+          .eq('id', starId)
+          .single();
+
+        if (playerData && starData) {
+          await notifyFriendsAboutGift(requesterId, playerData.name, {
+            giftType: itemType,
+            giftName: getItemTypeName(itemType),
+            fromPlayer: starId,
+            fromPlayerName: starData.name
+          });
+        }
+      } catch (error) {
+        console.error('❌ Ошибка отправки уведомления о подарке:', error);
       }
 
       // Обновляем список запросов

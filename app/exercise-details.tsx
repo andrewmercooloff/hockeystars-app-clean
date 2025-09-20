@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player } from '../utils/playerStorage';
+import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, notifyFriendsAboutExercise } from '../utils/playerStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -1968,6 +1968,19 @@ export default function ExerciseDetailsScreen() {
           await saveCurrentUser(updatedPlayer);
           setCurrentUser(updatedPlayer);
           console.log('✅ Данные пользователя обновлены в AsyncStorage');
+        }
+        
+        // Отправляем уведомление друзьям о выполнении упражнения
+        try {
+          await notifyFriendsAboutExercise(currentUser.id, currentUser.name, {
+            exerciseId: exerciseId as string,
+            exerciseName: exercise?.title || 'упражнение',
+            duration: exercise?.duration || 'не указано',
+            calories: exercise?.calories || 'не указано',
+            difficulty: exercise?.difficulty || 'не указано'
+          });
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомления о упражнении:', error);
         }
         
         Alert.alert(
