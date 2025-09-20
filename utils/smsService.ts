@@ -1,32 +1,45 @@
+import Constants from 'expo-constants';
+
 // SMS Service - React Native Compatible (using Twilio)
 // Note: Twilio не работает напрямую в React Native, используем fetch API
-import 'dotenv/config';
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+// Функция форматирования номера телефона
+const formatPhoneNumber = (phone: string): string => {
+  // Удаляем все символы, кроме цифр
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // Если номер начинается с 80 или 375, заменяем на +375
+  if (cleanPhone.startsWith('80') || cleanPhone.startsWith('375')) {
+    return `+375${cleanPhone.slice(-9)}`;
+  }
+  
+  // Если номер уже международный, возвращаем как есть
+  if (cleanPhone.startsWith('+')) {
+    return phone;
+  }
+  
+  // Если номер локальный, добавляем код страны
+  return `+375${cleanPhone}`;
+};
 
 // Функция отправки SMS через Twilio API
-export const sendSMSViaTwilio = async (phoneNumber: string, code: string): Promise<boolean> => {
+export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boolean> => {
   try {
     console.log('📱 Отправляем SMS через Twilio API');
     
+    const accountSid = Constants.expoConfig?.extra?.twilioAccountSid;
+    const authToken = Constants.expoConfig?.extra?.twilioAuthToken;
+    const twilioPhoneNumber = Constants.expoConfig?.extra?.twilioFromNumber;
+    
     if (!accountSid || !authToken || !twilioPhoneNumber) {
-      console.log('❌ Twilio credentials не найдены в .env');
+      console.log('❌ Twilio credentials не найдены в конфигурации Expo');
       return false;
     }
     
-    console.log('✅ Twilio credentials найдены в .env');
+    console.log('✅ Twilio credentials найдены в конфигурации Expo');
 
-    // Форматируем номер телефона (добавляем +375 для Беларуси, если нужно)
-    const formattedPhone = formatPhoneNumber(phoneNumber);
-    console.log('📱 Форматированный номер для SMS:', formattedPhone);
-    
-    if (!formattedPhone || formattedPhone.length < 10) {
-      console.error('❌ Неверный формат номера телефона:', formattedPhone);
-      return false;
-    }
-    
+    const formattedPhone = formatPhoneNumber(phone);
+
     // Текст сообщения (упрощенный для многоязычности)
     const message = `Hockeystars code: ${code}`;
 
@@ -38,33 +51,38 @@ export const sendSMSViaTwilio = async (phoneNumber: string, code: string): Promi
     console.log('   From:', twilioPhoneNumber);
     console.log('   To:', formattedPhone);
     console.log('   Body:', message);
-    console.log('   Body (encoded):', body);
 
-    // Отправляем SMS через Twilio API
-    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body,
-    });
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`)
+        },
+        body: body
+      }
+    );
 
-    const result = await response.json();
+    const responseData = await response.json();
 
-    if (!response.ok) {
-      console.error('❌ Ошибка Twilio API:', result);
+    if (response.ok) {
+      console.log('✅ SMS отправлено успешно:', responseData);
+      return true;
+    } else {
+      console.error('❌ Ошибка Twilio API:', responseData);
       return false;
     }
-
-    console.log('✅ SMS отправлено через Twilio');
-    console.log('📱 Message SID:', result.sid);
-    return true;
-
   } catch (error) {
-    console.error('❌ Ошибка отправки SMS через Twilio:', error);
+    console.error('❌ Ошибка отправки SMS:', error);
     return false;
   }
+};
+
+// Fallback функция для разработки (отправка в консоль)
+export const sendSMSFallback = (phone: string, code: string): boolean => {
+  console.log(`📱 [FALLBACK SMS] Номер: ${phone}, Код: ${code}`);
+  return true;
 };
 
 // Функция отправки WhatsApp через Twilio API
@@ -95,7 +113,7 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     const whatsappTo = `whatsapp:${formattedPhone}`;
     
     // Текст сообщения
-    const message = `🏒 *HockeyStars*\n\nВаш код подтверждения: *${code}*\n\nКод действителен 10 минут.\n\nЕсли вы не запрашивали этот код, проигнорируйте сообщение.`;
+    const message = `Hockeystars code: ${code}`;
 
     // Формируем тело запроса вручную для React Native совместимости
     const body = `From=${encodeURIComponent(whatsappFrom)}&To=${encodeURIComponent(whatsappTo)}&Body=${encodeURIComponent(message)}`;
@@ -132,54 +150,6 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     console.error('❌ Ошибка отправки WhatsApp через Twilio:', error);
     return false;
   }
-};
-
-// Функция форматирования номера телефона
-const formatPhoneNumber = (phone: string): string => {
-  console.log('🔍 Форматируем номер:', phone);
-  
-  // Убираем все нецифровые символы
-  const cleaned = phone.replace(/\D/g, '');
-  console.log('🧹 Очищенный номер:', cleaned);
-  
-  // Если номер уже начинается с +, возвращаем как есть
-  if (phone.startsWith('+')) {
-    console.log('✅ Номер уже с +:', phone);
-    return phone;
-  }
-  
-  // Если номер начинается с 375 (Беларусь), добавляем +
-  if (cleaned.startsWith('375') && cleaned.length === 12) {
-    const formatted = `+${cleaned}`;
-    console.log('🇧🇾 Белорусский номер:', formatted);
-    return formatted;
-  }
-  
-  // Если номер начинается с 7 (Россия), заменяем на +7
-  if (cleaned.startsWith('7') && cleaned.length === 11) {
-    const formatted = `+${cleaned}`;
-    console.log('🇷🇺 Российский номер:', formatted);
-    return formatted;
-  }
-  
-  // Если номер начинается с 80 (Беларусь без кода страны)
-  if (cleaned.startsWith('80') && cleaned.length === 11) {
-    const formatted = `+375${cleaned.substring(2)}`;
-    console.log('🇧🇾 Белорусский номер (80):', formatted);
-    return formatted;
-  }
-  
-  // Если номер короткий (9 цифр), добавляем +375
-  if (cleaned.length === 9) {
-    const formatted = `+375${cleaned}`;
-    console.log('🇧🇾 Короткий белорусский номер:', formatted);
-    return formatted;
-  }
-  
-  // По умолчанию добавляем +375 для белорусских номеров
-  const formatted = `+375${cleaned}`;
-  console.log('🔧 Номер по умолчанию:', formatted);
-  return formatted;
 };
 
 // Инструкция по настройке Twilio

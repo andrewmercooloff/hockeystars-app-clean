@@ -51,6 +51,7 @@ export interface Team {
 export interface PlayerTeam {
   teamId: string;
   teamName: string;
+  teamNameRu?: string;
   teamType: string;
   teamCountry?: string;
   teamCity?: string;
@@ -58,6 +59,7 @@ export interface PlayerTeam {
   joinedDate?: string;
   startYear?: number;
   endYear?: number;
+  teamOrder?: number;
 }
 
 // Интерфейс для достижения
@@ -73,6 +75,7 @@ export interface Achievement {
 export interface PastTeam {
   id: string;
   teamName: string;
+  teamNameRu?: string;
   teamCountry?: string;
   teamCity?: string;
   startYear: number;
@@ -92,6 +95,35 @@ export interface PlayerExerciseStats {
   completions: ExerciseCompletion[];
   totalCompletions: number;
   lastCompletedAt?: string;
+}
+
+// Интерфейс для отслеживания изменений статистики
+export interface StatChange {
+  field: string;
+  oldValue: number;
+  newValue: number;
+  change: number; // разность (newValue - oldValue)
+  timestamp: string;
+}
+
+// Интерфейс для отслеживания изменений нормативов
+export interface NormativeChange {
+  field: string;
+  oldValue: number;
+  newValue: number;
+  change: number;
+  timestamp: string;
+}
+
+// Интерфейс для уведомлений о изменениях
+export interface StatsChangeNotification {
+  id: string;
+  playerId: string;
+  playerName: string;
+  type: 'stats_change' | 'normative_change';
+  changes: StatChange[] | NormativeChange[];
+  timestamp: string;
+  isRead: boolean;
 }
 
 export interface Player {
@@ -247,20 +279,32 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
           typeof supabasePlayer.exercise_stats === 'string') {
         try {
           const parsed = JSON.parse(supabasePlayer.exercise_stats);
-          // Проверяем, что результат парсинга - это объект с нужными полями
-          if (parsed && typeof parsed === 'object' && 
-              Array.isArray(parsed.completions) && 
-              typeof parsed.totalCompletions === 'number') {
-            return parsed;
+          
+          // Проверяем, что результат парсинга - это объект
+          if (parsed && typeof parsed === 'object') {
+            // Если completions - это массив (старый формат)
+            if (Array.isArray(parsed.completions) && typeof parsed.totalCompletions === 'number') {
+              return parsed;
+            }
+            // Если completions - это объект (новый формат)
+            if (parsed.completions && typeof parsed.completions === 'object' && !Array.isArray(parsed.completions) && typeof parsed.totalCompletions === 'number') {
+              // Конвертируем в старый формат для совместимости
+              const completionsArray = Object.entries(parsed.completions).map(([exerciseId, count]) => ({
+                exerciseId,
+                count: count as number,
+                completedAt: new Date().toISOString() // Используем текущую дату как приблизительную
+              }));
+              
+              return {
+                completions: completionsArray,
+                totalCompletions: parsed.totalCompletions
+              };
+            }
           }
           // Если структура неправильная, возвращаем дефолт без ошибки
           return { completions: [], totalCompletions: 0 };
         } catch (error) {
-          // Логируем только первый раз для каждого игрока
-          if (!supabasePlayer._exercise_stats_error_logged) {
-            console.warn(`⚠️ Некорректные данные exercise_stats для игрока ${supabasePlayer.name || supabasePlayer.id}: "${supabasePlayer.exercise_stats}"`);
-            supabasePlayer._exercise_stats_error_logged = true;
-          }
+          console.warn(`⚠️ Некорректные данные exercise_stats для игрока ${supabasePlayer.name || supabasePlayer.id}: "${supabasePlayer.exercise_stats}"`);
           return { completions: [], totalCompletions: 0 };
         }
       }
@@ -369,8 +413,29 @@ export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | nul
 // Получение команд игрока
 export const getPlayerTeams = async (playerId: string): Promise<PlayerTeam[]> => {
   try {
+    
+    // Временно используем прямой запрос вместо RPC функции
     const { data, error } = await supabase
-      .rpc('get_player_teams', { player_uuid: playerId });
+      .from('player_teams')
+      .select(`
+        team_id,
+        is_primary,
+        joined_date,
+        start_year,
+        end_year,
+        team_order,
+        teams!inner(
+          id,
+          name,
+          name_ru,
+          type,
+          country,
+          city
+        )
+      `)
+      .eq('player_id', playerId)
+      .order('team_order', { ascending: true });
+    
     
     if (error) {
       console.error('❌ Ошибка получения команд игрока:', error);
@@ -380,22 +445,31 @@ export const getPlayerTeams = async (playerId: string): Promise<PlayerTeam[]> =>
     
     
     const teams = (data || []).map((team: any) => {
+      const teamData = team.teams;
+      
       
       return {
         teamId: team.team_id,
-        teamName: team.team_name,
-        teamType: team.team_type,
-        teamCountry: team.team_country,
-        teamCity: team.team_city,
+        teamName: teamData.name,
+        teamNameRu: teamData.name_ru,
+        teamType: teamData.type,
+        teamCountry: teamData.country,
+        teamCity: teamData.city,
         isPrimary: team.is_primary,
         joinedDate: team.joined_date,
         startYear: team.start_year,
-        endYear: team.end_year
+        endYear: team.end_year,
+        teamOrder: team.team_order || 0
       };
     });
     
-    // Сортируем команды по дате добавления (сначала новые)
+    // Сортируем команды по team_order (если есть) или по дате добавления
     teams.sort((a: PlayerTeam, b: PlayerTeam) => {
+      // Если есть team_order, сортируем по нему
+      if (a.teamOrder !== undefined && b.teamOrder !== undefined) {
+        return a.teamOrder - b.teamOrder;
+      }
+      // Иначе сортируем по дате добавления (сначала новые)
       const dateA = new Date(a.joinedDate || '1970-01-01');
       const dateB = new Date(b.joinedDate || '1970-01-01');
       return dateB.getTime() - dateA.getTime();
@@ -409,7 +483,7 @@ export const getPlayerTeams = async (playerId: string): Promise<PlayerTeam[]> =>
 };
 
 // Добавление команды игроку
-export const addPlayerTeam = async (playerId: string, teamId: string, isPrimary: boolean = false, startYear?: number, endYear?: number): Promise<boolean> => {
+export const addPlayerTeam = async (playerId: string, teamId: string, isPrimary: boolean = false, startYear?: number, endYear?: number, teamOrder?: number): Promise<boolean> => {
   try {
     console.log('➕ addPlayerTeam: добавляем команду', teamId, 'игроку', playerId, '(основная:', isPrimary, ')');
     console.log('➕ addPlayerTeam: годы - startYear:', startYear, 'endYear:', endYear);
@@ -483,6 +557,11 @@ export const addPlayerTeam = async (playerId: string, teamId: string, isPrimary:
       is_primary: isPrimary,
       joined_date: new Date().toISOString().split('T')[0]
     };
+    
+    // Добавляем team_order только если поле существует в базе
+    if (teamOrder !== undefined) {
+      insertData.team_order = teamOrder;
+    }
     
     // Добавляем годы только если они переданы
     if (startYear !== undefined) {
@@ -571,6 +650,7 @@ export const convertPlayerTeamToPastTeam = (playerTeam: PlayerTeam): PastTeam =>
   return {
     id: playerTeam.teamId,
     teamName: playerTeam.teamName,
+    teamNameRu: playerTeam.teamNameRu,
     teamCountry: playerTeam.teamCountry,
     teamCity: playerTeam.teamCity,
     startYear: playerTeam.startYear || new Date().getFullYear(), // Используем сохраненный год или текущий
@@ -583,7 +663,8 @@ export const convertPlayerTeamToPastTeam = (playerTeam: PlayerTeam): PastTeam =>
 export const getPlayerTeamsAsPastTeams = async (playerId: string): Promise<PastTeam[]> => {
   try {
     const playerTeams = await getPlayerTeams(playerId);
-    return playerTeams.map(convertPlayerTeamToPastTeam);
+    const pastTeams = playerTeams.map(convertPlayerTeamToPastTeam);
+    return pastTeams;
   } catch (error) {
     console.error('❌ Ошибка получения команд игрока:', error);
     return [];
@@ -642,9 +723,9 @@ export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[]
       return false;
     }
     
-    // Добавляем все команды параллельно
-    const addPromises = allTeams.map(team => 
-      addPlayerTeam(playerId, team.id, team.isCurrent, team.startYear, team.endYear)
+    // Добавляем все команды с сохранением порядка
+    const addPromises = allTeams.map((team, index) => 
+      addPlayerTeam(playerId, team.id, team.isCurrent, team.startYear, team.endYear, index)
     );
     
     const results = await Promise.all(addPromises);
@@ -682,8 +763,71 @@ export const clearOldPastTeamsData = async (playerId: string): Promise<boolean> 
   }
 };
 
+// Функция для добавления поля team_order (выполняется один раз)
+export const addTeamOrderField = async (): Promise<boolean> => {
+  try {
+    console.log('🔄 Добавляем поле team_order...');
+    
+    // Проверяем, есть ли уже поле team_order
+    const { data: columns, error: columnsError } = await supabase
+      .from('information_schema.columns')
+      .select('column_name')
+      .eq('table_name', 'player_teams')
+      .eq('column_name', 'team_order');
+    
+    if (columnsError) {
+      console.error('❌ Ошибка проверки колонок:', columnsError);
+      return false;
+    }
+    
+    if (columns.length > 0) {
+      console.log('✅ Поле team_order уже существует');
+      return true;
+    }
+    
+    // Добавляем поле team_order
+    const { error: alterError } = await supabase
+      .rpc('exec', {
+        sql: 'ALTER TABLE player_teams ADD COLUMN team_order INTEGER DEFAULT 0;'
+      });
+    
+    if (alterError) {
+      console.error('❌ Ошибка добавления поля team_order:', alterError);
+      return false;
+    }
+    
+    console.log('✅ Поле team_order добавлено');
+    
+    // Обновляем существующие записи
+    const { error: updateError } = await supabase
+      .rpc('exec', {
+        sql: `
+          UPDATE player_teams 
+          SET team_order = subquery.row_number
+          FROM (
+            SELECT id, ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY created_at) as row_number
+            FROM player_teams
+          ) AS subquery
+          WHERE player_teams.id = subquery.id;
+        `
+      });
+    
+    if (updateError) {
+      console.error('❌ Ошибка обновления записей:', updateError);
+      return false;
+    }
+    
+    console.log('✅ Порядок команд обновлен');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Ошибка добавления поля team_order:', error);
+    return false;
+  }
+};
+
 const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unreadNotificationsCount' | 'unreadMessagesCount'>): Omit<SupabasePlayer, 'id' | 'created_at' | 'updated_at'> => {
-  // Функция для конвертации даты из DD.MM.YYYY в YYYY-MM-DD
+  // Функция для конвертации даты из DD.MM.YYYY или MM.YYYY в YYYY-MM-DD
   const convertDate = (dateString?: string): string | undefined => {
     if (!dateString) return undefined;
     
@@ -697,6 +841,12 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unreadNotification
     if (parts.length === 3) {
       const [day, month, year] = parts;
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    
+    // Конвертируем из MM.YYYY в YYYY-MM-01 (первое число месяца)
+    if (parts.length === 2) {
+      const [month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-01`;
     }
     
     return dateString; // Возвращаем как есть, если формат не распознан
@@ -846,118 +996,102 @@ export const addPlayer = async (player: Omit<Player, 'id' | 'unreadNotifications
 };
 
 // Обновление игрока
-export const updatePlayer = async (id: string, updates: Partial<Player>, currentUserId?: string): Promise<Player | null> => {
+export const updatePlayer = async (playerId: string, updateData: Partial<Player>): Promise<Player | null> => {
   try {
-    // Проверяем права доступа
-    if (currentUserId) {
-      const currentUser = await getPlayerById(currentUserId);
-      if (!currentUser) {
-        console.error('❌ Пользователь не найден для проверки прав доступа');
-        return null;
-      }
-      
-      // Только владелец профиля или администратор может обновлять данные
-      if (currentUser.status !== 'admin' && currentUser.id !== id) {
-        console.error('❌ Попытка несанкционированного обновления профиля:', {
-          currentUserId,
-          targetId: id,
-          currentUserStatus: currentUser.status
-        });
-        return null;
-      }
-    }
+    // Получаем старые данные игрока для отслеживания изменений
+    const oldPlayer = await getPlayerById(playerId);
     
-    // Обновление игрока в Supabase
-    // Логи обновления убраны для чистоты консоли
-    // Функция для конвертации даты из MM.YYYY в YYYY-MM-DD
-    const convertDate = (dateString?: string): string | undefined => {
-      if (!dateString) return undefined;
-      
-      // Проверяем, если дата уже в формате YYYY-MM-DD
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-        return dateString;
-      }
-      
-      // Конвертируем из MM.YYYY в YYYY-MM-DD
-      const parts = dateString.split('.');
-      if (parts.length === 2) {
-        const [month, year] = parts;
-        return `${year}-${month.padStart(2, '0')}-01`; // Добавляем день 01
-      }
-      
-      // Конвертируем из DD.MM.YYYY в YYYY-MM-DD (для обратной совместимости)
-      if (parts.length === 3) {
-        const [day, month, year] = parts;
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      
-      return dateString; // Возвращаем как есть, если формат не распознан
-    };
-
-    // Преобразуем обновления в формат Supabase
-    const supabaseUpdates: Partial<SupabasePlayer> = {};
-    
-    if (updates.height) supabaseUpdates.height = parseInt(updates.height) || 0;
-    if (updates.weight) supabaseUpdates.weight = parseInt(updates.weight) || 0;
-    if (updates.birthDate) supabaseUpdates.birth_date = convertDate(updates.birthDate);
-    if (updates.hockeyStartDate !== undefined) supabaseUpdates.hockey_start_date = convertDate(updates.hockeyStartDate);
-    if (updates.experience) supabaseUpdates.experience = parseInt(updates.experience) || 0;
-    if (updates.goals) supabaseUpdates.goals = parseInt(updates.goals) || 0;
-    if (updates.assists) supabaseUpdates.assists = parseInt(updates.assists) || 0;
-    if (updates.games) supabaseUpdates.games = parseInt(updates.games) || 0;
-    if (updates.pullUps !== undefined) supabaseUpdates.pull_ups = parseInt(updates.pullUps) || 0;
-    if (updates.pushUps !== undefined) supabaseUpdates.push_ups = parseInt(updates.pushUps) || 0;
-    if (updates.plankTime !== undefined) supabaseUpdates.plank_time = parseInt(updates.plankTime) || 0;
-    if (updates.sprint100m !== undefined) supabaseUpdates.sprint_100m = parseFloat(updates.sprint100m) || 0;
-    if (updates.longJump !== undefined) supabaseUpdates.long_jump = parseInt(updates.longJump) || 0;
-    if (updates.jumpRope !== undefined) supabaseUpdates.jump_rope = parseInt(updates.jumpRope) || 0;
-    if (updates.favoriteGoals !== undefined) supabaseUpdates.favorite_goals = updates.favoriteGoals;
-    if (updates.photos !== undefined) supabaseUpdates.photos = updates.photos && updates.photos.length > 0 ? JSON.stringify(updates.photos) : '[]';
-    if (updates.number !== undefined) supabaseUpdates.number = updates.number;
-    if (updates.exerciseStats !== undefined) supabaseUpdates.exercise_stats = JSON.stringify(updates.exerciseStats);
-    
-    // Обрабатываем достижения (конвертируем массив в JSON строку)
-    if (updates.achievements !== undefined) {
-      supabaseUpdates.achievements = JSON.stringify(updates.achievements);
-    }
-    
-    // Обрабатываем прошлые команды (конвертируем массив в JSON строку)
-    if (updates.pastTeams !== undefined) {
-      supabaseUpdates.past_teams = JSON.stringify(updates.pastTeams);
-    }
-    
-    // Добавляем остальные поля напрямую
-    Object.assign(supabaseUpdates, {
-      name: updates.name,
-      position: updates.position,
-      team: updates.team,
-      age: updates.age,
-      avatar: updates.avatar,
-      email: updates.email,
-      password: updates.password,
-      status: updates.status,
-      phone: updates.phone,
-      city: updates.city,
-      country: updates.country,
-      grip: updates.grip
-    });
-    
-    console.log('📤 Данные для обновления в Supabase:', JSON.stringify(supabaseUpdates, null, 2));
+    // Конвертируем данные в формат Supabase
+    const supabaseData = convertPlayerToSupabase(updateData as Player);
     
     const { data, error } = await supabase
       .from('players')
-      .update(supabaseUpdates)
-      .eq('id', id)
+      .update(supabaseData)
+      .eq('id', playerId)
       .select()
       .single();
     
     if (error) {
       console.error('❌ Ошибка обновления игрока:', error);
-      return null;
+        return null;
+      }
+      
+    if (!data) {
+      console.error('❌ Не удалось найти игрока для обновления');
+        return null;
     }
     
-    // Игрок успешно обновлен в Supabase
-    return convertSupabaseToPlayer(data);
+    const updatedPlayer = convertSupabaseToPlayer(data);
+    
+    // Отслеживаем изменения статистики и нормативов
+    if (oldPlayer) {
+      console.log('🔍 Сравниваем данные игрока:');
+      console.log('  Старые данные:', {
+        goals: oldPlayer.goals,
+        assists: oldPlayer.assists,
+        games: oldPlayer.games,
+        pullUps: oldPlayer.pullUps,
+        pushUps: oldPlayer.pushUps
+      });
+      console.log('  Новые данные:', {
+        goals: updatedPlayer.goals,
+        assists: updatedPlayer.assists,
+        games: updatedPlayer.games,
+        pullUps: updatedPlayer.pullUps,
+        pushUps: updatedPlayer.pushUps
+      });
+      
+      const statChanges = trackStatsChanges(oldPlayer, updatedPlayer);
+      const normativeChanges = trackNormativeChanges(oldPlayer, updatedPlayer);
+      
+      console.log('📊 Результат отслеживания изменений:', {
+        statChanges,
+        normativeChanges,
+        statChangesLength: statChanges.length,
+        normativeChangesLength: normativeChanges.length
+      });
+      
+      // Если есть изменения, отправляем уведомления друзьям
+      if (statChanges.length > 0 || normativeChanges.length > 0) {
+        console.log(`📊 Обнаружены изменения в статистике игрока ${updatedPlayer.name}:`, {
+          stats: statChanges,
+          normatives: normativeChanges
+        });
+        
+        // Отправляем уведомления друзьям
+        await notifyFriendsAboutChanges(
+          playerId, 
+          updatedPlayer.name, 
+          statChanges, 
+          normativeChanges
+        );
+      } else {
+        console.log('📊 Изменений в статистике не обнаружено');
+      }
+    } else {
+      console.log('❌ Старые данные игрока не найдены, пропускаем отслеживание изменений');
+    }
+    
+    // Обновляем текущего пользователя в AsyncStorage, если это текущий пользователь
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const currentUserData = await AsyncStorage.getItem('hockeystars_current_user');
+    
+    if (currentUserData) {
+      const currentUser = JSON.parse(currentUserData);
+      if (currentUser.id === playerId) {
+        await AsyncStorage.setItem('hockeystars_current_user', JSON.stringify(updatedPlayer));
+        
+        // Обновляем кэш
+        const cacheKey = 'hockeystars_user_cache';
+        await AsyncStorage.setItem(cacheKey, JSON.stringify({
+          user: updatedPlayer,
+          timestamp: Date.now()
+        }));
+      }
+    }
+    
+    console.log(`✅ Игрок обновлен: ${updatedPlayer.name}`);
+    return updatedPlayer;
   } catch (error) {
     console.error('❌ Ошибка обновления игрока:', error);
     return null;
@@ -1505,7 +1639,25 @@ export const getFriends = async (userId: string): Promise<Player[]> => {
       return [];
     }
     
-    return (friends || []).map(convertSupabaseToPlayer);
+    // Конвертируем друзей и загружаем их основные команды
+    const friendsWithTeams = await Promise.all(
+      (friends || []).map(async (friend) => {
+        const convertedFriend = convertSupabaseToPlayer(friend);
+        
+        // Загружаем команды друга
+        const friendTeams = await getPlayerTeams(friend.id);
+        const primaryTeam = friendTeams.find(team => team.isPrimary);
+        
+        // Если есть основная команда, обновляем поле team
+        if (primaryTeam) {
+          convertedFriend.team = primaryTeam.teamName;
+        }
+        
+        return convertedFriend;
+      })
+    );
+    
+    return friendsWithTeams;
   } catch (error) {
     console.error('❌ Ошибка получения друзей:', error);
     return [];
@@ -1668,11 +1820,31 @@ export const markNotificationAsRead = async (notificationId: string): Promise<bo
 // Принудительная инициализация хранилища (заглушка для совместимости)
 export const forceInitializeStorage = async (): Promise<boolean> => {
   try {
-    console.log('🔧 Принудительная инициализация Supabase хранилища...');
-    await initializeStorage();
+    console.log('🔄 Принудительная инициализация хранилища...');
+    
+    // Очищаем существующие данные
+    const { error: deleteError } = await supabase
+      .from('players')
+      .delete()
+      .neq('status', 'admin');
+    
+    if (deleteError) {
+      console.error('❌ Ошибка очистки существующих игроков:', deleteError);
+      return false;
+    }
+    
+    // Создаем администратора
+    const admin = await createAdmin();
+    
+    if (!admin) {
+      console.error('❌ Не удалось создать администратора');
+      return false;
+    }
+    
+    console.log('✅ Хранилище инициализировано');
     return true;
   } catch (error) {
-    console.error('❌ Ошибка принудительной инициализации:', error);
+    console.error('❌ Ошибка инициализации хранилища:', error);
     return false;
   }
 };
@@ -1690,6 +1862,7 @@ export const createAdmin = async (): Promise<Player | null> => {
       email: 'admin',
       password: 'admin123',
       status: 'admin',
+      phone: '+375296549728', // Added phone number
       city: 'Минск',
       goals: 0,
       assists: 0,
@@ -1847,7 +2020,7 @@ export const getUnreadMessageCount = async (userId: string): Promise<number> => 
 };
 
 // Функция для расчета стажа в хоккее
-export const calculateHockeyExperience = (startDate?: string): string => {
+export const calculateHockeyExperience = (startDate?: string, language: string = 'ru'): string => {
   // Расчет опыта хоккея для даты
   if (!startDate || startDate === '' || startDate === 'null') {
     return '';
@@ -1870,15 +2043,35 @@ export const calculateHockeyExperience = (startDate?: string): string => {
       months += 12;
     }
     
-    // Правильное склонение для русского языка
-    const getYearWord = (num: number): string => {
+    // Правильное склонение для разных языков
+    const getYearWord = (num: number, lang: string): string => {
+      if (lang === 'en') {
+        return num === 1 ? 'year' : 'years';
+      } else {
+        // Русский язык
       if (num === 1) return 'год';
       if (num >= 2 && num <= 4) return 'года';
       return 'лет';
+      }
     };
     
-    const result = years > 0 ? `${years} ${getYearWord(years)}` : `${months} мес.`;
-    return result;
+    const getMonthWord = (lang: string): string => {
+      return lang === 'en' ? 'mo.' : 'мес.';
+    };
+    
+    const formatExperience = (lang: string) => {
+      if (lang === 'en') {
+        return years > 0 
+          ? `${years} ${getYearWord(years, lang)} in hockey`
+          : `${months} ${getMonthWord(lang)} in hockey`;
+      } else {
+        return years > 0 
+          ? `${years} ${getYearWord(years, lang)} в хоккее`
+          : `${months} ${getMonthWord(lang)} в хоккее`;
+      }
+    };
+    
+    return formatExperience(language);
   } catch (error) {
     console.error('❌ Ошибка расчета опыта хоккея:', error);
     return '';
@@ -2052,7 +2245,7 @@ export const completeExercise = async (playerId: string, exerciseId: string): Pr
     exerciseStats.lastCompletedAt = new Date().toISOString();
     
     // Сохраняем обновленные данные
-    const success = await updatePlayer(playerId, { exerciseStats }, playerId);
+    const success = await updatePlayer(playerId, { exerciseStats });
     
     if (success) {
       console.log('✅ Упражнение отмечено как выполненное');
@@ -2073,10 +2266,30 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
     const player = await getPlayerById(playerId);
     if (!player) return null;
     
-    return player.exerciseStats || {
-      completions: [],
-      totalCompletions: 0
-    };
+    if (!player.exerciseStats) {
+      return {
+        completions: [],
+        totalCompletions: 0
+      };
+    }
+    
+    // Проверяем формат данных и конвертируем если нужно
+    if (typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
+      // Новый формат: { "exerciseId": count }
+      const completionsArray = Object.entries(player.exerciseStats.completions).map(([exerciseId, count]) => ({
+        exerciseId,
+        count: count as number,
+        completedAt: new Date().toISOString() // Используем текущую дату как приблизительную
+      }));
+      
+      return {
+        completions: completionsArray,
+        totalCompletions: player.exerciseStats.totalCompletions || 0
+      };
+    }
+    
+    // Старый формат: [{ "exerciseId": "id", "completedAt": "date", "count": number }]
+    return player.exerciseStats;
   } catch (error) {
     console.error('❌ Ошибка получения статистики упражнений:', error);
     return null;
@@ -2094,6 +2307,20 @@ export const getExerciseCompletionCount = async (playerId: string, exerciseId: s
   } catch (error) {
     console.error('❌ Ошибка получения количества выполнений:', error);
     return 0;
+  }
+};
+
+// Получить время последнего выполнения конкретного упражнения
+export const getLastExerciseCompletion = async (playerId: string, exerciseId: string): Promise<ExerciseCompletion | null> => {
+  try {
+    const stats = await getPlayerExerciseStats(playerId);
+    if (!stats) return null;
+    
+    const completion = stats.completions.find(c => c.exerciseId === exerciseId);
+    return completion || null;
+  } catch (error) {
+    console.error('❌ Ошибка получения времени последнего выполнения:', error);
+    return null;
   }
 };
 
@@ -2162,31 +2389,64 @@ export const getPlayerByEmail = async (email: string): Promise<Player | null> =>
 };
 
 // Поиск игрока по телефону
-export const getPlayerByPhone = async (phone: string): Promise<Player | null> => {
+export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = false): Promise<Player | null> => {
   try {
-    console.log('🔍 Поиск игрока по телефону:', phone);
+    console.log('🔍 Поиск игрока по телефону:', phone, 'isAdminAccess:', isAdminAccess);
     
+    // Если это доступ администратора, ищем любого пользователя с этим номером
+    if (isAdminAccess) {
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .eq('phone', phone)
+        .single();
+      
+      if (error) {
+        console.error('❌ Ошибка поиска игрока (admin access):', error);
+        return null;
+      }
+      
+      if (data) {
+        console.log('✅ Игрок найден по телефону (admin access):', data.name);
+        return convertSupabaseToPlayer(data);
+      }
+      
+      console.log('❌ Игрок не найден по телефону (admin access)');
+      return null;
+    }
+    
+    // Обычный поиск - сначала администратор, потом обычный пользователь
+    const { data: adminData, error: adminError } = await supabase
+      .from('players')
+      .select('*')
+      .eq('phone', phone)
+      .eq('status', 'admin')
+      .single();
+    
+    if (adminData) {
+      console.log('✅ Найден администратор по телефону:', adminData.name);
+      return convertSupabaseToPlayer(adminData);
+    }
+    
+    // Если администратор не найден, ищем обычного пользователя
     const { data, error } = await supabase
       .from('players')
       .select('*')
-      .eq('phone', phone.trim())
-      .limit(1);
+      .eq('phone', phone)
+      .single();
     
     if (error) {
-      console.error('❌ Ошибка поиска игрока по телефону:', error);
+      console.error('❌ Ошибка поиска игрока:', error);
       return null;
     }
     
-    if (!data || data.length === 0) {
-      console.log('👤 Игрок с телефоном не найден:', phone);
-      return null;
+    if (data) {
+      console.log('✅ Игрок найден по телефону:', data.name);
+      return convertSupabaseToPlayer(data);
     }
     
-    const supabasePlayer = data[0];
-    const player = convertSupabaseToPlayer(supabasePlayer);
-    
-    console.log('✅ Игрок найден по телефону:', player.name);
-    return player;
+    console.log('❌ Игрок не найден по телефону');
+    return null;
   } catch (error) {
     console.error('❌ Ошибка поиска игрока по телефону:', error);
     return null;
@@ -2224,5 +2484,279 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
   } catch (error) {
     console.error('❌ Ошибка создания игрока:', error);
     return null;
+  }
+};
+
+// Обновление номера телефона игрока
+export const updatePlayerPhone = async (playerId: string, newPhone: string): Promise<Player | null> => {
+  try {
+    console.log(`🔄 Обновляем номер телефона для игрока с ID: ${playerId}`);
+    
+    const { data, error } = await supabase
+      .from('players')
+      .update({ phone: newPhone })
+      .eq('id', playerId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Ошибка обновления номера телефона:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.error('❌ Не удалось найти игрока для обновления');
+      return null;
+    }
+    
+    const updatedPlayer = convertSupabaseToPlayer(data);
+    console.log(`✅ Номер телефона обновлен для игрока: ${updatedPlayer.name}`);
+    return updatedPlayer;
+  } catch (error) {
+    console.error('❌ Ошибка обновления номера телефона:', error);
+    return null;
+  }
+};
+
+// Создание игрока администратором без SMS-подтверждения
+export const createPlayerManually = async (playerData: Player, adminId: string): Promise<Player | null> => {
+  try {
+    // Проверяем, что создающий пользователь - администратор
+    const admin = await getPlayerById(adminId);
+    if (!admin || admin.status !== 'admin') {
+      console.error('❌ Только администратор может создавать пользователей вручную');
+      return null;
+    }
+
+    console.log('👤 Администратор создает нового игрока:', playerData.name);
+    
+    // Генерируем уникальный ID, если не передан
+    if (!playerData.id) {
+      playerData.id = Date.now().toString();
+    }
+
+    // Устанавливаем значения по умолчанию, если не указаны
+    const completePlayerData: Player = {
+      ...playerData,
+      age: playerData.age || 0,
+      city: playerData.city || '',
+      goals: playerData.goals || '',
+      assists: playerData.assists || '',
+      games: playerData.games || '',
+      pullUps: playerData.pullUps || '',
+      pushUps: playerData.pushUps || '',
+      plankTime: playerData.plankTime || '',
+      sprint100m: playerData.sprint100m || '',
+      longJump: playerData.longJump || '',
+      status: playerData.status || 'player'
+    };
+
+    // Конвертируем данные игрока в формат Supabase
+    const supabaseData = convertPlayerToSupabase(completePlayerData);
+    
+    const { data, error } = await supabase
+      .from('players')
+      .insert([supabaseData])
+      .select('*')
+      .single();
+    
+    if (error) {
+      console.error('❌ Ошибка создания игрока администратором:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.error('❌ Нет данных после создания игрока');
+      return null;
+    }
+    
+    const createdPlayer = convertSupabaseToPlayer(data);
+    console.log('✅ Игрок создан администратором успешно:', createdPlayer.name);
+    return createdPlayer;
+    
+  } catch (error) {
+    console.error('❌ Ошибка создания игрока администратором:', error);
+    return null;
+  }
+};
+
+// Функция для отслеживания изменений статистики
+export const trackStatsChanges = (oldPlayer: Player, newPlayer: Player): StatChange[] => {
+  const changes: StatChange[] = [];
+  const timestamp = new Date().toISOString();
+  
+  // Поля статистики для отслеживания
+  const statsFields = ['goals', 'assists', 'games'];
+  
+  statsFields.forEach(field => {
+    const oldValue = parseInt(oldPlayer[field as keyof Player] as string || '0') || 0;
+    const newValue = parseInt(newPlayer[field as keyof Player] as string || '0') || 0;
+    
+    if (oldValue !== newValue) {
+      changes.push({
+        field,
+        oldValue,
+        newValue,
+        change: newValue - oldValue,
+        timestamp
+      });
+    }
+  });
+  
+  return changes;
+};
+
+// Функция для отслеживания изменений нормативов
+export const trackNormativeChanges = (oldPlayer: Player, newPlayer: Player): NormativeChange[] => {
+  const changes: NormativeChange[] = [];
+  const timestamp = new Date().toISOString();
+  
+  // Поля нормативов для отслеживания
+  const normativeFields = ['pullUps', 'pushUps', 'plankTime', 'sprint100m', 'longJump', 'jumpRope'];
+  
+  normativeFields.forEach(field => {
+    const oldValue = parseFloat(oldPlayer[field as keyof Player] as string || '0') || 0;
+    const newValue = parseFloat(newPlayer[field as keyof Player] as string || '0') || 0;
+    
+    if (oldValue !== newValue) {
+      changes.push({
+        field,
+        oldValue,
+        newValue,
+        change: newValue - oldValue,
+        timestamp
+      });
+    }
+  });
+  
+  return changes;
+};
+
+// Функция для отправки уведомлений друзьям о изменениях
+export const notifyFriendsAboutChanges = async (
+  playerId: string, 
+  playerName: string, 
+  statChanges: StatChange[], 
+  normativeChanges: NormativeChange[]
+): Promise<void> => {
+  try {
+    // Получаем список друзей игрока
+    const friends = await getFriends(playerId);
+    
+    // Функция для генерации UUID v4
+    const generateUUID = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+
+    // Создаем уведомления для каждого друга
+    const notifications = friends.map(friend => {
+      // Формируем детальное сообщение об изменениях
+      const changesText = [...statChanges, ...normativeChanges]
+        .map(change => {
+          const fieldNames: { [key: string]: string } = {
+            'goals': 'голов',
+            'assists': 'передач', 
+            'games': 'игр',
+            'pullUps': 'подтягиваний',
+            'pushUps': 'отжиманий',
+            'plankTime': 'планки',
+            'sprint100m': 'стометровки',
+            'longJump': 'прыжка в длину',
+            'jumpRope': 'скакалки'
+          };
+          const fieldName = fieldNames[change.field] || change.field;
+          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+          return `${fieldName}: ${changeText}`;
+        })
+        .join(', ');
+
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'stats_change',
+        title: 'Изменения в статистике',
+        message: `${playerName} обновил: ${changesText}`,
+        data: {
+          changes: [...statChanges, ...normativeChanges],
+          changedPlayerId: playerId,
+          changedPlayerName: playerName
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
+    });
+    
+    // Добавляем уведомление для самого игрока, чтобы он мог видеть свои изменения
+    const selfChangesText = [...statChanges, ...normativeChanges]
+      .map(change => {
+        const fieldNames: { [key: string]: string } = {
+          'goals': 'голов',
+          'assists': 'передач', 
+          'games': 'игр',
+          'pullUps': 'подтягиваний',
+          'pushUps': 'отжиманий',
+          'plankTime': 'планки',
+          'sprint100m': 'стометровки',
+          'longJump': 'прыжка в длину',
+          'jumpRope': 'скакалки'
+        };
+        const fieldName = fieldNames[change.field] || change.field;
+        const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+        return `${fieldName}: ${changeText}`;
+      })
+      .join(', ');
+
+    const selfNotification = {
+      id: generateUUID(),
+      user_id: playerId,
+      type: 'stats_change',
+      title: 'Ваша статистика обновлена',
+      message: `Вы обновили: ${selfChangesText}`,
+      data: {
+        changes: [...statChanges, ...normativeChanges],
+        changedPlayerId: playerId,
+        changedPlayerName: playerName
+      },
+      created_at: new Date().toISOString(),
+      is_read: false
+    };
+    
+    notifications.push(selfNotification);
+    
+    if (friends.length === 0) {
+      console.log('📭 У игрока нет друзей, создаем только уведомление для себя');
+    }
+    
+    // Сохраняем уведомления в базу данных
+    console.log('💾 Сохраняем уведомления в базу данных...');
+    console.log('💾 Количество уведомлений для сохранения:', notifications.length);
+    
+    for (const notification of notifications) {
+      console.log('💾 Сохраняем уведомление:', {
+        id: notification.id,
+        user_id: notification.user_id,
+        type: notification.type,
+        title: notification.title,
+        data: notification.data
+      });
+      
+      const { error: insertError } = await supabase
+        .from('notifications')
+        .insert(notification);
+        
+      if (insertError) {
+        console.error('❌ Ошибка сохранения уведомления:', insertError);
+      } else {
+        console.log('✅ Уведомление сохранено успешно');
+      }
+    }
+    
+    console.log(`📢 Отправлено ${notifications.length} уведомлений о изменениях статистики`);
+  } catch (error) {
+    console.error('❌ Ошибка отправки уведомлений о изменениях:', error);
   }
 };
