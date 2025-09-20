@@ -1,8 +1,12 @@
+import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { COUNTRIES } from '../../utils/constants';
 import { useCallback, useEffect, useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 import {
     Alert,
     Image,
@@ -33,14 +37,22 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarItemManager from '../../components/StarItemManager';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearAllFriendRequests, createFriendRequestNotification, debugFriendRequests, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, declineFriendRequest, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
+import { createPlayerManually } from '../../utils/playerStorage';
+import ChangeIndicator from '../../components/ChangeIndicator';
+import { useStatsChanges } from '../../hooks/useStatsChanges';
 
 const iceBg = require('../../assets/images/led.jpg');
 
 export default function PlayerProfile() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { t, language } = useLanguage();
+  
+  // Отладочная информация
+  console.log('Current language:', language);
+  console.log('Loading profile translation:', t('profile.loadingProfile'));
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,8 +71,8 @@ export default function PlayerProfile() {
     showCancel: false,
     showSecondary: false,
     confirmText: 'OK',
-    cancelText: 'Отмена',
-    secondaryText: 'Дополнительно'
+    cancelText: t('profile.cancel'),
+    secondaryText: t('profile.additional')
   });
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -79,11 +91,47 @@ export default function PlayerProfile() {
   const [pastTeams, setPastTeams] = useState<PastTeam[]>([]);
   
   // Массивы для селекторов
-  const countries = ['Беларусь', 'Россия', 'Канада', 'США', 'Финляндия', 'Швеция', 'Литва', 'Латвия', 'Польша'];
-  const positions = ['Центральный нападающий', 'Крайний нападающий', 'Защитник', 'Вратарь'];
-  const grips = ['Левый', 'Правый'];
+  const positions = [t('profile.center'), t('profile.winger'), t('profile.defender'), t('profile.goalie')];
+  const grips = [t('profile.left'), t('profile.right')];
 
+  const [newUserData, setNewUserData] = useState<Partial<Player>>({
+    name: '',
+    phone: '',
+    status: 'player',
+    birthDate: '',
+    country: 'Беларусь',
+    team: '',
+    position: '',
+    avatar: null
+  });
 
+  // Хук для отслеживания изменений статистики
+  const { statChanges, normativeChanges } = useStatsChanges({ 
+    playerId: id as string || '',
+    refreshTrigger: Date.now() // Обновляем при каждом рендере
+  });
+
+  // Функция для получения цвета обводки в зависимости от статуса
+  const getAvatarBorderColor = (status: string) => {
+    switch (status) {
+      case 'star': return '#FFD700'; // Золотистый для звезд
+      case 'coach': return '#FF4444'; // Красный для тренеров
+      case 'scout': return '#FF4444'; // Красный для скаутов
+      case 'admin': return '#000000'; // Черный для админов
+      default: return '#FFFFFF'; // Белый для обычных игроков
+    }
+  };
+
+  // Функция для получения изменений по конкретному полю
+  const getChangeForField = (field: string): number => {
+    const statChange = statChanges.find(change => change.field === field);
+    const normativeChange = normativeChanges.find(change => change.field === field);
+    
+    if (statChange) return statChange.change;
+    if (normativeChange) return normativeChange.change;
+    
+    return 0;
+  };
 
   useEffect(() => {
     loadPlayerData();
@@ -340,50 +388,39 @@ export default function PlayerProfile() {
   };
 
   // Функция для форматирования даты в читаемый вид
-  const formatBirthDate = (dateString: string): string => {
-    if (!dateString) return 'Не указана';
+  const formatBirthDate = (dateString: string, language: string = 'ru'): string => {
+    if (!dateString) return t('profile.notSpecified');
     
-    let day: number, month: number, year: number;
-    
-    // Проверяем формат ДД.ММ.ГГГГ
-    if (dateString.includes('.')) {
-      const parts = dateString.split('.');
+    try {
+      let day, month, year;
       
-      if (parts.length !== 3) {
-        return dateString;
+      // Проверяем формат YYYY-MM-DD (из базы данных)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        const [yearStr, monthStr, dayStr] = dateString.split('-');
+        year = parseInt(yearStr);
+        month = parseInt(monthStr);
+        day = parseInt(dayStr);
+      }
+      // Проверяем формат DD.MM.YYYY (старый формат)
+      else if (dateString.includes('.')) {
+        [day, month, year] = dateString.split('.').map(Number);
+      }
+      else {
+        return t('profile.notSpecified');
       }
       
-      day = parseInt(parts[0]);
-      month = parseInt(parts[1]);
-      year = parseInt(parts[2]);
-    }
-    // Проверяем формат ГГГГ-ММ-ДД (ISO)
-    else if (dateString.includes('-')) {
-      const parts = dateString.split('-');
-      
-      if (parts.length !== 3) {
-        return dateString;
+      if (!day || !month || !year) {
+        return t('profile.notSpecified');
       }
       
-      year = parseInt(parts[0]);
-      month = parseInt(parts[1]);
-      day = parseInt(parts[2]);
+      // Форматируем в нужный формат DD.MM.YYYY
+      const formattedDay = day.toString().padStart(2, '0');
+      const formattedMonth = month.toString().padStart(2, '0');
+      return `${formattedDay}.${formattedMonth}.${year}`;
+    } catch (error) {
+      console.error('❌ Ошибка форматирования даты:', error);
+      return t('profile.notSpecified');
     }
-    // Если формат не распознан
-    else {
-      return dateString;
-    }
-    
-    if (isNaN(day) || isNaN(month) || isNaN(year)) {
-      return dateString;
-    }
-    
-    const months = [
-      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-    ];
-    
-    return `${day} ${months[month - 1]} ${year}`;
   };
 
   const handleSendMessage = () => {
@@ -410,7 +447,7 @@ export default function PlayerProfile() {
         const success = await removeFriend(currentUser.id, player.id);
         if (success) {
           setFriendshipStatus('none');
-          showCustomAlert('Успешно', `${player.name} удален из друзей`, 'success');
+          showCustomAlert('Успешно', t('profile.removedFromFriends', { name: player.name }), 'success');
         } else {
           showCustomAlert('Ошибка', 'Не удалось удалить из друзей', 'error');
         }
@@ -421,7 +458,7 @@ export default function PlayerProfile() {
 
         if (success) {
           setFriendshipStatus('pending');
-          showCustomAlert('Запрос отправлен', `Запрос дружбы отправлен ${player.name}`, 'success');
+          showCustomAlert('Запрос отправлен', t('profile.friendRequestSent', { name: player.name }), 'success');
         } else {
           showCustomAlert('Ошибка', 'Не удалось отправить запрос дружбы', 'error');
         }
@@ -439,7 +476,7 @@ export default function PlayerProfile() {
         const success = await acceptFriendRequest(currentUser.id, player.id);
         if (success) {
           setFriendshipStatus('friends');
-          showCustomAlert('Дружба принята', `${player.name} добавлен в друзья`, 'success');
+          showCustomAlert('Дружба принята', t('profile.friendshipAccepted', { name: player.name }), 'success');
         } else {
           showCustomAlert('Ошибка', 'Не удалось принять запрос', 'error');
         }
@@ -499,93 +536,7 @@ export default function PlayerProfile() {
 
 
 
-  const handleDebugFriendRequests = async () => {
-    console.log('🔧 Отладка запросов дружбы...');
-    await debugFriendRequests();
-    showCustomAlert('Отладка', 'Проверьте консоль для информации о запросах дружбы', 'info');
-  };
 
-  const handleClearAllFriendRequests = async () => {
-    await clearAllFriendRequests();
-    showCustomAlert('Очистка', 'Все запросы дружбы очищены', 'info');
-    // Обновляем данные после очистки
-    await loadPlayerData();
-  };
-
-  const handleTestNotification = async () => {
-    if (!currentUser || !player) return;
-    
-
-    await createFriendRequestNotification(player.id, currentUser.id);
-    showCustomAlert('Тест', 'Тестовое уведомление создано', 'info');
-  };
-
-  const handleViewAllNotifications = async () => {
-    try {
-      const notificationsData = await AsyncStorage.getItem('hockeystars_notifications');
-      const allNotifications = notificationsData ? JSON.parse(notificationsData) : [];
-
-      showCustomAlert('Отладка', `Всего уведомлений: ${allNotifications.length}`, 'info');
-    } catch (error) {
-      console.error('❌ Ошибка просмотра уведомлений:', error);
-    }
-  };
-
-  const handleSendFriendRequestFromPlayer = async () => {
-    if (!currentUser || !player) return;
-    
-
-    try {
-      await sendFriendRequest(player.id, currentUser.id);
-      showCustomAlert('Успех', 'Запрос дружбы отправлен от имени игрока', 'success');
-    } catch (error) {
-      console.error('❌ Ошибка отправки запроса дружбы:', error);
-      showCustomAlert('Ошибка', 'Не удалось отправить запрос дружбы', 'error');
-    }
-  };
-
-  const handleTestMessage = async () => {
-    if (!currentUser || !player) return;
-    
-            // Тестируем отправку сообщения
-    try {
-      const { sendMessageSimple } = await import('../../utils/playerStorage');
-      const success = await sendMessageSimple(player.id, currentUser.id, 'Тестовое сообщение от игрока!');
-      if (success) {
-        showCustomAlert('Успех', 'Тестовое сообщение отправлено', 'success');
-      } else {
-        showCustomAlert('Ошибка', 'Не удалось отправить сообщение', 'error');
-      }
-    } catch (error) {
-      console.error('❌ Ошибка отправки тестового сообщения:', error);
-      showCustomAlert('Ошибка', 'Не удалось отправить сообщение', 'error');
-    }
-  };
-
-  const handleViewAllMessages = async () => {
-    try {
-      const messagesData = await AsyncStorage.getItem('hockeystars_messages');
-      const allMessages = messagesData ? JSON.parse(messagesData) : [];
-              // Все сообщения в системе
-      showCustomAlert('Отладка', `Всего сообщений: ${allMessages.length}`, 'info');
-    } catch (error) {
-      console.error('❌ Ошибка просмотра сообщений:', error);
-    }
-  };
-
-  const handleRefreshCounters = async () => {
-    if (!currentUser) return;
-    
-
-    try {
-      const { getUnreadMessageCount } = await import('../../utils/playerStorage');
-      const unreadMessagesCount = await getUnreadMessageCount(currentUser.id);
-              // Обновленный счетчик непрочитанных сообщений
-      showCustomAlert('Обновление', `Непрочитанных сообщений: ${unreadMessagesCount}`, 'info');
-    } catch (error) {
-      console.error('❌ Ошибка обновления счетчиков:', error);
-    }
-  };
 
   const handleCurrentTeamChange = async (teams: PastTeam[]) => {
     try {
@@ -630,9 +581,13 @@ export default function PlayerProfile() {
         // Убираем pastTeams, так как команды сохраняются в отдельной таблице
       };
       
+      
       // Синхронизируем команды с базой данных
       try {
-        const { syncPlayerTeams, clearOldPastTeamsData } = await import('../../utils/playerStorage');
+        const { syncPlayerTeams, clearOldPastTeamsData, addTeamOrderField } = await import('../../utils/playerStorage');
+        
+        // Добавляем поле team_order если его еще нет (выполняется один раз)
+        await addTeamOrderField();
         
         // Сначала очищаем старые данные команд
         const clearSuccess = await clearOldPastTeamsData(player.id);
@@ -656,9 +611,10 @@ export default function PlayerProfile() {
       }
       // Выполняем обновление данных игрока и перезагрузку команд параллельно
       const [refreshedPlayer, teams] = await Promise.all([
-        updatePlayer(player.id, updatedPlayer, currentUser.id).then(() => getPlayerById(player.id)),
+        updatePlayer(player.id, updatedPlayer).then(() => getPlayerById(player.id)),
         import('../../utils/playerStorage').then(({ getPlayerTeamsAsPastTeams }) => getPlayerTeamsAsPastTeams(player.id))
       ]);
+      
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
@@ -720,33 +676,19 @@ export default function PlayerProfile() {
     // Запрашиваем подтверждение
     showCustomAlert(
       'Удаление пользователя',
-      `Вы уверены, что хотите удалить пользователя "${player.name}"? Это действие нельзя отменить.`,
+      t('profile.deleteUserConfirm', { name: player.name }),
       'warning',
       async () => {
-        try {
-      
-          
-          // Удаляем пользователя из базы данных
-          const { error } = await supabase
-            .from('players')
-            .delete()
-            .eq('id', player.id);
-          
-          if (error) {
-            console.error('❌ Ошибка удаления пользователя:', error);
-            showCustomAlert('Ошибка', 'Не удалось удалить пользователя', 'error');
-          } else {
-
+        const success = await deletePlayer(player.id);
+        if (success) {
             showCustomAlert(
               'Успешно', 
-              `Пользователь "${player.name}" удален`,
+            t('profile.userDeleted', { name: player.name }),
               'success',
               () => router.push('/')
             );
-          }
-        } catch (error) {
-          console.error('❌ Общая ошибка удаления:', error);
-          showCustomAlert('Ошибка', 'Произошла ошибка при удалении пользователя', 'error');
+        } else {
+          showCustomAlert('Ошибка', 'Не удалось удалить пользователя', 'error');
         }
       }
     );
@@ -754,8 +696,8 @@ export default function PlayerProfile() {
 
   const handleLogout = async () => {
     showCustomAlert(
-      'Выход из профиля',
-      'Вы уверены, что хотите выйти из профиля?',
+      t('logoutConfirm'),
+      t('logoutConfirmMessage'),
       'warning',
       async () => {
         try {
@@ -774,13 +716,69 @@ export default function PlayerProfile() {
     );
   };
 
+  const handleCreateUser = async () => {
+    if (!currentUser || currentUser.status !== 'admin') {
+      Alert.alert('Ошибка', 'Только администратор может создавать пользователей');
+      return;
+    }
+
+    // Проверяем обязательные поля
+    if (!newUserData.name || !newUserData.phone) {
+      Alert.alert('Ошибка', 'Пожалуйста, заполните имя и номер телефона');
+      return;
+    }
+
+    try {
+      const createdPlayer = await createPlayerManually(
+        {
+          ...newUserData,
+          id: Date.now().toString(),
+          age: 0,
+          goals: '',
+          assists: '',
+          games: '',
+          pullUps: '',
+          pushUps: '',
+          plankTime: '',
+          sprint100m: '',
+          longJump: ''
+        } as Player,
+        currentUser.id
+      );
+
+      if (createdPlayer) {
+        Alert.alert('Успех', `Пользователь ${createdPlayer.name} создан`);
+        
+        // Сбрасываем форму и закрываем модальное окно
+        setNewUserData({
+          name: '',
+          phone: '',
+          status: 'player',
+          birthDate: '',
+          country: 'Беларусь',
+          team: '',
+          position: '',
+          avatar: null
+        });
+        setShowCreateUserModal(false);
+      } else {
+        Alert.alert('Ошибка', 'Не удалось создать пользователя');
+      }
+    } catch (error) {
+      console.error('Ошибка создания пользователя:', error);
+      Alert.alert('Ошибка', 'Не удалось создать пользователя');
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Загрузка профиля...</Text>
+              <Text style={styles.loadingText}>
+                {t('profile.loadingProfile') === 'profile.loadingProfile' ? 'Loading profile...' : t('profile.loadingProfile')}
+              </Text>
             </View>
           </View>
         </ImageBackground>
@@ -794,7 +792,9 @@ export default function PlayerProfile() {
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>Игрок не найден</Text>
+              <Text style={styles.errorText}>
+                {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Player not found' : t('profile.playerNotFound')}
+              </Text>
             </View>
           </View>
         </ImageBackground>
@@ -814,9 +814,27 @@ export default function PlayerProfile() {
 
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
+              {/* Круглая иконка сообщения справа от аватара */}
+              {currentUser && currentUser.id !== player.id && (
+                <TouchableOpacity 
+                  style={styles.messageIconButton}
+                  onPress={() => {
+                    router.push({ 
+                      pathname: '/chat/[id]', 
+                      params: { id: player.id } 
+                    });
+                  }}
+                >
+                  <Ionicons 
+                    name="chatbubble-outline" 
+                    size={20} 
+                    color="#fff" 
+                  />
+                </TouchableOpacity>
+              )}
               {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                 <TouchableOpacity 
-                  style={styles.profileImage}
+                  style={[styles.profileImage, { borderColor: getAvatarBorderColor(player.status) }]}
                   onPress={() => {
                     showCustomAlert('Редактирование фото', 'Функция редактирования фото будет добавлена позже', 'info');
                   }}
@@ -832,6 +850,8 @@ export default function PlayerProfile() {
 
                 if (hasValidImage) {
                   return (
+                    <View style={[styles.profileImage]}>
+                      <View style={[styles.innerCircle, { borderColor: getAvatarBorderColor(player.status) }]}>
                     <Image 
                       source={{ 
                         uri: imageSource,
@@ -840,13 +860,17 @@ export default function PlayerProfile() {
                               'Cache-Control': 'no-cache'
                             }
                           }}
-                          style={styles.profileImage}
+                              style={styles.avatarImage}
                         />
+                      </View>
+                    </View>
                       );
                     } else {
                       return (
-                        <View style={[styles.profileImage, styles.avatarPlaceholder]}>
+                        <View style={[styles.profileImage]}>
+                          <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColor(player.status) }]}>
                           <Ionicons name="person" size={48} color="#FFFFFF" />
+                          </View>
                         </View>
                       );
                     }
@@ -867,6 +891,8 @@ export default function PlayerProfile() {
 
                   if (hasValidImage) {
                     return (
+                      <View style={[styles.profileImage]}>
+                        <View style={[styles.innerCircle, { borderColor: getAvatarBorderColor(player.status) }]}>
                       <Image 
                         source={{ 
                           uri: imageSource,
@@ -875,7 +901,7 @@ export default function PlayerProfile() {
                           'Cache-Control': 'no-cache'
                         }
                       }}
-                      style={styles.profileImage}
+                          style={styles.avatarImage}
                       onError={(error) => {
                                 console.error('❌ Ошибка загрузки аватара в профиле игрока:', error);
                       }}
@@ -883,11 +909,15 @@ export default function PlayerProfile() {
                 
                       }}
                     />
+                        </View>
+                      </View>
                   );
                 } else {
                   return (
-                    <View style={[styles.profileImage, styles.avatarPlaceholder]}>
+                    <View style={[styles.profileImage]}>
+                      <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColor(player.status) }]}>
                       <Ionicons name="person" size={48} color="#FFFFFF" />
+                      </View>
                     </View>
                   );
                 }
@@ -929,17 +959,20 @@ export default function PlayerProfile() {
               </View>
               <View style={styles.statusContainer}>
                 <Text style={styles.playerStatus}>
-                  {player.status === 'player' ? 'Игрок' : 
-                   player.status === 'coach' ? 'Тренер' : 
-                   player.status === 'scout' ? 'Скаут' : 
-                   player.status === 'admin' ? 'Техподдержка' : 'Звезда'}
+                  {player.status === 'player' ? t('profile.player') : 
+                   player.status === 'coach' ? t('profile.coach') : 
+                   player.status === 'scout' ? t('profile.scout') : 
+                   player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                 </Text>
               </View>
               {playerTeams.length > 0 && (
                 <View style={styles.playerTeamsContainer}>
                   {playerTeams.map((team, index) => (
                     <Text key={index} style={styles.playerTeam}>
-                      {team.teamName}{index < playerTeams.length - 1 ? ', ' : ''}
+                      {(() => {
+                        const translationKey = `teams.${team.teamName}`;
+                        return t(translationKey, { defaultValue: team.teamName });
+                      })()}{index < playerTeams.length - 1 ? ', ' : ''}
                     </Text>
                   ))}
                 </View>
@@ -949,7 +982,7 @@ export default function PlayerProfile() {
               {player.status === 'player' && player.hockeyStartDate && (
                 <View style={styles.hockeyExperienceContainer}>
                   <Text style={styles.hockeyExperienceText}>
-                  В хоккее {calculateHockeyExperience(player.hockeyStartDate)}
+                  {calculateHockeyExperience(player.hockeyStartDate, language)}
                 </Text>
                 </View>
               )}
@@ -960,200 +993,23 @@ export default function PlayerProfile() {
 
             </View>
 
-            {/* Секция управления дружбой - показываем для всех статусов дружбы */}
-            {currentUser && currentUser.id !== player.id && (
-              <View style={styles.friendRequestSection}>
-                {friendshipStatus === 'received_request' ? (
-                  // Запрос дружбы получен
-                  <>
-                    <View style={styles.friendRequestHeader}>
-                      <Ionicons name="person-add-outline" size={24} color="#FF4444" />
-                      <Text style={[styles.friendRequestTitle, { color: '#FF4444' }]}>Запрос дружбы</Text>
-                    </View>
-                    <Text style={styles.friendRequestMessage}>
-                      {player.name} хочет добавить вас в друзья
-                    </Text>
-                    <View style={styles.friendRequestButtons}>
-                      <TouchableOpacity 
-                        style={[styles.friendRequestButton, styles.acceptRequestButton]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="checkmark-outline" size={20} color="#fff" />
-                        <Text style={styles.friendRequestButtonText}>
-                          {friendLoading ? 'Загрузка...' : 'Принять'}
-                        </Text>
-                      </TouchableOpacity>
-                      
-                      <TouchableOpacity 
-                        style={[styles.friendRequestButton, styles.declineRequestButton]} 
-                        onPress={handleDeclineFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="close-outline" size={20} color="#000" />
-                        <Text style={[styles.friendRequestButtonText, { color: '#000', fontFamily: 'Gilroy-Bold' }]}>
-                          {friendLoading ? 'Загрузка...' : 'Отклонить'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                ) : friendshipStatus === 'friends' ? (
-                  // Уже друзья
-                  <>
-                    <View style={styles.friendRequestHeader}>
-                      <Ionicons name="people-outline" size={24} color="#FF4444" />
-                      <Text style={[styles.friendRequestTitle, { color: '#FF4444' }]}>Друзья</Text>
-                    </View>
-                    <Text style={styles.friendRequestMessage}>
-                      Вы друзья с {player.name}
-                    </Text>
-                    <View style={styles.friendRequestButtons}>
-                      <TouchableOpacity 
-                        style={[styles.friendRequestButton, { backgroundColor: 'rgba(255, 0, 0, 0.3)', borderColor: '#FF0000' }]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="person-remove-outline" size={20} color="#fff" />
-                        <Text style={styles.friendRequestButtonText}>
-                          {friendLoading ? 'Загрузка...' : 'Удалить из друзей'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
-                  // Запрос дружбы отправлен
-                  <>
-                    <View style={styles.friendRequestHeader}>
-                      <Ionicons name="time-outline" size={24} color="#FF4444" />
-                      <Text style={[styles.friendRequestTitle, { color: '#FF4444' }]}>Запрос отправлен</Text>
-                    </View>
-                    <Text style={styles.friendRequestMessage}>
-                      Запрос дружбы отправлен {player.name}
-                    </Text>
-                    <View style={styles.friendRequestButtons}>
-                      <TouchableOpacity 
-                        style={[styles.friendRequestButton, { backgroundColor: 'rgba(255, 255, 255, 0.3)', borderColor: '#FFFFFF' }]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="close-outline" size={20} color="#fff" />
-                        <Text style={[styles.friendRequestButtonText, { color: '#fff' }]}>
-                          {friendLoading ? 'Загрузка...' : 'Отменить запрос'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                ) : (
-                  // Нет дружбы - можно добавить
-                  <>
-                    <View style={styles.friendRequestHeader}>
-                      <Ionicons name="person-add-outline" size={24} color="#FF4444" />
-                      <Text style={[styles.friendRequestTitle, { color: '#FF4444' }]}>Добавить в друзья</Text>
-                    </View>
-                    <Text style={styles.friendRequestMessage}>
-                      Хотите добавить {player.name} в друзья?
-                    </Text>
-                    <View style={styles.friendRequestButtons}>
-                      <TouchableOpacity 
-                        style={[styles.friendRequestButton, { backgroundColor: 'rgba(255, 68, 68, 0.3)', borderColor: '#FF4444' }]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="person-add-outline" size={20} color="#fff" />
-                        <Text style={styles.friendRequestButtonText}>
-                          {friendLoading ? 'Загрузка...' : 'Добавить в друзья'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                )}
-              </View>
-            )}
 
-            {/* Кнопка отладки для администратора */}
-            {currentUser && currentUser.status === 'admin' && (
+
+            {/* Кнопка добавления пользователя для администратора */}
+            {currentUser && currentUser.status === 'admin' && currentUser.id === player?.id && (
               <View style={styles.section}>
                 <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(0, 0, 255, 0.3)', borderColor: '#0000FF' }]} 
-                  onPress={handleDebugFriendRequests}
-                >
-                  <Ionicons name="bug-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Отладка запросов дружбы
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(255, 0, 0, 0.3)', borderColor: '#FF0000', marginTop: 10 }]} 
-                  onPress={handleClearAllFriendRequests}
-                >
-                  <Ionicons name="trash-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Очистить все запросы дружбы
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(0, 255, 0, 0.3)', borderColor: '#00FF00', marginTop: 10 }]} 
-                  onPress={handleTestNotification}
-                >
-                  <Ionicons name="notifications-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Тест уведомления
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(255, 165, 0, 0.3)', borderColor: '#FFA500', marginTop: 10 }]} 
-                  onPress={handleViewAllNotifications}
-                >
-                  <Ionicons name="eye-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Просмотр всех уведомлений
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(128, 0, 128, 0.3)', borderColor: '#800080', marginTop: 10 }]} 
-                  onPress={handleSendFriendRequestFromPlayer}
+                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(76, 175, 80, 0.3)', borderColor: '#4CAF50' }]} 
+                  onPress={() => router.push('/admin/create-user')}
                 >
                   <Ionicons name="person-add-outline" size={20} color="#fff" />
                   <Text style={styles.friendRequestButtonText}>
-                    Отправить запрос от игрока
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(0, 128, 128, 0.3)', borderColor: '#008080', marginTop: 10 }]} 
-                  onPress={handleTestMessage}
-                >
-                  <Ionicons name="chatbubble-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Тест сообщения
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(128, 128, 0, 0.3)', borderColor: '#808000', marginTop: 10 }]} 
-                  onPress={handleViewAllMessages}
-                >
-                  <Ionicons name="eye-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Просмотр всех сообщений
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, { backgroundColor: 'rgba(75, 0, 130, 0.3)', borderColor: '#4B0082', marginTop: 10 }]} 
-                  onPress={handleRefreshCounters}
-                >
-                  <Ionicons name="refresh-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Обновить счетчики
+                    {t('admin.addUser')}
                   </Text>
                 </TouchableOpacity>
               </View>
             )}
+
 
             {/* Статистика текущего сезона - только для обычных игроков с данными */}
             {player && player.status !== 'star' && (() => {
@@ -1169,11 +1025,11 @@ export default function PlayerProfile() {
               
               return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Статистика текущего сезона</Text>
+                  <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                   {isEditing ? (
                     <View style={styles.statsGrid}>
                       <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Игр</Text>
+                        <Text style={styles.statLabel}>{t('profile.gamesCount')}</Text>
                         <TextInput
                           style={styles.editInput}
                           value={editData.games !== undefined ? editData.games : (player.games || '')}
@@ -1184,7 +1040,7 @@ export default function PlayerProfile() {
                         />
                       </View>
                       <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Голов</Text>
+                        <Text style={styles.statLabel}>{t('profile.goalsCount')}</Text>
                         <TextInput
                           style={styles.editInput}
                           value={editData.goals !== undefined ? editData.goals : (player.goals || '')}
@@ -1195,7 +1051,7 @@ export default function PlayerProfile() {
                         />
                       </View>
                       <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Передач</Text>
+                        <Text style={styles.statLabel}>{t('profile.assists')}</Text>
                         <TextInput
                           style={styles.editInput}
                           value={editData.assists !== undefined ? editData.assists : (player.assists || '')}
@@ -1210,48 +1066,198 @@ export default function PlayerProfile() {
                   <View style={styles.statsGrid}>
                     {pointsNum > 0 && (
                       <View style={styles.statItem}>
+                        <View style={styles.statCircle}>
                         <Text style={styles.statValue}>{pointsNum.toString()}</Text>
-                        <Text style={styles.statLabel}>Очков</Text>
-                      </View>
-                    )}
-                    <View style={styles.statItem}>
-                      <Text style={styles.statValue}>{friends.length}</Text>
-                      <Text style={styles.statLabel}>Друзей</Text>
-                    </View>
-                    {goalsNum > 0 && (
-                      <View style={styles.statItem}>
-                        <Text style={styles.statValue}>{goalsNum.toString()}</Text>
-                        <Text style={styles.statLabel}>Голов</Text>
+                        </View>
+                        <View style={styles.statLabelContainer}>
+                          <Text style={styles.statLabel}>
+                            {t('profile.points') === 'profile.points' ? 'points' : t('profile.points')}
+                          </Text>
+                        </View>
                       </View>
                     )}
                     {assistsNum > 0 && (
+                    <View style={styles.statItem}>
+                        <View style={styles.statCircle}>
+                          <Text style={styles.statValue}>{assistsNum.toString()}</Text>
+                        </View>
+                        <View style={styles.statLabelContainer}>
+                          <Text style={styles.statLabel}>
+                            {t('profile.assists') === 'profile.assists' ? 'assists' : t('profile.assists')}
+                          </Text>
+                          <ChangeIndicator 
+                            change={getChangeForField('assists')} 
+                            size="small" 
+                          />
+                        </View>
+                    </View>
+                    )}
+                    {goalsNum > 0 && (
                       <View style={styles.statItem}>
-                        <Text style={styles.statValue}>{assistsNum.toString()}</Text>
-                        <Text style={styles.statLabel}>Передач</Text>
+                        <View style={styles.statCircle}>
+                        <Text style={styles.statValue}>{goalsNum.toString()}</Text>
+                        </View>
+                        <View style={styles.statLabelContainer}>
+                          <Text style={styles.statLabel}>
+                            {t('profile.goalsCount') === 'profile.goalsCount' ? 'goals' : t('profile.goalsCount')}
+                          </Text>
+                          <ChangeIndicator 
+                            change={getChangeForField('goals')} 
+                            size="small" 
+                          />
+                        </View>
                       </View>
                     )}
                     {gamesNum > 0 && (
                       <View style={styles.statItem}>
+                        <View style={styles.statCircle}>
                         <Text style={styles.statValue}>{gamesNum.toString()}</Text>
-                        <Text style={styles.statLabel}>Игр</Text>
+                        </View>
+                        <View style={styles.statLabelContainer}>
+                          <Text style={styles.statLabel}>
+                            {t('profile.gamesCount') === 'profile.gamesCount' ? 'games' : t('profile.gamesCount')}
+                          </Text>
+                          <ChangeIndicator 
+                            change={getChangeForField('games')} 
+                            size="small" 
+                          />
+                        </View>
                       </View>
                     )}
                   </View>
                   )}
                 </View>
               ) : null;
-            })()}
+            })(            )}
+
+            {/* Основная информация */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('profile.basicInfo')}</Text>
+              <View style={styles.infoGrid}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>{t('profile.country')}</Text>
+                  {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                    <TouchableOpacity
+                      style={styles.pickerButton}
+                      onPress={() => setShowCountryPicker(true)}
+                    >
+                      <Text style={styles.pickerButtonText}>
+                        {editData.country || t(`countries.${player.country.toLowerCase()}`)}
+                      </Text>
+                      <Ionicons name="chevron-down" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Text style={styles.infoValue}>{player.country ? t(`countries.${player.country.toLowerCase()}`) : t('profile.notSpecified')}</Text>
+                  )}
+                </View>
+
+                {player.status === 'player' && (
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.position')}</Text>
+                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                      <TouchableOpacity
+                        style={styles.pickerButton}
+                        onPress={() => setShowPositionPicker(true)}
+                      >
+                        <Text style={styles.pickerButtonText}>
+                          {editData.position || (() => {
+                            const positionKey = `profile.${player.position}`;
+                            const translation = t(positionKey);
+                            return translation === positionKey ? player.position : translation;
+                          })()}
+                        </Text>
+                        <Ionicons name="chevron-down" size={16} color="#fff" />
+                      </TouchableOpacity>
+                    ) : (
+                      <Text style={styles.infoValue}>
+                        {player.position ? (() => {
+                          const positionKey = `profile.${player.position}`;
+                          const translation = t(positionKey);
+                          return translation === positionKey ? player.position : translation;
+                        })() : t('profile.notSpecified')}
+                      </Text>
+                    )}
+                  </View>
+                )}
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>
+                    {t('profile.birthDate') === 'profile.birthDate' ? (language === 'ru' ? 'Дата рождения' : 'Birth Date') : t('profile.birthDate')}
+                  </Text>
+                  {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                    <TouchableOpacity
+                      style={styles.pickerButton}
+                      onPress={showBirthDatePickerModal}
+                    >
+                      <Text style={styles.pickerButtonText}>
+                        {editData.birthDate || player.birthDate || 'Выберите дату'}
+                      </Text>
+                      <Ionicons name="calendar-outline" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Text style={styles.infoValue}>{formatBirthDate(player.birthDate, language)}</Text>
+                  )}
+                </View>
+                {player.status === 'player' && (
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.startedHockey')}</Text>
+                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                    <TextInput
+                      style={styles.editInput}
+                        value={editData.hockeyStartDate !== undefined ? editData.hockeyStartDate : (player.hockeyStartDate || '')}
+                        onChangeText={(text) => setEditData({...editData, hockeyStartDate: text})}
+                        placeholder="ММ.ГГГГ (например: 12.2014)"
+                    />
+                  ) : (
+                      <Text style={styles.infoValue}>
+                        {player.hockeyStartDate || t('profile.notSpecified')}
+                      </Text>
+                  )}
+                </View>
+                )}
+                {player.status === 'player' && (
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.grip')}</Text>
+                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                      <TouchableOpacity
+                        style={styles.pickerButton}
+                        onPress={() => setShowGripPicker(true)}
+                      >
+                        <Text style={styles.pickerButtonText}>
+                          {editData.grip || 
+                           (t(`profile.${player.grip}`) === `profile.${player.grip}` ? 
+                            (player.grip === 'Левый' ? (language === 'ru' ? 'Левый' : 'Left') : 
+                             player.grip === 'Правый' ? (language === 'ru' ? 'Правый' : 'Right') : 
+                             player.grip) : 
+                            t(`profile.${player.grip}`))
+                          }
+                        </Text>
+                        <Ionicons name="chevron-down" size={16} color="#fff" />
+                      </TouchableOpacity>
+                    ) : (
+                      <Text style={styles.infoValue}>
+                        {t(`profile.${player.grip}`) === `profile.${player.grip}` ? 
+                          (player.grip === 'Левый' ? (language === 'ru' ? 'Левый' : 'Left') : 
+                           player.grip === 'Правый' ? (language === 'ru' ? 'Правый' : 'Right') : 
+                           player.grip) : 
+                          t(`profile.${player.grip}`) || player.grip || (language === 'ru' ? 'Не указан' : 'Not specified')
+                        }
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </View>
+            </View>
 
             {/* Секция команд */}
             {(playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
               <View style={styles.teamsSection}>
-                <Text style={styles.teamsSectionTitle}>Команды</Text>
+                <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
                 
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                   <>
                     {/* Текущие команды */}
                     <View style={styles.teamsSubsection}>
-                      <Text style={styles.subsectionTitle}>Текущие команды</Text>
+                      <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
                       <CurrentTeamsSection
                         currentTeams={playerTeams}
                         onCurrentTeamsChange={setPlayerTeams}
@@ -1266,7 +1272,7 @@ export default function PlayerProfile() {
                     
                     {/* Прошлые команды */}
                     <View style={styles.teamsSubsection}>
-                      <Text style={styles.subsectionTitle}>Прошлые команды</Text>
+                      <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
                       <PastTeamsSection
                         pastTeams={pastTeams}
                         isEditing={isEditing}
@@ -1284,7 +1290,7 @@ export default function PlayerProfile() {
                     {/* Текущие команды */}
                     {playerTeams.length > 0 && (
                       <>
-                        <Text style={styles.subsectionTitle}>Текущие команды</Text>
+                        <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
                         <View style={styles.teamsListContainer}>
                           {playerTeams.map((team, index) => (
                             <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
@@ -1292,7 +1298,10 @@ export default function PlayerProfile() {
                                 <Ionicons name="star" size={16} color="#FF4444" />
                               </Animated.View>
                               <Text style={styles.teamsListText}>
-                                {team.teamName} ({team.startYear} - настоящее время)
+                                {(() => {
+                        const translationKey = `teams.${team.teamName}`;
+                        return t(translationKey, { defaultValue: team.teamName });
+                      })()} ({team.startYear} - {t('profile.настоящее время')})
                               </Text>
                             </View>
                           ))}
@@ -1303,7 +1312,7 @@ export default function PlayerProfile() {
                     {/* Прошлые команды */}
                     {pastTeams.length > 0 && (
                       <>
-                        <Text style={styles.subsectionTitle}>Прошлые команды</Text>
+                        <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
                         <View style={styles.teamsListContainer}>
                           {pastTeams.map((team, index) => (
                             <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
@@ -1311,7 +1320,10 @@ export default function PlayerProfile() {
                                 <Ionicons name="star" size={16} color="#888" />
                               </Animated.View>
                               <Text style={styles.teamsListText}>
-                                {team.teamName} ({team.startYear}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
+                                {(() => {
+                        const translationKey = `teams.${team.teamName}`;
+                        return t(translationKey, { defaultValue: team.teamName });
+                      })()} ({team.startYear}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
                               </Text>
                             </View>
                           ))}
@@ -1326,164 +1338,67 @@ export default function PlayerProfile() {
             {/* Информация о команде для звезд */}
             {player.status === 'star' && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Информация о команде</Text>
+                <Text style={styles.sectionTitle}>{t('profile.teamInfo')}</Text>
                 <View style={styles.infoGrid}>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Команда</Text>
-                    <Text style={styles.infoValue}>{player.team || 'Не указана'}</Text>
+                    <Text style={styles.infoLabel}>{t('profile.team')}</Text>
+                    <Text style={styles.infoValue}>{player.team ? t(`teams.${player.team}`, { defaultValue: player.team }) : t('profile.notSpecified')}</Text>
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Друзей</Text>
+                    <Text style={styles.infoLabel}>{t('profile.friendsCount')}</Text>
                     <Text style={styles.infoValue}>{friends.length}</Text>
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Страна</Text>
-                    <Text style={styles.infoValue}>{player.country}</Text>
+                    <Text style={styles.infoLabel}>{t('profile.country')}</Text>
+                    <Text style={styles.infoValue}>{t(`countries.${player.country?.toLowerCase()}`) || player.country}</Text>
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Позиция</Text>
-                    <Text style={styles.infoValue}>{player.position || 'Не указана'}</Text>
+                    <Text style={styles.infoLabel}>{t('profile.position')}</Text>
+                    <Text style={styles.infoValue}>{player.position ? t(`profile.${player.position}`) || player.position : t('profile.notSpecified')}</Text>
                   </View>
                   {player.grip && (
                     <View style={styles.infoItem}>
-                      <Text style={styles.infoLabel}>Хват</Text>
-                      <Text style={styles.infoValue}>{player.grip}</Text>
+                      <Text style={styles.infoLabel}>{t('profile.grip')}</Text>
+                      <Text style={styles.infoValue}>{t(`profile.${player.grip}`) || player.grip}</Text>
                     </View>
                   )}
                 </View>
               </View>
             )}
 
-
-            {/* Основная информация */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Основная информация</Text>
-              <View style={styles.infoGrid}>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>Страна</Text>
-                  {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                    <TouchableOpacity
-                      style={styles.pickerButton}
-                      onPress={() => setShowCountryPicker(true)}
-                    >
-                      <Text style={styles.pickerButtonText}>
-                        {editData.country || player.country || 'Выберите страну'}
-                      </Text>
-                      <Ionicons name="chevron-down" size={16} color="#fff" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Text style={styles.infoValue}>{player.country || 'Не указана'}</Text>
-                  )}
-                </View>
-
-                {player.status === 'player' && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Позиция</Text>
-                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TouchableOpacity
-                        style={styles.pickerButton}
-                        onPress={() => setShowPositionPicker(true)}
-                      >
-                        <Text style={styles.pickerButtonText}>
-                          {editData.position || player.position || 'Выберите позицию'}
-                        </Text>
-                        <Ionicons name="chevron-down" size={16} color="#fff" />
-                      </TouchableOpacity>
-                    ) : (
-                      <Text style={styles.infoValue}>{player.position || 'Не указана'}</Text>
-                    )}
-                  </View>
-                )}
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>Дата рождения</Text>
-                  {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                    <TouchableOpacity
-                      style={styles.pickerButton}
-                      onPress={showBirthDatePickerModal}
-                    >
-                      <Text style={styles.pickerButtonText}>
-                        {editData.birthDate || player.birthDate || 'Выберите дату'}
-                      </Text>
-                      <Ionicons name="calendar-outline" size={16} color="#fff" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Text style={styles.infoValue}>{formatBirthDate(player.birthDate || '')}</Text>
-                  )}
-                </View>
-                {player.status === 'player' && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Начал играть в хоккей</Text>
-                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                    <TextInput
-                      style={styles.editInput}
-                        value={editData.hockeyStartDate !== undefined ? editData.hockeyStartDate : (player.hockeyStartDate || '')}
-                        onChangeText={(text) => setEditData({...editData, hockeyStartDate: text})}
-                        placeholder="ММ.ГГГГ (например: 12.2014)"
-                    />
-                  ) : (
-                      <Text style={styles.infoValue}>
-                        {player.hockeyStartDate ? 
-                          `В хоккее ${calculateHockeyExperience(player.hockeyStartDate)}` : 
-                          'Не указано'
-                        }
-                      </Text>
-                  )}
-                </View>
-                )}
-                {player.status === 'player' && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Хват</Text>
-                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TouchableOpacity
-                        style={styles.pickerButton}
-                        onPress={() => setShowGripPicker(true)}
-                      >
-                        <Text style={styles.pickerButtonText}>
-                          {editData.grip || player.grip || 'Выберите хват'}
-                        </Text>
-                        <Ionicons name="chevron-down" size={16} color="#fff" />
-                      </TouchableOpacity>
-                    ) : (
-                      <Text style={styles.infoValue}>{player.grip || 'Не указан'}</Text>
-                    )}
-                  </View>
-                )}
-              </View>
-            </View>
-
             {/* Физические данные - только для игроков (не тренеры) */}
             {player.status === 'player' && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Физические данные</Text>
+                <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
                 <View style={styles.infoGrid}>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Рост</Text>
+                    <Text style={styles.infoLabel}>{t('profile.height')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                       <TextInput
                         style={styles.editInput}
                         value={editData.height !== undefined ? editData.height : (player.height || '')}
                         onChangeText={(text) => setEditData({...editData, height: text})}
-                        placeholder="Рост (см)"
+                        placeholder={`${t('profile.height')} (${t('profile.cm')})`}
                         placeholderTextColor="#888"
                         keyboardType="numeric"
                       />
                     ) : (
-                      <Text style={styles.infoValue}>{player.height ? `${player.height} см` : 'Не указан'}</Text>
+                      <Text style={styles.infoValue}>{player.height ? `${player.height} ${t('profile.cm')}` : t('profile.notSpecified')}</Text>
                     )}
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Вес</Text>
+                    <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                       <TextInput
                         style={styles.editInput}
                         value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
                         onChangeText={(text) => setEditData({...editData, weight: text})}
-                        placeholder="Вес (кг)"
+                        placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
                         placeholderTextColor="#888"
                         keyboardType="numeric"
                       />
                     ) : (
-                      <Text style={styles.infoValue}>{player.weight ? `${player.weight} кг` : 'Не указан'}</Text>
+                      <Text style={styles.infoValue}>{player.weight ? `${player.weight} ${t('profile.kg')}` : t('profile.notSpecified')}</Text>
                     )}
                   </View>
                 </View>
@@ -1493,7 +1408,7 @@ export default function PlayerProfile() {
             {/* Видео моментов - только для игроков (не тренеры) */}
             {player.status === 'player' && ((currentUser && currentUser.id === player.id && isEditing) || (player.favoriteGoals && player.favoriteGoals.trim() !== '' && player.favoriteGoals.trim() !== 'null') || (isEditing && currentUser?.status === 'admin')) && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Видео моментов</Text>
+                <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                   <View>
                     <Text style={styles.sectionSubtitle}>
@@ -1597,7 +1512,15 @@ export default function PlayerProfile() {
               </View>
             )}
 
+            {/* Фотографии */}
+            <EditablePhotosSection
+              photos={galleryPhotos}
+              isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+              onPhotosChange={(newPhotos) => {
 
+                setGalleryPhotos(newPhotos);
+              }}
+            />
 
             {/* Нормативы - показываем только игрокам (не тренерам) */}
             {player && player.status === 'player' ? (
@@ -1618,10 +1541,10 @@ export default function PlayerProfile() {
                   isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                     // Редактируемая версия нормативов
                     <View style={styles.section}>
-                      <Text style={styles.sectionTitle}>Нормативы</Text>
+                      <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                       <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>Подтягивания</Text>
+                          <Text style={styles.infoLabel}>{t('profile.pullUps')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.pullUps !== undefined ? editData.pullUps : (player.pullUps || '')}
@@ -1631,7 +1554,7 @@ export default function PlayerProfile() {
                           />
                         </View>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>Отжимания</Text>
+                          <Text style={styles.infoLabel}>{t('profile.pushUps')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.pushUps !== undefined ? editData.pushUps : (player.pushUps || '')}
@@ -1641,7 +1564,7 @@ export default function PlayerProfile() {
                           />
                         </View>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>Планка</Text>
+                          <Text style={styles.infoLabel}>{t('profile.plank')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.plankTime !== undefined ? editData.plankTime : (player.plankTime || '')}
@@ -1661,17 +1584,17 @@ export default function PlayerProfile() {
                           />
                         </View>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>Прыжок в длину</Text>
+                          <Text style={styles.infoLabel}>{t('profile.longJump')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.longJump !== undefined ? editData.longJump : (player.longJump || '')}
                             onChangeText={(text) => setEditData({...editData, longJump: text})}
-                            placeholder="Длина в см"
+                            placeholder={t('profile.lengthInCm')}
                             keyboardType="numeric"
                           />
                         </View>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>Скакалка</Text>
+                          <Text style={styles.infoLabel}>{t('profile.jumpRope')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.jumpRope !== undefined ? editData.jumpRope : (player.jumpRope || '')}
@@ -1690,6 +1613,14 @@ export default function PlayerProfile() {
                       sprint100m={player.sprint100m}
                       longJump={player.longJump}
                       jumpRope={player.jumpRope}
+                      changes={{
+                        pullUps: getChangeForField('pullUps'),
+                        pushUps: getChangeForField('pushUps'),
+                        plankTime: getChangeForField('plankTime'),
+                        sprint100m: getChangeForField('sprint100m'),
+                        longJump: getChangeForField('longJump'),
+                        jumpRope: getChangeForField('jumpRope'),
+                      }}
                     />
                   )
                 ) : null // Не показываем секцию, если данных нет
@@ -1707,7 +1638,13 @@ export default function PlayerProfile() {
               )
             ) : null}
 
-
+            {/* Секция упражнений */}
+            {player && (
+              <PlayerExercisesSection 
+                player={player} 
+                isOwnProfile={currentUser?.id === player.id}
+              />
+            )}
 
             {/* Достижения */}
             <AchievementsSection 
@@ -1716,19 +1653,11 @@ export default function PlayerProfile() {
               onAchievementsChange={setAchievements}
             />
 
-            {/* Фотографии */}
-            <EditablePhotosSection
-              photos={galleryPhotos}
-              isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-              onPhotosChange={(newPhotos) => {
-            
-                setGalleryPhotos(newPhotos);
-              }}
-            />
-
             {/* Друзья */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Друзья</Text>
+              <Text style={styles.sectionTitle}>
+                {t('profile.friends')} ({friends.length})
+              </Text>
               {friends.length > 0 ? (
                 <View style={styles.friendsGrid}>
                   {friends.map((friend) => (
@@ -1746,7 +1675,12 @@ export default function PlayerProfile() {
                       </Text>
                       {friend.team && (
                         <Text style={styles.friendTeam} numberOfLines={1}>
-                          {friend.team}
+                          {(() => {
+                            const team = friend.team;
+                            if (team === 'Minsk Region Team') return t('teams.Сборная Минской области');
+                            if (team === 'Piranhas') return t('teams.Пираньи');
+                            return t(`teams.${team}`, { defaultValue: team });
+                          })()}
                         </Text>
                       )}
                     </TouchableOpacity>
@@ -1754,13 +1688,87 @@ export default function PlayerProfile() {
                 </View>
               ) : (
                 <View style={styles.friendsContainer}>
-                  <Text style={styles.noDataText}>У {player.name} пока нет друзей</Text>
+                  <Text style={styles.noDataText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
                   <Text style={styles.noDataSubtext}>
-                    Будьте первым, кто добавит {player.name} в друзья
+                    {t('profile.beFirstToAdd', {name: player.name})}
                   </Text>
                 </View>
               )}
             </View>
+
+            {/* Кнопка управления дружбой - показываем для всех статусов дружбы */}
+            {currentUser && currentUser.id !== player.id && (
+              <>
+                {friendshipStatus === 'received_request' ? (
+                  // Запрос дружбы получен
+                  <View style={{ gap: 10, marginTop: 10, marginBottom: 20 }}>
+                    <TouchableOpacity 
+                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
+                      onPress={handleAddFriend}
+                      disabled={friendLoading}
+                    >
+                      <Ionicons name="checkmark-outline" size={20} color="#fff" />
+                      <Text style={styles.actionButtonText}>
+                        {friendLoading ? t('common.loading') : t('notifications.accept')}
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={[styles.actionButton, { backgroundColor: '#f44336' }]} 
+                      onPress={handleDeclineFriend}
+                      disabled={friendLoading}
+                    >
+                      <Ionicons name="close-outline" size={20} color="#fff" />
+                      <Text style={styles.actionButtonText}>
+                        {friendLoading ? t('common.loading') : t('notifications.decline')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : friendshipStatus === 'friends' ? (
+                  // Уже друзья
+                  <View style={{ marginTop: 10, marginBottom: 20 }}>
+                    <TouchableOpacity 
+                      style={[styles.actionButton, { backgroundColor: '#f44336' }]} 
+                      onPress={handleAddFriend}
+                      disabled={friendLoading}
+                    >
+                      <Ionicons name="person-remove-outline" size={20} color="#fff" />
+                      <Text style={styles.actionButtonText}>
+                        {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
+                  // Запрос дружбы отправлен
+                  <View style={{ marginTop: 10, marginBottom: 20 }}>
+                    <TouchableOpacity 
+                      style={[styles.actionButton, { backgroundColor: '#FF9800' }]} 
+                      onPress={handleAddFriend}
+                      disabled={friendLoading}
+                    >
+                      <Ionicons name="close-outline" size={20} color="#fff" />
+                      <Text style={styles.actionButtonText}>
+                        {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  // Нет дружбы - можно добавить
+                  <View style={{ marginTop: 10, marginBottom: 20 }}>
+                    <TouchableOpacity 
+                      style={[styles.actionButton, { backgroundColor: '#FF4444' }]} 
+                      onPress={handleAddFriend}
+                      disabled={friendLoading}
+                    >
+                      <Ionicons name="person-add-outline" size={20} color="#fff" />
+                      <Text style={styles.actionButtonText}>
+                        {friendLoading ? t('profile.loading') : t('profile.addFriend')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </>
+            )}
 
             {/* Кнопки действий для взаимодействия с профилем */}
             <View style={styles.actionsSection}>
@@ -1791,28 +1799,7 @@ export default function PlayerProfile() {
                             <Text style={styles.actionButtonText}>Отменить</Text>
                           </TouchableOpacity>
                         </>
-                      ) : (
-                        <>
-                          <TouchableOpacity 
-                            style={[styles.actionButton, styles.editButton]} 
-                            onPress={() => {
-                              setEditData(player);
-                              setIsEditing(true);
-                            }}
-                          >
-                            <Ionicons name="create-outline" size={20} color="#fff" />
-                            <Text style={styles.actionButtonText}>Редактировать</Text>
-                          </TouchableOpacity>
-                          
-                          <TouchableOpacity 
-                            style={[styles.actionButton, styles.deleteButton]} 
-                            onPress={handleDeletePlayer}
-                          >
-                            <Ionicons name="trash-outline" size={20} color="#fff" />
-                            <Text style={styles.actionButtonText}>Удалить пользователя</Text>
-                          </TouchableOpacity>
-                        </>
-                      )}
+                      ) : null}
                     </>
                   )}
                   
@@ -1829,14 +1816,6 @@ export default function PlayerProfile() {
                 </TouchableOpacity>
               ) : null}
             </View>
-
-            {/* Секция упражнений */}
-            {player && (
-              <PlayerExercisesSection 
-                player={player} 
-                isOwnProfile={currentUser?.id === player.id}
-              />
-            )}
 
             {/* Музей игрока - полученные предметы */}
             {/* Показываем музей только для обычных игроков, у звезд, тренеров, скаутов его быть не должно */}
@@ -1905,12 +1884,20 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>Отмена</Text>
+                      <Text style={styles.actionButtonText}>{t('profile.cancel')}</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
                   // Кнопки для обычного режима
                   <View style={{ gap: 15, marginTop: 20, marginBottom: 20 }}>
+                    {/* Переключатель языка - только для собственного профиля */}
+                    {currentUser && currentUser.id === player?.id && (
+                      <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+                        <LanguageSwitcher />
+                      </View>
+                    )}
+                    
                     <TouchableOpacity 
                       style={[styles.actionButton, { backgroundColor: '#FF4444' }]} 
                       onPress={() => {
@@ -1919,7 +1906,7 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="create-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>Редактировать профиль</Text>
+                      <Text style={styles.actionButtonText}>{t('profile.editProfile')}</Text>
                     </TouchableOpacity>
                     
                     <TouchableOpacity 
@@ -1927,34 +1914,38 @@ export default function PlayerProfile() {
                       onPress={handleLogout}
                     >
                       <Ionicons name="log-out-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>Выйти из профиля</Text>
+                      <Text style={styles.actionButtonText}>{t('logout')}</Text>
                     </TouchableOpacity>
                   </View>
                 )}
               </>
             )}
 
-            {/* Кнопка "написать сообщение" */}
-            {currentUser && currentUser.id !== player.id && player.status !== 'star' && (
-              <View style={{ marginTop: 10, marginBottom: 20 }}>
+
+            {/* Кнопки редактирования и удаления для администратора */}
+            {currentUser?.status === 'admin' && player && (
+              <View style={styles.adminButtonsContainer}>
                 <TouchableOpacity 
-                  style={styles.actionButton} 
+                  style={[styles.adminButton, styles.editButton]} 
                   onPress={() => {
-                    router.push({ 
-                      pathname: '/chat/[id]', 
-                      params: { id: player.id } 
-                    });
+                    setEditData(player);
+                    setIsEditing(true);
                   }}
                 >
-                  <Ionicons name="chatbubble-outline" size={20} color="#fff" />
-                  <Text style={styles.actionButtonText}>
-                    {player.status === 'admin' 
-                      ? 'Написать в техподдержку' 
-                      : 'Написать сообщение'}
-                  </Text>
+                  <Ionicons name="create-outline" size={20} color="#fff" />
+                  <Text style={styles.adminButtonText}>{t('profile.edit')}</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.adminButton, styles.deleteButton]} 
+                  onPress={handleDeletePlayer}
+                >
+                  <Ionicons name="trash-outline" size={20} color="#fff" />
+                  <Text style={styles.adminButtonText}>{t('profile.deleteUser')}</Text>
                 </TouchableOpacity>
               </View>
             )}
+
 
           </ScrollView>
         </View>
@@ -2009,7 +2000,7 @@ export default function PlayerProfile() {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Выберите страну</Text>
             <ScrollView style={styles.modalScroll}>
-              {countries.map((country) => (
+              {COUNTRIES.map((country) => (
                 <TouchableOpacity
                   key={country}
                   style={styles.modalOption}
@@ -2026,7 +2017,7 @@ export default function PlayerProfile() {
               style={styles.modalCancelButton}
               onPress={() => setShowCountryPicker(false)}
             >
-              <Text style={styles.modalCancelButtonText}>Отмена</Text>
+              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2055,7 +2046,7 @@ export default function PlayerProfile() {
               style={styles.modalCancelButton}
               onPress={() => setShowPositionPicker(false)}
             >
-              <Text style={styles.modalCancelButtonText}>Отмена</Text>
+              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2084,7 +2075,7 @@ export default function PlayerProfile() {
               style={styles.modalCancelButton}
               onPress={() => setShowGripPicker(false)}
             >
-              <Text style={styles.modalCancelButtonText}>Отмена</Text>
+              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2110,7 +2101,7 @@ export default function PlayerProfile() {
                   style={styles.datePickerButton} 
                   onPress={() => setShowBirthDatePicker(false)}
                 >
-                  <Text style={styles.datePickerButtonText}>Отмена</Text>
+                  <Text style={styles.datePickerButtonText}>{t('profile.cancel')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.datePickerButton, styles.confirmButton]} 
@@ -2130,6 +2121,7 @@ export default function PlayerProfile() {
           </View>
         </View>
       )}
+
     </View>
   );
 }
@@ -2197,12 +2189,45 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    borderWidth: 3,
-    borderColor: '#FF4444',
+    borderWidth: 8, // Толстая черная обводка (в 2 раза толще)
+    borderColor: '#000000',
     marginBottom: 15,
+    backgroundColor: '#000000', // Черный фон как у шайбы
+    // Тень для эффекта шайбы
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 3,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: '0 3px 4px rgba(0, 0, 0, 0.8)',
+      },
+    }),
+  },
+  innerCircle: {
+    width: 104, // 120 - 16 (borderWidth * 2)
+    height: 104,
+    borderRadius: 52,
+    borderWidth: 2, // Тонкая цветная обводка
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center', // Центрируем без position absolute
+  },
+  avatarImage: {
+    width: 100, // Заполняет внутренний круг (104 - 4 для обводки)
+    height: 100,
+    borderRadius: 50,
   },
   avatarPlaceholder: {
-    backgroundColor: '#2C3E50',
+    backgroundColor: '#000000', // Черный фон как у шайбы
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2279,9 +2304,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addFriendButton: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    backgroundColor: '#000000',
     borderWidth: 1,
-    borderColor: '#FF4444',
+    borderColor: '#000000',
   },
   removeFriendButton: {
     backgroundColor: 'rgba(255, 0, 0, 0.3)',
@@ -2316,7 +2341,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)', 
     shadowColor: '#000',
     shadowOffset: {
@@ -2348,8 +2373,17 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: 'center',
   },
+  statCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 59, 48, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
   statValue: {
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
   },
@@ -2357,7 +2391,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
-    marginTop: 5,
+    marginTop: 2,
+  },
+  statLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 2,
+    position: 'relative',
   },
   infoGrid: {
     flexDirection: 'row',
@@ -2753,7 +2793,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)', 
     shadowColor: '#000',
     shadowOffset: {
@@ -2867,6 +2907,131 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 1,
+  },
+  modalContent: {
+    padding: 20,
+  },
+  modalSectionTitle: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#FF4444',
+    marginBottom: 15,
+  },
+  modalInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    minHeight: 40,
+    marginBottom: 10,
+  },
+  modalInputHint: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
+    marginBottom: 10,
+  },
+  modalStatusSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  modalStatusOption: {
+    flex: 1,
+    paddingVertical: 12,
+    borderWidth: 2,
+    borderColor: '#FF4444',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalStatusOptionSelected: {
+    backgroundColor: '#FF4444',
+  },
+  modalStatusOptionText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  modalStatusOptionTextSelected: {
+    color: '#fff',
+  },
+  modalCreateButton: {
+    backgroundColor: '#FF4444',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  modalCreateButtonText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  adminButtonsContainer: {
+    flexDirection: 'row',
+    gap: 15,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  adminButton: {
+    flex: 1,
+    backgroundColor: '#FF4444',
+    borderRadius: 12,
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adminButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    marginLeft: 8,
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+  },
+  deleteButton: {
+    backgroundColor: '#f44336',
+  },
+  compactButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    minHeight: 36,
+  },
+  compactButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Medium',
+    color: '#fff',
+    marginLeft: 6,
+  },
+  messageIconButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 10,
   },
 
 
