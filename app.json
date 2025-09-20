@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "HockeyStars",
+    "slug": "hockeystars",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "by.hockeystars.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "by.hockeystars.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ccb608ca-e849-4a98-b337-d38863d3ebff"
+      },
+      "resendApiKey": "REDACTED_RESEND_API_KEY"
+    },
+    "owner": "mercooloff"
+  }
+}
+
