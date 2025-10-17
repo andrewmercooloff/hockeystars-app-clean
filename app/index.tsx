@@ -351,25 +351,9 @@ const usePuckCollisionSystem = (players: Player[]) => {
           adjustedX += Math.cos(angle) * correctionDistance;
           adjustedY += Math.sin(angle) * correctionDistance;
           
-          // ТОЛКАЕМ ДРУГУЮ ШАЙБУ: передаем импульс от движения перетаскиваемой шайбы
-          const pushStrength = Platform.OS === 'ios' ? 1.5 : 0.3;
-          
-          // Вычисляем общую скорость перетаскивания
-          const dragSpeed = Math.sqrt(vx * vx + vy * vy);
-          
-          // angle - это угол ОТ другой шайбы К перетаскиваемой
-          // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
-          // dx = adjustedX - otherPos.x (от другой к текущей)
-          // Для толчка в обратную сторону используем отрицательный угол
-          const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
-          const pushVx = Math.cos(pushAngle) * dragSpeed * pushStrength;
-          const pushVy = Math.sin(pushAngle) * dragSpeed * pushStrength;
-          
-          updatedPositions[index] = {
-            ...otherPos,
-            vx: otherPos.vx + pushVx,
-            vy: otherPos.vy + pushVy
-          };
+          // НЕ ТОЛКАЕМ ДРУГУЮ ШАЙБУ при перетаскивании - это предотвращает торможение
+          // Перетаскиваемая шайба только отталкивается от других, не влияя на их физику
+          // Это позволяет другим шайбам продолжать плавно двигаться
         }
       });
       
@@ -402,16 +386,6 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
-  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Очищаем таймаут при размонтировании
-  useEffect(() => {
-    return () => {
-      if (dragTimeoutRef.current) {
-        clearTimeout(dragTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -434,14 +408,6 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     lastPositionRef.current = { x: position.x, y: position.y };
     hasDraggedRef.current = false;
     setIsDragging(true);
-    
-    // Устанавливаем таймаут на 0.5 секунды для автоматического окончания перетаскивания
-    if (dragTimeoutRef.current) {
-      clearTimeout(dragTimeoutRef.current);
-    }
-    dragTimeoutRef.current = setTimeout(() => {
-      handleTouchEnd();
-    }, 500); // 0.5 секунды
   };
 
   const handleTouchMove = (e: any) => {
@@ -473,13 +439,6 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    
-    // Очищаем таймаут
-    if (dragTimeoutRef.current) {
-      clearTimeout(dragTimeoutRef.current);
-      dragTimeoutRef.current = null;
-    }
-    
     // Сбрасываем флаг isDragging для этой шайбы
     if (onDrag) {
       onDrag(position.id, position.x, position.y, position.vx, position.vy, false);
