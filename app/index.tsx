@@ -502,7 +502,8 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     if (onDrag) {
       const finalVx = dragVelocityRef.current.vx * 0.5; // Уменьшаем для более реалистичного полета
       const finalVy = dragVelocityRef.current.vy * 0.5;
-      onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
+      // Используем текущую позицию из position, которая уже обновлена до позиции отпускания
+      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
     }
     
     // Сбрасываем накопленную скорость
