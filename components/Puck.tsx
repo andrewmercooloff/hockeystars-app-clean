@@ -158,11 +158,21 @@ const Puck: React.FC<PuckProps> = ({
               backgroundColor: '#2C3E50'
             }
           ]}>
-            <Ionicons 
-              name={status === 'shop' ? 'storefront' : 'person'} 
-              size={dimensions.iconSize} 
-              color="#FFFFFF" 
-            />
+            {status === 'scout' ? (
+              <Image 
+                source={require('../assets/images/scout.png')} 
+                style={{
+                  width: dimensions.iconSize,
+                  height: dimensions.iconSize,
+                }}
+              />
+            ) : (
+              <Ionicons 
+                name={status === 'shop' ? 'storefront' : 'person'} 
+                size={dimensions.iconSize} 
+                color="#FFFFFF" 
+              />
+            )}
           </View>
         )}
         
