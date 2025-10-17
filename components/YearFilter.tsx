@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: '#fff', // Белый текст
     fontSize: 13,
-    fontFamily: 'Gilroy-Regular',
+    fontFamily: 'Gilroy-Medium',
     flex: 1,
   },
   filterButtonIcon: {
@@ -168,16 +168,16 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)', // Белый цвет разделителя
   },
   selectedYearItem: {
-    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
   },
   yearText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontFamily: 'Gilroy-Regular',
+    fontFamily: 'Gilroy-Medium',
     textAlign: 'center',
   },
   selectedYearText: {
-    color: '#fa2f40',
+    color: '#FF4444',
     fontFamily: 'Gilroy-Bold',
   },
 });

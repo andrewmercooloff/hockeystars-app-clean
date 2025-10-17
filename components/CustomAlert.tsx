@@ -43,7 +43,7 @@ export default function CustomAlert({
       case 'success':
         return { name: 'checkmark-circle', color: '#4CAF50' };
       case 'error':
-        return { name: 'close-circle', color: '#fa2f40' };
+        return { name: 'close-circle', color: '#FF4444' };
       case 'warning':
         return { name: 'warning', color: '#FF9800' };
       case 'info':
@@ -57,7 +57,7 @@ export default function CustomAlert({
       case 'success':
         return 'rgba(76, 175, 80, 0.1)';
       case 'error':
-        return 'rgba(250, 47, 64, 0.1)';
+        return 'rgba(255, 68, 68, 0.1)';
       case 'warning':
         return 'rgba(255, 152, 0, 0.1)';
       case 'info':

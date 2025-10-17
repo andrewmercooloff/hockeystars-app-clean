@@ -2125,7 +2125,7 @@
     "home": "Home",
     "search": "Search",
     "messages": "Messages",
-    "notifications": "Events",
+    "notifications": "Notifications",
     "profile": "Profile"
   },
   "admin": {
@@ -2393,10 +2393,10 @@
     "you": "You: "
   },
   "notifications": {
-    "title": "Events",
-    "loading": "Loading events...",
-    "noNotifications": "No events",
-    "noNotificationsSubtitle": "You don't have any events about friendship, gifts or other actions yet",
+    "title": "Notifications",
+    "loading": "Loading notifications...",
+    "noNotifications": "No notifications",
+    "noNotificationsSubtitle": "You don't have any notifications about friendship, gifts or other actions yet",
     "accept": "Accept",
     "decline": "Decline",
     "gift": "Gift",

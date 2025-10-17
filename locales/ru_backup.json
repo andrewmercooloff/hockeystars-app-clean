@@ -22,8 +22,7 @@
     "deleteAchievementConfirm": "Are you sure you want to delete this achievement?",
     "deleteAllNotificationsConfirm": "Are you sure you want to delete all notifications?",
     "rejectRequestConfirm": "Are you sure you want to reject this request?",
-    "super": "Super!",
-    "retry": "Retry"
+    "super": "Super!"
   },
   "winger": "Winger",
   "center": "Center",

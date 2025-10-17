@@ -8,9 +8,11 @@ interface SocialLinksProps {
   tiktok?: string;
   vk?: string;
   website?: string;
+  onMessagePress?: () => void;
+  showMessageButton?: boolean;
 }
 
-export default function SocialLinks({ instagram, tiktok, vk, website }: SocialLinksProps) {
+export default function SocialLinks({ instagram, tiktok, vk, website, onMessagePress, showMessageButton }: SocialLinksProps) {
   const { t } = useLanguage();
 
   const socialLinks = [
@@ -83,13 +85,28 @@ export default function SocialLinks({ instagram, tiktok, vk, website }: SocialLi
     }
   };
 
-  // Если нет социальных ссылок, не показываем компонент
-  if (socialLinks.length === 0) {
+  // Если нет социальных ссылок и нет кнопки сообщения, не показываем компонент
+  if (socialLinks.length === 0 && !showMessageButton) {
     return null;
   }
 
   return (
     <View style={styles.container}>
+      {/* Кнопка сообщения - всегда первая */}
+      {showMessageButton && onMessagePress && (
+        <TouchableOpacity
+          style={[styles.linkButton, { backgroundColor: '#B71C1C' }]}
+          onPress={onMessagePress}
+          activeOpacity={0.7}
+        >
+          <Ionicons 
+            name="chatbubble-outline" 
+            size={16} 
+            color="#fff"
+          />
+        </TouchableOpacity>
+      )}
+      
       {/* Социальные ссылки */}
       {socialLinks.map((link) => (
         <TouchableOpacity

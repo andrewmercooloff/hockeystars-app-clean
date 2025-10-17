@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 8,
@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#fa2f40',
+    color: '#FF6B6B',
   },
 });

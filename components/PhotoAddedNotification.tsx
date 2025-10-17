@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#4A90E2', // Синяя как у видео и аватара
+    borderLeftColor: '#FF4444',
   },
   avatarContainer: {
     width: 50,
@@ -123,13 +123,12 @@ const styles = StyleSheet.create({
   playerName: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
     flex: 1,
   },
   timeText: {
     color: '#aaa',
     fontSize: 12,
-    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
   photoItem: {
@@ -141,13 +140,12 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
   photosInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -156,7 +154,7 @@ const styles = StyleSheet.create({
   photosCountText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
     marginLeft: 4,
   },
 });

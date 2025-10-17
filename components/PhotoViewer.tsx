@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   activeThumbnail: {
-    borderColor: '#fa2f40',
+    borderColor: '#FF4444',
   },
   thumbnailImage: {
     width: '100%',

@@ -43,7 +43,7 @@ export default function AchievementsSection({
       case 3:
         return { name: 'medal' as const, color: '#CD7F32' }; // бронза
       default:
-        return { name: 'trophy' as const, color: '#fa2f40' };
+        return { name: 'trophy' as const, color: '#FF4444' };
     }
   };
 
@@ -83,9 +83,6 @@ export default function AchievementsSection({
   };
 
   const handleAddAchievement = () => {
-    console.log('🏆 Добавление нового достижения...');
-    console.log('📊 Текущих достижений:', achievements.length, achievements);
-    
     if (!newAchievement.competition.trim()) {
       Alert.alert(t('common.error'), t('profile.errorEnterCompetition'));
       return;
@@ -105,9 +102,6 @@ export default function AchievementsSection({
     };
 
     const updatedAchievements = [...achievements, achievement];
-    console.log('✅ Достижение добавлено! Новое количество:', updatedAchievements.length);
-    console.log('📋 Все достижения после добавления:', updatedAchievements);
-    
     onAchievementsChange?.(updatedAchievements);
     
     setNewAchievement({
@@ -200,13 +194,13 @@ export default function AchievementsSection({
                       style={styles.medalEditButton}
                       onPress={() => openEditModal(achievement)}
                     >
-                      <Ionicons name="create" size={14} color="#fa2f40" />
+                      <Ionicons name="create" size={14} color="#FF4444" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.medalDeleteButton}
                       onPress={() => handleDeleteAchievement(achievement.id)}
                     >
-                      <Ionicons name="trash" size={14} color="#fa2f40" />
+                      <Ionicons name="trash" size={14} color="#FF4444" />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -221,7 +215,7 @@ export default function AchievementsSection({
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="add-circle" size={24} color="#fff" />
+          <Ionicons name="add-circle" size={24} color="#FF4444" />
           <Text style={styles.addButtonText}>{t('profile.addAchievement')}</Text>
         </TouchableOpacity>
       )}
@@ -350,7 +344,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -363,7 +357,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     marginBottom: 15,
   },
   emptyContainer: {
@@ -430,12 +424,12 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   medalEditButton: {
-    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
     borderRadius: 10,
     padding: 4,
   },
   medalDeleteButton: {
-    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
     borderRadius: 10,
     padding: 4,
   },
@@ -443,17 +437,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderRadius: 12,
-    padding: 9,
+    padding: 15,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: '#fa2f40',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#fff',
+    color: '#FF4444',
     marginLeft: 10,
   },
   modalOverlay: {
@@ -469,32 +463,26 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 400,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   modalTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     textAlign: 'center',
     marginBottom: 20,
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   textArea: {
     height: 80,
@@ -523,8 +511,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   placeButtonSelected: {
-    backgroundColor: 'rgba(250, 47, 64, 0.2)',
-    borderColor: '#fa2f40',
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    borderColor: '#FF4444',
   },
   placeButtonText: {
     fontSize: 14,
@@ -553,7 +541,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     borderRadius: 12,
     padding: 15,
     alignItems: 'center',

@@ -22,6 +22,7 @@ export function useActivityTracking(userId?: string, enabled: boolean = true) {
       const result = await addActivityPoints(userId, activityType, customDescription);
       
       if (result.success) {
+        console.log(`✅ Activity tracked: ${activityType}, total points: ${result.points}`);
       } else {
         console.error(`❌ Failed to track activity: ${activityType}`, result.error);
       }

@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#fa2f40',
+    borderColor: '#FF4444',
   },
   avatarPlaceholder: {
     backgroundColor: '#333',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButton: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
   },
   cancelButton: {
     backgroundColor: '#666',
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalCancelText: {
-    color: '#fa2f40',
+    color: '#FF4444',
     fontSize: 16,
   },
 });

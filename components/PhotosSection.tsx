@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     marginBottom: 15,
   },
   emptyContainer: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     borderWidth: 2,
-    borderColor: '#fa2f40',
+    borderColor: '#FF4444',
   },
   photo: {
     width: '100%',

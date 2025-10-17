@@ -70,7 +70,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   if (!videoId) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={48} color="#fa2f40" />
+        <Ionicons name="alert-circle" size={48} color="#FF4444" />
         <Text style={styles.errorText}>Неверная ссылка на YouTube</Text>
       </View>
     );
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginVertical: 8,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   header: {
     flexDirection: 'row',
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(250, 47, 64, 0.3)',
+    borderBottomColor: 'rgba(255, 68, 68, 0.3)',
   },
   title: {
     color: '#fff',
@@ -208,13 +208,13 @@ const styles = StyleSheet.create({
   errorContainer: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: 'rgba(250, 47, 64, 0.1)',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   errorText: {
-    color: '#fa2f40',
+    color: '#FF4444',
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 8,

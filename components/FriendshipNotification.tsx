@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#fa2f40',
+    borderLeftColor: '#FF4444',
   },
   avatarsContainer: {
     width: 50,
@@ -161,13 +161,12 @@ const styles = StyleSheet.create({
   friendsText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
     flex: 1,
   },
   timeText: {
     color: '#aaa',
     fontSize: 12,
-    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
   actionItem: {
@@ -179,13 +178,12 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
   friendshipBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
     marginLeft: 4,
   },
 });

@@ -11,7 +11,7 @@
     "done": "Prêt",
     "loading": "Chargement...",
     "error": "Erreur",
-    "success": "Succès",
+    "success": "Avec succès",
     "yes": "Oui",
     "no": "Non",
     "ok": "D'ACCORD",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Etes-vous sûr de vouloir supprimer cette réussite ?",
     "deleteAllNotificationsConfirm": "Êtes-vous sûr de vouloir effacer toutes les notifications ?",
     "rejectRequestConfirm": "Êtes-vous sûr de vouloir rejeter cette demande ?",
-    "super": "Super!",
-    "retry": "Réessayer",
-    "goalie": "Gardien de but"
+    "super": "Super!"
   },
   "winger": "Ailier",
   "center": "Avant-centre",
@@ -65,8 +63,7 @@
     "title": "Un cadeau d'une star",
     "message": "{playerName} a reçu {giftName} de {starName}",
     "received": "reçu",
-    "from": "depuis",
-    "gift": "Cadeau"
+    "from": "depuis"
   },
   "addPhoto": "Ajouter une photo",
   "selectPhotoSource": "Sélectionnez la source de la photo",
@@ -142,7 +139,6 @@
     "subtitle": "Sélectionnez un entraînement",
     "searchPlaceholder": "Rechercher par numéro ou par nom...",
     "loadingExercise": "Chargement de l'exercice...",
-    "loadingExercises": "Chargement des exercices...",
     "exercise": "Exercice",
     "alreadyCompleted": "L'exercice a déjà été réalisé",
     "canRetryIn": "Vous pouvez refaire cet exercice dans {heures} heures",
@@ -820,594 +816,816 @@
       },
       "27": {
         "title": "Échauffement du cou",
+        "description": "Rotations douces de la tête, inclinaisons vers l'avant et vers l'arrière, mouvements circulaires. 2 à 3 minutes.",
+        "benefits": [
+          "Prépare les muscles à l'exercice",
+          "Améliore la circulation sanguine",
+          "Réduit le risque de blessure",
+          "Augmente l'efficacité de la formation"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Tournez lentement la tête à gauche et à droite",
-          "Penchez la tête en avant et en arrière",
-          "Effectuez des mouvements circulaires avec votre tête",
-          "Gardez vos épaules détendues"
+          "Commencez lentement et augmentez progressivement l'intensité",
+          "Effectuer des mouvements en douceur et de manière contrôlée",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Respirez régulièrement pendant l'exécution"
         ],
         "tips": [
-          "Déplacez-vous lentement et en douceur",
-          "Ne faites pas de mouvements brusques",
+          "Prenez votre temps – la qualité est plus importante que la vitesse",
           "Si vous ressentez de la douleur, arrêtez.",
-          "Respirez profondément et régulièrement"
+          "Échauffez-vous avant chaque séance d’entraînement.",
+          "Passez suffisamment de temps sur chaque mouvement."
         ]
       },
       "28": {
         "title": "Échauffement du poignet",
+        "description": "Mouvements circulaires avec les mains, flexion et extension des doigts. 2 à 3 minutes pour chaque main.",
+        "benefits": [
+          "Prépare les muscles à l'exercice",
+          "Améliore la circulation sanguine",
+          "Réduit le risque de blessure",
+          "Augmente l'efficacité de la formation"
+        ],
         "instructions": [
-          "Tendez vos bras devant vous",
-          "Pliez vos poignets de haut en bas",
-          "Faites tourner vos poignets en cercle",
-          "Serrez et desserrez vos poings",
-          "Étirez vos doigts sur les côtés"
+          "Commencez lentement et augmentez progressivement l'intensité",
+          "Effectuer des mouvements en douceur et de manière contrôlée",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Respirez régulièrement pendant l'exécution"
         ],
         "tips": [
-          "Effectuez les mouvements lentement",
-          "Ne sollicitez pas trop vos articulations",
-          "Faites attention aux sensations dans vos poignets",
-          "Répéter régulièrement"
+          "Prenez votre temps – la qualité est plus importante que la vitesse",
+          "Si vous ressentez de la douleur, arrêtez.",
+          "Échauffez-vous avant chaque séance d’entraînement.",
+          "Passez suffisamment de temps sur chaque mouvement."
         ]
       },
       "29": {
         "title": "Étirements des genoux",
+        "description": "Demi-squats, cercles de genoux, sauts légers sur place. 3-4 minutes.",
+        "benefits": [
+          "Prépare les muscles à l'exercice",
+          "Améliore la circulation sanguine",
+          "Réduit le risque de blessure",
+          "Augmente l'efficacité de la formation"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Pliez et redressez lentement vos genoux",
-          "Effectuez des mouvements circulaires avec vos genoux",
-          "Faites des squats avec une petite amplitude",
-          "Étirez l'avant de votre cuisse"
+          "Commencez lentement et augmentez progressivement l'intensité",
+          "Effectuer des mouvements en douceur et de manière contrôlée",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Respirez régulièrement pendant l'exécution"
         ],
         "tips": [
-          "Ne faites pas de squats profonds",
-          "Déplacez-vous en douceur et en contrôle",
-          "Si vous avez des douleurs au genou, réduisez l’amplitude des mouvements.",
-          "Assurez-vous d'utiliser la bonne technique"
+          "Prenez votre temps – la qualité est plus importante que la vitesse",
+          "Si vous ressentez de la douleur, arrêtez.",
+          "Échauffez-vous avant chaque séance d’entraînement.",
+          "Passez suffisamment de temps sur chaque mouvement."
         ]
       },
       "30": {
         "title": "Échauffement des hanches",
+        "description": "Cercles de hanches, balancements des jambes sur les côtés, fentes légères. 4 à 5 minutes.",
+        "benefits": [
+          "Prépare les muscles à l'exercice",
+          "Améliore la circulation sanguine",
+          "Réduit le risque de blessure",
+          "Augmente l'efficacité de la formation"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Levez votre genou vers votre poitrine",
-          "Déplacez votre jambe sur le côté et vers l'arrière",
-          "Effectuez des mouvements circulaires avec vos hanches",
-          "Faire des fentes avec une petite amplitude"
+          "Commencez lentement et augmentez progressivement l'intensité",
+          "Effectuer des mouvements en douceur et de manière contrôlée",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Respirez régulièrement pendant l'exécution"
         ],
         "tips": [
-          "Gardez le dos droit",
-          "Travailler dans une plage confortable",
-          "Ne précipitez pas vos mouvements",
-          "Suivez votre solde"
+          "Prenez votre temps – la qualité est plus importante que la vitesse",
+          "Si vous ressentez de la douleur, arrêtez.",
+          "Échauffez-vous avant chaque séance d’entraînement.",
+          "Passez suffisamment de temps sur chaque mouvement."
         ]
       },
       "31": {
         "title": "Étirement de l'aine",
+        "description": "Papillon – Assis par terre, rapprochez les pieds et penchez-vous en avant. Maintenez la position 30 à 45 secondes.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Asseyez-vous sur le sol avec les genoux pliés.",
-          "Placez les plantes de vos pieds ensemble",
-          "Penchez-vous doucement en avant",
-          "Tirez vos genoux vers le sol",
-          "Maintenez l'étirement pendant 30 secondes"
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
-          "Ne forcez pas l'étirement",
-          "Respirez profondément et détendez-vous.",
-          "Si une douleur survient, réduisez l’amplitude.",
-          "Exécuter après l'échauffement"
+          "Respirez profondément pendant que vous vous étirez.",
+          "Ne faites pas de mouvements brusques",
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "32": {
         "title": "Étirement des ischio-jambiers",
+        "description": "Flexions vers l'avant avec les jambes tendues, maintenez la position pendant 30 secondes. 3 séries de 15 secondes.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Asseyez-vous sur le sol avec vos jambes tendues vers l’avant.",
-          "Penchez-vous en avant en essayant d'atteindre vos pieds",
-          "Joignez vos pieds avec vos mains",
-          "Tirez votre poitrine vers vos genoux",
-          "Maintenez l'étirement pendant 30 à 45 secondes"
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
-          "Ne courbez pas le dos",
-          "Travailler dans une plage confortable",
-          "Respirez profondément",
-          "Faites attention aux sensations à l’arrière de votre cuisse"
+          "Respirez profondément pendant que vous vous étirez.",
+          "Ne faites pas de mouvements brusques",
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "33": {
         "title": "Étirement des muscles du mollet",
+        "description": "Fentes contre un mur, étirement des ischio-jambiers. 20 secondes par jambe.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Tenez-vous face au mur",
-          "Placez un pied en avant et l’autre en arrière.",
-          "Abaissez le talon de votre pied arrière au sol",
-          "Penchez-vous en avant en étirant vos mollets",
-          "Changez de jambe et répétez"
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
-          "Gardez votre jambe arrière droite",
-          "Ne soulevez pas votre talon du sol",
-          "Étirez-vous en douceur",
-          "Exécuter pour les deux jambes"
+          "Respirez profondément pendant que vous vous étirez.",
+          "Ne faites pas de mouvements brusques",
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "34": {
         "title": "Étirement des muscles pectoraux",
+        "description": "Étirement au mur avec extensions des bras. Maintenez la position 30 secondes, 3 séries.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Restez dans l'embrasure de la porte",
-          "Placez vos mains sur les cadres de porte",
-          "Faites un pas en avant",
-          "Sentez l'étirement dans votre poitrine",
-          "Maintenez l'étirement pendant 30 secondes"
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
-          "Ne forcez pas trop vos épaules",
-          "Respirez profondément",
-          "Étirez-vous progressivement",
-          "Suivez vos sensations"
+          "Respirez profondément pendant que vous vous étirez.",
+          "Ne faites pas de mouvements brusques",
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "35": {
         "title": "Étirement des triceps",
+        "description": "Placez vos mains derrière votre tête pour étirer l’arrière de votre épaule. 20 secondes pour chaque bras.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Lève une main",
-          "Pliez votre bras au niveau du coude derrière votre tête",
-          "Avec votre autre main, tirez votre coude vers le bas",
-          "Sentez l'étirement dans vos triceps",
-          "Changez de main et répétez"
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
+          "Respirez profondément pendant que vous vous étirez.",
           "Ne faites pas de mouvements brusques",
-          "Étirez-vous en douceur",
-          "Respirez régulièrement",
-          "Exécuter pour les deux mains"
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "36": {
         "title": "Serpent entre les cônes",
+        "description": "Courez en effectuant un mouvement de serpent entre des cônes disposés en ligne. 5 passages à vitesse maximale.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Placez les cônes en forme de serpent à une distance de 2 à 3 mètres",
-          "Commencez à courir autour de chaque cône",
-          "Gardez votre centre de gravité bas",
-          "Travaillez vos jambes rapidement et souvent",
-          "Assurez-vous d’utiliser une technique de tournage appropriée."
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Commencez à un rythme lent",
-          "Concentrez-vous sur la technique, pas sur la vitesse.",
-          "Gardez la tête haute",
-          "Utilisez des étapes courtes et rapides"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "37": {
         "title": "Touches de pied rapides",
+        "description": "Touchez rapidement les cônes avec vos pieds dans un ordre aléatoire. 3 séries de 45 secondes.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous à côté du ballon",
-          "Touchez le ballon rapidement avec votre pied",
-          "Changer de jambe tous les 2-3 contacts",
-          "Maintenir un rythme constant",
-          "Exécutez pendant 30 à 60 secondes"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez le poids de votre corps sur votre jambe d'appui",
-          "Travailler rapidement mais de manière contrôlée",
-          "Ne perdez pas l'équilibre",
-          "Surveillez votre technique de toucher"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "38": {
         "title": "Sauts avec virages",
+        "description": "Saut sur place avec virages de 90 à 180 degrés. 3 séries de 20 sauts.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Faire un saut",
-          "Tournez à 180 degrés en sautant",
-          "Atterrissez doucement sur vos deux pieds.",
-          "Revenez immédiatement en arrière et répétez"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Atterrissez avec les jambes pliées",
-          "Utilisez vos bras pour garder l'équilibre",
-          "Commencez par de petits virages",
-          "Surveillez votre technique d'atterrissage"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "39": {
         "title": "Passes rapides du ballon",
+        "description": "Passer une balle de tennis entre les mains à vitesse maximale. 3 séries de 1 minute chacune.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous face au mur à une distance de 2 à 3 mètres",
-          "Passez le ballon rapidement au mur",
-          "Attrapez le rebond et passez-le immédiatement en arrière",
-          "Travailler avec les deux mains",
-          "Exécutez pendant 30 à 45 secondes"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Utiliser une technique de passe appropriée",
-          "Gardez les yeux sur la balle",
-          "Travaillez rapidement mais avec précision",
-          "Gardez vos mains détendues"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "40": {
         "title": "Courir à reculons",
+        "description": "Course en arrière avec virages rapides au signal. 5 séries de 30 secondes.",
+        "benefits": [
+          "Améliore l'endurance cardiovasculaire",
+          "Développe l'endurance aérobie",
+          "Brûle efficacement les calories",
+          "Renforce le muscle cardiaque"
+        ],
         "instructions": [
-          "Commencez par courir lentement en arrière.",
-          "Regardez souvent par-dessus votre épaule",
-          "Gardez votre centre de gravité bas",
-          "Utilisez vos bras pour garder l'équilibre",
-          "Compléter 20-30 mètres"
+          "Commencez par un échauffement léger de 5 à 10 minutes",
+          "Maintenez votre fréquence cardiaque cible",
+          "Surveillez votre respiration - respirez profondément",
+          "Terminez par un retour au calme et des étirements."
         ],
         "tips": [
-          "Commencez très lentement",
-          "Vérifiez toujours l'espace derrière vous",
-          "Gardez vos genoux légèrement pliés",
-          "Ne vous précipitez pas pour augmenter la vitesse"
+          "Augmenter progressivement la durée",
+          "Buvez de l’eau pendant votre entraînement.",
+          "Effectuer 3 à 4 fois par semaine",
+          "Écoutez votre corps"
         ]
       },
       "41": {
         "title": "Squats avec poids",
+        "description": "Squats avec haltères ou barre, cuisses parallèles au sol. 4 séries de 12 à 15 répétitions.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Prenez des haltères ou une barre",
-          "Accroupissez-vous jusqu’à ce que vos orteils soient parallèles au sol.",
-          "Levez-vous en utilisant la force de vos jambes",
-          "Effectuez 3 à 4 séries de 8 à 12 répétitions"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez le dos droit",
-          "Ne arrondissez pas le bas du dos",
-          "Vos genoux ne doivent pas dépasser vos orteils.",
-          "Commencez avec des poids légers"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "42": {
         "title": "Soulevé de terre",
+        "description": "Soulevez la barre du sol jusqu'au niveau des hanches avec le dos droit. 3 séries de 8 à 10 répétitions.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds écartés à la largeur des épaules",
-          "Prenez la barre du sol avec une prise en pronation.",
-          "Pliez vos genoux et déplacez votre bassin vers l'arrière",
-          "Soulevez la barre en redressant vos jambes et votre dos.",
-          "Remettez la barre au sol de manière contrôlée."
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez le dos droit tout au long du mouvement.",
-          "Ne arrondissez pas le bas du dos",
-          "Rapprochez la barre de votre corps",
-          "Commencez avec des poids légers"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "43": {
         "title": "Développé couché",
+        "description": "Développé couché avec barre. 4 séries de 8 à 12 répétitions.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Allongez-vous sur le banc avec vos pieds sur le sol.",
-          "Prenez la barre avec une prise large",
-          "Abaissez la barre jusqu’à votre poitrine de manière contrôlée.",
-          "Appuyez sur la barre vers le haut",
-          "Effectuez 3 à 4 séries de 6 à 10 répétitions"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez vos omoplates rapprochées",
-          "Gardez les pieds sur le sol",
-          "Respirez correctement : expirez avec effort",
-          "Utiliser une assurance"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "44": {
         "title": "Tractions",
+        "description": "Tractions. 3 séries de 8 à 12 répétitions.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Accrochez-vous à la barre avec une prise en pronation",
-          "Tirez-vous vers le haut jusqu’à ce que votre menton soit au-dessus de la barre.",
-          "Redescendez jusqu'à la position de départ",
-          "Gardez votre tronc serré",
-          "Effectuez 3 à 4 séries de répétitions maximales"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Ne balance pas",
-          "Tirez doucement et de manière contrôlée",
-          "Redressez complètement vos bras en bas",
-          "Utilisez de l'aide si nécessaire"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "45": {
         "title": "Dips sur les barres",
+        "description": "Dips avec barres parallèles, en descendant jusqu'à un angle de 90 degrés. 3 séries de 10 à 15 répétitions.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous entre les barreaux",
-          "Sautez et verrouillez les barres",
-          "Abaissez-vous en pliant les coudes.",
-          "Poussez vers le haut en tendant les bras",
-          "Effectuez 3 à 4 séries de 5 à 15 répétitions"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez votre corps droit",
-          "Ne balance pas",
-          "Descendre à une profondeur confortable",
-          "Utilisez vos jambes si nécessaire."
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "46": {
         "title": "Support sur une jambe",
+        "description": "Maintenir l’équilibre sur une jambe avec les yeux fermés. 3 séries de 30 secondes sur chaque jambe.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous sur une jambe",
-          "Levez votre autre jambe devant vous",
-          "Maintenez votre équilibre le plus longtemps possible",
-          "Utilisez vos bras pour garder l'équilibre",
-          "Changez de jambe et répétez"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Regardez vers l'avant, pas vers le bas",
-          "Gardez votre tronc serré",
-          "Commencez par des séries courtes",
-          "Augmenter le temps progressivement"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "47": {
         "title": "Planche sur une jambe",
+        "description": "Maintenez la planche avec une jambe levée. 3 séries de 30 secondes sur chaque jambe.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Mettez-vous en position de planche",
-          "Lever une jambe",
-          "Gardez votre jambe droite",
-          "Maintenez la position pendant 30 à 60 secondes",
-          "Changez de jambe et répétez"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez votre corps droit",
-          "Ne vous balancez pas d'un côté à l'autre",
-          "Respirez régulièrement",
-          "Commencez par des séries courtes"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "48": {
         "title": "Squats sur une jambe",
+        "description": "Squats sur une jambe avec l'autre jambe étendue vers l'avant. 3 séries de 8 à 10 répétitions sur chaque jambe.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous sur une jambe",
-          "Étendez votre autre jambe vers l'avant",
-          "Squat sur la jambe d'appui",
-          "Retour à la position de départ",
-          "Effectuez 3 à 4 séries de 5 à 10 répétitions sur chaque jambe."
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Gardez le dos droit",
-          "Ne touchez pas le sol avec votre autre pied.",
-          "Utilisez vos bras pour garder l'équilibre",
-          "Commencez avec une petite amplitude"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "49": {
         "title": "Exercices avec ballon Bosu",
+        "description": "Exercices d'équilibre sur une surface instable. 15 à 20 minutes de mouvements variés.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous sur l'hémisphère du ballon Bosu",
-          "Gardez votre équilibre",
-          "Faire des squats",
-          "Faire des torsions du corps",
-          "Effectuez 3 à 4 séries de 10 à 15 répétitions"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Commencez par des exercices simples",
-          "Surveillez votre technique",
-          "Prenez votre temps",
-          "Utiliser l'aide pour obtenir de l'aide"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "50": {
         "title": "Yoga Équilibre",
+        "description": "Postures de l'arbre, du guerrier III et de l'aigle pour l'équilibre. Maintenez chaque posture 30 à 60 secondes.",
+        "benefits": [
+          "Développe la coordination des mouvements",
+          "Améliore l'équilibre et la stabilité",
+          "Augmente l'agilité",
+          "Développe la connexion neuromusculaire"
+        ],
         "instructions": [
-          "Tenez-vous droit, les pieds joints.",
-          "Soulevez une jambe et placez-la sur la cuisse de l’autre.",
-          "Placez vos mains devant votre poitrine",
-          "Gardez votre équilibre",
-          "Effectuez l'exercice pour les deux jambes pendant 30 à 60 secondes."
+          "Commencez à un rythme lent",
+          "Se concentrer sur la précision des mouvements",
+          "Augmenter la vitesse progressivement",
+          "Répétez jusqu'à ce que cela devienne automatique."
         ],
         "tips": [
-          "Regarder devant soi à un moment donné",
-          "Respirez profondément et régulièrement",
-          "Prenez votre temps",
-          "Si vous perdez l’équilibre, recommencez."
+          "Pratiquez régulièrement",
+          "Prenez votre temps – la précision est plus importante que la vitesse",
+          "Utiliser des repères visuels",
+          "Entraînez-vous dans des conditions différentes"
         ]
       },
       "51": {
         "title": "Marcher sur une bûche",
+        "description": "Marcher sur une bûche ou une planche étroite pour développer l'équilibre. 5 allers-retours.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Trouver une bûche ou une planche stable",
-          "Tenez-vous debout sur la bûche",
-          "Avancez lentement",
-          "Gardez votre équilibre",
-          "Effectuer plusieurs passes"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Commencez avec une bûche large",
-          "Regardez vers l'avant, pas vers le bas",
-          "Utilisez vos bras pour garder l'équilibre",
-          "Prenez votre temps"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "52": {
         "title": "Le poirier contre le mur",
+        "description": "Le poirier contre un mur pour développer l'équilibre du haut du corps. 3 séries de 20 secondes.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Tenez-vous face au mur",
-          "Placez vos mains sur le sol à 30 cm du mur",
-          "Levez vos jambes contre le mur",
-          "Tenir le poirier",
-          "Abaissez vos jambes de manière contrôlée"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Commencez par des séries courtes",
-          "Utiliser l'aide pour l'assurance",
-          "Gardez votre tronc serré",
-          "Ne vous surmenez pas"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "53": {
         "title": "Fartlek",
+        "description": "Course à pied à intensité variable : course rapide pendant 2 minutes, course lente pendant 1 minute. 30 minutes de travail au total.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Commencez par un jogging lent pendant 5 à 10 minutes",
-          "Augmenter la vitesse à 80 % du maximum pendant 2 à 3 minutes",
-          "Reprenez un jogging lent pendant 1 à 2 minutes",
-          "Répétez le cycle 4 à 6 fois",
-          "Terminez par un jogging lent pendant 5 à 10 minutes"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Écoutez votre corps",
-          "Ne pas dépasser 80% de la vitesse maximale",
-          "Respirez profondément",
-          "Buvez de l’eau pendant votre entraînement."
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "54": {
         "title": "Sprints répétés",
+        "description": "Sprints de 100 mètres avec 2 à 3 minutes de repos. 6 à 8 répétitions pour développer l'endurance de vitesse.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Faites un échauffement de 10 minutes",
-          "Exécutez un sprint à vitesse maximale pendant 30 secondes",
-          "Reposez-vous pendant 2 à 3 minutes",
-          "Répétez le sprint",
-          "Effectuer 6 à 8 sprints"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Ne lésinez pas sur votre échauffement",
-          "Reposez-vous complètement entre les sprints",
-          "Surveillez votre technique de course",
-          "Ne faites pas d'exercice quotidiennement"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "55": {
         "title": "Intervalles sur un vélo",
+        "description": "30 secondes d'effort maximal, 90 secondes de récupération. 20 cycles pour développer l'endurance de vitesse.",
+        "benefits": [
+          "Améliore l'endurance cardiovasculaire",
+          "Développe l'endurance aérobie",
+          "Brûle efficacement les calories",
+          "Renforce le muscle cardiaque"
+        ],
         "instructions": [
-          "Commencez par un échauffement de 5 minutes",
-          "Augmenter la charge à 80% du maximum",
-          "Pédalez à haute intensité pendant 2 à 3 minutes",
-          "Réduisez la charge à 50 % pendant 1 à 2 minutes",
-          "Répétez le cycle 6 à 8 fois"
+          "Commencez par un échauffement léger de 5 à 10 minutes",
+          "Maintenez votre fréquence cardiaque cible",
+          "Surveillez votre respiration - respirez profondément",
+          "Terminez par un retour au calme et des étirements."
         ],
         "tips": [
-          "Maintenir une cadence élevée",
-          "Respirez profondément",
-          "Gardez un œil sur votre pouls",
-          "Boire de l'eau régulièrement"
+          "Augmenter progressivement la durée",
+          "Buvez de l’eau pendant votre entraînement.",
+          "Effectuer 3 à 4 fois par semaine",
+          "Écoutez votre corps"
         ]
       },
       "56": {
         "title": "Course en montagne",
+        "description": "Montez la colline aussi vite que vous le pouvez, puis redescendez en trottinant. 8 à 10 montées.",
+        "benefits": [
+          "Améliore l'endurance cardiovasculaire",
+          "Développe l'endurance aérobie",
+          "Brûle efficacement les calories",
+          "Renforce le muscle cardiaque"
+        ],
         "instructions": [
-          "Trouvez une colline avec une pente de 5 à 10 %",
-          "Faites un échauffement de 10 minutes",
-          "Montez la colline à une vitesse modérée",
-          "Descendre pour récupérer",
-          "Répétez 6 à 10 levées"
+          "Commencez par un échauffement léger de 5 à 10 minutes",
+          "Maintenez votre fréquence cardiaque cible",
+          "Surveillez votre respiration - respirez profondément",
+          "Terminez par un retour au calme et des étirements."
         ],
         "tips": [
-          "Commencez par une légère inclinaison",
-          "Gardez le dos droit pendant que vous soulevez.",
-          "Travaillez activement avec vos mains",
-          "Prenez votre temps dans la descente"
+          "Augmenter progressivement la durée",
+          "Buvez de l’eau pendant votre entraînement.",
+          "Effectuer 3 à 4 fois par semaine",
+          "Écoutez votre corps"
         ]
       },
       "57": {
         "title": "Cercles pliométriques",
+        "description": "Un circuit de 5-6 exercices pliométriques sans repos. 4-5 circuits avec 2 minutes de repos entre eux.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Faites un échauffement de 10 minutes",
-          "Faire des sauts en longueur à partir d'une position debout",
-          "Effectuer des sauts par-dessus des obstacles",
-          "Faire des sauts en boîte",
-          "Reposez-vous pendant 2 à 3 minutes et répétez le circuit."
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Surveillez votre technique d'atterrissage",
-          "Atterrissez avec les jambes pliées",
-          "Utilisez vos bras pour garder l'équilibre",
-          "N'en faites pas trop avec la quantité"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "58": {
         "title": "Étirements légers",
+        "description": "Étirements doux de tous les principaux groupes musculaires après l’entraînement. 15 à 20 minutes pour accélérer la récupération.",
+        "benefits": [
+          "Améliore la flexibilité et la mobilité",
+          "Soulage les tensions musculaires",
+          "Prévient les blessures",
+          "Améliore la récupération post-entraînement"
+        ],
         "instructions": [
-          "Commencez par des mouvements légers",
-          "Étirez vos principaux groupes musculaires",
-          "Respirez profondément et régulièrement",
-          "Déplacez-vous doucement et lentement",
-          "Terminez par une respiration profonde."
+          "Échauffez-vous avant de vous étirer",
+          "Étirez-vous lentement et en douceur",
+          "Maintenez la position pendant 20 à 30 secondes",
+          "Évitez les douleurs aiguës"
         ],
         "tips": [
-          "Ne vous étirez pas jusqu’à ressentir de la douleur.",
-          "Respirez profondément",
-          "Détendez-vous complètement",
-          "Faites-le régulièrement"
+          "Respirez profondément pendant que vous vous étirez.",
+          "Ne faites pas de mouvements brusques",
+          "Faites ceci quotidiennement pour de meilleurs résultats.",
+          "Étirez-vous après votre séance d'entraînement"
         ]
       },
       "59": {
         "title": "Roulage en mousse",
+        "description": "Massage musculaire avec un rouleau en mousse pour soulager les tensions. 10 à 15 minutes par groupe musculaire principal.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Allongez-vous sur le rouleau en mousse",
-          "Faites rouler lentement le rouleau sous vos muscles.",
-          "Se concentrer sur les points sensibles",
-          "Maintenez la pression pendant 30 à 60 secondes",
-          "Répétez l’opération pour tous les groupes musculaires."
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Ne roulez pas sur vos articulations",
-          "Respirez profondément",
-          "Ne tolérez pas la douleur intense",
-          "Commencez avec un rouleau souple"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "60": {
         "title": "Jogging léger",
+        "description": "Jogging de faible intensité pour une récupération active. 15 à 20 minutes.",
+        "benefits": [
+          "Améliore l'endurance cardiovasculaire",
+          "Développe l'endurance aérobie",
+          "Brûle efficacement les calories",
+          "Renforce le muscle cardiaque"
+        ],
         "instructions": [
-          "Commencez à un rythme lent",
-          "Maintenez votre fréquence cardiaque à 60-70 % de votre maximum",
-          "Respirez profondément et régulièrement",
-          "Maintenir un rythme constant",
-          "Terminez par une diminution progressive du rythme"
+          "Commencez par un échauffement léger de 5 à 10 minutes",
+          "Maintenez votre fréquence cardiaque cible",
+          "Surveillez votre respiration - respirez profondément",
+          "Terminez par un retour au calme et des étirements."
         ],
         "tips": [
-          "Gardez un œil sur votre pouls",
-          "Respirez par le nez",
-          "Ne vous surmenez pas",
-          "Profitez du processus"
+          "Augmenter progressivement la durée",
+          "Buvez de l’eau pendant votre entraînement.",
+          "Effectuer 3 à 4 fois par semaine",
+          "Écoutez votre corps"
         ]
       },
       "61": {
         "title": "Natation",
+        "description": "Baignade légère en piscine pour détendre les muscles et récupérer. 20 à 30 minutes.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Commencez par un échauffement sur la terre ferme",
-          "Entrez dans l'eau progressivement",
-          "Nagez à un rythme confortable",
-          "Changez vos styles de nage",
-          "Terminez par une nage lente"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Ne nagez pas seul",
-          "Surveillez votre technique",
-          "Respirez régulièrement",
-          "N'en faites pas trop"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "62": {
         "title": "Vélo de récupération",
+        "description": "Vélo facile à faible allure pour une récupération active. 20 à 25 minutes.",
+        "benefits": [
+          "Améliore l'endurance cardiovasculaire",
+          "Développe l'endurance aérobie",
+          "Brûle efficacement les calories",
+          "Renforce le muscle cardiaque"
+        ],
         "instructions": [
-          "Commencez à un rythme lent",
-          "Maintenez votre fréquence cardiaque à 50-60 % de votre maximum",
-          "Pédalez facilement et rythmiquement",
-          "Respirez profondément",
-          "Terminez par une diminution progressive du rythme"
+          "Commencez par un échauffement léger de 5 à 10 minutes",
+          "Maintenez votre fréquence cardiaque cible",
+          "Surveillez votre respiration - respirez profondément",
+          "Terminez par un retour au calme et des étirements."
         ],
         "tips": [
-          "Maintenir une cadence élevée",
-          "Respirez profondément",
-          "Ne vous surmenez pas",
-          "Profitez du voyage"
+          "Augmenter progressivement la durée",
+          "Buvez de l’eau pendant votre entraînement.",
+          "Effectuer 3 à 4 fois par semaine",
+          "Écoutez votre corps"
         ]
       },
       "63": {
         "title": "Yoga de récupération",
+        "description": "Asanas doux pour détendre les muscles et accélérer la récupération. 20 minutes.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Commencez par des poses simples",
-          "Effectuez les étirements lentement",
-          "Respirez profondément et régulièrement",
-          "Détendez-vous dans chaque pose",
-          "Terminez par la méditation"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Ne forcez pas les poses",
-          "Respirez par le nez",
-          "Écoutez votre corps",
-          "Profitez du processus"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       },
       "64": {
@@ -1436,18 +1654,24 @@
       },
       "65": {
         "title": "Douche de contraste",
+        "description": "Alterner eau chaude et eau froide pour améliorer la circulation et la récupération. 5 à 7 minutes.",
+        "benefits": [
+          "Augmente la force musculaire",
+          "Améliore l'endurance musculaire",
+          "Développe la force fonctionnelle",
+          "Renforce le système musculo-squelettique"
+        ],
         "instructions": [
-          "Commencez avec de l'eau tiède",
-          "Passer progressivement à l'eau froide",
-          "Maintenez l'eau froide pendant 30 à 60 secondes",
-          "Retour à l'eau chaude",
-          "Répétez le cycle 3 à 5 fois"
+          "Échauffez-vous avant l'exercice",
+          "Assurez-vous d'utiliser la bonne technique",
+          "Contrôlez votre respiration - expirez avec effort",
+          "Reposez-vous 60 à 90 secondes entre les séries."
         ],
         "tips": [
-          "Commencez progressivement",
-          "Respirez profondément",
-          "N'ayez pas trop froid",
-          "Écoutez votre corps"
+          "Commencez avec des poids plus légers et augmentez progressivement.",
+          "Ne retenez pas votre souffle",
+          "Effectuer 2 à 3 fois par semaine",
+          "Réduisez la charge lorsque vous vous sentez fatigué"
         ]
       }
     },
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Ajouter comme ami",
     "addFriendQuestion": "Souhaitez-vous ajouter {name} comme ami ?",
-    "sendMessage": "Envoyer un message",
     "loading": "Chargement...",
     "basicInfo": "Informations de base",
     "physicalData": "Données physiques",
@@ -1603,7 +1826,7 @@
     "addToFriendsToSeePhotos": "Ajoutez {name} comme ami pour voir les photos de hockey",
     "addToFriendsToSeeMuseum": "Ajoutez {name} comme ami pour voir le musée",
     "removeFromFriends": "Supprimer des amis",
-    "points": "Points",
+    "points": "points",
     "friendsCount": "amis",
     "friendsCountStats": "Amis",
     "seconds": "seconde",
@@ -1614,9 +1837,9 @@
     "Защитник": "Défenseur",
     "Вратарь": "Gardien de but",
     "настоящее время": "temps présent",
-    "goals": "Buts",
-    "assists": "Passes",
-    "games": "Matchs",
+    "goals": "objectifs",
+    "assists": "engrenages",
+    "games": "jeux",
     "pullUps": "Tractions",
     "pushUps": "Des pompes",
     "plankTime": "planche (sec)",
@@ -1783,19 +2006,7 @@
     "equipmentRepair": "Réparation d'équipement",
     "stickRepair": "Réparation de bâtons",
     "usedEquipmentSale": "Vente d'équipement usagé",
-    "newEquipmentSale": "Vente d'équipement neuf",
-    "phone": "Téléphone",
-    "qrCodeTitle": "Code QR du profil",
-    "qrCodeSubtitle": "Scanner pour un accès rapide",
-    "qrCodeInfo": "Pointez l'appareil photo de votre téléphone sur le code QR pour ouvrir le profil",
-    "shareProfile": "Partager le profil",
-    "savedToGallery": "Enregistré dans la galerie",
-    "noPermission": "Pas d'accès à la galerie",
-    "shareError": "Erreur lors de la création de l'image",
-    "currentTeam": "Équipe",
-    "hockeyExperience": "Expérience au hockey",
-    "years": "ans",
-    "currentSeasonStats": "Statistiques de la saison en cours"
+    "newEquipmentSale": "Vente d'équipement neuf"
   },
   "register": {
     "title": "Inscription",
@@ -1833,7 +2044,7 @@
     "home": "Maison",
     "search": "Recherche",
     "messages": "Messages",
-    "notifications": "Événements",
+    "notifications": "Notifications",
     "profile": "Profil"
   },
   "admin": {
@@ -1850,7 +2061,6 @@
     "noName": "Sans nom",
     "noPosition": "Non spécifié",
     "noTeam": "Non spécifié",
-    "sendGift": "Envoyer un cadeau",
     "yearsOld": "années",
     "addUser": "Ajouter un utilisateur",
     "searchPlayers": "Recherche de joueurs...",
@@ -2052,12 +2262,10 @@
   "settings": {
     "title": "Paramètres",
     "language": "Langue",
-    "selectLanguage": "Sélectionner la langue",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Sélectionner la langue"
   },
   "search": {
     "title": "Recherche",
-    "loading": "Chargement de la recherche...",
     "placeholder": "Recherche de joueurs...",
     "country": "Pays",
     "grip": "Poignée",
@@ -2083,10 +2291,10 @@
     "you": "Toi:"
   },
   "notifications": {
-    "title": "Événements",
-    "loading": "Chargement des événements...",
-    "noNotifications": "Aucun événement",
-    "noNotificationsSubtitle": "Vous n'avez pas encore d'événements concernant les amitiés, les cadeaux ou d'autres actions.",
+    "title": "Notifications",
+    "loading": "Chargement des notifications...",
+    "noNotifications": "Aucune notification",
+    "noNotificationsSubtitle": "Vous n'avez pas encore de notifications concernant les amitiés, les cadeaux ou d'autres actions.",
     "accept": "Accepter",
     "decline": "Rejeter",
     "friendRequests": "Demandes d'amis",
@@ -2136,13 +2344,11 @@
     "timesPlural": "fois"
   },
   "home": {
-    "loadingPlayers": "Resurfaçage de la glace...",
+    "loadingPlayers": "Chargement des joueurs...",
     "noPlayersCountry": "Aucun joueur de {{country}}",
     "noPlayersYear": "Il n'y a aucun joueur né en {{year}}",
     "noPlayersCountryYear": "Aucun joueur de {{country}} en {{year}}",
-    "iceEmpty": "La glace est vide. Choisissez un autre pays ou une autre année, ou réinitialisez les filtres.",
-    "waitingForConnection": "En attente de connexion",
-    "checkInternetConnection": "Vérifiez votre connexion Internet"
+    "iceEmpty": "La glace est vide. Choisissez un autre pays ou une autre année, ou réinitialisez les filtres."
   },
   "filters": {
     "year": "année",
@@ -2237,15 +2443,15 @@
     "jersey": "Jersey",
     "pleaseWriteMessage": "Veuillez écrire un message à votre demande",
     "invalidGift": "cadeau inapproprié",
-    "deleteGiftQuestion": "Supprimer le cadeau?",
+    "deleteGiftQuestion": "Supprimer le cadeau ?",
     "from": "depuis",
     "noGiftsYet": "Pas encore de cadeaux des étoiles",
     "museum": "Musée des cadeaux",
     "myGifts": "Mes cadeaux",
     "noGifts": "Pas encore de cadeaux",
-    "noGiftsSubtext": "Téléchargez votre premier cadeau pour le partager avec les joueurs",
+    "noGiftsSubtext": "Créez votre premier cadeau pour les fans",
     "addGift": "Ajouter un cadeau",
-    "successDeleted": "Cadeau supprimé",
+    "successDeleted": "Le cadeau a été retiré du musée.",
     "errorDelete": "Échec de la suppression du cadeau",
     "noImage": "pas d'image",
     "failedToSendRequest": "Échec de l'envoi de la demande",
@@ -2253,7 +2459,7 @@
     "requestSentMessage": "Votre demande pour {itemType} a été envoyée. Veuillez attendre une réponse.",
     "requestItem": "Demande {itemType}",
     "requestMessage": "Message à la demande",
-    "selectGiftType": "Sélectionnez le type de cadeau",
+    "selectGiftType": "Sélectionner le type de cadeau",
     "selectGiftTypeMessage": "Quel type de cadeau souhaitez-vous créer ?",
     "requestMessageHelper": "Écrivez un message poli expliquant pourquoi vous souhaitez recevoir ce cadeau.",
     "requestMessagePlaceholder": "Par exemple : Bonjour ! Je suis un grand fan de votre jeu et j’aimerais un autographe pour ma collection…",
@@ -2280,9 +2486,12 @@
     "failedToUpdateItemImage": "Échec de la mise à jour de l'image du cadeau",
     "allGiftsAdded": "Tous les cadeaux ont été ajoutés.",
     "allGiftTypesAdded": "Vous avez déjà tous types de dons",
+    "addGift": "Ajouter un cadeau",
+    "selectGiftType": "Sélectionnez le type de cadeau",
     "deletion": "Suppression",
     "itemDeleted": "Cadeau supprimé",
     "failedToDeleteItem": "Échec de la suppression du cadeau",
+    "noGifts": "Pas de cadeaux",
     "clickPlusToAdd": "Cliquez sur + pour ajouter",
     "настоящее время": "temps présent",
     "Центральный нападающий": "Avant-centre",
@@ -2298,33 +2507,7 @@
     "seconds": "seconde",
     "times": "une fois",
     "sprint": "Course de 100 mètres",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Envoyer un cadeau à {playerName}",
-    "selectExistingGift": "Sélectionner un cadeau existant",
-    "orCreateNew": "Ou créer un nouveau",
-    "giftName": "Nom du cadeau",
-    "giftNamePlaceholder": "par ex. Casquette signée",
-    "uploadImage": "Télécharger une image",
-    "send": "Envoyer",
-    "selectGift": "Sélectionner un cadeau",
-    "fromAdmin": "Administrateur",
-    "errorSelectOrCreate": "Sélectionnez un cadeau ou créez-en un nouveau",
-    "errorGiftAlreadyExists": "Ce cadeau existe déjà pour le joueur {playerName}.\n\nSélectionnez un autre cadeau ou créez-en un nouveau.",
-    "successGiftSent": "Cadeau envoyé à {playerName}!",
-    "errorSendingGift": "Échec de l'envoi du cadeau",
-    "deleteGiftConfirm": "Êtes-vous sûr de vouloir supprimer ce cadeau?",
-    "selectImage": "Sélectionner une image",
-    "errorPermissionDenied": "Vous n'avez pas la permission de supprimer ce cadeau",
-    "errorGiftNotFound": "Cadeau introuvable",
-    "errorGiftNotDeleted": "Le cadeau n'a pas été supprimé",
-    "noGiftsUploaded": "Aucun cadeau téléchargé pour le moment",
-    "fromStar": "de {starName}",
-    "giftReceived": "Cadeau reçu!",
-    "giftReceivedFromAdmin": "Vous avez reçu un cadeau de l'administrateur: {giftName}",
-    "giftReceivedFromStar": "Vous avez reçu un cadeau de {starName}: {giftName}",
-    "giftReceivedPush": "🎁 Cadeau reçu!",
-    "giftReceivedFromAdminPush": "Vous avez reçu un cadeau de l'administrateur: {giftName}",
-    "giftReceivedFromStarPush": "Vous avez reçu un cadeau de {starName}: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Normes",
@@ -2442,40 +2625,5 @@
   },
   "logout": "Sortie",
   "logoutConfirm": "Déconnectez-vous de votre profil",
-  "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de votre profil ?",
-  "adminGifts": {
-    "sendGift": "Envoyer un cadeau",
-    "giftName": "Nom du cadeau",
-    "selectImage": "Sélectionner une image"
-  },
-  "videoNotification": {
-    "added": "a ajouté",
-    "oneVideo": "nouvelle vidéo",
-    "multipleVideos": "{count} nouvelles vidéos",
-    "video": "vidéo",
-    "videos": "vidéos"
-  },
-  "achievementNotification": {
-    "added": "a ajouté",
-    "received": "a reçu",
-    "oneAchievement": "nouveau succès",
-    "multipleAchievements": "{count} nouveaux succès",
-    "achievement": "succès",
-    "achievements": "succès",
-    "title": "🏆 Succès!",
-    "message": "Félicitations! Vous avez reçu le succès: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "a changé son avatar"
-  },
-  "statsNotification": {
-    "updated": "a mis à jour",
-    "stats": "statistiques",
-    "normatives": "normes",
-    "physicalData": "données physiques"
-  },
-  "height": "taille",
-  "weight": "poids",
-  "cm": "cm",
-  "kg": "kg"
+  "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de votre profil ?"
 }

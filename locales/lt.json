@@ -2057,7 +2057,7 @@
     "home": "Pradžia",
     "search": "Ieškoti",
     "messages": "Žinutės",
-    "notifications": "Įvykiai",
+    "notifications": "Pranešimai",
     "profile": "Profilis"
   },
   "admin": {
@@ -2312,10 +2312,10 @@
     "you": "Jūs:"
   },
   "notifications": {
-    "title": "Įvykiai",
-    "loading": "Įkeliami įvykiai...",
-    "noNotifications": "Jokių įvykių",
-    "noNotificationsSubtitle": "Dar neturite jokių įvykių apie draugystę, dovanas ar kitus veiksmus.",
+    "title": "Pranešimai",
+    "loading": "Įkeliami pranešimai...",
+    "noNotifications": "Jokių pranešimų",
+    "noNotificationsSubtitle": "Dar neturite jokių pranešimų apie draugystę, dovanas ar kitus veiksmus.",
     "accept": "Priimti",
     "decline": "Atmesti",
     "friendRequests": "Draugo prašymai",

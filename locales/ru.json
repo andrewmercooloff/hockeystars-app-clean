@@ -1877,7 +1877,7 @@
     "home": "Главная",
     "search": "Поиск",
     "messages": "Сообщения",
-    "notifications": "События",
+    "notifications": "Уведомления",
     "profile": "Профиль"
   },
   "admin": {
@@ -2149,10 +2149,10 @@
     "you": "Вы: "
   },
   "notifications": {
-    "title": "События",
-    "loading": "Загрузка событий...",
-    "noNotifications": "Нет событий",
-    "noNotificationsSubtitle": "У вас пока нет событий о дружбе, подарках или других действиях",
+    "title": "Уведомления",
+    "loading": "Загрузка уведомлений...",
+    "noNotifications": "Нет уведомлений",
+    "noNotificationsSubtitle": "У вас пока нет уведомлений о дружбе, подарках или других действиях",
     "accept": "Принять",
     "decline": "Отклонить",
     "gift": "Подарить",

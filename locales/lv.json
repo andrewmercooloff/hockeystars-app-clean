@@ -2057,7 +2057,7 @@
     "home": "Sākums",
     "search": "Meklēt",
     "messages": "Ziņojumi",
-    "notifications": "Notikumi",
+    "notifications": "Paziņojumi",
     "profile": "Profils"
   },
   "admin": {
@@ -2307,10 +2307,10 @@
     "you": "Jūs:"
   },
   "notifications": {
-    "title": "Notikumi",
-    "loading": "Notiek notikumu ielāde...",
-    "noNotifications": "Nav notikumu",
-    "noNotificationsSubtitle": "Jums vēl nav nekādu notikumu par draudzību, dāvanām vai citām darbībām.",
+    "title": "Paziņojumi",
+    "loading": "Notiek paziņojumu ielāde...",
+    "noNotifications": "Nav paziņojumu",
+    "noNotificationsSubtitle": "Jums vēl nav nekādu paziņojumu par draudzību, dāvanām vai citām darbībām.",
     "accept": "Pieņemt",
     "decline": "Noraidīt",
     "friendRequests": "Draugu lūgumi",

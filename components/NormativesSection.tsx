@@ -146,12 +146,12 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.2)',
+    borderColor: 'rgba(255, 68, 68, 0.2)',
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     marginBottom: 20,
   },
   emptyContainer: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(250, 47, 64, 0.9)',
+    backgroundColor: 'rgba(255, 68, 68, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -198,11 +198,11 @@ const styles = StyleSheet.create({
   normativeLabel: {
     color: '#fff',
     fontSize: 13,
-    fontFamily: 'Gilroy-Regular',
+    fontFamily: 'Gilroy-Medium',
     marginBottom: 2,
   },
   normativeValue: {
-    color: '#fa2f40',
+    color: '#FF4444',
     fontSize: 15,
     fontFamily: 'Gilroy-Bold',
   },

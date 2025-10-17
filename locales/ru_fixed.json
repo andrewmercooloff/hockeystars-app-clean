@@ -22,8 +22,7 @@
     "deleteAchievementConfirm": "Вы уверены, что хотите удалить это достижение?",
     "deleteAllNotificationsConfirm": "Вы уверены, что хотите удалить все уведомления?",
     "rejectRequestConfirm": "Вы уверены, что хотите отклонить этот запрос?",
-    "super": "Super!",
-    "retry": "Retry"
+    "super": "Super!"
   },
   "winger": "Крайний нападающий",
   "center": "Центральный нападающий",

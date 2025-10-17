@@ -325,11 +325,10 @@ export default function CurrentTeamsSection({
           <Text style={styles.emptyText}>{t('noCurrentTeams')}</Text>
         </View>
       ) : (
-        <DraggableFlatList
+        <FlatList
           data={currentTeams}
           renderItem={renderCurrentTeamItem}
           keyExtractor={(item, index) => `${item.id}-${index}`}
-          onDragEnd={handleDragEnd}
           scrollEnabled={false}
           contentContainerStyle={styles.teamsList}
         />
@@ -343,7 +342,7 @@ export default function CurrentTeamsSection({
             setSelectedExistingTeam(null);
           }}
         >
-          <Ionicons name="add-circle" size={24} color="#fff" />
+          <Ionicons name="add-circle" size={24} color="#FF4444" />
           <Text style={styles.addButtonText}>{t('addTeam')}</Text>
         </TouchableOpacity>
       )}
@@ -530,17 +529,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderRadius: 12,
-    padding: 9,
+    padding: 15,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: '#fa2f40',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#fff',
+    color: '#FF4444',
     marginLeft: 10,
   },
   modalOverlay: {
@@ -571,20 +570,14 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   suggestionsContainer: {
     position: 'absolute',
@@ -620,21 +613,15 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -666,7 +653,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   saveButton: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
   },
   cancelButtonText: {
     fontSize: 16,

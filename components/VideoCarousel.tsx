@@ -106,7 +106,7 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
   if (!videos || videos.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="videocam-outline" size={48} color="#fa2f40" />
+        <Ionicons name="videocam-outline" size={48} color="#FF4444" />
         <Text style={styles.emptyText}>{t('noVideosAdded')}</Text>
       </View>
     );
@@ -137,7 +137,7 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
           >
             <YouTubeThumbnail videoUrl={video.url} />
             <View style={styles.playButton}>
-              <Ionicons name="play-circle" size={40} color="#fa2f40" />
+              <Ionicons name="play-circle" size={40} color="#FF4444" />
             </View>
             {video.timeCode && (
               <View style={styles.timeCodeBadge}>
@@ -203,9 +203,9 @@ const styles = StyleSheet.create({
     height: 180,
     marginHorizontal: 8,
     borderRadius: 12,
-    backgroundColor: 'rgba(250, 47, 64, 0.1)',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.2)',
+    borderColor: 'rgba(255, 68, 68, 0.2)',
     overflow: 'hidden',
     position: 'relative',
   },
@@ -300,11 +300,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(250, 47, 64, 0.3)',
+    backgroundColor: 'rgba(255, 68, 68, 0.3)',
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     width: 12,
     height: 12,
     borderRadius: 6,

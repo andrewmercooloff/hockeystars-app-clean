@@ -1,7 +1,6 @@
 {
   "cli": {
-    "version": ">= 3.0.0",
-    "appVersionSource": "remote"
+    "version": ">= 3.0.0"
   },
   "build": {
     "development": {
@@ -17,8 +16,7 @@
         "simulator": false
       },
       "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "buildType": "apk"
       }
     },
     "production": {
@@ -29,17 +27,11 @@
     }
   },
   "submit": {
-    "preview": {
-      "ios": {
-        "appleId": "am654@yandex.ru",
-        "appleTeamId": "FAL33J6D2V"
-      }
-    },
     "production": {
       "ios": {
         "appleId": "am654@yandex.ru",
-        "ascAppId": "6753738837",
-        "appleTeamId": "FAL33J6D2V"
+        "ascAppId": "your-app-store-connect-app-id",
+        "appleTeamId": "your-apple-team-id"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",

@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
 interface PuckProps {
@@ -24,6 +24,20 @@ const Puck: React.FC<PuckProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   
+  // Анимация для тени на льду
+  const shadowOpacity = useSharedValue(0.4);
+  
+  useEffect(() => {
+    shadowOpacity.value = withRepeat(
+      withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [shadowOpacity]);
+  
+  const animatedShadowStyle = useAnimatedStyle(() => ({
+    opacity: shadowOpacity.value,
+  }));
   
   const dimensions = useMemo(() => {
     const avatarSize = size * 0.86;
@@ -42,8 +56,8 @@ const Puck: React.FC<PuckProps> = ({
   const avatarBorderColor = useMemo(() => {
     switch (status) {
       case 'star': return '#FFD700'; // Золотистый для звезд
-      case 'coach': return '#fa2f40'; // Красный для тренеров
-      case 'scout': return '#808080'; // Серый для скаутов
+      case 'coach': return '#FF4444'; // Красный для тренеров
+      case 'scout': return '#FF4444'; // Красный для скаутов
       case 'admin': return '#000000'; // Черный для админов
       case 'shop': return '#4CAF50'; // Приглушенный зеленый для магазинов
       case 'skateSharpening': return '#0066CC'; // Синий для заточки коньков
@@ -105,6 +119,15 @@ const Puck: React.FC<PuckProps> = ({
       },
       animatedStyle
     ]}>
+      {/* Дополнительная тень на льду */}
+      <Animated.View style={[
+        styles.iceShadow,
+        {
+          width: size * 0.8,
+          left: size * 0.1,
+        },
+        animatedShadowStyle
+      ]} />
       
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
         {imageSource ? (
@@ -122,9 +145,6 @@ const Puck: React.FC<PuckProps> = ({
             ]}
             onError={handleError}
             onLoad={handleLoad}
-            fadeDuration={0}
-            loadingIndicatorSource={require('../assets/images/default-avatar.png')}
-            progressiveRenderingEnabled={true}
           />
         ) : (
           <View style={[
@@ -138,22 +158,11 @@ const Puck: React.FC<PuckProps> = ({
               backgroundColor: '#2C3E50'
             }
           ]}>
-            {status === 'scout' ? (
-              <Image 
-                source={require('../assets/images/scout.png')} 
-                style={{
-                  width: dimensions.avatarSize,
-                  height: dimensions.avatarSize,
-                  borderRadius: dimensions.avatarBorderRadius,
-                }}
-              />
-            ) : (
-              <Ionicons 
-                name={status === 'shop' ? 'storefront' : 'person'} 
-                size={dimensions.iconSize} 
-                color="#FFFFFF" 
-              />
-            )}
+            <Ionicons 
+              name={status === 'shop' ? 'storefront' : 'person'} 
+              size={dimensions.iconSize} 
+              color="#FFFFFF" 
+            />
           </View>
         )}
         
@@ -268,6 +277,33 @@ const styles = StyleSheet.create({
   },
   starText: {
     textAlign: 'center',
+  },
+  // Дополнительная тень для эффекта "лежания на льду"
+  iceShadow: {
+    position: 'absolute',
+    bottom: -8,
+    left: '50%',
+    width: '80%',
+    height: 8,
+    backgroundColor: 'transparent',
+    borderRadius: 50,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.7,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.7)',
+      },
+    }),
   },
 });
 

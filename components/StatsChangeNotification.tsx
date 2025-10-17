@@ -81,7 +81,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <Ionicons name="trending-up" size={24} color="#fa2f40" />
+            <Ionicons name="trending-up" size={24} color="#FF4444" />
           </View>
         )}
       </View>
@@ -95,21 +95,28 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
         
         <View style={styles.changesContainer}>
           {changes.map((change, index) => (
-            <View key={index} style={styles.changeItem}>
-              <Text style={styles.actionText}>
-                {getFieldName(change.field)}: {formatValue(change.newValue, change.field)}
+          <View key={index} style={styles.changeItem}>
+              <Text style={styles.fieldName}>{getFieldName(change.field)}</Text>
+              <View style={styles.valueContainer}>
+              <Text style={styles.oldValue}>
+                  {formatValue(change.oldValue, change.field)}
+              </Text>
+                <Ionicons name="arrow-forward" size={16} color="#666" />
+              <Text style={styles.newValue}>
+                  {formatValue(change.newValue, change.field)}
               </Text>
               <View style={[
-                styles.statsBadge,
-                { backgroundColor: change.change > 0 ? '#fa2f40' : '#FF9800' }
+                  styles.changeBadge,
+                  { backgroundColor: change.change > 0 ? '#FF4444' : '#FF9800' }
               ]}>
-                <Text style={styles.badgeText}>
-                  {change.change > 0 ? '+' : ''}{change.change}
+                <Text style={styles.changeText}>
+                    {change.change > 0 ? '+' : ''}{change.change}
                 </Text>
+                </View>
               </View>
             </View>
           ))}
-        </View>
+          </View>
       </View>
     </View>
   );
@@ -123,7 +130,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#fa2f40',
+    borderLeftColor: '#FF4444',
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -154,7 +161,6 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
-    fontFamily: 'Gilroy-Regular',
     color: '#999',
     marginLeft: 8,
   },
@@ -167,24 +173,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
-  actionText: {
-    color: '#ddd',
+  fieldName: {
     fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
     flex: 1,
   },
-  statsBadge: {
+  valueContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+  },
+  oldValue: {
+    fontSize: 14,
+    color: '#999',
+    textDecorationLine: 'line-through',
+  },
+  newValue: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  changeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
     minWidth: 32,
+    alignItems: 'center',
   },
-  badgeText: {
-    color: '#fff',
+  changeText: {
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
+    color: '#fff',
   },
   playerAvatar: {
     width: 50,

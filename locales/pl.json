@@ -1836,7 +1836,7 @@
     "home": "Dom",
     "search": "Szukaj",
     "messages": "Wiadomości",
-    "notifications": "Wydarzenia",
+    "notifications": "Powiadomienia",
     "profile": "Profil"
   },
   "admin": {
@@ -2086,10 +2086,10 @@
     "you": "Ty:"
   },
   "notifications": {
-    "title": "Wydarzenia",
-    "loading": "Ładowanie wydarzeń...",
-    "noNotifications": "Brak wydarzeń",
-    "noNotificationsSubtitle": "Nie masz jeszcze żadnych wydarzeń o znajomościach, prezentach i innych działaniach.",
+    "title": "Powiadomienia",
+    "loading": "Ładowanie powiadomień...",
+    "noNotifications": "Brak powiadomień",
+    "noNotificationsSubtitle": "Nie masz jeszcze żadnych powiadomień o znajomościach, prezentach i innych działaniach.",
     "accept": "Przyjąć",
     "decline": "Odrzucić",
     "friendRequests": "Prośby o dodanie do znajomych",

@@ -1,9 +1,9 @@
 {
   "common": {
     "save": "Salva",
-    "cancel": "Annulla",
+    "cancel": "Cancellare",
     "edit": "Modificare",
-    "delete": "Elimina",
+    "delete": "Eliminare",
     "add": "Aggiungere",
     "close": "Vicino",
     "back": "Indietro",
@@ -11,7 +11,7 @@
     "done": "Pronto",
     "loading": "Caricamento...",
     "error": "Errore",
-    "success": "Successo",
+    "success": "Con successo",
     "yes": "SÌ",
     "no": "NO",
     "ok": "OK",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Sei sicuro di voler rimuovere questo risultato?",
     "deleteAllNotificationsConfirm": "Vuoi davvero cancellare tutte le notifiche?",
     "rejectRequestConfirm": "Sei sicuro di voler rifiutare questa richiesta?",
-    "super": "Super!",
-    "retry": "Riprova",
-    "goalie": "Portiere"
+    "super": "Super!"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -65,8 +63,7 @@
     "title": "Un regalo da una stella",
     "message": "{playerName} ha ricevuto {giftName} da {starName}",
     "received": "ricevuto",
-    "from": "da",
-    "gift": "Regalo"
+    "from": "da"
   },
   "addPhoto": "Aggiungi una foto",
   "selectPhotoSource": "Seleziona la fonte della foto",
@@ -142,7 +139,6 @@
     "subtitle": "Seleziona un allenamento",
     "searchPlaceholder": "Cerca per numero o nome...",
     "loadingExercise": "Caricamento esercizio in corso...",
-    "loadingExercises": "Caricamento degli esercizi...",
     "exercise": "Esercizio",
     "alreadyCompleted": "L'esercizio è già stato completato",
     "canRetryIn": "Puoi ripetere questo esercizio tra {ore} ore",
@@ -820,594 +816,816 @@
       },
       "27": {
         "title": "Riscaldamento del collo",
+        "description": "Rotazioni fluide della testa, inclinazioni avanti e indietro, movimenti circolari. 2-3 minuti.",
+        "benefits": [
+          "Prepara i muscoli per l'esercizio",
+          "Migliora la circolazione sanguigna",
+          "Riduce il rischio di lesioni",
+          "Aumenta l'efficienza dell'allenamento"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Gira lentamente la testa a sinistra e a destra",
-          "Inclina la testa avanti e indietro",
-          "Eseguire movimenti circolari con la testa",
-          "Mantieni le spalle rilassate"
+          "Inizia lentamente e aumenta gradualmente l'intensità",
+          "Eseguire i movimenti in modo fluido e controllato",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Respirare in modo uniforme durante l'esecuzione"
         ],
         "tips": [
-          "Muoviti lentamente e senza intoppi",
-          "Non fare movimenti bruschi",
-          "Se si avverte dolore, interrompere l'operazione.",
-          "Respira profondamente e in modo uniforme"
+          "Prenditi il ​​tuo tempo: la qualità è più importante della velocità",
+          "Se si avverte dolore, fermarsi.",
+          "Riscaldarsi prima di ogni allenamento.",
+          "Dedica abbastanza tempo a ogni movimento."
         ]
       },
       "28": {
         "title": "Riscaldamento del polso",
+        "description": "Movimenti circolari con le mani, flettendo ed estendendo le dita. 2-3 minuti per mano.",
+        "benefits": [
+          "Prepara i muscoli per l'esercizio",
+          "Migliora la circolazione sanguigna",
+          "Riduce il rischio di lesioni",
+          "Aumenta l'efficienza dell'allenamento"
+        ],
         "instructions": [
-          "Allunga le braccia davanti a te",
-          "Piega i polsi su e giù",
-          "Ruota i polsi in cerchio",
-          "Stringi e apri i pugni",
-          "Allunga le dita ai lati"
+          "Inizia lentamente e aumenta gradualmente l'intensità",
+          "Eseguire i movimenti in modo fluido e controllato",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Respirare in modo uniforme durante l'esecuzione"
         ],
         "tips": [
-          "Eseguire i movimenti lentamente",
-          "Non sforzare troppo le articolazioni",
-          "Presta attenzione alle sensazioni nei tuoi polsi",
-          "Ripetere regolarmente"
+          "Prenditi il ​​tuo tempo: la qualità è più importante della velocità",
+          "Se si avverte dolore, fermarsi.",
+          "Riscaldarsi prima di ogni allenamento.",
+          "Dedica abbastanza tempo a ogni movimento."
         ]
       },
       "29": {
         "title": "allungamenti del ginocchio",
+        "description": "Mezzi squat, cerchi con le ginocchia, salti leggeri sul posto. 3-4 minuti.",
+        "benefits": [
+          "Prepara i muscoli per l'esercizio",
+          "Migliora la circolazione sanguigna",
+          "Riduce il rischio di lesioni",
+          "Aumenta l'efficienza dell'allenamento"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Piega e raddrizza lentamente le ginocchia",
-          "Eseguire movimenti circolari con le ginocchia",
-          "Fai squat con una piccola ampiezza",
-          "Allunga la parte anteriore della coscia"
+          "Inizia lentamente e aumenta gradualmente l'intensità",
+          "Eseguire i movimenti in modo fluido e controllato",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Respirare in modo uniforme durante l'esecuzione"
         ],
         "tips": [
-          "Non fare squat profondi",
-          "Muoviti con fluidità e controllo",
-          "Se avverti dolore al ginocchio, riduci l'ampiezza del movimento.",
-          "Assicurati di utilizzare la tecnica corretta"
+          "Prenditi il ​​tuo tempo: la qualità è più importante della velocità",
+          "Se si avverte dolore, fermarsi.",
+          "Riscaldarsi prima di ogni allenamento.",
+          "Dedica abbastanza tempo a ogni movimento."
         ]
       },
       "30": {
         "title": "Riscaldamento dei fianchi",
+        "description": "Rotazioni dei fianchi, oscillazioni delle gambe ai lati, affondi leggeri. 4-5 minuti.",
+        "benefits": [
+          "Prepara i muscoli per l'esercizio",
+          "Migliora la circolazione sanguigna",
+          "Riduce il rischio di lesioni",
+          "Aumenta l'efficienza dell'allenamento"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Solleva il ginocchio al petto",
-          "Sposta la gamba di lato e indietro",
-          "Esegui movimenti circolari con i fianchi",
-          "Eseguire affondi con una piccola ampiezza"
+          "Inizia lentamente e aumenta gradualmente l'intensità",
+          "Eseguire i movimenti in modo fluido e controllato",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Respirare in modo uniforme durante l'esecuzione"
         ],
         "tips": [
-          "Tieni la schiena dritta",
-          "Lavorare entro un intervallo confortevole",
-          "Non affrettare i tuoi movimenti",
-          "Tieni traccia del tuo saldo"
+          "Prenditi il ​​tuo tempo: la qualità è più importante della velocità",
+          "Se si avverte dolore, fermarsi.",
+          "Riscaldarsi prima di ogni allenamento.",
+          "Dedica abbastanza tempo a ogni movimento."
         ]
       },
       "31": {
         "title": "Allungamento dell'inguine",
+        "description": "Farfalla: seduti sul pavimento, unite i piedi e piegatevi in ​​avanti. Mantenete la posizione per 30-45 secondi.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Sedetevi sul pavimento con le ginocchia piegate.",
-          "Metti insieme le piante dei piedi",
-          "Sporgersi delicatamente in avanti",
-          "Tira le ginocchia verso il pavimento",
-          "Mantieni lo stretching per 30 secondi"
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
-          "Non forzare lo stretching",
-          "Respira profondamente e rilassati.",
-          "Se si avverte dolore, ridurre l'ampiezza.",
-          "Eseguire dopo il riscaldamento"
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "32": {
         "title": "Allungamento dei muscoli posteriori della coscia",
+        "description": "Piegamenti in avanti con le gambe dritte, mantenere la posizione per 30 secondi. 3 serie da 15 secondi.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Sedetevi sul pavimento con le gambe distese in avanti.",
-          "Piegati in avanti, cercando di raggiungere i tuoi piedi",
-          "Stringi i piedi con le mani",
-          "Tira il petto verso le ginocchia",
-          "Mantieni lo stretching per 30-45 secondi"
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
-          "Non curvare la schiena",
-          "Lavorare entro un intervallo confortevole",
-          "Respira profondamente",
-          "Presta attenzione alle sensazioni nella parte posteriore della coscia"
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "33": {
         "title": "Allungamento dei muscoli del polpaccio",
+        "description": "Affondi contro un muro, allungamento dei muscoli posteriori della coscia. 20 secondi per gamba.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Mettiti di fronte al muro",
-          "Posizionare un piede avanti e l'altro indietro.",
-          "Abbassare il tallone del piede posteriore sul pavimento",
-          "Piegati in avanti, allungando i polpacci",
-          "Cambia gamba e ripeti"
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
-          "Mantieni la gamba posteriore dritta",
-          "Non sollevare il tallone da terra",
-          "Allungare dolcemente",
-          "Eseguire per entrambe le gambe"
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "34": {
         "title": "Allungamento dei muscoli pettorali",
+        "description": "Allungamento al muro con estensione delle braccia. Mantieni la posizione per 30 secondi, 3 serie.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Fermati sulla porta",
-          "Metti le mani sugli stipiti delle porte",
-          "Fai un passo avanti",
-          "Senti lo stiramento nel tuo petto",
-          "Mantieni lo stretching per 30 secondi"
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
-          "Non sforzare troppo le spalle",
-          "Respira profondamente",
-          "Allungare gradualmente",
-          "Segui le tue sensazioni"
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "35": {
         "title": "Allungamento dei tricipiti",
+        "description": "Posiziona le mani dietro la testa per allungare la parte posteriore delle spalle. 20 secondi per ogni braccio.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Alza una mano",
-          "Piega il braccio all'altezza del gomito dietro la testa",
-          "Con l'altra mano, tira il gomito verso il basso",
-          "Senti lo stiramento nei tuoi tricipiti",
-          "Cambia mano e ripeti"
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
+          "Respira profondamente mentre fai stretching.",
           "Non fare movimenti bruschi",
-          "Allungare dolcemente",
-          "Respirare in modo uniforme",
-          "Eseguire per entrambe le mani"
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "36": {
         "title": "Serpente tra i coni",
+        "description": "Eseguire un movimento a serpente tra i coni disposti in fila. 5 passaggi alla massima velocità.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Posizionare i coni a forma di serpente a una distanza di 2-3 metri",
-          "Inizia a correre intorno a ogni cono",
-          "Mantieni il baricentro basso",
-          "Allena le gambe velocemente e spesso",
-          "Assicuratevi di utilizzare la tecnica di svolta corretta."
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Inizia a un ritmo lento",
-          "Concentratevi sulla tecnica, non sulla velocità.",
-          "Tieni la testa alta",
-          "Utilizzare passaggi brevi e rapidi"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "37": {
         "title": "Tocchi rapidi dei piedi",
+        "description": "Tocca rapidamente i coni con i piedi in ordine casuale. 3 serie da 45 secondi.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Mettiti accanto alla palla",
-          "Tocca la palla velocemente con il piede",
-          "Cambiare gamba ogni 2-3 tocchi",
-          "Mantenere un ritmo costante",
-          "Eseguire per 30-60 secondi"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Mantieni il peso del corpo sulla gamba di appoggio",
-          "Lavorare velocemente ma in modo controllato",
-          "Non perdere l'equilibrio",
-          "Fai attenzione alla tua tecnica di tocco"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "38": {
         "title": "Salti con curve",
+        "description": "Salti sul posto con curve da 90 a 180 gradi. 3 serie da 20 salti.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Fai un salto in alto",
-          "Girare di 180 gradi mentre si salta",
-          "Atterrare dolcemente su entrambi i piedi.",
-          "Tornare indietro immediatamente e ripetere"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Atterra con le gambe piegate",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Inizia con piccole curve",
-          "Fai attenzione alla tecnica di atterraggio"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "39": {
         "title": "Passaggi rapidi della palla",
+        "description": "Passarsi una pallina da tennis tra le mani alla massima velocità. 3 serie da 1 minuto ciascuna.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Posizionarsi di fronte al muro a una distanza di 2-3 metri",
-          "Passare la palla velocemente al muro",
-          "Prendi il rimbalzo e passalo subito indietro",
-          "Lavorare con entrambe le mani",
-          "Eseguire per 30-45 secondi"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Utilizzare la tecnica di passaggio corretta",
-          "Tieni gli occhi sulla palla",
-          "Lavorare velocemente ma con precisione",
-          "Tieni le mani rilassate"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "40": {
         "title": "Correre all'indietro",
+        "description": "Corsa all'indietro con rapidi giri al comando. 5 serie da 30 secondi.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
         "instructions": [
-          "Inizia correndo lentamente all'indietro.",
-          "Guardati spesso alle spalle",
-          "Mantieni il baricentro basso",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Completa 20-30 metri"
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
         ],
         "tips": [
-          "Inizia molto lentamente",
-          "Controlla sempre lo spazio dietro di te",
-          "Tieni le ginocchia leggermente piegate",
-          "Non affrettarti ad aumentare la velocità"
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
         ]
       },
       "41": {
         "title": "Squat con pesi",
+        "description": "Squat con manubri o bilanciere, cosce parallele al pavimento. 4 serie da 12-15 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Prendi dei manubri o un bilanciere",
-          "Accovacciatevi finché le dita dei piedi non sono parallele al pavimento.",
-          "Alzati usando la forza delle tue gambe",
-          "Eseguire 3-4 serie da 8-12 ripetizioni"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Tieni la schiena dritta",
-          "Non arrotondare la parte bassa della schiena",
-          "Le ginocchia non devono superare le dita dei piedi.",
-          "Inizia con pesi leggeri"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "42": {
         "title": "Stacco da terra",
+        "description": "Sollevare il bilanciere dal pavimento all'altezza dei fianchi tenendo la schiena dritta. Eseguire 3 serie da 8-10 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
-          "Prendi il bilanciere da terra con una presa prona.",
-          "Piega le ginocchia e sposta il bacino indietro",
-          "Sollevare il bilanciere raddrizzando le gambe e la schiena.",
-          "Riportare la barra a terra in modo controllato."
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Mantieni la schiena dritta durante tutto il movimento.",
-          "Non arrotondare la parte bassa della schiena",
-          "Avvicina la barra al tuo corpo",
-          "Inizia con pesi leggeri"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "43": {
         "title": "Panca piana",
+        "description": "Distensione su panca con bilanciere. 4 serie da 8-12 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Sdraiati sulla panca con i piedi sul pavimento.",
-          "Prendi il bilanciere con una presa larga",
-          "Abbassare la barra verso il petto in modo controllato.",
-          "Spingere il bilanciere verso l'alto",
-          "Eseguire 3-4 serie da 6-10 ripetizioni"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Tieni le scapole unite",
-          "Tieni i piedi sul pavimento",
-          "Respirare correttamente: espirare con sforzo",
-          "Utilizzare l'assicurazione"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "44": {
         "title": "Trazioni alla sbarra",
+        "description": "Trazioni alla sbarra. 3 serie da 8-12 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Appendersi alla barra con una presa sopramano",
-          "Tiratevi su finché il mento non si trova sopra la sbarra.",
-          "Abbassati di nuovo nella posizione di partenza",
-          "Mantieni il tuo core contratto",
-          "Eseguire 3-4 serie di ripetizioni massime"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Non oscillare",
-          "Tirare su in modo fluido e controllato",
-          "Raddrizza completamente le braccia in basso",
-          "Utilizzare assistenza se necessario"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "45": {
         "title": "Dip sulle barre",
+        "description": "Dip alle parallele, abbassandosi fino a un angolo di 90 gradi. 3 serie da 10-15 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Mettiti tra le sbarre",
-          "Salta e agganciati alle sbarre",
-          "Abbassatevi piegando i gomiti.",
-          "Spingi verso l'alto, raddrizzando le braccia",
-          "Eseguire 3-4 serie da 5-15 ripetizioni"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Mantieni il tuo corpo dritto",
-          "Non oscillare",
-          "Scendere a una profondità confortevole",
-          "Se necessario, usa le gambe."
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "46": {
         "title": "Posizione su una gamba",
+        "description": "Mantenere l'equilibrio su una gamba con gli occhi chiusi. 3 serie da 30 secondi per gamba.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Stare su una gamba",
-          "Solleva l'altra gamba davanti a te",
-          "Mantieni l'equilibrio il più a lungo possibile",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Cambia gamba e ripeti"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Guarda avanti, non giù",
-          "Mantieni il tuo core contratto",
-          "Inizia con serie brevi",
-          "Aumentare gradualmente il tempo"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "47": {
         "title": "Plank su una gamba",
+        "description": "Posizione plank con sollevamento di una gamba. 3 serie da 30 secondi per gamba.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Mettiti in posizione di plank",
-          "Sollevare una gamba",
-          "Tieni la gamba dritta",
-          "Mantenere la posizione per 30-60 secondi",
-          "Cambia gamba e ripeti"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Mantieni il tuo corpo dritto",
-          "Non dondolarti da un lato all'altro",
-          "Respirare in modo uniforme",
-          "Inizia con serie brevi"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "48": {
         "title": "Squat su una gamba",
+        "description": "Eseguire squat su una gamba con l'altra estesa in avanti. 3 serie da 8-10 ripetizioni per gamba.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Stare su una gamba",
-          "Estendi l'altra gamba in avanti",
-          "Accovacciarsi sulla gamba di appoggio",
-          "Ritornare alla posizione di partenza",
-          "Eseguire 3-4 serie da 5-10 ripetizioni per gamba."
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Tieni la schiena dritta",
-          "Non toccare il pavimento con l'altro piede.",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Inizia con una piccola ampiezza"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "49": {
         "title": "Esercizi con la palla Bosu",
+        "description": "Esercizi di equilibrio su una superficie instabile. 15-20 minuti di movimenti vari.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Posizionarsi sull'emisfero della palla Bosu",
-          "Mantieni l'equilibrio",
-          "Fai squat",
-          "Esegui torsioni del corpo",
-          "Eseguire 3-4 serie da 10-15 ripetizioni"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Inizia con esercizi semplici",
-          "Fai attenzione alla tua tecnica",
-          "Prenditi il ​​​​tuo tempo",
-          "Utilizzare l'aiuto per il supporto"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "50": {
         "title": "Equilibrio Yoga",
+        "description": "Posizione dell'albero, posizione del guerriero III e posizione dell'aquila per l'equilibrio. Mantieni ciascuna posizione per 30-60 secondi.",
+        "benefits": [
+          "Sviluppa la coordinazione dei movimenti",
+          "Migliora l'equilibrio e la stabilità",
+          "Aumenta l'agilità",
+          "Sviluppa la connessione neuromuscolare"
+        ],
         "instructions": [
-          "Mettiti in piedi con i piedi uniti.",
-          "Sollevare una gamba e posizionarla sulla coscia dell'altra.",
-          "Metti le mani davanti al petto",
-          "Mantieni l'equilibrio",
-          "Eseguire per entrambe le gambe per 30-60 secondi"
+          "Inizia a un ritmo lento",
+          "Concentrarsi sulla precisione dei movimenti",
+          "Aumentare gradualmente la velocità",
+          "Ripetere finché non diventa automatico."
         ],
         "tips": [
-          "Guarda avanti a un punto",
-          "Respira profondamente e in modo uniforme",
-          "Prenditi il ​​​​tuo tempo",
-          "Se perdi l'equilibrio, ricomincia da capo."
+          "Pratica regolarmente",
+          "Prenditi il ​​tuo tempo: la precisione è più importante della velocità",
+          "Utilizzare segnali visivi",
+          "Allenarsi in condizioni diverse"
         ]
       },
       "51": {
         "title": "Camminare su un tronco",
+        "description": "Camminare su un tronco o una tavola stretta per sviluppare l'equilibrio. 5 passaggi avanti e indietro.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Trova un tronco o una tavola stabile",
-          "Stare sul tronco",
-          "Camminare lentamente in avanti",
-          "Mantieni l'equilibrio",
-          "Eseguire più passaggi"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Inizia con un registro largo",
-          "Guarda avanti, non giù",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Prenditi il ​​​​tuo tempo"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "52": {
         "title": "Verticale contro il muro",
+        "description": "Verticali contro un muro per sviluppare l'equilibrio della parte superiore del corpo. 3 serie da 20 secondi.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Mettiti di fronte al muro",
-          "Posiziona le mani sul pavimento a 30 cm dal muro",
-          "Alza le gambe sul muro",
-          "Mantenere la verticale",
-          "Abbassare le gambe in modo controllato"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Inizia con serie brevi",
-          "Utilizzare l'aiuto per l'assicurazione",
-          "Mantieni il tuo core contratto",
-          "Non sforzarti troppo"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "53": {
         "title": "Fartlek",
+        "description": "Corsa a intensità variabile: corsa veloce per 2 minuti, corsa lenta per 1 minuto. 30 minuti di lavoro totale.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Inizia con una corsa lenta per 5-10 minuti",
-          "Aumentare la velocità all'80% del massimo per 2-3 minuti",
-          "Ritornare a una corsa lenta per 1-2 minuti",
-          "Ripetere il ciclo 4-6 volte",
-          "Termina con una corsa lenta per 5-10 minuti"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Ascolta il tuo corpo",
-          "Non superare l'80% della velocità massima",
-          "Respira profondamente",
-          "Bevi acqua durante l'allenamento."
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "54": {
         "title": "Sprint ripetuti",
+        "description": "Sprint da 100 metri con 2-3 minuti di riposo. 6-8 ripetizioni per sviluppare la resistenza alla velocità.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Fai un riscaldamento di 10 minuti",
-          "Eseguire uno sprint alla massima velocità per 30 secondi",
-          "Riposare per 2-3 minuti",
-          "Ripeti lo sprint",
-          "Eseguire 6-8 sprint"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Non lesinare sul riscaldamento",
-          "Riposare completamente tra gli sprint",
-          "Fai attenzione alla tua tecnica di corsa",
-          "Non fare esercizio fisico quotidianamente"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "55": {
         "title": "Intervalli in bicicletta",
+        "description": "30 secondi di sforzo massimo, 90 secondi di recupero. 20 cicli per sviluppare la resistenza alla velocità.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
         "instructions": [
-          "Inizia con un riscaldamento di 5 minuti",
-          "Aumentare il carico all'80% del massimo",
-          "Pedalare ad alta intensità per 2-3 minuti",
-          "Ridurre il carico al 50% per 1-2 minuti",
-          "Ripetere il ciclo 6-8 volte"
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
         ],
         "tips": [
-          "Mantenere una cadenza elevata",
-          "Respira profondamente",
-          "Tieni d'occhio il tuo polso",
-          "Bere acqua regolarmente"
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
         ]
       },
       "56": {
         "title": "Corsa in collina",
+        "description": "Corri su per la collina il più velocemente possibile, poi scendi di corsa. 8-10 salite.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
         "instructions": [
-          "Trova una collina con una pendenza del 5-10%",
-          "Fai un riscaldamento di 10 minuti",
-          "Corri su per la collina a velocità moderata",
-          "Scendere per recuperare",
-          "Ripeti 6-10 sollevamenti"
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
         ],
         "tips": [
-          "Inizia con una leggera pendenza",
-          "Mantieni la schiena dritta mentre sollevi.",
-          "Lavora attivamente con le mani",
-          "Prenditi il ​​tuo tempo durante la discesa"
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
         ]
       },
       "57": {
         "title": "Cerchi pliometrici",
+        "description": "Un circuito di 5-6 esercizi pliometrici senza riposo. 4-5 circuiti con 2 minuti di riposo tra di loro.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Fai un riscaldamento di 10 minuti",
-          "Eseguire salti lunghi partendo da una posizione eretta",
-          "Eseguire salti sopra gli ostacoli",
-          "Fai salti sulla scatola",
-          "Riposare per 2-3 minuti e ripetere il circuito."
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Fai attenzione alla tecnica di atterraggio",
-          "Atterra con le gambe piegate",
-          "Usa le braccia per mantenere l'equilibrio",
-          "Non esagerare con la quantità"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "58": {
         "title": "Allungamento leggero",
+        "description": "Dopo l'allenamento, allungare delicatamente tutti i principali gruppi muscolari. 15-20 minuti per accelerare il recupero.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
         "instructions": [
-          "Iniziare con movimenti leggeri",
-          "Allunga i principali gruppi muscolari",
-          "Respira profondamente e in modo uniforme",
-          "Muoviti dolcemente e lentamente",
-          "Termina con una respirazione profonda."
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
         ],
         "tips": [
-          "Non allungarti fino al punto di provare dolore.",
-          "Respira profondamente",
-          "Rilassati completamente",
-          "Fallo regolarmente"
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
         ]
       },
       "59": {
         "title": "Rullo di schiuma",
+        "description": "Massaggio muscolare con rullo di schiuma per alleviare la tensione. 10-15 minuti per ciascun gruppo muscolare principale.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Sdraiati sul foam roller",
-          "Fai rotolare lentamente il rullo sotto i muscoli.",
-          "Concentrarsi sui punti dolenti",
-          "Mantenere la pressione per 30-60 secondi",
-          "Ripetere l'esercizio per tutti i gruppi muscolari."
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Non rotolare sulle articolazioni",
-          "Respira profondamente",
-          "Non tollerare il dolore intenso",
-          "Inizia con un rullo morbido"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "60": {
         "title": "Corsa leggera",
+        "description": "Corsa a bassa intensità per un recupero attivo. 15-20 minuti.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
         "instructions": [
-          "Inizia a un ritmo lento",
-          "Mantieni la frequenza cardiaca al 60-70% del massimo",
-          "Respira profondamente e in modo uniforme",
-          "Mantenere un ritmo costante",
-          "Terminare con una graduale diminuzione del tempo"
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
         ],
         "tips": [
-          "Tieni d'occhio il tuo polso",
-          "Respira attraverso il naso",
-          "Non sforzarti troppo",
-          "Godetevi il processo"
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
         ]
       },
       "61": {
         "title": "Nuoto",
+        "description": "Nuoto leggero in piscina per rilassare i muscoli e recuperare. 20-30 minuti.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Inizia con un riscaldamento sulla terraferma",
-          "Entrare in acqua gradualmente",
-          "Nuotare a un ritmo confortevole",
-          "Cambia il tuo stile di nuoto",
-          "Termina con una nuotata lenta"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Non nuotare da solo",
-          "Fai attenzione alla tua tecnica",
-          "Respirare in modo uniforme",
-          "Non esagerare"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "62": {
         "title": "Bicicletta da recupero",
+        "description": "Pedalata leggera a ritmo lento per un recupero attivo. 20-25 minuti.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
         "instructions": [
-          "Inizia a un ritmo lento",
-          "Mantieni la frequenza cardiaca al 50-60% del massimo",
-          "Pedalare facilmente e ritmicamente",
-          "Respira profondamente",
-          "Terminare con una graduale diminuzione del tempo"
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
         ],
         "tips": [
-          "Mantenere una cadenza elevata",
-          "Respira profondamente",
-          "Non sforzarti troppo",
-          "Goditi il ​​viaggio"
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
         ]
       },
       "63": {
         "title": "Yoga di recupero",
+        "description": "Asana delicate per rilassare i muscoli e accelerare il recupero. 20 minuti.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Inizia con pose semplici",
-          "Eseguire lo stretching lentamente",
-          "Respira profondamente e in modo uniforme",
-          "Rilassati in ogni posa",
-          "Termina con la meditazione"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Non forzare le pose",
-          "Respira attraverso il naso",
-          "Ascolta il tuo corpo",
-          "Godetevi il processo"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       },
       "64": {
@@ -1436,18 +1654,24 @@
       },
       "65": {
         "title": "Doccia di contrasto",
+        "description": "Alternare acqua calda e fredda per migliorare la circolazione e il recupero. 5-7 minuti.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
         "instructions": [
-          "Inizia con acqua calda",
-          "Passare gradualmente all'acqua fredda",
-          "Tenere l'acqua fredda per 30-60 secondi",
-          "Ritornare all'acqua calda",
-          "Ripetere il ciclo 3-5 volte"
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
         ],
         "tips": [
-          "Inizia gradualmente",
-          "Respira profondamente",
-          "Non prendere troppo freddo",
-          "Ascolta il tuo corpo"
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
         ]
       }
     },
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Aggiungi come amico",
     "addFriendQuestion": "Vuoi aggiungere {name} come amico?",
-    "sendMessage": "Invia messaggio",
     "loading": "Caricamento...",
     "basicInfo": "Informazioni di base",
     "physicalData": "Dati fisici",
@@ -1603,7 +1826,7 @@
     "addToFriendsToSeePhotos": "Aggiungi {name} come amico per vedere le foto di hockey",
     "addToFriendsToSeeMuseum": "Aggiungi {name} come amico per vedere il museo",
     "removeFromFriends": "Rimuovi dagli amici",
-    "points": "Punti",
+    "points": "punti",
     "friendsCount": "amici",
     "friendsCountStats": "Amici",
     "seconds": "secondo",
@@ -1614,9 +1837,9 @@
     "Защитник": "Difensore",
     "Вратарь": "Portiere",
     "настоящее время": "tempo presente",
-    "goals": "Goal",
-    "assists": "Assist",
-    "games": "Partite",
+    "goals": "obiettivi",
+    "assists": "ingranaggi",
+    "games": "giochi",
     "pullUps": "Trazioni alla sbarra",
     "pushUps": "Sollevamento",
     "plankTime": "tavola (sec)",
@@ -1783,19 +2006,7 @@
     "equipmentRepair": "Riparazione attrezzature",
     "stickRepair": "Riparazione bastoni",
     "usedEquipmentSale": "Vendita attrezzature usate",
-    "newEquipmentSale": "Vendita attrezzature nuove",
-    "phone": "Telefono",
-    "qrCodeTitle": "Codice QR del profilo",
-    "qrCodeSubtitle": "Scansiona per accesso rapido",
-    "qrCodeInfo": "Punta la fotocamera del telefono sul codice QR per aprire il profilo",
-    "shareProfile": "Condividi profilo",
-    "savedToGallery": "Salvato nella galleria",
-    "noPermission": "Nessun accesso alla galleria",
-    "shareError": "Errore durante la creazione dell'immagine",
-    "currentTeam": "Squadra",
-    "hockeyExperience": "Esperienza nell'hockey",
-    "years": "anni",
-    "currentSeasonStats": "Statistiche della stagione corrente"
+    "newEquipmentSale": "Vendita attrezzature nuove"
   },
   "register": {
     "title": "Registrazione",
@@ -1833,7 +2044,7 @@
     "home": "Casa",
     "search": "Ricerca",
     "messages": "Messaggi",
-    "notifications": "Eventi",
+    "notifications": "Notifiche",
     "profile": "Profilo"
   },
   "admin": {
@@ -1850,7 +2061,6 @@
     "noName": "Nessun nome",
     "noPosition": "Non specificato",
     "noTeam": "Non specificato",
-    "sendGift": "Invia regalo",
     "yearsOld": "anni",
     "addUser": "Aggiungi utente",
     "searchPlayers": "Cerchiamo giocatori...",
@@ -2052,12 +2262,10 @@
   "settings": {
     "title": "Impostazioni",
     "language": "Lingua",
-    "selectLanguage": "Seleziona la lingua",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Seleziona la lingua"
   },
   "search": {
     "title": "Ricerca",
-    "loading": "Caricamento della ricerca...",
     "placeholder": "Cerchiamo giocatori...",
     "country": "Paese",
     "grip": "Presa",
@@ -2083,10 +2291,10 @@
     "you": "Voi:"
   },
   "notifications": {
-    "title": "Eventi",
-    "loading": "Caricamento eventi in corso...",
-    "noNotifications": "Nessun evento",
-    "noNotificationsSubtitle": "Non hai ancora ricevuto eventi su amicizie, regali o altre azioni.",
+    "title": "Notifiche",
+    "loading": "Caricamento notifiche in corso...",
+    "noNotifications": "Nessuna notifica",
+    "noNotificationsSubtitle": "Non hai ancora ricevuto notifiche su amicizie, regali o altre azioni.",
     "accept": "Accettare",
     "decline": "Rifiutare",
     "friendRequests": "Richieste di amicizia",
@@ -2136,13 +2344,11 @@
     "timesPlural": "volte"
   },
   "home": {
-    "loadingPlayers": "Rinnovamento del ghiaccio...",
+    "loadingPlayers": "Caricamento giocatori in corso...",
     "noPlayersCountry": "Nessun giocatore da {{country}}",
     "noPlayersYear": "Non ci sono giocatori nati in {{year}}",
     "noPlayersCountryYear": "Nessun giocatore da {{country}} in {{year}}",
-    "iceEmpty": "Il ghiaccio è vuoto. Scegli un paese o un anno diverso, oppure reimposta i filtri.",
-    "waitingForConnection": "In attesa di connessione",
-    "checkInternetConnection": "Controlla la tua connessione Internet"
+    "iceEmpty": "Il ghiaccio è vuoto. Scegli un paese o un anno diverso, oppure reimposta i filtri."
   },
   "filters": {
     "year": "anno",
@@ -2237,15 +2443,15 @@
     "jersey": "Maglia",
     "pleaseWriteMessage": "Si prega di scrivere un messaggio alla tua richiesta",
     "invalidGift": "regalo inappropriato",
-    "deleteGiftQuestion": "Eliminare regalo?",
+    "deleteGiftQuestion": "Eliminare il regalo?",
     "from": "da",
     "noGiftsYet": "Ancora nessun regalo dalle stelle",
     "museum": "Museo dei doni",
-    "myGifts": "I miei regali",
-    "noGifts": "Nessun regalo ancora",
-    "noGiftsSubtext": "Carica il tuo primo regalo da condividere con i giocatori",
-    "addGift": "Aggiungi un regalo",
-    "successDeleted": "Regalo eliminato",
+    "myGifts": "I miei doni",
+    "noGifts": "Nessun dono ancora",
+    "noGiftsSubtext": "Crea il tuo primo dono per i fan",
+    "addGift": "Aggiungi dono",
+    "successDeleted": "Il dono è stato rimosso dal museo.",
     "errorDelete": "Impossibile eliminare il regalo",
     "noImage": "nessuna immagine",
     "failedToSendRequest": "Impossibile inviare la richiesta",
@@ -2253,7 +2459,7 @@
     "requestSentMessage": "La tua richiesta per {itemType} è stata inviata. Attendi una risposta.",
     "requestItem": "Richiesta {itemType}",
     "requestMessage": "Messaggio alla richiesta",
-    "selectGiftType": "Seleziona il tipo di regalo",
+    "selectGiftType": "Seleziona tipo di regalo",
     "selectGiftTypeMessage": "Che tipo di regalo vorresti creare?",
     "requestMessageHelper": "Scrivi un messaggio cortese spiegando perché desideri ricevere questo regalo.",
     "requestMessagePlaceholder": "Ad esempio: Ciao! Sono un grande fan del tuo gioco e vorrei un autografo per la mia collezione...",
@@ -2280,9 +2486,12 @@
     "failedToUpdateItemImage": "Impossibile aggiornare l'immagine del regalo",
     "allGiftsAdded": "Tutti i regali sono stati aggiunti.",
     "allGiftTypesAdded": "Hai già tutti i tipi di doni",
+    "addGift": "Aggiungi un regalo",
+    "selectGiftType": "Seleziona il tipo di regalo",
     "deletion": "Rimozione",
     "itemDeleted": "Regalo rimosso",
     "failedToDeleteItem": "Impossibile eliminare il regalo",
+    "noGifts": "Nessun regalo",
     "clickPlusToAdd": "Clicca + per aggiungere",
     "настоящее время": "tempo presente",
     "Центральный нападающий": "Centravanti",
@@ -2298,33 +2507,7 @@
     "seconds": "secondo",
     "times": "una volta",
     "sprint": "100 metri piani",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Invia regalo a {playerName}",
-    "selectExistingGift": "Seleziona regalo esistente",
-    "orCreateNew": "O crea nuovo",
-    "giftName": "Nome regalo",
-    "giftNamePlaceholder": "es. Cappello firmato",
-    "uploadImage": "Carica immagine",
-    "send": "Invia",
-    "selectGift": "Seleziona regalo",
-    "fromAdmin": "Amministratore",
-    "errorSelectOrCreate": "Seleziona un regalo o creane uno nuovo",
-    "errorGiftAlreadyExists": "Questo regalo esiste già per il giocatore {playerName}.\n\nSeleziona un altro regalo o creane uno nuovo.",
-    "successGiftSent": "Regalo inviato a {playerName}!",
-    "errorSendingGift": "Impossibile inviare il regalo",
-    "deleteGiftConfirm": "Sei sicuro di voler eliminare questo regalo?",
-    "selectImage": "Seleziona immagine",
-    "errorPermissionDenied": "Non hai il permesso di eliminare questo regalo",
-    "errorGiftNotFound": "Regalo non trovato",
-    "errorGiftNotDeleted": "Il regalo non è stato eliminato",
-    "noGiftsUploaded": "Nessun regalo caricato ancora",
-    "fromStar": "da {starName}",
-    "giftReceived": "Regalo ricevuto!",
-    "giftReceivedFromAdmin": "Hai ricevuto un regalo dall'amministratore: {giftName}",
-    "giftReceivedFromStar": "Hai ricevuto un regalo da {starName}: {giftName}",
-    "giftReceivedPush": "🎁 Regalo ricevuto!",
-    "giftReceivedFromAdminPush": "Hai ricevuto un regalo dall'amministratore: {giftName}",
-    "giftReceivedFromStarPush": "Hai ricevuto un regalo da {starName}: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Standard",
@@ -2442,40 +2625,5 @@
   },
   "logout": "Uscita",
   "logoutConfirm": "Esci dal tuo profilo",
-  "logoutConfirmMessage": "Sei sicuro di voler uscire dal tuo profilo?",
-  "adminGifts": {
-    "sendGift": "Invia regalo",
-    "giftName": "Nome del regalo",
-    "selectImage": "Seleziona immagine"
-  },
-  "videoNotification": {
-    "added": "ha aggiunto",
-    "oneVideo": "nuovo video",
-    "multipleVideos": "{count} nuovi video",
-    "video": "video",
-    "videos": "video"
-  },
-  "achievementNotification": {
-    "added": "ha aggiunto",
-    "received": "ha ricevuto",
-    "oneAchievement": "nuovo traguardo",
-    "multipleAchievements": "{count} nuovi traguardi",
-    "achievement": "traguardo",
-    "achievements": "traguardi",
-    "title": "🏆 Traguardo!",
-    "message": "Congratulazioni! Hai ricevuto il traguardo: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "ha cambiato il suo avatar"
-  },
-  "statsNotification": {
-    "updated": "ha aggiornato",
-    "stats": "statistiche",
-    "normatives": "normative",
-    "physicalData": "dati fisici"
-  },
-  "height": "altezza",
-  "weight": "peso",
-  "cm": "cm",
-  "kg": "kg"
+  "logoutConfirmMessage": "Sei sicuro di voler uscire dal tuo profilo?"
 }

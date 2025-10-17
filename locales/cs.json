@@ -3,7 +3,7 @@
     "save": "Uložit",
     "cancel": "Zrušit",
     "edit": "Upravit",
-    "delete": "Smazat",
+    "delete": "Vymazat",
     "add": "Přidat",
     "close": "Blízko",
     "back": "Zadní",
@@ -11,7 +11,7 @@
     "done": "Připraveno",
     "loading": "Načítání...",
     "error": "Chyba",
-    "success": "Úspěch",
+    "success": "Úspěšně",
     "yes": "Ano",
     "no": "Žádný",
     "ok": "OK",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Opravdu chcete tento úspěch odstranit?",
     "deleteAllNotificationsConfirm": "Opravdu chcete vymazat všechna oznámení?",
     "rejectRequestConfirm": "Opravdu chcete tuto žádost odmítnout?",
-    "super": "Skvělé!",
-    "retry": "Zkusit znovu",
-    "goalie": "Brankář"
+    "super": "Skvělé!"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -65,8 +63,7 @@
     "title": "Dárek od hvězdy",
     "message": "{playerName} obdržel {giftName} od {starName}",
     "received": "přijaté",
-    "from": "z",
-    "gift": "Dárek"
+    "from": "z"
   },
   "addPhoto": "Přidejte fotku",
   "selectPhotoSource": "Vyberte zdroj fotografie",
@@ -142,7 +139,6 @@
     "subtitle": "Vyberte cvičení",
     "searchPlaceholder": "Hledat podle čísla nebo jména...",
     "loadingExercise": "Načítání cvičení...",
-    "loadingExercises": "Načítání cvičení...",
     "exercise": "Cvičení",
     "alreadyCompleted": "Cvičení již bylo dokončeno",
     "canRetryIn": "Toto cvičení můžete opakovat za {hours} h",
@@ -820,594 +816,816 @@
       },
       "27": {
         "title": "Zahřívání krku",
+        "description": "Plynulé otáčení hlavy, předklony a vzad, krouživé pohyby. 2-3 minuty.",
+        "benefits": [
+          "Připravuje svaly na cvičení",
+          "Zlepšuje krevní oběh",
+          "Snižuje riziko zranění",
+          "Zvyšuje efektivitu tréninku"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Pomalu otáčejte hlavou doleva a doprava",
-          "Nakloňte hlavu dopředu a dozadu",
-          "Provádějte krouživé pohyby hlavou",
-          "Udržujte ramena uvolněná"
+          "Začněte pomalu a postupně zvyšujte intenzitu",
+          "Pohyby provádějte plynule a kontrolovaně",
+          "Ujistěte se, že používáte správnou techniku",
+          "Při výkonu dýchejte rovnoměrně"
         ],
         "tips": [
-          "Pohybujte se pomalu a plynule",
-          "Nedělejte žádné náhlé pohyby",
+          "Nespěchejte – kvalita je důležitější než rychlost",
           "Pokud se objeví bolest, přestaňte.",
-          "Dýchejte zhluboka a rovnoměrně"
+          "Před každým tréninkem se zahřejte.",
+          "Každému pohybu věnujte dostatek času."
         ]
       },
       "28": {
         "title": "Zahřívání zápěstí",
+        "description": "Kruhové pohyby rukama, ohýbání a natahování prstů. 2-3 minuty na každou ruku.",
+        "benefits": [
+          "Připravuje svaly na cvičení",
+          "Zlepšuje krevní oběh",
+          "Snižuje riziko zranění",
+          "Zvyšuje efektivitu tréninku"
+        ],
         "instructions": [
-          "Natáhněte ruce před sebe",
-          "Ohněte zápěstí nahoru a dolů",
-          "Otočte zápěstí do kruhu",
-          "Zatínejte a uvolňujte pěsti",
-          "Natáhněte prsty do stran"
+          "Začněte pomalu a postupně zvyšujte intenzitu",
+          "Pohyby provádějte plynule a kontrolovaně",
+          "Ujistěte se, že používáte správnou techniku",
+          "Při výkonu dýchejte rovnoměrně"
         ],
         "tips": [
-          "Pohyby provádějte pomalu",
-          "Nepřetěžujte klouby",
-          "Věnujte pozornost pocitům v zápěstích",
-          "Opakujte pravidelně"
+          "Nespěchejte – kvalita je důležitější než rychlost",
+          "Pokud se objeví bolest, přestaňte.",
+          "Před každým tréninkem se zahřejte.",
+          "Každému pohybu věnujte dostatek času."
         ]
       },
       "29": {
         "title": "Protahuje se koleno",
+        "description": "Polodřepy, kruhy v kolenou, lehké skákání na místě. 3-4 minuty.",
+        "benefits": [
+          "Připravuje svaly na cvičení",
+          "Zlepšuje krevní oběh",
+          "Snižuje riziko zranění",
+          "Zvyšuje efektivitu tréninku"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Pomalu pokrčte a narovnejte kolena",
-          "Provádějte kruhové pohyby s koleny",
-          "Dělejte dřepy s malou amplitudou",
-          "Protáhněte přední část stehna"
+          "Začněte pomalu a postupně zvyšujte intenzitu",
+          "Pohyby provádějte plynule a kontrolovaně",
+          "Ujistěte se, že používáte správnou techniku",
+          "Při výkonu dýchejte rovnoměrně"
         ],
         "tips": [
-          "Nedělejte hluboké dřepy",
-          "Pohybujte se plynule a pod kontrolou",
-          "Pokud vás bolí koleno, snižte rozsah pohybu.",
-          "Ujistěte se, že používáte správnou techniku"
+          "Nespěchejte – kvalita je důležitější než rychlost",
+          "Pokud se objeví bolest, přestaňte.",
+          "Před každým tréninkem se zahřejte.",
+          "Každému pohybu věnujte dostatek času."
         ]
       },
       "30": {
         "title": "Zahřátí kyčle",
+        "description": "Kruhy kyčlí, výkyvy nohou do stran, lehké výpady. 4-5 minut.",
+        "benefits": [
+          "Připravuje svaly na cvičení",
+          "Zlepšuje krevní oběh",
+          "Snižuje riziko zranění",
+          "Zvyšuje efektivitu tréninku"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Zvedněte koleno k hrudi",
-          "Posuňte nohu do strany a dozadu",
-          "Provádějte krouživé pohyby boky",
-          "Dělejte výpady s malou amplitudou"
+          "Začněte pomalu a postupně zvyšujte intenzitu",
+          "Pohyby provádějte plynule a kontrolovaně",
+          "Ujistěte se, že používáte správnou techniku",
+          "Při výkonu dýchejte rovnoměrně"
         ],
         "tips": [
-          "Udržujte záda rovná",
-          "Pracujte v pohodlném dosahu",
-          "Neuspěchejte své pohyby",
-          "Sledujte svou rovnováhu"
+          "Nespěchejte – kvalita je důležitější než rychlost",
+          "Pokud se objeví bolest, přestaňte.",
+          "Před každým tréninkem se zahřejte.",
+          "Každému pohybu věnujte dostatek času."
         ]
       },
       "31": {
         "title": "Protažení třísel",
+        "description": "Butterfly - sedí na podlaze, spojte nohy a předkloňte se. Vydržte 30-45 sekund.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Sedněte si na podlahu s pokrčenými koleny.",
-          "Položte chodidla k sobě",
-          "Jemně se předkloňte",
-          "Přitáhněte kolena k podlaze",
-          "Protažení vydržte 30 sekund"
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
-          "Nenatahujte silou",
-          "Zhluboka se nadechněte a uvolněte se.",
-          "Pokud se objeví bolest, snižte amplitudu.",
-          "Proveďte po zahřátí"
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "32": {
         "title": "Protažení hamstringů",
+        "description": "Předklony s rovnými nohami, vydržte 30 sekund. 3 sady po 15 sekundách.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Sedněte si na podlahu s nohama nataženýma dopředu.",
-          "Předkloňte se a snažte se dosáhnout na nohy",
-          "Sepněte si nohy rukama",
-          "Přitáhněte hrudník směrem ke kolenům",
-          "Protažení vydržte 30-45 sekund"
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
-          "Nekruťte se v zádech",
-          "Pracujte v pohodlném dosahu",
-          "Zhluboka dýchejte",
-          "Věnujte pozornost pocitům v zadní části stehna"
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "33": {
         "title": "Protahování lýtkových svalů",
+        "description": "Výpady proti zdi, natažení hamstringů. 20 sekund na nohu.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Postavte se čelem ke zdi",
-          "Umístěte jednu nohu dopředu a druhou dozadu.",
-          "Spusťte patu zadní nohy na podlahu",
-          "Předkloňte se a protáhněte lýtka",
-          "Vyměňte nohy a opakujte"
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
-          "Udržujte zadní nohu rovně",
-          "Nezvedejte patu z podlahy",
-          "Plynule se protahujte",
-          "Proveďte pro obě nohy"
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "34": {
         "title": "Protažení prsních svalů",
+        "description": "Protažení stěny s prodloužením paží. Vydržte 30 sekund, 3 sady.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Postavte se do dveří",
-          "Položte ruce na rámy dveří",
-          "Udělejte krok vpřed",
-          "Vnímejte protažení v hrudi",
-          "Protažení vydržte 30 sekund"
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
-          "Nepřetěžujte ramena",
-          "Zhluboka dýchejte",
-          "Protahujte postupně",
-          "Následujte své pocity"
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "35": {
         "title": "Protažení tricepsů",
+        "description": "Položte ruce za hlavu, abyste natáhli zadní část ramene. 20 sekund pro každou paži.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Zvedněte jednu ruku nahoru",
-          "Ohněte ruku v lokti za hlavou",
-          "Druhou rukou stáhněte loket dolů",
-          "Vnímejte protažení tricepsu",
-          "Vyměňte ruce a opakujte"
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
+          "Při protahování zhluboka dýchejte.",
           "Nedělejte žádné náhlé pohyby",
-          "Plynule se protahujte",
-          "Dýchejte rovnoměrně",
-          "Proveďte pro obě ruce"
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "36": {
         "title": "Had mezi kužely",
+        "description": "Běhejte v hadím pohybu mezi kužely uspořádanými v řadě. 5 průjezdů maximální rychlostí.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Šišky umístěte do hadího vzoru ve vzdálenosti 2-3 metrů",
-          "Začněte běhat kolem každého kužele",
-          "Udržujte své těžiště nízko",
-          "Pracujte nohama rychle a často",
-          "Ujistěte se, že používáte správnou techniku ​​otáčení."
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Začněte pomalým tempem",
-          "Soustřeďte se na techniku, ne na rychlost.",
-          "Hlavu vzhůru",
-          "Používejte krátké, rychlé kroky"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "37": {
         "title": "Rychlé doteky nohou",
+        "description": "Rychle se dotkněte kuželů nohama v náhodném pořadí. 3 sady po 45 sekundách.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se vedle míče",
-          "Rychle se dotkněte míče nohou",
-          "Vyměňte nohy každé 2-3 doteky",
-          "Udržujte stálý rytmus",
-          "Provádějte 30-60 sekund"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte váhu těla na podpůrné noze",
-          "Pracujte rychle, ale kontrolovaně",
-          "Neztrácejte rovnováhu",
-          "Sledujte svou techniku ​​dotyku"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "38": {
         "title": "Skoky s obraty",
+        "description": "Skákání na místě s otočkami o 90-180 stupňů. 3 sady po 20 seskocích.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Vyskočte nahoru",
-          "Při skákání se otočte o 180 stupňů",
-          "Přistaňte jemně na obě nohy.",
-          "Okamžitě se otočte a opakujte"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Přistaňte s pokrčenýma nohama",
-          "Pro rovnováhu použijte paže",
-          "Začněte malými zatáčkami",
-          "Pozor na techniku ​​přistání"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "39": {
         "title": "Rychlé přihrávky míče",
+        "description": "Předávání tenisového míčku mezi rukama maximální rychlostí. 3 sady po 1 minutě.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se čelem ke zdi ve vzdálenosti 2-3 metry",
-          "Přihrávejte míč rychle ke zdi",
-          "Zachyťte odraz a okamžitě jej předejte zpět",
-          "Pracujte oběma rukama",
-          "Provádějte 30-45 sekund"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Používejte správnou techniku ​​přihrávek",
-          "Mějte oči na míči",
-          "Pracujte rychle, ale přesně",
-          "Udržujte ruce uvolněné"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "40": {
         "title": "Běh vzad",
+        "description": "Běh vzad s rychlými otáčkami na tágu. 5 sad po 30 sekundách.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
         "instructions": [
-          "Začněte pomalým běháním vzad.",
-          "Často se dívejte přes rameno",
-          "Udržujte své těžiště nízko",
-          "Pro rovnováhu použijte paže",
-          "Kompletní 20-30 metrů"
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
         ],
         "tips": [
-          "Začněte velmi pomalu",
-          "Vždy zkontrolujte prostor za vámi",
-          "Kolena mějte mírně pokrčená",
-          "Nespěchejte se zvyšováním rychlosti"
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
         ]
       },
       "41": {
         "title": "Dřepy se závažím",
+        "description": "Dřepy s činkami nebo činkou, stehna rovnoběžně s podlahou. 4 sady po 12-15 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Vezměte si činky nebo činku",
-          "Dřepněte si, dokud nebudou prsty u nohou rovnoběžné s podlahou.",
-          "Vstávejte pomocí síly svých nohou",
-          "Proveďte 3-4 sady po 8-12 opakováních"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte záda rovná",
-          "Nezakulacujte spodní část zad",
-          "Vaše kolena by neměla přesahovat prsty u nohou.",
-          "Začněte s lehkými váhami"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "42": {
         "title": "Mrtvý tah",
+        "description": "Zvedněte činku z podlahy na úroveň boků s rovnými zády. 3 sady po 8-10 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama na šířku ramen",
-          "Vezměte činku z podlahy nadhmatem.",
-          "Pokrčte kolena a posuňte pánev dozadu",
-          "Zvedněte činku narovnáním nohou a zad.",
-          "Vraťte tyč kontrolovaně na podlahu."
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Po celou dobu pohybu držte záda rovná.",
-          "Nezakulacujte spodní část zad",
-          "Přibližte tyč k tělu",
-          "Začněte s lehkými váhami"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "43": {
         "title": "Bench press",
+        "description": "Bench press s činkou. 4 sady po 8-12 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Lehněte si na lavici s nohama na podlaze.",
-          "Vezměte činku širokým úchopem",
-          "Kontrolovaně spusťte tyč k hrudi.",
-          "Stiskněte činku nahoru",
-          "Proveďte 3-4 sady po 6-10 opakováních"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte lopatky přitažené k sobě",
-          "Udržujte nohy na podlaze",
-          "Dýchejte správně: s námahou vydechujte",
-          "Použijte pojištění"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "44": {
         "title": "Přítahy",
+        "description": "Zvednutí brady. 3 sady po 8-12 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Zavěste se na hrazdu úchopem nadhmatem",
-          "Vytáhněte se nahoru, dokud nebude vaše brada nad tyčí.",
-          "Spusťte se zpět do výchozí polohy",
-          "Udržujte své jádro pevné",
-          "Proveďte 3-4 sady maximálních opakování"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Nehoupejte se",
-          "Vytahujte plynule a kontrolovaně",
-          "Narovnejte ruce úplně dole",
-          "V případě potřeby použijte pomoc"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "45": {
         "title": "Dipy na mřížích",
+        "description": "Paralelní lišta klesá, klesá do úhlu 90 stupňů. 3 sady po 10-15 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se mezi tyče",
-          "Vyskočte a zamkněte na mříže",
-          "Spusťte se dolů a ohněte lokty.",
-          "Zatlačte nahoru a narovnejte ruce",
-          "Proveďte 3-4 sady po 5-15 opakováních"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte své tělo rovně",
-          "Nehoupejte se",
-          "Sestup do pohodlné hloubky",
-          "V případě potřeby použijte nohy."
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "46": {
         "title": "Stojan na jedné noze",
+        "description": "Udržujte rovnováhu na jedné noze se zavřenýma očima. 3 sady po 30 sekundách na každou nohu.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se na jednu nohu",
-          "Zvedněte druhou nohu před sebe",
-          "Udržujte rovnováhu co nejdéle",
-          "Pro rovnováhu použijte paže",
-          "Vyměňte nohy a opakujte"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Dívejte se dopředu, ne dolů",
-          "Udržujte své jádro pevné",
-          "Začněte s krátkými sadami",
-          "Postupně prodlužujte čas"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "47": {
         "title": "Prkno s jednou nohou",
+        "description": "Držení prkna se zvednutím jedné nohy. 3 sady po 30 sekundách na každou nohu.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Dostaňte se do pozice prkna",
-          "Zvedněte jednu nohu nahoru",
-          "Udržujte nohu rovně",
-          "Držte pozici po dobu 30-60 sekund",
-          "Vyměňte nohy a opakujte"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte své tělo rovně",
-          "Nehoupejte se ze strany na stranu",
-          "Dýchejte rovnoměrně",
-          "Začněte s krátkými sadami"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "48": {
         "title": "Dřepy na jedné noze",
+        "description": "Dřepy na jedné noze s druhou nohou nataženou dopředu. 3 sady po 8-10 opakováních na každou nohu.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se na jednu nohu",
-          "Natáhněte druhou nohu dopředu",
-          "Dřep na opěrné noze",
-          "Vraťte se do výchozí pozice",
-          "Proveďte 3-4 sady po 5-10 opakováních na každou nohu."
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Udržujte záda rovná",
-          "Nedotýkejte se podlahy druhou nohou.",
-          "Pro rovnováhu použijte paže",
-          "Začněte s malou amplitudou"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "49": {
         "title": "Cvičení s bosu míčem",
+        "description": "Balanční cvičení na nestabilním povrchu. 15-20 minut různých pohybů.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se na polokouli míče Bosu",
-          "Udržujte rovnováhu",
-          "Dělejte dřepy",
-          "Dělejte kroucení těla",
-          "Proveďte 3-4 sady po 10-15 opakováních"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Začněte jednoduchými cviky",
-          "Pozor na techniku",
-          "Nespěchejte",
-          "Pro podporu použijte nápovědu"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "50": {
         "title": "Jóga rovnováha",
+        "description": "Póza stromu, Warrior III a Eagle pro rovnováhu. Držte každou pózu po dobu 30-60 sekund.",
+        "benefits": [
+          "Rozvíjí koordinaci pohybů",
+          "Zlepšuje rovnováhu a rovnováhu",
+          "Zvyšuje obratnost",
+          "Rozvíjí nervosvalové spojení"
+        ],
         "instructions": [
-          "Postavte se rovně s nohama u sebe.",
-          "Zvedněte jednu nohu a položte ji na stehno druhé.",
-          "Položte ruce před hrudník",
-          "Udržujte rovnováhu",
-          "Proveďte pro obě nohy po dobu 30-60 sekund"
+          "Začněte pomalým tempem",
+          "Zaměřte se na přesnost pohybů",
+          "Postupně zvyšujte rychlost",
+          "Opakujte, dokud se to nestane automatickým."
         ],
         "tips": [
-          "Podívejte se dopředu v jednom bodě",
-          "Dýchejte zhluboka a rovnoměrně",
-          "Nespěchejte",
-          "Pokud ztratíte rovnováhu, začněte znovu."
+          "Cvičte pravidelně",
+          "Nespěchejte – přesnost je důležitější než rychlost",
+          "Používejte vizuální podněty",
+          "Trénujte v různých podmínkách"
         ]
       },
       "51": {
         "title": "Chůze po kládě",
+        "description": "Chůze po úzké kládě nebo prkně pro rozvoj rovnováhy. 5 přejezdů tam a zpět.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Najděte stabilní kládu nebo desku",
-          "Postavte se na kládu",
-          "Jděte pomalu vpřed",
-          "Udržujte rovnováhu",
-          "Proveďte několik průchodů"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Začněte širokým polenem",
-          "Dívejte se dopředu, ne dolů",
-          "Pro rovnováhu použijte paže",
-          "Nespěchejte"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "52": {
         "title": "Stojka proti zdi",
+        "description": "Stojky opřené o zeď pro rozvoj rovnováhy horní části těla. 3 sady po 20 sekundách.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Postavte se čelem ke zdi",
-          "Položte ruce na podlahu 30 cm od stěny",
-          "Zvedněte nohy po zdi",
-          "Držte stojku",
-          "Kontrolovaně spusťte nohy dolů"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Začněte s krátkými sadami",
-          "Použijte pomoc pro pojištění",
-          "Udržujte své jádro pevné",
-          "Nepřetěžujte se"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "53": {
         "title": "Fartlek",
+        "description": "Běh s různou intenzitou: rychlý běh 2 minuty, pomalý běh 1 minutu. 30 minut celkové práce.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Začněte pomalým joggingem po dobu 5-10 minut",
-          "Zvyšte rychlost na 80 % maxima na 2-3 minuty",
-          "Vraťte se k pomalému běhání na 1-2 minuty",
-          "Cyklus opakujte 4-6krát",
-          "Dokončete pomalým poklusem po dobu 5-10 minut"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Poslouchejte své tělo",
-          "Nepřekračujte 80 % maximální rychlosti",
-          "Zhluboka dýchejte",
-          "Během cvičení pijte vodu."
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "54": {
         "title": "Opakované sprinty",
+        "description": "Sprinty na 100 metrů s 2-3 minutami odpočinku. 6-8 opakování pro rozvoj rychlostní vytrvalosti.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Proveďte 10minutové zahřátí",
-          "Běžte sprint maximální rychlostí po dobu 30 sekund",
-          "Odpočívejte 2-3 minuty",
-          "Opakujte sprint",
-          "Proveďte 6-8 sprintů"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Nešetřete na rozcvičce",
-          "Mezi sprinty si úplně odpočiňte",
-          "Sledujte techniku ​​běhu",
-          "Necvičte denně"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "55": {
         "title": "Intervaly na kole",
+        "description": "30 sekund maximálního úsilí, 90 sekund zotavení. 20 cyklů pro rozvoj rychlostní vytrvalosti.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
         "instructions": [
-          "Začněte 5minutovým zahřátím",
-          "Zvyšte zátěž na 80 % maxima",
-          "Pedál s vysokou intenzitou po dobu 2-3 minut",
-          "Snižte zátěž na 50 % po dobu 1-2 minut",
-          "Opakujte cyklus 6-8krát"
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
         ],
         "tips": [
-          "Udržujte vysokou kadenci",
-          "Zhluboka dýchejte",
-          "Sledujte svůj puls",
-          "Pijte pravidelně vodu"
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
         ]
       },
       "56": {
         "title": "Běh do kopce",
+        "description": "Vyběhněte do kopce tak rychle, jak jen můžete, a pak běžte dolů. 8-10 stoupání do kopce.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
         "instructions": [
-          "Najděte kopec se sklonem 5-10%",
-          "Proveďte 10minutové zahřátí",
-          "Vyběhněte do kopce mírnou rychlostí",
-          "Jděte dolů, abyste se vzpamatovali",
-          "Opakujte 6-10 zdvihů"
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
         ],
         "tips": [
-          "Začněte s mírným sklonem",
-          "Při zvedání mějte rovná záda.",
-          "Aktivně pracujte rukama",
-          "Dejte si na sestup načas"
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
         ]
       },
       "57": {
         "title": "Plyometrické kruhy",
+        "description": "Okruh 5-6 plyometrických cviků bez odpočinku. 4-5 okruhů s 2 minutami odpočinku mezi nimi.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Proveďte 10minutové zahřátí",
-          "Dělejte dlouhé skoky ze stoje",
-          "Provádějte skoky přes překážky",
-          "Dělejte boxové skoky",
-          "Odpočívejte 2-3 minuty a opakujte okruh."
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Pozor na techniku ​​přistání",
-          "Přistaňte s pokrčenýma nohama",
-          "Pro rovnováhu použijte paže",
-          "Nepřehánějte to s množstvím"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "58": {
         "title": "Lehké protažení",
+        "description": "Jemné protažení všech hlavních svalových skupin po tréninku. 15-20 minut pro urychlení zotavení.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
         "instructions": [
-          "Začněte lehkými pohyby",
-          "Protáhněte hlavní svalové skupiny",
-          "Dýchejte zhluboka a rovnoměrně",
-          "Pohybujte se plynule a pomalu",
-          "Dokončete hlubokým dýcháním."
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
         ],
         "tips": [
-          "Nenatahujte se až k bolesti.",
-          "Zhluboka dýchejte",
-          "Uvolněte se úplně",
-          "Dělejte to pravidelně"
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
         ]
       },
       "59": {
         "title": "Válcování pěny",
+        "description": "Svalová masáž pěnovým válečkem pro uvolnění napětí. 10-15 minut na hlavní svalovou skupinu.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Lehněte si na pěnový válec",
-          "Válec pomalu rolujte pod svaly.",
-          "Zaměřte se na bolestivé body",
-          "Držte tlak po dobu 30-60 sekund",
-          "Opakujte pro všechny svalové skupiny."
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Neválejte se na klouby",
-          "Zhluboka dýchejte",
-          "Netolerujte silnou bolest",
-          "Začněte měkkým válečkem"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "60": {
         "title": "Lehké běhání",
+        "description": "Běhání s nízkou intenzitou pro aktivní zotavení. 15-20 minut.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
         "instructions": [
-          "Začněte pomalým tempem",
-          "Udržujte tepovou frekvenci na 60-70% svého maxima",
-          "Dýchejte zhluboka a rovnoměrně",
-          "Udržujte konstantní tempo",
-          "Skončete postupným snižováním tempa"
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
         ],
         "tips": [
-          "Sledujte svůj puls",
-          "Dýchejte nosem",
-          "Nepřetěžujte se",
-          "Užijte si proces"
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
         ]
       },
       "61": {
         "title": "Plavání",
+        "description": "Lehké plavání v bazénu pro uvolnění svalů a zotavení. 20-30 minut.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Začněte rozcvičkou na suchu",
-          "Vstupujte do vody postupně",
-          "Plavte pohodlným tempem",
-          "Změňte své plavecké styly",
-          "Zakončete pomalým plaváním"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Neplavte sami",
-          "Pozor na techniku",
-          "Dýchejte rovnoměrně",
-          "Nepřeháněj to"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "62": {
         "title": "Regenerační kolo",
+        "description": "Snadná jízda na kole nízkým tempem pro aktivní regeneraci. 20-25 minut.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
         "instructions": [
-          "Začněte pomalým tempem",
-          "Udržujte tepovou frekvenci na 50-60% svého maxima",
-          "Šlapejte lehce a rytmicky",
-          "Zhluboka dýchejte",
-          "Skončete postupným snižováním tempa"
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
         ],
         "tips": [
-          "Udržujte vysokou kadenci",
-          "Zhluboka dýchejte",
-          "Nepřetěžujte se",
-          "Užijte si jízdu"
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
         ]
       },
       "63": {
         "title": "Zotavovací jóga",
+        "description": "Jemné ásany pro uvolnění svalů a urychlení regenerace. 20 minut.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Začněte jednoduchými pózami",
-          "Protahování provádějte pomalu",
-          "Dýchejte zhluboka a rovnoměrně",
-          "Uvolněte se v každé póze",
-          "Zakončete meditací"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Nevynucujte si pózy",
-          "Dýchejte nosem",
-          "Poslouchejte své tělo",
-          "Užijte si proces"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       },
       "64": {
@@ -1436,18 +1654,24 @@
       },
       "65": {
         "title": "Kontrastní sprcha",
+        "description": "Střídání teplé a studené vody pro zlepšení cirkulace a regenerace. 5-7 minut.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
         "instructions": [
-          "Začněte teplou vodou",
-          "Postupně přejděte do studené vody",
-          "Podržte studenou vodu po dobu 30-60 sekund",
-          "Vraťte se do teplé vody",
-          "Opakujte cyklus 3-5krát"
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
         ],
         "tips": [
-          "Začněte postupně",
-          "Zhluboka dýchejte",
-          "Nenechte se příliš chladit",
-          "Poslouchejte své tělo"
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
         ]
       }
     },
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Přidat jako přítele",
     "addFriendQuestion": "Chcete přidat {name} jako přítele?",
-    "sendMessage": "Odeslat zprávu",
     "loading": "Načítání...",
     "basicInfo": "Základní informace",
     "physicalData": "Fyzická data",
@@ -1610,7 +1833,7 @@
     "addToFriendsToSeePhotos": "Chcete-li vidět hokejové fotky, přidejte si {name} jako přítele",
     "addToFriendsToSeeMuseum": "Chcete-li vidět muzeum, přidejte si {name} jako přítele",
     "removeFromFriends": "Odebrat z přátel",
-    "points": "Body",
+    "points": "body",
     "friendsCount": "přátelé",
     "friendsCountStats": "Přátelé",
     "seconds": "sek",
@@ -1621,9 +1844,9 @@
     "Защитник": "Obránce",
     "Вратарь": "Brankář",
     "настоящее время": "současné době",
-    "goals": "Góly",
-    "assists": "Asistence",
-    "games": "Zápasy",
+    "goals": "cíle",
+    "assists": "ozubená kola",
+    "games": "hry",
     "pullUps": "Přítahy",
     "pushUps": "Shyby",
     "plankTime": "prkno (s)",
@@ -1775,19 +1998,7 @@
     },
     "discountForFriendsHint": "Přidejte si obchod jako přítele a získejte slevu! Ukažte slevu prodejci při nákupu.",
     "activityRating": "Hodnocení aktivity",
-    "coachingYears": "Trénuje roky",
-    "phone": "Telefon",
-    "qrCodeTitle": "QR kód profilu",
-    "qrCodeSubtitle": "Naskenujte pro rychlý přístup",
-    "qrCodeInfo": "Namiřte fotoaparát telefonu na QR kód pro otevření profilu",
-    "shareProfile": "Sdílet profil",
-    "savedToGallery": "Uloženo do galerie",
-    "noPermission": "Žádný přístup do galerie",
-    "shareError": "Chyba při vytváření obrázku",
-    "currentTeam": "Tým",
-    "hockeyExperience": "Hokejové zkušenosti",
-    "years": "let",
-    "currentSeasonStats": "Statistiky aktuální sezóny"
+    "coachingYears": "Trénuje roky"
   },
   "register": {
     "title": "Registrace",
@@ -1825,7 +2036,7 @@
     "home": "Domov",
     "search": "Vyhledávání",
     "messages": "Zprávy",
-    "notifications": "Události",
+    "notifications": "Oznámení",
     "profile": "Profil"
   },
   "admin": {
@@ -1842,7 +2053,6 @@
     "noName": "Žádné jméno",
     "noPosition": "Neuvedeno",
     "noTeam": "Neuvedeno",
-    "sendGift": "Odeslat dárek",
     "yearsOld": "let",
     "addUser": "Přidat uživatele",
     "searchPlayers": "Hledání hráčů...",
@@ -2044,12 +2254,10 @@
   "settings": {
     "title": "Nastavení",
     "language": "Jazyk",
-    "selectLanguage": "Vyberte jazyk",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Vyberte jazyk"
   },
   "search": {
     "title": "Vyhledávání",
-    "loading": "Načítání vyhledávání...",
     "placeholder": "Hledání hráčů...",
     "country": "Země",
     "grip": "Rukojeť",
@@ -2075,10 +2283,10 @@
     "you": "Vy:"
   },
   "notifications": {
-    "title": "Události",
-    "loading": "Načítání událostí...",
-    "noNotifications": "Žádné události",
-    "noNotificationsSubtitle": "Zatím nemáte žádné události o přátelství, dárcích nebo jiných akcích.",
+    "title": "Oznámení",
+    "loading": "Načítání oznámení...",
+    "noNotifications": "Žádná upozornění",
+    "noNotificationsSubtitle": "Zatím nemáte žádná oznámení o přátelství, dárcích nebo jiných akcích.",
     "accept": "Přijmout",
     "decline": "Odmítnout",
     "friendRequests": "Žádosti o přátelství",
@@ -2128,13 +2336,11 @@
     "timesPlural": "časy"
   },
   "home": {
-    "loadingPlayers": "Obnova ledu...",
+    "loadingPlayers": "Načítání hráčů...",
     "noPlayersCountry": "Žádní hráči z {{country}}",
     "noPlayersYear": "Nejsou žádní hráči narození v {{year}}",
     "noPlayersCountryYear": "Žádní hráči z {{country}} v {{year}}",
-    "iceEmpty": "Led je prázdný. Vyberte jinou zemi nebo rok nebo resetujte filtry.",
-    "waitingForConnection": "Čekání na připojení",
-    "checkInternetConnection": "Zkontrolujte připojení k internetu"
+    "iceEmpty": "Led je prázdný. Vyberte jinou zemi nebo rok nebo resetujte filtry."
   },
   "filters": {
     "year": "rok",
@@ -2234,9 +2440,9 @@
     "noGiftsYet": "Zatím žádné dárky od hvězd",
     "museum": "Muzeum dárků",
     "myGifts": "Moje dárky",
-    "noGiftsSubtext": "Nahrajte první dárek pro sdílení s hráči",
-    "successDeleted": "Dárek smazán",
-    "errorDelete": "Nepodařilo se smazat dárek",
+    "noGiftsSubtext": "Zde se zobrazí dárky od hvězd",
+    "successDeleted": "Dar byl z muzea odstraněn.",
+    "errorDelete": "Dar se nepodařilo smazat",
     "noImage": "žádný obrázek",
     "failedToSendRequest": "Odeslání požadavku se nezdařilo",
     "requestSent": "Žádost odeslána!",
@@ -2271,10 +2477,11 @@
     "allGiftsAdded": "Všechny dárky byly přidány.",
     "allGiftTypesAdded": "Už máte všechny druhy dárků",
     "addGift": "Přidat dárek",
+    "selectGiftType": "Vyberte typ dárku",
     "deletion": "Odstranění",
     "itemDeleted": "Dárek odstraněn",
     "failedToDeleteItem": "Dar se nepodařilo smazat",
-    "noGifts": "Zatím žádné dárky",
+    "noGifts": "Žádné dárky",
     "clickPlusToAdd": "Kliknutím na + přidáte",
     "настоящее время": "současné době",
     "Центральный нападающий": "Střed dopředu",
@@ -2290,33 +2497,7 @@
     "seconds": "sek",
     "times": "jednou",
     "sprint": "Běh na 100 metrů",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Poslat dárek {playerName}",
-    "selectExistingGift": "Vybrat existující dárek",
-    "orCreateNew": "Nebo vytvořit nový",
-    "giftName": "Název dárku",
-    "giftNamePlaceholder": "např. Podepsaná čepice",
-    "uploadImage": "Nahrát obrázek",
-    "send": "Poslat",
-    "selectGift": "Vybrat dárek",
-    "fromAdmin": "Administrátor",
-    "errorSelectOrCreate": "Vyberte dárek nebo vytvořte nový",
-    "errorGiftAlreadyExists": "Tento dárek již existuje pro hráče {playerName}.\n\nVyberte jiný dárek nebo vytvořte nový.",
-    "successGiftSent": "Dárek odeslán {playerName}!",
-    "errorSendingGift": "Nepodařilo se odeslat dárek",
-    "deleteGiftConfirm": "Opravdu chcete smazat tento dárek?",
-    "selectImage": "Vybrat obrázek",
-    "errorPermissionDenied": "Nemáte oprávnění smazat tento dárek",
-    "errorGiftNotFound": "Dárek nenalezen",
-    "errorGiftNotDeleted": "Dárek nebyl smazán",
-    "noGiftsUploaded": "Zatím nebyly nahrány žádné dárky",
-    "fromStar": "od {starName}",
-    "giftReceived": "Dárek přijat!",
-    "giftReceivedFromAdmin": "Obdrželi jste dárek od administrátora: {giftName}",
-    "giftReceivedFromStar": "Obdrželi jste dárek od {starName}: {giftName}",
-    "giftReceivedPush": "🎁 Dárek přijat!",
-    "giftReceivedFromAdminPush": "Obdrželi jste dárek od administrátora: {giftName}",
-    "giftReceivedFromStarPush": "Obdrželi jste dárek od {starName}: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Normy",
@@ -2434,40 +2615,5 @@
   },
   "logout": "Výstup",
   "logoutConfirm": "Odhlaste se ze svého profilu",
-  "logoutConfirmMessage": "Opravdu se chcete odhlásit ze svého profilu?",
-  "adminGifts": {
-    "sendGift": "Poslat dárek",
-    "giftName": "Název dárku",
-    "selectImage": "Vybrat obrázek"
-  },
-  "videoNotification": {
-    "added": "přidal",
-    "oneVideo": "nové video",
-    "multipleVideos": "{count} nových videí",
-    "video": "video",
-    "videos": "videa"
-  },
-  "achievementNotification": {
-    "added": "přidal",
-    "received": "obdržel",
-    "oneAchievement": "nový úspěch",
-    "multipleAchievements": "{count} nových úspěchů",
-    "achievement": "úspěch",
-    "achievements": "úspěchy",
-    "title": "🏆 Úspěch!",
-    "message": "Gratulujeme! Získali jste úspěch: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "změnil svůj avatar"
-  },
-  "statsNotification": {
-    "updated": "aktualizoval",
-    "stats": "statistiky",
-    "normatives": "normy",
-    "physicalData": "fyzická data"
-  },
-  "height": "výška",
-  "weight": "váha",
-  "cm": "cm",
-  "kg": "kg"
+  "logoutConfirmMessage": "Opravdu se chcete odhlásit ze svého profilu?"
 }

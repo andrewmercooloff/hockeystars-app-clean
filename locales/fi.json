@@ -1,9 +1,9 @@
 {
   "common": {
     "save": "Tallentaa",
-    "cancel": "Peruuta",
+    "cancel": "Peruuttaa",
     "edit": "Muokata",
-    "delete": "Poista",
+    "delete": "Poistaa",
     "add": "Lisätä",
     "close": "Lähellä",
     "back": "Takaisin",
@@ -11,7 +11,7 @@
     "done": "Valmis",
     "loading": "Ladataan...",
     "error": "Virhe",
-    "success": "Onnistui",
+    "success": "Onnistuneesti",
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Haluatko varmasti poistaa tämän saavutuksen?",
     "deleteAllNotificationsConfirm": "Haluatko varmasti tyhjentää kaikki ilmoitukset?",
     "rejectRequestConfirm": "Haluatko varmasti hylätä tämän pyynnön?",
-    "super": "Mahtavaa!",
-    "retry": "Yritä uudelleen",
-    "goalie": "Maalivahti"
+    "super": "Mahtavaa!"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -65,8 +63,7 @@
     "title": "Lahja tähdeltä",
     "message": "{playerName} sai {giftName} käyttäjältä {starName}",
     "received": "saanut",
-    "from": "alkaen",
-    "gift": "Lahja"
+    "from": "alkaen"
   },
   "addPhoto": "Lisää valokuva",
   "selectPhotoSource": "Valitse valokuvan lähde",
@@ -142,7 +139,6 @@
     "subtitle": "Valitse harjoitus",
     "searchPlaceholder": "Hae numerolla tai nimellä...",
     "loadingExercise": "Ladataan harjoitusta...",
-    "loadingExercises": "Ladataan harjoituksia...",
     "exercise": "Käyttää",
     "alreadyCompleted": "Harjoitus on jo suoritettu",
     "canRetryIn": "Voit tehdä tämän harjoituksen uudelleen {hours} tunnin kuluttua",
@@ -820,594 +816,816 @@
       },
       "27": {
         "title": "Kaulan lämmittely",
+        "description": "Tasaiset pään käännökset, eteen- ja taaksepäin kallistukset, pyöreät liikkeet. 2-3 minuuttia.",
+        "benefits": [
+          "Valmistelee lihaksia harjoitteluun",
+          "Parantaa verenkiertoa",
+          "Vähentää loukkaantumisriskiä",
+          "Lisää harjoittelun tehokkuutta"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Käännä päätäsi hitaasti vasemmalle ja oikealle",
-          "Kallista päätäsi eteenpäin ja taaksepäin",
-          "Tee pyöreitä liikkeitä päälläsi",
-          "Pidä hartiat rentoina"
+          "Aloita hitaasti ja lisää asteittain intensiteettiä",
+          "Tee liikkeet sujuvasti ja hallitusti",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hengitä tasaisesti suorituksen aikana"
         ],
         "tips": [
-          "Liiku hitaasti ja tasaisesti",
-          "Älä tee äkillisiä liikkeitä",
+          "Ota aikaa – laatu on tärkeämpää kuin nopeus",
           "Jos kipua ilmenee, lopeta.",
-          "Hengitä syvään ja tasaisesti"
+          "Lämmittely ennen jokaista treeniä.",
+          "Käytä riittävästi aikaa jokaiseen liikkeeseen."
         ]
       },
       "28": {
         "title": "Ranteen lämmittely",
+        "description": "Pyöreät liikkeet käsilläsi, taivuttamalla ja ojentaen sormia. 2-3 minuuttia jokaiselle kädelle.",
+        "benefits": [
+          "Valmistelee lihaksia harjoitteluun",
+          "Parantaa verenkiertoa",
+          "Vähentää loukkaantumisriskiä",
+          "Lisää harjoittelun tehokkuutta"
+        ],
         "instructions": [
-          "Ojenna kätesi edessäsi",
-          "Taivuta ranteita ylös ja alas",
-          "Pyöritä ranteitasi ympyrässä",
-          "Purista ja purista nyrkkisi",
-          "Venytä sormet sivuille"
+          "Aloita hitaasti ja lisää asteittain intensiteettiä",
+          "Tee liikkeet sujuvasti ja hallitusti",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hengitä tasaisesti suorituksen aikana"
         ],
         "tips": [
-          "Tee liikkeet hitaasti",
-          "Älä ylikuormita niveliäsi",
-          "Kiinnitä huomiota ranteissasi oleviin tuntemuksiin",
-          "Toista säännöllisesti"
+          "Ota aikaa – laatu on tärkeämpää kuin nopeus",
+          "Jos kipua ilmenee, lopeta.",
+          "Lämmittely ennen jokaista treeniä.",
+          "Käytä riittävästi aikaa jokaiseen liikkeeseen."
         ]
       },
       "29": {
         "title": "Polvi venyy",
+        "description": "Puolikyykkyt, polviympyrät, kevyt hyppy paikallaan. 3-4 minuuttia.",
+        "benefits": [
+          "Valmistelee lihaksia harjoitteluun",
+          "Parantaa verenkiertoa",
+          "Vähentää loukkaantumisriskiä",
+          "Lisää harjoittelun tehokkuutta"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Taivuta ja suorista polvia hitaasti",
-          "Tee pyöreitä liikkeitä polvillasi",
-          "Tee kyykkyjä pienellä amplitudilla",
-          "Venytä reidesi etuosaa"
+          "Aloita hitaasti ja lisää asteittain intensiteettiä",
+          "Tee liikkeet sujuvasti ja hallitusti",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hengitä tasaisesti suorituksen aikana"
         ],
         "tips": [
-          "Älä tee syviä kyykkyjä",
-          "Liikkuu sujuvasti ja hallinnassa",
-          "Jos sinulla on polvikipua, vähennä liikettä.",
-          "Varmista, että käytät oikeaa tekniikkaa"
+          "Ota aikaa – laatu on tärkeämpää kuin nopeus",
+          "Jos kipua ilmenee, lopeta.",
+          "Lämmittely ennen jokaista treeniä.",
+          "Käytä riittävästi aikaa jokaiseen liikkeeseen."
         ]
       },
       "30": {
         "title": "Lantion lämmittely",
+        "description": "Lonkkaympyrät, jalkojen heilahtelut sivuille, kevyet syöksyt. 4-5 minuuttia.",
+        "benefits": [
+          "Valmistelee lihaksia harjoitteluun",
+          "Parantaa verenkiertoa",
+          "Vähentää loukkaantumisriskiä",
+          "Lisää harjoittelun tehokkuutta"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Nosta polvi rintaasi vasten",
-          "Siirrä jalkaasi sivulle ja taakse",
-          "Tee pyöreitä liikkeitä lantiollasi",
-          "Tee syöksyjä pienellä amplitudilla"
+          "Aloita hitaasti ja lisää asteittain intensiteettiä",
+          "Tee liikkeet sujuvasti ja hallitusti",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hengitä tasaisesti suorituksen aikana"
         ],
         "tips": [
-          "Pidä selkäsi suorana",
-          "Työskentele mukavalla alueella",
-          "Älä kiirehdi liikkeitäsi",
-          "Seuraa tasapainoasi"
+          "Ota aikaa – laatu on tärkeämpää kuin nopeus",
+          "Jos kipua ilmenee, lopeta.",
+          "Lämmittely ennen jokaista treeniä.",
+          "Käytä riittävästi aikaa jokaiseen liikkeeseen."
         ]
       },
       "31": {
         "title": "Nivus venytys",
+        "description": "Perhonen - istu lattialla, tuo jalat yhteen ja taivuta eteenpäin. Pidä 30-45 sekuntia.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Istu lattialle polvet koukussa.",
-          "Aseta jalkapohjat yhteen",
-          "Nojaa kevyesti eteenpäin",
-          "Vedä polviasi lattiaa kohti",
-          "Pidä venytys 30 sekuntia"
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
-          "Älä pakota venytystä",
-          "Hengitä syvään ja rentoudu.",
-          "Jos kipua ilmenee, vähennä amplitudia.",
-          "Suorita lämmittelyn jälkeen"
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "32": {
         "title": "Reisilihaksen venytys",
+        "description": "Taivutukset eteenpäin suorilla jaloilla, pidä 30 sekuntia. 3 sarjaa 15 sekuntia.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Istu lattialle jalat ojennettuna eteenpäin.",
-          "Taivuta eteenpäin yrittäen yltää jalkaisi",
-          "Purista jalkasi käsilläsi",
-          "Vedä rintaasi polviasi kohti",
-          "Pidä venytys 30-45 sekuntia"
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
-          "Älä pyöritä selkääsi",
-          "Työskentele mukavalla alueella",
-          "Hengitä syvään",
-          "Kiinnitä huomiota reiden takaosassa oleviin tuntemuksiin"
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "33": {
         "title": "Pohjelihasten venyttely",
+        "description": "Syöksy seinää vasten, takareisi venyttää. 20 sekuntia per jalka.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Seiso seinää päin",
-          "Aseta toinen jalka eteenpäin ja toinen taaksepäin.",
-          "Laske takajalan kantapää lattiaan",
-          "Taivuta eteenpäin, venyttämällä pohkeita",
-          "Vaihda jalkaa ja toista"
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
-          "Pidä takajalka suorana",
-          "Älä nosta kantapäätäsi lattiasta",
-          "Venytä pehmeästi",
-          "Suorita molemmille jaloille"
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "34": {
         "title": "Rintalihasten venyttely",
+        "description": "Seinäjousto käsivarsien pidennyksillä. Pidä 30 sekuntia, 3 sarjaa.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Seiso ovella",
-          "Aseta kätesi ovenkarmeille",
-          "Ota askel eteenpäin",
-          "Tunne venytys rinnassasi",
-          "Pidä venytys 30 sekuntia"
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
-          "Älä ylikuormita hartioitasi",
-          "Hengitä syvään",
-          "Venytä vähitellen",
-          "Seuraa tuntemuksiasi"
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "35": {
         "title": "Triceps venyttää",
+        "description": "Aseta kätesi pään taakse venyttääksesi olkapään takaosaa. 20 sekuntia jokaiselle kädelle.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Nosta toinen käsi ylös",
-          "Taivuta käsivarsi kyynärpäästä pään taakse",
-          "Vedä kyynärpääsi toisella kädellä alas",
-          "Tunne venytys tricepsissäsi",
-          "Vaihda kättä ja toista"
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
+          "Hengitä syvään venyttäessäsi.",
           "Älä tee äkillisiä liikkeitä",
-          "Venytä pehmeästi",
-          "Hengitä tasaisesti",
-          "Suorita molemmille käsille"
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "36": {
         "title": "Käärme käpyjen välissä",
+        "description": "Juokse käärmemäisellä liikkeellä riviin järjestettyjen kartioiden välissä. 5 ohitusta maksiminopeudella.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Aseta käpyjä käärmemäisesti 2-3 metrin etäisyydelle",
-          "Aloita juokseminen jokaisen kartion ympäri",
-          "Pidä painopiste matalalla",
-          "Työskentele jaloillasi nopeasti ja usein",
-          "Varmista, että käytät oikeaa kääntötekniikkaa."
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Aloita hitaasti",
-          "Keskity tekniikkaan, älä nopeuteen.",
-          "Pidä pää pystyssä",
-          "Käytä lyhyitä, nopeita askeleita"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "37": {
         "title": "Nopeat kosketukset jalkaan",
+        "description": "Kosketa käpyjä nopeasti jaloillasi satunnaisessa järjestyksessä. 3 sarjaa 45 sekuntia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso pallon vieressä",
-          "Kosketa palloa nopeasti jalallasi",
-          "Vaihda jalkaa 2-3 kosketuksen välein",
-          "Säilytä jatkuva rytmi",
-          "Suorita 30-60 sekuntia"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä kehosi painosi tukijalassasi",
-          "Työskentele nopeasti, mutta hallitusti",
-          "Älä menetä tasapainoasi",
-          "Tarkkaile kosketustekniikkaasi"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "38": {
         "title": "Hyppää käännöksillä",
+        "description": "Hyppy paikalleen 90-180 asteen käännöksillä. 3 sarjaa 20 hyppyä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Tee hyppy ylös",
-          "Käänny 180 astetta hyppääessäsi",
-          "Laskeudu pehmeästi molemmille jaloille.",
-          "Käänny välittömästi takaisin ja toista"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Laskeudu jalat koukussa",
-          "Käytä käsiäsi tasapainoon",
-          "Aloita pienillä käännöksillä",
-          "Tarkkaile laskeutumistekniikkaasi"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "39": {
         "title": "Nopeita pallonsyöttöjä",
+        "description": "Tennispallon syöttäminen käsien välillä maksiminopeudella. 3 sarjaa, kukin 1 minuutti.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso seinää vasten 2-3 metrin etäisyydellä",
-          "Syötä pallo nopeasti seinään",
-          "Ota kiinni pallosta ja syötä se välittömästi takaisin",
-          "Työskentele molemmilla käsillä",
-          "Suorita 30-45 sekuntia"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Käytä oikeaa syöttötekniikkaa",
-          "Pidä silmäsi pallossa",
-          "Työskentele nopeasti mutta tarkasti",
-          "Pidä kätesi rentoina"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "40": {
         "title": "Juokseminen taaksepäin",
+        "description": "Juokse taaksepäin nopeilla käännöksillä vihjeellä. 5 sarjaa 30 sekuntia.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
         "instructions": [
-          "Aloita juoksemalla hitaasti taaksepäin.",
-          "Katso usein olkapääsi yli",
-          "Pidä painopiste matalalla",
-          "Käytä käsiäsi tasapainoon",
-          "Ajettu 20-30 metriä"
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
         ],
         "tips": [
-          "Aloita hyvin hitaasti",
-          "Tarkista aina takanasi oleva tila",
-          "Pidä polvet hieman koukussa",
-          "Älä kiirehdi nopeuteen"
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
         ]
       },
       "41": {
         "title": "Kyykky painoilla",
+        "description": "Kyykky käsipainoilla tai tankolla, reidet yhdensuuntaiset lattian kanssa. 4 sarjaa 12-15 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Ota käsipainot tai tanko",
-          "Kyykky, kunnes varpaat ovat yhdensuuntaiset lattian kanssa.",
-          "Nouse ylös käyttämällä jalkojen voimaa",
-          "Suorita 3-4 sarjaa 8-12 toistoa"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä selkäsi suorana",
-          "Älä pyöristä alaselkääsi",
-          "Polvisi eivät saa ylittää varpaitasi.",
-          "Aloita kevyillä painoilla"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "42": {
         "title": "Maastaveto",
+        "description": "Nosta tanko lattiasta lantion tasolle suoralla selällä. 3 sarjaa 8-10 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso suorana jalat hartioiden leveydellä toisistaan",
-          "Ota tanko lattiasta käsikahvalla.",
-          "Taivuta polviasi ja siirrä lantiota taaksepäin",
-          "Nosta tankoa suoristamalla jalkojasi ja selkääsi.",
-          "Palauta tanko lattialle hallitusti."
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä selkä suorana koko liikkeen ajan.",
-          "Älä pyöristä alaselkääsi",
-          "Siirrä tanko lähelle vartaloasi",
-          "Aloita kevyillä painoilla"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "43": {
         "title": "Penkkipunnerrus",
+        "description": "Penkkipunnerrus tankolla. 4 sarjaa 8-12 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Makaa penkillä jalat lattialla.",
-          "Ota tanko leveällä otteella",
-          "Laske tanko rintaasi vasten hallitusti.",
-          "Paina tanko ylös",
-          "Suorita 3-4 sarjaa 6-10 toistoa"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä lapaluita vedettynä yhteen",
-          "Pidä jalat lattialla",
-          "Hengitä oikein: hengitä ponnistelemalla",
-          "Käytä vakuutusta"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "44": {
         "title": "Vedot",
+        "description": "Leuannousut. 3 sarjaa 8-12 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Ripusta tangossa kädensijalla",
-          "Vedä itsesi ylös, kunnes leukasi on tangon yläpuolella.",
-          "Laske itsesi takaisin lähtöasentoon",
-          "Pidä ydin tiukkana",
-          "Tee 3-4 sarjaa maksimitoistoja"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Älä keinu",
-          "Vedä ylös pehmeästi ja hallitusti",
-          "Suorista kädet kokonaan alhaalta",
-          "Käytä tarvittaessa apua"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "45": {
         "title": "Dipit tankoissa",
+        "description": "Rinnakkaispalkki laskeutuu 90 asteen kulmaan. 3 sarjaa 10-15 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso tankojen välissä",
-          "Hyppää ylös ja lukitse tangot",
-          "Laske itsesi alas, taivuta kyynärpääsi.",
-          "Työnnä ylös, suorista käsiäsi",
-          "Suorita 3-4 sarjaa 5-15 toistoa"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä vartalosi suorana",
-          "Älä keinu",
-          "Laskeudu mukavaan syvyyteen",
-          "Käytä tarvittaessa jalkojasi."
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "46": {
         "title": "Yksijalkainen teline",
+        "description": "Säilytä tasapaino yhdellä jalalla silmät kiinni. 3 30 sekunnin sarjaa kummallakin jalalla.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso yhdellä jalalla",
-          "Nosta toinen jalka eteesi",
-          "Säilytä tasapainosi niin kauan kuin mahdollista",
-          "Käytä käsiäsi tasapainoon",
-          "Vaihda jalkaa ja toista"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Katso eteenpäin, älä alas",
-          "Pidä ydin tiukkana",
-          "Aloita lyhyillä sarjoilla",
-          "Lisää aikaa vähitellen"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "47": {
         "title": "Yksijalkainen lankku",
+        "description": "Lankun pito yhden jalan nostolla. 3 30 sekunnin sarjaa kummallakin jalalla.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Asetu lankkuasentoon",
-          "Nosta toinen jalka ylös",
-          "Pidä jalkasi suorana",
-          "Pidä asento 30-60 sekuntia",
-          "Vaihda jalkaa ja toista"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä vartalosi suorana",
-          "Älä heiluta puolelta toiselle",
-          "Hengitä tasaisesti",
-          "Aloita lyhyillä sarjoilla"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "48": {
         "title": "Yksijalkaiset kyykkyt",
+        "description": "Kyykky toisella jalalla, toinen jalka ojennettuna eteenpäin. 3 sarjaa 8-10 toistoa kummallakin jalalla.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso yhdellä jalalla",
-          "Ojenna toinen jalkasi eteenpäin",
-          "Kyykky tukijalassa",
-          "Palaa alkuasentoon",
-          "Tee 3-4 sarjaa 5-10 toistoa kummallakin jalalla."
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Pidä selkäsi suorana",
-          "Älä koske lattiaan toisella jalallasi.",
-          "Käytä käsiäsi tasapainoon",
-          "Aloita pienellä amplitudilla"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "49": {
         "title": "Bosu pallo harjoitukset",
+        "description": "Tasapainoharjoituksia epävakaalla alustalla. 15-20 minuuttia erilaisia ​​liikkeitä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso Bosu-pallon pallonpuoliskolla",
-          "Pidä tasapainosi",
-          "Tee kyykkyjä",
-          "Tee kehon käänteitä",
-          "Suorita 3-4 sarjaa 10-15 toistoa"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Aloita yksinkertaisilla harjoituksilla",
-          "Varo tekniikkaasi",
-          "Ota aikaa",
-          "Käytä apua tueksi"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "50": {
         "title": "Jooga tasapaino",
+        "description": "Tree-asento, Warrior III ja Eagle-asennot tasapainottavat. Pidä jokaisessa asennossa 30-60 sekuntia.",
+        "benefits": [
+          "Kehittää liikkeiden koordinaatiota",
+          "Parantaa tasapainoa ja tasapainoa",
+          "Lisää ketteryyttä",
+          "Kehittää neuromuskulaarista yhteyttä"
+        ],
         "instructions": [
-          "Seiso suorassa jalat yhdessä.",
-          "Nosta toinen jalka ja aseta se toisen reisille.",
-          "Aseta kätesi rintasi eteen",
-          "Pidä tasapainosi",
-          "Suorita molemmille jaloille 30-60 sekuntia"
+          "Aloita hitaasti",
+          "Keskity liikkeiden tarkkuuteen",
+          "Lisää nopeutta vähitellen",
+          "Toista, kunnes se muuttuu automaattiseksi."
         ],
         "tips": [
-          "Katso eteenpäin yhdessä vaiheessa",
-          "Hengitä syvään ja tasaisesti",
-          "Ota aikaa",
-          "Jos menetät tasapainon, aloita alusta."
+          "Harjoittele säännöllisesti",
+          "Ota aikaa - tarkkuus on tärkeämpää kuin nopeus",
+          "Käytä visuaalisia vihjeitä",
+          "Harjoittele erilaisissa olosuhteissa"
         ]
       },
       "51": {
         "title": "Kävely puun päällä",
+        "description": "Kävele kapealla puulla tai laudalla tasapainon kehittämiseksi. 5 kulkee edestakaisin.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Etsi vakaa tukki tai lauta",
-          "Seiso puun päällä",
-          "Kävele hitaasti eteenpäin",
-          "Pidä tasapainosi",
-          "Suorita useita kulkuja"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Aloita leveästä puusta",
-          "Katso eteenpäin, älä alas",
-          "Käytä käsiäsi tasapainoon",
-          "Ota aikaa"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "52": {
         "title": "Käsiseisonta seinää vasten",
+        "description": "Kädet seisoo seinää vasten kehittääkseen ylävartalon tasapainoa. 3 sarjaa 20 sekuntia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Seiso seinää päin",
-          "Aseta kätesi lattialle 30 cm seinästä",
-          "Nosta jalkasi seinää vasten",
-          "Pidä käsilläseisontaa",
-          "Laske jalat hallitusti"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Aloita lyhyillä sarjoilla",
-          "Käytä apua vakuutukseen",
-          "Pidä ydin tiukkana",
-          "Älä ylikuormita itseäsi"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "53": {
         "title": "Fartlek",
+        "description": "Juoksu vaihtelevalla intensiteetillä: nopea juoksu 2 minuuttia, hidas juoksu 1 minuutti. 30 minuuttia kokonaistyötä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Aloita hitaalla lenkillä 5-10 minuuttia",
-          "Lisää nopeutta 80 %:iin maksimiarvosta 2-3 minuutiksi",
-          "Palaa hitaaseen lenkkeilyyn 1-2 minuutiksi",
-          "Toista sykli 4-6 kertaa",
-          "Lopeta hidas hölkkä 5-10 minuuttia"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Kuuntele kehoasi",
-          "Älä ylitä 80 % enimmäisnopeudesta",
-          "Hengitä syvään",
-          "Juo vettä harjoittelun aikana."
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "54": {
         "title": "Toistuvat sprintit",
+        "description": "100 metrin sprintit 2-3 minuutin tauolla. 6-8 toistoa kehittää nopeuskestävyyttä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Tee 10 minuutin lämmittely",
-          "Juokse sprintti maksiminopeudella 30 sekuntia",
-          "Lepää 2-3 minuuttia",
-          "Toista sprintti",
-          "Suorita 6-8 sprinttiä"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Älä säästä lämmittelyssäsi",
-          "Lepää täysin sprinttien välillä",
-          "Tarkkaile juoksutekniikkaasi",
-          "Älä harjoittele päivittäin"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "55": {
         "title": "Intervallit pyörällä",
+        "description": "30 sekuntia maksimiponnistusta, 90 sekuntia palautumista. 20 sykliä nopeuskestävyyden kehittämiseen.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
         "instructions": [
-          "Aloita 5 minuutin lämmittelyllä",
-          "Lisää kuormitusta 80 prosenttiin maksimista",
-          "Poljin suurella teholla 2-3 minuuttia",
-          "Vähennä kuormitusta 50 %:iin 1-2 minuutiksi",
-          "Toista sykli 6-8 kertaa"
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
         ],
         "tips": [
-          "Säilytä korkea poljinnopeus",
-          "Hengitä syvään",
-          "Pidä pulssia silmällä",
-          "Juo vettä säännöllisesti"
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
         ]
       },
       "56": {
         "title": "Mäkijuoksu",
+        "description": "Juokse mäkeä ylös niin nopeasti kuin pystyt ja lenkkeile sitten alas. 8-10 mäen nousua.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
         "instructions": [
-          "Etsi mäki, jonka kaltevuus on 5-10 %",
-          "Tee 10 minuutin lämmittely",
-          "Juokse mäkeä ylös kohtuullisella nopeudella",
-          "Mene alas toipumaan",
-          "Toista 6-10 nostoa"
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
         ],
         "tips": [
-          "Aloita pienellä kaltevuudella",
-          "Pidä selkäsi suorana nostaessasi.",
-          "Työskentele aktiivisesti käsilläsi",
-          "Varaa aikaa laskeutumiseen"
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
         ]
       },
       "57": {
         "title": "Plyometriset ympyrät",
+        "description": "5-6 plyometrisen harjoituksen kierros ilman lepoa. 4-5 kierrosta, joiden välillä on 2 minuutin lepo.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Tee 10 minuutin lämmittely",
-          "Tee pitkiä hyppyjä seisoma-asennosta",
-          "Suorita hyppyjä esteiden yli",
-          "Tee laatikkohyppyjä",
-          "Lepää 2-3 minuuttia ja toista kierros."
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Tarkkaile laskeutumistekniikkaasi",
-          "Laskeudu jalat koukussa",
-          "Käytä käsiäsi tasapainoon",
-          "Älä liioittele määrän kanssa"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "58": {
         "title": "Kevyt venyttely",
+        "description": "Kaikkien tärkeimpien lihasryhmien hellävarainen venyttely harjoituksen jälkeen. 15-20 minuuttia palautumisen nopeuttamiseksi.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
         "instructions": [
-          "Aloita kevyillä liikkeillä",
-          "Venytä tärkeimpiä lihasryhmiäsi",
-          "Hengitä syvään ja tasaisesti",
-          "Liikkuu tasaisesti ja hitaasti",
-          "Viimeistele syvään hengityksellä."
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
         ],
         "tips": [
-          "Älä venytä kipuun asti.",
-          "Hengitä syvään",
-          "Rentoudu kokonaan",
-          "Tee se säännöllisesti"
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
         ]
       },
       "59": {
-        "title": "Vaahto rullaus",
+        "title": "Vaahtorullaus",
+        "description": "Lihashieronta vaahtotelalla jännityksen lievittämiseksi. 10-15 minuuttia per suuri lihasryhmä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Makaa vaahtomuovitelalle",
-          "Pyöritä rullaa hitaasti lihasten alle.",
-          "Keskity kipupisteisiin",
-          "Pidä painetta 30-60 sekuntia",
-          "Toista kaikille lihasryhmille."
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Älä pyöri nivelilläsi",
-          "Hengitä syvään",
-          "Älä siedä voimakasta kipua",
-          "Aloita pehmeällä telalla"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "60": {
         "title": "Kevyt lenkkeily",
+        "description": "Matalatehoinen lenkkeily aktiiviseen palautumiseen. 15-20 minuuttia.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
         "instructions": [
-          "Aloita hitaasti",
-          "Pidä sykkeesi 60-70 % maksimistasi",
-          "Hengitä syvään ja tasaisesti",
-          "Säilytä tasaista tahtia",
-          "Lopeta asteittainen tempon lasku"
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
         ],
         "tips": [
-          "Pidä pulssia silmällä",
-          "Hengitä nenäsi kautta",
-          "Älä ylikuormita itseäsi",
-          "Nauti prosessista"
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
         ]
       },
       "61": {
         "title": "Uima",
+        "description": "Kevyt uinti altaassa rentouttaa lihaksia ja palautua. 20-30 minuuttia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Aloita lämmittelyllä kuivalla maalla",
-          "Mene veteen vähitellen",
-          "Ui mukavaan tahtiin",
-          "Muuta uintityyliäsi",
-          "Lopeta hidas uiminen"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Älä ui yksin",
-          "Varo tekniikkaasi",
-          "Hengitä tasaisesti",
-          "Älä liioittele sitä"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "62": {
         "title": "Palautuspyörä",
+        "description": "Helppo pyöräily alhaisella vauhdilla aktiiviseen palautumiseen. 20-25 minuuttia.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
         "instructions": [
-          "Aloita hitaasti",
-          "Pidä sykkeesi 50-60 % maksimistasi",
-          "Polkimet helposti ja rytmikkäästi",
-          "Hengitä syvään",
-          "Lopeta asteittainen tempon lasku"
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
         ],
         "tips": [
-          "Säilytä korkea poljinnopeus",
-          "Hengitä syvään",
-          "Älä ylikuormita itseäsi",
-          "Nauti kyydistä"
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
         ]
       },
       "63": {
         "title": "Palauttava jooga",
+        "description": "Hellävaraiset asanat rentouttavat lihaksia ja nopeuttavat palautumista. 20 minuuttia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Aloita yksinkertaisilla asennoilla",
-          "Suorita venyttely hitaasti",
-          "Hengitä syvään ja tasaisesti",
-          "Rentoudu joka asennossa",
-          "Lopeta meditaatiolla"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Älä pakota asentoja",
-          "Hengitä nenäsi kautta",
-          "Kuuntele kehoasi",
-          "Nauti prosessista"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       },
       "64": {
@@ -1436,18 +1654,24 @@
       },
       "65": {
         "title": "Kontrastisuihku",
+        "description": "Vuorotteleva kuuma ja kylmä vesi parantamaan verenkiertoa ja palautumista. 5-7 minuuttia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
         "instructions": [
-          "Aloita lämpimällä vedellä",
-          "Siirrä vähitellen kylmään veteen",
-          "Pidä kylmää vettä 30-60 sekuntia",
-          "Palaa lämpimään veteen",
-          "Toista sykli 3-5 kertaa"
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
         ],
         "tips": [
-          "Aloita asteittain",
-          "Hengitä syvään",
-          "Älä jää liian kylmäksi",
-          "Kuuntele kehoasi"
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
       }
     },
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Lisää kaveriksi",
     "addFriendQuestion": "Haluatko lisätä {name} ystäväksi?",
-    "sendMessage": "Lähetä viesti",
     "loading": "Ladataan...",
     "basicInfo": "Perustiedot",
     "physicalData": "Fyysiset tiedot",
@@ -1610,7 +1833,7 @@
     "addToFriendsToSeePhotos": "Lisää {name} ystäväksi nähdäksesi jääkiekkokuvia",
     "addToFriendsToSeeMuseum": "Lisää {name} ystäväksi nähdäksesi museo",
     "removeFromFriends": "Poista ystävistä",
-    "points": "Pisteet",
+    "points": "pisteitä",
     "friendsCount": "ystäviä",
     "friendsCountStats": "Ystävät",
     "seconds": "sek",
@@ -1621,9 +1844,9 @@
     "Защитник": "Puolustaja",
     "Вратарь": "Maalivahti",
     "настоящее время": "nykyaikaa",
-    "goals": "Maalit",
-    "assists": "Syötöt",
-    "games": "Pelit",
+    "goals": "maalit",
+    "assists": "vaihteet",
+    "games": "pelejä",
     "pullUps": "Vedot",
     "pushUps": "Push-ups",
     "plankTime": "lankku (sek)",
@@ -1775,19 +1998,7 @@
     },
     "discountForFriendsHint": "Lisää kauppa ystäväksi saadaksesi alennuksen! Näytä alennus myyjälle ostaessasi.",
     "activityRating": "Aktiivisuusluokitus",
-    "coachingYears": "Valmentaa vuosia",
-    "phone": "Puhelin",
-    "qrCodeTitle": "Profiilin QR-koodi",
-    "qrCodeSubtitle": "Skannaa nopeaa pääsyä varten",
-    "qrCodeInfo": "Osoita puhelimen kameralla QR-koodia avataksesi profiilin",
-    "shareProfile": "Jaa profiili",
-    "savedToGallery": "Tallennettu galleriaan",
-    "noPermission": "Ei pääsyä galleriaan",
-    "shareError": "Virhe luotaessa kuvaa",
-    "currentTeam": "Joukkue",
-    "hockeyExperience": "Jääkiekkokokemus",
-    "years": "vuotta",
-    "currentSeasonStats": "Nykyisen kauden tilastot"
+    "coachingYears": "Valmentaa vuosia"
   },
   "register": {
     "title": "Rekisteröinti",
@@ -1825,7 +2036,7 @@
     "home": "Kotiin",
     "search": "Haku",
     "messages": "Viestit",
-    "notifications": "Tapahtumat",
+    "notifications": "Ilmoitukset",
     "profile": "Profiili"
   },
   "admin": {
@@ -1842,7 +2053,6 @@
     "noName": "Ei nimeä",
     "noPosition": "Ei määritelty",
     "noTeam": "Ei määritelty",
-    "sendGift": "Lähetä lahja",
     "yearsOld": "vuotta",
     "addUser": "Lisää käyttäjä",
     "searchPlayers": "Etsitään pelaajia...",
@@ -2044,12 +2254,10 @@
   "settings": {
     "title": "Asetukset",
     "language": "Kieli",
-    "selectLanguage": "Valitse kieli",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Valitse kieli"
   },
   "search": {
     "title": "Haku",
-    "loading": "Ladataan hakua...",
     "placeholder": "Etsitään pelaajia...",
     "country": "Maa",
     "grip": "Pito",
@@ -2075,10 +2283,10 @@
     "you": "Sinä:"
   },
   "notifications": {
-    "title": "Tapahtumat",
-    "loading": "Ladataan tapahtumia...",
-    "noNotifications": "Ei tapahtumia",
-    "noNotificationsSubtitle": "Sinulla ei ole vielä tapahtumia ystävyyssuhteista, lahjoista tai muista toimista.",
+    "title": "Ilmoitukset",
+    "loading": "Ladataan ilmoituksia...",
+    "noNotifications": "Ei ilmoituksia",
+    "noNotificationsSubtitle": "Sinulla ei ole vielä ilmoituksia ystävyyssuhteista, lahjoista tai muista toimista.",
     "accept": "Hyväksyä",
     "decline": "Hylätä",
     "friendRequests": "Ystäväpyynnöt",
@@ -2128,13 +2336,11 @@
     "timesPlural": "kertaa"
   },
   "home": {
-    "loadingPlayers": "Jään kunnostus...",
+    "loadingPlayers": "Ladataan pelaajia...",
     "noPlayersCountry": "Ei pelaajia maasta {{country}}",
     "noPlayersYear": "Ei pelaajia, jotka ovat syntyneet vuonna {{year}}",
     "noPlayersCountryYear": "Ei pelaajia maasta {{country}} vuonna {{year}}",
-    "iceEmpty": "Jää on tyhjä. Valitse toinen maa tai vuosi tai nollaa suodattimet.",
-    "waitingForConnection": "Odotetaan yhteyttä",
-    "checkInternetConnection": "Tarkista internet-yhteys"
+    "iceEmpty": "Jää on tyhjä. Valitse toinen maa tai vuosi tai nollaa suodattimet."
   },
   "filters": {
     "year": "vuosi",
@@ -2229,13 +2435,13 @@
     "jersey": "Jersey",
     "pleaseWriteMessage": "Kirjoita pyyntöösi viesti",
     "invalidGift": "sopimaton lahja",
-    "deleteGiftQuestion": "Poista lahja?",
+    "deleteGiftQuestion": "Poistetaanko lahja?",
     "from": "alkaen",
     "noGiftsYet": "Ei vielä lahjoja tähdiltä",
     "museum": "Lahjojen museo",
     "myGifts": "Minun lahjani",
-    "noGiftsSubtext": "Lataa ensimmäinen lahjasi jakaaksesi sen pelaajien kanssa",
-    "successDeleted": "Lahja poistettu",
+    "noGiftsSubtext": "Tähtien lahjat näytetään täällä",
+    "successDeleted": "Lahja on poistettu museosta.",
     "errorDelete": "Lahjan poistaminen epäonnistui",
     "noImage": "ei kuvaa",
     "failedToSendRequest": "Pyynnön lähettäminen epäonnistui",
@@ -2243,7 +2449,7 @@
     "requestSentMessage": "Pyyntösi kohteelle {itemType} on lähetetty. Odota vastausta.",
     "requestItem": "Pyydä {itemType}",
     "requestMessage": "Viesti pyyntöön",
-    "selectGiftType": "Valitse lahjan tyyppi",
+    "selectGiftType": "Valitse lahjatyyppi",
     "selectGiftTypeMessage": "Minkä tyyppisen lahjan haluat luoda?",
     "requestMessageHelper": "Kirjoita kohtelias viesti ja selitä miksi haluat saada tämän lahjan.",
     "requestMessagePlaceholder": "Esimerkiksi: Hei! Olen pelisi suuri fani ja haluaisin nimikirjoituksen kokoelmaani...",
@@ -2271,10 +2477,11 @@
     "allGiftsAdded": "Kaikki lahjat on lisätty.",
     "allGiftTypesAdded": "Sinulla on jo kaikenlaisia ​​lahjoja",
     "addGift": "Lisää lahja",
+    "selectGiftType": "Valitse lahjan tyyppi",
     "deletion": "Poistaminen",
     "itemDeleted": "Lahja poistettu",
     "failedToDeleteItem": "Lahjan poistaminen epäonnistui",
-    "noGifts": "Ei vielä lahjoja",
+    "noGifts": "Ei lahjoja",
     "clickPlusToAdd": "Lisää napsauttamalla +",
     "настоящее время": "nykyaikaa",
     "Центральный нападающий": "Keskushyökkääjä",
@@ -2290,33 +2497,7 @@
     "seconds": "sek",
     "times": "kerran",
     "sprint": "100 metrin juoksu",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Lähetä lahja pelaajalle {playerName}",
-    "selectExistingGift": "Valitse olemassa oleva lahja",
-    "orCreateNew": "Tai luo uusi",
-    "giftName": "Lahjan nimi",
-    "giftNamePlaceholder": "esim. Allekirjoitettu lippalakki",
-    "uploadImage": "Lataa kuva",
-    "send": "Lähetä",
-    "selectGift": "Valitse lahja",
-    "fromAdmin": "Järjestelmänvalvoja",
-    "errorSelectOrCreate": "Valitse lahja tai luo uusi",
-    "errorGiftAlreadyExists": "Tämä lahja on jo olemassa pelaajalle {playerName}.\n\nValitse toinen lahja tai luo uusi.",
-    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!",
-    "errorSendingGift": "Lahjan lähettäminen epäonnistui",
-    "deleteGiftConfirm": "Haluatko varmasti poistaa tämän lahjan?",
-    "selectImage": "Valitse kuva",
-    "errorPermissionDenied": "Sinulla ei ole oikeutta poistaa tätä lahjaa",
-    "errorGiftNotFound": "Lahjaa ei löytynyt",
-    "errorGiftNotDeleted": "Lahjaa ei poistettu",
-    "noGiftsUploaded": "Ei vielä ladattuja lahjoja",
-    "fromStar": "{starName}ltä",
-    "giftReceived": "Lahja vastaanotettu!",
-    "giftReceivedFromAdmin": "Olet saanut lahjan järjestelmänvalvojalta: {giftName}",
-    "giftReceivedFromStar": "Olet saanut lahjan henkilöltä {starName}: {giftName}",
-    "giftReceivedPush": "🎁 Lahja vastaanotettu!",
-    "giftReceivedFromAdminPush": "Olet saanut lahjan järjestelmänvalvojalta: {giftName}",
-    "giftReceivedFromStarPush": "Olet saanut lahjan henkilöltä {starName}: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardit",
@@ -2434,40 +2615,5 @@
   },
   "logout": "Poistu",
   "logoutConfirm": "Kirjaudu ulos profiilistasi",
-  "logoutConfirmMessage": "Haluatko varmasti kirjautua ulos profiilistasi?",
-  "adminGifts": {
-    "sendGift": "Lähetä lahja",
-    "giftName": "Lahjan nimi",
-    "selectImage": "Valitse kuva"
-  },
-  "videoNotification": {
-    "added": "lisäsi",
-    "oneVideo": "uuden videon",
-    "multipleVideos": "{count} uutta videota",
-    "video": "video",
-    "videos": "videot"
-  },
-  "achievementNotification": {
-    "added": "lisäsi",
-    "received": "sai",
-    "oneAchievement": "uuden saavutuksen",
-    "multipleAchievements": "{count} uutta saavutusta",
-    "achievement": "saavutus",
-    "achievements": "saavutukset",
-    "title": "🏆 Saavutus!",
-    "message": "Onnittelut! Sait saavutuksen: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "vaihtoi avatarinsa"
-  },
-  "statsNotification": {
-    "updated": "päivitti",
-    "stats": "tilastot",
-    "normatives": "normit",
-    "physicalData": "fyysiset tiedot"
-  },
-  "height": "pituus",
-  "weight": "paino",
-  "cm": "cm",
-  "kg": "kg"
+  "logoutConfirmMessage": "Haluatko varmasti kirjautua ulos profiilistasi?"
 }

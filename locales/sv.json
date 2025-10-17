@@ -1,17 +1,17 @@
 {
   "common": {
     "save": "Spara",
-    "cancel": "Avbryt",
+    "cancel": "Avboka",
     "edit": "Redigera",
-    "delete": "Ta bort",
+    "delete": "Radera",
     "add": "Tillägga",
     "close": "Nära",
     "back": "Tillbaka",
     "next": "Nästa",
     "done": "Redo",
-    "loading": "Laddar...",
+    "loading": "Belastning...",
     "error": "Fel",
-    "success": "Framgång",
+    "success": "Framgångsrikt",
     "yes": "Ja",
     "no": "Inga",
     "ok": "OK",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Är du säker på att du vill ta bort denna prestation?",
     "deleteAllNotificationsConfirm": "Är du säker på att du vill rensa alla aviseringar?",
     "rejectRequestConfirm": "Är du säker på att du vill avvisa denna begäran?",
-    "super": "Jättebra!",
-    "retry": "Försök igen",
-    "goalie": "Målvakt"
+    "super": "Jättebra!"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -65,8 +63,7 @@
     "title": "En gåva från en stjärna",
     "message": "{playerName} fick {giftName} från {starName}",
     "received": "mottagen",
-    "from": "från",
-    "gift": "Present"
+    "from": "från"
   },
   "addPhoto": "Lägg till ett foto",
   "selectPhotoSource": "Välj fotokälla",
@@ -142,7 +139,6 @@
     "subtitle": "Välj ett träningspass",
     "searchPlaceholder": "Sök på nummer eller namn...",
     "loadingExercise": "Laddar övning...",
-    "loadingExercises": "Laddar övningar...",
     "exercise": "Utöva",
     "alreadyCompleted": "Övningen är redan avslutad",
     "canRetryIn": "Du kan göra den här övningen igen om {hours} timmar",
@@ -826,594 +822,816 @@
       },
       "27": {
         "title": "Uppvärmning av halsen",
+        "description": "Mjuka huvudvändningar, framåt och bakåt tilt, cirkulära rörelser. 2-3 minuter.",
+        "benefits": [
+          "Förbereder musklerna för träning",
+          "Förbättrar blodcirkulationen",
+          "Minskar risken för skador",
+          "Ökar träningseffektiviteten"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Vrid sakta huvudet åt vänster och höger",
-          "Luta huvudet framåt och bakåt",
-          "Utför cirkulära rörelser med huvudet",
-          "Håll dina axlar avslappnade"
+          "Börja långsamt och öka gradvis intensiteten",
+          "Utför rörelser smidigt och kontrollerat",
+          "Se till att du använder rätt teknik",
+          "Andas jämnt medan du utför"
         ],
         "tips": [
-          "Rör dig långsamt och smidigt",
-          "Gör inga plötsliga rörelser",
+          "Ta dig tid – kvalitet är viktigare än snabbhet",
           "Om smärta uppstår, sluta.",
-          "Andas djupt och jämnt"
+          "Värm upp före varje träningspass.",
+          "Lägg tillräckligt med tid på varje rörelse."
         ]
       },
       "28": {
         "title": "Handledsuppvärmning",
+        "description": "Cirkulära rörelser med händerna, böjer och sträcker ut fingrarna. 2-3 minuter för varje hand.",
+        "benefits": [
+          "Förbereder musklerna för träning",
+          "Förbättrar blodcirkulationen",
+          "Minskar risken för skador",
+          "Ökar träningseffektiviteten"
+        ],
         "instructions": [
-          "Sträck ut armarna framför dig",
-          "Böj handlederna upp och ner",
-          "Rotera handlederna i en cirkel",
-          "Knyt och knyt nävarna",
-          "Sträck fingrarna åt sidorna"
+          "Börja långsamt och öka gradvis intensiteten",
+          "Utför rörelser smidigt och kontrollerat",
+          "Se till att du använder rätt teknik",
+          "Andas jämnt medan du utför"
         ],
         "tips": [
-          "Utför rörelserna långsamt",
-          "Överansträng inte dina leder",
-          "Var uppmärksam på förnimmelserna i dina handleder",
-          "Upprepa regelbundet"
+          "Ta dig tid – kvalitet är viktigare än snabbhet",
+          "Om smärta uppstår, sluta.",
+          "Värm upp före varje träningspass.",
+          "Lägg tillräckligt med tid på varje rörelse."
         ]
       },
       "29": {
         "title": "Knä sträcker sig",
+        "description": "Halva knäböj, knäcirklar, lätt hoppning på plats. 3-4 minuter.",
+        "benefits": [
+          "Förbereder musklerna för träning",
+          "Förbättrar blodcirkulationen",
+          "Minskar risken för skador",
+          "Ökar träningseffektiviteten"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Böj långsamt och räta ut dina knän",
-          "Utför cirkulära rörelser med knäna",
-          "Gör knäböj med liten amplitud",
-          "Sträck på framsidan av låret"
+          "Börja långsamt och öka gradvis intensiteten",
+          "Utför rörelser smidigt och kontrollerat",
+          "Se till att du använder rätt teknik",
+          "Andas jämnt medan du utför"
         ],
         "tips": [
-          "Gör inte djupa knäböj",
-          "Rör dig smidigt och med kontroll",
-          "Om du har knäsmärta, minska rörelseomfånget.",
-          "Se till att du använder rätt teknik"
+          "Ta dig tid – kvalitet är viktigare än snabbhet",
+          "Om smärta uppstår, sluta.",
+          "Värm upp före varje träningspass.",
+          "Lägg tillräckligt med tid på varje rörelse."
         ]
       },
       "30": {
         "title": "Höftuppvärmning",
+        "description": "Höftcirklar, bensvängningar åt sidorna, lätta utfall. 4-5 minuter.",
+        "benefits": [
+          "Förbereder musklerna för träning",
+          "Förbättrar blodcirkulationen",
+          "Minskar risken för skador",
+          "Ökar träningseffektiviteten"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Lyft upp ditt knä mot bröstet",
-          "Flytta benet åt sidan och bakåt",
-          "Utför cirkulära rörelser med dina höfter",
-          "Gör utfall med liten amplitud"
+          "Börja långsamt och öka gradvis intensiteten",
+          "Utför rörelser smidigt och kontrollerat",
+          "Se till att du använder rätt teknik",
+          "Andas jämnt medan du utför"
         ],
         "tips": [
-          "Håll ryggen rak",
-          "Arbeta inom ett bekvämt område",
-          "Förhasta inte dina rörelser",
-          "Håll koll på din balans"
+          "Ta dig tid – kvalitet är viktigare än snabbhet",
+          "Om smärta uppstår, sluta.",
+          "Värm upp före varje träningspass.",
+          "Lägg tillräckligt med tid på varje rörelse."
         ]
       },
       "31": {
         "title": "Ljumsken stretch",
+        "description": "Fjäril - sitta på golvet, samla ihop fötterna och böj dig framåt. Håll i 30-45 sekunder.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Sitt på golvet med böjda knän.",
-          "Placera fotsulorna tillsammans",
-          "Luta dig försiktigt framåt",
-          "Dra knäna mot golvet",
-          "Håll stretchen i 30 sekunder"
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
-          "Tvinga inte sträckningen",
-          "Andas djupt och slappna av.",
-          "Om smärta uppstår, minska amplituden.",
-          "Utför efter uppvärmning"
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "32": {
         "title": "Hamstring stretch",
+        "description": "Böj framåt med raka ben, håll i 30 sekunder. 3 set på 15 sekunder.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Sitt på golvet med benen sträckta framåt.",
-          "Böj dig framåt och försök att nå dina fötter",
-          "Knäpp ihop fötterna med händerna",
-          "Dra bröstet mot knäna",
-          "Håll stretchen i 30-45 sekunder"
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
-          "Runda inte ryggen",
-          "Arbeta inom ett bekvämt område",
-          "Andas djupt",
-          "Var uppmärksam på förnimmelserna på baksidan av låret"
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "33": {
         "title": "Stretching av vadmusklerna",
+        "description": "Utfaller mot en vägg, hamstring stretchar. 20 sekunder per ben.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Stå vänd mot väggen",
-          "Placera en fot framåt och den andra bakåt.",
-          "Sänk hälen på din bakre fot till golvet",
-          "Böj dig framåt, sträck dina vader",
-          "Byt ben och upprepa"
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
-          "Håll bakbenet rakt",
-          "Lyft inte hälen från golvet",
-          "Sträck ut smidigt",
-          "Utför båda benen"
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "34": {
         "title": "Stretching av bröstmusklerna",
+        "description": "Väggstretch med armförlängningar. Håll i 30 sekunder, 3 set.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Stå i dörröppningen",
-          "Placera händerna på dörrkarmarna",
-          "Ta ett steg framåt",
-          "Känn sträckningen i bröstet",
-          "Håll stretchen i 30 sekunder"
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
-          "Överansträng inte dina axlar",
-          "Andas djupt",
-          "Sträck ut gradvis",
-          "Följ dina förnimmelser"
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "35": {
         "title": "Triceps stretch",
+        "description": "Placera händerna bakom huvudet för att sträcka på baksidan av axeln. 20 sekunder för varje arm.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Lyft upp ena handen",
-          "Böj armen vid armbågen bakom huvudet",
-          "Dra ner armbågen med din andra hand",
-          "Känn stretchen i dina triceps",
-          "Byt händer och upprepa"
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
+          "Andas djupt medan du stretchar.",
           "Gör inga plötsliga rörelser",
-          "Sträck ut smidigt",
-          "Andas jämnt",
-          "Utför för båda händerna"
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "36": {
         "title": "Orm mellan kottar",
+        "description": "Spring i en ormliknande rörelse mellan kottar arrangerade i en linje. 5 pass i maxhastighet.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Lägg kottarna i ett ormliknande mönster på 2-3 meters avstånd",
-          "Börja springa runt varje kon",
-          "Håll din tyngdpunkt låg",
-          "Arbeta dina ben snabbt och ofta",
-          "Se till att du använder rätt svarvteknik."
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Börja i långsam takt",
-          "Fokusera på teknik, inte snabbhet.",
-          "Håll huvudet uppe",
-          "Använd korta, snabba steg"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "37": {
         "title": "Snabba fotberöringar",
+        "description": "Rör snabbt vid konerna med fötterna i en slumpmässig ordning. 3 set på 45 sekunder.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå bredvid bollen",
-          "Rör bollen snabbt med foten",
-          "Byt ben var 2-3 beröring",
-          "Håll en konstant rytm",
-          "Utför i 30-60 sekunder"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll din kroppsvikt på ditt stödben",
-          "Arbeta snabbt men kontrollerat",
-          "Tappa inte balansen",
-          "Titta på din beröringsteknik"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "38": {
         "title": "Hoppar med svängar",
+        "description": "Hoppar på plats med 90-180 graders svängar. 3 set med 20 hopp.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Gör ett hopp upp",
-          "Vrid 180 grader medan du hoppar",
-          "Landa mjukt på båda fötterna.",
-          "Vänd omedelbart tillbaka och upprepa"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Landa med böjda ben",
-          "Använd armarna för balans",
-          "Börja med små svängar",
-          "Titta på din landningsteknik"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "39": {
         "title": "Snabba bollpassningar",
+        "description": "Passar en tennisboll mellan händerna med maximal hastighet. 3 set à 1 minut vardera.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå vänd mot väggen på 2-3 meters avstånd",
-          "Passa bollen snabbt till väggen",
-          "Fånga returen och skicka tillbaka den omedelbart",
-          "Arbeta med båda händerna",
-          "Utför i 30-45 sekunder"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Använd rätt passningsteknik",
-          "Håll ögonen på bollen",
-          "Arbeta snabbt men noggrant",
-          "Håll händerna avslappnade"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "40": {
         "title": "Springer baklänges",
+        "description": "Springer baklänges med snabba vändningar på kö. 5 set på 30 sekunder.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
         "instructions": [
-          "Börja med att springa sakta bakåt.",
-          "Titta över axeln ofta",
-          "Håll din tyngdpunkt låg",
-          "Använd armarna för balans",
-          "Kör 20-30 meter"
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
         ],
         "tips": [
-          "Börja väldigt långsamt",
-          "Kontrollera alltid utrymmet bakom dig",
-          "Håll knäna lätt böjda",
-          "Rusa inte in i ökande hastighet"
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
         ]
       },
       "41": {
         "title": "Squats med vikter",
+        "description": "Squats med hantlar eller skivstång, låren parallella med golvet. 4 set med 12-15 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Ta hantlar eller en skivstång",
-          "Sitt på huk tills tårna är parallella med golvet.",
-          "Gå upp med styrkan i dina ben",
-          "Utför 3-4 set med 8-12 reps"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll ryggen rak",
-          "Runda inte nedre delen av ryggen",
-          "Dina knän ska inte gå längre än tårna.",
-          "Börja med lätta vikter"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "42": {
         "title": "Marklyft",
+        "description": "Lyft skivstången från golvet till höftnivå med rak rygg. 3 set med 8-10 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå rakt med fötterna axelbrett isär",
-          "Ta skivstången från golvet med ett överhandsgrepp.",
-          "Böj knäna och flytta bäckenet bakåt",
-          "Lyft skivstången genom att räta ut benen och ryggen.",
-          "Sätt tillbaka stången till golvet på ett kontrollerat sätt."
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll ryggen rak under hela rörelsen.",
-          "Runda inte nedre delen av ryggen",
-          "Flytta stången nära din kropp",
-          "Börja med lätta vikter"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "43": {
         "title": "Bänkpress",
+        "description": "Bänkpress med skivstång. 4 set med 8-12 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Lägg dig på bänken med fötterna på golvet.",
-          "Ta skivstången med ett brett grepp",
-          "Sänk stången till bröstet på ett kontrollerat sätt.",
-          "Tryck skivstången uppåt",
-          "Utför 3-4 set med 6-10 reps"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll skulderbladen ihopdragna",
-          "Håll fötterna på golvet",
-          "Andas rätt: andas ut med ansträngning",
-          "Använd försäkring"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "44": {
         "title": "Pull-ups",
+        "description": "Chin-ups. 3 set med 8-12 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Häng på stången med ett överhandsgrepp",
-          "Dra dig upp tills hakan är ovanför stången.",
-          "Sänk dig tillbaka till startpositionen",
-          "Håll din kärna tät",
-          "Utför 3-4 set med maximala reps"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Sväng inte",
-          "Dra upp smidigt och kontrollerat",
-          "Räta ut armarna helt i botten",
-          "Använd hjälp vid behov"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "45": {
         "title": "Dips på stängerna",
+        "description": "Parallella stångfall, sänks till 90 graders vinkel. 3 set med 10-15 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå mellan stängerna",
-          "Hoppa upp och lås fast vid stängerna",
-          "Sänk dig ner, böj armbågarna.",
-          "Tryck upp, räta ut armarna",
-          "Utför 3-4 set med 5-15 reps"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll din kropp rak",
-          "Sväng inte",
-          "Gå ner till ett bekvämt djup",
-          "Använd dina ben om det behövs."
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "46": {
         "title": "Enbensstativ",
+        "description": "Behåll balansen på ett ben med slutna ögon. 3 set à 30 sekunder på varje ben.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå på ett ben",
-          "Höj ditt andra ben framför dig",
-          "Behåll din balans så länge som möjligt",
-          "Använd armarna för balans",
-          "Byt ben och upprepa"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Se framåt, inte ner",
-          "Håll din kärna tät",
-          "Börja med korta set",
-          "Öka tiden gradvis"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "47": {
         "title": "Enbens planka",
+        "description": "Plankhållning med ett benlyft. 3 set à 30 sekunder på varje ben.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Kom in i en plankposition",
-          "Lyft upp ett ben",
-          "Håll benet rakt",
-          "Håll positionen i 30-60 sekunder",
-          "Byt ben och upprepa"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll din kropp rak",
-          "Gunga inte från sida till sida",
-          "Andas jämnt",
-          "Börja med korta set"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "48": {
         "title": "Enbens knäböj",
+        "description": "Squats på ett ben med det andra benet utsträckt framåt. 3 set med 8-10 reps på varje ben.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå på ett ben",
-          "Förläng ditt andra ben framåt",
-          "Knäböj på stödbenet",
-          "Återgå till startpositionen",
-          "Utför 3-4 set med 5-10 reps på varje ben."
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Håll ryggen rak",
-          "Rör inte golvet med din andra fot.",
-          "Använd armarna för balans",
-          "Börja med en liten amplitud"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "49": {
         "title": "Bosu bollövningar",
+        "description": "Balansövningar på ett instabilt underlag. 15-20 minuter av olika rörelser.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå på halvklotet av Bosu-bollen",
-          "Håll balansen",
-          "Gör knäböj",
-          "Gör kroppsvridningar",
-          "Utför 3-4 set med 10-15 reps"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Börja med enkla övningar",
-          "Titta på din teknik",
-          "Ta dig tid",
-          "Använd hjälp för stöd"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "50": {
         "title": "Yoga Balans",
+        "description": "Tree pose, Warrior III och Eagle poserar för balans. Håll varje ställning i 30-60 sekunder.",
+        "benefits": [
+          "Utvecklar koordination av rörelser",
+          "Förbättrar balans och jämvikt",
+          "Ökar smidigheten",
+          "Utvecklar neuromuskulär anslutning"
+        ],
         "instructions": [
-          "Stå upprätt med fötterna ihop.",
-          "Lyft upp ett ben och placera det på det andras lår.",
-          "Placera händerna framför bröstet",
-          "Håll balansen",
-          "Utför båda benen i 30-60 sekunder"
+          "Börja i långsam takt",
+          "Fokus på precision i rörelser",
+          "Öka hastigheten gradvis",
+          "Upprepa tills det blir automatiskt."
         ],
         "tips": [
-          "Titta framåt vid ett tillfälle",
-          "Andas djupt och jämnt",
-          "Ta dig tid",
-          "Om du tappar balansen, börja om."
+          "Öva regelbundet",
+          "Ta dig tid – precision är viktigare än snabbhet",
+          "Använd visuella signaler",
+          "Träna under olika förhållanden"
         ]
       },
       "51": {
         "title": "Går på en stock",
+        "description": "Gå på en smal stock eller bräda för att utveckla balans. 5 pass fram och tillbaka.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Hitta en stabil stock eller bräda",
-          "Stå på stocken",
-          "Gå långsamt framåt",
-          "Håll balansen",
-          "Utför flera pass"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Börja med en bred stock",
-          "Se framåt, inte ner",
-          "Använd armarna för balans",
-          "Ta dig tid"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "52": {
         "title": "Handstående mot väggen",
+        "description": "Handstår mot en vägg för att utveckla överkroppens balans. 3 set på 20 sekunder.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Stå vänd mot väggen",
-          "Placera händerna på golvet 30 cm från väggen",
-          "Lyft upp benen mot väggen",
-          "Håll ett handstående",
-          "Sänk benen på ett kontrollerat sätt"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Börja med korta set",
-          "Använd hjälp för försäkring",
-          "Håll din kärna tät",
-          "Överansträng dig inte"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "53": {
         "title": "Fartlek",
+        "description": "Löpning med varierande intensitet: snabb löpning i 2 minuter, långsam löpning i 1 minut. 30 minuters totalt arbete.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Börja med en långsam joggingtur i 5-10 minuter",
-          "Öka hastigheten till 80 % av max i 2-3 minuter",
-          "Återgå till en långsam joggingtur i 1-2 minuter",
-          "Upprepa cykeln 4-6 gånger",
-          "Avsluta med en långsam joggingtur i 5-10 minuter"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Lyssna på din kropp",
-          "Överskrid inte 80 % av maxhastigheten",
-          "Andas djupt",
-          "Drick vatten under träningen."
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "54": {
         "title": "Upprepade spurter",
+        "description": "100-meters sprint med 2-3 minuters vila. 6-8 repetitioner för att utveckla hastighetsuthållighet.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Gör en 10 minuters uppvärmning",
-          "Kör en sprint med maximal hastighet i 30 sekunder",
-          "Vila i 2-3 minuter",
-          "Upprepa sprinten",
-          "Kör 6-8 spurter"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Snåla inte med din uppvärmning",
-          "Vila helt mellan spurterna",
-          "Titta på din löpteknik",
-          "Träna inte dagligen"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "55": {
         "title": "Intervaller på en cykel",
+        "description": "30 sekunders maximal ansträngning, 90 sekunders återhämtning. 20 cykler för att utveckla hastighetsuthållighet.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
         "instructions": [
-          "Börja med en 5 minuters uppvärmning",
-          "Öka belastningen till 80 % av max",
-          "Pedal med hög intensitet i 2-3 minuter",
-          "Minska belastningen till 50 % i 1-2 minuter",
-          "Upprepa cykeln 6-8 gånger"
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
         ],
         "tips": [
-          "Håll en hög kadens",
-          "Andas djupt",
-          "Håll ett öga på pulsen",
-          "Drick vatten regelbundet"
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
         ]
       },
       "56": {
-        "title": "Berglöpning",
+        "title": "Backlöpning",
+        "description": "Spring uppför backen så fort du kan och jogga sedan ner. 8-10 backar.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
         "instructions": [
-          "Hitta en kulle med en lutning på 5-10 %",
-          "Gör en 10 minuters uppvärmning",
-          "Spring uppför backen i måttlig hastighet",
-          "Gå ner för att återhämta dig",
-          "Upprepa 6-10 lyft"
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
         ],
         "tips": [
-          "Börja med en liten lutning",
-          "Håll ryggen rak när du lyfter.",
-          "Arbeta aktivt med händerna",
-          "Ta dig tid på nedstigningen"
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
         ]
       },
       "57": {
         "title": "Plyometriska cirklar",
+        "description": "En krets med 5-6 plyometriska övningar utan vila. 4-5 kretsar med 2 minuters vila mellan dem.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Gör en 10 minuters uppvärmning",
-          "Gör långa hopp från stående position",
-          "Gör hopp över hinder",
-          "Gör box jumps",
-          "Vila i 2-3 minuter och upprepa kretsen."
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Titta på din landningsteknik",
-          "Landa med böjda ben",
-          "Använd armarna för balans",
-          "Överdriv inte med kvantiteten"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "58": {
         "title": "Lätt stretching",
+        "description": "Skonsam stretching av alla större muskelgrupper efter träning. 15-20 minuter för att påskynda återhämtningen.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
         "instructions": [
-          "Börja med lätta rörelser",
-          "Sträck dina stora muskelgrupper",
-          "Andas djupt och jämnt",
-          "Rör dig mjukt och långsamt",
-          "Avsluta med djup andning."
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
         ],
         "tips": [
-          "Sträck dig inte till smärtan.",
-          "Andas djupt",
-          "Slappna av helt",
-          "Gör det regelbundet"
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
         ]
       },
       "59": {
         "title": "Skumrullande",
+        "description": "Muskelmassage med en foam roller för att lindra spänningar. 10-15 minuter per större muskelgrupp.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Lägg dig på foam rollern",
-          "Rulla rullen långsamt under dina muskler.",
-          "Fokusera på smärtpunkter",
-          "Håll trycket i 30-60 sekunder",
-          "Upprepa för alla muskelgrupper."
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Rulla inte på lederna",
-          "Andas djupt",
-          "Tål inte svår smärta",
-          "Börja med en mjuk rulle"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "60": {
         "title": "Lätt jogging",
+        "description": "Lågintensiv jogging för aktiv återhämtning. 15-20 minuter.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
         "instructions": [
-          "Börja i långsam takt",
-          "Håll din puls på 60-70% av ditt maximala",
-          "Andas djupt och jämnt",
-          "Håll ett konstant tempo",
-          "Avsluta med en gradvis minskning av tempot"
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
         ],
         "tips": [
-          "Håll ett öga på pulsen",
-          "Andas genom näsan",
-          "Överansträng dig inte",
-          "Njut av processen"
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
         ]
       },
       "61": {
         "title": "Simning",
+        "description": "Lätt simning i poolen för att slappna av musklerna och återhämta dig. 20-30 minuter.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Börja med en uppvärmning på torrt land",
-          "Gå ner i vattnet gradvis",
-          "Simma i ett behagligt tempo",
-          "Ändra dina simstilar",
-          "Avsluta med ett långsamt dopp"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Simma inte ensam",
-          "Titta på din teknik",
-          "Andas jämnt",
-          "Överdriv inte"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "62": {
         "title": "Återställningscykel",
+        "description": "Lätt att cykla i lågt tempo för aktiv återhämtning. 20-25 minuter.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
         "instructions": [
-          "Börja i långsam takt",
-          "Håll din puls på 50-60% av ditt max",
-          "Trampa lätt och rytmiskt",
-          "Andas djupt",
-          "Avsluta med en gradvis minskning av tempot"
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
         ],
         "tips": [
-          "Håll en hög kadens",
-          "Andas djupt",
-          "Överansträng dig inte",
-          "Njut av åkturen"
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
         ]
       },
       "63": {
         "title": "Återhämtningsyoga",
+        "description": "Milda asanas för att slappna av musklerna och påskynda återhämtningen. 20 minuter.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Börja med enkla poser",
-          "Utför stretching långsamt",
-          "Andas djupt och jämnt",
-          "Koppla av i varje pose",
-          "Avsluta med meditation"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Tvinga inte poser",
-          "Andas genom näsan",
-          "Lyssna på din kropp",
-          "Njut av processen"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       },
       "64": {
@@ -1442,18 +1660,24 @@
       },
       "65": {
         "title": "Dusch i kontrast",
+        "description": "Omväxlande varmt och kallt vatten för att förbättra cirkulationen och återhämtningen. 5-7 minuter.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
         "instructions": [
-          "Börja med varmt vatten",
-          "Gå gradvis över till kallt vatten",
-          "Håll kallt vatten i 30-60 sekunder",
-          "Återgå till varmt vatten",
-          "Upprepa cykeln 3-5 gånger"
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
         ],
         "tips": [
-          "Börja gradvis",
-          "Andas djupt",
-          "Bli inte för kall",
-          "Lyssna på din kropp"
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
         ]
       }
     }
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Lägg till som vän",
     "addFriendQuestion": "Vill du lägga till {name} som vän?",
-    "sendMessage": "Skicka meddelande",
     "loading": "Belastning...",
     "basicInfo": "Grundläggande information",
     "physicalData": "Fysiska data",
@@ -1603,7 +1826,7 @@
     "addToFriendsToSeePhotos": "Lägg till {name} som vän för att se hockeyfoton",
     "addToFriendsToSeeMuseum": "Lägg till {name} som vän för att se museet",
     "removeFromFriends": "Ta bort från vänner",
-    "points": "Poäng",
+    "points": "poäng",
     "friendsCount": "vänner",
     "friendsCountStats": "Vänner",
     "seconds": "sek",
@@ -1614,9 +1837,9 @@
     "Защитник": "Försvarare",
     "Вратарь": "Målvakt",
     "настоящее время": "nutid",
-    "goals": "Mål",
-    "assists": "Assist",
-    "games": "Matcher",
+    "goals": "mål",
+    "assists": "växlar",
+    "games": "spel",
     "pullUps": "Pull-ups",
     "pushUps": "Armhävningar",
     "plankTime": "planka (sek)",
@@ -1783,19 +2006,7 @@
     "equipmentRepair": "Hockeyutrustningsreparation",
     "stickRepair": "Käppreparation",
     "usedEquipmentSale": "Begagnad utrustning",
-    "newEquipmentSale": "Ny utrustning",
-    "phone": "Telefon",
-    "qrCodeTitle": "Profil QR-kod",
-    "qrCodeSubtitle": "Skanna för snabb åtkomst",
-    "qrCodeInfo": "Rikta telefonkameran mot QR-koden för att öppna profilen",
-    "shareProfile": "Dela profil",
-    "savedToGallery": "Sparat i galleriet",
-    "noPermission": "Ingen åtkomst till galleriet",
-    "shareError": "Fel vid skapande av bild",
-    "currentTeam": "Lag",
-    "hockeyExperience": "Hockeyerfarenhet",
-    "years": "år",
-    "currentSeasonStats": "Nuvarande säsongens statistik"
+    "newEquipmentSale": "Ny utrustning"
   },
   "register": {
     "title": "Registrering",
@@ -1833,7 +2044,7 @@
     "home": "Hem",
     "search": "Söka",
     "messages": "Meddelanden",
-    "notifications": "Händelser",
+    "notifications": "Aviseringar",
     "profile": "Profil"
   },
   "admin": {
@@ -1850,7 +2061,6 @@
     "noName": "Inget namn",
     "noPosition": "Ej specificerat",
     "noTeam": "Ej specificerat",
-    "sendGift": "Skicka gåva",
     "yearsOld": "år",
     "addUser": "Lägg till användare",
     "searchPlayers": "Söker efter spelare...",
@@ -2052,12 +2262,10 @@
   "settings": {
     "title": "Inställningar",
     "language": "Språk",
-    "selectLanguage": "Välj språk",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Välj språk"
   },
   "search": {
     "title": "Söka",
-    "loading": "Laddar sökning...",
     "placeholder": "Söker efter spelare...",
     "country": "Land",
     "grip": "Grepp",
@@ -2083,10 +2291,10 @@
     "you": "Du:"
   },
   "notifications": {
-    "title": "Händelser",
-    "loading": "Läser in händelser...",
-    "noNotifications": "Inga händelser",
-    "noNotificationsSubtitle": "Du har inga händelser om vänskap, gåvor eller andra åtgärder än.",
+    "title": "Aviseringar",
+    "loading": "Läser in aviseringar...",
+    "noNotifications": "Inga aviseringar",
+    "noNotificationsSubtitle": "Du har inga aviseringar om vänskap, gåvor eller andra åtgärder än.",
     "accept": "Acceptera",
     "decline": "Avvisa",
     "friendRequests": "Vänförfrågningar",
@@ -2136,13 +2344,11 @@
     "timesPlural": "gånger"
   },
   "home": {
-    "loadingPlayers": "Isbanerenovering...",
+    "loadingPlayers": "Laddar spelare...",
     "noPlayersCountry": "Inga spelare från {{country}}",
     "noPlayersYear": "Det finns inga spelare födda i {{year}}",
     "noPlayersCountryYear": "Inga spelare från {{country}} i {{year}}",
-    "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren.",
-    "waitingForConnection": "Väntar på anslutning",
-    "checkInternetConnection": "Kontrollera din internetanslutning"
+    "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren."
   },
   "filters": {
     "year": "år",
@@ -2241,17 +2447,17 @@
     "from": "från",
     "noGiftsYet": "Inga gåvor från stjärnorna än",
     "museum": "Museum för gåvor",
-    "myGifts": "Mina presenter",
-    "noGiftsSubtext": "Ladda upp din första present för att dela med spelare",
-    "successDeleted": "Present borttagen",
-    "errorDelete": "Kunde inte ta bort present",
+    "myGifts": "Mina gåvor",
+    "noGiftsSubtext": "Gåvor från stjärnor kommer att visas här",
+    "successDeleted": "Gåvan har tagits bort från museet.",
+    "errorDelete": "Det gick inte att ta bort gåvan",
     "noImage": "ingen bild",
     "failedToSendRequest": "Det gick inte att skicka begäran",
     "requestSent": "Förfrågan har skickats!",
     "requestSentMessage": "Din begäran om {itemType} har skickats. Vänligen invänta ett svar.",
     "requestItem": "Begär {itemType}",
     "requestMessage": "Meddelande till begäran",
-    "selectGiftType": "Välj typ av gåva",
+    "selectGiftType": "Välj presenttyp",
     "selectGiftTypeMessage": "Vilken typ av present vill du skapa?",
     "requestMessageHelper": "Skriv ett artigt meddelande och förklara varför du vill ta emot denna gåva.",
     "requestMessagePlaceholder": "Till exempel: Hej! Jag är ett stort fan av ditt spel och skulle vilja ha en autograf till min samling...",
@@ -2279,10 +2485,11 @@
     "allGiftsAdded": "Alla gåvor har lagts till.",
     "allGiftTypesAdded": "Du har redan alla typer av presenter",
     "addGift": "Lägg till en gåva",
+    "selectGiftType": "Välj typ av gåva",
     "deletion": "Borttagning",
     "itemDeleted": "Gåvan borttagen",
     "failedToDeleteItem": "Det gick inte att ta bort gåvan",
-    "noGifts": "Inga presenter ännu",
+    "noGifts": "Inga gåvor",
     "clickPlusToAdd": "Klicka på + för att lägga till",
     "настоящее время": "nutid",
     "Центральный нападающий": "Center framåt",
@@ -2298,33 +2505,7 @@
     "seconds": "sek",
     "times": "en gång",
     "sprint": "100 meter streck",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Skicka present till {playerName}",
-    "selectExistingGift": "Välj befintlig present",
-    "orCreateNew": "Eller skapa ny",
-    "giftName": "Presentnamn",
-    "giftNamePlaceholder": "t.ex. Signerad mössa",
-    "uploadImage": "Ladda upp bild",
-    "send": "Skicka",
-    "selectGift": "Välj present",
-    "fromAdmin": "Administratör",
-    "errorSelectOrCreate": "Välj en present eller skapa en ny",
-    "errorGiftAlreadyExists": "Denna present finns redan för spelare {playerName}.\n\nVälj en annan present eller skapa en ny.",
-    "successGiftSent": "Present skickad till {playerName}!",
-    "errorSendingGift": "Kunde inte skicka present",
-    "deleteGiftConfirm": "Är du säker på att du vill ta bort denna present?",
-    "selectImage": "Välj bild",
-    "errorPermissionDenied": "Du har inte behörighet att ta bort denna present",
-    "errorGiftNotFound": "Present hittades inte",
-    "errorGiftNotDeleted": "Presenten togs inte bort",
-    "noGiftsUploaded": "Inga gåvor uppladdade ännu",
-    "fromStar": "från {starName}",
-    "giftReceived": "Present mottagen!",
-    "giftReceivedFromAdmin": "Du har fått en present från administratören: {giftName}",
-    "giftReceivedFromStar": "Du har fått en present från {starName}: {giftName}",
-    "giftReceivedPush": "🎁 Present mottagen!",
-    "giftReceivedFromAdminPush": "Du har fått en present från administratören: {giftName}",
-    "giftReceivedFromStarPush": "Du har fått en present från {starName}: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarder",
@@ -2442,40 +2623,5 @@
   },
   "logout": "Utgång",
   "logoutConfirm": "Logga ut från din profil",
-  "logoutConfirmMessage": "Är du säker på att du vill logga ut från din profil?",
-  "adminGifts": {
-    "sendGift": "Skicka present",
-    "giftName": "Presentens namn",
-    "selectImage": "Välj bild"
-  },
-  "videoNotification": {
-    "added": "lade till",
-    "oneVideo": "ny video",
-    "multipleVideos": "{count} nya videor",
-    "video": "video",
-    "videos": "videor"
-  },
-  "achievementNotification": {
-    "added": "lade till",
-    "received": "fick",
-    "oneAchievement": "ny prestation",
-    "multipleAchievements": "{count} nya prestationer",
-    "achievement": "prestation",
-    "achievements": "prestationer",
-    "title": "🏆 Prestation!",
-    "message": "Grattis! Du fick prestationen: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "ändrade sin avatar"
-  },
-  "statsNotification": {
-    "updated": "uppdaterade",
-    "stats": "statistik",
-    "normatives": "normer",
-    "physicalData": "fysiska data"
-  },
-  "height": "längd",
-  "weight": "vikt",
-  "cm": "cm",
-  "kg": "kg"
+  "logoutConfirmMessage": "Är du säker på att du vill logga ut från din profil?"
 }

@@ -31,14 +31,14 @@ async function sendWithResend(email: string, code: string, subject: string) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
           <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #fa2f40; margin: 0;">🏒 HockeyStars</h1>
+              <h1 style="color: #FF4444; margin: 0;">🏒 HockeyStars</h1>
             </div>
             
             <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Код подтверждения</h2>
             
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
               <p style="color: #666; margin: 0 0 10px 0; font-size: 16px;">Ваш код подтверждения:</p>
-              <h1 style="color: #fa2f40; font-size: 36px; font-weight: bold; margin: 0; letter-spacing: 5px;">${code}</h1>
+              <h1 style="color: #FF4444; font-size: 36px; font-weight: bold; margin: 0; letter-spacing: 5px;">${code}</h1>
             </div>
             
             <p style="color: #666; text-align: center; margin: 20px 0;">

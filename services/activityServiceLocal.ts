@@ -50,6 +50,7 @@ export async function addActivityPoints(
     const activity = ACTIVITY_TYPES[activityType];
     const description = customDescription || activity.description;
 
+    console.log(`🎯 Локальное начисление очков: ${activity.description} (+${activity.points}) для пользователя ${userId}`);
 
     // Получаем текущие очки
     const currentPoints = localActivityPoints.get(userId) || 0;

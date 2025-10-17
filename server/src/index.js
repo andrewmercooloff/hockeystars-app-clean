@@ -15,7 +15,6 @@ const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const friendRoutes = require('./routes/friends');
 const uploadRoutes = require('./routes/upload');
-const pushNotificationRoutes = require('./routes/pushNotifications');
 
 const auth = require('./middleware/auth');
 const setupSocketHandlers = require('./socket/handlers');
@@ -65,7 +64,6 @@ app.use('/api/messages', auth, messageRoutes);
 app.use('/api/notifications', auth, notificationRoutes);
 app.use('/api/friends', auth, friendRoutes);
 app.use('/api/upload', auth, uploadRoutes);
-app.use('/api/push-notifications', auth, pushNotificationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

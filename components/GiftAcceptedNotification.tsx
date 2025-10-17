@@ -118,13 +118,12 @@ const styles = StyleSheet.create({
   },
   playerName: {
     fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
     color: '#FFF',
     marginBottom: 2,
   },
   time: {
     fontSize: 11,
-    fontFamily: 'Gilroy-Regular',
     color: 'rgba(255, 255, 255, 0.5)',
   },
   requestItem: {
@@ -143,7 +142,6 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
     marginBottom: 4,
   },
   buttonsContainer: {
@@ -158,12 +156,12 @@ const styles = StyleSheet.create({
     minWidth: 70,
   },
   acknowledgeButton: {
-    backgroundColor: '#fa2f40', // Red like other action buttons
+    backgroundColor: '#FF4444', // Red like other action buttons
   },
   acknowledgeButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
+    fontWeight: 'bold',
   },
 });
 

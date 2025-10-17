@@ -1,7 +1,7 @@
 {
   "common": {
     "save": "Speichern",
-    "cancel": "Abbrechen",
+    "cancel": "Stornieren",
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "add": "Hinzufügen",
@@ -9,9 +9,9 @@
     "back": "Zurück",
     "next": "Nächste",
     "done": "Bereit",
-    "loading": "Lädt...",
+    "loading": "Laden...",
     "error": "Fehler",
-    "success": "Erfolg",
+    "success": "Erfolgreich",
     "yes": "Ja",
     "no": "NEIN",
     "ok": "OK",
@@ -23,9 +23,7 @@
     "deleteAchievementConfirm": "Möchten Sie diesen Erfolg wirklich entfernen?",
     "deleteAllNotificationsConfirm": "Möchten Sie wirklich alle Benachrichtigungen löschen?",
     "rejectRequestConfirm": "Möchten Sie diese Anfrage wirklich ablehnen?",
-    "super": "Super!",
-    "retry": "Wiederholen",
-    "goalie": "Torwart"
+    "super": "Super!"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -65,8 +63,7 @@
     "title": "Ein Geschenk von einem Star",
     "message": "{playerName} hat {giftName} von {starName} erhalten",
     "received": "erhalten",
-    "from": "aus",
-    "gift": "Geschenk"
+    "from": "aus"
   },
   "addPhoto": "Foto hinzufügen",
   "selectPhotoSource": "Wählen Sie die Fotoquelle",
@@ -142,7 +139,6 @@
     "subtitle": "Wähle ein Training",
     "searchPlaceholder": "Suche nach Nummer oder Name...",
     "loadingExercise": "Übung wird geladen …",
-    "loadingExercises": "Übungen werden geladen...",
     "exercise": "Übung",
     "alreadyCompleted": "Die Übung ist bereits abgeschlossen",
     "canRetryIn": "Sie können diese Übung in {hours} Stunden wiederholen",
@@ -820,594 +816,816 @@
       },
       "27": {
         "title": "Nackenaufwärmübungen",
+        "description": "Sanfte Kopfdrehungen, Vorwärts- und Rückwärtsneigungen, kreisende Bewegungen. 2–3 Minuten.",
+        "benefits": [
+          "Bereitet die Muskeln auf das Training vor",
+          "Verbessert die Durchblutung",
+          "Reduziert das Verletzungsrisiko",
+          "Erhöht die Trainingseffizienz"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Drehen Sie Ihren Kopf langsam nach links und rechts",
-          "Neigen Sie Ihren Kopf nach vorne und hinten",
-          "Führen Sie kreisende Bewegungen mit dem Kopf aus",
-          "Halten Sie Ihre Schultern entspannt"
+          "Beginnen Sie langsam und steigern Sie die Intensität allmählich",
+          "Führen Sie Bewegungen fließend und kontrolliert aus",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Atmen Sie gleichmäßig während der Ausführung"
         ],
         "tips": [
-          "Bewegen Sie sich langsam und gleichmäßig",
-          "Machen Sie keine plötzlichen Bewegungen",
+          "Nehmen Sie sich Zeit – Qualität ist wichtiger als Geschwindigkeit",
           "Wenn Schmerzen auftreten, hören Sie auf.",
-          "Atme tief und gleichmäßig"
+          "Wärmen Sie sich vor jedem Training auf.",
+          "Nehmen Sie sich für jede Bewegung ausreichend Zeit."
         ]
       },
       "28": {
         "title": "Aufwärmen der Handgelenke",
+        "description": "Kreisförmige Bewegungen mit den Händen, dabei die Finger beugen und strecken. 2–3 Minuten für jede Hand.",
+        "benefits": [
+          "Bereitet die Muskeln auf das Training vor",
+          "Verbessert die Durchblutung",
+          "Reduziert das Verletzungsrisiko",
+          "Erhöht die Trainingseffizienz"
+        ],
         "instructions": [
-          "Strecken Sie Ihre Arme vor sich aus",
-          "Beugen Sie Ihre Handgelenke nach oben und unten",
-          "Drehen Sie Ihre Handgelenke im Kreis",
-          "Ballen und öffnen Sie Ihre Fäuste",
-          "Strecken Sie Ihre Finger zu den Seiten"
+          "Beginnen Sie langsam und steigern Sie die Intensität allmählich",
+          "Führen Sie Bewegungen fließend und kontrolliert aus",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Atmen Sie gleichmäßig während der Ausführung"
         ],
         "tips": [
-          "Führen Sie die Bewegungen langsam aus",
-          "Überanstrengen Sie Ihre Gelenke nicht",
-          "Achten Sie auf die Empfindungen in Ihren Handgelenken",
-          "Regelmäßig wiederholen"
+          "Nehmen Sie sich Zeit – Qualität ist wichtiger als Geschwindigkeit",
+          "Wenn Schmerzen auftreten, hören Sie auf.",
+          "Wärmen Sie sich vor jedem Training auf.",
+          "Nehmen Sie sich für jede Bewegung ausreichend Zeit."
         ]
       },
       "29": {
         "title": "Kniedehnungen",
+        "description": "Halbe Kniebeugen, Kniekreise, leichtes Springen auf der Stelle. 3–4 Minuten.",
+        "benefits": [
+          "Bereitet die Muskeln auf das Training vor",
+          "Verbessert die Durchblutung",
+          "Reduziert das Verletzungsrisiko",
+          "Erhöht die Trainingseffizienz"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Beugen und strecken Sie langsam Ihre Knie",
-          "Führen Sie kreisende Bewegungen mit den Knien aus",
-          "Machen Sie Kniebeugen mit kleiner Amplitude",
-          "Dehnen Sie die Vorderseite Ihres Oberschenkels"
+          "Beginnen Sie langsam und steigern Sie die Intensität allmählich",
+          "Führen Sie Bewegungen fließend und kontrolliert aus",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Atmen Sie gleichmäßig während der Ausführung"
         ],
         "tips": [
-          "Machen Sie keine tiefen Kniebeugen",
-          "Bewegen Sie sich reibungslos und kontrolliert",
-          "Wenn Sie Knieschmerzen haben, reduzieren Sie den Bewegungsumfang.",
-          "Stellen Sie sicher, dass Sie die richtige Technik verwenden"
+          "Nehmen Sie sich Zeit – Qualität ist wichtiger als Geschwindigkeit",
+          "Wenn Schmerzen auftreten, hören Sie auf.",
+          "Wärmen Sie sich vor jedem Training auf.",
+          "Nehmen Sie sich für jede Bewegung ausreichend Zeit."
         ]
       },
       "30": {
         "title": "Aufwärmen der Hüfte",
+        "description": "Hüftkreisen, Beinschwünge zur Seite, leichte Ausfallschritte. 4–5 Minuten.",
+        "benefits": [
+          "Bereitet die Muskeln auf das Training vor",
+          "Verbessert die Durchblutung",
+          "Reduziert das Verletzungsrisiko",
+          "Erhöht die Trainingseffizienz"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Heben Sie Ihr Knie zur Brust",
-          "Bewegen Sie Ihr Bein zur Seite und nach hinten",
-          "Führen Sie kreisende Bewegungen mit Ihren Hüften aus",
-          "Machen Sie Ausfallschritte mit kleiner Amplitude"
+          "Beginnen Sie langsam und steigern Sie die Intensität allmählich",
+          "Führen Sie Bewegungen fließend und kontrolliert aus",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Atmen Sie gleichmäßig während der Ausführung"
         ],
         "tips": [
-          "Halten Sie Ihren Rücken gerade",
-          "Arbeiten Sie in einem angenehmen Bereich",
-          "Überstürzen Sie Ihre Bewegungen nicht",
-          "Behalten Sie den Überblick über Ihr Guthaben"
+          "Nehmen Sie sich Zeit – Qualität ist wichtiger als Geschwindigkeit",
+          "Wenn Schmerzen auftreten, hören Sie auf.",
+          "Wärmen Sie sich vor jedem Training auf.",
+          "Nehmen Sie sich für jede Bewegung ausreichend Zeit."
         ]
       },
       "31": {
         "title": "Leistendehnung",
+        "description": "Schmetterling – Setzen Sie sich auf den Boden, bringen Sie Ihre Füße zusammen und beugen Sie sich nach vorne. Halten Sie die Position 30–45 Sekunden lang.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Setzen Sie sich mit angewinkelten Knien auf den Boden.",
-          "Legen Sie die Fußsohlen zusammen",
-          "Lehnen Sie sich sanft nach vorne",
-          "Ziehe deine Knie Richtung Boden",
-          "Halten Sie die Dehnung 30 Sekunden lang"
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
-          "Erzwingen Sie die Dehnung nicht",
-          "Atmen Sie tief durch und entspannen Sie sich.",
-          "Wenn Schmerzen auftreten, reduzieren Sie die Amplitude.",
-          "Nach dem Aufwärmen durchführen"
+          "Atmen Sie beim Dehnen tief durch.",
+          "Machen Sie keine plötzlichen Bewegungen",
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "32": {
         "title": "Dehnung der Oberschenkelrückseite",
+        "description": "Vorwärtsbeugen mit gestreckten Beinen, 30 Sekunden halten. 3 Sätze à 15 Sekunden.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Setzen Sie sich mit nach vorne gestreckten Beinen auf den Boden.",
-          "Beugen Sie sich nach vorne und versuchen Sie, Ihre Füße zu erreichen",
-          "Umklammern Sie Ihre Füße mit den Händen",
-          "Ziehen Sie Ihre Brust in Richtung Ihrer Knie",
-          "Halten Sie die Dehnung für 30–45 Sekunden"
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
-          "Machen Sie keinen runden Rücken",
-          "Arbeiten Sie in einem angenehmen Bereich",
-          "Tief durchatmen",
-          "Achten Sie auf die Empfindungen an der Rückseite Ihres Oberschenkels"
+          "Atmen Sie beim Dehnen tief durch.",
+          "Machen Sie keine plötzlichen Bewegungen",
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "33": {
         "title": "Dehnung der Wadenmuskulatur",
+        "description": "Ausfallschritte gegen eine Wand, Dehnung der Oberschenkelmuskulatur. 20 Sekunden pro Bein.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Stellen Sie sich mit dem Gesicht zur Wand",
-          "Stellen Sie einen Fuß nach vorne und den anderen nach hinten.",
-          "Senken Sie die Ferse Ihres hinteren Fußes auf den Boden",
-          "Beugen Sie sich nach vorne und dehnen Sie Ihre Waden",
-          "Wechseln Sie die Beine und wiederholen Sie den Vorgang"
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
-          "Halten Sie Ihr hinteres Bein gerade",
-          "Heben Sie Ihre Ferse nicht vom Boden ab",
-          "Sanft dehnen",
-          "Für beide Beine durchführen"
+          "Atmen Sie beim Dehnen tief durch.",
+          "Machen Sie keine plötzlichen Bewegungen",
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "34": {
         "title": "Dehnung der Brustmuskulatur",
+        "description": "Wanddehnung mit Armstreckung. 30 Sekunden halten, 3 Sätze.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Stehen Sie im Türrahmen",
-          "Legen Sie Ihre Hände auf die Türrahmen",
-          "Machen Sie einen Schritt nach vorne",
-          "Spüren Sie die Dehnung in Ihrer Brust",
-          "Halten Sie die Dehnung 30 Sekunden lang"
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
-          "Überanstrengen Sie Ihre Schultern nicht",
-          "Tief durchatmen",
-          "Dehnen Sie sich allmählich",
-          "Folgen Sie Ihren Empfindungen"
+          "Atmen Sie beim Dehnen tief durch.",
+          "Machen Sie keine plötzlichen Bewegungen",
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "35": {
         "title": "Trizeps-Dehnung",
+        "description": "Legen Sie Ihre Hände hinter Ihren Kopf, um die Rückseite Ihrer Schulter zu dehnen. 20 Sekunden für jeden Arm.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Heben Sie eine Hand hoch",
-          "Beugen Sie Ihren Arm am Ellbogen hinter Ihrem Kopf",
-          "Ziehen Sie mit der anderen Hand Ihren Ellbogen nach unten",
-          "Spüren Sie die Dehnung in Ihrem Trizeps",
-          "Wechseln Sie den Besitzer und wiederholen Sie den Vorgang"
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
+          "Atmen Sie beim Dehnen tief durch.",
           "Machen Sie keine plötzlichen Bewegungen",
-          "Sanft dehnen",
-          "Atme gleichmäßig",
-          "Mit beiden Händen ausführen"
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "36": {
         "title": "Schlange zwischen Zapfen",
+        "description": "Laufen Sie in einer schlangenartigen Bewegung zwischen den in einer Linie angeordneten Kegeln. 5 Durchgänge mit maximaler Geschwindigkeit.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Platzieren Sie die Kegel in einem schlangenartigen Muster in einem Abstand von 2-3 Metern",
-          "Beginnen Sie, um jeden Kegel herumzulaufen",
-          "Halten Sie Ihren Schwerpunkt niedrig",
-          "Trainieren Sie Ihre Beine schnell und oft",
-          "Achten Sie auf die richtige Drehtechnik."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Beginnen Sie langsam",
-          "Konzentrieren Sie sich auf die Technik, nicht auf die Geschwindigkeit.",
-          "Kopf hoch",
-          "Verwenden Sie kurze, schnelle Schritte"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "37": {
         "title": "Schnelle Fußberührungen",
+        "description": "Berühren Sie die Kegel schnell und in zufälliger Reihenfolge mit Ihren Füßen. 3 Sätze à 45 Sekunden.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stehen Sie neben dem Ball",
-          "Berühre den Ball schnell mit deinem Fuß",
-          "Wechseln Sie alle 2-3 Berührungen das Bein",
-          "Halten Sie einen konstanten Rhythmus ein",
-          "30–60 Sekunden lang ausführen"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihr Körpergewicht auf Ihrem Standbein",
-          "Arbeiten Sie zügig, aber kontrolliert",
-          "Verlieren Sie nicht das Gleichgewicht",
-          "Achten Sie auf Ihre Berührungstechnik"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "38": {
         "title": "Sprünge mit Drehungen",
+        "description": "Sprünge auf der Stelle mit 90-180-Grad-Drehungen. 3 Sätze mit je 20 Sprüngen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Mach einen Sprung nach oben",
-          "Drehen Sie sich beim Springen um 180 Grad",
-          "Landen Sie sanft auf beiden Füßen.",
-          "Sofort umkehren und wiederholen"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Lande mit gebeugten Beinen",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Beginnen Sie mit kleinen Kurven",
-          "Achten Sie auf Ihre Landetechnik"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "39": {
         "title": "Schnelle Pässe",
+        "description": "Einen Tennisball mit maximaler Geschwindigkeit zwischen den Händen hin- und herspielen. 3 Sätze à 1 Minute.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stellen Sie sich mit dem Gesicht zur Wand in einem Abstand von 2-3 Metern",
-          "Passen Sie den Ball schnell zur Wand",
-          "Fangen Sie den Rebound und geben Sie ihn sofort zurück",
-          "Mit beiden Händen arbeiten",
-          "30–45 Sekunden lang ausführen"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Verwenden Sie die richtige Passtechnik",
-          "Behalten Sie den Ball im Auge",
-          "Arbeiten Sie schnell, aber genau",
-          "Halten Sie Ihre Hände entspannt"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "40": {
         "title": "Rückwärtslaufen",
+        "description": "Rückwärtslaufen mit schnellen Drehungen auf Kommando. 5 Sätze à 30 Sekunden.",
+        "benefits": [
+          "Verbessert die kardiovaskuläre Ausdauer",
+          "Entwickelt aerobe Ausdauer",
+          "Verbrennt effektiv Kalorien",
+          "Stärkt den Herzmuskel"
+        ],
         "instructions": [
-          "Beginnen Sie, indem Sie langsam rückwärts laufen.",
-          "Schauen Sie oft über Ihre Schulter",
-          "Halten Sie Ihren Schwerpunkt niedrig",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Schließe 20–30 Meter ab"
+          "Beginnen Sie mit einem leichten Aufwärmen von 5-10 Minuten",
+          "Halten Sie Ihre Zielherzfrequenz aufrecht",
+          "Achte auf deine Atmung – atme tief durch",
+          "Beenden Sie das Training mit einem Cool-down und Dehnen."
         ],
         "tips": [
-          "Beginnen Sie ganz langsam",
-          "Überprüfen Sie immer den Raum hinter Ihnen",
-          "Halten Sie Ihre Knie leicht gebeugt",
-          "Erhöhen Sie die Geschwindigkeit nicht überstürzt"
+          "Erhöhen Sie die Dauer schrittweise",
+          "Trinken Sie während des Trainings Wasser.",
+          "3-4 Mal pro Woche durchführen",
+          "Hören Sie auf Ihren Körper"
         ]
       },
       "41": {
         "title": "Kniebeugen mit Gewichten",
+        "description": "Kniebeugen mit Kurzhanteln oder Langhantel, Oberschenkel parallel zum Boden. 4 Sätze mit 12–15 Wiederholungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Nehmen Sie Hanteln oder eine Langhantel",
-          "Gehen Sie in die Hocke, bis Ihre Zehen parallel zum Boden sind.",
-          "Stehen Sie mit der Kraft Ihrer Beine auf",
-          "Führen Sie 3-4 Sätze mit 8-12 Wiederholungen durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihren Rücken gerade",
-          "Machen Sie keinen Rundumblick im unteren Rücken",
-          "Ihre Knie sollten nicht über Ihre Zehen hinausragen.",
-          "Beginnen Sie mit leichten Gewichten"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "42": {
         "title": "Kreuzheben",
+        "description": "Heben Sie die Langhantel mit geradem Rücken vom Boden auf Hüfthöhe. 3 Sätze mit 8–10 Wiederholungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stehen Sie gerade mit schulterbreit auseinander stehenden Füßen",
-          "Heben Sie die Langhantel mit einem Oberhandgriff vom Boden.",
-          "Beugen Sie die Knie und bewegen Sie das Becken nach hinten",
-          "Heben Sie die Langhantel an, indem Sie Ihre Beine und Ihren Rücken strecken.",
-          "Bringen Sie die Stange kontrolliert wieder auf den Boden."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihren Rücken während der gesamten Bewegung gerade.",
-          "Machen Sie keinen Rundumblick im unteren Rücken",
-          "Bewegen Sie die Stange nah an Ihren Körper",
-          "Beginnen Sie mit leichten Gewichten"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "43": {
         "title": "Bankdrücken",
+        "description": "Bankdrücken mit einer Langhantel. 4 Sätze mit 8–12 Wiederholungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Legen Sie sich mit den Füßen auf dem Boden auf die Bank.",
-          "Nehmen Sie die Langhantel mit weitem Griff",
-          "Senken Sie die Stange kontrolliert auf Ihre Brust.",
-          "Drücken Sie die Langhantel nach oben",
-          "Führen Sie 3-4 Sätze mit 6-10 Wiederholungen durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihre Schulterblätter zusammengezogen",
-          "Halten Sie Ihre Füße auf dem Boden",
-          "Richtig atmen: Mit Anstrengung ausatmen",
-          "Nutzen Sie die Versicherung"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "44": {
         "title": "Klimmzüge",
+        "description": "Klimmzüge. 3 Sätze mit 8–12 Wiederholungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Hängen Sie mit einem Oberhandgriff an der Stange",
-          "Ziehen Sie sich hoch, bis Ihr Kinn über der Stange ist.",
-          "Senken Sie sich zurück in die Ausgangsposition",
-          "Halten Sie Ihren Rumpf angespannt",
-          "Führen Sie 3-4 Sätze mit maximalen Wiederholungen durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Nicht schwingen",
-          "Ziehen Sie sanft und kontrolliert nach oben",
-          "Strecken Sie Ihre Arme unten vollständig",
-          "Nehmen Sie bei Bedarf Hilfe in Anspruch"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "45": {
         "title": "Dips am Barren",
+        "description": "Dips am Barren, Absenken bis zu einem 90-Grad-Winkel. 3 Sätze mit 10–15 Wiederholungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stehen Sie zwischen den Gitterstäben",
-          "Springen Sie hoch und haken Sie sich an den Stangen ein",
-          "Senken Sie sich ab und beugen Sie dabei die Ellbogen.",
-          "Drücken Sie sich nach oben und strecken Sie Ihre Arme",
-          "Führen Sie 3-4 Sätze mit 5-15 Wiederholungen durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihren Körper gerade",
-          "Nicht schwingen",
-          "Abstieg auf eine angenehme Tiefe",
-          "Benutzen Sie bei Bedarf Ihre Beine."
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "46": {
         "title": "Einbeinstand",
+        "description": "Halten Sie das Gleichgewicht auf einem Bein mit geschlossenen Augen. 3 Sätze à 30 Sekunden auf jedem Bein.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Auf einem Bein stehen",
-          "Heben Sie Ihr anderes Bein vor sich an",
-          "Halten Sie Ihr Gleichgewicht so lange wie möglich",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Wechseln Sie die Beine und wiederholen Sie den Vorgang"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Schau nach vorne, nicht nach unten",
-          "Halten Sie Ihren Rumpf angespannt",
-          "Beginnen Sie mit kurzen Sätzen",
-          "Erhöhen Sie die Zeit schrittweise"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "47": {
         "title": "Einbeinige Planke",
+        "description": "Plank Hold mit einem Beinheben. 3 Sätze à 30 Sekunden auf jedem Bein.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Gehen Sie in die Plank-Position",
-          "Heben Sie ein Bein hoch",
-          "Halten Sie Ihr Bein gerade",
-          "Halten Sie die Position für 30-60 Sekunden",
-          "Wechseln Sie die Beine und wiederholen Sie den Vorgang"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihren Körper gerade",
-          "Nicht von einer Seite zur anderen schaukeln",
-          "Atme gleichmäßig",
-          "Beginnen Sie mit kurzen Sätzen"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "48": {
         "title": "Einbeinige Kniebeugen",
+        "description": "Kniebeugen auf einem Bein, das andere Bein nach vorne gestreckt. 3 Sätze mit 8–10 Wiederholungen auf jedem Bein.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Auf einem Bein stehen",
-          "Strecken Sie Ihr anderes Bein nach vorne",
-          "Kniebeuge auf dem Standbein",
-          "Zurück in die Ausgangsposition",
-          "Führen Sie 3–4 Sätze mit 5–10 Wiederholungen pro Bein durch."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Halten Sie Ihren Rücken gerade",
-          "Berühren Sie mit dem anderen Fuß nicht den Boden.",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Beginnen Sie mit einer kleinen Amplitude"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "49": {
         "title": "Bosu-Ball-Übungen",
+        "description": "Gleichgewichtsübungen auf instabilem Untergrund. 15–20 Minuten mit verschiedenen Bewegungen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stellen Sie sich auf die Halbkugel des Bosu-Balls",
-          "Halten Sie Ihr Gleichgewicht",
-          "Mache Kniebeugen",
-          "Machen Sie Körperdrehungen",
-          "Führen Sie 3-4 Sätze mit 10-15 Wiederholungen durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Beginnen Sie mit einfachen Übungen",
-          "Achte auf deine Technik",
-          "Nehmen Sie sich Zeit",
-          "Nutzen Sie die Hilfe zur Unterstützung"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "50": {
         "title": "Yoga Balance",
+        "description": "Baumstellung, Krieger III und Adlerstellung für das Gleichgewicht. Halten Sie jede Stellung 30–60 Sekunden lang.",
+        "benefits": [
+          "Entwickelt die Bewegungskoordination",
+          "Verbessert das Gleichgewicht und die Balance",
+          "Erhöht die Beweglichkeit",
+          "Entwickelt neuromuskuläre Verbindung"
+        ],
         "instructions": [
-          "Stehen Sie aufrecht und stellen Sie die Füße zusammen.",
-          "Heben Sie ein Bein an und legen Sie es auf den Oberschenkel des anderen.",
-          "Legen Sie Ihre Hände vor Ihre Brust",
-          "Halten Sie Ihr Gleichgewicht",
-          "Führen Sie die Übung für beide Beine 30–60 Sekunden lang durch"
+          "Beginnen Sie langsam",
+          "Fokus auf Bewegungspräzision",
+          "Erhöhen Sie die Geschwindigkeit schrittweise",
+          "Wiederholen Sie den Vorgang, bis es automatisch abläuft."
         ],
         "tips": [
-          "Schauen Sie an einem Punkt nach vorne",
-          "Atme tief und gleichmäßig",
-          "Nehmen Sie sich Zeit",
-          "Wenn Sie das Gleichgewicht verlieren, beginnen Sie von vorne."
+          "Übe regelmäßig",
+          "Nehmen Sie sich Zeit – Präzision ist wichtiger als Geschwindigkeit",
+          "Verwenden Sie visuelle Hinweise",
+          "Trainieren Sie unter verschiedenen Bedingungen"
         ]
       },
       "51": {
         "title": "Auf einem Baumstamm laufen",
+        "description": "Gehen auf einem schmalen Baumstamm oder Brett, um das Gleichgewicht zu trainieren. 5 Durchgänge hin und her.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Suchen Sie einen stabilen Baumstamm oder ein Brett",
-          "Stehen Sie auf dem Baumstamm",
-          "Gehen Sie langsam vorwärts",
-          "Halten Sie Ihr Gleichgewicht",
-          "Führen Sie mehrere Durchgänge durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Beginnen Sie mit einem breiten Stamm",
-          "Schau nach vorne, nicht nach unten",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Nehmen Sie sich Zeit"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "52": {
         "title": "Handstand gegen die Wand",
+        "description": "Handstände an einer Wand zur Entwicklung des Oberkörpergleichgewichts. 3 Sätze à 20 Sekunden.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Stellen Sie sich mit dem Gesicht zur Wand",
-          "Legen Sie Ihre Hände 30 cm von der Wand entfernt auf den Boden",
-          "Hebe deine Beine an die Wand",
-          "Halten Sie einen Handstand",
-          "Senken Sie Ihre Beine kontrolliert ab"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Beginnen Sie mit kurzen Sätzen",
-          "Hilfe zur Versicherung nutzen",
-          "Halten Sie Ihren Rumpf angespannt",
-          "Überanstrengen Sie sich nicht"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "53": {
         "title": "Fahrtspiel",
+        "description": "Laufen mit unterschiedlicher Intensität: 2 Minuten schnelles Laufen, 1 Minute langsames Laufen. 30 Minuten Gesamtarbeit.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Beginnen Sie mit einem langsamen Joggen für 5-10 Minuten",
-          "Erhöhen Sie die Geschwindigkeit für 2–3 Minuten auf 80 % des Maximums",
-          "Kehren Sie für 1-2 Minuten zu einem langsamen Joggen zurück",
-          "Wiederholen Sie den Zyklus 4-6 Mal",
-          "Beenden Sie die Übung mit einem langsamen Lauf für 5–10 Minuten."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Hören Sie auf Ihren Körper",
-          "Überschreiten Sie nicht 80 % der Höchstgeschwindigkeit",
-          "Tief durchatmen",
-          "Trinken Sie während des Trainings Wasser."
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "54": {
         "title": "Wiederholte Sprints",
+        "description": "100-Meter-Sprints mit 2–3 Minuten Pause. 6–8 Wiederholungen zum Aufbau der Schnelligkeitsausdauer.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Machen Sie ein 10-minütiges Aufwärmtraining",
-          "Laufen Sie 30 Sekunden lang einen Sprint mit maximaler Geschwindigkeit",
-          "2-3 Minuten ruhen lassen",
-          "Wiederholen Sie den Sprint",
-          "Führen Sie 6-8 Sprints durch"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Sparen Sie nicht beim Aufwärmen",
-          "Machen Sie zwischen den Sprints eine vollständige Pause",
-          "Achte auf deine Lauftechnik",
-          "Trainieren Sie nicht täglich"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "55": {
         "title": "Intervalle auf dem Fahrrad",
+        "description": "30 Sekunden maximale Anstrengung, 90 Sekunden Erholung. 20 Zyklen zum Aufbau der Geschwindigkeitsausdauer.",
+        "benefits": [
+          "Verbessert die kardiovaskuläre Ausdauer",
+          "Entwickelt aerobe Ausdauer",
+          "Verbrennt effektiv Kalorien",
+          "Stärkt den Herzmuskel"
+        ],
         "instructions": [
-          "Beginnen Sie mit einem 5-minütigen Aufwärmen",
-          "Erhöhen Sie die Last auf 80 % des Maximums",
-          "Treten Sie 2–3 Minuten lang mit hoher Intensität in die Pedale",
-          "Reduzieren Sie die Belastung für 1-2 Minuten auf 50 %",
-          "Wiederholen Sie den Zyklus 6-8 Mal"
+          "Beginnen Sie mit einem leichten Aufwärmen von 5-10 Minuten",
+          "Halten Sie Ihre Zielherzfrequenz aufrecht",
+          "Achte auf deine Atmung – atme tief durch",
+          "Beenden Sie das Training mit einem Cool-down und Dehnen."
         ],
         "tips": [
-          "Behalten Sie eine hohe Trittfrequenz bei",
-          "Tief durchatmen",
-          "Behalten Sie Ihren Puls im Auge",
-          "Trinken Sie regelmäßig Wasser"
+          "Erhöhen Sie die Dauer schrittweise",
+          "Trinken Sie während des Trainings Wasser.",
+          "3-4 Mal pro Woche durchführen",
+          "Hören Sie auf Ihren Körper"
         ]
       },
       "56": {
         "title": "Berglauf",
+        "description": "Laufen Sie so schnell Sie können den Hügel hinauf und joggen Sie dann hinunter. 8–10 Anstiege.",
+        "benefits": [
+          "Verbessert die kardiovaskuläre Ausdauer",
+          "Entwickelt aerobe Ausdauer",
+          "Verbrennt effektiv Kalorien",
+          "Stärkt den Herzmuskel"
+        ],
         "instructions": [
-          "Suchen Sie einen Hügel mit einer Steigung von 5-10 %",
-          "Machen Sie ein 10-minütiges Aufwärmtraining",
-          "Laufen Sie mit mäßiger Geschwindigkeit den Hügel hinauf",
-          "Gehen Sie nach unten, um sich zu erholen",
-          "Wiederholen Sie 6-10 Hebungen"
+          "Beginnen Sie mit einem leichten Aufwärmen von 5-10 Minuten",
+          "Halten Sie Ihre Zielherzfrequenz aufrecht",
+          "Achte auf deine Atmung – atme tief durch",
+          "Beenden Sie das Training mit einem Cool-down und Dehnen."
         ],
         "tips": [
-          "Beginnen Sie mit einer leichten Steigung",
-          "Halten Sie beim Heben Ihren Rücken gerade.",
-          "Aktiv mit den Händen arbeiten",
-          "Nehmen Sie sich Zeit für den Abstieg"
+          "Erhöhen Sie die Dauer schrittweise",
+          "Trinken Sie während des Trainings Wasser.",
+          "3-4 Mal pro Woche durchführen",
+          "Hören Sie auf Ihren Körper"
         ]
       },
       "57": {
         "title": "Plyometrische Kreise",
+        "description": "Ein Zirkel mit 5–6 plyometrischen Übungen ohne Pause. 4–5 Zirkel mit 2 Minuten Pause dazwischen.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Machen Sie ein 10-minütiges Aufwärmtraining",
-          "Machen Sie weite Sprünge aus dem Stand",
-          "Führen Sie Sprünge über Hindernisse aus",
-          "Machen Sie Boxsprünge",
-          "Machen Sie 2–3 Minuten Pause und wiederholen Sie den Kreislauf."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Achten Sie auf Ihre Landetechnik",
-          "Lande mit gebeugten Beinen",
-          "Verwenden Sie Ihre Arme zum Balancieren",
-          "Übertreiben Sie es nicht mit der Menge"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "58": {
         "title": "Leichtes Dehnen",
+        "description": "Sanftes Dehnen aller großen Muskelgruppen nach dem Training. 15–20 Minuten zur Beschleunigung der Regeneration.",
+        "benefits": [
+          "Verbessert Flexibilität und Mobilität",
+          "Löst Muskelverspannungen",
+          "Beugt Verletzungen vor",
+          "Verbessert die Erholung nach dem Training"
+        ],
         "instructions": [
-          "Beginnen Sie mit leichten Bewegungen",
-          "Dehnen Sie Ihre großen Muskelgruppen",
-          "Atme tief und gleichmäßig",
-          "Bewegen Sie sich sanft und langsam",
-          "Beenden Sie die Übung mit einer tiefen Atmung."
+          "Aufwärmen vor dem Dehnen",
+          "Dehnen Sie sich langsam und gleichmäßig",
+          "Halten Sie die Position für 20-30 Sekunden",
+          "Vermeiden Sie stechende Schmerzen"
         ],
         "tips": [
-          "Dehnen Sie sich nicht bis zum Schmerz.",
-          "Tief durchatmen",
-          "Entspannen Sie sich vollkommen",
-          "Mach es regelmäßig"
+          "Atmen Sie beim Dehnen tief durch.",
+          "Machen Sie keine plötzlichen Bewegungen",
+          "Für beste Ergebnisse tun Sie dies täglich.",
+          "Dehnen Sie sich nach dem Training"
         ]
       },
       "59": {
         "title": "Schaumstoffrollen",
+        "description": "Muskelmassage mit einer Schaumstoffrolle zur Lösung von Verspannungen. 10–15 Minuten pro großer Muskelgruppe.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Legen Sie sich auf die Schaumstoffrolle",
-          "Rollen Sie die Rolle langsam unter Ihren Muskeln.",
-          "Konzentrieren Sie sich auf die Schmerzpunkte",
-          "Halten Sie den Druck 30-60 Sekunden lang",
-          "Wiederholen Sie dies für alle Muskelgruppen."
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Rollen Sie nicht auf Ihren Gelenken",
-          "Tief durchatmen",
-          "Keine starken Schmerzen ertragen",
-          "Beginnen Sie mit einer weichen Rolle"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "60": {
         "title": "Leichtes Joggen",
+        "description": "Joggen mit geringer Intensität zur aktiven Erholung. 15–20 Minuten.",
+        "benefits": [
+          "Verbessert die kardiovaskuläre Ausdauer",
+          "Entwickelt aerobe Ausdauer",
+          "Verbrennt effektiv Kalorien",
+          "Stärkt den Herzmuskel"
+        ],
         "instructions": [
-          "Beginnen Sie langsam",
-          "Halten Sie Ihre Herzfrequenz bei 60-70 % Ihres Maximums",
-          "Atme tief und gleichmäßig",
-          "Halten Sie ein konstantes Tempo",
-          "Beenden Sie mit einer allmählichen Verringerung des Tempos"
+          "Beginnen Sie mit einem leichten Aufwärmen von 5-10 Minuten",
+          "Halten Sie Ihre Zielherzfrequenz aufrecht",
+          "Achte auf deine Atmung – atme tief durch",
+          "Beenden Sie das Training mit einem Cool-down und Dehnen."
         ],
         "tips": [
-          "Behalten Sie Ihren Puls im Auge",
-          "Atme durch die Nase",
-          "Überanstrengen Sie sich nicht",
-          "Genießen Sie den Prozess"
+          "Erhöhen Sie die Dauer schrittweise",
+          "Trinken Sie während des Trainings Wasser.",
+          "3-4 Mal pro Woche durchführen",
+          "Hören Sie auf Ihren Körper"
         ]
       },
       "61": {
         "title": "Baden",
+        "description": "Leichtes Schwimmen im Pool zur Muskelentspannung und Erholung. 20–30 Minuten.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Beginnen Sie mit einem Aufwärmen an Land",
-          "Steigen Sie langsam ins Wasser ein",
-          "Schwimmen Sie in einem angenehmen Tempo",
-          "Ändern Sie Ihren Schwimmstil",
-          "Beenden Sie mit einem langsamen Schwimmen"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Schwimmen Sie nicht alleine",
-          "Achte auf deine Technik",
-          "Atme gleichmäßig",
-          "Übertreiben Sie es nicht"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "62": {
         "title": "Erholungsfahrrad",
+        "description": "Leichtes Radfahren in niedrigem Tempo zur aktiven Erholung. 20–25 Minuten.",
+        "benefits": [
+          "Verbessert die kardiovaskuläre Ausdauer",
+          "Entwickelt aerobe Ausdauer",
+          "Verbrennt effektiv Kalorien",
+          "Stärkt den Herzmuskel"
+        ],
         "instructions": [
-          "Beginnen Sie langsam",
-          "Halten Sie Ihre Herzfrequenz bei 50-60 % Ihres Maximums",
-          "Treten Sie leicht und rhythmisch in die Pedale",
-          "Tief durchatmen",
-          "Beenden Sie mit einer allmählichen Verringerung des Tempos"
+          "Beginnen Sie mit einem leichten Aufwärmen von 5-10 Minuten",
+          "Halten Sie Ihre Zielherzfrequenz aufrecht",
+          "Achte auf deine Atmung – atme tief durch",
+          "Beenden Sie das Training mit einem Cool-down und Dehnen."
         ],
         "tips": [
-          "Behalten Sie eine hohe Trittfrequenz bei",
-          "Tief durchatmen",
-          "Überanstrengen Sie sich nicht",
-          "Genieße die Fahrt"
+          "Erhöhen Sie die Dauer schrittweise",
+          "Trinken Sie während des Trainings Wasser.",
+          "3-4 Mal pro Woche durchführen",
+          "Hören Sie auf Ihren Körper"
         ]
       },
       "63": {
         "title": "Erholungs-Yoga",
+        "description": "Sanfte Asanas zur Muskelentspannung und Beschleunigung der Regeneration. 20 Minuten.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Beginnen Sie mit einfachen Posen",
-          "Dehnen Sie sich langsam",
-          "Atme tief und gleichmäßig",
-          "Entspannen Sie sich in jeder Pose",
-          "Beenden Sie mit Meditation"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Erzwingen Sie keine Posen",
-          "Atme durch die Nase",
-          "Hören Sie auf Ihren Körper",
-          "Genießen Sie den Prozess"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       },
       "64": {
@@ -1436,18 +1654,24 @@
       },
       "65": {
         "title": "Kontrastdusche",
+        "description": "Abwechselnd heißes und kaltes Wasser zur Verbesserung der Durchblutung und Erholung. 5–7 Minuten.",
+        "benefits": [
+          "Erhöht die Muskelkraft",
+          "Verbessert die Muskelausdauer",
+          "Entwickelt funktionelle Kraft",
+          "Stärkt den Bewegungsapparat"
+        ],
         "instructions": [
-          "Beginnen Sie mit warmem Wasser",
-          "Schrittweise auf kaltes Wasser umstellen",
-          "Halten Sie kaltes Wasser für 30-60 Sekunden",
-          "Zurück ins warme Wasser",
-          "Wiederholen Sie den Zyklus 3-5 Mal"
+          "Aufwärmen vor dem Training",
+          "Stellen Sie sicher, dass Sie die richtige Technik verwenden",
+          "Kontrollieren Sie Ihre Atmung – atmen Sie mit Anstrengung aus",
+          "Machen Sie zwischen den Sätzen 60–90 Sekunden Pause."
         ],
         "tips": [
-          "Beginnen Sie schrittweise",
-          "Tief durchatmen",
-          "Nicht zu kalt werden",
-          "Hören Sie auf Ihren Körper"
+          "Beginnen Sie mit leichteren Gewichten und steigern Sie diese schrittweise.",
+          "Halten Sie nicht den Atem an",
+          "2-3 mal pro Woche durchführen",
+          "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
       }
     },
@@ -1537,7 +1761,6 @@
   "profile": {
     "addFriend": "Als Freund hinzufügen",
     "addFriendQuestion": "Möchten Sie {name} als Freund hinzufügen?",
-    "sendMessage": "Nachricht senden",
     "loading": "Laden...",
     "basicInfo": "Grundlegende Informationen",
     "physicalData": "Physikalische Daten",
@@ -1614,8 +1837,8 @@
     "Защитник": "Verteidiger",
     "Вратарь": "Torwart",
     "настоящее время": "Gegenwart",
-    "goals": "Tore",
-    "assists": "Vorlagen",
+    "goals": "Ziele",
+    "assists": "Getriebe",
     "games": "Spiele",
     "pullUps": "Klimmzüge",
     "pushUps": "Liegestütze",
@@ -1783,19 +2006,7 @@
     "equipmentRepair": "Hockeyausrüstungsreparatur",
     "stickRepair": "Stockreparatur",
     "usedEquipmentSale": "Gebrauchte Ausrüstung",
-    "newEquipmentSale": "Neue Ausrüstung",
-    "phone": "Telefon",
-    "qrCodeTitle": "Profil-QR-Code",
-    "qrCodeSubtitle": "Scannen für schnellen Zugriff",
-    "qrCodeInfo": "Richten Sie die Handykamera auf den QR-Code, um das Profil zu öffnen",
-    "shareProfile": "Profil teilen",
-    "savedToGallery": "In Galerie gespeichert",
-    "noPermission": "Kein Zugriff auf Galerie",
-    "shareError": "Fehler beim Erstellen des Bildes",
-    "currentTeam": "Team",
-    "hockeyExperience": "Eishockey-Erfahrung",
-    "years": "Jahre",
-    "currentSeasonStats": "Statistiken der aktuellen Saison"
+    "newEquipmentSale": "Neue Ausrüstung"
   },
   "register": {
     "title": "Anmeldung",
@@ -1833,7 +2044,7 @@
     "home": "Heim",
     "search": "Suchen",
     "messages": "Nachrichten",
-    "notifications": "Ereignisse",
+    "notifications": "Benachrichtigungen",
     "profile": "Profil"
   },
   "admin": {
@@ -1850,7 +2061,6 @@
     "noName": "Kein Name",
     "noPosition": "Nicht angegeben",
     "noTeam": "Nicht angegeben",
-    "sendGift": "Geschenk senden",
     "yearsOld": "Jahre",
     "addUser": "Benutzer hinzufügen",
     "searchPlayers": "Suche nach Spielern...",
@@ -1874,23 +2084,9 @@
     "requiredForPlayers": "Bei Spielern und Stars ist die Angabe des Geburtsdatums und der Position obligatorisch"
   },
   "adminGifts": {
-    "title": "Geschenkverwaltung",
-    "addGift": "Geschenk hinzufügen",
     "sendGift": "Geschenk senden",
     "giftName": "Geschenkname",
-    "giftType": "Geschenktyp",
-    "selectImage": "Bild auswählen",
-    "searchPlayer": "Spieler suchen...",
-    "giftSent": "Geschenk gesendet!",
-    "giftAdded": "Geschenk hinzugefügt!",
-    "stick": "Schläger",
-    "puck": "Puck",
-    "jersey": "Trikot",
-    "autograph": "Autogramm",
-    "trophy": "Trophäe",
-    "medal": "Medaille",
-    "giftReceived": "Geschenk vom Administrator erhalten",
-    "giftReceivedMessage": "{{playerName}} hat ein Geschenk vom Administrator erhalten!"
+    "selectImage": "Bild auswählen"
   },
   "museum": {
     "title": "Museum",
@@ -2071,12 +2267,10 @@
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",
-    "selectLanguage": "Sprache auswählen",
-    "autoLanguage": "Auto"
+    "selectLanguage": "Sprache auswählen"
   },
   "search": {
     "title": "Suchen",
-    "loading": "Suche wird geladen...",
     "placeholder": "Suche nach Spielern...",
     "country": "Land",
     "grip": "Griff",
@@ -2102,10 +2296,10 @@
     "you": "Du:"
   },
   "notifications": {
-    "title": "Ereignisse",
-    "loading": "Ereignisse werden geladen …",
-    "noNotifications": "Keine Ereignisse",
-    "noNotificationsSubtitle": "Du hast noch keine Ereignisse über Freundschaften, Geschenke oder andere Aktionen.",
+    "title": "Benachrichtigungen",
+    "loading": "Benachrichtigungen werden geladen …",
+    "noNotifications": "Keine Benachrichtigungen",
+    "noNotificationsSubtitle": "Du hast noch keine Benachrichtigungen über Freundschaften, Geschenke oder andere Aktionen.",
     "accept": "Akzeptieren",
     "decline": "Ablehnen",
     "friendRequests": "Freundschaftsanfragen",
@@ -2155,13 +2349,11 @@
     "timesPlural": "mal"
   },
   "home": {
-    "loadingPlayers": "Eisaufbereitung...",
+    "loadingPlayers": "Spieler werden geladen …",
     "noPlayersCountry": "Keine Spieler aus {{country}}",
     "noPlayersYear": "Es gibt keine Spieler, die im {{year}} geboren wurden.",
     "noPlayersCountryYear": "Keine Spieler aus {{country}} in {{year}}",
-    "iceEmpty": "Das Eis ist leer. Wählen Sie ein anderes Land oder Jahr oder setzen Sie die Filter zurück.",
-    "waitingForConnection": "Warten auf Verbindung",
-    "checkInternetConnection": "Überprüfen Sie Ihre Internetverbindung"
+    "iceEmpty": "Das Eis ist leer. Wählen Sie ein anderes Land oder Jahr oder setzen Sie die Filter zurück."
   },
   "filters": {
     "year": "Jahr",
@@ -2262,9 +2454,9 @@
     "museum": "Museum der Geschenke",
     "myGifts": "Meine Geschenke",
     "noGifts": "Noch keine Geschenke",
-    "noGiftsSubtext": "Laden Sie Ihr erstes Geschenk hoch, um es mit Spielern zu teilen",
-    "addGift": "Ein Geschenk hinzufügen",
-    "successDeleted": "Geschenk gelöscht",
+    "noGiftsSubtext": "Erstellen Sie Ihr erstes Geschenk für Fans",
+    "addGift": "Geschenk hinzufügen",
+    "successDeleted": "Das Geschenk wurde aus dem Museum entfernt.",
     "errorDelete": "Geschenk konnte nicht gelöscht werden",
     "noImage": "kein Bild",
     "failedToSendRequest": "Senden der Anfrage fehlgeschlagen",
@@ -2272,7 +2464,7 @@
     "requestSentMessage": "Ihre Anfrage für {itemType} wurde gesendet. Bitte warten Sie auf eine Antwort.",
     "requestItem": "Anfrage {itemType}",
     "requestMessage": "Nachricht zur Anfrage",
-    "selectGiftType": "Wählen Sie die Art des Geschenks",
+    "selectGiftType": "Geschenktyp auswählen",
     "selectGiftTypeMessage": "Welchen Geschenktyp möchten Sie erstellen?",
     "requestMessageHelper": "Schreiben Sie eine höfliche Nachricht, in der Sie erklären, warum Sie dieses Geschenk erhalten möchten.",
     "requestMessagePlaceholder": "Zum Beispiel: Hallo! Ich bin ein großer Fan Ihres Spiels und hätte gerne ein Autogramm für meine Sammlung...",
@@ -2299,9 +2491,12 @@
     "failedToUpdateItemImage": "Geschenkbild konnte nicht aktualisiert werden",
     "allGiftsAdded": "Alle Geschenke wurden hinzugefügt.",
     "allGiftTypesAdded": "Sie haben bereits alle Arten von Geschenken",
+    "addGift": "Ein Geschenk hinzufügen",
+    "selectGiftType": "Wählen Sie die Art des Geschenks",
     "deletion": "Entfernung",
     "itemDeleted": "Geschenk entfernt",
     "failedToDeleteItem": "Geschenk konnte nicht gelöscht werden",
+    "noGifts": "Keine Geschenke",
     "clickPlusToAdd": "Klicken Sie auf +, um hinzuzufügen",
     "настоящее время": "Gegenwart",
     "Центральный нападающий": "Mittelstürmer",
@@ -2317,33 +2512,7 @@
     "seconds": "Sek.",
     "times": "einmal",
     "sprint": "100-Meter-Lauf",
-    "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Geschenk an {playerName} senden",
-    "selectExistingGift": "Vorhandenes Geschenk auswählen",
-    "orCreateNew": "Oder neu erstellen",
-    "giftName": "Geschenkname",
-    "giftNamePlaceholder": "z.B. Signierte Mütze",
-    "uploadImage": "Bild hochladen",
-    "send": "Senden",
-    "selectGift": "Geschenk auswählen",
-    "fromAdmin": "Administrator",
-    "errorSelectOrCreate": "Wählen Sie ein Geschenk aus oder erstellen Sie ein neues",
-    "errorGiftAlreadyExists": "Dieses Geschenk existiert bereits für Spieler {playerName}.\n\nWählen Sie ein anderes Geschenk oder erstellen Sie ein neues.",
-    "successGiftSent": "Geschenk an {playerName} gesendet!",
-    "errorSendingGift": "Geschenk konnte nicht gesendet werden",
-    "deleteGiftConfirm": "Möchten Sie dieses Geschenk wirklich löschen?",
-    "selectImage": "Bild auswählen",
-    "errorPermissionDenied": "Sie haben keine Berechtigung, dieses Geschenk zu löschen",
-    "errorGiftNotFound": "Geschenk nicht gefunden",
-    "errorGiftNotDeleted": "Geschenk wurde nicht gelöscht",
-    "noGiftsUploaded": "Noch keine Geschenke hochgeladen",
-    "fromStar": "von {starName}",
-    "giftReceived": "Geschenk erhalten!",
-    "giftReceivedFromAdmin": "Sie haben ein Geschenk vom Administrator erhalten: {giftName}",
-    "giftReceivedFromStar": "Sie haben ein Geschenk von {starName} erhalten: {giftName}",
-    "giftReceivedPush": "🎁 Geschenk erhalten!",
-    "giftReceivedFromAdminPush": "Sie haben ein Geschenk vom Administrator erhalten: {giftName}",
-    "giftReceivedFromStarPush": "Sie haben ein Geschenk von {starName} erhalten: {giftName}"
+    "_cache_clear": "2024-01-16-9"
   },
   "TEMP_DELETE_ME": {
     "title": "Normen",
@@ -2462,34 +2631,23 @@
   "logout": "Ausfahrt",
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",
   "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?",
-  "videoNotification": {
-    "added": "hat hinzugefügt",
-    "oneVideo": "neues Video",
-    "multipleVideos": "{count} neue Videos",
-    "video": "Video",
-    "videos": "Videos"
-  },
-  "achievementNotification": {
-    "added": "hat hinzugefügt",
-    "received": "hat erhalten",
-    "oneAchievement": "neue Errungenschaft",
-    "multipleAchievements": "{count} neue Errungenschaften",
-    "achievement": "Errungenschaft",
-    "achievements": "Errungenschaften",
-    "title": "🏆 Errungenschaft!",
-    "message": "Herzlichen Glückwunsch! Sie haben die Errungenschaft erhalten: {achievementName}"
-  },
-  "avatarNotification": {
-    "changed": "hat seinen Avatar geändert"
-  },
-  "statsNotification": {
-    "updated": "hat aktualisiert",
-    "stats": "Statistiken",
-    "normatives": "Normen",
-    "physicalData": "physische Daten"
-  },
-  "height": "Größe",
-  "weight": "Gewicht",
-  "cm": "cm",
-  "kg": "kg"
+  "adminGifts": {
+    "title": "Geschenkverwaltung",
+    "addGift": "Geschenk hinzufügen",
+    "sendGift": "Geschenk senden",
+    "giftName": "Geschenkname",
+    "giftType": "Geschenktyp",
+    "selectImage": "Bild auswählen",
+    "searchPlayer": "Spieler suchen...",
+    "giftSent": "Geschenk gesendet!",
+    "giftAdded": "Geschenk hinzugefügt!",
+    "stick": "Schläger",
+    "puck": "Puck",
+    "jersey": "Trikot",
+    "autograph": "Autogramm",
+    "trophy": "Trophäe",
+    "medal": "Medaille",
+    "giftReceived": "Geschenk vom Administrator erhalten",
+    "giftReceivedMessage": "{{playerName}} hat ein Geschenk vom Administrator erhalten!"
+  }
 }

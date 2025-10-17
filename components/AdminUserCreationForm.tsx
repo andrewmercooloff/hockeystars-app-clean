@@ -748,7 +748,7 @@ const styles = {
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fa2f40', // Красный цвет заголовка
+    color: '#FF4444', // Красный цвет заголовка
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -794,7 +794,7 @@ const styles = {
     minWidth: '30%',
   },
   pickerOptionSelected: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
   },
   pickerOptionText: {
     color: '#fff',
@@ -807,7 +807,7 @@ const styles = {
     fontFamily: 'Gilroy-Bold',
   },
   submitButton: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -905,7 +905,7 @@ const styles = {
     fontFamily: 'Gilroy-Regular',
   },
   confirmButton: {
-    backgroundColor: '#fa2f40',
-    borderColor: '#fa2f40',
+    backgroundColor: '#FF4444',
+    borderColor: '#FF4444',
   },
 };

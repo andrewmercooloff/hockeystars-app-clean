@@ -320,11 +320,10 @@ export default function PastTeamsSection({
           <Text style={styles.emptyText}>{t('noPastTeams')}</Text>
         </View>
              ) : (
-         <DraggableFlatList
+         <FlatList
            data={pastTeams.filter(team => !team.isCurrent)}
            renderItem={renderPastTeamItem}
            keyExtractor={(item, index) => `${item.id}-${index}`}
-           onDragEnd={handleDragEnd}
            scrollEnabled={false}
            contentContainerStyle={styles.teamsList}
          />
@@ -335,7 +334,7 @@ export default function PastTeamsSection({
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="add-circle" size={24} color="#fff" />
+          <Ionicons name="add-circle" size={24} color="#FF4444" />
           <Text style={styles.addButtonText}>{t('addTeam')}</Text>
         </TouchableOpacity>
       )}
@@ -557,7 +556,7 @@ const styles = StyleSheet.create({
   teamPeriod: {
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     marginBottom: 2,
   },
   teamLocation: {
@@ -569,17 +568,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderRadius: 12,
-    padding: 9,
+    padding: 15,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: '#fa2f40',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#fff',
+    color: '#FF4444',
     marginLeft: 10,
   },
   modalOverlay: {
@@ -595,12 +594,12 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 400,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   modalTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#FF4444',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -609,20 +608,14 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   suggestionsContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -654,21 +647,15 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -702,7 +689,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#FF4444',
     borderRadius: 12,
     padding: 15,
     alignItems: 'center',
