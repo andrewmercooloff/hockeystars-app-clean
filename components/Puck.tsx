@@ -67,6 +67,10 @@ const Puck: React.FC<PuckProps> = ({
 
   const imageSource = useMemo(() => {
     if (!avatar || imageError) {
+      // Если нет аватара и статус скаут - показываем scout.png как полноценное изображение
+      if (status === 'scout') {
+        return require('../assets/images/scout.png');
+      }
       return null;
     }
     
@@ -98,7 +102,7 @@ const Puck: React.FC<PuckProps> = ({
     
     // Для всех остальных случаев показываем силуэт
     return null;
-  }, [avatar, imageError]);
+  }, [avatar, imageError, status]);
 
   const handleError = useCallback((error: any) => {
 
@@ -158,21 +162,11 @@ const Puck: React.FC<PuckProps> = ({
               backgroundColor: '#2C3E50'
             }
           ]}>
-            {status === 'scout' ? (
-              <Image 
-                source={require('../assets/images/scout.png')} 
-                style={{
-                  width: dimensions.iconSize,
-                  height: dimensions.iconSize,
-                }}
-              />
-            ) : (
-              <Ionicons 
-                name={status === 'shop' ? 'storefront' : 'person'} 
-                size={dimensions.iconSize} 
-                color="#FFFFFF" 
-              />
-            )}
+            <Ionicons 
+              name={status === 'shop' ? 'storefront' : 'person'} 
+              size={dimensions.iconSize} 
+              color="#FFFFFF" 
+            />
           </View>
         )}
         
