@@ -351,9 +351,27 @@ const usePuckCollisionSystem = (players: Player[]) => {
           adjustedX += Math.cos(angle) * correctionDistance;
           adjustedY += Math.sin(angle) * correctionDistance;
           
-          // НЕ ТОЛКАЕМ ДРУГУЮ ШАЙБУ при перетаскивании - это предотвращает торможение
-          // Перетаскиваемая шайба только отталкивается от других, не влияя на их физику
-          // Это позволяет другим шайбам продолжать плавно двигаться
+          // ТОЛКАЕМ ДРУГУЮ ШАЙБУ только при реальном столкновении
+          // Но не при каждом движении пальца - только когда есть столкновение
+          const pushStrength = Platform.OS === 'ios' ? 1.5 : 0.3;
+          
+          // Вычисляем общую скорость перетаскивания
+          const dragSpeed = Math.sqrt(vx * vx + vy * vy);
+          
+          // Толкаем только если есть реальная скорость (не при каждом движении пальца)
+          if (dragSpeed > 0.5) { // Увеличиваем порог для более точного толчка
+            // angle - это угол ОТ другой шайбы К перетаскиваемой
+            // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
+            const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
+            const pushVx = Math.cos(pushAngle) * dragSpeed * pushStrength;
+            const pushVy = Math.sin(pushAngle) * dragSpeed * pushStrength;
+            
+            updatedPositions[index] = {
+              ...otherPos,
+              vx: otherPos.vx + pushVx,
+              vy: otherPos.vy + pushVy
+            };
+          }
         }
       });
       
@@ -430,8 +448,9 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const newY = touch.pageY - dragStartRef.current.y;
     
     // Вычисляем скорость на основе изменения позиции для толчка других шайб
-    const vx = (newX - lastPositionRef.current.x) * 1.2;
-    const vy = (newY - lastPositionRef.current.y) * 1.2;
+    // Уменьшаем коэффициент для более плавного движения
+    const vx = (newX - lastPositionRef.current.x) * 0.8;
+    const vy = (newY - lastPositionRef.current.y) * 0.8;
     
     lastPositionRef.current = { x: newX, y: newY };
     onDrag(position.id, newX, newY, vx, vy, true);
