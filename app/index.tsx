@@ -307,6 +307,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
         // Вызываем вибрацию если было столкновение (с дебаунсом)
         if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
+          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', now - lastHapticTimeRef.current);
           if (now - lastHapticTimeRef.current > 80) {
             lastHapticTimeRef.current = now;
             console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя');
@@ -322,6 +323,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               }
             });
           }
+          // Сбрасываем флаг после проверки
+          collisionDetectedRef.current = false;
         }
     }, 16); // Все платформы - 60 FPS для плавного движения
 
@@ -395,8 +398,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
     });
     
     // Вызываем вибрацию при столкновении drag только для шайбы пользователя (только на мобильных, с дебаунсом 50ms)
+    console.log('🔍 DRAG ПРОВЕРКА: hasCollision =', hasCollision, 'currentUserId =', currentUserId, 'id =', id, 'Platform.OS =', Platform.OS);
     if (hasCollision && currentUserId && id === currentUserId && (Platform.OS === 'ios' || Platform.OS === 'android')) {
       const now = Date.now();
+      console.log('🔍 DRAG ВИБРАЦИЯ: lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', now - lastHapticTimeRef.current);
       if (now - lastHapticTimeRef.current > 50) {
         lastHapticTimeRef.current = now;
         console.log('📳 ВИБРАЦИЯ DRAG: Вызываем вибрацию для пользователя при перетаскивании');
