@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Vibration } from 'react-native';
 import Animated, {
   useAnimatedStyle
 } from 'react-native-reanimated';
@@ -311,7 +312,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя');
             // Используем impactAsync со средним стилем для более заметной вибрации
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
-              console.log('❌ Ошибка вибрации:', error);
+              console.log('❌ Ошибка вибрации Haptics:', error);
+              // Альтернативная вибрация через Vibration API
+              try {
+                Vibration.vibrate(50);
+                console.log('📳 Альтернативная вибрация сработала');
+              } catch (vibError) {
+                console.log('❌ Ошибка альтернативной вибрации:', vibError);
+              }
             });
           }
         }
@@ -394,7 +402,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
         console.log('📳 ВИБРАЦИЯ DRAG: Вызываем вибрацию для пользователя при перетаскивании');
         // Используем Medium для более заметной вибрации при перетаскивании
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
-          console.log('❌ Ошибка вибрации DRAG:', error);
+          console.log('❌ Ошибка вибрации DRAG Haptics:', error);
+          // Альтернативная вибрация через Vibration API
+          try {
+            Vibration.vibrate(30);
+            console.log('📳 Альтернативная вибрация DRAG сработала');
+          } catch (vibError) {
+            console.log('❌ Ошибка альтернативной вибрации DRAG:', vibError);
+          }
         });
       }
     }
