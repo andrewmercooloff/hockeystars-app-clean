@@ -38,6 +38,7 @@ interface PuckPosition {
   vx: number;
   vy: number;
   size: number;
+  isDragging?: boolean; // Флаг для перетаскиваемой шайбы
 }
 
 const usePuckCollisionSystem = (players: Player[]) => {
@@ -175,6 +176,11 @@ const usePuckCollisionSystem = (players: Player[]) => {
           const velocityChanges = currentPositions.map(() => ({ dvx: 0, dvy: 0 }));
           
           return currentPositions.map((pos, posIndex) => {
+          // Пропускаем физику для перетаскиваемых шайб
+          if (pos.isDragging) {
+            return pos;
+          }
+          
           let newX = pos.x + pos.vx;
           let newY = pos.y + pos.vy;
           let newVx = pos.vx;
@@ -316,7 +322,7 @@ const usePuckCollisionSystem = (players: Player[]) => {
   }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize]);
 
   // Функция для обновления позиции и скорости конкретной шайбы (для drag)
-  const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number) => {
+  const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging: boolean = true) => {
     let hasCollision = false;
     
     setPuckPositions(currentPositions => {
@@ -368,7 +374,7 @@ const usePuckCollisionSystem = (players: Player[]) => {
       });
       
       return updatedPositions.map(pos => 
-        pos.id === id ? { ...pos, x: adjustedX, y: adjustedY, vx, vy } : pos
+        pos.id === id ? { ...pos, x: adjustedX, y: adjustedY, vx, vy, isDragging } : pos
       );
     });
     
@@ -390,7 +396,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   player: Player; 
   position: PuckPosition; 
   onNav: () => void; 
-  onDrag?: (id: string, x: number, y: number, vx: number, vy: number) => void;
+  onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
@@ -444,11 +450,15 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const vy = (newY - lastPositionRef.current.y) * 1.2;
     
     lastPositionRef.current = { x: newX, y: newY };
-    onDrag(position.id, newX, newY, vx, vy);
+    onDrag(position.id, newX, newY, vx, vy, true);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    // Сбрасываем флаг isDragging для этой шайбы
+    if (onDrag) {
+      onDrag(position.id, position.x, position.y, position.vx, position.vy, false);
+    }
   };
 
   return (
