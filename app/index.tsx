@@ -235,8 +235,9 @@ const usePuckCollisionSystem = (players: Player[]) => {
           }
 
           // Жесткая система коллизий - шайбы не могут накладываться
+          // ИСКЛЮЧАЕМ перетаскиваемые шайбы из проверки коллизий
           currentPositions.forEach((otherPos, otherIndex) => {
-            if (otherPos.id === pos.id) return;
+            if (otherPos.id === pos.id || otherPos.isDragging) return;
             
             const dx = newX - otherPos.x;
             const dy = newY - otherPos.y;
