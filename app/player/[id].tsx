@@ -1534,6 +1534,7 @@ export default function PlayerProfile() {
                 </TouchableOpacity>
               ) : (
                 (() => {
+                  console.log('🔍 ОТЛАДКА АВАТАРА: player.status =', player.status, 'player.avatar =', player.avatar);
                   const imageSource = player.avatar;
                   const hasValidImage = imageSource && typeof imageSource === 'string' && (
                     imageSource.startsWith('data:image/') || 
@@ -1541,6 +1542,7 @@ export default function PlayerProfile() {
                     imageSource.startsWith('file://') || 
                     imageSource.startsWith('content://')
                   );
+                  console.log('🔍 hasValidImage =', hasValidImage);
 
                   if (hasValidImage) {
                     return (
@@ -1567,10 +1569,13 @@ export default function PlayerProfile() {
                       <View style={[styles.profileImage]}>
                         <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                           {player.status === 'scout' ? (
-                            <Image 
-                              source={require('../../assets/images/scout.png')} 
-                              style={styles.avatarImage}
-                            />
+                            <>
+                              {console.log('🎯 ОТЛАДКА СКАУТА: player.status =', player.status, 'player.avatar =', player.avatar)}
+                              <Image 
+                                source={require('../../assets/images/scout.png')} 
+                                style={styles.avatarImage}
+                              />
+                            </>
                           ) : (
                             <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
                           )}
