@@ -498,10 +498,11 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     }
     
     // Применяем накопленную скорость как финальный импульс
+    // Используем текущую позицию шайбы (куда она была перетащена), а не исходную
     if (onDrag) {
       const finalVx = dragVelocityRef.current.vx * 0.5; // Уменьшаем для более реалистичного полета
       const finalVy = dragVelocityRef.current.vy * 0.5;
-      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+      onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
     }
     
     // Сбрасываем накопленную скорость
