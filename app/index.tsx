@@ -405,6 +405,17 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
   const lastUpdateTimeRef = useRef(0);
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const dragVelocityRef = useRef({ vx: 0, vy: 0 });
+
+  // Очищаем таймаут при размонтировании
+  useEffect(() => {
+    return () => {
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -426,7 +437,16 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     };
     lastPositionRef.current = { x: position.x, y: position.y };
     hasDraggedRef.current = false;
+    dragVelocityRef.current = { vx: 0, vy: 0 };
     setIsDragging(true);
+    
+    // Устанавливаем таймаут на 0.2 секунды для автоматического отпускания
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    dragTimeoutRef.current = setTimeout(() => {
+      handleTouchEnd();
+    }, 200); // 0.2 секунды
   };
 
   const handleTouchMove = (e: any) => {
@@ -460,16 +480,32 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const vx = (newX - lastPositionRef.current.x) * 0.8;
     const vy = (newY - lastPositionRef.current.y) * 0.8;
     
+    // Накапливаем скорость для финального импульса
+    dragVelocityRef.current.vx += vx;
+    dragVelocityRef.current.vy += vy;
+    
     lastPositionRef.current = { x: newX, y: newY };
     onDrag(position.id, newX, newY, vx, vy, true);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    // Сбрасываем флаг isDragging для этой шайбы
-    if (onDrag) {
-      onDrag(position.id, position.x, position.y, position.vx, position.vy, false);
+    
+    // Очищаем таймаут
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = null;
     }
+    
+    // Применяем накопленную скорость как финальный импульс
+    if (onDrag) {
+      const finalVx = dragVelocityRef.current.vx * 0.5; // Уменьшаем для более реалистичного полета
+      const finalVy = dragVelocityRef.current.vy * 0.5;
+      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+    }
+    
+    // Сбрасываем накопленную скорость
+    dragVelocityRef.current = { vx: 0, vy: 0 };
   };
 
   return (
