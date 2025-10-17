@@ -76,7 +76,7 @@ export default function PlayerProfile() {
       case 'coach': 
         return '#fa2f40'; // Красный для тренеров
       case 'scout': 
-        return '#808080'; // Серый для скаутов
+        return '#8B5CF6'; // Фиолетовый для скаутов
       case 'admin': 
         return '#000000'; // Черный для админов
       case 'shop': 

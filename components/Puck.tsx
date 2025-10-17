@@ -57,7 +57,7 @@ const Puck: React.FC<PuckProps> = ({
     switch (status) {
       case 'star': return '#FFD700'; // Золотистый для звезд
       case 'coach': return '#FF4444'; // Красный для тренеров
-      case 'scout': return '#FF4444'; // Красный для скаутов
+      case 'scout': return '#8B5CF6'; // Фиолетовый для скаутов
       case 'admin': return '#000000'; // Черный для админов
       case 'shop': return '#4CAF50'; // Приглушенный зеленый для магазинов
       case 'skateSharpening': return '#0066CC'; // Синий для заточки коньков
