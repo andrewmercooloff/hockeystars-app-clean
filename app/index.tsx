@@ -41,7 +41,7 @@ interface PuckPosition {
   isDragging?: boolean; // Флаг для перетаскиваемой шайбы
 }
 
-const usePuckCollisionSystem = (players: Player[]) => {
+const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const puckSize = 70; // Размер шайбы
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -265,8 +265,10 @@ const usePuckCollisionSystem = (players: Player[]) => {
               velocityChanges[otherIndex].dvx -= Math.cos(angle) * pushForce;
               velocityChanges[otherIndex].dvy -= Math.sin(angle) * pushForce;
               
-              // Отмечаем столкновение для вибрации
-              collisionDetectedRef.current = true;
+              // Отмечаем столкновение для вибрации только если это шайба пользователя
+              if (currentUserId && pos.id === currentUserId) {
+                collisionDetectedRef.current = true;
+              }
             }
           });
           
@@ -380,8 +382,8 @@ const usePuckCollisionSystem = (players: Player[]) => {
       );
     });
     
-    // Вызываем вибрацию при столкновении drag (только на мобильных, с дебаунсом 50ms)
-    if (hasCollision && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+    // Вызываем вибрацию при столкновении drag только для шайбы пользователя (только на мобильных, с дебаунсом 50ms)
+    if (hasCollision && currentUserId && id === currentUserId && (Platform.OS === 'ios' || Platform.OS === 'android')) {
       const now = Date.now();
       if (now - lastHapticTimeRef.current > 50) {
         lastHapticTimeRef.current = now;
@@ -389,7 +391,7 @@ const usePuckCollisionSystem = (players: Player[]) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
       }
     }
-  }, [puckSize]);
+  }, [puckSize, currentUserId]);
 
   return { puckPositions, puckSize, updatePuckPosition };
 };
@@ -760,7 +762,7 @@ export default function HomeScreen() {
 
 
 
-  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers);
+  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id);
 
 
 
