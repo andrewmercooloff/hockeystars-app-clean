@@ -1,0 +1,161 @@
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
+
+// Подключение к Supabase
+const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function analyzeExercises() {
+  try {
+    console.log('🔍 Анализируем упражнения в базе данных...');
+    
+    // Получаем все упражнения
+    const { data: exercises, error } = await supabase
+      .from('exercises')
+      .select('exercise_id, title_ru, instructions_ru, tips_ru, equipment_ru, calories_ru, category_ru, difficulty_ru, duration_ru')
+      .eq('is_active', true)
+      .order('exercise_id');
+
+    if (error) {
+      console.error('❌ Ошибка получения упражнений:', error);
+      return;
+    }
+
+    console.log(`📊 Найдено ${exercises.length} упражнений`);
+
+    // Группируем упражнения по одинаковым инструкциям и советам
+    const instructionsGroups = {};
+    const tipsGroups = {};
+    
+    exercises.forEach(exercise => {
+      const instructionsKey = JSON.stringify(exercise.instructions_ru);
+      const tipsKey = JSON.stringify(exercise.tips_ru);
+      
+      if (!instructionsGroups[instructionsKey]) {
+        instructionsGroups[instructionsKey] = [];
+      }
+      instructionsGroups[instructionsKey].push({
+        id: exercise.exercise_id,
+        title: exercise.title_ru
+      });
+      
+      if (!tipsGroups[tipsKey]) {
+        tipsGroups[tipsKey] = [];
+      }
+      tipsGroups[tipsKey].push({
+        id: exercise.exercise_id,
+        title: exercise.title_ru
+      });
+    });
+
+    // Находим группы с дублирующимися инструкциями (больше 1 упражнения)
+    const duplicateInstructions = Object.entries(instructionsGroups)
+      .filter(([key, exercises]) => exercises.length > 1)
+      .map(([key, exercises]) => ({
+        instructions: JSON.parse(key),
+        exercises: exercises
+      }));
+
+    // Находим группы с дублирующимися советами (больше 1 упражнения)
+    const duplicateTips = Object.entries(tipsGroups)
+      .filter(([key, exercises]) => exercises.length > 1)
+      .map(([key, exercises]) => ({
+        tips: JSON.parse(key),
+        exercises: exercises
+      }));
+
+    console.log('\n📋 ДУБЛИРУЮЩИЕСЯ ИНСТРУКЦИИ:');
+    console.log('=====================================');
+    
+    duplicateInstructions.forEach((group, index) => {
+      console.log(`\n${index + 1}. Группа инструкций (${group.exercises.length} упражнений):`);
+      console.log('Инструкции:', group.instructions);
+      console.log('Упражнения:');
+      group.exercises.forEach(ex => {
+        console.log(`  - #${ex.id}: ${ex.title}`);
+      });
+    });
+
+    console.log('\n💡 ДУБЛИРУЮЩИЕСЯ СОВЕТЫ:');
+    console.log('=====================================');
+    
+    duplicateTips.forEach((group, index) => {
+      console.log(`\n${index + 1}. Группа советов (${group.exercises.length} упражнений):`);
+      console.log('Советы:', group.tips);
+      console.log('Упражнения:');
+      group.exercises.forEach(ex => {
+        console.log(`  - #${ex.id}: ${ex.title}`);
+      });
+    });
+
+    // Сохраняем результаты в файл для дальнейшего анализа
+    const analysisResults = {
+      totalExercises: exercises.length,
+      duplicateInstructionsGroups: duplicateInstructions,
+      duplicateTipsGroups: duplicateTips,
+      timestamp: new Date().toISOString()
+    };
+
+    const fs = require('fs');
+    const path = require('path');
+    const outputPath = path.join(__dirname, 'exercise-analysis.json');
+    
+    fs.writeFileSync(outputPath, JSON.stringify(analysisResults, null, 2), 'utf8');
+    console.log(`\n💾 Результаты анализа сохранены в: ${outputPath}`);
+
+    // Создаем CSV файл для удобного просмотра в Google Sheets
+    const csvContent = createCSVContent(exercises);
+    const csvPath = path.join(__dirname, 'exercises-for-google-sheets.csv');
+    fs.writeFileSync(csvPath, csvContent, 'utf8');
+    console.log(`📊 CSV файл для Google Sheets сохранен в: ${csvPath}`);
+
+  } catch (error) {
+    console.error('❌ Ошибка анализа:', error);
+  }
+}
+
+function createCSVContent(exercises) {
+  const headers = [
+    'Exercise ID',
+    'Title (RU)',
+    'Instructions Count',
+    'Tips Count',
+    'Instructions (RU)',
+    'Tips (RU)',
+    'Equipment (RU)',
+    'Calories (RU)',
+    'Category (RU)',
+    'Difficulty (RU)',
+    'Duration (RU)'
+  ].join(',');
+
+  const rows = exercises.map(exercise => {
+    const instructions = Array.isArray(exercise.instructions_ru) 
+      ? exercise.instructions_ru.join(' | ') 
+      : exercise.instructions_ru || '';
+    const tips = Array.isArray(exercise.tips_ru) 
+      ? exercise.tips_ru.join(' | ') 
+      : exercise.tips_ru || '';
+    
+    return [
+      exercise.exercise_id,
+      `"${exercise.title_ru}"`,
+      Array.isArray(exercise.instructions_ru) ? exercise.instructions_ru.length : 0,
+      Array.isArray(exercise.tips_ru) ? exercise.tips_ru.length : 0,
+      `"${instructions}"`,
+      `"${tips}"`,
+      `"${exercise.equipment_ru || ''}"`,
+      `"${exercise.calories_ru || ''}"`,
+      `"${exercise.category_ru || ''}"`,
+      `"${exercise.difficulty_ru || ''}"`,
+      `"${exercise.duration_ru || ''}"`
+    ].join(',');
+  });
+
+  return [headers, ...rows].join('\n');
+}
+
+// Запускаем анализ
+analyzeExercises();

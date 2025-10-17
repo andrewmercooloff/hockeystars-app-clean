@@ -1,0 +1,2508 @@
+{
+  "common": {
+    "save": "Išsaugoti",
+    "cancel": "Atšaukti",
+    "edit": "Redaguoti",
+    "delete": "Ištrinti",
+    "add": "Pridėti",
+    "close": "Uždaryti",
+    "back": "Atgal",
+    "next": "Kitas",
+    "done": "Paruošta",
+    "loading": "Kraunama...",
+    "error": "Klaida",
+    "success": "Sėkmė",
+    "yes": "Taip",
+    "no": "Nr",
+    "ok": "Gerai",
+    "confirm": "Patvirtinti",
+    "deleteConfirm": "Pašalinimas",
+    "deletePhotoConfirm": "Ar tikrai norite ištrinti šią nuotrauką?",
+    "deleteTeamConfirm": "Ar tikrai norite ištrinti šią komandą?",
+    "deletePastTeamConfirm": "Ar tikrai norite pašalinti šią komandą iš istorijos?",
+    "deleteAchievementConfirm": "Ar tikrai norite pašalinti šį laimėjimą?",
+    "deleteAllNotificationsConfirm": "Ar tikrai norite išvalyti visus pranešimus?",
+    "rejectRequestConfirm": "Ar tikrai norite atmesti šią užklausą?",
+    "super": "Puiku!",
+    "retry": "Bandyti vėl",
+    "goalie": "Vartininkas"
+  },
+  "winger": "Krašto puolėjas",
+  "center": "Centro į priekį",
+  "defender": "Gynėjas",
+  "goals": "Tikslai",
+  "assists": "Transmisijos",
+  "games": "Žaidimai",
+  "pullUps": "Prisitraukimai",
+  "pushUps": "Atsispaudimai",
+  "plankTime": "Lenta (sek.)",
+  "sprint100m": "100 m (sek.)",
+  "longJump": "šuolis į tolį (m)",
+  "jumpRope": "šokinėjimo virvė (viena)",
+  "justNow": "tik dabar",
+  "minutesAgo": "Prieš {minutes} minutes",
+  "hoursAgo": "prieš {hours} valandas",
+  "daysAgo": "prieš {days} dienas",
+  "photoNotification": {
+    "added": "pridėta",
+    "onePhoto": "nauja nuotrauka",
+    "multiplePhotos": "{count} naujos nuotraukos",
+    "photo": "nuotrauka",
+    "photos": "nuotrauka"
+  },
+  "friendshipNotification": {
+    "title": "Nauja draugystė",
+    "message": "{friend1Name} ir {friend2Name} tapo draugais",
+    "became": "tapo draugais"
+  },
+  "exerciseNotification": {
+    "title": "Pratimas baigtas",
+    "message": "{playerName} atliko pratimą \"{exerciseName}“",
+    "completed": "baigė pratimą",
+    "exercise": "Pratimas"
+  },
+  "giftNotification": {
+    "title": "Dovana nuo žvaigždės",
+    "message": "{playerName} gavo {giftName} iš {starName}",
+    "received": "gavo",
+    "from": "iš",
+    "gift": "Dovana"
+  },
+  "addPhoto": "Pridėkite nuotrauką",
+  "selectPhotoSource": "Pasirinkite nuotraukos šaltinį",
+  "gallery": "Galerija",
+  "camera": "Fotoaparatas",
+  "cancel": "Atšaukti",
+  "error": "Klaida",
+  "maxPhotosReached": "Maksimalus nuotraukų skaičius: 50",
+  "galleryPermissionRequired": "Norint patekti į galeriją reikalingas leidimas.",
+  "galleryError": "Nepavyko įkelti nuotraukos iš galerijos.",
+  "cameraNotSupported": "Fotografavimas nepalaikomas žiniatinklio versijoje. Prašome pasinaudoti galerija.",
+  "cameraPermissionRequired": "Norint pasiekti kamerą reikalingas leidimas.",
+  "cameraError": "Nepavyko nufotografuoti.",
+  "noPhotos": "Nėra nuotraukų",
+  "clickToAddPhoto": "Norėdami pradėti, spustelėkite \"Pridėti nuotrauką“.",
+  "maxPhotos": "Daugiausia 50 nuotraukų",
+  "uploading": "Įkeliama...",
+  "uploadingPhotos": "Įkeliamos {count} nuotraukos... {progress} %",
+  "info": "Informacija",
+  "addVideoLink": "Pridėkite nuorodą į \"YouTube“ arba VK ir momento laiką (formatas: minutės:sekundės, pavyzdžiui: 1:25)",
+  "supportedPlatforms": "Palaikomos svetainės: youtube.com/watch?v=, youtube.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... arba vk.com/video...",
+  "timeCodePlaceholder": "min:sek",
+  "myMoment": "Mano akimirka",
+  "belarus": "Baltarusija",
+  "additional": "Papildomai",
+  "left": "Kairė",
+  "right": "Teisingai",
+  "birthDatePlaceholder": "MM.MM.MM (pavyzdžiui, 2014 m. 12 d.)",
+  "countPlaceholder": "Kartų skaičius",
+  "timePlaceholder": "Laikas sekundėmis",
+  "deleteUser": "Naudotojo ištrynimas",
+  "success": "Sėkmingai",
+  "selectTeams": "Pasirinkite komandas",
+  "enterTeamName": "Įveskite komandos pavadinimą",
+  "enterStartYear": "Įveskite galiojančius pradžios metus",
+  "enterEndYear": "Įveskite galiojančius pabaigos metus.",
+  "createTeamError": "Nepavyko sukurti komandos duomenų bazėje",
+  "addTeam": "Pridėti komandą",
+  "teamName": "Komandos pavadinimas*",
+  "teamCountry": "Šalis (neprivaloma)",
+  "teamCity": "Miestas (neprivaloma)",
+  "startYear": "Pradžios metai*",
+  "endYear": "Studijų baigimo metai (neprivaloma)",
+  "searchTeams": "Ieškau komandos...",
+  "save": "Išsaugoti",
+  "add": "Pridėti",
+  "editTeam": "Redaguoti komandą",
+  "noTeamsFound": "Nerasta jokių komandų",
+  "searching": "Ieškoti...",
+  "noCurrentTeams": "Dabartinių komandų nėra.",
+  "addMoreVideo": "Pridėkite daugiau vaizdo įrašų",
+  "noPastTeams": "Jokių ankstesnių komandų",
+  "noVideosAdded": "Vaizdo įrašų nepridėta",
+  "noTeamsSpecified": "Jokių komandų nenurodyta",
+  "selectCountry": "Pasirinkite šalį",
+  "selectPosition": "Pasirinkite poziciją",
+  "basicInfo": "Pagrindinė informacija",
+  "dateFormat": "DD.MM.YYYY",
+  "noPermission": "Neturite leidimo redaguoti šio profilio.",
+  "playerUpdated": "Duomenys atnaujinti",
+  "saveError": "Nepavyko išsaugoti duomenų",
+  "achievements": {
+    "firstPlace": "1 vieta",
+    "secondPlace": "2 vieta",
+    "thirdPlace": "3 vieta",
+    "place": "{place} vieta",
+    "noAchievements": "Jokių pasiekimų"
+  },
+  "exercises": {
+    "exerciseNumber": "Pratimas Nr. {id}",
+    "title": "Pratimai",
+    "subtitle": "Pasirinkite treniruotę",
+    "searchPlaceholder": "Ieškokite pagal numerį arba pavadinimą...",
+    "loadingExercise": "Įkeliamas pratimas...",
+    "loadingExercises": "Įkeliami pratimai...",
+    "exercise": "Pratimas",
+    "alreadyCompleted": "Pratimas jau baigtas",
+    "canRetryIn": "Šį pratimą vėl galėsite atlikti po {hours} valandų",
+    "all": "Visi",
+    "completed": "Užbaigta",
+    "times": "vieną kartą",
+    "loading": "Įkeliama...",
+    "categories": {
+      "Выносливость": "Ištvermė",
+      "Взрывная скорость": "Sprogimo greitis",
+      "Разминка": "Apšilimas",
+      "Растяжка": "Tempimas",
+      "Ловкость": "Vikrumas",
+      "Сила": "Jėga",
+      "Баланс": "Balansas",
+      "Скоростная выносливость": "Greičio ištvermė",
+      "Восстановление": "Atsigavimas",
+      "Endurance": "Ištvermė",
+      "Explosive Speed": "Sprogimo greitis",
+      "Warm-up": "Apšilimas",
+      "Stretching": "Tempimas",
+      "Agility": "Vikrumas",
+      "Strength": "Jėga",
+      "Balance": "Balansas",
+      "Speed Endurance": "Greičio ištvermė",
+      "Recovery": "Atsigavimas"
+    },
+    "difficulties": {
+      "Beginner": "Pradedantysis",
+      "Начинающий": "Pradedantysis",
+      "Intermediate": "Vidutinis",
+      "Средний": "Vidutinis",
+      "Advanced": "Pažengęs",
+      "Продвинутый": "Pažengęs",
+      "Expert": "Ekspertas",
+      "Эксперт": "Ekspertas"
+    },
+    "details": {
+      "category": "Kategorija",
+      "duration": "Trukmė",
+      "difficulty": "Sudėtingumas",
+      "description": "Aprašymas",
+      "benefits": "Pratimų privalumai",
+      "instructions": "Žingsnis po žingsnio instrukcijos",
+      "tips": "Naudingi patarimai",
+      "equipment": "Įranga",
+      "calories": "Kalorijos",
+      "additionalInfo": "Papildoma informacija",
+      "completed": "Užbaigta:",
+      "completedButton": "Aš tai padariau",
+      "alreadyCompleted": "Jau baigtas",
+      "saving": "Išsaugoma...",
+      "notFound": "Pratimas nerastas",
+      "unavailable": "Nėra",
+      "playersOnly": "Pratimai galimi tik žaidėjams",
+      "markedComplete": "Pratimas pažymimas kaip atliktas",
+      "error": "Klaida",
+      "saveError": "Nepavyko pažymėti pratimo kaip atlikto",
+      "generalError": "Išsaugant įvyko klaida",
+      "times": "vieną kartą",
+      "timesPlural": "kartų"
+    },
+    "difficulty": {
+      "Начинающий": "Pradžia",
+      "Средний": "Vidutinis",
+      "Продвинутый": "Išplėstinė",
+      "Легкая": "Lengva"
+    },
+    "items": {
+      "1": {
+        "title": "Intervalinis bėgimas",
+        "description": "20 minučių pakaitomis greitai (30 sekundžių) ir lėtai (30 sekundžių). Puikiai tinka lavinti širdies ištvermę ledo rituliui.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina gebėjimą greitai atsigauti",
+          "Pagerina bendrą fizinį pasirengimą",
+          "Imituoja ledo ritulio rungtynių įtampą"
+        ],
+        "instructions": [
+          "Pradėkite nuo 5 minučių apšilimo lengvo bėgiojimo",
+          "Greitai bėgkite 30 sekundžių (80–90% maksimalaus greičio)",
+          "Norėdami atsigauti, pereikite prie 30 sekundžių lėto bėgiojimo",
+          "Pakartokite ciklą 20-25 kartus",
+          "Užbaikite 5 minučių atvėsimu"
+        ],
+        "tips": [
+          "Stebėkite kvėpavimą – kvėpuokite giliai ir ritmingai",
+          "Neviršykite 90% didžiausio greičio",
+          "Jei esate pavargęs, galite pailginti atsigavimo laiką.",
+          "Atlikite 2-3 kartus per savaitę"
+        ],
+        "equipment": "Bėgimo takelis arba stadionas",
+        "calories": "250-350 kcal per treniruotę"
+      },
+      "2": {
+        "title": "Burpee šuolis",
+        "description": "Sudėtingas pratimas: pritūpimas → lenta → atsispaudimas → pritūpimas → šuolis. Atlikite 3 rinkinius po 10-15 pakartojimų.",
+        "benefits": [
+          "Lavina bendrą ištvermę",
+          "Stiprina viso kūno raumenis",
+          "Pagerina judesių koordinaciją",
+          "Padidina sprogstamąją galią"
+        ],
+        "instructions": [
+          "Atsistokite tiesiai, kojos pečių plotyje",
+          "Pritūpkite delnais ant grindų priešais save.",
+          "Stumkite kojas atgal į lentos padėtį",
+          "Atlikite vieną atsispaudimą",
+          "Patraukite kojas atgal link rankų, išlikdami pritūpimo padėtyje.",
+          "Šokinėkite aukštyn, pakelkite rankas virš galvos",
+          "Švelniai nusileiskite ir pakartokite."
+        ],
+        "tips": [
+          "Viso pratimo metu laikykite nugarą tiesiai.",
+          "Nusileiskite sulenkę kojas",
+          "Pradėkite nuo 5-8 pakartojimų ir palaipsniui didinkite",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių"
+        ],
+        "equipment": "Mankštos kilimėlis (neprivaloma)",
+        "calories": "200-300 kcal per treniruotę"
+      },
+      "3": {
+        "title": "Dviratis",
+        "description": "Intensyvus važiavimas dviračiu arba nejudantis dviratis su didelio intensyvumo intervalais. 5 minutės apšilimo, 20 minučių pertraukos.",
+        "benefits": [
+          "Lavina kardio ištvermę",
+          "Stiprina kojų raumenis",
+          "Sudegina daug kalorijų",
+          "Mažas krūvis sąnariams"
+        ],
+        "instructions": [
+          "5 minutės žemo intensyvumo apšilimo",
+          "2 minutės didelio intensyvumo (80–85 % maksimalaus)",
+          "1 minutės atsigavimas esant žemam intensyvumui",
+          "Pakartokite intervalus 10 kartų",
+          "5 minutes žemo intensyvumo atvėsinkite"
+        ],
+        "tips": [
+          "Palaikykite aukštą pedalo spaudimo ritmą (80-100 aps./min.)",
+          "Stebėkite savo kūno padėtį – laikykite nugarą tiesiai",
+          "Sureguliuokite pasipriešinimą, kad pakeistumėte intensyvumą",
+          "Treniruotės metu gerkite vandenį."
+        ],
+        "equipment": "Dviratis arba treniruoklis",
+        "calories": "300-400 kcal per treniruotę"
+      },
+      "4": {
+        "title": "Pliometriniai šuoliai",
+        "description": "Šokinėjimas vietoje kuo aukščiau, nusileidimas ant sulenktų kelių. 3 15-20 šuolių rinkiniai.",
+        "benefits": [
+          "Lavina sprogstamą kojų jėgą",
+          "Pagerina reakciją ir greitį",
+          "Stiprina sausgysles ir raiščius",
+          "Padidina vertikalų šuolį"
+        ],
+        "instructions": [
+          "Atsistokite tiesiai, kojos pečių plotyje",
+          "Pritūpkite 1/4 kelio sulenkę kelius",
+          "Sprogiai šokinėkite aukštyn, ištieskite rankas",
+          "Nusileiskite sulenkę kojas",
+          "Nedelsdami atlikite kitą šuolį",
+          "Atlikite 15-20 šuolių iš eilės"
+        ],
+        "tips": [
+          "Švelniai nusileiskite, sulenkite kelius.",
+          "Laikykite savo kūną tiesiai",
+          "Nedarykite pertraukų tarp šuolių",
+          "Tarp rinkinių pailsėkite 2-3 minutes"
+        ],
+        "equipment": "Mankštos kilimėlis (neprivaloma)",
+        "calories": "150-200 kcal per treniruotę"
+      },
+      "5": {
+        "title": "Trumpų nuotolių sprintas",
+        "description": "Bėkite maksimaliu greičiu 20-30 metrų atstumą su 30 sekundžių poilsiu tarp bėgimų. 8-10 bėgimų.",
+        "benefits": [
+          "Išvysto maksimalų greitį",
+          "Pagerina pagreitį",
+          "Stiprina kojų raumenis",
+          "Pagerina judesių koordinaciją"
+        ],
+        "instructions": [
+          "Pažymėkite 20-30 metrų atstumą",
+          "Užimkite pradinę padėtį (pusė pritūpimas)",
+          "Kai pasigirsta signalas, važiuokite maksimaliu greičiu.",
+          "Kirsti finišo liniją",
+          "Lėtai grįžkite į pradžią",
+          "Pailsėkite 30 sekundžių ir pakartokite."
+        ],
+        "tips": [
+          "Dėmesys bėgimo technikai",
+          "Laikykite savo kūną tiesiai",
+          "Aktyviai dirbkite rankomis",
+          "Netrumpinkite savo poilsio laiko"
+        ],
+        "equipment": "Atvira erdvė arba bėgimo takas",
+        "calories": "200-250 kcal per treniruotę"
+      },
+      "6": {
+        "title": "Kamuolio metimas į sieną",
+        "description": "Mesti medicininį rutulį į sieną maksimalia jėga, sugauti ir vėl mesti. 3 setai po 20 metimų.",
+        "benefits": [
+          "Lavina sprogstamą rankos jėgą",
+          "Pagerina koordinaciją",
+          "Stiprina pagrindinius raumenis",
+          "Padidina metimo greitį"
+        ],
+        "instructions": [
+          "Atsistokite 1-2 metrų atstumu nuo sienos",
+          "Laikykite kamuolį abiem rankomis krūtinės lygyje",
+          "Pritūpkite, sulenkite kelius",
+          "Mesdami kamuolį sprogstamai ištieskite kojas ir rankas.",
+          "Sugauti atšokusį kamuolį",
+          "Nedelsdami atlikite kitą metimą."
+        ],
+        "tips": [
+          "Naudokite 2-4 kg sveriantį rutulį",
+          "Mesti maksimalia jėga",
+          "Laikykite nugarą tiesiai",
+          "Dirbkite visu kūnu, o ne tik rankomis"
+        ],
+        "equipment": "Medicininis kamuolys 2-4 kg, sieninis",
+        "calories": "120-180 kcal per treniruotę"
+      },
+      "7": {
+        "title": "Dinaminis kojų tempimas",
+        "description": "Kojos svyruoja į priekį, atgal ir į šonus, sukamaisiais judesiais klubų sąnariuose. 10-15 pakartojimų kiekvienai kojai.",
+        "benefits": [
+          "Sušildo kojų raumenis",
+          "Pagerina sąnarių judrumą",
+          "Ruošiasi treniruotėms",
+          "Sumažina traumų riziką"
+        ],
+        "instructions": [
+          "Atsistokite tiesiai, laikydami atramą",
+          "Dešine koja atlikite 10-15 siūbavimo į priekį",
+          "Atlikite 10-15 smūgių atgal dešine koja",
+          "Dešine koja atlikite 10–15 sūpynės į šoną",
+          "Pakartokite kairei kojai.",
+          "Atlikite sukamuosius judesius klubo sąnariuose"
+        ],
+        "tips": [
+          "Laikykite nugarą tiesiai",
+          "Per daug nesiūbuokite",
+          "Atlikite judesius sklandžiai",
+          "Kvėpuokite giliai ir ritmingai"
+        ],
+        "equipment": "Siena ar kėdė atramai",
+        "calories": "50-80 kcal per apšilimą"
+      },
+      "8": {
+        "title": "Viršutinės kūno dalies apšilimas",
+        "description": "Rankų apskritimai, liemens lenkimai ir posūkiai. Apšilimas pečių sąnariams ir nugarai.",
+        "benefits": [
+          "Sušildo viršutinės kūno dalies raumenis",
+          "Pagerina peties sąnario judrumą",
+          "Paruošia rankas darbui",
+          "Aktyvina pagrindinius raumenis"
+        ],
+        "instructions": [
+          "Atsistokite tiesiai, kojos pečių plotyje",
+          "Atlikite 10 sukamųjų judesių rankomis į priekį",
+          "Atlikite 10 sukamųjų judesių rankomis atgal",
+          "Atlikite 10 šoninių lenkimų",
+          "Atlikite 10 liemens pasukimų",
+          "Atlikite sukamuosius judesius su pečiais"
+        ],
+        "tips": [
+          "Judėkite lėtai ir sklandžiai",
+          "Nedarykite staigių judesių",
+          "Stebėkite savo kvėpavimą",
+          "Palaipsniui didinkite judesių diapazoną"
+        ],
+        "equipment": "Nereikalaujama",
+        "calories": "40-60 kcal per apšilimą"
+      },
+      "9": {
+        "title": "Lengvas bėgiojimas vietoje",
+        "description": "Bėgimas vietoje aukštais keliais, palaipsniui didinant tempą. 5-7 minutes.",
+        "benefits": [
+          "Padidina širdies ritmą",
+          "Sušildo kojų raumenis",
+          "Pagerina koordinaciją",
+          "Ruošiasi pagrindinei treniruotei"
+        ],
+        "instructions": [
+          "Atsistokite tiesiai, kojos pečių plotyje",
+          "Pradėkite nuo lengvo bėgiojimo vietoje",
+          "Palaipsniui kelkite kelius aukščiau",
+          "Dirbkite rankomis taip, lyg bėgtumėte įprastai.",
+          "Padidinkite tempą 2-3 minutes",
+          "Sulėtinkite per paskutines 2 minutes"
+        ],
+        "tips": [
+          "Laikykite nugarą tiesiai",
+          "Nusileiskite ant kojų pirštų",
+          "Giliai įkvėpkite",
+          "Nešokti per aukštai"
+        ],
+        "equipment": "Nereikalaujama",
+        "calories": "60-80 kcal per apšilimą"
+      },
+      "10": {
+        "title": "Statinis kojų raumenų tempimas",
+        "description": "Laikykite keturgalvių raumenų, blauzdų ir pritraukiamųjų raumenų tempimo pozicijas. 30 sekundžių vienai grupei.",
+        "benefits": [
+          "Pagerina kojų raumenų lankstumą",
+          "Sumažina raumenų įtampą",
+          "Pagreitina atsigavimą",
+          "Apsaugo nuo traumų"
+        ],
+        "instructions": [
+          "Keturgalvių raumenų tempimas: Atsistokite ant vienos kojos, o kitą sulenkite atgal.",
+          "Blauzdos tempimas: pasilenkite į priekį, laikydami užpakalinę koją tiesiai.",
+          "Prietaiso tempimas: Sėdėkite išskėtę kojas.",
+          "Laikykite kiekvieną poziciją 30 sekundžių.",
+          "Giliai įkvėpkite ir atpalaiduokite raumenis."
+        ],
+        "tips": [
+          "Neištempkite iki skausmo.",
+          "Kvėpuokite giliai ir lėtai",
+          "Tempimo metu atpalaiduokite raumenis.",
+          "Atlikite po treniruotės"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "80-100 kcal per ruožą"
+      },
+      "11": {
+        "title": "Nugaros ir pečių tempimas",
+        "description": "Lenkimai į priekį, krūtinės tempimas, tricepso tempimas. Laikykite kiekvieną poziciją 20-30 sekundžių.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "12": {
+        "title": "Joga ledo ritulio žaidėjams",
+        "description": "Asanų rinkinys lankstumui ir pusiausvyrai lavinti: kario poza, medžio poza, žemyn nukreipto šuns poza.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "13": {
+        "title": "Koordinavimo kopėčios",
+        "description": "Greiti kojų judesiai per kopėčias: šoniniai žingsniai, kryžminiai žingsniai, šuoliai. 3 kiekvieno tipo leidimai.",
+        "benefits": [
+          "Lavina judesių koordinaciją",
+          "Pagerina pusiausvyrą ir pusiausvyrą",
+          "Padidina judrumą",
+          "Lavina neuromuskulinį ryšį"
+        ],
+        "instructions": [
+          "Pradėkite lėtu tempu",
+          "Sutelkite dėmesį į judesių tikslumą",
+          "Palaipsniui didinkite greitį",
+          "Kartokite tol, kol jis taps automatinis."
+        ],
+        "tips": [
+          "Praktikuokite reguliariai",
+          "Neskubėkite – tikslumas svarbiau nei greitis",
+          "Naudokite vaizdinius ženklus",
+          "Treniruokitės skirtingomis sąlygomis"
+        ]
+      },
+      "14": {
+        "title": "Žongliravimas kamuoliais",
+        "description": "Žongliravimas 2-3 teniso kamuoliukais lavinant rankų ir akių koordinaciją. Pradėkite nuo 1 kamuoliuko.",
+        "benefits": [
+          "Lavina judesių koordinaciją",
+          "Pagerina pusiausvyrą ir pusiausvyrą",
+          "Padidina judrumą",
+          "Lavina neuromuskulinį ryšį"
+        ],
+        "instructions": [
+          "Pradėkite lėtu tempu",
+          "Sutelkite dėmesį į judesių tikslumą",
+          "Palaipsniui didinkite greitį",
+          "Kartokite tol, kol jis taps automatinis."
+        ],
+        "tips": [
+          "Praktikuokite reguliariai",
+          "Neskubėkite – tikslumas svarbiau nei greitis",
+          "Naudokite vaizdinius ženklus",
+          "Treniruokitės skirtingomis sąlygomis"
+        ]
+      },
+      "15": {
+        "title": "Greiti spurgų prisilietimai",
+        "description": "Padėkite 5-6 kūgius ir greitai palieskite juos ranka atsitiktine tvarka. 3 rinkiniai po 30 sekundžių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "16": {
+        "title": "Irklavimo mašina",
+        "description": "Intervalinis irklavimas: 2 minutės didelio intensyvumo, 1 minutė poilsio. 8-10 ciklų ištvermei ugdyti.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "17": {
+        "title": "Šokinėjimo virvė su intervalais",
+        "description": "Kaitomi greiti (30 sek.) ir lėti (30 sek.) šuoliai. 20 minučių lavinti kardio ištvermę.",
+        "benefits": [
+          "Lavina kardio ištvermę",
+          "Pagerina judesių koordinaciją",
+          "Stiprina kojų raumenis",
+          "Sudegina daug kalorijų"
+        ],
+        "instructions": [
+          "Paimkite tinkamo ilgio šokdynę.",
+          "30 sekundžių greito šokinėjimo maksimaliu greičiu",
+          "30 sekundžių lėtai šokinėja domkratai atsigauti",
+          "Pakartokite ciklą 20 kartų",
+          "Užbaikite 2 minučių atvėsimu"
+        ],
+        "tips": [
+          "Laikykite nugarą tiesiai",
+          "Dirbkite riešais, o ne rankomis",
+          "Nusileiskite ant kojų pirštų",
+          "Pradėkite lėtu tempu"
+        ],
+        "equipment": "Šokinėja virvė",
+        "calories": "200-300 kcal per treniruotę"
+      },
+      "18": {
+        "title": "Bėgimas laiptais aukštyn",
+        "description": "Bėkite laiptais kuo greičiau, tada eikite žemyn. 10-15 pakartojimų kojų ištvermei ugdyti.",
+        "benefits": [
+          "Lavina kojų ištvermę",
+          "Stiprina šlaunų ir sėdmenų raumenis",
+          "Pagerina kardio ištvermę",
+          "Padidina kojų stiprumą"
+        ],
+        "instructions": [
+          "Raskite laiptus su 20-30 laiptelių",
+          "Bėkite maksimaliu greičiu",
+          "Kad atsigautumėte, nusileiskite ėjimo tempu",
+          "Atlikite 10-15 pakėlimų",
+          "Tarp pakėlimų pailsėkite 1-2 minutes"
+        ],
+        "tips": [
+          "Keldami naudokite visą pėdą.",
+          "Laikykite nugarą tiesiai",
+          "Aktyviai dirbkite rankomis",
+          "Neviršykite savo galimybių"
+        ],
+        "equipment": "Kopėčios",
+        "calories": "250-350 kcal per treniruotę"
+      },
+      "19": {
+        "title": "Lenta su judesiais",
+        "description": "Lentų laikymas su kintamu rankų ir kojų pakėlimu. 3 rinkiniai po 45-60 sekundžių šerdies stiprinimui.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "20": {
+        "title": "Bėgimas aukštu keliu",
+        "description": "Bėgiokite vietoje, keldami kelius prie krūtinės kuo aukščiau. 5 rinkiniai po 2 minutes su 1 minutės poilsiu.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "21": {
+        "title": "Šuolis į tolį stovint",
+        "description": "Šokite į priekį kiek įmanoma toliau, nusileiskite ant abiejų kojų. 5 8-10 šuolių rinkiniai.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "22": {
+        "title": "Greiti atsispaudimai",
+        "description": "Atsispaudimai kuo greičiau, liesdami krūtinę prie grindų. 4 rinkiniai po 15-20 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "23": {
+        "title": "Šokinėjimas per kliūtis",
+        "description": "Šokinėja per 30-40 cm aukščio kūgius ar kliūtis. 3 bėgimai po 10 kliūčių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "24": {
+        "title": "Greitieji pritūpimai",
+        "description": "Pritūpkite kuo greičiau, šlaunys lygiagrečios grindims. 4 rinkiniai po 20-25 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "25": {
+        "title": "Medicininio kamuoliuko metimai",
+        "description": "Sunkaus kamuolio (5-8 kg) metimas iš krūtinės maksimalia jėga. 3 setai po 15 metimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "26": {
+        "title": "Kulkšnies apšilimas",
+        "description": "Sukamaisiais judesiais pėdomis, lenkiant ir tiesinant kojų pirštus. 2-3 minutes kiekvienai kojai.",
+        "benefits": [
+          "Paruošia raumenis mankštai",
+          "Pagerina kraujotaką",
+          "Sumažina traumų riziką",
+          "Padidina treniruočių efektyvumą"
+        ],
+        "instructions": [
+          "Pradėkite lėtai ir palaipsniui didinkite intensyvumą",
+          "Atlikite judesius sklandžiai ir kontroliuojamai",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Atlikdami kvėpuokite tolygiai"
+        ],
+        "tips": [
+          "Neskubėkite – kokybė svarbiau nei greitis",
+          "Jei atsiranda skausmas, sustokite.",
+          "Prieš kiekvieną treniruotę apšilkite.",
+          "Kiekvienam judesiui skirkite pakankamai laiko."
+        ]
+      },
+      "27": {
+        "title": "Kaklo apšilimas",
+        "description": "Sklandūs galvos posūkiai, pakrypimai į priekį ir atgal, sukamieji judesiai. 2-3 minutes.",
+        "benefits": [
+          "Paruošia raumenis mankštai",
+          "Pagerina kraujotaką",
+          "Sumažina traumų riziką",
+          "Padidina treniruočių efektyvumą"
+        ],
+        "instructions": [
+          "Pradėkite lėtai ir palaipsniui didinkite intensyvumą",
+          "Atlikite judesius sklandžiai ir kontroliuojamai",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Atlikdami kvėpuokite tolygiai"
+        ],
+        "tips": [
+          "Neskubėkite – kokybė svarbiau nei greitis",
+          "Jei atsiranda skausmas, sustokite.",
+          "Prieš kiekvieną treniruotę apšilkite.",
+          "Kiekvienam judesiui skirkite pakankamai laiko."
+        ]
+      },
+      "28": {
+        "title": "Riešo apšilimas",
+        "description": "Sukamaisiais judesiais rankomis, sulenkiant ir ištiesiant pirštus. 2-3 minutes kiekvienai rankai.",
+        "benefits": [
+          "Paruošia raumenis mankštai",
+          "Pagerina kraujotaką",
+          "Sumažina traumų riziką",
+          "Padidina treniruočių efektyvumą"
+        ],
+        "instructions": [
+          "Pradėkite lėtai ir palaipsniui didinkite intensyvumą",
+          "Atlikite judesius sklandžiai ir kontroliuojamai",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Atlikdami kvėpuokite tolygiai"
+        ],
+        "tips": [
+          "Neskubėkite – kokybė svarbiau nei greitis",
+          "Jei atsiranda skausmas, sustokite.",
+          "Prieš kiekvieną treniruotę apšilkite.",
+          "Kiekvienam judesiui skirkite pakankamai laiko."
+        ]
+      },
+      "29": {
+        "title": "Kelio tempimas",
+        "description": "Pusiniai pritūpimai, kelių ratai, lengvas šokinėjimas vietoje. 3-4 minutes.",
+        "benefits": [
+          "Paruošia raumenis mankštai",
+          "Pagerina kraujotaką",
+          "Sumažina traumų riziką",
+          "Padidina treniruočių efektyvumą"
+        ],
+        "instructions": [
+          "Pradėkite lėtai ir palaipsniui didinkite intensyvumą",
+          "Atlikite judesius sklandžiai ir kontroliuojamai",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Atlikdami kvėpuokite tolygiai"
+        ],
+        "tips": [
+          "Neskubėkite – kokybė svarbiau nei greitis",
+          "Jei atsiranda skausmas, sustokite.",
+          "Prieš kiekvieną treniruotę apšilkite.",
+          "Kiekvienam judesiui skirkite pakankamai laiko."
+        ]
+      },
+      "30": {
+        "title": "Klubų apšilimas",
+        "description": "Klubų apskritimai, kojų svyravimas į šonus, lengvi įtūpstai. 4-5 minutes.",
+        "benefits": [
+          "Paruošia raumenis mankštai",
+          "Pagerina kraujotaką",
+          "Sumažina traumų riziką",
+          "Padidina treniruočių efektyvumą"
+        ],
+        "instructions": [
+          "Pradėkite lėtai ir palaipsniui didinkite intensyvumą",
+          "Atlikite judesius sklandžiai ir kontroliuojamai",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Atlikdami kvėpuokite tolygiai"
+        ],
+        "tips": [
+          "Neskubėkite – kokybė svarbiau nei greitis",
+          "Jei atsiranda skausmas, sustokite.",
+          "Prieš kiekvieną treniruotę apšilkite.",
+          "Kiekvienam judesiui skirkite pakankamai laiko."
+        ]
+      },
+      "31": {
+        "title": "Kirkšnies tempimas",
+        "description": "Drugelis - sėdėdamas ant grindų, sutrauk kojas ir pasilenk į priekį. Palaikykite 30-45 sekundes.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "32": {
+        "title": "Šlaunies raumens tempimas",
+        "description": "Lenkimai į priekį tiesiomis kojomis, palaikykite 30 sekundžių. 3 rinkiniai po 15 sekundžių.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "33": {
+        "title": "Blauzdos raumenų tempimas",
+        "description": "Pritūpimai į sieną, pakaunės tempimas. 20 sekundžių vienai kojai.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "34": {
+        "title": "Krūtinės raumenų tempimas",
+        "description": "Sienų tempimas su rankų prailginimu. Laikykite 30 sekundžių, 3 rinkiniai.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "35": {
+        "title": "Tricepso tempimas",
+        "description": "Padėkite rankas už galvos, kad ištemptumėte peties nugarą. 20 sekundžių kiekvienai rankai.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "36": {
+        "title": "Gyvatė tarp kūgių",
+        "description": "Bėkite gyvatės judesiu tarp kūgių, išdėstytų linijoje. 5 pravažiavimai maksimaliu greičiu.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "37": {
+        "title": "Greiti pėdų prisilietimai",
+        "description": "Greitai palieskite kūgius kojomis atsitiktine tvarka. 3 rinkiniai po 45 sekundes.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "38": {
+        "title": "Šuoliai su posūkiais",
+        "description": "Šokinėja vietoje su 90-180 laipsnių posūkiais. 3 20 šuolių rinkiniai.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "39": {
+        "title": "Greiti kamuolio perdavimai",
+        "description": "Teniso kamuoliuko perdavimas tarp rankų maksimaliu greičiu. 3 rinkiniai po 1 minutę.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "40": {
+        "title": "Bėgimas atgal",
+        "description": "Bėgimas atbulas su greitais posūkiais. 5 rinkiniai po 30 sekundžių.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "41": {
+        "title": "Pritūpimai su svarmenimis",
+        "description": "Pritūpimai su hanteliais arba štanga, šlaunys lygiagrečios grindims. 4 rinkiniai po 12-15 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "42": {
+        "title": "Deadlift",
+        "description": "Pakelkite štangą nuo grindų iki klubų lygio tiesia nugara. 3 rinkiniai po 8-10 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "43": {
+        "title": "Spaudimas ant suoliuko",
+        "description": "Spaudimas ant suoliuko su štanga. 4 rinkiniai po 8-12 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "44": {
+        "title": "Prisitraukimai",
+        "description": "Smakro pakėlimas. 3 rinkiniai po 8-12 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "45": {
+        "title": "Panardinimai ant strypų",
+        "description": "Lygiagretus strypas nusileidžia, nuleidžiamas iki 90 laipsnių kampo. 3 rinkiniai po 10-15 pakartojimų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "46": {
+        "title": "Vienos kojos stovas",
+        "description": "Išlaikykite pusiausvyrą ant vienos kojos užmerktomis akimis. 3 rinkiniai po 30 sekundžių kiekvienai kojai.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "47": {
+        "title": "Vienos kojos lenta",
+        "description": "Lentos laikymas vienos kojos pakėlimu. 3 rinkiniai po 30 sekundžių kiekvienai kojai.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "48": {
+        "title": "Pritūpimai viena koja",
+        "description": "Pritūpimai ant vienos kojos, kita koja ištiesta į priekį. 3 rinkiniai po 8-10 pakartojimų kiekvienai kojai.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "49": {
+        "title": "Bosu kamuoliuko pratimai",
+        "description": "Pusiausvyros pratimai ant nestabilaus paviršiaus. 15-20 minučių įvairių judesių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "50": {
+        "title": "Jogos balansas",
+        "description": "Medžio poza, Karys III ir Erelis pozuoja pusiausvyrai. Išlaikykite kiekvieną pozą 30-60 sekundžių.",
+        "benefits": [
+          "Lavina judesių koordinaciją",
+          "Pagerina pusiausvyrą ir pusiausvyrą",
+          "Padidina judrumą",
+          "Lavina neuromuskulinį ryšį"
+        ],
+        "instructions": [
+          "Pradėkite lėtu tempu",
+          "Sutelkite dėmesį į judesių tikslumą",
+          "Palaipsniui didinkite greitį",
+          "Kartokite tol, kol jis taps automatinis."
+        ],
+        "tips": [
+          "Praktikuokite reguliariai",
+          "Neskubėkite – tikslumas svarbiau nei greitis",
+          "Naudokite vaizdinius ženklus",
+          "Treniruokitės skirtingomis sąlygomis"
+        ]
+      },
+      "51": {
+        "title": "Vaikščiojimas ant rąsto",
+        "description": "Vaikščiojimas siauru rąstu ar lenta, kad išsiugdytų pusiausvyrą. 5 eina pirmyn ir atgal.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "52": {
+        "title": "Atsistokite rankomis į sieną",
+        "description": "Atsistoja rankomis prie sienos, kad išvystytų viršutinės kūno dalies pusiausvyrą. 3 rinkiniai po 20 sekundžių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "53": {
+        "title": "Fartlekas",
+        "description": "Bėgimas įvairaus intensyvumo: greitas bėgimas 2 minutes, lėtas bėgimas 1 minutę. 30 minučių viso darbo.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "54": {
+        "title": "Pakartotiniai sprintai",
+        "description": "100 metrų sprintas su 2-3 minučių poilsiu. 6-8 pakartojimai ugdyti greičio ištvermę.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "55": {
+        "title": "Intervalai ant dviračio",
+        "description": "30 sekundžių maksimalios pastangos, 90 sekundžių atsigavimas. 20 ciklų greičio ištvermei ugdyti.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "56": {
+        "title": "Bėgimas į kalną",
+        "description": "Bėkite į kalną kuo greičiau, tada bėkite žemyn. 8-10 įkalnių.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "57": {
+        "title": "Pliometriniai apskritimai",
+        "description": "5-6 plyometrinių pratimų grandinė be poilsio. 4-5 grandinės su 2 minučių poilsiu tarp jų.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "58": {
+        "title": "Lengvas tempimas",
+        "description": "Švelnus visų pagrindinių raumenų grupių tempimas po treniruotės. 15-20 minučių, kad greičiau atsigautumėte.",
+        "benefits": [
+          "Pagerina lankstumą ir mobilumą",
+          "Pašalina raumenų įtampą",
+          "Apsaugo nuo traumų",
+          "Pagerina atsigavimą po treniruotės"
+        ],
+        "instructions": [
+          "Prieš tempdami apšilkite",
+          "Ištempkite lėtai ir sklandžiai",
+          "Laikykite poziciją 20-30 sekundžių",
+          "Venkite aštrių skausmų"
+        ],
+        "tips": [
+          "Ištiesdami giliai kvėpuokite.",
+          "Nedarykite staigių judesių",
+          "Atlikite tai kasdien, kad pasiektumėte geriausių rezultatų.",
+          "Po treniruotės ištempkite"
+        ]
+      },
+      "59": {
+        "title": "Putplasčio valcavimas",
+        "description": "Raumenų masažas su putų voleliu įtampai nuimti. 10-15 minučių kiekvienai pagrindinei raumenų grupei.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "60": {
+        "title": "Lengvas bėgiojimas",
+        "description": "Žemo intensyvumo bėgiojimas aktyviam atsigavimui. 15-20 minučių.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "61": {
+        "title": "Plaukimas",
+        "description": "Lengvas plaukimas baseine raumenims atpalaiduoti ir atsigauti. 20-30 minučių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "62": {
+        "title": "Atkūrimo dviratis",
+        "description": "Lengvas važiavimas dviračiu mažu tempu aktyviam atsigavimui. 20-25 minutes.",
+        "benefits": [
+          "Pagerina širdies ir kraujagyslių sistemos ištvermę",
+          "Lavina aerobinę ištvermę",
+          "Veiksmingai degina kalorijas",
+          "Stiprina širdies raumenį"
+        ],
+        "instructions": [
+          "Pradėkite nuo lengvo 5-10 minučių apšilimo",
+          "Išlaikykite tikslinį širdies ritmą",
+          "Stebėkite kvėpavimą – kvėpuokite giliai",
+          "Baigti atvėsinti ir ištempti."
+        ],
+        "tips": [
+          "Palaipsniui didinkite trukmę",
+          "Treniruotės metu gerkite vandenį.",
+          "Atlikite 3-4 kartus per savaitę",
+          "Klausykite savo kūno"
+        ]
+      },
+      "63": {
+        "title": "Atkūrimo joga",
+        "description": "Švelnios asanos atpalaiduoja raumenis ir pagreitina atsigavimą. 20 minučių.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      },
+      "64": {
+        "title": "Tempimas gumine juostele",
+        "description": "Tempimo pratimai naudojant guminę juostelę",
+        "benefits": [
+          "Pagerina sąnarių lankstumą",
+          "Stiprina raiščius",
+          "Pašalina raumenų įtampą",
+          "Padidina judesių diapazoną"
+        ],
+        "instructions": [
+          "Pasirinkite tinkamą elastinę juostą",
+          "Atlikite lėtus judesius",
+          "Laikykite tempimą 20-30 sekundžių",
+          "Kiekvieną pratimą kartokite 3-5 kartus"
+        ],
+        "tips": [
+          "Pradėkite nuo lengvos elastinės juostos",
+          "Neleisk, kad skaudėtų",
+          "Kvėpuokite tolygiai",
+          "Palaipsniui didinkite pasipriešinimą"
+        ],
+        "equipment": "Guminė juosta",
+        "calories": "35-55 kcal"
+      },
+      "65": {
+        "title": "Kontrastinis dušas",
+        "description": "Kaitinamas karštas ir šaltas vanduo, siekiant pagerinti cirkuliaciją ir atsigavimą. 5-7 minutes.",
+        "benefits": [
+          "Padidina raumenų jėgą",
+          "Pagerina raumenų ištvermę",
+          "Lavina funkcinę jėgą",
+          "Stiprina raumenų ir kaulų sistemą"
+        ],
+        "instructions": [
+          "Prieš mankštą apšilkite",
+          "Įsitikinkite, kad naudojate tinkamą techniką",
+          "Kontroliuokite kvėpavimą – iškvėpkite su pastangomis",
+          "Tarp rinkinių pailsėkite 60-90 sekundžių."
+        ],
+        "tips": [
+          "Pradėkite nuo lengvesnių svorių ir palaipsniui didinkite.",
+          "Nelaikykite kvėpavimo",
+          "Atlikite 2-3 kartus per savaitę",
+          "Sumažinkite krūvį, kai jaučiatės pavargę"
+        ]
+      }
+    }
+  },
+  "items": {
+    "autograph": "autografas",
+    "stick": "lazda",
+    "puck": "ritulį",
+    "jersey": "Džersis"
+  },
+  "requests": {
+    "pending": "Laukiama atsakymo",
+    "accepted": "Priimta",
+    "rejected": "Atmesta",
+    "giftRequests": "Dovanų prašymai"
+  },
+  "auth": {
+    "login": "Išeinant ant ledo",
+    "register": "Registracija",
+    "phone": "Telefonas",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Įveskite savo telefono numerį su šalies kodu",
+    "code": "Patvirtinimo kodas",
+    "codePlaceholder": "Įveskite kodą",
+    "sendCode": "Siųsti kodą",
+    "resendCode": "Pakartokite po",
+    "verifyCode": "Patvirtinkite kodą",
+    "invalidPhone": "Netinkamas telefono numerio formatas",
+    "invalidCode": "Neteisingas patvirtinimo kodas",
+    "codeSent": "Kodas išsiųstas į",
+    "codeResent": "Kodas išsiųstas dar kartą.",
+    "required": "Reikalingas leidimas",
+    "loginRequired": "Norėdami peržiūrėti žaidėjo profilį, turite prisijungti.",
+    "welcomeBack": "Sveiki sugrįžę!",
+    "welcomeBackMessage": "Sveiki sugrįžę, {name}!",
+    "codeSentSuccess": "Kodas išsiųstas!",
+    "codeSentMessage": "Patikrinkite SMS savo telefone ir įveskite patvirtinimo kodą",
+    "userNotFound": "Vartotojas nerastas",
+    "userNotFoundMessage": "Paskyros šiuo telefono numeriu nėra. Prašome užsiregistruoti.",
+    "errorSendingCode": "Klaida",
+    "errorSendingCodeMessage": "Nepavyko išsiųsti kodo. Patikrinkite savo telefono numerį ir interneto ryšį.",
+    "errorResendingCode": "Klaida",
+    "errorResendingCodeMessage": "Nepavyko pakartotinai išsiųsti kodo",
+    "errorVerifyingCode": "Klaida",
+    "errorVerifyingCodeMessage": "Tikrinant kodą įvyko klaida.",
+    "errorSendingCodeGeneral": "Nepavyko išsiųsti kodo. Bandykite dar kartą.",
+    "errorSendingCodeResend": "Nepavyko pakartotinai išsiųsti kodo",
+    "errorInvalidCode": "Įveskite 6 skaitmenų kodą",
+    "errorRegistration": "Nepavyko užbaigti registracijos",
+    "errorLoginRequired": "Turite prisijungti prie savo profilio",
+    "errorLoginRequiredMessage": "Norėdami siųsti pranešimus, turite būti prisijungę.",
+    "errorLoginRequiredFriends": "Turite prisijungti, kad ką nors pridėtumėte prie draugų.",
+    "errorRemoveFriend": "Nepavyko pašalinti iš draugų",
+    "errorSendFriendRequest": "Nepavyko išsiųsti prašymo draugauti",
+    "errorCancelRequest": "Nepavyko atšaukti užklausos",
+    "errorAcceptRequest": "Nepavyko priimti užklausos",
+    "errorManageFriends": "Tvarkant draugus įvyko klaida.",
+    "errorRejectRequest": "Nepavyko atmesti užklausos",
+    "errorRejectRequestGeneral": "Atmetant jūsų užklausą įvyko klaida.",
+    "errorOpenLink": "Nepavyko atidaryti nuorodos",
+    "errorDataNotFound": "Duomenų nerasta",
+    "errorNoEditRights": "Neturite leidimo redaguoti šio profilio.",
+    "errorClearTeams": "Nepavyko išvalyti senų komandų duomenų",
+    "errorSaveTeams": "Nepavyko išsaugoti komandų",
+    "errorSaveChanges": "Nepavyko išsaugoti pakeitimų",
+    "errorAdminOnly": "Tik administratorius gali ištrinti vartotojus",
+    "errorPlayerNotFound": "Žaidėjo duomenys nerasta",
+    "errorDeleteUser": "Nepavyko ištrinti vartotojo",
+    "errorCreateUser": "Nepavyko sukurti vartotojo",
+    "errorFillNamePhone": "Prašome įrašyti savo vardą ir telefono numerį",
+    "errorLoadNotifications": "Nepavyko įkelti pranešimų",
+    "errorGetNotifications": "Nepavyko gauti pranešimų",
+    "errorClearNotifications": "Nepavyko išvalyti pranešimų",
+    "errorInvalidNotificationData": "Klaidingi pranešimo duomenys",
+    "errorProcessNotification": "Nepavyko apdoroti pranešimo. Bandykite dar kartą.",
+    "errorProcessNotificationGeneral": "Nepavyko apdoroti pranešimo. Bandykite dar kartą.",
+    "errorProcessFriendRequest": "Nepavyko apdoroti jūsų užklausos draugauti.",
+    "errorProcessRequest": "Nepavyko apdoroti jūsų užklausos",
+    "errorSendMessage": "Nepavyko išsiųsti pranešimo"
+  },
+  "profile": {
+    "addFriend": "Pridėti kaip draugą",
+    "addFriendQuestion": "Ar norėtumėte pridėti {name} kaip draugą?",
+    "sendMessage": "Siųsti žinutę",
+    "loading": "Įkeliama...",
+    "basicInfo": "Pagrindinė informacija",
+    "physicalData": "Fiziniai duomenys",
+    "country": "Šalis",
+    "position": "Padėtis",
+    "number": "Skaičius",
+    "grip": "sukibimas",
+    "birthDate": "Gimimo data",
+    "Левый": "Kairė",
+    "Правый": "Teisingai",
+    "Center": "Centro į priekį",
+    "Winger": "Krašto puolėjas",
+    "Defender": "Gynėjas",
+    "Goalie": "Vartininkas",
+    "height": "Aukštis",
+    "weight": "Svoris",
+    "age": "Amžius",
+    "team": "Komanda",
+    "status": "Būsena",
+    "player": "Žaidėjas",
+    "coach": "Treneris",
+    "scout": "Skautas",
+    "admin": "Techninė pagalba",
+    "star": "Žvaigždė",
+    "shop": "Ledo ritulio parduotuvė",
+    "skateSharpening": "Patinų galavimas",
+    "organizationName": "Organizacijos pavadinimas",
+    "organizationNamePlaceholder": "Organizacijos pavadinimas",
+    "services": "Paslaugos",
+    "notSpecified": "Nenurodyta",
+    "yearsOld": "metų",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Kairė",
+    "right": "Teisingai",
+    "skateSharpeningService": "Patinų galavimas",
+    "skateForming": "Patinų formavimas",
+    "skateProfiling": "Patinų profiliavimas",
+    "equipmentRepair": "Ledo ritulio įrangos remontas",
+    "stickRepair": "Lazdų remontas",
+    "usedEquipmentSale": "Naudotos įrangos pardavimas",
+    "newEquipmentSale": "Naujos įrangos pardavimas",
+    "center": "Centro į priekį",
+    "winger": "Krašto puolėjas",
+    "defender": "Gynėjas",
+    "goalie": "Vartininkas",
+    "Left": "Kairė",
+    "Right": "Teisingai",
+    "inHockey": "Ledo ritulyje",
+    "lengthInCm": "Ilgis cm",
+    "additional": "Papildomai",
+    "cancel": "Atšaukti",
+    "friends": "Draugai",
+    "friendship": "Draugystė",
+    "statistics": "Dabartinio sezono statistika",
+    "teams": "Komandos",
+    "currentTeams": "Dabartinės komandos",
+    "pastTeams": "Buvusios komandos",
+    "teamInfo": "Informacija apie komandą",
+    "videoMoments": "Vaizdo įrašų akcentai",
+    "standards": "Standartai",
+    "achievements": "Pasiekimai",
+    "noAchievements": "Jokių pasiekimų",
+    "hockeyPhotos": "Ledo ritulio nuotraukos",
+    "photos": "Nuotrauka",
+    "museum": "Muziejus",
+    "youAreFriendsWith": "Ar draugauji su",
+    "addToFriends": "Pridėti kaip draugą",
+    "addToFriendsToSeeStandards": "Pridėkite {name} kaip draugą, kad pamatytumėte standartus",
+    "addToFriendsToSeePhotos": "Pridėkite {name} prie draugo, kad pamatytumėte ledo ritulio nuotraukas",
+    "addToFriendsToSeeMuseum": "Pridėkite {name} kaip draugą, kad pamatytumėte muziejų",
+    "removeFromFriends": "Pašalinti iš draugų",
+    "points": "Taškai",
+    "friendsCount": "draugai",
+    "friendsCountStats": "Draugai",
+    "seconds": "sek",
+    "times": "vieną kartą",
+    "sprint": "100 metrų bėgimas",
+    "Центральный нападающий": "Centro į priekį",
+    "Крайний нападающий": "Krašto puolėjas",
+    "Защитник": "Gynėjas",
+    "Вратарь": "Vartininkas",
+    "настоящее время": "dabartinis laikas",
+    "goals": "Įvarčiai",
+    "assists": "Perdavimai",
+    "games": "Žaidimai",
+    "pullUps": "Prisitraukimai",
+    "pushUps": "Atsispaudimai",
+    "plankTime": "lenta (sek.)",
+    "sprint100m": "100 m (sek.)",
+    "longJump": "Šuolis į tolį",
+    "jumpRope": "Šokinėja virvė",
+    "goalsCount": "galvos",
+    "gamesCount": "žaidimai",
+    "belarus": "Baltarusija",
+    "usa": "JAV",
+    "russia": "Rusija",
+    "canada": "Kanada",
+    "finland": "Suomija",
+    "sweden": "Švedija",
+    "czech": "Čekijos Respublika",
+    "slovakia": "Slovakija",
+    "germany": "Vokietija",
+    "switzerland": "Šveicarija",
+    "austria": "Austrija",
+    "norway": "Norvegija",
+    "denmark": "Danija",
+    "latvia": "Latvija",
+    "lithuania": "Lietuva",
+    "estonia": "Estija",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazachstanas",
+    "squats": "Pritūpimai",
+    "plank": "Lenta",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "Ledo ritulyje su",
+    "noFriendsYet": "{name} dar neturi draugų",
+    "beFirstToAdd": "Būkite pirmasis, kuris prideda {name} kaip draugą",
+    "writeMessage": "Parašyk žinutę",
+    "edit": "Redaguoti",
+    "deleteUser": "Ištrinti vartotoją",
+    "noExercisesYet": "Žaidėjas dar neatliko jokių pratimų.",
+    "noGiftsYet": "Dovanų dar negauta",
+    "editProfile": "Redaguoti profilį",
+    "writeToSupport": "Rašykite techninei pagalbai",
+    "noExercisesOwn": "Dar neatlikote jokių pratimų.",
+    "noExercisesOther": "Žaidėjas dar neatliko jokių pratimų.",
+    "removedFromFriends": "{name} pašalintas iš draugų",
+    "removeFriendError": "Nepavyko pašalinti iš draugų",
+    "friendRequestSent": "Prašymas draugauti išsiųstas",
+    "friendshipAccepted": "{name} pridėtas kaip draugas",
+    "cancelRequest": "Atšaukti užklausą",
+    "friendRequestError": "Nepavyko išsiųsti prašymo draugauti",
+    "friendRequestAcceptError": "Nepavyko priimti užklausos",
+    "friendRequestCancelled": "Draugo prašymas atšauktas",
+    "friendRequestCancelError": "Nepavyko atšaukti užklausos",
+    "deleteUserConfirm": "Ar tikrai norite ištrinti naudotoją \"{{name}}“? Šio veiksmo anuliuoti negalima.",
+    "userDeleted": "Naudotojas \"{{name}}“ buvo ištrintas",
+    "wantsToAddYouToFriends": "{{name}} nori pridėti jus kaip draugą",
+    "friendRequestReceived": "{{name}} nori pridėti jus kaip draugą",
+    "loadingProfile": "Įkeliamas profilis...",
+    "playerNotFound": "Žaidėjas nerastas",
+    "addAchievement": "Pridėkite pasiekimą",
+    "editAchievement": "Redaguoti pasiekimą",
+    "competitionName": "Konkurso pavadinimas",
+    "year": "Metai",
+    "place": "Vieta",
+    "description": "Aprašymas (neprivaloma)",
+    "shopName": "Parduotuvės pavadinimas",
+    "address": "Adresas",
+    "map": "Žemėlapis",
+    "workingHours": "Darbo laikas",
+    "discountForFriends": "Draugams nuolaida",
+    "hockeyShop": "Ledo ritulio parduotuvė",
+    "nameHint": "Naudokite tik lotyniškas raides",
+    "photo": "Nuotrauka",
+    "selectPhoto": "Pasirinkite nuotrauką",
+    "logo": "Logotipas",
+    "selectLogo": "Pasirinkite logotipą",
+    "selectCountry": "Pasirinkite šalį",
+    "searchCountry": "Ieškokite šalies",
+    "errorEnterCompetition": "Įveskite konkurso pavadinimą",
+    "errorEnterYear": "Įveskite galiojančius metus.",
+    "grips": {
+      "Левый": "Kairė",
+      "Правый": "Teisingai"
+    },
+    "countries": {
+      "Канада": "Kanada",
+      "США": "JAV",
+      "Россия": "Rusija",
+      "Швеция": "Švedija",
+      "Финляндия": "Suomija",
+      "Чехия": "Čekijos Respublika",
+      "Словакия": "Slovakija",
+      "Швейцария": "Šveicarija",
+      "Германия": "Vokietija",
+      "Австрия": "Austrija",
+      "Норвегия": "Norvegija",
+      "Дания": "Danija",
+      "Латвия": "Latvija",
+      "Литва": "Lietuva",
+      "Эстония": "Estija",
+      "Беларусь": "Baltarusija",
+      "Украина": "Ukraina",
+      "Польша": "Lenkija",
+      "Венгрия": "Vengrija",
+      "Словения": "Slovėnija",
+      "Хорватия": "Kroatija",
+      "Франция": "Prancūzija",
+      "Италия": "Italija",
+      "Испания": "Ispanija",
+      "Нидерланды": "Nyderlandai",
+      "Бельгия": "Belgija",
+      "Великобритания": "Jungtinė Karalystė",
+      "Исландия": "Islandija",
+      "Люксембург": "Liuksemburgas",
+      "Румыния": "Rumunija",
+      "Болгария": "Bulgarija",
+      "Сербия": "Serbija",
+      "Турция": "Turkija",
+      "Казахстан": "Kazachstanas",
+      "Узбекистан": "Uzbekistanas",
+      "Китай": "Kinija",
+      "Япония": "Japonija",
+      "Южная Корея": "Pietų Korėja",
+      "Тайвань": "Taivanas",
+      "Гонконг": "Honkongas",
+      "Сингапур": "Singapūras",
+      "Малайзия": "Malaizija",
+      "Таиланд": "Tailandas",
+      "Индия": "Indija",
+      "Объединенные Арабские Эмираты": "Jungtiniai Arabų Emyratai",
+      "Израиль": "Izraelis",
+      "Австралия": "Australija",
+      "Новая Зеландия": "Naujoji Zelandija",
+      "Мексика": "Meksika",
+      "ЮАР": "Pietų Afrika",
+      "Аргентина": "Argentina"
+    },
+    "positions": {
+      "center": "Centro į priekį",
+      "winger": "Krašto puolėjas",
+      "defender": "Gynėjas",
+      "goalie": "Vartininkas",
+      "центральный нападающий": "vidurio puolėjas",
+      "крайний нападающий": "krašto puolėjas",
+      "защитник": "gynėjas",
+      "вратарь": "vartininkas",
+      "Центральный нападающий": "Centro į priekį",
+      "Крайний нападающий": "Krašto puolėjas",
+      "Защитник": "Gynėjas",
+      "Вратарь": "Vartininkas"
+    },
+    "discountForFriendsHint": "Pridėkite parduotuvę kaip draugą ir gaukite nuolaidą! Pirkdami parodykite nuolaidą pardavėjui.",
+    "activityRating": "Aktyvumo reitingas",
+    "coachingYears": "Trenuoja metus",
+    "phone": "Telefonas",
+    "qrCodeTitle": "Profilio QR kodas",
+    "qrCodeSubtitle": "Nuskaitykite greitam prieigai",
+    "qrCodeInfo": "Nukreipkite telefono kamerą į QR kodą, kad atidarytumėte profilį",
+    "shareProfile": "Dalintis profiliu",
+    "savedToGallery": "Išsaugota galerijoje",
+    "noPermission": "Nėra prieigos prie galerijos",
+    "shareError": "Klaida kuriant vaizdą",
+    "currentTeam": "Komanda",
+    "hockeyExperience": "Ledo ritulio patirtis",
+    "years": "metai",
+    "currentSeasonStats": "Dabartinio sezono statistika"
+  },
+  "register": {
+    "title": "Registracija",
+    "status": "Būsena",
+    "player": "Žaidėjas",
+    "coach": "Treneris",
+    "scout": "Skautas",
+    "star": "Žvaigždė",
+    "shop": "Ledo ritulio parduotuvė",
+    "phone": "Telefonas",
+    "name": "Vardas",
+    "surname": "Pavardė",
+    "birthDate": "Gimimo data",
+    "country": "Šalis",
+    "position": "Padėtis",
+    "grip": "Sugriebimas",
+    "height": "Aukštis (cm)",
+    "weight": "Svoris (kg)",
+    "number": "Skaičius",
+    "photo": "Nuotrauka",
+    "selectPhoto": "Pasirinkite nuotrauką",
+    "takePhoto": "Nufotografuokite",
+    "chooseFromGallery": "Pasirinkite iš galerijos",
+    "photoRequired": "Būtina nuotrauka",
+    "register": "Registruotis",
+    "back": "Atgal",
+    "welcome": "Sveiki atvykę!",
+    "registrationSuccess": "Registracija sėkmingai baigta! Sveiki atvykę į HockeyStars!",
+    "selectDate": "Pasirinkite datą",
+    "cancel": "Atšaukti",
+    "confirm": "Patvirtinti",
+    "photoError": "Įkeliant nuotrauką įvyko klaida"
+  },
+  "navigation": {
+    "home": "Pradžia",
+    "search": "Ieškoti",
+    "messages": "Žinutės",
+    "notifications": "Įvykiai",
+    "profile": "Profilis"
+  },
+  "admin": {
+    "accessDenied": "Prieiga uždrausta",
+    "onlyAdmins": "Šia funkcija gali naudotis tik administratoriai.",
+    "error": "Klaida",
+    "errorLoadingProfile": "Nepavyko pasiekti profilio",
+    "player": "Žaidėjas",
+    "coach": "Treneris",
+    "scout": "Skautas",
+    "admin": "Admin",
+    "star": "Žvaigždė",
+    "shop": "Ledo ritulio parduotuvė",
+    "noName": "Vardo nėra",
+    "noPosition": "Nenurodyta",
+    "noTeam": "Nenurodyta",
+    "sendGift": "Siųsti dovaną",
+    "yearsOld": "metų",
+    "addUser": "Pridėti naudotoją",
+    "searchPlayers": "Ieškome žaidėjų...",
+    "createUser": "Vartotojo kūrimas",
+    "basicInfo": "Pagrindinė informacija",
+    "name": "Vardas",
+    "phone": "Telefono numeris",
+    "status": "Būsena",
+    "position": "Padėtis",
+    "number": "Žaidėjo numeris",
+    "grip": "Sugriebimas",
+    "height": "Aukštis (cm)",
+    "weight": "Svoris (kg)",
+    "country": "Šalis",
+    "create": "Sukurti",
+    "success": "Sėkmės",
+    "userCreated": "Vartotojas {{name}} buvo sukurtas",
+    "errorCreatingUser": "Nepavyko sukurti vartotojo",
+    "fillRequiredFields": "Užpildykite visus privalomus laukus.",
+    "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+  },
+  "adminGifts": {
+    "sendGift": "Siųsti dovaną",
+    "giftName": "Dovanos pavadinimas",
+    "selectImage": "Pasirinkti vaizdą"
+  },
+  "museum": {
+    "title": "Muziejus",
+    "noItems": "Muziejus vis dar tuščias."
+  },
+  "teams": {
+    "Система": "Sistema",
+    "Привет": "Sveiki",
+    "Пираньи": "Piranijos",
+    "Динамо Минск": "Minsko \"Dinamo“.",
+    "Динамо-Минск": "Minsko \"Dinamo“.",
+    "Юность-Минск": "Junost-Minskas",
+    "Юность": "Jaunimas",
+    "Неман": "Nemanas",
+    "Гомель": "Gomelis",
+    "Брест": "Brestas",
+    "Витебск": "Vitebskas",
+    "Львы": "Liūtai",
+    "Керамин": "Keraminas",
+    "Могилев": "Mogiliovas",
+    "Гродно": "Gardinas",
+    "Сборная Беларуси": "Baltarusijos rinktinė",
+    "Сборная Минской области": "Minsko srities rinktinė",
+    "Сборная Гомельской области": "Gomelio regiono komanda",
+    "Сборная Брестской области": "Bresto regiono komanda",
+    "Сборная Витебской области": "Vitebsko srities rinktinė",
+    "Сборная Могилевской области": "Mogiliovo srities komanda",
+    "Сборная Гродненской области": "Gardino srities rinktinė",
+    "ХК Минск": "Minsko HC",
+    "ХК Гомель": "HC Gomel",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogiliovas",
+    "ХК Гродно": "HC Gardino",
+    "Динамо": "Dinamo",
+    "Спартак": "Spartakas",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Julajevas",
+    "Ак Барс": "Ak Bars",
+    "Металлург": "Metalurgas",
+    "Трактор": "Traktorius",
+    "Авангард": "Avangardas",
+    "Сибирь": "Sibiras",
+    "Амур": "Amūras",
+    "Адмирал": "Admirolas",
+    "Локомотив": "Lokomotyvas",
+    "Северсталь": "Severstal",
+    "Витязь": "Riteris",
+    "Сочи": "Sočis",
+    "Торпедо": "Torpeda",
+    "Нефтехимик": "naftos chemikas",
+    "Автомобилист": "Vairuotojas",
+    "Югра": "Jugra",
+    "Барыс": "Barysas",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Rygos \"Dinamo“.",
+    "Динамо Москва": "Maskvos \"Dinamo“.",
+    "Динамо Минск U20": "Minsko Dinamo U20",
+    "Динамо Минск U18": "Minsko Dinamo U18",
+    "Calgary Flames": "Kalgario \"Flames“.",
+    "New Jersey Devils": "Naujojo Džersio velniai",
+    "Юность-Минск U20": "Junost-Minskas U20",
+    "Юность-Минск U18": "Junost-Minskas U18",
+    "teams": {
+      "Сборная Беларуси": "Baltarusijos rinktinė",
+      "Динамо Минск": "Minsko \"Dinamo“.",
+      "Юность-Минск": "Junost-Minskas",
+      "Пираньи": "Piranijos",
+      "Сборная Минской области": "Minsko srities rinktinė",
+      "Сборная Беларуси U14": "Baltarusijos U14 rinktinė",
+      "Пчелки": "Bitės",
+      "Беларусь U14": "Baltarusijos U14 rinktinė",
+      "Минская область": "Minsko srities rinktinė",
+      "New Jersey Devils": "Naujojo Džersio velniai",
+      "Calgary Flames": "Kalgario \"Flames“.",
+      "Boston Hockey Club": "Bostono ledo ritulio klubas",
+      "Belarus U14 National Team": "Baltarusijos U14 rinktinė",
+      "Belarus National Team U14": "Baltarusijos U14 rinktinė",
+      "Minsk Region Team": "Minsko srities rinktinė",
+      "Piranhas": "Piranijos",
+      "Bees": "Bitės",
+      "Toronto Maple Leafs": "Toronto klevo lapai",
+      "Montreal Canadiens": "Monrealio \"Canadiens“.",
+      "Vancouver Canucks": "Vankuverio \"Canucks“.",
+      "Edmonton Oilers": "Edmontono \"Oilers“.",
+      "Winnipeg Jets": "Winnipeg Jets",
+      "Ottawa Senators": "Otavos senatoriai",
+      "New York Rangers": "Niujorko \"Rangers“.",
+      "Boston Bruins": "Bostono \"Bruins“.",
+      "Chicago Blackhawks": "Čikagos \"Blackhawks“.",
+      "Detroit Red Wings": "Detroito \"Red Wings“.",
+      "Pittsburgh Penguins": "Pitsburgo pingvinai",
+      "Washington Capitals": "Vašingtono sostinės",
+      "Tampa Bay Lightning": "Tampos įlankos žaibas",
+      "Colorado Avalanche": "Kolorado lavina",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kaunas",
+      "Vilnius": "Vilnius",
+      "Klaipeda": "Klaipėda",
+      "Riga": "Ryga",
+      "Daugavpils": "Daugpilis",
+      "Liepaja": "Liepoja",
+      "Cracovia": "Cracovia",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "Rusijos nacionalinė komanda",
+      "Сборная Канады": "Kanados komanda",
+      "Сборная США": "JAV komanda",
+      "Сборная Финляндии": "Suomijos rinktinė",
+      "Сборная Швеции": "Švedijos rinktinė",
+      "Сборная Беларуси U20": "Baltarusijos U20 rinktinė",
+      "Сборная Беларуси U18": "Baltarusijos U18 rinktinė",
+      "Динамо Минск U20": "Minsko Dinamo U20",
+      "Динамо Минск U18": "Minsko Dinamo U18",
+      "Юность-Минск U20": "Junost-Minskas U20",
+      "Юность-Минск U18": "Junost-Minskas U18",
+      "ШРС": "SRS",
+      "Динамо-Молодечно": "Dinamo-Molodechno",
+      "Динамо Р": "Dinamo R",
+      "Слован": "Slovanas",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranovičius",
+      "Шахтер": "Šachtioras",
+      "Лида": "Lyda",
+      "Пинск": "Pinskas",
+      "Ивацевичи": "Ivatsevičius",
+      "Береза": "Beržas",
+      "Кобрин": "Kobrinas",
+      "Химик": "Khimik",
+      "Жлобин": "Žlobinas",
+      "Бобруйск": "Bobruiskas",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "RB rinktinė",
+      "Сборная Минска": "Minsko komanda",
+      "ЦСКА Москва": "Maskvos CSKA",
+      "Спартак Москва": "Maskvos \"Spartak“.",
+      "Локомотив Ярославль": "Jaroslavlio \"Lokomotiv“.",
+      "Ак Барс Казань": "Ak Bars Kazan",
+      "Трактор Челябинск": "Traktorius Čeliabinskas",
+      "Металлург Магнитогорск": "Magnitogorsko metalurgas",
+      "Торпедо Нижний Новгород": "Nižnij Novgorodo torpeda"
+    },
+    "Сборная Беларуси U14": "Baltarusijos U14 rinktinė",
+    "Барановичи": "Baranovičius",
+    "Шахтер": "Miner",
+    "Лида": "Lyda",
+    "Пинск": "Pinskas",
+    "Ивацевичи": "Ivatsevičius",
+    "Береза": "Beržas",
+    "Кобрин": "Kobrinas",
+    "Химик": "Chemikas",
+    "Жлобин": "Žlobinas",
+    "Бобруйск": "Bobruiskas",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "RB rinktinė",
+    "Сборная Минска": "Minsko komanda",
+    "ЦСКА Москва": "Maskvos CSKA",
+    "Спартак Москва": "Maskvos \"Spartak“.",
+    "Локомотив Ярославль": "Jaroslavlio \"Lokomotiv“.",
+    "Ак Барс Казань": "Ak Bars Kazan",
+    "Трактор Челябинск": "Traktorius Čeliabinskas",
+    "Металлург Магнитогорск": "Magnitogorsko metalurgas",
+    "Торпедо Нижний Новгород": "Nižnij Novgorodo torpeda",
+    "Boston Hockey Club": "Bostono ledo ritulio klubas",
+    "Пчелки": "Bitės",
+    "Center": "Centro į priekį",
+    "Winger": "Kraštas",
+    "Defender": "Gynėjas",
+    "Goalie": "Vartininkas"
+  },
+  "settings": {
+    "title": "Nustatymai",
+    "language": "Kalba",
+    "selectLanguage": "Pasirinkite kalbą",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Ieškoti",
+    "loading": "Įkeliama paieška...",
+    "placeholder": "Ieškome žaidėjų...",
+    "country": "Šalis",
+    "grip": "Sugriebimas",
+    "position": "Padėtis",
+    "year": "Metai",
+    "height": "Aukštis",
+    "heightFrom": "Aukštis nuo",
+    "weight": "Svoris",
+    "weightFrom": "Svoris nuo",
+    "all": "Visi",
+    "noPlayersFound": "Žaidėjų nerasta",
+    "left": "Kairė",
+    "right": "Teisingai"
+  },
+  "messages": {
+    "title": "Žinutės",
+    "loading": "Įkeliami pokalbiai...",
+    "noMessages": "Jokių pranešimų",
+    "startConversation": "Pradėkite kalbėtis su kitais žaidėjais",
+    "error": "Klaida",
+    "errorLoadingChats": "Nepavyko įkelti pokalbių",
+    "yesterday": "vakar",
+    "you": "Jūs:"
+  },
+  "notifications": {
+    "title": "Įvykiai",
+    "loading": "Įkeliami įvykiai...",
+    "noNotifications": "Jokių įvykių",
+    "noNotificationsSubtitle": "Dar neturite jokių įvykių apie draugystę, dovanas ar kitus veiksmus.",
+    "accept": "Priimti",
+    "decline": "Atmesti",
+    "friendRequests": "Draugo prašymai",
+    "friendRequest": "draugo prašymas",
+    "wantsToAddYou": "{name} nori pridėti jus kaip draugą",
+    "wantsToAddAsFriend": "nori pridėti jus kaip draugą",
+    "friendRequestAccepted": "Prašymas draugauti priimtas!",
+    "friendRequestDeclined": "Draugo prašymas atmestas",
+    "giftRequest": "Dovanų prašymas",
+    "giftRequestMessage": "{playerName} prašo {itemType}",
+    "giftRequestApproved": "Prašymas patvirtintas",
+    "giftRequestApprovedMessage": "{starName} patvirtino jūsų prašymą dėl {itemType}",
+    "giftRequestAccepted": "Dovanų prašymas priimtas!",
+    "giftRequestRejected": "Dovanų prašymas atmestas",
+    "player": "Žaidėjas",
+    "unknownPlayer": "Nežinomas žaidėjas",
+    "star": "Žvaigždė"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Pasirinkite nuotraukos šaltinį",
+    "selectPhotoMessage": "Iš kur norite įkelti nuotrauką?",
+    "gallery": "Galerija",
+    "camera": "Fotoaparatas",
+    "cancel": "Atšaukti",
+    "save": "Išsaugoti",
+    "name": "Vardas",
+    "namePlaceholder": "Žaidėjo vardas",
+    "country": "Šalis",
+    "position": "Padėtis",
+    "height": "Aukštis (cm)",
+    "heightPlaceholder": "Aukštis",
+    "weight": "Svoris (kg)",
+    "weightPlaceholder": "Svoris",
+    "number": "Skaičius",
+    "grip": "Sugriebimas",
+    "birthDate": "Gimimo data",
+    "socialLinks": "Socialinė žiniasklaida",
+    "Левый": "Kairė"
+  },
+  "exercisesSection": {
+    "title": "Pratimai baigti",
+    "loading": "Įkeliama...",
+    "noExercises": "Dar neatlikote jokių pratimų.",
+    "noExercisesOwn": "Dar neatlikote jokių pratimų.",
+    "noExercisesOther": "Vartotojas dar neatliko jokių pratimų.",
+    "times": "vieną kartą",
+    "timesPlural": "kartų"
+  },
+  "home": {
+    "loadingPlayers": "Ledo atnaujinimas...",
+    "noPlayersCountry": "Nėra žaidėjų iš {{country}}",
+    "noPlayersYear": "Nėra žaidėjų, gimusių {{year}}",
+    "noPlayersCountryYear": "Nėra žaidėjų iš {{country}} per {{year}}",
+    "iceEmpty": "Ledas tuščias. Pasirinkite kitą šalį ar metus arba iš naujo nustatykite filtrus.",
+    "waitingForConnection": "Laukiama ryšio",
+    "checkInternetConnection": "Patikrinkite interneto ryšį"
+  },
+  "filters": {
+    "year": "metų",
+    "yearDefault": "2012 m"
+  },
+  "chat": {
+    "loading": "Įkeliamas pokalbis...",
+    "startConversation": "Pradėti pokalbį su {name}",
+    "enterMessage": "Įveskite savo žinutę...",
+    "player": "Žaidėjas",
+    "coach": "Treneris",
+    "scout": "Skautas",
+    "admin": "Techninė pagalba",
+    "star": "Žvaigždė",
+    "shop": "Ledo ritulio parduotuvė",
+    "error": "Klaida",
+    "errorLoadingChat": "Nepavyko įkelti pokalbių duomenų",
+    "errorSendingMessage": "Nepavyko išsiųsti pranešimo"
+  },
+  "createUser": {
+    "title": "Vartotojo kūrimas",
+    "selectPhotoSource": "Pasirinkite nuotraukos šaltinį",
+    "selectPhotoMessage": "Iš kur norite įkelti nuotrauką?",
+    "gallery": "Galerija",
+    "camera": "Fotoaparatas",
+    "cancel": "Atšaukti",
+    "permissionError": "Norint patekti į galeriją reikalingas leidimas.",
+    "permissionErrorCamera": "Norint pasiekti kamerą reikalingas leidimas.",
+    "errorLoadingPhoto": "Nepavyko įkelti nuotraukos iš galerijos",
+    "errorTakingPhoto": "Nepavyko nufotografuoti",
+    "addPhoto": "Pridėkite nuotrauką",
+    "status": "Būsena",
+    "player": "Žaidėjas",
+    "coach": "Treneris",
+    "scout": "Skautas",
+    "star": "Žvaigždė",
+    "shop": "Ledo ritulio parduotuvė",
+    "phone": "Telefono numeris",
+    "name": "Vardas ir pavardė",
+    "namePlaceholder": "Įveskite VARDĄ",
+    "nameHint": "Tik lotyniškos raidės (A–Z)",
+    "birthDate": "Gimimo data",
+    "selectBirthDate": "Pasirinkite savo gimimo datą",
+    "position": "Padėtis",
+    "number": "Žaidėjo numeris",
+    "numberPlaceholder": "Numeris ant uniformos",
+    "grip": "Sugriebimas",
+    "height": "Aukštis (cm)",
+    "heightPlaceholder": "Aukštis",
+    "weight": "Svoris (kg)",
+    "weightPlaceholder": "Svoris",
+    "country": "Šalis",
+    "selectCountry": "Pasirinkite šalį",
+    "searchCountry": "Ieškoma šalies...",
+    "close": "Uždaryti",
+    "create": "Sukurti",
+    "error": "Klaida",
+    "fillRequiredFields": "Užpildykite visus privalomus laukus.",
+    "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+  },
+  "logout": "Atsijungti",
+  "logoutConfirm": "Atsijungti nuo profilio",
+  "logoutConfirmMessage": "Ar tikrai norite atsijungti nuo savo profilio?",
+  "gifts": {
+    "from": "nuo",
+    "puck": "Ritulys",
+    "stick": "Lazda",
+    "jersey": "Marškiniai",
+    "autograph": "Autografas",
+    "sendGiftTo": "Siųsti dovaną {playerName}",
+    "selectExistingGift": "Pasirinkti esamą dovaną",
+    "orCreateNew": "Arba sukurti naują",
+    "giftName": "Dovanos pavadinimas",
+    "giftNamePlaceholder": "pvz., Pasirašyta kepurė",
+    "uploadImage": "Įkelti vaizdą",
+    "send": "Siųsti",
+    "selectGift": "Pasirinkti dovaną",
+    "myGifts": "Mano dovanos",
+    "noGifts": "Dovanų dar nėra",
+    "noGiftsSubtext": "Įkelkite pirmą dovaną, kad galėtumėte dalintis su žaidėjais",
+    "fromAdmin": "Administratorius",
+    "errorSelectOrCreate": "Pasirinkite dovaną arba sukurkite naują",
+    "errorGiftAlreadyExists": "Ši dovana jau yra žaidėjui {playerName}.\n\nPasirinkite kitą dovaną arba sukurkite naują.",
+    "successGiftSent": "Dovana išsiųsta {playerName}!",
+    "errorSendingGift": "Nepavyko išsiųsti dovanos",
+    "deleteGiftQuestion": "Ištrinti dovaną?",
+    "deleteGiftConfirm": "Ar tikrai norite ištrinti šią dovaną?",
+    "successDeleted": "Dovana ištrinta",
+    "errorDelete": "Nepavyko ištrinti dovanos",
+    "selectImage": "Pasirinkti vaizdą",
+    "errorPermissionDenied": "Neturite leidimo ištrinti šią dovaną",
+    "errorGiftNotFound": "Dovana nerasta",
+    "errorGiftNotDeleted": "Dovana nebuvo ištrinta",
+    "noGiftsUploaded": "Dar neįkeltos dovanos",
+    "fromStar": "nuo {starName}",
+    "giftReceived": "Gauta dovana!",
+    "giftReceivedFromAdmin": "Gavote dovaną iš administratoriaus: {giftName}",
+    "giftReceivedFromStar": "Gavote dovaną iš {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Gauta dovana!",
+    "giftReceivedFromAdminPush": "Gavote dovaną iš administratoriaus: {giftName}",
+    "giftReceivedFromStarPush": "Gavote dovaną iš {starName}: {giftName}"
+  },
+  "videoNotification": {
+    "added": "pridėjo",
+    "oneVideo": "naują vaizdo įrašą",
+    "multipleVideos": "{count} naujų vaizdo įrašų",
+    "video": "vaizdo įrašas",
+    "videos": "vaizdo įrašai"
+  },
+  "achievementNotification": {
+    "added": "pridėjo",
+    "received": "gavo",
+    "oneAchievement": "naują pasiekimą",
+    "multipleAchievements": "{count} naujų pasiekimų",
+    "achievement": "pasiekimas",
+    "achievements": "pasiekimai",
+    "title": "🏆 Pasiekimas!",
+    "message": "Sveikiname! Gavote pasiekimą: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "pakeitė savo avatarą"
+  },
+  "statsNotification": {
+    "updated": "atnaujino",
+    "stats": "statistiką",
+    "normatives": "normatyvus",
+    "physicalData": "fizinius duomenis"
+  },
+  "height": "ūgis",
+  "weight": "svoris",
+  "cm": "cm",
+  "kg": "kg"
+}

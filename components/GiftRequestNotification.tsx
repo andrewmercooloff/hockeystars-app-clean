@@ -1,0 +1,210 @@
+import React from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../contexts/LanguageContext';
+
+interface GiftRequestNotificationProps {
+  playerName: string;
+  timestamp: string;
+  playerAvatar?: string | null;
+  itemType: string;
+  requestMessage: string;
+  onGift: () => void;
+}
+
+export default function GiftRequestNotification({
+  playerName,
+  timestamp,
+  playerAvatar,
+  itemType,
+  requestMessage,
+  onGift,
+}: GiftRequestNotificationProps) {
+  const { t } = useLanguage();
+
+  const formatTime = (timestamp: string): string => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
+
+    if (diffInMinutes < 1) {
+      return t('justNow');
+    } else if (diffInMinutes < 60) {
+      return t('minutesAgo', { minutes: diffInMinutes });
+    } else if (diffInMinutes < 1440) { // 24 hours
+      const hours = Math.floor(diffInMinutes / 60);
+      return t('hoursAgo', { hours });
+    } else {
+      const days = Math.floor(diffInMinutes / 1440);
+      return t('daysAgo', { days });
+    }
+  };
+
+  const getItemTypeName = (type: string) => {
+    switch (type) {
+      case 'autograph': return t('gifts.autograph') || 'автограф';
+      case 'stick': return t('gifts.stick') || 'клюшку';
+      case 'puck': return t('gifts.puck') || 'шайбу';
+      case 'jersey': return t('gifts.jersey') || 'джерси';
+      default: return type;
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.avatarContainer}>
+        {playerAvatar ? (
+          <Image
+            source={{ uri: playerAvatar }}
+            style={styles.playerAvatar}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="person-outline" size={24} color="#fff" />
+          </View>
+        )}
+      </View>
+
+      <View style={styles.contentContainer}>
+        <View style={styles.header}>
+          <Text style={styles.playerName} numberOfLines={1}>
+            {playerName}
+          </Text>
+          <Text style={styles.timeText}>
+            {formatTime(timestamp)}
+          </Text>
+        </View>
+
+        <View style={styles.requestItem}>
+          <View style={styles.messageRow}>
+            <View style={styles.textContainer}>
+              <Text style={styles.actionText}>
+                {t('notifications.giftRequestMessage', { 
+                  playerName, 
+                  itemType: getItemTypeName(itemType) 
+                })}
+              </Text>
+              
+              <Text style={styles.requestMessageText}>
+                {requestMessage}
+              </Text>
+            </View>
+            
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.giftButton]}
+                onPress={onGift}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.giftButtonText}>{t('notifications.gift')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    marginHorizontal: 20,
+    marginVertical: 8,
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderLeftWidth: 4,
+    borderLeftColor: '#4ECDC4', // Cyan for gift requests
+  },
+  avatarContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  playerAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  avatarPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  playerName: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    flex: 1,
+  },
+  timeText: {
+    color: '#aaa',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    marginLeft: 8,
+  },
+  requestItem: {
+    flexDirection: 'column',
+    paddingVertical: 4,
+  },
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  textContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  actionText: {
+    color: '#ddd',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    marginBottom: 4,
+  },
+  requestMessageText: {
+    color: '#ccc',
+    fontSize: 13,
+    fontFamily: 'Gilroy-Regular',
+    fontStyle: 'italic',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    minWidth: 70,
+  },
+  giftButton: {
+    backgroundColor: '#fa2f40',
+  },
+  giftButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+  },
+});
+

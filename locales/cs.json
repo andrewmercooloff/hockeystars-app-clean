@@ -1,0 +1,2473 @@
+{
+  "common": {
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "edit": "Upravit",
+    "delete": "Smazat",
+    "add": "Přidat",
+    "close": "Blízko",
+    "back": "Zadní",
+    "next": "Další",
+    "done": "Připraveno",
+    "loading": "Načítání...",
+    "error": "Chyba",
+    "success": "Úspěch",
+    "yes": "Ano",
+    "no": "Žádný",
+    "ok": "OK",
+    "confirm": "Potvrdit",
+    "deleteConfirm": "Odstranění",
+    "deletePhotoConfirm": "Opravdu chcete tuto fotku smazat?",
+    "deleteTeamConfirm": "Opravdu chcete tento příkaz smazat?",
+    "deletePastTeamConfirm": "Opravdu chcete tento příkaz odstranit z historie?",
+    "deleteAchievementConfirm": "Opravdu chcete tento úspěch odstranit?",
+    "deleteAllNotificationsConfirm": "Opravdu chcete vymazat všechna oznámení?",
+    "rejectRequestConfirm": "Opravdu chcete tuto žádost odmítnout?",
+    "super": "Skvělé!",
+    "retry": "Zkusit znovu",
+    "goalie": "Brankář"
+  },
+  "winger": "Křídelník",
+  "center": "Střed dopředu",
+  "defender": "Obránce",
+  "goals": "Cíle",
+  "assists": "Převody",
+  "games": "Hry",
+  "pullUps": "Přítahy",
+  "pushUps": "Shyby",
+  "plankTime": "Plank (s)",
+  "sprint100m": "100 m (s)",
+  "longJump": "skok do dálky (m)",
+  "jumpRope": "Švihadlo (jedno)",
+  "justNow": "právě teď",
+  "minutesAgo": "před {minutes} minutami",
+  "hoursAgo": "před {hours} hodinami",
+  "daysAgo": "před {days} dny",
+  "photoNotification": {
+    "added": "přidáno",
+    "onePhoto": "nová fotka",
+    "multiplePhotos": "{count} nových fotek",
+    "photo": "fotografie",
+    "photos": "fotografie"
+  },
+  "friendshipNotification": {
+    "title": "Nové přátelství",
+    "message": "{friend1Name} a {friend2Name} se stali přáteli",
+    "became": "se stali přáteli"
+  },
+  "exerciseNotification": {
+    "title": "Cvičení dokončeno",
+    "message": "{playerName} dokončil cvičení „{exerciseName}“",
+    "completed": "dokončil cvičení",
+    "exercise": "Cvičení"
+  },
+  "giftNotification": {
+    "title": "Dárek od hvězdy",
+    "message": "{playerName} obdržel {giftName} od {starName}",
+    "received": "přijaté",
+    "from": "z",
+    "gift": "Dárek"
+  },
+  "addPhoto": "Přidejte fotku",
+  "selectPhotoSource": "Vyberte zdroj fotografie",
+  "gallery": "Galerie",
+  "camera": "Fotoaparát",
+  "cancel": "Zrušit",
+  "error": "Chyba",
+  "maxPhotosReached": "Maximální počet fotografií: 50",
+  "galleryPermissionRequired": "Pro přístup do galerie je vyžadováno povolení.",
+  "galleryError": "Nepodařilo se načíst fotku z galerie.",
+  "cameraNotSupported": "Pořizování fotografií není ve webové verzi podporováno. Použijte prosím galerii.",
+  "cameraPermissionRequired": "Pro přístup ke kameře je vyžadováno povolení.",
+  "cameraError": "Fotografování se nezdařilo.",
+  "noPhotos": "Žádné fotky",
+  "clickToAddPhoto": "Začněte kliknutím na \"Přidat fotografii\".",
+  "maxPhotos": "Maximálně 50 fotografií",
+  "uploading": "Načítání...",
+  "uploadingPhotos": "Načítání {count} fotek... {progress} %",
+  "info": "Informace",
+  "addVideoLink": "Přidejte odkaz na YouTube nebo VK a aktuální čas (formát: minuty:sekundy, například: 1:25)",
+  "supportedPlatforms": "Podporované stránky: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... nebo vk.com/video...",
+  "timeCodePlaceholder": "min:sec",
+  "myMoment": "Moje chvíle",
+  "belarus": "Bělorusko",
+  "additional": "Navíc",
+  "left": "Vlevo",
+  "right": "Právo",
+  "birthDatePlaceholder": "MM.RRRR (například: 12.2014)",
+  "countPlaceholder": "Kolikrát",
+  "timePlaceholder": "Čas v sekundách",
+  "deleteUser": "Smazání uživatele",
+  "success": "Úspěšně",
+  "selectTeams": "Vyberte týmy",
+  "enterTeamName": "Zadejte název týmu",
+  "enterStartYear": "Zadejte prosím platný počáteční rok",
+  "enterEndYear": "Zadejte prosím platný konec roku.",
+  "createTeamError": "Nepodařilo se vytvořit příkaz v databázi",
+  "addTeam": "Přidejte příkaz",
+  "teamName": "Název týmu *",
+  "teamCountry": "Země (volitelné)",
+  "teamCity": "Město (volitelné)",
+  "startYear": "Počáteční rok *",
+  "endYear": "rok promoce (volitelné)",
+  "searchTeams": "Hledá se tým...",
+  "save": "Uložit",
+  "add": "Přidat",
+  "editTeam": "Upravit tým",
+  "noTeamsFound": "Nebyly nalezeny žádné příkazy",
+  "searching": "Vyhledávání...",
+  "noCurrentTeams": "Neexistují žádné aktuální příkazy.",
+  "addMoreVideo": "Přidejte další videa",
+  "noPastTeams": "Žádné minulé příkazy",
+  "noVideosAdded": "Nebyla přidána žádná videa",
+  "noTeamsSpecified": "Nebyly zadány žádné příkazy",
+  "selectCountry": "Vyberte zemi",
+  "selectPosition": "Vyberte pozici",
+  "basicInfo": "Základní informace",
+  "dateFormat": "DD.MM.RRRR",
+  "noPermission": "Nemáte oprávnění upravovat tento profil.",
+  "playerUpdated": "Data aktualizována",
+  "saveError": "Data se nepodařilo uložit",
+  "achievements": {
+    "firstPlace": "1. místo",
+    "secondPlace": "2. místo",
+    "thirdPlace": "3. místo",
+    "place": "{place} místo",
+    "noAchievements": "Žádné úspěchy"
+  },
+  "exercises": {
+    "exerciseNumber": "Cvičení č. {id}",
+    "title": "Cvičení",
+    "subtitle": "Vyberte cvičení",
+    "searchPlaceholder": "Hledat podle čísla nebo jména...",
+    "loadingExercise": "Načítání cvičení...",
+    "loadingExercises": "Načítání cvičení...",
+    "exercise": "Cvičení",
+    "alreadyCompleted": "Cvičení již bylo dokončeno",
+    "canRetryIn": "Toto cvičení můžete opakovat za {hours} h",
+    "all": "Vše",
+    "completed": "Dokončeno",
+    "times": "jednou",
+    "loading": "Načítání...",
+    "categories": {
+      "Выносливость": "Vytrvalost",
+      "Взрывная скорость": "Výbušná rychlost",
+      "Разминка": "Rozcvička",
+      "Растяжка": "Protahování",
+      "Ловкость": "Šikovnost",
+      "Сила": "Pevnost",
+      "Баланс": "Váhy",
+      "Скоростная выносливость": "Rychlostní výdrž",
+      "Восстановление": "Zotavení",
+      "Endurance": "Výdrž",
+      "Explosive Speed": "Výbušná rychlost",
+      "Warm-up": "Zahřátí",
+      "Stretching": "Protahování",
+      "Agility": "Obratnost",
+      "Strength": "Síla",
+      "Balance": "Rovnováha",
+      "Speed Endurance": "Rychlostní výdrž",
+      "Recovery": "Zotavení"
+    },
+    "details": {
+      "category": "Kategorie",
+      "duration": "Trvání",
+      "difficulty": "Složitost",
+      "description": "Popis",
+      "benefits": "Výhody cvičení",
+      "instructions": "Pokyny krok za krokem",
+      "tips": "Užitečné tipy",
+      "equipment": "Zařízení",
+      "calories": "Kalorie",
+      "additionalInfo": "Další informace",
+      "completed": "Dokončeno:",
+      "completedButton": "udělal jsem to",
+      "alreadyCompleted": "Již dokončeno",
+      "saving": "Ukládání...",
+      "notFound": "Cvičení nenalezeno",
+      "unavailable": "Není k dispozici",
+      "playersOnly": "Cvičení jsou dostupná pouze hráčům",
+      "markedComplete": "Cvičení je označeno jako dokončené",
+      "error": "Chyba",
+      "saveError": "Cvičení nelze označit jako dokončené",
+      "generalError": "Při ukládání došlo k chybě",
+      "times": "jednou",
+      "timesPlural": "časy"
+    },
+    "difficulty": {
+      "Начинающий": "Začátek",
+      "Средний": "Průměrný",
+      "Продвинутый": "Moderní",
+      "Легкая": "Snadný"
+    },
+    "items": {
+      "1": {
+        "title": "Intervalový běh",
+        "description": "Střídání rychlého běhu (30 sekund) a pomalého běhu (30 sekund) po dobu 20 minut. Vynikající pro rozvoj kardio vytrvalosti pro hokej.",
+        "equipment": "Běžecký pás nebo stadion",
+        "calories": "250-350 kcal na trénink",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí schopnost rychlého zotavení",
+          "Zlepšuje celkovou fyzickou kondici",
+          "Simuluje stres z hokejového zápasu"
+        ],
+        "instructions": [
+          "Začněte 5minutovým zahřátím lehkého běhání",
+          "Proveďte 30 sekund rychlého běhu (80-90 % maximální rychlosti)",
+          "Pro zotavení přepněte na 30 sekund pomalého běhání",
+          "Opakujte cyklus 20-25krát",
+          "Dokončete 5minutovým vychladnutím"
+        ],
+        "tips": [
+          "Sledujte svůj dech – dýchejte zhluboka a rytmicky",
+          "Nepřekračujte 90 % maximální rychlosti",
+          "Pokud jste unavení, můžete prodloužit dobu zotavení.",
+          "Provádějte 2-3x týdně"
+        ]
+      },
+      "2": {
+        "title": "Burpee skok",
+        "description": "Komplexní cvik: dřep → plank → klik → dřep → výskok. Proveďte 3 sady po 10-15 opakováních.",
+        "equipment": "Podložka na cvičení (volitelné)",
+        "calories": "200-300 kcal na trénink",
+        "benefits": [
+          "Rozvíjí celkovou vytrvalost",
+          "Posiluje svaly celého těla",
+          "Zlepšuje koordinaci pohybů",
+          "Zvyšuje výbušnou sílu"
+        ],
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Dřepněte si s dlaněmi na podlahu před vámi.",
+          "Zatlačte nohy zpět do pozice prkna",
+          "Proveďte jeden klik",
+          "Přitáhněte nohy dozadu k rukám a zůstaňte v dřepu.",
+          "Vyskočte, zvedněte ruce nad hlavu",
+          "Přistát jemně a opakovat."
+        ],
+        "tips": [
+          "Po celou dobu cvičení držte záda rovná.",
+          "Přistaňte s pokrčenýma nohama",
+          "Začněte s 5-8 opakováními a postupně zvyšujte",
+          "Mezi sériemi odpočívejte 60-90 sekund"
+        ]
+      },
+      "3": {
+        "title": "Kolo",
+        "description": "Intenzivní jízda na kole nebo stacionární jízda s intervaly vysoké intenzity. 5 minut zahřívání, 20 minut intervaly.",
+        "equipment": "Kolo nebo rotoped",
+        "calories": "300-400 kcal na trénink",
+        "benefits": [
+          "Rozvíjí kardio vytrvalost",
+          "Posiluje svaly nohou",
+          "Spálí spoustu kalorií",
+          "Nízké zatížení kloubů"
+        ],
+        "instructions": [
+          "5 minut zahřívání s nízkou intenzitou",
+          "2 minuty vysoké intenzity (80-85 % maxima)",
+          "1 minuta zotavení při nízké intenzitě",
+          "Opakujte intervaly 10krát",
+          "5 minut nízké intenzity ochlaďte"
+        ],
+        "tips": [
+          "Udržujte vysokou kadenci šlapání (80-100 ot./min.)",
+          "Sledujte polohu těla – držte záda rovná",
+          "Upravte odpor pro změnu intenzity",
+          "Během tréninku pijte vodu."
+        ]
+      },
+      "4": {
+        "title": "Plyometrické skoky",
+        "description": "Skákání na místě co nejvýše, přistání na pokrčená kolena. 3 sady 15-20 skoků.",
+        "equipment": "Podložka na cvičení (volitelné)",
+        "calories": "150-200 kcal na trénink",
+        "benefits": [
+          "Rozvíjí výbušnou sílu nohou",
+          "Zlepšuje reakci a rychlost",
+          "Posiluje šlachy a vazy",
+          "Zvyšuje vertikální skok"
+        ],
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Dřepněte si do 1/4 s pokrčenými koleny",
+          "Vyskočte explozivně nahoru a natáhněte ruce",
+          "Přistaňte s pokrčenýma nohama",
+          "Okamžitě proveďte další skok",
+          "Proveďte 15-20 skoků v řadě"
+        ],
+        "tips": [
+          "Přistaňte měkce a pokrčte kolena.",
+          "Udržujte své tělo rovně",
+          "Nedělejte pauzy mezi skoky",
+          "Mezi sériemi odpočívejte 2-3 minuty"
+        ]
+      },
+      "5": {
+        "title": "Sprinty na krátkou vzdálenost",
+        "description": "Běžte maximální rychlostí na vzdálenost 20-30 metrů s 30sekundovou přestávkou mezi běhy. 8-10 běhů.",
+        "equipment": "Otevřený prostor nebo běžecká dráha",
+        "calories": "200-250 kcal na trénink",
+        "benefits": [
+          "Vyvíjí maximální rychlost",
+          "Zlepšuje zrychlení",
+          "Posiluje svaly nohou",
+          "Zlepšuje koordinaci pohybů"
+        ],
+        "instructions": [
+          "Označte vzdálenost 20-30 metrů",
+          "Zaujměte výchozí pozici (poloviční dřep)",
+          "Když zazní signál, běžte na maximální rychlost.",
+          "Protněte cílovou čáru",
+          "Pomalu se vraťte na začátek",
+          "Odpočívejte 30 sekund a opakujte."
+        ],
+        "tips": [
+          "Zaměřte se na techniku ​​běhu",
+          "Udržujte své tělo rovně",
+          "Aktivně pracujte rukama",
+          "Nezkracujte čas odpočinku"
+        ]
+      },
+      "6": {
+        "title": "Házení míče o zeď",
+        "description": "Hoďte medicinbal na zeď maximální silou, chyťte se a znovu házejte. 3 sady po 20 hodech.",
+        "equipment": "Medicinbal 2-4 kg, stěna",
+        "calories": "120-180 kcal na trénink",
+        "benefits": [
+          "Rozvíjí výbušnou sílu paží",
+          "Zlepšuje koordinaci",
+          "Posiluje základní svaly",
+          "Zvyšuje rychlost házení"
+        ],
+        "instructions": [
+          "Postavte se 1-2 metry od zdi",
+          "Držte míč oběma rukama na úrovni hrudníku",
+          "Dřepněte si, pokrčte kolena",
+          "Při házení míčem explozivně narovnejte nohy a ruce.",
+          "Chytit odrážející se míč",
+          "Okamžitě proveďte další hod."
+        ],
+        "tips": [
+          "Použijte míč o hmotnosti 2-4 kg",
+          "Házejte maximální silou",
+          "Udržujte záda rovná",
+          "Pracujte celým tělem, nejen pažemi"
+        ]
+      },
+      "7": {
+        "title": "Dynamické protažení nohou",
+        "description": "Noha se kývá dopředu, dozadu a do stran krouživými pohyby v kyčelních kloubech. 10-15 opakování pro každou nohu.",
+        "equipment": "Stěna nebo židle na podporu",
+        "calories": "50-80 kcal na zahřátí",
+        "benefits": [
+          "Prohřívá svaly nohou",
+          "Zlepšuje pohyblivost kloubů",
+          "Připravuje se na trénink",
+          "Snižuje riziko zranění"
+        ],
+        "instructions": [
+          "Postavte se rovně, držte se podpěry",
+          "Proveďte 10-15 švihů vpřed pravou nohou",
+          "Proveďte 10-15 kopů dozadu pravou nohou",
+          "Proveďte 10-15 švihů do strany pravou nohou",
+          "Opakujte pro levou nohu.",
+          "Provádějte krouživé pohyby v kyčelních kloubech"
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Nehoupejte se příliš",
+          "Pohyby provádějte plynule",
+          "Dýchejte zhluboka a rytmicky"
+        ]
+      },
+      "8": {
+        "title": "Zahřátí horní části těla",
+        "description": "Kruhy paží, ohyby trupu a zkroucení. Zahřátí pro ramenní klouby a záda.",
+        "equipment": "Není vyžadováno",
+        "calories": "40-60 kcal na zahřátí",
+        "benefits": [
+          "Prohřívá svaly horní části těla",
+          "Zlepšuje pohyblivost ramenního kloubu",
+          "Připravuje ruce na práci",
+          "Aktivuje základní svaly"
+        ],
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Proveďte 10 krouživých pohybů s pažemi vpřed",
+          "Proveďte 10 krouživých pohybů s pažemi vzad",
+          "Proveďte 10 bočních ohybů",
+          "Proveďte 10 rotací trupu",
+          "Provádějte krouživé pohyby rameny"
+        ],
+        "tips": [
+          "Pohybujte se pomalu a plynule",
+          "Nedělejte žádné náhlé pohyby",
+          "Sledujte své dýchání",
+          "Postupně zvyšujte rozsah pohybu"
+        ]
+      },
+      "9": {
+        "title": "Lehké běhání na místě",
+        "description": "Běhání na místě s vysokými koleny, postupné zvyšování tempa. 5-7 minut.",
+        "equipment": "Není vyžadováno",
+        "calories": "60-80 kcal na zahřátí",
+        "benefits": [
+          "Zvyšuje srdeční frekvenci",
+          "Prohřívá svaly nohou",
+          "Zlepšuje koordinaci",
+          "Připravuje se na hlavní trénink"
+        ],
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Začněte lehkým joggingem na místě",
+          "Postupně zvedejte kolena výš",
+          "Pracujte rukama, jako byste běželi normálně.",
+          "Zvyšte tempo na 2-3 minuty",
+          "V posledních 2 minutách zpomalte"
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Přistát na špičkách",
+          "Dýchejte zhluboka",
+          "Neskákej příliš vysoko"
+        ]
+      },
+      "10": {
+        "title": "Statické protažení svalů nohou",
+        "description": "Držte protahovací pozice pro kvadricepsy, lýtka a adduktory. 30 sekund na skupinu.",
+        "equipment": "Podložka na cvičení",
+        "calories": "80-100 kcal na jeden úsek",
+        "benefits": [
+          "Zlepšuje pružnost svalů nohou",
+          "Snižuje svalové napětí",
+          "Urychluje zotavení",
+          "Zabraňuje zranění"
+        ],
+        "instructions": [
+          "Protažení kvadricepsu: Postavte se na jednu nohu a druhou pokrčte dozadu.",
+          "Protažení lýtek: Výpad vpřed, držte zadní nohu rovně.",
+          "Protažení adduktoru: Posaďte se s nohama od sebe.",
+          "Držte každou pozici po dobu 30 sekund.",
+          "Zhluboka se nadechněte a uvolněte svaly."
+        ],
+        "tips": [
+          "Nenatahujte se až k bolesti.",
+          "Dýchejte zhluboka a pomalu",
+          "Při protahování uvolněte svaly.",
+          "Proveďte po tréninku"
+        ]
+      },
+      "11": {
+        "title": "Protažení zad a ramen",
+        "description": "Předklony, protažení hrudníku, protažení tricepsů. Vydržte v každé pozici 20-30 sekund.",
+        "benefits": [
+          "Zlepšuje flexibilitu a pohyblivost",
+          "Uvolňuje svalové napětí",
+          "Zabraňuje zranění",
+          "Zlepšuje regeneraci po tréninku"
+        ],
+        "instructions": [
+          "Před protažením se zahřejte",
+          "Protahujte se pomalu a plynule",
+          "Držte pozici po dobu 20-30 sekund",
+          "Vyvarujte se ostré bolesti"
+        ],
+        "tips": [
+          "Při protahování zhluboka dýchejte.",
+          "Nedělejte žádné náhlé pohyby",
+          "Pro dosažení nejlepších výsledků to dělejte denně.",
+          "Po tréninku se protáhněte"
+        ]
+      },
+      "12": {
+        "title": "Jóga pro hokejisty",
+        "description": "Sada ásan pro rozvoj flexibility a rovnováhy: pozice bojovníka, pozice stromu, pozice psa směřující dolů.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "13": {
+        "title": "Žebřík koordinace",
+        "description": "Rychlé pohyby nohou po žebříku: boční kroky, křížové kroky, skoky. 3 průchody od každého typu.",
+        "benefits": [
+          "Rozvíjí koordinaci pohybů",
+          "Zlepšuje rovnováhu a rovnováhu",
+          "Zvyšuje obratnost",
+          "Rozvíjí nervosvalové spojení"
+        ],
+        "instructions": [
+          "Začněte pomalým tempem",
+          "Zaměřte se na přesnost pohybů",
+          "Postupně zvyšujte rychlost",
+          "Opakujte, dokud se to nestane automatickým."
+        ],
+        "tips": [
+          "Cvičte pravidelně",
+          "Nespěchejte – přesnost je důležitější než rychlost",
+          "Používejte vizuální podněty",
+          "Trénujte v různých podmínkách"
+        ]
+      },
+      "14": {
+        "title": "Žonglování s míčky",
+        "description": "Žonglování se 2-3 tenisovými míčky pro rozvoj koordinace ruka-oko. Začněte s 1 míčem.",
+        "benefits": [
+          "Rozvíjí koordinaci pohybů",
+          "Zlepšuje rovnováhu a rovnováhu",
+          "Zvyšuje obratnost",
+          "Rozvíjí nervosvalové spojení"
+        ],
+        "instructions": [
+          "Začněte pomalým tempem",
+          "Zaměřte se na přesnost pohybů",
+          "Postupně zvyšujte rychlost",
+          "Opakujte, dokud se to nestane automatickým."
+        ],
+        "tips": [
+          "Cvičte pravidelně",
+          "Nespěchejte – přesnost je důležitější než rychlost",
+          "Používejte vizuální podněty",
+          "Trénujte v různých podmínkách"
+        ]
+      },
+      "15": {
+        "title": "Rychlé doteky šišek",
+        "description": "Umístěte 5-6 šišek a rychle se jich dotkněte rukou v náhodném pořadí. 3 sady po 30 sekundách.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "16": {
+        "title": "Veslovací trenažér",
+        "description": "Intervalové veslování: 2 minuty vysoké intenzity, 1 minuta odpočinek. 8-10 cyklů pro rozvoj vytrvalosti.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "17": {
+        "title": "Švihadlo s intervaly",
+        "description": "Střídání mezi rychlými (30 sekund) a pomalými (30 sekund) skoky. 20 minut na rozvoj kardio vytrvalosti.",
+        "equipment": "Švihadlo",
+        "calories": "200-300 kcal na trénink",
+        "benefits": [
+          "Rozvíjí kardio vytrvalost",
+          "Zlepšuje koordinaci pohybů",
+          "Posiluje svaly nohou",
+          "Spálí spoustu kalorií"
+        ],
+        "instructions": [
+          "Vezměte si švihadlo vhodné délky.",
+          "30 sekund rychlého skákání maximální rychlostí",
+          "30 sekund pomalého skákání jacků na zotavení",
+          "Opakujte cyklus 20krát",
+          "Dokončete 2minutovým ochlazením"
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Pracujte zápěstími, ne rukama",
+          "Přistát na špičkách",
+          "Začněte pomalým tempem"
+        ]
+      },
+      "18": {
+        "title": "Běh po schodech",
+        "description": "Vyběhněte po schodech co nejrychleji nahoru a pak sejděte dolů. 10-15 opakování pro rozvoj vytrvalosti nohou.",
+        "equipment": "Žebřík",
+        "calories": "250-350 kcal na trénink",
+        "benefits": [
+          "Rozvíjí vytrvalost nohou",
+          "Posiluje svaly stehen a hýždí",
+          "Zlepšuje kardio vytrvalost",
+          "Zvyšuje sílu nohou"
+        ],
+        "instructions": [
+          "Najděte schodiště s 20-30 schody",
+          "Rozběhněte se maximální rychlostí",
+          "Klesejte tempem chůze, abyste se vzpamatovali",
+          "Proveďte 10-15 zdvihů",
+          "Mezi výtahy odpočívejte 1-2 minuty"
+        ],
+        "tips": [
+          "Při zvedání používejte celé chodidlo.",
+          "Udržujte záda rovná",
+          "Aktivně pracujte rukama",
+          "Nepřekračujte své schopnosti"
+        ]
+      },
+      "19": {
+        "title": "Plank s pohyby",
+        "description": "Držení prkna se střídavým zvedáním paží a nohou. 3 sady po 45-60 sekundách pro posílení jádra.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "20": {
+        "title": "Běh s vysokým kolenem",
+        "description": "Běhejte na místě, zvedněte kolena k hrudníku co nejvýše. 5 sad po 2 minutách s 1 minutou odpočinku.",
+        "benefits": [
+          "Zlepšuje kardiovaskulární vytrvalost",
+          "Rozvíjí aerobní vytrvalost",
+          "Účinně spaluje kalorie",
+          "Posiluje srdeční sval"
+        ],
+        "instructions": [
+          "Začněte lehkým zahřátím po dobu 5-10 minut",
+          "Udržujte svou cílovou tepovou frekvenci",
+          "Sledujte svůj dech – dýchejte zhluboka",
+          "Dokončete vychladnutím a protažením."
+        ],
+        "tips": [
+          "Postupně dobu trvání prodlužujte",
+          "Během tréninku pijte vodu.",
+          "Provádějte 3-4krát týdně",
+          "Poslouchejte své tělo"
+        ]
+      },
+      "21": {
+        "title": "Skok do dálky ve stoje",
+        "description": "Skočte vpřed co nejdále a přistaňte na obě nohy. 5 sad 8-10 skoků.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "22": {
+        "title": "Rychlé kliky",
+        "description": "Shyby co nejrychleji, dotkněte se hrudníkem podlahy. 4 sady po 15-20 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "23": {
+        "title": "Skákání přes překážky",
+        "description": "Skákání přes kužely nebo překážky vysoké 30-40 cm. 3 běhy po 10 překážkách.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "24": {
+        "title": "Rychlostní dřepy",
+        "description": "Dřepy co nejrychleji, stehna rovnoběžně s podlahou. 4 sady po 20-25 opakováních.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "25": {
+        "title": "Hody medicinbalem",
+        "description": "Vyhození těžkého míče (5-8 kg) z hrudníku maximální silou. 3 sady po 15 hodech.",
+        "benefits": [
+          "Zvyšuje svalovou sílu",
+          "Zlepšuje svalovou vytrvalost",
+          "Rozvíjí funkční sílu",
+          "Posiluje pohybový aparát"
+        ],
+        "instructions": [
+          "Před cvičením se zahřejte",
+          "Ujistěte se, že používáte správnou techniku",
+          "Ovládejte svůj dech – vydechujte s námahou",
+          "Mezi sériemi odpočívejte 60-90 sekund."
+        ],
+        "tips": [
+          "Začněte s lehčími váhami a postupně zvyšujte.",
+          "Nezadržujte dech",
+          "Provádějte 2-3x týdně",
+          "Snižte zátěž, když se cítíte unavení"
+        ]
+      },
+      "26": {
+        "title": "Zahřátí kotníků",
+        "description": "Kruhové pohyby nohou, ohýbání a narovnávání prstů. 2-3 minuty na každou nohu.",
+        "benefits": [
+          "Připravuje svaly na cvičení",
+          "Zlepšuje krevní oběh",
+          "Snižuje riziko zranění",
+          "Zvyšuje efektivitu tréninku"
+        ],
+        "instructions": [
+          "Začněte pomalu a postupně zvyšujte intenzitu",
+          "Pohyby provádějte plynule a kontrolovaně",
+          "Ujistěte se, že používáte správnou techniku",
+          "Při výkonu dýchejte rovnoměrně"
+        ],
+        "tips": [
+          "Nespěchejte – kvalita je důležitější než rychlost",
+          "Pokud se objeví bolest, přestaňte.",
+          "Před každým tréninkem se zahřejte.",
+          "Každému pohybu věnujte dostatek času."
+        ]
+      },
+      "27": {
+        "title": "Zahřívání krku",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Pomalu otáčejte hlavou doleva a doprava",
+          "Nakloňte hlavu dopředu a dozadu",
+          "Provádějte krouživé pohyby hlavou",
+          "Udržujte ramena uvolněná"
+        ],
+        "tips": [
+          "Pohybujte se pomalu a plynule",
+          "Nedělejte žádné náhlé pohyby",
+          "Pokud se objeví bolest, přestaňte.",
+          "Dýchejte zhluboka a rovnoměrně"
+        ]
+      },
+      "28": {
+        "title": "Zahřívání zápěstí",
+        "instructions": [
+          "Natáhněte ruce před sebe",
+          "Ohněte zápěstí nahoru a dolů",
+          "Otočte zápěstí do kruhu",
+          "Zatínejte a uvolňujte pěsti",
+          "Natáhněte prsty do stran"
+        ],
+        "tips": [
+          "Pohyby provádějte pomalu",
+          "Nepřetěžujte klouby",
+          "Věnujte pozornost pocitům v zápěstích",
+          "Opakujte pravidelně"
+        ]
+      },
+      "29": {
+        "title": "Protahuje se koleno",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Pomalu pokrčte a narovnejte kolena",
+          "Provádějte kruhové pohyby s koleny",
+          "Dělejte dřepy s malou amplitudou",
+          "Protáhněte přední část stehna"
+        ],
+        "tips": [
+          "Nedělejte hluboké dřepy",
+          "Pohybujte se plynule a pod kontrolou",
+          "Pokud vás bolí koleno, snižte rozsah pohybu.",
+          "Ujistěte se, že používáte správnou techniku"
+        ]
+      },
+      "30": {
+        "title": "Zahřátí kyčle",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Zvedněte koleno k hrudi",
+          "Posuňte nohu do strany a dozadu",
+          "Provádějte krouživé pohyby boky",
+          "Dělejte výpady s malou amplitudou"
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Pracujte v pohodlném dosahu",
+          "Neuspěchejte své pohyby",
+          "Sledujte svou rovnováhu"
+        ]
+      },
+      "31": {
+        "title": "Protažení třísel",
+        "instructions": [
+          "Sedněte si na podlahu s pokrčenými koleny.",
+          "Položte chodidla k sobě",
+          "Jemně se předkloňte",
+          "Přitáhněte kolena k podlaze",
+          "Protažení vydržte 30 sekund"
+        ],
+        "tips": [
+          "Nenatahujte silou",
+          "Zhluboka se nadechněte a uvolněte se.",
+          "Pokud se objeví bolest, snižte amplitudu.",
+          "Proveďte po zahřátí"
+        ]
+      },
+      "32": {
+        "title": "Protažení hamstringů",
+        "instructions": [
+          "Sedněte si na podlahu s nohama nataženýma dopředu.",
+          "Předkloňte se a snažte se dosáhnout na nohy",
+          "Sepněte si nohy rukama",
+          "Přitáhněte hrudník směrem ke kolenům",
+          "Protažení vydržte 30-45 sekund"
+        ],
+        "tips": [
+          "Nekruťte se v zádech",
+          "Pracujte v pohodlném dosahu",
+          "Zhluboka dýchejte",
+          "Věnujte pozornost pocitům v zadní části stehna"
+        ]
+      },
+      "33": {
+        "title": "Protahování lýtkových svalů",
+        "instructions": [
+          "Postavte se čelem ke zdi",
+          "Umístěte jednu nohu dopředu a druhou dozadu.",
+          "Spusťte patu zadní nohy na podlahu",
+          "Předkloňte se a protáhněte lýtka",
+          "Vyměňte nohy a opakujte"
+        ],
+        "tips": [
+          "Udržujte zadní nohu rovně",
+          "Nezvedejte patu z podlahy",
+          "Plynule se protahujte",
+          "Proveďte pro obě nohy"
+        ]
+      },
+      "34": {
+        "title": "Protažení prsních svalů",
+        "instructions": [
+          "Postavte se do dveří",
+          "Položte ruce na rámy dveří",
+          "Udělejte krok vpřed",
+          "Vnímejte protažení v hrudi",
+          "Protažení vydržte 30 sekund"
+        ],
+        "tips": [
+          "Nepřetěžujte ramena",
+          "Zhluboka dýchejte",
+          "Protahujte postupně",
+          "Následujte své pocity"
+        ]
+      },
+      "35": {
+        "title": "Protažení tricepsů",
+        "instructions": [
+          "Zvedněte jednu ruku nahoru",
+          "Ohněte ruku v lokti za hlavou",
+          "Druhou rukou stáhněte loket dolů",
+          "Vnímejte protažení tricepsu",
+          "Vyměňte ruce a opakujte"
+        ],
+        "tips": [
+          "Nedělejte žádné náhlé pohyby",
+          "Plynule se protahujte",
+          "Dýchejte rovnoměrně",
+          "Proveďte pro obě ruce"
+        ]
+      },
+      "36": {
+        "title": "Had mezi kužely",
+        "instructions": [
+          "Šišky umístěte do hadího vzoru ve vzdálenosti 2-3 metrů",
+          "Začněte běhat kolem každého kužele",
+          "Udržujte své těžiště nízko",
+          "Pracujte nohama rychle a často",
+          "Ujistěte se, že používáte správnou techniku ​​otáčení."
+        ],
+        "tips": [
+          "Začněte pomalým tempem",
+          "Soustřeďte se na techniku, ne na rychlost.",
+          "Hlavu vzhůru",
+          "Používejte krátké, rychlé kroky"
+        ]
+      },
+      "37": {
+        "title": "Rychlé doteky nohou",
+        "instructions": [
+          "Postavte se vedle míče",
+          "Rychle se dotkněte míče nohou",
+          "Vyměňte nohy každé 2-3 doteky",
+          "Udržujte stálý rytmus",
+          "Provádějte 30-60 sekund"
+        ],
+        "tips": [
+          "Udržujte váhu těla na podpůrné noze",
+          "Pracujte rychle, ale kontrolovaně",
+          "Neztrácejte rovnováhu",
+          "Sledujte svou techniku ​​dotyku"
+        ]
+      },
+      "38": {
+        "title": "Skoky s obraty",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Vyskočte nahoru",
+          "Při skákání se otočte o 180 stupňů",
+          "Přistaňte jemně na obě nohy.",
+          "Okamžitě se otočte a opakujte"
+        ],
+        "tips": [
+          "Přistaňte s pokrčenýma nohama",
+          "Pro rovnováhu použijte paže",
+          "Začněte malými zatáčkami",
+          "Pozor na techniku ​​přistání"
+        ]
+      },
+      "39": {
+        "title": "Rychlé přihrávky míče",
+        "instructions": [
+          "Postavte se čelem ke zdi ve vzdálenosti 2-3 metry",
+          "Přihrávejte míč rychle ke zdi",
+          "Zachyťte odraz a okamžitě jej předejte zpět",
+          "Pracujte oběma rukama",
+          "Provádějte 30-45 sekund"
+        ],
+        "tips": [
+          "Používejte správnou techniku ​​přihrávek",
+          "Mějte oči na míči",
+          "Pracujte rychle, ale přesně",
+          "Udržujte ruce uvolněné"
+        ]
+      },
+      "40": {
+        "title": "Běh vzad",
+        "instructions": [
+          "Začněte pomalým běháním vzad.",
+          "Často se dívejte přes rameno",
+          "Udržujte své těžiště nízko",
+          "Pro rovnováhu použijte paže",
+          "Kompletní 20-30 metrů"
+        ],
+        "tips": [
+          "Začněte velmi pomalu",
+          "Vždy zkontrolujte prostor za vámi",
+          "Kolena mějte mírně pokrčená",
+          "Nespěchejte se zvyšováním rychlosti"
+        ]
+      },
+      "41": {
+        "title": "Dřepy se závažím",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Vezměte si činky nebo činku",
+          "Dřepněte si, dokud nebudou prsty u nohou rovnoběžné s podlahou.",
+          "Vstávejte pomocí síly svých nohou",
+          "Proveďte 3-4 sady po 8-12 opakováních"
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Nezakulacujte spodní část zad",
+          "Vaše kolena by neměla přesahovat prsty u nohou.",
+          "Začněte s lehkými váhami"
+        ]
+      },
+      "42": {
+        "title": "Mrtvý tah",
+        "instructions": [
+          "Postavte se rovně s nohama na šířku ramen",
+          "Vezměte činku z podlahy nadhmatem.",
+          "Pokrčte kolena a posuňte pánev dozadu",
+          "Zvedněte činku narovnáním nohou a zad.",
+          "Vraťte tyč kontrolovaně na podlahu."
+        ],
+        "tips": [
+          "Po celou dobu pohybu držte záda rovná.",
+          "Nezakulacujte spodní část zad",
+          "Přibližte tyč k tělu",
+          "Začněte s lehkými váhami"
+        ]
+      },
+      "43": {
+        "title": "Bench press",
+        "instructions": [
+          "Lehněte si na lavici s nohama na podlaze.",
+          "Vezměte činku širokým úchopem",
+          "Kontrolovaně spusťte tyč k hrudi.",
+          "Stiskněte činku nahoru",
+          "Proveďte 3-4 sady po 6-10 opakováních"
+        ],
+        "tips": [
+          "Udržujte lopatky přitažené k sobě",
+          "Udržujte nohy na podlaze",
+          "Dýchejte správně: s námahou vydechujte",
+          "Použijte pojištění"
+        ]
+      },
+      "44": {
+        "title": "Přítahy",
+        "instructions": [
+          "Zavěste se na hrazdu úchopem nadhmatem",
+          "Vytáhněte se nahoru, dokud nebude vaše brada nad tyčí.",
+          "Spusťte se zpět do výchozí polohy",
+          "Udržujte své jádro pevné",
+          "Proveďte 3-4 sady maximálních opakování"
+        ],
+        "tips": [
+          "Nehoupejte se",
+          "Vytahujte plynule a kontrolovaně",
+          "Narovnejte ruce úplně dole",
+          "V případě potřeby použijte pomoc"
+        ]
+      },
+      "45": {
+        "title": "Dipy na mřížích",
+        "instructions": [
+          "Postavte se mezi tyče",
+          "Vyskočte a zamkněte na mříže",
+          "Spusťte se dolů a ohněte lokty.",
+          "Zatlačte nahoru a narovnejte ruce",
+          "Proveďte 3-4 sady po 5-15 opakováních"
+        ],
+        "tips": [
+          "Udržujte své tělo rovně",
+          "Nehoupejte se",
+          "Sestup do pohodlné hloubky",
+          "V případě potřeby použijte nohy."
+        ]
+      },
+      "46": {
+        "title": "Stojan na jedné noze",
+        "instructions": [
+          "Postavte se na jednu nohu",
+          "Zvedněte druhou nohu před sebe",
+          "Udržujte rovnováhu co nejdéle",
+          "Pro rovnováhu použijte paže",
+          "Vyměňte nohy a opakujte"
+        ],
+        "tips": [
+          "Dívejte se dopředu, ne dolů",
+          "Udržujte své jádro pevné",
+          "Začněte s krátkými sadami",
+          "Postupně prodlužujte čas"
+        ]
+      },
+      "47": {
+        "title": "Prkno s jednou nohou",
+        "instructions": [
+          "Dostaňte se do pozice prkna",
+          "Zvedněte jednu nohu nahoru",
+          "Udržujte nohu rovně",
+          "Držte pozici po dobu 30-60 sekund",
+          "Vyměňte nohy a opakujte"
+        ],
+        "tips": [
+          "Udržujte své tělo rovně",
+          "Nehoupejte se ze strany na stranu",
+          "Dýchejte rovnoměrně",
+          "Začněte s krátkými sadami"
+        ]
+      },
+      "48": {
+        "title": "Dřepy na jedné noze",
+        "instructions": [
+          "Postavte se na jednu nohu",
+          "Natáhněte druhou nohu dopředu",
+          "Dřep na opěrné noze",
+          "Vraťte se do výchozí pozice",
+          "Proveďte 3-4 sady po 5-10 opakováních na každou nohu."
+        ],
+        "tips": [
+          "Udržujte záda rovná",
+          "Nedotýkejte se podlahy druhou nohou.",
+          "Pro rovnováhu použijte paže",
+          "Začněte s malou amplitudou"
+        ]
+      },
+      "49": {
+        "title": "Cvičení s bosu míčem",
+        "instructions": [
+          "Postavte se na polokouli míče Bosu",
+          "Udržujte rovnováhu",
+          "Dělejte dřepy",
+          "Dělejte kroucení těla",
+          "Proveďte 3-4 sady po 10-15 opakováních"
+        ],
+        "tips": [
+          "Začněte jednoduchými cviky",
+          "Pozor na techniku",
+          "Nespěchejte",
+          "Pro podporu použijte nápovědu"
+        ]
+      },
+      "50": {
+        "title": "Jóga rovnováha",
+        "instructions": [
+          "Postavte se rovně s nohama u sebe.",
+          "Zvedněte jednu nohu a položte ji na stehno druhé.",
+          "Položte ruce před hrudník",
+          "Udržujte rovnováhu",
+          "Proveďte pro obě nohy po dobu 30-60 sekund"
+        ],
+        "tips": [
+          "Podívejte se dopředu v jednom bodě",
+          "Dýchejte zhluboka a rovnoměrně",
+          "Nespěchejte",
+          "Pokud ztratíte rovnováhu, začněte znovu."
+        ]
+      },
+      "51": {
+        "title": "Chůze po kládě",
+        "instructions": [
+          "Najděte stabilní kládu nebo desku",
+          "Postavte se na kládu",
+          "Jděte pomalu vpřed",
+          "Udržujte rovnováhu",
+          "Proveďte několik průchodů"
+        ],
+        "tips": [
+          "Začněte širokým polenem",
+          "Dívejte se dopředu, ne dolů",
+          "Pro rovnováhu použijte paže",
+          "Nespěchejte"
+        ]
+      },
+      "52": {
+        "title": "Stojka proti zdi",
+        "instructions": [
+          "Postavte se čelem ke zdi",
+          "Položte ruce na podlahu 30 cm od stěny",
+          "Zvedněte nohy po zdi",
+          "Držte stojku",
+          "Kontrolovaně spusťte nohy dolů"
+        ],
+        "tips": [
+          "Začněte s krátkými sadami",
+          "Použijte pomoc pro pojištění",
+          "Udržujte své jádro pevné",
+          "Nepřetěžujte se"
+        ]
+      },
+      "53": {
+        "title": "Fartlek",
+        "instructions": [
+          "Začněte pomalým joggingem po dobu 5-10 minut",
+          "Zvyšte rychlost na 80 % maxima na 2-3 minuty",
+          "Vraťte se k pomalému běhání na 1-2 minuty",
+          "Cyklus opakujte 4-6krát",
+          "Dokončete pomalým poklusem po dobu 5-10 minut"
+        ],
+        "tips": [
+          "Poslouchejte své tělo",
+          "Nepřekračujte 80 % maximální rychlosti",
+          "Zhluboka dýchejte",
+          "Během cvičení pijte vodu."
+        ]
+      },
+      "54": {
+        "title": "Opakované sprinty",
+        "instructions": [
+          "Proveďte 10minutové zahřátí",
+          "Běžte sprint maximální rychlostí po dobu 30 sekund",
+          "Odpočívejte 2-3 minuty",
+          "Opakujte sprint",
+          "Proveďte 6-8 sprintů"
+        ],
+        "tips": [
+          "Nešetřete na rozcvičce",
+          "Mezi sprinty si úplně odpočiňte",
+          "Sledujte techniku ​​běhu",
+          "Necvičte denně"
+        ]
+      },
+      "55": {
+        "title": "Intervaly na kole",
+        "instructions": [
+          "Začněte 5minutovým zahřátím",
+          "Zvyšte zátěž na 80 % maxima",
+          "Pedál s vysokou intenzitou po dobu 2-3 minut",
+          "Snižte zátěž na 50 % po dobu 1-2 minut",
+          "Opakujte cyklus 6-8krát"
+        ],
+        "tips": [
+          "Udržujte vysokou kadenci",
+          "Zhluboka dýchejte",
+          "Sledujte svůj puls",
+          "Pijte pravidelně vodu"
+        ]
+      },
+      "56": {
+        "title": "Běh do kopce",
+        "instructions": [
+          "Najděte kopec se sklonem 5-10%",
+          "Proveďte 10minutové zahřátí",
+          "Vyběhněte do kopce mírnou rychlostí",
+          "Jděte dolů, abyste se vzpamatovali",
+          "Opakujte 6-10 zdvihů"
+        ],
+        "tips": [
+          "Začněte s mírným sklonem",
+          "Při zvedání mějte rovná záda.",
+          "Aktivně pracujte rukama",
+          "Dejte si na sestup načas"
+        ]
+      },
+      "57": {
+        "title": "Plyometrické kruhy",
+        "instructions": [
+          "Proveďte 10minutové zahřátí",
+          "Dělejte dlouhé skoky ze stoje",
+          "Provádějte skoky přes překážky",
+          "Dělejte boxové skoky",
+          "Odpočívejte 2-3 minuty a opakujte okruh."
+        ],
+        "tips": [
+          "Pozor na techniku ​​přistání",
+          "Přistaňte s pokrčenýma nohama",
+          "Pro rovnováhu použijte paže",
+          "Nepřehánějte to s množstvím"
+        ]
+      },
+      "58": {
+        "title": "Lehké protažení",
+        "instructions": [
+          "Začněte lehkými pohyby",
+          "Protáhněte hlavní svalové skupiny",
+          "Dýchejte zhluboka a rovnoměrně",
+          "Pohybujte se plynule a pomalu",
+          "Dokončete hlubokým dýcháním."
+        ],
+        "tips": [
+          "Nenatahujte se až k bolesti.",
+          "Zhluboka dýchejte",
+          "Uvolněte se úplně",
+          "Dělejte to pravidelně"
+        ]
+      },
+      "59": {
+        "title": "Válcování pěny",
+        "instructions": [
+          "Lehněte si na pěnový válec",
+          "Válec pomalu rolujte pod svaly.",
+          "Zaměřte se na bolestivé body",
+          "Držte tlak po dobu 30-60 sekund",
+          "Opakujte pro všechny svalové skupiny."
+        ],
+        "tips": [
+          "Neválejte se na klouby",
+          "Zhluboka dýchejte",
+          "Netolerujte silnou bolest",
+          "Začněte měkkým válečkem"
+        ]
+      },
+      "60": {
+        "title": "Lehké běhání",
+        "instructions": [
+          "Začněte pomalým tempem",
+          "Udržujte tepovou frekvenci na 60-70% svého maxima",
+          "Dýchejte zhluboka a rovnoměrně",
+          "Udržujte konstantní tempo",
+          "Skončete postupným snižováním tempa"
+        ],
+        "tips": [
+          "Sledujte svůj puls",
+          "Dýchejte nosem",
+          "Nepřetěžujte se",
+          "Užijte si proces"
+        ]
+      },
+      "61": {
+        "title": "Plavání",
+        "instructions": [
+          "Začněte rozcvičkou na suchu",
+          "Vstupujte do vody postupně",
+          "Plavte pohodlným tempem",
+          "Změňte své plavecké styly",
+          "Zakončete pomalým plaváním"
+        ],
+        "tips": [
+          "Neplavte sami",
+          "Pozor na techniku",
+          "Dýchejte rovnoměrně",
+          "Nepřeháněj to"
+        ]
+      },
+      "62": {
+        "title": "Regenerační kolo",
+        "instructions": [
+          "Začněte pomalým tempem",
+          "Udržujte tepovou frekvenci na 50-60% svého maxima",
+          "Šlapejte lehce a rytmicky",
+          "Zhluboka dýchejte",
+          "Skončete postupným snižováním tempa"
+        ],
+        "tips": [
+          "Udržujte vysokou kadenci",
+          "Zhluboka dýchejte",
+          "Nepřetěžujte se",
+          "Užijte si jízdu"
+        ]
+      },
+      "63": {
+        "title": "Zotavovací jóga",
+        "instructions": [
+          "Začněte jednoduchými pózami",
+          "Protahování provádějte pomalu",
+          "Dýchejte zhluboka a rovnoměrně",
+          "Uvolněte se v každé póze",
+          "Zakončete meditací"
+        ],
+        "tips": [
+          "Nevynucujte si pózy",
+          "Dýchejte nosem",
+          "Poslouchejte své tělo",
+          "Užijte si proces"
+        ]
+      },
+      "64": {
+        "title": "Protahování pomocí gumičky",
+        "description": "Protahovací cvičení s použitím gumičky",
+        "equipment": "Gumička",
+        "calories": "35-55 kcal",
+        "benefits": [
+          "Zlepšuje pružnost kloubů",
+          "Posiluje vazy",
+          "Uvolňuje svalové napětí",
+          "Zvyšuje rozsah pohybu"
+        ],
+        "instructions": [
+          "Vyberte si správnou elastickou pásku",
+          "Provádějte pomalé pohyby",
+          "Držte strečink po dobu 20-30 sekund",
+          "Každé cvičení opakujte 3-5krát"
+        ],
+        "tips": [
+          "Začněte lehkým elastickým páskem",
+          "Nenech to bolet",
+          "Dýchejte rovnoměrně",
+          "Postupně zvyšujte odpor"
+        ]
+      },
+      "65": {
+        "title": "Kontrastní sprcha",
+        "instructions": [
+          "Začněte teplou vodou",
+          "Postupně přejděte do studené vody",
+          "Podržte studenou vodu po dobu 30-60 sekund",
+          "Vraťte se do teplé vody",
+          "Opakujte cyklus 3-5krát"
+        ],
+        "tips": [
+          "Začněte postupně",
+          "Zhluboka dýchejte",
+          "Nenechte se příliš chladit",
+          "Poslouchejte své tělo"
+        ]
+      }
+    },
+    "difficulties": {
+      "Beginner": "Začátečník",
+      "Intermediate": "Střední",
+      "Advanced": "Pokročilý",
+      "Easy": "Snadný"
+    }
+  },
+  "items": {
+    "autograph": "autogram",
+    "stick": "držet",
+    "puck": "puk",
+    "jersey": "Trikot"
+  },
+  "requests": {
+    "pending": "Čeká se na odpověď",
+    "accepted": "Přijato",
+    "rejected": "Odmítnuto",
+    "giftRequests": "Žádosti o dárky"
+  },
+  "auth": {
+    "login": "Jít ven na led",
+    "register": "Registrace",
+    "phone": "Telefon",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Zadejte své telefonní číslo s kódem země",
+    "code": "Potvrzovací kód",
+    "codePlaceholder": "Zadejte kód",
+    "sendCode": "Odeslat kód",
+    "resendCode": "Opakujte po",
+    "verifyCode": "Potvrďte kód",
+    "invalidPhone": "Neplatný formát telefonního čísla",
+    "invalidCode": "Neplatný potvrzovací kód",
+    "codeSent": "Kód odeslán na",
+    "codeResent": "Kód byl znovu odeslán.",
+    "required": "Je vyžadována autorizace",
+    "loginRequired": "Chcete-li zobrazit profil hráče, musíte se přihlásit.",
+    "welcomeBack": "Vítejte zpět!",
+    "welcomeBackMessage": "Vítejte zpět, {name}!",
+    "codeSentSuccess": "Kód odeslán!",
+    "codeSentMessage": "Zkontrolujte SMS v telefonu a zadejte potvrzovací kód",
+    "userNotFound": "Uživatel nenalezen",
+    "userNotFoundMessage": "Účet s tímto telefonním číslem neexistuje. Prosím zaregistrujte se.",
+    "errorSendingCode": "Chyba",
+    "errorSendingCodeMessage": "Kód se nepodařilo odeslat. Zkontrolujte své telefonní číslo a připojení k internetu.",
+    "errorResendingCode": "Chyba",
+    "errorResendingCodeMessage": "Nepodařilo se znovu odeslat kód",
+    "errorVerifyingCode": "Chyba",
+    "errorVerifyingCodeMessage": "Při kontrole kódu došlo k chybě.",
+    "errorSendingCodeGeneral": "Kód se nepodařilo odeslat. Zkuste to znovu.",
+    "errorSendingCodeResend": "Nepodařilo se znovu odeslat kód",
+    "errorInvalidCode": "Zadejte 6místný kód",
+    "errorRegistration": "Registraci se nepodařilo dokončit",
+    "errorLoginRequired": "Musíte se přihlásit do svého profilu",
+    "errorLoginRequiredMessage": "Pro odesílání zpráv musíte být přihlášeni.",
+    "errorLoginRequiredFriends": "Chcete-li přidat někoho jako přítele, musíte se přihlásit.",
+    "errorRemoveFriend": "Nelze odebrat z přátel",
+    "errorSendFriendRequest": "Odeslání žádosti o přátelství se nezdařilo",
+    "errorCancelRequest": "Požadavek se nepodařilo zrušit",
+    "errorAcceptRequest": "Žádost se nepodařilo přijmout",
+    "errorManageFriends": "Při správě přátel došlo k chybě.",
+    "errorRejectRequest": "Žádost se nepodařilo odmítnout",
+    "errorRejectRequestGeneral": "Při odmítání vašeho požadavku došlo k chybě.",
+    "errorOpenLink": "Odkaz se nepodařilo otevřít",
+    "errorDataNotFound": "Data nenalezena",
+    "errorNoEditRights": "Nemáte oprávnění upravovat tento profil.",
+    "errorClearTeams": "Nepodařilo se vymazat stará data příkazu",
+    "errorSaveTeams": "Příkazy se nepodařilo uložit",
+    "errorSaveChanges": "Změny se nepodařilo uložit",
+    "errorAdminOnly": "Uživatele může mazat pouze administrátor",
+    "errorPlayerNotFound": "Data přehrávače nebyla nalezena",
+    "errorDeleteUser": "Uživatele se nepodařilo smazat",
+    "errorCreateUser": "Vytvoření uživatele se nezdařilo",
+    "errorFillNamePhone": "Vyplňte prosím své jméno a telefonní číslo",
+    "errorLoadNotifications": "Oznámení se nepodařilo načíst",
+    "errorGetNotifications": "Nelze přijímat oznámení",
+    "errorClearNotifications": "Oznámení se nepodařilo vymazat",
+    "errorInvalidNotificationData": "Nesprávná data oznámení",
+    "errorProcessNotification": "Oznámení nelze zpracovat. Zkuste to znovu.",
+    "errorProcessNotificationGeneral": "Oznámení nelze zpracovat. Zkuste to znovu.",
+    "errorProcessFriendRequest": "Vaši žádost o přátelství nelze zpracovat.",
+    "errorProcessRequest": "Zpracování vašeho požadavku se nezdařilo",
+    "errorSendMessage": "Odeslání zprávy se nezdařilo"
+  },
+  "profile": {
+    "addFriend": "Přidat jako přítele",
+    "addFriendQuestion": "Chcete přidat {name} jako přítele?",
+    "sendMessage": "Odeslat zprávu",
+    "loading": "Načítání...",
+    "basicInfo": "Základní informace",
+    "physicalData": "Fyzická data",
+    "country": "Země",
+    "position": "Pozice",
+    "number": "Číslo",
+    "grip": "rukojeť",
+    "birthDate": "Datum narození",
+    "Левый": "Vlevo",
+    "Правый": "Právo",
+    "Center": "Střed dopředu",
+    "Winger": "Křídelník",
+    "Defender": "Obránce",
+    "Goalie": "Brankář",
+    "height": "Výška",
+    "weight": "Hmotnost",
+    "age": "Stáří",
+    "team": "Tým",
+    "status": "Postavení",
+    "player": "Hráč",
+    "coach": "Trenér",
+    "scout": "Skaut",
+    "admin": "Technická podpora",
+    "star": "Hvězda",
+    "shop": "Hokejový obchod",
+    "skateSharpening": "Broušení bruslí",
+    "organizationName": "Název organizace",
+    "organizationNamePlaceholder": "Název organizace",
+    "services": "Služby",
+    "notSpecified": "Neuvedeno",
+    "yearsOld": "let",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Vlevo",
+    "right": "Právo",
+    "skateSharpeningService": "Broušení bruslí",
+    "skateForming": "Tvarování bruslí",
+    "skateProfiling": "Profilování bruslí",
+    "equipmentRepair": "Oprava hokejové výbavy",
+    "stickRepair": "Oprava holí",
+    "usedEquipmentSale": "Prodej použité výbavy",
+    "newEquipmentSale": "Prodej nové výbavy",
+    "center": "Střed dopředu",
+    "winger": "Křídelník",
+    "defender": "Obránce",
+    "goalie": "Brankář",
+    "Left": "Vlevo",
+    "Right": "Právo",
+    "inHockey": "V hokeji",
+    "lengthInCm": "Délka v cm",
+    "additional": "Navíc",
+    "cancel": "Zrušit",
+    "friends": "Přátelé",
+    "friendship": "Přátelství",
+    "statistics": "Statistiky aktuální sezóny",
+    "teams": "Týmy",
+    "currentTeams": "Současné týmy",
+    "pastTeams": "Minulé týmy",
+    "teamInfo": "Informace o týmu",
+    "videoMoments": "Nejdůležitější videa",
+    "standards": "Normy",
+    "achievements": "Úspěchy",
+    "noAchievements": "Žádné úspěchy",
+    "hockeyPhotos": "Hokejové fotky",
+    "photos": "Fotografie",
+    "museum": "Muzeum",
+    "youAreFriendsWith": "Jste přátelé s?",
+    "addToFriends": "Přidat jako přítele",
+    "addToFriendsToSeeStandards": "Chcete-li zobrazit standardy, přidejte si {name} jako přítele",
+    "addToFriendsToSeePhotos": "Chcete-li vidět hokejové fotky, přidejte si {name} jako přítele",
+    "addToFriendsToSeeMuseum": "Chcete-li vidět muzeum, přidejte si {name} jako přítele",
+    "removeFromFriends": "Odebrat z přátel",
+    "points": "Body",
+    "friendsCount": "přátelé",
+    "friendsCountStats": "Přátelé",
+    "seconds": "sek",
+    "times": "jednou",
+    "sprint": "Běh na 100 metrů",
+    "Центральный нападающий": "Střed dopředu",
+    "Крайний нападающий": "Křídelník",
+    "Защитник": "Obránce",
+    "Вратарь": "Brankář",
+    "настоящее время": "současné době",
+    "goals": "Góly",
+    "assists": "Asistence",
+    "games": "Zápasy",
+    "pullUps": "Přítahy",
+    "pushUps": "Shyby",
+    "plankTime": "prkno (s)",
+    "sprint100m": "100 m (s)",
+    "longJump": "Skok do dálky",
+    "jumpRope": "Švihadlo",
+    "goalsCount": "hlavy",
+    "gamesCount": "hry",
+    "belarus": "Bělorusko",
+    "usa": "USA",
+    "russia": "Rusko",
+    "canada": "Kanada",
+    "finland": "Finsko",
+    "sweden": "Švédsko",
+    "czech": "Česká republika",
+    "slovakia": "Slovensko",
+    "germany": "Německo",
+    "switzerland": "Švýcarsko",
+    "austria": "Rakousko",
+    "norway": "Norsko",
+    "denmark": "Dánsko",
+    "latvia": "Lotyšsko",
+    "lithuania": "Litva",
+    "estonia": "Estonsko",
+    "ukraine": "Ukrajina",
+    "kazakhstan": "Kazachstán",
+    "squats": "Dřepy",
+    "plank": "Prkno",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "V hokeji s",
+    "noFriendsYet": "{name} zatím nemá žádné přátele",
+    "beFirstToAdd": "Buďte první, kdo přidá {name} jako přítele",
+    "writeMessage": "Napište zprávu",
+    "edit": "Upravit",
+    "deleteUser": "Smazat uživatele",
+    "noExercisesYet": "Hráč ještě nedokončil žádná cvičení.",
+    "noGiftsYet": "Zatím nebyly doručeny žádné dárky",
+    "editProfile": "Upravit profil",
+    "writeToSupport": "Napište na technickou podporu",
+    "noExercisesOwn": "Ještě jste nedokončili žádná cvičení.",
+    "noExercisesOther": "Hráč ještě neabsolvoval žádné cvičení.",
+    "removedFromFriends": "{name} byl odebrán z přátel",
+    "removeFriendError": "Nelze odebrat z přátel",
+    "friendRequestSent": "Žádost o přátelství odeslána",
+    "friendshipAccepted": "{name} přidán jako přítel",
+    "cancelRequest": "Zrušit požadavek",
+    "friendRequestError": "Odeslání žádosti o přátelství se nezdařilo",
+    "friendRequestAcceptError": "Žádost se nepodařilo přijmout",
+    "friendRequestCancelled": "Žádost o přátelství byla zrušena",
+    "friendRequestCancelError": "Požadavek se nepodařilo zrušit",
+    "deleteUserConfirm": "Opravdu chcete smazat uživatele „{{name}}“? Tuto akci nelze vrátit zpět.",
+    "userDeleted": "Uživatel \"{{name}}\" byl smazán",
+    "wantsToAddYouToFriends": "{{name}} si vás chce přidat jako přítele",
+    "friendRequestReceived": "{{name}} si vás chce přidat jako přítele",
+    "loadingProfile": "Načítání profilu...",
+    "playerNotFound": "Přehrávač nenalezen",
+    "addAchievement": "Přidejte úspěch",
+    "editAchievement": "Upravit úspěch",
+    "competitionName": "Název soutěže",
+    "year": "Rok",
+    "place": "Místo",
+    "description": "Popis (volitelné)",
+    "shopName": "Název obchodu",
+    "address": "Adresa",
+    "map": "Mapa",
+    "workingHours": "Otevírací doba",
+    "discountForFriends": "Sleva pro přátele",
+    "hockeyShop": "Hokejový obchod",
+    "nameHint": "Používejte pouze latinská písmena",
+    "photo": "Fotografie",
+    "selectPhoto": "Vyberte fotografii",
+    "logo": "Logo",
+    "selectLogo": "Vyberte logo",
+    "selectCountry": "Vyberte zemi",
+    "searchCountry": "Vyhledejte zemi",
+    "errorEnterCompetition": "Zadejte název soutěže",
+    "errorEnterYear": "Zadejte prosím platný rok.",
+    "grips": {
+      "Левый": "Vlevo",
+      "Правый": "Právo"
+    },
+    "countries": {
+      "Канада": "Kanada",
+      "США": "USA",
+      "Россия": "Rusko",
+      "Швеция": "Švédsko",
+      "Финляндия": "Finsko",
+      "Чехия": "Česká republika",
+      "Словакия": "Slovensko",
+      "Швейцария": "Švýcarsko",
+      "Германия": "Německo",
+      "Австрия": "Rakousko",
+      "Норвегия": "Norsko",
+      "Дания": "Dánsko",
+      "Латвия": "Lotyšsko",
+      "Литва": "Litva",
+      "Эстония": "Estonsko",
+      "Беларусь": "Bělorusko",
+      "Украина": "Ukrajina",
+      "Польша": "Polsko",
+      "Венгрия": "Maďarsko",
+      "Словения": "Slovinsko",
+      "Хорватия": "Chorvatsko",
+      "Франция": "Francie",
+      "Италия": "Itálie",
+      "Испания": "Španělsko",
+      "Нидерланды": "Nizozemí",
+      "Бельгия": "Belgie",
+      "Великобритания": "Spojené království",
+      "Исландия": "Island",
+      "Люксембург": "Lucembursko",
+      "Румыния": "Rumunsko",
+      "Болгария": "Bulharsko",
+      "Сербия": "Srbsko",
+      "Турция": "Turecko",
+      "Казахстан": "Kazachstán",
+      "Узбекистан": "Uzbekistán",
+      "Китай": "Čína",
+      "Япония": "Japonsko",
+      "Южная Корея": "Jižní Korea",
+      "Тайвань": "Tchaj-wan",
+      "Гонконг": "Hongkong",
+      "Сингапур": "Singapur",
+      "Малайзия": "Malajsie",
+      "Таиланд": "Thajsko",
+      "Индия": "Indie",
+      "Объединенные Арабские Эмираты": "Spojené arabské emiráty",
+      "Израиль": "Izrael",
+      "Австралия": "Austrálie",
+      "Новая Зеландия": "Nový Zéland",
+      "Мексика": "Mexiko",
+      "ЮАР": "Jižní Afrika",
+      "Аргентина": "Argentina"
+    },
+    "positions": {
+      "center": "Střed dopředu",
+      "winger": "Křídelník",
+      "defender": "Obránce",
+      "goalie": "Brankář",
+      "центральный нападающий": "středový útočník",
+      "крайний нападающий": "křídelník",
+      "защитник": "obránce",
+      "вратарь": "brankář",
+      "Центральный нападающий": "Střed dopředu",
+      "Крайний нападающий": "Křídelník",
+      "Защитник": "Obránce",
+      "Вратарь": "Brankář"
+    },
+    "discountForFriendsHint": "Přidejte si obchod jako přítele a získejte slevu! Ukažte slevu prodejci při nákupu.",
+    "activityRating": "Hodnocení aktivity",
+    "coachingYears": "Trénuje roky",
+    "phone": "Telefon",
+    "qrCodeTitle": "QR kód profilu",
+    "qrCodeSubtitle": "Naskenujte pro rychlý přístup",
+    "qrCodeInfo": "Namiřte fotoaparát telefonu na QR kód pro otevření profilu",
+    "shareProfile": "Sdílet profil",
+    "savedToGallery": "Uloženo do galerie",
+    "noPermission": "Žádný přístup do galerie",
+    "shareError": "Chyba při vytváření obrázku",
+    "currentTeam": "Tým",
+    "hockeyExperience": "Hokejové zkušenosti",
+    "years": "let",
+    "currentSeasonStats": "Statistiky aktuální sezóny"
+  },
+  "register": {
+    "title": "Registrace",
+    "status": "Postavení",
+    "player": "Hráč",
+    "coach": "Trenér",
+    "scout": "Skaut",
+    "star": "Hvězda",
+    "shop": "Hokejový obchod",
+    "phone": "Telefon",
+    "name": "Jméno",
+    "surname": "Příjmení",
+    "birthDate": "Datum narození",
+    "country": "Země",
+    "position": "Pozice",
+    "grip": "Rukojeť",
+    "height": "výška (cm)",
+    "weight": "Hmotnost (kg)",
+    "number": "Číslo",
+    "photo": "Fotografie",
+    "selectPhoto": "Vyberte fotografii",
+    "takePhoto": "Pořiďte fotku",
+    "chooseFromGallery": "Vyberte z galerie",
+    "photoRequired": "Je vyžadována fotografie",
+    "register": "Rejstřík",
+    "back": "Zadní",
+    "welcome": "Vítejte!",
+    "registrationSuccess": "Registrace byla úspěšně dokončena! Vítejte v HockeyStars!",
+    "selectDate": "Vyberte datum",
+    "cancel": "Zrušit",
+    "confirm": "Potvrdit",
+    "photoError": "Při nahrávání fotky došlo k chybě"
+  },
+  "navigation": {
+    "home": "Domov",
+    "search": "Vyhledávání",
+    "messages": "Zprávy",
+    "notifications": "Události",
+    "profile": "Profil"
+  },
+  "admin": {
+    "accessDenied": "Přístup odepřen",
+    "onlyAdmins": "Tuto funkci mohou používat pouze správci.",
+    "error": "Chyba",
+    "errorLoadingProfile": "Nepodařilo se získat přístup k profilu",
+    "player": "Hráč",
+    "coach": "Trenér",
+    "scout": "Skaut",
+    "admin": "Admin",
+    "star": "Hvězda",
+    "shop": "Hokejový obchod",
+    "noName": "Žádné jméno",
+    "noPosition": "Neuvedeno",
+    "noTeam": "Neuvedeno",
+    "sendGift": "Odeslat dárek",
+    "yearsOld": "let",
+    "addUser": "Přidat uživatele",
+    "searchPlayers": "Hledání hráčů...",
+    "createUser": "Vytvoření uživatele",
+    "basicInfo": "Základní informace",
+    "name": "Jméno",
+    "phone": "Telefonní číslo",
+    "status": "Postavení",
+    "position": "Pozice",
+    "number": "Číslo hráče",
+    "grip": "Rukojeť",
+    "height": "výška (cm)",
+    "weight": "Hmotnost (kg)",
+    "country": "Země",
+    "create": "Vytvořit",
+    "success": "Úspěch",
+    "userCreated": "Uživatel {{name}} byl vytvořen",
+    "errorCreatingUser": "Vytvoření uživatele se nezdařilo",
+    "fillRequiredFields": "Vyplňte prosím všechna povinná pole.",
+    "enterValidPhone": "Zadejte prosím platné telefonní číslo s kódem země.",
+    "requiredForPlayers": "U hráčů a hvězd je povinné uvést datum narození a pozici"
+  },
+  "museum": {
+    "title": "Muzeum",
+    "noItems": "Muzeum je stále prázdné."
+  },
+  "teams": {
+    "Система": "Systém",
+    "Привет": "Ahoj",
+    "Пираньи": "piraně",
+    "Динамо Минск": "Dynamo Minsk",
+    "Динамо-Минск": "Dynamo Minsk",
+    "Юность-Минск": "Yunost-Minsk",
+    "Юность": "Mládí",
+    "Неман": "Neman",
+    "Гомель": "Gomel",
+    "Брест": "Brest",
+    "Витебск": "Vitebsk",
+    "Львы": "Lvi",
+    "Керамин": "Keramin",
+    "Могилев": "Mogilev",
+    "Гродно": "Grodno",
+    "Сборная Беларуси": "Běloruský národní tým",
+    "Сборная Минской области": "Tým Minské oblasti",
+    "Сборная Гомельской области": "Tým regionu Gomel",
+    "Сборная Брестской области": "Tým regionu Brest",
+    "Сборная Витебской области": "Tým Vitebské oblasti",
+    "Сборная Могилевской области": "Tým Mogilevské oblasti",
+    "Сборная Гродненской области": "Tým regionu Grodno",
+    "ХК Минск": "HC Minsk",
+    "ХК Гомель": "HC Gomel",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogilev",
+    "ХК Гродно": "HC Grodno",
+    "Динамо": "Dynamo",
+    "Спартак": "Spartakus",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Julajev",
+    "Ак Барс": "Ak Bars",
+    "Металлург": "Hutník",
+    "Трактор": "Traktor",
+    "Авангард": "avantgarda",
+    "Сибирь": "Sibiř",
+    "Амур": "Amur",
+    "Адмирал": "Admirál",
+    "Локомотив": "Lokomotiva",
+    "Северсталь": "Severstal",
+    "Витязь": "Rytíř",
+    "Сочи": "Soči",
+    "Торпедо": "Torpédo",
+    "Нефтехимик": "petrochemik",
+    "Автомобилист": "Motorista",
+    "Югра": "Jugra",
+    "Барыс": "Barys",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Dinamo Riga",
+    "Динамо Москва": "Dynamo Moskva",
+    "Динамо Минск U20": "Dynamo Minsk U20",
+    "Динамо Минск U18": "Dynamo Minsk U18",
+    "Calgary Flames": "Calgary Flames",
+    "New Jersey Devils": "New Jersey Devils",
+    "Юность-Минск U20": "Yunost-Minsk U20",
+    "Юность-Минск U18": "Yunost-Minsk U18",
+    "teams": {
+      "Сборная Беларуси": "Běloruský národní tým",
+      "Динамо Минск": "Dinamo Minsk",
+      "Юность-Минск": "Yunost-Minsk",
+      "Пираньи": "piraně",
+      "Сборная Минской области": "Tým Minské oblasti",
+      "Сборная Беларуси U14": "Běloruská reprezentace do 14 let",
+      "Пчелки": "Včely",
+      "Беларусь U14": "Běloruská reprezentace do 14 let",
+      "Минская область": "Tým Minské oblasti",
+      "New Jersey Devils": "New Jersey Devils",
+      "Calgary Flames": "Calgary Flames",
+      "Boston Hockey Club": "Bostonský hokejový klub",
+      "Belarus U14 National Team": "Běloruská reprezentace do 14 let",
+      "Belarus National Team U14": "Běloruská reprezentace do 14 let",
+      "Minsk Region Team": "Tým Minské oblasti",
+      "Piranhas": "piraně",
+      "Bees": "Včely",
+      "Toronto Maple Leafs": "Toronto Maple Leafs",
+      "Montreal Canadiens": "Montreal Canadiens",
+      "Vancouver Canucks": "Vancouver Canucks",
+      "Edmonton Oilers": "Edmonton Oilers",
+      "Winnipeg Jets": "Winnipeg Jets",
+      "Ottawa Senators": "Ottawa Senators",
+      "New York Rangers": "New York Rangers",
+      "Boston Bruins": "Boston Bruins",
+      "Chicago Blackhawks": "Chicago Blackhawks",
+      "Detroit Red Wings": "Detroit Red Wings",
+      "Pittsburgh Penguins": "Pittsburgh Penguins",
+      "Washington Capitals": "Washington Capitals",
+      "Tampa Bay Lightning": "Tampa Bay Lightning",
+      "Colorado Avalanche": "Colorado Avalanche",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kaunas",
+      "Vilnius": "Vilnius",
+      "Klaipeda": "Klajpeda",
+      "Riga": "Riga",
+      "Daugavpils": "Daugavpils",
+      "Liepaja": "Liepaja",
+      "Cracovia": "Cracovia",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "Ruský národní tým",
+      "Сборная Канады": "Tým Kanady",
+      "Сборная США": "Tým USA",
+      "Сборная Финляндии": "Národní tým Finska",
+      "Сборная Швеции": "Švédská reprezentace",
+      "Сборная Беларуси U20": "Běloruská reprezentace do 20 let",
+      "Сборная Беларуси U18": "Běloruská reprezentace do 18 let",
+      "Динамо Минск U20": "Dinamo Minsk U20",
+      "Динамо Минск U18": "Dinamo Minsk U18",
+      "Юность-Минск U20": "Yunost-Minsk U20",
+      "Юность-Минск U18": "Yunost-Minsk U18",
+      "ШРС": "SRS",
+      "Динамо-Молодечно": "Dynamo-Molodechno",
+      "Динамо Р": "Dynamo R",
+      "Слован": "Slovan",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranoviči",
+      "Шахтер": "Shakhtyor",
+      "Лида": "Lída",
+      "Пинск": "Pinsk",
+      "Ивацевичи": "Ivatsevichi",
+      "Береза": "Bříza",
+      "Кобрин": "Kobrin",
+      "Химик": "Khimik",
+      "Жлобин": "Žlobin",
+      "Бобруйск": "Bobruisk",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "Národní tým RB",
+      "Сборная Минска": "Minsk tým",
+      "ЦСКА Москва": "CSKA Moskva",
+      "Спартак Москва": "Spartak Moskva",
+      "Локомотив Ярославль": "Lokomotiv Jaroslavl",
+      "Ак Барс Казань": "Ak Bars Kazaň",
+      "Трактор Челябинск": "Traktor Čeljabinsk",
+      "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+      "Торпедо Нижний Новгород": "Torpedo Nižnij Novgorod"
+    },
+    "Сборная Беларуси U14": "Běloruská reprezentace do 14 let",
+    "Барановичи": "Baranoviči",
+    "Шахтер": "Horník",
+    "Лида": "Lída",
+    "Пинск": "Pinsk",
+    "Ивацевичи": "Ivatsevichi",
+    "Береза": "Bříza",
+    "Кобрин": "Kobrin",
+    "Химик": "Chemik",
+    "Жлобин": "Žlobin",
+    "Бобруйск": "Bobruisk",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "Národní tým RB",
+    "Сборная Минска": "Minsk tým",
+    "ЦСКА Москва": "CSKA Moskva",
+    "Спартак Москва": "Spartak Moskva",
+    "Локомотив Ярославль": "Lokomotiv Jaroslavl",
+    "Ак Барс Казань": "Ak Bars Kazaň",
+    "Трактор Челябинск": "Traktor Čeljabinsk",
+    "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+    "Торпедо Нижний Новгород": "Torpedo Nižnij Novgorod",
+    "Boston Hockey Club": "Bostonský hokejový klub",
+    "Пчелки": "Včely",
+    "Center": "Střed dopředu",
+    "Winger": "Okraj",
+    "Defender": "Obránce",
+    "Goalie": "Brankář"
+  },
+  "settings": {
+    "title": "Nastavení",
+    "language": "Jazyk",
+    "selectLanguage": "Vyberte jazyk",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Vyhledávání",
+    "loading": "Načítání vyhledávání...",
+    "placeholder": "Hledání hráčů...",
+    "country": "Země",
+    "grip": "Rukojeť",
+    "position": "Pozice",
+    "year": "Rok",
+    "height": "Výška",
+    "heightFrom": "Výška od",
+    "weight": "Hmotnost",
+    "weightFrom": "Hmotnost od",
+    "all": "Vše",
+    "noPlayersFound": "Nebyli nalezeni žádní hráči",
+    "left": "Vlevo",
+    "right": "Právo"
+  },
+  "messages": {
+    "title": "Zprávy",
+    "loading": "Načítání chatů...",
+    "noMessages": "Žádné zprávy",
+    "startConversation": "Začněte chatovat s ostatními hráči",
+    "error": "Chyba",
+    "errorLoadingChats": "Chaty se nepodařilo načíst",
+    "yesterday": "Včera",
+    "you": "Vy:"
+  },
+  "notifications": {
+    "title": "Události",
+    "loading": "Načítání událostí...",
+    "noNotifications": "Žádné události",
+    "noNotificationsSubtitle": "Zatím nemáte žádné události o přátelství, dárcích nebo jiných akcích.",
+    "accept": "Přijmout",
+    "decline": "Odmítnout",
+    "friendRequests": "Žádosti o přátelství",
+    "friendRequest": "žádost o přátelství",
+    "wantsToAddYou": "{name} si vás chce přidat jako přítele",
+    "wantsToAddAsFriend": "si vás chce přidat jako přítele",
+    "friendRequestAccepted": "Žádost o přátelství přijata!",
+    "friendRequestDeclined": "Žádost o přátelství zamítnuta",
+    "giftRequest": "Žádost o dárek",
+    "giftRequestMessage": "{playerName} žádá o {itemType}",
+    "giftRequestApproved": "Žádost schválena",
+    "giftRequestApprovedMessage": "{starName} schválil vaši žádost o {itemType}",
+    "giftRequestAccepted": "Žádost o dárek přijata!",
+    "giftRequestRejected": "Žádost o dárek zamítnuta",
+    "player": "Hráč",
+    "unknownPlayer": "Neznámý hráč",
+    "star": "Hvězda"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Vyberte zdroj fotografie",
+    "selectPhotoMessage": "Odkud chcete nahrát fotku?",
+    "gallery": "Galerie",
+    "camera": "Fotoaparát",
+    "cancel": "Zrušit",
+    "save": "Uložit",
+    "name": "Jméno",
+    "namePlaceholder": "Jméno hráče",
+    "country": "Země",
+    "position": "Pozice",
+    "height": "výška (cm)",
+    "heightPlaceholder": "Výška",
+    "weight": "Hmotnost (kg)",
+    "weightPlaceholder": "Hmotnost",
+    "number": "Číslo",
+    "grip": "Rukojeť",
+    "birthDate": "Datum narození",
+    "socialLinks": "sociální média",
+    "Левый": "Vlevo"
+  },
+  "exercisesSection": {
+    "title": "Cvičení dokončena",
+    "loading": "Načítání...",
+    "noExercises": "Ještě jste nedokončili žádná cvičení.",
+    "noExercisesOwn": "Ještě jste nedokončili žádná cvičení.",
+    "noExercisesOther": "Uživatel dosud neabsolvoval žádná cvičení.",
+    "times": "jednou",
+    "timesPlural": "časy"
+  },
+  "home": {
+    "loadingPlayers": "Obnova ledu...",
+    "noPlayersCountry": "Žádní hráči z {{country}}",
+    "noPlayersYear": "Nejsou žádní hráči narození v {{year}}",
+    "noPlayersCountryYear": "Žádní hráči z {{country}} v {{year}}",
+    "iceEmpty": "Led je prázdný. Vyberte jinou zemi nebo rok nebo resetujte filtry.",
+    "waitingForConnection": "Čekání na připojení",
+    "checkInternetConnection": "Zkontrolujte připojení k internetu"
+  },
+  "filters": {
+    "year": "rok",
+    "yearDefault": "2012"
+  },
+  "chat": {
+    "loading": "Načítání chatu...",
+    "startConversation": "Zahájit konverzaci s {name}",
+    "enterMessage": "Zadejte svou zprávu...",
+    "player": "Hráč",
+    "coach": "Trenér",
+    "scout": "Skaut",
+    "admin": "Technická podpora",
+    "star": "Hvězda",
+    "shop": "Hokejový obchod",
+    "error": "Chyba",
+    "errorLoadingChat": "Data chatu se nepodařilo načíst",
+    "errorSendingMessage": "Odeslání zprávy se nezdařilo"
+  },
+  "createUser": {
+    "title": "Vytvoření uživatele",
+    "selectPhotoSource": "Vyberte zdroj fotografie",
+    "selectPhotoMessage": "Odkud chcete nahrát fotku?",
+    "gallery": "Galerie",
+    "camera": "Fotoaparát",
+    "cancel": "Zrušit",
+    "permissionError": "Pro přístup do galerie je vyžadováno povolení.",
+    "permissionErrorCamera": "Pro přístup ke kameře je vyžadováno povolení.",
+    "errorLoadingPhoto": "Nepodařilo se načíst fotku z galerie",
+    "errorTakingPhoto": "Fotografování se nezdařilo",
+    "addPhoto": "Přidejte fotku",
+    "status": "Postavení",
+    "player": "Hráč",
+    "coach": "Trenér",
+    "scout": "Skaut",
+    "star": "Hvězda",
+    "shop": "Hokejový obchod",
+    "phone": "Telefonní číslo",
+    "name": "Jméno a příjmení",
+    "namePlaceholder": "ZADEJTE JMÉNO",
+    "nameHint": "Pouze latinská písmena (A–Z)",
+    "birthDate": "Datum narození",
+    "selectBirthDate": "Vyberte datum narození",
+    "position": "Pozice",
+    "number": "Číslo hráče",
+    "numberPlaceholder": "Číslo na uniformě",
+    "grip": "Rukojeť",
+    "height": "výška (cm)",
+    "heightPlaceholder": "Výška",
+    "weight": "Hmotnost (kg)",
+    "weightPlaceholder": "Hmotnost",
+    "country": "Země",
+    "selectCountry": "Vyberte zemi",
+    "searchCountry": "Hledání země...",
+    "close": "Blízko",
+    "create": "Vytvořit",
+    "error": "Chyba",
+    "fillRequiredFields": "Vyplňte prosím všechna povinná pole.",
+    "enterValidPhone": "Zadejte prosím platné telefonní číslo s kódem země.",
+    "requiredForPlayers": "U hráčů a hvězd je povinné uvést datum narození a pozici",
+    "success": "Úspěch",
+    "userCreated": "Uživatel {{name}} byl vytvořen",
+    "errorCreatingUser": "Vytvoření uživatele se nezdařilo"
+  },
+  "exerciseDetails": {
+    "back": "Zadní",
+    "complete": "Vykonat",
+    "completed": "Dokončeno",
+    "times": "jednou",
+    "timesPlural": "časy",
+    "duration": "Trvání",
+    "difficulty": "Složitost",
+    "equipment": "Zařízení",
+    "calories": "Kalorie",
+    "benefits": "Prospěch",
+    "instructions": "Instrukce",
+    "tips": "Poraďte",
+    "beginner": "Začátek",
+    "intermediate": "Průměrný",
+    "advanced": "Moderní",
+    "error": "Chyba",
+    "errorCompleting": "Cvičení se nepodařilo dokončit",
+    "success": "Úspěch",
+    "exerciseCompleted": "Cvičení dokončeno!"
+  },
+  "gifts": {
+    "requestGift": "Požádejte o dárek",
+    "gifts": "Současnost",
+    "autograph": "Autogram",
+    "stick": "Držet",
+    "puck": "Podložka",
+    "jersey": "Trikot",
+    "pleaseWriteMessage": "Napište prosím zprávu k vaší poptávce",
+    "invalidGift": "nevhodný dárek",
+    "deleteGiftQuestion": "Smazat dárek?",
+    "from": "z",
+    "noGiftsYet": "Zatím žádné dárky od hvězd",
+    "museum": "Muzeum dárků",
+    "myGifts": "Moje dárky",
+    "noGiftsSubtext": "Nahrajte první dárek pro sdílení s hráči",
+    "successDeleted": "Dárek smazán",
+    "errorDelete": "Nepodařilo se smazat dárek",
+    "noImage": "žádný obrázek",
+    "failedToSendRequest": "Odeslání požadavku se nezdařilo",
+    "requestSent": "Žádost odeslána!",
+    "requestSentMessage": "Váš požadavek na {itemType} byl odeslán. Počkejte prosím na odpověď.",
+    "requestItem": "Žádost o {itemType}",
+    "requestMessage": "Zpráva k žádosti",
+    "selectGiftType": "Vyberte typ dárku",
+    "selectGiftTypeMessage": "Jaký typ dárku chcete vytvořit?",
+    "requestMessageHelper": "Napište zdvořilou zprávu s vysvětlením, proč chcete tento dárek obdržet.",
+    "requestMessagePlaceholder": "Například: Ahoj! Jsem velkým fanouškem vaší hry a chtěl bych autogram do své sbírky...",
+    "characters": "symboly",
+    "sending": "Odesílání...",
+    "sendRequest": "Pošlete žádost",
+    "requestInfo": "Po odeslání vaší žádosti hvězda obdrží oznámení a bude moci vaši žádost přijmout nebo odmítnout. Pokud bude dárek přijat, objeví se ve vašem Muzeu dárků.",
+    "failedToLoadItems": "Položky se nepodařilo načíst",
+    "noPermissionToUpload": "Nemáte oprávnění nahrávat položky pro jiného uživatele.",
+    "failedToGetImageUri": "Nepodařilo se získat identifikátor URI obrázku",
+    "failedToSelectImage": "Nelze vybrat obrázek",
+    "emptyImageUri": "Identifikátor URI obrázku je prázdný.",
+    "formDataUploadError": "Chyba při nahrávání přes FormData",
+    "imageUploadError": "Chyba při načítání obrázku: {error}",
+    "itemUploadedSuccessfully": "{itemType} bylo úspěšně načteno!",
+    "failedToUploadItem": "Položku se nepodařilo načíst",
+    "userNotAuthorized": "Uživatel nemá oprávnění",
+    "noPermissionToEdit": "Nemáte oprávnění upravovat položky pro jiného uživatele.",
+    "itemNotFound": "Dárek nenalezen",
+    "failedToUploadNewImage": "Chyba při načítání nového obrázku",
+    "emptyImage": "Obrázek je prázdný (0 bajtů)",
+    "failedToUpdateDatabase": "Chyba při aktualizaci záznamu databáze",
+    "itemImageUpdated": "Obrázek dárku aktualizován!",
+    "failedToUpdateItemImage": "Aktualizace obrázku dárku se nezdařila",
+    "allGiftsAdded": "Všechny dárky byly přidány.",
+    "allGiftTypesAdded": "Už máte všechny druhy dárků",
+    "addGift": "Přidat dárek",
+    "deletion": "Odstranění",
+    "itemDeleted": "Dárek odstraněn",
+    "failedToDeleteItem": "Dar se nepodařilo smazat",
+    "noGifts": "Zatím žádné dárky",
+    "clickPlusToAdd": "Kliknutím na + přidáte",
+    "настоящее время": "současné době",
+    "Центральный нападающий": "Střed dopředu",
+    "Крайний нападающий": "Křídelník",
+    "Защитник": "Obránce",
+    "Вратарь": "Brankář",
+    "Center": "Střed dopředu",
+    "Winger": "Okraj",
+    "Defender": "Obránce",
+    "Goalie": "Brankář",
+    "Left": "Vlevo",
+    "Right": "Právo",
+    "seconds": "sek",
+    "times": "jednou",
+    "sprint": "Běh na 100 metrů",
+    "_cache_clear": "2024-01-16-9",
+    "sendGiftTo": "Poslat dárek {playerName}",
+    "selectExistingGift": "Vybrat existující dárek",
+    "orCreateNew": "Nebo vytvořit nový",
+    "giftName": "Název dárku",
+    "giftNamePlaceholder": "např. Podepsaná čepice",
+    "uploadImage": "Nahrát obrázek",
+    "send": "Poslat",
+    "selectGift": "Vybrat dárek",
+    "fromAdmin": "Administrátor",
+    "errorSelectOrCreate": "Vyberte dárek nebo vytvořte nový",
+    "errorGiftAlreadyExists": "Tento dárek již existuje pro hráče {playerName}.\n\nVyberte jiný dárek nebo vytvořte nový.",
+    "successGiftSent": "Dárek odeslán {playerName}!",
+    "errorSendingGift": "Nepodařilo se odeslat dárek",
+    "deleteGiftConfirm": "Opravdu chcete smazat tento dárek?",
+    "selectImage": "Vybrat obrázek",
+    "errorPermissionDenied": "Nemáte oprávnění smazat tento dárek",
+    "errorGiftNotFound": "Dárek nenalezen",
+    "errorGiftNotDeleted": "Dárek nebyl smazán",
+    "noGiftsUploaded": "Zatím nebyly nahrány žádné dárky",
+    "fromStar": "od {starName}",
+    "giftReceived": "Dárek přijat!",
+    "giftReceivedFromAdmin": "Obdrželi jste dárek od administrátora: {giftName}",
+    "giftReceivedFromStar": "Obdrželi jste dárek od {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Dárek přijat!",
+    "giftReceivedFromAdminPush": "Obdrželi jste dárek od administrátora: {giftName}",
+    "giftReceivedFromStarPush": "Obdrželi jste dárek od {starName}: {giftName}"
+  },
+  "TEMP_DELETE_ME": {
+    "title": "Normy",
+    "noNormatives": "Normy zatím nebyly přidány.",
+    "russia": "Rusko",
+    "canada": "Kanada",
+    "finland": "Finsko",
+    "sweden": "Švédsko",
+    "czech": "Česká republika",
+    "slovakia": "Slovensko",
+    "germany": "Německo",
+    "switzerland": "Švýcarsko",
+    "austria": "Rakousko",
+    "norway": "Norsko",
+    "denmark": "Dánsko",
+    "latvia": "Lotyšsko",
+    "lithuania": "Litva",
+    "estonia": "Estonsko",
+    "ukraine": "Ukrajina",
+    "kazakhstan": "Kazachstán",
+    "беларусь": "Bělorusko",
+    "россия": "Rusko",
+    "сша": "USA",
+    "канада": "Kanada",
+    "финляндия": "Finsko",
+    "швеция": "Švédsko",
+    "чехия": "Česká republika",
+    "словакия": "Slovensko",
+    "германия": "Německo",
+    "швейцария": "Švýcarsko",
+    "австрия": "Rakousko",
+    "норвегия": "Norsko",
+    "дания": "Dánsko",
+    "латвия": "Lotyšsko",
+    "литва": "Litva",
+    "эстония": "Estonsko",
+    "украина": "Ukrajina",
+    "казахстан": "Kazachstán",
+    "польша": "Polsko",
+    "венгрия": "Maďarsko",
+    "словения": "Slovinsko",
+    "хорватия": "Chorvatsko",
+    "франция": "Francie",
+    "италия": "Itálie",
+    "испания": "Španělsko",
+    "нидерланды": "Nizozemí",
+    "бельгия": "Belgie",
+    "великобритания": "Spojené království",
+    "исландия": "Island",
+    "люксембург": "Lucembursko",
+    "румыния": "Rumunsko",
+    "болгария": "Bulharsko",
+    "сербия": "Srbsko",
+    "турция": "Turecko",
+    "узбекистан": "Uzbekistán",
+    "китай": "Čína",
+    "япония": "Japonsko",
+    "южнаякорея": "Jižní Korea",
+    "тайвань": "Tchaj-wan",
+    "гонконг": "Hongkong",
+    "сингапур": "Singapur",
+    "малайзия": "Malajsie",
+    "таиланд": "Thajsko",
+    "индия": "Indie",
+    "объединенныеарабскиеэмираты": "Spojené arabské emiráty",
+    "израиль": "Izrael",
+    "австралия": "Austrálie",
+    "новаязеландия": "Nový Zéland",
+    "мексика": "Mexiko",
+    "юар": "Jižní Afrika",
+    "аргентина": "Argentina"
+  },
+  "normatives": {
+    "title": "Normy",
+    "noNormatives": "Normy zatím nebyly přidány.",
+    "addNormative": "Přidejte standard",
+    "name": "Jméno",
+    "description": "Popis",
+    "type": "Typ",
+    "value": "Význam",
+    "unit": "Jednotka měření",
+    "add": "Přidat",
+    "cancel": "Zrušit",
+    "save": "Uložit",
+    "edit": "Upravit",
+    "delete": "Vymazat",
+    "back": "Zadní",
+    "editNormative": "Upravte normu",
+    "deleteNormativeConfirm": "Opravdu chcete smazat nařízení \"{{name}}\"? Tuto akci nelze vrátit zpět.",
+    "normativeDeleted": "Standardní „{{name}}“ bylo odstraněno",
+    "normativeCreated": "Standardní „{{name}}“ byl vytvořen",
+    "errorCreatingNormative": "Vytvoření standardu se nezdařilo",
+    "errorDeletingNormative": "Smazání standardu se nezdařilo",
+    "errorEditingNormative": "Úprava normy se nezdařila",
+    "errorLoadingNormatives": "Nepodařilo se načíst normy",
+    "normativeUpdated": "Standard \"{{name}}\" byl aktualizován",
+    "errorUpdatingNormative": "Aktualizace standardu se nezdařila"
+  },
+  "socialLinks": {
+    "website": "webové stránky",
+    "error": "Chyba",
+    "cannotOpenLink": "Nelze otevřít odkaz na {platform}",
+    "openError": "Chyba při otevírání odkazu",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "vk": "VK",
+    "enterInstagram": "Zadejte Instagram",
+    "enterTiktok": "Zadejte TikTok",
+    "enterVk": "Zadejte VK",
+    "enterWebsite": "Zadejte webovou stránku",
+    "instagramPlaceholder": "@uživatelské jméno nebo odkaz",
+    "tiktokPlaceholder": "@uživatelské jméno nebo odkaz",
+    "vkPlaceholder": "@uživatelské jméno nebo odkaz",
+    "websitePlaceholder": "example.com"
+  },
+  "logout": "Výstup",
+  "logoutConfirm": "Odhlaste se ze svého profilu",
+  "logoutConfirmMessage": "Opravdu se chcete odhlásit ze svého profilu?",
+  "adminGifts": {
+    "sendGift": "Poslat dárek",
+    "giftName": "Název dárku",
+    "selectImage": "Vybrat obrázek"
+  },
+  "videoNotification": {
+    "added": "přidal",
+    "oneVideo": "nové video",
+    "multipleVideos": "{count} nových videí",
+    "video": "video",
+    "videos": "videa"
+  },
+  "achievementNotification": {
+    "added": "přidal",
+    "received": "obdržel",
+    "oneAchievement": "nový úspěch",
+    "multipleAchievements": "{count} nových úspěchů",
+    "achievement": "úspěch",
+    "achievements": "úspěchy",
+    "title": "🏆 Úspěch!",
+    "message": "Gratulujeme! Získali jste úspěch: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "změnil svůj avatar"
+  },
+  "statsNotification": {
+    "updated": "aktualizoval",
+    "stats": "statistiky",
+    "normatives": "normy",
+    "physicalData": "fyzická data"
+  },
+  "height": "výška",
+  "weight": "váha",
+  "cm": "cm",
+  "kg": "kg"
+}

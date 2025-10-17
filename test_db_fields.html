@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Database Fields</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Database Fields</h1>
+    <button onclick="testFields()">Test Fields</button>
+    <div id="result"></div>
+
+    <script>
+        // Замените на ваши данные Supabase
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function testFields() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                // 1. Проверяем структуру таблицы
+                const { data: players, error: fetchError } = await supabase
+                    .from('players')
+                    .select('id, name, individual_training, skate_services')
+                    .limit(1);
+                
+                if (fetchError) {
+                    resultDiv.innerHTML = `<p style="color: red;">Error fetching: ${fetchError.message}</p>`;
+                    return;
+                }
+                
+                let html = '<h2>1. Table Structure Check</h2>';
+                html += `<p>✅ Fields exist in table</p>`;
+                html += `<pre>${JSON.stringify(players[0], null, 2)}</pre>`;
+                
+                // 2. Тестируем обновление
+                if (players[0]) {
+                    const testId = players[0].id;
+                    
+                    const { error: updateError } = await supabase
+                        .from('players')
+                        .update({
+                            individual_training: ['hockeySkills', 'skating'],
+                            skate_services: ['skateSharpeningService']
+                        })
+                        .eq('id', testId);
+                    
+                    if (updateError) {
+                        html += `<p style="color: red;">Update error: ${updateError.message}</p>`;
+                    } else {
+                        html += '<p style="color: green;">✅ Update successful</p>';
+                        
+                        // 3. Проверяем, что данные сохранились
+                        const { data: updatedPlayer, error: fetchError2 } = await supabase
+                            .from('players')
+                            .select('individual_training, skate_services')
+                            .eq('id', testId)
+                            .single();
+                        
+                        if (fetchError2) {
+                            html += `<p style="color: red;">Fetch error: ${fetchError2.message}</p>`;
+                        } else {
+                            html += '<h2>2. Updated Data</h2>';
+                            html += `<pre>${JSON.stringify(updatedPlayer, null, 2)}</pre>`;
+                            
+                            if (Array.isArray(updatedPlayer.individual_training) && 
+                                updatedPlayer.individual_training.length > 0) {
+                                html += '<p style="color: green;">✅ individual_training works!</p>';
+                            } else {
+                                html += '<p style="color: red;">❌ individual_training not working</p>';
+                            }
+                            
+                            if (Array.isArray(updatedPlayer.skate_services) && 
+                                updatedPlayer.skate_services.length > 0) {
+                                html += '<p style="color: green;">✅ skate_services works!</p>';
+                            } else {
+                                html += '<p style="color: red;">❌ skate_services not working</p>';
+                            }
+                        }
+                    }
+                }
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
+

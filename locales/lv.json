@@ -1,0 +1,2705 @@
+{
+  "common": {
+    "save": "Saglabāt",
+    "cancel": "Atcelt",
+    "edit": "Rediģēt",
+    "delete": "Dzēst",
+    "add": "Pievienot",
+    "close": "Aizvērt",
+    "back": "Atpakaļ",
+    "next": "Tālāk",
+    "done": "Gatavs",
+    "loading": "Ielādē...",
+    "error": "Kļūda",
+    "success": "Panākumi",
+    "yes": "Jā",
+    "no": "Nē",
+    "ok": "Labi",
+    "confirm": "Apstiprināt",
+    "deleteConfirm": "Noņemšana",
+    "deletePhotoConfirm": "Vai tiešām vēlaties dzēst šo fotoattēlu?",
+    "deleteTeamConfirm": "Vai tiešām vēlaties dzēst šo komandu?",
+    "deletePastTeamConfirm": "Vai tiešām vēlaties noņemt šo komandu no vēstures?",
+    "deleteAchievementConfirm": "Vai tiešām vēlaties noņemt šo sasniegumu?",
+    "deleteAllNotificationsConfirm": "Vai tiešām vēlaties notīrīt visus paziņojumus?",
+    "rejectRequestConfirm": "Vai tiešām vēlaties noraidīt šo pieprasījumu?",
+    "super": "Super!",
+    "retry": "Mēģināt vēlreiz",
+    "goalie": "Vārtsargs"
+  },
+  "winger": "Malējais uzbrucējs",
+  "center": "Centra uzbrucējs",
+  "defender": "Aizstāvis",
+  "goals": "Mērķi",
+  "assists": "Transmisijas",
+  "games": "Spēles",
+  "pullUps": "Pievilkšanās",
+  "pushUps": "Atspiešanās",
+  "plankTime": "Dēlis (s)",
+  "sprint100m": "100 m (sek.)",
+  "longJump": "Tāllēkšana (m)",
+  "jumpRope": "lecamaukla (viena)",
+  "justNow": "tikai tagad",
+  "minutesAgo": "pirms {minutes} minūtēm",
+  "hoursAgo": "pirms {hours} stundām",
+  "daysAgo": "pirms {dienas} dienām",
+  "photoNotification": {
+    "added": "pievienots",
+    "onePhoto": "jauna fotogrāfija",
+    "multiplePhotos": "{count} jauni fotoattēli",
+    "photo": "foto",
+    "photos": "foto"
+  },
+  "friendshipNotification": {
+    "title": "Jauna draudzība",
+    "message": "{friend1Name} un {friend2Name} kļuva par draugiem",
+    "became": "kļuva par draugiem"
+  },
+  "exerciseNotification": {
+    "title": "Vingrinājums pabeigts",
+    "message": "{playerName} pabeidza vingrinājumu \"{exerciseName}\"",
+    "completed": "pabeidza vingrinājumu",
+    "exercise": "Exercise"
+  },
+  "giftNotification": {
+    "title": "Dāvana no zvaigznes",
+    "message": "{playerName} saņēma {giftName} no {starName}",
+    "received": "saņemts",
+    "from": "no",
+    "gift": "Dāvana"
+  },
+  "addPhoto": "Pievienojiet fotoattēlu",
+  "selectPhotoSource": "Izvēlieties fotoattēla avotu",
+  "gallery": "Galerija",
+  "camera": "Kamera",
+  "cancel": "Atcelt",
+  "error": "Kļūda",
+  "maxPhotosReached": "Maksimālais fotoattēlu skaits: 50",
+  "galleryPermissionRequired": "Lai piekļūtu galerijai, nepieciešama atļauja.",
+  "galleryError": "Neizdevās ielādēt fotoattēlu no galerijas.",
+  "cameraNotSupported": "Tīmekļa versijā fotoattēlu uzņemšana netiek atbalstīta. Lūdzu, izmantojiet galeriju.",
+  "cameraPermissionRequired": "Lai piekļūtu kamerai, ir nepieciešama atļauja.",
+  "cameraError": "Neizdevās uzņemt fotoattēlu.",
+  "noPhotos": "Nav fotoattēlu",
+  "clickToAddPhoto": "Lai sāktu, noklikšķiniet uz \"Pievienot fotoattēlu\".",
+  "maxPhotos": "Maksimāli 50 fotogrāfijas",
+  "uploading": "Notiek ielāde...",
+  "uploadingPhotos": "Notiek {count} fotoattēlu ielāde... {progress}%",
+  "info": "Informācija",
+  "addVideoLink": "Pievienojiet saiti uz YouTube vai VK un mirkļa laiku (formāts: minūtes:sekundes, piemēram: 1:25)",
+  "supportedPlatforms": "Atbalstītās vietnes: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... vai vk.com/video...",
+  "timeCodePlaceholder": "min:sek",
+  "myMoment": "Mans brīdis",
+  "belarus": "Baltkrievija",
+  "additional": "Turklāt",
+  "left": "Pa kreisi",
+  "right": "Pareizi",
+  "birthDatePlaceholder": "MM.GGGG (piemēram, 12.2014.)",
+  "countPlaceholder": "Reižu skaits",
+  "timePlaceholder": "Laiks sekundēs",
+  "deleteUser": "Lietotāja dzēšana",
+  "success": "Veiksmīgi",
+  "selectTeams": "Izvēlieties komandas",
+  "enterTeamName": "Ievadiet komandas nosaukumu",
+  "enterStartYear": "Lūdzu, ievadiet derīgu sākuma gadu",
+  "enterEndYear": "Lūdzu, ievadiet derīgu beigu gadu.",
+  "createTeamError": "Neizdevās izveidot komandu datu bāzē",
+  "addTeam": "Pievienojiet komandu",
+  "teamName": "Komandas nosaukums*",
+  "teamCountry": "Valsts (pēc izvēles)",
+  "teamCity": "Pilsēta (pēc izvēles)",
+  "startYear": "Sākuma gads*",
+  "endYear": "Izlaiduma gads (pēc izvēles)",
+  "searchTeams": "Meklējam komandu...",
+  "save": "Saglabāt",
+  "add": "Pievienot",
+  "editTeam": "Rediģēt komandu",
+  "noTeamsFound": "Nav atrasta neviena komanda",
+  "searching": "Meklēt...",
+  "noCurrentTeams": "Pašreizējo komandu nav.",
+  "addMoreVideo": "Pievienojiet citus videoklipus",
+  "noPastTeams": "Nav pagātnes komandu",
+  "noVideosAdded": "Nav pievienots neviens videoklips",
+  "noTeamsSpecified": "Nav norādītas komandas",
+  "selectCountry": "Izvēlieties valsti",
+  "selectPosition": "Izvēlieties pozīciju",
+  "basicInfo": "Pamatinformācija",
+  "dateFormat": "DD.MM.GGGG",
+  "noPermission": "Jums nav atļaujas rediģēt šo profilu.",
+  "playerUpdated": "Dati atjaunināti",
+  "saveError": "Neizdevās saglabāt datus",
+  "achievements": {
+    "firstPlace": "1. vieta",
+    "secondPlace": "2. vieta",
+    "thirdPlace": "3. vieta",
+    "place": "{place} vieta",
+    "noAchievements": "Nav sasniegumu"
+  },
+  "exercises": {
+    "exerciseNumber": "Vingrinājums #{id}",
+    "title": "Vingrinājumi",
+    "subtitle": "Izvēlieties treniņu",
+    "searchPlaceholder": "Meklēt pēc numura vai vārda...",
+    "loadingExercise": "Notiek vingrinājuma ielāde...",
+    "loadingExercises": "Ielādē vingrinājumus...",
+    "exercise": "Exercise",
+    "alreadyCompleted": "Vingrinājums jau ir pabeigts",
+    "canRetryIn": "Šo vingrinājumu varēsiet atkārtoti veikt pēc {hours} stundām",
+    "all": "Visi",
+    "completed": "Pabeigts",
+    "times": "vienreiz",
+    "loading": "Notiek ielāde...",
+    "categories": {
+      "Выносливость": "Izturība",
+      "Взрывная скорость": "Sprādzienbīstams ātrums",
+      "Разминка": "Iesildīšanās",
+      "Растяжка": "Stiepšanās",
+      "Ловкость": "Veiklība",
+      "Сила": "Spēks",
+      "Баланс": "Līdzsvars",
+      "Скоростная выносливость": "Ātruma izturība",
+      "Восстановление": "Atveseļošanās",
+      "Endurance": "Izturība",
+      "Explosive Speed": "Sprādzienbīstams ātrums",
+      "Warm-up": "Iesildīšanās",
+      "Stretching": "Stiepšanās",
+      "Agility": "Veiklība",
+      "Strength": "Spēks",
+      "Balance": "Līdzsvars",
+      "Speed Endurance": "Ātruma izturība",
+      "Recovery": "Atveseļošanās"
+    },
+    "difficulties": {
+      "Beginner": "Iesācējs",
+      "Начинающий": "Iesācējs",
+      "Intermediate": "Vidējs",
+      "Средний": "Vidējs",
+      "Advanced": "Augsts",
+      "Продвинутый": "Augsts",
+      "Expert": "Eksperts",
+      "Эксперт": "Eksperts"
+    },
+    "details": {
+      "category": "Kategorija",
+      "duration": "Ilgums",
+      "difficulty": "Sarežģītība",
+      "description": "Apraksts",
+      "benefits": "Vingrošanas priekšrocības",
+      "instructions": "Soli pa solim instrukcijas",
+      "tips": "Noderīgi padomi",
+      "equipment": "Aprīkojums",
+      "calories": "Kalorijas",
+      "additionalInfo": "Papildus informācija",
+      "completed": "Pabeigts:",
+      "completedButton": "Esmu to izdarījis",
+      "alreadyCompleted": "Jau pabeigts",
+      "saving": "Notiek saglabāšana...",
+      "notFound": "Vingrinājums nav atrasts",
+      "unavailable": "Nav pieejams",
+      "playersOnly": "Vingrinājumi ir pieejami tikai spēlētājiem",
+      "markedComplete": "Vingrinājums ir atzīmēts kā pabeigts",
+      "error": "Kļūda",
+      "saveError": "Vingrinājumu nevar atzīmēt kā pabeigtu",
+      "generalError": "Saglabāšanas laikā radās kļūda",
+      "times": "vienreiz",
+      "timesPlural": "reizes"
+    },
+    "difficulty": {
+      "Начинающий": "Sākums",
+      "Средний": "Vidēji",
+      "Продвинутый": "Papildu",
+      "Легкая": "Viegli"
+    },
+    "items": {
+      "1": {
+        "title": "Intervāla skriešana",
+        "description": "Pārmaiņus starp ātru skriešanu (30 sekundes) un lēnu skriešanu (30 sekundes) 20 minūtes. Lieliski piemērots kardio izturības attīstīšanai hokejā.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta spēju ātri atgūties",
+          "Uzlabo vispārējo fizisko sagatavotību",
+          "Imitē hokeja spēles radīto stresu"
+        ],
+        "instructions": [
+          "Sāciet ar 5 minūšu iesildīšanos ar vieglu skriešanu",
+          "Veiciet 30 sekunžu ātru skriešanu (80-90% no maksimālā ātruma)",
+          "Lai atgūtu, pārslēdzieties uz 30 sekunžu lēnu skriešanu",
+          "Atkārtojiet ciklu 20-25 reizes",
+          "Pabeidziet ar 5 minūšu atdzišanu"
+        ],
+        "tips": [
+          "Vērojiet savu elpošanu – elpojiet dziļi un ritmiski",
+          "Nepārsniedziet 90% no maksimālā ātruma",
+          "Ja esat noguris, varat palielināt atveseļošanās laiku.",
+          "Veikt 2-3 reizes nedēļā"
+        ],
+        "equipment": "Skrejceļš vai stadions",
+        "calories": "250-350 kcal vienā treniņā"
+      },
+      "2": {
+        "title": "Burpī lēciens",
+        "description": "Komplekss vingrinājums: pietupiens → plank → atspiešanās → pietupiens → lēciens. Veiciet 3 komplektus ar 10-15 atkārtojumiem.",
+        "benefits": [
+          "Attīsta vispārējo izturību",
+          "Stiprina muskuļus visā ķermenī",
+          "Uzlabo kustību koordināciju",
+          "Palielina sprādzienbīstamību"
+        ],
+        "instructions": [
+          "Stāviet taisni ar kājām plecu platumā",
+          "Pietupieties ar plaukstām uz grīdas sev priekšā.",
+          "Nospiediet kājas atpakaļ dēļu stāvoklī",
+          "Izpildi vienu atspiešanos",
+          "Pavelciet kājas atpakaļ uz rokām, paliekot tupus stāvoklī.",
+          "Uzlēkt, paceļot rokas virs galvas",
+          "Mīksti piezemējiet un atkārtojiet."
+        ],
+        "tips": [
+          "Turiet muguru taisni visa vingrinājuma laikā.",
+          "Piezemējies ar saliektām kājām",
+          "Sāciet ar 5-8 atkārtojumiem un pakāpeniski palieliniet",
+          "Starp komplektiem atpūtieties 60-90 sekundes"
+        ],
+        "equipment": "Vingrošanas paklājiņš (pēc izvēles)",
+        "calories": "200-300 kcal vienā treniņā"
+      },
+      "3": {
+        "title": "Velosipēds",
+        "description": "Intensīva riteņbraukšana vai stacionāra riteņbraukšana ar augstas intensitātes intervāliem. 5 minūtes iesildīšanās, 20 minūšu intervāli.",
+        "benefits": [
+          "Attīsta kardio izturību",
+          "Stiprina kāju muskuļus",
+          "Dedzina daudz kaloriju",
+          "Zema slodze uz locītavām"
+        ],
+        "instructions": [
+          "5 minūtes zemas intensitātes iesildīšanās",
+          "2 minūtes augstas intensitātes (80-85% no maksimālās)",
+          "1 minūtes atveseļošanās ar zemu intensitāti",
+          "Atkārtojiet intervālus 10 reizes",
+          "5 minūtes zemas intensitātes atdzesē"
+        ],
+        "tips": [
+          "Uzturiet augstu pedāļu ritmu (80-100 apgr./min.)",
+          "Vērojiet savu ķermeņa stāvokli - turiet muguru taisni",
+          "Pielāgojiet pretestību, lai mainītu intensitāti",
+          "Treniņa laikā dzeriet ūdeni."
+        ],
+        "equipment": "Velosipēds vai velotrenažieris",
+        "calories": "300-400 kcal vienā treniņā"
+      },
+      "4": {
+        "title": "Pliometriskie lēcieni",
+        "description": "Lēkšana vietā pēc iespējas augstāk, piezemēšanās uz saliektiem ceļiem. 3 15-20 lēcienu komplekti.",
+        "benefits": [
+          "Attīsta sprādzienbīstamu kāju spēku",
+          "Uzlabo reakciju un ātrumu",
+          "Stiprina cīpslas un saites",
+          "Palielina vertikālo lēcienu"
+        ],
+        "instructions": [
+          "Stāviet taisni ar kājām plecu platumā",
+          "Pietupieni 1/4 no ceļa ar saliektiem ceļiem",
+          "Sprādzienbīstami lec uz augšu, izstiepjot rokas",
+          "Piezemējies ar saliektām kājām",
+          "Nekavējoties veiciet nākamo lēcienu",
+          "Veiciet 15-20 lēcienus pēc kārtas"
+        ],
+        "tips": [
+          "Mīksti nolaidieties, saliekot ceļus.",
+          "Turiet ķermeni taisni",
+          "Nepārtrauciet pauzi starp lēcieniem",
+          "Starp komplektiem atpūtieties 2-3 minūtes"
+        ],
+        "equipment": "Vingrošanas paklājiņš (pēc izvēles)",
+        "calories": "150-200 kcal vienā treniņā"
+      },
+      "5": {
+        "title": "Īsās distances sprints",
+        "description": "Skrieniet ar maksimālo ātrumu 20-30 metru distanci ar 30 sekunžu atpūtu starp skrējieniem. 8-10 skrējieni.",
+        "benefits": [
+          "Attīsta maksimālo ātrumu",
+          "Uzlabo paātrinājumu",
+          "Stiprina kāju muskuļus",
+          "Uzlabo kustību koordināciju"
+        ],
+        "instructions": [
+          "Atzīmējiet 20-30 metru attālumu",
+          "Ieņemiet sākuma pozīciju (pustupus)",
+          "Kad atskan signāls, brauciet ar maksimālo ātrumu.",
+          "Šķērsojiet finiša līniju",
+          "Lēnām atgriezieties sākumā",
+          "Atpūtieties 30 sekundes un atkārtojiet."
+        ],
+        "tips": [
+          "Koncentrējieties uz skriešanas tehniku",
+          "Turiet ķermeni taisni",
+          "Aktīvi strādājiet ar rokām",
+          "Nesaīsiniet atpūtas laiku"
+        ],
+        "equipment": "Atvērts laukums vai skriešanas trase",
+        "calories": "200-250 kcal vienā treniņā"
+      },
+      "6": {
+        "title": "Bumbiņas mešana pret sienu",
+        "description": "Ar maksimālu spēku met medicīnas bumbiņu pret sienu, noķer un met vēlreiz. 3 seti pa 20 metieniem.",
+        "benefits": [
+          "Attīsta sprādzienbīstamu roku spēku",
+          "Uzlabo koordināciju",
+          "Stiprina pamata muskuļus",
+          "Palielina mešanas ātrumu"
+        ],
+        "instructions": [
+          "Stāviet 1-2 metrus no sienas",
+          "Turiet bumbu ar abām rokām krūšu līmenī",
+          "Pietupieties, saliekot ceļus",
+          "Sprādzienbīstami iztaisnojiet kājas un rokas, metot bumbu.",
+          "Noķer atlēkušo bumbu",
+          "Nekavējoties izdari nākamo metienu."
+        ],
+        "tips": [
+          "Izmantojiet bumbu, kas sver 2-4 kg",
+          "Metiet ar maksimālu spēku",
+          "Turiet muguru taisni",
+          "Strādājiet ar visu ķermeni, ne tikai ar rokām"
+        ],
+        "equipment": "Zāļu bumba 2-4 kg, siena",
+        "calories": "120-180 kcal vienā treniņā"
+      },
+      "7": {
+        "title": "Dinamiska kāju stiepšana",
+        "description": "Kājas šūpojas uz priekšu, atpakaļ un uz sāniem ar apļveida kustībām gūžas locītavās. 10-15 atkārtojumi katrai kājai.",
+        "benefits": [
+          "Sasilda kāju muskuļus",
+          "Uzlabo locītavu kustīgumu",
+          "Gatavojas apmācībai",
+          "Samazina traumu risku"
+        ],
+        "instructions": [
+          "Stāviet taisni, turoties pie atbalsta",
+          "Veiciet 10-15 šūpošanos uz priekšu ar labo kāju",
+          "Veiciet 10-15 sitienus mugurā ar labo kāju",
+          "Veiciet 10-15 šūpošanos uz sāniem ar labo kāju",
+          "Atkārtojiet kreisajai kājai.",
+          "Veiciet apļveida kustības gūžas locītavās"
+        ],
+        "tips": [
+          "Turiet muguru taisni",
+          "Nepārāk daudz šūpoties",
+          "Veiciet kustības vienmērīgi",
+          "Elpojiet dziļi un ritmiski"
+        ],
+        "equipment": "Siena vai krēsls atbalstam",
+        "calories": "50-80 kcal uz iesildīšanos"
+      },
+      "8": {
+        "title": "Ķermeņa augšdaļas iesildīšana",
+        "description": "Roku apļi, rumpja izliekumi un pagriezieni. Iesildīšanās plecu locītavām un mugurai.",
+        "benefits": [
+          "Sasilda ķermeņa augšdaļas muskuļus",
+          "Uzlabo plecu locītavu kustīgumu",
+          "Sagatavo rokas darbam",
+          "Aktivizē pamata muskuļus"
+        ],
+        "instructions": [
+          "Stāviet taisni ar kājām plecu platumā",
+          "Veiciet 10 apļveida kustības ar rokām uz priekšu",
+          "Veiciet 10 apļveida kustības ar rokām atpakaļ",
+          "Veiciet 10 sānu līkumus",
+          "Veiciet 10 rumpja apgriezienus",
+          "Veiciet apļveida kustības ar pleciem"
+        ],
+        "tips": [
+          "Pārvietojieties lēnām un vienmērīgi",
+          "Neveiciet pēkšņas kustības",
+          "Vērojiet savu elpošanu",
+          "Pakāpeniski palieliniet kustību diapazonu"
+        ],
+        "equipment": "Nav nepieciešams",
+        "calories": "40-60 kcal uz iesildīšanos"
+      },
+      "9": {
+        "title": "Viegla skriešana vietā",
+        "description": "Skriešana vietā ar augstiem ceļiem, pakāpeniski palielinot tempu. 5-7 minūtes.",
+        "benefits": [
+          "Palielina sirdsdarbības ātrumu",
+          "Sasilda kāju muskuļus",
+          "Uzlabo koordināciju",
+          "Gatavojas galvenajam treniņam"
+        ],
+        "instructions": [
+          "Stāviet taisni ar kājām plecu platumā",
+          "Sāciet ar vieglu skriešanu vietā",
+          "Pakāpeniski paceliet ceļus augstāk",
+          "Strādājiet ar rokām tā, it kā jūs skrietu normāli.",
+          "Palieliniet tempu 2-3 minūtes",
+          "Pēdējās 2 minūtēs samaziniet ātrumu"
+        ],
+        "tips": [
+          "Turiet muguru taisni",
+          "Piezemējies uz pirkstiem",
+          "Elpojiet dziļi",
+          "Nelec pārāk augstu"
+        ],
+        "equipment": "Nav nepieciešams",
+        "calories": "60-80 kcal uz iesildīšanos"
+      },
+      "10": {
+        "title": "Statiskā kāju muskuļu stiepšana",
+        "description": "Turiet četrgalvu, ikru un adduktoru stiepšanās pozīcijas. 30 sekundes vienai grupai.",
+        "benefits": [
+          "Uzlabo kāju muskuļu elastību",
+          "Samazina muskuļu sasprindzinājumu",
+          "Paātrina atveseļošanos",
+          "Novērš traumas"
+        ],
+        "instructions": [
+          "Četrgalvu stiepšanās: stāviet uz vienas kājas un salieciet otru kāju atpakaļ.",
+          "Teļu izstiepšana: Izliecieties uz priekšu, turot aizmugurējo kāju taisni.",
+          "Adductor stiept: Sēdiet, kājas nošķirtas.",
+          "Turiet katru pozīciju 30 sekundes.",
+          "Elpojiet dziļi un atslābiniet muskuļus."
+        ],
+        "tips": [
+          "Neizstiepies līdz sāpēm.",
+          "Elpojiet dziļi un lēni",
+          "Stiepšanās laikā atslābiniet muskuļus.",
+          "Veikt pēc treniņa"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "80-100 kcal uz vienu posmu"
+      },
+      "11": {
+        "title": "Muguras un plecu stiepšanās",
+        "description": "Liekumi uz priekšu, krūškurvja stiepšana, tricepsa stiepšanās. Turiet katru pozīciju 20-30 sekundes.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "12": {
+        "title": "Joga hokejistiem",
+        "description": "Asanu komplekts lokanības un līdzsvara attīstīšanai: karotāja poza, koka poza, uz leju vērsta suņa poza.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "13": {
+        "title": "Koordinācijas kāpnes",
+        "description": "Ātras kāju kustības pāri kāpnēm: sānsoļi, šķērssoļi, lēcieni. 3 katra veida caurlaides.",
+        "benefits": [
+          "Attīsta kustību koordināciju",
+          "Uzlabo līdzsvaru un līdzsvaru",
+          "Palielina veiklību",
+          "Attīsta neiromuskulāro savienojumu"
+        ],
+        "instructions": [
+          "Sāciet lēnā tempā",
+          "Koncentrējieties uz kustību precizitāti",
+          "Palieliniet ātrumu pakāpeniski",
+          "Atkārtojiet, līdz tas kļūst automātiski."
+        ],
+        "tips": [
+          "Trenējies regulāri",
+          "Nesteidzieties – precizitāte ir svarīgāka par ātrumu",
+          "Izmantojiet vizuālas norādes",
+          "Trenējies dažādos apstākļos"
+        ]
+      },
+      "14": {
+        "title": "Žonglēšana ar bumbām",
+        "description": "Žonglēšana ar 2-3 tenisa bumbiņām, lai attīstītu roku-acu koordināciju. Sāciet ar 1 bumbu.",
+        "benefits": [
+          "Attīsta kustību koordināciju",
+          "Uzlabo līdzsvaru un līdzsvaru",
+          "Palielina veiklību",
+          "Attīsta neiromuskulāro savienojumu"
+        ],
+        "instructions": [
+          "Sāciet lēnā tempā",
+          "Koncentrējieties uz kustību precizitāti",
+          "Palieliniet ātrumu pakāpeniski",
+          "Atkārtojiet, līdz tas kļūst automātiski."
+        ],
+        "tips": [
+          "Trenējies regulāri",
+          "Nesteidzieties – precizitāte ir svarīgāka par ātrumu",
+          "Izmantojiet vizuālas norādes",
+          "Trenējies dažādos apstākļos"
+        ]
+      },
+      "15": {
+        "title": "Ātri čiekuru pieskārieni",
+        "description": "Novietojiet 5-6 konusus un ātri pieskarieties tiem ar roku nejaušā secībā. 3 komplekti pa 30 sekundēm.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "16": {
+        "title": "Airēšanas trenažieris",
+        "description": "Intervāla airēšana: 2 minūtes augstas intensitātes, 1 minūte atpūtas. 8-10 cikli, lai attīstītu izturību.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "17": {
+        "title": "Lecamaukla ar intervāliem",
+        "description": "Pārmaiņus starp ātriem (30 sek.) un lēniem (30 sek.) lēcieniem. 20 minūtes, lai attīstītu kardio izturību.",
+        "benefits": [
+          "Attīsta kardio izturību",
+          "Uzlabo kustību koordināciju",
+          "Stiprina kāju muskuļus",
+          "Dedzina daudz kaloriju"
+        ],
+        "instructions": [
+          "Paņemiet atbilstoša garuma lecamo virvi.",
+          "30 sekundes ātra lēkšana ar maksimālo ātrumu",
+          "30 sekundes lēnas lēkšanas, lai atgūtos",
+          "Atkārtojiet ciklu 20 reizes",
+          "Pabeidziet ar 2 minūšu atdzišanu"
+        ],
+        "tips": [
+          "Turiet muguru taisni",
+          "Strādājiet ar plaukstas locītavām, nevis rokām",
+          "Piezemējies uz pirkstiem",
+          "Sāciet lēnā tempā"
+        ],
+        "equipment": "Lecamaukla",
+        "calories": "200-300 kcal vienā treniņā"
+      },
+      "18": {
+        "title": "Skrienot pa kāpnēm",
+        "description": "Skrien augšā pa kāpnēm cik ātri vien vari, tad ej lejā. 10-15 atkārtojumi, lai attīstītu kāju izturību.",
+        "benefits": [
+          "Attīsta kāju izturību",
+          "Stiprina augšstilbu un sēžamvietas muskuļus",
+          "Uzlabo kardio izturību",
+          "Palielina kāju spēku"
+        ],
+        "instructions": [
+          "Atrodiet kāpnes ar 20-30 pakāpieniem",
+          "Skrien ar maksimālo ātrumu",
+          "Lai atgūtos, nolaidieties staigāšanas tempā",
+          "Veiciet 10-15 pacelšanas",
+          "Starp pacēlumiem atpūtieties 1-2 minūtes"
+        ],
+        "tips": [
+          "Celšanas laikā izmantojiet visu pēdu.",
+          "Turiet muguru taisni",
+          "Aktīvi strādājiet ar rokām",
+          "Nepārsniedziet savas iespējas"
+        ],
+        "equipment": "Kāpnes",
+        "calories": "250-350 kcal vienā treniņā"
+      },
+      "19": {
+        "title": "Dēlis ar kustībām",
+        "description": "Dēļu turēšana ar pārmaiņus roku un kāju pacēlumiem. 3 komplekti pa 45-60 sekundēm, lai nostiprinātu serdi.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "20": {
+        "title": "Skriešana ar augstu ceļgalu",
+        "description": "Skrieniet vietā, paceliet ceļus uz krūtīm pēc iespējas augstāk. 5 komplekti pa 2 minūtēm ar 1 minūtes atpūtu.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "21": {
+        "title": "Tāllēkšana stāvus",
+        "description": "Leciet uz priekšu, cik vien iespējams, nolaižoties uz abām kājām. 5 8-10 lēcienu komplekti.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "22": {
+        "title": "Ātri atspiešanās",
+        "description": "Atspiešanās pēc iespējas ātrāk, pieskaroties krūtīm grīdai. 4 komplekti ar 15-20 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "23": {
+        "title": "Lēkšana pāri šķēršļiem",
+        "description": "Lēkšana pāri 30-40 cm augstiem konusiem vai barjerām. 3 piegājieni pa 10 šķēršļiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "24": {
+        "title": "Ātruma pietupieni",
+        "description": "Pietupieni pēc iespējas ātrāk, augšstilbi paralēli grīdai. 4 komplekti ar 20-25 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "25": {
+        "title": "Medicīniskās bumbas metieni",
+        "description": "Smagas bumbas (5-8 kg) mešana no krūtīm ar maksimālu spēku. 3 seti pa 15 metieniem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "26": {
+        "title": "Potītes iesildīšana",
+        "description": "Apļveida kustības ar kājām, saliekot un iztaisnojot pirkstus. 2-3 minūtes katrai kājai.",
+        "benefits": [
+          "Sagatavo muskuļus vingrinājumiem",
+          "Uzlabo asinsriti",
+          "Samazina traumu risku",
+          "Paaugstina treniņu efektivitāti"
+        ],
+        "instructions": [
+          "Sāciet lēnām un pakāpeniski palieliniet intensitāti",
+          "Veiciet kustības vienmērīgi un kontrolēti",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Izpildes laikā elpojiet vienmērīgi"
+        ],
+        "tips": [
+          "Nesteidzieties – kvalitāte ir svarīgāka par ātrumu",
+          "Ja rodas sāpes, pārtrauciet.",
+          "Pirms katra treniņa iesildieties.",
+          "Katrai kustībai veltiet pietiekami daudz laika."
+        ]
+      },
+      "27": {
+        "title": "Kakla iesildīšana",
+        "description": "Gludi galvas pagriezieni, slīpumi uz priekšu un atpakaļ, apļveida kustības. 2-3 minūtes.",
+        "benefits": [
+          "Sagatavo muskuļus vingrinājumiem",
+          "Uzlabo asinsriti",
+          "Samazina traumu risku",
+          "Paaugstina treniņu efektivitāti"
+        ],
+        "instructions": [
+          "Sāciet lēnām un pakāpeniski palieliniet intensitāti",
+          "Veiciet kustības vienmērīgi un kontrolēti",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Izpildes laikā elpojiet vienmērīgi"
+        ],
+        "tips": [
+          "Nesteidzieties – kvalitāte ir svarīgāka par ātrumu",
+          "Ja rodas sāpes, pārtrauciet.",
+          "Pirms katra treniņa iesildieties.",
+          "Katrai kustībai veltiet pietiekami daudz laika."
+        ]
+      },
+      "28": {
+        "title": "Plaukstas locītavas iesildīšana",
+        "description": "Apļveida kustības ar rokām, saliekot un izstiepjot pirkstus. 2-3 minūtes katrai rokai.",
+        "benefits": [
+          "Sagatavo muskuļus vingrinājumiem",
+          "Uzlabo asinsriti",
+          "Samazina traumu risku",
+          "Paaugstina treniņu efektivitāti"
+        ],
+        "instructions": [
+          "Sāciet lēnām un pakāpeniski palieliniet intensitāti",
+          "Veiciet kustības vienmērīgi un kontrolēti",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Izpildes laikā elpojiet vienmērīgi"
+        ],
+        "tips": [
+          "Nesteidzieties – kvalitāte ir svarīgāka par ātrumu",
+          "Ja rodas sāpes, pārtrauciet.",
+          "Pirms katra treniņa iesildieties.",
+          "Katrai kustībai veltiet pietiekami daudz laika."
+        ]
+      },
+      "29": {
+        "title": "Celis stiepjas",
+        "description": "Puspietupieni, ceļgalu apļi, viegla lēkšana vietā. 3-4 minūtes.",
+        "benefits": [
+          "Sagatavo muskuļus vingrinājumiem",
+          "Uzlabo asinsriti",
+          "Samazina traumu risku",
+          "Paaugstina treniņu efektivitāti"
+        ],
+        "instructions": [
+          "Sāciet lēnām un pakāpeniski palieliniet intensitāti",
+          "Veiciet kustības vienmērīgi un kontrolēti",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Izpildes laikā elpojiet vienmērīgi"
+        ],
+        "tips": [
+          "Nesteidzieties – kvalitāte ir svarīgāka par ātrumu",
+          "Ja rodas sāpes, pārtrauciet.",
+          "Pirms katra treniņa iesildieties.",
+          "Katrai kustībai veltiet pietiekami daudz laika."
+        ]
+      },
+      "30": {
+        "title": "Gurnu iesildīšana",
+        "description": "Gurnu apļi, kāju šūpošanās uz sāniem, vieglas izklupienas. 4-5 minūtes.",
+        "benefits": [
+          "Sagatavo muskuļus vingrinājumiem",
+          "Uzlabo asinsriti",
+          "Samazina traumu risku",
+          "Paaugstina treniņu efektivitāti"
+        ],
+        "instructions": [
+          "Sāciet lēnām un pakāpeniski palieliniet intensitāti",
+          "Veiciet kustības vienmērīgi un kontrolēti",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Izpildes laikā elpojiet vienmērīgi"
+        ],
+        "tips": [
+          "Nesteidzieties – kvalitāte ir svarīgāka par ātrumu",
+          "Ja rodas sāpes, pārtrauciet.",
+          "Pirms katra treniņa iesildieties.",
+          "Katrai kustībai veltiet pietiekami daudz laika."
+        ]
+      },
+      "31": {
+        "title": "Cirkšņa stiepšanās",
+        "description": "Tauriņš - sēžot uz grīdas, salieciet kājas kopā un noliecieties uz priekšu. Turiet 30-45 sekundes.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "32": {
+        "title": "Paceles cīpslas stiepšanās",
+        "description": "Liekumus uz priekšu ar taisnām kājām, turiet 30 sekundes. 3 komplekti pa 15 sekundēm.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "33": {
+        "title": "Teļu muskuļu stiepšana",
+        "description": "Izstiepjas pret sienu, paceles cīpslas stiepšanās. 20 sekundes uz vienu kāju.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "34": {
+        "title": "Krūšu muskuļu stiepšana",
+        "description": "Sienas stiepšana ar roku pagarinājumiem. Turiet 30 sekundes, 3 komplekti.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "35": {
+        "title": "Tricepss stiepjas",
+        "description": "Novietojiet rokas aiz galvas, lai izstieptu pleca aizmuguri. 20 sekundes katrai rokai.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "36": {
+        "title": "Čūska starp čiekuriem",
+        "description": "Skrieniet čūskai līdzīgā kustībā starp līnijā izkārtotiem čiekuriem. 5 piegājieni ar maksimālo ātrumu.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "37": {
+        "title": "Ātri pēdu pieskārieni",
+        "description": "Ātri pieskarieties čiekuriem ar kājām nejaušā secībā. 3 komplekti pa 45 sekundēm.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "38": {
+        "title": "Lēcieni ar pagriezieniem",
+        "description": "Lēkšana vietā ar 90-180 grādu pagriezieniem. 3 20 lēcienu komplekti.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "39": {
+        "title": "Ātras bumbas piespēles",
+        "description": "Tenisa bumbiņas piespēlēšana starp rokām ar maksimālo ātrumu. 3 komplekti pa 1 minūti katrs.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "40": {
+        "title": "Skriešana atmuguriski",
+        "description": "Skriešana atmuguriski ar ātriem pagriezieniem. 5 30 sekunžu komplekti.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "41": {
+        "title": "Pietupieni ar svariem",
+        "description": "Pietupieni ar hanteles vai stieni, augšstilbi paralēli grīdai. 4 komplekti ar 12-15 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "42": {
+        "title": "Deadlift",
+        "description": "Paceliet stieni no grīdas līdz gurnu līmenim ar taisnu muguru. 3 komplekti ar 8-10 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "43": {
+        "title": "Spiešana guļus",
+        "description": "Spiešana guļus ar stieni. 4 komplekti ar 8-12 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "44": {
+        "title": "Pievilkšanās",
+        "description": "Zoda pievilkšana. 3 komplekti ar 8-12 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "45": {
+        "title": "Dips uz stieņiem",
+        "description": "Paralēlā stienis nolaižas līdz 90 grādu leņķim. 3 komplekti ar 10-15 atkārtojumiem.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "46": {
+        "title": "Vienas kājas statīvs",
+        "description": "Saglabājiet līdzsvaru uz vienas kājas ar aizvērtām acīm. 3 komplekti pa 30 sekundēm katrā kājā.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "47": {
+        "title": "Vienas kājas dēlis",
+        "description": "Dēļu turēšana ar vienas kājas pacelšanu. 3 komplekti pa 30 sekundēm katrā kājā.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "48": {
+        "title": "Pietupieni ar vienu kāju",
+        "description": "Pietupieni uz vienas kājas ar otru kāju izstieptu uz priekšu. 3 komplekti pa 8-10 atkārtojumiem katrā kājā.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "49": {
+        "title": "Bosu bumbas vingrinājumi",
+        "description": "Līdzsvara vingrinājumi uz nestabilas virsmas. 15-20 minūtes dažādu kustību.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "50": {
+        "title": "Jogas līdzsvars",
+        "description": "Koka poza, Warrior III un Eagle poza līdzsvaram. Turiet katru pozu 30-60 sekundes.",
+        "benefits": [
+          "Attīsta kustību koordināciju",
+          "Uzlabo līdzsvaru un līdzsvaru",
+          "Palielina veiklību",
+          "Attīsta neiromuskulāro savienojumu"
+        ],
+        "instructions": [
+          "Sāciet lēnā tempā",
+          "Koncentrējieties uz kustību precizitāti",
+          "Palieliniet ātrumu pakāpeniski",
+          "Atkārtojiet, līdz tas kļūst automātiski."
+        ],
+        "tips": [
+          "Trenējies regulāri",
+          "Nesteidzieties – precizitāte ir svarīgāka par ātrumu",
+          "Izmantojiet vizuālas norādes",
+          "Trenējies dažādos apstākļos"
+        ]
+      },
+      "51": {
+        "title": "Pastaiga pa baļķi",
+        "description": "Staigāšana pa šauru baļķi vai dēli, lai attīstītu līdzsvaru. 5 iet uz priekšu un atpakaļ.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "52": {
+        "title": "Stāviet ar roku pret sienu",
+        "description": "Rokas stāv pret sienu, lai attīstītu ķermeņa augšdaļas līdzsvaru. 3 komplekti pa 20 sekundēm.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "53": {
+        "title": "Fartleks",
+        "description": "Skriešana ar dažādu intensitāti: ātrs skrējiens 2 minūtes, lēns skrējiens 1 minūti. Kopējais darbs 30 minūtes.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "54": {
+        "title": "Atkārtoti sprinti",
+        "description": "100 metru sprints ar 2-3 minūšu atpūtu. 6-8 atkārtojumi, lai attīstītu ātruma izturību.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "55": {
+        "title": "Intervāli uz velosipēda",
+        "description": "30 sekundes maksimālas piepūles, 90 sekundes atveseļošanās. 20 cikli, lai attīstītu ātruma izturību.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "56": {
+        "title": "Kalnu skriešana",
+        "description": "Skrien augšā kalnā, cik ātri vien vari, tad skrien lejā. 8-10 kāpumi kalnā.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "57": {
+        "title": "Pliometriskie apļi",
+        "description": "5-6 plyometrisko vingrinājumu ķēde bez atpūtas. 4-5 ķēdes ar 2 minūšu atpūtu starp tām.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "58": {
+        "title": "Viegla stiepšanās",
+        "description": "Visu galveno muskuļu grupu maiga stiepšana pēc treniņa. 15-20 minūtes, lai paātrinātu atveseļošanos.",
+        "benefits": [
+          "Uzlabo elastību un mobilitāti",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Novērš traumas",
+          "Uzlabo atjaunošanos pēc treniņa"
+        ],
+        "instructions": [
+          "Pirms stiepšanās iesildieties",
+          "Izstiepiet lēnām un gludi",
+          "Turiet pozīciju 20-30 sekundes",
+          "Izvairieties no asām sāpēm"
+        ],
+        "tips": [
+          "Izstiepjot dziļi elpojiet.",
+          "Neveiciet pēkšņas kustības",
+          "Dariet to katru dienu, lai iegūtu labākos rezultātus.",
+          "Izstiepies pēc treniņa"
+        ]
+      },
+      "59": {
+        "title": "Putu velmēšana",
+        "description": "Muskuļu masāža ar putu rullīti spriedzes mazināšanai. 10-15 minūtes katrai galvenajai muskuļu grupai.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "60": {
+        "title": "Viegla skriešana",
+        "description": "Zemas intensitātes skriešana aktīvai atveseļošanai. 15-20 minūtes.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "61": {
+        "title": "Peldēšana",
+        "description": "Viegla peldēšana baseinā, lai atslābinātu muskuļus un atjaunotos. 20-30 minūtes.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "62": {
+        "title": "Atkopšanas velosipēds",
+        "description": "Viegla riteņbraukšana zemā tempā aktīvai atveseļošanai. 20-25 minūtes.",
+        "benefits": [
+          "Uzlabo sirds un asinsvadu izturību",
+          "Attīsta aerobo izturību",
+          "Efektīvi sadedzina kalorijas",
+          "Stiprina sirds muskuli"
+        ],
+        "instructions": [
+          "Sāciet ar vieglu iesildīšanos 5-10 minūšu garumā",
+          "Saglabājiet savu mērķa sirdsdarbības ātrumu",
+          "Vērojiet savu elpošanu - elpojiet dziļi",
+          "Pabeidziet ar atdzesēšanu un izstiepiet."
+        ],
+        "tips": [
+          "Pakāpeniski palieliniet ilgumu",
+          "Treniņa laikā dzeriet ūdeni.",
+          "Veikt 3-4 reizes nedēļā",
+          "Klausieties savu ķermeni"
+        ]
+      },
+      "63": {
+        "title": "Atveseļošanās joga",
+        "description": "Maigas asanas, lai atslābinātu muskuļus un paātrinātu atveseļošanos. 20 minūtes.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      },
+      "64": {
+        "title": "Stiepšanās ar gumiju",
+        "description": "Stiepšanās vingrinājumi, izmantojot gumiju",
+        "benefits": [
+          "Uzlabo locītavu elastību",
+          "Stiprina saites",
+          "Atbrīvo muskuļu sasprindzinājumu",
+          "Palielina kustību amplitūdu"
+        ],
+        "instructions": [
+          "Izvēlieties pareizo elastīgo joslu",
+          "Veiciet lēnas kustības",
+          "Turiet stiept 20-30 sekundes",
+          "Atkārtojiet katru vingrinājumu 3-5 reizes"
+        ],
+        "tips": [
+          "Sāciet ar vieglu elastīgo joslu",
+          "Neļaujiet tam sāpēt",
+          "Elpojiet vienmērīgi",
+          "Pakāpeniski palieliniet pretestību"
+        ],
+        "equipment": "Gumijas josla",
+        "calories": "35-55 kcal"
+      },
+      "65": {
+        "title": "Kontrasta duša",
+        "description": "Mainiet karstu un aukstu ūdeni, lai uzlabotu cirkulāciju un atveseļošanos. 5-7 minūtes.",
+        "benefits": [
+          "Palielina muskuļu spēku",
+          "Uzlabo muskuļu izturību",
+          "Attīsta funkcionālo spēku",
+          "Stiprina muskuļu un skeleta sistēmu"
+        ],
+        "instructions": [
+          "Pirms treniņa iesildieties",
+          "Pārliecinieties, ka izmantojat pareizo tehniku",
+          "Kontrolējiet elpošanu - izelpojiet ar piepūli",
+          "Starp komplektiem atpūtieties 60-90 sekundes."
+        ],
+        "tips": [
+          "Sāciet ar vieglākiem svariem un pakāpeniski palieliniet.",
+          "Neaizturi elpu",
+          "Veikt 2-3 reizes nedēļā",
+          "Samaziniet slodzi, kad jūtaties noguris"
+        ]
+      }
+    }
+  },
+  "items": {
+    "autograph": "autogrāfs",
+    "stick": "stick",
+    "puck": "ripa",
+    "jersey": "Džērsija"
+  },
+  "requests": {
+    "pending": "Gaida atbildi",
+    "accepted": "Pieņemts",
+    "rejected": "Noraidīts",
+    "giftRequests": "Dāvanu pieprasījumi"
+  },
+  "auth": {
+    "login": "Izejot uz ledus",
+    "register": "Reģistrācija",
+    "phone": "Tālrunis",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Ievadiet savu tālruņa numuru ar valsts kodu",
+    "code": "Apstiprinājuma kods",
+    "codePlaceholder": "Ievadiet kodu",
+    "sendCode": "Nosūtiet kodu",
+    "resendCode": "Atkārtojiet pēc",
+    "verifyCode": "Apstipriniet kodu",
+    "invalidPhone": "Nederīgs tālruņa numura formāts",
+    "invalidCode": "Nederīgs apstiprinājuma kods",
+    "codeSent": "Kods nosūtīts uz",
+    "codeResent": "Kods ir nosūtīts atkārtoti.",
+    "required": "Nepieciešama autorizācija",
+    "loginRequired": "Lai skatītu spēlētāja profilu, ir jāpiesakās.",
+    "welcomeBack": "Laipni lūdzam atpakaļ!",
+    "welcomeBackMessage": "Laipni lūdzam atpakaļ, {name}!",
+    "codeSentSuccess": "Kods nosūtīts!",
+    "codeSentMessage": "Pārbaudiet SMS savā tālrunī un ievadiet apstiprinājuma kodu",
+    "userNotFound": "Lietotājs nav atrasts",
+    "userNotFoundMessage": "Konts ar šo tālruņa numuru nepastāv. Lūdzu reģistrēties.",
+    "errorSendingCode": "Kļūda",
+    "errorSendingCodeMessage": "Neizdevās nosūtīt kodu. Pārbaudiet savu tālruņa numuru un interneta savienojumu.",
+    "errorResendingCode": "Kļūda",
+    "errorResendingCodeMessage": "Neizdevās atkārtoti nosūtīt kodu",
+    "errorVerifyingCode": "Kļūda",
+    "errorVerifyingCodeMessage": "Pārbaudot kodu, radās kļūda.",
+    "errorSendingCodeGeneral": "Neizdevās nosūtīt kodu. Lūdzu, mēģiniet vēlreiz.",
+    "errorSendingCodeResend": "Neizdevās atkārtoti nosūtīt kodu",
+    "errorInvalidCode": "Lūdzu, ievadiet 6 ciparu kodu",
+    "errorRegistration": "Neizdevās pabeigt reģistrāciju",
+    "errorLoginRequired": "Jums ir jāpiesakās savā profilā",
+    "errorLoginRequiredMessage": "Lai nosūtītu ziņas, jums ir jāpiesakās.",
+    "errorLoginRequiredFriends": "Lai kādu pievienotu kā draugu, jums ir jāpiesakās.",
+    "errorRemoveFriend": "Nevar noņemt no draugiem",
+    "errorSendFriendRequest": "Neizdevās nosūtīt draudzības pieprasījumu",
+    "errorCancelRequest": "Neizdevās atcelt pieprasījumu",
+    "errorAcceptRequest": "Neizdevās pieņemt pieprasījumu",
+    "errorManageFriends": "Pārvaldot draugus, radās kļūda.",
+    "errorRejectRequest": "Neizdevās noraidīt pieprasījumu",
+    "errorRejectRequestGeneral": "Noraidot jūsu pieprasījumu, radās kļūda.",
+    "errorOpenLink": "Neizdevās atvērt saiti",
+    "errorDataNotFound": "Dati nav atrasti",
+    "errorNoEditRights": "Jums nav atļaujas rediģēt šo profilu.",
+    "errorClearTeams": "Neizdevās notīrīt vecos komandu datus",
+    "errorSaveTeams": "Neizdevās saglabāt komandas",
+    "errorSaveChanges": "Neizdevās saglabāt izmaiņas",
+    "errorAdminOnly": "Tikai administrators var izdzēst lietotājus",
+    "errorPlayerNotFound": "Spēlētāja dati nav atrasti",
+    "errorDeleteUser": "Neizdevās izdzēst lietotāju",
+    "errorCreateUser": "Neizdevās izveidot lietotāju",
+    "errorFillNamePhone": "Lūdzu, ievadiet savu vārdu un tālruņa numuru",
+    "errorLoadNotifications": "Neizdevās ielādēt paziņojumus",
+    "errorGetNotifications": "Nevar saņemt paziņojumus",
+    "errorClearNotifications": "Neizdevās notīrīt paziņojumus",
+    "errorInvalidNotificationData": "Nepareizi paziņojuma dati",
+    "errorProcessNotification": "Nevar apstrādāt paziņojumu. Lūdzu, mēģiniet vēlreiz.",
+    "errorProcessNotificationGeneral": "Nevar apstrādāt paziņojumu. Lūdzu, mēģiniet vēlreiz.",
+    "errorProcessFriendRequest": "Nevar apstrādāt jūsu draudzības pieprasījumu.",
+    "errorProcessRequest": "Neizdevās apstrādāt jūsu pieprasījumu",
+    "errorSendMessage": "Neizdevās nosūtīt ziņojumu"
+  },
+  "profile": {
+    "addFriend": "Pievienot kā draugu",
+    "addFriendQuestion": "Vai vēlaties pievienot {name} kā draugu?",
+    "sendMessage": "Sūtīt ziņojumu",
+    "loading": "Notiek ielāde...",
+    "basicInfo": "Pamatinformācija",
+    "physicalData": "Fiziskie dati",
+    "country": "Valsts",
+    "position": "Pozīcija",
+    "number": "Numurs",
+    "grip": "saķere",
+    "birthDate": "Dzimšanas datums",
+    "Левый": "Pa kreisi",
+    "Правый": "Pareizi",
+    "Center": "Centra uzbrucējs",
+    "Winger": "Malējais uzbrucējs",
+    "Defender": "Aizstāvis",
+    "Goalie": "Vārtsargs",
+    "height": "Augstums",
+    "weight": "Svars",
+    "age": "Vecums",
+    "team": "Komanda",
+    "status": "Statuss",
+    "player": "Spēlētājs",
+    "coach": "Treneris",
+    "scout": "Skauts",
+    "admin": "Tehniskais atbalsts",
+    "star": "Zvaigzne",
+    "shop": "Hokeja veikals",
+    "skateSharpening": "Slidotāju asināšana",
+    "organizationName": "Organizācijas nosaukums",
+    "organizationNamePlaceholder": "Organizācijas nosaukums",
+    "services": "Pakalpojumi",
+    "notSpecified": "Nav norādīts",
+    "yearsOld": "gadiem",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Pa kreisi",
+    "right": "Pareizi",
+    "skateSharpeningService": "Slidotāju asināšana",
+    "skateForming": "Slidotāju formēšana",
+    "skateProfiling": "Slidotāju profilēšana",
+    "equipmentRepair": "Hokeja aprīkojuma remonts",
+    "stickRepair": "Nūju remonts",
+    "usedEquipmentSale": "Lietota aprīkojuma pārdošana",
+    "newEquipmentSale": "Jauna aprīkojuma pārdošana",
+    "center": "Centra uzbrucējs",
+    "winger": "Malējais uzbrucējs",
+    "defender": "Aizstāvis",
+    "goalie": "Vārtsargs",
+    "Left": "Pa kreisi",
+    "Right": "Pareizi",
+    "inHockey": "Hokejā",
+    "lengthInCm": "Garums cm",
+    "additional": "Turklāt",
+    "cancel": "Atcelt",
+    "friends": "Draugi",
+    "friendship": "Draudzība",
+    "statistics": "Pašreizējās sezonas statistika",
+    "teams": "Komandas",
+    "currentTeams": "Pašreizējās komandas",
+    "pastTeams": "Iepriekšējās komandas",
+    "teamInfo": "Komandas informācija",
+    "videoMoments": "Video svarīgākie momenti",
+    "standards": "Standarti",
+    "achievements": "Sasniegumi",
+    "noAchievements": "Nav sasniegumu",
+    "hockeyPhotos": "Hokeja fotogrāfijas",
+    "photos": "Fotoattēls",
+    "museum": "Muzejs",
+    "youAreFriendsWith": "Vai jūs esat draugi ar",
+    "addToFriends": "Pievienot kā draugu",
+    "addToFriendsToSeeStandards": "Pievienojiet {name} kā draugu, lai redzētu standartus",
+    "addToFriendsToSeePhotos": "Pievienojiet {name} kā draugu, lai skatītu hokeja fotoattēlus",
+    "addToFriendsToSeeMuseum": "Pievienojiet {name} kā draugu, lai apskatītu muzeju",
+    "removeFromFriends": "Noņemt no draugiem",
+    "points": "Punkti",
+    "friendsCount": "draugi",
+    "friendsCountStats": "Draugi",
+    "seconds": "sek",
+    "times": "vienreiz",
+    "sprint": "100 metru skrējiens",
+    "Центральный нападающий": "Centra uzbrucējs",
+    "Крайний нападающий": "Malējais uzbrucējs",
+    "Защитник": "Aizstāvis",
+    "Вратарь": "Vārtsargs",
+    "настоящее время": "pašreizējais laiks",
+    "goals": "Vārti",
+    "assists": "Piespēles",
+    "games": "Spēles",
+    "pullUps": "Pievilkšanās",
+    "pushUps": "Atspiešanās",
+    "plankTime": "dēlis (sek.)",
+    "sprint100m": "100 m (sek.)",
+    "longJump": "Tāllēkšana",
+    "jumpRope": "Lecamaukla",
+    "goalsCount": "galvas",
+    "gamesCount": "spēles",
+    "belarus": "Baltkrievija",
+    "usa": "ASV",
+    "russia": "Krievija",
+    "canada": "Kanāda",
+    "finland": "Somija",
+    "sweden": "Zviedrija",
+    "czech": "Čehijas Republika",
+    "slovakia": "Slovākija",
+    "germany": "Vācija",
+    "switzerland": "Šveice",
+    "austria": "Austrija",
+    "norway": "Norvēģija",
+    "denmark": "Dānija",
+    "latvia": "Latvija",
+    "lithuania": "Lietuva",
+    "estonia": "Igaunija",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazahstāna",
+    "squats": "Pietupieni",
+    "plank": "Dēlis",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "Hokejā ar",
+    "noFriendsYet": "{name} vēl nav draugu",
+    "beFirstToAdd": "Esiet pirmais, kas pievieno {name} kā draugu",
+    "writeMessage": "Uzrakstiet ziņu",
+    "edit": "Rediģēt",
+    "deleteUser": "Dzēst lietotāju",
+    "noExercisesYet": "Spēlētājs vēl nav pabeidzis nevienu vingrinājumu.",
+    "noGiftsYet": "Dāvanas vēl nav saņemtas",
+    "editProfile": "Rediģēt profilu",
+    "writeToSupport": "Rakstiet tehniskajam atbalstam",
+    "noExercisesOwn": "Jūs vēl neesat pabeidzis nevienu vingrinājumu.",
+    "noExercisesOther": "Spēlētājs vēl nav izpildījis nevienu vingrinājumu.",
+    "removedFromFriends": "{name} noņemts no draugiem",
+    "removeFriendError": "Nevar noņemt no draugiem",
+    "friendRequestSent": "Draudzības pieprasījums nosūtīts",
+    "friendshipAccepted": "{name} tika pievienots kā draugs",
+    "cancelRequest": "Atcelt pieprasījumu",
+    "friendRequestError": "Neizdevās nosūtīt draudzības pieprasījumu",
+    "friendRequestAcceptError": "Neizdevās pieņemt pieprasījumu",
+    "friendRequestCancelled": "Draudzības pieprasījums ir atcelts",
+    "friendRequestCancelError": "Neizdevās atcelt pieprasījumu",
+    "deleteUserConfirm": "Vai tiešām vēlaties dzēst lietotāju {{name}}? Šo darbību nevar atsaukt.",
+    "userDeleted": "Lietotājs \"{{name}}\" ir izdzēsts",
+    "wantsToAddYouToFriends": "{{name}} vēlas pievienot jūs kā draugu",
+    "friendRequestReceived": "{{name}} vēlas pievienot jūs kā draugu",
+    "loadingProfile": "Notiek profila ielāde...",
+    "playerNotFound": "Spēlētājs nav atrasts",
+    "addAchievement": "Pievienojiet sasniegumu",
+    "editAchievement": "Rediģēt sasniegumu",
+    "competitionName": "Konkursa nosaukums",
+    "year": "gads",
+    "place": "Vieta",
+    "description": "Apraksts (pēc izvēles)",
+    "shopName": "Veikala nosaukums",
+    "address": "Adrese",
+    "map": "Karte",
+    "workingHours": "Darba laiks",
+    "discountForFriends": "Draugiem atlaide",
+    "hockeyShop": "Hokeja veikals",
+    "nameHint": "Izmantojiet tikai latīņu burtus",
+    "photo": "Fotoattēls",
+    "selectPhoto": "Izvēlieties fotoattēlu",
+    "logo": "Logotips",
+    "selectLogo": "Izvēlieties logotipu",
+    "selectCountry": "Izvēlieties valsti",
+    "searchCountry": "Meklējiet valsti",
+    "errorEnterCompetition": "Ievadiet konkursa nosaukumu",
+    "errorEnterYear": "Lūdzu, ievadiet derīgu gadu.",
+    "grips": {
+      "Левый": "Pa kreisi",
+      "Правый": "Pareizi"
+    },
+    "countries": {
+      "Канада": "Kanāda",
+      "США": "ASV",
+      "Россия": "Krievija",
+      "Швеция": "Zviedrija",
+      "Финляндия": "Somija",
+      "Чехия": "Čehijas Republika",
+      "Словакия": "Slovākija",
+      "Швейцария": "Šveice",
+      "Германия": "Vācija",
+      "Австрия": "Austrija",
+      "Норвегия": "Norvēģija",
+      "Дания": "Dānija",
+      "Латвия": "Latvija",
+      "Литва": "Lietuva",
+      "Эстония": "Igaunija",
+      "Беларусь": "Baltkrievija",
+      "Украина": "Ukraina",
+      "Польша": "Polija",
+      "Венгрия": "Ungārija",
+      "Словения": "Slovēnija",
+      "Хорватия": "Horvātija",
+      "Франция": "Francija",
+      "Италия": "Itālija",
+      "Испания": "Spānija",
+      "Нидерланды": "Nīderlande",
+      "Бельгия": "Beļģija",
+      "Великобритания": "Apvienotā Karaliste",
+      "Исландия": "Islande",
+      "Люксембург": "Luksemburga",
+      "Румыния": "Rumānija",
+      "Болгария": "Bulgārija",
+      "Сербия": "Serbija",
+      "Турция": "Turkiye",
+      "Казахстан": "Kazahstāna",
+      "Узбекистан": "Uzbekistāna",
+      "Китай": "Ķīna",
+      "Япония": "Japāna",
+      "Южная Корея": "Dienvidkoreja",
+      "Тайвань": "Taivāna",
+      "Гонконг": "Honkonga",
+      "Сингапур": "Singapūra",
+      "Малайзия": "Malaizija",
+      "Таиланд": "Taizeme",
+      "Индия": "Indija",
+      "Объединенные Арабские Эмираты": "Apvienotie Arābu Emirāti",
+      "Израиль": "Izraēla",
+      "Австралия": "Austrālija",
+      "Новая Зеландия": "Jaunzēlande",
+      "Мексика": "Meksika",
+      "ЮАР": "Dienvidāfrika",
+      "Аргентина": "Argentīna"
+    },
+    "positions": {
+      "center": "Centra uzbrucējs",
+      "winger": "Malējais uzbrucējs",
+      "defender": "Aizstāvis",
+      "goalie": "Vārtsargs",
+      "центральный нападающий": "centra uzbrucējs",
+      "крайний нападающий": "malējais uzbrucējs",
+      "защитник": "aizstāvis",
+      "вратарь": "vārtsargs",
+      "Центральный нападающий": "Centra uzbrucējs",
+      "Крайний нападающий": "Malējais uzbrucējs",
+      "Защитник": "Aizstāvis",
+      "Вратарь": "Vārtsargs"
+    },
+    "discountForFriendsHint": "Pievienojiet veikalu kā draugu, lai saņemtu atlaidi! Pērkot, parādiet atlaidi pārdevējam.",
+    "activityRating": "Aktivitātes reitings",
+    "coachingYears": "Trenē gadus",
+    "phone": "Tālrunis",
+    "qrCodeTitle": "Profila QR kods",
+    "qrCodeSubtitle": "Skenējiet, lai ātri piekļūtu",
+    "qrCodeInfo": "Pavērsiet telefona kameru uz QR kodu, lai atvērtu profilu",
+    "shareProfile": "Kopīgot profilu",
+    "savedToGallery": "Saglabāts galerijā",
+    "noPermission": "Nav piekļuves galerijai",
+    "shareError": "Kļūda, veidojot attēlu",
+    "currentTeam": "Komanda",
+    "hockeyExperience": "Hokeja pieredze",
+    "years": "gadi",
+    "currentSeasonStats": "Pašreizējā sezona statistika"
+  },
+  "register": {
+    "title": "Reģistrācija",
+    "status": "Statuss",
+    "player": "Spēlētājs",
+    "coach": "Treneris",
+    "scout": "Skauts",
+    "star": "Zvaigzne",
+    "shop": "Hokeja veikals",
+    "phone": "Tālrunis",
+    "name": "Vārds",
+    "surname": "Uzvārds",
+    "birthDate": "Dzimšanas datums",
+    "country": "Valsts",
+    "position": "Pozīcija",
+    "grip": "Satvēriens",
+    "height": "Augstums (cm)",
+    "weight": "Svars (kg)",
+    "number": "Numurs",
+    "photo": "Fotoattēls",
+    "selectPhoto": "Izvēlieties fotoattēlu",
+    "takePhoto": "Uzņemiet fotoattēlu",
+    "chooseFromGallery": "Izvēlieties no galerijas",
+    "photoRequired": "Nepieciešams fotoattēls",
+    "register": "Reģistrēties",
+    "back": "Atpakaļ",
+    "welcome": "Laipni lūdzam!",
+    "registrationSuccess": "Reģistrācija veiksmīgi pabeigta! Laipni lūdzam HockeyStars!",
+    "selectDate": "Izvēlieties datumu",
+    "cancel": "Atcelt",
+    "confirm": "Apstiprināt",
+    "photoError": "Augšupielādējot fotoattēlu, radās kļūda"
+  },
+  "navigation": {
+    "home": "Sākums",
+    "search": "Meklēt",
+    "messages": "Ziņojumi",
+    "notifications": "Notikumi",
+    "profile": "Profils"
+  },
+  "admin": {
+    "accessDenied": "Piekļuve liegta",
+    "onlyAdmins": "Šo funkciju var izmantot tikai administratori.",
+    "error": "Kļūda",
+    "errorLoadingProfile": "Neizdevās piekļūt profilam",
+    "player": "Spēlētājs",
+    "coach": "Treneris",
+    "scout": "Skauts",
+    "admin": "Administrators",
+    "star": "Zvaigzne",
+    "shop": "Hokeja veikals",
+    "noName": "Nav vārda",
+    "noPosition": "Nav norādīts",
+    "noTeam": "Nav norādīts",
+    "sendGift": "Nosūtīt dāvanu",
+    "yearsOld": "gadiem",
+    "addUser": "Pievienot lietotāju",
+    "searchPlayers": "Tiek meklēti spēlētāji...",
+    "createUser": "Lietotāja izveide",
+    "basicInfo": "Pamatinformācija",
+    "name": "Vārds",
+    "phone": "Tālruņa numurs",
+    "status": "Statuss",
+    "position": "Pozīcija",
+    "number": "Spēlētāja numurs",
+    "grip": "Satvēriens",
+    "height": "Augstums (cm)",
+    "weight": "Svars (kg)",
+    "country": "Valsts",
+    "create": "Izveidot",
+    "success": "Panākumi",
+    "userCreated": "Lietotājs {{name}} ir izveidots",
+    "errorCreatingUser": "Neizdevās izveidot lietotāju",
+    "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus.",
+    "enterValidPhone": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu.",
+    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija"
+  },
+  "museum": {
+    "title": "Muzejs",
+    "noItems": "Muzejs joprojām ir tukšs."
+  },
+  "teams": {
+    "Система": "Sistēma",
+    "Привет": "Sveiki",
+    "Пираньи": "Piranhas",
+    "Динамо Минск": "Minskas Dinamo",
+    "Динамо-Минск": "Minskas Dinamo",
+    "Юность-Минск": "Junost-Minska",
+    "Юность": "Jaunatne",
+    "Неман": "Neman",
+    "Гомель": "Gomeļa",
+    "Брест": "Brest",
+    "Витебск": "Vitebska",
+    "Львы": "Lauvas",
+    "Керамин": "Keramīns",
+    "Могилев": "Mogiļeva",
+    "Гродно": "Grodņa",
+    "Сборная Беларуси": "Baltkrievijas izlase",
+    "Сборная Минской области": "Minskas apgabala komanda",
+    "Сборная Гомельской области": "Gomeļas reģiona komanda",
+    "Сборная Брестской области": "Brestas reģiona komanda",
+    "Сборная Витебской области": "Vitebskas apgabala komanda",
+    "Сборная Могилевской области": "Mogiļevas apgabala komanda",
+    "Сборная Гродненской области": "Grodņas apgabala komanda",
+    "ХК Минск": "HC Minsk",
+    "ХК Гомель": "HC Gomeļa",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogiļeva",
+    "ХК Гродно": "HC Grodno",
+    "Динамо": "Dinamo",
+    "Спартак": "Spartaks",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Julajevs",
+    "Ак Барс": "Ak Bars",
+    "Металлург": "Metalurgs",
+    "Трактор": "Traktors",
+    "Авангард": "Avangards",
+    "Сибирь": "Sibīrija",
+    "Амур": "Amūra",
+    "Адмирал": "Admirālis",
+    "Локомотив": "Lokomotīve",
+    "Северсталь": "Severstal",
+    "Витязь": "Bruņinieks",
+    "Сочи": "Soči",
+    "Торпедо": "Torpēda",
+    "Нефтехимик": "petroķīmiķis",
+    "Автомобилист": "Autobraucējs",
+    "Югра": "Jugra",
+    "Барыс": "Barys",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Dinamo Rīga",
+    "Динамо Москва": "Maskavas Dinamo",
+    "Динамо Минск U20": "Minskas Dinamo U20",
+    "Динамо Минск U18": "Minskas Dinamo U18",
+    "Calgary Flames": "Kalgari Flames",
+    "New Jersey Devils": "Ņūdžersijas Devils",
+    "Юность-Минск U20": "Junostj-Minska U20",
+    "Юность-Минск U18": "Junostj-Minska U18",
+    "teams": {
+      "Сборная Беларуси": "Baltkrievijas izlase",
+      "Динамо Минск": "Minskas Dinamo",
+      "Юность-Минск": "Junost-Minska",
+      "Пираньи": "Piranhas",
+      "Сборная Минской области": "Minskas apgabala komanda",
+      "Сборная Беларуси U14": "Baltkrievijas U14 izlase",
+      "Пчелки": "Bites",
+      "Беларусь U14": "Baltkrievijas U14 izlase",
+      "Минская область": "Minskas apgabala komanda",
+      "New Jersey Devils": "Ņūdžersijas Devils",
+      "Calgary Flames": "Kalgari Flames",
+      "Boston Hockey Club": "Bostonas hokeja klubs",
+      "Belarus U14 National Team": "Baltkrievijas U14 izlase",
+      "Belarus National Team U14": "Baltkrievijas U14 izlase",
+      "Minsk Region Team": "Minskas apgabala komanda",
+      "Piranhas": "Piranhas",
+      "Bees": "Bites",
+      "Toronto Maple Leafs": "Toronto Maple Leafs",
+      "Montreal Canadiens": "Monreālas Canadiens",
+      "Vancouver Canucks": "Vankūveras \"Canucks\".",
+      "Edmonton Oilers": "Edmontonas \"Oilers\".",
+      "Winnipeg Jets": "Vinipegas Jets",
+      "Ottawa Senators": "Otavas senators",
+      "New York Rangers": "Ņujorkas Rangers",
+      "Boston Bruins": "Bostonas Bruins",
+      "Chicago Blackhawks": "Čikāgas Blackhawks",
+      "Detroit Red Wings": "Detroitas Red Wings",
+      "Pittsburgh Penguins": "Pitsburgas pingvīni",
+      "Washington Capitals": "Vašingtonas Capitals",
+      "Tampa Bay Lightning": "Tampabejas zibens",
+      "Colorado Avalanche": "Kolorādo lavīna",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kauņa",
+      "Vilnius": "Viļņa",
+      "Klaipeda": "Klaipēda",
+      "Riga": "Rīga",
+      "Daugavpils": "Daugavpils",
+      "Liepaja": "Liepāja",
+      "Cracovia": "Krakovija",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "Krievijas izlase",
+      "Сборная Канады": "Kanādas komanda",
+      "Сборная США": "ASV komanda",
+      "Сборная Финляндии": "Somijas izlase",
+      "Сборная Швеции": "Zviedrijas izlase",
+      "Сборная Беларуси U20": "Baltkrievijas U20 izlase",
+      "Сборная Беларуси U18": "Baltkrievijas U18 izlase",
+      "Динамо Минск U20": "Minskas Dinamo U20",
+      "Динамо Минск U18": "Minskas Dinamo U18",
+      "Юность-Минск U20": "Junostj-Minska U20",
+      "Юность-Минск U18": "Junostj-Minska U18",
+      "ШРС": "VID",
+      "Динамо-Молодечно": "Dinamo-Molodečno",
+      "Динамо Р": "Dinamo R",
+      "Слован": "Slovan",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranoviči",
+      "Шахтер": "Šahtjora",
+      "Лида": "Lida",
+      "Пинск": "Pinska",
+      "Ивацевичи": "Ivaceviči",
+      "Береза": "Bērzs",
+      "Кобрин": "Kobrins",
+      "Химик": "Himik",
+      "Жлобин": "Žlobins",
+      "Бобруйск": "Bobruisks",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "RB izlase",
+      "Сборная Минска": "Minskas komanda",
+      "ЦСКА Москва": "Maskavas CSKA",
+      "Спартак Москва": "Maskavas Spartak",
+      "Локомотив Ярославль": "Jaroslavļas Lokomotiv",
+      "Ак Барс Казань": "Ak Bars Kazaņa",
+      "Трактор Челябинск": "Traktors Čeļabinska",
+      "Металлург Магнитогорск": "Magņitogorskas Metallurg",
+      "Торпедо Нижний Новгород": "Ņižņijnovgorodas torpēda"
+    },
+    "Сборная Беларуси U14": "Baltkrievijas U14 izlase",
+    "Барановичи": "Baranoviči",
+    "Шахтер": "Kalnracis",
+    "Лида": "Lida",
+    "Пинск": "Pinska",
+    "Ивацевичи": "Ivaceviči",
+    "Береза": "Bērzs",
+    "Кобрин": "Kobrins",
+    "Химик": "Ķīmiķis",
+    "Жлобин": "Žlobins",
+    "Бобруйск": "Bobruisks",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "RB izlase",
+    "Сборная Минска": "Minskas komanda",
+    "ЦСКА Москва": "Maskavas CSKA",
+    "Спартак Москва": "Maskavas Spartak",
+    "Локомотив Ярославль": "Jaroslavļas Lokomotiv",
+    "Ак Барс Казань": "Ak Bars Kazaņa",
+    "Трактор Челябинск": "Traktors Čeļabinska",
+    "Металлург Магнитогорск": "Magņitogorskas Metallurg",
+    "Торпедо Нижний Новгород": "Ņižņijnovgorodas torpēda",
+    "Boston Hockey Club": "Bostonas hokeja klubs",
+    "Пчелки": "Bites",
+    "Center": "Centra uzbrucējs",
+    "Winger": "Mala",
+    "Defender": "Aizstāvis",
+    "Goalie": "Vārtsargs"
+  },
+  "settings": {
+    "title": "Iestatījumi",
+    "language": "Valoda",
+    "selectLanguage": "Izvēlieties valodu",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Meklēt",
+    "loading": "Ielādē meklēšanu...",
+    "placeholder": "Tiek meklēti spēlētāji...",
+    "country": "Valsts",
+    "grip": "Satvēriens",
+    "position": "Pozīcija",
+    "year": "gads",
+    "height": "Augstums",
+    "heightFrom": "Augstums no",
+    "weight": "Svars",
+    "weightFrom": "Svars no",
+    "all": "Visi",
+    "noPlayersFound": "Nav atrasts neviens spēlētājs",
+    "left": "Pa kreisi",
+    "right": "Pareizi"
+  },
+  "messages": {
+    "title": "Ziņojumi",
+    "loading": "Notiek tērzēšanas sarunu ielāde...",
+    "noMessages": "Nav ziņojumu",
+    "startConversation": "Sāciet tērzēt ar citiem spēlētājiem",
+    "error": "Kļūda",
+    "errorLoadingChats": "Neizdevās ielādēt tērzēšanu",
+    "yesterday": "vakar",
+    "you": "Jūs:"
+  },
+  "notifications": {
+    "title": "Notikumi",
+    "loading": "Notiek notikumu ielāde...",
+    "noNotifications": "Nav notikumu",
+    "noNotificationsSubtitle": "Jums vēl nav nekādu notikumu par draudzību, dāvanām vai citām darbībām.",
+    "accept": "Pieņemt",
+    "decline": "Noraidīt",
+    "friendRequests": "Draugu lūgumi",
+    "friendRequest": "drauga pieprasījums",
+    "wantsToAddYou": "{name} vēlas pievienot jūs kā draugu",
+    "wantsToAddAsFriend": "vēlas pievienot jūs kā draugu",
+    "friendRequestAccepted": "Drauga pieprasījums pieņemts!",
+    "friendRequestDeclined": "Draudzības pieprasījums noraidīts",
+    "giftRequest": "Dāvanas pieprasījums",
+    "giftRequestMessage": "{playerName} lūdz {itemType}",
+    "giftRequestApproved": "Pieprasījums apstiprināts",
+    "giftRequestApprovedMessage": "{starName} apstiprināja jūsu pieprasījumu par {itemType}",
+    "giftRequestAccepted": "Dāvanas pieprasījums pieņemts!",
+    "giftRequestRejected": "Dāvanas pieprasījums noraidīts",
+    "player": "Spēlētājs",
+    "unknownPlayer": "Nezināms spēlētājs",
+    "star": "Zvaigzne"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Izvēlieties fotoattēla avotu",
+    "selectPhotoMessage": "No kurienes vēlaties augšupielādēt fotoattēlu?",
+    "gallery": "Galerija",
+    "camera": "Kamera",
+    "cancel": "Atcelt",
+    "save": "Saglabāt",
+    "name": "Vārds",
+    "namePlaceholder": "Spēlētāja vārds",
+    "country": "Valsts",
+    "position": "Pozīcija",
+    "height": "Augstums (cm)",
+    "heightPlaceholder": "Augstums",
+    "weight": "Svars (kg)",
+    "weightPlaceholder": "Svars",
+    "number": "Numurs",
+    "grip": "Satvēriens",
+    "birthDate": "Dzimšanas datums",
+    "socialLinks": "Sociālie mediji",
+    "Левый": "Pa kreisi"
+  },
+  "exercisesSection": {
+    "title": "Vingrinājumi izpildīti",
+    "loading": "Notiek ielāde...",
+    "noExercises": "Jūs vēl neesat pabeidzis nevienu vingrinājumu.",
+    "noExercisesOwn": "Jūs vēl neesat pabeidzis nevienu vingrinājumu.",
+    "noExercisesOther": "Lietotājs vēl nav pabeidzis nevienu vingrinājumu.",
+    "times": "vienreiz",
+    "timesPlural": "reizes"
+  },
+  "home": {
+    "loadingPlayers": "Ledus atjaunošana...",
+    "noPlayersCountry": "Nav spēlētāju no {{country}}",
+    "noPlayersYear": "Nav neviena spēlētāja, kas dzimis {{year}}",
+    "noPlayersCountryYear": "{{year}} nav neviena spēlētāja no {{country}}",
+    "iceEmpty": "Ledus ir tukšs. Izvēlieties citu valsti vai gadu vai atiestatiet filtrus.",
+    "waitingForConnection": "Gaida savienojumu",
+    "checkInternetConnection": "Pārbaudiet interneta savienojumu"
+  },
+  "filters": {
+    "year": "gadā",
+    "yearDefault": "2012. gads"
+  },
+  "chat": {
+    "loading": "Notiek tērzēšanas ielāde...",
+    "startConversation": "Sāciet sarunu ar {name}",
+    "enterMessage": "Ievadiet savu ziņojumu...",
+    "player": "Spēlētājs",
+    "coach": "Treneris",
+    "scout": "Skauts",
+    "admin": "Tehniskais atbalsts",
+    "star": "Zvaigzne",
+    "shop": "Hokeja veikals",
+    "error": "Kļūda",
+    "errorLoadingChat": "Neizdevās ielādēt tērzēšanas datus",
+    "errorSendingMessage": "Neizdevās nosūtīt ziņojumu"
+  },
+  "createUser": {
+    "title": "Lietotāja izveide",
+    "selectPhotoSource": "Izvēlieties fotoattēla avotu",
+    "selectPhotoMessage": "No kurienes vēlaties augšupielādēt fotoattēlu?",
+    "gallery": "Galerija",
+    "camera": "Kamera",
+    "cancel": "Atcelt",
+    "permissionError": "Lai piekļūtu galerijai, nepieciešama atļauja.",
+    "permissionErrorCamera": "Lai piekļūtu kamerai, ir nepieciešama atļauja.",
+    "errorLoadingPhoto": "Neizdevās ielādēt fotoattēlu no galerijas",
+    "errorTakingPhoto": "Neizdevās uzņemt fotoattēlu",
+    "addPhoto": "Pievienojiet fotoattēlu",
+    "status": "Statuss",
+    "player": "Spēlētājs",
+    "coach": "Treneris",
+    "scout": "Skauts",
+    "star": "Zvaigzne",
+    "shop": "Hokeja veikals",
+    "phone": "Tālruņa numurs",
+    "name": "Vārds un uzvārds",
+    "namePlaceholder": "IEVADĪT VĀRDU",
+    "nameHint": "Tikai latīņu burti (A–Z)",
+    "birthDate": "Dzimšanas datums",
+    "selectBirthDate": "Izvēlieties savu dzimšanas datumu",
+    "position": "Pozīcija",
+    "number": "Spēlētāja numurs",
+    "numberPlaceholder": "Numurs uz formas tērpa",
+    "grip": "Satvēriens",
+    "height": "Augstums (cm)",
+    "heightPlaceholder": "Augstums",
+    "weight": "Svars (kg)",
+    "weightPlaceholder": "Svars",
+    "country": "Valsts",
+    "selectCountry": "Izvēlieties valsti",
+    "searchCountry": "Notiek valsts meklēšana...",
+    "close": "Aizvērt",
+    "create": "Izveidot",
+    "error": "Kļūda",
+    "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus.",
+    "enterValidPhone": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu.",
+    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija",
+    "success": "Panākumi",
+    "userCreated": "Lietotājs {{name}} ir izveidots",
+    "errorCreatingUser": "Neizdevās izveidot lietotāju"
+  },
+  "exerciseDetails": {
+    "back": "Atpakaļ",
+    "complete": "Izpildīt",
+    "completed": "Pabeigts",
+    "times": "vienreiz",
+    "timesPlural": "reizes",
+    "duration": "Ilgums",
+    "difficulty": "Sarežģītība",
+    "equipment": "Aprīkojums",
+    "calories": "Kalorijas",
+    "benefits": "Ieguvums",
+    "instructions": "Norādījumi",
+    "tips": "Padoms",
+    "beginner": "Sākums",
+    "intermediate": "Vidēji",
+    "advanced": "Papildu",
+    "error": "Kļūda",
+    "errorCompleting": "Vingrinājumu neizdevās pabeigt",
+    "success": "Panākumi",
+    "exerciseCompleted": "Vingrinājums pabeigts!"
+  },
+  "gifts": {
+    "requestGift": "Pieprasiet dāvanu",
+    "gifts": "Klāt",
+    "autograph": "Autogrāfs",
+    "stick": "Nūja",
+    "puck": "Paplāksne",
+    "jersey": "Džērsija",
+    "pleaseWriteMessage": "Lūdzu, rakstiet ziņu savam pieprasījumam",
+    "invalidGift": "nepiemērota dāvana",
+    "deleteGiftQuestion": "Dzēst dāvanu?",
+    "from": "no",
+    "noGiftsYet": "Pagaidām nav dāvanu no zvaigznēm",
+    "museum": "Dāvanu muzejs",
+    "myGifts": "Manas dāvanas",
+    "noGiftsSubtext": "Augšupielādējiet pirmo dāvanu, lai dalītos ar spēlētājiem",
+    "successDeleted": "Dāvana izdzēsta",
+    "errorDelete": "Neizdevās dzēst dāvanu",
+    "noImage": "nav attēla",
+    "failedToSendRequest": "Neizdevās nosūtīt pieprasījumu",
+    "requestSent": "Pieprasījums nosūtīts!",
+    "requestSentMessage": "Jūsu pieprasījums par {itemType} ir nosūtīts. Lūdzu, sagaidiet atbildi.",
+    "requestItem": "Pieprasīt {itemType}",
+    "requestMessage": "Ziņa pieprasījumam",
+    "selectGiftType": "Izvēlieties dāvanas veidu",
+    "selectGiftTypeMessage": "Kāda veida dāvanu vēlaties izveidot?",
+    "requestMessageHelper": "Uzrakstiet pieklājīgu ziņu, paskaidrojot, kāpēc vēlaties saņemt šo dāvanu.",
+    "requestMessagePlaceholder": "Piemēram: Sveiki! Esmu liels tavas spēles cienītājs un vēlētos autogrāfu savai kolekcijai...",
+    "characters": "simboliem",
+    "sending": "Notiek sūtīšana...",
+    "sendRequest": "Nosūtiet pieprasījumu",
+    "requestInfo": "Pēc pieprasījuma iesniegšanas zvaigzne saņems paziņojumu un varēs pieņemt vai noraidīt jūsu pieprasījumu. Ja dāvana tiks pieņemta, tā parādīsies jūsu Dāvanu muzejā.",
+    "failedToLoadItems": "Neizdevās ielādēt vienumus",
+    "noPermissionToUpload": "Jums nav atļaujas augšupielādēt cita lietotāja vienumus.",
+    "failedToGetImageUri": "Neizdevās iegūt attēla URI",
+    "failedToSelectImage": "Nevar atlasīt attēlu",
+    "emptyImageUri": "Attēla URI ir tukšs.",
+    "formDataUploadError": "Augšupielādējot, izmantojot FormData, radās kļūda",
+    "imageUploadError": "Ielādējot attēlu, radās kļūda: {error}",
+    "itemUploadedSuccessfully": "{itemType} ir veiksmīgi ielādēts!",
+    "failedToUploadItem": "Neizdevās ielādēt vienumu",
+    "userNotAuthorized": "Lietotājs nav autorizēts",
+    "noPermissionToEdit": "Jums nav atļaujas rediģēt cita lietotāja vienumus.",
+    "itemNotFound": "Dāvana nav atrasta",
+    "failedToUploadNewImage": "Ielādējot jaunu attēlu, radās kļūda",
+    "emptyImage": "Attēls ir tukšs (0 baitu)",
+    "failedToUpdateDatabase": "Atjauninot datu bāzes ierakstu, radās kļūda",
+    "itemImageUpdated": "Dāvanas attēls atjaunināts!",
+    "failedToUpdateItemImage": "Neizdevās atjaunināt dāvanas attēlu",
+    "allGiftsAdded": "Visas dāvanas ir pievienotas.",
+    "allGiftTypesAdded": "Jums jau ir visu veidu dāvanas",
+    "addGift": "Pievienojiet dāvanu",
+    "deletion": "Noņemšana",
+    "itemDeleted": "Dāvana noņemta",
+    "failedToDeleteItem": "Neizdevās izdzēst dāvanu",
+    "noGifts": "Dāvanu vēl nav",
+    "clickPlusToAdd": "Noklikšķiniet uz +, lai pievienotu",
+    "настоящее время": "pašreizējais laiks",
+    "Центральный нападающий": "Centra uzbrucējs",
+    "Крайний нападающий": "Malējais uzbrucējs",
+    "Защитник": "Aizstāvis",
+    "Вратарь": "Vārtsargs",
+    "Center": "Centra uzbrucējs",
+    "Winger": "Mala",
+    "Defender": "Aizstāvis",
+    "Goalie": "Vārtsargs",
+    "Left": "Pa kreisi",
+    "Right": "Pareizi",
+    "seconds": "sek",
+    "times": "vienreiz",
+    "sprint": "100 metru skrējiens",
+    "_cache_clear": "2024-01-16-9",
+    "sendGiftTo": "Nosūtīt dāvanu {playerName}",
+    "selectExistingGift": "Izvēlēties esošu dāvanu",
+    "orCreateNew": "Vai izveidot jaunu",
+    "giftName": "Dāvanas nosaukums",
+    "giftNamePlaceholder": "piem., Parakstīta cepure",
+    "uploadImage": "Augšupielādēt attēlu",
+    "send": "Nosūtīt",
+    "selectGift": "Izvēlēties dāvanu",
+    "fromAdmin": "Administrators",
+    "errorSelectOrCreate": "Izvēlieties dāvanu vai izveidojiet jaunu",
+    "errorGiftAlreadyExists": "Šī dāvana jau ir spēlētājam {playerName}.\n\nIzvēlieties citu dāvanu vai izveidojiet jaunu.",
+    "successGiftSent": "Dāvana nosūtīta {playerName}!",
+    "errorSendingGift": "Neizdevās nosūtīt dāvanu",
+    "deleteGiftConfirm": "Vai tiešām vēlaties dzēst šo dāvanu?",
+    "selectImage": "Izvēlēties attēlu",
+    "errorPermissionDenied": "Jums nav atļaujas dzēst šo dāvanu",
+    "errorGiftNotFound": "Dāvana nav atrasta",
+    "errorGiftNotDeleted": "Dāvana netika izdzēsta",
+    "noGiftsUploaded": "Vēl nav augšupielādētas dāvanas",
+    "fromStar": "no {starName}",
+    "giftReceived": "Saņemta dāvana!",
+    "giftReceivedFromAdmin": "Jūs saņēmāt dāvanu no administratora: {giftName}",
+    "giftReceivedFromStar": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Saņemta dāvana!",
+    "giftReceivedFromAdminPush": "Jūs saņēmāt dāvanu no administratora: {giftName}",
+    "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}"
+  },
+  "TEMP_DELETE_ME": {
+    "title": "Standarti",
+    "noNormatives": "Standarti vēl nav pievienoti.",
+    "russia": "Krievija",
+    "canada": "Kanāda",
+    "finland": "Somija",
+    "sweden": "Zviedrija",
+    "czech": "Čehijas Republika",
+    "slovakia": "Slovākija",
+    "germany": "Vācija",
+    "switzerland": "Šveice",
+    "austria": "Austrija",
+    "norway": "Norvēģija",
+    "denmark": "Dānija",
+    "latvia": "Latvija",
+    "lithuania": "Lietuva",
+    "estonia": "Igaunija",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazahstāna",
+    "беларусь": "Baltkrievija",
+    "россия": "Krievija",
+    "сша": "ASV",
+    "канада": "Kanāda",
+    "финляндия": "Somija",
+    "швеция": "Zviedrija",
+    "чехия": "Čehijas Republika",
+    "словакия": "Slovākija",
+    "германия": "Vācija",
+    "швейцария": "Šveice",
+    "австрия": "Austrija",
+    "норвегия": "Norvēģija",
+    "дания": "Dānija",
+    "латвия": "Latvija",
+    "литва": "Lietuva",
+    "эстония": "Igaunija",
+    "украина": "Ukraina",
+    "казахстан": "Kazahstāna",
+    "польша": "Polija",
+    "венгрия": "Ungārija",
+    "словения": "Slovēnija",
+    "хорватия": "Horvātija",
+    "франция": "Francija",
+    "италия": "Itālija",
+    "испания": "Spānija",
+    "нидерланды": "Nīderlande",
+    "бельгия": "Beļģija",
+    "великобритания": "Apvienotā Karaliste",
+    "исландия": "Islande",
+    "люксембург": "Luksemburga",
+    "румыния": "Rumānija",
+    "болгария": "Bulgārija",
+    "сербия": "Serbija",
+    "турция": "Turkiye",
+    "узбекистан": "Uzbekistāna",
+    "китай": "Ķīna",
+    "япония": "Japāna",
+    "южнаякорея": "Dienvidkoreja",
+    "тайвань": "Taivāna",
+    "гонконг": "Honkonga",
+    "сингапур": "Singapūra",
+    "малайзия": "Malaizija",
+    "таиланд": "Taizeme",
+    "индия": "Indija",
+    "объединенныеарабскиеэмираты": "Apvienotie Arābu Emirāti",
+    "израиль": "Izraēla",
+    "австралия": "Austrālija",
+    "новаязеландия": "Jaunzēlande",
+    "мексика": "Meksika",
+    "юар": "Dienvidāfrika",
+    "аргентина": "Argentīna"
+  },
+  "normatives": {
+    "title": "Standarti",
+    "noNormatives": "Standarti vēl nav pievienoti.",
+    "addNormative": "Pievienojiet standartu",
+    "name": "Vārds",
+    "description": "Apraksts",
+    "type": "Tips",
+    "value": "Nozīme",
+    "unit": "Mērvienība",
+    "add": "Pievienot",
+    "cancel": "Atcelt",
+    "save": "Saglabāt",
+    "edit": "Rediģēt",
+    "delete": "Dzēst",
+    "back": "Atpakaļ",
+    "editNormative": "Rediģējiet standartu",
+    "deleteNormativeConfirm": "Vai tiešām vēlaties dzēst regulu \"{{name}}\"? Šo darbību nevar atsaukt.",
+    "normativeDeleted": "Standarta \"{{name}}\" ir noņemts",
+    "normativeCreated": "Izveidots standarta \"{{name}}\".",
+    "errorCreatingNormative": "Neizdevās izveidot standartu",
+    "errorDeletingNormative": "Neizdevās izdzēst standartu",
+    "errorEditingNormative": "Neizdevās rediģēt standartu",
+    "errorLoadingNormatives": "Neizdevās ielādēt standartus",
+    "normativeUpdated": "Standarts \"{{name}}\" ir atjaunināts",
+    "errorUpdatingNormative": "Neizdevās atjaunināt standartu"
+  },
+  "socialLinks": {
+    "website": "Tīmekļa vietne",
+    "error": "Kļūda",
+    "cannotOpenLink": "Nevar atvērt saiti uz {platform}",
+    "openError": "Atverot saiti, radās kļūda",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "vk": "VK",
+    "enterInstagram": "Ievadiet Instagram",
+    "enterTiktok": "Ievadiet TikTok",
+    "enterVk": "Ievadiet VK",
+    "enterWebsite": "Ievadiet vietni",
+    "instagramPlaceholder": "@lietotājvārds vai saite",
+    "tiktokPlaceholder": "@lietotājvārds vai saite",
+    "vkPlaceholder": "@lietotājvārds vai saite",
+    "websitePlaceholder": "example.com"
+  },
+  "logout": "Iziet",
+  "logoutConfirm": "Iziet no sava profila",
+  "logoutConfirmMessage": "Vai tiešām vēlaties iziet no sava profila?",
+  "adminGifts": {
+    "sendGift": "Nosūtīt dāvanu",
+    "giftName": "Dāvanas nosaukums",
+    "selectImage": "Izvēlēties attēlu"
+  },
+  "videoNotification": {
+    "added": "pievienoja",
+    "oneVideo": "jaunu video",
+    "multipleVideos": "{count} jaunus video",
+    "video": "video",
+    "videos": "video"
+  },
+  "achievementNotification": {
+    "added": "pievienoja",
+    "received": "saņēma",
+    "oneAchievement": "jaunu sasniegumu",
+    "multipleAchievements": "{count} jaunus sasniegumus",
+    "achievement": "sasniegums",
+    "achievements": "sasniegumi",
+    "title": "🏆 Sasniegums!",
+    "message": "Apsveicam! Saņēmāt sasniegumu: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "mainīja savu avataru"
+  },
+  "statsNotification": {
+    "updated": "atjaunoja",
+    "stats": "statistiku",
+    "normatives": "normatīvus",
+    "physicalData": "fiziskos datus"
+  },
+  "height": "augums",
+  "weight": "svars",
+  "cm": "cm",
+  "kg": "kg"
+}

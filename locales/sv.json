@@ -1,0 +1,2481 @@
+{
+  "common": {
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "edit": "Redigera",
+    "delete": "Ta bort",
+    "add": "Tillägga",
+    "close": "Nära",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "done": "Redo",
+    "loading": "Laddar...",
+    "error": "Fel",
+    "success": "Framgång",
+    "yes": "Ja",
+    "no": "Inga",
+    "ok": "OK",
+    "confirm": "Bekräfta",
+    "deleteConfirm": "Borttagning",
+    "deletePhotoConfirm": "Är du säker på att du vill ta bort det här fotot?",
+    "deleteTeamConfirm": "Är du säker på att du vill ta bort det här kommandot?",
+    "deletePastTeamConfirm": "Är du säker på att du vill ta bort det här kommandot från historiken?",
+    "deleteAchievementConfirm": "Är du säker på att du vill ta bort denna prestation?",
+    "deleteAllNotificationsConfirm": "Är du säker på att du vill rensa alla aviseringar?",
+    "rejectRequestConfirm": "Är du säker på att du vill avvisa denna begäran?",
+    "super": "Jättebra!",
+    "retry": "Försök igen",
+    "goalie": "Målvakt"
+  },
+  "winger": "Ytter",
+  "center": "Center framåt",
+  "defender": "Försvarare",
+  "goals": "Mål",
+  "assists": "Transmissioner",
+  "games": "Spel",
+  "pullUps": "Pull-ups",
+  "pushUps": "Armhävningar",
+  "plankTime": "Planka (sek)",
+  "sprint100m": "100m (sek)",
+  "longJump": "Längdhopp (m)",
+  "jumpRope": "Hopprep (ett)",
+  "justNow": "just nu",
+  "minutesAgo": "för {minutes} minuter sedan",
+  "hoursAgo": "för {hours} timmar sedan",
+  "daysAgo": "för {days} dagar sedan",
+  "photoNotification": {
+    "added": "lagt till",
+    "onePhoto": "nytt foto",
+    "multiplePhotos": "{count} nya foton",
+    "photo": "bild",
+    "photos": "bild"
+  },
+  "friendshipNotification": {
+    "title": "Ny vänskap",
+    "message": "{friend1Name} och {friend2Name} blev vänner",
+    "became": "blev vänner"
+  },
+  "exerciseNotification": {
+    "title": "Övningen avklarad",
+    "message": "{playerName} slutförde övningen \"{exerciseName}\"",
+    "completed": "slutfört övningen",
+    "exercise": "Utöva"
+  },
+  "giftNotification": {
+    "title": "En gåva från en stjärna",
+    "message": "{playerName} fick {giftName} från {starName}",
+    "received": "mottagen",
+    "from": "från",
+    "gift": "Present"
+  },
+  "addPhoto": "Lägg till ett foto",
+  "selectPhotoSource": "Välj fotokälla",
+  "gallery": "Galleri",
+  "camera": "Kamera",
+  "cancel": "Avboka",
+  "error": "Fel",
+  "maxPhotosReached": "Max antal bilder: 50",
+  "galleryPermissionRequired": "Tillstånd krävs för att komma åt galleriet.",
+  "galleryError": "Det gick inte att ladda foto från galleriet.",
+  "cameraNotSupported": "Att ta bilder stöds inte i webbversionen. Använd gärna galleriet.",
+  "cameraPermissionRequired": "Tillstånd krävs för att komma åt kameran.",
+  "cameraError": "Det gick inte att ta foto.",
+  "noPhotos": "Inga foton",
+  "clickToAddPhoto": "Klicka på \"Lägg till foto\" för att komma igång.",
+  "maxPhotos": "Max 50 bilder",
+  "uploading": "Belastning...",
+  "uploadingPhotos": "Laddar {count} foton... {progress}%",
+  "info": "Information",
+  "addVideoLink": "Lägg till en länk till YouTube eller VK och tidpunkten (format: minuter:sekunder, till exempel: 1:25)",
+  "supportedPlatforms": "Webbplatser som stöds: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... eller vk.com/video...",
+  "timeCodePlaceholder": "min:sek",
+  "myMoment": "Mitt ögonblick",
+  "belarus": "Belarus",
+  "additional": "Dessutom",
+  "left": "Vänster",
+  "right": "Rätt",
+  "birthDatePlaceholder": "MM.ÅÅÅÅ (till exempel: 12.2014)",
+  "countPlaceholder": "Antal gånger",
+  "timePlaceholder": "Tid i sekunder",
+  "deleteUser": "Ta bort en användare",
+  "success": "Framgångsrikt",
+  "selectTeams": "Välj lag",
+  "enterTeamName": "Ange lagets namn",
+  "enterStartYear": "Ange ett giltigt startår",
+  "enterEndYear": "Ange ett giltigt slutår.",
+  "createTeamError": "Det gick inte att skapa kommando i databasen",
+  "addTeam": "Lägg till ett kommando",
+  "teamName": "Lagnamn *",
+  "teamCountry": "Land (valfritt)",
+  "teamCity": "Stad (valfritt)",
+  "startYear": "Startår *",
+  "endYear": "examensår (valfritt)",
+  "searchTeams": "Söker efter ett team...",
+  "save": "Spara",
+  "add": "Tillägga",
+  "editTeam": "Redigera team",
+  "noTeamsFound": "Inga kommandon hittades",
+  "searching": "Söka...",
+  "noCurrentTeams": "Det finns inga aktuella kommandon.",
+  "addMoreVideo": "Lägg till fler videor",
+  "noPastTeams": "Inga tidigare kommandon",
+  "noVideosAdded": "Inga videor har lagts till",
+  "noTeamsSpecified": "Inga kommandon specificerade",
+  "selectCountry": "Välj ett land",
+  "selectPosition": "Välj en position",
+  "basicInfo": "Grundläggande information",
+  "dateFormat": "DD.MM.ÅÅÅÅ",
+  "noPermission": "Du har inte behörighet att redigera den här profilen.",
+  "playerUpdated": "Data uppdaterad",
+  "saveError": "Det gick inte att spara data",
+  "achievements": {
+    "firstPlace": "1:a plats",
+    "secondPlace": "2:a plats",
+    "thirdPlace": "3:e plats",
+    "place": "{place} plats",
+    "noAchievements": "Inga prestationer"
+  },
+  "exercises": {
+    "exerciseNumber": "Övning #{id}",
+    "title": "Övningar",
+    "subtitle": "Välj ett träningspass",
+    "searchPlaceholder": "Sök på nummer eller namn...",
+    "loadingExercise": "Laddar övning...",
+    "loadingExercises": "Laddar övningar...",
+    "exercise": "Utöva",
+    "alreadyCompleted": "Övningen är redan avslutad",
+    "canRetryIn": "Du kan göra den här övningen igen om {hours} timmar",
+    "all": "Alla",
+    "completed": "Avslutad",
+    "times": "en gång",
+    "loading": "Belastning...",
+    "categories": {
+      "Выносливость": "Uthållighet",
+      "Взрывная скорость": "Explosiv hastighet",
+      "Разминка": "Uppvärmning",
+      "Растяжка": "Stretching",
+      "Ловкость": "Fingerfärdighet",
+      "Сила": "Styrka",
+      "Баланс": "Balans",
+      "Скоростная выносливость": "Hastighet uthållighet",
+      "Восстановление": "Återhämtning",
+      "Endurance": "Uthållighet",
+      "Explosive Speed": "Explosiv hastighet",
+      "Warm-up": "Uppvärmning",
+      "Stretching": "Stretching",
+      "Agility": "Fingerfärdighet",
+      "Strength": "Styrka",
+      "Balance": "Balans",
+      "Speed Endurance": "Hastighet uthållighet",
+      "Recovery": "Återhämtning"
+    },
+    "details": {
+      "category": "Kategori",
+      "duration": "Varaktighet",
+      "difficulty": "Komplexitet",
+      "description": "Beskrivning",
+      "benefits": "Fördelar med träning",
+      "instructions": "Steg-för-steg instruktioner",
+      "tips": "Användbara tips",
+      "equipment": "Utrustning",
+      "calories": "Kalorier",
+      "additionalInfo": "Ytterligare information",
+      "completed": "Avslutad:",
+      "completedButton": "Jag har gjort det",
+      "alreadyCompleted": "Redan klar",
+      "saving": "Sparande...",
+      "notFound": "Övningen hittades inte",
+      "unavailable": "Ej tillgängligt",
+      "playersOnly": "Övningar är endast tillgängliga för spelare",
+      "markedComplete": "Övningen markeras som avslutad",
+      "error": "Fel",
+      "saveError": "Det gick inte att markera övningen som avslutad",
+      "generalError": "Ett fel uppstod när du sparade",
+      "times": "en gång",
+      "timesPlural": "gånger"
+    },
+    "difficulty": {
+      "Начинающий": "Början",
+      "Средний": "Genomsnitt",
+      "Продвинутый": "Avancerad",
+      "Легкая": "Lätt"
+    },
+    "difficulties": {
+      "Beginner": "Början",
+      "Intermediate": "Genomsnitt",
+      "Advanced": "Avancerad",
+      "Easy": "Lätt"
+    },
+    "items": {
+      "1": {
+        "title": "Intervalllöpning",
+        "description": "Växlar mellan snabb löpning (30 sekunder) och långsam löpning (30 sekunder) i 20 minuter. Utmärkt för att utveckla konditionsuthållighet för hockey.",
+        "equipment": "Löpband eller stadion",
+        "calories": "250-350 kcal per träningspass",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar förmågan att snabbt återhämta sig",
+          "Förbättrar den allmänna fysiska konditionen",
+          "Simulerar stressen i en hockeymatch"
+        ],
+        "instructions": [
+          "Börja med en 5-minuters uppvärmning av lätt jogging",
+          "Utför 30 sekunders snabb löpning (80-90 % av maximal hastighet)",
+          "Byt till 30 sekunders långsam jogging för att återhämta dig",
+          "Upprepa cykeln 20-25 gånger",
+          "Avsluta med en 5 minuters nedkylning"
+        ],
+        "tips": [
+          "Titta på din andning - andas djupt och rytmiskt",
+          "Överskrid inte 90 % av maxhastigheten",
+          "Om du är trött kan du öka din återhämtningstid.",
+          "Utför 2-3 gånger i veckan"
+        ]
+      },
+      "2": {
+        "title": "Burpee hoppa",
+        "description": "Komplex övning: knäböj → planka → armhävning → knäböj → hopp. Utför 3 set med 10-15 reps.",
+        "equipment": "Träningsmatta (tillval)",
+        "calories": "200-300 kcal per träningspass",
+        "benefits": [
+          "Utvecklar övergripande uthållighet",
+          "Stärker musklerna i hela kroppen",
+          "Förbättrar koordinationen av rörelser",
+          "Ökar explosiv kraft"
+        ],
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Sätt dig på huk med handflatorna på golvet framför dig.",
+          "Skjut tillbaka benen till plankposition",
+          "Utför en armhävning",
+          "Dra tillbaka benen mot händerna och håll dig i knäböj.",
+          "Hoppa upp, höj armarna ovanför huvudet",
+          "Landa mjukt och upprepa."
+        ],
+        "tips": [
+          "Håll ryggen rak under hela övningen.",
+          "Landa med böjda ben",
+          "Börja med 5-8 reps och öka gradvis",
+          "Vila 60-90 sekunder mellan seten"
+        ]
+      },
+      "3": {
+        "title": "Cykel",
+        "description": "Intensiv cykling eller stationär cykling med högintensiva intervaller. 5 minuters uppvärmning, 20 minuters intervall.",
+        "equipment": "Cykel eller motionscykel",
+        "calories": "300-400 kcal per träningspass",
+        "benefits": [
+          "Utvecklar konditionsuthållighet",
+          "Stärker benmusklerna",
+          "Bränner mycket kalorier",
+          "Låg belastning på lederna"
+        ],
+        "instructions": [
+          "5 minuters lågintensiv uppvärmning",
+          "2 minuter med hög intensitet (80-85 % av max)",
+          "1 minuts återhämtning vid låg intensitet",
+          "Upprepa intervallerna 10 gånger",
+          "5 minuters lågintensiv nedkylning"
+        ],
+        "tips": [
+          "Håll en hög trampfrekvens (80-100 rpm)",
+          "Se upp din kroppsposition – håll ryggen rak",
+          "Justera motståndet för att ändra intensiteten",
+          "Drick vatten under träningen."
+        ]
+      },
+      "4": {
+        "title": "Plyometriska hopp",
+        "description": "Hoppar på plats så högt som möjligt, landar på böjda knän. 3 set med 15-20 hopp.",
+        "equipment": "Träningsmatta (tillval)",
+        "calories": "150-200 kcal per träningspass",
+        "benefits": [
+          "Utvecklar explosiv benstyrka",
+          "Förbättrar reaktion och hastighet",
+          "Stärker senor och ligament",
+          "Ökar det vertikala hoppet"
+        ],
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Sätt dig på huk 1/4 av vägen med böjda knän",
+          "Hoppa explosivt uppåt och sträck ut armarna",
+          "Landa med böjda ben",
+          "Utför nästa hopp omedelbart",
+          "Gör 15-20 hopp i rad"
+        ],
+        "tips": [
+          "Landa mjukt, böj knäna.",
+          "Håll din kropp rak",
+          "Pausa inte mellan hoppen",
+          "Vila 2-3 minuter mellan seten"
+        ]
+      },
+      "5": {
+        "title": "Kortdistansspurter",
+        "description": "Spring i maxhastighet över en sträcka på 20-30 meter med 30 sekunders vila mellan löpningarna. 8-10 löpningar.",
+        "equipment": "Öppen plats eller löparbana",
+        "calories": "200-250 kcal per träningspass",
+        "benefits": [
+          "Utvecklar maximal hastighet",
+          "Förbättrar accelerationen",
+          "Stärker benmusklerna",
+          "Förbättrar koordinationen av rörelser"
+        ],
+        "instructions": [
+          "Markera ett avstånd på 20-30 meter",
+          "Anta startpositionen (halv knäböj)",
+          "När signalen ljuder, kör med maximal hastighet.",
+          "Gå över mållinjen",
+          "Gå långsamt tillbaka till start",
+          "Vila i 30 sekunder och upprepa."
+        ],
+        "tips": [
+          "Fokus på löpteknik",
+          "Håll din kropp rak",
+          "Arbeta aktivt med händerna",
+          "Förkorta inte din vilotid"
+        ]
+      },
+      "6": {
+        "title": "Att kasta en boll mot en vägg",
+        "description": "Kasta en medicinboll mot en vägg med maximal kraft, fånga och kasta igen. 3 set med 20 kast.",
+        "equipment": "Medicinboll 2-4 kg, vägg",
+        "calories": "120-180 kcal per träningspass",
+        "benefits": [
+          "Utvecklar explosiv armstyrka",
+          "Förbättrar koordinationen",
+          "Stärker kärnmusklerna",
+          "Ökar kasthastigheten"
+        ],
+        "instructions": [
+          "Stå 1-2 meter från väggen",
+          "Håll bollen med båda händerna i brösthöjd",
+          "Sätt dig på huk, böj dina knän",
+          "Räta ut dina ben och armar explosivt när du kastar bollen.",
+          "Fånga den studsande bollen",
+          "Gör nästa kast direkt."
+        ],
+        "tips": [
+          "Använd en boll som väger 2-4 kg",
+          "Kasta med maximal kraft",
+          "Håll ryggen rak",
+          "Arbeta med hela kroppen, inte bara armarna"
+        ]
+      },
+      "7": {
+        "title": "Dynamiska bensträckningar",
+        "description": "Benet svänger framåt, bakåt och åt sidorna, med cirkulära rörelser i höftlederna. 10-15 repetitioner för varje ben.",
+        "equipment": "En vägg eller stol för stöd",
+        "calories": "50-80 kcal per uppvärmning",
+        "benefits": [
+          "Värmer upp benmusklerna",
+          "Förbättrar rörligheten i lederna",
+          "Förbereder för träning",
+          "Minskar risken för skador"
+        ],
+        "instructions": [
+          "Stå upprätt och håll i stödet",
+          "Utför 10-15 framsvängningar med höger ben",
+          "Utför 10-15 ryggspark med höger ben",
+          "Utför 10-15 svängningar åt sidan med höger ben",
+          "Upprepa för vänster ben.",
+          "Utför cirkulära rörelser i dina höftleder"
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Sväng inte för mycket",
+          "Utför rörelser smidigt",
+          "Andas djupt och rytmiskt"
+        ]
+      },
+      "8": {
+        "title": "Uppvärmning av överkroppen",
+        "description": "Armcirklar, bålböjningar och vridningar. Uppvärmning för axelleder och rygg.",
+        "equipment": "Krävs inte",
+        "calories": "40-60 kcal per uppvärmning",
+        "benefits": [
+          "Värmer upp musklerna i överkroppen",
+          "Förbättrar axelledens rörlighet",
+          "Förbereder händerna för arbete",
+          "Aktiverar kärnmusklerna"
+        ],
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Utför 10 cirkulära rörelser med armarna framåt",
+          "Utför 10 cirkulära rörelser med armarna bakåt",
+          "Utför 10 sidoböjar",
+          "Utför 10 bålrotationer",
+          "Utför cirkulära rörelser med dina axlar"
+        ],
+        "tips": [
+          "Rör dig långsamt och smidigt",
+          "Gör inga plötsliga rörelser",
+          "Titta på din andning",
+          "Öka gradvis rörelseomfånget"
+        ]
+      },
+      "9": {
+        "title": "Lätt jogging på plats",
+        "description": "Joggar på plats med höga knän, ökar gradvis takten. 5-7 minuter.",
+        "equipment": "Krävs inte",
+        "calories": "60-80 kcal per uppvärmning",
+        "benefits": [
+          "Ökar hjärtfrekvensen",
+          "Värmer upp benmusklerna",
+          "Förbättrar koordinationen",
+          "Förbereder för huvudpasset"
+        ],
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Börja med lätt jogging på plats",
+          "Lyft upp knäna gradvis högre",
+          "Arbeta med armarna som om du sprang normalt.",
+          "Öka tempot i 2-3 minuter",
+          "Sakta ner de senaste 2 minuterna"
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Landa på tårna",
+          "Andas djupt",
+          "Hoppa inte för högt"
+        ]
+      },
+      "10": {
+        "title": "Statisk sträckning av benmusklerna",
+        "description": "Håll stretchpositioner för quadriceps, vader och adduktorer. 30 sekunder per grupp.",
+        "equipment": "Träningsmatta",
+        "calories": "80-100 kcal per sträcka",
+        "benefits": [
+          "Förbättrar benmusklernas flexibilitet",
+          "Minskar muskelspänningar",
+          "Påskyndar återhämtningen",
+          "Förebygger skador"
+        ],
+        "instructions": [
+          "Quadriceps stretch: Stå på ett ben och böj det andra benet bakåt.",
+          "Vadsträcka: Lucka framåt, håll ditt bakre ben rakt.",
+          "Adductor stretch: Sitt med benen isär.",
+          "Håll varje position i 30 sekunder.",
+          "Andas djupt och slappna av i dina muskler."
+        ],
+        "tips": [
+          "Sträck dig inte till smärtan.",
+          "Andas djupt och långsamt",
+          "Slappna av i musklerna medan du stretchar.",
+          "Utför efter träning"
+        ]
+      },
+      "11": {
+        "title": "Stretch på rygg och axlar",
+        "description": "Framåtböjningar, bröststretch, tricepsstretch. Håll varje position i 20-30 sekunder.",
+        "benefits": [
+          "Förbättrar flexibilitet och rörlighet",
+          "Lindrar muskelspänningar",
+          "Förebygger skador",
+          "Förbättrar återhämtningen efter träning"
+        ],
+        "instructions": [
+          "Värm upp innan du stretchar",
+          "Sträck långsamt och mjukt",
+          "Håll positionen i 20-30 sekunder",
+          "Undvik skarp smärta"
+        ],
+        "tips": [
+          "Andas djupt medan du stretchar.",
+          "Gör inga plötsliga rörelser",
+          "Gör detta dagligen för bästa resultat.",
+          "Stretcha efter ditt träningspass"
+        ]
+      },
+      "12": {
+        "title": "Yoga för hockeyspelare",
+        "description": "En uppsättning asanas för att utveckla flexibilitet och balans: krigarställning, trädställning, nedåtvänd hundställning.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "13": {
+        "title": "Samordningsstege",
+        "description": "Snabba benrörelser över stegen: sidosteg, korsningssteg, hopp. 3 pass av varje typ.",
+        "benefits": [
+          "Utvecklar koordination av rörelser",
+          "Förbättrar balans och jämvikt",
+          "Ökar smidigheten",
+          "Utvecklar neuromuskulär anslutning"
+        ],
+        "instructions": [
+          "Börja i långsam takt",
+          "Fokus på precision i rörelser",
+          "Öka hastigheten gradvis",
+          "Upprepa tills det blir automatiskt."
+        ],
+        "tips": [
+          "Öva regelbundet",
+          "Ta dig tid – precision är viktigare än snabbhet",
+          "Använd visuella signaler",
+          "Träna under olika förhållanden"
+        ]
+      },
+      "14": {
+        "title": "Jonglerar bollar",
+        "description": "Jonglerar 2-3 tennisbollar för att utveckla hand-öga-koordination. Börja med 1 boll.",
+        "benefits": [
+          "Utvecklar koordination av rörelser",
+          "Förbättrar balans och jämvikt",
+          "Ökar smidigheten",
+          "Utvecklar neuromuskulär anslutning"
+        ],
+        "instructions": [
+          "Börja i långsam takt",
+          "Fokus på precision i rörelser",
+          "Öka hastigheten gradvis",
+          "Upprepa tills det blir automatiskt."
+        ],
+        "tips": [
+          "Öva regelbundet",
+          "Ta dig tid – precision är viktigare än snabbhet",
+          "Använd visuella signaler",
+          "Träna under olika förhållanden"
+        ]
+      },
+      "15": {
+        "title": "Snabba inslag av kottar",
+        "description": "Placera 5-6 kottar och rör dem snabbt med handen i slumpmässig ordning. 3 set på 30 sekunder.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "16": {
+        "title": "Roddmaskin",
+        "description": "Intervallrodd: 2 minuter med hög intensitet, 1 minuts vila. 8-10 cykler för att utveckla uthålligheten.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "17": {
+        "title": "Hopprep med intervaller",
+        "description": "Växlar mellan snabba (30 sek) och långsamma (30 sek) hopp. 20 minuter för att utveckla konditionsuthållighet.",
+        "equipment": "Hopprep",
+        "calories": "200-300 kcal per träningspass",
+        "benefits": [
+          "Utvecklar konditionsuthållighet",
+          "Förbättrar koordinationen av rörelser",
+          "Stärker benmusklerna",
+          "Bränner mycket kalorier"
+        ],
+        "instructions": [
+          "Ta ett hopprep av lämplig längd.",
+          "30 sekunders snabb hoppning i maximal hastighet",
+          "30 sekunder av långsamt hoppande jack för att återhämta sig",
+          "Upprepa cykeln 20 gånger",
+          "Avsluta med en 2 minuters nedkylning"
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Arbeta med handlederna, inte händerna",
+          "Landa på tårna",
+          "Börja i långsam takt"
+        ]
+      },
+      "18": {
+        "title": "Springer uppför trappan",
+        "description": "Spring upp för trappan så fort du kan och gå sedan ner. 10-15 repetitioner för att utveckla benuthålligheten.",
+        "equipment": "Stege",
+        "calories": "250-350 kcal per träningspass",
+        "benefits": [
+          "Utvecklar benens uthållighet",
+          "Stärker musklerna i lår och rumpa",
+          "Förbättrar konditionsuthålligheten",
+          "Ökar benstyrkan"
+        ],
+        "instructions": [
+          "Hitta en trappa med 20-30 trappsteg",
+          "Spring upp i högsta hastighet",
+          "Gå ner i gångtakt för att återhämta dig",
+          "Utför 10-15 lyft",
+          "Vila 1-2 minuter mellan lyften"
+        ],
+        "tips": [
+          "Använd hela foten när du lyfter.",
+          "Håll ryggen rak",
+          "Arbeta aktivt med händerna",
+          "Överskrid inte dina förmågor"
+        ]
+      },
+      "19": {
+        "title": "Planka med rörelser",
+        "description": "Plankhållning med omväxlande arm- och benhöjningar. 3 set på 45-60 sekunder för att stärka kärnan.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "20": {
+        "title": "Höga knälöpning",
+        "description": "Jogga på plats, höj dina knän till bröstet så högt som möjligt. 5 set à 2 minuter med 1 minuts vila.",
+        "benefits": [
+          "Förbättrar kardiovaskulär uthållighet",
+          "Utvecklar aerob uthållighet",
+          "Förbränner kalorier effektivt",
+          "Stärker hjärtmuskeln"
+        ],
+        "instructions": [
+          "Börja med en lätt uppvärmning på 5-10 minuter",
+          "Behåll din målpuls",
+          "Titta på din andning - andas djupt",
+          "Avsluta med en cool down och stretch."
+        ],
+        "tips": [
+          "Öka varaktigheten gradvis",
+          "Drick vatten under träningen.",
+          "Utför 3-4 gånger i veckan",
+          "Lyssna på din kropp"
+        ]
+      },
+      "21": {
+        "title": "Stående längdhopp",
+        "description": "Hoppa framåt så långt som möjligt och landa på båda fötterna. 5 set med 8-10 hopp.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "22": {
+        "title": "Snabba armhävningar",
+        "description": "Armhävningar så fort som möjligt, röra bröstet mot golvet. 4 set med 15-20 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "23": {
+        "title": "Hoppa över hinder",
+        "description": "Hoppa över kottar eller barriärer 30-40 cm höga. 3 åk med 10 hinder.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "24": {
+        "title": "Speed ​​squats",
+        "description": "Knäböj så snabbt som möjligt, låren parallellt med golvet. 4 set med 20-25 reps.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "25": {
+        "title": "Medicin boll kastar",
+        "description": "Kasta en tung boll (5-8 kg) från bröstet med maximal kraft. 3 set om 15 kast.",
+        "benefits": [
+          "Ökar muskelstyrkan",
+          "Förbättrar muskulär uthållighet",
+          "Utvecklar funktionell styrka",
+          "Stärker muskuloskeletala systemet"
+        ],
+        "instructions": [
+          "Värm upp innan träning",
+          "Se till att du använder rätt teknik",
+          "Kontrollera din andning - andas ut med ansträngning",
+          "Vila 60-90 sekunder mellan seten."
+        ],
+        "tips": [
+          "Börja med lättare vikter och öka gradvis.",
+          "Håll inte andan",
+          "Utför 2-3 gånger i veckan",
+          "Minska belastningen när du känner dig trött"
+        ]
+      },
+      "26": {
+        "title": "Ankeluppvärmning",
+        "description": "Cirkulära rörelser med fötterna, böj och räta ut tårna. 2-3 minuter för varje ben.",
+        "benefits": [
+          "Förbereder musklerna för träning",
+          "Förbättrar blodcirkulationen",
+          "Minskar risken för skador",
+          "Ökar träningseffektiviteten"
+        ],
+        "instructions": [
+          "Börja långsamt och öka gradvis intensiteten",
+          "Utför rörelser smidigt och kontrollerat",
+          "Se till att du använder rätt teknik",
+          "Andas jämnt medan du utför"
+        ],
+        "tips": [
+          "Ta dig tid – kvalitet är viktigare än snabbhet",
+          "Om smärta uppstår, sluta.",
+          "Värm upp före varje träningspass.",
+          "Lägg tillräckligt med tid på varje rörelse."
+        ]
+      },
+      "27": {
+        "title": "Uppvärmning av halsen",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Vrid sakta huvudet åt vänster och höger",
+          "Luta huvudet framåt och bakåt",
+          "Utför cirkulära rörelser med huvudet",
+          "Håll dina axlar avslappnade"
+        ],
+        "tips": [
+          "Rör dig långsamt och smidigt",
+          "Gör inga plötsliga rörelser",
+          "Om smärta uppstår, sluta.",
+          "Andas djupt och jämnt"
+        ]
+      },
+      "28": {
+        "title": "Handledsuppvärmning",
+        "instructions": [
+          "Sträck ut armarna framför dig",
+          "Böj handlederna upp och ner",
+          "Rotera handlederna i en cirkel",
+          "Knyt och knyt nävarna",
+          "Sträck fingrarna åt sidorna"
+        ],
+        "tips": [
+          "Utför rörelserna långsamt",
+          "Överansträng inte dina leder",
+          "Var uppmärksam på förnimmelserna i dina handleder",
+          "Upprepa regelbundet"
+        ]
+      },
+      "29": {
+        "title": "Knä sträcker sig",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Böj långsamt och räta ut dina knän",
+          "Utför cirkulära rörelser med knäna",
+          "Gör knäböj med liten amplitud",
+          "Sträck på framsidan av låret"
+        ],
+        "tips": [
+          "Gör inte djupa knäböj",
+          "Rör dig smidigt och med kontroll",
+          "Om du har knäsmärta, minska rörelseomfånget.",
+          "Se till att du använder rätt teknik"
+        ]
+      },
+      "30": {
+        "title": "Höftuppvärmning",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Lyft upp ditt knä mot bröstet",
+          "Flytta benet åt sidan och bakåt",
+          "Utför cirkulära rörelser med dina höfter",
+          "Gör utfall med liten amplitud"
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Arbeta inom ett bekvämt område",
+          "Förhasta inte dina rörelser",
+          "Håll koll på din balans"
+        ]
+      },
+      "31": {
+        "title": "Ljumsken stretch",
+        "instructions": [
+          "Sitt på golvet med böjda knän.",
+          "Placera fotsulorna tillsammans",
+          "Luta dig försiktigt framåt",
+          "Dra knäna mot golvet",
+          "Håll stretchen i 30 sekunder"
+        ],
+        "tips": [
+          "Tvinga inte sträckningen",
+          "Andas djupt och slappna av.",
+          "Om smärta uppstår, minska amplituden.",
+          "Utför efter uppvärmning"
+        ]
+      },
+      "32": {
+        "title": "Hamstring stretch",
+        "instructions": [
+          "Sitt på golvet med benen sträckta framåt.",
+          "Böj dig framåt och försök att nå dina fötter",
+          "Knäpp ihop fötterna med händerna",
+          "Dra bröstet mot knäna",
+          "Håll stretchen i 30-45 sekunder"
+        ],
+        "tips": [
+          "Runda inte ryggen",
+          "Arbeta inom ett bekvämt område",
+          "Andas djupt",
+          "Var uppmärksam på förnimmelserna på baksidan av låret"
+        ]
+      },
+      "33": {
+        "title": "Stretching av vadmusklerna",
+        "instructions": [
+          "Stå vänd mot väggen",
+          "Placera en fot framåt och den andra bakåt.",
+          "Sänk hälen på din bakre fot till golvet",
+          "Böj dig framåt, sträck dina vader",
+          "Byt ben och upprepa"
+        ],
+        "tips": [
+          "Håll bakbenet rakt",
+          "Lyft inte hälen från golvet",
+          "Sträck ut smidigt",
+          "Utför båda benen"
+        ]
+      },
+      "34": {
+        "title": "Stretching av bröstmusklerna",
+        "instructions": [
+          "Stå i dörröppningen",
+          "Placera händerna på dörrkarmarna",
+          "Ta ett steg framåt",
+          "Känn sträckningen i bröstet",
+          "Håll stretchen i 30 sekunder"
+        ],
+        "tips": [
+          "Överansträng inte dina axlar",
+          "Andas djupt",
+          "Sträck ut gradvis",
+          "Följ dina förnimmelser"
+        ]
+      },
+      "35": {
+        "title": "Triceps stretch",
+        "instructions": [
+          "Lyft upp ena handen",
+          "Böj armen vid armbågen bakom huvudet",
+          "Dra ner armbågen med din andra hand",
+          "Känn stretchen i dina triceps",
+          "Byt händer och upprepa"
+        ],
+        "tips": [
+          "Gör inga plötsliga rörelser",
+          "Sträck ut smidigt",
+          "Andas jämnt",
+          "Utför för båda händerna"
+        ]
+      },
+      "36": {
+        "title": "Orm mellan kottar",
+        "instructions": [
+          "Lägg kottarna i ett ormliknande mönster på 2-3 meters avstånd",
+          "Börja springa runt varje kon",
+          "Håll din tyngdpunkt låg",
+          "Arbeta dina ben snabbt och ofta",
+          "Se till att du använder rätt svarvteknik."
+        ],
+        "tips": [
+          "Börja i långsam takt",
+          "Fokusera på teknik, inte snabbhet.",
+          "Håll huvudet uppe",
+          "Använd korta, snabba steg"
+        ]
+      },
+      "37": {
+        "title": "Snabba fotberöringar",
+        "instructions": [
+          "Stå bredvid bollen",
+          "Rör bollen snabbt med foten",
+          "Byt ben var 2-3 beröring",
+          "Håll en konstant rytm",
+          "Utför i 30-60 sekunder"
+        ],
+        "tips": [
+          "Håll din kroppsvikt på ditt stödben",
+          "Arbeta snabbt men kontrollerat",
+          "Tappa inte balansen",
+          "Titta på din beröringsteknik"
+        ]
+      },
+      "38": {
+        "title": "Hoppar med svängar",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Gör ett hopp upp",
+          "Vrid 180 grader medan du hoppar",
+          "Landa mjukt på båda fötterna.",
+          "Vänd omedelbart tillbaka och upprepa"
+        ],
+        "tips": [
+          "Landa med böjda ben",
+          "Använd armarna för balans",
+          "Börja med små svängar",
+          "Titta på din landningsteknik"
+        ]
+      },
+      "39": {
+        "title": "Snabba bollpassningar",
+        "instructions": [
+          "Stå vänd mot väggen på 2-3 meters avstånd",
+          "Passa bollen snabbt till väggen",
+          "Fånga returen och skicka tillbaka den omedelbart",
+          "Arbeta med båda händerna",
+          "Utför i 30-45 sekunder"
+        ],
+        "tips": [
+          "Använd rätt passningsteknik",
+          "Håll ögonen på bollen",
+          "Arbeta snabbt men noggrant",
+          "Håll händerna avslappnade"
+        ]
+      },
+      "40": {
+        "title": "Springer baklänges",
+        "instructions": [
+          "Börja med att springa sakta bakåt.",
+          "Titta över axeln ofta",
+          "Håll din tyngdpunkt låg",
+          "Använd armarna för balans",
+          "Kör 20-30 meter"
+        ],
+        "tips": [
+          "Börja väldigt långsamt",
+          "Kontrollera alltid utrymmet bakom dig",
+          "Håll knäna lätt böjda",
+          "Rusa inte in i ökande hastighet"
+        ]
+      },
+      "41": {
+        "title": "Squats med vikter",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Ta hantlar eller en skivstång",
+          "Sitt på huk tills tårna är parallella med golvet.",
+          "Gå upp med styrkan i dina ben",
+          "Utför 3-4 set med 8-12 reps"
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Runda inte nedre delen av ryggen",
+          "Dina knän ska inte gå längre än tårna.",
+          "Börja med lätta vikter"
+        ]
+      },
+      "42": {
+        "title": "Marklyft",
+        "instructions": [
+          "Stå rakt med fötterna axelbrett isär",
+          "Ta skivstången från golvet med ett överhandsgrepp.",
+          "Böj knäna och flytta bäckenet bakåt",
+          "Lyft skivstången genom att räta ut benen och ryggen.",
+          "Sätt tillbaka stången till golvet på ett kontrollerat sätt."
+        ],
+        "tips": [
+          "Håll ryggen rak under hela rörelsen.",
+          "Runda inte nedre delen av ryggen",
+          "Flytta stången nära din kropp",
+          "Börja med lätta vikter"
+        ]
+      },
+      "43": {
+        "title": "Bänkpress",
+        "instructions": [
+          "Lägg dig på bänken med fötterna på golvet.",
+          "Ta skivstången med ett brett grepp",
+          "Sänk stången till bröstet på ett kontrollerat sätt.",
+          "Tryck skivstången uppåt",
+          "Utför 3-4 set med 6-10 reps"
+        ],
+        "tips": [
+          "Håll skulderbladen ihopdragna",
+          "Håll fötterna på golvet",
+          "Andas rätt: andas ut med ansträngning",
+          "Använd försäkring"
+        ]
+      },
+      "44": {
+        "title": "Pull-ups",
+        "instructions": [
+          "Häng på stången med ett överhandsgrepp",
+          "Dra dig upp tills hakan är ovanför stången.",
+          "Sänk dig tillbaka till startpositionen",
+          "Håll din kärna tät",
+          "Utför 3-4 set med maximala reps"
+        ],
+        "tips": [
+          "Sväng inte",
+          "Dra upp smidigt och kontrollerat",
+          "Räta ut armarna helt i botten",
+          "Använd hjälp vid behov"
+        ]
+      },
+      "45": {
+        "title": "Dips på stängerna",
+        "instructions": [
+          "Stå mellan stängerna",
+          "Hoppa upp och lås fast vid stängerna",
+          "Sänk dig ner, böj armbågarna.",
+          "Tryck upp, räta ut armarna",
+          "Utför 3-4 set med 5-15 reps"
+        ],
+        "tips": [
+          "Håll din kropp rak",
+          "Sväng inte",
+          "Gå ner till ett bekvämt djup",
+          "Använd dina ben om det behövs."
+        ]
+      },
+      "46": {
+        "title": "Enbensstativ",
+        "instructions": [
+          "Stå på ett ben",
+          "Höj ditt andra ben framför dig",
+          "Behåll din balans så länge som möjligt",
+          "Använd armarna för balans",
+          "Byt ben och upprepa"
+        ],
+        "tips": [
+          "Se framåt, inte ner",
+          "Håll din kärna tät",
+          "Börja med korta set",
+          "Öka tiden gradvis"
+        ]
+      },
+      "47": {
+        "title": "Enbens planka",
+        "instructions": [
+          "Kom in i en plankposition",
+          "Lyft upp ett ben",
+          "Håll benet rakt",
+          "Håll positionen i 30-60 sekunder",
+          "Byt ben och upprepa"
+        ],
+        "tips": [
+          "Håll din kropp rak",
+          "Gunga inte från sida till sida",
+          "Andas jämnt",
+          "Börja med korta set"
+        ]
+      },
+      "48": {
+        "title": "Enbens knäböj",
+        "instructions": [
+          "Stå på ett ben",
+          "Förläng ditt andra ben framåt",
+          "Knäböj på stödbenet",
+          "Återgå till startpositionen",
+          "Utför 3-4 set med 5-10 reps på varje ben."
+        ],
+        "tips": [
+          "Håll ryggen rak",
+          "Rör inte golvet med din andra fot.",
+          "Använd armarna för balans",
+          "Börja med en liten amplitud"
+        ]
+      },
+      "49": {
+        "title": "Bosu bollövningar",
+        "instructions": [
+          "Stå på halvklotet av Bosu-bollen",
+          "Håll balansen",
+          "Gör knäböj",
+          "Gör kroppsvridningar",
+          "Utför 3-4 set med 10-15 reps"
+        ],
+        "tips": [
+          "Börja med enkla övningar",
+          "Titta på din teknik",
+          "Ta dig tid",
+          "Använd hjälp för stöd"
+        ]
+      },
+      "50": {
+        "title": "Yoga Balans",
+        "instructions": [
+          "Stå upprätt med fötterna ihop.",
+          "Lyft upp ett ben och placera det på det andras lår.",
+          "Placera händerna framför bröstet",
+          "Håll balansen",
+          "Utför båda benen i 30-60 sekunder"
+        ],
+        "tips": [
+          "Titta framåt vid ett tillfälle",
+          "Andas djupt och jämnt",
+          "Ta dig tid",
+          "Om du tappar balansen, börja om."
+        ]
+      },
+      "51": {
+        "title": "Går på en stock",
+        "instructions": [
+          "Hitta en stabil stock eller bräda",
+          "Stå på stocken",
+          "Gå långsamt framåt",
+          "Håll balansen",
+          "Utför flera pass"
+        ],
+        "tips": [
+          "Börja med en bred stock",
+          "Se framåt, inte ner",
+          "Använd armarna för balans",
+          "Ta dig tid"
+        ]
+      },
+      "52": {
+        "title": "Handstående mot väggen",
+        "instructions": [
+          "Stå vänd mot väggen",
+          "Placera händerna på golvet 30 cm från väggen",
+          "Lyft upp benen mot väggen",
+          "Håll ett handstående",
+          "Sänk benen på ett kontrollerat sätt"
+        ],
+        "tips": [
+          "Börja med korta set",
+          "Använd hjälp för försäkring",
+          "Håll din kärna tät",
+          "Överansträng dig inte"
+        ]
+      },
+      "53": {
+        "title": "Fartlek",
+        "instructions": [
+          "Börja med en långsam joggingtur i 5-10 minuter",
+          "Öka hastigheten till 80 % av max i 2-3 minuter",
+          "Återgå till en långsam joggingtur i 1-2 minuter",
+          "Upprepa cykeln 4-6 gånger",
+          "Avsluta med en långsam joggingtur i 5-10 minuter"
+        ],
+        "tips": [
+          "Lyssna på din kropp",
+          "Överskrid inte 80 % av maxhastigheten",
+          "Andas djupt",
+          "Drick vatten under träningen."
+        ]
+      },
+      "54": {
+        "title": "Upprepade spurter",
+        "instructions": [
+          "Gör en 10 minuters uppvärmning",
+          "Kör en sprint med maximal hastighet i 30 sekunder",
+          "Vila i 2-3 minuter",
+          "Upprepa sprinten",
+          "Kör 6-8 spurter"
+        ],
+        "tips": [
+          "Snåla inte med din uppvärmning",
+          "Vila helt mellan spurterna",
+          "Titta på din löpteknik",
+          "Träna inte dagligen"
+        ]
+      },
+      "55": {
+        "title": "Intervaller på en cykel",
+        "instructions": [
+          "Börja med en 5 minuters uppvärmning",
+          "Öka belastningen till 80 % av max",
+          "Pedal med hög intensitet i 2-3 minuter",
+          "Minska belastningen till 50 % i 1-2 minuter",
+          "Upprepa cykeln 6-8 gånger"
+        ],
+        "tips": [
+          "Håll en hög kadens",
+          "Andas djupt",
+          "Håll ett öga på pulsen",
+          "Drick vatten regelbundet"
+        ]
+      },
+      "56": {
+        "title": "Berglöpning",
+        "instructions": [
+          "Hitta en kulle med en lutning på 5-10 %",
+          "Gör en 10 minuters uppvärmning",
+          "Spring uppför backen i måttlig hastighet",
+          "Gå ner för att återhämta dig",
+          "Upprepa 6-10 lyft"
+        ],
+        "tips": [
+          "Börja med en liten lutning",
+          "Håll ryggen rak när du lyfter.",
+          "Arbeta aktivt med händerna",
+          "Ta dig tid på nedstigningen"
+        ]
+      },
+      "57": {
+        "title": "Plyometriska cirklar",
+        "instructions": [
+          "Gör en 10 minuters uppvärmning",
+          "Gör långa hopp från stående position",
+          "Gör hopp över hinder",
+          "Gör box jumps",
+          "Vila i 2-3 minuter och upprepa kretsen."
+        ],
+        "tips": [
+          "Titta på din landningsteknik",
+          "Landa med böjda ben",
+          "Använd armarna för balans",
+          "Överdriv inte med kvantiteten"
+        ]
+      },
+      "58": {
+        "title": "Lätt stretching",
+        "instructions": [
+          "Börja med lätta rörelser",
+          "Sträck dina stora muskelgrupper",
+          "Andas djupt och jämnt",
+          "Rör dig mjukt och långsamt",
+          "Avsluta med djup andning."
+        ],
+        "tips": [
+          "Sträck dig inte till smärtan.",
+          "Andas djupt",
+          "Slappna av helt",
+          "Gör det regelbundet"
+        ]
+      },
+      "59": {
+        "title": "Skumrullande",
+        "instructions": [
+          "Lägg dig på foam rollern",
+          "Rulla rullen långsamt under dina muskler.",
+          "Fokusera på smärtpunkter",
+          "Håll trycket i 30-60 sekunder",
+          "Upprepa för alla muskelgrupper."
+        ],
+        "tips": [
+          "Rulla inte på lederna",
+          "Andas djupt",
+          "Tål inte svår smärta",
+          "Börja med en mjuk rulle"
+        ]
+      },
+      "60": {
+        "title": "Lätt jogging",
+        "instructions": [
+          "Börja i långsam takt",
+          "Håll din puls på 60-70% av ditt maximala",
+          "Andas djupt och jämnt",
+          "Håll ett konstant tempo",
+          "Avsluta med en gradvis minskning av tempot"
+        ],
+        "tips": [
+          "Håll ett öga på pulsen",
+          "Andas genom näsan",
+          "Överansträng dig inte",
+          "Njut av processen"
+        ]
+      },
+      "61": {
+        "title": "Simning",
+        "instructions": [
+          "Börja med en uppvärmning på torrt land",
+          "Gå ner i vattnet gradvis",
+          "Simma i ett behagligt tempo",
+          "Ändra dina simstilar",
+          "Avsluta med ett långsamt dopp"
+        ],
+        "tips": [
+          "Simma inte ensam",
+          "Titta på din teknik",
+          "Andas jämnt",
+          "Överdriv inte"
+        ]
+      },
+      "62": {
+        "title": "Återställningscykel",
+        "instructions": [
+          "Börja i långsam takt",
+          "Håll din puls på 50-60% av ditt max",
+          "Trampa lätt och rytmiskt",
+          "Andas djupt",
+          "Avsluta med en gradvis minskning av tempot"
+        ],
+        "tips": [
+          "Håll en hög kadens",
+          "Andas djupt",
+          "Överansträng dig inte",
+          "Njut av åkturen"
+        ]
+      },
+      "63": {
+        "title": "Återhämtningsyoga",
+        "instructions": [
+          "Börja med enkla poser",
+          "Utför stretching långsamt",
+          "Andas djupt och jämnt",
+          "Koppla av i varje pose",
+          "Avsluta med meditation"
+        ],
+        "tips": [
+          "Tvinga inte poser",
+          "Andas genom näsan",
+          "Lyssna på din kropp",
+          "Njut av processen"
+        ]
+      },
+      "64": {
+        "title": "Stretching med ett gummiband",
+        "description": "Stretchövningar med ett gummiband",
+        "equipment": "Gummisnodd",
+        "calories": "35-55 kcal",
+        "benefits": [
+          "Förbättrar ledernas flexibilitet",
+          "Stärker ligament",
+          "Lindrar muskelspänningar",
+          "Ökar rörelseomfånget"
+        ],
+        "instructions": [
+          "Välj rätt elastiskt band",
+          "Utför långsamma rörelser",
+          "Håll stretchen i 20-30 sekunder",
+          "Upprepa varje övning 3-5 gånger"
+        ],
+        "tips": [
+          "Börja med ett lätt resårband",
+          "Låt det inte göra ont",
+          "Andas jämnt",
+          "Öka gradvis motståndet"
+        ]
+      },
+      "65": {
+        "title": "Dusch i kontrast",
+        "instructions": [
+          "Börja med varmt vatten",
+          "Gå gradvis över till kallt vatten",
+          "Håll kallt vatten i 30-60 sekunder",
+          "Återgå till varmt vatten",
+          "Upprepa cykeln 3-5 gånger"
+        ],
+        "tips": [
+          "Börja gradvis",
+          "Andas djupt",
+          "Bli inte för kall",
+          "Lyssna på din kropp"
+        ]
+      }
+    }
+  },
+  "items": {
+    "autograph": "autograf",
+    "stick": "stick",
+    "puck": "puck",
+    "jersey": "Jersey"
+  },
+  "requests": {
+    "pending": "Väntar på svar",
+    "accepted": "Accepterad",
+    "rejected": "Avvisad",
+    "giftRequests": "Gåvoförfrågningar"
+  },
+  "auth": {
+    "login": "Går ut på isen",
+    "register": "Registrering",
+    "phone": "Telefon",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Ange ditt telefonnummer med landskod",
+    "code": "Bekräftelsekod",
+    "codePlaceholder": "Ange koden",
+    "sendCode": "Skicka kod",
+    "resendCode": "Upprepa efter",
+    "verifyCode": "Bekräfta koden",
+    "invalidPhone": "Ogiltigt telefonnummerformat",
+    "invalidCode": "Ogiltig bekräftelsekod",
+    "codeSent": "Koden skickas till",
+    "codeResent": "Koden har skickats på nytt.",
+    "required": "Auktorisering krävs",
+    "loginRequired": "För att se en spelares profil måste du logga in.",
+    "welcomeBack": "Välkommen tillbaka!",
+    "welcomeBackMessage": "Välkommen tillbaka, {name}!",
+    "codeSentSuccess": "Koden har skickats!",
+    "codeSentMessage": "Kontrollera SMS på din telefon och ange bekräftelsekoden",
+    "userNotFound": "Användaren hittades inte",
+    "userNotFoundMessage": "Ett konto med detta telefonnummer finns inte. Vänligen registrera dig.",
+    "errorSendingCode": "Fel",
+    "errorSendingCodeMessage": "Det gick inte att skicka koden. Kontrollera ditt telefonnummer och internetuppkoppling.",
+    "errorResendingCode": "Fel",
+    "errorResendingCodeMessage": "Det gick inte att skicka koden igen",
+    "errorVerifyingCode": "Fel",
+    "errorVerifyingCodeMessage": "Det uppstod ett fel vid kontroll av koden.",
+    "errorSendingCodeGeneral": "Det gick inte att skicka koden. Försök igen.",
+    "errorSendingCodeResend": "Det gick inte att skicka koden igen",
+    "errorInvalidCode": "Ange den 6-siffriga koden",
+    "errorRegistration": "Det gick inte att slutföra registreringen",
+    "errorLoginRequired": "Du måste logga in på din profil",
+    "errorLoginRequiredMessage": "Du måste vara inloggad för att skicka meddelanden.",
+    "errorLoginRequiredFriends": "Du måste logga in för att lägga till någon som vän.",
+    "errorRemoveFriend": "Det går inte att ta bort från vänner",
+    "errorSendFriendRequest": "Det gick inte att skicka vänförfrågan",
+    "errorCancelRequest": "Det gick inte att avbryta begäran",
+    "errorAcceptRequest": "Det gick inte att acceptera begäran",
+    "errorManageFriends": "Ett fel uppstod när vänner hanterades.",
+    "errorRejectRequest": "Det gick inte att avvisa begäran",
+    "errorRejectRequestGeneral": "Ett fel uppstod när din begäran avvisades.",
+    "errorOpenLink": "Det gick inte att öppna länken",
+    "errorDataNotFound": "Data hittades inte",
+    "errorNoEditRights": "Du har inte behörighet att redigera den här profilen.",
+    "errorClearTeams": "Det gick inte att rensa gamla kommandodata",
+    "errorSaveTeams": "Det gick inte att spara kommandon",
+    "errorSaveChanges": "Det gick inte att spara ändringarna",
+    "errorAdminOnly": "Endast administratören kan ta bort användare",
+    "errorPlayerNotFound": "Spelardata hittades inte",
+    "errorDeleteUser": "Det gick inte att ta bort användaren",
+    "errorCreateUser": "Det gick inte att skapa användare",
+    "errorFillNamePhone": "Vänligen fyll i ditt namn och telefonnummer",
+    "errorLoadNotifications": "Det gick inte att läsa in aviseringar",
+    "errorGetNotifications": "Det går inte att ta emot aviseringar",
+    "errorClearNotifications": "Det gick inte att rensa aviseringar",
+    "errorInvalidNotificationData": "Felaktig aviseringsdata",
+    "errorProcessNotification": "Det gick inte att behandla aviseringen. Försök igen.",
+    "errorProcessNotificationGeneral": "Det gick inte att behandla aviseringen. Försök igen.",
+    "errorProcessFriendRequest": "Det gick inte att behandla din vänförfrågan.",
+    "errorProcessRequest": "Det gick inte att behandla din begäran",
+    "errorSendMessage": "Det gick inte att skicka meddelandet"
+  },
+  "profile": {
+    "addFriend": "Lägg till som vän",
+    "addFriendQuestion": "Vill du lägga till {name} som vän?",
+    "sendMessage": "Skicka meddelande",
+    "loading": "Belastning...",
+    "basicInfo": "Grundläggande information",
+    "physicalData": "Fysiska data",
+    "country": "Land",
+    "position": "Placera",
+    "number": "Antal",
+    "grip": "grepp",
+    "birthDate": "Födelsedatum",
+    "Левый": "Vänster",
+    "Правый": "Rätt",
+    "Center": "Center framåt",
+    "Winger": "Ytter",
+    "Defender": "Försvarare",
+    "Goalie": "Målvakt",
+    "height": "Höjd",
+    "weight": "Vikt",
+    "age": "Åldras",
+    "team": "Team",
+    "status": "Status",
+    "player": "Spelare",
+    "coach": "Tränare",
+    "scout": "Spana",
+    "admin": "Teknisk support",
+    "star": "Stjärna",
+    "shop": "Hockeybutik",
+    "skateSharpening": "Skridskoslipning",
+    "organizationName": "Organisationsnamn",
+    "organizationNamePlaceholder": "Organisationsnamn",
+    "services": "Tjänster",
+    "notSpecified": "Ej specificerat",
+    "yearsOld": "år",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Vänster",
+    "right": "Rätt",
+    "center": "Center framåt",
+    "winger": "Ytter",
+    "defender": "Försvarare",
+    "goalie": "Målvakt",
+    "Left": "Vänster",
+    "Right": "Rätt",
+    "inHockey": "I hockey",
+    "lengthInCm": "Längd i cm",
+    "additional": "Dessutom",
+    "cancel": "Avboka",
+    "friends": "Vänner",
+    "friendship": "Vänskap",
+    "statistics": "Aktuell säsongsstatistik",
+    "teams": "Lag",
+    "currentTeams": "Aktuella lag",
+    "pastTeams": "Tidigare lag",
+    "teamInfo": "Teaminformation",
+    "videoMoments": "Videohöjdpunkter",
+    "standards": "Standarder",
+    "achievements": "Prestationer",
+    "noAchievements": "Inga prestationer",
+    "hockeyPhotos": "Hockey bilder",
+    "photos": "Bild",
+    "museum": "Museum",
+    "youAreFriendsWith": "är du vän med",
+    "addToFriends": "Lägg till som vän",
+    "addToFriendsToSeeStandards": "Lägg till {name} som vän för att se standarderna",
+    "addToFriendsToSeePhotos": "Lägg till {name} som vän för att se hockeyfoton",
+    "addToFriendsToSeeMuseum": "Lägg till {name} som vän för att se museet",
+    "removeFromFriends": "Ta bort från vänner",
+    "points": "Poäng",
+    "friendsCount": "vänner",
+    "friendsCountStats": "Vänner",
+    "seconds": "sek",
+    "times": "en gång",
+    "sprint": "100 meter streck",
+    "Центральный нападающий": "Center framåt",
+    "Крайний нападающий": "Ytter",
+    "Защитник": "Försvarare",
+    "Вратарь": "Målvakt",
+    "настоящее время": "nutid",
+    "goals": "Mål",
+    "assists": "Assist",
+    "games": "Matcher",
+    "pullUps": "Pull-ups",
+    "pushUps": "Armhävningar",
+    "plankTime": "planka (sek)",
+    "sprint100m": "100m (sek)",
+    "longJump": "Längdhopp",
+    "jumpRope": "Hopprep",
+    "goalsCount": "huvuden",
+    "gamesCount": "spel",
+    "belarus": "Belarus",
+    "usa": "USA",
+    "russia": "Ryssland",
+    "canada": "Kanada",
+    "finland": "Finland",
+    "sweden": "Sverige",
+    "czech": "Tjeckien",
+    "slovakia": "Slovakien",
+    "germany": "Tyskland",
+    "switzerland": "Schweiz",
+    "austria": "Österrike",
+    "norway": "Norge",
+    "denmark": "Danmark",
+    "latvia": "Lettland",
+    "lithuania": "Litauen",
+    "estonia": "Estland",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazakstan",
+    "squats": "Knäböj",
+    "plank": "Planka",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "I hockey med",
+    "noFriendsYet": "{name} har inga vänner än",
+    "beFirstToAdd": "Var den första att lägga till {name} som vän",
+    "writeMessage": "Skriv ett meddelande",
+    "edit": "Redigera",
+    "deleteUser": "Ta bort användare",
+    "noExercisesYet": "Spelaren har inte slutfört några övningar än.",
+    "noGiftsYet": "Inga gåvor mottagna ännu",
+    "editProfile": "Redigera profil",
+    "writeToSupport": "Skriv till teknisk support",
+    "noExercisesOwn": "Du har inte gjort några övningar än.",
+    "noExercisesOther": "Spelaren har inte genomfört några övningar ännu.",
+    "removedFromFriends": "{name} har tagits bort från vänner",
+    "removeFriendError": "Det går inte att ta bort från vänner",
+    "friendRequestSent": "Vänförfrågan har skickats",
+    "friendshipAccepted": "{name} har lagts till som vän",
+    "cancelRequest": "Avbryt begäran",
+    "friendRequestError": "Det gick inte att skicka vänförfrågan",
+    "friendRequestAcceptError": "Det gick inte att acceptera begäran",
+    "friendRequestCancelled": "Vänförfrågan avbröts",
+    "friendRequestCancelError": "Det gick inte att avbryta begäran",
+    "deleteUserConfirm": "Är du säker på att du vill ta bort användaren \"{{name}}\"? Denna åtgärd kan inte ångras.",
+    "userDeleted": "Användaren \"{{name}}\" har tagits bort",
+    "wantsToAddYouToFriends": "{{name}} vill lägga till dig som vän",
+    "friendRequestReceived": "{{name}} vill lägga till dig som vän",
+    "loadingProfile": "Laddar profil...",
+    "playerNotFound": "Spelaren hittades inte",
+    "addAchievement": "Lägg till en prestation",
+    "editAchievement": "Redigera prestation",
+    "competitionName": "Tävlingens namn",
+    "year": "År",
+    "place": "Plats",
+    "description": "Beskrivning (valfritt)",
+    "shopName": "Butiksnamn",
+    "address": "Adress",
+    "map": "Karta",
+    "workingHours": "Öppettider",
+    "discountForFriends": "Rabatt för vänner",
+    "hockeyShop": "Hockeybutik",
+    "nameHint": "Använd endast latinska bokstäver",
+    "photo": "Bild",
+    "selectPhoto": "Välj ett foto",
+    "logo": "Logotyp",
+    "selectLogo": "Välj en logotyp",
+    "selectCountry": "Välj ett land",
+    "searchCountry": "Sök efter ett land",
+    "errorEnterCompetition": "Ange namnet på tävlingen",
+    "errorEnterYear": "Ange ett giltigt år.",
+    "grips": {
+      "Левый": "Vänster",
+      "Правый": "Rätt"
+    },
+    "countries": {
+      "Канада": "Kanada",
+      "США": "USA",
+      "Россия": "Ryssland",
+      "Швеция": "Sverige",
+      "Финляндия": "Finland",
+      "Чехия": "Tjeckien",
+      "Словакия": "Slovakien",
+      "Швейцария": "Schweiz",
+      "Германия": "Tyskland",
+      "Австрия": "Österrike",
+      "Норвегия": "Norge",
+      "Дания": "Danmark",
+      "Латвия": "Lettland",
+      "Литва": "Litauen",
+      "Эстония": "Estland",
+      "Беларусь": "Belarus",
+      "Украина": "Ukraina",
+      "Польша": "Polen",
+      "Венгрия": "Ungern",
+      "Словения": "Slovenien",
+      "Хорватия": "Kroatien",
+      "Франция": "Frankrike",
+      "Италия": "Italien",
+      "Испания": "Spanien",
+      "Нидерланды": "Nederländerna",
+      "Бельгия": "Belgien",
+      "Великобритания": "Storbritannien",
+      "Исландия": "Island",
+      "Люксембург": "Luxemburg",
+      "Румыния": "Rumänien",
+      "Болгария": "Bulgarien",
+      "Сербия": "Serbien",
+      "Турция": "Turkiet",
+      "Казахстан": "Kazakstan",
+      "Узбекистан": "Uzbekistan",
+      "Китай": "Kina",
+      "Япония": "Japan",
+      "Южная Корея": "Sydkorea",
+      "Тайвань": "Taiwan",
+      "Гонконг": "Hong Kong",
+      "Сингапур": "Singapore",
+      "Малайзия": "Malaysia",
+      "Таиланд": "Thailand",
+      "Индия": "Indien",
+      "Объединенные Арабские Эмираты": "Förenade Arabemiraten",
+      "Израиль": "Israel",
+      "Австралия": "Australien",
+      "Новая Зеландия": "Nya Zeeland",
+      "Мексика": "Mexiko",
+      "ЮАР": "Sydafrika",
+      "Аргентина": "Argentina"
+    },
+    "positions": {
+      "center": "Center framåt",
+      "winger": "Ytter",
+      "defender": "Försvarare",
+      "goalie": "Målvakt",
+      "центральный нападающий": "mitt framåt",
+      "крайний нападающий": "ytter",
+      "защитник": "försvarare",
+      "вратарь": "målvakt",
+      "Центральный нападающий": "Center framåt",
+      "Крайний нападающий": "Ytter",
+      "Защитник": "Försvarare",
+      "Вратарь": "Målvakt"
+    },
+    "discountForFriendsHint": "Lägg till butiken som vän för att få rabatt! Visa rabatten för säljaren när du köper.",
+    "activityRating": "Aktivitetsbetyg",
+    "coachingYears": "Tränar år",
+    "individualTraining": "Individuell träning",
+    "hockeySkills": "Hockeyfärdigheter",
+    "skating": "Skridskoåkning",
+    "shooting": "Skott",
+    "fitness": "Fitness",
+    "goalieTraining": "Målvaktsträning",
+    "dryLand": "Torrträning",
+    "faceOffs": "Face-off övning",
+    "skateSharpeningService": "Skridskoslipning",
+    "skateForming": "Skridskoformning",
+    "skateProfiling": "Skridskoprofilering",
+    "equipmentRepair": "Hockeyutrustningsreparation",
+    "stickRepair": "Käppreparation",
+    "usedEquipmentSale": "Begagnad utrustning",
+    "newEquipmentSale": "Ny utrustning",
+    "phone": "Telefon",
+    "qrCodeTitle": "Profil QR-kod",
+    "qrCodeSubtitle": "Skanna för snabb åtkomst",
+    "qrCodeInfo": "Rikta telefonkameran mot QR-koden för att öppna profilen",
+    "shareProfile": "Dela profil",
+    "savedToGallery": "Sparat i galleriet",
+    "noPermission": "Ingen åtkomst till galleriet",
+    "shareError": "Fel vid skapande av bild",
+    "currentTeam": "Lag",
+    "hockeyExperience": "Hockeyerfarenhet",
+    "years": "år",
+    "currentSeasonStats": "Nuvarande säsongens statistik"
+  },
+  "register": {
+    "title": "Registrering",
+    "status": "Status",
+    "player": "Spelare",
+    "coach": "Tränare",
+    "scout": "Spana",
+    "star": "Stjärna",
+    "shop": "Hockeybutik",
+    "phone": "Telefon",
+    "name": "Namn",
+    "surname": "Efternamn",
+    "birthDate": "Födelsedatum",
+    "country": "Land",
+    "position": "Placera",
+    "grip": "Grepp",
+    "height": "Höjd (cm)",
+    "weight": "Vikt (kg)",
+    "number": "Antal",
+    "photo": "Bild",
+    "selectPhoto": "Välj ett foto",
+    "takePhoto": "Ta ett foto",
+    "chooseFromGallery": "Välj från galleriet",
+    "photoRequired": "Ett foto krävs",
+    "register": "Register",
+    "back": "Tillbaka",
+    "welcome": "Välkomna!",
+    "registrationSuccess": "Registreringen slutförd framgångsrikt! Välkommen till HockeyStars!",
+    "selectDate": "Välj datum",
+    "cancel": "Avboka",
+    "confirm": "Bekräfta",
+    "photoError": "Fel vid uppladdning av foto"
+  },
+  "navigation": {
+    "home": "Hem",
+    "search": "Söka",
+    "messages": "Meddelanden",
+    "notifications": "Händelser",
+    "profile": "Profil"
+  },
+  "admin": {
+    "accessDenied": "Åtkomst nekad",
+    "onlyAdmins": "Endast administratörer kan använda den här funktionen.",
+    "error": "Fel",
+    "errorLoadingProfile": "Det gick inte att komma åt profilen",
+    "player": "Spelare",
+    "coach": "Tränare",
+    "scout": "Spana",
+    "admin": "Administration",
+    "star": "Stjärna",
+    "shop": "Hockeybutik",
+    "noName": "Inget namn",
+    "noPosition": "Ej specificerat",
+    "noTeam": "Ej specificerat",
+    "sendGift": "Skicka gåva",
+    "yearsOld": "år",
+    "addUser": "Lägg till användare",
+    "searchPlayers": "Söker efter spelare...",
+    "createUser": "Skapa en användare",
+    "basicInfo": "Grundläggande information",
+    "name": "Namn",
+    "phone": "Telefonnummer",
+    "status": "Status",
+    "position": "Placera",
+    "number": "Spelarnummer",
+    "grip": "Grepp",
+    "height": "Höjd (cm)",
+    "weight": "Vikt (kg)",
+    "country": "Land",
+    "create": "Skapa",
+    "success": "Framgång",
+    "userCreated": "Användaren {{name}} har skapats",
+    "errorCreatingUser": "Det gick inte att skapa användare",
+    "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält.",
+    "enterValidPhone": "Ange ett giltigt telefonnummer med landskod.",
+    "requiredForPlayers": "För spelare och stjärnor är det obligatoriskt att ange födelsedatum och position"
+  },
+  "museum": {
+    "title": "Museum",
+    "noItems": "Museet är fortfarande tomt."
+  },
+  "teams": {
+    "Система": "System",
+    "Привет": "Hej",
+    "Пираньи": "Piranhas",
+    "Динамо Минск": "Dynamo Minsk",
+    "Динамо-Минск": "Dynamo Minsk",
+    "Юность-Минск": "Yunost-Minsk",
+    "Юность": "Ungdom",
+    "Неман": "Neman",
+    "Гомель": "Gomel",
+    "Брест": "Brest",
+    "Витебск": "Vitebsk",
+    "Львы": "Lions",
+    "Керамин": "Keramin",
+    "Могилев": "Mogilev",
+    "Гродно": "Grodno",
+    "Сборная Беларуси": "Det vitryska landslaget",
+    "Сборная Минской области": "Minsk Region Team",
+    "Сборная Гомельской области": "Gomel Region Team",
+    "Сборная Брестской области": "Brest Region Team",
+    "Сборная Витебской области": "Vitebsk Region Team",
+    "Сборная Могилевской области": "Mogilev Region Team",
+    "Сборная Гродненской области": "Grodno Region Team",
+    "ХК Минск": "HC Minsk",
+    "ХК Гомель": "HC Gomel",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogilev",
+    "ХК Гродно": "HC Grodno",
+    "Динамо": "Dynamo",
+    "Спартак": "Spartacus",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Yulaev",
+    "Ак Барс": "Ak Bars",
+    "Металлург": "Metallurg",
+    "Трактор": "Traktor",
+    "Авангард": "Avantgarde",
+    "Сибирь": "Sibirien",
+    "Амур": "Amur",
+    "Адмирал": "Amiral",
+    "Локомотив": "Lokomotiv",
+    "Северсталь": "Severstal",
+    "Витязь": "Riddare",
+    "Сочи": "Sochi",
+    "Торпедо": "Torped",
+    "Нефтехимик": "petrokemist",
+    "Автомобилист": "Bilist",
+    "Югра": "Yugra",
+    "Барыс": "Barys",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Dinamo Riga",
+    "Динамо Москва": "Dynamo Moskva",
+    "Динамо Минск U20": "Dynamo Minsk U20",
+    "Динамо Минск U18": "Dynamo Minsk U18",
+    "Calgary Flames": "Calgary Flames",
+    "New Jersey Devils": "New Jersey Devils",
+    "Юность-Минск U20": "Yunost-Minsk U20",
+    "Юность-Минск U18": "Yunost-Minsk U18",
+    "teams": {
+      "Сборная Беларуси": "Det vitryska landslaget",
+      "Динамо Минск": "Dinamo Minsk",
+      "Юность-Минск": "Yunost-Minsk",
+      "Пираньи": "Piranhas",
+      "Сборная Минской области": "Minsk Region Team",
+      "Сборная Беларуси U14": "Vitrysslands U14-landslag",
+      "Пчелки": "Bin",
+      "Беларусь U14": "Vitrysslands U14-landslag",
+      "Минская область": "Minsk Region Team",
+      "New Jersey Devils": "New Jersey Devils",
+      "Calgary Flames": "Calgary Flames",
+      "Boston Hockey Club": "Boston Hockey Club",
+      "Belarus U14 National Team": "Vitrysslands U14-landslag",
+      "Belarus National Team U14": "Vitrysslands U14-landslag",
+      "Minsk Region Team": "Minsk Region Team",
+      "Piranhas": "Piranhas",
+      "Bees": "Bin",
+      "Toronto Maple Leafs": "Toronto Maple Leafs",
+      "Montreal Canadiens": "Montreal Canadiens",
+      "Vancouver Canucks": "Vancouver Canucks",
+      "Edmonton Oilers": "Edmonton Oilers",
+      "Winnipeg Jets": "Winnipeg Jets",
+      "Ottawa Senators": "Ottawa senatorer",
+      "New York Rangers": "New York Rangers",
+      "Boston Bruins": "Boston Bruins",
+      "Chicago Blackhawks": "Chicago Blackhawks",
+      "Detroit Red Wings": "Detroit Red Wings",
+      "Pittsburgh Penguins": "Pittsburgh Penguins",
+      "Washington Capitals": "Washington huvudstäder",
+      "Tampa Bay Lightning": "Tampa Bay Lightning",
+      "Colorado Avalanche": "Colorado Avalanche",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kaunas",
+      "Vilnius": "Vilnius",
+      "Klaipeda": "Klaipeda",
+      "Riga": "Riga",
+      "Daugavpils": "Daugavpils",
+      "Liepaja": "Liepaja",
+      "Cracovia": "Cracovia",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "ryska landslaget",
+      "Сборная Канады": "Team Kanada",
+      "Сборная США": "Team USA",
+      "Сборная Финляндии": "Finlands landslag",
+      "Сборная Швеции": "Sveriges landslag",
+      "Сборная Беларуси U20": "Vitrysslands U20-landslag",
+      "Сборная Беларуси U18": "Vitrysslands U18-landslag",
+      "Динамо Минск U20": "Dinamo Minsk U20",
+      "Динамо Минск U18": "Dinamo Minsk U18",
+      "Юность-Минск U20": "Yunost-Minsk U20",
+      "Юность-Минск U18": "Yunost-Minsk U18",
+      "ШРС": "SRS",
+      "Динамо-Молодечно": "Dynamo-Molodechno",
+      "Динамо Р": "Dynamo R",
+      "Слован": "Slovan",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranovichi",
+      "Шахтер": "Shakhtyor",
+      "Лида": "Lida",
+      "Пинск": "Pinsk",
+      "Ивацевичи": "Ivatsevichi",
+      "Береза": "Björk",
+      "Кобрин": "Kobrin",
+      "Химик": "Khimik",
+      "Жлобин": "Zhlobin",
+      "Бобруйск": "Bobruisk",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "RB-landslaget",
+      "Сборная Минска": "Minsk laget",
+      "ЦСКА Москва": "CSKA Moskva",
+      "Спартак Москва": "Spartak Moskva",
+      "Локомотив Ярославль": "Lokomotiv Yaroslavl",
+      "Ак Барс Казань": "Ak Bars Kazan",
+      "Трактор Челябинск": "Traktor Chelyabinsk",
+      "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+      "Торпедо Нижний Новгород": "Torped Nizjnij Novgorod"
+    },
+    "Сборная Беларуси U14": "Vitrysslands U14-landslag",
+    "Барановичи": "Baranovichi",
+    "Шахтер": "Gruvarbetare",
+    "Лида": "Lida",
+    "Пинск": "Pinsk",
+    "Ивацевичи": "Ivatsevichi",
+    "Береза": "Björk",
+    "Кобрин": "Kobrin",
+    "Химик": "Kemist",
+    "Жлобин": "Zhlobin",
+    "Бобруйск": "Bobruisk",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "RB-landslaget",
+    "Сборная Минска": "Minsk laget",
+    "ЦСКА Москва": "CSKA Moskva",
+    "Спартак Москва": "Spartak Moskva",
+    "Локомотив Ярославль": "Lokomotiv Yaroslavl",
+    "Ак Барс Казань": "Ak Bars Kazan",
+    "Трактор Челябинск": "Traktor Chelyabinsk",
+    "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+    "Торпедо Нижний Новгород": "Torped Nizjnij Novgorod",
+    "Boston Hockey Club": "Boston Hockey Club",
+    "Пчелки": "Bin",
+    "Center": "Center framåt",
+    "Winger": "Kant",
+    "Defender": "Försvarare",
+    "Goalie": "Målvakt"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "language": "Språk",
+    "selectLanguage": "Välj språk",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Söka",
+    "loading": "Laddar sökning...",
+    "placeholder": "Söker efter spelare...",
+    "country": "Land",
+    "grip": "Grepp",
+    "position": "Placera",
+    "year": "År",
+    "height": "Höjd",
+    "heightFrom": "Höjd från",
+    "weight": "Vikt",
+    "weightFrom": "Vikt från",
+    "all": "Alla",
+    "noPlayersFound": "Inga spelare hittades",
+    "left": "Vänster",
+    "right": "Rätt"
+  },
+  "messages": {
+    "title": "Meddelanden",
+    "loading": "Laddar chattar...",
+    "noMessages": "Inga meddelanden",
+    "startConversation": "Börja chatta med andra spelare",
+    "error": "Fel",
+    "errorLoadingChats": "Det gick inte att läsa in chattar",
+    "yesterday": "I går",
+    "you": "Du:"
+  },
+  "notifications": {
+    "title": "Händelser",
+    "loading": "Läser in händelser...",
+    "noNotifications": "Inga händelser",
+    "noNotificationsSubtitle": "Du har inga händelser om vänskap, gåvor eller andra åtgärder än.",
+    "accept": "Acceptera",
+    "decline": "Avvisa",
+    "friendRequests": "Vänförfrågningar",
+    "friendRequest": "vänförfrågan",
+    "wantsToAddYou": "{name} vill lägga till dig som vän",
+    "wantsToAddAsFriend": "vill lägga till dig som vän",
+    "friendRequestAccepted": "Vänförfrågan accepterad!",
+    "friendRequestDeclined": "Vänförfrågan avvisades",
+    "giftRequest": "Gåva begäran",
+    "giftRequestMessage": "{playerName} begär {itemType}",
+    "giftRequestApproved": "Begäran godkänd",
+    "giftRequestApprovedMessage": "{starName} godkände din begäran om {itemType}",
+    "giftRequestAccepted": "Gåva begäran accepterad!",
+    "giftRequestRejected": "Gåva begäran avvisad",
+    "player": "Spelare",
+    "unknownPlayer": "Okänd spelare",
+    "star": "Stjärna"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Välj en fotokälla",
+    "selectPhotoMessage": "Var vill du ladda upp ett foto från?",
+    "gallery": "Galleri",
+    "camera": "Kamera",
+    "cancel": "Avboka",
+    "save": "Spara",
+    "name": "Namn",
+    "namePlaceholder": "Spelarens namn",
+    "country": "Land",
+    "position": "Placera",
+    "height": "Höjd (cm)",
+    "heightPlaceholder": "Höjd",
+    "weight": "Vikt (kg)",
+    "weightPlaceholder": "Vikt",
+    "number": "Antal",
+    "grip": "Grepp",
+    "birthDate": "Födelsedatum",
+    "socialLinks": "Sociala medier",
+    "Левый": "Vänster"
+  },
+  "exercisesSection": {
+    "title": "Övningar genomförda",
+    "loading": "Belastning...",
+    "noExercises": "Du har inte gjort några övningar än.",
+    "noExercisesOwn": "Du har inte gjort några övningar än.",
+    "noExercisesOther": "Användaren har inte slutfört några övningar ännu.",
+    "times": "en gång",
+    "timesPlural": "gånger"
+  },
+  "home": {
+    "loadingPlayers": "Isbanerenovering...",
+    "noPlayersCountry": "Inga spelare från {{country}}",
+    "noPlayersYear": "Det finns inga spelare födda i {{year}}",
+    "noPlayersCountryYear": "Inga spelare från {{country}} i {{year}}",
+    "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren.",
+    "waitingForConnection": "Väntar på anslutning",
+    "checkInternetConnection": "Kontrollera din internetanslutning"
+  },
+  "filters": {
+    "year": "år",
+    "yearDefault": "2012"
+  },
+  "chat": {
+    "loading": "Laddar chatt...",
+    "startConversation": "Starta en konversation med {name}",
+    "enterMessage": "Skriv ditt meddelande...",
+    "player": "Spelare",
+    "coach": "Tränare",
+    "scout": "Spana",
+    "admin": "Teknisk support",
+    "star": "Stjärna",
+    "shop": "Hockeybutik",
+    "error": "Fel",
+    "errorLoadingChat": "Det gick inte att läsa in chattdata",
+    "errorSendingMessage": "Det gick inte att skicka meddelandet"
+  },
+  "createUser": {
+    "title": "Skapa en användare",
+    "selectPhotoSource": "Välj en fotokälla",
+    "selectPhotoMessage": "Var vill du ladda upp ett foto från?",
+    "gallery": "Galleri",
+    "camera": "Kamera",
+    "cancel": "Avboka",
+    "permissionError": "Tillstånd krävs för att komma åt galleriet.",
+    "permissionErrorCamera": "Tillstånd krävs för att komma åt kameran.",
+    "errorLoadingPhoto": "Det gick inte att ladda foto från galleriet",
+    "errorTakingPhoto": "Det gick inte att ta foto",
+    "addPhoto": "Lägg till ett foto",
+    "status": "Status",
+    "player": "Spelare",
+    "coach": "Tränare",
+    "scout": "Spana",
+    "star": "Stjärna",
+    "shop": "Hockeybutik",
+    "phone": "Telefonnummer",
+    "name": "För- och efternamn",
+    "namePlaceholder": "ANGE NAMN",
+    "nameHint": "Endast latinska bokstäver (A-Z)",
+    "birthDate": "Födelsedatum",
+    "selectBirthDate": "Välj ditt födelsedatum",
+    "position": "Placera",
+    "number": "Spelarnummer",
+    "numberPlaceholder": "Nummer på uniformen",
+    "grip": "Grepp",
+    "height": "Höjd (cm)",
+    "heightPlaceholder": "Höjd",
+    "weight": "Vikt (kg)",
+    "weightPlaceholder": "Vikt",
+    "country": "Land",
+    "selectCountry": "Välj ett land",
+    "searchCountry": "Söker efter land...",
+    "close": "Nära",
+    "create": "Skapa",
+    "error": "Fel",
+    "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält.",
+    "enterValidPhone": "Ange ett giltigt telefonnummer med landskod.",
+    "requiredForPlayers": "För spelare och stjärnor är det obligatoriskt att ange födelsedatum och position",
+    "success": "Framgång",
+    "userCreated": "Användaren {{name}} har skapats",
+    "errorCreatingUser": "Det gick inte att skapa användare"
+  },
+  "exerciseDetails": {
+    "back": "Tillbaka",
+    "complete": "Utföra",
+    "completed": "Avslutad",
+    "times": "en gång",
+    "timesPlural": "gånger",
+    "duration": "Varaktighet",
+    "difficulty": "Komplexitet",
+    "equipment": "Utrustning",
+    "calories": "Kalorier",
+    "benefits": "Förmån",
+    "instructions": "Instruktioner",
+    "tips": "Råd",
+    "beginner": "Början",
+    "intermediate": "Genomsnitt",
+    "advanced": "Avancerad",
+    "error": "Fel",
+    "errorCompleting": "Det gick inte att slutföra övningen",
+    "success": "Framgång",
+    "exerciseCompleted": "Övningen avklarad!"
+  },
+  "gifts": {
+    "requestGift": "Begär en gåva",
+    "gifts": "Presentera",
+    "autograph": "Autograf",
+    "stick": "Stick",
+    "puck": "Bricka",
+    "jersey": "Jersey",
+    "pleaseWriteMessage": "Skriv ett meddelande till din förfrågan",
+    "invalidGift": "olämplig gåva",
+    "deleteGiftQuestion": "Ta bort present?",
+    "from": "från",
+    "noGiftsYet": "Inga gåvor från stjärnorna än",
+    "museum": "Museum för gåvor",
+    "myGifts": "Mina presenter",
+    "noGiftsSubtext": "Ladda upp din första present för att dela med spelare",
+    "successDeleted": "Present borttagen",
+    "errorDelete": "Kunde inte ta bort present",
+    "noImage": "ingen bild",
+    "failedToSendRequest": "Det gick inte att skicka begäran",
+    "requestSent": "Förfrågan har skickats!",
+    "requestSentMessage": "Din begäran om {itemType} har skickats. Vänligen invänta ett svar.",
+    "requestItem": "Begär {itemType}",
+    "requestMessage": "Meddelande till begäran",
+    "selectGiftType": "Välj typ av gåva",
+    "selectGiftTypeMessage": "Vilken typ av present vill du skapa?",
+    "requestMessageHelper": "Skriv ett artigt meddelande och förklara varför du vill ta emot denna gåva.",
+    "requestMessagePlaceholder": "Till exempel: Hej! Jag är ett stort fan av ditt spel och skulle vilja ha en autograf till min samling...",
+    "characters": "symboler",
+    "sending": "Sändning...",
+    "sendRequest": "Skicka en förfrågan",
+    "requestInfo": "Efter att ha skickat in din begäran kommer stjärnan att få ett meddelande och kommer att kunna acceptera eller avslå din begäran. Om den accepteras kommer gåvan att synas i ditt Gåvomuseum.",
+    "failedToLoadItems": "Det gick inte att läsa in objekt",
+    "noPermissionToUpload": "Du har inte behörighet att ladda upp objekt för en annan användare.",
+    "failedToGetImageUri": "Det gick inte att hämta bild-URI",
+    "failedToSelectImage": "Det gick inte att välja bild",
+    "emptyImageUri": "Bildens URI är tom.",
+    "formDataUploadError": "Fel vid uppladdning via FormData",
+    "imageUploadError": "Det gick inte att läsa in bilden: {error}",
+    "itemUploadedSuccessfully": "{itemType} har lästs in!",
+    "failedToUploadItem": "Det gick inte att läsa in objektet",
+    "userNotAuthorized": "Användaren är inte auktoriserad",
+    "noPermissionToEdit": "Du har inte behörighet att redigera objekt för en annan användare.",
+    "itemNotFound": "Gåvan hittades inte",
+    "failedToUploadNewImage": "Det gick inte att ladda ny bild",
+    "emptyImage": "Bilden är tom (0 byte)",
+    "failedToUpdateDatabase": "Fel vid uppdatering av databaspost",
+    "itemImageUpdated": "Presentbild uppdaterad!",
+    "failedToUpdateItemImage": "Det gick inte att uppdatera presentbilden",
+    "allGiftsAdded": "Alla gåvor har lagts till.",
+    "allGiftTypesAdded": "Du har redan alla typer av presenter",
+    "addGift": "Lägg till en gåva",
+    "deletion": "Borttagning",
+    "itemDeleted": "Gåvan borttagen",
+    "failedToDeleteItem": "Det gick inte att ta bort gåvan",
+    "noGifts": "Inga presenter ännu",
+    "clickPlusToAdd": "Klicka på + för att lägga till",
+    "настоящее время": "nutid",
+    "Центральный нападающий": "Center framåt",
+    "Крайний нападающий": "Ytter",
+    "Защитник": "Försvarare",
+    "Вратарь": "Målvakt",
+    "Center": "Center framåt",
+    "Winger": "Kant",
+    "Defender": "Försvarare",
+    "Goalie": "Målvakt",
+    "Left": "Vänster",
+    "Right": "Rätt",
+    "seconds": "sek",
+    "times": "en gång",
+    "sprint": "100 meter streck",
+    "_cache_clear": "2024-01-16-9",
+    "sendGiftTo": "Skicka present till {playerName}",
+    "selectExistingGift": "Välj befintlig present",
+    "orCreateNew": "Eller skapa ny",
+    "giftName": "Presentnamn",
+    "giftNamePlaceholder": "t.ex. Signerad mössa",
+    "uploadImage": "Ladda upp bild",
+    "send": "Skicka",
+    "selectGift": "Välj present",
+    "fromAdmin": "Administratör",
+    "errorSelectOrCreate": "Välj en present eller skapa en ny",
+    "errorGiftAlreadyExists": "Denna present finns redan för spelare {playerName}.\n\nVälj en annan present eller skapa en ny.",
+    "successGiftSent": "Present skickad till {playerName}!",
+    "errorSendingGift": "Kunde inte skicka present",
+    "deleteGiftConfirm": "Är du säker på att du vill ta bort denna present?",
+    "selectImage": "Välj bild",
+    "errorPermissionDenied": "Du har inte behörighet att ta bort denna present",
+    "errorGiftNotFound": "Present hittades inte",
+    "errorGiftNotDeleted": "Presenten togs inte bort",
+    "noGiftsUploaded": "Inga gåvor uppladdade ännu",
+    "fromStar": "från {starName}",
+    "giftReceived": "Present mottagen!",
+    "giftReceivedFromAdmin": "Du har fått en present från administratören: {giftName}",
+    "giftReceivedFromStar": "Du har fått en present från {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Present mottagen!",
+    "giftReceivedFromAdminPush": "Du har fått en present från administratören: {giftName}",
+    "giftReceivedFromStarPush": "Du har fått en present från {starName}: {giftName}"
+  },
+  "TEMP_DELETE_ME": {
+    "title": "Standarder",
+    "noNormatives": "Standarder har inte lagts till ännu.",
+    "russia": "Ryssland",
+    "canada": "Kanada",
+    "finland": "Finland",
+    "sweden": "Sverige",
+    "czech": "Tjeckien",
+    "slovakia": "Slovakien",
+    "germany": "Tyskland",
+    "switzerland": "Schweiz",
+    "austria": "Österrike",
+    "norway": "Norge",
+    "denmark": "Danmark",
+    "latvia": "Lettland",
+    "lithuania": "Litauen",
+    "estonia": "Estland",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazakstan",
+    "беларусь": "Belarus",
+    "россия": "Ryssland",
+    "сша": "USA",
+    "канада": "Kanada",
+    "финляндия": "Finland",
+    "швеция": "Sverige",
+    "чехия": "Tjeckien",
+    "словакия": "Slovakien",
+    "германия": "Tyskland",
+    "швейцария": "Schweiz",
+    "австрия": "Österrike",
+    "норвегия": "Norge",
+    "дания": "Danmark",
+    "латвия": "Lettland",
+    "литва": "Litauen",
+    "эстония": "Estland",
+    "украина": "Ukraina",
+    "казахстан": "Kazakstan",
+    "польша": "Polen",
+    "венгрия": "Ungern",
+    "словения": "Slovenien",
+    "хорватия": "Kroatien",
+    "франция": "Frankrike",
+    "италия": "Italien",
+    "испания": "Spanien",
+    "нидерланды": "Nederländerna",
+    "бельгия": "Belgien",
+    "великобритания": "Storbritannien",
+    "исландия": "Island",
+    "люксембург": "Luxemburg",
+    "румыния": "Rumänien",
+    "болгария": "Bulgarien",
+    "сербия": "Serbien",
+    "турция": "Turkiet",
+    "узбекистан": "Uzbekistan",
+    "китай": "Kina",
+    "япония": "Japan",
+    "южнаякорея": "Sydkorea",
+    "тайвань": "Taiwan",
+    "гонконг": "Hong Kong",
+    "сингапур": "Singapore",
+    "малайзия": "Malaysia",
+    "таиланд": "Thailand",
+    "индия": "Indien",
+    "объединенныеарабскиеэмираты": "Förenade Arabemiraten",
+    "израиль": "Israel",
+    "австралия": "Australien",
+    "новаязеландия": "Nya Zeeland",
+    "мексика": "Mexiko",
+    "юар": "Sydafrika",
+    "аргентина": "Argentina"
+  },
+  "normatives": {
+    "title": "Standarder",
+    "noNormatives": "Standarder har inte lagts till ännu.",
+    "addNormative": "Lägg till en standard",
+    "name": "Namn",
+    "description": "Beskrivning",
+    "type": "Typ",
+    "value": "Menande",
+    "unit": "Måttenhet",
+    "add": "Tillägga",
+    "cancel": "Avboka",
+    "save": "Spara",
+    "edit": "Redigera",
+    "delete": "Radera",
+    "back": "Tillbaka",
+    "editNormative": "Redigera standarden",
+    "deleteNormativeConfirm": "Är du säker på att du vill ta bort förordningen \"{{name}}\"? Denna åtgärd kan inte ångras.",
+    "normativeDeleted": "Standarden \"{{name}}\" har tagits bort",
+    "normativeCreated": "Standard \"{{name}}\" skapades",
+    "errorCreatingNormative": "Det gick inte att skapa standard",
+    "errorDeletingNormative": "Det gick inte att ta bort standarden",
+    "errorEditingNormative": "Det gick inte att redigera standarden",
+    "errorLoadingNormatives": "Det gick inte att ladda standarder",
+    "normativeUpdated": "Standarden \"{{name}}\" har uppdaterats",
+    "errorUpdatingNormative": "Det gick inte att uppdatera standarden"
+  },
+  "socialLinks": {
+    "website": "Webbplats",
+    "error": "Fel",
+    "cannotOpenLink": "Det går inte att öppna länken till {plattform}",
+    "openError": "Det gick inte att öppna länken",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "vk": "VK",
+    "enterInstagram": "Gå in på Instagram",
+    "enterTiktok": "Ange TikTok",
+    "enterVk": "Ange VK",
+    "enterWebsite": "Gå in på webbplatsen",
+    "instagramPlaceholder": "@användarnamn eller länk",
+    "tiktokPlaceholder": "@användarnamn eller länk",
+    "vkPlaceholder": "@användarnamn eller länk",
+    "websitePlaceholder": "exempel.com"
+  },
+  "logout": "Utgång",
+  "logoutConfirm": "Logga ut från din profil",
+  "logoutConfirmMessage": "Är du säker på att du vill logga ut från din profil?",
+  "adminGifts": {
+    "sendGift": "Skicka present",
+    "giftName": "Presentens namn",
+    "selectImage": "Välj bild"
+  },
+  "videoNotification": {
+    "added": "lade till",
+    "oneVideo": "ny video",
+    "multipleVideos": "{count} nya videor",
+    "video": "video",
+    "videos": "videor"
+  },
+  "achievementNotification": {
+    "added": "lade till",
+    "received": "fick",
+    "oneAchievement": "ny prestation",
+    "multipleAchievements": "{count} nya prestationer",
+    "achievement": "prestation",
+    "achievements": "prestationer",
+    "title": "🏆 Prestation!",
+    "message": "Grattis! Du fick prestationen: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "ändrade sin avatar"
+  },
+  "statsNotification": {
+    "updated": "uppdaterade",
+    "stats": "statistik",
+    "normatives": "normer",
+    "physicalData": "fysiska data"
+  },
+  "height": "längd",
+  "weight": "vikt",
+  "cm": "cm",
+  "kg": "kg"
+}

@@ -1,0 +1,2481 @@
+{
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "edit": "Modificare",
+    "delete": "Elimina",
+    "add": "Aggiungere",
+    "close": "Vicino",
+    "back": "Indietro",
+    "next": "Prossimo",
+    "done": "Pronto",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "yes": "SÌ",
+    "no": "NO",
+    "ok": "OK",
+    "confirm": "Confermare",
+    "deleteConfirm": "Rimozione",
+    "deletePhotoConfirm": "Sei sicuro di voler eliminare questa foto?",
+    "deleteTeamConfirm": "Sei sicuro di voler eliminare questo comando?",
+    "deletePastTeamConfirm": "Vuoi davvero rimuovere questo comando dalla cronologia?",
+    "deleteAchievementConfirm": "Sei sicuro di voler rimuovere questo risultato?",
+    "deleteAllNotificationsConfirm": "Vuoi davvero cancellare tutte le notifiche?",
+    "rejectRequestConfirm": "Sei sicuro di voler rifiutare questa richiesta?",
+    "super": "Super!",
+    "retry": "Riprova",
+    "goalie": "Portiere"
+  },
+  "winger": "Ala",
+  "center": "Centravanti",
+  "defender": "Difensore",
+  "goals": "Obiettivi",
+  "assists": "Trasmissioni",
+  "games": "Giochi",
+  "pullUps": "Trazioni alla sbarra",
+  "pushUps": "Sollevamento",
+  "plankTime": "Plank (sec)",
+  "sprint100m": "100 m (secondo)",
+  "longJump": "Salto in lungo (m)",
+  "jumpRope": "Salta la corda (una)",
+  "justNow": "proprio adesso",
+  "minutesAgo": "{minutes} minuti fa",
+  "hoursAgo": "{hours} ore fa",
+  "daysAgo": "{days} giorni fa",
+  "photoNotification": {
+    "added": "aggiunto",
+    "onePhoto": "nuova foto",
+    "multiplePhotos": "{count} nuove foto",
+    "photo": "foto",
+    "photos": "foto"
+  },
+  "friendshipNotification": {
+    "title": "Nuova amicizia",
+    "message": "{friend1Name} e {friend2Name} sono diventati amici",
+    "became": "sono diventati amici"
+  },
+  "exerciseNotification": {
+    "title": "Esercizio completato",
+    "message": "{playerName} ha completato l'esercizio \"{exerciseName}\"",
+    "completed": "completato l'esercizio",
+    "exercise": "Esercizio"
+  },
+  "giftNotification": {
+    "title": "Un regalo da una stella",
+    "message": "{playerName} ha ricevuto {giftName} da {starName}",
+    "received": "ricevuto",
+    "from": "da",
+    "gift": "Regalo"
+  },
+  "addPhoto": "Aggiungi una foto",
+  "selectPhotoSource": "Seleziona la fonte della foto",
+  "gallery": "Galleria",
+  "camera": "Telecamera",
+  "cancel": "Cancellare",
+  "error": "Errore",
+  "maxPhotosReached": "Numero massimo di foto: 50",
+  "galleryPermissionRequired": "Per accedere alla galleria è necessario il permesso.",
+  "galleryError": "Impossibile caricare la foto dalla galleria.",
+  "cameraNotSupported": "La versione web non supporta lo scatto di foto. Si prega di utilizzare la galleria.",
+  "cameraPermissionRequired": "Per accedere alla telecamera è necessaria l'autorizzazione.",
+  "cameraError": "Impossibile scattare la foto.",
+  "noPhotos": "Nessuna foto",
+  "clickToAddPhoto": "Fai clic su \"Aggiungi foto\" per iniziare.",
+  "maxPhotos": "Massimo 50 foto",
+  "uploading": "Caricamento...",
+  "uploadingPhotos": "Caricamento di {count} foto... {progress}%",
+  "info": "Informazioni",
+  "addVideoLink": "Aggiungi un collegamento a YouTube o VK e l'ora del momento (formato: minuti:secondi, ad esempio: 1:25)",
+  "supportedPlatforms": "Siti supportati: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... o vk.com/video...",
+  "timeCodePlaceholder": "min:sec",
+  "myMoment": "Il mio momento",
+  "belarus": "Bielorussia",
+  "additional": "Inoltre",
+  "left": "Sinistra",
+  "right": "Giusto",
+  "birthDatePlaceholder": "MM.AAAA (ad esempio: 12.2014)",
+  "countPlaceholder": "Numero di volte",
+  "timePlaceholder": "Tempo in secondi",
+  "deleteUser": "Eliminazione di un utente",
+  "success": "Con successo",
+  "selectTeams": "Seleziona le squadre",
+  "enterTeamName": "Inserisci il nome della squadra",
+  "enterStartYear": "Inserisci un anno di inizio valido",
+  "enterEndYear": "Inserisci un anno di fine valido.",
+  "createTeamError": "Impossibile creare il comando nel database",
+  "addTeam": "Aggiungi un comando",
+  "teamName": "Nome della squadra *",
+  "teamCountry": "Paese (facoltativo)",
+  "teamCity": "Città (facoltativo)",
+  "startYear": "Anno di inizio *",
+  "endYear": "Anno di laurea (facoltativo)",
+  "searchTeams": "Alla ricerca di una squadra...",
+  "save": "Salva",
+  "add": "Aggiungere",
+  "editTeam": "Modifica squadra",
+  "noTeamsFound": "Nessun comando trovato",
+  "searching": "Ricerca...",
+  "noCurrentTeams": "Non ci sono comandi correnti.",
+  "addMoreVideo": "Aggiungi altri video",
+  "noPastTeams": "Nessun comando passato",
+  "noVideosAdded": "Nessun video aggiunto",
+  "noTeamsSpecified": "Nessun comando specificato",
+  "selectCountry": "Seleziona un paese",
+  "selectPosition": "Seleziona una posizione",
+  "basicInfo": "Informazioni di base",
+  "dateFormat": "GG.MM.AAAA",
+  "noPermission": "Non hai l'autorizzazione per modificare questo profilo.",
+  "playerUpdated": "Dati aggiornati",
+  "saveError": "Impossibile salvare i dati",
+  "achievements": {
+    "firstPlace": "1° posto",
+    "secondPlace": "2° posto",
+    "thirdPlace": "3° posto",
+    "place": "{luogo} luogo",
+    "noAchievements": "Nessun risultato"
+  },
+  "exercises": {
+    "exerciseNumber": "Esercizio n. {id}",
+    "title": "Esercizi",
+    "subtitle": "Seleziona un allenamento",
+    "searchPlaceholder": "Cerca per numero o nome...",
+    "loadingExercise": "Caricamento esercizio in corso...",
+    "loadingExercises": "Caricamento degli esercizi...",
+    "exercise": "Esercizio",
+    "alreadyCompleted": "L'esercizio è già stato completato",
+    "canRetryIn": "Puoi ripetere questo esercizio tra {ore} ore",
+    "all": "Tutto",
+    "completed": "Completato",
+    "times": "una volta",
+    "loading": "Caricamento...",
+    "categories": {
+      "Выносливость": "Resistenza",
+      "Взрывная скорость": "Velocità esplosiva",
+      "Разминка": "Riscaldamento",
+      "Растяжка": "Allungamento",
+      "Ловкость": "Destrezza",
+      "Сила": "Forza",
+      "Баланс": "Bilancia",
+      "Скоростная выносливость": "Resistenza alla velocità",
+      "Восстановление": "Recupero",
+      "Endurance": "Resistenza",
+      "Explosive Speed": "Velocità esplosiva",
+      "Warm-up": "Riscaldamento",
+      "Stretching": "Stretching",
+      "Agility": "Agilità",
+      "Strength": "Forza",
+      "Balance": "Equilibrio",
+      "Speed Endurance": "Resistenza alla velocità",
+      "Recovery": "Recupero"
+    },
+    "details": {
+      "category": "Categoria",
+      "duration": "Durata",
+      "difficulty": "Complessità",
+      "description": "Descrizione",
+      "benefits": "Benefici dell'esercizio fisico",
+      "instructions": "Istruzioni passo passo",
+      "tips": "Consigli utili",
+      "equipment": "Attrezzatura",
+      "calories": "Calorie",
+      "additionalInfo": "Informazioni aggiuntive",
+      "completed": "Completato:",
+      "completedButton": "L'ho fatto",
+      "alreadyCompleted": "Già completato",
+      "saving": "Risparmio...",
+      "notFound": "Esercizio non trovato",
+      "unavailable": "Non disponibile",
+      "playersOnly": "Gli esercizi sono disponibili solo per i giocatori",
+      "markedComplete": "L'esercizio è contrassegnato come completato",
+      "error": "Errore",
+      "saveError": "Impossibile contrassegnare l'esercizio come completato",
+      "generalError": "Si è verificato un errore durante il salvataggio",
+      "times": "una volta",
+      "timesPlural": "volte"
+    },
+    "difficulty": {
+      "Начинающий": "Inizio",
+      "Средний": "Media",
+      "Продвинутый": "Avanzato",
+      "Легкая": "Facile"
+    },
+    "items": {
+      "1": {
+        "title": "Corsa a intervalli",
+        "description": "Alternare corsa veloce (30 secondi) e corsa lenta (30 secondi) per 20 minuti. Ottimo per sviluppare la resistenza cardiovascolare nell'hockey.",
+        "equipment": "Tapis roulant o stadio",
+        "calories": "250-350 kcal per allenamento",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la capacità di recuperare rapidamente",
+          "Migliora la forma fisica generale",
+          "Simula lo stress di una partita di hockey"
+        ],
+        "instructions": [
+          "Inizia con un riscaldamento di 5 minuti di jogging leggero",
+          "Eseguire 30 secondi di corsa veloce (80-90% della velocità massima)",
+          "Passa a 30 secondi di corsa lenta per recuperare",
+          "Ripetere il ciclo 20-25 volte",
+          "Termina con 5 minuti di defaticamento"
+        ],
+        "tips": [
+          "Osserva il tuo respiro: respira profondamente e ritmicamente",
+          "Non superare il 90% della velocità massima",
+          "Se sei stanco, puoi aumentare il tempo di recupero.",
+          "Eseguire 2-3 volte a settimana"
+        ]
+      },
+      "2": {
+        "title": "Burpee jump",
+        "description": "Esercizio complesso: squat → plank → flessioni → squat → salto. Eseguire 3 serie da 10-15 ripetizioni.",
+        "equipment": "Tappetino per esercizi (facoltativo)",
+        "calories": "200-300 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la resistenza generale",
+          "Rafforza i muscoli di tutto il corpo",
+          "Migliora la coordinazione dei movimenti",
+          "Aumenta la potenza esplosiva"
+        ],
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Accovacciatevi con i palmi delle mani sul pavimento davanti a voi.",
+          "Spingi le gambe indietro in posizione di plank",
+          "Eseguire una flessione",
+          "Tirare le gambe indietro verso le mani, mantenendo la posizione accovacciata.",
+          "Salta in alto, alzando le braccia sopra la testa",
+          "Atterrare dolcemente e ripetere."
+        ],
+        "tips": [
+          "Mantieni la schiena dritta per tutta la durata dell'esercizio.",
+          "Atterra con le gambe piegate",
+          "Inizia con 5-8 ripetizioni e aumenta gradualmente",
+          "Riposare 60-90 secondi tra le serie"
+        ]
+      },
+      "3": {
+        "title": "Bicicletta",
+        "description": "Ciclismo intenso o cyclette con intervalli ad alta intensità. 5 minuti di riscaldamento, 20 minuti di intervalli.",
+        "equipment": "Bicicletta o cyclette",
+        "calories": "300-400 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la resistenza cardiovascolare",
+          "Rafforza i muscoli delle gambe",
+          "Brucia molte calorie",
+          "Basso stress sulle articolazioni"
+        ],
+        "instructions": [
+          "5 minuti di riscaldamento a bassa intensità",
+          "2 minuti di alta intensità (80-85% del massimo)",
+          "1 minuto di recupero a bassa intensità",
+          "Ripeti gli intervalli 10 volte",
+          "5 minuti di defaticamento a bassa intensità"
+        ],
+        "tips": [
+          "Mantenere una cadenza di pedalata elevata (80-100 rpm)",
+          "Fai attenzione alla posizione del tuo corpo: tieni la schiena dritta",
+          "Regola la resistenza per cambiare l'intensità",
+          "Bevi acqua durante l'allenamento."
+        ]
+      },
+      "4": {
+        "title": "Salti pliometrici",
+        "description": "Saltare sul posto il più in alto possibile, atterrando sulle ginocchia piegate. 3 serie da 15-20 salti.",
+        "equipment": "Tappetino per esercizi (facoltativo)",
+        "calories": "150-200 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la forza esplosiva delle gambe",
+          "Migliora la reazione e la velocità",
+          "Rafforza tendini e legamenti",
+          "Aumenta il salto verticale"
+        ],
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Accovacciati per 1/4 della lunghezza con le ginocchia piegate",
+          "Salta in modo esplosivo verso l'alto, estendendo le braccia",
+          "Atterra con le gambe piegate",
+          "Eseguire immediatamente il salto successivo",
+          "Eseguire 15-20 salti di fila"
+        ],
+        "tips": [
+          "Atterra dolcemente, piegando le ginocchia.",
+          "Mantieni il tuo corpo dritto",
+          "Non fare pause tra i salti",
+          "Riposare 2-3 minuti tra le serie"
+        ]
+      },
+      "5": {
+        "title": "Sprint di breve distanza",
+        "description": "Correre alla massima velocità per una distanza di 20-30 metri con una pausa di 30 secondi tra una corsa e l'altra. 8-10 corse.",
+        "equipment": "Spazio aperto o pista da corsa",
+        "calories": "200-250 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la massima velocità",
+          "Migliora l'accelerazione",
+          "Rafforza i muscoli delle gambe",
+          "Migliora la coordinazione dei movimenti"
+        ],
+        "instructions": [
+          "Segna una distanza di 20-30 metri",
+          "Assumi la posizione di partenza (mezzo squat)",
+          "Quando suona il segnale, procedere alla massima velocità.",
+          "Attraversare il traguardo",
+          "Ritornare lentamente all'inizio",
+          "Riposare per 30 secondi e ripetere."
+        ],
+        "tips": [
+          "Concentrati sulla tecnica di corsa",
+          "Mantieni il tuo corpo dritto",
+          "Lavora attivamente con le mani",
+          "Non ridurre il tempo di riposo"
+        ]
+      },
+      "6": {
+        "title": "Lanciare una palla contro un muro",
+        "description": "Lancia una palla medica contro un muro con la massima forza, afferrala e lanciala di nuovo. 3 serie da 20 lanci.",
+        "equipment": "Palla medica 2-4 kg, da parete",
+        "calories": "120-180 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la forza esplosiva del braccio",
+          "Migliora la coordinazione",
+          "Rafforza i muscoli del core",
+          "Aumenta la velocità di lancio"
+        ],
+        "instructions": [
+          "Stare a 1-2 metri dal muro",
+          "Tenere la palla con entrambe le mani all'altezza del petto",
+          "Accovacciati, piegando le ginocchia",
+          "Raddrizza gambe e braccia in modo esplosivo mentre lanci la palla.",
+          "Cattura la palla che rimbalza",
+          "Effettuare immediatamente il lancio successivo."
+        ],
+        "tips": [
+          "Utilizzare una palla del peso di 2-4 kg",
+          "Lanciare con la massima forza",
+          "Tieni la schiena dritta",
+          "Lavora con tutto il corpo, non solo con le braccia"
+        ]
+      },
+      "7": {
+        "title": "Allungamenti dinamici delle gambe",
+        "description": "Oscillazioni delle gambe in avanti, indietro e lateralmente, con movimenti circolari delle articolazioni dell'anca. 10-15 ripetizioni per ciascuna gamba.",
+        "equipment": "Un muro o una sedia per supporto",
+        "calories": "50-80 kcal per riscaldamento",
+        "benefits": [
+          "Riscalda i muscoli delle gambe",
+          "Migliora la mobilità articolare",
+          "Si prepara per l'addestramento",
+          "Riduce il rischio di lesioni"
+        ],
+        "instructions": [
+          "Stai in piedi dritto, tenendoti al supporto",
+          "Eseguire 10-15 oscillazioni in avanti con la gamba destra",
+          "Eseguire 10-15 calci all'indietro con la gamba destra",
+          "Eseguire 10-15 oscillazioni laterali con la gamba destra",
+          "Ripetere l'operazione per la gamba sinistra.",
+          "Eseguire movimenti circolari nelle articolazioni dell'anca"
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Non oscillare troppo",
+          "Eseguire i movimenti in modo fluido",
+          "Respira profondamente e ritmicamente"
+        ]
+      },
+      "8": {
+        "title": "Riscaldamento della parte superiore del corpo",
+        "description": "Rotazioni delle braccia, piegamenti e torsioni del busto. Riscaldamento per le articolazioni delle spalle e della schiena.",
+        "equipment": "Non richiesto",
+        "calories": "40-60 kcal per riscaldamento",
+        "benefits": [
+          "Riscalda i muscoli della parte superiore del corpo",
+          "Migliora la mobilità dell'articolazione della spalla",
+          "Prepara le mani al lavoro",
+          "Attiva i muscoli del core"
+        ],
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Eseguire 10 movimenti circolari con le braccia in avanti",
+          "Eseguire 10 movimenti circolari con le braccia all'indietro",
+          "Eseguire 10 piegamenti laterali",
+          "Eseguire 10 rotazioni del busto",
+          "Esegui movimenti circolari con le spalle"
+        ],
+        "tips": [
+          "Muoviti lentamente e senza intoppi",
+          "Non fare movimenti bruschi",
+          "Fai attenzione al tuo respiro",
+          "Aumentare gradualmente l'ampiezza del movimento"
+        ]
+      },
+      "9": {
+        "title": "Corsa leggera sul posto",
+        "description": "Correre sul posto con le ginocchia alte, aumentando gradualmente il ritmo. 5-7 minuti.",
+        "equipment": "Non richiesto",
+        "calories": "60-80 kcal per riscaldamento",
+        "benefits": [
+          "Aumenta la frequenza cardiaca",
+          "Riscalda i muscoli delle gambe",
+          "Migliora la coordinazione",
+          "Si prepara per l'allenamento principale"
+        ],
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Inizia con una leggera corsa sul posto",
+          "Sollevare gradualmente le ginocchia più in alto",
+          "Muovi le braccia come se stessi correndo normalmente.",
+          "Aumentare il ritmo per 2-3 minuti",
+          "Rallenta negli ultimi 2 minuti"
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Atterra sulle punte",
+          "Respira profondamente",
+          "Non saltare troppo in alto"
+        ]
+      },
+      "10": {
+        "title": "Allungamento statico dei muscoli delle gambe",
+        "description": "Mantenere le posizioni di allungamento per quadricipiti, polpacci e adduttori. 30 secondi per gruppo.",
+        "equipment": "Tappetino per esercizi",
+        "calories": "80-100 kcal per tratto",
+        "benefits": [
+          "Migliora la flessibilità dei muscoli delle gambe",
+          "Riduce la tensione muscolare",
+          "Accelera il recupero",
+          "Previene gli infortuni"
+        ],
+        "instructions": [
+          "Allungamento dei quadricipiti: stare in piedi su una gamba e piegare l'altra gamba all'indietro.",
+          "Allungamento del polpaccio: affondo in avanti, tenendo la gamba posteriore dritta.",
+          "Allungamento degli adduttori: siediti con le gambe divaricate.",
+          "Mantenere ogni posizione per 30 secondi.",
+          "Respira profondamente e rilassa i muscoli."
+        ],
+        "tips": [
+          "Non allungarti fino al punto di provare dolore.",
+          "Respira profondamente e lentamente",
+          "Rilassa i muscoli mentre fai stretching.",
+          "Eseguire dopo l'allenamento"
+        ]
+      },
+      "11": {
+        "title": "Allungamento della schiena e delle spalle",
+        "description": "Piegamenti in avanti, allungamento del petto, allungamento dei tricipiti. Mantieni ogni posizione per 20-30 secondi.",
+        "benefits": [
+          "Migliora la flessibilità e la mobilità",
+          "Allevia la tensione muscolare",
+          "Previene gli infortuni",
+          "Migliora il recupero post-allenamento"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dello stretching",
+          "Allungati lentamente e dolcemente",
+          "Mantenere la posizione per 20-30 secondi",
+          "Evitare il dolore acuto"
+        ],
+        "tips": [
+          "Respira profondamente mentre fai stretching.",
+          "Non fare movimenti bruschi",
+          "Per ottenere i migliori risultati, esegui questa operazione ogni giorno.",
+          "Allungati dopo l'allenamento"
+        ]
+      },
+      "12": {
+        "title": "Yoga per giocatori di hockey",
+        "description": "Una serie di asana per sviluppare flessibilità ed equilibrio: posizione del guerriero, posizione dell'albero, posizione del cane a testa in giù.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "13": {
+        "title": "Scala di coordinamento",
+        "description": "Movimenti rapidi delle gambe sulla scala: passi laterali, passi incrociati, salti. 3 passaggi di ogni tipo.",
+        "benefits": [
+          "Sviluppa la coordinazione dei movimenti",
+          "Migliora l'equilibrio e la stabilità",
+          "Aumenta l'agilità",
+          "Sviluppa la connessione neuromuscolare"
+        ],
+        "instructions": [
+          "Inizia a un ritmo lento",
+          "Concentrarsi sulla precisione dei movimenti",
+          "Aumentare gradualmente la velocità",
+          "Ripetere finché non diventa automatico."
+        ],
+        "tips": [
+          "Pratica regolarmente",
+          "Prenditi il ​​tuo tempo: la precisione è più importante della velocità",
+          "Utilizzare segnali visivi",
+          "Allenarsi in condizioni diverse"
+        ]
+      },
+      "14": {
+        "title": "Palle da giocoleria",
+        "description": "Giocare con 2-3 palline da tennis per sviluppare la coordinazione occhio-mano. Iniziare con 1 pallina.",
+        "benefits": [
+          "Sviluppa la coordinazione dei movimenti",
+          "Migliora l'equilibrio e la stabilità",
+          "Aumenta l'agilità",
+          "Sviluppa la connessione neuromuscolare"
+        ],
+        "instructions": [
+          "Inizia a un ritmo lento",
+          "Concentrarsi sulla precisione dei movimenti",
+          "Aumentare gradualmente la velocità",
+          "Ripetere finché non diventa automatico."
+        ],
+        "tips": [
+          "Pratica regolarmente",
+          "Prenditi il ​​tuo tempo: la precisione è più importante della velocità",
+          "Utilizzare segnali visivi",
+          "Allenarsi in condizioni diverse"
+        ]
+      },
+      "15": {
+        "title": "Tocchi rapidi di coni",
+        "description": "Posiziona 5-6 coni e toccali velocemente con la mano in ordine casuale. 3 serie da 30 secondi.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "16": {
+        "title": "Vogatore",
+        "description": "Vogatore a intervalli: 2 minuti ad alta intensità, 1 minuto di riposo. 8-10 cicli per sviluppare la resistenza.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "17": {
+        "title": "Salto con la corda a intervalli",
+        "description": "Alternare salti veloci (30 sec) e lenti (30 sec). 20 minuti per sviluppare la resistenza cardiovascolare.",
+        "equipment": "saltare la corda",
+        "calories": "200-300 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la resistenza cardiovascolare",
+          "Migliora la coordinazione dei movimenti",
+          "Rafforza i muscoli delle gambe",
+          "Brucia molte calorie"
+        ],
+        "instructions": [
+          "Prendi una corda per saltare della lunghezza adeguata.",
+          "30 secondi di salto veloce alla massima velocità",
+          "30 secondi di saltelli lenti per recuperare",
+          "Ripeti il ​​ciclo 20 volte",
+          "Termina con 2 minuti di defaticamento"
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Lavora con i polsi, non con le mani",
+          "Atterra sulle punte",
+          "Inizia a un ritmo lento"
+        ]
+      },
+      "18": {
+        "title": "Correre su per le scale",
+        "description": "Sali le scale il più velocemente possibile, poi scendi. Esegui 10-15 ripetizioni per sviluppare la resistenza delle gambe.",
+        "equipment": "Scala",
+        "calories": "250-350 kcal per allenamento",
+        "benefits": [
+          "Sviluppa la resistenza delle gambe",
+          "Rafforza i muscoli delle cosce e dei glutei",
+          "Migliora la resistenza cardiovascolare",
+          "Aumenta la forza delle gambe"
+        ],
+        "instructions": [
+          "Trova una scala con 20-30 gradini",
+          "Corri alla massima velocità",
+          "Scendere a passo d'uomo per recuperare",
+          "Eseguire 10-15 sollevamenti",
+          "Riposare 1-2 minuti tra un sollevamento e l'altro"
+        ],
+        "tips": [
+          "Quando sollevi, usa tutto il piede.",
+          "Tieni la schiena dritta",
+          "Lavora attivamente con le mani",
+          "Non superare le tue capacità"
+        ]
+      },
+      "19": {
+        "title": "Plank con movimenti",
+        "description": "Posizione plank con sollevamento alternato di braccia e gambe. 3 serie da 45-60 secondi per rafforzare il core.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "20": {
+        "title": "Corsa con ginocchia alte",
+        "description": "Corri sul posto, sollevando le ginocchia al petto il più possibile. 5 serie da 2 minuti con 1 minuto di riposo.",
+        "benefits": [
+          "Migliora la resistenza cardiovascolare",
+          "Sviluppa la resistenza aerobica",
+          "Brucia calorie in modo efficace",
+          "Rafforza il muscolo cardiaco"
+        ],
+        "instructions": [
+          "Inizia con un leggero riscaldamento di 5-10 minuti",
+          "Mantieni la frequenza cardiaca target",
+          "Osserva il tuo respiro - respira profondamente",
+          "Concludere con defaticamento e stretching."
+        ],
+        "tips": [
+          "Aumentare gradualmente la durata",
+          "Bevi acqua durante l'allenamento.",
+          "Eseguire 3-4 volte a settimana",
+          "Ascolta il tuo corpo"
+        ]
+      },
+      "21": {
+        "title": "Salto in lungo da fermo",
+        "description": "Saltare in avanti il ​​più possibile, atterrando su entrambi i piedi. Eseguire 5 serie da 8-10 salti.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "22": {
+        "title": "Flessioni veloci",
+        "description": "Eseguire flessioni il più velocemente possibile, toccando il pavimento con il petto. 4 serie da 15-20 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "23": {
+        "title": "Saltare gli ostacoli",
+        "description": "Saltare coni o barriere alte 30-40 cm. 3 serie da 10 ostacoli.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "24": {
+        "title": "Squat veloci",
+        "description": "Eseguire gli squat il più velocemente possibile, con le cosce parallele al pavimento. 4 serie da 20-25 ripetizioni.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "25": {
+        "title": "Lancio della palla medica",
+        "description": "Lancio di una palla pesante (5-8 kg) dal petto con la massima forza. 3 serie da 15 lanci.",
+        "benefits": [
+          "Aumenta la forza muscolare",
+          "Migliora la resistenza muscolare",
+          "Sviluppa la forza funzionale",
+          "Rafforza il sistema muscolo-scheletrico"
+        ],
+        "instructions": [
+          "Riscaldarsi prima dell'esercizio",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Controlla il tuo respiro - espira con sforzo",
+          "Riposare 60-90 secondi tra le serie."
+        ],
+        "tips": [
+          "Iniziare con pesi più leggeri e aumentare gradualmente.",
+          "Non trattenere il respiro",
+          "Eseguire 2-3 volte a settimana",
+          "Ridurre il carico quando ci si sente stanchi"
+        ]
+      },
+      "26": {
+        "title": "Riscaldamento della caviglia",
+        "description": "Esegui movimenti circolari con i piedi, piegando e raddrizzando le dita. 2-3 minuti per gamba.",
+        "benefits": [
+          "Prepara i muscoli per l'esercizio",
+          "Migliora la circolazione sanguigna",
+          "Riduce il rischio di lesioni",
+          "Aumenta l'efficienza dell'allenamento"
+        ],
+        "instructions": [
+          "Inizia lentamente e aumenta gradualmente l'intensità",
+          "Eseguire i movimenti in modo fluido e controllato",
+          "Assicurati di utilizzare la tecnica corretta",
+          "Respirare in modo uniforme durante l'esecuzione"
+        ],
+        "tips": [
+          "Prenditi il ​​tuo tempo: la qualità è più importante della velocità",
+          "Se si avverte dolore, fermarsi.",
+          "Riscaldarsi prima di ogni allenamento.",
+          "Dedica abbastanza tempo a ogni movimento."
+        ]
+      },
+      "27": {
+        "title": "Riscaldamento del collo",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Gira lentamente la testa a sinistra e a destra",
+          "Inclina la testa avanti e indietro",
+          "Eseguire movimenti circolari con la testa",
+          "Mantieni le spalle rilassate"
+        ],
+        "tips": [
+          "Muoviti lentamente e senza intoppi",
+          "Non fare movimenti bruschi",
+          "Se si avverte dolore, interrompere l'operazione.",
+          "Respira profondamente e in modo uniforme"
+        ]
+      },
+      "28": {
+        "title": "Riscaldamento del polso",
+        "instructions": [
+          "Allunga le braccia davanti a te",
+          "Piega i polsi su e giù",
+          "Ruota i polsi in cerchio",
+          "Stringi e apri i pugni",
+          "Allunga le dita ai lati"
+        ],
+        "tips": [
+          "Eseguire i movimenti lentamente",
+          "Non sforzare troppo le articolazioni",
+          "Presta attenzione alle sensazioni nei tuoi polsi",
+          "Ripetere regolarmente"
+        ]
+      },
+      "29": {
+        "title": "allungamenti del ginocchio",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Piega e raddrizza lentamente le ginocchia",
+          "Eseguire movimenti circolari con le ginocchia",
+          "Fai squat con una piccola ampiezza",
+          "Allunga la parte anteriore della coscia"
+        ],
+        "tips": [
+          "Non fare squat profondi",
+          "Muoviti con fluidità e controllo",
+          "Se avverti dolore al ginocchio, riduci l'ampiezza del movimento.",
+          "Assicurati di utilizzare la tecnica corretta"
+        ]
+      },
+      "30": {
+        "title": "Riscaldamento dei fianchi",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Solleva il ginocchio al petto",
+          "Sposta la gamba di lato e indietro",
+          "Esegui movimenti circolari con i fianchi",
+          "Eseguire affondi con una piccola ampiezza"
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Lavorare entro un intervallo confortevole",
+          "Non affrettare i tuoi movimenti",
+          "Tieni traccia del tuo saldo"
+        ]
+      },
+      "31": {
+        "title": "Allungamento dell'inguine",
+        "instructions": [
+          "Sedetevi sul pavimento con le ginocchia piegate.",
+          "Metti insieme le piante dei piedi",
+          "Sporgersi delicatamente in avanti",
+          "Tira le ginocchia verso il pavimento",
+          "Mantieni lo stretching per 30 secondi"
+        ],
+        "tips": [
+          "Non forzare lo stretching",
+          "Respira profondamente e rilassati.",
+          "Se si avverte dolore, ridurre l'ampiezza.",
+          "Eseguire dopo il riscaldamento"
+        ]
+      },
+      "32": {
+        "title": "Allungamento dei muscoli posteriori della coscia",
+        "instructions": [
+          "Sedetevi sul pavimento con le gambe distese in avanti.",
+          "Piegati in avanti, cercando di raggiungere i tuoi piedi",
+          "Stringi i piedi con le mani",
+          "Tira il petto verso le ginocchia",
+          "Mantieni lo stretching per 30-45 secondi"
+        ],
+        "tips": [
+          "Non curvare la schiena",
+          "Lavorare entro un intervallo confortevole",
+          "Respira profondamente",
+          "Presta attenzione alle sensazioni nella parte posteriore della coscia"
+        ]
+      },
+      "33": {
+        "title": "Allungamento dei muscoli del polpaccio",
+        "instructions": [
+          "Mettiti di fronte al muro",
+          "Posizionare un piede avanti e l'altro indietro.",
+          "Abbassare il tallone del piede posteriore sul pavimento",
+          "Piegati in avanti, allungando i polpacci",
+          "Cambia gamba e ripeti"
+        ],
+        "tips": [
+          "Mantieni la gamba posteriore dritta",
+          "Non sollevare il tallone da terra",
+          "Allungare dolcemente",
+          "Eseguire per entrambe le gambe"
+        ]
+      },
+      "34": {
+        "title": "Allungamento dei muscoli pettorali",
+        "instructions": [
+          "Fermati sulla porta",
+          "Metti le mani sugli stipiti delle porte",
+          "Fai un passo avanti",
+          "Senti lo stiramento nel tuo petto",
+          "Mantieni lo stretching per 30 secondi"
+        ],
+        "tips": [
+          "Non sforzare troppo le spalle",
+          "Respira profondamente",
+          "Allungare gradualmente",
+          "Segui le tue sensazioni"
+        ]
+      },
+      "35": {
+        "title": "Allungamento dei tricipiti",
+        "instructions": [
+          "Alza una mano",
+          "Piega il braccio all'altezza del gomito dietro la testa",
+          "Con l'altra mano, tira il gomito verso il basso",
+          "Senti lo stiramento nei tuoi tricipiti",
+          "Cambia mano e ripeti"
+        ],
+        "tips": [
+          "Non fare movimenti bruschi",
+          "Allungare dolcemente",
+          "Respirare in modo uniforme",
+          "Eseguire per entrambe le mani"
+        ]
+      },
+      "36": {
+        "title": "Serpente tra i coni",
+        "instructions": [
+          "Posizionare i coni a forma di serpente a una distanza di 2-3 metri",
+          "Inizia a correre intorno a ogni cono",
+          "Mantieni il baricentro basso",
+          "Allena le gambe velocemente e spesso",
+          "Assicuratevi di utilizzare la tecnica di svolta corretta."
+        ],
+        "tips": [
+          "Inizia a un ritmo lento",
+          "Concentratevi sulla tecnica, non sulla velocità.",
+          "Tieni la testa alta",
+          "Utilizzare passaggi brevi e rapidi"
+        ]
+      },
+      "37": {
+        "title": "Tocchi rapidi dei piedi",
+        "instructions": [
+          "Mettiti accanto alla palla",
+          "Tocca la palla velocemente con il piede",
+          "Cambiare gamba ogni 2-3 tocchi",
+          "Mantenere un ritmo costante",
+          "Eseguire per 30-60 secondi"
+        ],
+        "tips": [
+          "Mantieni il peso del corpo sulla gamba di appoggio",
+          "Lavorare velocemente ma in modo controllato",
+          "Non perdere l'equilibrio",
+          "Fai attenzione alla tua tecnica di tocco"
+        ]
+      },
+      "38": {
+        "title": "Salti con curve",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Fai un salto in alto",
+          "Girare di 180 gradi mentre si salta",
+          "Atterrare dolcemente su entrambi i piedi.",
+          "Tornare indietro immediatamente e ripetere"
+        ],
+        "tips": [
+          "Atterra con le gambe piegate",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Inizia con piccole curve",
+          "Fai attenzione alla tecnica di atterraggio"
+        ]
+      },
+      "39": {
+        "title": "Passaggi rapidi della palla",
+        "instructions": [
+          "Posizionarsi di fronte al muro a una distanza di 2-3 metri",
+          "Passare la palla velocemente al muro",
+          "Prendi il rimbalzo e passalo subito indietro",
+          "Lavorare con entrambe le mani",
+          "Eseguire per 30-45 secondi"
+        ],
+        "tips": [
+          "Utilizzare la tecnica di passaggio corretta",
+          "Tieni gli occhi sulla palla",
+          "Lavorare velocemente ma con precisione",
+          "Tieni le mani rilassate"
+        ]
+      },
+      "40": {
+        "title": "Correre all'indietro",
+        "instructions": [
+          "Inizia correndo lentamente all'indietro.",
+          "Guardati spesso alle spalle",
+          "Mantieni il baricentro basso",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Completa 20-30 metri"
+        ],
+        "tips": [
+          "Inizia molto lentamente",
+          "Controlla sempre lo spazio dietro di te",
+          "Tieni le ginocchia leggermente piegate",
+          "Non affrettarti ad aumentare la velocità"
+        ]
+      },
+      "41": {
+        "title": "Squat con pesi",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Prendi dei manubri o un bilanciere",
+          "Accovacciatevi finché le dita dei piedi non sono parallele al pavimento.",
+          "Alzati usando la forza delle tue gambe",
+          "Eseguire 3-4 serie da 8-12 ripetizioni"
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Non arrotondare la parte bassa della schiena",
+          "Le ginocchia non devono superare le dita dei piedi.",
+          "Inizia con pesi leggeri"
+        ]
+      },
+      "42": {
+        "title": "Stacco da terra",
+        "instructions": [
+          "Stai in piedi dritto con i piedi alla larghezza delle spalle",
+          "Prendi il bilanciere da terra con una presa prona.",
+          "Piega le ginocchia e sposta il bacino indietro",
+          "Sollevare il bilanciere raddrizzando le gambe e la schiena.",
+          "Riportare la barra a terra in modo controllato."
+        ],
+        "tips": [
+          "Mantieni la schiena dritta durante tutto il movimento.",
+          "Non arrotondare la parte bassa della schiena",
+          "Avvicina la barra al tuo corpo",
+          "Inizia con pesi leggeri"
+        ]
+      },
+      "43": {
+        "title": "Panca piana",
+        "instructions": [
+          "Sdraiati sulla panca con i piedi sul pavimento.",
+          "Prendi il bilanciere con una presa larga",
+          "Abbassare la barra verso il petto in modo controllato.",
+          "Spingere il bilanciere verso l'alto",
+          "Eseguire 3-4 serie da 6-10 ripetizioni"
+        ],
+        "tips": [
+          "Tieni le scapole unite",
+          "Tieni i piedi sul pavimento",
+          "Respirare correttamente: espirare con sforzo",
+          "Utilizzare l'assicurazione"
+        ]
+      },
+      "44": {
+        "title": "Trazioni alla sbarra",
+        "instructions": [
+          "Appendersi alla barra con una presa sopramano",
+          "Tiratevi su finché il mento non si trova sopra la sbarra.",
+          "Abbassati di nuovo nella posizione di partenza",
+          "Mantieni il tuo core contratto",
+          "Eseguire 3-4 serie di ripetizioni massime"
+        ],
+        "tips": [
+          "Non oscillare",
+          "Tirare su in modo fluido e controllato",
+          "Raddrizza completamente le braccia in basso",
+          "Utilizzare assistenza se necessario"
+        ]
+      },
+      "45": {
+        "title": "Dip sulle barre",
+        "instructions": [
+          "Mettiti tra le sbarre",
+          "Salta e agganciati alle sbarre",
+          "Abbassatevi piegando i gomiti.",
+          "Spingi verso l'alto, raddrizzando le braccia",
+          "Eseguire 3-4 serie da 5-15 ripetizioni"
+        ],
+        "tips": [
+          "Mantieni il tuo corpo dritto",
+          "Non oscillare",
+          "Scendere a una profondità confortevole",
+          "Se necessario, usa le gambe."
+        ]
+      },
+      "46": {
+        "title": "Posizione su una gamba",
+        "instructions": [
+          "Stare su una gamba",
+          "Solleva l'altra gamba davanti a te",
+          "Mantieni l'equilibrio il più a lungo possibile",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Cambia gamba e ripeti"
+        ],
+        "tips": [
+          "Guarda avanti, non giù",
+          "Mantieni il tuo core contratto",
+          "Inizia con serie brevi",
+          "Aumentare gradualmente il tempo"
+        ]
+      },
+      "47": {
+        "title": "Plank su una gamba",
+        "instructions": [
+          "Mettiti in posizione di plank",
+          "Sollevare una gamba",
+          "Tieni la gamba dritta",
+          "Mantenere la posizione per 30-60 secondi",
+          "Cambia gamba e ripeti"
+        ],
+        "tips": [
+          "Mantieni il tuo corpo dritto",
+          "Non dondolarti da un lato all'altro",
+          "Respirare in modo uniforme",
+          "Inizia con serie brevi"
+        ]
+      },
+      "48": {
+        "title": "Squat su una gamba",
+        "instructions": [
+          "Stare su una gamba",
+          "Estendi l'altra gamba in avanti",
+          "Accovacciarsi sulla gamba di appoggio",
+          "Ritornare alla posizione di partenza",
+          "Eseguire 3-4 serie da 5-10 ripetizioni per gamba."
+        ],
+        "tips": [
+          "Tieni la schiena dritta",
+          "Non toccare il pavimento con l'altro piede.",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Inizia con una piccola ampiezza"
+        ]
+      },
+      "49": {
+        "title": "Esercizi con la palla Bosu",
+        "instructions": [
+          "Posizionarsi sull'emisfero della palla Bosu",
+          "Mantieni l'equilibrio",
+          "Fai squat",
+          "Esegui torsioni del corpo",
+          "Eseguire 3-4 serie da 10-15 ripetizioni"
+        ],
+        "tips": [
+          "Inizia con esercizi semplici",
+          "Fai attenzione alla tua tecnica",
+          "Prenditi il ​​​​tuo tempo",
+          "Utilizzare l'aiuto per il supporto"
+        ]
+      },
+      "50": {
+        "title": "Equilibrio Yoga",
+        "instructions": [
+          "Mettiti in piedi con i piedi uniti.",
+          "Sollevare una gamba e posizionarla sulla coscia dell'altra.",
+          "Metti le mani davanti al petto",
+          "Mantieni l'equilibrio",
+          "Eseguire per entrambe le gambe per 30-60 secondi"
+        ],
+        "tips": [
+          "Guarda avanti a un punto",
+          "Respira profondamente e in modo uniforme",
+          "Prenditi il ​​​​tuo tempo",
+          "Se perdi l'equilibrio, ricomincia da capo."
+        ]
+      },
+      "51": {
+        "title": "Camminare su un tronco",
+        "instructions": [
+          "Trova un tronco o una tavola stabile",
+          "Stare sul tronco",
+          "Camminare lentamente in avanti",
+          "Mantieni l'equilibrio",
+          "Eseguire più passaggi"
+        ],
+        "tips": [
+          "Inizia con un registro largo",
+          "Guarda avanti, non giù",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Prenditi il ​​​​tuo tempo"
+        ]
+      },
+      "52": {
+        "title": "Verticale contro il muro",
+        "instructions": [
+          "Mettiti di fronte al muro",
+          "Posiziona le mani sul pavimento a 30 cm dal muro",
+          "Alza le gambe sul muro",
+          "Mantenere la verticale",
+          "Abbassare le gambe in modo controllato"
+        ],
+        "tips": [
+          "Inizia con serie brevi",
+          "Utilizzare l'aiuto per l'assicurazione",
+          "Mantieni il tuo core contratto",
+          "Non sforzarti troppo"
+        ]
+      },
+      "53": {
+        "title": "Fartlek",
+        "instructions": [
+          "Inizia con una corsa lenta per 5-10 minuti",
+          "Aumentare la velocità all'80% del massimo per 2-3 minuti",
+          "Ritornare a una corsa lenta per 1-2 minuti",
+          "Ripetere il ciclo 4-6 volte",
+          "Termina con una corsa lenta per 5-10 minuti"
+        ],
+        "tips": [
+          "Ascolta il tuo corpo",
+          "Non superare l'80% della velocità massima",
+          "Respira profondamente",
+          "Bevi acqua durante l'allenamento."
+        ]
+      },
+      "54": {
+        "title": "Sprint ripetuti",
+        "instructions": [
+          "Fai un riscaldamento di 10 minuti",
+          "Eseguire uno sprint alla massima velocità per 30 secondi",
+          "Riposare per 2-3 minuti",
+          "Ripeti lo sprint",
+          "Eseguire 6-8 sprint"
+        ],
+        "tips": [
+          "Non lesinare sul riscaldamento",
+          "Riposare completamente tra gli sprint",
+          "Fai attenzione alla tua tecnica di corsa",
+          "Non fare esercizio fisico quotidianamente"
+        ]
+      },
+      "55": {
+        "title": "Intervalli in bicicletta",
+        "instructions": [
+          "Inizia con un riscaldamento di 5 minuti",
+          "Aumentare il carico all'80% del massimo",
+          "Pedalare ad alta intensità per 2-3 minuti",
+          "Ridurre il carico al 50% per 1-2 minuti",
+          "Ripetere il ciclo 6-8 volte"
+        ],
+        "tips": [
+          "Mantenere una cadenza elevata",
+          "Respira profondamente",
+          "Tieni d'occhio il tuo polso",
+          "Bere acqua regolarmente"
+        ]
+      },
+      "56": {
+        "title": "Corsa in collina",
+        "instructions": [
+          "Trova una collina con una pendenza del 5-10%",
+          "Fai un riscaldamento di 10 minuti",
+          "Corri su per la collina a velocità moderata",
+          "Scendere per recuperare",
+          "Ripeti 6-10 sollevamenti"
+        ],
+        "tips": [
+          "Inizia con una leggera pendenza",
+          "Mantieni la schiena dritta mentre sollevi.",
+          "Lavora attivamente con le mani",
+          "Prenditi il ​​tuo tempo durante la discesa"
+        ]
+      },
+      "57": {
+        "title": "Cerchi pliometrici",
+        "instructions": [
+          "Fai un riscaldamento di 10 minuti",
+          "Eseguire salti lunghi partendo da una posizione eretta",
+          "Eseguire salti sopra gli ostacoli",
+          "Fai salti sulla scatola",
+          "Riposare per 2-3 minuti e ripetere il circuito."
+        ],
+        "tips": [
+          "Fai attenzione alla tecnica di atterraggio",
+          "Atterra con le gambe piegate",
+          "Usa le braccia per mantenere l'equilibrio",
+          "Non esagerare con la quantità"
+        ]
+      },
+      "58": {
+        "title": "Allungamento leggero",
+        "instructions": [
+          "Iniziare con movimenti leggeri",
+          "Allunga i principali gruppi muscolari",
+          "Respira profondamente e in modo uniforme",
+          "Muoviti dolcemente e lentamente",
+          "Termina con una respirazione profonda."
+        ],
+        "tips": [
+          "Non allungarti fino al punto di provare dolore.",
+          "Respira profondamente",
+          "Rilassati completamente",
+          "Fallo regolarmente"
+        ]
+      },
+      "59": {
+        "title": "Rullo di schiuma",
+        "instructions": [
+          "Sdraiati sul foam roller",
+          "Fai rotolare lentamente il rullo sotto i muscoli.",
+          "Concentrarsi sui punti dolenti",
+          "Mantenere la pressione per 30-60 secondi",
+          "Ripetere l'esercizio per tutti i gruppi muscolari."
+        ],
+        "tips": [
+          "Non rotolare sulle articolazioni",
+          "Respira profondamente",
+          "Non tollerare il dolore intenso",
+          "Inizia con un rullo morbido"
+        ]
+      },
+      "60": {
+        "title": "Corsa leggera",
+        "instructions": [
+          "Inizia a un ritmo lento",
+          "Mantieni la frequenza cardiaca al 60-70% del massimo",
+          "Respira profondamente e in modo uniforme",
+          "Mantenere un ritmo costante",
+          "Terminare con una graduale diminuzione del tempo"
+        ],
+        "tips": [
+          "Tieni d'occhio il tuo polso",
+          "Respira attraverso il naso",
+          "Non sforzarti troppo",
+          "Godetevi il processo"
+        ]
+      },
+      "61": {
+        "title": "Nuoto",
+        "instructions": [
+          "Inizia con un riscaldamento sulla terraferma",
+          "Entrare in acqua gradualmente",
+          "Nuotare a un ritmo confortevole",
+          "Cambia il tuo stile di nuoto",
+          "Termina con una nuotata lenta"
+        ],
+        "tips": [
+          "Non nuotare da solo",
+          "Fai attenzione alla tua tecnica",
+          "Respirare in modo uniforme",
+          "Non esagerare"
+        ]
+      },
+      "62": {
+        "title": "Bicicletta da recupero",
+        "instructions": [
+          "Inizia a un ritmo lento",
+          "Mantieni la frequenza cardiaca al 50-60% del massimo",
+          "Pedalare facilmente e ritmicamente",
+          "Respira profondamente",
+          "Terminare con una graduale diminuzione del tempo"
+        ],
+        "tips": [
+          "Mantenere una cadenza elevata",
+          "Respira profondamente",
+          "Non sforzarti troppo",
+          "Goditi il ​​viaggio"
+        ]
+      },
+      "63": {
+        "title": "Yoga di recupero",
+        "instructions": [
+          "Inizia con pose semplici",
+          "Eseguire lo stretching lentamente",
+          "Respira profondamente e in modo uniforme",
+          "Rilassati in ogni posa",
+          "Termina con la meditazione"
+        ],
+        "tips": [
+          "Non forzare le pose",
+          "Respira attraverso il naso",
+          "Ascolta il tuo corpo",
+          "Godetevi il processo"
+        ]
+      },
+      "64": {
+        "title": "Stretching con elastico",
+        "description": "Esercizi di stretching con elastico",
+        "equipment": "Elastico",
+        "calories": "35-55 kcal",
+        "benefits": [
+          "Migliora la flessibilità delle articolazioni",
+          "Rafforza i legamenti",
+          "Allevia la tensione muscolare",
+          "Aumenta la gamma di movimento"
+        ],
+        "instructions": [
+          "Scegli l'elastico giusto",
+          "Eseguire movimenti lenti",
+          "Mantieni lo stretching per 20-30 secondi",
+          "Ripeti ogni esercizio 3-5 volte"
+        ],
+        "tips": [
+          "Inizia con un elastico leggero",
+          "Non lasciare che ti faccia male",
+          "Respirare in modo uniforme",
+          "Aumentare gradualmente la resistenza"
+        ]
+      },
+      "65": {
+        "title": "Doccia di contrasto",
+        "instructions": [
+          "Inizia con acqua calda",
+          "Passare gradualmente all'acqua fredda",
+          "Tenere l'acqua fredda per 30-60 secondi",
+          "Ritornare all'acqua calda",
+          "Ripetere il ciclo 3-5 volte"
+        ],
+        "tips": [
+          "Inizia gradualmente",
+          "Respira profondamente",
+          "Non prendere troppo freddo",
+          "Ascolta il tuo corpo"
+        ]
+      }
+    },
+    "difficulties": {
+      "Beginner": "Principiante",
+      "Intermediate": "Intermedio",
+      "Advanced": "Avanzato",
+      "Easy": "Facile"
+    }
+  },
+  "items": {
+    "autograph": "autografo",
+    "stick": "bastone",
+    "puck": "disco",
+    "jersey": "Maglia"
+  },
+  "requests": {
+    "pending": "In attesa di risposta",
+    "accepted": "Accettato",
+    "rejected": "Respinto",
+    "giftRequests": "Richieste di regali"
+  },
+  "auth": {
+    "login": "Uscire sul ghiaccio",
+    "register": "Registrazione",
+    "phone": "Telefono",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Inserisci il tuo numero di telefono con il prefisso internazionale",
+    "code": "Codice di conferma",
+    "codePlaceholder": "Inserisci il codice",
+    "sendCode": "Invia codice",
+    "resendCode": "Ripeti dopo",
+    "verifyCode": "Conferma il codice",
+    "invalidPhone": "Formato del numero di telefono non valido",
+    "invalidCode": "Codice di conferma non valido",
+    "codeSent": "Codice inviato a",
+    "codeResent": "Il codice è stato reinviato.",
+    "required": "Autorizzazione richiesta",
+    "loginRequired": "Per visualizzare il profilo di un giocatore, devi effettuare l'accesso.",
+    "welcomeBack": "Bentornato!",
+    "welcomeBackMessage": "Bentornato, {name}!",
+    "codeSentSuccess": "Codice inviato!",
+    "codeSentMessage": "Controlla l'SMS sul tuo telefono e inserisci il codice di conferma",
+    "userNotFound": "Utente non trovato",
+    "userNotFoundMessage": "Non esiste un account con questo numero di telefono. Registrati.",
+    "errorSendingCode": "Errore",
+    "errorSendingCodeMessage": "Impossibile inviare il codice. Controlla il tuo numero di telefono e la connessione Internet.",
+    "errorResendingCode": "Errore",
+    "errorResendingCodeMessage": "Impossibile inviare nuovamente il codice",
+    "errorVerifyingCode": "Errore",
+    "errorVerifyingCodeMessage": "Si è verificato un errore durante il controllo del codice.",
+    "errorSendingCodeGeneral": "Impossibile inviare il codice. Riprova.",
+    "errorSendingCodeResend": "Impossibile inviare nuovamente il codice",
+    "errorInvalidCode": "Inserisci il codice di 6 cifre",
+    "errorRegistration": "Impossibile completare la registrazione",
+    "errorLoginRequired": "Devi effettuare l'accesso al tuo profilo",
+    "errorLoginRequiredMessage": "Devi aver effettuato l'accesso per inviare messaggi.",
+    "errorLoginRequiredFriends": "Devi effettuare l'accesso per aggiungere qualcuno come amico.",
+    "errorRemoveFriend": "Impossibile rimuovere dagli amici",
+    "errorSendFriendRequest": "Impossibile inviare la richiesta di amicizia",
+    "errorCancelRequest": "Impossibile annullare la richiesta",
+    "errorAcceptRequest": "Impossibile accettare la richiesta",
+    "errorManageFriends": "Si è verificato un errore durante la gestione degli amici.",
+    "errorRejectRequest": "Impossibile rifiutare la richiesta",
+    "errorRejectRequestGeneral": "Si è verificato un errore durante il rifiuto della tua richiesta.",
+    "errorOpenLink": "Impossibile aprire il collegamento",
+    "errorDataNotFound": "Dati non trovati",
+    "errorNoEditRights": "Non hai l'autorizzazione per modificare questo profilo.",
+    "errorClearTeams": "Impossibile cancellare i vecchi dati del comando",
+    "errorSaveTeams": "Impossibile salvare i comandi",
+    "errorSaveChanges": "Impossibile salvare le modifiche",
+    "errorAdminOnly": "Solo l'amministratore può eliminare gli utenti",
+    "errorPlayerNotFound": "Dati del giocatore non trovati",
+    "errorDeleteUser": "Impossibile eliminare l'utente",
+    "errorCreateUser": "Impossibile creare l'utente",
+    "errorFillNamePhone": "Si prega di compilare il nome e il numero di telefono",
+    "errorLoadNotifications": "Impossibile caricare le notifiche",
+    "errorGetNotifications": "Impossibile ricevere notifiche",
+    "errorClearNotifications": "Impossibile cancellare le notifiche",
+    "errorInvalidNotificationData": "Dati di notifica errati",
+    "errorProcessNotification": "Impossibile elaborare la notifica. Riprova.",
+    "errorProcessNotificationGeneral": "Impossibile elaborare la notifica. Riprova.",
+    "errorProcessFriendRequest": "Impossibile elaborare la tua richiesta di amicizia.",
+    "errorProcessRequest": "Impossibile elaborare la tua richiesta",
+    "errorSendMessage": "Impossibile inviare il messaggio"
+  },
+  "profile": {
+    "addFriend": "Aggiungi come amico",
+    "addFriendQuestion": "Vuoi aggiungere {name} come amico?",
+    "sendMessage": "Invia messaggio",
+    "loading": "Caricamento...",
+    "basicInfo": "Informazioni di base",
+    "physicalData": "Dati fisici",
+    "country": "Paese",
+    "position": "Posizione",
+    "number": "Numero",
+    "grip": "presa",
+    "birthDate": "Data di nascita",
+    "Левый": "Sinistra",
+    "Правый": "Giusto",
+    "Center": "Centravanti",
+    "Winger": "Ala",
+    "Defender": "Difensore",
+    "Goalie": "Portiere",
+    "height": "Altezza",
+    "weight": "Peso",
+    "age": "Età",
+    "team": "Squadra",
+    "status": "Stato",
+    "player": "Giocatore",
+    "coach": "Allenatore",
+    "scout": "Esploratore",
+    "admin": "Supporto tecnico",
+    "star": "Stella",
+    "shop": "Negozio di hockey",
+    "skateSharpening": "Affilatura pattini",
+    "organizationName": "Nome organizzazione",
+    "organizationNamePlaceholder": "Nome dell'organizzazione",
+    "services": "Servizi",
+    "notSpecified": "Non specificato",
+    "yearsOld": "anni",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Sinistra",
+    "right": "Giusto",
+    "center": "Centravanti",
+    "winger": "Ala",
+    "defender": "Difensore",
+    "goalie": "Portiere",
+    "Left": "Sinistra",
+    "Right": "Giusto",
+    "inHockey": "Nell'hockey",
+    "lengthInCm": "Lunghezza in cm",
+    "additional": "Inoltre",
+    "cancel": "Cancellare",
+    "friends": "Amici",
+    "friendship": "Amicizia",
+    "statistics": "Statistiche della stagione attuale",
+    "teams": "Squadre",
+    "currentTeams": "Squadre attuali",
+    "pastTeams": "Squadre passate",
+    "teamInfo": "Informazioni sulla squadra",
+    "videoMoments": "Momenti salienti del video",
+    "standards": "Standard",
+    "achievements": "Risultati",
+    "noAchievements": "Nessun risultato",
+    "hockeyPhotos": "Foto di hockey",
+    "photos": "Foto",
+    "museum": "Museo",
+    "youAreFriendsWith": "Sei amico di",
+    "addToFriends": "Aggiungi come amico",
+    "addToFriendsToSeeStandards": "Aggiungi {name} come amico per vedere gli standard",
+    "addToFriendsToSeePhotos": "Aggiungi {name} come amico per vedere le foto di hockey",
+    "addToFriendsToSeeMuseum": "Aggiungi {name} come amico per vedere il museo",
+    "removeFromFriends": "Rimuovi dagli amici",
+    "points": "Punti",
+    "friendsCount": "amici",
+    "friendsCountStats": "Amici",
+    "seconds": "secondo",
+    "times": "una volta",
+    "sprint": "100 metri piani",
+    "Центральный нападающий": "Centravanti",
+    "Крайний нападающий": "Ala",
+    "Защитник": "Difensore",
+    "Вратарь": "Portiere",
+    "настоящее время": "tempo presente",
+    "goals": "Goal",
+    "assists": "Assist",
+    "games": "Partite",
+    "pullUps": "Trazioni alla sbarra",
+    "pushUps": "Sollevamento",
+    "plankTime": "tavola (sec)",
+    "sprint100m": "100 m (secondo)",
+    "longJump": "Salto in lungo",
+    "jumpRope": "saltare la corda",
+    "goalsCount": "teste",
+    "gamesCount": "giochi",
+    "belarus": "Bielorussia",
+    "usa": "U.S.A.",
+    "russia": "Russia",
+    "canada": "Canada",
+    "finland": "Finlandia",
+    "sweden": "Svezia",
+    "czech": "Repubblica Ceca",
+    "slovakia": "Slovacchia",
+    "germany": "Germania",
+    "switzerland": "Svizzera",
+    "austria": "Austria",
+    "norway": "Norvegia",
+    "denmark": "Danimarca",
+    "latvia": "Lettonia",
+    "lithuania": "Lituania",
+    "estonia": "Estonia",
+    "ukraine": "Ucraina",
+    "kazakhstan": "Kazakistan",
+    "squats": "Squat",
+    "plank": "Tavola",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "Nell'hockey con",
+    "noFriendsYet": "{name} non ha ancora amici",
+    "beFirstToAdd": "Sii il primo ad aggiungere {name} come amico",
+    "writeMessage": "Scrivi un messaggio",
+    "edit": "Modificare",
+    "deleteUser": "Elimina utente",
+    "noExercisesYet": "Il giocatore non ha ancora completato alcun esercizio.",
+    "noGiftsYet": "Nessun regalo ricevuto ancora",
+    "editProfile": "Modifica profilo",
+    "writeToSupport": "Scrivi al supporto tecnico",
+    "noExercisesOwn": "Non hai ancora completato nessun esercizio.",
+    "noExercisesOther": "Il giocatore non ha ancora completato alcun esercizio.",
+    "removedFromFriends": "{name} rimosso dagli amici",
+    "removeFriendError": "Impossibile rimuovere dagli amici",
+    "friendRequestSent": "Richiesta di amicizia inviata",
+    "friendshipAccepted": "{name} aggiunto come amico",
+    "cancelRequest": "Annulla richiesta",
+    "friendRequestError": "Impossibile inviare la richiesta di amicizia",
+    "friendRequestAcceptError": "Impossibile accettare la richiesta",
+    "friendRequestCancelled": "Richiesta di amicizia annullata",
+    "friendRequestCancelError": "Impossibile annullare la richiesta",
+    "deleteUserConfirm": "Vuoi davvero eliminare l'utente \"{{name}}\"? Questa azione non può essere annullata.",
+    "userDeleted": "L'utente \"{{name}}\" è stato eliminato",
+    "wantsToAddYouToFriends": "{{name}} vuole aggiungerti come amico",
+    "friendRequestReceived": "{{name}} vuole aggiungerti come amico",
+    "loadingProfile": "Caricamento profilo in corso...",
+    "playerNotFound": "Giocatore non trovato",
+    "addAchievement": "Aggiungi un risultato",
+    "editAchievement": "Modifica risultato",
+    "competitionName": "Nome del concorso",
+    "year": "Anno",
+    "place": "Posto",
+    "description": "Descrizione (facoltativa)",
+    "shopName": "Nome del negozio",
+    "address": "Indirizzo",
+    "map": "Mappa",
+    "workingHours": "Orari di apertura",
+    "discountForFriends": "Sconto per gli amici",
+    "hockeyShop": "Negozio di hockey",
+    "nameHint": "Utilizzare solo lettere latine",
+    "photo": "Foto",
+    "selectPhoto": "Seleziona una foto",
+    "logo": "Logo",
+    "selectLogo": "Seleziona un logo",
+    "selectCountry": "Seleziona un paese",
+    "searchCountry": "Cerca un paese",
+    "errorEnterCompetition": "Inserisci il nome del concorso",
+    "errorEnterYear": "Inserisci un anno valido.",
+    "grips": {
+      "Левый": "Sinistra",
+      "Правый": "Giusto"
+    },
+    "countries": {
+      "Канада": "Canada",
+      "США": "U.S.A.",
+      "Россия": "Russia",
+      "Швеция": "Svezia",
+      "Финляндия": "Finlandia",
+      "Чехия": "Repubblica Ceca",
+      "Словакия": "Slovacchia",
+      "Швейцария": "Svizzera",
+      "Германия": "Germania",
+      "Австрия": "Austria",
+      "Норвегия": "Norvegia",
+      "Дания": "Danimarca",
+      "Латвия": "Lettonia",
+      "Литва": "Lituania",
+      "Эстония": "Estonia",
+      "Беларусь": "Bielorussia",
+      "Украина": "Ucraina",
+      "Польша": "Polonia",
+      "Венгрия": "Ungheria",
+      "Словения": "Slovenia",
+      "Хорватия": "Croazia",
+      "Франция": "Francia",
+      "Италия": "Italia",
+      "Испания": "Spagna",
+      "Нидерланды": "Paesi Bassi",
+      "Бельгия": "Belgio",
+      "Великобритания": "Regno Unito",
+      "Исландия": "Islanda",
+      "Люксембург": "Lussemburgo",
+      "Румыния": "Romania",
+      "Болгария": "Bulgaria",
+      "Сербия": "Serbia",
+      "Турция": "Turchia",
+      "Казахстан": "Kazakistan",
+      "Узбекистан": "Uzbekistan",
+      "Китай": "Cina",
+      "Япония": "Giappone",
+      "Южная Корея": "Corea del Sud",
+      "Тайвань": "Taiwan",
+      "Гонконг": "Hong Kong",
+      "Сингапур": "Singapore",
+      "Малайзия": "Malaysia",
+      "Таиланд": "Thailandia",
+      "Индия": "India",
+      "Объединенные Арабские Эмираты": "Emirati Arabi Uniti",
+      "Израиль": "Israele",
+      "Австралия": "Australia",
+      "Новая Зеландия": "Nuova Zelanda",
+      "Мексика": "Messico",
+      "ЮАР": "Sudafrica",
+      "Аргентина": "Argentina"
+    },
+    "positions": {
+      "center": "Centravanti",
+      "winger": "Ala",
+      "defender": "Difensore",
+      "goalie": "Portiere",
+      "центральный нападающий": "centravanti",
+      "крайний нападающий": "ala",
+      "защитник": "difensore",
+      "вратарь": "portiere",
+      "Центральный нападающий": "Centravanti",
+      "Крайний нападающий": "Ala",
+      "Защитник": "Difensore",
+      "Вратарь": "Portiere"
+    },
+    "discountForFriendsHint": "Aggiungi il negozio come amico per ottenere uno sconto! Mostra lo sconto al venditore quando acquisti.",
+    "activityRating": "Valutazione attività",
+    "coachingYears": "Allena gli anni",
+    "individualTraining": "Allenamento individuale",
+    "hockeySkills": "Abilità hockey",
+    "skating": "Pattinaggio",
+    "shooting": "Tiri",
+    "fitness": "Fitness",
+    "goalieTraining": "Allenamento portiere",
+    "dryLand": "Allenamento a secco",
+    "faceOffs": "Pratica face-off",
+    "skateSharpeningService": "Affilatura pattini",
+    "skateForming": "Formatura pattini",
+    "skateProfiling": "Profilatura pattini",
+    "equipmentRepair": "Riparazione attrezzature",
+    "stickRepair": "Riparazione bastoni",
+    "usedEquipmentSale": "Vendita attrezzature usate",
+    "newEquipmentSale": "Vendita attrezzature nuove",
+    "phone": "Telefono",
+    "qrCodeTitle": "Codice QR del profilo",
+    "qrCodeSubtitle": "Scansiona per accesso rapido",
+    "qrCodeInfo": "Punta la fotocamera del telefono sul codice QR per aprire il profilo",
+    "shareProfile": "Condividi profilo",
+    "savedToGallery": "Salvato nella galleria",
+    "noPermission": "Nessun accesso alla galleria",
+    "shareError": "Errore durante la creazione dell'immagine",
+    "currentTeam": "Squadra",
+    "hockeyExperience": "Esperienza nell'hockey",
+    "years": "anni",
+    "currentSeasonStats": "Statistiche della stagione corrente"
+  },
+  "register": {
+    "title": "Registrazione",
+    "status": "Stato",
+    "player": "Giocatore",
+    "coach": "Allenatore",
+    "scout": "Esploratore",
+    "star": "Stella",
+    "shop": "Negozio di hockey",
+    "phone": "Telefono",
+    "name": "Nome",
+    "surname": "Cognome",
+    "birthDate": "Data di nascita",
+    "country": "Paese",
+    "position": "Posizione",
+    "grip": "Presa",
+    "height": "Altezza (cm)",
+    "weight": "Peso (kg)",
+    "number": "Numero",
+    "photo": "Foto",
+    "selectPhoto": "Seleziona una foto",
+    "takePhoto": "Scatta una foto",
+    "chooseFromGallery": "Seleziona dalla galleria",
+    "photoRequired": "È richiesta una foto",
+    "register": "Registro",
+    "back": "Indietro",
+    "welcome": "Benvenuto!",
+    "registrationSuccess": "Registrazione completata con successo! Benvenuti su HockeyStars!",
+    "selectDate": "Seleziona la data",
+    "cancel": "Cancellare",
+    "confirm": "Confermare",
+    "photoError": "Errore durante il caricamento della foto"
+  },
+  "navigation": {
+    "home": "Casa",
+    "search": "Ricerca",
+    "messages": "Messaggi",
+    "notifications": "Eventi",
+    "profile": "Profilo"
+  },
+  "admin": {
+    "accessDenied": "Accesso negato",
+    "onlyAdmins": "Questa funzionalità può essere utilizzata solo dagli amministratori.",
+    "error": "Errore",
+    "errorLoadingProfile": "Impossibile accedere al profilo",
+    "player": "Giocatore",
+    "coach": "Allenatore",
+    "scout": "Esploratore",
+    "admin": "Amministratore",
+    "star": "Stella",
+    "shop": "Negozio di hockey",
+    "noName": "Nessun nome",
+    "noPosition": "Non specificato",
+    "noTeam": "Non specificato",
+    "sendGift": "Invia regalo",
+    "yearsOld": "anni",
+    "addUser": "Aggiungi utente",
+    "searchPlayers": "Cerchiamo giocatori...",
+    "createUser": "Creazione di un utente",
+    "basicInfo": "Informazioni di base",
+    "name": "Nome",
+    "phone": "Numero di telefono",
+    "status": "Stato",
+    "position": "Posizione",
+    "number": "Numero del giocatore",
+    "grip": "Presa",
+    "height": "Altezza (cm)",
+    "weight": "Peso (kg)",
+    "country": "Paese",
+    "create": "Creare",
+    "success": "Successo",
+    "userCreated": "L'utente {{name}} è stato creato",
+    "errorCreatingUser": "Impossibile creare l'utente",
+    "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori.",
+    "enterValidPhone": "Inserisci un numero di telefono valido con prefisso internazionale.",
+    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione"
+  },
+  "museum": {
+    "title": "Museo",
+    "noItems": "Il museo è ancora vuoto."
+  },
+  "teams": {
+    "Система": "Sistema",
+    "Привет": "Ciao",
+    "Пираньи": "Piranha",
+    "Динамо Минск": "Dinamo Minsk",
+    "Динамо-Минск": "Dinamo Minsk",
+    "Юность-Минск": "Yunost-Minsk",
+    "Юность": "Gioventù",
+    "Неман": "Neman",
+    "Гомель": "Gomel",
+    "Брест": "Brest",
+    "Витебск": "Vitebsk",
+    "Львы": "Leoni",
+    "Керамин": "Cheramina",
+    "Могилев": "Mogilev",
+    "Гродно": "Grodno",
+    "Сборная Беларуси": "La nazionale bielorussa",
+    "Сборная Минской области": "Squadra della regione di Minsk",
+    "Сборная Гомельской области": "Squadra della regione di Gomel",
+    "Сборная Брестской области": "Squadra della regione di Brest",
+    "Сборная Витебской области": "Squadra della regione di Vitebsk",
+    "Сборная Могилевской области": "Squadra della regione di Mogilev",
+    "Сборная Гродненской области": "Squadra della regione di Grodno",
+    "ХК Минск": "HC Minsk",
+    "ХК Гомель": "HC Gomel",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogilev",
+    "ХК Гродно": "HC Grodno",
+    "Динамо": "Dinamo",
+    "Спартак": "Spartaco",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Yulaev",
+    "Ак Барс": "Barrette Ak",
+    "Металлург": "metallurgista",
+    "Трактор": "Trattore",
+    "Авангард": "Avanguardia",
+    "Сибирь": "Siberia",
+    "Амур": "Amur",
+    "Адмирал": "Ammiraglio",
+    "Локомотив": "Locomotiva",
+    "Северсталь": "Severstal",
+    "Витязь": "Cavaliere",
+    "Сочи": "Sochi",
+    "Торпедо": "Siluro",
+    "Нефтехимик": "petrolchimico",
+    "Автомобилист": "Automobilista",
+    "Югра": "Yugra",
+    "Барыс": "Barys",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Dinamo Riga",
+    "Динамо Москва": "Dinamo Mosca",
+    "Динамо Минск U20": "Dinamo Minsk U20",
+    "Динамо Минск U18": "Dinamo Minsk U18",
+    "Calgary Flames": "Calgary Flames",
+    "New Jersey Devils": "New Jersey Devils",
+    "Юность-Минск U20": "Yunost-Minsk U20",
+    "Юность-Минск U18": "Yunost-Minsk U18",
+    "teams": {
+      "Сборная Беларуси": "La nazionale bielorussa",
+      "Динамо Минск": "Dinamo Minsk",
+      "Юность-Минск": "Yunost-Minsk",
+      "Пираньи": "Piranha",
+      "Сборная Минской области": "Squadra della regione di Minsk",
+      "Сборная Беларуси U14": "Nazionale bielorussa U14",
+      "Пчелки": "Api",
+      "Беларусь U14": "Nazionale bielorussa U14",
+      "Минская область": "Squadra della regione di Minsk",
+      "New Jersey Devils": "New Jersey Devils",
+      "Calgary Flames": "Calgary Flames",
+      "Boston Hockey Club": "Boston Hockey Club",
+      "Belarus U14 National Team": "Nazionale bielorussa U14",
+      "Belarus National Team U14": "Nazionale bielorussa U14",
+      "Minsk Region Team": "Squadra della regione di Minsk",
+      "Piranhas": "Piranha",
+      "Bees": "Api",
+      "Toronto Maple Leafs": "Toronto Maple Leafs",
+      "Montreal Canadiens": "Montreal Canadiens",
+      "Vancouver Canucks": "Vancouver Canucks",
+      "Edmonton Oilers": "Edmonton Oilers",
+      "Winnipeg Jets": "Winnipeg Jets",
+      "Ottawa Senators": "Senatori di Ottawa",
+      "New York Rangers": "New York Rangers",
+      "Boston Bruins": "Boston Bruins",
+      "Chicago Blackhawks": "Chicago Blackhawks",
+      "Detroit Red Wings": "Detroit Red Wings",
+      "Pittsburgh Penguins": "Pittsburgh Penguins",
+      "Washington Capitals": "Washington Capitals",
+      "Tampa Bay Lightning": "Tampa Bay Lightning",
+      "Colorado Avalanche": "Valanga del Colorado",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kaunas",
+      "Vilnius": "Vilnius",
+      "Klaipeda": "Klaipeda",
+      "Riga": "Riga",
+      "Daugavpils": "Daugavpils",
+      "Liepaja": "Liepaja",
+      "Cracovia": "Cracovia",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "squadra nazionale russa",
+      "Сборная Канады": "Squadra Canada",
+      "Сборная США": "Squadra USA",
+      "Сборная Финляндии": "nazionale finlandese",
+      "Сборная Швеции": "nazionale svedese",
+      "Сборная Беларуси U20": "Nazionale bielorussa U20",
+      "Сборная Беларуси U18": "Nazionale bielorussa U18",
+      "Динамо Минск U20": "Dinamo Minsk U20",
+      "Динамо Минск U18": "Dinamo Minsk U18",
+      "Юность-Минск U20": "Yunost-Minsk U20",
+      "Юность-Минск U18": "Yunost-Minsk U18",
+      "ШРС": "SRS",
+      "Динамо-Молодечно": "Dynamo-Molodechno",
+      "Динамо Р": "Dinamo R",
+      "Слован": "Slovan",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranovichi",
+      "Шахтер": "Šachtyor",
+      "Лида": "Lida",
+      "Пинск": "Pinsk",
+      "Ивацевичи": "Ivatsevichi",
+      "Береза": "Betulla",
+      "Кобрин": "Kobryn",
+      "Химик": "Khimik",
+      "Жлобин": "Zhlobin",
+      "Бобруйск": "Bobruisk",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "Nazionale RB",
+      "Сборная Минска": "squadra di Minsk",
+      "ЦСКА Москва": "CSKA Mosca",
+      "Спартак Москва": "Spartak Mosca",
+      "Локомотив Ярославль": "Lokomotiv Yaroslavl",
+      "Ак Барс Казань": "Ak Bars Kazan",
+      "Трактор Челябинск": "Trattore Chelyabinsk",
+      "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+      "Торпедо Нижний Новгород": "Siluro Nizhny Novgorod"
+    },
+    "Сборная Беларуси U14": "Nazionale bielorussa U14",
+    "Барановичи": "Baranovichi",
+    "Шахтер": "Minatore",
+    "Лида": "Lida",
+    "Пинск": "Pinsk",
+    "Ивацевичи": "Ivatsevichi",
+    "Береза": "Betulla",
+    "Кобрин": "Kobryn",
+    "Химик": "Chimico",
+    "Жлобин": "Zhlobin",
+    "Бобруйск": "Bobruisk",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "Nazionale RB",
+    "Сборная Минска": "squadra di Minsk",
+    "ЦСКА Москва": "CSKA Mosca",
+    "Спартак Москва": "Spartak Mosca",
+    "Локомотив Ярославль": "Lokomotiv Yaroslavl",
+    "Ак Барс Казань": "Ak Bars Kazan",
+    "Трактор Челябинск": "Trattore Chelyabinsk",
+    "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+    "Торпедо Нижний Новгород": "Siluro Nizhny Novgorod",
+    "Boston Hockey Club": "Boston Hockey Club",
+    "Пчелки": "Api",
+    "Center": "Centravanti",
+    "Winger": "Bordo",
+    "Defender": "Difensore",
+    "Goalie": "Portiere"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "selectLanguage": "Seleziona la lingua",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Ricerca",
+    "loading": "Caricamento della ricerca...",
+    "placeholder": "Cerchiamo giocatori...",
+    "country": "Paese",
+    "grip": "Presa",
+    "position": "Posizione",
+    "year": "Anno",
+    "height": "Altezza",
+    "heightFrom": "Altezza da",
+    "weight": "Peso",
+    "weightFrom": "Peso da",
+    "all": "Tutto",
+    "noPlayersFound": "Nessun giocatore trovato",
+    "left": "Sinistra",
+    "right": "Giusto"
+  },
+  "messages": {
+    "title": "Messaggi",
+    "loading": "Caricamento chat in corso...",
+    "noMessages": "Nessun messaggio",
+    "startConversation": "Inizia a chattare con altri giocatori",
+    "error": "Errore",
+    "errorLoadingChats": "Impossibile caricare le chat",
+    "yesterday": "Ieri",
+    "you": "Voi:"
+  },
+  "notifications": {
+    "title": "Eventi",
+    "loading": "Caricamento eventi in corso...",
+    "noNotifications": "Nessun evento",
+    "noNotificationsSubtitle": "Non hai ancora ricevuto eventi su amicizie, regali o altre azioni.",
+    "accept": "Accettare",
+    "decline": "Rifiutare",
+    "friendRequests": "Richieste di amicizia",
+    "friendRequest": "richiesta di amicizia",
+    "wantsToAddYou": "{name} vuole aggiungerti come amico",
+    "wantsToAddAsFriend": "vuole aggiungerti come amico",
+    "friendRequestAccepted": "Richiesta di amicizia accettata!",
+    "friendRequestDeclined": "Richiesta di amicizia rifiutata",
+    "giftRequest": "Richiesta regalo",
+    "giftRequestMessage": "{playerName} richiede {itemType}",
+    "giftRequestApproved": "Richiesta approvata",
+    "giftRequestApprovedMessage": "{starName} ha approvato la tua richiesta per {itemType}",
+    "giftRequestAccepted": "Richiesta regalo accettata!",
+    "giftRequestRejected": "Richiesta regalo rifiutata",
+    "player": "Giocatore",
+    "unknownPlayer": "Giocatore sconosciuto",
+    "star": "Stella"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Seleziona una fonte fotografica",
+    "selectPhotoMessage": "Da dove vuoi caricare una foto?",
+    "gallery": "Galleria",
+    "camera": "Telecamera",
+    "cancel": "Cancellare",
+    "save": "Salva",
+    "name": "Nome",
+    "namePlaceholder": "Nome del giocatore",
+    "country": "Paese",
+    "position": "Posizione",
+    "height": "Altezza (cm)",
+    "heightPlaceholder": "Altezza",
+    "weight": "Peso (kg)",
+    "weightPlaceholder": "Peso",
+    "number": "Numero",
+    "grip": "Presa",
+    "birthDate": "Data di nascita",
+    "socialLinks": "Social media",
+    "Левый": "Sinistra"
+  },
+  "exercisesSection": {
+    "title": "Esercizi completati",
+    "loading": "Caricamento...",
+    "noExercises": "Non hai ancora completato nessun esercizio.",
+    "noExercisesOwn": "Non hai ancora completato nessun esercizio.",
+    "noExercisesOther": "L'utente non ha ancora completato alcun esercizio.",
+    "times": "una volta",
+    "timesPlural": "volte"
+  },
+  "home": {
+    "loadingPlayers": "Rinnovamento del ghiaccio...",
+    "noPlayersCountry": "Nessun giocatore da {{country}}",
+    "noPlayersYear": "Non ci sono giocatori nati in {{year}}",
+    "noPlayersCountryYear": "Nessun giocatore da {{country}} in {{year}}",
+    "iceEmpty": "Il ghiaccio è vuoto. Scegli un paese o un anno diverso, oppure reimposta i filtri.",
+    "waitingForConnection": "In attesa di connessione",
+    "checkInternetConnection": "Controlla la tua connessione Internet"
+  },
+  "filters": {
+    "year": "anno",
+    "yearDefault": "2012"
+  },
+  "chat": {
+    "loading": "Caricamento chat...",
+    "startConversation": "Inizia una conversazione con {nome}",
+    "enterMessage": "Inserisci il tuo messaggio...",
+    "player": "Giocatore",
+    "coach": "Allenatore",
+    "scout": "Esploratore",
+    "admin": "Supporto tecnico",
+    "star": "Stella",
+    "shop": "Negozio di hockey",
+    "error": "Errore",
+    "errorLoadingChat": "Impossibile caricare i dati della chat",
+    "errorSendingMessage": "Impossibile inviare il messaggio"
+  },
+  "createUser": {
+    "title": "Creazione di un utente",
+    "selectPhotoSource": "Seleziona una fonte fotografica",
+    "selectPhotoMessage": "Da dove vuoi caricare una foto?",
+    "gallery": "Galleria",
+    "camera": "Telecamera",
+    "cancel": "Cancellare",
+    "permissionError": "Per accedere alla galleria è necessario il permesso.",
+    "permissionErrorCamera": "Per accedere alla telecamera è necessaria l'autorizzazione.",
+    "errorLoadingPhoto": "Impossibile caricare la foto dalla galleria",
+    "errorTakingPhoto": "Impossibile scattare la foto",
+    "addPhoto": "Aggiungi una foto",
+    "status": "Stato",
+    "player": "Giocatore",
+    "coach": "Allenatore",
+    "scout": "Esploratore",
+    "star": "Stella",
+    "shop": "Negozio di hockey",
+    "phone": "Numero di telefono",
+    "name": "Nome e cognome",
+    "namePlaceholder": "INSERISCI IL NOME",
+    "nameHint": "Solo lettere latine (A-Z)",
+    "birthDate": "Data di nascita",
+    "selectBirthDate": "Seleziona la tua data di nascita",
+    "position": "Posizione",
+    "number": "Numero del giocatore",
+    "numberPlaceholder": "Numero sulla divisa",
+    "grip": "Presa",
+    "height": "Altezza (cm)",
+    "heightPlaceholder": "Altezza",
+    "weight": "Peso (kg)",
+    "weightPlaceholder": "Peso",
+    "country": "Paese",
+    "selectCountry": "Seleziona un paese",
+    "searchCountry": "Ricerca per paese...",
+    "close": "Vicino",
+    "create": "Creare",
+    "error": "Errore",
+    "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori.",
+    "enterValidPhone": "Inserisci un numero di telefono valido con prefisso internazionale.",
+    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione",
+    "success": "Successo",
+    "userCreated": "L'utente {{name}} è stato creato",
+    "errorCreatingUser": "Impossibile creare l'utente"
+  },
+  "exerciseDetails": {
+    "back": "Indietro",
+    "complete": "Eseguire",
+    "completed": "Completato",
+    "times": "una volta",
+    "timesPlural": "volte",
+    "duration": "Durata",
+    "difficulty": "Complessità",
+    "equipment": "Attrezzatura",
+    "calories": "Calorie",
+    "benefits": "Beneficio",
+    "instructions": "Istruzioni",
+    "tips": "Consiglio",
+    "beginner": "Inizio",
+    "intermediate": "Media",
+    "advanced": "Avanzato",
+    "error": "Errore",
+    "errorCompleting": "Impossibile completare l'esercizio",
+    "success": "Successo",
+    "exerciseCompleted": "Esercizio completato!"
+  },
+  "gifts": {
+    "requestGift": "Richiedi un regalo",
+    "gifts": "Presente",
+    "autograph": "Autografo",
+    "stick": "Bastone",
+    "puck": "Rondella",
+    "jersey": "Maglia",
+    "pleaseWriteMessage": "Si prega di scrivere un messaggio alla tua richiesta",
+    "invalidGift": "regalo inappropriato",
+    "deleteGiftQuestion": "Eliminare regalo?",
+    "from": "da",
+    "noGiftsYet": "Ancora nessun regalo dalle stelle",
+    "museum": "Museo dei doni",
+    "myGifts": "I miei regali",
+    "noGifts": "Nessun regalo ancora",
+    "noGiftsSubtext": "Carica il tuo primo regalo da condividere con i giocatori",
+    "addGift": "Aggiungi un regalo",
+    "successDeleted": "Regalo eliminato",
+    "errorDelete": "Impossibile eliminare il regalo",
+    "noImage": "nessuna immagine",
+    "failedToSendRequest": "Impossibile inviare la richiesta",
+    "requestSent": "Richiesta inviata!",
+    "requestSentMessage": "La tua richiesta per {itemType} è stata inviata. Attendi una risposta.",
+    "requestItem": "Richiesta {itemType}",
+    "requestMessage": "Messaggio alla richiesta",
+    "selectGiftType": "Seleziona il tipo di regalo",
+    "selectGiftTypeMessage": "Che tipo di regalo vorresti creare?",
+    "requestMessageHelper": "Scrivi un messaggio cortese spiegando perché desideri ricevere questo regalo.",
+    "requestMessagePlaceholder": "Ad esempio: Ciao! Sono un grande fan del tuo gioco e vorrei un autografo per la mia collezione...",
+    "characters": "simboli",
+    "sending": "Invio in corso...",
+    "sendRequest": "Invia una richiesta",
+    "requestInfo": "Dopo aver inviato la richiesta, la stella riceverà una notifica e potrà accettarla o rifiutarla. Se accettata, il regalo apparirà nel tuo Museo dei Regali.",
+    "failedToLoadItems": "Impossibile caricare gli elementi",
+    "noPermissionToUpload": "Non hai l'autorizzazione per caricare elementi per un altro utente.",
+    "failedToGetImageUri": "Impossibile ottenere l'URI dell'immagine",
+    "failedToSelectImage": "Impossibile selezionare l'immagine",
+    "emptyImageUri": "L'URI dell'immagine è vuoto.",
+    "formDataUploadError": "Errore durante il caricamento tramite FormData",
+    "imageUploadError": "Errore durante il caricamento dell'immagine: {error}",
+    "itemUploadedSuccessfully": "{itemType} caricato con successo!",
+    "failedToUploadItem": "Impossibile caricare l'elemento",
+    "userNotAuthorized": "L'utente non è autorizzato",
+    "noPermissionToEdit": "Non hai l'autorizzazione per modificare gli elementi per un altro utente.",
+    "itemNotFound": "Regalo non trovato",
+    "failedToUploadNewImage": "Errore durante il caricamento della nuova immagine",
+    "emptyImage": "L'immagine è vuota (0 byte)",
+    "failedToUpdateDatabase": "Errore durante l'aggiornamento del record del database",
+    "itemImageUpdated": "Immagine del regalo aggiornata!",
+    "failedToUpdateItemImage": "Impossibile aggiornare l'immagine del regalo",
+    "allGiftsAdded": "Tutti i regali sono stati aggiunti.",
+    "allGiftTypesAdded": "Hai già tutti i tipi di doni",
+    "deletion": "Rimozione",
+    "itemDeleted": "Regalo rimosso",
+    "failedToDeleteItem": "Impossibile eliminare il regalo",
+    "clickPlusToAdd": "Clicca + per aggiungere",
+    "настоящее время": "tempo presente",
+    "Центральный нападающий": "Centravanti",
+    "Крайний нападающий": "Ala",
+    "Защитник": "Difensore",
+    "Вратарь": "Portiere",
+    "Center": "Centravanti",
+    "Winger": "Bordo",
+    "Defender": "Difensore",
+    "Goalie": "Portiere",
+    "Left": "Sinistra",
+    "Right": "Giusto",
+    "seconds": "secondo",
+    "times": "una volta",
+    "sprint": "100 metri piani",
+    "_cache_clear": "2024-01-16-9",
+    "sendGiftTo": "Invia regalo a {playerName}",
+    "selectExistingGift": "Seleziona regalo esistente",
+    "orCreateNew": "O crea nuovo",
+    "giftName": "Nome regalo",
+    "giftNamePlaceholder": "es. Cappello firmato",
+    "uploadImage": "Carica immagine",
+    "send": "Invia",
+    "selectGift": "Seleziona regalo",
+    "fromAdmin": "Amministratore",
+    "errorSelectOrCreate": "Seleziona un regalo o creane uno nuovo",
+    "errorGiftAlreadyExists": "Questo regalo esiste già per il giocatore {playerName}.\n\nSeleziona un altro regalo o creane uno nuovo.",
+    "successGiftSent": "Regalo inviato a {playerName}!",
+    "errorSendingGift": "Impossibile inviare il regalo",
+    "deleteGiftConfirm": "Sei sicuro di voler eliminare questo regalo?",
+    "selectImage": "Seleziona immagine",
+    "errorPermissionDenied": "Non hai il permesso di eliminare questo regalo",
+    "errorGiftNotFound": "Regalo non trovato",
+    "errorGiftNotDeleted": "Il regalo non è stato eliminato",
+    "noGiftsUploaded": "Nessun regalo caricato ancora",
+    "fromStar": "da {starName}",
+    "giftReceived": "Regalo ricevuto!",
+    "giftReceivedFromAdmin": "Hai ricevuto un regalo dall'amministratore: {giftName}",
+    "giftReceivedFromStar": "Hai ricevuto un regalo da {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Regalo ricevuto!",
+    "giftReceivedFromAdminPush": "Hai ricevuto un regalo dall'amministratore: {giftName}",
+    "giftReceivedFromStarPush": "Hai ricevuto un regalo da {starName}: {giftName}"
+  },
+  "TEMP_DELETE_ME": {
+    "title": "Standard",
+    "noNormatives": "Gli standard non sono ancora stati aggiunti.",
+    "russia": "Russia",
+    "canada": "Canada",
+    "finland": "Finlandia",
+    "sweden": "Svezia",
+    "czech": "Repubblica Ceca",
+    "slovakia": "Slovacchia",
+    "germany": "Germania",
+    "switzerland": "Svizzera",
+    "austria": "Austria",
+    "norway": "Norvegia",
+    "denmark": "Danimarca",
+    "latvia": "Lettonia",
+    "lithuania": "Lituania",
+    "estonia": "Estonia",
+    "ukraine": "Ucraina",
+    "kazakhstan": "Kazakistan",
+    "беларусь": "Bielorussia",
+    "россия": "Russia",
+    "сша": "U.S.A.",
+    "канада": "Canada",
+    "финляндия": "Finlandia",
+    "швеция": "Svezia",
+    "чехия": "Repubblica Ceca",
+    "словакия": "Slovacchia",
+    "германия": "Germania",
+    "швейцария": "Svizzera",
+    "австрия": "Austria",
+    "норвегия": "Norvegia",
+    "дания": "Danimarca",
+    "латвия": "Lettonia",
+    "литва": "Lituania",
+    "эстония": "Estonia",
+    "украина": "Ucraina",
+    "казахстан": "Kazakistan",
+    "польша": "Polonia",
+    "венгрия": "Ungheria",
+    "словения": "Slovenia",
+    "хорватия": "Croazia",
+    "франция": "Francia",
+    "италия": "Italia",
+    "испания": "Spagna",
+    "нидерланды": "Paesi Bassi",
+    "бельгия": "Belgio",
+    "великобритания": "Regno Unito",
+    "исландия": "Islanda",
+    "люксембург": "Lussemburgo",
+    "румыния": "Romania",
+    "болгария": "Bulgaria",
+    "сербия": "Serbia",
+    "турция": "Turchia",
+    "узбекистан": "Uzbekistan",
+    "китай": "Cina",
+    "япония": "Giappone",
+    "южнаякорея": "Corea del Sud",
+    "тайвань": "Taiwan",
+    "гонконг": "Hong Kong",
+    "сингапур": "Singapore",
+    "малайзия": "Malaysia",
+    "таиланд": "Thailandia",
+    "индия": "India",
+    "объединенныеарабскиеэмираты": "Emirati Arabi Uniti",
+    "израиль": "Israele",
+    "австралия": "Australia",
+    "новаязеландия": "Nuova Zelanda",
+    "мексика": "Messico",
+    "юар": "Sudafrica",
+    "аргентина": "Argentina"
+  },
+  "normatives": {
+    "title": "Standard",
+    "noNormatives": "Gli standard non sono ancora stati aggiunti.",
+    "addNormative": "Aggiungi uno standard",
+    "name": "Nome",
+    "description": "Descrizione",
+    "type": "Tipo",
+    "value": "Senso",
+    "unit": "Unità di misura",
+    "add": "Aggiungere",
+    "cancel": "Cancellare",
+    "save": "Salva",
+    "edit": "Modificare",
+    "delete": "Eliminare",
+    "back": "Indietro",
+    "editNormative": "Modifica lo standard",
+    "deleteNormativeConfirm": "Vuoi davvero eliminare il regolamento \"{{name}}\"? Questa azione non può essere annullata.",
+    "normativeDeleted": "Lo standard \"{{name}}\" è stato rimosso",
+    "normativeCreated": "Creato lo standard \"{{name}}\"",
+    "errorCreatingNormative": "Impossibile creare lo standard",
+    "errorDeletingNormative": "Impossibile eliminare lo standard",
+    "errorEditingNormative": "Impossibile modificare lo standard",
+    "errorLoadingNormatives": "Impossibile caricare gli standard",
+    "normativeUpdated": "Lo standard \"{{name}}\" è stato aggiornato",
+    "errorUpdatingNormative": "Impossibile aggiornare lo standard"
+  },
+  "socialLinks": {
+    "website": "Sito web",
+    "error": "Errore",
+    "cannotOpenLink": "Impossibile aprire il collegamento a {piattaforma}",
+    "openError": "Errore durante l'apertura del collegamento",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "vk": "VK",
+    "enterInstagram": "Entra in Instagram",
+    "enterTiktok": "Entra TikTok",
+    "enterVk": "Entra in VK",
+    "enterWebsite": "Entra nel sito web",
+    "instagramPlaceholder": "@nomeutente o collegamento",
+    "tiktokPlaceholder": "@nomeutente o collegamento",
+    "vkPlaceholder": "@nomeutente o collegamento",
+    "websitePlaceholder": "esempio.com"
+  },
+  "logout": "Uscita",
+  "logoutConfirm": "Esci dal tuo profilo",
+  "logoutConfirmMessage": "Sei sicuro di voler uscire dal tuo profilo?",
+  "adminGifts": {
+    "sendGift": "Invia regalo",
+    "giftName": "Nome del regalo",
+    "selectImage": "Seleziona immagine"
+  },
+  "videoNotification": {
+    "added": "ha aggiunto",
+    "oneVideo": "nuovo video",
+    "multipleVideos": "{count} nuovi video",
+    "video": "video",
+    "videos": "video"
+  },
+  "achievementNotification": {
+    "added": "ha aggiunto",
+    "received": "ha ricevuto",
+    "oneAchievement": "nuovo traguardo",
+    "multipleAchievements": "{count} nuovi traguardi",
+    "achievement": "traguardo",
+    "achievements": "traguardi",
+    "title": "🏆 Traguardo!",
+    "message": "Congratulazioni! Hai ricevuto il traguardo: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "ha cambiato il suo avatar"
+  },
+  "statsNotification": {
+    "updated": "ha aggiornato",
+    "stats": "statistiche",
+    "normatives": "normative",
+    "physicalData": "dati fisici"
+  },
+  "height": "altezza",
+  "weight": "peso",
+  "cm": "cm",
+  "kg": "kg"
+}

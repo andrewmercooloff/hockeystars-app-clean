@@ -1,0 +1,2473 @@
+{
+  "common": {
+    "save": "Tallentaa",
+    "cancel": "Peruuta",
+    "edit": "Muokata",
+    "delete": "Poista",
+    "add": "Lisätä",
+    "close": "Lähellä",
+    "back": "Takaisin",
+    "next": "Seuraavaksi",
+    "done": "Valmis",
+    "loading": "Ladataan...",
+    "error": "Virhe",
+    "success": "Onnistui",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "ok": "OK",
+    "confirm": "Vahvistaa",
+    "deleteConfirm": "Poistaminen",
+    "deletePhotoConfirm": "Haluatko varmasti poistaa tämän kuvan?",
+    "deleteTeamConfirm": "Haluatko varmasti poistaa tämän komennon?",
+    "deletePastTeamConfirm": "Haluatko varmasti poistaa tämän komennon historiasta?",
+    "deleteAchievementConfirm": "Haluatko varmasti poistaa tämän saavutuksen?",
+    "deleteAllNotificationsConfirm": "Haluatko varmasti tyhjentää kaikki ilmoitukset?",
+    "rejectRequestConfirm": "Haluatko varmasti hylätä tämän pyynnön?",
+    "super": "Mahtavaa!",
+    "retry": "Yritä uudelleen",
+    "goalie": "Maalivahti"
+  },
+  "winger": "Laituri",
+  "center": "Keskushyökkääjä",
+  "defender": "Puolustaja",
+  "goals": "Maalit",
+  "assists": "Vaihteistot",
+  "games": "Pelit",
+  "pullUps": "Vedot",
+  "pushUps": "Push-ups",
+  "plankTime": "Lankku (s)",
+  "sprint100m": "100 m (sek)",
+  "longJump": "pituushyppy (m)",
+  "jumpRope": "hyppynaru (yksi)",
+  "justNow": "juuri nyt",
+  "minutesAgo": "{minutes} minuuttia sitten",
+  "hoursAgo": "{hours} tuntia sitten",
+  "daysAgo": "{days} päivää sitten",
+  "photoNotification": {
+    "added": "lisätty",
+    "onePhoto": "uusi valokuva",
+    "multiplePhotos": "{count} uutta kuvaa",
+    "photo": "kuva",
+    "photos": "kuva"
+  },
+  "friendshipNotification": {
+    "title": "Uusi ystävyys",
+    "message": "{friend1Name} ja {friend2Name} ystävystyivät",
+    "became": "tuli ystäviä"
+  },
+  "exerciseNotification": {
+    "title": "Harjoitus suoritettu",
+    "message": "{playerName} suoritti harjoituksen \"{exerciseName}\"",
+    "completed": "suoritti harjoituksen",
+    "exercise": "Käyttää"
+  },
+  "giftNotification": {
+    "title": "Lahja tähdeltä",
+    "message": "{playerName} sai {giftName} käyttäjältä {starName}",
+    "received": "saanut",
+    "from": "alkaen",
+    "gift": "Lahja"
+  },
+  "addPhoto": "Lisää valokuva",
+  "selectPhotoSource": "Valitse valokuvan lähde",
+  "gallery": "Galleria",
+  "camera": "Kamera",
+  "cancel": "Peruuttaa",
+  "error": "Virhe",
+  "maxPhotosReached": "Kuvien enimmäismäärä: 50",
+  "galleryPermissionRequired": "Galleriaan pääsyyn vaaditaan lupa.",
+  "galleryError": "Kuvan lataaminen galleriasta epäonnistui.",
+  "cameraNotSupported": "Valokuvien ottamista ei tueta verkkoversiossa. Käytä galleriaa.",
+  "cameraPermissionRequired": "Kameraan pääsyyn vaaditaan lupa.",
+  "cameraError": "Kuvan ottaminen epäonnistui.",
+  "noPhotos": "Ei valokuvia",
+  "clickToAddPhoto": "Napsauta \"Lisää valokuva\" aloittaaksesi.",
+  "maxPhotos": "Enintään 50 kuvaa",
+  "uploading": "Ladataan...",
+  "uploadingPhotos": "Ladataan {count} kuvaa... {progress}%",
+  "info": "Tiedot",
+  "addVideoLink": "Lisää linkki YouTubeen tai VK:hen ja kellonaika (muoto: minuutit:sekunnit, esimerkiksi: 1:25)",
+  "supportedPlatforms": "Tuetut sivustot: youtube.com/watch?v=, youtube.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=... tai vk.com/video...",
+  "timeCodePlaceholder": "min:sek",
+  "myMoment": "Minun hetkeni",
+  "belarus": "Valko-Venäjä",
+  "additional": "Lisäksi",
+  "left": "Vasen",
+  "right": "Oikein",
+  "birthDatePlaceholder": "KK.VVVV (esimerkiksi: 12.2014)",
+  "countPlaceholder": "Kertojen lukumäärä",
+  "timePlaceholder": "Aika sekunneissa",
+  "deleteUser": "Käyttäjän poistaminen",
+  "success": "Onnistuneesti",
+  "selectTeams": "Valitse joukkueet",
+  "enterTeamName": "Kirjoita joukkueen nimi",
+  "enterStartYear": "Anna kelvollinen aloitusvuosi",
+  "enterEndYear": "Anna kelvollinen loppuvuosi.",
+  "createTeamError": "Komennon luominen tietokantaan epäonnistui",
+  "addTeam": "Lisää komento",
+  "teamName": "Joukkueen nimi*",
+  "teamCountry": "Maa (valinnainen)",
+  "teamCity": "Kaupunki (valinnainen)",
+  "startYear": "Aloitusvuosi*",
+  "endYear": "Valmistumisvuosi (valinnainen)",
+  "searchTeams": "Etsitään joukkuetta...",
+  "save": "Tallentaa",
+  "add": "Lisätä",
+  "editTeam": "Muokkaa joukkuetta",
+  "noTeamsFound": "Ei löytynyt komentoja",
+  "searching": "Haku...",
+  "noCurrentTeams": "Nykyisiä komentoja ei ole.",
+  "addMoreVideo": "Lisää videoita",
+  "noPastTeams": "Ei menneitä komentoja",
+  "noVideosAdded": "Ei lisätty videoita",
+  "noTeamsSpecified": "Ei määritettyjä komentoja",
+  "selectCountry": "Valitse maa",
+  "selectPosition": "Valitse sijainti",
+  "basicInfo": "Perustiedot",
+  "dateFormat": "PP.KK.VVVV",
+  "noPermission": "Sinulla ei ole lupaa muokata tätä profiilia.",
+  "playerUpdated": "Tiedot päivitetty",
+  "saveError": "Tietojen tallennus epäonnistui",
+  "achievements": {
+    "firstPlace": "1. sija",
+    "secondPlace": "2. sija",
+    "thirdPlace": "3. sija",
+    "place": "{place} paikka",
+    "noAchievements": "Ei saavutuksia"
+  },
+  "exercises": {
+    "exerciseNumber": "Harjoitus #{id}",
+    "title": "Harjoitukset",
+    "subtitle": "Valitse harjoitus",
+    "searchPlaceholder": "Hae numerolla tai nimellä...",
+    "loadingExercise": "Ladataan harjoitusta...",
+    "loadingExercises": "Ladataan harjoituksia...",
+    "exercise": "Käyttää",
+    "alreadyCompleted": "Harjoitus on jo suoritettu",
+    "canRetryIn": "Voit tehdä tämän harjoituksen uudelleen {hours} tunnin kuluttua",
+    "all": "Kaikki",
+    "completed": "Valmis",
+    "times": "kerran",
+    "loading": "Ladataan...",
+    "categories": {
+      "Выносливость": "Kestävyys",
+      "Взрывная скорость": "Räjähtävä nopeus",
+      "Разминка": "Lämmittely",
+      "Растяжка": "Venyttely",
+      "Ловкость": "Ketteryys",
+      "Сила": "Vahvuus",
+      "Баланс": "Saldo",
+      "Скоростная выносливость": "Nopeuden kestävyys",
+      "Восстановление": "Toipuminen",
+      "Endurance": "Kestävyys",
+      "Explosive Speed": "Räjähdysmäinen nopeus",
+      "Warm-up": "Lämmittely",
+      "Stretching": "Venyttely",
+      "Agility": "Ketteryys",
+      "Strength": "Voima",
+      "Balance": "Tasapaino",
+      "Speed Endurance": "Nopeuskestävyys",
+      "Recovery": "Toipuminen"
+    },
+    "details": {
+      "category": "Luokka",
+      "duration": "Kesto",
+      "difficulty": "Monimutkaisuus",
+      "description": "Kuvaus",
+      "benefits": "Harjoittelun edut",
+      "instructions": "Vaiheittaiset ohjeet",
+      "tips": "Hyödyllisiä vinkkejä",
+      "equipment": "Laitteet",
+      "calories": "Kalorit",
+      "additionalInfo": "Lisätietoja",
+      "completed": "Valmistunut:",
+      "completedButton": "Olen tehnyt sen",
+      "alreadyCompleted": "jo valmis",
+      "saving": "Tallennetaan...",
+      "notFound": "Harjoitusta ei löytynyt",
+      "unavailable": "Ei saatavilla",
+      "playersOnly": "Harjoitukset ovat vain pelaajien saatavilla",
+      "markedComplete": "Harjoitus on merkitty suoritetuksi",
+      "error": "Virhe",
+      "saveError": "Harjoitusta ei voi merkitä suoritetuksi",
+      "generalError": "Tallennettaessa tapahtui virhe",
+      "times": "kerran",
+      "timesPlural": "kertaa"
+    },
+    "difficulty": {
+      "Начинающий": "Alku",
+      "Средний": "Keskimäärin",
+      "Продвинутый": "Edistynyt",
+      "Легкая": "Helppo"
+    },
+    "items": {
+      "1": {
+        "title": "Intervallijuoksu",
+        "description": "Vuorotellen nopean (30 sekuntia) ja hitaan juoksun (30 sekuntia) välillä 20 minuutin ajan. Erinomainen kardiokestävyyden kehittämiseen jääkiekkoon.",
+        "equipment": "Juoksumatto tai stadion",
+        "calories": "250-350 kcal per harjoitus",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää kykyä toipua nopeasti",
+          "Parantaa yleistä fyysistä kuntoa",
+          "Simuloi jääkiekko-ottelun stressiä"
+        ],
+        "instructions": [
+          "Aloita 5 minuutin lämmittelyllä kevyellä lenkkeilyllä",
+          "Suorita 30 sekunnin nopea juoksu (80-90 % enimmäisnopeudesta)",
+          "Vaihda 30 sekunnin hitaaseen hölkkäämiseen palautuaksesi",
+          "Toista sykli 20-25 kertaa",
+          "Viimeistele 5 minuutin jäähdytyksellä"
+        ],
+        "tips": [
+          "Tarkkaile hengitystäsi - hengitä syvään ja rytmisesti",
+          "Älä ylitä 90 % enimmäisnopeudesta",
+          "Jos olet väsynyt, voit pidentää palautumisaikaasi.",
+          "Suorita 2-3 kertaa viikossa"
+        ]
+      },
+      "2": {
+        "title": "Burpee-hyppy",
+        "description": "Monimutkainen harjoitus: kyykky → lankku → punnerrus → kyykky → hyppy. Suorita 3 sarjaa 10-15 toistoa.",
+        "equipment": "Treenimatto (valinnainen)",
+        "calories": "200-300 kcal per harjoitus",
+        "benefits": [
+          "Kehittää yleistä kestävyyttä",
+          "Vahvistaa lihaksia koko kehossa",
+          "Parantaa liikkeiden koordinaatiota",
+          "Lisää räjähdysvoimaa"
+        ],
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä",
+          "Kyykky alas kämmenet lattialla edessäsi.",
+          "Työnnä jalat takaisin lankkuasentoon",
+          "Suorita yksi punnerrus",
+          "Vedä jalkojasi takaisin käsiäsi kohti pysyen kyykkyasennossa.",
+          "Hyppää ylös, nosta kädet pään yläpuolelle",
+          "Laske pehmeästi ja toista."
+        ],
+        "tips": [
+          "Pidä selkä suorana koko harjoituksen ajan.",
+          "Laskeudu jalat koukussa",
+          "Aloita 5-8 toistolla ja lisää vähitellen",
+          "Lepo sarjojen välillä 60-90 sekuntia"
+        ]
+      },
+      "3": {
+        "title": "Pyörä",
+        "description": "Intensiivinen pyöräily tai paikallaan pyöräily korkean intensiteetin intervalleilla. 5 minuuttia lämmittelyä, 20 minuutin tauko.",
+        "equipment": "Polkupyörä tai kuntopyörä",
+        "calories": "300-400 kcal per harjoitus",
+        "benefits": [
+          "Kehittää kardiokestävyyttä",
+          "Vahvistaa jalkojen lihaksia",
+          "Polttaa paljon kaloreita",
+          "Alhainen rasitus nivelissä"
+        ],
+        "instructions": [
+          "5 minuuttia matalatehoista lämmittelyä",
+          "2 minuuttia korkeaa intensiteettiä (80-85 % maksimista)",
+          "1 minuutin palautuminen alhaisella intensiteetillä",
+          "Toista välit 10 kertaa",
+          "5 minuuttia matalan intensiteetin jäähdytystä"
+        ],
+        "tips": [
+          "Säilytä korkea poljinnopeus (80-100 rpm)",
+          "Tarkkaile kehon asentoa - pidä selkäsi suorana",
+          "Säädä vastusta muuttaaksesi intensiteettiä",
+          "Juo vettä harjoittelun aikana."
+        ]
+      },
+      "4": {
+        "title": "Plyometriset hyppyt",
+        "description": "Hyppy paikalleen mahdollisimman korkealle, laskeudu polvilleen. 3 sarjaa 15-20 hyppyä.",
+        "equipment": "Treenimatto (valinnainen)",
+        "calories": "150-200 kcal per harjoitus",
+        "benefits": [
+          "Kehittää räjähtävää jalkavoimaa",
+          "Parantaa reaktiota ja nopeutta",
+          "Vahvistaa jänteitä ja nivelsiteitä",
+          "Lisää pystysuoraa hyppyä"
+        ],
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä",
+          "Kyykky alas 1/4 matkasta polvet koukussa",
+          "Hyppää räjähdysmäisesti ylöspäin ojentaen käsiäsi",
+          "Laskeudu jalat koukussa",
+          "Suorita seuraava hyppy välittömästi",
+          "Tee 15-20 hyppyä peräkkäin"
+        ],
+        "tips": [
+          "Laskeudu pehmeästi taivuttamalla polviasi.",
+          "Pidä vartalosi suorana",
+          "Älä pidä taukoa hyppyjen välillä",
+          "Lepo sarjojen välillä 2-3 minuuttia"
+        ]
+      },
+      "5": {
+        "title": "Lyhyen matkan sprintit",
+        "description": "Juokse maksiminopeudella 20-30 metrin matka 30 sekunnin taukolla juoksujen välillä. 8-10 juoksua.",
+        "equipment": "Avoin tila tai juoksurata",
+        "calories": "200-250 kcal per harjoitus",
+        "benefits": [
+          "Kehittää maksiminopeutta",
+          "Parantaa kiihtyvyyttä",
+          "Vahvistaa jalkojen lihaksia",
+          "Parantaa liikkeiden koordinaatiota"
+        ],
+        "instructions": [
+          "Merkitse etäisyys 20-30 metriä",
+          "Oletetaan aloitusasento (puolikyykky)",
+          "Kun merkkiääni kuuluu, aja suurimmalla nopeudella.",
+          "Ylitä maaliviiva",
+          "Palaa hitaasti alkuun",
+          "Lepää 30 sekuntia ja toista."
+        ],
+        "tips": [
+          "Keskity juoksutekniikkaan",
+          "Pidä vartalosi suorana",
+          "Työskentele aktiivisesti käsilläsi",
+          "Älä lyhennä lepoaikaasi"
+        ]
+      },
+      "6": {
+        "title": "Pallon heittäminen seinää vasten",
+        "description": "Heitä lääkepallo seinää vasten suurimmalla voimalla, ota kiinni ja heitä uudelleen. 3 sarjaa 20 heittoa.",
+        "equipment": "Lääkepallo 2-4 kg, seinä",
+        "calories": "120-180 kcal per harjoitus",
+        "benefits": [
+          "Kehittää räjähtävää käsivarren voimaa",
+          "Parantaa koordinaatiota",
+          "Vahvistaa ydinlihaksia",
+          "Lisää heittonopeutta"
+        ],
+        "instructions": [
+          "Seiso 1-2 metrin päässä seinästä",
+          "Pidä palloa molemmin käsin rinnan tasolla",
+          "Kyykky alas taivuta polviasi",
+          "Suorista jalkojasi ja käsiäsi räjähdysmäisesti heittäessäsi palloa.",
+          "Ota kiinni palautuva pallo",
+          "Tee seuraava heitto heti."
+        ],
+        "tips": [
+          "Käytä palloa, jonka paino on 2-4 kg",
+          "Heitä suurimmalla voimalla",
+          "Pidä selkäsi suorana",
+          "Työskentele koko kehollasi, ei vain käsivarsillasi"
+        ]
+      },
+      "7": {
+        "title": "Dynaamiset jalkavenytykset",
+        "description": "Jalka heiluu eteenpäin, taaksepäin ja sivuille pyörivin liikkein lonkkanivelissä. 10-15 toistoa jokaiselle jalalle.",
+        "equipment": "Seinä tai tuoli tueksi",
+        "calories": "50-80 kcal per lämmittely",
+        "benefits": [
+          "Lämmittää jalkojen lihaksia",
+          "Parantaa nivelten liikkuvuutta",
+          "Valmistautuu harjoituksiin",
+          "Vähentää loukkaantumisriskiä"
+        ],
+        "instructions": [
+          "Seiso suorana pitäen kiinni tuesta",
+          "Tee 10-15 heilahtelua eteenpäin oikealla jalallasi",
+          "Suorita 10-15 takapotkua oikealla jalallasi",
+          "Tee 10-15 heilahtelua sivulle oikealla jalallasi",
+          "Toista vasemmalle jalalle.",
+          "Tee pyöreitä liikkeitä lonkkanivelissäsi"
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Älä heiluta liikaa",
+          "Suorita liikkeet sujuvasti",
+          "Hengitä syvään ja rytmisesti"
+        ]
+      },
+      "8": {
+        "title": "Ylävartalon lämmittely",
+        "description": "Käsivarsien ympyröitä, vartalon taivutuksia ja kiertymiä. Olkanivelten ja selän lämmittely.",
+        "equipment": "Ei vaadita",
+        "calories": "40-60 kcal per lämmittely",
+        "benefits": [
+          "Lämmittää ylävartalon lihaksia",
+          "Parantaa olkanivelten liikkuvuutta",
+          "Valmistelee kädet työhön",
+          "Aktivoi ydinlihaksia"
+        ],
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä",
+          "Tee 10 pyöreää liikettä käsivarret eteenpäin",
+          "Tee 10 pyöreää liikettä käsivarret taaksepäin",
+          "Tee 10 sivukaarta",
+          "Tee 10 vartalon kiertoa",
+          "Tee pyöreitä liikkeitä hartioillasi"
+        ],
+        "tips": [
+          "Liiku hitaasti ja tasaisesti",
+          "Älä tee äkillisiä liikkeitä",
+          "Tarkkaile hengitystäsi",
+          "Lisää liikealuetta vähitellen"
+        ]
+      },
+      "9": {
+        "title": "Kevyt lenkkeily paikallaan",
+        "description": "Lenkkeily paikallaan korkeilla polvilla, asteittain lisäämällä vauhtia. 5-7 minuuttia.",
+        "equipment": "Ei vaadita",
+        "calories": "60-80 kcal per lämmittely",
+        "benefits": [
+          "Lisää sykettä",
+          "Lämmittää jalkojen lihaksia",
+          "Parantaa koordinaatiota",
+          "Valmistautuu pääharjoitukseen"
+        ],
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä",
+          "Aloita kevyellä lenkillä paikallaan",
+          "Nosta polviasi vähitellen korkeammalle",
+          "Harjoittele käsiäsi kuin juoksisit normaalisti.",
+          "Lisää vauhtia 2-3 minuuttia",
+          "Hidasta viimeisen 2 minuutin aikana"
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Laskeudu varpaillesi",
+          "Hengitä syvään",
+          "Älä hyppää liian korkealle"
+        ]
+      },
+      "10": {
+        "title": "Jalkalihasten staattinen venyttely",
+        "description": "Pidä nelipäisen reisilihaksen, pohkeiden ja adduktoreiden venytysasentoja. 30 sekuntia per ryhmä.",
+        "equipment": "Harjoitusmatto",
+        "calories": "80-100 kcal per venytys",
+        "benefits": [
+          "Parantaa jalkojen lihasten joustavuutta",
+          "Vähentää lihasjännitystä",
+          "Nopeuttaa palautumista",
+          "Ehkäisee loukkaantumisia"
+        ],
+        "instructions": [
+          "Nelipään venytys: Seiso toisella jalalla ja taivuta toinen jalka taaksepäin.",
+          "Pohkeen venytys: Syöksy eteenpäin pitäen takajalka suorana.",
+          "Adductor-venytys: Istu jalat erillään.",
+          "Pidä jokaisessa asennossa 30 sekuntia.",
+          "Hengitä syvään ja rentouta lihaksia."
+        ],
+        "tips": [
+          "Älä venytä kipuun asti.",
+          "Hengitä syvään ja hitaasti",
+          "Rentouta lihaksesi venyttäessäsi.",
+          "Suorita harjoituksen jälkeen"
+        ]
+      },
+      "11": {
+        "title": "Selkä ja olkapäät venyvät",
+        "description": "Taivutukset eteenpäin, rintakehän venytys, tricepsin venytys. Pysy jokaisessa asennossa 20-30 sekuntia.",
+        "benefits": [
+          "Parantaa joustavuutta ja liikkuvuutta",
+          "Lievittää lihasjännitystä",
+          "Ehkäisee loukkaantumisia",
+          "Parantaa harjoituksen jälkeistä palautumista"
+        ],
+        "instructions": [
+          "Lämmitä ennen venytystä",
+          "Venytä hitaasti ja tasaisesti",
+          "Pidä asento 20-30 sekuntia",
+          "Vältä terävää kipua"
+        ],
+        "tips": [
+          "Hengitä syvään venyttäessäsi.",
+          "Älä tee äkillisiä liikkeitä",
+          "Tee tämä päivittäin parhaan tuloksen saavuttamiseksi.",
+          "Venytä treenin jälkeen"
+        ]
+      },
+      "12": {
+        "title": "Jooga jääkiekkopelaajille",
+        "description": "Asanasarja joustavuuden ja tasapainon kehittämiseen: soturiasento, puuasento, alaspäin osoittava koiran asento.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "13": {
+        "title": "Koordinoinnin tikkaat",
+        "description": "Nopeat jalkojen liikkeet tikkaiden poikki: sivuaskelmat, poikkiaskelmat, hyppyt. 3 passia kutakin tyyppiä.",
+        "benefits": [
+          "Kehittää liikkeiden koordinaatiota",
+          "Parantaa tasapainoa ja tasapainoa",
+          "Lisää ketteryyttä",
+          "Kehittää neuromuskulaarista yhteyttä"
+        ],
+        "instructions": [
+          "Aloita hitaasti",
+          "Keskity liikkeiden tarkkuuteen",
+          "Lisää nopeutta vähitellen",
+          "Toista, kunnes se muuttuu automaattiseksi."
+        ],
+        "tips": [
+          "Harjoittele säännöllisesti",
+          "Ota aikaa - tarkkuus on tärkeämpää kuin nopeus",
+          "Käytä visuaalisia vihjeitä",
+          "Harjoittele erilaisissa olosuhteissa"
+        ]
+      },
+      "14": {
+        "title": "Jongleeraa palloilla",
+        "description": "Jongleeraa 2-3 tennispalloa käsien ja silmän koordinaation kehittämiseksi. Aloita 1 pallolla.",
+        "benefits": [
+          "Kehittää liikkeiden koordinaatiota",
+          "Parantaa tasapainoa ja tasapainoa",
+          "Lisää ketteryyttä",
+          "Kehittää neuromuskulaarista yhteyttä"
+        ],
+        "instructions": [
+          "Aloita hitaasti",
+          "Keskity liikkeiden tarkkuuteen",
+          "Lisää nopeutta vähitellen",
+          "Toista, kunnes se muuttuu automaattiseksi."
+        ],
+        "tips": [
+          "Harjoittele säännöllisesti",
+          "Ota aikaa - tarkkuus on tärkeämpää kuin nopeus",
+          "Käytä visuaalisia vihjeitä",
+          "Harjoittele erilaisissa olosuhteissa"
+        ]
+      },
+      "15": {
+        "title": "Nopeat käpyjen kosketukset",
+        "description": "Aseta 5-6 kartiota ja kosketa niitä nopeasti kädelläsi satunnaisessa järjestyksessä. 3 sarjaa 30 sekuntia.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "16": {
+        "title": "Soutulaite",
+        "description": "Välisoutu: 2 minuuttia korkeaa intensiteettiä, 1 minuutti lepoa. 8-10 sykliä kestävyyden kehittämiseksi.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "17": {
+        "title": "Hyppynaru väliajoin",
+        "description": "Vuorotellen nopeita (30 s) ja hitaita (30 s) hyppyjä. 20 minuuttia sydämen kestävyyden kehittämiseen.",
+        "equipment": "hyppynaru",
+        "calories": "200-300 kcal per harjoitus",
+        "benefits": [
+          "Kehittää kardiokestävyyttä",
+          "Parantaa liikkeiden koordinaatiota",
+          "Vahvistaa jalkojen lihaksia",
+          "Polttaa paljon kaloreita"
+        ],
+        "instructions": [
+          "Ota sopivan pituinen hyppynaru.",
+          "30 sekuntia nopeaa hyppäämistä maksiminopeudella",
+          "30 sekuntia hitaita hyppyjälkiä palautumiseen",
+          "Toista sykli 20 kertaa",
+          "Viimeistele 2 minuutin jäähdytyksellä"
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Työskentele ranteillasi, älä käsilläsi",
+          "Laskeudu varpaillesi",
+          "Aloita hitaasti"
+        ]
+      },
+      "18": {
+        "title": "Juoksemassa portaita ylös",
+        "description": "Juokse portaat ylös niin nopeasti kuin pystyt ja kävele sitten alas. 10-15 toistoa kehittää jalkojen kestävyyttä.",
+        "equipment": "Tikapuut",
+        "calories": "250-350 kcal per harjoitus",
+        "benefits": [
+          "Kehittää jalkojen kestävyyttä",
+          "Vahvistaa reisien ja pakaroiden lihaksia",
+          "Parantaa kardiokestävyyttä",
+          "Lisää jalkojen voimaa"
+        ],
+        "instructions": [
+          "Etsi portaikko, jossa on 20-30 askelmaa",
+          "Juokse maksiminopeudella",
+          "Laskeudu kävelyvauhtiin palautuaksesi",
+          "Tee 10-15 nostoa",
+          "Lepo 1-2 minuuttia nostojen välillä"
+        ],
+        "tips": [
+          "Käytä koko jalkaasi nostaessasi.",
+          "Pidä selkäsi suorana",
+          "Työskentele aktiivisesti käsilläsi",
+          "Älä ylitä kykyjäsi"
+        ]
+      },
+      "19": {
+        "title": "Lankku liikkeillä",
+        "description": "Lankkupito vuorotellen käsien ja jalkojen nostoilla. 3 sarjaa 45-60 sekuntia vahvistaakseen ydintä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "20": {
+        "title": "Korkea polvi juoksu",
+        "description": "Hölkkää paikallaan nostaen polvet rintakehään niin korkealle kuin mahdollista. 5 sarjaa 2 minuuttia ja 1 minuutin lepo.",
+        "benefits": [
+          "Parantaa kardiovaskulaarista kestävyyttä",
+          "Kehittää aerobista kestävyyttä",
+          "Polttaa kaloreita tehokkaasti",
+          "Vahvistaa sydänlihasta"
+        ],
+        "instructions": [
+          "Aloita kevyellä 5-10 minuutin lämmittelyllä",
+          "Säilytä tavoitesyke",
+          "Tarkkaile hengitystäsi - hengitä syvään",
+          "Viimeistele jäähdytyksellä ja venyttelyllä."
+        ],
+        "tips": [
+          "Lisää kestoa vähitellen",
+          "Juo vettä harjoittelun aikana.",
+          "Suorita 3-4 kertaa viikossa",
+          "Kuuntele kehoasi"
+        ]
+      },
+      "21": {
+        "title": "Seisova pituushyppy",
+        "description": "Hyppää eteenpäin niin pitkälle kuin mahdollista laskeutuen molemmille jaloille. 5 sarjaa 8-10 hyppyä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "22": {
+        "title": "Nopeat punnerrukset",
+        "description": "Push-up mahdollisimman nopeasti koskettamalla rintaasi lattiaan. 4 sarjaa 15-20 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "23": {
+        "title": "Esteiden yli hyppääminen",
+        "description": "Hyppy yli 30-40 cm korkeiden kartioiden tai esteiden yli. 3 juoksua 10 esteellä.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "24": {
+        "title": "Pikakyykkyt",
+        "description": "Kyykky mahdollisimman nopeasti, reidet lattian suuntaisesti. 4 sarjaa 20-25 toistoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "25": {
+        "title": "Lääkepallon heitot",
+        "description": "Raskaan pallon (5-8 kg) heittäminen rinnasta maksimivoimalla. 3 erää 15 heittoa.",
+        "benefits": [
+          "Lisää lihasvoimaa",
+          "Parantaa lihasten kestävyyttä",
+          "Kehittää toiminnallista voimaa",
+          "Vahvistaa tuki- ja liikuntaelimistöä"
+        ],
+        "instructions": [
+          "Lämmittele ennen harjoittelua",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hallitse hengitystäsi - hengitä ponnistelemalla",
+          "Lepo sarjojen välillä 60-90 sekuntia."
+        ],
+        "tips": [
+          "Aloita kevyemmillä painoilla ja lisää vähitellen.",
+          "Älä pidätä hengitystäsi",
+          "Suorita 2-3 kertaa viikossa",
+          "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
+        ]
+      },
+      "26": {
+        "title": "Nilkan lämmittely",
+        "description": "Pyöreät liikkeet jaloillasi, taivuttamalla ja suoristaen varpaita. 2-3 minuuttia jokaiselle jalalle.",
+        "benefits": [
+          "Valmistelee lihaksia harjoitteluun",
+          "Parantaa verenkiertoa",
+          "Vähentää loukkaantumisriskiä",
+          "Lisää harjoittelun tehokkuutta"
+        ],
+        "instructions": [
+          "Aloita hitaasti ja lisää asteittain intensiteettiä",
+          "Tee liikkeet sujuvasti ja hallitusti",
+          "Varmista, että käytät oikeaa tekniikkaa",
+          "Hengitä tasaisesti suorituksen aikana"
+        ],
+        "tips": [
+          "Ota aikaa – laatu on tärkeämpää kuin nopeus",
+          "Jos kipua ilmenee, lopeta.",
+          "Lämmittely ennen jokaista treeniä.",
+          "Käytä riittävästi aikaa jokaiseen liikkeeseen."
+        ]
+      },
+      "27": {
+        "title": "Kaulan lämmittely",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Käännä päätäsi hitaasti vasemmalle ja oikealle",
+          "Kallista päätäsi eteenpäin ja taaksepäin",
+          "Tee pyöreitä liikkeitä päälläsi",
+          "Pidä hartiat rentoina"
+        ],
+        "tips": [
+          "Liiku hitaasti ja tasaisesti",
+          "Älä tee äkillisiä liikkeitä",
+          "Jos kipua ilmenee, lopeta.",
+          "Hengitä syvään ja tasaisesti"
+        ]
+      },
+      "28": {
+        "title": "Ranteen lämmittely",
+        "instructions": [
+          "Ojenna kätesi edessäsi",
+          "Taivuta ranteita ylös ja alas",
+          "Pyöritä ranteitasi ympyrässä",
+          "Purista ja purista nyrkkisi",
+          "Venytä sormet sivuille"
+        ],
+        "tips": [
+          "Tee liikkeet hitaasti",
+          "Älä ylikuormita niveliäsi",
+          "Kiinnitä huomiota ranteissasi oleviin tuntemuksiin",
+          "Toista säännöllisesti"
+        ]
+      },
+      "29": {
+        "title": "Polvi venyy",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Taivuta ja suorista polvia hitaasti",
+          "Tee pyöreitä liikkeitä polvillasi",
+          "Tee kyykkyjä pienellä amplitudilla",
+          "Venytä reidesi etuosaa"
+        ],
+        "tips": [
+          "Älä tee syviä kyykkyjä",
+          "Liikkuu sujuvasti ja hallinnassa",
+          "Jos sinulla on polvikipua, vähennä liikettä.",
+          "Varmista, että käytät oikeaa tekniikkaa"
+        ]
+      },
+      "30": {
+        "title": "Lantion lämmittely",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Nosta polvi rintaasi vasten",
+          "Siirrä jalkaasi sivulle ja taakse",
+          "Tee pyöreitä liikkeitä lantiollasi",
+          "Tee syöksyjä pienellä amplitudilla"
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Työskentele mukavalla alueella",
+          "Älä kiirehdi liikkeitäsi",
+          "Seuraa tasapainoasi"
+        ]
+      },
+      "31": {
+        "title": "Nivus venytys",
+        "instructions": [
+          "Istu lattialle polvet koukussa.",
+          "Aseta jalkapohjat yhteen",
+          "Nojaa kevyesti eteenpäin",
+          "Vedä polviasi lattiaa kohti",
+          "Pidä venytys 30 sekuntia"
+        ],
+        "tips": [
+          "Älä pakota venytystä",
+          "Hengitä syvään ja rentoudu.",
+          "Jos kipua ilmenee, vähennä amplitudia.",
+          "Suorita lämmittelyn jälkeen"
+        ]
+      },
+      "32": {
+        "title": "Reisilihaksen venytys",
+        "instructions": [
+          "Istu lattialle jalat ojennettuna eteenpäin.",
+          "Taivuta eteenpäin yrittäen yltää jalkaisi",
+          "Purista jalkasi käsilläsi",
+          "Vedä rintaasi polviasi kohti",
+          "Pidä venytys 30-45 sekuntia"
+        ],
+        "tips": [
+          "Älä pyöritä selkääsi",
+          "Työskentele mukavalla alueella",
+          "Hengitä syvään",
+          "Kiinnitä huomiota reiden takaosassa oleviin tuntemuksiin"
+        ]
+      },
+      "33": {
+        "title": "Pohjelihasten venyttely",
+        "instructions": [
+          "Seiso seinää päin",
+          "Aseta toinen jalka eteenpäin ja toinen taaksepäin.",
+          "Laske takajalan kantapää lattiaan",
+          "Taivuta eteenpäin, venyttämällä pohkeita",
+          "Vaihda jalkaa ja toista"
+        ],
+        "tips": [
+          "Pidä takajalka suorana",
+          "Älä nosta kantapäätäsi lattiasta",
+          "Venytä pehmeästi",
+          "Suorita molemmille jaloille"
+        ]
+      },
+      "34": {
+        "title": "Rintalihasten venyttely",
+        "instructions": [
+          "Seiso ovella",
+          "Aseta kätesi ovenkarmeille",
+          "Ota askel eteenpäin",
+          "Tunne venytys rinnassasi",
+          "Pidä venytys 30 sekuntia"
+        ],
+        "tips": [
+          "Älä ylikuormita hartioitasi",
+          "Hengitä syvään",
+          "Venytä vähitellen",
+          "Seuraa tuntemuksiasi"
+        ]
+      },
+      "35": {
+        "title": "Triceps venyttää",
+        "instructions": [
+          "Nosta toinen käsi ylös",
+          "Taivuta käsivarsi kyynärpäästä pään taakse",
+          "Vedä kyynärpääsi toisella kädellä alas",
+          "Tunne venytys tricepsissäsi",
+          "Vaihda kättä ja toista"
+        ],
+        "tips": [
+          "Älä tee äkillisiä liikkeitä",
+          "Venytä pehmeästi",
+          "Hengitä tasaisesti",
+          "Suorita molemmille käsille"
+        ]
+      },
+      "36": {
+        "title": "Käärme käpyjen välissä",
+        "instructions": [
+          "Aseta käpyjä käärmemäisesti 2-3 metrin etäisyydelle",
+          "Aloita juokseminen jokaisen kartion ympäri",
+          "Pidä painopiste matalalla",
+          "Työskentele jaloillasi nopeasti ja usein",
+          "Varmista, että käytät oikeaa kääntötekniikkaa."
+        ],
+        "tips": [
+          "Aloita hitaasti",
+          "Keskity tekniikkaan, älä nopeuteen.",
+          "Pidä pää pystyssä",
+          "Käytä lyhyitä, nopeita askeleita"
+        ]
+      },
+      "37": {
+        "title": "Nopeat kosketukset jalkaan",
+        "instructions": [
+          "Seiso pallon vieressä",
+          "Kosketa palloa nopeasti jalallasi",
+          "Vaihda jalkaa 2-3 kosketuksen välein",
+          "Säilytä jatkuva rytmi",
+          "Suorita 30-60 sekuntia"
+        ],
+        "tips": [
+          "Pidä kehosi painosi tukijalassasi",
+          "Työskentele nopeasti, mutta hallitusti",
+          "Älä menetä tasapainoasi",
+          "Tarkkaile kosketustekniikkaasi"
+        ]
+      },
+      "38": {
+        "title": "Hyppää käännöksillä",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Tee hyppy ylös",
+          "Käänny 180 astetta hyppääessäsi",
+          "Laskeudu pehmeästi molemmille jaloille.",
+          "Käänny välittömästi takaisin ja toista"
+        ],
+        "tips": [
+          "Laskeudu jalat koukussa",
+          "Käytä käsiäsi tasapainoon",
+          "Aloita pienillä käännöksillä",
+          "Tarkkaile laskeutumistekniikkaasi"
+        ]
+      },
+      "39": {
+        "title": "Nopeita pallonsyöttöjä",
+        "instructions": [
+          "Seiso seinää vasten 2-3 metrin etäisyydellä",
+          "Syötä pallo nopeasti seinään",
+          "Ota kiinni pallosta ja syötä se välittömästi takaisin",
+          "Työskentele molemmilla käsillä",
+          "Suorita 30-45 sekuntia"
+        ],
+        "tips": [
+          "Käytä oikeaa syöttötekniikkaa",
+          "Pidä silmäsi pallossa",
+          "Työskentele nopeasti mutta tarkasti",
+          "Pidä kätesi rentoina"
+        ]
+      },
+      "40": {
+        "title": "Juokseminen taaksepäin",
+        "instructions": [
+          "Aloita juoksemalla hitaasti taaksepäin.",
+          "Katso usein olkapääsi yli",
+          "Pidä painopiste matalalla",
+          "Käytä käsiäsi tasapainoon",
+          "Ajettu 20-30 metriä"
+        ],
+        "tips": [
+          "Aloita hyvin hitaasti",
+          "Tarkista aina takanasi oleva tila",
+          "Pidä polvet hieman koukussa",
+          "Älä kiirehdi nopeuteen"
+        ]
+      },
+      "41": {
+        "title": "Kyykky painoilla",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Ota käsipainot tai tanko",
+          "Kyykky, kunnes varpaat ovat yhdensuuntaiset lattian kanssa.",
+          "Nouse ylös käyttämällä jalkojen voimaa",
+          "Suorita 3-4 sarjaa 8-12 toistoa"
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Älä pyöristä alaselkääsi",
+          "Polvisi eivät saa ylittää varpaitasi.",
+          "Aloita kevyillä painoilla"
+        ]
+      },
+      "42": {
+        "title": "Maastaveto",
+        "instructions": [
+          "Seiso suorana jalat hartioiden leveydellä toisistaan",
+          "Ota tanko lattiasta käsikahvalla.",
+          "Taivuta polviasi ja siirrä lantiota taaksepäin",
+          "Nosta tankoa suoristamalla jalkojasi ja selkääsi.",
+          "Palauta tanko lattialle hallitusti."
+        ],
+        "tips": [
+          "Pidä selkä suorana koko liikkeen ajan.",
+          "Älä pyöristä alaselkääsi",
+          "Siirrä tanko lähelle vartaloasi",
+          "Aloita kevyillä painoilla"
+        ]
+      },
+      "43": {
+        "title": "Penkkipunnerrus",
+        "instructions": [
+          "Makaa penkillä jalat lattialla.",
+          "Ota tanko leveällä otteella",
+          "Laske tanko rintaasi vasten hallitusti.",
+          "Paina tanko ylös",
+          "Suorita 3-4 sarjaa 6-10 toistoa"
+        ],
+        "tips": [
+          "Pidä lapaluita vedettynä yhteen",
+          "Pidä jalat lattialla",
+          "Hengitä oikein: hengitä ponnistelemalla",
+          "Käytä vakuutusta"
+        ]
+      },
+      "44": {
+        "title": "Vedot",
+        "instructions": [
+          "Ripusta tangossa kädensijalla",
+          "Vedä itsesi ylös, kunnes leukasi on tangon yläpuolella.",
+          "Laske itsesi takaisin lähtöasentoon",
+          "Pidä ydin tiukkana",
+          "Tee 3-4 sarjaa maksimitoistoja"
+        ],
+        "tips": [
+          "Älä keinu",
+          "Vedä ylös pehmeästi ja hallitusti",
+          "Suorista kädet kokonaan alhaalta",
+          "Käytä tarvittaessa apua"
+        ]
+      },
+      "45": {
+        "title": "Dipit tankoissa",
+        "instructions": [
+          "Seiso tankojen välissä",
+          "Hyppää ylös ja lukitse tangot",
+          "Laske itsesi alas, taivuta kyynärpääsi.",
+          "Työnnä ylös, suorista käsiäsi",
+          "Suorita 3-4 sarjaa 5-15 toistoa"
+        ],
+        "tips": [
+          "Pidä vartalosi suorana",
+          "Älä keinu",
+          "Laskeudu mukavaan syvyyteen",
+          "Käytä tarvittaessa jalkojasi."
+        ]
+      },
+      "46": {
+        "title": "Yksijalkainen teline",
+        "instructions": [
+          "Seiso yhdellä jalalla",
+          "Nosta toinen jalka eteesi",
+          "Säilytä tasapainosi niin kauan kuin mahdollista",
+          "Käytä käsiäsi tasapainoon",
+          "Vaihda jalkaa ja toista"
+        ],
+        "tips": [
+          "Katso eteenpäin, älä alas",
+          "Pidä ydin tiukkana",
+          "Aloita lyhyillä sarjoilla",
+          "Lisää aikaa vähitellen"
+        ]
+      },
+      "47": {
+        "title": "Yksijalkainen lankku",
+        "instructions": [
+          "Asetu lankkuasentoon",
+          "Nosta toinen jalka ylös",
+          "Pidä jalkasi suorana",
+          "Pidä asento 30-60 sekuntia",
+          "Vaihda jalkaa ja toista"
+        ],
+        "tips": [
+          "Pidä vartalosi suorana",
+          "Älä heiluta puolelta toiselle",
+          "Hengitä tasaisesti",
+          "Aloita lyhyillä sarjoilla"
+        ]
+      },
+      "48": {
+        "title": "Yksijalkaiset kyykkyt",
+        "instructions": [
+          "Seiso yhdellä jalalla",
+          "Ojenna toinen jalkasi eteenpäin",
+          "Kyykky tukijalassa",
+          "Palaa alkuasentoon",
+          "Tee 3-4 sarjaa 5-10 toistoa kummallakin jalalla."
+        ],
+        "tips": [
+          "Pidä selkäsi suorana",
+          "Älä koske lattiaan toisella jalallasi.",
+          "Käytä käsiäsi tasapainoon",
+          "Aloita pienellä amplitudilla"
+        ]
+      },
+      "49": {
+        "title": "Bosu pallo harjoitukset",
+        "instructions": [
+          "Seiso Bosu-pallon pallonpuoliskolla",
+          "Pidä tasapainosi",
+          "Tee kyykkyjä",
+          "Tee kehon käänteitä",
+          "Suorita 3-4 sarjaa 10-15 toistoa"
+        ],
+        "tips": [
+          "Aloita yksinkertaisilla harjoituksilla",
+          "Varo tekniikkaasi",
+          "Ota aikaa",
+          "Käytä apua tueksi"
+        ]
+      },
+      "50": {
+        "title": "Jooga tasapaino",
+        "instructions": [
+          "Seiso suorassa jalat yhdessä.",
+          "Nosta toinen jalka ja aseta se toisen reisille.",
+          "Aseta kätesi rintasi eteen",
+          "Pidä tasapainosi",
+          "Suorita molemmille jaloille 30-60 sekuntia"
+        ],
+        "tips": [
+          "Katso eteenpäin yhdessä vaiheessa",
+          "Hengitä syvään ja tasaisesti",
+          "Ota aikaa",
+          "Jos menetät tasapainon, aloita alusta."
+        ]
+      },
+      "51": {
+        "title": "Kävely puun päällä",
+        "instructions": [
+          "Etsi vakaa tukki tai lauta",
+          "Seiso puun päällä",
+          "Kävele hitaasti eteenpäin",
+          "Pidä tasapainosi",
+          "Suorita useita kulkuja"
+        ],
+        "tips": [
+          "Aloita leveästä puusta",
+          "Katso eteenpäin, älä alas",
+          "Käytä käsiäsi tasapainoon",
+          "Ota aikaa"
+        ]
+      },
+      "52": {
+        "title": "Käsiseisonta seinää vasten",
+        "instructions": [
+          "Seiso seinää päin",
+          "Aseta kätesi lattialle 30 cm seinästä",
+          "Nosta jalkasi seinää vasten",
+          "Pidä käsilläseisontaa",
+          "Laske jalat hallitusti"
+        ],
+        "tips": [
+          "Aloita lyhyillä sarjoilla",
+          "Käytä apua vakuutukseen",
+          "Pidä ydin tiukkana",
+          "Älä ylikuormita itseäsi"
+        ]
+      },
+      "53": {
+        "title": "Fartlek",
+        "instructions": [
+          "Aloita hitaalla lenkillä 5-10 minuuttia",
+          "Lisää nopeutta 80 %:iin maksimiarvosta 2-3 minuutiksi",
+          "Palaa hitaaseen lenkkeilyyn 1-2 minuutiksi",
+          "Toista sykli 4-6 kertaa",
+          "Lopeta hidas hölkkä 5-10 minuuttia"
+        ],
+        "tips": [
+          "Kuuntele kehoasi",
+          "Älä ylitä 80 % enimmäisnopeudesta",
+          "Hengitä syvään",
+          "Juo vettä harjoittelun aikana."
+        ]
+      },
+      "54": {
+        "title": "Toistuvat sprintit",
+        "instructions": [
+          "Tee 10 minuutin lämmittely",
+          "Juokse sprintti maksiminopeudella 30 sekuntia",
+          "Lepää 2-3 minuuttia",
+          "Toista sprintti",
+          "Suorita 6-8 sprinttiä"
+        ],
+        "tips": [
+          "Älä säästä lämmittelyssäsi",
+          "Lepää täysin sprinttien välillä",
+          "Tarkkaile juoksutekniikkaasi",
+          "Älä harjoittele päivittäin"
+        ]
+      },
+      "55": {
+        "title": "Intervallit pyörällä",
+        "instructions": [
+          "Aloita 5 minuutin lämmittelyllä",
+          "Lisää kuormitusta 80 prosenttiin maksimista",
+          "Poljin suurella teholla 2-3 minuuttia",
+          "Vähennä kuormitusta 50 %:iin 1-2 minuutiksi",
+          "Toista sykli 6-8 kertaa"
+        ],
+        "tips": [
+          "Säilytä korkea poljinnopeus",
+          "Hengitä syvään",
+          "Pidä pulssia silmällä",
+          "Juo vettä säännöllisesti"
+        ]
+      },
+      "56": {
+        "title": "Mäkijuoksu",
+        "instructions": [
+          "Etsi mäki, jonka kaltevuus on 5-10 %",
+          "Tee 10 minuutin lämmittely",
+          "Juokse mäkeä ylös kohtuullisella nopeudella",
+          "Mene alas toipumaan",
+          "Toista 6-10 nostoa"
+        ],
+        "tips": [
+          "Aloita pienellä kaltevuudella",
+          "Pidä selkäsi suorana nostaessasi.",
+          "Työskentele aktiivisesti käsilläsi",
+          "Varaa aikaa laskeutumiseen"
+        ]
+      },
+      "57": {
+        "title": "Plyometriset ympyrät",
+        "instructions": [
+          "Tee 10 minuutin lämmittely",
+          "Tee pitkiä hyppyjä seisoma-asennosta",
+          "Suorita hyppyjä esteiden yli",
+          "Tee laatikkohyppyjä",
+          "Lepää 2-3 minuuttia ja toista kierros."
+        ],
+        "tips": [
+          "Tarkkaile laskeutumistekniikkaasi",
+          "Laskeudu jalat koukussa",
+          "Käytä käsiäsi tasapainoon",
+          "Älä liioittele määrän kanssa"
+        ]
+      },
+      "58": {
+        "title": "Kevyt venyttely",
+        "instructions": [
+          "Aloita kevyillä liikkeillä",
+          "Venytä tärkeimpiä lihasryhmiäsi",
+          "Hengitä syvään ja tasaisesti",
+          "Liikkuu tasaisesti ja hitaasti",
+          "Viimeistele syvään hengityksellä."
+        ],
+        "tips": [
+          "Älä venytä kipuun asti.",
+          "Hengitä syvään",
+          "Rentoudu kokonaan",
+          "Tee se säännöllisesti"
+        ]
+      },
+      "59": {
+        "title": "Vaahto rullaus",
+        "instructions": [
+          "Makaa vaahtomuovitelalle",
+          "Pyöritä rullaa hitaasti lihasten alle.",
+          "Keskity kipupisteisiin",
+          "Pidä painetta 30-60 sekuntia",
+          "Toista kaikille lihasryhmille."
+        ],
+        "tips": [
+          "Älä pyöri nivelilläsi",
+          "Hengitä syvään",
+          "Älä siedä voimakasta kipua",
+          "Aloita pehmeällä telalla"
+        ]
+      },
+      "60": {
+        "title": "Kevyt lenkkeily",
+        "instructions": [
+          "Aloita hitaasti",
+          "Pidä sykkeesi 60-70 % maksimistasi",
+          "Hengitä syvään ja tasaisesti",
+          "Säilytä tasaista tahtia",
+          "Lopeta asteittainen tempon lasku"
+        ],
+        "tips": [
+          "Pidä pulssia silmällä",
+          "Hengitä nenäsi kautta",
+          "Älä ylikuormita itseäsi",
+          "Nauti prosessista"
+        ]
+      },
+      "61": {
+        "title": "Uima",
+        "instructions": [
+          "Aloita lämmittelyllä kuivalla maalla",
+          "Mene veteen vähitellen",
+          "Ui mukavaan tahtiin",
+          "Muuta uintityyliäsi",
+          "Lopeta hidas uiminen"
+        ],
+        "tips": [
+          "Älä ui yksin",
+          "Varo tekniikkaasi",
+          "Hengitä tasaisesti",
+          "Älä liioittele sitä"
+        ]
+      },
+      "62": {
+        "title": "Palautuspyörä",
+        "instructions": [
+          "Aloita hitaasti",
+          "Pidä sykkeesi 50-60 % maksimistasi",
+          "Polkimet helposti ja rytmikkäästi",
+          "Hengitä syvään",
+          "Lopeta asteittainen tempon lasku"
+        ],
+        "tips": [
+          "Säilytä korkea poljinnopeus",
+          "Hengitä syvään",
+          "Älä ylikuormita itseäsi",
+          "Nauti kyydistä"
+        ]
+      },
+      "63": {
+        "title": "Palauttava jooga",
+        "instructions": [
+          "Aloita yksinkertaisilla asennoilla",
+          "Suorita venyttely hitaasti",
+          "Hengitä syvään ja tasaisesti",
+          "Rentoudu joka asennossa",
+          "Lopeta meditaatiolla"
+        ],
+        "tips": [
+          "Älä pakota asentoja",
+          "Hengitä nenäsi kautta",
+          "Kuuntele kehoasi",
+          "Nauti prosessista"
+        ]
+      },
+      "64": {
+        "title": "Venyttely kuminauhalla",
+        "description": "Venytysharjoitukset kuminauhalla",
+        "equipment": "Kuminauha",
+        "calories": "35-55 kcal",
+        "benefits": [
+          "Parantaa nivelten joustavuutta",
+          "Vahvistaa nivelsiteitä",
+          "Lievittää lihasjännitystä",
+          "Lisää liikerataa"
+        ],
+        "instructions": [
+          "Valitse oikea kuminauha",
+          "Suorita hitaita liikkeitä",
+          "Pidä venytys 20-30 sekuntia",
+          "Toista jokainen harjoitus 3-5 kertaa"
+        ],
+        "tips": [
+          "Aloita kevyellä kuminauhalla",
+          "Älä anna sen sattua",
+          "Hengitä tasaisesti",
+          "Lisää vastusta vähitellen"
+        ]
+      },
+      "65": {
+        "title": "Kontrastisuihku",
+        "instructions": [
+          "Aloita lämpimällä vedellä",
+          "Siirrä vähitellen kylmään veteen",
+          "Pidä kylmää vettä 30-60 sekuntia",
+          "Palaa lämpimään veteen",
+          "Toista sykli 3-5 kertaa"
+        ],
+        "tips": [
+          "Aloita asteittain",
+          "Hengitä syvään",
+          "Älä jää liian kylmäksi",
+          "Kuuntele kehoasi"
+        ]
+      }
+    },
+    "difficulties": {
+      "Beginner": "Aloittelija",
+      "Intermediate": "Keskitaso",
+      "Advanced": "Edistynyt",
+      "Easy": "Helppo"
+    }
+  },
+  "items": {
+    "autograph": "nimikirjoitus",
+    "stick": "keppi",
+    "puck": "kiekko",
+    "jersey": "Jersey"
+  },
+  "requests": {
+    "pending": "Odottaa vastausta",
+    "accepted": "Hyväksytty",
+    "rejected": "Hylätty",
+    "giftRequests": "Lahjapyynnöt"
+  },
+  "auth": {
+    "login": "Jäälle menossa",
+    "register": "Rekisteröinti",
+    "phone": "Puhelin",
+    "phonePlaceholder": "+375296549728",
+    "phoneHint": "Anna puhelinnumerosi maakoodin kanssa",
+    "code": "Vahvistuskoodi",
+    "codePlaceholder": "Syötä koodi",
+    "sendCode": "Lähetä koodi",
+    "resendCode": "Toista jälkeen",
+    "verifyCode": "Vahvista koodi",
+    "invalidPhone": "Virheellinen puhelinnumeron muoto",
+    "invalidCode": "Virheellinen vahvistuskoodi",
+    "codeSent": "Koodi lähetetty osoitteeseen",
+    "codeResent": "Koodi on lähetetty uudelleen.",
+    "required": "Valtuutus vaaditaan",
+    "loginRequired": "Nähdäksesi pelaajan profiilin sinun on kirjauduttava sisään.",
+    "welcomeBack": "Tervetuloa takaisin!",
+    "welcomeBackMessage": "Tervetuloa takaisin, {name}!",
+    "codeSentSuccess": "Koodi lähetetty!",
+    "codeSentMessage": "Tarkista puhelimesi tekstiviesti ja anna vahvistuskoodi",
+    "userNotFound": "Käyttäjää ei löydy",
+    "userNotFoundMessage": "Tällä puhelinnumerolla ei ole tiliä. Ole hyvä ja rekisteröidy.",
+    "errorSendingCode": "Virhe",
+    "errorSendingCodeMessage": "Koodin lähettäminen epäonnistui. Tarkista puhelinnumerosi ja internetyhteytesi.",
+    "errorResendingCode": "Virhe",
+    "errorResendingCodeMessage": "Koodin uudelleenlähetys epäonnistui",
+    "errorVerifyingCode": "Virhe",
+    "errorVerifyingCodeMessage": "Koodia tarkistettaessa tapahtui virhe.",
+    "errorSendingCodeGeneral": "Koodin lähettäminen epäonnistui. Yritä uudelleen.",
+    "errorSendingCodeResend": "Koodin uudelleenlähetys epäonnistui",
+    "errorInvalidCode": "Anna 6-numeroinen koodi",
+    "errorRegistration": "Rekisteröinnin viimeistely epäonnistui",
+    "errorLoginRequired": "Sinun täytyy kirjautua sisään profiiliisi",
+    "errorLoginRequiredMessage": "Sinun tulee olla kirjautuneena sisään lähettääksesi viestejä.",
+    "errorLoginRequiredFriends": "Sinun on kirjauduttava sisään, jotta voit lisätä jonkun ystäväksi.",
+    "errorRemoveFriend": "Ei voida poistaa ystävistä",
+    "errorSendFriendRequest": "Ystäväpyynnön lähettäminen epäonnistui",
+    "errorCancelRequest": "Pyynnön peruuttaminen epäonnistui",
+    "errorAcceptRequest": "Pyynnön hyväksyminen epäonnistui",
+    "errorManageFriends": "Ystävien hallinnassa tapahtui virhe.",
+    "errorRejectRequest": "Pyynnön hylkääminen epäonnistui",
+    "errorRejectRequestGeneral": "Pyyntösi hylkäämisessä tapahtui virhe.",
+    "errorOpenLink": "Linkin avaaminen epäonnistui",
+    "errorDataNotFound": "Tietoja ei löydy",
+    "errorNoEditRights": "Sinulla ei ole lupaa muokata tätä profiilia.",
+    "errorClearTeams": "Vanhojen komentotietojen tyhjennys epäonnistui",
+    "errorSaveTeams": "Komentojen tallentaminen epäonnistui",
+    "errorSaveChanges": "Muutosten tallentaminen epäonnistui",
+    "errorAdminOnly": "Vain järjestelmänvalvoja voi poistaa käyttäjiä",
+    "errorPlayerNotFound": "Pelaajatietoja ei löydy",
+    "errorDeleteUser": "Käyttäjän poistaminen epäonnistui",
+    "errorCreateUser": "Käyttäjän luominen epäonnistui",
+    "errorFillNamePhone": "Täytä nimesi ja puhelinnumerosi",
+    "errorLoadNotifications": "Ilmoitusten lataaminen epäonnistui",
+    "errorGetNotifications": "Ilmoitusten vastaanottaminen ei onnistu",
+    "errorClearNotifications": "Ilmoitusten poistaminen epäonnistui",
+    "errorInvalidNotificationData": "Virheelliset ilmoitustiedot",
+    "errorProcessNotification": "Ilmoitusta ei voi käsitellä. Yritä uudelleen.",
+    "errorProcessNotificationGeneral": "Ilmoitusta ei voi käsitellä. Yritä uudelleen.",
+    "errorProcessFriendRequest": "Ystäväpyyntöäsi ei voi käsitellä.",
+    "errorProcessRequest": "Pyyntösi käsittely epäonnistui",
+    "errorSendMessage": "Viestin lähettäminen epäonnistui"
+  },
+  "profile": {
+    "addFriend": "Lisää kaveriksi",
+    "addFriendQuestion": "Haluatko lisätä {name} ystäväksi?",
+    "sendMessage": "Lähetä viesti",
+    "loading": "Ladataan...",
+    "basicInfo": "Perustiedot",
+    "physicalData": "Fyysiset tiedot",
+    "country": "Maa",
+    "position": "asema",
+    "number": "Määrä",
+    "grip": "ote",
+    "birthDate": "Syntymäaika",
+    "Левый": "Vasen",
+    "Правый": "Oikein",
+    "Center": "Keskushyökkääjä",
+    "Winger": "Laituri",
+    "Defender": "Puolustaja",
+    "Goalie": "Maalivahti",
+    "height": "Korkeus",
+    "weight": "Paino",
+    "age": "Ikä",
+    "team": "Joukkue",
+    "status": "Status",
+    "player": "Pelaaja",
+    "coach": "Kouluttaja",
+    "scout": "Partiolainen",
+    "admin": "Tekninen tuki",
+    "star": "Tähti",
+    "shop": "Jääkiekkokauppa",
+    "skateSharpening": "Luistimien teroitus",
+    "organizationName": "Organisaation nimi",
+    "organizationNamePlaceholder": "Organisaation nimi",
+    "services": "Palvelut",
+    "notSpecified": "Ei määritelty",
+    "yearsOld": "vuotta",
+    "cm": "cm",
+    "kg": "kg",
+    "left": "Vasen",
+    "right": "Oikein",
+    "skateSharpeningService": "Luistimien teroitus",
+    "skateForming": "Luistimien muotoilu",
+    "skateProfiling": "Luistimien profilointi",
+    "equipmentRepair": "Jääkiekkovarusteiden korjaus",
+    "stickRepair": "Mailojen korjaus",
+    "usedEquipmentSale": "Käytettyjen varusteiden myynti",
+    "newEquipmentSale": "Uusien varusteiden myynti",
+    "center": "Keskushyökkääjä",
+    "winger": "Laituri",
+    "defender": "Puolustaja",
+    "goalie": "Maalivahti",
+    "Left": "Vasen",
+    "Right": "Oikein",
+    "inHockey": "Jääkiekossa",
+    "lengthInCm": "Pituus cm",
+    "additional": "Lisäksi",
+    "cancel": "Peruuttaa",
+    "friends": "Ystävät",
+    "friendship": "Ystävyys",
+    "statistics": "Kuluvan kauden tilastot",
+    "teams": "Joukkueet",
+    "currentTeams": "Nykyiset joukkueet",
+    "pastTeams": "Entiset joukkueet",
+    "teamInfo": "Joukkueen tiedot",
+    "videoMoments": "Videon kohokohdat",
+    "standards": "Standardit",
+    "achievements": "Saavutukset",
+    "noAchievements": "Ei saavutuksia",
+    "hockeyPhotos": "Jääkiekko kuvia",
+    "photos": "Kuva",
+    "museum": "Museo",
+    "youAreFriendsWith": "Oletko ystäviä",
+    "addToFriends": "Lisää kaveriksi",
+    "addToFriendsToSeeStandards": "Lisää {name} ystäväksi nähdäksesi standardit",
+    "addToFriendsToSeePhotos": "Lisää {name} ystäväksi nähdäksesi jääkiekkokuvia",
+    "addToFriendsToSeeMuseum": "Lisää {name} ystäväksi nähdäksesi museo",
+    "removeFromFriends": "Poista ystävistä",
+    "points": "Pisteet",
+    "friendsCount": "ystäviä",
+    "friendsCountStats": "Ystävät",
+    "seconds": "sek",
+    "times": "kerran",
+    "sprint": "100 metrin juoksu",
+    "Центральный нападающий": "Keskushyökkääjä",
+    "Крайний нападающий": "Laituri",
+    "Защитник": "Puolustaja",
+    "Вратарь": "Maalivahti",
+    "настоящее время": "nykyaikaa",
+    "goals": "Maalit",
+    "assists": "Syötöt",
+    "games": "Pelit",
+    "pullUps": "Vedot",
+    "pushUps": "Push-ups",
+    "plankTime": "lankku (sek)",
+    "sprint100m": "100 m (sek)",
+    "longJump": "Pituushyppy",
+    "jumpRope": "hyppynaru",
+    "goalsCount": "päät",
+    "gamesCount": "pelejä",
+    "belarus": "Valko-Venäjä",
+    "usa": "USA",
+    "russia": "Venäjä",
+    "canada": "Kanada",
+    "finland": "Suomi",
+    "sweden": "Ruotsi",
+    "czech": "Tšekin tasavalta",
+    "slovakia": "Slovakia",
+    "germany": "Saksa",
+    "switzerland": "Sveitsi",
+    "austria": "Itävalta",
+    "norway": "Norja",
+    "denmark": "Tanska",
+    "latvia": "Latvia",
+    "lithuania": "Liettua",
+    "estonia": "Viro",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazakstan",
+    "squats": "Kyykky",
+    "plank": "Lankku",
+    "leftShort": "L",
+    "rightShort": "P",
+    "startedHockey": "Jääkiekossa kanssa",
+    "noFriendsYet": "{name} ei ole vielä ystäviä",
+    "beFirstToAdd": "Lisää {name} ensimmäisenä ystäväksi",
+    "writeMessage": "Kirjoita viesti",
+    "edit": "Muokata",
+    "deleteUser": "Poista käyttäjä",
+    "noExercisesYet": "Pelaaja ei ole vielä suorittanut yhtään harjoitusta.",
+    "noGiftsYet": "Lahjoja ei ole vielä saatu",
+    "editProfile": "Muokkaa profiilia",
+    "writeToSupport": "Kirjoita tekniseen tukeen",
+    "noExercisesOwn": "Et ole vielä suorittanut yhtään harjoitusta.",
+    "noExercisesOther": "Pelaaja ei ole vielä suorittanut yhtään harjoitusta.",
+    "removedFromFriends": "{name} poistettu ystävistä",
+    "removeFriendError": "Ei voida poistaa ystävistä",
+    "friendRequestSent": "Ystäväpyyntö lähetetty",
+    "friendshipAccepted": "{name} lisätty ystäväksi",
+    "cancelRequest": "Peruuta pyyntö",
+    "friendRequestError": "Ystäväpyynnön lähettäminen epäonnistui",
+    "friendRequestAcceptError": "Pyynnön hyväksyminen epäonnistui",
+    "friendRequestCancelled": "Ystäväpyyntö peruutettu",
+    "friendRequestCancelError": "Pyynnön peruuttaminen epäonnistui",
+    "deleteUserConfirm": "Haluatko varmasti poistaa käyttäjän \"{{name}}\"? Tätä toimintoa ei voi kumota.",
+    "userDeleted": "Käyttäjä \"{{name}}\" on poistettu",
+    "wantsToAddYouToFriends": "{{name}} haluaa lisätä sinut ystäväkseen",
+    "friendRequestReceived": "{{name}} haluaa lisätä sinut ystäväkseen",
+    "loadingProfile": "Ladataan profiilia...",
+    "playerNotFound": "Pelaajaa ei löydy",
+    "addAchievement": "Lisää saavutus",
+    "editAchievement": "Muokkaa saavutusta",
+    "competitionName": "Kilpailun nimi",
+    "year": "vuosi",
+    "place": "Paikka",
+    "description": "Kuvaus (valinnainen)",
+    "shopName": "Kaupan nimi",
+    "address": "Osoite",
+    "map": "Kartta",
+    "workingHours": "Aukioloajat",
+    "discountForFriends": "Alennus ystäville",
+    "hockeyShop": "Jääkiekkokauppa",
+    "nameHint": "Käytä vain latinalaisia ​​kirjaimia",
+    "photo": "Kuva",
+    "selectPhoto": "Valitse valokuva",
+    "logo": "Logo",
+    "selectLogo": "Valitse logo",
+    "selectCountry": "Valitse maa",
+    "searchCountry": "Etsi maa",
+    "errorEnterCompetition": "Kirjoita kilpailun nimi",
+    "errorEnterYear": "Anna kelvollinen vuosi.",
+    "grips": {
+      "Левый": "Vasen",
+      "Правый": "Oikein"
+    },
+    "countries": {
+      "Канада": "Kanada",
+      "США": "USA",
+      "Россия": "Venäjä",
+      "Швеция": "Ruotsi",
+      "Финляндия": "Suomi",
+      "Чехия": "Tšekin tasavalta",
+      "Словакия": "Slovakia",
+      "Швейцария": "Sveitsi",
+      "Германия": "Saksa",
+      "Австрия": "Itävalta",
+      "Норвегия": "Norja",
+      "Дания": "Tanska",
+      "Латвия": "Latvia",
+      "Литва": "Liettua",
+      "Эстония": "Viro",
+      "Беларусь": "Valko-Venäjä",
+      "Украина": "Ukraina",
+      "Польша": "Puola",
+      "Венгрия": "Unkari",
+      "Словения": "Slovenia",
+      "Хорватия": "Kroatia",
+      "Франция": "Ranska",
+      "Италия": "Italia",
+      "Испания": "Espanja",
+      "Нидерланды": "Alankomaat",
+      "Бельгия": "Belgia",
+      "Великобритания": "Yhdistynyt kuningaskunta",
+      "Исландия": "Islanti",
+      "Люксембург": "Luxemburg",
+      "Румыния": "Romania",
+      "Болгария": "Bulgaria",
+      "Сербия": "Serbia",
+      "Турция": "Turkkiye",
+      "Казахстан": "Kazakstan",
+      "Узбекистан": "Uzbekistan",
+      "Китай": "Kiina",
+      "Япония": "Japani",
+      "Южная Корея": "Etelä-Korea",
+      "Тайвань": "Taiwan",
+      "Гонконг": "Hong Kong",
+      "Сингапур": "Singapore",
+      "Малайзия": "Malesia",
+      "Таиланд": "Thaimaa",
+      "Индия": "Intia",
+      "Объединенные Арабские Эмираты": "Yhdistyneet arabiemiirikunnat",
+      "Израиль": "Israel",
+      "Австралия": "Australia",
+      "Новая Зеландия": "Uusi-Seelanti",
+      "Мексика": "Meksiko",
+      "ЮАР": "Etelä-Afrikka",
+      "Аргентина": "Argentiina"
+    },
+    "positions": {
+      "center": "Keskushyökkääjä",
+      "winger": "Laituri",
+      "defender": "Puolustaja",
+      "goalie": "Maalivahti",
+      "центральный нападающий": "keskushyökkääjä",
+      "крайний нападающий": "laitahyökkääjä",
+      "защитник": "puolustaja",
+      "вратарь": "maalivahti",
+      "Центральный нападающий": "Keskushyökkääjä",
+      "Крайний нападающий": "Laituri",
+      "Защитник": "Puolustaja",
+      "Вратарь": "Maalivahti"
+    },
+    "discountForFriendsHint": "Lisää kauppa ystäväksi saadaksesi alennuksen! Näytä alennus myyjälle ostaessasi.",
+    "activityRating": "Aktiivisuusluokitus",
+    "coachingYears": "Valmentaa vuosia",
+    "phone": "Puhelin",
+    "qrCodeTitle": "Profiilin QR-koodi",
+    "qrCodeSubtitle": "Skannaa nopeaa pääsyä varten",
+    "qrCodeInfo": "Osoita puhelimen kameralla QR-koodia avataksesi profiilin",
+    "shareProfile": "Jaa profiili",
+    "savedToGallery": "Tallennettu galleriaan",
+    "noPermission": "Ei pääsyä galleriaan",
+    "shareError": "Virhe luotaessa kuvaa",
+    "currentTeam": "Joukkue",
+    "hockeyExperience": "Jääkiekkokokemus",
+    "years": "vuotta",
+    "currentSeasonStats": "Nykyisen kauden tilastot"
+  },
+  "register": {
+    "title": "Rekisteröinti",
+    "status": "Status",
+    "player": "Pelaaja",
+    "coach": "Kouluttaja",
+    "scout": "Partiolainen",
+    "star": "Tähti",
+    "shop": "Jääkiekkokauppa",
+    "phone": "Puhelin",
+    "name": "Nimi",
+    "surname": "Sukunimi",
+    "birthDate": "Syntymäaika",
+    "country": "Maa",
+    "position": "asema",
+    "grip": "Pito",
+    "height": "Korkeus (cm)",
+    "weight": "Paino (kg)",
+    "number": "Määrä",
+    "photo": "Kuva",
+    "selectPhoto": "Valitse valokuva",
+    "takePhoto": "Ota valokuva",
+    "chooseFromGallery": "Valitse galleriasta",
+    "photoRequired": "Valokuva vaaditaan",
+    "register": "Rekisteröidy",
+    "back": "Takaisin",
+    "welcome": "Tervetuloa!",
+    "registrationSuccess": "Ilmoittautuminen onnistui! Tervetuloa HockeyStarsiin!",
+    "selectDate": "Valitse päivämäärä",
+    "cancel": "Peruuttaa",
+    "confirm": "Vahvistaa",
+    "photoError": "Virhe kuvan lataamisessa"
+  },
+  "navigation": {
+    "home": "Kotiin",
+    "search": "Haku",
+    "messages": "Viestit",
+    "notifications": "Tapahtumat",
+    "profile": "Profiili"
+  },
+  "admin": {
+    "accessDenied": "Käyttö estetty",
+    "onlyAdmins": "Vain järjestelmänvalvojat voivat käyttää tätä ominaisuutta.",
+    "error": "Virhe",
+    "errorLoadingProfile": "Profiilin käyttö epäonnistui",
+    "player": "Pelaaja",
+    "coach": "Kouluttaja",
+    "scout": "Partiolainen",
+    "admin": "Admin",
+    "star": "Tähti",
+    "shop": "Jääkiekkokauppa",
+    "noName": "Ei nimeä",
+    "noPosition": "Ei määritelty",
+    "noTeam": "Ei määritelty",
+    "sendGift": "Lähetä lahja",
+    "yearsOld": "vuotta",
+    "addUser": "Lisää käyttäjä",
+    "searchPlayers": "Etsitään pelaajia...",
+    "createUser": "Käyttäjän luominen",
+    "basicInfo": "Perustiedot",
+    "name": "Nimi",
+    "phone": "Puhelinnumero",
+    "status": "Status",
+    "position": "asema",
+    "number": "Pelaajan numero",
+    "grip": "Pito",
+    "height": "Korkeus (cm)",
+    "weight": "Paino (kg)",
+    "country": "Maa",
+    "create": "Luoda",
+    "success": "Menestys",
+    "userCreated": "Käyttäjä {{name}} on luotu",
+    "errorCreatingUser": "Käyttäjän luominen epäonnistui",
+    "fillRequiredFields": "Täytä kaikki pakolliset kentät.",
+    "enterValidPhone": "Anna kelvollinen puhelinnumero ja maakoodi.",
+    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka"
+  },
+  "museum": {
+    "title": "Museo",
+    "noItems": "Museo on edelleen tyhjä."
+  },
+  "teams": {
+    "Система": "Järjestelmä",
+    "Привет": "Hei",
+    "Пираньи": "Piraijoja",
+    "Динамо Минск": "Dynamo Minsk",
+    "Динамо-Минск": "Dynamo Minsk",
+    "Юность-Минск": "Yunost-Minsk",
+    "Юность": "Nuoriso",
+    "Неман": "Neman",
+    "Гомель": "Gomel",
+    "Брест": "Brest",
+    "Витебск": "Vitebsk",
+    "Львы": "Lionit",
+    "Керамин": "Keramin",
+    "Могилев": "Mogilev",
+    "Гродно": "Grodno",
+    "Сборная Беларуси": "Valko-Venäjän maajoukkue",
+    "Сборная Минской области": "Minskin alueen joukkue",
+    "Сборная Гомельской области": "Gomelin alueen joukkue",
+    "Сборная Брестской области": "Brestin alueen joukkue",
+    "Сборная Витебской области": "Vitebskin alueen joukkue",
+    "Сборная Могилевской области": "Mogilevin alueen joukkue",
+    "Сборная Гродненской области": "Grodnon alueen joukkue",
+    "ХК Минск": "HC Minsk",
+    "ХК Гомель": "HC Gomel",
+    "ХК Брест": "HC Brest",
+    "ХК Витебск": "HC Vitebsk",
+    "ХК Могилев": "HC Mogilev",
+    "ХК Гродно": "HC Grodno",
+    "Динамо": "Dynamo",
+    "Спартак": "Spartacus",
+    "ЦСКА": "CSKA",
+    "Салават Юлаев": "Salavat Julajev",
+    "Ак Барс": "Ak Bars",
+    "Металлург": "Metallurgi",
+    "Трактор": "Traktori",
+    "Авангард": "Avantgarde",
+    "Сибирь": "Siperia",
+    "Амур": "Amur",
+    "Адмирал": "Amiraali",
+    "Локомотив": "Veturi",
+    "Северсталь": "Severstal",
+    "Витязь": "Ritari",
+    "Сочи": "Sotši",
+    "Торпедо": "Torpedo",
+    "Нефтехимик": "petrokemisti",
+    "Автомобилист": "Autoilija",
+    "Югра": "Yugra",
+    "Барыс": "Barys",
+    "Куньлунь": "Kunlun",
+    "Динамо Рига": "Dinamo Riika",
+    "Динамо Москва": "Dynamo Moskova",
+    "Динамо Минск U20": "Dynamo Minsk U20",
+    "Динамо Минск U18": "Dynamo Minsk U18",
+    "Calgary Flames": "Calgary Flames",
+    "New Jersey Devils": "New Jersey Devils",
+    "Юность-Минск U20": "Yunost-Minsk U20",
+    "Юность-Минск U18": "Yunost-Minsk U18",
+    "teams": {
+      "Сборная Беларуси": "Valko-Venäjän maajoukkue",
+      "Динамо Минск": "Dinamo Minsk",
+      "Юность-Минск": "Yunost-Minsk",
+      "Пираньи": "Piraijoja",
+      "Сборная Минской области": "Minskin alueen joukkue",
+      "Сборная Беларуси U14": "Valko-Venäjän U14-maajoukkue",
+      "Пчелки": "Mehiläiset",
+      "Беларусь U14": "Valko-Venäjän U14-maajoukkue",
+      "Минская область": "Minskin alueen joukkue",
+      "New Jersey Devils": "New Jersey Devils",
+      "Calgary Flames": "Calgary Flames",
+      "Boston Hockey Club": "Boston Hockey Club",
+      "Belarus U14 National Team": "Valko-Venäjän U14-maajoukkue",
+      "Belarus National Team U14": "Valko-Venäjän U14-maajoukkue",
+      "Minsk Region Team": "Minskin alueen joukkue",
+      "Piranhas": "Piraijoja",
+      "Bees": "Mehiläiset",
+      "Toronto Maple Leafs": "Toronto Maple Leafs",
+      "Montreal Canadiens": "Montreal Canadiens",
+      "Vancouver Canucks": "Vancouver Canucks",
+      "Edmonton Oilers": "Edmonton Oilers",
+      "Winnipeg Jets": "Winnipeg Jets",
+      "Ottawa Senators": "Ottawan senaattorit",
+      "New York Rangers": "New York Rangers",
+      "Boston Bruins": "Boston Bruins",
+      "Chicago Blackhawks": "Chicago Blackhawks",
+      "Detroit Red Wings": "Detroit Red Wings",
+      "Pittsburgh Penguins": "Pittsburgh Penguins",
+      "Washington Capitals": "Washington Capitals",
+      "Tampa Bay Lightning": "Tampa Bay Lightning",
+      "Colorado Avalanche": "Colorado Avalanche",
+      "HIFK": "HIFK",
+      "Tappara": "Tappara",
+      "Kärpät": "Kärpät",
+      "TPS": "TPS",
+      "Färjestad BK": "Färjestad BK",
+      "HV71": "HV71",
+      "Frölunda HC": "Frölunda HC",
+      "Djurgårdens IF": "Djurgårdens IF",
+      "Kaunas": "Kaunas",
+      "Vilnius": "Vilna",
+      "Klaipeda": "Klaipeda",
+      "Riga": "Riika",
+      "Daugavpils": "Daugavpils",
+      "Liepaja": "Liepaja",
+      "Cracovia": "Cracovia",
+      "GKS Tychy": "GKS Tychy",
+      "Podhale": "Podhale",
+      "Сборная России": "Venäjän maajoukkue",
+      "Сборная Канады": "Kanadan joukkue",
+      "Сборная США": "USA:n joukkue",
+      "Сборная Финляндии": "Suomen maajoukkue",
+      "Сборная Швеции": "Ruotsin maajoukkue",
+      "Сборная Беларуси U20": "Valko-Venäjän U20-maajoukkue",
+      "Сборная Беларуси U18": "Valko-Venäjän U18-maajoukkue",
+      "Динамо Минск U20": "Dinamo Minsk U20",
+      "Динамо Минск U18": "Dinamo Minsk U18",
+      "Юность-Минск U20": "Yunost-Minsk U20",
+      "Юность-Минск U18": "Yunost-Minsk U18",
+      "ШРС": "SRS",
+      "Динамо-Молодечно": "Dynamo-Molodechno",
+      "Динамо Р": "Dynamo R",
+      "Слован": "Slovan",
+      "Металлург Мг": "Metallurg Mg",
+      "Барановичи": "Baranovichi",
+      "Шахтер": "Shakhtyor",
+      "Лида": "Lida",
+      "Пинск": "Pinsk",
+      "Ивацевичи": "Ivatsevichi",
+      "Береза": "Koivu",
+      "Кобрин": "Kobrin",
+      "Химик": "Khimik",
+      "Жлобин": "Zhlobin",
+      "Бобруйск": "Bobruisk",
+      "Лунинец": "Luninets",
+      "Сборная РБ": "RB maajoukkue",
+      "Сборная Минска": "Minskin joukkue",
+      "ЦСКА Москва": "CSKA Moskova",
+      "Спартак Москва": "Moskovan Spartak",
+      "Локомотив Ярославль": "Lokomotiv Jaroslavl",
+      "Ак Барс Казань": "Ak Bars Kazan",
+      "Трактор Челябинск": "Traktori Tšeljabinsk",
+      "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+      "Торпедо Нижний Новгород": "Torpedo Nižni Novgorod"
+    },
+    "Сборная Беларуси U14": "Valko-Venäjän U14-maajoukkue",
+    "Барановичи": "Baranovichi",
+    "Шахтер": "Kaivosmies",
+    "Лида": "Lida",
+    "Пинск": "Pinsk",
+    "Ивацевичи": "Ivatsevichi",
+    "Береза": "Koivu",
+    "Кобрин": "Kobrin",
+    "Химик": "Kemisti",
+    "Жлобин": "Zhlobin",
+    "Бобруйск": "Bobruisk",
+    "Лунинец": "Luninets",
+    "Сборная РБ": "RB maajoukkue",
+    "Сборная Минска": "Minskin joukkue",
+    "ЦСКА Москва": "CSKA Moskova",
+    "Спартак Москва": "Moskovan Spartak",
+    "Локомотив Ярославль": "Lokomotiv Jaroslavl",
+    "Ак Барс Казань": "Ak Bars Kazan",
+    "Трактор Челябинск": "Traktori Tšeljabinsk",
+    "Металлург Магнитогорск": "Metallurg Magnitogorsk",
+    "Торпедо Нижний Новгород": "Torpedo Nižni Novgorod",
+    "Boston Hockey Club": "Boston Hockey Club",
+    "Пчелки": "Mehiläiset",
+    "Center": "Keskushyökkääjä",
+    "Winger": "Reuna",
+    "Defender": "Puolustaja",
+    "Goalie": "Maalivahti"
+  },
+  "settings": {
+    "title": "Asetukset",
+    "language": "Kieli",
+    "selectLanguage": "Valitse kieli",
+    "autoLanguage": "Auto"
+  },
+  "search": {
+    "title": "Haku",
+    "loading": "Ladataan hakua...",
+    "placeholder": "Etsitään pelaajia...",
+    "country": "Maa",
+    "grip": "Pito",
+    "position": "asema",
+    "year": "vuosi",
+    "height": "Korkeus",
+    "heightFrom": "Korkeus alkaen",
+    "weight": "Paino",
+    "weightFrom": "Paino alkaen",
+    "all": "Kaikki",
+    "noPlayersFound": "Pelaajia ei löytynyt",
+    "left": "Vasen",
+    "right": "Oikein"
+  },
+  "messages": {
+    "title": "Viestit",
+    "loading": "Ladataan keskusteluja...",
+    "noMessages": "Ei viestejä",
+    "startConversation": "Aloita chattailu muiden pelaajien kanssa",
+    "error": "Virhe",
+    "errorLoadingChats": "Keskustelujen lataaminen epäonnistui",
+    "yesterday": "Eilen",
+    "you": "Sinä:"
+  },
+  "notifications": {
+    "title": "Tapahtumat",
+    "loading": "Ladataan tapahtumia...",
+    "noNotifications": "Ei tapahtumia",
+    "noNotificationsSubtitle": "Sinulla ei ole vielä tapahtumia ystävyyssuhteista, lahjoista tai muista toimista.",
+    "accept": "Hyväksyä",
+    "decline": "Hylätä",
+    "friendRequests": "Ystäväpyynnöt",
+    "friendRequest": "ystäväpyyntö",
+    "wantsToAddYou": "{name} haluaa lisätä sinut ystäväkseen",
+    "wantsToAddAsFriend": "haluaa lisätä sinut ystäväkseen",
+    "friendRequestAccepted": "Ystäväpyyntö hyväksytty!",
+    "friendRequestDeclined": "Ystäväpyyntö hylätty",
+    "giftRequest": "Lahjapyyntö",
+    "giftRequestMessage": "{playerName} pyytää {itemType}",
+    "giftRequestApproved": "Pyyntö hyväksytty",
+    "giftRequestApprovedMessage": "{starName} hyväksyi pyyntösi {itemType}",
+    "giftRequestAccepted": "Lahjapyyntö hyväksytty!",
+    "giftRequestRejected": "Lahjapyyntö hylätty",
+    "player": "Pelaaja",
+    "unknownPlayer": "Tuntematon pelaaja",
+    "star": "Tähti"
+  },
+  "editProfile": {
+    "selectPhotoSource": "Valitse valokuvalähde",
+    "selectPhotoMessage": "Mistä haluat ladata kuvan?",
+    "gallery": "Galleria",
+    "camera": "Kamera",
+    "cancel": "Peruuttaa",
+    "save": "Tallentaa",
+    "name": "Nimi",
+    "namePlaceholder": "Pelaajan nimi",
+    "country": "Maa",
+    "position": "asema",
+    "height": "Korkeus (cm)",
+    "heightPlaceholder": "Korkeus",
+    "weight": "Paino (kg)",
+    "weightPlaceholder": "Paino",
+    "number": "Määrä",
+    "grip": "Pito",
+    "birthDate": "Syntymäaika",
+    "socialLinks": "Sosiaalinen media",
+    "Левый": "Vasen"
+  },
+  "exercisesSection": {
+    "title": "Harjoitukset suoritettu",
+    "loading": "Ladataan...",
+    "noExercises": "Et ole vielä suorittanut yhtään harjoitusta.",
+    "noExercisesOwn": "Et ole vielä suorittanut yhtään harjoitusta.",
+    "noExercisesOther": "Käyttäjä ei ole vielä suorittanut yhtään harjoitusta.",
+    "times": "kerran",
+    "timesPlural": "kertaa"
+  },
+  "home": {
+    "loadingPlayers": "Jään kunnostus...",
+    "noPlayersCountry": "Ei pelaajia maasta {{country}}",
+    "noPlayersYear": "Ei pelaajia, jotka ovat syntyneet vuonna {{year}}",
+    "noPlayersCountryYear": "Ei pelaajia maasta {{country}} vuonna {{year}}",
+    "iceEmpty": "Jää on tyhjä. Valitse toinen maa tai vuosi tai nollaa suodattimet.",
+    "waitingForConnection": "Odotetaan yhteyttä",
+    "checkInternetConnection": "Tarkista internet-yhteys"
+  },
+  "filters": {
+    "year": "vuosi",
+    "yearDefault": "2012"
+  },
+  "chat": {
+    "loading": "Ladataan chattia...",
+    "startConversation": "Aloita keskustelu henkilön {name} kanssa",
+    "enterMessage": "Kirjoita viestisi...",
+    "player": "Pelaaja",
+    "coach": "Kouluttaja",
+    "scout": "Partiolainen",
+    "admin": "Tekninen tuki",
+    "star": "Tähti",
+    "shop": "Jääkiekkokauppa",
+    "error": "Virhe",
+    "errorLoadingChat": "Chat-tietojen lataaminen epäonnistui",
+    "errorSendingMessage": "Viestin lähettäminen epäonnistui"
+  },
+  "createUser": {
+    "title": "Käyttäjän luominen",
+    "selectPhotoSource": "Valitse valokuvalähde",
+    "selectPhotoMessage": "Mistä haluat ladata kuvan?",
+    "gallery": "Galleria",
+    "camera": "Kamera",
+    "cancel": "Peruuttaa",
+    "permissionError": "Galleriaan pääsyyn vaaditaan lupa.",
+    "permissionErrorCamera": "Kameraan pääsyyn vaaditaan lupa.",
+    "errorLoadingPhoto": "Kuvan lataaminen galleriasta epäonnistui",
+    "errorTakingPhoto": "Kuvan ottaminen epäonnistui",
+    "addPhoto": "Lisää valokuva",
+    "status": "Status",
+    "player": "Pelaaja",
+    "coach": "Kouluttaja",
+    "scout": "Partiolainen",
+    "star": "Tähti",
+    "shop": "Jääkiekkokauppa",
+    "phone": "Puhelinnumero",
+    "name": "Etu- ja sukunimi",
+    "namePlaceholder": "ANNA NIMI",
+    "nameHint": "Vain latinalaiset kirjaimet (A-Z)",
+    "birthDate": "Syntymäaika",
+    "selectBirthDate": "Valitse syntymäaikasi",
+    "position": "asema",
+    "number": "Pelaajan numero",
+    "numberPlaceholder": "Numero univormussa",
+    "grip": "Pito",
+    "height": "Korkeus (cm)",
+    "heightPlaceholder": "Korkeus",
+    "weight": "Paino (kg)",
+    "weightPlaceholder": "Paino",
+    "country": "Maa",
+    "selectCountry": "Valitse maa",
+    "searchCountry": "Haetaan maata...",
+    "close": "Lähellä",
+    "create": "Luoda",
+    "error": "Virhe",
+    "fillRequiredFields": "Täytä kaikki pakolliset kentät.",
+    "enterValidPhone": "Anna kelvollinen puhelinnumero ja maakoodi.",
+    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka",
+    "success": "Menestys",
+    "userCreated": "Käyttäjä {{name}} on luotu",
+    "errorCreatingUser": "Käyttäjän luominen epäonnistui"
+  },
+  "exerciseDetails": {
+    "back": "Takaisin",
+    "complete": "Suorittaa",
+    "completed": "Valmis",
+    "times": "kerran",
+    "timesPlural": "kertaa",
+    "duration": "Kesto",
+    "difficulty": "Monimutkaisuus",
+    "equipment": "Laitteet",
+    "calories": "Kalorit",
+    "benefits": "Hyöty",
+    "instructions": "Ohjeet",
+    "tips": "neuvoja",
+    "beginner": "Alku",
+    "intermediate": "Keskimäärin",
+    "advanced": "Edistynyt",
+    "error": "Virhe",
+    "errorCompleting": "Harjoituksen suorittaminen epäonnistui",
+    "success": "Menestys",
+    "exerciseCompleted": "Harjoitus suoritettu!"
+  },
+  "gifts": {
+    "requestGift": "Pyydä lahja",
+    "gifts": "Esittää",
+    "autograph": "Nimikirjoitus",
+    "stick": "Tikku",
+    "puck": "Pesukone",
+    "jersey": "Jersey",
+    "pleaseWriteMessage": "Kirjoita pyyntöösi viesti",
+    "invalidGift": "sopimaton lahja",
+    "deleteGiftQuestion": "Poista lahja?",
+    "from": "alkaen",
+    "noGiftsYet": "Ei vielä lahjoja tähdiltä",
+    "museum": "Lahjojen museo",
+    "myGifts": "Minun lahjani",
+    "noGiftsSubtext": "Lataa ensimmäinen lahjasi jakaaksesi sen pelaajien kanssa",
+    "successDeleted": "Lahja poistettu",
+    "errorDelete": "Lahjan poistaminen epäonnistui",
+    "noImage": "ei kuvaa",
+    "failedToSendRequest": "Pyynnön lähettäminen epäonnistui",
+    "requestSent": "Pyyntö lähetetty!",
+    "requestSentMessage": "Pyyntösi kohteelle {itemType} on lähetetty. Odota vastausta.",
+    "requestItem": "Pyydä {itemType}",
+    "requestMessage": "Viesti pyyntöön",
+    "selectGiftType": "Valitse lahjan tyyppi",
+    "selectGiftTypeMessage": "Minkä tyyppisen lahjan haluat luoda?",
+    "requestMessageHelper": "Kirjoita kohtelias viesti ja selitä miksi haluat saada tämän lahjan.",
+    "requestMessagePlaceholder": "Esimerkiksi: Hei! Olen pelisi suuri fani ja haluaisin nimikirjoituksen kokoelmaani...",
+    "characters": "symboleja",
+    "sending": "Lähetetään...",
+    "sendRequest": "Lähetä pyyntö",
+    "requestInfo": "Pyyntösi lähettämisen jälkeen tähti saa ilmoituksen ja voi hyväksyä tai hylätä pyyntösi. Jos lahja hyväksytään, se näkyy lahjamuseossasi.",
+    "failedToLoadItems": "Kohteiden lataaminen epäonnistui",
+    "noPermissionToUpload": "Sinulla ei ole lupaa ladata kohteita toiselle käyttäjälle.",
+    "failedToGetImageUri": "Kuvan URI:n hakeminen epäonnistui",
+    "failedToSelectImage": "Kuvaa ei voi valita",
+    "emptyImageUri": "Kuvan URI on tyhjä.",
+    "formDataUploadError": "Virhe lataamisessa FormDatan kautta",
+    "imageUploadError": "Virhe kuvan lataamisessa: {error}",
+    "itemUploadedSuccessfully": "{itemType} ladattu onnistuneesti!",
+    "failedToUploadItem": "Kohteen lataaminen epäonnistui",
+    "userNotAuthorized": "Käyttäjä ei ole valtuutettu",
+    "noPermissionToEdit": "Sinulla ei ole lupaa muokata kohteita toisen käyttäjän puolesta.",
+    "itemNotFound": "Lahjaa ei löytynyt",
+    "failedToUploadNewImage": "Virhe uuden kuvan lataamisessa",
+    "emptyImage": "Kuva on tyhjä (0 tavua)",
+    "failedToUpdateDatabase": "Virhe päivitettäessä tietokantatietuetta",
+    "itemImageUpdated": "Lahjakuva päivitetty!",
+    "failedToUpdateItemImage": "Lahjakuvan päivittäminen epäonnistui",
+    "allGiftsAdded": "Kaikki lahjat on lisätty.",
+    "allGiftTypesAdded": "Sinulla on jo kaikenlaisia ​​lahjoja",
+    "addGift": "Lisää lahja",
+    "deletion": "Poistaminen",
+    "itemDeleted": "Lahja poistettu",
+    "failedToDeleteItem": "Lahjan poistaminen epäonnistui",
+    "noGifts": "Ei vielä lahjoja",
+    "clickPlusToAdd": "Lisää napsauttamalla +",
+    "настоящее время": "nykyaikaa",
+    "Центральный нападающий": "Keskushyökkääjä",
+    "Крайний нападающий": "Laituri",
+    "Защитник": "Puolustaja",
+    "Вратарь": "Maalivahti",
+    "Center": "Keskushyökkääjä",
+    "Winger": "Reuna",
+    "Defender": "Puolustaja",
+    "Goalie": "Maalivahti",
+    "Left": "Vasen",
+    "Right": "Oikein",
+    "seconds": "sek",
+    "times": "kerran",
+    "sprint": "100 metrin juoksu",
+    "_cache_clear": "2024-01-16-9",
+    "sendGiftTo": "Lähetä lahja pelaajalle {playerName}",
+    "selectExistingGift": "Valitse olemassa oleva lahja",
+    "orCreateNew": "Tai luo uusi",
+    "giftName": "Lahjan nimi",
+    "giftNamePlaceholder": "esim. Allekirjoitettu lippalakki",
+    "uploadImage": "Lataa kuva",
+    "send": "Lähetä",
+    "selectGift": "Valitse lahja",
+    "fromAdmin": "Järjestelmänvalvoja",
+    "errorSelectOrCreate": "Valitse lahja tai luo uusi",
+    "errorGiftAlreadyExists": "Tämä lahja on jo olemassa pelaajalle {playerName}.\n\nValitse toinen lahja tai luo uusi.",
+    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!",
+    "errorSendingGift": "Lahjan lähettäminen epäonnistui",
+    "deleteGiftConfirm": "Haluatko varmasti poistaa tämän lahjan?",
+    "selectImage": "Valitse kuva",
+    "errorPermissionDenied": "Sinulla ei ole oikeutta poistaa tätä lahjaa",
+    "errorGiftNotFound": "Lahjaa ei löytynyt",
+    "errorGiftNotDeleted": "Lahjaa ei poistettu",
+    "noGiftsUploaded": "Ei vielä ladattuja lahjoja",
+    "fromStar": "{starName}ltä",
+    "giftReceived": "Lahja vastaanotettu!",
+    "giftReceivedFromAdmin": "Olet saanut lahjan järjestelmänvalvojalta: {giftName}",
+    "giftReceivedFromStar": "Olet saanut lahjan henkilöltä {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Lahja vastaanotettu!",
+    "giftReceivedFromAdminPush": "Olet saanut lahjan järjestelmänvalvojalta: {giftName}",
+    "giftReceivedFromStarPush": "Olet saanut lahjan henkilöltä {starName}: {giftName}"
+  },
+  "TEMP_DELETE_ME": {
+    "title": "Standardit",
+    "noNormatives": "Standardeja ei ole vielä lisätty.",
+    "russia": "Venäjä",
+    "canada": "Kanada",
+    "finland": "Suomi",
+    "sweden": "Ruotsi",
+    "czech": "Tšekin tasavalta",
+    "slovakia": "Slovakia",
+    "germany": "Saksa",
+    "switzerland": "Sveitsi",
+    "austria": "Itävalta",
+    "norway": "Norja",
+    "denmark": "Tanska",
+    "latvia": "Latvia",
+    "lithuania": "Liettua",
+    "estonia": "Viro",
+    "ukraine": "Ukraina",
+    "kazakhstan": "Kazakstan",
+    "беларусь": "Valko-Venäjä",
+    "россия": "Venäjä",
+    "сша": "USA",
+    "канада": "Kanada",
+    "финляндия": "Suomi",
+    "швеция": "Ruotsi",
+    "чехия": "Tšekin tasavalta",
+    "словакия": "Slovakia",
+    "германия": "Saksa",
+    "швейцария": "Sveitsi",
+    "австрия": "Itävalta",
+    "норвегия": "Norja",
+    "дания": "Tanska",
+    "латвия": "Latvia",
+    "литва": "Liettua",
+    "эстония": "Viro",
+    "украина": "Ukraina",
+    "казахстан": "Kazakstan",
+    "польша": "Puola",
+    "венгрия": "Unkari",
+    "словения": "Slovenia",
+    "хорватия": "Kroatia",
+    "франция": "Ranska",
+    "италия": "Italia",
+    "испания": "Espanja",
+    "нидерланды": "Alankomaat",
+    "бельгия": "Belgia",
+    "великобритания": "Yhdistynyt kuningaskunta",
+    "исландия": "Islanti",
+    "люксембург": "Luxemburg",
+    "румыния": "Romania",
+    "болгария": "Bulgaria",
+    "сербия": "Serbia",
+    "турция": "Turkkiye",
+    "узбекистан": "Uzbekistan",
+    "китай": "Kiina",
+    "япония": "Japani",
+    "южнаякорея": "Etelä-Korea",
+    "тайвань": "Taiwan",
+    "гонконг": "Hong Kong",
+    "сингапур": "Singapore",
+    "малайзия": "Malesia",
+    "таиланд": "Thaimaa",
+    "индия": "Intia",
+    "объединенныеарабскиеэмираты": "Yhdistyneet arabiemiirikunnat",
+    "израиль": "Israel",
+    "австралия": "Australia",
+    "новаязеландия": "Uusi-Seelanti",
+    "мексика": "Meksiko",
+    "юар": "Etelä-Afrikka",
+    "аргентина": "Argentiina"
+  },
+  "normatives": {
+    "title": "Standardit",
+    "noNormatives": "Standardeja ei ole vielä lisätty.",
+    "addNormative": "Lisää standardi",
+    "name": "Nimi",
+    "description": "Kuvaus",
+    "type": "Tyyppi",
+    "value": "Merkitys",
+    "unit": "Mittayksikkö",
+    "add": "Lisätä",
+    "cancel": "Peruuttaa",
+    "save": "Tallentaa",
+    "edit": "Muokata",
+    "delete": "Poistaa",
+    "back": "Takaisin",
+    "editNormative": "Muokkaa standardia",
+    "deleteNormativeConfirm": "Haluatko varmasti poistaa asetuksen \"{{name}}\"? Tätä toimintoa ei voi kumota.",
+    "normativeDeleted": "Normaali \"{{name}}\" on poistettu",
+    "normativeCreated": "Vakio \"{{name}}\" luotu",
+    "errorCreatingNormative": "Standardin luominen epäonnistui",
+    "errorDeletingNormative": "Standardin poistaminen epäonnistui",
+    "errorEditingNormative": "Standardin muokkaaminen epäonnistui",
+    "errorLoadingNormatives": "Standardien lataaminen epäonnistui",
+    "normativeUpdated": "Standardi \"{{name}}\" on päivitetty",
+    "errorUpdatingNormative": "Standardin päivittäminen epäonnistui"
+  },
+  "socialLinks": {
+    "website": "Verkkosivusto",
+    "error": "Virhe",
+    "cannotOpenLink": "Ei voida avata linkkiä kohteeseen {platform}",
+    "openError": "Virhe avattaessa linkkiä",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "vk": "VK",
+    "enterInstagram": "Siirry Instagramiin",
+    "enterTiktok": "Syötä TikTok",
+    "enterVk": "Syötä VK",
+    "enterWebsite": "Siirry verkkosivustolle",
+    "instagramPlaceholder": "@käyttäjänimi tai linkki",
+    "tiktokPlaceholder": "@käyttäjänimi tai linkki",
+    "vkPlaceholder": "@käyttäjänimi tai linkki",
+    "websitePlaceholder": "esimerkki.fi"
+  },
+  "logout": "Poistu",
+  "logoutConfirm": "Kirjaudu ulos profiilistasi",
+  "logoutConfirmMessage": "Haluatko varmasti kirjautua ulos profiilistasi?",
+  "adminGifts": {
+    "sendGift": "Lähetä lahja",
+    "giftName": "Lahjan nimi",
+    "selectImage": "Valitse kuva"
+  },
+  "videoNotification": {
+    "added": "lisäsi",
+    "oneVideo": "uuden videon",
+    "multipleVideos": "{count} uutta videota",
+    "video": "video",
+    "videos": "videot"
+  },
+  "achievementNotification": {
+    "added": "lisäsi",
+    "received": "sai",
+    "oneAchievement": "uuden saavutuksen",
+    "multipleAchievements": "{count} uutta saavutusta",
+    "achievement": "saavutus",
+    "achievements": "saavutukset",
+    "title": "🏆 Saavutus!",
+    "message": "Onnittelut! Sait saavutuksen: {achievementName}"
+  },
+  "avatarNotification": {
+    "changed": "vaihtoi avatarinsa"
+  },
+  "statsNotification": {
+    "updated": "päivitti",
+    "stats": "tilastot",
+    "normatives": "normit",
+    "physicalData": "fyysiset tiedot"
+  },
+  "height": "pituus",
+  "weight": "paino",
+  "cm": "cm",
+  "kg": "kg"
+}

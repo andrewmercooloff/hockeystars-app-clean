@@ -1,0 +1,196 @@
+import React, { useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../contexts/LanguageContext';
+
+interface StatChange {
+  field: string;
+  oldValue: number;
+  newValue: number;
+  change: number;
+  timestamp: string;
+}
+
+interface StatsChangeNotificationProps {
+  changes: StatChange[];
+  playerName: string;
+  timestamp: number;
+  playerAvatar?: string | null;
+}
+
+const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
+  changes,
+  playerName,
+  timestamp,
+  playerAvatar
+}) => {
+  const { t } = useLanguage();
+
+  const fieldNames = useMemo(() => ({
+    'goals': t('goals'),
+    'assists': t('assists'), 
+    'games': t('games'),
+    'pullUps': t('pullUps'),
+    'pushUps': t('pushUps'),
+    'plankTime': t('plankTime'),
+    'sprint100m': t('sprint100m'),
+    'longJump': t('longJump'),
+    'jumpRope': t('jumpRope')
+  }), [t]);
+
+  const getFieldName = (field: string): string => {
+    return fieldNames[field] || field;
+  };
+
+  const formatValue = (value: number, field: string): string => {
+    if (field === 'plankTime' || field === 'sprint100m') {
+      return `${value}с`;
+    }
+    if (field === 'longJump') {
+      return `${value}м`;
+    }
+    return value.toString();
+  };
+
+  const formatTime = useCallback((timestamp: number): string => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    if (diff < 60000) { // меньше минуты
+      return t('justNow');
+    } else if (diff < 3600000) { // меньше часа
+      const minutes = Math.floor(diff / 60000);
+      return t('minutesAgo', { minutes });
+    } else if (diff < 86400000) { // меньше дня
+      const hours = Math.floor(diff / 3600000);
+      return t('hoursAgo', { hours });
+    } else {
+      const days = Math.floor(diff / 86400000);
+      return t('daysAgo', { days });
+    }
+  }, [t]);
+
+  return (
+    <View style={styles.container}>
+      {/* Аватар слева */}
+      <View style={styles.avatarContainer}>
+        {playerAvatar ? (
+          <Image 
+            source={{ uri: playerAvatar }} 
+            style={styles.playerAvatar}
+          />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="trending-up" size={24} color="#fa2f40" />
+          </View>
+        )}
+      </View>
+      
+      {/* Информация справа */}
+      <View style={styles.contentContainer}>
+        <View style={styles.header}>
+          <Text style={styles.playerName}>{playerName}</Text>
+          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+        </View>
+        
+        <View style={styles.changesContainer}>
+          {changes.map((change, index) => (
+            <View key={index} style={styles.changeItem}>
+              <Text style={styles.actionText}>
+                {getFieldName(change.field)}: {formatValue(change.newValue, change.field)}
+              </Text>
+              <View style={[
+                styles.statsBadge,
+                { backgroundColor: change.change > 0 ? '#fa2f40' : '#FF9800' }
+              ]}>
+                <Text style={styles.badgeText}>
+                  {change.change > 0 ? '+' : ''}{change.change}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    marginVertical: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#fa2f40',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  avatarContainer: {
+    marginRight: 12,
+  },
+  avatarPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  playerName: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    flex: 1,
+  },
+  timeText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    color: '#999',
+    marginLeft: 8,
+  },
+  changesContainer: {
+    gap: 8,
+  },
+  changeItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  actionText: {
+    color: '#ddd',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    flex: 1,
+  },
+  statsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    minWidth: 32,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+  },
+  playerAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+});
+
+export default StatsChangeNotification;

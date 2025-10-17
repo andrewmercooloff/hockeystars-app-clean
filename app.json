@@ -1,0 +1,117 @@
+{
+  "expo": {
+    "name": "HockeyStars",
+    "slug": "hockeystars",
+    "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "hockeystars",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "by.hockeystars.app",
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      },
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification",
+          "remote-notification"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/splash-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "by.hockeystars.app",
+      "splash": {
+        "mdpi": "./assets/images/splash-icon.png",
+        "hdpi": "./assets/images/splash-icon.png",
+        "xhdpi": "./assets/images/splash-icon.png",
+        "xxhdpi": "./assets/images/splash-icon.png",
+        "xxxhdpi": "./assets/images/splash-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "notification": {
+        "icon": "./assets/images/ic_notification.png",
+        "color": "#fa2f40",
+        "androidMode": "default",
+        "androidCollapsedTitle": "HockeyStars"
+      },
+      "softwareKeyboardLayoutMode": "pan",
+      "navigationBar": {
+        "visible": false
+      },
+      "userInterfaceStyle": "dark",
+      "statusBar": {
+        "style": "dark",
+        "backgroundColor": "#000000"
+      }
+    },
+    "web": {
+      "favicon": "./assets/images/splash-icon.png",
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      },
+      "build": {
+        "babel": {
+          "include": [
+            "@expo/vector-icons"
+          ]
+        }
+      },
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ccb608ca-e849-4a98-b337-d38863d3ebff"
+      },
+      "debug": {
+        "splashScreenDuration": 2000,
+        "showBuildProgress": true
+      },
+      "twilioAccountSid": "REDACTED_TWILIO_ACCOUNT_SID",
+      "twilioAuthToken": "REDACTED_HEX_SECRET",
+      "twilioFromNumber": "+46731727922",
+      "twilioWhatsAppFrom": "whatsapp:+14155238886"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/splash-icon.png",
+          "color": "#fa2f40",
+          "defaultChannel": "default"
+        }
+      ]
+    ],
+    "notification": {
+      "icon": "./assets/images/splash-icon.png",
+      "color": "#fa2f40"
+    }
+  }
+}
