@@ -352,24 +352,26 @@ const usePuckCollisionSystem = (players: Player[]) => {
           adjustedY += Math.sin(angle) * correctionDistance;
           
           // ТОЛКАЕМ ДРУГУЮ ШАЙБУ: передаем импульс от движения перетаскиваемой шайбы
-          const pushStrength = Platform.OS === 'ios' ? 1.5 : 0.3;
-          
-          // Вычисляем общую скорость перетаскивания
+          // Только если есть реальная скорость (не при перетаскивании)
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
           
-          // angle - это угол ОТ другой шайбы К перетаскиваемой
-          // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
-          // dx = adjustedX - otherPos.x (от другой к текущей)
-          // Для толчка в обратную сторону используем отрицательный угол
-          const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
-          const pushVx = Math.cos(pushAngle) * dragSpeed * pushStrength;
-          const pushVy = Math.sin(pushAngle) * dragSpeed * pushStrength;
-          
-          updatedPositions[index] = {
-            ...otherPos,
-            vx: otherPos.vx + pushVx,
-            vy: otherPos.vy + pushVy
-          };
+          if (dragSpeed > 0.1) { // Минимальная скорость для толчка
+            const pushStrength = Platform.OS === 'ios' ? 1.5 : 0.3;
+            
+            // angle - это угол ОТ другой шайбы К перетаскиваемой
+            // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
+            // dx = adjustedX - otherPos.x (от другой к текущей)
+            // Для толчка в обратную сторону используем отрицательный угол
+            const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
+            const pushVx = Math.cos(pushAngle) * dragSpeed * pushStrength;
+            const pushVy = Math.sin(pushAngle) * dragSpeed * pushStrength;
+            
+            updatedPositions[index] = {
+              ...otherPos,
+              vx: otherPos.vx + pushVx,
+              vy: otherPos.vy + pushVy
+            };
+          }
         }
       });
       
@@ -445,18 +447,22 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const newX = touch.pageX - dragStartRef.current.x;
     const newY = touch.pageY - dragStartRef.current.y;
     
-    // Вычисляем скорость на основе изменения позиции (увеличенный коэффициент для лучшего толкания)
-    const vx = (newX - lastPositionRef.current.x) * 1.2;
-    const vy = (newY - lastPositionRef.current.y) * 1.2;
-    
+    // При перетаскивании НЕ вычисляем скорость - это может влиять на физику других шайб
+    // Скорость будет вычислена только при отпускании пальца
     lastPositionRef.current = { x: newX, y: newY };
-    onDrag(position.id, newX, newY, vx, vy, true);
+    onDrag(position.id, newX, newY, 0, 0, true); // Передаем нулевую скорость при перетаскивании
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    // Сбрасываем флаг isDragging для этой шайбы
-    if (onDrag) {
+    
+    // Вычисляем финальную скорость только при отпускании пальца
+    if (onDrag && hasDraggedRef.current) {
+      const finalVx = (position.x - lastPositionRef.current.x) * 0.5; // Уменьшенный коэффициент
+      const finalVy = (position.y - lastPositionRef.current.y) * 0.5;
+      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+    } else if (onDrag) {
+      // Если не было перетаскивания, просто сбрасываем флаг
       onDrag(position.id, position.x, position.y, position.vx, position.vy, false);
     }
   };
