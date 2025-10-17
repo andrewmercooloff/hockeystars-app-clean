@@ -267,6 +267,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               
               // Отмечаем столкновение для вибрации только если это шайба пользователя
               if (currentUserId && pos.id === currentUserId) {
+                console.log('🎯 ВИБРАЦИЯ: Столкновение шайбы пользователя', pos.id, 'с', otherPos.id);
                 collisionDetectedRef.current = true;
               }
             }
@@ -307,8 +308,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           const now = Date.now();
           if (now - lastHapticTimeRef.current > 80) {
             lastHapticTimeRef.current = now;
+            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя');
             // Используем impactAsync со средним стилем для более заметной вибрации
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
+              console.log('❌ Ошибка вибрации:', error);
+            });
           }
         }
     }, 16); // Все платформы - 60 FPS для плавного движения
@@ -387,8 +391,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
       const now = Date.now();
       if (now - lastHapticTimeRef.current > 50) {
         lastHapticTimeRef.current = now;
+        console.log('📳 ВИБРАЦИЯ DRAG: Вызываем вибрацию для пользователя при перетаскивании');
         // Используем Medium для более заметной вибрации при перетаскивании
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
+          console.log('❌ Ошибка вибрации DRAG:', error);
+        });
       }
     }
   }, [puckSize, currentUserId]);
@@ -763,6 +770,11 @@ export default function HomeScreen() {
 
 
   const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id);
+  
+  // Отладочный лог для проверки ID пользователя
+  useEffect(() => {
+    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: currentUser?.id =', currentUser?.id);
+  }, [currentUser?.id]);
 
 
 
