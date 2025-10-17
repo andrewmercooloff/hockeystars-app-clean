@@ -353,13 +353,13 @@ const usePuckCollisionSystem = (players: Player[]) => {
           
           // ТОЛКАЕМ ДРУГУЮ ШАЙБУ только при реальном столкновении
           // Но не при каждом движении пальца - только когда есть столкновение
-          const pushStrength = Platform.OS === 'ios' ? 1.5 : 0.3;
+          const pushStrength = Platform.OS === 'ios' ? 0.8 : 0.2; // Уменьшаем силу толчка
           
           // Вычисляем общую скорость перетаскивания
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
           
           // Толкаем только если есть реальная скорость (не при каждом движении пальца)
-          if (dragSpeed > 0.5) { // Увеличиваем порог для более точного толчка
+          if (dragSpeed > 1.0) { // Еще больше увеличиваем порог для более точного толчка
             // angle - это угол ОТ другой шайбы К перетаскиваемой
             // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
             const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
@@ -404,6 +404,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
+  const lastUpdateTimeRef = useRef(0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -432,6 +433,13 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     if (!isDragging || !onDrag) return;
     
     const touch = e.nativeEvent;
+    const now = Date.now();
+    
+    // Throttling - обновляем не чаще чем раз в 16ms (60 FPS)
+    if (now - lastUpdateTimeRef.current < 16) {
+      return;
+    }
+    lastUpdateTimeRef.current = now;
     
     // Проверяем, что палец сдвинулся достаточно для drag (минимум 5 пикселей)
     const dx = touch.pageX - dragStartRef.current.pageX;
