@@ -320,10 +320,11 @@ export default function PastTeamsSection({
           <Text style={styles.emptyText}>{t('noPastTeams')}</Text>
         </View>
              ) : (
-         <FlatList
+         <DraggableFlatList
            data={pastTeams.filter(team => !team.isCurrent)}
            renderItem={renderPastTeamItem}
            keyExtractor={(item, index) => `${item.id}-${index}`}
+           onDragEnd={handleDragEnd}
            scrollEnabled={false}
            contentContainerStyle={styles.teamsList}
          />

@@ -325,10 +325,11 @@ export default function CurrentTeamsSection({
           <Text style={styles.emptyText}>{t('noCurrentTeams')}</Text>
         </View>
       ) : (
-        <FlatList
+        <DraggableFlatList
           data={currentTeams}
           renderItem={renderCurrentTeamItem}
           keyExtractor={(item, index) => `${item.id}-${index}`}
+          onDragEnd={handleDragEnd}
           scrollEnabled={false}
           contentContainerStyle={styles.teamsList}
         />
