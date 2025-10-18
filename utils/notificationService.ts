@@ -7,7 +7,24 @@ import { playNotificationSound } from './soundService';
 // Настройка обработчика уведомлений
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
-    // Воспроизводим звук уведомления
+    // Проверяем, в фоне ли приложение
+    const appState = require('react-native').AppState.currentState;
+    console.log('🔔 Обработка уведомления. AppState:', appState);
+    
+    // Если приложение активно - не показываем уведомления
+    if (appState === 'active') {
+      console.log('🔔 Приложение активно - не показываем push уведомление');
+      return {
+        shouldShowAlert: false, // Не показываем уведомления когда приложение активно
+        shouldPlaySound: false, // Не воспроизводим звук
+        shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
+      };
+    }
+    
+    // Если приложение в фоне - показываем уведомления
+    console.log('🔔 Приложение в фоне - показываем push уведомление');
+    
+    // Воспроизводим звук уведомления только в фоне
     try {
       await playNotificationSound();
     } catch (error) {
@@ -15,8 +32,8 @@ Notifications.setNotificationHandler({
     }
     
     return {
-      shouldShowAlert: true, // Показываем уведомления
-      shouldPlaySound: true, // Воспроизводим звук
+      shouldShowAlert: true, // Показываем уведомления когда в фоне
+      shouldPlaySound: true, // Воспроизводим звук когда в фоне
       shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
     };
   },
@@ -152,6 +169,10 @@ export async function savePushToken(token: string, userId: string): Promise<bool
   }
 }
 
+// Кеш для предотвращения дублирования уведомлений
+const sentNotifications = new Map<string, number>();
+const NOTIFICATION_COOLDOWN = 5000; // 5 секунд между одинаковыми уведомлениями
+
 /**
  * Отправка push-уведомления через Expo Push API
  */
@@ -162,6 +183,29 @@ export async function sendPushNotification(
   data?: any
 ): Promise<boolean> {
   try {
+    // Создаем уникальный ключ для проверки дублирования
+    const notificationKey = `${token}-${title}-${body}`;
+    const now = Date.now();
+    
+    // Проверяем, не отправляли ли мы такое же уведомление недавно
+    if (sentNotifications.has(notificationKey)) {
+      const lastSent = sentNotifications.get(notificationKey)!;
+      if (now - lastSent < NOTIFICATION_COOLDOWN) {
+        console.log('🔔 Пропускаем дублирующееся уведомление:', title);
+        return true; // Возвращаем true, так как уведомление уже было отправлено
+      }
+    }
+    
+    // Записываем время отправки
+    sentNotifications.set(notificationKey, now);
+    
+    // Очищаем старые записи (старше 1 минуты)
+    for (const [key, timestamp] of sentNotifications.entries()) {
+      if (now - timestamp > 60000) {
+        sentNotifications.delete(key);
+      }
+    }
+    
     const message = {
       to: token,
       sound: 'default',

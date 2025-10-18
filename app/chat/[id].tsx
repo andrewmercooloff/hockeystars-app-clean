@@ -25,6 +25,7 @@ import {
     sendMessageSimple
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { playOutgoingMessageSound, playIncomingMessageSound } from '../../utils/soundService';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -123,8 +124,15 @@ export default function ChatScreen() {
         
         setMessages(conversation);
         
-        // Если есть новые сообщения, прокручиваем вниз
+        // Если есть новые сообщения, прокручиваем вниз и воспроизводим звук
         if (newMessages.length > 0) {
+          // Воспроизводим звук получения сообщения
+          try {
+            await playIncomingMessageSound();
+          } catch (soundError) {
+            console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+          }
+          
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }, 100);
@@ -144,6 +152,13 @@ export default function ChatScreen() {
     try {
       const success = await sendMessageSimple(currentUser.id, otherPlayer.id, newMessage.trim());
       if (success) {
+        // Воспроизводим звук отправки сообщения
+        try {
+          await playOutgoingMessageSound();
+        } catch (soundError) {
+          console.error('❌ Ошибка воспроизведения звука отправки:', soundError);
+        }
+        
         setNewMessage('');
         // Небольшая задержка для сохранения сообщения в базе данных
         setTimeout(async () => {

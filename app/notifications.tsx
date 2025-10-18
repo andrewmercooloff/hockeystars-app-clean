@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -38,7 +39,7 @@ import {
 } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
-// import { useNotificationContext } from '../contexts/NotificationContext'; // Больше не нужен
+import { useNotificationContext } from '../contexts/NotificationContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -129,7 +130,7 @@ interface GiftRequestItem {
 export default function NotificationsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  // const { updateNotificationCount } = useNotificationContext(); // Больше не нужен
+  const { updateNotificationCount } = useNotificationContext();
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
@@ -319,16 +320,14 @@ export default function NotificationsScreen() {
     }, [currentUser])
   );
 
-  // Автоматически отмечаем все уведомления как прочитанные через 7 секунд после входа в экран
+  // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
   useEffect(() => {
     if (currentUser && notifications.length > 0) {
       const timer = setTimeout(async () => {
         await markAllNotificationsAsRead();
-        // Убираем автоматическое обновление счетчика - он уже обновлен в notifyFriendsAboutGiftReceived
-        // setTimeout(() => {
-        //   updateNotificationCount();
-        // }, 200);
-      }, 7000);
+        // Обновляем счетчик уведомлений через контекст
+        await updateNotificationCount(currentUser);
+      }, 5000); // Уменьшаем до 5 секунд
       
       return () => {
         clearTimeout(timer);
