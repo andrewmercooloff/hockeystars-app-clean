@@ -916,7 +916,7 @@ export default function PlayerProfile() {
 
   const handleCurrentTeamChange = async (teams: PastTeam[]) => {
     try {
-
+      console.log('🔄 handleCurrentTeamChange: обновляем текущие команды:', teams.length);
       setPlayerTeams(teams);
     } catch (error) {
       console.error('Ошибка при изменении текущих команд:', error);
@@ -1246,6 +1246,16 @@ export default function PlayerProfile() {
         console.error('❌ Ошибка подготовки уведомлений (не критично):', notifyError);
       }
       
+      // Обновляем состояние команд СРАЗУ после сохранения
+      if (teams) {
+        const currentTeams = teams.filter(team => team.isCurrent);
+        const pastTeams = teams.filter(team => !team.isCurrent);
+        
+        console.log('🔄 Обновляем команды после сохранения:', { currentTeams: currentTeams.length, pastTeams: pastTeams.length });
+        setPlayerTeams(currentTeams);
+        setPastTeams(pastTeams);
+      }
+      
       // Обновляем состояние игрока
       if (refreshedPlayer) {
         setPlayer(refreshedPlayer);
@@ -1279,15 +1289,6 @@ export default function PlayerProfile() {
             router.replace(`/player/${player.id}?refresh=${Date.now()}`);
           }, 0);
         }
-      }
-      
-      // Обновляем состояние команд
-      if (teams) {
-        const currentTeams = teams.filter(team => team.isCurrent);
-        const pastTeams = teams.filter(team => !team.isCurrent);
-        
-        setPlayerTeams(currentTeams);
-        setPastTeams(pastTeams);
       }
       
       setIsEditing(false);
