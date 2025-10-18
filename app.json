@@ -27,9 +27,11 @@
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification",
-          "remote-notification"
+          "audio"
         ],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "This app uses audio for notification sounds",
+        "NSCameraUsageDescription": "This app uses camera for profile photos"
       }
     },
     "android": {
@@ -50,13 +52,16 @@
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.VIBRATE",
         "android.permission.WAKE_LOCK",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "notification": {
         "icon": "./assets/images/ic_notification.png",
         "color": "#fa2f40",
         "androidMode": "default",
-        "androidCollapsedTitle": "HockeyStars"
+        "androidCollapsedTitle": "HockeyStars",
+        "sounds": ["./assets/not.m4a"]
       },
       "softwareKeyboardLayoutMode": "pan",
       "navigationBar": {
@@ -103,15 +108,17 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/splash-icon.png",
+          "icon": "./assets/images/ic_notification.png",
           "color": "#fa2f40",
-          "defaultChannel": "default"
+          "defaultChannel": "default",
+          "sounds": ["./assets/not.m4a"]
         }
       ]
     ],
     "notification": {
-      "icon": "./assets/images/splash-icon.png",
-      "color": "#fa2f40"
+      "icon": "./assets/images/ic_notification.png",
+      "color": "#fa2f40",
+      "sounds": ["./assets/not.m4a"]
     }
   }
 }

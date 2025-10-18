@@ -7,12 +7,16 @@ import { playNotificationSound } from './soundService';
 // Настройка обработчика уведомлений
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
-    // Когда приложение активно (в фокусе) - не показываем push уведомления
-    // Они будут показаны только когда приложение в фоне или закрыто
+    // Воспроизводим звук уведомления
+    try {
+      await playNotificationSound();
+    } catch (error) {
+      console.error('❌ Ошибка воспроизведения звука уведомления:', error);
+    }
     
     return {
-      shouldShowAlert: false, // Не показываем уведомления когда приложение активно
-      shouldPlaySound: false, // Не воспроизводим звук
+      shouldShowAlert: true, // Показываем уведомления
+      shouldPlaySound: true, // Воспроизводим звук
       shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
     };
   },
@@ -34,10 +38,14 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
   if (Platform.OS === 'android') {
     // На Android нужно создать канал уведомлений
     await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+      name: 'HockeyStars Notifications',
+      description: 'Notifications for HockeyStars app',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#fa2f40',
+      sound: 'default',
+      enableVibrate: true,
+      enableLights: true,
     });
   }
 
@@ -52,9 +60,11 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     }
     
     if (finalStatus !== 'granted') {
-      console.log('❌ Push notifications permission denied');
+      console.log('❌ Push notifications permission denied. Status:', finalStatus);
       return null;
     }
+    
+    console.log('✅ Push notifications permission granted');
     
     try {
       // Получаем Expo push token
@@ -163,13 +173,14 @@ export async function sendPushNotification(
         vibrate: [0, 250, 250, 250],
         color: '#fa2f40', // Цвет темы приложения
         icon: 'ic_notification',
-        channelId: 'hockey_messages',
+        channelId: 'default',
       },
       // Параметры для iOS
       ios: {
         sound: 'default',
         badge: 1,
         categoryId: 'hockey_notification',
+        critical: false,
       },
     };
 

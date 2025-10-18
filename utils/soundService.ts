@@ -22,13 +22,15 @@ export async function initializeSounds(): Promise<void> {
   if (isInitialized) return;
 
   try {
-    // Настраиваем аудио режим (упрощенная версия для совместимости)
+    // Настраиваем аудио режим для TestFlight и продакшена
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
-      staysActiveInBackground: false,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
+      staysActiveInBackground: true, // Разрешаем воспроизведение в фоне
+      playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
+      shouldDuckAndroid: false, // Не приглушаем другие звуки
       playThroughEarpieceAndroid: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
     });
 
     // Загружаем звук отправки сообщения (out.m4a)
@@ -54,6 +56,9 @@ export async function initializeSounds(): Promise<void> {
 
     isInitialized = true;
     console.log('🔊 Звуки сообщений и уведомлений инициализированы');
+    console.log('🔊 Outgoing sound:', !!outgoingSound);
+    console.log('🔊 Incoming sound:', !!incomingSound);
+    console.log('🔊 Notification sound:', !!notificationSound);
   } catch (error) {
     console.error('❌ Ошибка инициализации звуков:', error);
   }
