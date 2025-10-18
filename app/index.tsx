@@ -45,13 +45,11 @@ interface PuckPosition {
 const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const puckSize = 70; // Размер шайбы
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
-  const [smoothedPositions, setSmoothedPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
-  const previousPositionsRef = useRef<PuckPosition[]>([]);
 
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
@@ -184,15 +182,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             return pos;
           }
           
-          // Более плавное движение с интерполяцией
-          const deltaTime = 1/120; // 120 FPS для более плавного движения
-          let newX = pos.x + pos.vx * deltaTime;
-          let newY = pos.y + pos.vy * deltaTime;
+          // Более плавное движение
+          let newX = pos.x + pos.vx;
+          let newY = pos.y + pos.vy;
           let newVx = pos.vx;
           let newVy = pos.vy;
           
           // Добавляем легкое трение для более естественного движения
-          const friction = 0.998; // Очень легкое трение
+          const friction = 0.999; // Очень легкое трение
           newVx *= friction;
           newVy *= friction;
 
@@ -310,28 +307,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             vx: newVx,
             vy: newVy
           };
-        });
-        
-        // Добавляем интерполяцию для сглаживания движения
-        setPuckPositions(currentPositions => {
-          const smoothed = currentPositions.map((pos, index) => {
-            const prevPos = previousPositionsRef.current[index];
-            if (!prevPos) return pos;
-            
-            // Интерполяция между предыдущей и текущей позицией
-            const smoothingFactor = 0.3; // Коэффициент сглаживания (0-1)
-            return {
-              ...pos,
-              x: prevPos.x + (pos.x - prevPos.x) * smoothingFactor,
-              y: prevPos.y + (pos.y - prevPos.y) * smoothingFactor
-            };
-          });
-          
-          // Сохраняем текущие позиции как предыдущие для следующего кадра
-          previousPositionsRef.current = currentPositions;
-          setSmoothedPositions(smoothed);
-          
-          return currentPositions;
         });
       });
         
@@ -451,7 +426,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
     }
   }, [puckSize, currentUserId]);
 
-  return { puckPositions: smoothedPositions.length > 0 ? smoothedPositions : puckPositions, puckSize, updatePuckPosition };
+  return { puckPositions, puckSize, updatePuckPosition };
 };
 
 const PuckAnimator = ({ player, position, onNav, onDrag }: { 
