@@ -296,9 +296,13 @@ export default function RootLayout() {
 
              // Инициализируем push-уведомления для пользователя
              try {
-               await initializePushNotifications(user.id);
+               console.log('🚀 НАЧИНАЕМ ИНИЦИАЛИЗАЦИЮ PUSH-УВЕДОМЛЕНИЙ для пользователя:', user.id);
+               const pushResult = await initializePushNotifications(user.id);
+               console.log('🚀 РЕЗУЛЬТАТ ИНИЦИАЛИЗАЦИИ PUSH-УВЕДОМЛЕНИЙ:', pushResult);
              } catch (error) {
                console.error('❌ Ошибка инициализации push-уведомлений:', error);
+               console.error('❌ Error details:', error.message);
+               console.error('❌ Error stack:', error.stack);
              }
 
           // Настраиваем системный UI для скрытия панели навигации

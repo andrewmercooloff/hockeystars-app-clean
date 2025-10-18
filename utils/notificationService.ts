@@ -409,10 +409,14 @@ export async function sendAchievementNotification(
  */
 export async function initializePushNotifications(userId: string): Promise<boolean> {
   try {
-    console.log('🚀 Инициализация push-уведомлений...');
+    console.log('🚀 Инициализация push-уведомлений для userId:', userId);
+    console.log('🚀 Platform.OS:', Platform.OS);
+    console.log('🚀 Device.isDevice:', Device.isDevice);
     
     // Регистрируем для получения уведомлений
+    console.log('🚀 Вызываем registerForPushNotificationsAsync...');
     const token = await registerForPushNotificationsAsync();
+    console.log('🚀 Получен token:', token);
     
     if (!token) {
       console.log('❌ Не удалось получить push token');
@@ -420,7 +424,9 @@ export async function initializePushNotifications(userId: string): Promise<boole
     }
 
     // Сохраняем token в базе данных
+    console.log('🚀 Сохраняем token в базе данных...');
     const saved = await savePushToken(token, userId);
+    console.log('🚀 Результат сохранения token:', saved);
     
     if (saved) {
       console.log('✅ Push-уведомления успешно инициализированы');
@@ -431,6 +437,8 @@ export async function initializePushNotifications(userId: string): Promise<boole
     }
   } catch (error) {
     console.error('❌ Ошибка инициализации push-уведомлений:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
     return false;
   }
 }
