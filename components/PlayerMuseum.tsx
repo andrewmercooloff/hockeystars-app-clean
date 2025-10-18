@@ -396,46 +396,24 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   };
 
   // Обновление при фокусе на экране
-  useFocusEffect(
-    useCallback(() => {
-      if (!isStar) {
-        // Загружаем данные только если нет кешированных данных
-        if (cachedMuseumItems === undefined || cachedMuseumItems === null) {
-          loadMuseumItems();
-        }
-      }
-    }, [playerId, isStar, cachedMuseumItems])
-  );
-
+  // Упрощенная логика загрузки - загружаем только один раз
   useEffect(() => {
-    if (playerId) {
+    if (playerId && !isStar) {
       console.log('🎁 МУЗЕЙ: useEffect вызван для', playerId, 'cachedMuseumItems:', cachedMuseumItems?.length || 'undefined');
-      // Добавляем небольшую задержку для стабильности
-      const timer = setTimeout(() => {
-        // Загружаем данные только если нет кешированных данных
-        if (cachedMuseumItems === undefined || cachedMuseumItems === null) {
-          console.log('🎁 МУЗЕЙ: useEffect - Нет кешированных данных, загружаем из Supabase');
-          loadMuseumItems();
-        } else {
-          console.log('🎁 МУЗЕЙ: useEffect - Есть кешированные данные, НЕ загружаем заново');
-        }
-      }, 100);
       
-      return () => clearTimeout(timer);
-    }
-  }, [playerId, isOwner, isAdmin, isEditing, cachedMuseumItems]);
-
-  // Обновляем музей при фокусе на экране
-  useFocusEffect(
-    useCallback(() => {
-      if (playerId) {
-        // Загружаем данные только если нет кешированных данных
-        if (cachedMuseumItems === undefined || cachedMuseumItems === null) {
-          loadMuseumItems();
-        }
+      // Если есть кешированные данные, используем их
+      if (cachedMuseumItems && Array.isArray(cachedMuseumItems)) {
+        console.log('🎁 МУЗЕЙ: Используем кешированные данные');
+        setMuseumItems(cachedMuseumItems);
+        setLoading(false);
+        return;
       }
-    }, [playerId, cachedMuseumItems])
-  );
+      
+      // Иначе загружаем из базы данных
+      console.log('🎁 МУЗЕЙ: Загружаем данные из Supabase');
+      loadMuseumItems();
+    }
+  }, [playerId, isStar, cachedMuseumItems]);
 
   // Проверяем, что playerId передан
   if (!playerId) {

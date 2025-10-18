@@ -393,6 +393,15 @@ export default function PlayerProfile() {
         setFriendshipStatus(friendsStatus);
         setFriends(friendsList);
         
+        // Предзагружаем аватары друзей для быстрого отображения
+        friendsList.forEach(friend => {
+          if (friend.avatar) {
+            Image.prefetch(friend.avatar).catch(() => {
+              // Игнорируем ошибки предзагрузки
+            });
+          }
+        });
+        
         // Сохраняем в кеш состояния для мгновенного переключения
         setFriendshipStatusCache(prev => ({
           ...prev,
@@ -406,6 +415,15 @@ export default function PlayerProfile() {
         // Для собственного профиля загружаем только друзей
         const friendsList = await getFriends(playerData.id);
         setFriends(friendsList);
+        
+        // Предзагружаем аватары друзей для быстрого отображения
+        friendsList.forEach(friend => {
+          if (friend.avatar) {
+            Image.prefetch(friend.avatar).catch(() => {
+              // Игнорируем ошибки предзагрузки
+            });
+          }
+        });
         
         // Сохраняем в кеш состояния для мгновенного переключения
         setFriendsCache(prev => ({
@@ -3040,10 +3058,8 @@ export default function PlayerProfile() {
                 (currentUser?.status === 'star') ||
                 (friendshipStatus === 'friends') ? (
                   <View style={styles.section} ref={museumRef}>
-                  {/* Заголовок музея - показываем только если есть подарки */}
-                  {museumItemsCount[player.id] && museumItemsCount[player.id] > 0 && (
-                    <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
-                  )}
+                  {/* Заголовок музея - показываем всегда */}
+                  <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   
                   <PlayerMuseum 
                     playerId={player.id} 
@@ -3142,8 +3158,13 @@ export default function PlayerProfile() {
                       onPress={() => router.push(`/player/${friend.id}`)}
                     >
                       <Image 
-                        source={{ uri: friend.avatar || 'https://via.placeholder.com/60/333/fff?text=Player' }} 
+                        source={{ 
+                          uri: friend.avatar || 'https://via.placeholder.com/60/333/fff?text=Player',
+                          cache: 'force-cache' // Кешируем аватары
+                        }} 
                         style={styles.friendAvatar}
+                        defaultSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=Player' }}
+                        loadingIndicatorSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=...' }}
                       />
                       <Text style={styles.friendName} numberOfLines={2}>
                         {friend.name?.toUpperCase()}
