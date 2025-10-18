@@ -4886,6 +4886,39 @@ export const sendGiftNotification = async (
               .eq('id', friend.id);
           }
         }
+        
+        // Отправляем push-уведомления друзьям
+        try {
+          const { sendPushNotification } = await import('./notificationService');
+          for (const friend of friends) {
+            const { data: friendDeviceData, error: friendDeviceError } = await supabase
+              .from('push_tokens')
+              .select('token')
+              .eq('user_id', friend.id);
+            
+            if (!friendDeviceError && friendDeviceData && friendDeviceData.length > 0) {
+              const friendPushTokens = friendDeviceData.map(d => d.token);
+              const friendPushTitle = `🎁 ${playerName} получил подарок!`;
+              const friendPushBody = `${playerName} получил подарок от ${senderName}: ${giftName}`;
+              
+              for (const token of friendPushTokens) {
+                try {
+                  await sendPushNotification(token, friendPushTitle, friendPushBody, {
+                    type: 'friend_gift_received',
+                    player_name: playerName,
+                    sender_name: senderName,
+                    gift_name: giftName
+                  });
+                } catch (pushError) {
+                  console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push другу:', pushError);
+                }
+              }
+            }
+          }
+          console.log('🎁 NOTIFICATIONS: ✅ Push-уведомления друзьям отправлены');
+        } catch (pushError) {
+          console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push друзьям:', pushError);
+        }
       }
     }
     

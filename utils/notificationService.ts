@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 import { supabase } from './supabase';
 import { playNotificationSound } from './soundService';
 
@@ -8,7 +8,7 @@ import { playNotificationSound } from './soundService';
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
     // Проверяем, в фоне ли приложение
-    const appState = require('react-native').AppState.currentState;
+    const appState = AppState.currentState;
     console.log('🔔 Обработка уведомления. AppState:', appState);
     
     // Если приложение активно - не показываем уведомления
