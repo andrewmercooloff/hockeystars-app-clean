@@ -1029,6 +1029,8 @@ export default function PlayerProfile() {
         import('../../utils/playerStorage').then(({ getPlayerTeamsAsPastTeams }) => getPlayerTeamsAsPastTeams(player.id))
       ]);
       
+      console.log('🔍 Результат загрузки команд:', teams);
+      
       // Проверяем результат синхронизации команд
       if (!teamsSyncResult.success) {
         showCustomAlert('Ошибка', teamsSyncResult.error || 'Неизвестная ошибка', 'error');
@@ -1247,13 +1249,19 @@ export default function PlayerProfile() {
       }
       
       // Обновляем состояние команд СРАЗУ после сохранения
-      if (teams) {
+      if (teams && Array.isArray(teams)) {
         const currentTeams = teams.filter(team => team.isCurrent);
         const pastTeams = teams.filter(team => !team.isCurrent);
         
-        console.log('🔄 Обновляем команды после сохранения:', { currentTeams: currentTeams.length, pastTeams: pastTeams.length });
+        console.log('🔄 Обновляем команды после сохранения:', { 
+          totalTeams: teams.length,
+          currentTeams: currentTeams.length, 
+          pastTeams: pastTeams.length 
+        });
         setPlayerTeams(currentTeams);
         setPastTeams(pastTeams);
+      } else {
+        console.log('❌ Команды не загружены или не являются массивом:', teams);
       }
       
       // Обновляем состояние игрока
@@ -1293,6 +1301,27 @@ export default function PlayerProfile() {
       
       setIsEditing(false);
       showCustomAlert(t('common.success'), t('playerUpdated'), 'success');
+      
+      // Дополнительное обновление команд через небольшую задержку для надежности
+      setTimeout(async () => {
+        try {
+          const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
+          const freshTeams = await getPlayerTeamsAsPastTeams(player.id);
+          if (freshTeams && Array.isArray(freshTeams)) {
+            const currentTeams = freshTeams.filter(team => team.isCurrent);
+            const pastTeams = freshTeams.filter(team => !team.isCurrent);
+            console.log('🔄 Дополнительное обновление команд:', { 
+              totalTeams: freshTeams.length,
+              currentTeams: currentTeams.length, 
+              pastTeams: pastTeams.length 
+            });
+            setPlayerTeams(currentTeams);
+            setPastTeams(pastTeams);
+          }
+        } catch (error) {
+          console.error('❌ Ошибка дополнительного обновления команд:', error);
+        }
+      }, 500);
       
       // Отправляем все уведомления асинхронно
       if (notificationPromises.length > 0) {
