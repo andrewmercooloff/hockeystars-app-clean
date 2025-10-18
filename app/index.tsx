@@ -45,11 +45,13 @@ interface PuckPosition {
 const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const puckSize = 70; // Размер шайбы
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
+  const [smoothedPositions, setSmoothedPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
+  const previousPositionsRef = useRef<PuckPosition[]>([]);
 
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
@@ -182,10 +184,17 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             return pos;
           }
           
-          let newX = pos.x + pos.vx;
-          let newY = pos.y + pos.vy;
+          // Более плавное движение с интерполяцией
+          const deltaTime = 1/120; // 120 FPS для более плавного движения
+          let newX = pos.x + pos.vx * deltaTime;
+          let newY = pos.y + pos.vy * deltaTime;
           let newVx = pos.vx;
           let newVy = pos.vy;
+          
+          // Добавляем легкое трение для более естественного движения
+          const friction = 0.998; // Очень легкое трение
+          newVx *= friction;
+          newVy *= friction;
 
 
           // Обработка коллизий со стенами (платформо-зависимые границы)
@@ -193,11 +202,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           const wallMaxY = height - boundaries.bottomOffset - puckSize;
           
           if (newX <= boundaries.leftOffset || newX >= wallMaxX) {
-            newVx = -newVx * (Platform.OS === 'android' ? 0.6 : 0.8); // Android - уменьшено, iOS и Web - исходное
+            newVx = -newVx * (Platform.OS === 'android' ? 0.75 : 0.85); // Улучшенные коэффициенты отскока
             newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
           }
           if (newY <= boundaries.topOffset || newY >= wallMaxY) {
-            newVy = -newVy * (Platform.OS === 'android' ? 0.6 : 0.8); // Android - уменьшено, iOS и Web - исходное
+            newVy = -newVy * (Platform.OS === 'android' ? 0.75 : 0.85); // Улучшенные коэффициенты отскока
             newY = Math.max(boundaries.topOffset, Math.min(wallMaxY, newY));
           }
 
@@ -228,10 +237,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             
             // Если шайба прижалась к границе, отражаем скорость
             if (newX <= boundaries.leftOffset || newX >= maxX - puckSize) {
-              newVx = -newVx * 0.8; // Web - исходное значение
+              newVx = -newVx * 0.85; // Web - улучшенный коэффициент
             }
             if (newY <= boundaries.topOffset || newY >= maxY - puckSize) {
-              newVy = -newVy * 0.8; // Web - исходное значение
+              newVy = -newVy * 0.85; // Web - улучшенный коэффициент
             }
           }
 
@@ -254,9 +263,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               newX += Math.cos(angle) * correctionDistance;
               newY += Math.sin(angle) * correctionDistance;
               
-              // ПРОСТАЯ ФИЗИКА: усиленное отталкивание на основе overlap
+              // ПРОСТАЯ ФИЗИКА: более плавное отталкивание на основе overlap
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.05 : 0.1));
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.4 : (Platform.OS === 'android' ? 0.08 : 0.12));
               
               // Текущая шайба отталкивается от другой
               newVx += Math.cos(angle) * pushForce;
@@ -278,9 +287,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           newVx += velocityChanges[posIndex].dvx;
           newVy += velocityChanges[posIndex].dvy;
           
-          // Платформо-зависимые ограничения скорости
-          const maxSpeed = Platform.OS === 'ios' ? 4.5 : (Platform.OS === 'web' ? 5.2 : 1.92); // iOS - увеличено для лучшего drag, Web - исходное, Android - увеличено на 20%
-          const minSpeed = Platform.OS === 'ios' ? 0.2 : (Platform.OS === 'web' ? 0.208 : 0.072); // iOS - увеличено для поддержания движения
+          // Платформо-зависимые ограничения скорости (улучшенные для плавности)
+          const maxSpeed = Platform.OS === 'ios' ? 5.0 : (Platform.OS === 'web' ? 5.5 : 2.2); // Увеличены для более плавного движения
+          const minSpeed = Platform.OS === 'ios' ? 0.15 : (Platform.OS === 'web' ? 0.18 : 0.06); // Уменьшены для более естественного замедления
           const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
           if (currentSpeed > maxSpeed) {
             newVx = (newVx / currentSpeed) * maxSpeed;
@@ -301,6 +310,28 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
             vx: newVx,
             vy: newVy
           };
+        });
+        
+        // Добавляем интерполяцию для сглаживания движения
+        setPuckPositions(currentPositions => {
+          const smoothed = currentPositions.map((pos, index) => {
+            const prevPos = previousPositionsRef.current[index];
+            if (!prevPos) return pos;
+            
+            // Интерполяция между предыдущей и текущей позицией
+            const smoothingFactor = 0.3; // Коэффициент сглаживания (0-1)
+            return {
+              ...pos,
+              x: prevPos.x + (pos.x - prevPos.x) * smoothingFactor,
+              y: prevPos.y + (pos.y - prevPos.y) * smoothingFactor
+            };
+          });
+          
+          // Сохраняем текущие позиции как предыдущие для следующего кадра
+          previousPositionsRef.current = currentPositions;
+          setSmoothedPositions(smoothed);
+          
+          return currentPositions;
         });
       });
         
@@ -326,7 +357,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
         }
-    }, 16); // Все платформы - 60 FPS для плавного движения
+    }, 8); // Все платформы - 120 FPS для более плавного движения
 
     return () => {
       if (animationIntervalRef.current) {
@@ -420,7 +451,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
     }
   }, [puckSize, currentUserId]);
 
-  return { puckPositions, puckSize, updatePuckPosition };
+  return { puckPositions: smoothedPositions.length > 0 ? smoothedPositions : puckPositions, puckSize, updatePuckPosition };
 };
 
 const PuckAnimator = ({ player, position, onNav, onDrag }: { 
