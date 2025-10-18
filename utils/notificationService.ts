@@ -74,8 +74,13 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       
       token = expoPushToken.data;
       console.log('✅ Push token получен:', token);
+      console.log('✅ Project ID:', 'ccb608ca-e849-4a98-b337-d38863d3ebff');
+      console.log('✅ Platform:', Platform.OS);
+      console.log('✅ Device isDevice:', Device.isDevice);
     } catch (error) {
       console.error('❌ Ошибка получения push token:', error);
+      console.error('❌ Error details:', error.message);
+      console.error('❌ Error stack:', error.stack);
     }
   } else {
     console.log('❌ Push notifications работают только на физических устройствах');

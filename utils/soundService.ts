@@ -61,6 +61,8 @@ export async function initializeSounds(): Promise<void> {
     console.log('🔊 Notification sound:', !!notificationSound);
   } catch (error) {
     console.error('❌ Ошибка инициализации звуков:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
   }
 }
 
