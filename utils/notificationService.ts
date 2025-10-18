@@ -10,8 +10,30 @@ Notifications.setNotificationHandler({
     // Проверяем, в фоне ли приложение
     const appState = AppState.currentState;
     console.log('🔔 Обработка уведомления. AppState:', appState);
+    console.log('🔔 Тип уведомления:', notification.request.content.data?.type);
     
-    // Если приложение активно - не показываем уведомления
+    // Специальная логика для уведомлений о подарках - всегда показываем
+    const notificationType = notification.request.content.data?.type;
+    const isGiftNotification = notificationType === 'gift_received' || notificationType === 'friend_gift_received';
+    
+    if (isGiftNotification) {
+      console.log('🔔 Уведомление о подарке - показываем всегда');
+      
+      // Воспроизводим звук уведомления
+      try {
+        await playNotificationSound();
+      } catch (error) {
+        console.error('❌ Ошибка воспроизведения звука уведомления:', error);
+      }
+      
+      return {
+        shouldShowAlert: true, // Показываем уведомления о подарках всегда
+        shouldPlaySound: true, // Воспроизводим звук
+        shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
+      };
+    }
+    
+    // Для остальных уведомлений - только в фоне
     if (appState === 'active') {
       console.log('🔔 Приложение активно - не показываем push уведомление');
       return {

@@ -4784,7 +4784,7 @@ export const sendGiftNotification = async (
       }
     }
     
-    // 3. Отправляем push-уведомление
+    // 3. Отправляем push-уведомление получателю подарка
     try {
       const { sendPushNotification } = await import('./notificationService');
       const { data: deviceData, error: deviceError } = await supabase
@@ -4792,9 +4792,14 @@ export const sendGiftNotification = async (
         .select('token')
         .eq('user_id', playerId);
       
+      console.log('🎁 NOTIFICATIONS: Поиск push-токенов для получателя:', playerId);
+      console.log('🎁 NOTIFICATIONS: deviceData:', deviceData);
+      console.log('🎁 NOTIFICATIONS: deviceError:', deviceError);
+      
       if (!deviceError && deviceData && deviceData.length > 0) {
         const pushTokens = deviceData.map(d => d.token);
-        console.log('🎁 NOTIFICATIONS: Отправка push на', pushTokens.length, 'устройств');
+        console.log('🎁 NOTIFICATIONS: Найдено', pushTokens.length, 'push-токенов для получателя');
+        console.log('🎁 NOTIFICATIONS: Отправляем push получателю:', pushTitle, pushBody);
         
         for (const token of pushTokens) {
           try {
@@ -4803,17 +4808,21 @@ export const sendGiftNotification = async (
               sender_name: senderName,
               gift_name: giftName
             });
+            console.log('🎁 NOTIFICATIONS: ✅ Push отправлен получателю на токен:', token.substring(0, 20) + '...');
           } catch (pushError) {
-            console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push:', pushError);
+            console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
           }
         }
         
-        console.log('🎁 NOTIFICATIONS: ✅ Push-уведомления отправлены');
+        console.log('🎁 NOTIFICATIONS: ✅ Push-уведомления получателю отправлены');
       } else {
-        console.log('🎁 NOTIFICATIONS: ⚠️ Нет зарегистрированных устройств для push');
+        console.log('🎁 NOTIFICATIONS: ⚠️ У получателя нет зарегистрированных устройств для push');
+        if (deviceError) {
+          console.error('🎁 NOTIFICATIONS: ❌ Ошибка получения push-токенов:', deviceError);
+        }
       }
     } catch (pushError) {
-      console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push:', pushError);
+      console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
     }
     
     // 4. Уведомляем друзей игрока (исключая отправителя)
