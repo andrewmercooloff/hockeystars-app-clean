@@ -32,7 +32,7 @@ export async function initializeSounds(): Promise<void> {
         playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
         shouldDuckAndroid: false, // Не приглушаем другие звуки
         playThroughEarpieceAndroid: false,
-        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
       });
       console.log('🔊 Аудио режим настроен успешно');
