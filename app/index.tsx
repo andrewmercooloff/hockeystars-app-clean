@@ -267,17 +267,24 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               
               // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
-              const otherSpeed = Math.sqrt(otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy);
               
-              // Если текущая шайба движется быстрее, передаем импульс другой шайбе
-              if (currentSpeed > otherSpeed && currentSpeed > 0.5) {
-                const impulseTransfer = Math.min(currentSpeed * 0.3, 2.0); // Ограничиваем передачу импульса
+              // Передаем импульс если текущая шайба движется (независимо от скорости другой)
+              if (currentSpeed > 0.3) {
+                const impulseTransfer = Math.min(currentSpeed * 0.4, 3.0); // Увеличиваем передачу импульса
                 const impulseX = Math.cos(angle) * impulseTransfer;
                 const impulseY = Math.sin(angle) * impulseTransfer;
                 
                 // Другая шайба получает импульс от движущейся
                 velocityChanges[otherIndex].dvx += impulseX;
                 velocityChanges[otherIndex].dvy += impulseY;
+                
+                console.log('💥 ПЕРЕДАЧА ИМПУЛЬСА:', {
+                  currentSpeed: currentSpeed.toFixed(2),
+                  impulseTransfer: impulseTransfer.toFixed(2),
+                  impulse: { x: impulseX.toFixed(2), y: impulseY.toFixed(2) },
+                  from: pos.id,
+                  to: otherPos.id
+                });
               }
               
               // Текущая шайба отталкивается от другой
