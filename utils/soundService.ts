@@ -22,16 +22,24 @@ export async function initializeSounds(): Promise<void> {
   if (isInitialized) return;
 
   try {
+    // Небольшая задержка для полной загрузки приложения
+    await new Promise(resolve => setTimeout(resolve, 1000));
     // Настраиваем аудио режим для TestFlight и продакшена
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: true, // Разрешаем воспроизведение в фоне
-      playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
-      shouldDuckAndroid: false, // Не приглушаем другие звуки
-      playThroughEarpieceAndroid: false,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-    });
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true, // Разрешаем воспроизведение в фоне
+        playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
+        shouldDuckAndroid: false, // Не приглушаем другие звуки
+        playThroughEarpieceAndroid: false,
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      });
+      console.log('🔊 Аудио режим настроен успешно');
+    } catch (audioModeError) {
+      console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError.message);
+      // Продолжаем без настройки аудио режима
+    }
 
     // Загружаем звук отправки сообщения (out.m4a)
     const { sound: outSound } = await Audio.Sound.createAsync(
