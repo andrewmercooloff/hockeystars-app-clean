@@ -15,6 +15,12 @@ let notificationSound: Audio.Sound | null = null;
 // Флаг инициализации
 let isInitialized = false;
 
+// Дебаунс для предотвращения повторных вызовов звуков
+let lastOutgoingSoundTime = 0;
+let lastIncomingSoundTime = 0;
+let lastNotificationSoundTime = 0;
+const SOUND_DEBOUNCE_MS = 500; // 500ms между звуками одного типа
+
 /**
  * Инициализация аудио системы и загрузка звуков
  */
@@ -79,6 +85,13 @@ export async function initializeSounds(): Promise<void> {
  */
 export async function playOutgoingMessageSound(): Promise<void> {
   try {
+    const now = Date.now();
+    if (now - lastOutgoingSoundTime < SOUND_DEBOUNCE_MS) {
+      console.log('🔊 Пропускаем звук отправки - слишком рано');
+      return;
+    }
+    lastOutgoingSoundTime = now;
+
     if (!isInitialized) {
       await initializeSounds();
     }
@@ -102,6 +115,13 @@ export async function playOutgoingMessageSound(): Promise<void> {
  */
 export async function playIncomingMessageSound(): Promise<void> {
   try {
+    const now = Date.now();
+    if (now - lastIncomingSoundTime < SOUND_DEBOUNCE_MS) {
+      console.log('🔊 Пропускаем звук получения - слишком рано');
+      return;
+    }
+    lastIncomingSoundTime = now;
+
     if (!isInitialized) {
       await initializeSounds();
     }
@@ -125,6 +145,13 @@ export async function playIncomingMessageSound(): Promise<void> {
  */
 export async function playNotificationSound(): Promise<void> {
   try {
+    const now = Date.now();
+    if (now - lastNotificationSoundTime < SOUND_DEBOUNCE_MS) {
+      console.log('🔊 Пропускаем звук уведомления - слишком рано');
+      return;
+    }
+    lastNotificationSoundTime = now;
+
     if (!isInitialized) {
       await initializeSounds();
     }
