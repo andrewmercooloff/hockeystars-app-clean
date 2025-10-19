@@ -151,6 +151,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   useEffect(() => {
     if (puckPositions.length === 0) return;
 
+    // Проверяем, что мы на главном экране перед запуском анимации
+    if (currentScreen !== 'index') {
+      console.log('🎯 АНИМАЦИЯ: Останавливаем анимацию - не на главном экране, currentScreen =', currentScreen);
+      return;
+    }
+
     // Запускаем анимацию только при первой инициализации или изменении количества
     // Используем строгое сравнение - запускаем только когда длина реально изменилась
     const hasLengthChanged = previousLengthRef.current !== puckPositions.length;
@@ -173,6 +179,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
     // Запускаем анимацию сразу без задержки
       animationIntervalRef.current = setInterval(() => {
+        // Проверяем, что мы на главном экране перед обработкой физики
+        if (currentScreen !== 'index') {
+          return; // Не обрабатываем физику, если не на главном экране
+        }
         
       setPuckPositions(currentPositions => {
           // Создаем массив обновлений для хранения изменений скоростей от коллизий
@@ -376,7 +386,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
-        } else if (collisionDetectedRef.current && currentScreen !== 'index') {
+        } else if (collisionDetectedRef.current) {
           console.log('📳 ВИБРАЦИЯ: Пропускаем - не на главном экране, currentScreen =', currentScreen);
           collisionDetectedRef.current = false;
         }
@@ -390,7 +400,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         clearTimeout(startDelayRef.current);
       }
     };
-  }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize]);
+  }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize, currentScreen]);
 
   // Функция для обновления позиции и скорости конкретной шайбы (для drag)
   const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging: boolean = true) => {
