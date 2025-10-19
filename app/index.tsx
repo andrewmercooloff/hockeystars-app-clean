@@ -515,8 +515,9 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       
       if (timeDiff > 0) {
         // Рассчитываем скорость на основе расстояния и времени
-        const dx = position.x - dragStartRef.current.x;
-        const dy = position.y - dragStartRef.current.y;
+        // Используем последнюю позицию из lastPositionRef, а не position
+        const dx = lastPositionRef.current.x - dragStartRef.current.x;
+        const dy = lastPositionRef.current.y - dragStartRef.current.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         // Скорость пропорциональна расстоянию и обратно пропорциональна времени
@@ -529,15 +530,15 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
         
         console.log('🎯 НАПРАВЛЕНИЕ:', {
           start: { x: dragStartRef.current.x, y: dragStartRef.current.y },
-          end: { x: position.x, y: position.y },
+          end: { x: lastPositionRef.current.x, y: lastPositionRef.current.y },
           delta: { dx, dy },
           angle: (angle * 180 / Math.PI).toFixed(1) + '°',
           speed: speed.toFixed(2),
           velocity: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) }
         });
         
-        // Используем текущую позицию из position, которая уже обновлена до позиции отпускания
-        onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+        // Используем последнюю позицию из lastPositionRef
+        onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
       } else {
         // Если время слишком мало, используем накопленную скорость
         const finalVx = dragVelocityRef.current.vx * 0.3;
