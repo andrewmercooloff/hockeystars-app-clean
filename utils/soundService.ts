@@ -47,9 +47,9 @@ export async function initializeSounds(): Promise<void> {
       // Продолжаем без настройки аудио режима
     }
 
-    // Загружаем звук отправки сообщения (out.m4a)
+    // Загружаем звук отправки сообщения (out.mp3)
     const { sound: outSound } = await Audio.Sound.createAsync(
-      require('../assets/out.m4a'),
+      require('../assets/out.mp3'),
       { shouldPlay: false, volume: 0.8 }
     );
     outgoingSound = outSound;
