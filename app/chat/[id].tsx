@@ -25,7 +25,7 @@ import {
     sendMessageSimple
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { playOutgoingMessageSound, playIncomingMessageSound } from '../../utils/soundService';
+import { playOutgoingMessageSound } from '../../utils/soundService';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -133,15 +133,15 @@ export default function ChatScreen() {
           lastLoadTimeRef.current = now;
           lastMessageCountRef.current = conversation.length;
           
-          // Воспроизводим звук получения только для сообщений от других пользователей
-          const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
-          if (incomingMessages.length > 0) {
-            try {
-              await playIncomingMessageSound();
-            } catch (soundError) {
-              console.error('❌ Ошибка воспроизведения звука получения:', soundError);
-            }
-          }
+          // Временно отключаем звук получения в чате
+          // const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
+          // if (incomingMessages.length > 0) {
+          //   try {
+          //     await playIncomingMessageSound();
+          //   } catch (soundError) {
+          //     console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+          //   }
+          // }
           
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
