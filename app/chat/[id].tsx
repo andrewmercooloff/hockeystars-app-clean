@@ -126,11 +126,14 @@ export default function ChatScreen() {
         
         // Если есть новые сообщения, прокручиваем вниз и воспроизводим звук
         if (newMessages.length > 0) {
-          // Воспроизводим звук получения сообщения
-          try {
-            await playIncomingMessageSound();
-          } catch (soundError) {
-            console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+          // Воспроизводим звук получения только для сообщений от других пользователей
+          const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
+          if (incomingMessages.length > 0) {
+            try {
+              await playIncomingMessageSound();
+            } catch (soundError) {
+              console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+            }
           }
           
           setTimeout(() => {
