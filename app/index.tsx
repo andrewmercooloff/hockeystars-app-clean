@@ -508,13 +508,33 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const handleTouchEnd = () => {
     setIsDragging(false);
     
-    // Применяем накопленную скорость как финальный импульс
-    // Используем текущую позицию шайбы (куда она была перетащена), а не исходную
+    // Рассчитываем финальную скорость на основе направления движения пальца
     if (onDrag) {
-      const finalVx = dragVelocityRef.current.vx * 0.5; // Уменьшаем для более реалистичного полета
-      const finalVy = dragVelocityRef.current.vy * 0.5;
-      // Используем текущую позицию из position, которая уже обновлена до позиции отпускания
-      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+      const now = Date.now();
+      const timeDiff = now - dragStartRef.current.time;
+      
+      if (timeDiff > 0) {
+        // Рассчитываем скорость на основе расстояния и времени
+        const dx = position.x - dragStartRef.current.x;
+        const dy = position.y - dragStartRef.current.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Скорость пропорциональна расстоянию и обратно пропорциональна времени
+        const speed = Math.min(distance / (timeDiff / 1000), 8.0); // Ограничиваем максимальную скорость
+        
+        // Направление от начальной точки к конечной
+        const angle = Math.atan2(dy, dx);
+        const finalVx = Math.cos(angle) * speed;
+        const finalVy = Math.sin(angle) * speed;
+        
+        // Используем текущую позицию из position, которая уже обновлена до позиции отпускания
+        onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+      } else {
+        // Если время слишком мало, используем накопленную скорость
+        const finalVx = dragVelocityRef.current.vx * 0.3;
+        const finalVy = dragVelocityRef.current.vy * 0.3;
+        onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+      }
     }
     
     // Сбрасываем накопленную скорость
