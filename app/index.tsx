@@ -49,7 +49,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
-  const lastDragHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
   
   // Отладочная информация
@@ -280,6 +279,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               if (currentUserId && pos.id === currentUserId) {
                 console.log('🎯 ВИБРАЦИЯ: Столкновение шайбы пользователя', pos.id, 'с', otherPos.id);
                 console.log('🎯 ВИБРАЦИЯ: currentUserId =', currentUserId, 'pos.id =', pos.id);
+                console.log('🎯 ВИБРАЦИЯ: Устанавливаем collisionDetectedRef.current = true');
                 collisionDetectedRef.current = true;
               } else {
                 console.log('🎯 ВИБРАЦИЯ: НЕ вибрируем - currentUserId =', currentUserId, 'pos.id =', pos.id);
@@ -318,10 +318,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
       });
         
         // Вызываем вибрацию если было столкновение (с дебаунсом)
+        console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'Platform.OS =', Platform.OS);
         if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
-          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', timeDiff, 'threshold = 100');
+          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', timeDiff, 'threshold = 100');
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
             console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя! Platform.OS =', Platform.OS);
@@ -346,6 +347,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
         } else {
           if (collisionDetectedRef.current) {
             console.log('🔍 ВИБРАЦИЯ: collisionDetectedRef.current = true, но Platform.OS =', Platform.OS, 'не поддерживается');
+          } else {
+            console.log('🔍 ВИБРАЦИЯ: collisionDetectedRef.current = false, вибрация не нужна');
           }
         }
     }, 8); // Все платформы - 120 FPS для более плавного движения
@@ -419,27 +422,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
       );
     });
     
-    // Вызываем вибрацию при столкновении drag только для шайбы пользователя (только на мобильных, с дебаунсом 50ms)
+    // Вибрация при перетаскивании отключена - только при столкновениях
     console.log('🔍 DRAG ПРОВЕРКА: hasCollision =', hasCollision, 'currentUserId =', currentUserId, 'id =', id, 'Platform.OS =', Platform.OS);
-    if (hasCollision && currentUserId && id === currentUserId && (Platform.OS === 'ios' || Platform.OS === 'android')) {
-      const now = Date.now();
-      console.log('🔍 DRAG ВИБРАЦИЯ: lastDragHapticTime =', lastDragHapticTimeRef.current, 'now =', now, 'diff =', now - lastDragHapticTimeRef.current);
-      if (now - lastDragHapticTimeRef.current > 50) {
-        lastDragHapticTimeRef.current = now;
-        console.log('📳 ВИБРАЦИЯ DRAG: Вызываем вибрацию для пользователя при перетаскивании');
-        // Используем Medium для более заметной вибрации при перетаскивании
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
-          console.log('❌ Ошибка вибрации DRAG Haptics:', error);
-          // Альтернативная вибрация через Vibration API
-          try {
-            Vibration.vibrate(30);
-            console.log('📳 Альтернативная вибрация DRAG сработала');
-          } catch (vibError) {
-            console.log('❌ Ошибка альтернативной вибрации DRAG:', vibError);
-          }
-        });
-      }
-    }
+    // Вибрация при drag отключена по запросу пользователя
   }, [puckSize, currentUserId]);
 
   return { puckPositions, puckSize, updatePuckPosition };
