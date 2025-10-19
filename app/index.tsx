@@ -189,10 +189,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           let newVx = pos.vx;
           let newVy = pos.vy;
           
-          // Добавляем легкое трение для более естественного движения
-          const friction = 0.999; // Очень легкое трение
-          newVx *= friction;
-          newVy *= friction;
+          // Убираем трение для постоянного движения
+          // const friction = 0.999; // Убираем трение
+          // newVx *= friction;
+          // newVy *= friction;
 
 
           // Обработка коллизий со стенами (платформо-зависимые границы)
@@ -319,15 +319,15 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           
           // Платформо-зависимые ограничения скорости (улучшенные для плавности)
           const maxSpeed = Platform.OS === 'ios' ? 5.0 : (Platform.OS === 'web' ? 5.5 : 2.2); // Увеличены для более плавного движения
-          const minSpeed = Platform.OS === 'ios' ? 0.15 : (Platform.OS === 'web' ? 0.18 : 0.06); // Уменьшены для более естественного замедления
+          const minSpeed = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'web' ? 0.8 : 0.5); // Увеличиваем минимальную скорость для постоянного движения
           const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
           if (currentSpeed > maxSpeed) {
             newVx = (newVx / currentSpeed) * maxSpeed;
             newVy = (newVy / currentSpeed) * maxSpeed;
           }
           
-          // Минимальная скорость для предотвращения остановки (только если нет импульса от коллизии)
-          if (currentSpeed < minSpeed && velocityChanges[posIndex].dvx === 0 && velocityChanges[posIndex].dvy === 0) {
+          // Минимальная скорость для предотвращения остановки - применяем всегда
+          if (currentSpeed < minSpeed) {
             const angle = Math.random() * 2 * Math.PI;
             newVx = Math.cos(angle) * minSpeed;
             newVy = Math.sin(angle) * minSpeed;
