@@ -19,7 +19,7 @@ let isInitialized = false;
 let lastOutgoingSoundTime = 0;
 let lastIncomingSoundTime = 0;
 let lastNotificationSoundTime = 0;
-const SOUND_DEBOUNCE_MS = 2000; // 2000ms между звуками одного типа
+const SOUND_DEBOUNCE_MS = 1000; // 1000ms между звуками одного типа
 
 /**
  * Инициализация аудио системы и загрузка звуков
