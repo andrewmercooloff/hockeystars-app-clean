@@ -39,6 +39,8 @@ export default function ChatScreen() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
+  const lastLoadTimeRef = useRef<number>(0);
+  const lastMessageCountRef = useRef<number>(0);
 
 
   useEffect(() => {
@@ -117,15 +119,20 @@ export default function ChatScreen() {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
       try {
         const conversation = await getConversation(currentUser.id, otherPlayer.id);
+        const now = Date.now();
         
         // Проверяем, есть ли новые сообщения
         const previousMessageIds = new Set(messages.map(m => m.id));
         const newMessages = conversation.filter(m => !previousMessageIds.has(m.id));
         
+        // Обновляем состояние сообщений
         setMessages(conversation);
         
-        // Если есть новые сообщения, прокручиваем вниз и воспроизводим звук
-        if (newMessages.length > 0) {
+        // Проверяем, действительно ли есть новые сообщения и прошло ли достаточно времени
+        if (newMessages.length > 0 && (now - lastLoadTimeRef.current > 2000 || conversation.length > lastMessageCountRef.current)) {
+          lastLoadTimeRef.current = now;
+          lastMessageCountRef.current = conversation.length;
+          
           // Воспроизводим звук получения только для сообщений от других пользователей
           const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
           if (incomingMessages.length > 0) {
