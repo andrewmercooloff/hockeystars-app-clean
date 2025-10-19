@@ -26,6 +26,7 @@ import {
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { playOutgoingMessageSound, playIncomingMessageSound } from '../../utils/soundService';
+import { supabase } from '../../utils/supabase';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -54,18 +55,34 @@ export default function ChatScreen() {
   }, [id]);
 
   useEffect(() => {
-    // Автообновление сообщений каждые 5 секунд (увеличили интервал для оптимизации)
-    const interval = setInterval(() => {
-      if (currentUser && otherPlayer && otherPlayer.id === id) {
-        loadMessages();
-      }
-    }, 5000);
+    if (!currentUser || !otherPlayer || otherPlayer.id !== id) {
+      return;
+    }
+
+    // Настраиваем Realtime подписку на изменения сообщений
+    const channel = supabase
+      .channel(`messages-${currentUser.id}-${otherPlayer.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id})`
+        },
+        (payload) => {
+          console.log('🔔 Получено новое сообщение через Realtime:', payload);
+          // Загружаем сообщения только при получении нового сообщения
+          loadMessages();
+        }
+      )
+      .subscribe();
 
     return () => {
-      clearInterval(interval);
-
+      console.log('🔌 Отключаем Realtime подписку для сообщений');
+      supabase.removeChannel(channel);
     };
-      }, [currentUser, otherPlayer, id]);
+  }, [currentUser, otherPlayer, id]);
 
   // Обработка системной кнопки "назад"
   useFocusEffect(
