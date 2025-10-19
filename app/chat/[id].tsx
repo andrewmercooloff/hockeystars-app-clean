@@ -42,6 +42,7 @@ export default function ChatScreen() {
   const lastLoadTimeRef = useRef<number>(0);
   const lastMessageCountRef = useRef<number>(0);
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
+  const justSentMessageRef = useRef<boolean>(false);
 
 
   useEffect(() => {
@@ -139,17 +140,23 @@ export default function ChatScreen() {
           // Находим новые сообщения по ID
           const newMessages = conversation.filter(m => newMessageIds.includes(m.id));
           
-          // Воспроизводим звук получения только для сообщений от других пользователей
-          const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
-          if (incomingMessages.length > 0) {
-            console.log('🔊 Воспроизводим звук получения для', incomingMessages.length, 'новых сообщений от других пользователей');
-            try {
-              await playIncomingMessageSound();
-            } catch (soundError) {
-              console.error('❌ Ошибка воспроизведения звука получения:', soundError);
-            }
+          // Если только что отправили сообщение, не воспроизводим звук получения
+          if (justSentMessageRef.current) {
+            console.log('🔊 Пропускаем звук получения - только что отправили сообщение');
+            justSentMessageRef.current = false;
           } else {
-            console.log('🔊 Пропускаем звук получения - все новые сообщения от текущего пользователя');
+            // Воспроизводим звук получения только для сообщений от других пользователей
+            const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
+            if (incomingMessages.length > 0) {
+              console.log('🔊 Воспроизводим звук получения для', incomingMessages.length, 'новых сообщений от других пользователей');
+              try {
+                await playIncomingMessageSound();
+              } catch (soundError) {
+                console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+              }
+            } else {
+              console.log('🔊 Пропускаем звук получения - все новые сообщения от текущего пользователя');
+            }
           }
           
           setTimeout(() => {
@@ -175,6 +182,9 @@ export default function ChatScreen() {
     try {
       const success = await sendMessageSimple(currentUser.id, otherPlayer.id, newMessage.trim());
       if (success) {
+        // Устанавливаем флаг, что только что отправили сообщение
+        justSentMessageRef.current = true;
+        
         // Воспроизводим звук отправки сообщения
         try {
           await playOutgoingMessageSound();
