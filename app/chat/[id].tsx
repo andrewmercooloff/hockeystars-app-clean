@@ -41,6 +41,7 @@ export default function ChatScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const lastLoadTimeRef = useRef<number>(0);
   const lastMessageCountRef = useRef<number>(0);
+  const lastMessageIdsRef = useRef<Set<string>>(new Set());
 
 
   useEffect(() => {
@@ -121,17 +122,22 @@ export default function ChatScreen() {
         const conversation = await getConversation(currentUser.id, otherPlayer.id);
         const now = Date.now();
         
-        // Проверяем, есть ли новые сообщения
-        const previousMessageIds = new Set(messages.map(m => m.id));
-        const newMessages = conversation.filter(m => !previousMessageIds.has(m.id));
+        // Проверяем, есть ли действительно новые сообщения по ID
+        const currentMessageIds = new Set(conversation.map(m => m.id));
+        const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
         
         // Обновляем состояние сообщений
         setMessages(conversation);
         
-        // Проверяем, действительно ли есть новые сообщения и прошло ли достаточно времени
-        if (newMessages.length > 0 && (now - lastLoadTimeRef.current > 2000 || conversation.length > lastMessageCountRef.current)) {
+        // Обновляем отслеживаемые ID сообщений
+        lastMessageIdsRef.current = currentMessageIds;
+        
+        // Проверяем, есть ли действительно новые сообщения и прошло ли достаточно времени
+        if (newMessageIds.length > 0 && now - lastLoadTimeRef.current > 1000) {
           lastLoadTimeRef.current = now;
-          lastMessageCountRef.current = conversation.length;
+          
+          // Находим новые сообщения по ID
+          const newMessages = conversation.filter(m => newMessageIds.includes(m.id));
           
           // Воспроизводим звук получения только для сообщений от других пользователей
           const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
@@ -149,6 +155,10 @@ export default function ChatScreen() {
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }, 100);
+        } else if (newMessageIds.length === 0) {
+          console.log('🔊 Нет новых сообщений - пропускаем звук');
+        } else {
+          console.log('🔊 Слишком рано для звука - пропускаем');
         }
 
       } catch (error) {
