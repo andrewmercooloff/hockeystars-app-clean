@@ -522,10 +522,19 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
         // Скорость пропорциональна расстоянию и обратно пропорциональна времени
         const speed = Math.min(distance / (timeDiff / 1000), 8.0); // Ограничиваем максимальную скорость
         
-        // Направление от начальной точки к конечной
+        // Направление от начальной точки к конечной (куда пользователь перетащил)
         const angle = Math.atan2(dy, dx);
         const finalVx = Math.cos(angle) * speed;
         const finalVy = Math.sin(angle) * speed;
+        
+        console.log('🎯 НАПРАВЛЕНИЕ:', {
+          start: { x: dragStartRef.current.x, y: dragStartRef.current.y },
+          end: { x: position.x, y: position.y },
+          delta: { dx, dy },
+          angle: (angle * 180 / Math.PI).toFixed(1) + '°',
+          speed: speed.toFixed(2),
+          velocity: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) }
+        });
         
         // Используем текущую позицию из position, которая уже обновлена до позиции отпускания
         onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
