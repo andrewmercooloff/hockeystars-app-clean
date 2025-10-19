@@ -278,16 +278,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
                 velocityChanges[otherIndex].dvx += impulseX;
                 velocityChanges[otherIndex].dvy += impulseY;
                 
-                // Убираем частые логи для производительности - только при значительных столкновениях
-                if (impulseTransfer > 0.5) {
-                  console.log('💥 ПЕРЕДАЧА ИМПУЛЬСА:', {
-                    currentSpeed: currentSpeed.toFixed(2),
-                    impulseTransfer: impulseTransfer.toFixed(2),
-                    impulse: { x: impulseX.toFixed(2), y: impulseY.toFixed(2) },
-                    from: pos.id,
-                    to: otherPos.id
-                  });
-                }
+                // Убираем логи передачи импульса для чистоты консоли
               }
               
               // Текущая шайба отталкивается от другой
@@ -349,18 +340,13 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
-            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя!');
             // Используем impactAsync со средним стилем для более заметной вибрации
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
-              console.log('📳 ВИБРАЦИЯ: Haptics успешно выполнен!');
-            }).catch((error) => {
-              console.log('❌ Ошибка вибрации Haptics:', error);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
               // Альтернативная вибрация через Vibration API
               try {
                 Vibration.vibrate(50);
-                console.log('📳 Альтернативная вибрация сработала');
               } catch (vibError) {
-                console.log('❌ Ошибка альтернативной вибрации:', vibError);
+                // Игнорируем ошибки вибрации
               }
             });
           }
@@ -543,11 +529,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       const finalVx = dragVelocityRef.current.vx * 0.5;
       const finalVy = dragVelocityRef.current.vy * 0.5;
       
-      console.log('🎯 ПРОСТОЕ НАПРАВЛЕНИЕ:', {
-        accumulated: { vx: dragVelocityRef.current.vx.toFixed(2), vy: dragVelocityRef.current.vy.toFixed(2) },
-        final: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) },
-        position: { x: position.x.toFixed(2), y: position.y.toFixed(2) }
-      });
+      // Убираем логи направления для чистоты консоли
       
       onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
     }
@@ -811,7 +793,7 @@ export default function HomeScreen() {
   // Отладочный лог для проверки ID пользователя (только при изменении)
   useEffect(() => {
     if (currentUser?.id) {
-      console.log('👤 ПОЛЬЗОВАТЕЛЬ: currentUser.id =', currentUser.id);
+      // Убираем лог пользователя для чистоты консоли
     }
   }, [currentUser?.id]);
 
