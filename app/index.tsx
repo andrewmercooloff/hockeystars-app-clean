@@ -43,7 +43,7 @@ interface PuckPosition {
   isDragging?: boolean; // Флаг для перетаскиваемой шайбы
 }
 
-const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMainScreen?: boolean) => {
+const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string) => {
   const puckSize = 70; // Размер шайбы
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -817,7 +817,7 @@ export default function HomeScreen() {
 
 
   const { isMainScreen, currentScreen } = useScreenContext();
-  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, isMainScreen);
+  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen);
   
   // Отладочная функция для проверки состояния экрана
   const debugScreenState = () => {
