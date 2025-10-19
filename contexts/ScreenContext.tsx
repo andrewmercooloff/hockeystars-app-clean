@@ -33,7 +33,9 @@ export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
   React.useEffect(() => {
     console.log('🖥️ ЭКРАН: currentScreen изменился на', currentScreen);
     // Обновляем isMainScreen на основе currentScreen
-    setIsMainScreen(currentScreen === 'index');
+    const isMain = currentScreen === 'index';
+    setIsMainScreen(isMain);
+    console.log('🖥️ ЭКРАН: isMainScreen установлен в', isMain);
   }, [currentScreen]);
 
   return (

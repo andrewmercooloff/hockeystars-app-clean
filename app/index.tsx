@@ -336,12 +336,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMai
       });
         
         // Вызываем вибрацию если было столкновение (с дебаунсом) и мы на главном экране
-        if (collisionDetectedRef.current && isMainScreen === true && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+        if (collisionDetectedRef.current && currentScreen === 'index' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
-            console.log('📳 ВИБРАЦИЯ: Срабатывает на главном экране, isMainScreen =', isMainScreen);
+            console.log('📳 ВИБРАЦИЯ: Срабатывает на главном экране, currentScreen =', currentScreen);
             
             // Более агрессивный подход для iOS
             if (Platform.OS === 'ios') {
@@ -376,8 +376,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMai
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
-        } else if (collisionDetectedRef.current && isMainScreen !== true) {
-          console.log('📳 ВИБРАЦИЯ: Пропускаем - не на главном экране, isMainScreen =', isMainScreen);
+        } else if (collisionDetectedRef.current && currentScreen !== 'index') {
+          console.log('📳 ВИБРАЦИЯ: Пропускаем - не на главном экране, currentScreen =', currentScreen);
           collisionDetectedRef.current = false;
         }
     }, Platform.OS === 'ios' ? 8 : 16); // iOS - 120 FPS, Android/Web - 60 FPS для производительности
@@ -950,6 +950,7 @@ export default function HomeScreen() {
     useCallback(() => {
       // Устанавливаем, что мы на главном экране
       setCurrentScreen('index');
+      console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       // Проверяем наличие нового пользователя при возврате на экран
       checkForNewUser();
       // НЕ перезагружаем игроков - используем кеш из loadPlayers
@@ -958,6 +959,7 @@ export default function HomeScreen() {
       // Возвращаем функцию очистки
       return () => {
         setCurrentScreen(null);
+        console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
       };
     }, [checkForNewUser, setCurrentScreen])
   );

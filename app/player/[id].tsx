@@ -326,8 +326,10 @@ export default function PlayerProfile() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
+      console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = player');
       return () => {
         setCurrentScreen(null);
+        console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen])
   );

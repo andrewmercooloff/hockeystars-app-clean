@@ -150,9 +150,11 @@ export default function MessagesScreen() {
   useFocusEffect(
     React.useCallback(() => {
       setCurrentScreen('messages');
+      console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       loadChats();
       return () => {
         setCurrentScreen(null);
+        console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
       };
     }, [loadChats, setCurrentScreen])
   );
