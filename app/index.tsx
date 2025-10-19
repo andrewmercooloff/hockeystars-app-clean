@@ -341,15 +341,37 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMai
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
-            // Используем impactAsync со средним стилем для более заметной вибрации
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
-              // Альтернативная вибрация через Vibration API
+            
+            // Более агрессивный подход для iOS
+            if (Platform.OS === 'ios') {
+              // Пробуем несколько методов вибрации для iOS
+              try {
+                // Сначала пробуем Haptics
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {
+                  // Если не сработало, пробуем Vibration
+                  try {
+                    Vibration.vibrate([0, 100, 50, 100]); // Паттерн вибрации
+                  } catch (vibError) {
+                    // Последняя попытка - простая вибрация
+                    Vibration.vibrate(100);
+                  }
+                });
+              } catch (error) {
+                // Если все не сработало, пробуем Vibration напрямую
+                try {
+                  Vibration.vibrate(100);
+                } catch (vibError) {
+                  // Игнорируем ошибки
+                }
+              }
+            } else {
+              // Для Android используем обычную вибрацию
               try {
                 Vibration.vibrate(50);
               } catch (vibError) {
-                // Игнорируем ошибки вибрации
+                // Игнорируем ошибки
               }
-            });
+            }
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
@@ -793,6 +815,38 @@ export default function HomeScreen() {
   const { isMainScreen } = useScreenContext();
   const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, isMainScreen);
   
+  // Тестовая функция для проверки вибрации
+  const testVibration = async () => {
+    console.log('🧪 ТЕСТ ВИБРАЦИИ: Начинаем тест');
+    if (Platform.OS === 'ios') {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        console.log('🧪 ТЕСТ ВИБРАЦИИ: Haptics Heavy успешно выполнен!');
+      } catch (error) {
+        console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка Haptics Heavy:', error);
+        try {
+          Vibration.vibrate([0, 100, 50, 100]);
+          console.log('🧪 ТЕСТ ВИБРАЦИИ: Паттерн вибрации сработал');
+        } catch (vibError) {
+          console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка паттерна, пробуем простую вибрацию');
+          try {
+            Vibration.vibrate(100);
+            console.log('🧪 ТЕСТ ВИБРАЦИИ: Простая вибрация сработала');
+          } catch (simpleError) {
+            console.log('🧪 ТЕСТ ВИБРАЦИИ: Все методы не сработали:', simpleError);
+          }
+        }
+      }
+    } else {
+      try {
+        Vibration.vibrate(100);
+        console.log('🧪 ТЕСТ ВИБРАЦИИ: Android вибрация сработала');
+      } catch (error) {
+        console.log('🧪 ТЕСТ ВИБРАЦИИ: Android вибрация не сработала:', error);
+      }
+    }
+  };
+  
   // Отладочный лог для проверки ID пользователя (только при изменении)
   useEffect(() => {
     if (currentUser?.id) {
@@ -991,10 +1045,17 @@ export default function HomeScreen() {
 
         {/* Фильтры */}
         <View style={styles.filtersWrapper}>
-          <View style={styles.filtersContainer}>
-            <CountryFilter players={players} />
-            <YearFilter players={players} />
-          </View>
+        <View style={styles.filtersContainer}>
+          <CountryFilter players={players} />
+          <YearFilter players={players} />
+          {/* Кнопка для тестирования вибрации */}
+          <TouchableOpacity 
+            style={styles.testVibrationButton} 
+            onPress={testVibration}
+          >
+            <Text style={styles.testVibrationButtonText}>🧪 Тест вибрации</Text>
+          </TouchableOpacity>
+        </View>
         </View>
 
         {/* Показываем сообщение, если нет подключения к интернету */}
@@ -1271,6 +1332,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8, // Уменьшаем отступ между фильтрами
+  },
+  testVibrationButton: {
+    backgroundColor: '#fa2f40',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    marginLeft: 10,
+  },
+  testVibrationButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
   },
   filterButton: {
     // Удалено
