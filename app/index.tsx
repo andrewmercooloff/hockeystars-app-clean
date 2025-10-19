@@ -336,11 +336,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMai
       });
         
         // Вызываем вибрацию если было столкновение (с дебаунсом) и мы на главном экране
-        if (collisionDetectedRef.current && isMainScreen && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+        if (collisionDetectedRef.current && isMainScreen === true && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
+            console.log('📳 ВИБРАЦИЯ: Срабатывает на главном экране, isMainScreen =', isMainScreen);
             
             // Более агрессивный подход для iOS
             if (Platform.OS === 'ios') {
@@ -374,6 +375,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMai
             }
           }
           // Сбрасываем флаг после проверки
+          collisionDetectedRef.current = false;
+        } else if (collisionDetectedRef.current && isMainScreen !== true) {
+          console.log('📳 ВИБРАЦИЯ: Пропускаем - не на главном экране, isMainScreen =', isMainScreen);
           collisionDetectedRef.current = false;
         }
     }, Platform.OS === 'ios' ? 8 : 16); // iOS - 120 FPS, Android/Web - 60 FPS для производительности
@@ -815,36 +819,9 @@ export default function HomeScreen() {
   const { isMainScreen } = useScreenContext();
   const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, isMainScreen);
   
-  // Тестовая функция для проверки вибрации
-  const testVibration = async () => {
-    console.log('🧪 ТЕСТ ВИБРАЦИИ: Начинаем тест');
-    if (Platform.OS === 'ios') {
-      try {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Haptics Heavy успешно выполнен!');
-      } catch (error) {
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка Haptics Heavy:', error);
-        try {
-          Vibration.vibrate([0, 100, 50, 100]);
-          console.log('🧪 ТЕСТ ВИБРАЦИИ: Паттерн вибрации сработал');
-        } catch (vibError) {
-          console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка паттерна, пробуем простую вибрацию');
-          try {
-            Vibration.vibrate(100);
-            console.log('🧪 ТЕСТ ВИБРАЦИИ: Простая вибрация сработала');
-          } catch (simpleError) {
-            console.log('🧪 ТЕСТ ВИБРАЦИИ: Все методы не сработали:', simpleError);
-          }
-        }
-      }
-    } else {
-      try {
-        Vibration.vibrate(100);
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Android вибрация сработала');
-      } catch (error) {
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Android вибрация не сработала:', error);
-      }
-    }
+  // Отладочная функция для проверки состояния экрана
+  const debugScreenState = () => {
+    console.log('🔍 ОТЛАДКА ЭКРАНА: isMainScreen =', isMainScreen);
   };
   
   // Отладочный лог для проверки ID пользователя (только при изменении)
@@ -1048,12 +1025,12 @@ export default function HomeScreen() {
         <View style={styles.filtersContainer}>
           <CountryFilter players={players} />
           <YearFilter players={players} />
-          {/* Кнопка для тестирования вибрации */}
+          {/* Кнопка для отладки экрана */}
           <TouchableOpacity 
             style={styles.testVibrationButton} 
-            onPress={testVibration}
+            onPress={debugScreenState}
           >
-            <Text style={styles.testVibrationButtonText}>🧪 Тест вибрации</Text>
+            <Text style={styles.testVibrationButtonText}>🔍 Экран: {isMainScreen ? 'Главный' : 'Другой'}</Text>
           </TouchableOpacity>
         </View>
         </View>

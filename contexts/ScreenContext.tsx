@@ -22,6 +22,11 @@ interface ScreenProviderProps {
 export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
   const [isMainScreen, setIsMainScreen] = useState(false);
 
+  // Логируем изменения состояния экрана для отладки
+  React.useEffect(() => {
+    console.log('🖥️ ЭКРАН: isMainScreen изменился на', isMainScreen);
+  }, [isMainScreen]);
+
   return (
     <ScreenContext.Provider value={{ isMainScreen, setIsMainScreen }}>
       {children}
