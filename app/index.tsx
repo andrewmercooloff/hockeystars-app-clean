@@ -50,6 +50,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
+  
+  // Отладочная информация
+  console.log('🎯 ВИБРАЦИЯ: usePuckCollisionSystem инициализирован с currentUserId =', currentUserId);
 
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
@@ -275,7 +278,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               // Отмечаем столкновение для вибрации только если это шайба пользователя
               if (currentUserId && pos.id === currentUserId) {
                 console.log('🎯 ВИБРАЦИЯ: Столкновение шайбы пользователя', pos.id, 'с', otherPos.id);
+                console.log('🎯 ВИБРАЦИЯ: currentUserId =', currentUserId, 'pos.id =', pos.id);
                 collisionDetectedRef.current = true;
+              } else {
+                console.log('🎯 ВИБРАЦИЯ: НЕ вибрируем - currentUserId =', currentUserId, 'pos.id =', pos.id);
               }
             }
           });
@@ -316,9 +322,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', now - lastHapticTimeRef.current);
           if (now - lastHapticTimeRef.current > 80) {
             lastHapticTimeRef.current = now;
-            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя');
+            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя! Platform.OS =', Platform.OS);
             // Используем impactAsync со средним стилем для более заметной вибрации
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
+              console.log('📳 ВИБРАЦИЯ: Haptics успешно выполнен!');
+            }).catch((error) => {
               console.log('❌ Ошибка вибрации Haptics:', error);
               // Альтернативная вибрация через Vibration API
               try {
@@ -328,9 +336,15 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
                 console.log('❌ Ошибка альтернативной вибрации:', vibError);
               }
             });
+          } else {
+            console.log('🔍 ВИБРАЦИЯ: Слишком рано для вибрации, пропускаем');
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
+        } else {
+          if (collisionDetectedRef.current) {
+            console.log('🔍 ВИБРАЦИЯ: collisionDetectedRef.current = true, но Platform.OS =', Platform.OS, 'не поддерживается');
+          }
         }
     }, 8); // Все платформы - 120 FPS для более плавного движения
 
@@ -800,7 +814,9 @@ export default function HomeScreen() {
   // Отладочный лог для проверки ID пользователя
   useEffect(() => {
     console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: currentUser?.id =', currentUser?.id);
-  }, [currentUser?.id]);
+    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: allVisiblePlayers.length =', allVisiblePlayers.length);
+    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: puckPositions.length =', puckPositions.length);
+  }, [currentUser?.id, allVisiblePlayers.length, puckPositions.length]);
 
 
 
