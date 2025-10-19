@@ -426,17 +426,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
   const lastUpdateTimeRef = useRef(0);
-  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
-
-  // Очищаем таймаут при размонтировании
-  useEffect(() => {
-    return () => {
-      if (dragTimeoutRef.current) {
-        clearTimeout(dragTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -461,13 +451,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     dragVelocityRef.current = { vx: 0, vy: 0 };
     setIsDragging(true);
     
-    // Устанавливаем таймаут на 0.2 секунды для автоматического отпускания
-    if (dragTimeoutRef.current) {
-      clearTimeout(dragTimeoutRef.current);
-    }
-    dragTimeoutRef.current = setTimeout(() => {
-      handleTouchEnd();
-    }, 200); // 0.2 секунды
+    // Таймаут отключен - можно держать шайбу сколько угодно
   };
 
   const handleTouchMove = (e: any) => {
@@ -511,12 +495,6 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    
-    // Очищаем таймаут
-    if (dragTimeoutRef.current) {
-      clearTimeout(dragTimeoutRef.current);
-      dragTimeoutRef.current = null;
-    }
     
     // Применяем накопленную скорость как финальный импульс
     // Используем текущую позицию шайбы (куда она была перетащена), а не исходную
