@@ -765,22 +765,6 @@ export default function HomeScreen() {
     }
   }, [currentUser?.id]);
 
-  // Тестовая функция для проверки вибрации
-  const testVibration = async () => {
-    console.log('🧪 ТЕСТ ВИБРАЦИИ: Начинаем тест');
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      console.log('🧪 ТЕСТ ВИБРАЦИИ: Haptics успешно выполнен!');
-    } catch (error) {
-      console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка Haptics:', error);
-      try {
-        Vibration.vibrate(100);
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Альтернативная вибрация сработала');
-      } catch (vibError) {
-        console.log('🧪 ТЕСТ ВИБРАЦИИ: Ошибка альтернативной вибрации:', vibError);
-      }
-    }
-  };
 
 
 
@@ -968,13 +952,6 @@ export default function HomeScreen() {
           <View style={styles.filtersContainer}>
             <CountryFilter players={players} />
             <YearFilter players={players} />
-            {/* Кнопка для тестирования вибрации */}
-            <TouchableOpacity 
-              style={styles.testVibrationButton} 
-              onPress={testVibration}
-            >
-              <Text style={styles.testVibrationButtonText}>🧪 Тест вибрации</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -1270,18 +1247,6 @@ const styles = StyleSheet.create({
   },
   filtersHintSubtext: {
     // Удалено
-  },
-  testVibrationButton: {
-    backgroundColor: '#fa2f40',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginLeft: 8,
-  },
-  testVibrationButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
   },
 
 
