@@ -277,7 +277,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               
               // Отмечаем столкновение для вибрации только если это шайба пользователя
               if (currentUserId && pos.id === currentUserId) {
-                console.log('🎯 ВИБРАЦИЯ: Столкновение шайбы пользователя', pos.id, 'с', otherPos.id);
+                console.log('🎯 СТОЛКНОВЕНИЕ: Шайба пользователя с', otherPos.id);
                 collisionDetectedRef.current = true;
               }
             }
