@@ -521,46 +521,17 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       const now = Date.now();
       const timeDiff = now - dragStartRef.current.time;
       
-      if (timeDiff > 0 && dragHistoryRef.current.length >= 2) {
-        // Используем последние 2 точки из истории для определения направления
-        const recent = dragHistoryRef.current.slice(-2);
-        const dx = recent[1].x - recent[0].x;
-        const dy = recent[1].y - recent[0].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const timeDiffRecent = recent[1].time - recent[0].time;
-        
-        if (timeDiffRecent > 0) {
-          // Скорость на основе последнего движения
-          const rawSpeed = distance / (timeDiffRecent / 1000);
-          const speed = Math.min(rawSpeed, 15.0);
-          
-          // Направление последнего движения
-          const angle = Math.atan2(dy, dx);
-          const finalVx = Math.cos(angle) * speed;
-          const finalVy = Math.sin(angle) * speed;
-          
-          console.log('🎯 НАПРАВЛЕНИЕ (из истории):', {
-            recent: recent,
-            delta: { dx, dy },
-            angle: (angle * 180 / Math.PI).toFixed(1) + '°',
-            speed: speed.toFixed(2),
-            velocity: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) }
-          });
-          
-          // Используем последнюю позицию из lastPositionRef
-          onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
-        } else {
-          // Fallback к накопленной скорости
-          const finalVx = dragVelocityRef.current.vx * 0.3;
-          const finalVy = dragVelocityRef.current.vy * 0.3;
-          onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
-        }
-      } else {
-        // Если времени мало или нет истории, используем накопленную скорость
-        const finalVx = dragVelocityRef.current.vx * 0.3;
-        const finalVy = dragVelocityRef.current.vy * 0.3;
-        onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
-      }
+      // Простое решение: используем накопленную скорость, но с правильным направлением
+      const finalVx = dragVelocityRef.current.vx * 0.5;
+      const finalVy = dragVelocityRef.current.vy * 0.5;
+      
+      console.log('🎯 ПРОСТОЕ НАПРАВЛЕНИЕ:', {
+        accumulated: { vx: dragVelocityRef.current.vx.toFixed(2), vy: dragVelocityRef.current.vy.toFixed(2) },
+        final: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) },
+        position: { x: position.x.toFixed(2), y: position.y.toFixed(2) }
+      });
+      
+      onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
     }
     
     // Сбрасываем накопленную скорость
