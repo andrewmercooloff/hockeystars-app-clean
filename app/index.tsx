@@ -49,6 +49,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
+  const lastDragHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
   
   // Отладочная информация
@@ -319,8 +320,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
         // Вызываем вибрацию если было столкновение (с дебаунсом)
         if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
-          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', now - lastHapticTimeRef.current);
-          if (now - lastHapticTimeRef.current > 80) {
+          const timeDiff = now - lastHapticTimeRef.current;
+          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', timeDiff, 'threshold = 100');
+          if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
             console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя! Platform.OS =', Platform.OS);
             // Используем impactAsync со средним стилем для более заметной вибрации
@@ -337,7 +339,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               }
             });
           } else {
-            console.log('🔍 ВИБРАЦИЯ: Слишком рано для вибрации, пропускаем');
+            console.log('🔍 ВИБРАЦИЯ: Слишком рано для вибрации, пропускаем. Нужно подождать еще', 100 - timeDiff, 'ms');
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
@@ -421,9 +423,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
     console.log('🔍 DRAG ПРОВЕРКА: hasCollision =', hasCollision, 'currentUserId =', currentUserId, 'id =', id, 'Platform.OS =', Platform.OS);
     if (hasCollision && currentUserId && id === currentUserId && (Platform.OS === 'ios' || Platform.OS === 'android')) {
       const now = Date.now();
-      console.log('🔍 DRAG ВИБРАЦИЯ: lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', now - lastHapticTimeRef.current);
-      if (now - lastHapticTimeRef.current > 50) {
-        lastHapticTimeRef.current = now;
+      console.log('🔍 DRAG ВИБРАЦИЯ: lastDragHapticTime =', lastDragHapticTimeRef.current, 'now =', now, 'diff =', now - lastDragHapticTimeRef.current);
+      if (now - lastDragHapticTimeRef.current > 50) {
+        lastDragHapticTimeRef.current = now;
         console.log('📳 ВИБРАЦИЯ DRAG: Вызываем вибрацию для пользователя при перетаскивании');
         // Используем Medium для более заметной вибрации при перетаскивании
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch((error) => {
