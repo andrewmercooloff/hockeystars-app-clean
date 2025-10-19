@@ -9,6 +9,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { COUNTRIES } from '../../utils/constants';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useScreenContext } from '../../contexts/ScreenContext';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import {
     Alert,
@@ -64,6 +65,7 @@ export default function PlayerProfile() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
+  const { setCurrentScreen } = useScreenContext();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
@@ -320,9 +322,15 @@ export default function PlayerProfile() {
     };
   }, [currentUser?.id, player?.id]);
 
-  // Убрали useFocusEffect - теперь используем только кеш из getPlayerById
-  // Данные загружаются автоматически в useEffect при изменении id
-  // useFocusEffect больше не нужен - все данные кешируются
+  // Отслеживаем, что мы на экране профиля
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('player');
+      return () => {
+        setCurrentScreen(null);
+      };
+    }, [setCurrentScreen])
+  );
 
   // Обработка прокрутки к музею
   useEffect(() => {

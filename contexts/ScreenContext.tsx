@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface ScreenContextType {
   isMainScreen: boolean;
   setIsMainScreen: (isMain: boolean) => void;
+  currentScreen: string | null;
+  setCurrentScreen: (screen: string | null) => void;
 }
 
 const ScreenContext = createContext<ScreenContextType | undefined>(undefined);
@@ -21,14 +23,21 @@ interface ScreenProviderProps {
 
 export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
   const [isMainScreen, setIsMainScreen] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState<string | null>(null);
 
   // Логируем изменения состояния экрана для отладки
   React.useEffect(() => {
     console.log('🖥️ ЭКРАН: isMainScreen изменился на', isMainScreen);
   }, [isMainScreen]);
 
+  React.useEffect(() => {
+    console.log('🖥️ ЭКРАН: currentScreen изменился на', currentScreen);
+    // Обновляем isMainScreen на основе currentScreen
+    setIsMainScreen(currentScreen === 'index');
+  }, [currentScreen]);
+
   return (
-    <ScreenContext.Provider value={{ isMainScreen, setIsMainScreen }}>
+    <ScreenContext.Provider value={{ isMainScreen, setIsMainScreen, currentScreen, setCurrentScreen }}>
       {children}
     </ScreenContext.Provider>
   );

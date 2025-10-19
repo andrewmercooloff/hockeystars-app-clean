@@ -1,5 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useScreenContext } from '../contexts/ScreenContext';
 import {
     Alert,
     Image,
@@ -33,6 +34,7 @@ interface ChatPreview {
 export default function MessagesScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { setCurrentScreen } = useScreenContext();
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,8 +149,12 @@ export default function MessagesScreen() {
   // Обновляем список сообщений при фокусе на экране
   useFocusEffect(
     React.useCallback(() => {
+      setCurrentScreen('messages');
       loadChats();
-    }, [loadChats])
+      return () => {
+        setCurrentScreen(null);
+      };
+    }, [loadChats, setCurrentScreen])
   );
 
   const onRefresh = () => {

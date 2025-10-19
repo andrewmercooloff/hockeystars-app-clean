@@ -602,7 +602,7 @@ const iceBg = require('../assets/images/led.jpg');
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { setIsMainScreen } = useScreenContext();
+  const { setCurrentScreen } = useScreenContext();
   const params = useLocalSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -816,12 +816,12 @@ export default function HomeScreen() {
 
 
 
-  const { isMainScreen } = useScreenContext();
+  const { isMainScreen, currentScreen } = useScreenContext();
   const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, isMainScreen);
   
   // Отладочная функция для проверки состояния экрана
   const debugScreenState = () => {
-    console.log('🔍 ОТЛАДКА ЭКРАНА: isMainScreen =', isMainScreen);
+    console.log('🔍 ОТЛАДКА ЭКРАНА: isMainScreen =', isMainScreen, 'currentScreen =', currentScreen);
   };
   
   // Отладочный лог для проверки ID пользователя (только при изменении)
@@ -948,8 +948,8 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Устанавливаем флаг, что мы на главном экране
-      setIsMainScreen(true);
+      // Устанавливаем, что мы на главном экране
+      setCurrentScreen('index');
       // Проверяем наличие нового пользователя при возврате на экран
       checkForNewUser();
       // НЕ перезагружаем игроков - используем кеш из loadPlayers
@@ -957,9 +957,9 @@ export default function HomeScreen() {
       
       // Возвращаем функцию очистки
       return () => {
-        setIsMainScreen(false);
+        setCurrentScreen(null);
       };
-    }, [checkForNewUser, setIsMainScreen])
+    }, [checkForNewUser, setCurrentScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1030,7 +1030,7 @@ export default function HomeScreen() {
             style={styles.testVibrationButton} 
             onPress={debugScreenState}
           >
-            <Text style={styles.testVibrationButtonText}>🔍 Экран: {isMainScreen ? 'Главный' : 'Другой'}</Text>
+            <Text style={styles.testVibrationButtonText}>🔍 {currentScreen || 'Неизвестно'}</Text>
           </TouchableOpacity>
         </View>
         </View>
