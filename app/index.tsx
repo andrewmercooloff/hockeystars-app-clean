@@ -200,11 +200,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           const wallMaxY = height - boundaries.bottomOffset - puckSize;
           
           if (newX <= boundaries.leftOffset || newX >= wallMaxX) {
-            newVx = -newVx * (Platform.OS === 'android' ? 0.75 : 0.85); // Улучшенные коэффициенты отскока
+            newVx = -newVx * (Platform.OS === 'android' ? 1.1 : 1.05); // Увеличиваем скорость при отскоке от стен
             newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
           }
           if (newY <= boundaries.topOffset || newY >= wallMaxY) {
-            newVy = -newVy * (Platform.OS === 'android' ? 0.75 : 0.85); // Улучшенные коэффициенты отскока
+            newVy = -newVy * (Platform.OS === 'android' ? 1.1 : 1.05); // Увеличиваем скорость при отскоке от стен
             newY = Math.max(boundaries.topOffset, Math.min(wallMaxY, newY));
           }
 
@@ -263,7 +263,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               
               // ПРОСТАЯ ФИЗИКА: более плавное отталкивание на основе overlap
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.4 : (Platform.OS === 'android' ? 0.08 : 0.12));
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.15 : 0.18)); // Увеличиваем силу отталкивания
               
               // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
@@ -306,6 +306,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           });
           
           // Применяем изменения скорости от коллизий ПЕРЕД ограничениями
+          // Добавляем небольшое ускорение при столкновениях для динамичности
+          const hasCollision = velocityChanges[posIndex].dvx !== 0 || velocityChanges[posIndex].dvy !== 0;
+          if (hasCollision) {
+            const speedBoost = 1.05; // 5% ускорение при столкновениях
+            newVx *= speedBoost;
+            newVy *= speedBoost;
+          }
+          
           newVx += velocityChanges[posIndex].dvx;
           newVy += velocityChanges[posIndex].dvy;
           
