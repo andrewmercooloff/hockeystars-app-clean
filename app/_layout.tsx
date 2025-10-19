@@ -9,6 +9,7 @@ import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterC
 import { YearFilterProvider } from '../utils/YearFilterContext';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import { ScreenProvider } from '../contexts/ScreenContext';
 import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player } from '../utils/playerStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../utils/supabase';
@@ -641,7 +642,8 @@ export default function RootLayout() {
     <LanguageProvider>
       <CountryFilterProvider>
         <YearFilterProvider>
-          <NotificationProvider updateNotificationCount={updateNotificationCount}>
+          <ScreenProvider>
+            <NotificationProvider updateNotificationCount={updateNotificationCount}>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <StatusBar 
               barStyle="light-content" 
@@ -893,7 +895,8 @@ export default function RootLayout() {
             </Animated.View>
           )}
           </GestureHandlerRootView>
-          </NotificationProvider>
+            </NotificationProvider>
+          </ScreenProvider>
         </YearFilterProvider>
       </CountryFilterProvider>
     </LanguageProvider>

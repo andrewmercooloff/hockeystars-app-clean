@@ -26,6 +26,7 @@ import { useYearFilter } from '../utils/YearFilterContext';
 import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryUtils';
 import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
 import NetInfo from '@react-native-community/netinfo';
 // Lazy load Puck component to improve initial render performance
 const Puck = React.lazy(() => import('../components/Puck'));
@@ -42,7 +43,7 @@ interface PuckPosition {
   isDragging?: boolean; // Флаг для перетаскиваемой шайбы
 }
 
-const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
+const usePuckCollisionSystem = (players: Player[], currentUserId?: string, isMainScreen?: boolean) => {
   const puckSize = 70; // Размер шайбы
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -334,8 +335,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
         });
       });
         
-        // Вызываем вибрацию если было столкновение (с дебаунсом)
-        if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+        // Вызываем вибрацию если было столкновение (с дебаунсом) и мы на главном экране
+        if (collisionDetectedRef.current && isMainScreen && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
@@ -575,6 +576,7 @@ const iceBg = require('../assets/images/led.jpg');
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { setIsMainScreen } = useScreenContext();
   const params = useLocalSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -788,7 +790,8 @@ export default function HomeScreen() {
 
 
 
-  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id);
+  const { isMainScreen } = useScreenContext();
+  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, isMainScreen);
   
   // Отладочный лог для проверки ID пользователя (только при изменении)
   useEffect(() => {
@@ -914,11 +917,18 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // Устанавливаем флаг, что мы на главном экране
+      setIsMainScreen(true);
       // Проверяем наличие нового пользователя при возврате на экран
       checkForNewUser();
       // НЕ перезагружаем игроков - используем кеш из loadPlayers
       // refreshPlayers(); // Закомментировано для использования кеша
-    }, [checkForNewUser])
+      
+      // Возвращаем функцию очистки
+      return () => {
+        setIsMainScreen(false);
+      };
+    }, [checkForNewUser, setIsMainScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
