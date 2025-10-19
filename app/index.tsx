@@ -130,8 +130,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           
           // Логирование для веб-платформы
           
-          // Платформо-зависимая скорость (Android ускорен на 20%)
-          const speedMultiplier = Platform.OS === 'ios' ? 0.39 : (Platform.OS === 'web' ? 0.39 : 0.144); // iOS и Web - исходные значения, Android - увеличено на 20%
+          // Платформо-зависимая скорость - увеличиваем для более активного движения
+          const speedMultiplier = Platform.OS === 'ios' ? 1.2 : (Platform.OS === 'web' ? 1.2 : 0.8); // Увеличиваем начальную скорость
           nextPositions.push({
             id: player.id,
             x: newX,
@@ -278,13 +278,16 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
                 velocityChanges[otherIndex].dvx += impulseX;
                 velocityChanges[otherIndex].dvy += impulseY;
                 
-                console.log('💥 ПЕРЕДАЧА ИМПУЛЬСА:', {
-                  currentSpeed: currentSpeed.toFixed(2),
-                  impulseTransfer: impulseTransfer.toFixed(2),
-                  impulse: { x: impulseX.toFixed(2), y: impulseY.toFixed(2) },
-                  from: pos.id,
-                  to: otherPos.id
-                });
+                // Убираем частые логи для производительности - только при значительных столкновениях
+                if (impulseTransfer > 0.5) {
+                  console.log('💥 ПЕРЕДАЧА ИМПУЛЬСА:', {
+                    currentSpeed: currentSpeed.toFixed(2),
+                    impulseTransfer: impulseTransfer.toFixed(2),
+                    impulse: { x: impulseX.toFixed(2), y: impulseY.toFixed(2) },
+                    from: pos.id,
+                    to: otherPos.id
+                  });
+                }
               }
               
               // Текущая шайба отталкивается от другой
@@ -356,7 +359,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
         }
-    }, 8); // Все платформы - 120 FPS для более плавного движения
+    }, Platform.OS === 'ios' ? 8 : 16); // iOS - 120 FPS, Android/Web - 60 FPS для производительности
 
     return () => {
       if (animationIntervalRef.current) {
