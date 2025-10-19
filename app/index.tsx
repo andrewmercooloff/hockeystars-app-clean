@@ -265,6 +265,21 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               const overlap = minDistance - distance;
               const pushForce = overlap * (Platform.OS === 'ios' ? 0.4 : (Platform.OS === 'android' ? 0.08 : 0.12));
               
+              // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
+              const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
+              const otherSpeed = Math.sqrt(otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy);
+              
+              // Если текущая шайба движется быстрее, передаем импульс другой шайбе
+              if (currentSpeed > otherSpeed && currentSpeed > 0.5) {
+                const impulseTransfer = Math.min(currentSpeed * 0.3, 2.0); // Ограничиваем передачу импульса
+                const impulseX = Math.cos(angle) * impulseTransfer;
+                const impulseY = Math.sin(angle) * impulseTransfer;
+                
+                // Другая шайба получает импульс от движущейся
+                velocityChanges[otherIndex].dvx += impulseX;
+                velocityChanges[otherIndex].dvy += impulseY;
+              }
+              
               // Текущая шайба отталкивается от другой
               newVx += Math.cos(angle) * pushForce;
               newVy += Math.sin(angle) * pushForce;
