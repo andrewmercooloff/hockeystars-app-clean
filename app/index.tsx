@@ -51,8 +51,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
   
-  // Отладочная информация
-  console.log('🎯 ВИБРАЦИЯ: usePuckCollisionSystem инициализирован с currentUserId =', currentUserId);
+  // Отладочная информация (только при изменении currentUserId)
+  // console.log('🎯 ВИБРАЦИЯ: usePuckCollisionSystem инициализирован с currentUserId =', currentUserId);
 
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
@@ -278,11 +278,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               // Отмечаем столкновение для вибрации только если это шайба пользователя
               if (currentUserId && pos.id === currentUserId) {
                 console.log('🎯 ВИБРАЦИЯ: Столкновение шайбы пользователя', pos.id, 'с', otherPos.id);
-                console.log('🎯 ВИБРАЦИЯ: currentUserId =', currentUserId, 'pos.id =', pos.id);
-                console.log('🎯 ВИБРАЦИЯ: Устанавливаем collisionDetectedRef.current = true');
                 collisionDetectedRef.current = true;
-              } else {
-                console.log('🎯 ВИБРАЦИЯ: НЕ вибрируем - currentUserId =', currentUserId, 'pos.id =', pos.id);
               }
             }
           });
@@ -318,14 +314,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
       });
         
         // Вызываем вибрацию если было столкновение (с дебаунсом)
-        console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: collisionDetectedRef.current =', collisionDetectedRef.current, 'Platform.OS =', Platform.OS);
         if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
-          console.log('🔍 ПРОВЕРКА ВИБРАЦИИ: lastHapticTime =', lastHapticTimeRef.current, 'now =', now, 'diff =', timeDiff, 'threshold = 100');
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
-            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя! Platform.OS =', Platform.OS);
+            console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя!');
             // Используем impactAsync со средним стилем для более заметной вибрации
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
               console.log('📳 ВИБРАЦИЯ: Haptics успешно выполнен!');
@@ -339,17 +333,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
                 console.log('❌ Ошибка альтернативной вибрации:', vibError);
               }
             });
-          } else {
-            console.log('🔍 ВИБРАЦИЯ: Слишком рано для вибрации, пропускаем. Нужно подождать еще', 100 - timeDiff, 'ms');
           }
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
-        } else {
-          if (collisionDetectedRef.current) {
-            console.log('🔍 ВИБРАЦИЯ: collisionDetectedRef.current = true, но Platform.OS =', Platform.OS, 'не поддерживается');
-          } else {
-            console.log('🔍 ВИБРАЦИЯ: collisionDetectedRef.current = false, вибрация не нужна');
-          }
         }
     }, 8); // Все платформы - 120 FPS для более плавного движения
 
@@ -423,7 +409,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
     });
     
     // Вибрация при перетаскивании отключена - только при столкновениях
-    console.log('🔍 DRAG ПРОВЕРКА: hasCollision =', hasCollision, 'currentUserId =', currentUserId, 'id =', id, 'Platform.OS =', Platform.OS);
     // Вибрация при drag отключена по запросу пользователя
   }, [puckSize, currentUserId]);
 
@@ -798,12 +783,12 @@ export default function HomeScreen() {
 
   const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id);
   
-  // Отладочный лог для проверки ID пользователя
+  // Отладочный лог для проверки ID пользователя (только при изменении)
   useEffect(() => {
-    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: currentUser?.id =', currentUser?.id);
-    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: allVisiblePlayers.length =', allVisiblePlayers.length);
-    console.log('👤 ОТЛАДКА ПОЛЬЗОВАТЕЛЯ: puckPositions.length =', puckPositions.length);
-  }, [currentUser?.id, allVisiblePlayers.length, puckPositions.length]);
+    if (currentUser?.id) {
+      console.log('👤 ПОЛЬЗОВАТЕЛЬ: currentUser.id =', currentUser.id);
+    }
+  }, [currentUser?.id]);
 
   // Тестовая функция для проверки вибрации
   const testVibration = async () => {
