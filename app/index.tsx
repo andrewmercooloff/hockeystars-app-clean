@@ -521,7 +521,9 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         // Скорость пропорциональна расстоянию и обратно пропорциональна времени
-        const speed = Math.min(distance / (timeDiff / 1000), 8.0); // Ограничиваем максимальную скорость
+        // Мягкое ограничение скорости для реалистичности
+        const rawSpeed = distance / (timeDiff / 1000);
+        const speed = Math.min(rawSpeed, 15.0); // Увеличиваем лимит, но оставляем ограничение
         
         // Направление от начальной точки к конечной (куда пользователь перетащил)
         const angle = Math.atan2(dy, dx);
