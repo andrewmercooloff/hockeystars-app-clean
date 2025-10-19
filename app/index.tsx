@@ -439,6 +439,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const hasDraggedRef = useRef(false);
   const lastUpdateTimeRef = useRef(0);
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
+  const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -461,6 +462,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     lastPositionRef.current = { x: position.x, y: position.y };
     hasDraggedRef.current = false;
     dragVelocityRef.current = { vx: 0, vy: 0 };
+    dragHistoryRef.current = []; // Очищаем историю
     setIsDragging(true);
     
     // Таймаут отключен - можно держать шайбу сколько угодно
@@ -501,6 +503,12 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     dragVelocityRef.current.vx += vx;
     dragVelocityRef.current.vy += vy;
     
+    // Записываем историю движения (последние 5 точек)
+    dragHistoryRef.current.push({ x: newX, y: newY, time: now });
+    if (dragHistoryRef.current.length > 5) {
+      dragHistoryRef.current.shift(); // Удаляем старые точки
+    }
+    
     lastPositionRef.current = { x: newX, y: newY };
     onDrag(position.id, newX, newY, vx, vy, true);
   };
@@ -513,39 +521,45 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       const now = Date.now();
       const timeDiff = now - dragStartRef.current.time;
       
-      if (timeDiff > 0) {
-        // Рассчитываем скорость на основе расстояния и времени
-        // Используем последнюю позицию из lastPositionRef, а не position
-        const dx = lastPositionRef.current.x - dragStartRef.current.x;
-        const dy = lastPositionRef.current.y - dragStartRef.current.y;
+      if (timeDiff > 0 && dragHistoryRef.current.length >= 2) {
+        // Используем последние 2 точки из истории для определения направления
+        const recent = dragHistoryRef.current.slice(-2);
+        const dx = recent[1].x - recent[0].x;
+        const dy = recent[1].y - recent[0].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
+        const timeDiffRecent = recent[1].time - recent[0].time;
         
-        // Скорость пропорциональна расстоянию и обратно пропорциональна времени
-        // Мягкое ограничение скорости для реалистичности
-        const rawSpeed = distance / (timeDiff / 1000);
-        const speed = Math.min(rawSpeed, 15.0); // Увеличиваем лимит, но оставляем ограничение
-        
-        // Направление от начальной точки к конечной (куда пользователь перетащил)
-        const angle = Math.atan2(dy, dx);
-        const finalVx = Math.cos(angle) * speed;
-        const finalVy = Math.sin(angle) * speed;
-        
-        console.log('🎯 НАПРАВЛЕНИЕ:', {
-          start: { x: dragStartRef.current.x, y: dragStartRef.current.y },
-          end: { x: lastPositionRef.current.x, y: lastPositionRef.current.y },
-          delta: { dx, dy },
-          angle: (angle * 180 / Math.PI).toFixed(1) + '°',
-          speed: speed.toFixed(2),
-          velocity: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) }
-        });
-        
-        // Используем последнюю позицию из lastPositionRef
-        onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
+        if (timeDiffRecent > 0) {
+          // Скорость на основе последнего движения
+          const rawSpeed = distance / (timeDiffRecent / 1000);
+          const speed = Math.min(rawSpeed, 15.0);
+          
+          // Направление последнего движения
+          const angle = Math.atan2(dy, dx);
+          const finalVx = Math.cos(angle) * speed;
+          const finalVy = Math.sin(angle) * speed;
+          
+          console.log('🎯 НАПРАВЛЕНИЕ (из истории):', {
+            recent: recent,
+            delta: { dx, dy },
+            angle: (angle * 180 / Math.PI).toFixed(1) + '°',
+            speed: speed.toFixed(2),
+            velocity: { vx: finalVx.toFixed(2), vy: finalVy.toFixed(2) }
+          });
+          
+          // Используем последнюю позицию из lastPositionRef
+          onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
+        } else {
+          // Fallback к накопленной скорости
+          const finalVx = dragVelocityRef.current.vx * 0.3;
+          const finalVy = dragVelocityRef.current.vy * 0.3;
+          onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
+        }
       } else {
-        // Если время слишком мало, используем накопленную скорость
+        // Если времени мало или нет истории, используем накопленную скорость
         const finalVx = dragVelocityRef.current.vx * 0.3;
         const finalVy = dragVelocityRef.current.vy * 0.3;
-        onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
+        onDrag(position.id, lastPositionRef.current.x, lastPositionRef.current.y, finalVx, finalVy, false);
       }
     }
     
