@@ -1998,7 +1998,8 @@
     },
     "discountForFriendsHint": "Lisää kauppa ystäväksi saadaksesi alennuksen! Näytä alennus myyjälle ostaessasi.",
     "activityRating": "Aktiivisuusluokitus",
-    "coachingYears": "Valmentaa vuosia"
+    "coachingYears": "Valmentaa vuosia",
+    "effectiveness": "tehokkuus"
   },
   "register": {
     "title": "Rekisteröinti",
@@ -2449,7 +2450,7 @@
     "requestSentMessage": "Pyyntösi kohteelle {itemType} on lähetetty. Odota vastausta.",
     "requestItem": "Pyydä {itemType}",
     "requestMessage": "Viesti pyyntöön",
-    "selectGiftType": "Valitse lahjatyyppi",
+    "selectGiftType": "Valitse lahjan tyyppi",
     "selectGiftTypeMessage": "Minkä tyyppisen lahjan haluat luoda?",
     "requestMessageHelper": "Kirjoita kohtelias viesti ja selitä miksi haluat saada tämän lahjan.",
     "requestMessagePlaceholder": "Esimerkiksi: Hei! Olen pelisi suuri fani ja haluaisin nimikirjoituksen kokoelmaani...",
@@ -2477,7 +2478,6 @@
     "allGiftsAdded": "Kaikki lahjat on lisätty.",
     "allGiftTypesAdded": "Sinulla on jo kaikenlaisia ​​lahjoja",
     "addGift": "Lisää lahja",
-    "selectGiftType": "Valitse lahjan tyyppi",
     "deletion": "Poistaminen",
     "itemDeleted": "Lahja poistettu",
     "failedToDeleteItem": "Lahjan poistaminen epäonnistui",

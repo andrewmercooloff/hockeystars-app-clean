@@ -1759,6 +1759,7 @@ export default function PlayerProfile() {
               const assistsNum = parseInt(player.assists || '0') || 0;
               const gamesNum = parseInt(player.games || '0') || 0;
               const pointsNum = goalsNum + assistsNum;
+              const effectiveness = gamesNum > 0 ? (pointsNum / gamesNum).toFixed(1) : '0.0';
               
 
               
@@ -1813,7 +1814,7 @@ export default function PlayerProfile() {
                         </View>
                         <View style={styles.statLabelContainer}>
                           <Text style={styles.statLabel}>
-                            {t('profile.points') === 'profile.points' ? 'points' : t('profile.points')}
+                            {t('profile.points') === 'profile.points' ? 'очки' : t('profile.points')}
                           </Text>
                         </View>
                       </View>
@@ -1829,7 +1830,7 @@ export default function PlayerProfile() {
                         </View>
                         <View style={styles.statLabelContainer}>
                           <Text style={styles.statLabel}>
-                            {t('profile.assists') === 'profile.assists' ? 'assists' : t('profile.assists')}
+                            {t('profile.assists') === 'profile.assists' ? 'передачи' : t('profile.assists')}
                           </Text>
                         </View>
                     </View>
@@ -1845,7 +1846,7 @@ export default function PlayerProfile() {
                         </View>
                         <View style={styles.statLabelContainer}>
                           <Text style={styles.statLabel}>
-                            {t('profile.goalsCount') === 'profile.goalsCount' ? 'goals' : t('profile.goalsCount')}
+                            {t('profile.goalsCount') === 'profile.goalsCount' ? 'голы' : t('profile.goalsCount')}
                           </Text>
                         </View>
                       </View>
@@ -1861,7 +1862,19 @@ export default function PlayerProfile() {
                         </View>
                         <View style={styles.statLabelContainer}>
                           <Text style={styles.statLabel}>
-                            {t('profile.gamesCount') === 'profile.gamesCount' ? 'games' : t('profile.gamesCount')}
+                            {t('profile.gamesCount') === 'profile.gamesCount' ? 'игры' : t('profile.gamesCount')}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                    {pointsNum > 0 && gamesNum > 0 && (
+                      <View style={styles.statItem}>
+                        <View style={styles.statCircle}>
+                          <Text style={styles.statValue}>{effectiveness}</Text>
+                        </View>
+                        <View style={styles.statLabelContainer}>
+                          <Text style={[styles.statLabel, styles.statLabelSmall]}>
+                            {t('profile.effectiveness') === 'profile.effectiveness' ? 'результативность' : t('profile.effectiveness')}
                           </Text>
                         </View>
                       </View>
@@ -4335,6 +4348,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     marginTop: 2,
+  },
+  statLabelSmall: {
+    fontSize: 10,
+    fontFamily: 'Gilroy-Regular',
   },
   statLabelContainer: {
     flexDirection: 'row',

@@ -2019,7 +2019,8 @@
     "currentTeam": "Komanda",
     "hockeyExperience": "Hokeja pieredze",
     "years": "gadi",
-    "currentSeasonStats": "Pašreizējā sezona statistika"
+    "currentSeasonStats": "Pašreizējā sezona statistika",
+    "effectiveness": "efektivitāte"
   },
   "register": {
     "title": "Reģistrācija",

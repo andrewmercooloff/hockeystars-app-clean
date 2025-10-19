@@ -1998,7 +1998,8 @@
     },
     "discountForFriendsHint": "Pridajte si obchod ako priateľa a získajte zľavu! Ukážte zľavu predajcovi pri nákupe.",
     "activityRating": "Hodnotenie aktivity",
-    "coachingYears": "Trénuje roky"
+    "coachingYears": "Trénuje roky",
+    "effectiveness": "efektívnosť"
   },
   "register": {
     "title": "Registrácia",
@@ -2477,7 +2478,6 @@
     "allGiftsAdded": "Všetky darčeky boli pridané.",
     "allGiftTypesAdded": "Už máte všetky druhy darčekov",
     "addGift": "Pridajte darček",
-    "selectGiftType": "Vyberte typ darčeka",
     "deletion": "Odstránenie",
     "itemDeleted": "Darček odstránený",
     "failedToDeleteItem": "Darček sa nepodarilo odstrániť",

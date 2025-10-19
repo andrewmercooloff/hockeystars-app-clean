@@ -2019,7 +2019,8 @@
     "currentTeam": "Komanda",
     "hockeyExperience": "Ledo ritulio patirtis",
     "years": "metai",
-    "currentSeasonStats": "Dabartinio sezono statistika"
+    "currentSeasonStats": "Dabartinio sezono statistika",
+    "effectiveness": "efektyvumas"
   },
   "register": {
     "title": "Registracija",

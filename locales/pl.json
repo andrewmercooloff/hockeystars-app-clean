@@ -1798,7 +1798,8 @@
     "currentTeam": "Drużyna",
     "hockeyExperience": "Doświadczenie w hokeju",
     "years": "lat",
-    "currentSeasonStats": "Statystyki obecnego sezonu"
+    "currentSeasonStats": "Statystyki obecnego sezonu",
+    "effectiveness": "efektywność"
   },
   "register": {
     "title": "Rejestracja",

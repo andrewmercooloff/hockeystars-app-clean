@@ -2006,7 +2006,8 @@
     "equipmentRepair": "Hockeyutrustningsreparation",
     "stickRepair": "Käppreparation",
     "usedEquipmentSale": "Begagnad utrustning",
-    "newEquipmentSale": "Ny utrustning"
+    "newEquipmentSale": "Ny utrustning",
+    "effectiveness": "effektivitet"
   },
   "register": {
     "title": "Registrering",
@@ -2457,7 +2458,7 @@
     "requestSentMessage": "Din begäran om {itemType} har skickats. Vänligen invänta ett svar.",
     "requestItem": "Begär {itemType}",
     "requestMessage": "Meddelande till begäran",
-    "selectGiftType": "Välj presenttyp",
+    "selectGiftType": "Välj typ av gåva",
     "selectGiftTypeMessage": "Vilken typ av present vill du skapa?",
     "requestMessageHelper": "Skriv ett artigt meddelande och förklara varför du vill ta emot denna gåva.",
     "requestMessagePlaceholder": "Till exempel: Hej! Jag är ett stort fan av ditt spel och skulle vilja ha en autograf till min samling...",
@@ -2485,7 +2486,6 @@
     "allGiftsAdded": "Alla gåvor har lagts till.",
     "allGiftTypesAdded": "Du har redan alla typer av presenter",
     "addGift": "Lägg till en gåva",
-    "selectGiftType": "Välj typ av gåva",
     "deletion": "Borttagning",
     "itemDeleted": "Gåvan borttagen",
     "failedToDeleteItem": "Det gick inte att ta bort gåvan",

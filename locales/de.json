@@ -2006,7 +2006,8 @@
     "equipmentRepair": "Hockeyausrüstungsreparatur",
     "stickRepair": "Stockreparatur",
     "usedEquipmentSale": "Gebrauchte Ausrüstung",
-    "newEquipmentSale": "Neue Ausrüstung"
+    "newEquipmentSale": "Neue Ausrüstung",
+    "effectiveness": "effektivität"
   },
   "register": {
     "title": "Anmeldung",
@@ -2084,9 +2085,23 @@
     "requiredForPlayers": "Bei Spielern und Stars ist die Angabe des Geburtsdatums und der Position obligatorisch"
   },
   "adminGifts": {
+    "title": "Geschenkverwaltung",
+    "addGift": "Geschenk hinzufügen",
     "sendGift": "Geschenk senden",
     "giftName": "Geschenkname",
-    "selectImage": "Bild auswählen"
+    "giftType": "Geschenktyp",
+    "selectImage": "Bild auswählen",
+    "searchPlayer": "Spieler suchen...",
+    "giftSent": "Geschenk gesendet!",
+    "giftAdded": "Geschenk hinzugefügt!",
+    "stick": "Schläger",
+    "puck": "Puck",
+    "jersey": "Trikot",
+    "autograph": "Autogramm",
+    "trophy": "Trophäe",
+    "medal": "Medaille",
+    "giftReceived": "Geschenk vom Administrator erhalten",
+    "giftReceivedMessage": "{{playerName}} hat ein Geschenk vom Administrator erhalten!"
   },
   "museum": {
     "title": "Museum",
@@ -2453,9 +2468,9 @@
     "noGiftsYet": "Noch keine Geschenke von den Sternen",
     "museum": "Museum der Geschenke",
     "myGifts": "Meine Geschenke",
-    "noGifts": "Noch keine Geschenke",
+    "noGifts": "Keine Geschenke",
     "noGiftsSubtext": "Erstellen Sie Ihr erstes Geschenk für Fans",
-    "addGift": "Geschenk hinzufügen",
+    "addGift": "Ein Geschenk hinzufügen",
     "successDeleted": "Das Geschenk wurde aus dem Museum entfernt.",
     "errorDelete": "Geschenk konnte nicht gelöscht werden",
     "noImage": "kein Bild",
@@ -2464,7 +2479,7 @@
     "requestSentMessage": "Ihre Anfrage für {itemType} wurde gesendet. Bitte warten Sie auf eine Antwort.",
     "requestItem": "Anfrage {itemType}",
     "requestMessage": "Nachricht zur Anfrage",
-    "selectGiftType": "Geschenktyp auswählen",
+    "selectGiftType": "Wählen Sie die Art des Geschenks",
     "selectGiftTypeMessage": "Welchen Geschenktyp möchten Sie erstellen?",
     "requestMessageHelper": "Schreiben Sie eine höfliche Nachricht, in der Sie erklären, warum Sie dieses Geschenk erhalten möchten.",
     "requestMessagePlaceholder": "Zum Beispiel: Hallo! Ich bin ein großer Fan Ihres Spiels und hätte gerne ein Autogramm für meine Sammlung...",
@@ -2491,12 +2506,9 @@
     "failedToUpdateItemImage": "Geschenkbild konnte nicht aktualisiert werden",
     "allGiftsAdded": "Alle Geschenke wurden hinzugefügt.",
     "allGiftTypesAdded": "Sie haben bereits alle Arten von Geschenken",
-    "addGift": "Ein Geschenk hinzufügen",
-    "selectGiftType": "Wählen Sie die Art des Geschenks",
     "deletion": "Entfernung",
     "itemDeleted": "Geschenk entfernt",
     "failedToDeleteItem": "Geschenk konnte nicht gelöscht werden",
-    "noGifts": "Keine Geschenke",
     "clickPlusToAdd": "Klicken Sie auf +, um hinzuzufügen",
     "настоящее время": "Gegenwart",
     "Центральный нападающий": "Mittelstürmer",
@@ -2630,24 +2642,5 @@
   },
   "logout": "Ausfahrt",
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",
-  "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?",
-  "adminGifts": {
-    "title": "Geschenkverwaltung",
-    "addGift": "Geschenk hinzufügen",
-    "sendGift": "Geschenk senden",
-    "giftName": "Geschenkname",
-    "giftType": "Geschenktyp",
-    "selectImage": "Bild auswählen",
-    "searchPlayer": "Spieler suchen...",
-    "giftSent": "Geschenk gesendet!",
-    "giftAdded": "Geschenk hinzugefügt!",
-    "stick": "Schläger",
-    "puck": "Puck",
-    "jersey": "Trikot",
-    "autograph": "Autogramm",
-    "trophy": "Trophäe",
-    "medal": "Medaille",
-    "giftReceived": "Geschenk vom Administrator erhalten",
-    "giftReceivedMessage": "{{playerName}} hat ein Geschenk vom Administrator erhalten!"
-  }
+  "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?"
 }
