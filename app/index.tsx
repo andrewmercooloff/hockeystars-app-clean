@@ -172,8 +172,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
 
     // Запускаем анимацию сразу без задержки
       animationIntervalRef.current = setInterval(() => {
-        // Сбрасываем флаг столкновения перед обработкой
-        collisionDetectedRef.current = false;
         
       setPuckPositions(currentPositions => {
           // Создаем массив обновлений для хранения изменений скоростей от коллизий
@@ -278,6 +276,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
               // Отмечаем столкновение для вибрации только если это шайба пользователя
               if (currentUserId && pos.id === currentUserId) {
                 console.log('🎯 СТОЛКНОВЕНИЕ: Шайба пользователя с', otherPos.id);
+                console.log('🎯 СТОЛКНОВЕНИЕ: currentUserId =', currentUserId, 'pos.id =', pos.id);
                 collisionDetectedRef.current = true;
               }
             }
@@ -314,9 +313,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string) => {
       });
         
         // Вызываем вибрацию если было столкновение (с дебаунсом)
+        console.log('📳 ПРОВЕРКА: collisionDetectedRef.current =', collisionDetectedRef.current, 'Platform.OS =', Platform.OS);
         if (collisionDetectedRef.current && (Platform.OS === 'ios' || Platform.OS === 'android')) {
           const now = Date.now();
           const timeDiff = now - lastHapticTimeRef.current;
+          console.log('📳 ПРОВЕРКА: timeDiff =', timeDiff, 'lastHapticTime =', lastHapticTimeRef.current);
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
             console.log('📳 ВИБРАЦИЯ: Вызываем вибрацию для пользователя!');
