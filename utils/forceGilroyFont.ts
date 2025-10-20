@@ -17,6 +17,7 @@ export function forceGilroyFont() {
   
   // Переопределяем Text.render
   Text.render = function (props: any, ref: any) {
+    // Всегда применяем Gilroy-Regular как базовый шрифт
     const newProps = {
       ...props,
       style: [
@@ -24,23 +25,13 @@ export function forceGilroyFont() {
         props.style,
       ],
     };
-    
-    // Если в стилях уже есть Gilroy-Bold, сохраняем его
-    if (props.style) {
-      const flatStyle = Array.isArray(props.style) 
-        ? Object.assign({}, ...props.style.filter(Boolean))
-        : props.style;
-      
-      if (flatStyle?.fontFamily?.includes('Gilroy')) {
-        newProps.style = props.style;
-      }
-    }
     
     return OriginalTextRender.call(this, newProps, ref);
   };
   
   // Переопределяем TextInput.render
   TextInput.render = function (props: any, ref: any) {
+    // Всегда применяем Gilroy-Regular как базовый шрифт
     const newProps = {
       ...props,
       style: [
@@ -48,17 +39,6 @@ export function forceGilroyFont() {
         props.style,
       ],
     };
-    
-    // Если в стилях уже есть Gilroy, сохраняем его
-    if (props.style) {
-      const flatStyle = Array.isArray(props.style) 
-        ? Object.assign({}, ...props.style.filter(Boolean))
-        : props.style;
-      
-      if (flatStyle?.fontFamily?.includes('Gilroy')) {
-        newProps.style = props.style;
-      }
-    }
     
     return OriginalTextInputRender.call(this, newProps, ref);
   };

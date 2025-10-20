@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { forceGilroyFont } from '../utils/forceGilroyFont';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -223,6 +224,9 @@ export default function SearchScreen() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Принудительно применяем шрифт Gilroy
+        forceGilroyFont();
+        
         // Загрузка пользователя с таймаутом
         const userPromise = loadCurrentUser();
         const userTimeout = new Promise<Player | null>((_, reject) => 

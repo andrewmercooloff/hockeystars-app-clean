@@ -28,6 +28,7 @@ import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadC
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import NetInfo from '@react-native-community/netinfo';
+import { forceGilroyFont } from '../utils/forceGilroyFont';
 // Lazy load Puck component to improve initial render performance
 const Puck = React.lazy(() => import('../components/Puck'));
 
@@ -870,6 +871,9 @@ export default function HomeScreen() {
   // Функция инициализации приложения
   const initializeApp = useCallback(async () => {
     try {
+      // Принудительно применяем шрифт Gilroy
+      forceGilroyFont();
+      
       setLoading(true);
       setImageLoaded(false); // Сбрасываем флаг загрузки изображения
       
