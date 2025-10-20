@@ -310,7 +310,18 @@ export async function getUserPushTokens(userId: string): Promise<string[]> {
       return [];
     }
 
-    return data?.map(item => item.token) || [];
+    const tokens = data?.map(item => item.token) || [];
+    
+    // Дедупликация токенов на уровне базы данных
+    const uniqueTokens = [...new Set(tokens)];
+    
+    if (tokens.length !== uniqueTokens.length) {
+      console.log(`⚠️ PUSH: Найдены дублирующиеся токены для пользователя ${userId}`);
+      console.log(`⚠️ PUSH: Токенов до дедупликации: ${tokens.length}`);
+      console.log(`⚠️ PUSH: Токенов после дедупликации: ${uniqueTokens.length}`);
+    }
+    
+    return uniqueTokens;
   } catch (error) {
     console.error('❌ Ошибка получения push tokens:', error);
     return [];
@@ -367,7 +378,16 @@ export async function sendMessageNotification(
   const title = `💬 ${senderName}`;
   const body = messageText.length > 50 ? `${messageText.substring(0, 50)}...` : messageText;
   
-  const promises = receiverTokens.map(token => 
+  // Дедупликация токенов - убираем дубликаты
+  const uniqueTokens = [...new Set(receiverTokens)];
+  
+  console.log(`📱 PUSH: Отправляем уведомление о сообщении`);
+  console.log(`📱 PUSH: Получатель: ${senderName} (${senderId})`);
+  console.log(`📱 PUSH: Токенов до дедупликации: ${receiverTokens.length}`);
+  console.log(`📱 PUSH: Токенов после дедупликации: ${uniqueTokens.length}`);
+  console.log(`📱 PUSH: Текст: ${messageText.substring(0, 30)}...`);
+  
+  const promises = uniqueTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'message',
       senderId,

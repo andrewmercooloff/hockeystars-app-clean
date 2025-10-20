@@ -1750,6 +1750,13 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
       // Исключаем токены отправителя из списка получателей (на случай если это один пользователь)
       const filteredReceiverTokens = receiverTokens.filter(token => !senderTokens.includes(token));
       
+      console.log(`📱 PUSH: Отправка уведомления о сообщении`);
+      console.log(`📱 PUSH: Отправитель: ${senderPlayer?.name || 'Неизвестно'} (${senderId})`);
+      console.log(`📱 PUSH: Получатель: ${receiverId}`);
+      console.log(`📱 PUSH: Токенов получателя: ${receiverTokens.length}`);
+      console.log(`📱 PUSH: Токенов отправителя: ${senderTokens.length}`);
+      console.log(`📱 PUSH: Токенов после фильтрации: ${filteredReceiverTokens.length}`);
+      
       if (filteredReceiverTokens.length > 0 && senderPlayer) {
         await sendMessageNotification(
           filteredReceiverTokens,
@@ -1757,6 +1764,8 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
           text,
           senderId
         );
+      } else {
+        console.log(`📱 PUSH: Пропускаем отправку - нет токенов получателя или отправитель не найден`);
       }
     } catch (pushError) {
       console.error('⚠️ Не удалось отправить push-уведомление получателю:', pushError);
