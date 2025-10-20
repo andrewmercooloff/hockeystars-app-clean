@@ -27,8 +27,10 @@ import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryU
 import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
+import { useUser } from '../contexts/UserContext';
 import NetInfo from '@react-native-community/netinfo';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 // Lazy load Puck component to improve initial render performance
 const Puck = React.lazy(() => import('../components/Puck'));
 
@@ -155,6 +157,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Проверяем, что мы на главном экране перед запуском анимации
     if (currentScreen !== 'index') {
       console.log('🎯 АНИМАЦИЯ: Останавливаем анимацию - не на главном экране, currentScreen =', currentScreen);
+      // Очищаем интервал при уходе с главного экрана
+      if (animationIntervalRef.current) {
+        clearInterval(animationIntervalRef.current);
+        animationIntervalRef.current = null;
+      }
       return;
     }
 
@@ -162,8 +169,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Используем строгое сравнение - запускаем только когда длина реально изменилась
     const hasLengthChanged = previousLengthRef.current !== puckPositions.length;
     
-    if (!hasLengthChanged && animationIntervalRef.current !== null) {
-      return; // Интервал уже работает и количество шайб не изменилось
+    // Если анимация уже запущена и количество шайб не изменилось, не перезапускаем
+    if (animationIntervalRef.current && !hasLengthChanged) {
+      return;
     }
     
     previousLengthRef.current = puckPositions.length;
@@ -179,7 +187,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     }
 
     // Запускаем анимацию сразу без задержки
-      animationIntervalRef.current = setInterval(() => {
+    console.log('🎯 АНИМАЦИЯ: Запускаем анимацию шайб, currentScreen =', currentScreen);
+    animationIntervalRef.current = setInterval(() => {
         // Проверяем, что мы на главном экране перед обработкой физики
         if (currentScreen !== 'index') {
           return; // Не обрабатываем физику, если не на главном экране
@@ -614,11 +623,11 @@ export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
+  const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isConnected, setIsConnected] = useState(true);
@@ -828,30 +837,22 @@ export default function HomeScreen() {
 
 
   const { isMainScreen, currentScreen } = useScreenContext();
-  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen);
+  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen || undefined);
   
   // Отладочная функция для проверки состояния экрана
-  const debugScreenState = () => {
-    console.log('🔍 ОТЛАДКА ЭКРАНА: isMainScreen =', isMainScreen, 'currentScreen =', currentScreen);
-  };
-  
-  // Отладочный лог для проверки ID пользователя (только при изменении)
-  useEffect(() => {
-    if (currentUser?.id) {
-      // Убираем лог пользователя для чистоты консоли
-    }
-  }, [currentUser?.id]);
+  // Функция отладки отключена
 
 
 
 
   const refreshPlayers = useCallback(async () => {
     try {
-      const loadedPlayers = await loadPlayers();
-      
-      // Добавляем отладочную информацию для каждого игрока
-      loadedPlayers.forEach(player => {
-      });
+      // Используем кеширование для загрузки игроков
+      const loadedPlayers = await dataCache.getOrLoad(
+        CACHE_KEYS.PLAYERS,
+        () => loadPlayers(),
+        5 * 60 * 1000 // 5 минут
+      );
       
       setPlayers(loadedPlayers);
     } catch (error) {
@@ -877,19 +878,22 @@ export default function HomeScreen() {
       setLoading(true);
       setImageLoaded(false); // Сбрасываем флаг загрузки изображения
       
-      // Убрали тяжелые операции для быстрой загрузки
-      // await initializeStorage(); // Выполняется автоматически при первом доступе
-      // await fixCorruptedData(); // Не нужно при каждой загрузке
-      // await checkDatabaseStatus(); // Только для отладки
-      
+      // Используем кеширование для быстрой загрузки
       const [loadedPlayers, user] = await Promise.all([
-        loadPlayers(),
-        loadCurrentUser()
+        dataCache.getOrLoad(
+          CACHE_KEYS.PLAYERS,
+          () => loadPlayers(),
+          5 * 60 * 1000 // 5 минут
+        ),
+        dataCache.getOrLoad(
+          CACHE_KEYS.USER_PROFILE,
+          () => loadCurrentUser(),
+          2 * 60 * 1000 // 2 минуты
+        )
       ]);
       
       setPlayers(loadedPlayers);
       setCurrentUser(user);
-      
       
       // Устанавливаем значения по умолчанию только если они не установлены
       if (!selectedCountry) {
@@ -965,17 +969,36 @@ export default function HomeScreen() {
       // Устанавливаем, что мы на главном экране
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
-      // Проверяем наличие нового пользователя при возврате на экран
-      checkForNewUser();
-      // НЕ перезагружаем игроков - используем кеш из loadPlayers
-      // refreshPlayers(); // Закомментировано для использования кеша
+      
+      // Принудительно обновляем пользователя при переходе на главную страницу
+      // Это нужно для корректного выхода из профиля
+      const refreshUserOnFocus = async () => {
+        try {
+          // Очищаем кеш пользователя для принудительной перезагрузки
+          const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
+          await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+          
+          const user = await loadCurrentUser();
+          if (user) {
+            refreshUser();
+          } else {
+            // Если пользователь не найден, очищаем состояние
+            refreshUser();
+          }
+        } catch (error) {
+          console.error('❌ Ошибка обновления пользователя:', error);
+          refreshUser();
+        }
+      };
+      
+      refreshUserOnFocus();
       
       // Возвращаем функцию очистки
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
       };
-    }, [checkForNewUser, setCurrentScreen])
+    }, [refreshUser, setCurrentScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1041,13 +1064,7 @@ export default function HomeScreen() {
         <View style={styles.filtersContainer}>
           <CountryFilter players={players} />
           <YearFilter players={players} />
-          {/* Кнопка для отладки экрана */}
-          <TouchableOpacity 
-            style={styles.testVibrationButton} 
-            onPress={debugScreenState}
-          >
-            <Text style={styles.testVibrationButtonText}>🔍 {currentScreen || 'Неизвестно'}</Text>
-          </TouchableOpacity>
+          {/* Кнопка отладки отключена */}
         </View>
         </View>
 
@@ -1326,18 +1343,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8, // Уменьшаем отступ между фильтрами
   },
-  testVibrationButton: {
-    backgroundColor: '#fa2f40',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    marginLeft: 10,
-  },
-  testVibrationButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-  },
+  // Стили кнопки отладки удалены
   filterButton: {
     // Удалено
   },

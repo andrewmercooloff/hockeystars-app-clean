@@ -56,6 +56,7 @@ import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
 import { useStatsChanges } from '../../hooks/useStatsChanges';
 import { useNotificationContext } from '../../contexts/NotificationContext';
+import { useUser } from '../../contexts/UserContext';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -66,6 +67,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
+  const { currentUser: globalCurrentUser, refreshUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
@@ -103,6 +105,24 @@ export default function PlayerProfile() {
   const [loading, setLoading] = useState(true);
   const [activityRefreshKey, setActivityRefreshKey] = useState<number>(0);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
+
+  // Синхронизируем локальное состояние с глобальным
+  useEffect(() => {
+    setCurrentUser(globalCurrentUser);
+  }, [globalCurrentUser]);
+
+  // Проверяем авторизацию при загрузке компонента
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!globalCurrentUser) {
+        // Если пользователь не авторизован, перенаправляем на главную страницу
+        console.log('🔐 Пользователь не авторизован, перенаправляем на главную страницу');
+        router.replace('/');
+      }
+    };
+    
+    checkAuth();
+  }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
@@ -327,11 +347,23 @@ export default function PlayerProfile() {
     useCallback(() => {
       setCurrentScreen('player');
       console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = player');
+      
+      // Принудительно обновляем пользователя при фокусе на профиле
+      const refreshUserOnFocus = async () => {
+        try {
+          await refreshUser();
+        } catch (error) {
+          console.error('❌ Ошибка обновления пользователя в профиле:', error);
+        }
+      };
+      
+      refreshUserOnFocus();
+      
       return () => {
         setCurrentScreen(null);
         console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = null');
       };
-    }, [setCurrentScreen])
+    }, [setCurrentScreen, refreshUser])
   );
 
   // Обработка прокрутки к музею
@@ -1057,7 +1089,7 @@ export default function PlayerProfile() {
         import('../../utils/playerStorage').then(({ getPlayerTeamsAsPastTeams }) => getPlayerTeamsAsPastTeams(player.id))
       ]);
       
-      console.log('🔍 Результат загрузки команд:', teams);
+      // Отладочный лог отключен
       
       // Проверяем результат синхронизации команд
       if (!teamsSyncResult.success) {
@@ -1164,12 +1196,7 @@ export default function PlayerProfile() {
         // 5. Проверяем изменение статистики (голы/передачи)
         const statsChanges: { field: string, oldValue: number, newValue: number }[] = [];
         
-        console.log('🔍 ПРОВЕРКА СТАТИСТИКИ:', {
-          playerGoals: player.goals,
-          editDataGoals: editData.goals,
-          playerAssists: player.assists,
-          editDataAssists: editData.assists
-        });
+        // Отладочный лог отключен
         
         const oldGoals = parseInt(player.goals) || 0;
         const newGoals = parseInt(editData.goals || player.goals) || 0;
@@ -1343,9 +1370,9 @@ export default function PlayerProfile() {
               currentTeams: currentTeams.length, 
               pastTeams: pastTeams.length 
             });
-            setPlayerTeams(currentTeams);
-            setPastTeams(pastTeams);
-          }
+        setPlayerTeams(currentTeams);
+        setPastTeams(pastTeams);
+      }
         } catch (error) {
           console.error('❌ Ошибка дополнительного обновления команд:', error);
         }
@@ -1434,11 +1461,19 @@ export default function PlayerProfile() {
           const { logoutUser } = await import('../../utils/playerStorage');
           await logoutUser();
           
+          // Очищаем кеш пользователя
+          const { dataCache, CACHE_KEYS } = await import('../../utils/DataCache');
+          await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+          
+          // Принудительно обновляем глобальное состояние пользователя
+          await refreshUser();
+          
           // Переходим на главную страницу
           router.replace('/');
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           // Даже если произошла ошибка, все равно переходим на главную
+          await refreshUser();
           router.replace('/');
         }
       }
@@ -1592,7 +1627,7 @@ export default function PlayerProfile() {
                 </TouchableOpacity>
               ) : (
                 (() => {
-                  console.log('🔍 ОТЛАДКА АВАТАРА: player.status =', player.status, 'player.avatar =', player.avatar);
+                  // Отладочный лог отключен
                   const imageSource = player.avatar;
                   const hasValidImage = imageSource && typeof imageSource === 'string' && (
                     imageSource.startsWith('data:image/') || 
@@ -1600,7 +1635,7 @@ export default function PlayerProfile() {
                     imageSource.startsWith('file://') || 
                     imageSource.startsWith('content://')
                   );
-                  console.log('🔍 hasValidImage =', hasValidImage);
+                  // Отладочный лог отключен
 
                   if (hasValidImage) {
                     return (
@@ -1628,11 +1663,11 @@ export default function PlayerProfile() {
                         <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                           {player.status === 'scout' ? (
                             <>
-                              {console.log('🎯 ОТЛАДКА СКАУТА: player.status =', player.status, 'player.avatar =', player.avatar)}
-                              <Image 
-                                source={require('../../assets/images/scout.png')} 
-                                style={styles.avatarImage}
-                              />
+                              {/* Отладочный лог отключен */}
+                            <Image 
+                              source={require('../../assets/images/scout.png')} 
+                              style={styles.avatarImage}
+                            />
                             </>
                           ) : (
                             <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
@@ -3082,7 +3117,7 @@ export default function PlayerProfile() {
                 (friendshipStatus === 'friends') ? (
                   <View style={styles.section} ref={museumRef}>
                   {/* Заголовок музея - показываем всегда */}
-                  <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
+                    <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   
                   <PlayerMuseum 
                     playerId={player.id} 

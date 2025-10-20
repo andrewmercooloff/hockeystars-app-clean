@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { AppState, LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
+import { UserProvider, useUser } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
 import { LanguageProvider } from '../contexts/LanguageContext';
@@ -20,6 +21,7 @@ import { configureSystemUI } from '../utils/systemUI';
 import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
+import { realtimeManager } from '../utils/RealtimeManager';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -117,6 +119,43 @@ export default function RootLayout() {
 
   const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
+
+  // Внутренний компонент для синхронизации с UserContext
+  const UserSync = () => {
+    const { setCurrentUser: setGlobalUser, refreshUser } = useUser();
+    const params = useLocalSearchParams();
+    
+    // Синхронизируем локальное состояние с глобальным
+    React.useEffect(() => {
+      setGlobalUser(currentUser);
+    }, [currentUser, setGlobalUser]);
+    
+    // Обрабатываем параметр refresh из URL
+    React.useEffect(() => {
+      if (params.refresh === 'true') {
+        console.log('🔄 Обнаружен параметр refresh, принудительно обновляем пользователя');
+        // Очищаем кеш пользователя для принудительной перезагрузки
+        const clearUserCache = async () => {
+          try {
+            const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
+            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+            console.log('🧹 Кеш пользователя очищен');
+          } catch (error) {
+            console.error('❌ Ошибка очистки кеша:', error);
+          }
+        };
+        
+        clearUserCache().then(() => {
+          // Очищаем кеш и принудительно загружаем пользователя
+          loadUser();
+          // Также обновляем UserContext
+          refreshUser(true);
+        });
+      }
+    }, [params.refresh]);
+    
+    return null;
+  };
   
   // Функция для загрузки счетчика уведомлений из БД
   const loadNotificationCount = React.useCallback(async (userId: string) => {
@@ -352,20 +391,8 @@ export default function RootLayout() {
         // Локальный счетчик обновляется только через updateNotificationCount()
         // при переходе в уведомления или явном обновлении
 
-        // Избегаем лишних перерисовок, если значения не изменились
-        setCurrentUser(prev => {
-          if (
-            prev &&
-            prev.id === nextUser.id &&
-            (prev.unreadMessagesCount || 0) === (nextUser.unreadMessagesCount || 0) &&
-            (prev.friendRequestsCount || 0) === (nextUser.friendRequestsCount || 0) &&
-            (prev.giftRequestsCount || 0) === (nextUser.giftRequestsCount || 0)
-          ) {
-            return prev;
-          }
-          lastUserLoadTime.current = Date.now();
-          return nextUser;
-        });
+        // Обновляем пользователя с новыми счетчиками
+        setCurrentUser(nextUser);
         
         // Обновляем счетчик уведомлений после установки currentUser
         setTimeout(() => {
@@ -374,9 +401,7 @@ export default function RootLayout() {
         
       } else {
         setUserLoaded(false);
-        if (currentUser !== null) {
-          setCurrentUser(null);
-        }
+        setCurrentUser(null);
       }
     } catch (error) {
       console.error('Ошибка загрузки текущего пользователя:', error);
@@ -481,6 +506,26 @@ export default function RootLayout() {
     // УБРАЛИ setInterval - теперь счетчик обновляется только через Realtime!
   }, [loaded, appReady]);
 
+  // Принудительно обновляем пользователя при переходе на главную страницу
+  // Это нужно для корректного выхода из профиля
+  React.useEffect(() => {
+    const handleFocus = () => {
+      // Небольшая задержка для того, чтобы навигация завершилась
+      setTimeout(() => {
+        loadUser();
+      }, 100);
+    };
+
+    // Добавляем слушатель для обновления при фокусе на приложении
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        handleFocus();
+      }
+    });
+
+    return () => subscription?.remove();
+  }, []);
+
   // Дополнительная загрузка пользователя при возврате в приложение
   React.useEffect(() => {
     if (appState === 'active' && appReady) {
@@ -502,58 +547,14 @@ export default function RootLayout() {
       return;
     }
 
-    console.log('🔌 Настраиваем Realtime подписки для пользователя:', currentUser.id);
-
-
-    const notificationsChannel = supabase
-      .channel('notifications-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🔔 Новое уведомление получено через Realtime!', payload);
-          // Обновляем счетчик уведомлений из БД
-          if (currentUser?.id) {
-            loadNotificationCount(currentUser.id);
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки notifications-updates:', status);
-      });
-
-    // Подписываемся на изменения поля unread_notifications_count в таблице players
-    const playersChannel = supabase
-      .channel('players-notifications-count')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'players',
-          filter: `id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🔄 Счетчик уведомлений изменен в БД через Realtime:', payload.new.unread_notifications_count);
-          // Обновляем локальный счетчик
-          setUnreadNotificationsCount(payload.new.unread_notifications_count || 0);
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки players-notifications-count:', status);
-      });
+    // Используем централизованный менеджер подписок
+    realtimeManager.setupSubscriptions(currentUser.id);
 
     return () => {
-      console.log('🔌 Отключаем Realtime подписки');
-      supabase.removeChannel(notificationsChannel);
-      supabase.removeChannel(playersChannel);
+      // Отключаем подписки при размонтировании
+      realtimeManager.disconnect();
     };
-  }, [currentUser?.id, loadNotificationCount]);
+  }, [currentUser?.id]);
 
   // Обновляем счетчики при фокусе на экране сообщений
   React.useEffect(() => {
@@ -590,34 +591,38 @@ export default function RootLayout() {
       <CountryFilterProvider>
         <YearFilterProvider>
           <ScreenProvider>
-            <NotificationProvider updateNotificationCount={updateNotificationCount}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <StatusBar 
-              barStyle="light-content" 
-              backgroundColor="#000000" 
-              translucent={false}
-              hidden={false}
-            />
-          <Tabs
-          screenOptions={{
-            headerStyle: { backgroundColor: '#000', height: 128 },
-            headerTitleAlign: 'center',
-            tabBarStyle: { 
-              backgroundColor: '#000', 
-              borderTopWidth: 0,
-              height: 80,
-              paddingBottom: 10,
-              paddingTop: 10
-            },
-            tabBarActiveTintColor: '#fff',
-            tabBarInactiveTintColor: '#888',
-            tabBarShowLabel: false,
-          }}
-        >
+            <UserProvider>
+              <UserSync />
+              <NotificationProvider updateNotificationCount={updateNotificationCount}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <StatusBar 
+                barStyle="light-content" 
+                backgroundColor="#000000" 
+                translucent={false}
+                hidden={false}
+              />
+              
+              {/* Глобальный хедер - не перерендеривается при переходах */}
+              <LogoHeader />
+              
+              <Tabs
+            screenOptions={{
+              headerShown: false, // Убираем встроенные хедеры
+              tabBarStyle: { 
+                backgroundColor: '#000', 
+                borderTopWidth: 0,
+                height: 80,
+                paddingBottom: 10,
+                paddingTop: 10
+              },
+              tabBarActiveTintColor: '#fff',
+              tabBarInactiveTintColor: '#888',
+              tabBarShowLabel: false,
+            }}
+          >
         <Tabs.Screen
           name="index"
           options={{
-            headerTitle: () => <LogoHeader />,
             tabBarIcon: ({ size }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return (
@@ -646,7 +651,6 @@ export default function RootLayout() {
             },
           }}
           options={{
-            headerTitle: () => <LogoHeader />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return (
@@ -695,7 +699,6 @@ export default function RootLayout() {
             },
           }}
           options={{
-            headerTitle: () => <LogoHeader />,
             tabBarIcon: NotificationsTabIcon,
           }}
         />
@@ -711,7 +714,6 @@ export default function RootLayout() {
             },
           }}
           options={{
-            headerTitle: () => <LogoHeader />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="search-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
@@ -730,7 +732,6 @@ export default function RootLayout() {
             },
           }}
           options={{
-            headerTitle: () => <LogoHeader />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="barbell-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
@@ -742,7 +743,6 @@ export default function RootLayout() {
           name="exercise-details"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
 
@@ -750,14 +750,12 @@ export default function RootLayout() {
           name="login"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
         <Tabs.Screen
           name="register"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
               />
 
@@ -766,28 +764,24 @@ export default function RootLayout() {
           name="chat/[id]"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
         <Tabs.Screen
           name="player/[id]"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
         <Tabs.Screen
           name="admin"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
         <Tabs.Screen
           name="admin/create-user"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
 
@@ -803,14 +797,12 @@ export default function RootLayout() {
           name="+not-found"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
         <Tabs.Screen
           name="components/Puck"
           options={{
             href: null,
-            headerTitle: () => <LogoHeader />,
           }}
         />
 
@@ -842,7 +834,8 @@ export default function RootLayout() {
             </Animated.View>
           )}
           </GestureHandlerRootView>
-            </NotificationProvider>
+              </NotificationProvider>
+            </UserProvider>
           </ScreenProvider>
         </YearFilterProvider>
       </CountryFilterProvider>

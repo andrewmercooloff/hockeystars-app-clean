@@ -1317,7 +1317,7 @@ const styles = StyleSheet.create({
   },
   resendButtonText: {
     fontSize: 12,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
     color: '#4CAF50',
     textAlign: 'center',
   },

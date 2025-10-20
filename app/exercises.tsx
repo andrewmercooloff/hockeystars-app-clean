@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
     Dimensions,
     ScrollView,
@@ -15,6 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
 import { useExercises } from '../hooks/useExercises';
 import { LocalizedExercise, Language } from '../types/exercise';
 
@@ -25,6 +26,7 @@ const { width } = Dimensions.get('window');
 export default function ExercisesScreen() {
   const { t, language } = useLanguage();
   const router = useRouter();
+  const { setCurrentScreen } = useScreenContext();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +41,7 @@ export default function ExercisesScreen() {
     return t(`exercises.difficulties.${difficulty}`) || difficulty;
   };
 
-  // Используем новый хук для загрузки упражнений из базы данных (без серверного поиска)
+  // Используем новый хук для загрузки упражнений из базы данных (все упражнения)
   const {
     exercises: allExercises,
     loading,
@@ -49,10 +51,7 @@ export default function ExercisesScreen() {
     refreshExercises,
     userStats,
     exerciseRankings
-  } = useExercises(language as Language, {
-    category: selectedCategory || undefined
-    // Убираем search из серверного запроса
-  });
+  } = useExercises(language as Language); // Убираем фильтры - загружаем все упражнения
 
   // Загружаем данные пользователя
   useEffect(() => {
@@ -73,8 +72,25 @@ export default function ExercisesScreen() {
     refreshExercises();
   }, [selectedCategory]);
 
+  // Устанавливаем currentScreen при фокусе на экране упражнений
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('exercises');
+      console.log('💪 УПРАЖНЕНИЯ: Устанавливаем currentScreen = exercises');
+      return () => {
+        setCurrentScreen(null);
+        console.log('💪 УПРАЖНЕНИЯ: Устанавливаем currentScreen = null');
+      };
+    }, [setCurrentScreen])
+  );
+
   // Фильтруем и сортируем упражнения с мемоизацией (клиентская фильтрация)
   const sortedExercises = useMemo(() => {
+    // Если данные еще загружаются, возвращаем пустой массив
+    if (loading || allExercises.length === 0) {
+      return [];
+    }
+
     const filtered = allExercises.filter(exercise => {
       // Фильтр по категории
       if (selectedCategory && exercise.category !== selectedCategory) {
@@ -82,9 +98,9 @@ export default function ExercisesScreen() {
       }
       
       // Фильтр по поиску (клиентский)
-      if (searchQuery) {
-        const searchLower = searchQuery.toLowerCase();
-        const searchTerm = searchQuery.replace('#', ''); // Убираем # если пользователь его ввел
+      if (searchQuery.trim()) {
+        const searchLower = searchQuery.toLowerCase().trim();
+        const searchTerm = searchQuery.replace('#', '').trim(); // Убираем # если пользователь его ввел
         
         const matchesId = exercise.exerciseId.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesTitle = exercise.title.toLowerCase().includes(searchLower);
@@ -112,7 +128,7 @@ export default function ExercisesScreen() {
       const bId = parseInt(b.exerciseId);
       return aId - bId;
     });
-  }, [allExercises, selectedCategory, searchQuery, exerciseRankings]);
+  }, [allExercises, selectedCategory, searchQuery, exerciseRankings, loading]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {

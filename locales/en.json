@@ -1743,7 +1743,7 @@
     "codePlaceholder": "Enter code",
     "sendCode": "Send Code",
     "resendCode": "Resend in",
-    "verifyCode": "Verify Code",
+    "verifyCode": "Verify",
     "invalidPhone": "Invalid phone number format",
     "invalidCode": "Invalid verification code",
     "codeSent": "Code sent to",

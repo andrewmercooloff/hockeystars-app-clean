@@ -91,14 +91,15 @@ export class ExerciseService {
   }
 
   /**
-   * Получить локализованные упражнения
+   * Получить локализованные упражнения (все, без фильтров)
    */
   static async getLocalizedExercises(
     language: Language = 'ru', 
     filters?: ExerciseFilters
   ): Promise<LocalizedExercise[]> {
     try {
-      const exercises = await this.getAllExercises(filters);
+      // Игнорируем фильтры для загрузки всех упражнений
+      const exercises = await this.getAllExercises();
       return exercises.map(exercise => localizeExercise(exercise, language));
     } catch (error) {
       console.error('Error in getLocalizedExercises:', error);

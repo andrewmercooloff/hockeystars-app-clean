@@ -12,10 +12,11 @@ import {
     ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 
 // Предотвращаем автоматическое скрытие заставки
@@ -59,7 +60,7 @@ const FilterButton = React.memo(({
   return (
     <View style={[styles.filterContainer, isActive && styles.filterContainerActive]}>
       <TouchableOpacity 
-        style={styles.filterButton} 
+        style={[styles.filterButton, isActive && styles.filterButtonActive]} 
         onPress={toggleDropdown}
       >
         <Text style={styles.filterButtonText}>
@@ -135,6 +136,7 @@ const FilterButton = React.memo(({
 export default function SearchScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { setCurrentScreen } = useScreenContext();
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -242,13 +244,20 @@ export default function SearchScreen() {
 
         setCurrentUser(user);
 
+        // Очищаем кеш для принудительной перезагрузки рейтингов
+        const { clearAllPlayersCache } = await import('../utils/playerStorage');
+        await clearAllPlayersCache();
+        
         // Загрузка игроков
         const allPlayers = await loadPlayers();
-        const filteredPlayers = allPlayers.filter(
-          player => 
-            player.status === 'player' || 
-            player.status === 'admin'
-        );
+        
+        // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
+        const filteredPlayers = user.status === 'admin' 
+          ? allPlayers // Администратор видит всех
+          : allPlayers.filter(player => 
+              player.status === 'player' || 
+              player.status === 'admin'
+            );
         
         setPlayers(filteredPlayers);
       } catch (error) {
@@ -262,6 +271,18 @@ export default function SearchScreen() {
 
     loadData();
   }, [router]);
+
+  // Устанавливаем currentScreen при фокусе на экране поиска
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('search');
+      console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
+      return () => {
+        setCurrentScreen(null);
+        console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
+      };
+    }, [setCurrentScreen])
+  );
 
   // Мемоизированные фильтры
   const countries = useMemo(() => {
@@ -423,6 +444,9 @@ export default function SearchScreen() {
     const filtered = players.filter(player => {
       // Администратор всегда виден
       if (player.status === 'admin') return true;
+      
+      // Если текущий пользователь - администратор, показываем всех
+      if (currentUser?.status === 'admin') return true;
 
       // Фильтр по поиску
       const matchesSearch = !searchQuery || 
@@ -470,12 +494,20 @@ export default function SearchScreen() {
     });
 
     // Сортируем по рейтингу активности (убывание)
-    return filtered.sort((a, b) => {
+    const sorted = filtered.sort((a, b) => {
       const ratingA = a.activityRating || 0;
       const ratingB = b.activityRating || 0;
       return ratingB - ratingA;
     });
-  }, [players, searchQuery, selectedCountry, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight]);
+    
+    // Отладочный лог для проверки сортировки (временно включен)
+    console.log('🔍 ОТЛАДКА СОРТИРОВКИ:');
+    sorted.slice(0, 5).forEach((player, index) => {
+      console.log(`${index + 1}. ${player.name} - рейтинг: ${player.activityRating || 0}`);
+    });
+    
+    return sorted;
+  }, [players, searchQuery, selectedCountry, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, currentUser]);
 
   // Key extractor для FlatList
   const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
@@ -523,7 +555,7 @@ export default function SearchScreen() {
             <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
               {item.name}
             </Text>
-            {item.status === 'player' && item.activityRating !== undefined && (
+            {item.activityRating !== undefined && item.activityRating > 0 && (
               <View style={styles.ratingContainer}>
                 <Ionicons name="star" size={12} color="#AA3333" />
                 <Text style={styles.ratingText}>{item.activityRating}</Text>
@@ -567,9 +599,7 @@ export default function SearchScreen() {
         style={styles.backgroundImage}
         resizeMode="cover"
       >
-        <View style={styles.overlay} />
-        
-        <View style={styles.contentContainer}>
+        <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -578,20 +608,22 @@ export default function SearchScreen() {
             <Text style={styles.pageTitle}>{t('search.title')}</Text>
           </View>
           
-          {/* Поле поиска */}
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder={t('search.placeholder')}
-              placeholderTextColor="#888"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
+          {/* Общий контейнер для поиска и фильтров */}
+          <View style={styles.searchSection}>
+            {/* Поле поиска */}
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={t('search.placeholder')}
+                placeholderTextColor="#888"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
 
-          {/* Контейнер фильтров */}
-          <View style={styles.filtersContainer}>
+            {/* Контейнер фильтров */}
+            <View style={styles.filtersContainer}>
             <FilterButton 
               title={t('search.country')} 
               options={countries} 
@@ -672,6 +704,7 @@ export default function SearchScreen() {
               isOpen={isFilterOpen('weight')}
               onToggle={toggleFilter}
             />
+            </View>
           </View>
 
           {/* Список игроков */}
@@ -694,7 +727,6 @@ export default function SearchScreen() {
           />
         </View>
       </ImageBackground>
-      
     </View>
   );
 }
@@ -709,13 +741,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Легкое затемнение фона
-  },
-  contentContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)', // Полупрозрачный фон
-    paddingTop: 40, // Поднято еще на 10 пикселей ближе к заголовку
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   pageHeader: {
     position: 'absolute',
@@ -733,23 +760,32 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   pageTitle: {
-    color: '#fff',
     fontSize: 24,
     fontFamily: 'Gilroy-Bold',
+    color: '#fff',
     flex: 1,
-    textAlign: 'left',
+  },
+  searchSection: {
+    position: 'absolute',
+    top: 41, // Под заголовком
+    left: 0,
+    right: 0,
+    zIndex: 1001,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 10,
-    marginHorizontal: 20,
-    marginTop: 10,
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
+    height: 40,
+    width: '100%',
   },
   searchIcon: {
     marginRight: 10,
@@ -757,14 +793,17 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
+    height: 24,
+    textAlignVertical: 'center',
+    paddingVertical: 0,
     fontFamily: 'Gilroy-Regular',
   },
   filtersContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     marginTop: 8,
     marginBottom: 0,
     zIndex: 1000,
@@ -784,18 +823,24 @@ const styles = StyleSheet.create({
     elevation: 10000,
   },
   filterButton: {
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  filterButtonActive: {
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   filterButtonText: {
     color: '#fff',
     fontSize: 13,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
   },
   filterButtonIcon: {
     color: '#fff',
@@ -847,7 +892,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     zIndex: 1,
     elevation: 1,
-    marginTop: 5,
+    marginTop: 200, // Отступ для поиска и фильтров
   },
   playerItem: {
     flexDirection: 'row',
@@ -936,3 +981,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
 });
+
+

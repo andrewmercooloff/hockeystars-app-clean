@@ -1,56 +1,41 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { loadCurrentUser, Player } from '../utils/playerStorage';
+import HeaderAvatar from './HeaderAvatar';
+import { useUser } from '../contexts/UserContext';
 
 const logo = require('../assets/images/logo.png');
 
-const LogoHeader = () => {
+const LogoHeader = React.memo(() => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
+  const { currentUser, refreshUser } = useUser();
 
-  const loadUser = async () => {
-    try {
-      const user = await loadCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('Ошибка загрузки текущего пользователя:', error);
-    }
-  };
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  // Обновляем данные при возврате на экран
-  useFocusEffect(
-    React.useCallback(() => {
-      loadUser();
-    }, [])
-  );
-
-  // Обновляем данные при изменении параметров
+  // Обновляем данные только при изменении параметров refresh
   useEffect(() => {
     if (params.refresh) {
-      loadUser();
+      refreshUser(true); // Принудительное обновление
     }
-  }, [params.refresh]);
+  }, [params.refresh, refreshUser]);
 
   return (
     <View style={{ 
       height: 128, 
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      gap: 40
+      alignItems: 'flex-end',
+      paddingBottom: 5,
+      backgroundColor: '#000'
     }}>
-      <Image source={logo} style={{ width: 180, height: 60 }} resizeMode='contain' />
+      {/* Логотип приложения слева */}
+      <View style={{ marginLeft: 30, marginBottom: -5 }}>
+        <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
+      </View>
       
+      {/* Аватар справа */}
       <TouchableOpacity 
-        style={{ alignItems: 'center', marginTop: -8 }}
+        style={{ alignItems: 'center', marginRight: 45 }}
         onPress={() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
@@ -69,27 +54,17 @@ const LogoHeader = () => {
           borderWidth: 2,
           borderColor: '#fff',
         }}>
-          {(() => {
-            return currentUser?.avatar ? (
-              <Image 
-                source={{ uri: currentUser.avatar }}
-                style={{
-                  width: 45,
-                  height: 45,
-                  borderRadius: 22.5,
-                }}
-                resizeMode='cover'
-                onError={(error) => {
-                  // Ошибка загрузки изображения - логируем только в development
-                  if (__DEV__) {
-                    console.error('❌ Заголовок - Ошибка загрузки изображения:', error);
-                  }
-                }}
-              />
-            ) : (
-              <Ionicons name="person" size={25} color="#fff" />
-            );
-          })()}
+          {currentUser?.avatar ? (
+            <HeaderAvatar
+              uri={currentUser.avatar}
+              size={45}
+              fallbackIcon="person"
+              fallbackSize={25}
+              fallbackColor="#fff"
+            />
+          ) : (
+            <Ionicons name="person" size={25} color="#fff" />
+          )}
         </View>
         {currentUser && currentUser.name && currentUser.name.trim() !== '' && (
           <Text style={{
@@ -104,6 +79,8 @@ const LogoHeader = () => {
       </TouchableOpacity>
     </View>
   );
-};
+});
+
+LogoHeader.displayName = 'LogoHeader';
 
 export default LogoHeader;

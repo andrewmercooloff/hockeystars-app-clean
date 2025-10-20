@@ -40,6 +40,7 @@ import {
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNotificationContext } from '../contexts/NotificationContext';
+import { useScreenContext } from '../contexts/ScreenContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -131,6 +132,7 @@ export default function NotificationsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
+  const { setCurrentScreen } = useScreenContext();
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
@@ -313,11 +315,17 @@ export default function NotificationsScreen() {
   // Обновляем данные при фокусе на экран (только если пользователь авторизован)
   useFocusEffect(
     useCallback(() => {
+      setCurrentScreen('notifications');
+      console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
         loadNotificationsData();
       }
-    }, [currentUser])
+      return () => {
+        setCurrentScreen(null);
+        console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
+      };
+    }, [currentUser, setCurrentScreen])
   );
 
   // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
@@ -363,83 +371,12 @@ export default function NotificationsScreen() {
   useEffect(() => {
     if (!currentUser) return;
 
-    console.log('🔌 Настраиваем Realtime подписки для уведомлений пользователя:', currentUser.id);
+    // Подписки уже настроены в главном layout через realtimeManager
+    // Здесь только загружаем данные при фокусе на экране
+    loadNotificationsData();
 
-    // Подписываемся на INSERT в таблицу notifications для текущего пользователя
-    const notificationsChannel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🔔 Новое уведомление получено через Realtime!');
-          // Перезагружаем уведомления
-          loadNotificationsData();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🗑️ Уведомление удалено через Realtime!', payload);
-          // Перезагружаем уведомления
-          loadNotificationsData();
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки notifications-changes:', status);
-      });
-
-    // Подписываемся на INSERT в таблицу friend_requests для запросов в друзья
-    const friendRequestsChannel = supabase
-      .channel('friend-requests-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'friend_requests',
-          filter: `to_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('👥 Новый запрос в друзья получен через Realtime!', payload);
-          // Перезагружаем уведомления
-          loadNotificationsData();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'friend_requests',
-          filter: `to_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🗑️ Запрос в друзья удален через Realtime (отменен отправителем)!', payload);
-          // Перезагружаем уведомления для удаления отмененных запросов
-          loadNotificationsData();
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки friend-requests-changes:', status);
-      });
-
-    // Отписываемся при размонтировании
     return () => {
-      console.log('🔌 Отключаем Realtime подписки уведомлений');
-      supabase.removeChannel(notificationsChannel);
-      supabase.removeChannel(friendRequestsChannel);
+      // Ничего не отключаем - подписки управляются централизованно
     };
   }, [currentUser, loadNotificationsData]);
 
@@ -1731,4 +1668,4 @@ const styles = StyleSheet.create({
     width: 60,
     height: '100%',
   },
-}); 
+});

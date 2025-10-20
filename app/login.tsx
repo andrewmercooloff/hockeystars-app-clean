@@ -677,6 +677,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     marginLeft: 8,
+    textAlign: 'center',
+    flex: 1,
   },
   modalButtonTextSecondary: {
     color: '#FF4444',
@@ -746,7 +748,7 @@ const styles = StyleSheet.create({
   },
   resendButtonText: {
     fontSize: 12,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
     color: '#4CAF50',
     textAlign: 'center',
   },

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: '#fff', // Белый текст
     fontSize: 13,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   filterButtonIcon: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   countryText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
   },
   selectedCountryText: {

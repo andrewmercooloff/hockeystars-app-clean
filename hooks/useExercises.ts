@@ -7,6 +7,7 @@ import {
   ExerciseFilters,
   ExerciseStats 
 } from '../types/exercise';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 
 export interface UseExercisesReturn {
   exercises: LocalizedExercise[];
@@ -33,17 +34,34 @@ export function useExercises(
   const [userStats, setUserStats] = useState<{ [exerciseId: string]: number }>({});
   const [exerciseRankings, setExerciseRankings] = useState<{ [exerciseId: string]: number }>({});
 
-  // Загружаем упражнения
+  // Загружаем упражнения с кешированием
   const loadExercises = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
+      // Используем кеширование для всех данных
       const [exercisesData, categoriesData, difficultiesData, rankingsData] = await Promise.all([
-        ExerciseService.getLocalizedExercises(language, filters),
-        ExerciseService.getExerciseCategories(language),
-        ExerciseService.getExerciseDifficulties(language),
-        ExerciseService.getExerciseRankings()
+        dataCache.getOrLoad(
+          `${CACHE_KEYS.EXERCISES}_${language}`,
+          () => ExerciseService.getLocalizedExercises(language, filters),
+          10 * 60 * 1000 // 10 минут
+        ),
+        dataCache.getOrLoad(
+          `${CACHE_KEYS.EXERCISE_CATEGORIES}_${language}`,
+          () => ExerciseService.getExerciseCategories(language),
+          30 * 60 * 1000 // 30 минут
+        ),
+        dataCache.getOrLoad(
+          `${CACHE_KEYS.EXERCISE_DIFFICULTIES}_${language}`,
+          () => ExerciseService.getExerciseDifficulties(language),
+          30 * 60 * 1000 // 30 минут
+        ),
+        dataCache.getOrLoad(
+          CACHE_KEYS.EXERCISE_RANKINGS,
+          () => ExerciseService.getExerciseRankings(),
+          5 * 60 * 1000 // 5 минут
+        )
       ]);
 
       setExercises(exercisesData);
@@ -58,7 +76,7 @@ export function useExercises(
     }
   }, [language, filters]);
 
-  // Загружаем статистику пользователя
+  // Загружаем статистику пользователя с кешированием
   const loadUserStats = useCallback(async () => {
     try {
       // Импортируем функцию загрузки текущего пользователя
@@ -66,7 +84,11 @@ export function useExercises(
       const user = await loadCurrentUser();
       
       if (user && user.id) {
-        const stats = await ExerciseService.getUserExerciseStats(user.id);
+        const stats = await dataCache.getOrLoad(
+          `${CACHE_KEYS.USER_STATS}_${user.id}`,
+          () => ExerciseService.getUserExerciseStats(user.id),
+          2 * 60 * 1000 // 2 минуты
+        );
         setUserStats(stats);
       } else {
         setUserStats({});
@@ -97,6 +119,9 @@ export function useExercises(
       if (user && user.id) {
         await ExerciseService.markExerciseAsCompleted(user.id, exerciseId);
         
+        // Инвалидируем кеш статистики пользователя
+        await dataCache.invalidate(`${CACHE_KEYS.USER_STATS}_${user.id}`);
+        
         // Обновляем локальную статистику
         setUserStats(prev => {
           const newStats = {
@@ -120,11 +145,11 @@ export function useExercises(
     await loadExercises();
   }, [loadExercises]);
 
-  // Загружаем данные при монтировании и изменении зависимостей
+  // Загружаем данные при монтировании и изменении языка
   useEffect(() => {
     loadExercises();
     loadUserStats();
-  }, [language, filters?.category, filters?.difficulty, filters?.search]);
+  }, [language]); // Убираем фильтры из зависимостей
 
   return {
     exercises,

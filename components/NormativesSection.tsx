@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   normativeLabel: {
     color: '#fff',
     fontSize: 13,
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Gilroy-Bold',
     marginBottom: 2,
   },
   normativeValue: {

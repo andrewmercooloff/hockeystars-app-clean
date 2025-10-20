@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Alert,
     FlatList,
@@ -18,6 +18,7 @@ import PlayerEditForm from '../components/PlayerEditForm';
 import { Player, loadCurrentUser, loadPlayers } from '../utils/playerStorage';
 import { createPlayerManually } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
 
 const logo = require('../assets/images/logo.png');
 
@@ -109,6 +110,7 @@ const AdminHeader = () => {
 export default function AdminScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { setCurrentScreen } = useScreenContext();
   const [players, setPlayers] = useState<Player[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
@@ -129,6 +131,18 @@ export default function AdminScreen() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Устанавливаем currentScreen при фокусе на экране админки
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('admin');
+      console.log('👑 АДМИНКА: Устанавливаем currentScreen = admin');
+      return () => {
+        setCurrentScreen(null);
+        console.log('👑 АДМИНКА: Устанавливаем currentScreen = null');
+      };
+    }, [setCurrentScreen])
+  );
 
 
 

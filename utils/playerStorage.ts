@@ -977,6 +977,7 @@ export const loadPlayers = async (): Promise<Player[]> => {
     const cacheKey = 'all_players';
     const cacheTime = 10 * 60 * 1000; // 10 минут
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    
     const cachedData = await AsyncStorage.getItem(cacheKey);
     
     if (cachedData) {
@@ -1000,19 +1001,32 @@ export const loadPlayers = async (): Promise<Player[]> => {
       // Преобразуем данные из Supabase в формат приложения
       const players = data.map(convertSupabaseToPlayer);
       
-      // Убрали загрузку рейтингов активности для быстрой загрузки
-      // Рейтинги будут загружаться только на странице рейтингов
-      // try {
-      //   const { getPlayersActivityRatings } = await import('../services/activityService');
-      //   const playerIds = players.map(p => p.id);
-      //   const activityRatings = await getPlayersActivityRatings(playerIds);
-      //   
-      //   players.forEach(player => {
-      //     player.activityRating = activityRatings[player.id] || 0;
-      //   });
-      // } catch (ratingError) {
-      //   console.error('❌ Ошибка загрузки рейтингов активности:', ratingError);
-      // }
+      // Загружаем рейтинги активности для сортировки в поиске
+      try {
+        console.log('🔍 НАЧИНАЕМ ЗАГРУЗКУ РЕЙТИНГОВ...');
+        const { getPlayersActivityRatings } = await import('../services/activityService');
+        const playerIds = players.map(p => p.id);
+        console.log('🔍 ID игроков для загрузки рейтингов:', playerIds.length);
+        
+        const activityRatings = await getPlayersActivityRatings(playerIds);
+        console.log('🔍 Получены рейтинги:', Object.keys(activityRatings).length);
+        
+        players.forEach(player => {
+          player.activityRating = activityRatings[player.id] || 0;
+        });
+        
+        // Отладочный лог для проверки загрузки рейтингов
+        console.log('🔍 ОТЛАДКА ЗАГРУЗКИ РЕЙТИНГОВ:');
+        players.slice(0, 5).forEach(player => {
+          console.log(`${player.name} - рейтинг: ${player.activityRating}`);
+        });
+      } catch (ratingError) {
+        console.error('❌ Ошибка загрузки рейтингов активности:', ratingError);
+        // Устанавливаем рейтинг по умолчанию если не удалось загрузить
+        players.forEach(player => {
+          player.activityRating = 0;
+        });
+      }
       
       // Кешируем результат
       await AsyncStorage.setItem(cacheKey, JSON.stringify({

@@ -257,19 +257,14 @@ export default function ExerciseDetailsScreen() {
     <View style={styles.container}>
       <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-          {/* Заголовок */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-            onPress={() => router.push('/exercises')}
-            >
+          {/* Заголовок страницы */}
+          <View style={styles.pageHeader}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
-          <Text style={styles.pageTitle}>
-            #{exercise?.exerciseId} {exercise?.title || t('exercises.exercise')}
-          </Text>
+            <Text style={styles.pageTitle}>{exercise?.title || t('exercises.details.title')}</Text>
           </View>
-
+          
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
             {/* Основная информация */}
@@ -415,6 +410,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
+  pageHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  backButton: {
+    marginRight: 15,
+    padding: 5,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
     paddingTop: 0, // Убираем отступ, так как заголовок теперь фиксированный
@@ -444,7 +456,7 @@ const styles = StyleSheet.create({
   infoSection: {
     backgroundColor: '#2a2a2a',
     paddingHorizontal: 20,
-    paddingTop: 60, // Отступ для фиксированного заголовка
+    paddingTop: 20,
     paddingBottom: 20,
   },
   infoRow: {
