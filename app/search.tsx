@@ -754,6 +754,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#fff',
     fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
   },
   filtersContainer: {
     flexDirection: 'row',
@@ -790,10 +791,12 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: '#fff',
     fontSize: 13,
+    fontFamily: 'Gilroy-Medium',
   },
   filterButtonIcon: {
     color: '#fff',
     fontSize: 10,
+    fontFamily: 'Gilroy-Regular',
   },
   filterDropdown: {
     position: 'absolute',
@@ -830,6 +833,7 @@ const styles = StyleSheet.create({
   filterDropdownItemText: {
     color: '#fff',
     fontSize: 13,
+    fontFamily: 'Gilroy-Regular',
   },
   selectedFilterItem: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -887,7 +891,7 @@ const styles = StyleSheet.create({
   playerName: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   ratingContainer: {
@@ -898,12 +902,13 @@ const styles = StyleSheet.create({
   ratingText: {
     color: '#AA3333',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     marginLeft: 2,
   },
   playerInfo: {
     color: '#ccc',
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
   },
   emptyContainer: {
     flex: 1,
@@ -914,6 +919,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#fff',
     fontSize: 18,
+    fontFamily: 'Gilroy-Regular',
   },
   loadingContainer: {
     flex: 1,
@@ -923,5 +929,6 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#fff',
     fontSize: 18,
+    fontFamily: 'Gilroy-Regular',
   },
 });
