@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   filterButtonIcon: {
     color: '#fff', // Белый цвет иконки
     fontSize: 10,
+    fontFamily: 'Gilroy-Regular',
   },
   countriesList: {
     position: 'absolute',

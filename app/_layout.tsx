@@ -84,58 +84,6 @@ export default function RootLayout() {
       
       // Принудительно применяем шрифт Gilroy
       forceGilroyFont();
-      
-      // Устанавливаем Gilroy как шрифт по умолчанию для всего приложения
-      const TextRender = Text.render;
-      const TextInputRender = TextInput.render;
-      
-      // Для Text компонентов - применяем Gilroy если шрифт не указан
-      Text.render = function (props: any, ref: any) {
-        let hasFont = false;
-        
-        // Проверяем, есть ли уже fontFamily в стилях
-        if (props.style) {
-          if (Array.isArray(props.style)) {
-            hasFont = props.style.some((s: any) => s && typeof s === 'object' && s.fontFamily);
-          } else if (typeof props.style === 'object') {
-            hasFont = !!props.style.fontFamily;
-          }
-        }
-        
-        const defaultProps = {
-          ...props,
-          style: [
-            // Только добавляем Gilroy если шрифт не указан
-            !hasFont && { fontFamily: 'Gilroy-Regular' },
-            props.style,
-          ],
-        };
-        return TextRender.call(this, defaultProps, ref);
-      };
-      
-      // Для TextInput компонентов - применяем Gilroy если шрифт не указан
-      TextInput.render = function (props: any, ref: any) {
-        let hasFont = false;
-        
-        // Проверяем, есть ли уже fontFamily в стилях
-        if (props.style) {
-          if (Array.isArray(props.style)) {
-            hasFont = props.style.some((s: any) => s && typeof s === 'object' && s.fontFamily);
-          } else if (typeof props.style === 'object') {
-            hasFont = !!props.style.fontFamily;
-          }
-        }
-        
-        const defaultProps = {
-          ...props,
-          style: [
-            // Только добавляем Gilroy если шрифт не указан
-            !hasFont && { fontFamily: 'Gilroy-Regular' },
-            props.style,
-          ],
-        };
-        return TextInputRender.call(this, defaultProps, ref);
-      };
     }
   }, [loaded]);
 
@@ -395,7 +343,6 @@ export default function RootLayout() {
         
         const nextUser: Player = {
           ...user,
-          unreadNotificationsCount: unreadNotificationsCount, // Сохраняем для истории
           unreadMessagesCount,
           friendRequestsCount,
           giftRequestsCount,
@@ -711,7 +658,7 @@ export default function RootLayout() {
                   height: size + 4,
                 }}>
                   <Ionicons name="chatbubble-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
-                  {currentUser && currentUser.unreadMessagesCount > 0 && (
+                  {currentUser && (currentUser.unreadMessagesCount || 0) > 0 && (
                     <View style={{
                       position: 'absolute',
                       top: -8,
