@@ -172,7 +172,7 @@ export default function ExercisesScreen() {
           style={styles.background}
           resizeMode="cover"
         >
-          <View style={styles.overlay}>
+          <View style={styles.overlayLoading}>
             <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         </ImageBackground>
@@ -489,6 +489,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
+  overlayLoading: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',

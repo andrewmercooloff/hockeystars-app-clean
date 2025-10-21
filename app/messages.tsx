@@ -213,13 +213,7 @@ export default function MessagesScreen() {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-          <View style={styles.overlay}>
-            <View style={styles.pageHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.pageTitle}>{t('messages.title')}</Text>
-            </View>
+          <View style={styles.overlayLoading}>
             <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         </ImageBackground>
@@ -348,6 +342,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
+  overlayLoading: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
