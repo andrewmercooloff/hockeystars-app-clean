@@ -152,10 +152,10 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда пользователь загружен
+    // Скрываем splash screen когда приложение готово, но пользователь еще загружается
     React.useEffect(() => {
-      if (!isUserLoading && appReady) {
-        // Плавно скрываем наш кастомный splash screen
+      if (appReady && isUserLoading) {
+        // Плавно скрываем наш кастомный splash screen пока пользователь загружается
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
