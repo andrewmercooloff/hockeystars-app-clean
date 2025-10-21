@@ -37,7 +37,7 @@ export default function MessagesScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser } = useUser();
+  const { currentUser, isUserLoading } = useUser();
   
   // Убираем все анимации - простое мгновенное переключение
   const [chats, setChats] = useState<ChatPreview[]>([]);
@@ -207,14 +207,35 @@ export default function MessagesScreen() {
     return prefix + text;
   };
 
+  // Если пользователь загружается, показываем спиннер
+  if (isUserLoading || currentUser === undefined) {
+    return (
+      <View style={styles.container}>
+        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlay}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('messages.title')}</Text>
+            </View>
+            <View style={styles.loadingCenter}>
+              <CustomSpinner size={60} color="#fa2f40" />
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
+
   // Если пользователь не авторизован (null), перенаправляем на логин
   if (currentUser === null) {
     router.replace('/login');
     return null;
   }
 
-  // Если currentUser еще загружается (undefined) или загружаем чаты, показываем загрузку с заголовком
-  if (currentUser === undefined || (loading && chats.length === 0)) {
+  // Если загружаем чаты, показываем загрузку с заголовком
+  if (loading && chats.length === 0) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">

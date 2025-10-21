@@ -137,7 +137,7 @@ export default function NotificationsScreen() {
   const { t } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser } = useUser();
+  const { currentUser, isUserLoading } = useUser();
   
   // Убираем все анимации - простое мгновенное переключение
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -938,14 +938,35 @@ export default function NotificationsScreen() {
     }
   };
 
+  // Если пользователь загружается, показываем спиннер
+  if (isUserLoading || currentUser === undefined) {
+    return (
+      <View style={styles.container}>
+        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlay}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
+            </View>
+            <View style={styles.loadingCenter}>
+              <CustomSpinner size={60} color="#fa2f40" />
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
+
   // Если пользователь не авторизован (null), перенаправляем на логин
   if (currentUser === null) {
     router.replace('/login');
     return null;
   }
 
-  // Если currentUser еще загружается (undefined) или загружаем уведомления, показываем загрузку с заголовком
-  if (currentUser === undefined || (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0)) {
+  // Если загружаем уведомления, показываем загрузку с заголовком
+  if (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
