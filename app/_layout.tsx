@@ -122,7 +122,7 @@ export default function RootLayout() {
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
-    const { setCurrentUser: setGlobalUser, refreshUser } = useUser();
+    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
     
     // Синхронизируем локальное состояние с глобальным (layout -> context)
@@ -151,6 +151,20 @@ export default function RootLayout() {
         });
       }
     }, [params.refresh]);
+    
+    // Скрываем splash screen когда пользователь загружен
+    React.useEffect(() => {
+      if (!isUserLoading && appReady) {
+        // Плавно скрываем наш кастомный splash screen
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500, // 500ms плавное исчезновение
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
+      }
+    }, [isUserLoading, appReady]);
     
     return null;
   };
@@ -450,19 +464,6 @@ export default function RootLayout() {
         
         // Помечаем приложение как готовое
         setAppReady(true);
-        
-        
-        // Дополнительные полсекунды для показа заставки
-        setTimeout(() => {
-          // Плавно скрываем наш кастомный splash screen
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 500, // 500ms плавное исчезновение
-            useNativeDriver: true,
-          }).start(() => {
-            setShowSplash(false);
-          });
-        }, 500); // Дополнительные полсекунды
       } catch (catchError) {
         console.error('🚨 App Initialization Error:', catchError);
         
