@@ -10,7 +10,7 @@ const logo = require('../assets/images/logo.png');
 const LogoHeader = React.memo(() => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { currentUser, refreshUser } = useUser();
+  const { currentUser, refreshUser, setAvatarLoading } = useUser();
 
   // Обновляем данные только при изменении параметров refresh
   useEffect(() => {
@@ -18,6 +18,19 @@ const LogoHeader = React.memo(() => {
       refreshUser(true); // Принудительное обновление
     }
   }, [params.refresh, refreshUser]);
+
+  // Управляем состоянием загрузки аватарки
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.avatar) {
+        setAvatarLoading(true); // Начинаем загрузку аватарки
+      } else {
+        setAvatarLoading(false); // Нет аватарки - сразу готово
+      }
+    } else {
+      setAvatarLoading(false); // Нет пользователя - нет аватарки
+    }
+  }, [currentUser, setAvatarLoading]);
 
   return (
     <View style={{ 
@@ -54,17 +67,18 @@ const LogoHeader = React.memo(() => {
           borderWidth: 2,
           borderColor: '#fff',
         }}>
-          {currentUser?.avatar ? (
-            <HeaderAvatar
-              uri={currentUser.avatar}
-              size={49.5}
-              fallbackIcon="person"
-              fallbackSize={27.5}
-              fallbackColor="#fff"
-            />
-          ) : (
-            <Ionicons name="person" size={27.5} color="#fff" />
-          )}
+              {currentUser?.avatar ? (
+                <HeaderAvatar
+                  uri={currentUser.avatar}
+                  size={49.5}
+                  fallbackIcon="person"
+                  fallbackSize={27.5}
+                  fallbackColor="#fff"
+                  onLoadComplete={() => setAvatarLoading(false)}
+                />
+              ) : (
+                <Ionicons name="person" size={27.5} color="#fff" />
+              )}
         </View>
         {currentUser && currentUser.name && currentUser.name.trim() !== '' && (
           <Text style={{

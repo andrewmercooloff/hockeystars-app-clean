@@ -8,6 +8,7 @@ interface HeaderAvatarProps {
   fallbackIcon?: string;
   fallbackSize?: number;
   fallbackColor?: string;
+  onLoadComplete?: () => void;
 }
 
 const HeaderAvatar: React.FC<HeaderAvatarProps> = React.memo(({
@@ -15,7 +16,8 @@ const HeaderAvatar: React.FC<HeaderAvatarProps> = React.memo(({
   size = 45,
   fallbackIcon = 'person',
   fallbackSize = 25,
-  fallbackColor = '#fff'
+  fallbackColor = '#fff',
+  onLoadComplete
 }) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -37,13 +39,15 @@ const HeaderAvatar: React.FC<HeaderAvatarProps> = React.memo(({
   const handleError = useCallback((error: any) => {
     setImageError(true);
     setImageLoaded(false);
-  }, []);
+    onLoadComplete?.(); // Вызываем callback даже при ошибке
+  }, [onLoadComplete]);
 
   const handleLoad = useCallback(() => {
     lastSuccessfulUriRef.current = uri;
     setImageError(false);
     setImageLoaded(true);
-  }, [uri]);
+    onLoadComplete?.();
+  }, [uri, onLoadComplete]);
 
   // Если есть ошибка и нет предыдущего удачного изображения, показываем fallback
   if ((imageError || !uri) && !lastSuccessfulUriRef.current) {

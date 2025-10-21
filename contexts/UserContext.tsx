@@ -7,6 +7,8 @@ interface UserContextType {
   setCurrentUser: (user: Player | null) => void;
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
   isUserLoading: boolean;
+  isAvatarLoading: boolean;
+  setAvatarLoading: (loading: boolean) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
   // Если нет кешированного пользователя, начинаем с загрузки
   const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(true);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
@@ -96,7 +99,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       currentUser, 
       setCurrentUser, 
       refreshUser, 
-      isUserLoading 
+      isUserLoading,
+      isAvatarLoading,
+      setAvatarLoading: setIsAvatarLoading
     }}>
       {children}
     </UserContext.Provider>

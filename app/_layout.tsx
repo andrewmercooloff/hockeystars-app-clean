@@ -122,7 +122,7 @@ export default function RootLayout() {
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
-    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
+    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading, isAvatarLoading } = useUser();
     const params = useLocalSearchParams();
     
     // Синхронизируем локальное состояние с глобальным (layout -> context)
@@ -152,10 +152,10 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда пользователь полностью загружен
+    // Скрываем splash screen когда пользователь и аватарка полностью загружены
     React.useEffect(() => {
-      if (appReady && !isUserLoading && currentUser) {
-        // Плавно скрываем наш кастомный splash screen когда пользователь загружен
+      if (appReady && !isUserLoading && !isAvatarLoading) {
+        // Плавно скрываем наш кастомный splash screen когда все загружено
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
@@ -163,17 +163,8 @@ export default function RootLayout() {
         }).start(() => {
           setShowSplash(false);
         });
-      } else if (appReady && !isUserLoading && !currentUser) {
-        // Если пользователь не авторизован, тоже скрываем splash
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowSplash(false);
-        });
       }
-    }, [appReady, isUserLoading, currentUser]);
+    }, [appReady, isUserLoading, isAvatarLoading]);
     
     return null;
   };
