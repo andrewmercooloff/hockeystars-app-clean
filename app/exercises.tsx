@@ -8,10 +8,10 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    ActivityIndicator,
     Alert,
     ImageBackground,
 } from 'react-native';
+import { CustomSpinner } from '../components/CustomSpinner';
 import { Ionicons } from '@expo/vector-icons';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -173,7 +173,7 @@ export default function ExercisesScreen() {
           resizeMode="cover"
         >
           <View style={styles.overlayLoading}>
-            <ActivityIndicator size="large" color="#fa2f40" style={styles.spinner} />
+            <CustomSpinner size={60} color="#fa2f40" />
           </View>
         </ImageBackground>
       </View>
@@ -497,9 +497,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  spinner: {
-    transform: [{ scale: 1.5 }],
   },
   scrollView: {
     flex: 1,

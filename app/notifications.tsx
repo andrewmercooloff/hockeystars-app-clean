@@ -9,9 +9,9 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
-    ActivityIndicator
+    View
 } from 'react-native';
+import { CustomSpinner } from '../components/CustomSpinner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -965,7 +965,7 @@ export default function NotificationsScreen() {
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
             <View style={styles.loadingCenter}>
-              <ActivityIndicator size="large" color="#fa2f40" style={styles.spinner} />
+              <CustomSpinner size={60} color="#fa2f40" />
             </View>
           </View>
         </ImageBackground>
@@ -1323,9 +1323,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  spinner: {
-    transform: [{ scale: 1.5 }],
   },
   header: {
     flexDirection: 'row',
