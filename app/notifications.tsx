@@ -45,19 +45,21 @@ import { useUser } from '../contexts/UserContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
-// Компонент с анимацией для уведомлений
-const AnimatedNotification = ({ children, index }: { children: React.ReactNode; index: number }) => {
-  const animatedValue = React.useRef(new RNAnimated.Value(0)).current;
+// Компонент с анимацией для уведомлений (только для новых)
+const AnimatedNotification = ({ children, index, isNew }: { children: React.ReactNode; index: number; isNew: boolean }) => {
+  const animatedValue = React.useRef(new RNAnimated.Value(isNew ? 0 : 1)).current;
   
   React.useEffect(() => {
-    RNAnimated.timing(animatedValue, {
-      toValue: 1,
-      duration: 300,
-      delay: index * 50, // Задержка для каждого уведомления
-      useNativeDriver: true,
-    }).start();
-  }, [animatedValue, index]);
-  
+    if (isNew) {
+      RNAnimated.timing(animatedValue, {
+        toValue: 1,
+        duration: 300,
+        delay: index * 50, // Задержка для каждого уведомления
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [animatedValue, index, isNew]);
+
   return (
     <RNAnimated.View
       style={{
@@ -152,9 +154,12 @@ export default function NotificationsScreen() {
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Состояние для отслеживания новых уведомлений (для анимации)
+  const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
 
   // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
-  const loadNotificationsData = useCallback(async () => {
+  const loadNotificationsData = useCallback(async (isInitialLoad = false) => {
     try {
       // Убираем setLoading(true) чтобы не показывать индикатор загрузки при каждом обновлении
       if (!currentUser) return;
@@ -287,6 +292,31 @@ export default function NotificationsScreen() {
         // Обрабатываем ошибки отдельно, так как .then() возвращает Promise<void>
       }
       
+      // Если это первая загрузка, помечаем все уведомления как "старые" (без анимации)
+      if (isInitialLoad) {
+        setNewNotificationIds(new Set());
+      } else {
+        // При обновлении определяем новые уведомления
+        const currentIds = new Set([
+          ...notifications.map(n => n.id),
+          ...friendRequests.map(r => r.id),
+          ...giftRequests.map(g => g.id)
+        ]);
+        
+        const newIds = new Set([
+          ...userNotifications.map(n => n.id),
+          ...friendRequestItems.map(r => r.id),
+          ...giftRequestItems.map(g => g.id)
+        ].filter(id => !currentIds.has(id)));
+        
+        setNewNotificationIds(newIds);
+        
+        // Через 1 секунду убираем анимацию с новых уведомлений
+        setTimeout(() => {
+          setNewNotificationIds(new Set());
+        }, 1000);
+      }
+
       setNotifications(userNotifications);
       setFriendRequests(friendRequestItems);
       // giftRequestItems загружаются асинхронно выше
@@ -295,7 +325,7 @@ export default function NotificationsScreen() {
       console.error('❌ Ошибка загрузки уведомлений:', error);
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     }
-  }, [currentUser, t]);
+  }, [currentUser, t, notifications, friendRequests, giftRequests]);
 
   // Проверяем авторизацию пользователя
   useEffect(() => {
@@ -309,7 +339,7 @@ export default function NotificationsScreen() {
   // Загружаем уведомления когда пользователь загружен
   useEffect(() => {
     if (currentUser) {
-      loadNotificationsData();
+      loadNotificationsData(true); // Первая загрузка - без анимации
     }
   }, [currentUser, loadNotificationsData]);
 
@@ -325,7 +355,7 @@ export default function NotificationsScreen() {
       
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
-        loadNotificationsData();
+        loadNotificationsData(false); // Обновление - с анимацией для новых
       }
       return () => {
         setCurrentScreen(null);
@@ -1024,7 +1054,7 @@ export default function NotificationsScreen() {
                 friction={2}
                 rightThreshold={40}
               >
-                <AnimatedNotification key={notification.id} index={index}>
+                <AnimatedNotification key={notification.id} index={index} isNew={newNotificationIds.has(notification.id)}>
                   {notification.type === 'stats_change' && notification.data && notification.data.changes ? (
                 <TouchableOpacity
                   onPress={() => {
