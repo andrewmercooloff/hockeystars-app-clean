@@ -13,7 +13,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+// Убираем все анимации переходов
 import {
     getPlayerById,
     getUserConversations,
@@ -38,18 +38,7 @@ export default function MessagesScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1);
-  
-  // Анимированный стиль
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: fadeAnim.value,
-    };
-  });
-  
-  // Состояние для контроля видимости
-  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  // Убираем все анимации - простое мгновенное переключение
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -173,19 +162,12 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
-      // Мгновенно показываем экран (без анимации для предотвращения мигания)
-      setIsScreenVisible(true);
-      fadeAnim.value = 1;
-      
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
-        setIsScreenVisible(false);
-        fadeAnim.value = 0;
       };
-    }, [loadChats, setCurrentScreen, fadeAnim])
+    }, [loadChats, setCurrentScreen])
   );
 
   const onRefresh = () => {
@@ -251,13 +233,9 @@ export default function MessagesScreen() {
     return null;
   }
 
-  if (!isScreenVisible) {
-    return null;
-  }
-
   return (
-    <Animated.View 
-      style={[styles.container, animatedStyle]}
+    <View 
+      style={styles.container}
     >
       <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>

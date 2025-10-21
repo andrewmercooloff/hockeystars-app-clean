@@ -14,7 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+// Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StatsChangeNotification from '../components/StatsChangeNotification';
 import PhotoAddedNotification from '../components/PhotoAddedNotification';
@@ -138,18 +138,7 @@ export default function NotificationsScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1);
-  
-  // Анимированный стиль
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: fadeAnim.value,
-    };
-  });
-  
-  // Состояние для контроля видимости
-  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  // Убираем все анимации - простое мгновенное переключение
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
@@ -349,10 +338,6 @@ export default function NotificationsScreen() {
       setCurrentScreen('notifications');
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
-      // Мгновенно показываем экран (без анимации для предотвращения мигания)
-      setIsScreenVisible(true);
-      fadeAnim.value = 1;
-      
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
         loadNotificationsData(false); // Обновление - с анимацией для новых
@@ -360,11 +345,8 @@ export default function NotificationsScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
-        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
-        setIsScreenVisible(false);
-        fadeAnim.value = 0;
       };
-    }, [currentUser, setCurrentScreen, fadeAnim])
+    }, [currentUser, setCurrentScreen])
   );
 
   // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
@@ -988,14 +970,10 @@ export default function NotificationsScreen() {
     return null;
   }
 
-  if (!isScreenVisible) {
-    return null;
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Animated.View 
-        style={[styles.container, animatedStyle]}
+      <View 
+        style={styles.container}
       >
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
@@ -1315,7 +1293,7 @@ export default function NotificationsScreen() {
           </ScrollView>
         </View>
       </ImageBackground>
-      </Animated.View>
+      </View>
     </GestureHandlerRootView>
   );
 }

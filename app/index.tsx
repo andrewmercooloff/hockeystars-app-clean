@@ -16,12 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
+// Убираем все анимации переходов
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import { useCountryFilter } from '../utils/CountryFilterContext';
@@ -495,14 +490,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
   const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: position.x },
-        { translateY: position.y }
-      ]
-    };
-  }, [position.x, position.y]);
+  // Убираем анимацию - используем обычные стили
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -589,34 +577,41 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   };
 
   return (
-    <Animated.View 
-      style={[styles.puckContainer, animatedStyle]}
+    <View 
+      style={[
+        styles.puckContainer,
+        {
+          transform: [
+            { translateX: position.x },
+            { translateY: position.y }
+          ]
+        }
+      ]}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       <Suspense fallback={null}>
         <Puck
-                        avatar={player.avatar}
+          avatar={player.avatar}
           onPress={hasDraggedRef.current ? () => {} : onNav}
-        animatedStyle={animatedStyle}
-        size={position.size}
-        points={player.goals && player.assists ? 
-          (() => {
-            try {
-              const goals = parseInt(player.goals) || 0;
-              const assists = parseInt(player.assists) || 0;
-              const total = goals + assists;
-              return total > 0 && !isNaN(total) ? total.toString() : undefined;
-            } catch (error) {
-              return undefined;
-            }
-          })() : undefined}
-        isStar={player.status === 'star'}
-        status={player.status}
+          size={position.size}
+          points={player.goals && player.assists ? 
+            (() => {
+              try {
+                const goals = parseInt(player.goals) || 0;
+                const assists = parseInt(player.assists) || 0;
+                const total = goals + assists;
+                return total > 0 && !isNaN(total) ? total.toString() : undefined;
+              } catch (error) {
+                return undefined;
+              }
+            })() : undefined}
+          isStar={player.status === 'star'}
+          status={player.status}
         />
       </Suspense>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -629,18 +624,7 @@ export default function HomeScreen() {
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
   
-  // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1);
-  
-  // Анимированный стиль
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: fadeAnim.value,
-    };
-  });
-  
-  // Состояние для контроля видимости
-  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  // Убираем все анимации - простое мгновенное переключение
   
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -987,10 +971,6 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Мгновенно показываем экран (без анимации для предотвращения мигания)
-      setIsScreenVisible(true);
-      fadeAnim.value = 1;
-      
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
       const refreshUserOnFocus = async () => {
@@ -1018,11 +998,8 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
-        setIsScreenVisible(false);
-        fadeAnim.value = 0;
       };
-    }, [refreshUser, setCurrentScreen, fadeAnim])
+    }, [refreshUser, setCurrentScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1072,13 +1049,9 @@ export default function HomeScreen() {
     );
   }
 
-  if (!isScreenVisible) {
-    return null;
-  }
-
   return (
-    <Animated.View 
-      style={[styles.container, animatedStyle]}
+    <View 
+      style={styles.container}
     >
       <ImageBackground 
         source={iceBg} 
@@ -1183,7 +1156,7 @@ export default function HomeScreen() {
           </View>
         </Modal>
       </ImageBackground>
-    </Animated.View>
+    </View>
   );
 }
 

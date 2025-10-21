@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+// Убираем все анимации переходов
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -141,18 +141,7 @@ export default function SearchScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1);
-  
-  // Анимированный стиль
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: fadeAnim.value,
-    };
-  });
-  
-  // Состояние для контроля видимости
-  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  // Убираем все анимации - простое мгновенное переключение
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -292,18 +281,11 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       
-      // Мгновенно показываем экран (без анимации для предотвращения мигания)
-      setIsScreenVisible(true);
-      fadeAnim.value = 1;
-      
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
-        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
-        setIsScreenVisible(false);
-        fadeAnim.value = 0;
       };
-    }, [setCurrentScreen, fadeAnim])
+    }, [setCurrentScreen])
   );
 
   // Мемоизированные фильтры
@@ -619,13 +601,9 @@ export default function SearchScreen() {
     );
   }
 
-  if (!isScreenVisible) {
-    return null;
-  }
-
   return (
-    <Animated.View 
-      style={[styles.container, animatedStyle]}
+    <View 
+      style={styles.container}
     >
       {/* Полупрозрачный фон льда */}
       <ImageBackground
@@ -761,7 +739,7 @@ export default function SearchScreen() {
           />
         </View>
       </ImageBackground>
-    </Animated.View>
+    </View>
   );
 }
 
