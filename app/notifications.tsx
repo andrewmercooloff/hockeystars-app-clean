@@ -116,6 +116,7 @@ export default function NotificationsScreen() {
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isScreenFocused, setIsScreenFocused] = useState(false);
   
   // Состояние для отслеживания новых уведомлений (для анимации)
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
@@ -301,26 +302,11 @@ export default function NotificationsScreen() {
     }
   }, [currentUser, isUserLoading, loadNotificationsData]);
 
-  // Обновляем данные при фокусе на экран (только если пользователь авторизован)
-  // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
-  useEffect(() => {
-    if (currentUser && notifications.length > 0) {
-      const timer = setTimeout(async () => {
-        await markAllNotificationsAsRead();
-        // Обновляем счетчик уведомлений через контекст
-        await updateNotificationCount(currentUser);
-      }, 5000); // Уменьшаем до 5 секунд
-      
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [currentUser, notifications.length]);
-
   // Обновляем уведомления при фокусе на экран
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('notifications');
+      setIsScreenFocused(true);
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
       if (currentUser && !isUserLoading) {
@@ -328,11 +314,27 @@ export default function NotificationsScreen() {
       }
       
       return () => {
+        setIsScreenFocused(false);
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
       };
     }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
   );
+
+  // Автоматически отмечаем все уведомления как прочитанные через 5 секунд ТОЛЬКО когда экран в фокусе
+  useEffect(() => {
+    if (isScreenFocused && currentUser && notifications.length > 0) {
+      const timer = setTimeout(async () => {
+        await markAllNotificationsAsRead();
+        // Обновляем счетчик уведомлений через контекст
+        await updateNotificationCount(currentUser);
+      }, 5000);
+      
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isScreenFocused, currentUser, notifications.length, updateNotificationCount]);
 
   // Realtime подписки настроены в главном layout через realtimeManager
   // Загрузка данных происходит через useFocusEffect
