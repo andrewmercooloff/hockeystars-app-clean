@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useGlobalSearchParams, useRouter, useNavigation } from 'expo-router';
+import { useLocalSearchParams, useGlobalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, getLastExerciseCompletion } from '../utils/playerStorage';
@@ -13,12 +13,10 @@ const { width } = Dimensions.get('window');
 
 export default function ExerciseDetailsScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
   const { t, language } = useLanguage();
   const localParams = useLocalSearchParams();
   const globalParams = useGlobalSearchParams();
   const exerciseId = localParams.id || globalParams.id;
-  const fromScreen = localParams.from || globalParams.from; // Откуда пришли
   
   // Используем хук для загрузки упражнений из базы данных
   const { getExerciseById, loading, error, markAsCompleted } = useExercises(language as Language);
@@ -41,14 +39,9 @@ export default function ExerciseDetailsScreen() {
     return t(`exercises.difficulties.${difficulty}`) || difficulty;
   };
 
-  // Функция для навигации назад
+  // Функция для навигации назад - возвращаемся на экран упражнений
   const handleGoBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      // Если нет истории, идем на главную
-      router.push('/');
-    }
+    router.push('/exercises');
   };
   
   useEffect(() => {
@@ -445,7 +438,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingTop: 60, // Отступ для абсолютного заголовка
+    paddingTop: 53, // Отступ для абсолютного заголовка (уменьшен на 7px)
   },
   header: {
     position: 'absolute',
