@@ -287,7 +287,7 @@ export default function NotificationsScreen() {
       console.error('❌ Ошибка загрузки уведомлений:', error);
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     }
-  }, [currentUser, t, notifications, friendRequests, giftRequests]);
+  }, [currentUser, t]);
 
   // Запускаем загрузку только когда пользователь авторизован
   useEffect(() => {
@@ -302,22 +302,6 @@ export default function NotificationsScreen() {
   }, [currentUser, isUserLoading, loadNotificationsData]);
 
   // Обновляем данные при фокусе на экран (только если пользователь авторизован)
-  useFocusEffect(
-    useCallback(() => {
-      setCurrentScreen('notifications');
-      console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
-      
-      if (currentUser) {
-        // Обновляем данные только если пользователь уже загружен
-        loadNotificationsData(false); // Обновление - с анимацией для новых
-      }
-      return () => {
-        setCurrentScreen(null);
-        console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
-      };
-    }, [currentUser, setCurrentScreen])
-  );
-
   // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
   useEffect(() => {
     if (currentUser && notifications.length > 0) {
@@ -336,39 +320,22 @@ export default function NotificationsScreen() {
   // Обновляем уведомления при фокусе на экран
   useFocusEffect(
     useCallback(() => {
-      loadNotificationsData();
-      // Убрали автоматическую отметку - она уже есть в useEffect
-    }, [currentUser])
-  );
-
-  // Обновляем счетчик уведомлений при уходе с экрана
-  useFocusEffect(
-    useCallback(() => {
+      setCurrentScreen('notifications');
+      console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
+      
+      if (currentUser && !isUserLoading) {
+        loadNotificationsData();
+      }
+      
       return () => {
-        // При уходе с экрана обновляем данные пользователя
-        // Это обновит счетчик в _layout.tsx
-        if (currentUser) {
-          // Обновляем данные только один раз для избежания дерганья
-          loadNotificationsData();
-          // Убираем принудительное обновление счетчика - он уже обновлен в notifyFriendsAboutGiftReceived
-          // updateNotificationCount();
-        }
+        setCurrentScreen(null);
+        console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
       };
-    }, [currentUser])
+    }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
   );
 
-  // Realtime подписка на новые уведомления
-  useEffect(() => {
-    if (!currentUser) return;
-
-    // Подписки уже настроены в главном layout через realtimeManager
-    // Здесь только загружаем данные при фокусе на экране
-    loadNotificationsData();
-
-    return () => {
-      // Ничего не отключаем - подписки управляются централизованно
-    };
-  }, [currentUser, loadNotificationsData]);
+  // Realtime подписки настроены в главном layout через realtimeManager
+  // Загрузка данных происходит через useFocusEffect
 
   // Отмечаем все уведомления как прочитанные
   const markAllNotificationsAsRead = async () => {
