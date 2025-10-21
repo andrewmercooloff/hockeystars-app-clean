@@ -2,7 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
-    Animated,
+    Animated as RNAnimated,
     Image,
     ImageBackground,
     ScrollView,
@@ -14,6 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StatsChangeNotification from '../components/StatsChangeNotification';
 import PhotoAddedNotification from '../components/PhotoAddedNotification';
@@ -46,10 +47,10 @@ const iceBg = require('../assets/images/led.jpg');
 
 // Компонент с анимацией для уведомлений
 const AnimatedNotification = ({ children, index }: { children: React.ReactNode; index: number }) => {
-  const animatedValue = React.useRef(new Animated.Value(0)).current;
+  const animatedValue = React.useRef(new RNAnimated.Value(0)).current;
   
   React.useEffect(() => {
-    Animated.timing(animatedValue, {
+    RNAnimated.timing(animatedValue, {
       toValue: 1,
       duration: 300,
       delay: index * 50, // Задержка для каждого уведомления
@@ -58,7 +59,7 @@ const AnimatedNotification = ({ children, index }: { children: React.ReactNode; 
   }, [animatedValue, index]);
   
   return (
-    <Animated.View
+    <RNAnimated.View
       style={{
         opacity: animatedValue,
         transform: [{
@@ -70,7 +71,7 @@ const AnimatedNotification = ({ children, index }: { children: React.ReactNode; 
       }}
     >
       {children}
-    </Animated.View>
+    </RNAnimated.View>
   );
 };
 
@@ -938,7 +939,11 @@ export default function NotificationsScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <Animated.View 
+        style={styles.container}
+        entering={FadeIn.duration(300)}
+        exiting={FadeOut.duration(200)}
+      >
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
@@ -1257,7 +1262,7 @@ export default function NotificationsScreen() {
           </ScrollView>
         </View>
       </ImageBackground>
-      </View>
+      </Animated.View>
     </GestureHandlerRootView>
   );
 }

@@ -17,7 +17,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
 import Animated, {
-  useAnimatedStyle
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  FadeIn,
+  FadeOut
 } from 'react-native-reanimated';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -1049,7 +1053,11 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <Animated.View 
+      style={styles.container}
+      entering={FadeIn.duration(300)}
+      exiting={FadeOut.duration(200)}
+    >
       <ImageBackground 
         source={iceBg} 
         style={styles.hockeyRink} 
@@ -1153,7 +1161,7 @@ export default function HomeScreen() {
           </View>
         </Modal>
       </ImageBackground>
-    </View>
+    </Animated.View>
   );
 }
 

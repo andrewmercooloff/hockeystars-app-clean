@@ -13,6 +13,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import {
     getPlayerById,
     getUserConversations,
@@ -230,7 +231,11 @@ export default function MessagesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <Animated.View 
+      style={styles.container}
+      entering={FadeIn.duration(300)}
+      exiting={FadeOut.duration(200)}
+    >
       <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
@@ -330,7 +335,7 @@ export default function MessagesScreen() {
           </ScrollView>
         </View>
       </ImageBackground>
-    </View>
+    </Animated.View>
   );
 }
 

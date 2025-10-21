@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -598,7 +599,11 @@ export default function SearchScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <Animated.View 
+      style={styles.container}
+      entering={FadeIn.duration(300)}
+      exiting={FadeOut.duration(200)}
+    >
       {/* Полупрозрачный фон льда */}
       <ImageBackground
         source={require('../assets/images/led.jpg')}
@@ -733,7 +738,7 @@ export default function SearchScreen() {
           />
         </View>
       </ImageBackground>
-    </View>
+    </Animated.View>
   );
 }
 
