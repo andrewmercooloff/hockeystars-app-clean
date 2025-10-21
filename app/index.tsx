@@ -17,11 +17,10 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
 import Animated, {
-  FadeIn,
-  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -640,6 +639,9 @@ export default function HomeScreen() {
     };
   });
   
+  // Состояние для контроля видимости
+  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -985,8 +987,9 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 100 });
+      // Мгновенно показываем экран (без анимации для предотвращения мигания)
+      setIsScreenVisible(true);
+      fadeAnim.value = 1;
       
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
@@ -1015,8 +1018,9 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 100 });
+        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
+        setIsScreenVisible(false);
+        fadeAnim.value = 0;
       };
     }, [refreshUser, setCurrentScreen, fadeAnim])
   );
@@ -1066,6 +1070,10 @@ export default function HomeScreen() {
         </ImageBackground>
       </View>
     );
+  }
+
+  if (!isScreenVisible) {
+    return null;
   }
 
   return (

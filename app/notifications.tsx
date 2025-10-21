@@ -145,6 +145,9 @@ export default function NotificationsScreen() {
       opacity: fadeAnim.value,
     };
   });
+  
+  // Состояние для контроля видимости
+  const [isScreenVisible, setIsScreenVisible] = useState(true);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
@@ -316,8 +319,9 @@ export default function NotificationsScreen() {
       setCurrentScreen('notifications');
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 100 });
+      // Мгновенно показываем экран (без анимации для предотвращения мигания)
+      setIsScreenVisible(true);
+      fadeAnim.value = 1;
       
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
@@ -326,8 +330,9 @@ export default function NotificationsScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 100 });
+        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
+        setIsScreenVisible(false);
+        fadeAnim.value = 0;
       };
     }, [currentUser, setCurrentScreen, fadeAnim])
   );
@@ -950,6 +955,10 @@ export default function NotificationsScreen() {
 
   // Если пользователь не авторизован, не показываем пустое состояние — скрываем контент
   if (!currentUser) {
+    return null;
+  }
+
+  if (!isScreenVisible) {
     return null;
   }
 

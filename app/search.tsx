@@ -151,6 +151,9 @@ export default function SearchScreen() {
     };
   });
   
+  // Состояние для контроля видимости
+  const [isScreenVisible, setIsScreenVisible] = useState(true);
+  
   
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
@@ -289,14 +292,16 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 100 });
+      // Мгновенно показываем экран (без анимации для предотвращения мигания)
+      setIsScreenVisible(true);
+      fadeAnim.value = 1;
       
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 100 });
+        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
+        setIsScreenVisible(false);
+        fadeAnim.value = 0;
       };
     }, [setCurrentScreen, fadeAnim])
   );
@@ -612,6 +617,10 @@ export default function SearchScreen() {
         <Text style={styles.loadingText}>Загрузка игроков...</Text>
       </View>
     );
+  }
+
+  if (!isScreenVisible) {
+    return null;
   }
 
   return (

@@ -47,6 +47,9 @@ export default function MessagesScreen() {
       opacity: fadeAnim.value,
     };
   });
+  
+  // Состояние для контроля видимости
+  const [isScreenVisible, setIsScreenVisible] = useState(true);
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -170,15 +173,17 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 100 });
+      // Мгновенно показываем экран (без анимации для предотвращения мигания)
+      setIsScreenVisible(true);
+      fadeAnim.value = 1;
       
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 100 });
+        // Мгновенно скрываем экран (без анимации для предотвращения мигания)
+        setIsScreenVisible(false);
+        fadeAnim.value = 0;
       };
     }, [loadChats, setCurrentScreen, fadeAnim])
   );
@@ -243,6 +248,10 @@ export default function MessagesScreen() {
 
   // Если пользователь не авторизован, не отображаем контент экрана во время редиректа
   if (!currentUser) {
+    return null;
+  }
+
+  if (!isScreenVisible) {
     return null;
   }
 
