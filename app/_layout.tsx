@@ -152,7 +152,7 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда пользователь и аватарка полностью загружены
+    // Скрываем splash screen когда приложение готово, пользователь загружен и аватарка загружена
     React.useEffect(() => {
       if (appReady && !isUserLoading && !isAvatarLoading) {
         // Плавно скрываем наш кастомный splash screen когда все загружено

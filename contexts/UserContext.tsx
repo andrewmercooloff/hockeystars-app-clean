@@ -34,7 +34,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
   // Если нет кешированного пользователя, начинаем с загрузки
   const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
-  const [isAvatarLoading, setIsAvatarLoading] = useState(true);
+  // Если есть пользователь с аватаркой, начинаем с загрузки аватарки
+  const [isAvatarLoading, setIsAvatarLoading] = useState(!!(globalUserCache?.avatar));
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
