@@ -30,7 +30,8 @@ const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
-  const [isUserLoading, setIsUserLoading] = useState(false);
+  // Если нет кешированного пользователя, начинаем с загрузки
+  const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;

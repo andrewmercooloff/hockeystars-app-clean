@@ -16,7 +16,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
-// Убираем все анимации переходов
+import Animated, {
+  useAnimatedStyle
+} from 'react-native-reanimated';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import { useCountryFilter } from '../utils/CountryFilterContext';
@@ -490,7 +492,14 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
   const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
 
-  // Убираем анимацию - используем обычные стили
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: position.x },
+        { translateY: position.y }
+      ]
+    };
+  }, [position.x, position.y]);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -577,41 +586,34 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
   };
 
   return (
-    <View 
-      style={[
-        styles.puckContainer,
-        {
-          transform: [
-            { translateX: position.x },
-            { translateY: position.y }
-          ]
-        }
-      ]}
+    <Animated.View 
+      style={[styles.puckContainer, animatedStyle]}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       <Suspense fallback={null}>
         <Puck
-          avatar={player.avatar}
+                        avatar={player.avatar}
           onPress={hasDraggedRef.current ? () => {} : onNav}
-          size={position.size}
-          points={player.goals && player.assists ? 
-            (() => {
-              try {
-                const goals = parseInt(player.goals) || 0;
-                const assists = parseInt(player.assists) || 0;
-                const total = goals + assists;
-                return total > 0 && !isNaN(total) ? total.toString() : undefined;
-              } catch (error) {
-                return undefined;
-              }
-            })() : undefined}
-          isStar={player.status === 'star'}
-          status={player.status}
+        animatedStyle={animatedStyle}
+        size={position.size}
+        points={player.goals && player.assists ? 
+          (() => {
+            try {
+              const goals = parseInt(player.goals) || 0;
+              const assists = parseInt(player.assists) || 0;
+              const total = goals + assists;
+              return total > 0 && !isNaN(total) ? total.toString() : undefined;
+            } catch (error) {
+              return undefined;
+            }
+          })() : undefined}
+        isStar={player.status === 'star'}
+        status={player.status}
         />
       </Suspense>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -623,9 +625,6 @@ export default function HomeScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
-  
-  // Убираем все анимации - простое мгновенное переключение
-  
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -971,35 +970,12 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Принудительно обновляем пользователя при переходе на главную страницу
-      // Это нужно для корректного выхода из профиля
-      const refreshUserOnFocus = async () => {
-        try {
-          // Очищаем кеш пользователя для принудительной перезагрузки
-          const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
-          await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-          
-          const user = await loadCurrentUser();
-          if (user) {
-            refreshUser();
-          } else {
-            // Если пользователь не найден, очищаем состояние
-            refreshUser();
-          }
-        } catch (error) {
-          console.error('❌ Ошибка обновления пользователя:', error);
-          refreshUser();
-        }
-      };
-      
-      refreshUserOnFocus();
-      
       // Возвращаем функцию очистки
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
       };
-    }, [refreshUser, setCurrentScreen])
+    }, [setCurrentScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1050,9 +1026,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View 
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ImageBackground 
         source={iceBg} 
         style={styles.hockeyRink} 
