@@ -170,15 +170,15 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
-      // Запускаем анимацию появления
-      fadeAnim.value = withTiming(1, { duration: 300 });
+      // Запускаем анимацию появления (быстро и плавно)
+      fadeAnim.value = withTiming(1, { duration: 150 });
       
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        // Анимация исчезновения
-        fadeAnim.value = withTiming(0, { duration: 200 });
+        // Быстро скрываем экран без анимации для плавного перехода
+        fadeAnim.value = 0;
       };
     }, [loadChats, setCurrentScreen, fadeAnim])
   );

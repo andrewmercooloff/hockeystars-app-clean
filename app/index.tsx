@@ -985,8 +985,8 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Запускаем анимацию появления
-      fadeAnim.value = withTiming(1, { duration: 300 });
+      // Запускаем анимацию появления (быстро и плавно)
+      fadeAnim.value = withTiming(1, { duration: 150 });
       
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
@@ -1015,8 +1015,8 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Анимация исчезновения
-        fadeAnim.value = withTiming(0, { duration: 200 });
+        // Быстро скрываем экран без анимации для плавного перехода
+        fadeAnim.value = 0;
       };
     }, [refreshUser, setCurrentScreen, fadeAnim])
   );
