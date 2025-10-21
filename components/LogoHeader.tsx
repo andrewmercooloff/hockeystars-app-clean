@@ -29,13 +29,13 @@ const LogoHeader = React.memo(() => {
       backgroundColor: '#000'
     }}>
       {/* Логотип приложения слева */}
-      <View style={{ marginLeft: 55, marginBottom: -5 }}>
+      <View style={{ marginLeft: 57.5, marginBottom: -5 }}>
         <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
       </View>
       
       {/* Аватар справа */}
       <TouchableOpacity 
-        style={{ alignItems: 'center', marginRight: 70 }}
+        style={{ alignItems: 'center', marginRight: 67.5 }}
         onPress={() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
@@ -45,9 +45,9 @@ const LogoHeader = React.memo(() => {
         }}
       >
         <View style={{
-          width: 51,
-          height: 51,
-          borderRadius: 25.5,
+          width: 56.1,
+          height: 56.1,
+          borderRadius: 28.05,
           backgroundColor: '#333',
           justifyContent: 'center',
           alignItems: 'center',
@@ -57,13 +57,13 @@ const LogoHeader = React.memo(() => {
           {currentUser?.avatar ? (
             <HeaderAvatar
               uri={currentUser.avatar}
-              size={45}
+              size={49.5}
               fallbackIcon="person"
-              fallbackSize={25}
+              fallbackSize={27.5}
               fallbackColor="#fff"
             />
           ) : (
-            <Ionicons name="person" size={25} color="#fff" />
+            <Ionicons name="person" size={27.5} color="#fff" />
           )}
         </View>
         {currentUser && currentUser.name && currentUser.name.trim() !== '' && (
