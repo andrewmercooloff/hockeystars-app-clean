@@ -152,10 +152,10 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда приложение готово
+    // Скрываем splash screen когда пользователь полностью загружен
     React.useEffect(() => {
-      if (appReady) {
-        // Плавно скрываем наш кастомный splash screen когда приложение готово
+      if (appReady && !isUserLoading && currentUser) {
+        // Плавно скрываем наш кастомный splash screen когда пользователь загружен
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
@@ -163,8 +163,17 @@ export default function RootLayout() {
         }).start(() => {
           setShowSplash(false);
         });
+      } else if (appReady && !isUserLoading && !currentUser) {
+        // Если пользователь не авторизован, тоже скрываем splash
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
       }
-    }, [appReady]);
+    }, [appReady, isUserLoading, currentUser]);
     
     return null;
   };
