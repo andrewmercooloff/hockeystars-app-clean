@@ -2,7 +2,6 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
-    Animated as RNAnimated,
     Image,
     ImageBackground,
     ScrollView,
@@ -46,35 +45,9 @@ import { useUser } from '../contexts/UserContext';
 const iceBg = require('../assets/images/led.jpg');
 
 // Компонент с анимацией для уведомлений (только для новых)
-const AnimatedNotification = ({ children, index, isNew }: { children: React.ReactNode; index: number; isNew: boolean }) => {
-  const animatedValue = React.useRef(new RNAnimated.Value(isNew ? 0 : 1)).current;
-  
-  React.useEffect(() => {
-    if (isNew) {
-      RNAnimated.timing(animatedValue, {
-        toValue: 1,
-        duration: 300,
-        delay: index * 50, // Задержка для каждого уведомления
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [animatedValue, index, isNew]);
-
-  return (
-    <RNAnimated.View
-      style={{
-        opacity: animatedValue,
-        transform: [{
-          translateY: animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [20, 0],
-          })
-        }]
-      }}
-    >
-      {children}
-    </RNAnimated.View>
-  );
+// Убрали анимацию уведомлений для улучшения производительности
+const AnimatedNotification = ({ children }: { children: React.ReactNode; index: number; isNew: boolean }) => {
+  return <View>{children}</View>;
 };
 
 // Вспомогательная функция для получения названия типа предмета
