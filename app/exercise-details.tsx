@@ -17,6 +17,7 @@ export default function ExerciseDetailsScreen() {
   const localParams = useLocalSearchParams();
   const globalParams = useGlobalSearchParams();
   const exerciseId = localParams.id || globalParams.id;
+  const fromScreen = localParams.from || globalParams.from; // Откуда пришли
   
   // Используем хук для загрузки упражнений из базы данных
   const { getExerciseById, loading, error, markAsCompleted } = useExercises(language as Language);
@@ -37,6 +38,16 @@ export default function ExerciseDetailsScreen() {
   // Функция для перевода сложности
   const translateDifficulty = (difficulty: string): string => {
     return t(`exercises.difficulties.${difficulty}`) || difficulty;
+  };
+
+  // Функция для навигации назад
+  const handleGoBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      // Если нет истории, идем на главную
+      router.push('/');
+    }
   };
   
   useEffect(() => {
@@ -259,7 +270,7 @@ export default function ExerciseDetailsScreen() {
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.pageTitle}>{exercise?.title || t('exercises.details.title')}</Text>
