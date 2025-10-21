@@ -14,7 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StatsChangeNotification from '../components/StatsChangeNotification';
 import PhotoAddedNotification from '../components/PhotoAddedNotification';
@@ -135,6 +135,16 @@ export default function NotificationsScreen() {
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
+  
+  // Анимация для плавного появления экрана
+  const fadeAnim = useSharedValue(0);
+  
+  // Анимированный стиль
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+    };
+  });
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
@@ -305,6 +315,10 @@ export default function NotificationsScreen() {
     useCallback(() => {
       setCurrentScreen('notifications');
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
+      
+      // Запускаем анимацию появления
+      fadeAnim.value = withTiming(1, { duration: 300 });
+      
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
         loadNotificationsData();
@@ -312,8 +326,10 @@ export default function NotificationsScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
+        // Анимация исчезновения
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
-    }, [currentUser, setCurrentScreen])
+    }, [currentUser, setCurrentScreen, fadeAnim])
   );
 
   // Автоматически отмечаем все уведомления как прочитанные через 5 секунд после входа в экран
@@ -940,9 +956,7 @@ export default function NotificationsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Animated.View 
-        style={styles.container}
-        entering={FadeIn.duration(300)}
-        exiting={FadeOut.duration(200)}
+        style={[styles.container, animatedStyle]}
       >
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>

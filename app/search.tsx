@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -140,6 +140,16 @@ export default function SearchScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
+  
+  // Анимация для плавного появления экрана
+  const fadeAnim = useSharedValue(0);
+  
+  // Анимированный стиль
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+    };
+  });
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -278,11 +288,17 @@ export default function SearchScreen() {
     useCallback(() => {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
+      
+      // Запускаем анимацию появления
+      fadeAnim.value = withTiming(1, { duration: 300 });
+      
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
+        // Анимация исчезновения
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
-    }, [setCurrentScreen])
+    }, [setCurrentScreen, fadeAnim])
   );
 
   // Мемоизированные фильтры
@@ -600,9 +616,7 @@ export default function SearchScreen() {
 
   return (
     <Animated.View 
-      style={styles.container}
-      entering={FadeIn.duration(300)}
-      exiting={FadeOut.duration(200)}
+      style={[styles.container, animatedStyle]}
     >
       {/* Полупрозрачный фон льда */}
       <ImageBackground

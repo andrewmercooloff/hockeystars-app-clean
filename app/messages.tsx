@@ -13,7 +13,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle } from 'react-native-reanimated';
 import {
     getPlayerById,
     getUserConversations,
@@ -37,6 +37,16 @@ export default function MessagesScreen() {
   const { t } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
+  
+  // Анимация для плавного появления экрана
+  const fadeAnim = useSharedValue(0);
+  
+  // Анимированный стиль
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+    };
+  });
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -159,12 +169,18 @@ export default function MessagesScreen() {
     React.useCallback(() => {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
+      
+      // Запускаем анимацию появления
+      fadeAnim.value = withTiming(1, { duration: 300 });
+      
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
+        // Анимация исчезновения
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
-    }, [loadChats, setCurrentScreen])
+    }, [loadChats, setCurrentScreen, fadeAnim])
   );
 
   const onRefresh = () => {
@@ -232,9 +248,7 @@ export default function MessagesScreen() {
 
   return (
     <Animated.View 
-      style={styles.container}
-      entering={FadeIn.duration(300)}
-      exiting={FadeOut.duration(200)}
+      style={[styles.container, animatedStyle]}
     >
       <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
