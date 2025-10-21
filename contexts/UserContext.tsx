@@ -83,6 +83,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [setCurrentUser]);
 
+  // Автоматическая загрузка пользователя при инициализации
+  React.useEffect(() => {
+    // Загружаем пользователя только если нет кеша
+    if (!globalUserCache) {
+      refreshUser();
+    }
+  }, [refreshUser]);
+
   return (
     <UserContext.Provider value={{ 
       currentUser, 

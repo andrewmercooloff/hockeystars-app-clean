@@ -319,11 +319,14 @@ export default function NotificationsScreen() {
 
   // Запускаем загрузку только когда пользователь авторизован
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !isUserLoading) {
       loadNotificationsData(true); // Первая загрузка
       setLoading(false); // Убираем индикатор загрузки после первой загрузки данных
+    } else if (!isUserLoading && currentUser === null) {
+      // Если загрузка завершена и пользователь не авторизован
+      setLoading(false);
     }
-  }, [currentUser, loadNotificationsData]);
+  }, [currentUser, isUserLoading, loadNotificationsData]);
 
   // Обновляем данные при фокусе на экран (только если пользователь авторизован)
   useFocusEffect(

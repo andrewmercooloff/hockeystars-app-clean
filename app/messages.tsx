@@ -110,10 +110,13 @@ export default function MessagesScreen() {
 
   // Запускаем загрузку только когда пользователь авторизован
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !isUserLoading) {
       loadChats();
+    } else if (!isUserLoading && currentUser === null) {
+      // Если загрузка завершена и пользователь не авторизован
+      setLoading(false);
     }
-  }, [currentUser, loadChats]);
+  }, [currentUser, isUserLoading, loadChats]);
 
   // Тихая загрузка чатов (без индикатора)
   const silentLoadChats = useCallback(async () => {
