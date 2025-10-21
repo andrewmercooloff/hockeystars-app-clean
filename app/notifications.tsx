@@ -317,19 +317,11 @@ export default function NotificationsScreen() {
     }
   }, [currentUser, t, notifications, friendRequests, giftRequests]);
 
-  // Проверяем авторизацию пользователя
-  useEffect(() => {
-    if (!currentUser) {
-      router.replace('/login');
-      return;
-    }
-    setLoading(false);
-  }, [currentUser, router]);
-
-  // Загружаем уведомления когда пользователь загружен
+  // Запускаем загрузку только когда пользователь авторизован
   useEffect(() => {
     if (currentUser) {
-      loadNotificationsData(true); // Первая загрузка - без анимации
+      loadNotificationsData(true); // Первая загрузка
+      setLoading(false); // Убираем индикатор загрузки после первой загрузки данных
     }
   }, [currentUser, loadNotificationsData]);
 

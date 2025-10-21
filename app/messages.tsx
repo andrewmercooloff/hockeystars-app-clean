@@ -95,15 +95,6 @@ export default function MessagesScreen() {
     }
   }, [router, currentUser]);
 
-  // Проверяем авторизацию пользователя
-  useEffect(() => {
-    if (!currentUser) {
-      router.replace('/login');
-      return;
-    }
-    setLoading(false);
-  }, [currentUser, router]);
-
   // Загрузка чатов с индикатором
   const loadChats = useCallback(async () => {
     try {
@@ -116,6 +107,13 @@ export default function MessagesScreen() {
       setRefreshing(false);
     }
   }, [loadChatsData]);
+
+  // Запускаем загрузку только когда пользователь авторизован
+  useEffect(() => {
+    if (currentUser) {
+      loadChats();
+    }
+  }, [currentUser, loadChats]);
 
   // Тихая загрузка чатов (без индикатора)
   const silentLoadChats = useCallback(async () => {
