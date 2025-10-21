@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useGlobalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useGlobalSearchParams, useRouter, useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, getLastExerciseCompletion } from '../utils/playerStorage';
@@ -13,6 +13,7 @@ const { width } = Dimensions.get('window');
 
 export default function ExerciseDetailsScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { t, language } = useLanguage();
   const localParams = useLocalSearchParams();
   const globalParams = useGlobalSearchParams();
@@ -42,8 +43,8 @@ export default function ExerciseDetailsScreen() {
 
   // Функция для навигации назад
   const handleGoBack = () => {
-    if (router.canGoBack()) {
-      router.back();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     } else {
       // Если нет истории, идем на главную
       router.push('/');
