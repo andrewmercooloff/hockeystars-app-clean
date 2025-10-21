@@ -170,15 +170,15 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 200 });
+      // Кроссфейд: мгновенно появляемся (без анимации для предотвращения мигания)
+      fadeAnim.value = 1;
       
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 200 });
+        // Кроссфейд: мгновенно исчезаем (без анимации для предотвращения мигания)
+        fadeAnim.value = 0;
       };
     }, [loadChats, setCurrentScreen, fadeAnim])
   );

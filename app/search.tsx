@@ -289,14 +289,14 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 200 });
+      // Кроссфейд: мгновенно появляемся (без анимации для предотвращения мигания)
+      fadeAnim.value = 1;
       
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 200 });
+        // Кроссфейд: мгновенно исчезаем (без анимации для предотвращения мигания)
+        fadeAnim.value = 0;
       };
     }, [setCurrentScreen, fadeAnim])
   );

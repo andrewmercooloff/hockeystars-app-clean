@@ -17,11 +17,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
 import Animated, {
+  FadeIn,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  FadeIn,
-  FadeOut
 } from 'react-native-reanimated';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -630,15 +630,8 @@ export default function HomeScreen() {
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
   
-  // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
-  
-  // Анимированный стиль
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: fadeAnim.value,
-    };
-  });
+  // Состояние для контроля анимации
+  const [isVisible, setIsVisible] = useState(true);
   
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -985,8 +978,8 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Кроссфейд: плавно появляемся
-      fadeAnim.value = withTiming(1, { duration: 200 });
+      // Показываем экран с анимацией
+      setIsVisible(true);
       
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
@@ -1015,10 +1008,10 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Кроссфейд: плавно исчезаем
-        fadeAnim.value = withTiming(0, { duration: 200 });
+        // Скрываем экран с анимацией
+        setIsVisible(false);
       };
-    }, [refreshUser, setCurrentScreen, fadeAnim])
+    }, [refreshUser, setCurrentScreen])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1070,7 +1063,9 @@ export default function HomeScreen() {
 
   return (
     <Animated.View 
-      style={[styles.container, animatedStyle]}
+      style={styles.container}
+      entering={FadeIn.duration(150)}
+      exiting={FadeOut.duration(150)}
     >
       <ImageBackground 
         source={iceBg} 
