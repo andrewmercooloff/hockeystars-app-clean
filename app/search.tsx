@@ -559,11 +559,11 @@ export default function SearchScreen() {
           </View>
           {item.status !== 'admin' && (
             <Text style={styles.playerInfo} numberOfLines={2} ellipsizeMode="tail">
-              {item.country ? t(`profile.countries.${item.country}`) : item.country} | {t(`profile.${item.position}`) || item.position} | {formatBirthDate(item.birthDate || '')} | {item.height} {t('profile.cm')} | {item.weight} {t('profile.kg')} | {(() => {
+              {item.country ? t(`profile.countries.${item.country}`) : item.country} | {item.position ? (t(`profile.${item.position}`) || item.position) : ''} | {formatBirthDate(item.birthDate || '')} | {item.height} {t('profile.cm')} | {item.weight} {t('profile.kg')} | {(() => {
                 const grip = item.grip?.toLowerCase();
                 if (grip === 'левый' || grip === 'left') return t('profile.left');
                 if (grip === 'правый' || grip === 'right') return t('profile.right');
-                return t(`profile.${grip}`) || item.grip;
+                return grip ? (t(`profile.${grip}`) || item.grip) : '';
               })()}
             </Text>
           )}
