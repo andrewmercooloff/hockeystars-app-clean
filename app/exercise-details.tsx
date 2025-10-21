@@ -411,15 +411,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   pageHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
   },
   backButton: {
-    marginRight: 15,
-    padding: 5,
+    marginRight: 16,
   },
   pageTitle: {
     fontSize: 24,
@@ -429,7 +433,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingTop: 0, // Убираем отступ, так как заголовок теперь фиксированный
+    paddingTop: 60, // Отступ для абсолютного заголовка
   },
   header: {
     position: 'absolute',
