@@ -630,8 +630,8 @@ export default function HomeScreen() {
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
   
-  // Анимация для плавного появления экрана
-  const fadeAnim = useSharedValue(0);
+  // Анимация для кроссфейда
+  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -985,8 +985,8 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Запускаем анимацию появления (быстро и плавно)
-      fadeAnim.value = withTiming(1, { duration: 150 });
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 200 });
       
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
@@ -1015,8 +1015,8 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Быстро скрываем экран без анимации для плавного перехода
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
     }, [refreshUser, setCurrentScreen, fadeAnim])
   );

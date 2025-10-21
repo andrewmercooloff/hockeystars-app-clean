@@ -38,8 +38,8 @@ export default function MessagesScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для плавного появления экрана
-  const fadeAnim = useSharedValue(0);
+  // Анимация для кроссфейда
+  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -170,15 +170,15 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
-      // Запускаем анимацию появления (быстро и плавно)
-      fadeAnim.value = withTiming(1, { duration: 150 });
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 200 });
       
       loadChats();
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        // Быстро скрываем экран без анимации для плавного перехода
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
     }, [loadChats, setCurrentScreen, fadeAnim])
   );

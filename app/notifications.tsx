@@ -136,8 +136,8 @@ export default function NotificationsScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для плавного появления экрана
-  const fadeAnim = useSharedValue(0);
+  // Анимация для кроссфейда
+  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -316,8 +316,8 @@ export default function NotificationsScreen() {
       setCurrentScreen('notifications');
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
-      // Запускаем анимацию появления (быстро и плавно)
-      fadeAnim.value = withTiming(1, { duration: 150 });
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 200 });
       
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
@@ -326,8 +326,8 @@ export default function NotificationsScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
-        // Быстро скрываем экран без анимации для плавного перехода
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
     }, [currentUser, setCurrentScreen, fadeAnim])
   );

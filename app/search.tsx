@@ -141,8 +141,8 @@ export default function SearchScreen() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
   
-  // Анимация для плавного появления экрана
-  const fadeAnim = useSharedValue(0);
+  // Анимация для кроссфейда
+  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -289,14 +289,14 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       
-      // Запускаем анимацию появления (быстро и плавно)
-      fadeAnim.value = withTiming(1, { duration: 150 });
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 200 });
       
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
-        // Быстро скрываем экран без анимации для плавного перехода
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 200 });
       };
     }, [setCurrentScreen, fadeAnim])
   );
