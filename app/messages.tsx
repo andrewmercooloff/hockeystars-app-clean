@@ -336,7 +336,7 @@ export default function MessagesScreen() {
           </ScrollView>
         </View>
       </ImageBackground>
-    </Animated.View>
+    </View>
   );
 }
 
