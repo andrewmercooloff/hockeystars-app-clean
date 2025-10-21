@@ -125,7 +125,7 @@ export default function RootLayout() {
     const { setCurrentUser: setGlobalUser, refreshUser } = useUser();
     const params = useLocalSearchParams();
     
-    // Синхронизируем локальное состояние с глобальным
+    // Синхронизируем локальное состояние с глобальным (layout -> context)
     React.useEffect(() => {
       setGlobalUser(currentUser);
     }, [currentUser, setGlobalUser]);
@@ -133,13 +133,11 @@ export default function RootLayout() {
     // Обрабатываем параметр refresh из URL
     React.useEffect(() => {
       if (params.refresh === 'true') {
-        console.log('🔄 Обнаружен параметр refresh, принудительно обновляем пользователя');
         // Очищаем кеш пользователя для принудительной перезагрузки
         const clearUserCache = async () => {
           try {
             const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-            console.log('🧹 Кеш пользователя очищен');
           } catch (error) {
             console.error('❌ Ошибка очистки кеша:', error);
           }

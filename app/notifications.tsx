@@ -32,7 +32,6 @@ import {
     acceptFriendRequest,
     declineFriendRequest,
     getReceivedFriendRequests,
-    loadCurrentUser,
     loadNotifications,
     markNotificationAsRead,
     Player
@@ -41,6 +40,7 @@ import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
+import { useUser } from '../contexts/UserContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -133,7 +133,7 @@ export default function NotificationsScreen() {
   const { t } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
+  const { currentUser } = useUser();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
@@ -283,27 +283,14 @@ export default function NotificationsScreen() {
     }
   }, [currentUser, t]);
 
+  // Проверяем авторизацию пользователя
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const user = await loadCurrentUser();
-        if (user) {
-          setCurrentUser(user);
-        } else {
-          router.replace('/login');
-          return;
-        }
-      } catch (error) {
-        console.error('Ошибка загрузки пользователя:', error);
-        router.replace('/login');
-        return;
-    } finally {
-      setLoading(false);
+    if (!currentUser) {
+      router.replace('/login');
+      return;
     }
-  };
-    
-    loadUser();
-  }, [router]);
+    setLoading(false);
+  }, [currentUser, router]);
 
   // Загружаем уведомления когда пользователь загружен
   useEffect(() => {

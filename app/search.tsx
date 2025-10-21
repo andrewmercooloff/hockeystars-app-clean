@@ -17,6 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
+import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 
 // Предотвращаем автоматическое скрытие заставки
@@ -137,6 +138,7 @@ export default function SearchScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
+  const { currentUser } = useUser();
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -176,7 +178,6 @@ export default function SearchScreen() {
   
   // Состояния для фильтрации и поиска
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -229,20 +230,13 @@ export default function SearchScreen() {
         // Принудительно применяем шрифт Gilroy
         forceGilroyFont();
         
-        // Загрузка пользователя с таймаутом
-        const userPromise = loadCurrentUser();
-        const userTimeout = new Promise<Player | null>((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout')), 500)
-        );
-
-        const user = await Promise.race([userPromise, userTimeout]);
-
-        if (!user) {
+        // Используем пользователя из UserContext
+        if (!currentUser) {
+          console.log('🔍 Поиск: Пользователь не найден, перенаправляем на логин');
           router.replace('/login');
           return;
         }
 
-        setCurrentUser(user);
 
         // Очищаем кеш для принудительной перезагрузки рейтингов
         const { clearAllPlayersCache } = await import('../utils/playerStorage');
@@ -252,7 +246,7 @@ export default function SearchScreen() {
         const allPlayers = await loadPlayers();
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
-        const filteredPlayers = user.status === 'admin' 
+        const filteredPlayers = currentUser.status === 'admin' 
           ? allPlayers // Администратор видит всех
           : allPlayers.filter(player => 
               player.status === 'player' || 
@@ -261,7 +255,7 @@ export default function SearchScreen() {
         
         setPlayers(filteredPlayers);
       } catch (error) {
-        console.error('Ошибка загрузки:', error);
+        console.error('❌ Ошибка загрузки поиска:', error);
         router.replace('/login');
       } finally {
         await SplashScreen.hideAsync();
@@ -269,8 +263,14 @@ export default function SearchScreen() {
       }
     };
 
-    loadData();
-  }, [router]);
+    // Запускаем загрузку только если currentUser определен и не null
+    if (currentUser !== undefined && currentUser !== null) {
+      loadData();
+    } else if (currentUser === null) {
+      // Если currentUser явно null, перенаправляем на логин
+      router.replace('/login');
+    }
+  }, [router, currentUser]);
 
   // Устанавливаем currentScreen при фокусе на экране поиска
   useFocusEffect(
@@ -500,11 +500,6 @@ export default function SearchScreen() {
       return ratingB - ratingA;
     });
     
-    // Отладочный лог для проверки сортировки (временно включен)
-    console.log('🔍 ОТЛАДКА СОРТИРОВКИ:');
-    sorted.slice(0, 5).forEach((player, index) => {
-      console.log(`${index + 1}. ${player.name} - рейтинг: ${player.activityRating || 0}`);
-    });
     
     return sorted;
   }, [players, searchQuery, selectedCountry, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, currentUser]);
@@ -578,17 +573,28 @@ export default function SearchScreen() {
   }, [router, t]);
 
   // Показываем загрузку пока проверяем авторизацию
+  // Если пользователь не авторизован, показываем загрузку или перенаправляем
+  if (!currentUser) {
+    if (currentUser === null) {
+      // Пользователь явно не авторизован, перенаправляем
+      return null;
+    } else {
+      // currentUser === undefined, еще загружается
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Загрузка...</Text>
+        </View>
+      );
+    }
+  }
+
+  // Если загружаем данные
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Проверка авторизации...</Text>
+        <Text style={styles.loadingText}>Загрузка игроков...</Text>
       </View>
     );
-  }
-
-  // Если пользователь не авторизован, не показываем контент
-  if (!currentUser) {
-    return null;
   }
 
   return (

@@ -1003,23 +1003,15 @@ export const loadPlayers = async (): Promise<Player[]> => {
       
       // Загружаем рейтинги активности для сортировки в поиске
       try {
-        console.log('🔍 НАЧИНАЕМ ЗАГРУЗКУ РЕЙТИНГОВ...');
         const { getPlayersActivityRatings } = await import('../services/activityService');
         const playerIds = players.map(p => p.id);
-        console.log('🔍 ID игроков для загрузки рейтингов:', playerIds.length);
         
         const activityRatings = await getPlayersActivityRatings(playerIds);
-        console.log('🔍 Получены рейтинги:', Object.keys(activityRatings).length);
         
         players.forEach(player => {
           player.activityRating = activityRatings[player.id] || 0;
         });
         
-        // Отладочный лог для проверки загрузки рейтингов
-        console.log('🔍 ОТЛАДКА ЗАГРУЗКИ РЕЙТИНГОВ:');
-        players.slice(0, 5).forEach(player => {
-          console.log(`${player.name} - рейтинг: ${player.activityRating}`);
-        });
       } catch (ratingError) {
         console.error('❌ Ошибка загрузки рейтингов активности:', ratingError);
         // Устанавливаем рейтинг по умолчанию если не удалось загрузить

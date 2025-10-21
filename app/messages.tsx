@@ -16,12 +16,12 @@ import { Ionicons } from '@expo/vector-icons';
 import {
     getPlayerById,
     getUserConversations,
-    loadCurrentUser,
     Message,
     Player
 } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
+import { useUser } from '../contexts/UserContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -35,7 +35,7 @@ export default function MessagesScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
+  const { currentUser } = useUser();
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,15 +43,13 @@ export default function MessagesScreen() {
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
     try {
-      const user = await loadCurrentUser();
-      if (!user) {
+      if (!currentUser) {
         router.replace('/login');
         return;
       }
 
       // Загружаем чаты для пользователя
-      setCurrentUser(user);
-      const conversations = await getUserConversations(user.id);
+      const conversations = await getUserConversations(currentUser.id);
       
       const chatPreviews: ChatPreview[] = [];
       
@@ -63,7 +61,7 @@ export default function MessagesScreen() {
             
             // Подсчитываем непрочитанные сообщения только для этой беседы
             const unreadCount = messages.filter(m => 
-              m.receiverId === user.id && !m.read
+              m.receiverId === currentUser.id && !m.read
             ).length;
             
             chatPreviews.push({
@@ -91,7 +89,16 @@ export default function MessagesScreen() {
       // Не показываем ошибку, просто оставляем пустой список
       // Это позволит показать кешированные данные если они есть
     }
-  }, [router]);
+  }, [router, currentUser]);
+
+  // Проверяем авторизацию пользователя
+  useEffect(() => {
+    if (!currentUser) {
+      router.replace('/login');
+      return;
+    }
+    setLoading(false);
+  }, [currentUser, router]);
 
   // Загрузка чатов с индикатором
   const loadChats = useCallback(async () => {

@@ -195,11 +195,6 @@ export async function getPlayersActivityRatings(playerIds: string[]): Promise<{ 
       ratings[entry.user_id] = entry.points || 0;
     });
 
-    console.log('🔍 ОТЛАДКА РЕЙТИНГОВ АКТИВНОСТИ:');
-    console.log('Загружено рейтингов:', Object.keys(ratings).length);
-    Object.entries(ratings).slice(0, 5).forEach(([id, rating]) => {
-      console.log(`ID: ${id} - рейтинг: ${rating}`);
-    });
 
     return ratings;
   } catch (error) {
