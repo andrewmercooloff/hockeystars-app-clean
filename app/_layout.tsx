@@ -152,10 +152,10 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда приложение готово, но пользователь еще загружается
+    // Скрываем splash screen когда приложение готово
     React.useEffect(() => {
-      if (appReady && isUserLoading) {
-        // Плавно скрываем наш кастомный splash screen пока пользователь загружается
+      if (appReady) {
+        // Плавно скрываем наш кастомный splash screen когда приложение готово
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
@@ -164,7 +164,7 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-    }, [isUserLoading, appReady]);
+    }, [appReady]);
     
     return null;
   };
