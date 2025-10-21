@@ -50,6 +50,9 @@ class RealtimeManager {
       
       // 3. Подписка на запросы в друзья
       await this.setupFriendRequestsSubscription(userId);
+      
+      // 4. Подписка на новые сообщения для push уведомлений
+      await this.setupMessagesSubscription(userId);
 
       console.log('✅ Все Realtime подписки настроены успешно');
     } catch (error) {
@@ -114,6 +117,70 @@ class RealtimeManager {
     this.subscriptions.set('players-notifications-count', {
       channel,
       name: 'players-notifications-count'
+    });
+  }
+
+  /**
+   * Настраивает подписку на новые сообщения для отправки push уведомлений
+   */
+  private async setupMessagesSubscription(userId: string): Promise<void> {
+    const channel = supabase
+      .channel('messages-push-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${userId}`
+        },
+        async (payload) => {
+          console.log('💬 Новое сообщение получено через Realtime:', payload.new);
+          
+          // Отправляем push уведомление
+          try {
+            const { sendMessageNotification } = await import('./notificationService');
+            const { getPlayerById, getUserPushTokens } = await import('./playerStorage');
+            
+            const senderId = payload.new.sender_id;
+            const messageText = payload.new.text;
+            
+            // Получаем данные отправителя
+            const senderPlayer = await getPlayerById(senderId);
+            if (!senderPlayer) {
+              console.log('⚠️ Отправитель не найден, пропускаем push');
+              return;
+            }
+            
+            // Получаем токены получателя
+            const receiverTokens = await getUserPushTokens(userId);
+            if (receiverTokens.length === 0) {
+              console.log('⚠️ У получателя нет токенов, пропускаем push');
+              return;
+            }
+            
+            console.log(`📱 Отправляем push о сообщении от ${senderPlayer.name} для пользователя ${userId}`);
+            
+            await sendMessageNotification(
+              receiverTokens,
+              senderPlayer.name || 'Пользователь',
+              messageText,
+              senderId
+            );
+            
+            console.log('✅ Push уведомление о сообщении отправлено через Realtime');
+          } catch (error) {
+            console.error('❌ Ошибка отправки push через Realtime:', error);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Статус подписки messages-push-notifications:', status);
+      });
+
+    this.subscriptions.set('messages-push-notifications', {
+      channel,
+      name: 'messages-push-notifications'
     });
   }
 
