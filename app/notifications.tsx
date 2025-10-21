@@ -946,32 +946,27 @@ export default function NotificationsScreen() {
     }
   };
 
-  // Если currentUser еще загружается (undefined), показываем загрузку
-  if (currentUser === undefined) {
-    return (
-      <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-          <View style={styles.overlayLoading}>
-            <ActivityIndicator size="large" color="#fa2f40" />
-          </View>
-        </ImageBackground>
-      </View>
-    );
-  }
-
   // Если пользователь не авторизован (null), перенаправляем на логин
   if (currentUser === null) {
     router.replace('/login');
     return null;
   }
 
-  // Если загружаем уведомления
-  if (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0) {
+  // Если currentUser еще загружается (undefined) или загружаем уведомления, показываем загрузку с заголовком
+  if (currentUser === undefined || (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0)) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-          <View style={styles.overlayLoading}>
-            <ActivityIndicator size="large" color="#fa2f40" />
+          <View style={styles.overlay}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
+            </View>
+            <View style={styles.loadingCenter}>
+              <ActivityIndicator size="large" color="#fa2f40" style={styles.spinner} />
+            </View>
           </View>
         </ImageBackground>
       </View>
@@ -1323,6 +1318,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinner: {
+    transform: [{ scale: 1.5 }],
   },
   header: {
     flexDirection: 'row',

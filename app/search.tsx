@@ -589,7 +589,7 @@ export default function SearchScreen() {
             resizeMode="cover"
           >
             <View style={styles.overlayLoading}>
-              <ActivityIndicator size="large" color="#fa2f40" />
+              <ActivityIndicator size="large" color="#fa2f40" style={styles.spinner} />
             </View>
           </ImageBackground>
         </View>
@@ -607,7 +607,7 @@ export default function SearchScreen() {
           resizeMode="cover"
         >
           <View style={styles.overlayLoading}>
-            <ActivityIndicator size="large" color="#fa2f40" />
+            <ActivityIndicator size="large" color="#fa2f40" style={styles.spinner} />
           </View>
         </ImageBackground>
       </View>
@@ -772,6 +772,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  spinner: {
+    transform: [{ scale: 1.5 }],
   },
   pageHeader: {
     position: 'absolute',
