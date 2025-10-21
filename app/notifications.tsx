@@ -320,8 +320,9 @@ export default function NotificationsScreen() {
   // Запускаем загрузку только когда пользователь авторизован
   useEffect(() => {
     if (currentUser && !isUserLoading) {
-      loadNotificationsData(true); // Первая загрузка
-      setLoading(false); // Убираем индикатор загрузки после первой загрузки данных
+      loadNotificationsData(true).then(() => {
+        setLoading(false); // Убираем индикатор загрузки после завершения загрузки данных
+      });
     } else if (!isUserLoading && currentUser === null) {
       // Если загрузка завершена и пользователь не авторизован
       setLoading(false);
