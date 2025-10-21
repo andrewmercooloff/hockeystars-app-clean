@@ -9,12 +9,12 @@ import {
     View,
     ImageBackground,
     Dimensions,
-    ScrollView
+    ScrollView,
+    ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-// Убираем все анимации переходов
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -140,8 +140,6 @@ export default function SearchScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser } = useUser();
-  
-  // Убираем все анимации - простое мгновенное переключение
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -280,7 +278,6 @@ export default function SearchScreen() {
     useCallback(() => {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
-      
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
@@ -393,7 +390,7 @@ export default function SearchScreen() {
         case 'goalie':
           translated = t('goalie');
           // Если перевод не найден, используем правильное название в зависимости от языка
-          if (translated === 'goalie') {
+          if (translated === 'goalie' || translated === 'Translation missing for key: goalie in language: ru') {
             translated = language === 'en' ? 'Goalie' : 'Вратарь';
           }
           break;
@@ -585,8 +582,19 @@ export default function SearchScreen() {
     } else {
       // currentUser === undefined, еще загружается
       return (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Загрузка...</Text>
+        <View style={styles.container}>
+          <ImageBackground
+            source={require('../assets/images/led.jpg')}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+          >
+            <View style={styles.overlay}>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#fa2f40" />
+                <Text style={styles.loadingText}>Загрузка...</Text>
+              </View>
+            </View>
+          </ImageBackground>
         </View>
       );
     }
@@ -595,16 +603,25 @@ export default function SearchScreen() {
   // Если загружаем данные
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Загрузка игроков...</Text>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require('../assets/images/led.jpg')}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          <View style={styles.overlay}>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#fa2f40" />
+              <Text style={styles.loadingText}>Загрузка игроков...</Text>
+            </View>
+          </View>
+        </ImageBackground>
       </View>
     );
   }
 
   return (
-    <View 
-      style={styles.container}
-    >
+    <View style={styles.container}>
       {/* Полупрозрачный фон льда */}
       <ImageBackground
         source={require('../assets/images/led.jpg')}
@@ -986,11 +1003,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 15,
+    marginHorizontal: 20,
+    paddingVertical: 30,
   },
   loadingText: {
     color: '#fff',
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    marginTop: 15,
   },
 });
 
