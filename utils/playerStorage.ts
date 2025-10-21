@@ -1737,6 +1737,12 @@ export const getConversation = async (userId1: string, userId2: string): Promise
 // Упрощенная отправка сообщения
 export const sendMessageSimple = async (senderId: string, receiverId: string, text: string): Promise<boolean> => {
   try {
+    console.log('📨 ОТПРАВКА СООБЩЕНИЯ:', {
+      senderId,
+      receiverId,
+      text: text.substring(0, 30) + '...'
+    });
+    
     const message = {
       senderId,
       receiverId,
@@ -1745,9 +1751,11 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     };
     
     await sendMessage(message);
+    console.log('✅ Сообщение сохранено в БД');
     
     // Отправляем push-уведомление только получателю (не отправителю)
     try {
+      console.log('📱 Начинаем отправку push уведомления о сообщении...');
       const { getUserPushTokens, sendMessageNotification } = await import('./notificationService');
       const senderPlayer = await getPlayerById(senderId);
       const receiverTokens = await getUserPushTokens(receiverId);
@@ -1764,14 +1772,17 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
       console.log(`📱 PUSH: Токенов после фильтрации: ${filteredReceiverTokens.length}`);
       
       if (filteredReceiverTokens.length > 0 && senderPlayer) {
-        await sendMessageNotification(
+        const pushResult = await sendMessageNotification(
           filteredReceiverTokens,
           senderPlayer.name || 'Пользователь',
           text,
           senderId
         );
+        console.log('📱 PUSH: Результат отправки уведомления о сообщении:', pushResult ? '✅ Успешно' : '❌ Ошибка');
       } else {
         console.log(`📱 PUSH: Пропускаем отправку - нет токенов получателя или отправитель не найден`);
+        console.log(`📱 PUSH: filteredReceiverTokens.length = ${filteredReceiverTokens.length}`);
+        console.log(`📱 PUSH: senderPlayer =`, senderPlayer ? 'найден' : 'НЕ найден');
       }
     } catch (pushError) {
       console.error('⚠️ Не удалось отправить push-уведомление получателю:', pushError);
