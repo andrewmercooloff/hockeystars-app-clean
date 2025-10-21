@@ -4259,7 +4259,32 @@ export const notifyFriendsAboutChanges = async (
     console.log('💾 Сохраняем уведомления в базу данных...');
     console.log('💾 Количество уведомлений для сохранения:', allNotifications.length);
     
+    // Группируем уведомления по пользователю и типу для проверки дубликатов
+    const notificationsByUserAndType = new Map<string, typeof allNotifications[0]>();
+    
     for (const notification of allNotifications) {
+      const key = `${notification.user_id}_${notification.type}_${playerId}`;
+      
+      // Проверяем, есть ли уже похожее уведомление за последние 30 секунд
+      const { data: existingNotifications, error: checkError } = await supabase
+        .from('notifications')
+        .select('id, created_at')
+        .eq('user_id', notification.user_id)
+        .eq('type', notification.type)
+        .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Последние 30 секунд
+        .order('created_at', { ascending: false })
+        .limit(1);
+      
+      if (checkError) {
+        console.error('❌ Ошибка проверки дубликатов уведомлений:', checkError);
+      }
+      
+      // Если уведомление уже было отправлено недавно, пропускаем
+      if (existingNotifications && existingNotifications.length > 0) {
+        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id);
+        continue;
+      }
+      
       console.log('💾 Сохраняем уведомление:', {
         id: notification.id,
         user_id: notification.user_id,
@@ -4276,6 +4301,8 @@ export const notifyFriendsAboutChanges = async (
         console.error('❌ Ошибка сохранения уведомления:', insertError);
       } else {
         console.log('✅ Уведомление сохранено в базу данных');
+        // Запоминаем что уведомление отправлено
+        notificationsByUserAndType.set(key, notification);
       }
     }
     
