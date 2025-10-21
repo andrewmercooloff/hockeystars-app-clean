@@ -142,7 +142,7 @@ export default function SearchScreen() {
   const { currentUser } = useUser();
   
   // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
+  const fadeAnim = useSharedValue(1);
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -289,14 +289,14 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       
-      // Кроссфейд: мгновенно появляемся (без анимации для предотвращения мигания)
-      fadeAnim.value = 1;
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 100 });
       
       return () => {
         setCurrentScreen(null);
         console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
-        // Кроссфейд: мгновенно исчезаем (без анимации для предотвращения мигания)
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 100 });
       };
     }, [setCurrentScreen, fadeAnim])
   );

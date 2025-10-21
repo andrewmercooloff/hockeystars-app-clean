@@ -630,8 +630,15 @@ export default function HomeScreen() {
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const params = useLocalSearchParams();
   
-  // Состояние для контроля анимации
-  const [isVisible, setIsVisible] = useState(true);
+  // Анимация для кроссфейда
+  const fadeAnim = useSharedValue(1);
+  
+  // Анимированный стиль
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+    };
+  });
   
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -978,8 +985,8 @@ export default function HomeScreen() {
       setCurrentScreen('index');
       console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
-      // Показываем экран с анимацией
-      setIsVisible(true);
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 100 });
       
       // Принудительно обновляем пользователя при переходе на главную страницу
       // Это нужно для корректного выхода из профиля
@@ -1008,10 +1015,10 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
-        // Скрываем экран с анимацией
-        setIsVisible(false);
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 100 });
       };
-    }, [refreshUser, setCurrentScreen])
+    }, [refreshUser, setCurrentScreen, fadeAnim])
   );
 
   // Обработка параметра refresh для принудительного обновления
@@ -1063,9 +1070,7 @@ export default function HomeScreen() {
 
   return (
     <Animated.View 
-      style={styles.container}
-      entering={FadeIn.duration(150)}
-      exiting={FadeOut.duration(150)}
+      style={[styles.container, animatedStyle]}
     >
       <ImageBackground 
         source={iceBg} 

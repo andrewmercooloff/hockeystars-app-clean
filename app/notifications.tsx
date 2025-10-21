@@ -137,7 +137,7 @@ export default function NotificationsScreen() {
   const { currentUser } = useUser();
   
   // Анимация для кроссфейда
-  const fadeAnim = useSharedValue(1); // Начинаем с видимого состояния
+  const fadeAnim = useSharedValue(1);
   
   // Анимированный стиль
   const animatedStyle = useAnimatedStyle(() => {
@@ -316,8 +316,8 @@ export default function NotificationsScreen() {
       setCurrentScreen('notifications');
       console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
-      // Кроссфейд: мгновенно появляемся (без анимации для предотвращения мигания)
-      fadeAnim.value = 1;
+      // Кроссфейд: плавно появляемся
+      fadeAnim.value = withTiming(1, { duration: 100 });
       
       if (currentUser) {
         // Обновляем данные только если пользователь уже загружен
@@ -326,8 +326,8 @@ export default function NotificationsScreen() {
       return () => {
         setCurrentScreen(null);
         console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
-        // Кроссфейд: мгновенно исчезаем (без анимации для предотвращения мигания)
-        fadeAnim.value = 0;
+        // Кроссфейд: плавно исчезаем
+        fadeAnim.value = withTiming(0, { duration: 100 });
       };
     }, [currentUser, setCurrentScreen, fadeAnim])
   );
