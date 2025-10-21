@@ -11,7 +11,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { CustomSpinner } from '../components/CustomSpinner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -942,7 +941,7 @@ export default function NotificationsScreen() {
     }
   };
 
-  // Если пользователь загружается, показываем спиннер
+  // Если пользователь загружается, показываем текст загрузки
   if (isUserLoading || currentUser === undefined) {
     return (
       <View style={styles.container}>
@@ -955,7 +954,7 @@ export default function NotificationsScreen() {
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
             <View style={styles.loadingCenter}>
-              <CustomSpinner size={60} color="#fa2f40" />
+              <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           </View>
         </ImageBackground>
@@ -982,7 +981,7 @@ export default function NotificationsScreen() {
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
             <View style={styles.loadingCenter}>
-              <CustomSpinner size={60} color="#fa2f40" />
+              <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           </View>
         </ImageBackground>
@@ -1340,6 +1339,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Gilroy-Regular',
   },
   header: {
     flexDirection: 'row',
