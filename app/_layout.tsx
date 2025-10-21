@@ -545,6 +545,11 @@ export default function RootLayout() {
       return;
     }
 
+    // Устанавливаем callback для обновления счетчика
+    realtimeManager.setNotificationCountCallback((count: number) => {
+      setUnreadNotificationsCount(count);
+    });
+
     // Используем централизованный менеджер подписок
     realtimeManager.setupSubscriptions(currentUser.id);
 

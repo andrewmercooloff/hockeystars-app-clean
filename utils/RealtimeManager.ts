@@ -9,12 +9,20 @@ class RealtimeManager {
   private static instance: RealtimeManager;
   private subscriptions: Map<string, RealtimeSubscription> = new Map();
   private currentUserId: string | null = null;
+  private notificationCountCallback: ((count: number) => void) | null = null;
 
   static getInstance(): RealtimeManager {
     if (!RealtimeManager.instance) {
       RealtimeManager.instance = new RealtimeManager();
     }
     return RealtimeManager.instance;
+  }
+
+  /**
+   * Устанавливает callback для обновления счетчика уведомлений
+   */
+  setNotificationCountCallback(callback: (count: number) => void): void {
+    this.notificationCountCallback = callback;
   }
 
   /**
@@ -238,8 +246,9 @@ class RealtimeManager {
   }
 
   private emitNotificationCountUpdate(count: number): void {
-    // Можно использовать EventEmitter или другие механизмы
-    // Пока просто логируем
+    if (this.notificationCountCallback) {
+      this.notificationCountCallback(count);
+    }
   }
 
   private emitFriendRequestUpdate(): void {
