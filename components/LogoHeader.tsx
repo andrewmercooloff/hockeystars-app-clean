@@ -29,13 +29,13 @@ const LogoHeader = React.memo(() => {
       backgroundColor: '#000'
     }}>
       {/* Логотип приложения слева */}
-      <View style={{ marginLeft: 30, marginBottom: -5 }}>
+      <View style={{ marginLeft: 80, marginBottom: -5 }}>
         <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
       </View>
       
       {/* Аватар справа */}
       <TouchableOpacity 
-        style={{ alignItems: 'center', marginRight: 45 }}
+        style={{ alignItems: 'center', marginRight: 95 }}
         onPress={() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
