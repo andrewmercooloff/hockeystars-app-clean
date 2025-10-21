@@ -209,7 +209,8 @@ export default function MessagesScreen() {
     return prefix + text;
   };
 
-  if (loading && chats.length === 0) {
+  // Если currentUser еще загружается (undefined), показываем загрузку
+  if (currentUser === undefined) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
@@ -221,9 +222,23 @@ export default function MessagesScreen() {
     );
   }
 
-  // Если пользователь не авторизован, не отображаем контент экрана во время редиректа
-  if (!currentUser) {
+  // Если пользователь не авторизован (null), перенаправляем на логин
+  if (currentUser === null) {
+    router.replace('/login');
     return null;
+  }
+
+  // Если загружаем чаты
+  if (loading && chats.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlayLoading}>
+            <ActivityIndicator size="large" color="#fa2f40" />
+          </View>
+        </ImageBackground>
+      </View>
+    );
   }
 
   return (

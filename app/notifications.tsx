@@ -946,7 +946,8 @@ export default function NotificationsScreen() {
     }
   };
 
-  if (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0) {
+  // Если currentUser еще загружается (undefined), показываем загрузку
+  if (currentUser === undefined) {
     return (
       <View style={styles.container}>
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
@@ -958,9 +959,23 @@ export default function NotificationsScreen() {
     );
   }
 
-  // Если пользователь не авторизован, не показываем пустое состояние — скрываем контент
-  if (!currentUser) {
+  // Если пользователь не авторизован (null), перенаправляем на логин
+  if (currentUser === null) {
+    router.replace('/login');
     return null;
+  }
+
+  // Если загружаем уведомления
+  if (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlayLoading}>
+            <ActivityIndicator size="large" color="#fa2f40" />
+          </View>
+        </ImageBackground>
+      </View>
+    );
   }
 
   return (
