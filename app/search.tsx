@@ -61,7 +61,7 @@ const FilterButton = React.memo(({
   return (
     <View style={[styles.filterContainer, isActive && styles.filterContainerActive]}>
       <TouchableOpacity 
-        style={[styles.filterButton, isActive && styles.filterButtonActive]} 
+        style={[styles.filterButton, (isActive || selectedValue) && styles.filterButtonActive]} 
         onPress={toggleDropdown}
       >
         <Text style={styles.filterButtonText}>
