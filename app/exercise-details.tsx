@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingTop: 43, // Отступ для абсолютного заголовка (уменьшен еще на 10px)
+    paddingTop: 42, // Отступ для абсолютного заголовка
   },
   header: {
     position: 'absolute',
