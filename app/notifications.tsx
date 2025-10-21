@@ -9,7 +9,8 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
+    View,
+    ActivityIndicator
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -956,9 +957,7 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>{t('notifications.loading')}</Text>
-            </View>
+            <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         </ImageBackground>
       </View>
@@ -1309,17 +1308,8 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
-  },
-  loadingContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000', // Черный фон для предотвращения белого экрана при загрузке
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
   },
   header: {
     flexDirection: 'row',

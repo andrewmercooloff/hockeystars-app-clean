@@ -589,10 +589,7 @@ export default function SearchScreen() {
             resizeMode="cover"
           >
             <View style={styles.overlay}>
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#fa2f40" />
-                <Text style={styles.loadingText}>Загрузка...</Text>
-              </View>
+              <ActivityIndicator size="large" color="#fa2f40" />
             </View>
           </ImageBackground>
         </View>
@@ -610,10 +607,7 @@ export default function SearchScreen() {
           resizeMode="cover"
         >
           <View style={styles.overlay}>
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#fa2f40" />
-              <Text style={styles.loadingText}>Загрузка игроков...</Text>
-            </View>
+            <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         </ImageBackground>
       </View>
@@ -772,6 +766,8 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   pageHeader: {
     position: 'absolute',
@@ -998,22 +994,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 15,
-    marginHorizontal: 20,
-    paddingVertical: 30,
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Gilroy-Regular',
-    textAlign: 'center',
-    marginTop: 15,
   },
 });
 

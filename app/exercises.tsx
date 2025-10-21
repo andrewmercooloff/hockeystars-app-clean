@@ -166,8 +166,16 @@ export default function ExercisesScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>{t('exercises.loadingExercises')}</Text>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require('../assets/images/led.jpg')}
+          style={styles.background}
+          resizeMode="cover"
+        >
+          <View style={styles.overlay}>
+            <ActivityIndicator size="large" color="#fa2f40" />
+          </View>
+        </ImageBackground>
       </View>
     );
   }
@@ -483,6 +491,8 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,
@@ -664,18 +674,6 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     fontWeight: '600',
     fontFamily: 'Gilroy-Bold',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000', // Черный фон для предотвращения белого экрана при загрузке
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-    marginTop: 16,
-    fontFamily: 'Gilroy-Regular',
   },
   errorContainer: {
     flex: 1,
