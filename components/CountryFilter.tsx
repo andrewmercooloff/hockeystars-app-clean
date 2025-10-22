@@ -56,23 +56,39 @@ export default function CountryFilter({ players }: { players: Player[] }) {
 
       {showCountryFilter && (
         <View style={styles.countriesList}>
-          {countries.map((country) => (
-            <TouchableOpacity
-              key={country}
-              style={[
-                styles.countryItem, 
-                selectedCountry === country && styles.selectedCountryItem
-              ]}
-              onPress={() => handleCountrySelect(country)}
-            >
-              <Text style={[
-                styles.countryText, 
-                selectedCountry === country && styles.selectedCountryText
-              ]}>
-                {t(`profile.countries.${country}`)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {countries.map((country, index) => {
+            const isSelected = selectedCountry === country;
+            const isFirst = index === 0;
+            const isLast = index === countries.length - 1;
+            const isOnly = countries.length === 1;
+            
+            let selectedStyle = styles.selectedCountryItem;
+            if (isOnly) {
+              selectedStyle = styles.onlySelectedItem;
+            } else if (isFirst) {
+              selectedStyle = styles.firstSelectedItem;
+            } else if (isLast) {
+              selectedStyle = styles.lastSelectedItem;
+            }
+            
+            return (
+              <TouchableOpacity
+                key={country}
+                style={[
+                  styles.countryItem, 
+                  isSelected && selectedStyle
+                ]}
+                onPress={() => handleCountrySelect(country)}
+              >
+                <Text style={[
+                  styles.countryText, 
+                  isSelected && styles.selectedCountryText
+                ]}>
+                  {t(`profile.countries.${country}`)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       )}
     </View>
@@ -139,6 +155,7 @@ const styles = StyleSheet.create({
   },
   selectedCountryItem: {
     backgroundColor: '#fa2f40',
+    borderRadius: 12,
   },
   countryText: {
     color: '#FFFFFF',
@@ -149,5 +166,23 @@ const styles = StyleSheet.create({
   selectedCountryText: {
     color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
+  },
+  firstSelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  lastSelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  onlySelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderRadius: 12,
   },
 });

@@ -87,23 +87,39 @@ export default function YearFilter({ players }: { players: any[] }) {
 
       {showYearFilter && (
         <View style={styles.yearsList}>
-          {availableYears.map(({ year }) => (
-            <TouchableOpacity
-              key={year}
-              style={[
-                styles.yearItem, 
-                selectedYear === year && styles.selectedYearItem
-              ]}
-              onPress={() => handleYearSelect(year)}
-            >
-              <Text style={[
-                styles.yearText, 
-                selectedYear === year && styles.selectedYearText
-              ]}>
-                {year}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {availableYears.map(({ year }, index) => {
+            const isSelected = selectedYear === year;
+            const isFirst = index === 0;
+            const isLast = index === availableYears.length - 1;
+            const isOnly = availableYears.length === 1;
+            
+            let selectedStyle = styles.selectedYearItem;
+            if (isOnly) {
+              selectedStyle = styles.onlySelectedItem;
+            } else if (isFirst) {
+              selectedStyle = styles.firstSelectedItem;
+            } else if (isLast) {
+              selectedStyle = styles.lastSelectedItem;
+            }
+            
+            return (
+              <TouchableOpacity
+                key={year}
+                style={[
+                  styles.yearItem, 
+                  isSelected && selectedStyle
+                ]}
+                onPress={() => handleYearSelect(year)}
+              >
+                <Text style={[
+                  styles.yearText, 
+                  isSelected && styles.selectedYearText
+                ]}>
+                  {year}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       )}
     </View>
@@ -170,6 +186,7 @@ const styles = StyleSheet.create({
   },
   selectedYearItem: {
     backgroundColor: '#fa2f40',
+    borderRadius: 12,
   },
   yearText: {
     color: '#FFFFFF',
@@ -180,5 +197,23 @@ const styles = StyleSheet.create({
   selectedYearText: {
     color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
+  },
+  firstSelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  lastSelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  onlySelectedItem: {
+    backgroundColor: '#fa2f40',
+    borderRadius: 12,
   },
 });
