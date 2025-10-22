@@ -2463,6 +2463,7 @@
     "myGifts": "Mes cadeaux",
     "noGifts": "Pas de cadeaux",
     "noGiftsSubtext": "Créez votre premier cadeau pour les fans",
+    "noGiftsUploaded": "Aucun cadeau téléchargé",
     "addGift": "Ajouter un cadeau",
     "successDeleted": "Le cadeau a été retiré du musée.",
     "errorDelete": "Échec de la suppression du cadeau",

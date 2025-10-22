@@ -2447,6 +2447,7 @@
     "myGifts": "My Gifts",
     "noGifts": "No gifts yet",
     "noGiftsSubtext": "Upload your first gift to share with players",
+    "noGiftsUploaded": "No gifts uploaded",
     "addGift": "Add Gift",
     "successDeleted": "Gift deleted",
     "errorDelete": "Failed to delete gift",

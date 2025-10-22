@@ -2464,6 +2464,7 @@
     "museum": "Museum för gåvor",
     "myGifts": "Mina gåvor",
     "noGiftsSubtext": "Gåvor från stjärnor kommer att visas här",
+    "noGiftsUploaded": "Inga gåvor uppladdade",
     "successDeleted": "Gåvan har tagits bort från museet.",
     "errorDelete": "Det gick inte att ta bort gåvan",
     "noImage": "ingen bild",

@@ -2461,6 +2461,7 @@
     "myGifts": "Mano dovanos",
     "noGifts": "Dovanų dar nėra",
     "noGiftsSubtext": "Įkelkite pirmą dovaną, kad galėtumėte dalintis su žaidėjais",
+    "noGiftsUploaded": "Nėra įkeltų dovanų",
     "fromAdmin": "Administratorius",
     "errorSelectOrCreate": "Pasirinkite dovaną arba sukurkite naują",
     "errorGiftAlreadyExists": "Ši dovana jau yra žaidėjui {playerName}.\n\nPasirinkite kitą dovaną arba sukurkite naują.",

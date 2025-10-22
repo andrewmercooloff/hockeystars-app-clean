@@ -2459,6 +2459,7 @@
     "successDeleted": "Lahja on poistettu museosta.",
     "errorDelete": "Lahjan poistaminen epäonnistui",
     "noImage": "ei kuvaa",
+    "noGiftsUploaded": "Ei ladattuja lahjoja",
     "failedToSendRequest": "Pyynnön lähettäminen epäonnistui",
     "requestSent": "Pyyntö lähetetty!",
     "requestSentMessage": "Pyyntösi kohteelle {itemType} on lähetetty. Odota vastausta.",
