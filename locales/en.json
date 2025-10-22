@@ -2388,6 +2388,7 @@
     "loading": "Loading chats...",
     "noMessages": "No messages",
     "startConversation": "Start a conversation with other players",
+    "searchPlaceholder": "Search messages...",
     "error": "Error",
     "errorLoadingChats": "Failed to load chats",
     "yesterday": "Yesterday",

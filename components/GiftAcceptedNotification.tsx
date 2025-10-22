@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   playerName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     color: '#FFF',
     marginBottom: 2,
   },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   acknowledgeButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
   },
 });
 

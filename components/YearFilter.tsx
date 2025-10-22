@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)', // Белый цвет разделителя
   },
   selectedYearItem: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    backgroundColor: '#fa2f40',
   },
   yearText: {
     color: '#FFFFFF',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedYearText: {
-    color: '#FF4444',
+    color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
   },
 });

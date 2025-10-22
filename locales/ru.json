@@ -2144,6 +2144,7 @@
     "loading": "Загрузка чатов...",
     "noMessages": "Нет сообщений",
     "startConversation": "Начните общение с другими игроками",
+    "searchPlaceholder": "Поиск по сообщениям...",
     "error": "Ошибка",
     "errorLoadingChats": "Не удалось загрузить чаты",
     "yesterday": "Вчера",

@@ -269,10 +269,16 @@ export default function ChatScreen() {
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.headerInfo}>
-              <Image 
-                source={{ uri: otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player' }} 
-                style={styles.headerAvatar}
-              />
+              <TouchableOpacity 
+                onPress={() => router.push(`/player/${otherPlayer.id}`)}
+                style={styles.avatarButton}
+                activeOpacity={0.7}
+              >
+                <Image 
+                  source={{ uri: otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player' }} 
+                  style={styles.headerAvatar}
+                />
+              </TouchableOpacity>
               <View style={styles.headerText}>
                 <Text style={styles.headerName}>{otherPlayer.name?.toUpperCase()}</Text>
                 <Text style={styles.headerStatus}>
@@ -435,6 +441,9 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 12,
+  },
+  avatarButton: {
+    // Стиль для кнопки аватарки - прозрачный фон
   },
   headerText: {
     flex: 1,

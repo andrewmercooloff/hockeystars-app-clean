@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)', // Белый цвет разделителя
   },
   selectedCountryItem: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    backgroundColor: '#fa2f40',
   },
   countryText: {
     color: '#FFFFFF',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedCountryText: {
-    color: '#FF4444',
+    color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
   },
 });

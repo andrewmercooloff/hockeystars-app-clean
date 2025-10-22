@@ -41,6 +41,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
+import OptimizedBackground from '../components/OptimizedBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -883,26 +884,6 @@ export default function NotificationsScreen() {
     }
   };
 
-  // Если пользователь загружается, показываем текст загрузки
-  if (isUserLoading || currentUser === undefined) {
-    return (
-      <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-          <View style={styles.overlay}>
-            <View style={styles.pageHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
-            </View>
-            <View style={styles.loadingCenter}>
-              <Text style={styles.loadingText}>{t('common.loading')}</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-    );
-  }
 
   // Если пользователь не авторизован (null), перенаправляем на логин
   if (currentUser === null) {
@@ -910,11 +891,15 @@ export default function NotificationsScreen() {
     return null;
   }
 
-  // Если загружаем уведомления, показываем загрузку с заголовком
-  if (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0) {
+  // Если загружается пользователь ИЛИ данные, показываем один loading screen
+  if (isUserLoading || currentUser === undefined || loading) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <ImageBackground 
+          source={require('../assets/images/led.jpg')} 
+          style={styles.background} 
+          resizeMode="cover"
+        >
           <View style={styles.overlay}>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -930,6 +915,7 @@ export default function NotificationsScreen() {
       </View>
     );
   }
+
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -1262,7 +1248,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#87A3B1',
   },
   background: {
     flex: 1,
@@ -1273,7 +1259,7 @@ const styles = StyleSheet.create({
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(135, 163, 177, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -343,7 +343,7 @@ export default function ExerciseDetailsScreen() {
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>{t('exercises.details.additionalInfo')}</Text>
               <View style={styles.bottomInfoRow}>
-                <Ionicons name="fitness-outline" size={20} color="#fa2f40" />
+                <Ionicons name="barbell-outline" size={20} color="#fa2f40" />
                 <Text style={styles.bottomInfoLabel}>{t('exercises.details.equipment')}:</Text>
                 <Text style={styles.bottomInfoValue}>{exercise?.equipment || ''}</Text>
               </View>
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: '#fa2f40',
   },
   sectionTitle: {
     fontSize: 18,

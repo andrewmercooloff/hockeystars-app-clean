@@ -163,6 +163,7 @@ export default function ExercisesScreen() {
     }
   };
 
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -480,7 +481,7 @@ export default function ExercisesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#87A3B1',
   },
   background: {
     flex: 1,
@@ -493,7 +494,7 @@ const styles = StyleSheet.create({
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(135, 163, 177, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },

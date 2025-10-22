@@ -124,12 +124,13 @@ const styles = StyleSheet.create({
   playerName: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   timeText: {
     color: '#aaa',
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
   exerciseItem: {
@@ -141,6 +142,7 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
   exerciseBadge: {
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     marginLeft: 4,
   },
 });

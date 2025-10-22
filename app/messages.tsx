@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
     Alert,
@@ -9,6 +9,7 @@ import {
     ScrollView,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -23,6 +24,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
+import OptimizedBackground from '../components/OptimizedBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -42,6 +44,7 @@ export default function MessagesScreen() {
   const [chats, setChats] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
@@ -93,6 +96,26 @@ export default function MessagesScreen() {
       // Это позволит показать кешированные данные если они есть
     }
   }, [router, currentUser]);
+
+  // Фильтрация чатов по поиску
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return chats;
+    }
+
+    const searchLower = searchQuery.toLowerCase().trim();
+    return chats.filter(chat => {
+      // Поиск по имени игрока
+      const playerName = chat.player.name?.toLowerCase() || '';
+      const matchesName = playerName.includes(searchLower);
+      
+      // Поиск по последнему сообщению
+      const lastMessageText = chat.lastMessage?.text?.toLowerCase() || '';
+      const matchesMessage = lastMessageText.includes(searchLower);
+      
+      return matchesName || matchesMessage;
+    });
+  }, [chats, searchQuery]);
 
   // Загрузка чатов с индикатором
   const loadChats = useCallback(async () => {
@@ -209,26 +232,6 @@ export default function MessagesScreen() {
     return prefix + text;
   };
 
-  // Если пользователь загружается, показываем текст загрузки
-  if (isUserLoading || currentUser === undefined) {
-    return (
-      <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-          <View style={styles.overlay}>
-            <View style={styles.pageHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.pageTitle}>{t('messages.title')}</Text>
-            </View>
-            <View style={styles.loadingCenter}>
-              <Text style={styles.loadingText}>{t('common.loading')}</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-    );
-  }
 
   // Если пользователь не авторизован (null), перенаправляем на логин
   if (currentUser === null) {
@@ -236,11 +239,15 @@ export default function MessagesScreen() {
     return null;
   }
 
-  // Если загружаем чаты, показываем загрузку с заголовком
-  if (loading && chats.length === 0) {
+  // Если загружается пользователь ИЛИ данные, показываем один loading screen
+  if (isUserLoading || currentUser === undefined || (loading && filteredChats.length === 0)) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <ImageBackground 
+          source={require('../assets/images/led.jpg')} 
+          style={styles.background} 
+          resizeMode="cover"
+        >
           <View style={styles.overlay}>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -261,14 +268,38 @@ export default function MessagesScreen() {
     <View 
       style={styles.container}
     >
-      <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <OptimizedBackground useLedBackground style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-          {/* Заголовок страницы */}
+          {/* Заголовок страницы с поиском */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.pageTitle}>{t('messages.title')}</Text>
+          </View>
+          
+          {/* Строка поиска */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={t('messages.searchPlaceholder')}
+                placeholderTextColor="#888"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => setSearchQuery('')}
+                  style={styles.clearSearchButton}
+                >
+                  <Ionicons name="close-circle" size={20} color="#888" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
           
           {/* Список чатов */}
@@ -286,7 +317,7 @@ export default function MessagesScreen() {
             removeClippedSubviews={true}
             decelerationRate="fast"
           >
-            {chats.length === 0 && !loading ? (
+            {filteredChats.length === 0 && !loading ? (
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyContent}>
                   <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
@@ -296,8 +327,8 @@ export default function MessagesScreen() {
                   </Text>
                 </View>
               </View>
-            ) : chats.length > 0 ? (
-              chats.map((chat) => (
+            ) : filteredChats.length > 0 ? (
+              filteredChats.map((chat) => (
                 <TouchableOpacity
                   key={chat.player.id}
                   style={styles.chatItem}
@@ -359,7 +390,7 @@ export default function MessagesScreen() {
             ) : null}
           </ScrollView>
         </View>
-      </ImageBackground>
+      </OptimizedBackground>
     </View>
   );
 }
@@ -367,7 +398,7 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#87A3B1',
   },
   background: {
     flex: 1,
@@ -378,7 +409,7 @@ const styles = StyleSheet.create({
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(135, 163, 177, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -434,7 +465,7 @@ const styles = StyleSheet.create({
   },
   chatsContainer: {
     flex: 1,
-    paddingTop: 60, // Отступ для фиксированного заголовка
+    paddingTop: 91, // Отступ для заголовка + поиска (еще на 1px выше)
   },
   chatsContent: {
     paddingVertical: 8,
@@ -481,7 +512,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
@@ -552,5 +583,43 @@ const styles = StyleSheet.create({
     color: '#fa2f40',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
+  },
+  // Стили для поиска
+  searchContainer: {
+    position: 'absolute',
+    top: 41, // Еще на 1px выше
+    left: 0,
+    right: 0,
+    zIndex: 1001,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: '#fa2f40',
+    height: 40,
+    width: '100%',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 14,
+    height: 24,
+    textAlignVertical: 'center',
+    paddingVertical: 0,
+    fontFamily: 'Gilroy-Regular',
+  },
+  clearSearchButton: {
+    marginLeft: 8,
   },
 }); 

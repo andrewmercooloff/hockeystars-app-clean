@@ -161,12 +161,13 @@ const styles = StyleSheet.create({
   friendsText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   timeText: {
     color: '#aaa',
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
   actionItem: {
@@ -178,6 +179,7 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
   friendshipBadge: {
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     marginLeft: 4,
   },
 });

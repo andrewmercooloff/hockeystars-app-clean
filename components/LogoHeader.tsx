@@ -10,7 +10,7 @@ const logo = require('../assets/images/logo.png');
 const LogoHeader = React.memo(() => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { currentUser, refreshUser, setAvatarLoading } = useUser();
+  const { currentUser, refreshUser } = useUser();
 
   // Обновляем данные только при изменении параметров refresh
   useEffect(() => {
@@ -18,19 +18,6 @@ const LogoHeader = React.memo(() => {
       refreshUser(true); // Принудительное обновление
     }
   }, [params.refresh, refreshUser]);
-
-  // Управляем состоянием загрузки аватарки
-  useEffect(() => {
-    if (currentUser) {
-      if (currentUser.avatar) {
-        setAvatarLoading(true); // Начинаем загрузку аватарки
-      } else {
-        setAvatarLoading(false); // Нет аватарки - сразу готово
-      }
-    } else {
-      setAvatarLoading(false); // Нет пользователя - нет аватарки
-    }
-  }, [currentUser, setAvatarLoading]);
 
   return (
     <View style={{ 
@@ -42,13 +29,13 @@ const LogoHeader = React.memo(() => {
       backgroundColor: '#000'
     }}>
       {/* Логотип приложения слева */}
-      <View style={{ marginLeft: 57.5, marginBottom: -5 }}>
+      <View style={{ marginLeft: 61.5, marginBottom: -5 }}>
         <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
       </View>
       
       {/* Аватар справа */}
       <TouchableOpacity 
-        style={{ alignItems: 'center', marginRight: 67.5 }}
+        style={{ alignItems: 'center', marginRight: 76.5, minHeight: 70, marginBottom: -6 }}
         onPress={() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
@@ -58,29 +45,28 @@ const LogoHeader = React.memo(() => {
         }}
       >
         <View style={{
-          width: 56.1,
-          height: 56.1,
-          borderRadius: 28.05,
+          width: 51,
+          height: 51,
+          borderRadius: 25.5,
           backgroundColor: '#333',
           justifyContent: 'center',
           alignItems: 'center',
           borderWidth: 2,
           borderColor: '#fff',
         }}>
-              {currentUser?.avatar ? (
-                <HeaderAvatar
-                  uri={currentUser.avatar}
-                  size={49.5}
-                  fallbackIcon="person"
-                  fallbackSize={27.5}
-                  fallbackColor="#fff"
-                  onLoadComplete={() => setAvatarLoading(false)}
-                />
-              ) : (
-                <Ionicons name="person" size={27.5} color="#fff" />
-              )}
+          {currentUser?.avatar ? (
+            <HeaderAvatar
+              uri={currentUser.avatar}
+              size={45}
+              fallbackIcon="person"
+              fallbackSize={25}
+              fallbackColor="#fff"
+            />
+          ) : (
+            <Ionicons name="person" size={25} color="#fff" />
+          )}
         </View>
-        {currentUser && currentUser.name && currentUser.name.trim() !== '' && (
+        {currentUser && currentUser.name && currentUser.name.trim() !== '' ? (
           <Text style={{
             color: '#fff',
             fontSize: 12,
@@ -89,6 +75,8 @@ const LogoHeader = React.memo(() => {
           }}>
 {(currentUser?.name || 'Пользователь').toUpperCase()}
           </Text>
+        ) : (
+          <View style={{ height: 16, marginTop: 2 }} />
         )}
       </TouchableOpacity>
     </View>

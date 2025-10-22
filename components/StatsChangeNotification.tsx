@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
     color: '#999',
     marginLeft: 8,
   },
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
   },
   fieldName: {
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     color: '#ccc',
     flex: 1,
   },
@@ -185,6 +187,7 @@ const styles = StyleSheet.create({
   },
   oldValue: {
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     color: '#999',
     textDecorationLine: 'line-through',
   },

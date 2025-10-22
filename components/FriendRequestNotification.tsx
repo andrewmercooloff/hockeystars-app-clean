@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   playerName: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   timeText: {
@@ -182,11 +182,11 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
   },
   declineButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Gilroy-Bold',
   },
 });

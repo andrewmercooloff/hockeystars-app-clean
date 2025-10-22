@@ -16,6 +16,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import OptimizedBackground from '../components/OptimizedBackground';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
@@ -190,6 +191,7 @@ export default function SearchScreen() {
   
   // Состояние для отслеживания открытых фильтров
   const [openFilters, setOpenFilters] = useState<Set<string>>(new Set());
+  
   
   // Функция для открытия фильтра (закрывает все остальные)
   const openFilter = useCallback((filterName: string) => {
@@ -616,8 +618,8 @@ export default function SearchScreen() {
   return (
     <View style={styles.container}>
       {/* Полупрозрачный фон льда */}
-      <ImageBackground
-        source={require('../assets/images/led.jpg')}
+      <OptimizedBackground
+        useLedBackground
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -748,7 +750,7 @@ export default function SearchScreen() {
             })}
           />
         </View>
-      </ImageBackground>
+      </OptimizedBackground>
     </View>
   );
 }
@@ -756,6 +758,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#87A3B1',
   },
   backgroundImage: {
     flex: 1,
@@ -768,7 +771,7 @@ const styles = StyleSheet.create({
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(135, 163, 177, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
