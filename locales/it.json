@@ -2007,7 +2007,11 @@
     "stickRepair": "Riparazione bastoni",
     "usedEquipmentSale": "Vendita attrezzature usate",
     "newEquipmentSale": "Vendita attrezzature nuove",
-    "effectiveness": "PPG"
+    "effectiveness": "PPG",
+    "phone": "Telefono",
+    "sendMessage": "Invia messaggio",
+    "shareProfile": "Condividi profilo",
+    "currentSeasonStats": "Statistiche stagione corrente"
   },
   "register": {
     "title": "Registrazione",
@@ -2447,6 +2451,14 @@
     "deleteGiftQuestion": "Eliminare il regalo?",
     "from": "da",
     "noGiftsYet": "Ancora nessun regalo dalle stelle",
+    "sendGiftTo": "Invia regalo a {playerName}",
+    "selectExistingGift": "Seleziona regalo esistente",
+    "orCreateNew": "O crea nuovo",
+    "giftName": "Nome del regalo",
+    "giftNamePlaceholder": "es. Cappello firmato",
+    "uploadImage": "Carica immagine",
+    "selectImage": "Seleziona immagine",
+    "send": "Invia",
     "museum": "Museo dei doni",
     "myGifts": "I miei doni",
     "noGifts": "Nessun regalo",

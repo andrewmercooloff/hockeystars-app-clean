@@ -2007,7 +2007,11 @@
     "stickRepair": "Stockreparatur",
     "usedEquipmentSale": "Gebrauchte Ausrüstung",
     "newEquipmentSale": "Neue Ausrüstung",
-    "effectiveness": "PPG"
+    "effectiveness": "PPG",
+    "phone": "Telefon",
+    "sendMessage": "Nachricht senden",
+    "shareProfile": "Profil teilen",
+    "currentSeasonStats": "Aktuelle Saisonstatistiken"
   },
   "register": {
     "title": "Anmeldung",
@@ -2466,6 +2470,14 @@
     "deleteGiftQuestion": "Geschenk löschen?",
     "from": "aus",
     "noGiftsYet": "Noch keine Geschenke von den Sternen",
+    "sendGiftTo": "Geschenk an {playerName} senden",
+    "selectExistingGift": "Vorhandenes Geschenk auswählen",
+    "orCreateNew": "Oder neu erstellen",
+    "giftName": "Geschenkname",
+    "giftNamePlaceholder": "z.B. Signierte Kappe",
+    "uploadImage": "Bild hochladen",
+    "selectImage": "Bild auswählen",
+    "send": "Senden",
     "museum": "Museum der Geschenke",
     "myGifts": "Meine Geschenke",
     "noGifts": "Keine Geschenke",

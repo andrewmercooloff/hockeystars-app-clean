@@ -2073,7 +2073,10 @@
     "currentTeam": "Team",
     "hockeyExperience": "Hockey Experience",
     "years": "years",
-    "currentSeasonStats": "Current Season Stats"
+    "currentSeasonStats": "Current Season Stats",
+    "phone": "Phone",
+    "sendMessage": "Send Message",
+    "shareProfile": "Share Profile"
   },
   "register": {
     "title": "Registration",
@@ -2432,6 +2435,14 @@
     "deleteGiftQuestion": "Delete gift?",
     "from": "from",
     "noGiftsYet": "No gifts from stars yet",
+    "sendGiftTo": "Send gift to {playerName}",
+    "selectExistingGift": "Select existing gift",
+    "orCreateNew": "Or create new",
+    "giftName": "Gift name",
+    "giftNamePlaceholder": "e.g., Signed cap",
+    "uploadImage": "Upload image",
+    "selectImage": "Select image",
+    "send": "Send",
     "museum": "Gift Museum",
     "myGifts": "My Gifts",
     "noGifts": "No gifts yet",

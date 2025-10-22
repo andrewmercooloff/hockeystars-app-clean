@@ -2020,7 +2020,11 @@
     "hockeyExperience": "Ledo ritulio patirtis",
     "years": "metai",
     "currentSeasonStats": "Dabartinio sezono statistika",
-    "effectiveness": "PPG"
+    "effectiveness": "PPG",
+    "phone": "Telefonas",
+    "sendMessage": "Siųsti žinutę",
+    "shareProfile": "Dalintis profiliu",
+    "currentSeasonStats": "Dabartinio sezono statistika"
   },
   "register": {
     "title": "Registracija",
@@ -2448,6 +2452,9 @@
     "orCreateNew": "Arba sukurti naują",
     "giftName": "Dovanos pavadinimas",
     "giftNamePlaceholder": "pvz., Pasirašyta kepurė",
+    "uploadImage": "Įkelti vaizdą",
+    "selectImage": "Pasirinkti vaizdą",
+    "send": "Siųsti",
     "uploadImage": "Įkelti vaizdą",
     "send": "Siųsti",
     "selectGift": "Pasirinkti dovaną",

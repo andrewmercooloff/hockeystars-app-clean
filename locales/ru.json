@@ -1840,7 +1840,10 @@
     "currentTeam": "Команда",
     "hockeyExperience": "Опыт в хоккее",
     "years": "лет",
-    "currentSeasonStats": "Статистика текущего сезона"
+    "currentSeasonStats": "Статистика текущего сезона",
+    "phone": "Телефон",
+    "sendMessage": "Отправить сообщение",
+    "shareProfile": "Поделиться профилем"
   },
   "register": {
     "title": "Регистрация",
@@ -2311,6 +2314,14 @@
     "deleteGiftQuestion": "Удалить подарок?",
     "from": "от",
     "noGiftsYet": "Пока нет подарков от звезд",
+    "sendGiftTo": "Отправить подарок {playerName}",
+    "selectExistingGift": "Выбрать существующий подарок",
+    "orCreateNew": "Или создать новый",
+    "giftName": "Название подарка",
+    "giftNamePlaceholder": "например, Подписанная кепка",
+    "uploadImage": "Загрузить изображение",
+    "selectImage": "Выбрать изображение",
+    "send": "Отправить",
     "museum": "Музей подарков",
     "myGifts": "Мои подарки",
     "noGifts": "Подарков пока нет",

@@ -2007,7 +2007,11 @@
     "stickRepair": "Réparation de bâtons",
     "usedEquipmentSale": "Vente d'équipement usagé",
     "newEquipmentSale": "Vente d'équipement neuf",
-    "effectiveness": "PPG"
+    "effectiveness": "PPG",
+    "phone": "Téléphone",
+    "sendMessage": "Envoyer un message",
+    "shareProfile": "Partager le profil",
+    "currentSeasonStats": "Statistiques de la saison actuelle"
   },
   "register": {
     "title": "Inscription",
@@ -2447,6 +2451,14 @@
     "deleteGiftQuestion": "Supprimer le cadeau ?",
     "from": "depuis",
     "noGiftsYet": "Pas encore de cadeaux des étoiles",
+    "sendGiftTo": "Envoyer un cadeau à {playerName}",
+    "selectExistingGift": "Sélectionner un cadeau existant",
+    "orCreateNew": "Ou créer nouveau",
+    "giftName": "Nom du cadeau",
+    "giftNamePlaceholder": "ex. Casquette signée",
+    "uploadImage": "Télécharger une image",
+    "selectImage": "Sélectionner une image",
+    "send": "Envoyer",
     "museum": "Musée des cadeaux",
     "myGifts": "Mes cadeaux",
     "noGifts": "Pas de cadeaux",

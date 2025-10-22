@@ -1999,7 +1999,11 @@
     "discountForFriendsHint": "Přidejte si obchod jako přítele a získejte slevu! Ukažte slevu prodejci při nákupu.",
     "activityRating": "Hodnocení aktivity",
     "coachingYears": "Trénuje roky",
-    "effectiveness": "PPG"
+    "effectiveness": "PPG",
+    "phone": "Telefon",
+    "sendMessage": "Odeslat zprávu",
+    "shareProfile": "Sdílet profil",
+    "currentSeasonStats": "Statistiky aktuální sezóny"
   },
   "register": {
     "title": "Registrace",
@@ -2439,6 +2443,14 @@
     "deleteGiftQuestion": "Smazat dárek?",
     "from": "z",
     "noGiftsYet": "Zatím žádné dárky od hvězd",
+    "sendGiftTo": "Poslat dárek {playerName}",
+    "selectExistingGift": "Vybrat existující dárek",
+    "orCreateNew": "Nebo vytvořit nový",
+    "giftName": "Název dárku",
+    "giftNamePlaceholder": "např. Podepsaná čepice",
+    "uploadImage": "Nahrát obrázek",
+    "selectImage": "Vybrat obrázek",
+    "send": "Odeslat",
     "museum": "Muzeum dárků",
     "myGifts": "Moje dárky",
     "noGiftsSubtext": "Zde se zobrazí dárky od hvězd",
