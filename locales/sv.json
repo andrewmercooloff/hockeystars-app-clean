@@ -2292,6 +2292,7 @@
     "loading": "Laddar chattar...",
     "noMessages": "Inga meddelanden",
     "startConversation": "Börja chatta med andra spelare",
+    "searchPlaceholder": "Sök meddelanden...",
     "error": "Fel",
     "errorLoadingChats": "Det gick inte att läsa in chattar",
     "yesterday": "I går",

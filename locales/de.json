@@ -2309,6 +2309,7 @@
     "loading": "Chats werden geladen …",
     "noMessages": "Keine Nachrichten",
     "startConversation": "Beginnen Sie mit anderen Spielern zu chatten",
+    "searchPlaceholder": "Nachrichten suchen...",
     "error": "Fehler",
     "errorLoadingChats": "Chats konnten nicht geladen werden",
     "yesterday": "Gestern",

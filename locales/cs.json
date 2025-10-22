@@ -2282,6 +2282,7 @@
     "loading": "Načítání chatů...",
     "noMessages": "Žádné zprávy",
     "startConversation": "Začněte chatovat s ostatními hráči",
+    "searchPlaceholder": "Hledat zprávy...",
     "error": "Chyba",
     "errorLoadingChats": "Chaty se nepodařilo načíst",
     "yesterday": "Včera",

@@ -2086,6 +2086,7 @@
     "loading": "Ładowanie czatów...",
     "noMessages": "Brak wiadomości",
     "startConversation": "Rozpocznij czatowanie z innymi graczami",
+    "searchPlaceholder": "Szukaj wiadomości...",
     "error": "Błąd",
     "errorLoadingChats": "Nie udało się załadować czatów",
     "yesterday": "Wczoraj",

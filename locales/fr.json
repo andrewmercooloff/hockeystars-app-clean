@@ -2290,6 +2290,7 @@
     "loading": "Chargement des discussions...",
     "noMessages": "Aucun message",
     "startConversation": "Commencez à discuter avec d'autres joueurs",
+    "searchPlaceholder": "Rechercher des messages...",
     "error": "Erreur",
     "errorLoadingChats": "Échec du chargement des discussions",
     "yesterday": "Hier",

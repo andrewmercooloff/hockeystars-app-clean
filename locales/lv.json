@@ -2307,6 +2307,7 @@
     "loading": "Notiek tērzēšanas sarunu ielāde...",
     "noMessages": "Nav ziņojumu",
     "startConversation": "Sāciet tērzēt ar citiem spēlētājiem",
+    "searchPlaceholder": "Meklēt ziņojumus...",
     "error": "Kļūda",
     "errorLoadingChats": "Neizdevās ielādēt tērzēšanu",
     "yesterday": "vakar",

@@ -2290,6 +2290,7 @@
     "loading": "Caricamento chat in corso...",
     "noMessages": "Nessun messaggio",
     "startConversation": "Inizia a chattare con altri giocatori",
+    "searchPlaceholder": "Cerca messaggi...",
     "error": "Errore",
     "errorLoadingChats": "Impossibile caricare le chat",
     "yesterday": "Ieri",

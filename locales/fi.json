@@ -2284,6 +2284,7 @@
     "loading": "Ladataan keskusteluja...",
     "noMessages": "Ei viestejä",
     "startConversation": "Aloita chattailu muiden pelaajien kanssa",
+    "searchPlaceholder": "Hae viestejä...",
     "error": "Virhe",
     "errorLoadingChats": "Keskustelujen lataaminen epäonnistui",
     "yesterday": "Eilen",

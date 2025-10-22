@@ -2284,6 +2284,7 @@
     "loading": "Načítavajú sa rozhovory...",
     "noMessages": "Žiadne správy",
     "startConversation": "Začnite chatovať s ostatnými hráčmi",
+    "searchPlaceholder": "Hľadať správy...",
     "error": "Chyba",
     "errorLoadingChats": "Načítanie četov zlyhalo",
     "yesterday": "včera",
