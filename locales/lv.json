@@ -46,9 +46,13 @@
   "photoNotification": {
     "added": "pievienots",
     "onePhoto": "jauna fotogrāfija",
-    "multiplePhotos": "{count} jauni fotoattēli",
+    "multiplePhotos": "{count} jauni fotoattēli",
     "photo": "foto",
     "photos": "foto"
+  },
+  "achievementNotification": {
+    "added": "pievienots",
+    "oneAchievement": "jauns sasniegums"
   },
   "friendshipNotification": {
     "title": "Jauna draudzība",

@@ -51,6 +51,10 @@
     "photo": "photo",
     "photos": "photos"
   },
+  "achievementNotification": {
+    "added": "added",
+    "oneAchievement": "new achievement"
+  },
   "videoNotification": {
     "added": "added",
     "oneVideo": "new video",

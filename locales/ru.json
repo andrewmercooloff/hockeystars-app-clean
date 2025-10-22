@@ -51,6 +51,10 @@
     "photo": "фото",
     "photos": "фото"
   },
+  "achievementNotification": {
+    "added": "добавил",
+    "oneAchievement": "новое достижение"
+  },
   "videoNotification": {
     "added": "добавил",
     "oneVideo": "новое видео",

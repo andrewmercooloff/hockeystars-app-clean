@@ -51,6 +51,10 @@
     "photo": "zdjęcie",
     "photos": "zdjęcie"
   },
+  "achievementNotification": {
+    "added": "w dodatku",
+    "oneAchievement": "nowe osiągnięcie"
+  },
   "friendshipNotification": {
     "title": "Nowa przyjaźń",
     "message": "{friend1Name} i {friend2Name} zostali przyjaciółmi",

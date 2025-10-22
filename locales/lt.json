@@ -50,6 +50,10 @@
     "photo": "nuotrauka",
     "photos": "nuotrauka"
   },
+  "achievementNotification": {
+    "added": "pridėta",
+    "oneAchievement": "naujas pasiekimas"
+  },
   "friendshipNotification": {
     "title": "Nauja draugystė",
     "message": "{friend1Name} ir {friend2Name} tapo draugais",

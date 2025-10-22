@@ -49,6 +49,10 @@
     "photo": "bild",
     "photos": "bild"
   },
+  "achievementNotification": {
+    "added": "lagt till",
+    "oneAchievement": "ny prestation"
+  },
   "friendshipNotification": {
     "title": "Ny vänskap",
     "message": "{friend1Name} och {friend2Name} blev vänner",

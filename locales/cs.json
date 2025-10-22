@@ -49,6 +49,10 @@
     "photo": "fotografie",
     "photos": "fotografie"
   },
+  "achievementNotification": {
+    "added": "přidáno",
+    "oneAchievement": "nový úspěch"
+  },
   "friendshipNotification": {
     "title": "Nové přátelství",
     "message": "{friend1Name} a {friend2Name} se stali přáteli",

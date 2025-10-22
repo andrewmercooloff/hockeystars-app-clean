@@ -49,6 +49,10 @@
     "photo": "kuva",
     "photos": "kuva"
   },
+  "achievementNotification": {
+    "added": "lisätty",
+    "oneAchievement": "uusi saavutus"
+  },
   "friendshipNotification": {
     "title": "Uusi ystävyys",
     "message": "{friend1Name} ja {friend2Name} ystävystyivät",
