@@ -1808,15 +1808,20 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
 // Отметка сообщений как прочитанные
 export const markMessagesAsRead = async (userId: string, otherUserId: string): Promise<void> => {
   try {
-    const { error } = await supabase
+    console.log('📖 Отмечаем сообщения как прочитанные:', { userId, otherUserId });
+    
+    const { data, error } = await supabase
       .from('messages')
       .update({ read: true })
       .eq('sender_id', otherUserId)
       .eq('receiver_id', userId)
-      .eq('read', false);
+      .eq('read', false)
+      .select();
     
     if (error) {
       console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
+    } else {
+      console.log('✅ Сообщения отмечены как прочитанные:', data?.length || 0, 'сообщений');
     }
   } catch (error) {
     console.error('❌ Ошибка отметки сообщений как прочитанные:', error);

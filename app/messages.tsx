@@ -213,11 +213,13 @@ export default function MessagesScreen() {
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
+      // Обновляем UserContext для актуального счетчика при заходе в раздел
+      refreshUser(true);
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
       };
-    }, [loadChats, setCurrentScreen])
+    }, [loadChats, setCurrentScreen, refreshUser])
   );
 
   const onRefresh = () => {

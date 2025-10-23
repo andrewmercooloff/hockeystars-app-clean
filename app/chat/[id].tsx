@@ -90,6 +90,8 @@ export default function ChatScreen() {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
+        // Обновляем UserContext перед возвратом в сообщения
+        refreshUser(true);
         router.push('/messages');
         return true; // Предотвращаем стандартное поведение
       };
@@ -97,7 +99,7 @@ export default function ChatScreen() {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
       return () => backHandler.remove();
-    }, [])
+    }, [refreshUser])
   );
 
   const loadChatData = async () => {
@@ -127,8 +129,8 @@ export default function ChatScreen() {
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Обновляем UserContext для обновления счетчика в нижнем меню (с задержкой)
-          setTimeout(() => refreshUser(true), 200);
+          // Обновляем UserContext для обновления счетчика в нижнем меню
+          await refreshUser(true);
         }
       }
     } catch (error) {
@@ -270,7 +272,10 @@ export default function ChatScreen() {
         <View style={styles.overlay}>
           {/* Заголовок чата */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
+            <TouchableOpacity onPress={async () => {
+              await refreshUser(true);
+              router.push('/messages');
+            }} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.headerInfo}>
