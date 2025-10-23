@@ -133,6 +133,13 @@ export default function ChatScreen() {
           setTimeout(async () => {
             console.log('🔄 Обновляем UserContext после markMessagesAsRead');
             await refreshUser(true);
+            
+            // Принудительно обновляем нижнее меню
+            setTimeout(() => {
+              console.log('🔄 Принудительное обновление нижнего меню');
+              // Триггерим перерендер через изменение состояния
+              setCurrentUser(prev => prev ? { ...prev, unreadMessagesCount: 0 } : null);
+            }, 100);
           }, 100);
           
           setTimeout(async () => {

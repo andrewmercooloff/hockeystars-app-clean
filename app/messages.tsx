@@ -177,7 +177,10 @@ export default function MessagesScreen() {
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
           }
-          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
+          refreshTimeoutRef.current = setTimeout(async () => {
+            await refreshUser(true);
+            console.log('🔄 Обновление нижнего меню после получения сообщения');
+          }, 500);
         }
       )
       .on(
@@ -194,7 +197,10 @@ export default function MessagesScreen() {
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
           }
-          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
+          refreshTimeoutRef.current = setTimeout(async () => {
+            await refreshUser(true);
+            console.log('🔄 Обновление нижнего меню после обновления сообщения');
+          }, 500);
         }
       )
       .subscribe();
