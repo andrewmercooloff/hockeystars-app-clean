@@ -326,7 +326,8 @@ export default function EditablePhotosSection({
             <DraggableFlatList
               data={photos}
               onDragEnd={({ data }) => handleReorder(data)}
-              keyExtractor={(item, index) => `${item}-${index}`}
+              keyExtractor={(item) => item}
+              extraData={photos}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.photosScroll}
