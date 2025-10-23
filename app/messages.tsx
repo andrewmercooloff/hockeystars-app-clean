@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
     Alert,
@@ -45,6 +45,7 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
@@ -171,8 +172,11 @@ export default function MessagesScreen() {
         (payload) => {
           console.log('🔔 Получено новое сообщение через Realtime:', payload);
           silentLoadChats();
-          // Обновляем UserContext для обновления счетчика в нижнем меню
-          refreshUser(true);
+          // Дебаунсинг для обновления UserContext
+          if (refreshTimeoutRef.current) {
+            clearTimeout(refreshTimeoutRef.current);
+          }
+          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
         }
       )
       .on(
@@ -185,14 +189,20 @@ export default function MessagesScreen() {
         },
         (payload) => {
           console.log('🔔 Сообщение обновлено через Realtime:', payload);
-          // Обновляем UserContext при изменении статуса прочтения
-          refreshUser(true);
+          // Дебаунсинг для обновления UserContext
+          if (refreshTimeoutRef.current) {
+            clearTimeout(refreshTimeoutRef.current);
+          }
+          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
         }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     };
   }, [currentUser, silentLoadChats, refreshUser]);
 
@@ -203,13 +213,11 @@ export default function MessagesScreen() {
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
-      // Обновляем UserContext для актуального счетчика
-      refreshUser(true);
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
       };
-    }, [loadChats, setCurrentScreen, refreshUser])
+    }, [loadChats, setCurrentScreen])
   );
 
   const onRefresh = () => {

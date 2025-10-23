@@ -127,8 +127,8 @@ export default function ChatScreen() {
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Обновляем UserContext для обновления счетчика в нижнем меню
-          await refreshUser(true);
+          // Обновляем UserContext для обновления счетчика в нижнем меню (с задержкой)
+          setTimeout(() => refreshUser(true), 200);
         }
       }
     } catch (error) {
