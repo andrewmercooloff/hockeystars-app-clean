@@ -2932,8 +2932,16 @@ export default function PlayerProfile() {
             <EditablePhotosSection
               photos={galleryPhotos}
               isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-              onPhotosChange={(newPhotos) => {
+              onPhotosChange={async (newPhotos) => {
                 setGalleryPhotos(newPhotos);
+                // Обновляем фото в базе данных
+                try {
+                  const updatedPlayer = { ...player, photos: newPhotos };
+                  await updatePlayer(player.id, updatedPlayer);
+                  setPlayer(updatedPlayer);
+                } catch (error) {
+                  console.error('Ошибка обновления фото:', error);
+                }
               }}
               isShopProfile={true}
             />
@@ -2945,8 +2953,16 @@ export default function PlayerProfile() {
                 <EditablePhotosSection
                   photos={galleryPhotos}
                   isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-                  onPhotosChange={(newPhotos) => {
+                  onPhotosChange={async (newPhotos) => {
                     setGalleryPhotos(newPhotos);
+                    // Обновляем фото в базе данных
+                    try {
+                      const updatedPlayer = { ...player, photos: newPhotos };
+                      await updatePlayer(player.id, updatedPlayer);
+                      setPlayer(updatedPlayer);
+                    } catch (error) {
+                      console.error('Ошибка обновления фото:', error);
+                    }
                   }}
                 />
                 ) : (
