@@ -36,7 +36,7 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { currentUser, refreshUser, setCurrentUser } = useUser();
+  const { currentUser, refreshUser, setCurrentUser, updateUserCounter } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -133,16 +133,9 @@ export default function ChatScreen() {
             await refreshUser(true);
             
             // Принудительно обновляем нижнее меню
-            setTimeout(async () => {
+            setTimeout(() => {
               console.log('🔄 Принудительное обновление нижнего меню');
-              // Получаем актуальные данные пользователя
-              const updatedUser = await loadCurrentUser();
-              if (updatedUser) {
-                setCurrentUser({ ...updatedUser, unreadMessagesCount: 0 });
-                console.log('🔄 Счетчик сообщений обнулен в UserContext');
-              } else {
-                console.log('❌ Не удалось получить данные пользователя для обновления счетчика');
-              }
+              updateUserCounter(0);
             }, 100);
           }, 100);
           

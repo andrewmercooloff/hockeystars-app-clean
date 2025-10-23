@@ -7,6 +7,7 @@ interface UserContextType {
   setCurrentUser: (user: Player | null) => void;
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
   isUserLoading: boolean;
+  updateUserCounter: (count: number) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -84,6 +85,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [setCurrentUser]);
 
+  const updateUserCounter = useCallback((count: number) => {
+    if (currentUser) {
+      const updatedUser = { ...currentUser, unreadMessagesCount: count };
+      setCurrentUser(updatedUser);
+      globalUserCache = updatedUser;
+      console.log('🔄 Счетчик сообщений обновлен в UserContext:', count);
+    }
+  }, [currentUser, setCurrentUser]);
+
   // Автоматическая загрузка пользователя при инициализации
   React.useEffect(() => {
     // Загружаем пользователя только если нет кеша
@@ -97,7 +107,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       currentUser, 
       setCurrentUser, 
       refreshUser, 
-      isUserLoading 
+      isUserLoading,
+      updateUserCounter
     }}>
       {children}
     </UserContext.Provider>
