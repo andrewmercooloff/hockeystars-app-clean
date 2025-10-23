@@ -289,11 +289,7 @@ export default function ChatScreen() {
         <View style={styles.overlay}>
           {/* Заголовок чата */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={async () => {
-              // Обновляем UserContext перед возвратом в сообщения
-              await refreshUser(true);
-              router.push('/messages');
-            }} style={styles.backButton}>
+            <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.headerInfo}>

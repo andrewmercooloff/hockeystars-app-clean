@@ -214,24 +214,11 @@ export default function MessagesScreen() {
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
-      
-      // Обновляем UserContext с дебаунсингом при заходе в раздел
-      if (focusRefreshTimeoutRef.current) {
-        clearTimeout(focusRefreshTimeoutRef.current);
-      }
-      focusRefreshTimeoutRef.current = setTimeout(async () => {
-        console.log('🔄 Обновляем UserContext при заходе в раздел сообщений');
-        await refreshUser(true);
-      }, 500);
-      
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
-        if (focusRefreshTimeoutRef.current) {
-          clearTimeout(focusRefreshTimeoutRef.current);
-        }
       };
-    }, [loadChats, setCurrentScreen, refreshUser])
+    }, [loadChats, setCurrentScreen])
   );
 
   const onRefresh = () => {

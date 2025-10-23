@@ -1810,6 +1810,26 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
   try {
     console.log('📖 Отмечаем сообщения как прочитанные:', { userId, otherUserId });
     
+    // Сначала проверим, сколько непрочитанных сообщений есть
+    const { data: unreadData, error: unreadError } = await supabase
+      .from('messages')
+      .select('id')
+      .eq('sender_id', otherUserId)
+      .eq('receiver_id', userId)
+      .eq('read', false);
+    
+    if (unreadError) {
+      console.error('❌ Ошибка проверки непрочитанных сообщений:', unreadError);
+      return;
+    }
+    
+    console.log('📖 Найдено непрочитанных сообщений:', unreadData?.length || 0);
+    
+    if ((unreadData?.length || 0) === 0) {
+      console.log('📖 Нет непрочитанных сообщений для отметки');
+      return;
+    }
+    
     const { data, error } = await supabase
       .from('messages')
       .update({ read: true })
@@ -1822,6 +1842,20 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
       console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
     } else {
       console.log('✅ Сообщения отмечены как прочитанные:', data?.length || 0, 'сообщений');
+      
+      // Проверим, что сообщения действительно обновились
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('messages')
+        .select('id, read')
+        .eq('sender_id', otherUserId)
+        .eq('receiver_id', userId)
+        .eq('read', false);
+      
+      if (verifyError) {
+        console.error('❌ Ошибка проверки обновления:', verifyError);
+      } else {
+        console.log('✅ Проверка: осталось непрочитанных сообщений:', verifyData?.length || 0);
+      }
     }
   } catch (error) {
     console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
@@ -2514,11 +2548,15 @@ export const getUnreadMessageCount = async (userId: string): Promise<number> => 
       .eq('read', false);
     
     if (error) {
+      console.error('❌ Ошибка получения счетчика непрочитанных сообщений:', error);
       return 0;
     }
     
-    return data?.length || 0;
+    const count = data?.length || 0;
+    console.log('📊 Счетчик непрочитанных сообщений для пользователя', userId + ':', count);
+    return count;
   } catch (error) {
+    console.error('❌ Ошибка получения счетчика непрочитанных сообщений:', error);
     return 0;
   }
 };
