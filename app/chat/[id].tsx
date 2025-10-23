@@ -26,7 +26,8 @@ import {
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
-import { playOutgoingMessageSound, playIncomingMessageSound } from '../../utils/soundService';
+import { Vibration } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { supabase } from '../../utils/supabase';
 
 const iceBg = require('../../assets/images/led.jpg');
@@ -127,8 +128,10 @@ export default function ChatScreen() {
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Обновляем UserContext для обновления счетчика в нижнем меню
-          await refreshUser(true);
+          // Обновляем UserContext для обновления счетчика в нижнем меню (с небольшой задержкой)
+          setTimeout(async () => {
+            await refreshUser(true);
+          }, 300);
         }
       }
     } catch (error) {
@@ -162,22 +165,26 @@ export default function ChatScreen() {
           // Находим новые сообщения по ID
           const newMessages = conversation.filter(m => newMessageIds.includes(m.id));
           
-          // Если только что отправили сообщение, не воспроизводим звук получения
+          // Если только что отправили сообщение, не воспроизводим вибрацию получения
           if (justSentMessageRef.current) {
-            console.log('🔊 Пропускаем звук получения - только что отправили сообщение');
+            console.log('📳 Пропускаем вибрацию получения - только что отправили сообщение');
             justSentMessageRef.current = false;
           } else {
-            // Воспроизводим звук получения только для сообщений от других пользователей
+            // Вибрация при получении сообщений от других пользователей
             const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
             if (incomingMessages.length > 0) {
-              console.log('🔊 Воспроизводим звук получения для', incomingMessages.length, 'новых сообщений от других пользователей');
+              console.log('📳 Вибрация при получении', incomingMessages.length, 'новых сообщений от других пользователей');
               try {
-                await playIncomingMessageSound();
-              } catch (soundError) {
-                console.error('❌ Ошибка воспроизведения звука получения:', soundError);
+                if (Platform.OS === 'ios') {
+                  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                } else {
+                  Vibration.vibrate(75);
+                }
+              } catch (vibError) {
+                console.error('❌ Ошибка вибрации при получении:', vibError);
               }
             } else {
-              console.log('🔊 Пропускаем звук получения - все новые сообщения от текущего пользователя');
+              console.log('📳 Пропускаем вибрацию - все новые сообщения от текущего пользователя');
             }
           }
           
@@ -185,9 +192,9 @@ export default function ChatScreen() {
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }, 100);
         } else if (newMessageIds.length === 0) {
-          console.log('🔊 Нет новых сообщений - пропускаем звук');
+          console.log('📳 Нет новых сообщений - пропускаем вибрацию');
         } else {
-          console.log('🔊 Слишком рано для звука - пропускаем');
+          console.log('📳 Слишком рано для вибрации - пропускаем');
         }
 
       } catch (error) {
@@ -207,11 +214,16 @@ export default function ChatScreen() {
         // Устанавливаем флаг, что только что отправили сообщение
         justSentMessageRef.current = true;
         
-        // Воспроизводим звук отправки сообщения
+        // Вибрация при отправке сообщения
         try {
-          await playOutgoingMessageSound();
-        } catch (soundError) {
-          console.error('❌ Ошибка воспроизведения звука отправки:', soundError);
+          if (Platform.OS === 'ios') {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          } else {
+            Vibration.vibrate(50);
+          }
+          console.log('📳 Вибрация при отправке сообщения');
+        } catch (vibError) {
+          console.error('❌ Ошибка вибрации при отправке:', vibError);
         }
         
         setNewMessage('');
