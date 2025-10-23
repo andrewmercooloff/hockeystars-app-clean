@@ -36,9 +36,8 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { refreshUser } = useUser();
+  const { currentUser, refreshUser, setCurrentUser } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
-  const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -113,7 +112,6 @@ export default function ChatScreen() {
         }
 
         setOtherPlayer(otherPlayerData);
-        setCurrentUser(userData);
         
         if (otherPlayerData) {
           // Сразу загружаем сообщения
@@ -138,7 +136,10 @@ export default function ChatScreen() {
             setTimeout(() => {
               console.log('🔄 Принудительное обновление нижнего меню');
               // Триггерим перерендер через изменение состояния
-              setCurrentUser(prev => prev ? { ...prev, unreadMessagesCount: 0 } : null);
+              if (currentUser) {
+                setCurrentUser({ ...currentUser, unreadMessagesCount: 0 });
+                console.log('🔄 Счетчик сообщений обнулен в UserContext');
+              }
             }, 100);
           }, 100);
           
