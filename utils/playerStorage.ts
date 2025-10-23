@@ -1592,55 +1592,54 @@ export const saveCurrentUser = async (user: Player): Promise<void> => {
 // Загрузка текущего пользователя
 export const loadCurrentUser = async (): Promise<Player | null> => {
   try {
-    // Кэшируем результат на короткое время, чтобы избежать повторных логов
-    const cacheKey = 'hockeystars_user_cache';
-    const cacheTime = 30000; // 30 секунд кэша
-    
-    // Проверяем кэш
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-    
-    if (cachedData) {
-      const { user, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < cacheTime) {
-        return user;
-      }
-    }
-    
-    // Загрузка текущего пользователя
-    const userData = await AsyncStorage.getItem('hockeystars_current_user');
-    
-    if (!userData) {
+    // Получаем текущего пользователя из AsyncStorage
+    const userJson = await AsyncStorage.getItem('currentUser');
+    console.log('🔍 Загрузка пользователя из AsyncStorage:', userJson ? 'Найден' : 'Не найден');
+
+    if (!userJson) {
+      console.log('❌ Пользователь не найден в AsyncStorage');
       return null;
     }
-    
-    const user = JSON.parse(userData);
-    
-    // Обновляем счетчик непрочитанных сообщений
-    try {
-      const unreadCount = await getUnreadMessageCount(user.id);
-      user.unreadMessagesCount = unreadCount;
-    } catch (error) {
-      console.error('❌ Ошибка получения счетчика сообщений:', error);
-      user.unreadMessagesCount = 0;
+
+    const userData = JSON.parse(userJson);
+    console.log('🔍 Данные пользователя из AsyncStorage:', {
+      id: userData.id,
+      name: userData.name,
+      unreadMessagesCount: userData.unreadMessagesCount
+    });
+
+    // Получаем актуальные данные пользователя из Supabase
+    const { data, error } = await supabase
+      .from('players')
+      .select('*')
+      .eq('id', userData.id)
+      .single();
+
+    if (error) {
+      console.error('❌ Ошибка получения данных пользователя из Supabase:', error);
+      return userData;
     }
-    
-    // Логируем детали только при первом заходе или изменении пользователя
-    const lastUserKey = 'hockeystars_last_user_id';
-    const lastUserId = await AsyncStorage.getItem(lastUserKey);
-    
-    if (lastUserId !== user.id) {
-        // User data logged
-      await AsyncStorage.setItem(lastUserKey, user.id);
-    }
-    
-    // Кэшируем результат
-    await AsyncStorage.setItem(cacheKey, JSON.stringify({
-      user,
-      timestamp: Date.now()
-    }));
-    
-    return user;
+
+    // Получаем количество непрочитанных сообщений
+    const unreadCount = await getUnreadMessageCount(userData.id);
+    console.log('📊 Количество непрочитанных сообщений:', unreadCount);
+
+    // Обновляем данные пользователя
+    const updatedUser = {
+      ...convertSupabaseToPlayer(data),
+      unreadMessagesCount: unreadCount
+    };
+
+    console.log('🔄 Обновленные данные пользователя:', {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      unreadMessagesCount: updatedUser.unreadMessagesCount
+    });
+
+    // Сохраняем обновленные данные в AsyncStorage
+    await AsyncStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+    return updatedUser;
   } catch (error) {
     console.error('❌ Ошибка загрузки текущего пользователя:', error);
     return null;
@@ -1809,27 +1808,27 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
 export const markMessagesAsRead = async (userId: string, otherUserId: string): Promise<void> => {
   try {
     console.log('📖 Отмечаем сообщения как прочитанные:', { userId, otherUserId });
-    
+
     // Сначала проверим, сколько непрочитанных сообщений есть
     const { data: unreadData, error: unreadError } = await supabase
       .from('messages')
-      .select('id')
+      .select('id, sender_id, receiver_id, read, created_at')
       .eq('sender_id', otherUserId)
       .eq('receiver_id', userId)
       .eq('read', false);
-    
+
     if (unreadError) {
       console.error('❌ Ошибка проверки непрочитанных сообщений:', unreadError);
       return;
     }
-    
+
     console.log('📖 Найдено непрочитанных сообщений:', unreadData?.length || 0);
-    
+
     if ((unreadData?.length || 0) === 0) {
       console.log('📖 Нет непрочитанных сообщений для отметки');
       return;
     }
-    
+
     const { data, error } = await supabase
       .from('messages')
       .update({ read: true })
@@ -1837,12 +1836,12 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
       .eq('receiver_id', userId)
       .eq('read', false)
       .select();
-    
+
     if (error) {
       console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
     } else {
       console.log('✅ Сообщения отмечены как прочитанные:', data?.length || 0, 'сообщений');
-      
+
       // Проверим, что сообщения действительно обновились
       const { data: verifyData, error: verifyError } = await supabase
         .from('messages')
@@ -1850,7 +1849,7 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
         .eq('sender_id', otherUserId)
         .eq('receiver_id', userId)
         .eq('read', false);
-      
+
       if (verifyError) {
         console.error('❌ Ошибка проверки обновления:', verifyError);
       } else {
