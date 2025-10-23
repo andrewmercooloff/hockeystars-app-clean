@@ -332,9 +332,16 @@ export default function EditablePhotosSection({
               data={photos}
               onDragEnd={({ data }) => handleReorder(data)}
               keyExtractor={(item) => item}
+              extraData={photos}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.photosScroll}
+              getItemLayout={(data, index) => ({
+                length: 135, // 120px photo + 15px margin
+                offset: 135 * index,
+                index,
+              })}
+              removeClippedSubviews={false}
               renderItem={({ item: photo, index, drag, isActive }) => (
                 <View style={[styles.photoContainer, isActive && styles.draggingItem]}>
                   <TouchableOpacity
