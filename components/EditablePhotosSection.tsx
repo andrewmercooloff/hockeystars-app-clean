@@ -40,6 +40,7 @@ export default function EditablePhotosSection({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const openPhotoViewer = (index: number) => {
     setSelectedPhotoIndex(index);
@@ -273,6 +274,7 @@ export default function EditablePhotosSection({
           onPress: () => {
             const newPhotos = photos.filter((_, i) => i !== index);
             onPhotosChange?.(newPhotos);
+            setForceUpdate(prev => prev + 1); // Принудительное обновление
           }
         }
       ]
@@ -331,8 +333,8 @@ export default function EditablePhotosSection({
             <DraggableFlatList
               data={photos}
               onDragEnd={({ data }) => handleReorder(data)}
-              keyExtractor={(item) => item}
-              extraData={photos}
+              keyExtractor={(item, index) => `${item}-${index}-${forceUpdate}`}
+              extraData={[photos, forceUpdate]}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.photosScroll}
