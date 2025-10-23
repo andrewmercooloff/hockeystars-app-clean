@@ -133,12 +133,15 @@ export default function ChatScreen() {
             await refreshUser(true);
             
             // Принудительно обновляем нижнее меню
-            setTimeout(() => {
+            setTimeout(async () => {
               console.log('🔄 Принудительное обновление нижнего меню');
-              // Триггерим перерендер через изменение состояния
-              if (currentUser) {
-                setCurrentUser({ ...currentUser, unreadMessagesCount: 0 });
+              // Получаем актуальные данные пользователя
+              const updatedUser = await loadCurrentUser();
+              if (updatedUser) {
+                setCurrentUser({ ...updatedUser, unreadMessagesCount: 0 });
                 console.log('🔄 Счетчик сообщений обнулен в UserContext');
+              } else {
+                console.log('❌ Не удалось получить данные пользователя для обновления счетчика');
               }
             }, 100);
           }, 100);

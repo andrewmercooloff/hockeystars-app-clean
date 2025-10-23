@@ -75,6 +75,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
       // Если в кеше нет актуальных данных, загружаем из хранилища
       const user = await loadCurrentUser();
+      console.log('🔄 UserContext: Обновляем пользователя, счетчик сообщений:', user?.unreadMessagesCount || 0);
       setCurrentUser(user);
       setIsUserLoading(false);
     } catch (error) {
