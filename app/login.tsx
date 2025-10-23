@@ -18,12 +18,14 @@ import WebTextInput from '../components/WebTextInput';
 import { findPlayerByCredentials, saveCurrentUser, getPlayerByPhone, createPlayer } from '../utils/playerStorage';
 import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUser } from '../contexts/UserContext';
 
 const iceBg = require('../assets/images/led.jpg');
 
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { refreshUser } = useUser();
   const phoneRef = useRef<TextInput>(null);
   const codeRef = useRef<TextInput>(null);
   const [step, setStep] = useState<'phone' | 'code'>('phone');
@@ -135,6 +137,9 @@ export default function LoginScreen() {
         
         // Входим в систему как найденный пользователь
         await saveCurrentUser(user);
+        
+        // Обновляем контекст пользователя для немедленного обновления интерфейса
+        refreshUser(true); // forceRefresh = true
         
         setAlert({
           visible: true,
@@ -348,6 +353,9 @@ export default function LoginScreen() {
       
       // Пользователь найден - входим в систему
       await saveCurrentUser(user);
+      
+      // Обновляем контекст пользователя для немедленного обновления интерфейса
+      refreshUser(true); // forceRefresh = true
       
       setAlert({
         visible: true,

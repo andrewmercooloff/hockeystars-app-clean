@@ -3534,6 +3534,9 @@ export default function PlayerProfile() {
                             // Сохраняем нового пользователя
                             await saveCurrentUser(player);
                             
+                            // Обновляем контекст пользователя для немедленного обновления интерфейса
+                            refreshUser(true); // forceRefresh = true
+                            
                             // Показываем уведомление
                             Alert.alert(
                               t('common.success') || 'Успешно',
@@ -3542,7 +3545,7 @@ export default function PlayerProfile() {
                                 {
                                   text: 'OK',
                                   onPress: () => {
-                                    // Перезагружаем приложение
+                                    // Переходим на главную страницу (контекст уже обновлен)
                                     router.replace('/');
                                   }
                                 }
