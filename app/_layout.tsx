@@ -63,7 +63,6 @@ export default function RootLayout() {
   const [showSplash, setShowSplash] = React.useState<boolean>(true);
   const [appReady, setAppReady] = React.useState<boolean>(false);
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
-  const [forceUpdateKey, setForceUpdateKey] = React.useState<number>(0);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   
   React.useEffect(() => {
@@ -559,9 +558,32 @@ export default function RootLayout() {
     // Используем централизованный менеджер подписок
     realtimeManager.setupSubscriptions(currentUser.id);
 
+    // Добавляем подписку на изменения счетчика сообщений
+    const messagesChannel = supabase
+      .channel('players-messages-count')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players',
+          filter: `id=eq.${currentUser.id}`
+        },
+        (payload) => {
+          console.log('🔄 Счетчик сообщений изменен в БД через Realtime:', payload.new.unread_messages_count);
+          // Обновляем UserContext для обновления индикатора
+          // Используем loadUser вместо refreshUser
+          loadUser();
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Статус подписки players-messages-count:', status);
+      });
+
     return () => {
       // Отключаем подписки при размонтировании
       realtimeManager.disconnect();
+      supabase.removeChannel(messagesChannel);
     };
   }, [currentUser?.id]);
 
