@@ -669,7 +669,7 @@ export default function PlayerProfile() {
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 0.7, // Уменьшаем качество для экономии места
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -695,7 +695,7 @@ export default function PlayerProfile() {
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 0.7, // Уменьшаем качество для экономии места
       });
 
       if (!result.canceled && result.assets[0]) {

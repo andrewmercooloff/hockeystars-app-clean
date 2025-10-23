@@ -130,7 +130,7 @@ export default function EditablePhotosSection({
         const result = await ImagePicker.launchImageLibraryAsync({
           allowsEditing: false,
           allowsMultipleSelection: true,
-          quality: 0.8,
+          quality: 0.7, // Уменьшаем качество для экономии места
           mediaTypes: ['images'],
         });
 
@@ -221,7 +221,7 @@ export default function EditablePhotosSection({
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 0.7, // Уменьшаем качество для экономии места
       });
 
              if (!result.canceled && result.assets[0]) {

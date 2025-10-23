@@ -193,8 +193,8 @@ export const uploadGalleryPhoto = async (imageUri: string, fileName?: string): P
       try {
         const result = await ImageManipulator.manipulateAsync(
           imageUri,
-          [{ resize: { width: 1200 } }], // Оптимальный размер для галереи
-          { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG } // JPEG для галереи - экономия места
+          [{ resize: { width: 800 } }], // Оптимальный размер для галереи - не больше 800px
+          { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } // JPEG для галереи - экономия места
         );
         
         processedImageUri = result.uri;
