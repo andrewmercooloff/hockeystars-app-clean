@@ -128,10 +128,17 @@ export default function ChatScreen() {
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Обновляем UserContext для обновления счетчика в нижнем меню (с небольшой задержкой)
+          // Обновляем UserContext для обновления счетчика в нижнем меню
+          // Попробуем несколько раз с разными задержками для надежности
           setTimeout(async () => {
+            console.log('🔄 Обновляем UserContext после markMessagesAsRead');
             await refreshUser(true);
-          }, 300);
+          }, 100);
+          
+          setTimeout(async () => {
+            console.log('🔄 Повторное обновление UserContext');
+            await refreshUser(true);
+          }, 1000);
         }
       }
     } catch (error) {
@@ -282,7 +289,11 @@ export default function ChatScreen() {
         <View style={styles.overlay}>
           {/* Заголовок чата */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
+            <TouchableOpacity onPress={async () => {
+              // Обновляем UserContext перед возвратом в сообщения
+              await refreshUser(true);
+              router.push('/messages');
+            }} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.headerInfo}>

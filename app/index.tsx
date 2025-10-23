@@ -363,32 +363,23 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             lastHapticTimeRef.current = now;
             console.log('📳 ВИБРАЦИЯ: Срабатывает на главном экране, currentScreen =', currentScreen);
             
-            // Более агрессивный подход для iOS
+            // Легкая вибрация для столкновений шайб
             if (Platform.OS === 'ios') {
-              // Пробуем несколько методов вибрации для iOS
               try {
-                // Сначала пробуем Haptics
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {
-                  // Если не сработало, пробуем Vibration
-                  try {
-                    Vibration.vibrate([0, 100, 50, 100]); // Паттерн вибрации
-                  } catch (vibError) {
-                    // Последняя попытка - простая вибрация
-                    Vibration.vibrate(100);
-                  }
-                });
+                // Используем легкую вибрацию для iOS
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               } catch (error) {
-                // Если все не сработало, пробуем Vibration напрямую
+                // Если не сработало, пробуем Vibration
                 try {
-                  Vibration.vibrate(100);
+                  Vibration.vibrate(30); // Короткая легкая вибрация
                 } catch (vibError) {
                   // Игнорируем ошибки
                 }
               }
             } else {
-              // Для Android используем обычную вибрацию
+              // Для Android используем короткую легкую вибрацию
               try {
-                Vibration.vibrate(50);
+                Vibration.vibrate(30);
               } catch (vibError) {
                 // Игнорируем ошибки
               }
