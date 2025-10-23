@@ -12,7 +12,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { uploadGalleryPhoto } from '../utils/uploadImage';
 import { loadCurrentUser, notifyFriendsAboutPhotos } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
@@ -40,7 +40,8 @@ export default function EditablePhotosSection({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadingCount, setUploadingCount] = useState(0);
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const openPhotoViewer = (index: number) => {
     setSelectedPhotoIndex(index);
@@ -281,8 +282,35 @@ export default function EditablePhotosSection({
     );
   };
 
-  const handleReorder = (data: string[]) => {
-    onPhotosChange?.(data);
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragMove = (event: any) => {
+    if (draggedIndex !== null) {
+      setDragOffset({
+        x: event.nativeEvent.translationX,
+        y: event.nativeEvent.translationY,
+      });
+    }
+  };
+
+  const handleDragEnd = (event: any) => {
+    if (draggedIndex !== null) {
+      const newIndex = Math.round(event.nativeEvent.translationX / 135); // 135px per photo
+      const targetIndex = Math.max(0, Math.min(photos.length - 1, draggedIndex + newIndex));
+      
+      if (targetIndex !== draggedIndex) {
+        const newPhotos = [...photos];
+        const draggedPhoto = newPhotos[draggedIndex];
+        newPhotos.splice(draggedIndex, 1);
+        newPhotos.splice(targetIndex, 0, draggedPhoto);
+        onPhotosChange?.(newPhotos);
+      }
+      
+      setDraggedIndex(null);
+      setDragOffset({ x: 0, y: 0 });
+    }
   };
 
 
@@ -329,23 +357,52 @@ export default function EditablePhotosSection({
       
       {photos.length > 0 && (
         <View style={styles.photosContainer}>
-          {isEditing ? (
-            <DraggableFlatList
-              data={photos}
-              onDragEnd={({ data }) => handleReorder(data)}
-              keyExtractor={(item, index) => `${item}-${index}-${forceUpdate}`}
-              extraData={[photos, forceUpdate]}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.photosScroll}
-              getItemLayout={(data, index) => ({
-                length: 135, // 120px photo + 15px margin
-                offset: 135 * index,
-                index,
-              })}
-              removeClippedSubviews={false}
-              renderItem={({ item: photo, index, drag, isActive }) => (
-                <View style={[styles.photoContainer, isActive && styles.draggingItem]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.photosScroll}
+            removeClippedSubviews={true}
+            decelerationRate="fast"
+          >
+            {photos.map((photo, index) => (
+              <View key={photo} style={styles.photoContainer}>
+                {isEditing ? (
+                  <PanGestureHandler
+                    onGestureEvent={handleDragMove}
+                    onHandlerStateChange={(event) => {
+                      if (event.nativeEvent.state === State.BEGAN) {
+                        handleDragStart(index);
+                      } else if (event.nativeEvent.state === State.END) {
+                        handleDragEnd(event);
+                      }
+                    }}
+                  >
+                    <View style={[
+                      styles.photoWrapper,
+                      draggedIndex === index && styles.draggingItem,
+                      draggedIndex === index && {
+                        transform: [
+                          { translateX: dragOffset.x },
+                          { translateY: dragOffset.y },
+                        ],
+                      },
+                    ]}>
+                      <TouchableOpacity
+                        onPress={() => openPhotoViewer(index)}
+                        activeOpacity={0.8}
+                      >
+                        <Image
+                          source={{ uri: photo }}
+                          style={styles.photo}
+                          resizeMode="cover"
+                        />
+                        <View style={styles.dragHandle}>
+                          <Ionicons name="reorder-three" size={16} color="#fff" />
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </PanGestureHandler>
+                ) : (
                   <TouchableOpacity
                     style={styles.photoWrapper}
                     onPress={() => openPhotoViewer(index)}
@@ -356,49 +413,20 @@ export default function EditablePhotosSection({
                       style={styles.photo}
                       resizeMode="cover"
                     />
-                    <TouchableOpacity
-                      style={styles.dragHandle}
-                      onLongPress={drag}
-                      disabled={isActive}
-                    >
-                      <Ionicons name="reorder-three" size={16} color="#fff" />
-                    </TouchableOpacity>
                   </TouchableOpacity>
-                  
+                )}
+                
+                {isEditing && (
                   <TouchableOpacity
                     style={styles.removePhotoButton}
                     onPress={() => handleRemovePhoto(index)}
                   >
                     <Ionicons name="close-circle" size={24} color="#fa2f40" />
                   </TouchableOpacity>
-                </View>
-              )}
-            />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.photosScroll}
-              removeClippedSubviews={true}
-              decelerationRate="fast"
-            >
-              {photos.map((photo, index) => (
-                <View key={photo} style={styles.photoContainer}>
-                  <TouchableOpacity
-                    style={styles.photoWrapper}
-                    onPress={() => openPhotoViewer(index)}
-                    activeOpacity={0.8}
-                  >
-                    <Image
-                      source={{ uri: photo }}
-                      style={styles.photo}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-          )}
+                )}
+              </View>
+            ))}
+          </ScrollView>
         </View>
       )}
 
