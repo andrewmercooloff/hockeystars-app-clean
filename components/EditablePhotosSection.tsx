@@ -12,6 +12,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { uploadGalleryPhoto } from '../utils/uploadImage';
 import { loadCurrentUser, notifyFriendsAboutPhotos } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
@@ -39,6 +40,7 @@ export default function EditablePhotosSection({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [isReordering, setIsReordering] = useState(false);
 
   const openPhotoViewer = (index: number) => {
     setSelectedPhotoIndex(index);
@@ -140,9 +142,16 @@ export default function EditablePhotosSection({
            setUploadingCount(result.assets.length);
            setUploadProgress(0);
            
+           // Сортируем фото по дате создания (новые сначала)
+           const sortedAssets = [...result.assets].sort((a, b) => {
+             const dateA = new Date(a.creationTime || a.modificationTime || 0).getTime();
+             const dateB = new Date(b.creationTime || b.modificationTime || 0).getTime();
+             return dateB - dateA; // Убывающий порядок (новые сначала)
+           });
+           
            const newPhotos = [...photos];
-                        for (let i = 0; i < result.assets.length && newPhotos.length < 50; i++) {
-               const asset = result.assets[i];
+                        for (let i = 0; i < sortedAssets.length && newPhotos.length < 50; i++) {
+               const asset = sortedAssets[i];
 
              
              // Обновляем прогресс
@@ -267,6 +276,14 @@ export default function EditablePhotosSection({
     );
   };
 
+  const handleReorder = (data: string[]) => {
+    onPhotosChange?.(data);
+  };
+
+  const toggleReordering = () => {
+    setIsReordering(!isReordering);
+  };
+
   if (photos.length === 0 && !isEditing) {
     return null;
   }
@@ -279,16 +296,30 @@ export default function EditablePhotosSection({
       
              {isEditing && (
          <>
-                       <TouchableOpacity
-              style={styles.addPhotoButton}
-              onPress={handleAddPhoto}
-              disabled={isUploading || photos.length >= 50}
-            >
-              <Ionicons name="add-circle" size={24} color={(isUploading || photos.length >= 50) ? "#666" : "#fff"} />
-              <Text style={[styles.addPhotoButtonText, (isUploading || photos.length >= 50) && styles.disabledText]}>
-                {(isUploading || photos.length >= 50) ? (photos.length >= 50 ? t('maxPhotos') : t('uploading')) : `${t('addPhoto')} (${photos.length}/50)`}
-              </Text>
-            </TouchableOpacity>
+           <View style={styles.buttonsContainer}>
+             <TouchableOpacity
+               style={styles.addPhotoButton}
+               onPress={handleAddPhoto}
+               disabled={isUploading || photos.length >= 50}
+             >
+               <Ionicons name="add-circle" size={24} color={(isUploading || photos.length >= 50) ? "#666" : "#fff"} />
+               <Text style={[styles.addPhotoButtonText, (isUploading || photos.length >= 50) && styles.disabledText]}>
+                 {(isUploading || photos.length >= 50) ? (photos.length >= 50 ? t('maxPhotos') : t('uploading')) : `${t('addPhoto')} (${photos.length}/50)`}
+               </Text>
+             </TouchableOpacity>
+             
+             {photos.length > 1 && (
+               <TouchableOpacity
+                 style={[styles.reorderButton, isReordering && styles.reorderButtonActive]}
+                 onPress={toggleReordering}
+               >
+                 <Ionicons name="reorder-three" size={20} color={isReordering ? "#fff" : "#fa2f40"} />
+                 <Text style={[styles.reorderButtonText, isReordering && styles.reorderButtonTextActive]}>
+                   {isReordering ? t('done') : t('reorder')}
+                 </Text>
+               </TouchableOpacity>
+             )}
+           </View>
            
            {isUploading && (
              <View style={styles.uploadProgressContainer}>
@@ -309,38 +340,79 @@ export default function EditablePhotosSection({
        )}
       
       {photos.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.photosScroll}
-          removeClippedSubviews={true}
-          decelerationRate="fast"
-        >
-          {photos.map((photo, index) => (
-            <View key={index} style={styles.photoContainer}>
-                             <TouchableOpacity
-                 style={styles.photoWrapper}
-                 onPress={() => openPhotoViewer(index)}
-                 activeOpacity={0.8}
-               >
-                 <Image
-                   source={{ uri: photo }}
-                   style={styles.photo}
-                   resizeMode="cover"
-                 />
-               </TouchableOpacity>
-              
-              {isEditing && (
-                <TouchableOpacity
-                  style={styles.removePhotoButton}
-                  onPress={() => handleRemovePhoto(index)}
-                >
-                  <Ionicons name="close-circle" size={24} color="#fa2f40" />
-                </TouchableOpacity>
+        <View style={styles.photosContainer}>
+          {isReordering ? (
+            <DraggableFlatList
+              data={photos}
+              onDragEnd={({ data }) => handleReorder(data)}
+              keyExtractor={(item, index) => `${item}-${index}`}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.photosScroll}
+              renderItem={({ item: photo, index, drag, isActive }) => (
+                <View style={[styles.photoContainer, isActive && styles.draggingItem]}>
+                  <TouchableOpacity
+                    style={styles.photoWrapper}
+                    onLongPress={drag}
+                    disabled={isActive}
+                    activeOpacity={0.8}
+                  >
+                    <Image
+                      source={{ uri: photo }}
+                      style={styles.photo}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.dragHandle}>
+                      <Ionicons name="reorder-three" size={16} color="#fff" />
+                    </View>
+                  </TouchableOpacity>
+                  
+                  {isEditing && (
+                    <TouchableOpacity
+                      style={styles.removePhotoButton}
+                      onPress={() => handleRemovePhoto(index)}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#fa2f40" />
+                    </TouchableOpacity>
+                  )}
+                </View>
               )}
-            </View>
-          ))}
-        </ScrollView>
+            />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.photosScroll}
+              removeClippedSubviews={true}
+              decelerationRate="fast"
+            >
+              {photos.map((photo, index) => (
+                <View key={index} style={styles.photoContainer}>
+                  <TouchableOpacity
+                    style={styles.photoWrapper}
+                    onPress={() => openPhotoViewer(index)}
+                    activeOpacity={0.8}
+                  >
+                    <Image
+                      source={{ uri: photo }}
+                      style={styles.photo}
+                      resizeMode="cover"
+                    />
+                  </TouchableOpacity>
+                  
+                  {isEditing && (
+                    <TouchableOpacity
+                      style={styles.removePhotoButton}
+                      onPress={() => handleRemovePhoto(index)}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#fa2f40" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
       )}
 
       {photos.length === 0 && isEditing && (
@@ -384,17 +456,45 @@ const styles = StyleSheet.create({
     color: '#fa2f40',
     marginBottom: 15,
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 15,
+  },
   addPhotoButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 7,
-    marginBottom: 15,
     backgroundColor: '#fa2f40',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#fa2f40',
     paddingHorizontal: 12,
+    flex: 1,
+  },
+  reorderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    backgroundColor: 'transparent',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+    paddingHorizontal: 12,
+  },
+  reorderButtonActive: {
+    backgroundColor: '#fa2f40',
+  },
+  reorderButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fa2f40',
+    marginLeft: 6,
+  },
+  reorderButtonTextActive: {
+    color: '#fff',
   },
   addPhotoButtonText: {
     fontSize: 16,
@@ -445,8 +545,23 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: 'center',
   },
+  photosContainer: {
+    marginTop: 5,
+  },
   photosScroll: {
     paddingRight: 20,
+  },
+  draggingItem: {
+    opacity: 0.8,
+    transform: [{ scale: 1.05 }],
+  },
+  dragHandle: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 4,
+    padding: 2,
   },
   photoContainer: {
     position: 'relative',
