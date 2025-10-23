@@ -8,6 +8,7 @@ interface UserContextType {
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
   isUserLoading: boolean;
   updateUserCounter: (count: number) => void;
+  forceUpdateBottomMenu: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -94,6 +95,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [currentUser, setCurrentUser]);
 
+  const forceUpdateBottomMenu = useCallback(() => {
+    // Принудительно обновляем UserContext для перерендера нижнего меню
+    if (currentUser) {
+      setCurrentUser({ ...currentUser });
+      console.log('🔄 Принудительное обновление нижнего меню');
+    }
+  }, [currentUser, setCurrentUser]);
+
   // Автоматическая загрузка пользователя при инициализации
   React.useEffect(() => {
     // Загружаем пользователя только если нет кеша
@@ -108,7 +117,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setCurrentUser, 
       refreshUser, 
       isUserLoading,
-      updateUserCounter
+      updateUserCounter,
+      forceUpdateBottomMenu
     }}>
       {children}
     </UserContext.Provider>

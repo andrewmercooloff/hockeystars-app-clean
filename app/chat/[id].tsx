@@ -36,7 +36,7 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { currentUser, refreshUser, setCurrentUser, updateUserCounter } = useUser();
+  const { currentUser, refreshUser, setCurrentUser, updateUserCounter, forceUpdateBottomMenu } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -136,6 +136,10 @@ export default function ChatScreen() {
             setTimeout(() => {
               console.log('🔄 Принудительное обновление нижнего меню');
               updateUserCounter(0);
+              // Дополнительно принудительно обновляем нижнее меню
+              setTimeout(() => {
+                forceUpdateBottomMenu();
+              }, 50);
             }, 100);
           }, 100);
           

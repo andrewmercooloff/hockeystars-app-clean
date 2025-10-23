@@ -63,6 +63,7 @@ export default function RootLayout() {
   const [showSplash, setShowSplash] = React.useState<boolean>(true);
   const [appReady, setAppReady] = React.useState<boolean>(false);
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
+  const [forceUpdateKey, setForceUpdateKey] = React.useState<number>(0);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   
   React.useEffect(() => {
