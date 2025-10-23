@@ -122,7 +122,7 @@ export default function RootLayout() {
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
-    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading, isAvatarLoading } = useUser();
+    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
     
     // Синхронизируем локальное состояние с глобальным (layout -> context)
@@ -152,9 +152,9 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда приложение готово, пользователь загружен и аватарка загружена
+    // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
-      if (appReady && !isUserLoading && !isAvatarLoading) {
+      if (appReady && !isUserLoading) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
         Animated.timing(splashOpacity, {
           toValue: 0,
@@ -164,7 +164,7 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-    }, [appReady, isUserLoading, isAvatarLoading]);
+    }, [appReady, isUserLoading]);
     
     return null;
   };
@@ -440,7 +440,11 @@ export default function RootLayout() {
       try {
 
         // Быстро скрываем нативный Metro splash screen
-        await SplashScreen.hideAsync();
+        try {
+          await SplashScreen.hideAsync();
+        } catch (splashError) {
+          console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
+        }
         
         // Инициализируем только критически важные ресурсы
         await initializeStorage();
@@ -471,7 +475,7 @@ export default function RootLayout() {
         try {
           await SplashScreen.hideAsync();
         } catch (finalError) {
-          console.error('🚨 Final Metro Splash Screen Hide Error:', finalError);
+          console.log('ℹ️ Splash screen already hidden or not registered:', finalError.message);
         }
         
         // При ошибке сразу переходим к скрытию заставки

@@ -60,7 +60,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   onMuseumItemsLoaded,
   updateTrigger
 }) => {
-  console.log('🎁 МУЗЕЙ: PROPS:', { playerId, isOwner, isAdmin, isEditing });
+  // console.log('🎁 МУЗЕЙ: PROPS:', { playerId, isOwner, isAdmin, isEditing });
   
   const { t } = useLanguage();
   const router = useRouter();
@@ -164,8 +164,8 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
 
 
   const loadMuseumItems = async () => {
-    console.log('🎁 МУЗЕЙ: ===== loadMuseumItems ВЫЗВАН =====');
-    console.log('🎁 МУЗЕЙ: playerId:', playerId);
+    // console.log('🎁 МУЗЕЙ: ===== loadMuseumItems ВЫЗВАН =====');
+    // console.log('🎁 МУЗЕЙ: playerId:', playerId);
     
     try {
       // Кешируем результат на 10 минут для улучшения производительности
@@ -173,29 +173,29 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
       const cacheTime = 10 * 60 * 1000; // 10 минут
       
       // Проверяем кэш
-      console.log('🎁 МУЗЕЙ: Проверяем AsyncStorage кеш...');
+      // console.log('🎁 МУЗЕЙ: Проверяем AsyncStorage кеш...');
       const cachedData = await AsyncStorage.getItem(cacheKey);
       
       if (cachedData) {
         const { items, timestamp } = JSON.parse(cachedData);
         const age = Date.now() - timestamp;
-        console.log('🎁 МУЗЕЙ: Найден кеш в AsyncStorage. Возраст:', Math.round(age / 1000), 'сек, items:', items.length);
+        // console.log('🎁 МУЗЕЙ: Найден кеш в AsyncStorage. Возраст:', Math.round(age / 1000), 'сек, items:', items.length);
         
         if (Date.now() - timestamp < cacheTime) {
-          console.log('🎁 МУЗЕЙ: ✅ Используем кеш из AsyncStorage');
+          // console.log('🎁 МУЗЕЙ: ✅ Используем кеш из AsyncStorage');
           setMuseumItems(items);
           setLoading(false);
           return;
         } else {
-          console.log('🎁 МУЗЕЙ: ⚠️ Кеш устарел, загружаем из Supabase');
+          // console.log('🎁 МУЗЕЙ: ⚠️ Кеш устарел, загружаем из Supabase');
         }
       } else {
-        console.log('🎁 МУЗЕЙ: Кеш в AsyncStorage не найден');
+        // console.log('🎁 МУЗЕЙ: Кеш в AsyncStorage не найден');
       }
       
       // Если кеш не найден или истек, показываем загрузку
       setLoading(true);
-      console.log('🎁 МУЗЕЙ: Loading = true, запрашиваем данные из Supabase...');
+      // console.log('🎁 МУЗЕЙ: Loading = true, запрашиваем данные из Supabase...');
       
       const { data, error } = await supabase
         .from('player_museum')
@@ -224,11 +224,11 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
         return;
       }
 
-      console.log('🎁 МУЗЕЙ: ✅ Данные получены из Supabase. Количество подарков:', data?.length || 0);
+      // console.log('🎁 МУЗЕЙ: ✅ Данные получены из Supabase. Количество подарков:', data?.length || 0);
       
       // Сразу устанавливаем данные для быстрого отображения
       setMuseumItems(data || []);
-      console.log('🎁 МУЗЕЙ: setMuseumItems вызван с', data?.length || 0, 'подарками');
+      // console.log('🎁 МУЗЕЙ: setMuseumItems вызван с', data?.length || 0, 'подарками');
       
       // Предзагружаем изображения для кеширования
       if (data && data.length > 0) {
@@ -263,34 +263,34 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     } catch (error) {
       console.error('Ошибка загрузки музея:', error);
     } finally {
-      console.log('🎁 МУЗЕЙ: Загрузка музея завершена');
+      // console.log('🎁 МУЗЕЙ: Загрузка музея завершена');
       setLoading(false);
     }
   };
 
   // Функция для удаления подарка из музея игрока
   const deleteMuseumItem = async (museumItemId: string, itemId: string) => {
-    console.log('🗑️ МУЗЕЙ: Начало удаления подарка');
-    console.log('🗑️ МУЗЕЙ: museumItemId:', museumItemId);
-    console.log('🗑️ МУЗЕЙ: itemId:', itemId);
-    console.log('🗑️ МУЗЕЙ: playerId:', playerId);
-    console.log('🗑️ МУЗЕЙ: currentUserId:', currentUserId);
+    // console.log('🗑️ МУЗЕЙ: Начало удаления подарка');
+    // console.log('🗑️ МУЗЕЙ: museumItemId:', museumItemId);
+    // console.log('🗑️ МУЗЕЙ: itemId:', itemId);
+    // console.log('🗑️ МУЗЕЙ: playerId:', playerId);
+    // console.log('🗑️ МУЗЕЙ: currentUserId:', currentUserId);
     
     // Проверяем аутентификацию через Supabase Auth
     const { data: sessionData } = await supabase.auth.getSession();
-    console.log('🗑️ МУЗЕЙ: Supabase session:', sessionData.session ? 'ЕСТЬ' : 'НЕТ');
-    console.log('🗑️ МУЗЕЙ: Supabase auth.uid:', sessionData.session?.user?.id || 'НЕТ');
+    // console.log('🗑️ МУЗЕЙ: Supabase session:', sessionData.session ? 'ЕСТЬ' : 'НЕТ');
+    // console.log('🗑️ МУЗЕЙ: Supabase auth.uid:', sessionData.session?.user?.id || 'НЕТ');
     
     if (!sessionData.session) {
       console.error('🗑️ МУЗЕЙ: ❌ Пользователь НЕ аутентифицирован через Supabase Auth!');
-      console.log('🗑️ МУЗЕЙ: Это объясняет, почему RLS блокирует удаление');
+      // console.log('🗑️ МУЗЕЙ: Это объясняет, почему RLS блокирует удаление');
     }
     
     try {
       // Используем серверную функцию для удаления (обходит RLS)
-      console.log('🗑️ МУЗЕЙ: Вызываем серверную функцию delete_museum_item_by_user...');
-      console.log('🗑️ МУЗЕЙ: - museum_item_id:', museumItemId);
-      console.log('🗑️ МУЗЕЙ: - requesting_user_id:', currentUserId);
+      // console.log('🗑️ МУЗЕЙ: Вызываем серверную функцию delete_museum_item_by_user...');
+      // console.log('🗑️ МУЗЕЙ: - museum_item_id:', museumItemId);
+      // console.log('🗑️ МУЗЕЙ: - requesting_user_id:', currentUserId);
       
       const { data, error } = await supabase
         .rpc('delete_museum_item_by_user', {
@@ -298,9 +298,9 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
           requesting_user_id: currentUserId
         });
 
-      console.log('🗑️ МУЗЕЙ: Результат RPC вызова:');
-      console.log('🗑️ МУЗЕЙ: - data:', data);
-      console.log('🗑️ МУЗЕЙ: - error:', error);
+      // console.log('🗑️ МУЗЕЙ: Результат RPC вызова:');
+      // console.log('🗑️ МУЗЕЙ: - data:', data);
+      // console.log('🗑️ МУЗЕЙ: - error:', error);
 
       if (error) {
         console.error('🗑️ МУЗЕЙ: ❌ Ошибка удаления подарка:', error);
@@ -321,31 +321,31 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
         return;
       }
 
-      console.log('🗑️ МУЗЕЙ: ✅ Подарок успешно удален через серверную функцию');
-      console.log('🗑️ МУЗЕЙ: Обновляем локальное состояние...');
+      // console.log('🗑️ МУЗЕЙ: ✅ Подарок успешно удален через серверную функцию');
+      // console.log('🗑️ МУЗЕЙ: Обновляем локальное состояние...');
 
       // Обновляем локальное состояние
       const newItems = museumItems.filter(item => item.id !== museumItemId);
-      console.log('🗑️ МУЗЕЙ: Было подарков:', museumItems.length, '-> Осталось:', newItems.length);
+      // console.log('🗑️ МУЗЕЙ: Было подарков:', museumItems.length, '-> Осталось:', newItems.length);
       setMuseumItems(newItems);
 
       // Сразу обновляем кеш состояния в родительском компоненте с новыми данными
       if (onMuseumItemsLoaded) {
-        console.log('🗑️ МУЗЕЙ: Обновляем кеш состояния с новыми данными');
+        // console.log('🗑️ МУЗЕЙ: Обновляем кеш состояния с новыми данными');
         onMuseumItemsLoaded(newItems);
       }
 
-      console.log('🗑️ МУЗЕЙ: Очищаем AsyncStorage кеш...');
+      // console.log('🗑️ МУЗЕЙ: Очищаем AsyncStorage кеш...');
       
       // Очищаем AsyncStorage кеш
       await clearMuseumCache();
 
-      console.log('🗑️ МУЗЕЙ: НЕ вызываем onMuseumUpdated() - используем локальное состояние');
+      // console.log('🗑️ МУЗЕЙ: НЕ вызываем onMuseumUpdated() - используем локальное состояние');
       
       // НЕ вызываем onMuseumUpdated() - мы уже обновили данные через onMuseumItemsLoaded
       // Это предотвращает множественные перезагрузки и race condition
       
-      console.log('🗑️ МУЗЕЙ: ✅ Подарок успешно удален');
+      // console.log('🗑️ МУЗЕЙ: ✅ Подарок успешно удален');
       Alert.alert(t('common.success') || 'Успешно', t('gifts.successDeleted'));
     } catch (error) {
       console.error('🗑️ МУЗЕЙ: ❌❌❌ КРИТИЧЕСКАЯ ОШИБКА удаления подарка:', error);
@@ -399,18 +399,18 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   // Упрощенная логика загрузки - загружаем только один раз
   useEffect(() => {
     if (playerId && !isStar) {
-      console.log('🎁 МУЗЕЙ: useEffect вызван для', playerId, 'cachedMuseumItems:', cachedMuseumItems?.length || 'undefined');
+      // console.log('🎁 МУЗЕЙ: useEffect вызван для', playerId, 'cachedMuseumItems:', cachedMuseumItems?.length || 'undefined');
       
       // Если есть кешированные данные, используем их
       if (cachedMuseumItems && Array.isArray(cachedMuseumItems)) {
-        console.log('🎁 МУЗЕЙ: Используем кешированные данные');
+        // console.log('🎁 МУЗЕЙ: Используем кешированные данные');
         setMuseumItems(cachedMuseumItems);
         setLoading(false);
         return;
       }
       
       // Иначе загружаем из базы данных
-      console.log('🎁 МУЗЕЙ: Загружаем данные из Supabase');
+      // console.log('🎁 МУЗЕЙ: Загружаем данные из Supabase');
       loadMuseumItems();
     }
   }, [playerId, isStar, cachedMuseumItems]);
