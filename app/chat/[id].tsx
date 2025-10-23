@@ -25,6 +25,7 @@ import {
     sendMessageSimple
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useUser } from '../../contexts/UserContext';
 import { playOutgoingMessageSound, playIncomingMessageSound } from '../../utils/soundService';
 import { supabase } from '../../utils/supabase';
 
@@ -34,6 +35,7 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { refreshUser } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -124,6 +126,9 @@ export default function ChatScreen() {
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
+          
+          // Обновляем UserContext для обновления счетчика в нижнем меню
+          await refreshUser(true);
         }
       }
     } catch (error) {

@@ -38,7 +38,7 @@ export default function MessagesScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser, isUserLoading } = useUser();
+  const { currentUser, isUserLoading, refreshUser } = useUser();
   
   // Убираем все анимации - простое мгновенное переключение
   const [chats, setChats] = useState<ChatPreview[]>([]);
@@ -157,7 +157,6 @@ export default function MessagesScreen() {
   useEffect(() => {
     if (!currentUser) return;
 
-
     // Подписываемся на INSERT события когда текущий пользователь - получатель
     const channel = supabase
       .channel('messages-updates')
@@ -170,7 +169,24 @@ export default function MessagesScreen() {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
+          console.log('🔔 Получено новое сообщение через Realtime:', payload);
           silentLoadChats();
+          // Обновляем UserContext для обновления счетчика в нижнем меню
+          refreshUser(true);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${currentUser.id}`
+        },
+        (payload) => {
+          console.log('🔔 Сообщение обновлено через Realtime:', payload);
+          // Обновляем UserContext при изменении статуса прочтения
+          refreshUser(true);
         }
       )
       .subscribe();
@@ -178,7 +194,7 @@ export default function MessagesScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUser, silentLoadChats]);
+  }, [currentUser, silentLoadChats, refreshUser]);
 
   // Обновляем список сообщений при фокусе на экране
   useFocusEffect(
@@ -187,11 +203,13 @@ export default function MessagesScreen() {
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
+      // Обновляем UserContext для актуального счетчика
+      refreshUser(true);
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
       };
-    }, [loadChats, setCurrentScreen])
+    }, [loadChats, setCurrentScreen, refreshUser])
   );
 
   const onRefresh = () => {

@@ -1616,6 +1616,15 @@ export const loadCurrentUser = async (): Promise<Player | null> => {
     
     const user = JSON.parse(userData);
     
+    // Обновляем счетчик непрочитанных сообщений
+    try {
+      const unreadCount = await getUnreadMessageCount(user.id);
+      user.unreadMessagesCount = unreadCount;
+    } catch (error) {
+      console.error('❌ Ошибка получения счетчика сообщений:', error);
+      user.unreadMessagesCount = 0;
+    }
+    
     // Логируем детали только при первом заходе или изменении пользователя
     const lastUserKey = 'hockeystars_last_user_id';
     const lastUserId = await AsyncStorage.getItem(lastUserKey);
