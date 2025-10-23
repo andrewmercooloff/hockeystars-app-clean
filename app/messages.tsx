@@ -47,6 +47,7 @@ export default function MessagesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const focusRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
@@ -177,10 +178,7 @@ export default function MessagesScreen() {
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
           }
-          refreshTimeoutRef.current = setTimeout(async () => {
-            await refreshUser(true);
-            console.log('🔄 Обновление нижнего меню после получения сообщения');
-          }, 500);
+          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
         }
       )
       .on(
@@ -197,10 +195,7 @@ export default function MessagesScreen() {
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
           }
-          refreshTimeoutRef.current = setTimeout(async () => {
-            await refreshUser(true);
-            console.log('🔄 Обновление нижнего меню после обновления сообщения');
-          }, 500);
+          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
         }
       )
       .subscribe();
@@ -220,11 +215,24 @@ export default function MessagesScreen() {
       console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
+      
+      // Автоматически скрываем индикатор сообщений через 5 секунд
+      if (autoHideTimeoutRef.current) {
+        clearTimeout(autoHideTimeoutRef.current);
+      }
+      autoHideTimeoutRef.current = setTimeout(async () => {
+        console.log('🔄 Автоматическое скрытие индикатора сообщений через 5 секунд');
+        await refreshUser(true);
+      }, 5000);
+      
       return () => {
         setCurrentScreen(null);
         console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
+        if (autoHideTimeoutRef.current) {
+          clearTimeout(autoHideTimeoutRef.current);
+        }
       };
-    }, [loadChats, setCurrentScreen])
+    }, [loadChats, setCurrentScreen, refreshUser])
   );
 
   const onRefresh = () => {

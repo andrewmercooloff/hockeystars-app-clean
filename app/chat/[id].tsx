@@ -36,8 +36,9 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { currentUser, refreshUser, setCurrentUser, updateUserCounter, forceUpdateBottomMenu } = useUser();
+  const { refreshUser } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
+  const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -112,6 +113,7 @@ export default function ChatScreen() {
         }
 
         setOtherPlayer(otherPlayerData);
+        setCurrentUser(userData);
         
         if (otherPlayerData) {
           // Сразу загружаем сообщения
@@ -131,22 +133,18 @@ export default function ChatScreen() {
           setTimeout(async () => {
             console.log('🔄 Обновляем UserContext после markMessagesAsRead');
             await refreshUser(true);
-            
-            // Принудительно обновляем нижнее меню
-            setTimeout(() => {
-              console.log('🔄 Принудительное обновление нижнего меню');
-              updateUserCounter(0);
-              // Дополнительно принудительно обновляем нижнее меню
-              setTimeout(() => {
-                forceUpdateBottomMenu();
-              }, 50);
-            }, 100);
           }, 100);
           
           setTimeout(async () => {
             console.log('🔄 Повторное обновление UserContext');
             await refreshUser(true);
           }, 1000);
+          
+          // Автоматически скрываем индикатор через 2 секунды после захода в чат
+          setTimeout(async () => {
+            console.log('🔄 Автоматическое скрытие индикатора через 2 секунды после захода в чат');
+            await refreshUser(true);
+          }, 2000);
         }
       }
     } catch (error) {
