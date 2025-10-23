@@ -275,7 +275,6 @@ export default function EditablePhotosSection({
           onPress: () => {
             const newPhotos = photos.filter((_, i) => i !== index);
             onPhotosChange?.(newPhotos);
-            setForceUpdate(prev => prev + 1); // Принудительное обновление
           }
         }
       ]
