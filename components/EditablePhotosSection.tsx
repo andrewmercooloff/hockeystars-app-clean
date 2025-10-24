@@ -300,7 +300,7 @@ export default function EditablePhotosSection({
       console.log('🔄 Drag end:', { draggedIndex, translationX: event.nativeEvent.translationX, translationY: event.nativeEvent.translationY });
       
       // Для сетки 3 столбца рассчитываем новый индекс на основе движения
-      const photoWidth = screenWidth * 0.3; // 30% от ширины экрана
+      const photoWidth = screenWidth * 0.32; // 32% от ширины экрана
       const photoHeight = photoWidth + 20; // высота + отступ
       
       const deltaX = event.nativeEvent.translationX;
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   photoGridItem: {
-    width: '30%', // Просто 30% ширины для 3 столбцов
+    width: '32%', // Чуть шире для 3 столбцов без отступов
     marginBottom: 15,
     position: 'relative',
   },
