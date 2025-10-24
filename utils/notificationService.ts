@@ -103,7 +103,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       return null;
     }
     
-    console.log('✅ Push notifications permission granted');
     
     try {
       // Получаем Expo push token
@@ -112,10 +111,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       });
       
       token = expoPushToken.data;
-      console.log('✅ Push token получен:', token);
-      console.log('✅ Project ID:', 'ccb608ca-e849-4a98-b337-d38863d3ebff');
-      console.log('✅ Platform:', Platform.OS);
-      console.log('✅ Device isDevice:', Device.isDevice);
     } catch (error) {
       console.error('❌ Ошибка получения push token:', error);
       console.error('❌ Error details:', error.message);
@@ -183,7 +178,6 @@ export async function savePushToken(token: string, userId: string): Promise<bool
       }
     }
 
-    console.log('✅ Push token сохранен в базе данных');
     return true;
   } catch (error) {
     console.error('❌ Ошибка сохранения push token:', error);
@@ -501,14 +495,8 @@ export async function sendAchievementNotification(
  */
 export async function initializePushNotifications(userId: string): Promise<boolean> {
   try {
-    console.log('🚀 Инициализация push-уведомлений для userId:', userId);
-    console.log('🚀 Platform.OS:', Platform.OS);
-    console.log('🚀 Device.isDevice:', Device.isDevice);
-    
     // Регистрируем для получения уведомлений
-    console.log('🚀 Вызываем registerForPushNotificationsAsync...');
     const token = await registerForPushNotificationsAsync();
-    console.log('🚀 Получен token:', token);
     
     if (!token) {
       console.log('❌ Не удалось получить push token');
@@ -516,12 +504,8 @@ export async function initializePushNotifications(userId: string): Promise<boole
     }
 
     // Сохраняем token в базе данных
-    console.log('🚀 Сохраняем token в базе данных...');
     const saved = await savePushToken(token, userId);
-    console.log('🚀 Результат сохранения token:', saved);
-    
     if (saved) {
-      console.log('✅ Push-уведомления успешно инициализированы');
       return true;
     } else {
       console.log('❌ Не удалось сохранить push token');

@@ -967,7 +967,6 @@ export default function PlayerProfile() {
 
   const handleCurrentTeamChange = async (teams: PastTeam[]) => {
     try {
-      console.log('🔄 handleCurrentTeamChange: обновляем текущие команды:', teams.length);
       setPlayerTeams(teams);
     } catch (error) {
       console.error('Ошибка при изменении текущих команд:', error);
@@ -1006,7 +1005,6 @@ export default function PlayerProfile() {
         const uploadedUrl = await uploadImageToStorage(avatarUrl);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
-          console.log('✅ Аватар загружен в Storage:', uploadedUrl);
         } else {
           console.error('❌ Не удалось загрузить аватар в Storage');
         }
@@ -1107,7 +1105,6 @@ export default function PlayerProfile() {
                 multipleVideos: t('videoNotification.multipleVideos')
               }
             })
-              .then(() => console.log(`✅ Отправлены уведомления о ${addedVideos} новых видео`))
           );
         }
         
@@ -1123,7 +1120,6 @@ export default function PlayerProfile() {
                 changed: t('avatarNotification.changed')
               }
             })
-              .then(() => console.log('✅ Отправлены уведомления об изменении аватара'))
           );
         }
         
@@ -1147,7 +1143,6 @@ export default function PlayerProfile() {
                 multipleAchievements: t('achievementNotification.multipleAchievements')
               }
             })
-              .then(() => console.log(`✅ Отправлены уведомления о ${addedAchievements} новых достижениях`))
           );
         } else {
           console.log('ℹ️ Достижения не изменились или уменьшились, уведомления не отправляются');
@@ -1180,7 +1175,6 @@ export default function PlayerProfile() {
               cm: t('cm'),
               kg: t('kg')
             })
-              .then(() => console.log(`✅ Отправлены уведомления об изменении физических данных: ${physicalChanges.map(c => c.field).join(', ')}`))
           );
         }
         
@@ -1198,7 +1192,6 @@ export default function PlayerProfile() {
         
         const oldAssists = parseInt(player.assists) || 0;
         const newAssists = parseInt(editData.assists || player.assists) || 0;
-        console.log(`🎯 Передачи: ${oldAssists} → ${newAssists}`);
         if (oldAssists !== newAssists) {
           statsChanges.push({ field: 'assists', oldValue: oldAssists, newValue: newAssists });
         }
@@ -1219,7 +1212,6 @@ export default function PlayerProfile() {
           
           notificationPromises.push(
             notifyFriendsAboutChanges(player.id, player.name, formattedStatChanges, [])
-              .then(() => console.log(`✅ Отправлены уведомления об изменении статистики`))
               .catch((err) => console.error('❌ ОШИБКА отправки уведомлений о статистике:', err))
           );
         } else {
@@ -1283,7 +1275,6 @@ export default function PlayerProfile() {
           
           notificationPromises.push(
             notifyFriendsAboutChanges(player.id, player.name, [], normativeChanges)
-              .then(() => console.log(`✅ Отправлены уведомления об изменении нормативов`))
               .catch((err) => console.error('❌ ОШИБКА отправки уведомлений о нормативах:', err))
           );
         } else {
@@ -1299,11 +1290,6 @@ export default function PlayerProfile() {
         const currentTeams = teams.filter(team => team.isCurrent);
         const pastTeams = teams.filter(team => !team.isCurrent);
         
-        console.log('🔄 Обновляем команды после сохранения:', { 
-          totalTeams: teams.length,
-          currentTeams: currentTeams.length, 
-          pastTeams: pastTeams.length 
-        });
         setPlayerTeams(currentTeams);
         setPastTeams(pastTeams);
       } else {
@@ -1312,13 +1298,6 @@ export default function PlayerProfile() {
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
-        console.log('🔄 handleSave: Обновленные данные игрока:', {
-          id: refreshedPlayer.id,
-          name: refreshedPlayer.name,
-          games: refreshedPlayer.games,
-          goals: refreshedPlayer.goals,
-          assists: refreshedPlayer.assists
-        });
         setPlayer(refreshedPlayer);
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
@@ -1349,7 +1328,6 @@ export default function PlayerProfile() {
             try {
               // Обновляем глобальное состояние пользователя
               await refreshUser(true);
-              console.log('✅ Глобальное состояние пользователя обновлено после сохранения профиля');
               
               // Дополнительно обновляем локальное состояние для немедленного отображения
               setCurrentUser(refreshedPlayer);

@@ -282,7 +282,6 @@ export default function EditablePhotosSection({
   };
 
   const handleDragStart = (index: number) => {
-    console.log('🚀 Drag start for photo index:', index);
     setDraggedIndex(index);
   };
 
@@ -297,7 +296,6 @@ export default function EditablePhotosSection({
 
   const handleDragEnd = (event: any) => {
     if (draggedIndex !== null) {
-      console.log('🔄 Drag end:', { draggedIndex, translationX: event.nativeEvent.translationX, translationY: event.nativeEvent.translationY });
       
       // Для сетки 3 столбца рассчитываем новый индекс на основе движения
       const photoWidth = screenWidth * 0.3; // 30% от ширины экрана
@@ -321,7 +319,6 @@ export default function EditablePhotosSection({
       
       const targetIndex = Math.max(0, Math.min(photos.length - 1, newIndex));
       
-      console.log('🎯 Target index:', targetIndex);
       
       if (targetIndex !== draggedIndex) {
         const newPhotos = [...photos];
@@ -329,7 +326,6 @@ export default function EditablePhotosSection({
         newPhotos.splice(draggedIndex, 1);
         newPhotos.splice(targetIndex, 0, draggedPhoto);
         onPhotosChange?.(newPhotos);
-        console.log('✅ Photo moved from', draggedIndex, 'to', targetIndex);
       }
       
       setDraggedIndex(null);

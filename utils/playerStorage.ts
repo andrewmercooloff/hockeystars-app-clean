@@ -1416,13 +1416,6 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     const updatedPlayer = convertSupabaseToPlayer(data);
     
-    console.log('🔄 updatePlayer: Обновленные данные из БД:', {
-      id: updatedPlayer.id,
-      name: updatedPlayer.name,
-      games: updatedPlayer.games,
-      goals: updatedPlayer.goals,
-      assists: updatedPlayer.assists
-    });
     
     // Очищаем кеш игрока при обновлении (только если не пропускаем)
     if (!skipCacheClear) {
@@ -1984,7 +1977,6 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
         // Увеличиваем счетчик уведомлений для отправителя
         await supabase.rpc('increment_unread_notifications', { user_id: senderId });
         
-        console.log('✅ Уведомление о принятии запроса отправлено');
         
         // Отправляем push уведомление
         try {
@@ -1999,7 +1991,6 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
               action: 'open_notifications'
             }
           );
-          console.log('✅ Push уведомление о принятии запроса отправлено');
         } catch (pushError) {
           console.error('⚠️ Ошибка отправки push уведомления:', pushError);
         }
@@ -2551,7 +2542,6 @@ export const findPlayerByName = async (name: string): Promise<Player | null> => 
 // Функция для диагностики дружбы между двумя игроками
 export const debugFriendship = async (player1Name: string, player2Name: string): Promise<void> => {
   try {
-    console.log(`🔍 ДИАГНОСТИКА ДРУЖБЫ между ${player1Name} и ${player2Name}:`);
     
     // Находим игроков по имени
     const player1 = await findPlayerByName(player1Name);
@@ -2567,9 +2557,6 @@ export const debugFriendship = async (player1Name: string, player2Name: string):
       return;
     }
     
-    console.log(`✅ Найдены игроки:`);
-    console.log(`   ${player1Name}: ${player1.id}`);
-    console.log(`   ${player2Name}: ${player2.id}`);
     
     // Проверяем статус дружбы
     const friendshipStatus = await getFriendshipStatus(player1.id, player2.id);
