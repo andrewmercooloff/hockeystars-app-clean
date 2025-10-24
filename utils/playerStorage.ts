@@ -1790,8 +1790,30 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     await sendMessage(message);
     console.log('✅ Сообщение сохранено в БД');
     
-    // Push-уведомления отправляются через RealtimeManager, не дублируем здесь
-    console.log('📱 Push-уведомления будут отправлены через Realtime подписку');
+    // ВРЕМЕННО: Принудительная отправка push-уведомления для тестирования
+    try {
+      const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
+      const { getPlayerById } = await import('./playerStorage');
+      
+      const senderPlayer = await getPlayerById(senderId);
+      const receiverTokens = await getUserPushTokens(receiverId);
+      
+      if (senderPlayer && receiverTokens.length > 0) {
+        console.log('🧪 ТЕСТ: Принудительно отправляем push-уведомление');
+        await sendMessageNotification(
+          receiverTokens,
+          senderPlayer.name || 'Пользователь',
+          text,
+          senderId
+        );
+        console.log('🧪 ТЕСТ: Push-уведомление отправлено принудительно');
+      } else {
+        console.log('🧪 ТЕСТ: Не удалось отправить push - нет отправителя или токенов');
+        console.log('🧪 ТЕСТ: senderPlayer:', !!senderPlayer, 'tokens:', receiverTokens.length);
+      }
+    } catch (error) {
+      console.error('🧪 ТЕСТ: Ошибка принудительной отправки push:', error);
+    }
     
     return true;
   } catch (error) {
