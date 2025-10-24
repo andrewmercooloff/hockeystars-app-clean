@@ -425,7 +425,7 @@ export default function ChatScreen() {
   const renderRightActions = () => {
     return (
       <View style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={32} color="#fff" />
+        <Ionicons name="trash-outline" size={24} color="#fa2f40" />
       </View>
     );
   };
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 68, 68, 0.5)',
   },
   deleteButton: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     width: 60,
