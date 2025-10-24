@@ -57,7 +57,7 @@ const LogoHeader = React.memo(() => {
           {currentUser?.avatar ? (
             <HeaderAvatar
               uri={currentUser.avatar}
-              size={45}
+              size={51}
               fallbackIcon="person"
               fallbackSize={25}
               fallbackColor="#fff"
