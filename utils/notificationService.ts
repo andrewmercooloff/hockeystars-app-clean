@@ -206,14 +206,16 @@ export async function sendPushNotification(
     }
     
     // Создаем уникальный ключ для проверки дублирования
-    const notificationKey = `${token}-${title}-${body}`;
+    // Включаем данные в ключ для более точного определения дублирования
+    const dataString = data ? JSON.stringify(data) : '';
+    const notificationKey = `${token}-${title}-${body}-${dataString}`;
     const now = Date.now();
     
     // Проверяем, не отправляли ли мы такое же уведомление недавно
     if (sentNotifications.has(notificationKey)) {
       const lastSent = sentNotifications.get(notificationKey)!;
       if (now - lastSent < NOTIFICATION_COOLDOWN) {
-        console.log('🔔 Пропускаем дублирующееся уведомление:', title);
+        console.log('🔔 Пропускаем дублирующееся уведомление:', title, 'для токена:', token.substring(0, 10) + '...');
         return true; // Возвращаем true, так как уведомление уже было отправлено
       }
     }
@@ -345,15 +347,22 @@ export async function sendNotificationToUser(
       return false;
     }
 
+    // Дедупликация токенов - убираем дубликаты
+    const uniqueTokens = [...new Set(tokens)];
+    
+    if (uniqueTokens.length !== tokens.length) {
+      console.log(`🔧 Дедупликация токенов: ${tokens.length} → ${uniqueTokens.length} уникальных токенов`);
+    }
+
     let successCount = 0;
     
-    // Отправляем на все устройства пользователя
-    for (const token of tokens) {
+    // Отправляем на все уникальные устройства пользователя
+    for (const token of uniqueTokens) {
       const success = await sendPushNotification(token, title, body, data);
       if (success) successCount++;
     }
 
-    console.log(`✅ Уведомления отправлены на ${successCount}/${tokens.length} устройств`);
+    console.log(`✅ Уведомления отправлены на ${successCount}/${uniqueTokens.length} устройств для пользователя ${userId}`);
     return successCount > 0;
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления пользователю:', error);
@@ -382,7 +391,7 @@ export async function sendMessageNotification(
   const uniqueTokens = [...new Set(receiverTokens)];
   
   console.log(`📱 PUSH: Отправляем уведомление о сообщении`);
-  console.log(`📱 PUSH: Получатель: ${senderName} (${senderId})`);
+  console.log(`📱 PUSH: Отправитель: ${senderName} (${senderId})`);
   console.log(`📱 PUSH: Токенов до дедупликации: ${receiverTokens.length}`);
   console.log(`📱 PUSH: Токенов после дедупликации: ${uniqueTokens.length}`);
   console.log(`📱 PUSH: Текст: ${messageText.substring(0, 30)}...`);
@@ -396,6 +405,9 @@ export async function sendMessageNotification(
   );
   
   const results = await Promise.all(promises);
+  const successCount = results.filter(r => r).length;
+  console.log(`📱 PUSH: Успешно отправлено ${successCount}/${uniqueTokens.length} уведомлений`);
+  
   return results.every(result => result);
 }
 

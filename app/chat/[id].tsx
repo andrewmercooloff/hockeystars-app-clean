@@ -48,6 +48,7 @@ export default function ChatScreen() {
   const lastMessageCountRef = useRef<number>(0);
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
   const justSentMessageRef = useRef<boolean>(false);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
   useEffect(() => {
@@ -56,6 +57,12 @@ export default function ChatScreen() {
     setNewMessage('');
     setLoading(true);
     loadChatData();
+    
+    // Очищаем polling при смене чата
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
   }, [id]);
 
   useEffect(() => {
@@ -64,30 +71,90 @@ export default function ChatScreen() {
     }
 
     // Настраиваем Realtime подписку на изменения сообщений
+    console.log('🔧 Настраиваем Realtime подписку для чата:', currentUser.id, 'с', otherPlayer.id);
     const channel = supabase
-      .channel(`messages-${currentUser.id}-${otherPlayer.id}`)
+      .channel(`messages-chat-${currentUser.id}-${otherPlayer.id}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages',
-          filter: `or(sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id})`
+          table: 'messages'
+          // Убираем фильтр - слушаем все сообщения и фильтруем в коде
         },
         (payload) => {
-          // Загружаем сообщения только при получении нового сообщения
-          loadMessages();
+          console.log('💬 Новое сообщение получено в чате:', payload.new);
           
-          // Прокручиваем вниз после получения нового сообщения
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+          // Проверяем, что сообщение для этого чата
+          const newMessage = payload.new;
+          const isForThisChat = (
+            (newMessage.sender_id === currentUser.id && newMessage.receiver_id === otherPlayer.id) ||
+            (newMessage.sender_id === otherPlayer.id && newMessage.receiver_id === currentUser.id)
+          );
+          
+          if (isForThisChat) {
+            console.log('💬 Сообщение для этого чата, добавляем');
+            
+            // Добавляем новое сообщение в состояние
+            setMessages(prevMessages => {
+              // Проверяем, что сообщение еще не добавлено
+              const exists = prevMessages.some(msg => msg.id === newMessage.id);
+              if (exists) {
+                console.log('💬 Сообщение уже существует, пропускаем');
+                return prevMessages;
+              }
+              
+              console.log('💬 Добавляем новое сообщение в чат');
+              return [...prevMessages, newMessage];
+            });
+            
+            // Прокручиваем вниз после получения нового сообщения
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, Platform.OS === 'android' ? 200 : 100);
+          } else {
+            console.log('💬 Сообщение не для этого чата, пропускаем');
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔧 Статус Realtime подписки в чате:', status);
+      });
+
+    // Запускаем polling как fallback для Realtime
+    console.log('🔧 Запускаем polling для чата');
+    pollingIntervalRef.current = setInterval(async () => {
+      if (currentUser && otherPlayer && otherPlayer.id === id) {
+        try {
+          const conversation = await getConversation(currentUser.id, otherPlayer.id);
+          const currentMessageIds = new Set(conversation.map(m => m.id));
+          const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
+          
+          if (newMessageIds.length > 0) {
+            console.log('🔄 Polling: найдены новые сообщения:', newMessageIds.length);
+            setMessages(conversation);
+            lastMessageIdsRef.current = currentMessageIds;
+            
+            // Прокручиваем вниз
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+          }
+        } catch (error) {
+          console.error('❌ Ошибка polling:', error);
+        }
+      }
+    }, 2000); // Проверяем каждые 2 секунды
 
     return () => {
+      console.log('🔧 Отключаем Realtime подписку в чате');
       supabase.removeChannel(channel);
+      
+      if (pollingIntervalRef.current) {
+        console.log('🔧 Останавливаем polling для чата');
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
     };
   }, [currentUser, otherPlayer, id]);
 
@@ -127,7 +194,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз после загрузки сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+          }, Platform.OS === 'android' ? 300 : 100); // Больше времени для Android
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
@@ -202,7 +269,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз при получении новых сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+          }, Platform.OS === 'android' ? 200 : 100);
         }
 
       } catch (error) {
@@ -239,7 +306,7 @@ export default function ChatScreen() {
         // Прокручиваем к последнему сообщению после загрузки
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, 100);
+        }, Platform.OS === 'android' ? 200 : 100);
       } else {
         Alert.alert(t('chat.error'), t('chat.errorSendingMessage'));
       }
@@ -442,7 +509,7 @@ export default function ChatScreen() {
           <KeyboardAvoidingView 
             style={styles.chatContainer} 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 132 : 20}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 132 : 0}
           >
             <ScrollView 
               ref={scrollViewRef}
@@ -534,7 +601,7 @@ export default function ChatScreen() {
                 onFocus={() => {
                   setTimeout(() => {
                     scrollViewRef.current?.scrollToEnd({ animated: true });
-                  }, 100);
+                  }, Platform.OS === 'android' ? 300 : 100);
                 }}
               />
               <TouchableOpacity 
@@ -642,11 +709,12 @@ const styles = StyleSheet.create({
   messagesContainer: {
     flex: 1,
     paddingTop: 60, // Отступ для фиксированного заголовка
+    paddingBottom: Platform.OS === 'android' ? 30 : 0, // Дополнительный отступ снизу для Android
   },
   messagesContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: 20,
+    paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
   },
   emptyContainer: {
     justifyContent: 'center',
@@ -732,6 +800,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 68, 68, 0.3)',

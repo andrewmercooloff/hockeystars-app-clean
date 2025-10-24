@@ -3201,7 +3201,6 @@ export default function PlayerProfile() {
                         }} 
                         style={styles.friendAvatar}
                         defaultSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=Player' }}
-                        loadingIndicatorSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=...' }}
                         // Оптимизация для медленного интернета
                         fadeDuration={200}
                       />

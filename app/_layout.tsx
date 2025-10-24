@@ -540,44 +540,30 @@ export default function RootLayout() {
     }
   }, [currentUser?.id, loadNotificationCount]);
 
-  // Realtime подписка на изменения счетчика уведомлений
+  // Realtime подписка на изменения счетчиков
   React.useEffect(() => {
     if (!currentUser) {
       return;
     }
 
-    // Устанавливаем callback для обновления счетчика
+    // Устанавливаем callback для обновления счетчика уведомлений
     realtimeManager.setNotificationCountCallback((count: number) => {
       setUnreadNotificationsCount(count);
+    });
+
+    // Устанавливаем callback для обновления счетчика сообщений
+    realtimeManager.setMessagesCountCallback((count: number) => {
+      console.log('🔄 Счетчик сообщений изменен через RealtimeManager:', count);
+      // Обновляем UserContext для обновления индикатора
+      loadUser();
     });
 
     // Используем централизованный менеджер подписок
     realtimeManager.setupSubscriptions(currentUser.id);
 
-    // Добавляем подписку на изменения счетчика сообщений
-    const messagesChannel = supabase
-      .channel('players-messages-count')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'players',
-          filter: `id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('🔄 Счетчик сообщений изменен в БД через Realtime:', payload.new.unread_messages_count);
-          // Обновляем UserContext для обновления индикатора
-          // Используем loadUser вместо refreshUser
-          loadUser();
-        }
-      )
-      .subscribe();
-
     return () => {
       // Отключаем подписки при размонтировании
       realtimeManager.disconnect();
-      supabase.removeChannel(messagesChannel);
     };
   }, [currentUser?.id]);
 
@@ -637,7 +623,7 @@ export default function RootLayout() {
                 backgroundColor: '#000', 
                 borderTopWidth: 0,
                 height: 80,
-                paddingBottom: 10,
+                paddingBottom: Platform.OS === 'android' ? 0 : 10, // Убираем отступ снизу для Android
                 paddingTop: 10
               },
               tabBarActiveTintColor: '#fff',

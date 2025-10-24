@@ -5,6 +5,7 @@ import {
     Alert,
     Image,
     ImageBackground,
+    Platform,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -156,13 +157,14 @@ export default function MessagesScreen() {
     loadChats();
   }, [loadChats]);
 
-  // Realtime подписка на новые сообщения
+  // Realtime подписка на новые сообщения (только для обновления UI чатов)
   useEffect(() => {
     if (!currentUser) return;
 
-    // Подписываемся на INSERT события когда текущий пользователь - получатель
+    // Подписываемся только на INSERT события для обновления списка чатов
+    // Push уведомления обрабатываются в RealtimeManager
     const channel = supabase
-      .channel('messages-updates')
+      .channel('messages-ui-updates')
       .on(
         'postgres_changes',
         {
@@ -172,23 +174,8 @@ export default function MessagesScreen() {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
+          console.log('💬 Новое сообщение для UI обновления:', payload.new);
           silentLoadChats();
-          // Дебаунсинг для обновления UserContext
-          if (refreshTimeoutRef.current) {
-            clearTimeout(refreshTimeoutRef.current);
-          }
-          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${currentUser.id}`
-        },
-        (payload) => {
           // Дебаунсинг для обновления UserContext
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
@@ -549,11 +536,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: Platform.OS === 'android' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.7)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: Platform.OS === 'android' ? 0 : 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     shadowColor: '#000',
     shadowOffset: {

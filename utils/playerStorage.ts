@@ -1765,8 +1765,33 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     
     await sendMessage(message);
     
-    // Push-уведомления отправляются через RealtimeManager, не дублируем здесь
-    console.log('📱 Push-уведомления будут отправлены через Realtime подписку');
+    // Отправляем push-уведомление напрямую (альтернатива Realtime)
+    try {
+      const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
+      
+      // Получаем данные отправителя
+      const senderPlayer = await getPlayerById(senderId);
+      if (senderPlayer) {
+        // Получаем токены получателя
+        const receiverTokens = await getUserPushTokens(receiverId);
+        console.log(`📱 Push токены для получателя ${receiverId}:`, receiverTokens.length);
+        
+        if (receiverTokens.length > 0) {
+          console.log(`📱 Отправляем push о сообщении от ${senderPlayer.name} для пользователя ${receiverId}`);
+          
+          await sendMessageNotification(
+            receiverTokens,
+            senderPlayer.name || 'Пользователь',
+            text,
+            senderId
+          );
+        } else {
+          console.log('⚠️ У получателя нет push токенов, уведомление не отправляется');
+        }
+      }
+    } catch (pushError) {
+      console.error('❌ Ошибка отправки push-уведомления:', pushError);
+    }
     
     return true;
   } catch (error) {
@@ -4188,7 +4213,7 @@ export const notifyFriendsAboutChanges = async (
   const lastCall = notificationCache.get(cacheKey);
   const now = Date.now();
   
-  if (lastCall && (now - lastCall) < 300000) { // 5 минут
+  if (lastCall && (now - lastCall) < 30000) { // 30 секунд
     console.log('⏭️ Пропускаем повторный вызов notifyFriendsAboutChanges для игрока:', playerId);
     return;
   }
@@ -4212,6 +4237,16 @@ export const notifyFriendsAboutChanges = async (
     const friends = allFriends.filter(friend => friend.id !== playerId);
     
     console.log(`👥 Список друзей игрока ${playerName}:`, friends.length, 'из', allFriends.length);
+    
+    // Дополнительная проверка: логируем, если игрок попал в список друзей самому себе
+    if (allFriends.some(friend => friend.id === playerId)) {
+      console.error('🚨 КРИТИЧЕСКАЯ ОШИБКА: Игрок попал в список друзей самому себе!', {
+        playerId,
+        playerName,
+        allFriendsCount: allFriends.length,
+        friendsCount: friends.length
+      });
+    }
     
     // Функция для генерации UUID v4
     const generateUUID = () => {
@@ -4336,7 +4371,7 @@ export const notifyFriendsAboutChanges = async (
         .select('id, created_at, data')
         .eq('user_id', notification.user_id)
         .eq('type', notification.type)
-        .gte('created_at', new Date(Date.now() - 300000).toISOString()) // Последние 5 минут
+        .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Последние 30 секунд
         .order('created_at', { ascending: false })
         .limit(10);
       
@@ -4344,14 +4379,17 @@ export const notifyFriendsAboutChanges = async (
         console.error('❌ Ошибка проверки дубликатов уведомлений:', checkError);
       }
       
-      // Проверяем, есть ли уведомление от того же игрока за последние 2 минуты
+      // Проверяем, есть ли уведомление с теми же изменениями за последние 30 секунд
+      const currentData = notification.data as any;
       const isDuplicate = existingNotifications?.some(existing => {
         const existingData = existing.data as any;
-        return existingData?.changedPlayerId === playerId;
+        // Сравниваем конкретные изменения, а не просто игрока
+        return existingData?.changedPlayerId === playerId && 
+               JSON.stringify(existingData?.changes) === JSON.stringify(currentData?.changes);
       });
       
       if (isDuplicate) {
-        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id, 'от игрока:', playerId);
+        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id, 'от игрока:', playerId, 'с теми же изменениями');
         continue;
       }
       
@@ -4391,8 +4429,9 @@ export const notifyFriendsAboutChanges = async (
         const userNotifications = deduplicatedNotifications.filter(n => n.user_id === userId);
         const notificationType = userNotifications[0]?.type;
         
-        // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока
-        const pushCacheKey = `${userId}_${playerId}_${notificationType}`;
+        // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока с теми же изменениями
+        const changesHash = JSON.stringify(userNotifications[0]?.data?.changes || []);
+        const pushCacheKey = `${userId}_${playerId}_${notificationType}_${changesHash}`;
         
         // Двойная проверка: глобальный кеш + локальный кеш
         if (sentPushNotifications.has(pushCacheKey)) {
@@ -4403,8 +4442,19 @@ export const notifyFriendsAboutChanges = async (
         const lastPushTime = pushNotificationCache.get(pushCacheKey);
         const now = Date.now();
         
-        if (lastPushTime && (now - lastPushTime) < 300000) { // 5 минут
+        if (lastPushTime && (now - lastPushTime) < 30000) { // 30 секунд
           console.log('⏭️ Пропускаем дублирующееся push-уведомление (глобальный кеш):', userId, 'от игрока:', playerId);
+          continue;
+        }
+        
+        // Дополнительная проверка: не отправляем уведомление самому игроку
+        if (userId === playerId) {
+          console.error('🚨 КРИТИЧЕСКАЯ ОШИБКА: Попытка отправить уведомление самому игроку!', {
+            userId,
+            playerId,
+            playerName,
+            notificationType
+          });
           continue;
         }
         

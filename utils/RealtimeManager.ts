@@ -10,6 +10,7 @@ class RealtimeManager {
   private subscriptions: Map<string, RealtimeSubscription> = new Map();
   private currentUserId: string | null = null;
   private notificationCountCallback: ((count: number) => void) | null = null;
+  private messagesCountCallback: ((count: number) => void) | null = null;
 
   static getInstance(): RealtimeManager {
     if (!RealtimeManager.instance) {
@@ -26,11 +27,19 @@ class RealtimeManager {
   }
 
   /**
+   * Устанавливает callback для обновления счетчика сообщений
+   */
+  setMessagesCountCallback(callback: (count: number) => void): void {
+    this.messagesCountCallback = callback;
+  }
+
+  /**
    * Настраивает все Realtime подписки для пользователя
    */
   async setupSubscriptions(userId: string): Promise<void> {
     // Если подписки уже настроены для этого пользователя, не пересоздаем их
     if (this.currentUserId === userId && this.subscriptions.size > 0) {
+      console.log('⏭️ Realtime подписки уже настроены для пользователя:', userId);
       return;
     }
 
@@ -46,12 +55,16 @@ class RealtimeManager {
       // 2. Подписка на счетчик уведомлений
       await this.setupNotificationCountSubscription(userId);
       
-      // 3. Подписка на запросы в друзья
+      // 3. Подписка на счетчик сообщений
+      await this.setupMessagesCountSubscription(userId);
+      
+      // 4. Подписка на запросы в друзья
       await this.setupFriendRequestsSubscription(userId);
       
-      // 4. Подписка на новые сообщения для push уведомлений
-      await this.setupMessagesSubscription(userId);
+      // 5. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
+      // await this.setupMessagesSubscription(userId);
 
+      console.log('✅ Realtime подписки настроены для пользователя:', userId);
     } catch (error) {
       console.error('❌ Ошибка настройки Realtime подписок:', error);
     }
@@ -113,26 +126,65 @@ class RealtimeManager {
   }
 
   /**
+   * Настраивает подписку на счетчик сообщений
+   */
+  private async setupMessagesCountSubscription(userId: string): Promise<void> {
+    const channel = supabase
+      .channel('players-messages-count')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players',
+          filter: `id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('🔄 Счетчик сообщений изменен в БД через Realtime:', payload.new.unread_messages_count);
+          // Эмитируем событие для обновления UI
+          this.emitMessagesCountUpdate(payload.new.unread_messages_count || 0);
+        }
+      )
+      .subscribe();
+
+    this.subscriptions.set('players-messages-count', {
+      channel,
+      name: 'players-messages-count'
+    });
+  }
+
+  /**
    * Настраивает подписку на новые сообщения для отправки push уведомлений
    */
   private async setupMessagesSubscription(userId: string): Promise<void> {
+    console.log('🔧 Настраиваем глобальную подписку на сообщения для пользователя:', userId);
     const channel = supabase
-      .channel('messages-push-notifications')
+      .channel('messages-push-notifications-global')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${userId}`
+          table: 'messages'
+          // Убираем фильтр - слушаем все сообщения
         },
         async (payload) => {
           console.log('💬 Новое сообщение получено через Realtime:', payload.new);
+          console.log('💬 Отправитель:', payload.new.sender_id);
+          console.log('💬 Получатель:', payload.new.receiver_id);
+          console.log('💬 Текст:', payload.new.text);
+          
+          // Проверяем, является ли текущий пользователь получателем
+          const receiverId = payload.new.receiver_id;
+          if (receiverId !== userId) {
+            console.log('⏭️ Сообщение не для текущего пользователя, пропускаем');
+            return;
+          }
           
           // Отправляем push уведомление
           try {
-            const { sendMessageNotification } = await import('./notificationService');
-            const { getPlayerById, getUserPushTokens } = await import('./playerStorage');
+            const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
+            const { getPlayerById } = await import('./playerStorage');
             
             const senderId = payload.new.sender_id;
             const messageText = payload.new.text;
@@ -140,12 +192,15 @@ class RealtimeManager {
             // Получаем данные отправителя
             const senderPlayer = await getPlayerById(senderId);
             if (!senderPlayer) {
+              console.log('❌ Не удалось получить данные отправителя');
               return;
             }
             
             // Получаем токены получателя
             const receiverTokens = await getUserPushTokens(userId);
+            console.log(`📱 Push токены для пользователя ${userId}:`, receiverTokens.length);
             if (receiverTokens.length === 0) {
+              console.log('⚠️ У пользователя нет push токенов, уведомление не отправляется');
               return;
             }
             
@@ -165,10 +220,12 @@ class RealtimeManager {
       )
       .subscribe();
 
-    this.subscriptions.set('messages-push-notifications', {
+    this.subscriptions.set('messages-push-notifications-global', {
       channel,
-      name: 'messages-push-notifications'
+      name: 'messages-push-notifications-global'
     });
+    
+    console.log('✅ Подписка на сообщения создана для пользователя:', userId);
   }
 
   /**
@@ -294,6 +351,12 @@ class RealtimeManager {
   private emitNotificationCountUpdate(count: number): void {
     if (this.notificationCountCallback) {
       this.notificationCountCallback(count);
+    }
+  }
+
+  private emitMessagesCountUpdate(count: number): void {
+    if (this.messagesCountCallback) {
+      this.messagesCountCallback(count);
     }
   }
 
