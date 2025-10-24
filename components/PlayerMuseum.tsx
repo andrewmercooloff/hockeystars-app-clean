@@ -460,6 +460,9 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
                       item.item.image_url.toLowerCase().includes('.png') && styles.pngImage
                     ]}
                     resizeMode="contain"
+                    // Оптимизация для медленного интернета
+                    loadingIndicatorSource={{ uri: 'https://via.placeholder.com/100/333/fff?text=...' }}
+                    fadeDuration={200}
                   />
                 </>
               ) : (

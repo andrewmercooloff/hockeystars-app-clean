@@ -310,7 +310,6 @@ export default function PlayerProfile() {
           filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}` // Запросы ОТ текущего пользователя К просматриваемому
         },
         async (payload) => {
-          console.log('👥 Изменение запроса в друзья через Realtime (профиль):', payload);
           // Перезагружаем статус дружбы
           const status = await getFriendshipStatus(currentUser.id, player.id);
           setFriendshipStatus(status);
@@ -325,7 +324,6 @@ export default function PlayerProfile() {
           filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}` // Запросы ОТ просматриваемого К текущему пользователю
         },
         async (payload) => {
-          console.log('👥 Изменение запроса в друзья через Realtime (профиль):', payload);
           // Перезагружаем статус дружбы
           const status = await getFriendshipStatus(currentUser.id, player.id);
           setFriendshipStatus(status);
@@ -3246,6 +3244,8 @@ export default function PlayerProfile() {
                         style={styles.friendAvatar}
                         defaultSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=Player' }}
                         loadingIndicatorSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=...' }}
+                        // Оптимизация для медленного интернета
+                        fadeDuration={200}
                       />
                       <Text style={styles.friendName} numberOfLines={2}>
                         {friend.name?.toUpperCase()}

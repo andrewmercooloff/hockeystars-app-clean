@@ -1261,15 +1261,13 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const cachedData = await AsyncStorage.getItem(cacheKey);
     
-    // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ОТЛАДКИ
-    // if (cachedData) {
-    //   const { status, timestamp } = JSON.parse(cachedData);
-    //   if (Date.now() - timestamp < cacheTime) {
-    //     console.log('📦 Используем кэш:', status);
-    //     return status;
-    //   }
-    // }
-    console.log('🔄 Загружаем статус дружбы из БД (кэш отключен)');
+    // Проверяем кеш
+    if (cachedData) {
+      const { status, timestamp } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < cacheTime) {
+        return status;
+      }
+    }
     
     const { data, error } = await supabase
       .from('friend_requests')
@@ -1277,15 +1275,7 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       .or(`and(from_id.eq.${userId1},to_id.eq.${userId2}),and(from_id.eq.${userId2},to_id.eq.${userId1})`)
       .single();
     
-    console.log('🔍 getFriendshipStatus:', {
-      userId1,
-      userId2,
-      data,
-      error: error?.message
-    });
-    
     if (error) {
-      console.log('❌ Ошибка или нет записи в friend_requests:', error.message);
       // Кешируем результат "none" при ошибке
       await AsyncStorage.setItem(cacheKey, JSON.stringify({
         status: 'none',
@@ -1304,10 +1294,8 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       // Проверяем направление запроса
       if (data.from_id === userId1) {
         status = 'sent_request';
-        console.log('📤 Статус: sent_request (от', userId1, 'к', userId2, ')');
       } else {
         status = 'received_request';
-        console.log('📥 Статус: received_request (от', userId2, 'к', userId1, ')');
       }
     } else {
       status = data.status as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending';
@@ -1319,7 +1307,6 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       timestamp: Date.now()
     }));
     
-    console.log('🎯 Итоговый статус:', status);
     return status;
   } catch (error) {
     console.error('❌ Ошибка получения статуса дружбы:', error);
@@ -2176,23 +2163,13 @@ export const getFriends = async (userId: string): Promise<Player[]> => {
       return [];
     }
     
-    // Конвертируем друзей и загружаем их основные команды
-    const friendsWithTeams = await Promise.all(
-      (friends || []).map(async (friend) => {
-        const convertedFriend = convertSupabaseToPlayer(friend);
-        
-        // Загружаем команды друга
-        const friendTeams = await getPlayerTeams(friend.id);
-        const primaryTeam = friendTeams.find(team => team.isPrimary);
-        
-        // Если есть основная команда, обновляем поле team
-        if (primaryTeam) {
-          convertedFriend.team = primaryTeam.teamName;
-        }
-        
-        return convertedFriend;
-      })
-    );
+    // Конвертируем друзей (без загрузки команд для ускорения)
+    const friendsWithTeams = (friends || []).map((friend) => {
+      const convertedFriend = convertSupabaseToPlayer(friend);
+      // Используем team из основного запроса (уже есть в данных игрока)
+      // Дополнительная загрузка команд замедляет загрузку друзей
+      return convertedFriend;
+    });
     
     // Кешируем результат
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
