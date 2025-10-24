@@ -82,7 +82,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз после получения нового сообщения
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 300);
+          }, 100);
         }
       )
       .subscribe();
@@ -129,7 +129,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз после загрузки сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 200);
+          }, 100);
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
@@ -208,7 +208,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз при получении новых сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 200);
+          }, 100);
         } else if (newMessageIds.length === 0) {
           console.log('📳 Нет новых сообщений - пропускаем вибрацию');
         } else {
@@ -245,14 +245,12 @@ export default function ChatScreen() {
         }
         
         setNewMessage('');
-        // Небольшая задержка для сохранения сообщения в базе данных
-        setTimeout(async () => {
-          await loadMessages();
-          // Прокручиваем к последнему сообщению после загрузки
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 100);
-        }, 500);
+        // Загружаем сообщения сразу без задержки
+        await loadMessages();
+        // Прокручиваем к последнему сообщению после загрузки
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
       } else {
         Alert.alert(t('chat.error'), t('chat.errorSendingMessage'));
       }
