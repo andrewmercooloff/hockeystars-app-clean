@@ -1433,6 +1433,14 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     const updatedPlayer = convertSupabaseToPlayer(data);
     
+    console.log('🔄 updatePlayer: Обновленные данные из БД:', {
+      id: updatedPlayer.id,
+      name: updatedPlayer.name,
+      games: updatedPlayer.games,
+      goals: updatedPlayer.goals,
+      assists: updatedPlayer.assists
+    });
+    
     // Очищаем кеш игрока при обновлении (только если не пропускаем)
     if (!skipCacheClear) {
       await clearPlayerCache(playerId);
@@ -2288,19 +2296,8 @@ export const loadNotifications = async (userId?: string): Promise<any[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      // Если не получилось, пытаемся со старой структурой (playerId)
-      const altResult = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('playerId', userId)
-        .order('timestamp', { ascending: false });
-      
-      if (altResult.error) {
-        console.error('❌ Ошибка загрузки уведомлений (обе структуры):', error, altResult.error);
-        return [];
-      }
-
-      return altResult.data || [];
+      console.error('❌ Ошибка загрузки уведомлений:', error);
+      return [];
     }
 
     return data || [];

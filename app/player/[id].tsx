@@ -1321,6 +1321,13 @@ export default function PlayerProfile() {
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
+        console.log('🔄 handleSave: Обновленные данные игрока:', {
+          id: refreshedPlayer.id,
+          name: refreshedPlayer.name,
+          games: refreshedPlayer.games,
+          goals: refreshedPlayer.goals,
+          assists: refreshedPlayer.assists
+        });
         setPlayer(refreshedPlayer);
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
