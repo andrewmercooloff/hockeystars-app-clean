@@ -222,7 +222,8 @@ export default function MessagesScreen() {
       }
       autoHideTimeoutRef.current = setTimeout(async () => {
         console.log('🔄 Автоматическое скрытие индикатора сообщений через 5 секунд');
-        await refreshUser(true);
+        // Убираем refreshUser - теперь счетчик управляется через БД и Realtime
+        // await refreshUser(true);
       }, 5000);
       
       return () => {

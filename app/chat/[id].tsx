@@ -77,6 +77,11 @@ export default function ChatScreen() {
           console.log('🔔 Получено новое сообщение через Realtime:', payload);
           // Загружаем сообщения только при получении нового сообщения
           loadMessages();
+          
+          // Прокручиваем вниз после получения нового сообщения
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 300);
         }
       )
       .subscribe();
@@ -122,29 +127,27 @@ export default function ChatScreen() {
           
           // Прокручиваем вниз после загрузки сообщений
           setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: false });
-          }, 100);
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 200);
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Обновляем UserContext для обновления счетчика в нижнем меню
-          // Попробуем несколько раз с разными задержками для надежности
-          setTimeout(async () => {
-            console.log('🔄 Обновляем UserContext после markMessagesAsRead');
-            await refreshUser(true);
-          }, 100);
+          // Убираем лишние обновления - теперь счетчик управляется через БД и Realtime
+          // setTimeout(async () => {
+          //   console.log('🔄 Обновляем UserContext после markMessagesAsRead');
+          //   await refreshUser(true);
+          // }, 100);
           
-          setTimeout(async () => {
-            console.log('🔄 Повторное обновление UserContext');
-            await refreshUser(true);
-          }, 1000);
+          // setTimeout(async () => {
+          //   console.log('🔄 Повторное обновление UserContext');
+          //   await refreshUser(true);
+          // }, 1000);
           
-          // Автоматически скрываем индикатор через 2 секунды после захода в чат
-          setTimeout(async () => {
-            console.log('🔄 Автоматическое скрытие индикатора через 2 секунды после захода в чат');
-            await refreshUser(true);
-          }, 2000);
+          // setTimeout(async () => {
+          //   console.log('🔄 Автоматическое скрытие индикатора через 2 секунды после захода в чат');
+          //   await refreshUser(true);
+          // }, 2000);
         }
       }
     } catch (error) {
@@ -201,9 +204,10 @@ export default function ChatScreen() {
             }
           }
           
+          // Прокручиваем вниз при получении новых сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+          }, 200);
         } else if (newMessageIds.length === 0) {
           console.log('📳 Нет новых сообщений - пропускаем вибрацию');
         } else {
