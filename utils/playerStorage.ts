@@ -4156,12 +4156,27 @@ export const notifyFriendsAboutPhysicalData = async (
 };
 
 // Функция для отправки уведомлений друзьям о изменениях
+// Кеш для предотвращения повторных вызовов
+const notificationCache = new Map<string, number>();
+
 export const notifyFriendsAboutChanges = async (
   playerId: string, 
   playerName: string, 
   statChanges: StatChange[], 
   normativeChanges: NormativeChange[]
 ): Promise<void> => {
+  // Проверяем, не вызывалась ли функция недавно для этого игрока
+  const cacheKey = `${playerId}_${statChanges.length}_${normativeChanges.length}`;
+  const lastCall = notificationCache.get(cacheKey);
+  const now = Date.now();
+  
+  if (lastCall && (now - lastCall) < 5000) { // 5 секунд
+    console.log('⏭️ Пропускаем повторный вызов notifyFriendsAboutChanges для игрока:', playerId);
+    return;
+  }
+  
+  notificationCache.set(cacheKey, now);
+  
   try {
     // Получаем данные игрока для аватара
     const { data: playerData, error: playerError } = await supabase
@@ -4287,23 +4302,28 @@ export const notifyFriendsAboutChanges = async (
     for (const notification of allNotifications) {
       const key = `${notification.user_id}_${notification.type}_${playerId}`;
       
-      // Проверяем, есть ли уже похожее уведомление за последние 30 секунд
+      // Проверяем, есть ли уже похожее уведомление за последние 2 минуты
       const { data: existingNotifications, error: checkError } = await supabase
         .from('notifications')
-        .select('id, created_at')
+        .select('id, created_at, data')
         .eq('user_id', notification.user_id)
         .eq('type', notification.type)
-        .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Последние 30 секунд
+        .gte('created_at', new Date(Date.now() - 120000).toISOString()) // Последние 2 минуты
         .order('created_at', { ascending: false })
-        .limit(1);
+        .limit(5);
       
       if (checkError) {
         console.error('❌ Ошибка проверки дубликатов уведомлений:', checkError);
       }
       
-      // Если уведомление уже было отправлено недавно, пропускаем
-      if (existingNotifications && existingNotifications.length > 0) {
-        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id);
+      // Проверяем, есть ли уведомление от того же игрока за последние 2 минуты
+      const isDuplicate = existingNotifications?.some(existing => {
+        const existingData = existing.data as any;
+        return existingData?.changedPlayerId === playerId;
+      });
+      
+      if (isDuplicate) {
+        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id, 'от игрока:', playerId);
         continue;
       }
       
