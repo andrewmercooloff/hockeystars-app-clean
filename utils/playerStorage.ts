@@ -1453,15 +1453,15 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
         // Отправляем уведомления друзьям асинхронно (не блокируем основной поток)
         setTimeout(async () => {
           try {
-        await notifyFriendsAboutChanges(
-          playerId, 
-          updatedPlayer.name, 
-          statChanges, 
-          normativeChanges
-        );
+            await notifyFriendsAboutChanges(
+              playerId, 
+              updatedPlayer.name, 
+              statChanges, 
+              normativeChanges
+            );
           } catch (error) {
             console.error('❌ Ошибка отправки уведомлений (не критично):', error);
-      }
+          }
         }, 0);
       }
     }
