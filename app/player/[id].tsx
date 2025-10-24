@@ -1084,7 +1084,7 @@ export default function PlayerProfile() {
       }
         })(),
         // Обновление данных игрока
-        updatePlayer(player.id, updatedPlayer, true).then(() => getPlayerById(player.id)), // Пропускаем очистку кеша для миграции
+        updatePlayer(player.id, updatedPlayer, true), // Пропускаем очистку кеша для миграции
         // Загрузка команд
         import('../../utils/playerStorage').then(({ getPlayerTeamsAsPastTeams }) => getPlayerTeamsAsPastTeams(player.id))
       ]);
