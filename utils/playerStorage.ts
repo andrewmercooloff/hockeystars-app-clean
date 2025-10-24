@@ -4161,12 +4161,26 @@ const notificationCache = new Map<string, number>();
 // Кеш для предотвращения дублирования push-уведомлений
 const pushNotificationCache = new Map<string, number>();
 
+// Функция для очистки старых записей кеша
+const cleanOldCacheEntries = (cache: Map<string, number>, maxAge: number = 300000) => { // 5 минут
+  const now = Date.now();
+  for (const [key, timestamp] of cache.entries()) {
+    if (now - timestamp > maxAge) {
+      cache.delete(key);
+    }
+  }
+};
+
 export const notifyFriendsAboutChanges = async (
   playerId: string, 
   playerName: string, 
   statChanges: StatChange[], 
   normativeChanges: NormativeChange[]
 ): Promise<void> => {
+  // Очищаем старые записи кеша
+  cleanOldCacheEntries(notificationCache);
+  cleanOldCacheEntries(pushNotificationCache);
+  
   // Проверяем, не вызывалась ли функция недавно для этого игрока
   const statChangesHash = statChanges.map(c => `${c.field}_${c.oldValue}_${c.newValue}`).join('|');
   const normativeChangesHash = normativeChanges.map(c => `${c.field}_${c.oldValue}_${c.newValue}`).join('|');
@@ -4174,7 +4188,7 @@ export const notifyFriendsAboutChanges = async (
   const lastCall = notificationCache.get(cacheKey);
   const now = Date.now();
   
-  if (lastCall && (now - lastCall) < 5000) { // 5 секунд
+  if (lastCall && (now - lastCall) < 30000) { // 30 секунд
     console.log('⏭️ Пропускаем повторный вызов notifyFriendsAboutChanges для игрока:', playerId);
     return;
   }
@@ -4379,7 +4393,7 @@ export const notifyFriendsAboutChanges = async (
         const lastPushTime = pushNotificationCache.get(pushCacheKey);
         const now = Date.now();
         
-        if (lastPushTime && (now - lastPushTime) < 10000) { // 10 секунд
+        if (lastPushTime && (now - lastPushTime) < 60000) { // 60 секунд
           console.log('⏭️ Пропускаем дублирующееся push-уведомление (глобальный кеш):', userId, 'от игрока:', playerId);
           continue;
         }
