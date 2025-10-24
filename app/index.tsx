@@ -135,7 +135,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Логирование для веб-платформы
           
           // Платформо-зависимая скорость - увеличиваем для более активного движения
-          const speedMultiplier = Platform.OS === 'ios' ? 1.2 : (Platform.OS === 'web' ? 1.2 : 0.8); // Увеличиваем начальную скорость
+          const speedMultiplier = Platform.OS === 'ios' ? 1.2 : (Platform.OS === 'web' ? 1.2 : 0.5); // Снижаем начальную скорость для Android
           nextPositions.push({
             id: player.id,
             x: newX,
@@ -282,7 +282,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               
               // ПРОСТАЯ ФИЗИКА: более плавное отталкивание на основе overlap
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.1 : 0.18)); // Минимальная сила отталкивания для Android
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.05 : 0.18)); // Еще более минимальная сила отталкивания для Android
               
               // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
@@ -328,8 +328,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           newVy += velocityChanges[posIndex].dvy;
           
           // Платформо-зависимые ограничения скорости (улучшенные для плавности)
-          const maxSpeed = Platform.OS === 'ios' ? 5.0 : (Platform.OS === 'web' ? 5.5 : 2.2); // Увеличены для более плавного движения
-          const minSpeed = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'web' ? 0.8 : 0.5); // Увеличиваем минимальную скорость для постоянного движения
+          const maxSpeed = Platform.OS === 'ios' ? 5.0 : (Platform.OS === 'web' ? 5.5 : 1.5); // Снижаем максимальную скорость для Android
+          const minSpeed = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'web' ? 0.8 : 0.3); // Снижаем минимальную скорость для Android
           const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
           if (currentSpeed > maxSpeed) {
             newVx = (newVx / currentSpeed) * maxSpeed;
@@ -387,7 +387,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         } else if (collisionDetectedRef.current) {
           collisionDetectedRef.current = false;
         }
-    }, Platform.OS === 'ios' ? 8 : 16); // iOS - 120 FPS, Android/Web - 60 FPS для производительности
+    }, Platform.OS === 'ios' ? 8 : (Platform.OS === 'android' ? 33 : 16)); // iOS - 120 FPS, Android - 30 FPS, Web - 60 FPS для производительности
 
     return () => {
       if (animationIntervalRef.current) {
@@ -431,7 +431,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           
           // ТОЛКАЕМ ДРУГУЮ ШАЙБУ только при реальном столкновении
           // Но не при каждом движении пальца - только когда есть столкновение
-          const pushStrength = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'android' ? 0.15 : 0.2); // Минимальная сила толчка для Android
+          const pushStrength = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'android' ? 0.1 : 0.2); // Еще более минимальная сила толчка для Android
           
           // Вычисляем общую скорость перетаскивания
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
@@ -512,8 +512,9 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const touch = e.nativeEvent;
     const now = Date.now();
     
-    // Throttling - обновляем не чаще чем раз в 16ms (60 FPS)
-    if (now - lastUpdateTimeRef.current < 16) {
+    // Throttling - обновляем не чаще чем раз в 16ms (60 FPS) для iOS/Web, 33ms (30 FPS) для Android
+    const throttleInterval = Platform.OS === 'android' ? 33 : 16;
+    if (now - lastUpdateTimeRef.current < throttleInterval) {
       return;
     }
     lastUpdateTimeRef.current = now;
@@ -533,9 +534,10 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const newY = touch.pageY - dragStartRef.current.y;
     
     // Вычисляем скорость на основе изменения позиции для толчка других шайб
-    // Уменьшаем коэффициент для более плавного движения
-    const vx = (newX - lastPositionRef.current.x) * 0.8;
-    const vy = (newY - lastPositionRef.current.y) * 0.8;
+    // Уменьшаем коэффициент для более плавного движения (еще больше для Android)
+    const speedMultiplier = Platform.OS === 'android' ? 0.5 : 0.8;
+    const vx = (newX - lastPositionRef.current.x) * speedMultiplier;
+    const vy = (newY - lastPositionRef.current.y) * speedMultiplier;
     
     // Накапливаем скорость для финального импульса
     dragVelocityRef.current.vx += vx;
@@ -560,8 +562,10 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       const timeDiff = now - dragStartRef.current.time;
       
       // Простое решение: используем накопленную скорость, но с правильным направлением
-      const finalVx = dragVelocityRef.current.vx * 0.5;
-      const finalVy = dragVelocityRef.current.vy * 0.5;
+      // Уменьшаем финальный импульс для Android для более плавного движения
+      const impulseMultiplier = Platform.OS === 'android' ? 0.3 : 0.5;
+      const finalVx = dragVelocityRef.current.vx * impulseMultiplier;
+      const finalVy = dragVelocityRef.current.vy * impulseMultiplier;
       
       // Убираем логи направления для чистоты консоли
       
