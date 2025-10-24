@@ -38,8 +38,7 @@ export async function initializeSounds(): Promise<void> {
         playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
         shouldDuckAndroid: false, // Не приглушаем другие звуки
         playThroughEarpieceAndroid: false,
-        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+        // Убираем проблемные параметры interruptionMode
       });
     } catch (audioModeError) {
       console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError.message);

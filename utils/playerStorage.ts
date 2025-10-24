@@ -4158,6 +4158,8 @@ export const notifyFriendsAboutPhysicalData = async (
 // Функция для отправки уведомлений друзьям о изменениях
 // Кеш для предотвращения повторных вызовов
 const notificationCache = new Map<string, number>();
+// Кеш для предотвращения дублирования push-уведомлений
+const pushNotificationCache = new Map<string, number>();
 
 export const notifyFriendsAboutChanges = async (
   playerId: string, 
@@ -4371,6 +4373,18 @@ export const notifyFriendsAboutChanges = async (
           title = '💪 Обновление нормативов';
           body = `${playerName} обновил свои нормативы`;
         }
+        
+        // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока
+        const pushCacheKey = `${userId}_${playerId}_${notificationType}`;
+        const lastPushTime = pushNotificationCache.get(pushCacheKey);
+        const now = Date.now();
+        
+        if (lastPushTime && (now - lastPushTime) < 10000) { // 10 секунд
+          console.log('⏭️ Пропускаем дублирующееся push-уведомление для пользователя:', userId, 'от игрока:', playerId);
+          continue;
+        }
+        
+        pushNotificationCache.set(pushCacheKey, now);
         
         await sendNotificationToUser(
           userId,

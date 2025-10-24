@@ -1200,7 +1200,8 @@ export default function PlayerProfile() {
           console.log('📊 Обнаружены изменения статистики:', statsChanges);
           console.log('🔔 Отправляем уведомления для игрока:', player.id, player.name);
           // Используем существующую функцию notifyFriendsAboutChanges
-          const { notifyFriendsAboutChanges } = await import('../../utils/playerStorage');
+          const playerStorage = await import('../../utils/playerStorage');
+          const { notifyFriendsAboutChanges } = playerStorage;
           
           // Преобразуем формат: { field, oldValue, newValue } → { field, oldValue, newValue, change }
           const formattedStatChanges = statsChanges.map(change => ({
@@ -1274,7 +1275,7 @@ export default function PlayerProfile() {
           console.log('🔔 Отправляем уведомления о нормативах для игрока:', player.id, player.name);
           
           notificationPromises.push(
-            notifyFriendsAboutChanges(player.id, player.name, [], normativeChanges)
+            playerStorage.notifyFriendsAboutChanges(player.id, player.name, [], normativeChanges)
               .catch((err) => console.error('❌ ОШИБКА отправки уведомлений о нормативах:', err))
           );
         } else {
