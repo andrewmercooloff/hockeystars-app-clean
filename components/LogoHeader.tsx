@@ -63,7 +63,9 @@ const LogoHeader = React.memo(() => {
               fallbackColor="#fff"
             />
           ) : (
-            <Ionicons name="person" size={25} color="#fff" />
+            <View style={{ marginLeft: -2, marginTop: 2 }}>
+              <Ionicons name="person" size={25} color="#fff" />
+            </View>
           )}
         </View>
         {currentUser && currentUser.name && currentUser.name.trim() !== '' ? (
