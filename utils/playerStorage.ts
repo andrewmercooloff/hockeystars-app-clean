@@ -4298,6 +4298,16 @@ export const notifyFriendsAboutChanges = async (
     // Объединяем все уведомления
     const allNotifications = [...statNotifications, ...normativeNotifications];
     
+    // Дедуплицируем уведомления по пользователю и типу
+    const uniqueNotifications = new Map<string, typeof allNotifications[0]>();
+    for (const notification of allNotifications) {
+      const key = `${notification.user_id}_${notification.type}`;
+      if (!uniqueNotifications.has(key)) {
+        uniqueNotifications.set(key, notification);
+      }
+    }
+    const deduplicatedNotifications = Array.from(uniqueNotifications.values());
+    
     // Уведомления получают только друзья, не сам игрок
     
     if (friends.length === 0) {
@@ -4305,19 +4315,19 @@ export const notifyFriendsAboutChanges = async (
       return;
     }
     
-    if (allNotifications.length === 0) {
+    if (deduplicatedNotifications.length === 0) {
       console.log('📭 Нет изменений для отправки уведомлений');
       return;
     }
     
     // Сохраняем уведомления в базу данных (только для друзей)
     console.log('💾 Сохраняем уведомления в базу данных...');
-    console.log('💾 Количество уведомлений для сохранения:', allNotifications.length);
+    console.log('💾 Количество уведомлений для сохранения:', deduplicatedNotifications.length);
     
     // Группируем уведомления по пользователю и типу для проверки дубликатов
-    const notificationsByUserAndType = new Map<string, typeof allNotifications[0]>();
+    const notificationsByUserAndType = new Map<string, typeof deduplicatedNotifications[0]>();
     
-    for (const notification of allNotifications) {
+    for (const notification of deduplicatedNotifications) {
       const key = `${notification.user_id}_${notification.type}_${playerId}`;
       
       // Проверяем, есть ли уже похожее уведомление за последние 5 минут
@@ -4371,14 +4381,14 @@ export const notifyFriendsAboutChanges = async (
     console.log(`📢 Отправлено ${statCount} уведомлений о статистике и ${normativeCount} уведомлений о нормативах`);
     
     // Отправляем push уведомления и обновляем счетчик для каждого друга
-    const uniqueUserIds = [...new Set(allNotifications.map(n => n.user_id))];
+    const uniqueUserIds = [...new Set(deduplicatedNotifications.map(n => n.user_id))];
     const sentPushNotifications = new Set<string>(); // Кеш для предотвращения дублирования
     
     for (const userId of uniqueUserIds) {
       // Отправляем push уведомление
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        const userNotifications = allNotifications.filter(n => n.user_id === userId);
+        const userNotifications = deduplicatedNotifications.filter(n => n.user_id === userId);
         const notificationType = userNotifications[0]?.type;
         
         // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока
