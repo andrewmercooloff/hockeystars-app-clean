@@ -699,16 +699,19 @@ const styles = StyleSheet.create({
   },
   chatContainer: {
     flex: 1,
+    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   messagesContainer: {
     flex: 1,
     paddingTop: 60, // Отступ для фиксированного заголовка
     paddingBottom: Platform.OS === 'android' ? 30 : 0, // Дополнительный отступ снизу для Android
+    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   messagesContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
+    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   emptyContainer: {
     justifyContent: 'center',
@@ -739,6 +742,7 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginVertical: 6,
+    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   myMessage: {
     alignItems: 'flex-end',
