@@ -577,6 +577,7 @@ const styles = StyleSheet.create({
   },
   photosContainer: {
     marginTop: 5,
+    paddingHorizontal: 20, // Добавляем padding для контейнера
   },
   photosScroll: {
     paddingRight: 20,
@@ -625,7 +626,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   photoGridItem: {
-    width: (screenWidth - 100) / 3, // 3 столбца с отступами (20px padding + 20px margins)
+    width: (screenWidth - 100) / 3, // 3 столбца: 40px padding + 20px margins + 40px spacing
     marginBottom: 15,
     marginRight: 10,
     position: 'relative',
