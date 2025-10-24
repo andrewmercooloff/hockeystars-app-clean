@@ -2574,7 +2574,9 @@
     "shop": "Hockey Shop",
     "error": "Error",
     "errorLoadingChat": "Failed to load chat data",
-    "errorSendingMessage": "Failed to send message"
+    "errorSendingMessage": "Failed to send message",
+    "clearChat": "Clear Chat",
+    "clearChatConfirm": "Are you sure you want to delete all messages in this chat? This action cannot be undone."
   },
   "createUser": {
     "title": "Create User",

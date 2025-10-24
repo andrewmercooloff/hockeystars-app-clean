@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
     getConversation,
     getPlayerById,
@@ -269,6 +270,83 @@ export default function ChatScreen() {
     });
   };
 
+  // Удаление одного сообщения
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      // Сначала удаляем из UI для плавной анимации
+      setMessages(prev => prev.filter(m => m.id !== messageId));
+      
+      // Затем удаляем из базы данных в фоне
+      setTimeout(async () => {
+        const { error } = await supabase
+          .from('messages')
+          .delete()
+          .eq('id', messageId);
+        
+        if (error) {
+          console.error('❌ Ошибка удаления сообщения:', error);
+          // Если ошибка, возвращаем сообщение в UI
+          loadMessages();
+        } else {
+          console.log('✅ Сообщение удалено из БД');
+        }
+      }, 100);
+    } catch (error) {
+      console.error('❌ Ошибка удаления сообщения:', error);
+    }
+  };
+
+  // Очистка всего чата
+  const handleClearChat = async () => {
+    Alert.alert(
+      t('chat.clearChat'),
+      t('chat.clearChatConfirm'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel'
+        },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              if (!currentUser || !otherPlayer) return;
+              
+              // Сначала очищаем UI
+              setMessages([]);
+              
+              // Затем удаляем все сообщения из базы данных
+              const { error } = await supabase
+                .from('messages')
+                .delete()
+                .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${otherPlayer.id}),and(sender_id.eq.${otherPlayer.id},receiver_id.eq.${currentUser.id})`);
+              
+              if (error) {
+                console.error('❌ Ошибка очистки чата:', error);
+                // Если ошибка, загружаем сообщения обратно
+                loadMessages();
+              } else {
+                console.log('✅ Чат очищен');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка очистки чата:', error);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  // Рендер правой кнопки удаления при свайпе
+  const renderRightActions = () => {
+    return (
+      <View style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={32} color="#fa2f40" />
+      </View>
+    );
+  };
+
 
 
   if (loading) {
@@ -323,6 +401,13 @@ export default function ChatScreen() {
                 </Text>
               </View>
             </View>
+            
+            {/* Кнопка очистки чата */}
+            {messages.length > 0 && (
+              <TouchableOpacity onPress={handleClearChat} style={styles.clearChatButton}>
+                <Ionicons name="trash-outline" size={24} color="#fa2f40" />
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Сообщения */}
@@ -346,35 +431,41 @@ export default function ChatScreen() {
                 messages.map((message) => {
                   const isMyMessage = message.senderId === currentUser.id;
                   
-
-                  
                   return (
-                    <View 
-                      key={message.id} 
-                      style={[
-                        styles.messageContainer,
-                        isMyMessage ? styles.myMessage : styles.otherMessage
-                      ]}
+                    <Swipeable
+                      key={message.id}
+                      renderRightActions={renderRightActions}
+                      onSwipeableOpen={() => handleDeleteMessage(message.id)}
+                      overshootRight={false}
+                      friction={2}
+                      rightThreshold={40}
                     >
-                      <View style={[
-                        styles.messageBubble,
-                        isMyMessage ? styles.myBubble : styles.otherBubble
-                      ]}>
-                        <Text style={[
-                          styles.messageText,
-                          isMyMessage ? styles.myMessageText : styles.otherMessageText
+                      <View 
+                        style={[
+                          styles.messageContainer,
+                          isMyMessage ? styles.myMessage : styles.otherMessage
+                        ]}
+                      >
+                        <View style={[
+                          styles.messageBubble,
+                          isMyMessage ? styles.myBubble : styles.otherBubble
                         ]}>
-                          {message.text}
-                          {'  '}
                           <Text style={[
-                            styles.messageTime,
-                            isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                            styles.messageText,
+                            isMyMessage ? styles.myMessageText : styles.otherMessageText
                           ]}>
-                            {formatTime(message.timestamp)}
+                            {message.text}
+                            {'  '}
+                            <Text style={[
+                              styles.messageTime,
+                              isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                            ]}>
+                              {formatTime(message.timestamp)}
+                            </Text>
                           </Text>
-                        </Text>
+                        </View>
                       </View>
-                    </View>
+                    </Swipeable>
                   );
                 })
               ) : null}
@@ -491,6 +582,9 @@ const styles = StyleSheet.create({
     color: '#FF4444',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
+  },
+  clearChatButton: {
+    // Убираем фон и отступы для компактности
   },
   chatContainer: {
     flex: 1,
@@ -624,5 +718,12 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: 'rgba(255, 68, 68, 0.5)',
+  },
+  deleteButton: {
+    backgroundColor: '#fa2f40',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: '100%',
   },
 }); 
