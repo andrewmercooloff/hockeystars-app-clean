@@ -490,10 +490,18 @@ export async function sendAchievementNotification(
   return results.every(result => result);
 }
 
+// Кеш для предотвращения повторной инициализации
+const initializedUsers = new Set<string>();
+
 /**
  * Инициализация push-уведомлений для пользователя
  */
 export async function initializePushNotifications(userId: string): Promise<boolean> {
+  // Проверяем, не инициализированы ли уже уведомления для этого пользователя
+  if (initializedUsers.has(userId)) {
+    return true;
+  }
+
   try {
     // Регистрируем для получения уведомлений
     const token = await registerForPushNotificationsAsync();
@@ -506,6 +514,8 @@ export async function initializePushNotifications(userId: string): Promise<boole
     // Сохраняем token в базе данных
     const saved = await savePushToken(token, userId);
     if (saved) {
+      // Помечаем пользователя как инициализированного
+      initializedUsers.add(userId);
       return true;
     } else {
       console.log('❌ Не удалось сохранить push token');

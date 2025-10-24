@@ -459,12 +459,12 @@ export default function ChatScreen() {
                 (() => {
                   const groupedMessages = groupMessagesByDate(messages);
                   const dateKeys = Object.keys(groupedMessages).sort((a, b) => {
-                    // Сортируем даты: сегодня -> вчера -> остальные по убыванию
-                    if (a === 'Сегодня') return -1;
-                    if (b === 'Сегодня') return 1;
-                    if (a === 'Вчера') return -1;
-                    if (b === 'Вчера') return 1;
-                    return b.localeCompare(a);
+                    // Сортируем даты: старые -> вчера -> сегодня (новые внизу)
+                    if (a === 'Сегодня') return 1;
+                    if (b === 'Сегодня') return -1;
+                    if (a === 'Вчера') return 1;
+                    if (b === 'Вчера') return -1;
+                    return a.localeCompare(b); // Старые даты вверху
                   });
 
                   return dateKeys.map(dateKey => (
