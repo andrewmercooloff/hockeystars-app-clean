@@ -84,8 +84,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return {
         leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
         topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
-        rightOffset: 180,  // Уменьшено чтобы убрать пустое пространство справа
-        bottomOffset: 430  // Уменьшено чтобы убрать пустое пространство снизу
+        rightOffset: 165,  // Уменьшено чтобы шайбы долетали до края
+        bottomOffset: 415  // Уменьшено чтобы шайбы долетали до края
       };
     }
   }, [width, height]);
@@ -270,7 +270,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             // Минимальное расстояние между центрами шайб (диаметр шайбы)
-            const minDistance = Platform.OS === 'android' ? puckSize * 0.4 : puckSize;
+            const minDistance = Platform.OS === 'android' ? puckSize * 0.5 : puckSize;
             
             if (distance < minDistance && distance > 0) {
               const angle = Math.atan2(dy, dx);
