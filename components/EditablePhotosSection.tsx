@@ -356,16 +356,16 @@ export default function EditablePhotosSection({
       
       {photos.length > 0 && (
         <View style={styles.photosContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.photosScroll}
-            removeClippedSubviews={true}
-            decelerationRate="fast"
-          >
-            {photos.map((photo, index) => (
-              <View key={photo} style={styles.photoContainer}>
-                {isEditing ? (
+          {isEditing ? (
+            // Режим редактирования - вертикальный список для перетаскивания
+            <ScrollView
+              vertical
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.photosVerticalScroll}
+              removeClippedSubviews={true}
+            >
+              {photos.map((photo, index) => (
+                <View key={photo} style={styles.photoVerticalContainer}>
                   <PanGestureHandler
                     onGestureEvent={handleDragMove}
                     onHandlerStateChange={(event) => {
@@ -377,7 +377,7 @@ export default function EditablePhotosSection({
                     }}
                   >
                     <View style={[
-                      styles.photoWrapper,
+                      styles.photoVerticalWrapper,
                       draggedIndex === index && styles.draggingItem,
                       draggedIndex === index && {
                         transform: [
@@ -389,19 +389,43 @@ export default function EditablePhotosSection({
                       <TouchableOpacity
                         onPress={() => openPhotoViewer(index)}
                         activeOpacity={0.8}
+                        style={styles.photoVerticalTouchable}
                       >
                         <Image
                           source={{ uri: photo }}
-                          style={styles.photo}
+                          style={styles.photoVertical}
                           resizeMode="cover"
                         />
-                        <View style={styles.dragHandle}>
-                          <Ionicons name="reorder-three" size={16} color="#fff" />
+                        <View style={styles.dragHandleVertical}>
+                          <Ionicons name="reorder-three" size={20} color="#fff" />
+                        </View>
+                        <View style={styles.photoIndex}>
+                          <Text style={styles.photoIndexText}>{index + 1}</Text>
                         </View>
                       </TouchableOpacity>
                     </View>
                   </PanGestureHandler>
-                ) : (
+                  
+                  <TouchableOpacity
+                    style={styles.removePhotoButtonVertical}
+                    onPress={() => handleRemovePhoto(index)}
+                  >
+                    <Ionicons name="close-circle" size={28} color="#fa2f40" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            // Режим просмотра - горизонтальное пролистывание
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.photosScroll}
+              removeClippedSubviews={true}
+              decelerationRate="fast"
+            >
+              {photos.map((photo, index) => (
+                <View key={photo} style={styles.photoContainer}>
                   <TouchableOpacity
                     style={styles.photoWrapper}
                     onPress={() => openPhotoViewer(index)}
@@ -413,19 +437,10 @@ export default function EditablePhotosSection({
                       resizeMode="cover"
                     />
                   </TouchableOpacity>
-                )}
-                
-                {isEditing && (
-                  <TouchableOpacity
-                    style={styles.removePhotoButton}
-                    onPress={() => handleRemovePhoto(index)}
-                  >
-                    <Ionicons name="close-circle" size={24} color="#fa2f40" />
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-          </ScrollView>
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
       )}
 
@@ -570,5 +585,60 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     zIndex: 10,
+  },
+  // Стили для вертикального режима редактирования
+  photosVerticalScroll: {
+    paddingBottom: 20,
+  },
+  photoVerticalContainer: {
+    marginBottom: 15,
+    position: 'relative',
+  },
+  photoVerticalWrapper: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.3)',
+  },
+  photoVerticalTouchable: {
+    position: 'relative',
+  },
+  photoVertical: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+  },
+  dragHandleVertical: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 8,
+    padding: 6,
+  },
+  photoIndex: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(250, 47, 64, 0.9)',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoIndexText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+  },
+  removePhotoButtonVertical: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 14,
+    padding: 2,
   },
 }); 
