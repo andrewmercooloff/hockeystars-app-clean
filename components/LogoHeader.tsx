@@ -53,6 +53,8 @@ const LogoHeader = React.memo(() => {
           alignItems: 'center',
           borderWidth: 2,
           borderColor: '#fff',
+          marginLeft: -4,
+          marginTop: 4,
         }}>
           {currentUser?.avatar ? (
             <HeaderAvatar
@@ -63,9 +65,7 @@ const LogoHeader = React.memo(() => {
               fallbackColor="#fff"
             />
           ) : (
-            <View style={{ marginLeft: -2, marginTop: 2 }}>
-              <Ionicons name="person" size={25} color="#fff" />
-            </View>
+            <Ionicons name="person" size={25} color="#fff" />
           )}
         </View>
         {currentUser && currentUser.name && currentUser.name.trim() !== '' ? (
