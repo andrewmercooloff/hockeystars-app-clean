@@ -205,6 +205,12 @@ export async function sendPushNotification(
   data?: any
 ): Promise<boolean> {
   try {
+    // Проверяем платформу - push-уведомления не работают в веб-версии
+    if (Platform.OS === 'web') {
+      console.log('🌐 Веб-версия: пропускаем push-уведомление (не поддерживается)');
+      return true; // Возвращаем true, чтобы не блокировать логику
+    }
+    
     // Создаем уникальный ключ для проверки дублирования
     const notificationKey = `${token}-${title}-${body}`;
     const now = Date.now();
