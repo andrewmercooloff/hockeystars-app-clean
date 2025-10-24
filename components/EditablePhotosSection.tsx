@@ -367,45 +367,49 @@ export default function EditablePhotosSection({
               <View style={styles.photosGrid}>
                 {photos.map((photo, index) => (
                   <View key={photo} style={styles.photoGridItem}>
-                    <PanGestureHandler
-                      onGestureEvent={handleDragMove}
-                      onHandlerStateChange={(event) => {
-                        if (event.nativeEvent.state === State.BEGAN) {
-                          handleDragStart(index);
-                        } else if (event.nativeEvent.state === State.END) {
-                          handleDragEnd(event);
-                        }
-                      }}
-                    >
-                      <View style={[
-                        styles.photoGridWrapper,
-                        draggedIndex === index && styles.draggingItem,
-                        draggedIndex === index && {
-                          transform: [
-                            { translateX: dragOffset.x },
-                            { translateY: dragOffset.y },
-                          ],
-                        },
-                      ]}>
+                    <View style={[
+                      styles.photoGridWrapper,
+                      draggedIndex === index && styles.draggingItem,
+                      draggedIndex === index && {
+                        transform: [
+                          { translateX: dragOffset.x },
+                          { translateY: dragOffset.y },
+                        ],
+                      },
+                    ]}>
+                      <TouchableOpacity
+                        onPress={() => openPhotoViewer(index)}
+                        activeOpacity={0.8}
+                        style={styles.photoGridTouchable}
+                      >
+                        <Image
+                          source={{ uri: photo }}
+                          style={styles.photoGrid}
+                          resizeMode="cover"
+                        />
+                        <View style={styles.photoIndexGrid}>
+                          <Text style={styles.photoIndexTextGrid}>{index + 1}</Text>
+                        </View>
+                      </TouchableOpacity>
+                      
+                      <PanGestureHandler
+                        onGestureEvent={handleDragMove}
+                        onHandlerStateChange={(event) => {
+                          if (event.nativeEvent.state === State.BEGAN) {
+                            handleDragStart(index);
+                          } else if (event.nativeEvent.state === State.END) {
+                            handleDragEnd(event);
+                          }
+                        }}
+                      >
                         <TouchableOpacity
-                          onPress={() => openPhotoViewer(index)}
-                          activeOpacity={0.8}
-                          style={styles.photoGridTouchable}
+                          style={styles.dragHandleGrid}
+                          activeOpacity={0.7}
                         >
-                          <Image
-                            source={{ uri: photo }}
-                            style={styles.photoGrid}
-                            resizeMode="cover"
-                          />
-                          <View style={styles.dragHandleGrid}>
-                            <Ionicons name="reorder-three" size={16} color="#fff" />
-                          </View>
-                          <View style={styles.photoIndexGrid}>
-                            <Text style={styles.photoIndexTextGrid}>{index + 1}</Text>
-                          </View>
+                          <Ionicons name="reorder-three" size={16} color="#fff" />
                         </TouchableOpacity>
-                      </View>
-                    </PanGestureHandler>
+                      </PanGestureHandler>
+                    </View>
                     
                     <TouchableOpacity
                       style={styles.removePhotoButtonGrid}
@@ -595,11 +599,12 @@ const styles = StyleSheet.create({
   photosGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
   photoGridItem: {
-    width: (screenWidth - 60) / 3, // 3 столбца с отступами
+    width: (screenWidth - 80) / 3, // 3 столбца с отступами
     marginBottom: 15,
+    marginRight: 10,
     position: 'relative',
   },
   photoGridWrapper: {
@@ -619,7 +624,7 @@ const styles = StyleSheet.create({
   },
   dragHandleGrid: {
     position: 'absolute',
-    top: 6,
+    bottom: 6,
     right: 6,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 6,
