@@ -12,7 +12,7 @@ WITH duplicates AS (
         WHEN data IS NOT NULL THEN data::text 
         ELSE 'no_data' 
       END
-      ORDER BY timestamp DESC
+      ORDER BY created_at DESC
     ) as rn
   FROM notifications
 )
