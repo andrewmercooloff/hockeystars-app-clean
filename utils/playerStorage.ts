@@ -4168,7 +4168,9 @@ export const notifyFriendsAboutChanges = async (
   normativeChanges: NormativeChange[]
 ): Promise<void> => {
   // Проверяем, не вызывалась ли функция недавно для этого игрока
-  const cacheKey = `${playerId}_${statChanges.length}_${normativeChanges.length}`;
+  const statChangesHash = statChanges.map(c => `${c.field}_${c.oldValue}_${c.newValue}`).join('|');
+  const normativeChangesHash = normativeChanges.map(c => `${c.field}_${c.oldValue}_${c.newValue}`).join('|');
+  const cacheKey = `${playerId}_${statChangesHash}_${normativeChangesHash}`;
   const lastCall = notificationCache.get(cacheKey);
   const now = Date.now();
   
