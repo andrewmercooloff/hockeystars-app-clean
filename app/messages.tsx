@@ -172,7 +172,6 @@ export default function MessagesScreen() {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
-          console.log('🔔 Получено новое сообщение через Realtime:', payload);
           silentLoadChats();
           // Дебаунсинг для обновления UserContext
           if (refreshTimeoutRef.current) {
@@ -190,7 +189,6 @@ export default function MessagesScreen() {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
-          console.log('🔔 Сообщение обновлено через Realtime:', payload);
           // Дебаунсинг для обновления UserContext
           if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
@@ -212,7 +210,6 @@ export default function MessagesScreen() {
   useFocusEffect(
     React.useCallback(() => {
       setCurrentScreen('messages');
-      console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = messages');
       
       loadChats();
       
@@ -221,14 +218,12 @@ export default function MessagesScreen() {
         clearTimeout(autoHideTimeoutRef.current);
       }
       autoHideTimeoutRef.current = setTimeout(async () => {
-        console.log('🔄 Автоматическое скрытие индикатора сообщений через 5 секунд');
         // Убираем refreshUser - теперь счетчик управляется через БД и Realtime
         // await refreshUser(true);
       }, 5000);
       
       return () => {
         setCurrentScreen(null);
-        console.log('💬 СООБЩЕНИЯ: Устанавливаем currentScreen = null');
         if (autoHideTimeoutRef.current) {
           clearTimeout(autoHideTimeoutRef.current);
         }

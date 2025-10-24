@@ -122,9 +122,9 @@
   "uploading": "Загрузка...",
   "uploadingPhotos": "Загружается {count} фото... {progress}%",
   "info": "Информация",
-  "addVideoLink": "Добавьте ссылку на YouTube или VK и время момента (формат: минуты:секунды, например: 1:25)",
-  "supportedPlatforms": "Поддерживаются: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/, vk.com/video, vk.com/clip",
-  "videoUrlPlaceholder": "https://youtube.com/watch?v=... или vk.com/video...",
+  "addVideoLink": "Добавьте ссылку на YouTube видео и время момента (формат: минуты:секунды, например: 1:25)",
+  "supportedPlatforms": "Поддерживаются: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/live/, m.youtube.com/",
+  "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "мин:сек",
   "myMoment": "Мой момент",
   "belarus": "Беларусь",
@@ -2182,7 +2182,9 @@
     "noGiftsAvailable": "У вас нет доступных подарков этого типа. Создайте подарок в разделе \"Мои подарки\" перед принятием запроса.",
     "player": "Игрок",
     "unknownPlayer": "Неизвестный игрок",
-    "star": "Звезда"
+    "star": "Звезда",
+    "newRegistration": "Новая регистрация",
+    "newUserRegistered": "Зарегистрировался новый пользователь: {name}"
   },
   "editProfile": {
     "selectPhotoSource": "Выберите источник фото",

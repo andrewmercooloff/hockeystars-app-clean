@@ -43,7 +43,13 @@ export default function FriendRequestNotification({
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
           <Image
-            source={{ uri: playerAvatar }}
+            source={{ 
+              uri: playerAvatar,
+              cache: 'force-cache',
+              headers: {
+                'Cache-Control': 'max-age=3600'
+              }
+            }}
             style={styles.playerAvatar}
             resizeMode="cover"
           />

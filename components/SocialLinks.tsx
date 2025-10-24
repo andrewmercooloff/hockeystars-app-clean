@@ -6,13 +6,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface SocialLinksProps {
   instagram?: string;
   tiktok?: string;
-  vk?: string;
   website?: string;
   onMessagePress?: () => void;
   showMessageButton?: boolean;
 }
 
-export default function SocialLinks({ instagram, tiktok, vk, website, onMessagePress, showMessageButton }: SocialLinksProps) {
+export default function SocialLinks({ instagram, tiktok, website, onMessagePress, showMessageButton }: SocialLinksProps) {
   const { t } = useLanguage();
 
   const socialLinks = [
@@ -27,12 +26,6 @@ export default function SocialLinks({ instagram, tiktok, vk, website, onMessageP
       url: tiktok,
       icon: 'logo-tiktok',
       color: '#4A1A1A' // TikTok черный смешанный с темно-красным
-    },
-    {
-      key: 'vk',
-      url: vk,
-      icon: 'logo-vk',
-      color: '#3D4A6B' // VK синий смешанный с темно-красным
     },
     {
       key: 'website',
@@ -57,9 +50,6 @@ export default function SocialLinks({ instagram, tiktok, vk, website, onMessageP
               break;
             case 'tiktok':
               formattedUrl = `https://tiktok.com/@${url.replace('@', '').replace('tiktok.com/@', '')}`;
-              break;
-            case 'vk':
-              formattedUrl = `https://vk.com/${url.replace('vk.com/', '').replace('@', '')}`;
               break;
             default:
               formattedUrl = `https://${url}`;

@@ -408,7 +408,13 @@ export default function EditablePhotosSection({
                         style={styles.photoGridTouchable}
                       >
                         <Image
-                          source={{ uri: photo }}
+                          source={{ 
+                            uri: photo,
+                            cache: 'force-cache',
+                            headers: {
+                              'Cache-Control': 'max-age=3600'
+                            }
+                          }}
                           style={styles.photoGrid}
                           resizeMode="cover"
                         />
@@ -461,7 +467,13 @@ export default function EditablePhotosSection({
                     activeOpacity={0.8}
                   >
                     <Image
-                      source={{ uri: photo }}
+                      source={{ 
+                        uri: photo,
+                        cache: 'force-cache',
+                        headers: {
+                          'Cache-Control': 'max-age=3600'
+                        }
+                      }}
                       style={styles.photo}
                       resizeMode="cover"
                     />

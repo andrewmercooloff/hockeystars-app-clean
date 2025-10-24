@@ -234,7 +234,6 @@ export default function SearchScreen() {
         
         // Используем пользователя из UserContext
         if (!currentUser) {
-          console.log('🔍 Поиск: Пользователь не найден, перенаправляем на логин');
           router.replace('/login');
           return;
         }
@@ -278,10 +277,8 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
-      console.log('🔍 ПОИСК: Устанавливаем currentScreen = search');
       return () => {
         setCurrentScreen(null);
-        console.log('🔍 ПОИСК: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen])
   );
@@ -537,7 +534,13 @@ export default function SearchScreen() {
       >
         <View style={photoContainerStyle}>
           <Image 
-            source={typeof playerPhoto === 'string' ? { uri: playerPhoto } : playerPhoto} 
+            source={typeof playerPhoto === 'string' ? { 
+              uri: playerPhoto,
+              cache: 'force-cache',
+              headers: {
+                'Cache-Control': 'max-age=3600'
+              }
+            } : playerPhoto} 
             style={styles.playerPhoto} 
             onError={(e) => {
               console.warn(`Ошибка загрузки фото для игрока ${item.name}:`, e.nativeEvent.error);

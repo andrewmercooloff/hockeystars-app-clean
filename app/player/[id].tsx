@@ -298,7 +298,6 @@ export default function PlayerProfile() {
   useEffect(() => {
     if (!currentUser || !player) return;
 
-    console.log('🔌 Настраиваем Realtime подписку на friend_requests для профиля:', player.id);
 
     const friendRequestsChannel = supabase
       .channel(`friend-requests-${player.id}`)
@@ -332,12 +331,9 @@ export default function PlayerProfile() {
           setFriendshipStatus(status);
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки friend-requests (профиль):', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('🔌 Отключаем Realtime подписку на friend_requests для профиля');
       supabase.removeChannel(friendRequestsChannel);
     };
   }, [currentUser?.id, player?.id]);
@@ -346,7 +342,6 @@ export default function PlayerProfile() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
-      console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = player');
       
       // Принудительно обновляем пользователя при фокусе на профиле
       const refreshUserOnFocus = async () => {
@@ -361,7 +356,6 @@ export default function PlayerProfile() {
       
       return () => {
         setCurrentScreen(null);
-        console.log('👤 ПРОФИЛЬ: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen, refreshUser])
   );
@@ -950,19 +944,18 @@ export default function PlayerProfile() {
     // Удаляем таймкод из строки
     const urlWithoutTimeCode = input.replace(/\s*\(время:\s*\d{1,2}:\d{2}\)/, '').trim();
     
-    // Проверяем, является ли ссылка YouTube или VK
+    // Проверяем, является ли ссылка YouTube
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/|m\.youtube\.com\/)/;
-    const vkRegex = /^(https?:\/\/)?(www\.)?(vk\.com\/video|vk\.com\/clip)/;
     
-    if (youtubeRegex.test(urlWithoutTimeCode) || vkRegex.test(urlWithoutTimeCode)) {
+    if (youtubeRegex.test(urlWithoutTimeCode)) {
       return { url: urlWithoutTimeCode, timeCode };
     }
     
-    // Если ссылка не соответствует YouTube или VK, возвращаем пустую строку
+    // Если ссылка не соответствует YouTube, возвращаем пустую строку
     return { url: '', timeCode: undefined };
   };
 
-  const openYouTubeLink = (url: string) => {
+  const openVideoLink = (url: string) => {
     if (url) {
       Linking.openURL(url).catch(() => {
         Alert.alert('Ошибка', 'Не удалось открыть ссылку');
@@ -1616,13 +1609,13 @@ export default function PlayerProfile() {
                     <Image 
                       source={{ 
                         uri: imageSource,
-                            cache: 'reload',
-                            headers: {
-                              'Cache-Control': 'no-cache'
-                            }
-                          }}
-                              style={styles.avatarImage}
-                        />
+                        cache: 'force-cache',
+                        headers: {
+                          'Cache-Control': 'max-age=3600'
+                        }
+                      }}
+                      style={styles.avatarImage}
+                    />
                       </View>
                     </View>
                       );
@@ -1756,7 +1749,6 @@ export default function PlayerProfile() {
                 <SocialLinks
                   instagram={player.instagram}
                   tiktok={player.tiktok}
-                  vk={player.vk}
                   website={player.website}
                 />
               )}
@@ -3707,7 +3699,13 @@ export default function PlayerProfile() {
                 <View style={styles.shareCardAvatarContainer}>
                   {player.avatar ? (
                     <Image 
-                      source={{ uri: player.avatar }} 
+                      source={{ 
+                        uri: player.avatar,
+                        cache: 'force-cache',
+                        headers: {
+                          'Cache-Control': 'max-age=3600'
+                        }
+                      }} 
                       style={styles.shareCardAvatar}
                     />
                   ) : (

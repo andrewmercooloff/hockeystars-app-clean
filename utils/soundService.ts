@@ -41,7 +41,6 @@ export async function initializeSounds(): Promise<void> {
         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
       });
-      console.log('🔊 Аудио режим настроен успешно');
     } catch (audioModeError) {
       console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError.message);
       // Продолжаем без настройки аудио режима
@@ -69,10 +68,6 @@ export async function initializeSounds(): Promise<void> {
     notificationSound = notSound;
 
     isInitialized = true;
-    console.log('🔊 Звуки сообщений и уведомлений инициализированы');
-    console.log('🔊 Outgoing sound:', !!outgoingSound);
-    console.log('🔊 Incoming sound:', !!incomingSound);
-    console.log('🔊 Notification sound:', !!notificationSound);
   } catch (error) {
     console.error('❌ Ошибка инициализации звуков:', error);
     console.error('❌ Error details:', error.message);
@@ -87,7 +82,6 @@ export async function playOutgoingMessageSound(): Promise<void> {
   try {
     const now = Date.now();
     if (now - lastOutgoingSoundTime < SOUND_DEBOUNCE_MS) {
-      console.log('🔊 Пропускаем звук отправки - слишком рано');
       return;
     }
     lastOutgoingSoundTime = now;
@@ -103,7 +97,6 @@ export async function playOutgoingMessageSound(): Promise<void> {
       await outgoingSound.setPositionAsync(0);
       // Воспроизводим
       await outgoingSound.playAsync();
-      console.log('🔊 Звук отправки сообщения');
     }
   } catch (error) {
     console.error('❌ Ошибка воспроизведения звука отправки:', error);
@@ -117,7 +110,6 @@ export async function playIncomingMessageSound(): Promise<void> {
   try {
     const now = Date.now();
     if (now - lastIncomingSoundTime < SOUND_DEBOUNCE_MS) {
-      console.log('🔊 Пропускаем звук получения - слишком рано');
       return;
     }
     lastIncomingSoundTime = now;
@@ -130,7 +122,6 @@ export async function playIncomingMessageSound(): Promise<void> {
       // Проверяем, не играет ли уже звук
       const status = await incomingSound.getStatusAsync();
       if (status.isLoaded && status.isPlaying) {
-        console.log('🔊 Звук получения уже играет - пропускаем');
         return;
       }
       
@@ -140,7 +131,6 @@ export async function playIncomingMessageSound(): Promise<void> {
       await incomingSound.setPositionAsync(0);
       // Воспроизводим
       await incomingSound.playAsync();
-      console.log('🔊 Звук получения сообщения');
     }
   } catch (error) {
     console.error('❌ Ошибка воспроизведения звука получения:', error);
@@ -154,7 +144,6 @@ export async function playNotificationSound(): Promise<void> {
   try {
     const now = Date.now();
     if (now - lastNotificationSoundTime < SOUND_DEBOUNCE_MS) {
-      console.log('🔊 Пропускаем звук уведомления - слишком рано');
       return;
     }
     lastNotificationSoundTime = now;

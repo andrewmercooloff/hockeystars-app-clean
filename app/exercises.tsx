@@ -75,10 +75,8 @@ export default function ExercisesScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('exercises');
-      console.log('💪 УПРАЖНЕНИЯ: Устанавливаем currentScreen = exercises');
       return () => {
         setCurrentScreen(null);
-        console.log('💪 УПРАЖНЕНИЯ: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen])
   );

@@ -53,8 +53,6 @@ const LogoHeader = React.memo(() => {
           alignItems: 'center',
           borderWidth: 2,
           borderColor: '#fff',
-          marginLeft: -6,
-          marginTop: 6,
         }}>
           {currentUser?.avatar ? (
             <HeaderAvatar

@@ -14,10 +14,16 @@ import YouTubeVideo from './YouTubeVideo';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // Компонент для изображения с fallback
-const YouTubeThumbnail = ({ videoUrl }: { videoUrl: string }) => {
+const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  const getVideoId = (url: string): string | null => {
+  // Функция для проверки YouTube ссылки
+  const isYouTubeUrl = (url: string): boolean => {
+    const cleanUrl = url.trim().toLowerCase();
+    return cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
+  };
+
+  const getYouTubeVideoId = (url: string): string | null => {
     const cleanUrl = url.trim();
     const patterns = [
       /youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i,
@@ -37,43 +43,43 @@ const YouTubeThumbnail = ({ videoUrl }: { videoUrl: string }) => {
     return null;
   };
   
-  const videoId = getVideoId(videoUrl);
+  const youtubeVideoId = getYouTubeVideoId(videoUrl);
   
-  if (!videoId) {
+  // Для YouTube видео
+  if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
+    // Разные форматы превью в порядке приоритета
+    const thumbnailFormats = [
+      `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/mqdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/sddefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/default.jpg`
+    ];
+    
+    const currentThumbnail = thumbnailFormats[currentImageIndex];
+    
+    const handleError = () => {
+      if (currentImageIndex < thumbnailFormats.length - 1) {
+        setCurrentImageIndex(currentImageIndex + 1);
+      }
+    };
+    
     return (
       <Image
-        source={{ uri: 'https://via.placeholder.com/300x200/333/666?text=Video' }}
+        source={{ uri: currentThumbnail }}
         style={styles.thumbnail}
         resizeMode="cover"
+        onError={handleError}
       />
     );
   }
   
-  // Разные форматы превью в порядке приоритета
-  const thumbnailFormats = [
-    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/default.jpg`
-  ];
-  
-  const currentThumbnail = thumbnailFormats[currentImageIndex];
-  
-  const handleError = () => {
-    
-    if (currentImageIndex < thumbnailFormats.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
-  };
-  
+  // Fallback для не-YouTube ссылок
   return (
-    <Image
-      source={{ uri: currentThumbnail }}
-      style={styles.thumbnail}
-      resizeMode="cover"
-      onError={handleError}
-    />
+    <View style={styles.errorThumbnail}>
+      <Ionicons name="alert-circle" size={48} color="#FF4444" />
+      <Text style={styles.errorThumbnailText}>Только YouTube</Text>
+    </View>
   );
 };
 
@@ -135,7 +141,7 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
             style={styles.videoCard}
             onPress={() => handleVideoPress(video)}
           >
-            <YouTubeThumbnail videoUrl={video.url} />
+            <VideoThumbnail videoUrl={video.url} />
             <View style={styles.playButton}>
               <Ionicons name="play-circle" size={40} color="#FF4444" />
             </View>
@@ -308,5 +314,19 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+  },
+  errorThumbnail: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+  },
+  errorThumbnailText: {
+    color: '#FF4444',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    marginTop: 8,
+    textAlign: 'center',
   },
 }); 

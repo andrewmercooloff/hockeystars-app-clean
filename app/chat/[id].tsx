@@ -75,7 +75,6 @@ export default function ChatScreen() {
           filter: `or(sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id})`
         },
         (payload) => {
-          console.log('🔔 Получено новое сообщение через Realtime:', payload);
           // Загружаем сообщения только при получении нового сообщения
           loadMessages();
           
@@ -88,7 +87,6 @@ export default function ChatScreen() {
       .subscribe();
 
     return () => {
-      console.log('🔌 Отключаем Realtime подписку для сообщений');
       supabase.removeChannel(channel);
     };
   }, [currentUser, otherPlayer, id]);
@@ -184,13 +182,11 @@ export default function ChatScreen() {
           
           // Если только что отправили сообщение, не воспроизводим вибрацию получения
           if (justSentMessageRef.current) {
-            console.log('📳 Пропускаем вибрацию получения - только что отправили сообщение');
             justSentMessageRef.current = false;
           } else {
             // Вибрация при получении сообщений от других пользователей
             const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
             if (incomingMessages.length > 0) {
-              console.log('📳 Вибрация при получении', incomingMessages.length, 'новых сообщений от других пользователей');
               try {
                 if (Platform.OS === 'ios') {
                   await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -200,8 +196,6 @@ export default function ChatScreen() {
               } catch (vibError) {
                 console.error('❌ Ошибка вибрации при получении:', vibError);
               }
-            } else {
-              console.log('📳 Пропускаем вибрацию - все новые сообщения от текущего пользователя');
             }
           }
           
@@ -209,10 +203,6 @@ export default function ChatScreen() {
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }, 100);
-        } else if (newMessageIds.length === 0) {
-          console.log('📳 Нет новых сообщений - пропускаем вибрацию');
-        } else {
-          console.log('📳 Слишком рано для вибрации - пропускаем');
         }
 
       } catch (error) {
@@ -239,7 +229,6 @@ export default function ChatScreen() {
           } else {
             Vibration.vibrate(50);
           }
-          console.log('📳 Вибрация при отправке сообщения');
         } catch (vibError) {
           console.error('❌ Ошибка вибрации при отправке:', vibError);
         }
@@ -268,6 +257,43 @@ export default function ChatScreen() {
     });
   };
 
+  // Функция для форматирования даты (сегодня/вчера/дата)
+  const formatDate = (timestamp: Date | number) => {
+    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    if (messageDate.getTime() === today.getTime()) {
+      return 'Сегодня';
+    } else if (messageDate.getTime() === yesterday.getTime()) {
+      return 'Вчера';
+    } else {
+      return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+  };
+
+  // Функция для группировки сообщений по дням
+  const groupMessagesByDate = (messages: Message[]) => {
+    const grouped: { [key: string]: Message[] } = {};
+    
+    messages.forEach(message => {
+      const dateKey = formatDate(message.timestamp);
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(message);
+    });
+    
+    return grouped;
+  };
+
   // Удаление одного сообщения
   const handleDeleteMessage = async (messageId: string) => {
     try {
@@ -286,7 +312,6 @@ export default function ChatScreen() {
           // Если ошибка, возвращаем сообщение в UI
           loadMessages();
         } else {
-          console.log('✅ Сообщение удалено из БД');
         }
       }, 100);
     } catch (error) {
@@ -325,7 +350,6 @@ export default function ChatScreen() {
                 // Если ошибка, загружаем сообщения обратно
                 loadMessages();
               } else {
-                console.log('✅ Чат очищен');
               }
             } catch (error) {
               console.error('❌ Ошибка очистки чата:', error);
@@ -385,7 +409,13 @@ export default function ChatScreen() {
                 activeOpacity={0.7}
               >
                 <Image 
-                  source={{ uri: otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player' }} 
+                  source={{ 
+                    uri: otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player',
+                    cache: 'force-cache',
+                    headers: {
+                      'Cache-Control': 'max-age=3600'
+                    }
+                  }} 
                   style={styles.headerAvatar}
                 />
               </TouchableOpacity>
@@ -426,46 +456,68 @@ export default function ChatScreen() {
                   <Text style={styles.emptyText}>{t('chat.startConversation', { name: otherPlayer.name?.toUpperCase() })}</Text>
                 </View>
               ) : !loading ? (
-                messages.map((message) => {
-                  const isMyMessage = message.senderId === currentUser.id;
-                  
-                  return (
-                    <Swipeable
-                      key={message.id}
-                      renderRightActions={renderRightActions}
-                      onSwipeableOpen={() => handleDeleteMessage(message.id)}
-                      overshootRight={false}
-                      friction={2}
-                      rightThreshold={40}
-                    >
-                      <View 
-                        style={[
-                          styles.messageContainer,
-                          isMyMessage ? styles.myMessage : styles.otherMessage
-                        ]}
-                      >
-                        <View style={[
-                          styles.messageBubble,
-                          isMyMessage ? styles.myBubble : styles.otherBubble
-                        ]}>
-                          <Text style={[
-                            styles.messageText,
-                            isMyMessage ? styles.myMessageText : styles.otherMessageText
-                          ]}>
-                            {message.text}
-                            {'  '}
-                            <Text style={[
-                              styles.messageTime,
-                              isMyMessage ? styles.myMessageTime : styles.otherMessageTime
-                            ]}>
-                              {formatTime(message.timestamp)}
-                            </Text>
-                          </Text>
-                        </View>
+                (() => {
+                  const groupedMessages = groupMessagesByDate(messages);
+                  const dateKeys = Object.keys(groupedMessages).sort((a, b) => {
+                    // Сортируем даты: сегодня -> вчера -> остальные по убыванию
+                    if (a === 'Сегодня') return -1;
+                    if (b === 'Сегодня') return 1;
+                    if (a === 'Вчера') return -1;
+                    if (b === 'Вчера') return 1;
+                    return b.localeCompare(a);
+                  });
+
+                  return dateKeys.map(dateKey => (
+                    <View key={dateKey}>
+                      {/* Заголовок даты */}
+                      <View style={styles.dateHeader}>
+                        <Text style={styles.dateHeaderText}>{dateKey}</Text>
                       </View>
-                    </Swipeable>
-                  );
-                })
+                      
+                      {/* Сообщения за этот день */}
+                      {groupedMessages[dateKey].map((message) => {
+                        const isMyMessage = message.senderId === currentUser.id;
+                        
+                        return (
+                          <Swipeable
+                            key={message.id}
+                            renderRightActions={renderRightActions}
+                            onSwipeableOpen={() => handleDeleteMessage(message.id)}
+                            overshootRight={false}
+                            friction={2}
+                            rightThreshold={40}
+                          >
+                            <View 
+                              style={[
+                                styles.messageContainer,
+                                isMyMessage ? styles.myMessage : styles.otherMessage
+                              ]}
+                            >
+                              <View style={[
+                                styles.messageBubble,
+                                isMyMessage ? styles.myBubble : styles.otherBubble
+                              ]}>
+                                <Text style={[
+                                  styles.messageText,
+                                  isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                ]}>
+                                  {message.text}
+                                  {'  '}
+                                  <Text style={[
+                                    styles.messageTime,
+                                    isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                                  ]}>
+                                    {formatTime(message.timestamp)}
+                                  </Text>
+                                </Text>
+                              </View>
+                            </View>
+                          </Swipeable>
+                        );
+                      })}
+                    </View>
+                  ));
+                })()
               ) : null}
             </ScrollView>
 
@@ -723,5 +775,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 60,
     height: '100%',
+  },
+  dateHeader: {
+    alignItems: 'center',
+    marginVertical: 16,
+    marginHorizontal: 20,
+  },
+  dateHeaderText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
 }); 

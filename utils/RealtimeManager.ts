@@ -31,7 +31,6 @@ class RealtimeManager {
   async setupSubscriptions(userId: string): Promise<void> {
     // Если подписки уже настроены для этого пользователя, не пересоздаем их
     if (this.currentUserId === userId && this.subscriptions.size > 0) {
-      console.log('🔌 Realtime подписки уже настроены для пользователя:', userId);
       return;
     }
 
@@ -39,7 +38,6 @@ class RealtimeManager {
     await this.disconnect();
 
     this.currentUserId = userId;
-    console.log('🔌 Настраиваем Realtime подписки для пользователя:', userId);
 
     try {
       // 1. Подписка на уведомления
@@ -54,7 +52,6 @@ class RealtimeManager {
       // 4. Подписка на новые сообщения для push уведомлений
       await this.setupMessagesSubscription(userId);
 
-      console.log('✅ Все Realtime подписки настроены успешно');
     } catch (error) {
       console.error('❌ Ошибка настройки Realtime подписок:', error);
     }
@@ -75,14 +72,11 @@ class RealtimeManager {
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
-          console.log('🔔 Новое уведомление получено через Realtime!', payload);
           // Эмитируем событие для обновления UI
           this.emitNotificationUpdate();
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки notifications-updates:', status);
-      });
+      .subscribe();
 
     this.subscriptions.set('notifications-updates', {
       channel,
@@ -110,9 +104,7 @@ class RealtimeManager {
           this.emitNotificationCountUpdate(payload.new.unread_notifications_count || 0);
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки players-notifications-count:', status);
-      });
+      .subscribe();
 
     this.subscriptions.set('players-notifications-count', {
       channel,
@@ -148,14 +140,12 @@ class RealtimeManager {
             // Получаем данные отправителя
             const senderPlayer = await getPlayerById(senderId);
             if (!senderPlayer) {
-              console.log('⚠️ Отправитель не найден, пропускаем push');
               return;
             }
             
             // Получаем токены получателя
             const receiverTokens = await getUserPushTokens(userId);
             if (receiverTokens.length === 0) {
-              console.log('⚠️ У получателя нет токенов, пропускаем push');
               return;
             }
             
@@ -168,15 +158,12 @@ class RealtimeManager {
               senderId
             );
             
-            console.log('✅ Push уведомление о сообщении отправлено через Realtime');
           } catch (error) {
             console.error('❌ Ошибка отправки push через Realtime:', error);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки messages-push-notifications:', status);
-      });
+      .subscribe();
 
     this.subscriptions.set('messages-push-notifications', {
       channel,
@@ -216,9 +203,7 @@ class RealtimeManager {
           this.emitFriendRequestUpdate();
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки friend-requests-changes:', status);
-      });
+      .subscribe();
 
     this.subscriptions.set('friend-requests-changes', {
       channel,
@@ -248,13 +233,10 @@ class RealtimeManager {
           filter: `or(sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId})`
         },
         (payload) => {
-          console.log('🔔 Получено новое сообщение через Realtime:', payload);
           this.emitMessageUpdate(payload);
         }
       )
-      .subscribe((status) => {
-        console.log(`📡 Статус подписки ${channelName}:`, status);
-      });
+      .subscribe();
 
     this.subscriptions.set(channelName, {
       channel,
@@ -270,7 +252,6 @@ class RealtimeManager {
     const subscription = this.subscriptions.get(channelName);
     
     if (subscription) {
-      console.log('🔌 Отключаем Realtime подписку для сообщений:', channelName);
       await supabase.removeChannel(subscription.channel);
       this.subscriptions.delete(channelName);
     }
@@ -284,12 +265,10 @@ class RealtimeManager {
       return;
     }
 
-    console.log('🔌 Отключаем все Realtime подписки');
     
     for (const [name, subscription] of this.subscriptions) {
       try {
         await supabase.removeChannel(subscription.channel);
-        console.log(`✅ Подписка ${name} отключена`);
       } catch (error) {
         console.error(`❌ Ошибка отключения подписки ${name}:`, error);
       }

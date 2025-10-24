@@ -9,7 +9,6 @@ let isGilroyForced = false;
 export function forceGilroyFont() {
   if (isGilroyForced) return;
   
-  console.log('🔤 Принудительное применение шрифта Gilroy...');
   
   // Сохраняем оригинальные render функции
   const OriginalTextRender = Text.render;
@@ -44,7 +43,6 @@ export function forceGilroyFont() {
   };
   
   isGilroyForced = true;
-  console.log('✅ Шрифт Gilroy принудительно применен ко всем компонентам');
 }
 
 /**

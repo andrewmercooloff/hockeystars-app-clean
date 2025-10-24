@@ -119,12 +119,10 @@ class DataCache {
     // Сначала проверяем кеш
     const cached = await this.get<T>(key);
     if (cached !== null) {
-      console.log(`📦 Данные получены из кеша: ${key}`);
       return cached;
     }
 
     // Если в кеше нет, загружаем данные
-    console.log(`🌐 Загружаем данные из сети: ${key}`);
     const data = await loadFunction();
     
     // Сохраняем в кеш

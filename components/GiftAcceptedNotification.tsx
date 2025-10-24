@@ -26,7 +26,13 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {starAvatar ? (
-          <Image source={{ uri: starAvatar }} style={styles.playerAvatar} />
+          <Image source={{ 
+            uri: starAvatar,
+            cache: 'force-cache',
+            headers: {
+              'Cache-Control': 'max-age=3600'
+            }
+          }} style={styles.playerAvatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="person-outline" size={28} color="#666" />

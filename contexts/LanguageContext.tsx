@@ -61,7 +61,6 @@ const getDeviceLanguage = (): Language => {
         const languageCode = locales[0].languageCode.toLowerCase();
         
         if (supportedLanguages.includes(languageCode as Language)) {
-          console.log('🌍 Определен язык через getLocales():', languageCode);
           return languageCode as Language;
         }
       }
@@ -75,7 +74,6 @@ const getDeviceLanguage = (): Language => {
     
     // Проверяем, поддерживается ли этот язык
     if (supportedLanguages.includes(languageCode as Language)) {
-      console.log('🌍 Определен язык устройства:', languageCode);
       return languageCode as Language;
     }
     
@@ -107,7 +105,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       if (savedLanguage && supportedLanguages.includes(savedLanguage as Language)) {
         // Если есть сохраненный язык, используем его
         setLanguageState(savedLanguage as Language);
-        console.log('🌍 Используем сохраненный язык:', savedLanguage);
       } else {
         // Если нет сохраненного языка, определяем язык устройства
         const deviceLanguage = getDeviceLanguage();
@@ -115,7 +112,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
         
         // Сохраняем определенный язык для будущих запусков
         await AsyncStorage.setItem('selectedLanguage', deviceLanguage);
-        console.log('🌍 Автоматически определен язык устройства:', deviceLanguage);
       }
     } catch (error) {
       console.warn('❌ Ошибка загрузки языка:', error);
@@ -128,7 +124,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     try {
       setLanguageState(lang);
       await AsyncStorage.setItem('selectedLanguage', lang);
-      console.log('🌍 Язык изменен на:', lang);
     } catch (error) {
       console.warn('Ошибка сохранения языка:', error);
     }
@@ -140,7 +135,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       const deviceLanguage = getDeviceLanguage();
       setLanguageState(deviceLanguage);
       await AsyncStorage.setItem('selectedLanguage', deviceLanguage);
-      console.log('🌍 Язык сброшен на язык устройства:', deviceLanguage);
     } catch (error) {
       console.warn('Ошибка сброса языка:', error);
     }

@@ -17,6 +17,12 @@ const { width, height } = Dimensions.get('window');
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCode }) => {
   const { t } = useLanguage();
 
+  // Функция для проверки YouTube ссылки
+  const isYouTubeUrl = (url: string): boolean => {
+    const cleanUrl = url.trim().toLowerCase();
+    return cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
+  };
+
   // Универсальная функция для извлечения ID видео из YouTube URL
   const getYouTubeVideoId = (url: string): string | null => {
     // Простая и надежная функция для извлечения YouTube ID
@@ -64,19 +70,21 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
     return `${minutes}m${remainingSeconds.toString().padStart(2, '0')}s`;
   };
 
-  const videoId = getYouTubeVideoId(url);
+  const youtubeVideoId = getYouTubeVideoId(url);
   const startSeconds = timeCode ? timeCodeToSeconds(timeCode) : 0;
 
-  if (!videoId) {
+  // Проверяем, что это YouTube ссылка
+  if (!isYouTubeUrl(url) || !youtubeVideoId) {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color="#FF4444" />
         <Text style={styles.errorText}>Неверная ссылка на YouTube</Text>
+        <Text style={styles.errorSubtext}>Поддерживаются только YouTube ссылки</Text>
       </View>
     );
   }
 
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&start=${startSeconds}`;
+  const embedUrl = `https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&rel=0&modestbranding=1&start=${startSeconds}`;
 
   // Создаем HTML для встроенного YouTube плеера
   const htmlContent = `
@@ -119,7 +127,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
             player = new YT.Player('player', {
               height: '100%',
               width: '100%',
-              videoId: '${videoId}',
+              videoId: '${youtubeVideoId}',
               playerVars: {
                 'autoplay': 1,
                 'rel': 0,
@@ -218,6 +226,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 8,
+    textAlign: 'center',
+  },
+  errorSubtext: {
+    color: '#FF4444',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    marginTop: 4,
     textAlign: 'center',
   },
 });

@@ -308,7 +308,6 @@ export default function NotificationsScreen() {
     useCallback(() => {
       setCurrentScreen('notifications');
       setIsScreenFocused(true);
-      console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = notifications');
       
       if (currentUser && !isUserLoading) {
         loadNotificationsData();
@@ -317,7 +316,6 @@ export default function NotificationsScreen() {
       return () => {
         setIsScreenFocused(false);
         setCurrentScreen(null);
-        console.log('🔔 УВЕДОМЛЕНИЯ: Устанавливаем currentScreen = null');
       };
     }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
   );
@@ -1191,7 +1189,13 @@ export default function NotificationsScreen() {
                   {notification.playerAvatar && (
                     <View style={styles.playerInfo}>
                       <Image 
-                        source={{ uri: notification.playerAvatar }} 
+                        source={{ 
+                          uri: notification.playerAvatar,
+                          cache: 'force-cache',
+                          headers: {
+                            'Cache-Control': 'max-age=3600'
+                          }
+                        }} 
                         style={styles.playerAvatar}
                         defaultSource={require('../assets/images/default-avatar.png')}
                         onError={() => {

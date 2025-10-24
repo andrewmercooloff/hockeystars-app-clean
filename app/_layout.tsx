@@ -154,7 +154,7 @@ export default function RootLayout() {
     
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
-      if (appReady && !isUserLoading) {
+      if (appReady && !isUserLoading && userLoaded) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
         Animated.timing(splashOpacity, {
           toValue: 0,
@@ -164,7 +164,7 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-    }, [appReady, isUserLoading]);
+    }, [appReady, isUserLoading, userLoaded]);
     
     return null;
   };
@@ -172,7 +172,6 @@ export default function RootLayout() {
   // Функция для загрузки счетчика уведомлений из БД
   const loadNotificationCount = React.useCallback(async (userId: string) => {
     try {
-      console.log('📊 Загружаем счетчик уведомлений для пользователя:', userId);
       const { data, error } = await supabase
         .from('players')
         .select('unread_notifications_count')
@@ -185,7 +184,6 @@ export default function RootLayout() {
       }
       
       const count = data?.unread_notifications_count || 0;
-      console.log('✅ Счетчик уведомлений загружен:', count);
       setUnreadNotificationsCount(count);
     } catch (error) {
       console.error('❌ Ошибка загрузки счетчика:', error);
@@ -296,9 +294,7 @@ export default function RootLayout() {
 
              // Инициализируем push-уведомления для пользователя
              try {
-               console.log('🚀 НАЧИНАЕМ ИНИЦИАЛИЗАЦИЮ PUSH-УВЕДОМЛЕНИЙ для пользователя:', user.id);
                const pushResult = await initializePushNotifications(user.id);
-               console.log('🚀 РЕЗУЛЬТАТ ИНИЦИАЛИЗАЦИИ PUSH-УВЕДОМЛЕНИЙ:', pushResult);
              } catch (error) {
                console.error('❌ Ошибка инициализации push-уведомлений:', error);
                console.error('❌ Error details:', error.message);
@@ -504,10 +500,11 @@ export default function RootLayout() {
 
   // Загружаем пользователя при инициализации и при возврате в приложение
   React.useEffect(() => {
-    if (!loaded || !appReady) return;
+    if (!loaded) return;
+    // Загружаем пользователя сразу после загрузки шрифтов, не ждем appReady
     loadUser();
     // УБРАЛИ setInterval - теперь счетчик обновляется только через Realtime!
-  }, [loaded, appReady]);
+  }, [loaded]);
 
   // Принудительно обновляем пользователя при переходе на главную страницу
   // Это нужно для корректного выхода из профиля
@@ -546,7 +543,6 @@ export default function RootLayout() {
   // Realtime подписка на изменения счетчика уведомлений
   React.useEffect(() => {
     if (!currentUser) {
-      console.log('⚠️ Realtime подписки НЕ настроены - нет currentUser');
       return;
     }
 
@@ -576,9 +572,7 @@ export default function RootLayout() {
           loadUser();
         }
       )
-      .subscribe((status) => {
-        console.log('📡 Статус подписки players-messages-count:', status);
-      });
+      .subscribe();
 
     return () => {
       // Отключаем подписки при размонтировании

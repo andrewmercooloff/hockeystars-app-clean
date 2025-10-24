@@ -27,15 +27,9 @@ export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
 
   // Логируем изменения состояния экрана для отладки
   React.useEffect(() => {
-    console.log('🖥️ ЭКРАН: isMainScreen изменился на', isMainScreen);
-  }, [isMainScreen]);
-
-  React.useEffect(() => {
-    console.log('🖥️ ЭКРАН: currentScreen изменился на', currentScreen);
     // Обновляем isMainScreen на основе currentScreen
     const isMain = currentScreen === 'index';
     setIsMainScreen(isMain);
-    console.log('🖥️ ЭКРАН: isMainScreen установлен в', isMain);
   }, [currentScreen]);
 
   return (

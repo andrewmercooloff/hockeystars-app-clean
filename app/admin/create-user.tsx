@@ -284,7 +284,13 @@ export default function CreateUserScreen() {
               >
                 {formData.avatar ? (
                   <Image 
-                    source={{ uri: formData.avatar }} 
+                    source={{ 
+                      uri: formData.avatar,
+                      cache: 'force-cache',
+                      headers: {
+                        'Cache-Control': 'max-age=3600'
+                      }
+                    }} 
                     style={styles.avatar} 
                   />
                 ) : (

@@ -7,8 +7,6 @@ interface UserContextType {
   setCurrentUser: (user: Player | null) => void;
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
   isUserLoading: boolean;
-  updateUserCounter: (count: number) => void;
-  forceUpdateBottomMenu: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,8 +30,8 @@ const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
-  // Если нет кешированного пользователя, начинаем с загрузки
-  const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
+  // Всегда начинаем с загрузки, чтобы избежать задержки авторизации
+  const [isUserLoading, setIsUserLoading] = useState(true);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
@@ -76,8 +74,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
 
       // Если в кеше нет актуальных данных, загружаем из хранилища
-      const user = await loadCurrentUser();
-      console.log('🔄 UserContext: Обновляем пользователя, счетчик сообщений:', user?.unreadMessagesCount || 0);
+      const user = await loadCurrentUser(forceRefresh);
       setCurrentUser(user);
       setIsUserLoading(false);
     } catch (error) {
@@ -85,23 +82,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setIsUserLoading(false);
     }
   }, [setCurrentUser]);
-
-  const updateUserCounter = useCallback((count: number) => {
-    if (currentUser) {
-      const updatedUser = { ...currentUser, unreadMessagesCount: count };
-      setCurrentUser(updatedUser);
-      globalUserCache = updatedUser;
-      console.log('🔄 Счетчик сообщений обновлен в UserContext:', count);
-    }
-  }, [currentUser, setCurrentUser]);
-
-  const forceUpdateBottomMenu = useCallback(() => {
-    // Принудительно обновляем UserContext для перерендера нижнего меню
-    if (currentUser) {
-      setCurrentUser({ ...currentUser });
-      console.log('🔄 Принудительное обновление нижнего меню');
-    }
-  }, [currentUser, setCurrentUser]);
 
   // Автоматическая загрузка пользователя при инициализации
   React.useEffect(() => {
@@ -116,9 +96,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       currentUser, 
       setCurrentUser, 
       refreshUser, 
-      isUserLoading,
-      updateUserCounter,
-      forceUpdateBottomMenu
+      isUserLoading 
     }}>
       {children}
     </UserContext.Provider>

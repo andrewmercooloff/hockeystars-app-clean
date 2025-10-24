@@ -1221,7 +1221,6 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
         // Увеличиваем счетчик уведомлений для получателя
         await supabase.rpc('increment_unread_notifications', { user_id: toId });
         
-        console.log('✅ Уведомление о запросе дружбы отправлено');
         
         // Отправляем push уведомление
         try {
@@ -1236,7 +1235,6 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
               action: 'open_notifications'
             }
           );
-          console.log('✅ Push уведомление о запросе дружбы отправлено');
         } catch (pushError) {
           console.error('⚠️ Ошибка отправки push уведомления:', pushError);
         }
@@ -1302,7 +1300,6 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
     if (data.status === 'friends' || data.status === 'accepted') {
       // 'accepted' и 'friends' означают одно и то же - пользователи друзья
       status = 'friends';
-      console.log('✅ Статус: friends (было в БД:', data.status, ')');
     } else if (data.status === 'pending' || data.status === 'sent_request' || data.status === 'received_request') {
       // Проверяем направление запроса
       if (data.from_id === userId1) {
@@ -1314,7 +1311,6 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       }
     } else {
       status = data.status as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending';
-      console.log('⚠️ Неизвестный статус:', data.status);
     }
     
     // Кешируем результат
@@ -1617,6 +1613,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       if (cachedData) {
         const { user, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < cacheTime) {
+          // Быстро возвращаем кешированного пользователя
           return user;
         }
       }
@@ -1646,7 +1643,6 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
         user.unreadMessagesCount = unreadCount;
       } else {
         user.unreadMessagesCount = playerData?.unread_messages_count || 0;
-        console.log('📊 Счетчик сообщений загружен из БД для пользователя', user.id + ':', user.unreadMessagesCount);
       }
     } catch (error) {
       console.error('❌ Ошибка получения счетчика сообщений:', error);
@@ -1788,7 +1784,6 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     };
     
     await sendMessage(message);
-    console.log('✅ Сообщение сохранено в БД');
     
     // Push-уведомления отправляются через RealtimeManager, не дублируем здесь
     console.log('📱 Push-уведомления будут отправлены через Realtime подписку');
@@ -1836,7 +1831,6 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
     if (error) {
       console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
     } else {
-      console.log('✅ Сообщения отмечены как прочитанные:', data?.length || 0, 'сообщений');
       
       // Проверим, что сообщения действительно обновились
       const { data: verifyData, error: verifyError } = await supabase
@@ -1849,7 +1843,6 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
       if (verifyError) {
         console.error('❌ Ошибка проверки обновления:', verifyError);
       } else {
-        console.log('✅ Проверка: осталось непрочитанных сообщений:', verifyData?.length || 0);
       }
       
       // Проверим, что счетчик в БД обновился (триггер должен был сработать)
@@ -1862,7 +1855,6 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
       if (countError) {
         console.error('❌ Ошибка проверки счетчика в БД:', countError);
       } else {
-        console.log('✅ Счетчик в БД после отметки как прочитанные:', countData?.unread_messages_count || 0);
       }
     }
   } catch (error) {
@@ -2550,7 +2542,6 @@ export const getUnreadMessageCount = async (userId: string): Promise<number> => 
     }
     
     const count = data?.length || 0;
-    console.log('📊 Счетчик непрочитанных сообщений для пользователя', userId + ':', count);
     return count;
   } catch (error) {
     console.error('❌ Ошибка получения счетчика непрочитанных сообщений:', error);
@@ -3166,6 +3157,13 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     // Очищаем кеш всех игроков при создании нового игрока
     await clearAllPlayersCache();
+    
+    // Отправляем уведомление админам о новой регистрации
+    try {
+      await notifyAdminsAboutNewRegistration(createdPlayer);
+    } catch (notificationError) {
+      console.error('❌ Ошибка отправки уведомления админам о регистрации:', notificationError);
+    }
     
     return createdPlayer;
     
@@ -5137,5 +5135,60 @@ export const cleanupExpiredStatsChanges = async (): Promise<void> => {
     }
   } catch (error) {
     console.error('❌ Ошибка очистки истекших изменений:', error);
+  }
+};
+
+// Уведомление админов о новой регистрации
+export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promise<void> => {
+  try {
+    console.log('🔔 Отправляем уведомление админам о новой регистрации:', newPlayer.name);
+    
+    // Получаем всех админов
+    const { data: admins, error: adminsError } = await supabase
+      .from('players')
+      .select('id, name, push_token')
+      .eq('status', 'admin')
+      .not('push_token', 'is', null);
+    
+    if (adminsError) {
+      console.error('❌ Ошибка получения списка админов:', adminsError);
+      return;
+    }
+    
+    if (!admins || admins.length === 0) {
+      console.log('ℹ️ Админы не найдены или у них нет push токенов');
+      return;
+    }
+    
+    // Отправляем уведомление каждому админу
+    for (const admin of admins) {
+      try {
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert({
+            user_id: admin.id,
+            type: 'new_registration',
+            title: 'Новая регистрация',
+            message: `Зарегистрировался новый пользователь: ${newPlayer.name}`,
+            data: {
+              player_id: newPlayer.id,
+              player_name: newPlayer.name,
+              player_phone: newPlayer.phone,
+              player_status: newPlayer.status
+            }
+          });
+        
+        if (notificationError) {
+          console.error(`❌ Ошибка создания уведомления для админа ${admin.name}:`, notificationError);
+        } else {
+          console.log(`✅ Уведомление отправлено админу: ${admin.name}`);
+        }
+      } catch (error) {
+        console.error(`❌ Ошибка отправки уведомления админу ${admin.name}:`, error);
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Ошибка уведомления админов о регистрации:', error);
   }
 };

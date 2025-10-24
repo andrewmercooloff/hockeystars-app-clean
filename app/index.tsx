@@ -156,7 +156,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
     // Проверяем, что мы на главном экране перед запуском анимации
     if (currentScreen !== 'index') {
-      console.log('🎯 АНИМАЦИЯ: Останавливаем анимацию - не на главном экране, currentScreen =', currentScreen);
       // Очищаем интервал при уходе с главного экрана
       if (animationIntervalRef.current) {
         clearInterval(animationIntervalRef.current);
@@ -187,7 +186,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     }
 
     // Запускаем анимацию сразу без задержки
-    console.log('🎯 АНИМАЦИЯ: Запускаем анимацию шайб, currentScreen =', currentScreen);
     animationIntervalRef.current = setInterval(() => {
         // Проверяем, что мы на главном экране перед обработкой физики
         if (currentScreen !== 'index') {
@@ -361,7 +359,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           const timeDiff = now - lastHapticTimeRef.current;
           if (timeDiff > 100) {
             lastHapticTimeRef.current = now;
-            console.log('📳 ВИБРАЦИЯ: Срабатывает на главном экране, currentScreen =', currentScreen);
             
             // Легкая вибрация для столкновений шайб
             if (Platform.OS === 'ios') {
@@ -388,7 +385,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Сбрасываем флаг после проверки
           collisionDetectedRef.current = false;
         } else if (collisionDetectedRef.current) {
-          console.log('📳 ВИБРАЦИЯ: Пропускаем - не на главном экране, currentScreen =', currentScreen);
           collisionDetectedRef.current = false;
         }
     }, Platform.OS === 'ios' ? 8 : 16); // iOS - 120 FPS, Android/Web - 60 FPS для производительности
@@ -942,7 +938,6 @@ export default function HomeScreen() {
       
       // Если подключение восстановлено и были загружены игроки - перезагружаем данные
       if (connected && !loading && players.length === 0) {
-        console.log('🌐 Подключение восстановлено, перезагружаем данные...');
         setLoading(true);
         initializeApp();
       }
@@ -959,12 +954,10 @@ export default function HomeScreen() {
     useCallback(() => {
       // Устанавливаем, что мы на главном экране
       setCurrentScreen('index');
-      console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = index');
       
       // Возвращаем функцию очистки
       return () => {
         setCurrentScreen(null);
-        console.log('🏠 ГЛАВНЫЙ ЭКРАН: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen])
   );
