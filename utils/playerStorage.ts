@@ -4356,6 +4356,8 @@ export const notifyFriendsAboutChanges = async (
     
     // Отправляем push уведомления и обновляем счетчик для каждого друга
     const uniqueUserIds = [...new Set(allNotifications.map(n => n.user_id))];
+    const sentPushNotifications = new Set<string>(); // Кеш для предотвращения дублирования
+    
     for (const userId of uniqueUserIds) {
       // Отправляем push уведомление
       try {
@@ -4365,14 +4367,23 @@ export const notifyFriendsAboutChanges = async (
         
         // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока
         const pushCacheKey = `${userId}_${playerId}_${notificationType}`;
+        
+        // Двойная проверка: глобальный кеш + локальный кеш
+        if (sentPushNotifications.has(pushCacheKey)) {
+          console.log('⏭️ Пропускаем дублирующееся push-уведомление (локальный кеш):', userId, 'от игрока:', playerId);
+          continue;
+        }
+        
         const lastPushTime = pushNotificationCache.get(pushCacheKey);
         const now = Date.now();
         
         if (lastPushTime && (now - lastPushTime) < 10000) { // 10 секунд
-          console.log('⏭️ Пропускаем дублирующееся push-уведомление для пользователя:', userId, 'от игрока:', playerId);
+          console.log('⏭️ Пропускаем дублирующееся push-уведомление (глобальный кеш):', userId, 'от игрока:', playerId);
           continue;
         }
         
+        // Помечаем как отправленное
+        sentPushNotifications.add(pushCacheKey);
         pushNotificationCache.set(pushCacheKey, now);
         
         let title = '📊 Обновление статистики';
