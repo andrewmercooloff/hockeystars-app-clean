@@ -1347,9 +1347,17 @@ export default function PlayerProfile() {
         
         // Принудительно обновляем все экраны, которые могут показывать данные пользователя (асинхронно)
         if (currentUser.id === player.id) {
-          setTimeout(() => {
-            // Перенаправляем с параметром обновления для LogoHeader
-            router.replace(`/player/${player.id}?refresh=${Date.now()}`);
+          setTimeout(async () => {
+            try {
+              // Обновляем глобальное состояние пользователя
+              await refreshUser(true);
+              console.log('✅ Глобальное состояние пользователя обновлено после сохранения профиля');
+              
+              // Дополнительно обновляем локальное состояние для немедленного отображения
+              setCurrentUser(refreshedPlayer);
+            } catch (error) {
+              console.error('❌ Ошибка обновления глобального состояния:', error);
+            }
           }, 0);
         }
       }
@@ -3551,7 +3559,7 @@ export default function PlayerProfile() {
                             await saveCurrentUser(player);
                             
                             // Обновляем контекст пользователя для немедленного обновления интерфейса
-                            refreshUser(true); // forceRefresh = true
+                            await refreshUser(true); // forceRefresh = true
                             
                             // Показываем уведомление
                             Alert.alert(
