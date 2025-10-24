@@ -282,6 +282,7 @@ export default function EditablePhotosSection({
   };
 
   const handleDragStart = (index: number) => {
+    console.log('🚀 Drag start for photo index:', index);
     setDraggedIndex(index);
   };
 
@@ -296,8 +297,31 @@ export default function EditablePhotosSection({
 
   const handleDragEnd = (event: any) => {
     if (draggedIndex !== null) {
-      const newIndex = Math.round(event.nativeEvent.translationX / 135); // 135px per photo
-      const targetIndex = Math.max(0, Math.min(photos.length - 1, draggedIndex + newIndex));
+      console.log('🔄 Drag end:', { draggedIndex, translationX: event.nativeEvent.translationX, translationY: event.nativeEvent.translationY });
+      
+      // Для сетки 3 столбца рассчитываем новый индекс на основе движения
+      const photoWidth = (screenWidth - 100) / 3;
+      const photoHeight = photoWidth + 20; // высота + отступ
+      
+      const deltaX = event.nativeEvent.translationX;
+      const deltaY = event.nativeEvent.translationY;
+      
+      // Определяем направление движения
+      let newIndex = draggedIndex;
+      
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Горизонтальное движение
+        const horizontalSteps = Math.round(deltaX / photoWidth);
+        newIndex = draggedIndex + horizontalSteps;
+      } else {
+        // Вертикальное движение
+        const verticalSteps = Math.round(deltaY / photoHeight);
+        newIndex = draggedIndex + (verticalSteps * 3); // 3 столбца
+      }
+      
+      const targetIndex = Math.max(0, Math.min(photos.length - 1, newIndex));
+      
+      console.log('🎯 Target index:', targetIndex);
       
       if (targetIndex !== draggedIndex) {
         const newPhotos = [...photos];
@@ -305,6 +329,7 @@ export default function EditablePhotosSection({
         newPhotos.splice(draggedIndex, 1);
         newPhotos.splice(targetIndex, 0, draggedPhoto);
         onPhotosChange?.(newPhotos);
+        console.log('✅ Photo moved from', draggedIndex, 'to', targetIndex);
       }
       
       setDraggedIndex(null);
@@ -401,13 +426,11 @@ export default function EditablePhotosSection({
                             handleDragEnd(event);
                           }
                         }}
+                        minDist={10}
                       >
-                        <TouchableOpacity
-                          style={styles.dragHandleGrid}
-                          activeOpacity={0.7}
-                        >
+                        <View style={styles.dragHandleGrid}>
                           <Ionicons name="reorder-three" size={16} color="#fff" />
-                        </TouchableOpacity>
+                        </View>
                       </PanGestureHandler>
                     </View>
                     
@@ -602,7 +625,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   photoGridItem: {
-    width: (screenWidth - 80) / 3, // 3 столбца с отступами
+    width: (screenWidth - 100) / 3, // 3 столбца с отступами (20px padding + 20px margins)
     marginBottom: 15,
     marginRight: 10,
     position: 'relative',
