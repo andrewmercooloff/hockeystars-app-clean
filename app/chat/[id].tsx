@@ -35,7 +35,7 @@ const iceBg = require('../../assets/images/led.jpg');
 
 export default function ChatScreen() {
   const { t } = useLanguage();
-  const { id } = useLocalSearchParams();
+  const { id, scrollToBottom } = useLocalSearchParams();
   const router = useRouter();
   const { refreshUser } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
@@ -64,6 +64,16 @@ export default function ChatScreen() {
       pollingIntervalRef.current = null;
     }
   }, [id]);
+
+  // Обработка автоматической прокрутки при переходе через deep link
+  useEffect(() => {
+    if (scrollToBottom === 'true' && messages.length > 0 && !loading) {
+      console.log('🔗 Автоматическая прокрутка в чат через deep link');
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, Platform.OS === 'android' ? 300 : 200);
+    }
+  }, [scrollToBottom, messages.length, loading]);
 
   useEffect(() => {
     if (!currentUser || !otherPlayer || otherPlayer.id !== id) {

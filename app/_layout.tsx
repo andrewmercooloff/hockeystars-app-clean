@@ -17,6 +17,7 @@ import { supabase } from '../utils/supabase';
 import * as SplashScreen from 'expo-splash-screen';
 import { addActivityPoints } from '../services/activityService';
 import { initializePushNotifications } from '../utils/notificationService';
+import * as Notifications from 'expo-notifications';
 import { configureSystemUI } from '../utils/systemUI';
 import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
@@ -524,6 +525,30 @@ export default function RootLayout() {
     });
 
     return () => subscription?.remove();
+  }, []);
+
+  // Обработчик push-уведомлений для deep links
+  React.useEffect(() => {
+    const notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      const deepLink = data?.deepLink;
+      
+      if (deepLink) {
+        console.log('🔗 Deep link из уведомления:', deepLink);
+        
+        // Небольшая задержка для завершения навигации
+        setTimeout(() => {
+          // Добавляем параметр для автоматической прокрутки в чат
+          if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
+            router.push(`${deepLink}?scrollToBottom=true` as any);
+          } else {
+            router.push(deepLink as any);
+          }
+        }, 500);
+      }
+    });
+
+    return () => notificationListener.remove();
   }, []);
 
   // Дополнительная загрузка пользователя при возврате в приложение

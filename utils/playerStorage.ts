@@ -4475,7 +4475,8 @@ export const notifyFriendsAboutChanges = async (
           {
             type: notificationType,
             player_id: playerId,
-            action: 'open_notifications'
+            action: 'open_profile',
+            deepLink: `/player/${playerId}`
           }
         );
       } catch (pushError) {

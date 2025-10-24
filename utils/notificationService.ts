@@ -390,12 +390,12 @@ export async function sendMessageNotification(
   // Дедупликация токенов - убираем дубликаты
   const uniqueTokens = [...new Set(receiverTokens)];
   
-  
   const promises = uniqueTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'message',
       senderId,
-      action: 'open_chat'
+      action: 'open_chat',
+      deepLink: `/chat/${senderId}`
     })
   );
   
@@ -417,7 +417,8 @@ export async function sendGiftNotification(
   const promises = receiverTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'gift',
-      action: 'open_gifts'
+      action: 'open_gifts',
+      deepLink: '/gifts'
     })
   );
   
@@ -438,7 +439,8 @@ export async function sendFriendshipNotification(
   const promises = receiverTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'friendship',
-      action: 'open_friends'
+      action: 'open_friends',
+      deepLink: '/friends'
     })
   );
   
