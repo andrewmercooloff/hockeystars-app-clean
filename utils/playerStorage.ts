@@ -4188,7 +4188,7 @@ export const notifyFriendsAboutChanges = async (
   const lastCall = notificationCache.get(cacheKey);
   const now = Date.now();
   
-  if (lastCall && (now - lastCall) < 30000) { // 30 секунд
+  if (lastCall && (now - lastCall) < 300000) { // 5 минут
     console.log('⏭️ Пропускаем повторный вызов notifyFriendsAboutChanges для игрока:', playerId);
     return;
   }
@@ -4320,15 +4320,15 @@ export const notifyFriendsAboutChanges = async (
     for (const notification of allNotifications) {
       const key = `${notification.user_id}_${notification.type}_${playerId}`;
       
-      // Проверяем, есть ли уже похожее уведомление за последние 2 минуты
+      // Проверяем, есть ли уже похожее уведомление за последние 5 минут
       const { data: existingNotifications, error: checkError } = await supabase
         .from('notifications')
         .select('id, created_at, data')
         .eq('user_id', notification.user_id)
         .eq('type', notification.type)
-        .gte('created_at', new Date(Date.now() - 120000).toISOString()) // Последние 2 минуты
+        .gte('created_at', new Date(Date.now() - 300000).toISOString()) // Последние 5 минут
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(10);
       
       if (checkError) {
         console.error('❌ Ошибка проверки дубликатов уведомлений:', checkError);
@@ -4393,7 +4393,7 @@ export const notifyFriendsAboutChanges = async (
         const lastPushTime = pushNotificationCache.get(pushCacheKey);
         const now = Date.now();
         
-        if (lastPushTime && (now - lastPushTime) < 60000) { // 60 секунд
+        if (lastPushTime && (now - lastPushTime) < 300000) { // 5 минут
           console.log('⏭️ Пропускаем дублирующееся push-уведомление (глобальный кеш):', userId, 'от игрока:', playerId);
           continue;
         }
