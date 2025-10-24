@@ -4363,17 +4363,6 @@ export const notifyFriendsAboutChanges = async (
         const userNotifications = allNotifications.filter(n => n.user_id === userId);
         const notificationType = userNotifications[0]?.type;
         
-        let title = '📊 Обновление статистики';
-        let body = `${playerName} обновил свою статистику`;
-        
-        if (notificationType === 'stats_change') {
-          title = '📊 Обновление статистики';
-          body = `${playerName} обновил статистику`;
-        } else if (notificationType === 'physical_data_changed') {
-          title = '💪 Обновление нормативов';
-          body = `${playerName} обновил свои нормативы`;
-        }
-        
         // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока
         const pushCacheKey = `${userId}_${playerId}_${notificationType}`;
         const lastPushTime = pushNotificationCache.get(pushCacheKey);
@@ -4385,6 +4374,17 @@ export const notifyFriendsAboutChanges = async (
         }
         
         pushNotificationCache.set(pushCacheKey, now);
+        
+        let title = '📊 Обновление статистики';
+        let body = `${playerName} обновил свою статистику`;
+        
+        if (notificationType === 'stats_change') {
+          title = '📊 Обновление статистики';
+          body = `${playerName} обновил статистику`;
+        } else if (notificationType === 'physical_data_changed') {
+          title = '💪 Обновление нормативов';
+          body = `${playerName} обновил свои нормативы`;
+        }
         
         await sendNotificationToUser(
           userId,
