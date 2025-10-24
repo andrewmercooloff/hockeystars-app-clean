@@ -84,8 +84,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return {
         leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
         topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
-        rightOffset: 150,  // Увеличено для предотвращения вылета за правый край
-        bottomOffset: 400  // Увеличено для предотвращения вылета за нижний край
+        rightOffset: 200,  // Еще больше увеличено для предотвращения вылета за правый край
+        bottomOffset: 450  // Еще больше увеличено для предотвращения вылета за нижний край
       };
     }
   }, [width, height]);
@@ -270,7 +270,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             // Минимальное расстояние между центрами шайб (диаметр шайбы)
-            const minDistance = Platform.OS === 'android' ? puckSize * 1.1 : puckSize;
+            const minDistance = Platform.OS === 'android' ? puckSize * 0.9 : puckSize;
             
             if (distance < minDistance && distance > 0) {
               const angle = Math.atan2(dy, dx);
@@ -282,7 +282,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               
               // ПРОСТАЯ ФИЗИКА: более плавное отталкивание на основе overlap
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.4 : 0.18)); // Увеличиваем силу отталкивания для Android
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.25 : 0.18)); // Уменьшаем силу отталкивания для Android
               
               // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
@@ -431,7 +431,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           
           // ТОЛКАЕМ ДРУГУЮ ШАЙБУ только при реальном столкновении
           // Но не при каждом движении пальца - только когда есть столкновение
-          const pushStrength = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'android' ? 0.5 : 0.2); // Увеличиваем силу толчка для Android
+          const pushStrength = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'android' ? 0.3 : 0.2); // Уменьшаем силу толчка для Android
           
           // Вычисляем общую скорость перетаскивания
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
