@@ -55,6 +55,49 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
   
+  // Определяем производительность устройства для Android
+  const getAndroidPerformanceLevel = useCallback(() => {
+    if (Platform.OS !== 'android') return 'high';
+    
+    // Простая эвристика на основе количества ядер и памяти
+    // В реальном приложении можно использовать react-native-device-info
+    const deviceInfo = {
+      // Примерные значения для разных типов устройств
+      cores: navigator.hardwareConcurrency || 4,
+      memory: (navigator as any).deviceMemory || 4
+    };
+    
+    // Определяем уровень производительности
+    if (deviceInfo.cores >= 8 && deviceInfo.memory >= 6) {
+      return 'high'; // Флагманы и мощные устройства
+    } else if (deviceInfo.cores >= 4 && deviceInfo.memory >= 4) {
+      return 'medium'; // Средние устройства
+    } else {
+      return 'low'; // Старые/слабые устройства
+    }
+  }, []);
+  
+  // Получаем оптимальную частоту обновления
+  const getOptimalFrameRate = useCallback(() => {
+    if (Platform.OS === 'ios') {
+      return 8; // 120 FPS для iOS
+    } else if (Platform.OS === 'web') {
+      return 16; // 60 FPS для Web
+    } else if (Platform.OS === 'android') {
+      const performanceLevel = getAndroidPerformanceLevel();
+      switch (performanceLevel) {
+        case 'high':
+          return 16; // 60 FPS для мощных Android
+        case 'medium':
+          return 20; // 50 FPS для средних Android
+        case 'low':
+        default:
+          return 33; // 30 FPS для слабых Android
+      }
+    }
+    return 16; // По умолчанию 60 FPS
+  }, [getAndroidPerformanceLevel]);
+  
   // Отладочная информация (только при изменении currentUserId)
   // console.log('🎯 ВИБРАЦИЯ: usePuckCollisionSystem инициализирован с currentUserId =', currentUserId);
 
@@ -134,8 +177,29 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           
           // Логирование для веб-платформы
           
-          // Платформо-зависимая скорость - увеличиваем для более активного движения
-          const speedMultiplier = Platform.OS === 'ios' ? 1.2 : (Platform.OS === 'web' ? 1.2 : 0.5); // Снижаем начальную скорость для Android
+          // Адаптивная скорость в зависимости от производительности устройства
+          let speedMultiplier;
+          if (Platform.OS === 'ios') {
+            speedMultiplier = 1.2;
+          } else if (Platform.OS === 'web') {
+            speedMultiplier = 1.2;
+          } else if (Platform.OS === 'android') {
+            const performanceLevel = getAndroidPerformanceLevel();
+            switch (performanceLevel) {
+              case 'high':
+                speedMultiplier = 1.0; // Высокая скорость для мощных Android
+                break;
+              case 'medium':
+                speedMultiplier = 0.7; // Средняя скорость для средних Android
+                break;
+              case 'low':
+              default:
+                speedMultiplier = 0.5; // Низкая скорость для слабых Android
+                break;
+            }
+          } else {
+            speedMultiplier = 1.2;
+          }
           nextPositions.push({
             id: player.id,
             x: newX,
@@ -327,9 +391,35 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           newVx += velocityChanges[posIndex].dvx;
           newVy += velocityChanges[posIndex].dvy;
           
-          // Платформо-зависимые ограничения скорости (улучшенные для плавности)
-          const maxSpeed = Platform.OS === 'ios' ? 5.0 : (Platform.OS === 'web' ? 5.5 : 1.5); // Снижаем максимальную скорость для Android
-          const minSpeed = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'web' ? 0.8 : 0.3); // Снижаем минимальную скорость для Android
+          // Адаптивные ограничения скорости в зависимости от производительности устройства
+          let maxSpeed, minSpeed;
+          if (Platform.OS === 'ios') {
+            maxSpeed = 5.0;
+            minSpeed = 0.8;
+          } else if (Platform.OS === 'web') {
+            maxSpeed = 5.5;
+            minSpeed = 0.8;
+          } else if (Platform.OS === 'android') {
+            const performanceLevel = getAndroidPerformanceLevel();
+            switch (performanceLevel) {
+              case 'high':
+                maxSpeed = 4.0; // Высокая максимальная скорость для мощных Android
+                minSpeed = 0.6;
+                break;
+              case 'medium':
+                maxSpeed = 2.5; // Средняя максимальная скорость для средних Android
+                minSpeed = 0.4;
+                break;
+              case 'low':
+              default:
+                maxSpeed = 1.5; // Низкая максимальная скорость для слабых Android
+                minSpeed = 0.3;
+                break;
+            }
+          } else {
+            maxSpeed = 5.0;
+            minSpeed = 0.8;
+          }
           const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
           if (currentSpeed > maxSpeed) {
             newVx = (newVx / currentSpeed) * maxSpeed;
@@ -387,7 +477,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         } else if (collisionDetectedRef.current) {
           collisionDetectedRef.current = false;
         }
-    }, Platform.OS === 'ios' ? 8 : (Platform.OS === 'android' ? 33 : 16)); // iOS - 120 FPS, Android - 30 FPS, Web - 60 FPS для производительности
+    }, getOptimalFrameRate()); // Адаптивная частота обновления в зависимости от производительности устройства
 
     return () => {
       if (animationIntervalRef.current) {
@@ -462,14 +552,15 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Вибрация при drag отключена по запросу пользователя
   }, [puckSize, currentUserId]);
 
-  return { puckPositions, puckSize, updatePuckPosition };
+  return { puckPositions, puckSize, updatePuckPosition, getAndroidPerformanceLevel };
 };
 
-const PuckAnimator = ({ player, position, onNav, onDrag }: { 
+const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLevel }: { 
   player: Player; 
   position: PuckPosition; 
   onNav: () => void; 
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
+  getAndroidPerformanceLevel: () => 'high' | 'medium' | 'low';
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
@@ -512,8 +603,10 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const touch = e.nativeEvent;
     const now = Date.now();
     
-    // Throttling - обновляем не чаще чем раз в 16ms (60 FPS) для iOS/Web, 33ms (30 FPS) для Android
-    const throttleInterval = Platform.OS === 'android' ? 33 : 16;
+    // Адаптивный throttling в зависимости от производительности устройства
+    const throttleInterval = Platform.OS === 'android' ? 
+      (getAndroidPerformanceLevel() === 'high' ? 16 : 
+       getAndroidPerformanceLevel() === 'medium' ? 20 : 33) : 16;
     if (now - lastUpdateTimeRef.current < throttleInterval) {
       return;
     }
@@ -534,8 +627,25 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
     const newY = touch.pageY - dragStartRef.current.y;
     
     // Вычисляем скорость на основе изменения позиции для толчка других шайб
-    // Уменьшаем коэффициент для более плавного движения (еще больше для Android)
-    const speedMultiplier = Platform.OS === 'android' ? 0.5 : 0.8;
+    // Адаптивный коэффициент в зависимости от производительности устройства
+    let speedMultiplier;
+    if (Platform.OS === 'android') {
+      const performanceLevel = getAndroidPerformanceLevel();
+      switch (performanceLevel) {
+        case 'high':
+          speedMultiplier = 0.8; // Высокий коэффициент для мощных Android
+          break;
+        case 'medium':
+          speedMultiplier = 0.6; // Средний коэффициент для средних Android
+          break;
+        case 'low':
+        default:
+          speedMultiplier = 0.5; // Низкий коэффициент для слабых Android
+          break;
+      }
+    } else {
+      speedMultiplier = 0.8;
+    }
     const vx = (newX - lastPositionRef.current.x) * speedMultiplier;
     const vy = (newY - lastPositionRef.current.y) * speedMultiplier;
     
@@ -562,8 +672,25 @@ const PuckAnimator = ({ player, position, onNav, onDrag }: {
       const timeDiff = now - dragStartRef.current.time;
       
       // Простое решение: используем накопленную скорость, но с правильным направлением
-      // Уменьшаем финальный импульс для Android для более плавного движения
-      const impulseMultiplier = Platform.OS === 'android' ? 0.3 : 0.5;
+      // Адаптивный финальный импульс в зависимости от производительности устройства
+      let impulseMultiplier;
+      if (Platform.OS === 'android') {
+        const performanceLevel = getAndroidPerformanceLevel();
+        switch (performanceLevel) {
+          case 'high':
+            impulseMultiplier = 0.5; // Высокий импульс для мощных Android
+            break;
+          case 'medium':
+            impulseMultiplier = 0.4; // Средний импульс для средних Android
+            break;
+          case 'low':
+          default:
+            impulseMultiplier = 0.3; // Низкий импульс для слабых Android
+            break;
+        }
+      } else {
+        impulseMultiplier = 0.5;
+      }
       const finalVx = dragVelocityRef.current.vx * impulseMultiplier;
       const finalVy = dragVelocityRef.current.vy * impulseMultiplier;
       
@@ -828,7 +955,7 @@ export default function HomeScreen() {
 
 
   const { isMainScreen, currentScreen } = useScreenContext();
-  const { puckPositions = [], puckSize, updatePuckPosition } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen || undefined);
+  const { puckPositions = [], puckSize, updatePuckPosition, getAndroidPerformanceLevel } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen || undefined);
   
   // Отладочная функция для проверки состояния экрана
   // Функция отладки отключена
@@ -1080,6 +1207,7 @@ export default function HomeScreen() {
                 }
               }}
               onDrag={updatePuckPosition}
+              getAndroidPerformanceLevel={getAndroidPerformanceLevel}
             />
           );
         })}
