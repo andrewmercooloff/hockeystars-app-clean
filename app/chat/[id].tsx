@@ -71,7 +71,6 @@ export default function ChatScreen() {
     }
 
     // Настраиваем Realtime подписку на изменения сообщений
-    console.log('🔧 Настраиваем Realtime подписку для чата:', currentUser.id, 'с', otherPlayer.id);
     const channel = supabase
       .channel(`messages-chat-${currentUser.id}-${otherPlayer.id}`)
       .on(
@@ -80,11 +79,8 @@ export default function ChatScreen() {
           event: 'INSERT',
           schema: 'public',
           table: 'messages'
-          // Убираем фильтр - слушаем все сообщения и фильтруем в коде
         },
         (payload) => {
-          console.log('💬 Новое сообщение получено в чате:', payload.new);
-          
           // Проверяем, что сообщение для этого чата
           const newMessage = payload.new;
           const isForThisChat = (
@@ -93,18 +89,14 @@ export default function ChatScreen() {
           );
           
           if (isForThisChat) {
-            console.log('💬 Сообщение для этого чата, добавляем');
-            
             // Добавляем новое сообщение в состояние
             setMessages(prevMessages => {
               // Проверяем, что сообщение еще не добавлено
               const exists = prevMessages.some(msg => msg.id === newMessage.id);
               if (exists) {
-                console.log('💬 Сообщение уже существует, пропускаем');
                 return prevMessages;
               }
               
-              console.log('💬 Добавляем новое сообщение в чат');
               return [...prevMessages, newMessage];
             });
             
@@ -112,17 +104,12 @@ export default function ChatScreen() {
             setTimeout(() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
             }, Platform.OS === 'android' ? 200 : 100);
-          } else {
-            console.log('💬 Сообщение не для этого чата, пропускаем');
           }
         }
       )
-      .subscribe((status) => {
-        console.log('🔧 Статус Realtime подписки в чате:', status);
-      });
+      .subscribe();
 
     // Запускаем polling как fallback для Realtime
-    console.log('🔧 Запускаем polling для чата');
     pollingIntervalRef.current = setInterval(async () => {
       if (currentUser && otherPlayer && otherPlayer.id === id) {
         try {
@@ -131,7 +118,6 @@ export default function ChatScreen() {
           const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
           
           if (newMessageIds.length > 0) {
-            console.log('🔄 Polling: найдены новые сообщения:', newMessageIds.length);
             setMessages(conversation);
             lastMessageIdsRef.current = currentMessageIds;
             
@@ -147,11 +133,9 @@ export default function ChatScreen() {
     }, 2000); // Проверяем каждые 2 секунды
 
     return () => {
-      console.log('🔧 Отключаем Realtime подписку в чате');
       supabase.removeChannel(channel);
       
       if (pollingIntervalRef.current) {
-        console.log('🔧 Останавливаем polling для чата');
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
       }

@@ -1772,22 +1772,17 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
       // Получаем данные отправителя
       const senderPlayer = await getPlayerById(senderId);
       if (senderPlayer) {
-        // Получаем токены получателя
-        const receiverTokens = await getUserPushTokens(receiverId);
-        console.log(`📱 Push токены для получателя ${receiverId}:`, receiverTokens.length);
-        
-        if (receiverTokens.length > 0) {
-          console.log(`📱 Отправляем push о сообщении от ${senderPlayer.name} для пользователя ${receiverId}`);
-          
-          await sendMessageNotification(
-            receiverTokens,
-            senderPlayer.name || 'Пользователь',
-            text,
-            senderId
-          );
-        } else {
-          console.log('⚠️ У получателя нет push токенов, уведомление не отправляется');
-        }
+      // Получаем токены получателя
+      const receiverTokens = await getUserPushTokens(receiverId);
+      
+      if (receiverTokens.length > 0) {
+        await sendMessageNotification(
+          receiverTokens,
+          senderPlayer.name || 'Пользователь',
+          text,
+          senderId
+        );
+      }
       }
     } catch (pushError) {
       console.error('❌ Ошибка отправки push-уведомления:', pushError);

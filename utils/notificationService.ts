@@ -390,11 +390,6 @@ export async function sendMessageNotification(
   // Дедупликация токенов - убираем дубликаты
   const uniqueTokens = [...new Set(receiverTokens)];
   
-  console.log(`📱 PUSH: Отправляем уведомление о сообщении`);
-  console.log(`📱 PUSH: Отправитель: ${senderName} (${senderId})`);
-  console.log(`📱 PUSH: Токенов до дедупликации: ${receiverTokens.length}`);
-  console.log(`📱 PUSH: Токенов после дедупликации: ${uniqueTokens.length}`);
-  console.log(`📱 PUSH: Текст: ${messageText.substring(0, 30)}...`);
   
   const promises = uniqueTokens.map(token => 
     sendPushNotification(token, title, body, {
@@ -405,9 +400,6 @@ export async function sendMessageNotification(
   );
   
   const results = await Promise.all(promises);
-  const successCount = results.filter(r => r).length;
-  console.log(`📱 PUSH: Успешно отправлено ${successCount}/${uniqueTokens.length} уведомлений`);
-  
   return results.every(result => result);
 }
 

@@ -157,7 +157,6 @@ class RealtimeManager {
    * Настраивает подписку на новые сообщения для отправки push уведомлений
    */
   private async setupMessagesSubscription(userId: string): Promise<void> {
-    console.log('🔧 Настраиваем глобальную подписку на сообщения для пользователя:', userId);
     const channel = supabase
       .channel('messages-push-notifications-global')
       .on(
@@ -166,18 +165,11 @@ class RealtimeManager {
           event: 'INSERT',
           schema: 'public',
           table: 'messages'
-          // Убираем фильтр - слушаем все сообщения
         },
         async (payload) => {
-          console.log('💬 Новое сообщение получено через Realtime:', payload.new);
-          console.log('💬 Отправитель:', payload.new.sender_id);
-          console.log('💬 Получатель:', payload.new.receiver_id);
-          console.log('💬 Текст:', payload.new.text);
-          
           // Проверяем, является ли текущий пользователь получателем
           const receiverId = payload.new.receiver_id;
           if (receiverId !== userId) {
-            console.log('⏭️ Сообщение не для текущего пользователя, пропускаем');
             return;
           }
           
@@ -192,26 +184,19 @@ class RealtimeManager {
             // Получаем данные отправителя
             const senderPlayer = await getPlayerById(senderId);
             if (!senderPlayer) {
-              console.log('❌ Не удалось получить данные отправителя');
               return;
             }
             
             // Получаем токены получателя
             const receiverTokens = await getUserPushTokens(userId);
-            console.log(`📱 Push токены для пользователя ${userId}:`, receiverTokens.length);
-            if (receiverTokens.length === 0) {
-              console.log('⚠️ У пользователя нет push токенов, уведомление не отправляется');
-              return;
+            if (receiverTokens.length > 0) {
+              await sendMessageNotification(
+                receiverTokens,
+                senderPlayer.name || 'Пользователь',
+                messageText,
+                senderId
+              );
             }
-            
-            console.log(`📱 Отправляем push о сообщении от ${senderPlayer.name} для пользователя ${userId}`);
-            
-            await sendMessageNotification(
-              receiverTokens,
-              senderPlayer.name || 'Пользователь',
-              messageText,
-              senderId
-            );
             
           } catch (error) {
             console.error('❌ Ошибка отправки push через Realtime:', error);
