@@ -1198,23 +1198,7 @@ export default function PlayerProfile() {
         
         if (statsChanges.length > 0) {
           console.log('📊 Обнаружены изменения статистики:', statsChanges);
-          console.log('🔔 Отправляем уведомления для игрока:', player.id, player.name);
-          // Используем существующую функцию notifyFriendsAboutChanges
-          const playerStorage = await import('../../utils/playerStorage');
-          const { notifyFriendsAboutChanges } = playerStorage;
-          
-          // Преобразуем формат: { field, oldValue, newValue } → { field, oldValue, newValue, change }
-          const formattedStatChanges = statsChanges.map(change => ({
-            field: change.field,
-            oldValue: change.oldValue,
-            newValue: change.newValue,
-            change: change.newValue - change.oldValue  // Добавляем change для совместимости
-          }));
-          
-          notificationPromises.push(
-            notifyFriendsAboutChanges(player.id, player.name, formattedStatChanges, [])
-              .catch((err) => console.error('❌ ОШИБКА отправки уведомлений о статистике:', err))
-          );
+          console.log('ℹ️ Уведомления будут отправлены автоматически через updatePlayer');
         } else {
           console.log('ℹ️ Статистика НЕ изменилась, уведомления НЕ отправляются');
         }
@@ -1272,12 +1256,7 @@ export default function PlayerProfile() {
         
         if (normativeChanges.length > 0) {
           console.log('🏃‍♂️ Обнаружены изменения нормативов:', normativeChanges);
-          console.log('🔔 Отправляем уведомления о нормативах для игрока:', player.id, player.name);
-          
-          notificationPromises.push(
-            playerStorage.notifyFriendsAboutChanges(player.id, player.name, [], normativeChanges)
-              .catch((err) => console.error('❌ ОШИБКА отправки уведомлений о нормативах:', err))
-          );
+          console.log('ℹ️ Уведомления будут отправлены автоматически через updatePlayer');
         } else {
           console.log('ℹ️ Нормативы НЕ изменились, уведомления НЕ отправляются');
         }
