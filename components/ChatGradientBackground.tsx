@@ -11,7 +11,7 @@ export default function ChatGradientBackground({ children, style }: ChatGradient
   return (
     <View style={[styles.container, style]}>
       <LinearGradient
-        colors={['rgba(0, 0, 0, 0.3)', 'rgba(13, 0, 18, 0.3)']}
+        colors={['rgba(0, 0, 0, 0.8)', 'rgba(13, 0, 18, 0.8)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
