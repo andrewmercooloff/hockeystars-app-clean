@@ -639,7 +639,7 @@ export default function ChatScreen() {
                 <Ionicons 
                   name="send" 
                   size={20} 
-                  color="#fff" 
+                  color="#fa2f40" 
                 />
               </TouchableOpacity>
             </View>
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -842,8 +842,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     maxHeight: 100,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 2,
+    borderColor: '#fa2f40',
   },
   sendButton: {
     backgroundColor: '#FF4444',
@@ -852,6 +852,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: -3, // Поднимаем кнопку на 3 пикселя вверх
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
