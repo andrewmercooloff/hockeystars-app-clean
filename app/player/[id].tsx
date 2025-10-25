@@ -3627,7 +3627,7 @@ export default function PlayerProfile() {
             {/* QR-код профиля */}
             {player && (
               <View style={styles.qrCodeSection}>
-                <View style={styles.qrCodeContainer}>
+                <View style={[styles.qrCodeContainer, { borderWidth: 6, borderColor: '#fa2f40', borderRadius: 12 }]}>
                   <QRCode
                     value={`hockeystars://player/${player.id}`}
                     size={Dimensions.get('window').width - 80}
@@ -3638,8 +3638,6 @@ export default function PlayerProfile() {
                     logoBackgroundColor="#fff"
                     logoBorderRadius={40}
                     logoMargin={4}
-                    logoBorderWidth={6}
-                    logoBorderColor="#fa2f40"
                   />
                 </View>
               </View>
