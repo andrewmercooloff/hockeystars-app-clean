@@ -615,7 +615,6 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',
