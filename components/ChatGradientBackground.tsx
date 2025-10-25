@@ -1,0 +1,35 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+
+interface ChatGradientBackgroundProps {
+  children: React.ReactNode;
+  style?: any;
+}
+
+export default function ChatGradientBackground({ children, style }: ChatGradientBackgroundProps) {
+  return (
+    <View style={[styles.container, style]}>
+      <LinearGradient
+        colors={['rgba(0, 0, 0, 0.92)', 'rgba(9, 0, 13, 0.92)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradient}
+      />
+      {children}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+});

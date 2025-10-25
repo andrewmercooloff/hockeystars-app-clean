@@ -27,6 +27,7 @@ import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import GradientOverlay from '../components/GradientOverlay';
+import ChatGradientBackground from '../components/ChatGradientBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -356,10 +357,11 @@ export default function MessagesScreen() {
               filteredChats.map((chat) => (
                 <TouchableOpacity
                   key={chat.player.id}
-                  style={styles.chatItem}
+                  style={styles.chatItemContainer}
                   onPress={() => openChat(chat.player.id)}
                   activeOpacity={0.8}
                 >
+                  <ChatGradientBackground style={styles.chatItem}>
                   <Image 
                     source={{ 
                       uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
@@ -410,6 +412,7 @@ export default function MessagesScreen() {
                        chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                     </Text>
                   </View>
+                  </ChatGradientBackground>
                 </TouchableOpacity>
               ))
             ) : null}
@@ -528,12 +531,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20, // Уменьшили с 40 до 20 (в 2 раза)
   },
-  chatItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  chatItemContainer: {
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
@@ -545,6 +543,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 8,
+  },
+  chatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
   },
   chatAvatar: {
     width: 50,
