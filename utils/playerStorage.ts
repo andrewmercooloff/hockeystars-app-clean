@@ -3066,11 +3066,37 @@ export const getExerciseCompletionCount = async (playerId: string, exerciseId: s
 // Получить время последнего выполнения конкретного упражнения
 export const getLastExerciseCompletion = async (playerId: string, exerciseId: string): Promise<ExerciseCompletion | null> => {
   try {
-    const stats = await getPlayerExerciseStats(playerId);
-    if (!stats) return null;
+    console.log('💪 getLastExerciseCompletion вызван для:', { playerId, exerciseId });
     
-    const completion = stats.completions.find(c => c.exerciseId === exerciseId);
-    return completion || null;
+    // Получаем данные игрока напрямую из базы
+    const player = await getPlayerById(playerId);
+    if (!player || !player.exerciseStats) {
+      console.log('💪 У игрока нет данных о статистике упражнений');
+      return null;
+    }
+    
+    console.log('💪 Данные exerciseStats игрока:', player.exerciseStats);
+    
+    // Проверяем старый формат (массив)
+    if (Array.isArray(player.exerciseStats.completions)) {
+      console.log('💪 Используем старый формат данных (массив)');
+      const completion = player.exerciseStats.completions.find(c => c.exerciseId === exerciseId);
+      if (completion) {
+        console.log('💪 Найдена запись в старом формате:', completion);
+        return completion;
+      }
+    }
+    
+    // Проверяем новый формат (объект) - если есть
+    if (player.exerciseStats.completions && typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
+      console.log('💪 Используем новый формат данных (объект)');
+      // В новом формате нет информации о времени, возвращаем null
+      console.log('⚠️ В новом формате нет информации о времени выполнения');
+      return null;
+    }
+    
+    console.log('💪 Упражнение не найдено в статистике');
+    return null;
   } catch (error) {
     console.error('❌ Ошибка получения времени последнего выполнения:', error);
     return null;
