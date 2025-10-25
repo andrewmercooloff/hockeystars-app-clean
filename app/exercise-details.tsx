@@ -426,7 +426,7 @@ export default function ExerciseDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
   },
   background: {
     flex: 1,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(8, 0, 15, 0.2)',
   },
   pageHeader: {
     position: 'absolute',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(8, 0, 15, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(8, 0, 15, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     marginHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(8, 0, 15, 0.7)',
     borderRadius: 15,
     padding: 16,
     borderWidth: 1,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   completionStatsText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    color: '#000000',
+    color: '#08000F',
     marginLeft: 8,
   },
   completeButton: {

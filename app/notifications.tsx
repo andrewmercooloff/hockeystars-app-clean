@@ -1300,7 +1300,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(8, 0, 15, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -1324,7 +1324,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(8, 0, 15, 0.5)',
   },
   headerLeft: {
     flex: 1,
@@ -1353,7 +1353,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(8, 0, 15, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -1379,13 +1379,13 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(8, 0, 15, 0.5)',
     borderRadius: 15,
     padding: 20, // Точно такой же padding как в сообщениях
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1414,13 +1414,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(8, 0, 15, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1520,7 +1520,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(8, 0, 15, 0.5)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
     marginHorizontal: 16,
@@ -1540,13 +1540,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(8, 0, 15, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1574,7 +1574,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderWidth: 1,
     borderColor: '#4CAF50',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1593,7 +1593,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1667,7 +1667,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,

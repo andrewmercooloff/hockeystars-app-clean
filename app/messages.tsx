@@ -304,7 +304,15 @@ export default function MessagesScreen() {
           </View>
           
           {/* Строка поиска */}
-          <View style={styles.searchContainer}>
+          <LinearGradient
+            colors={[
+              'rgba(8, 0, 15, 0.8)', 
+              'rgba(20, 0, 7, 0.8)'
+            ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.searchContainer}
+          >
             <View style={styles.searchInputContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
@@ -325,7 +333,7 @@ export default function MessagesScreen() {
                 </TouchableOpacity>
               )}
             </View>
-          </View>
+          </LinearGradient>
           
           {/* Список чатов */}
           <ScrollView 
@@ -359,12 +367,16 @@ export default function MessagesScreen() {
                   onPress={() => openChat(chat.player.id)}
                   activeOpacity={0.8}
                 >
-                  <LinearGradient
-                    colors={['#090f30', '#000000', '#190631']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.chatItem}
-                  >
+                  <View style={styles.chatGradientShadow}>
+                    <LinearGradient
+                      colors={[
+                        'rgba(8, 0, 15, 0.87)', 
+                        'rgba(20, 0, 7, 0.86)'
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.chatItem}
+                    >
                   <Image 
                     source={{ 
                       uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
@@ -416,6 +428,7 @@ export default function MessagesScreen() {
                     </Text>
                   </View>
                   </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               ))
             ) : null}
@@ -436,7 +449,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(8, 0, 15, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -457,7 +470,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(8, 0, 15, 0.8)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
   },
@@ -478,7 +491,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(8, 0, 15, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -508,13 +521,13 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(8, 0, 15, 0.8)',
     borderRadius: 15,
     padding: 20, // Уменьшили с 40 до 20 (в 2 раза)
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -543,17 +556,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    marginHorizontal: 16,
-    marginVertical: 6,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 5,
   },
   chatAvatar: {
     width: 50,
@@ -621,12 +624,11 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(8, 0, 15, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -649,5 +651,18 @@ const styles = StyleSheet.create({
   },
   clearSearchButton: {
     marginLeft: 8,
+  },
+  chatGradientShadow: {
+    marginHorizontal: 16,
+    marginVertical: 6,
+    borderRadius: 12,
+    shadowColor: '#08000F',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
   },
 }); 

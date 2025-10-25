@@ -87,7 +87,7 @@ export default function PlayerProfile() {
       case 'scout': 
         return '#8B5CF6'; // Фиолетовый для скаутов
       case 'admin': 
-        return '#000000'; // Черный для админов
+        return '#08000F'; // Глубокий темно-фиолетовый для админов
       case 'shop': 
         return '#4CAF50'; // Приглушенный зеленый для магазинов
       case 'skateSharpening': 
@@ -210,7 +210,7 @@ export default function PlayerProfile() {
       case 'star': return '#FFD700'; // Золотистый для звезд
       case 'coach': return '#fa2f40'; // Красный для тренеров
       case 'scout': return '#808080'; // Серый для скаутов
-      case 'admin': return '#000000'; // Черный для админов
+      case 'admin': return '#08000F'; // Глубокий темно-фиолетовый для админов
       default: return '#FFFFFF'; // Белый для обычных игроков
     }
   };
@@ -4100,15 +4100,15 @@ export default function PlayerProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
   },
   background: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(8, 0, 15, 0.6)',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -4175,10 +4175,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: '#000000', // Черный фон как у шайбы
+    backgroundColor: '#08000F', // Черный фон как у шайбы
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: '#08000F',
         shadowOffset: {
           width: 0,
           height: 3,
@@ -4292,7 +4292,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   addFriendButton: {
-    backgroundColor: '#000000',
+    backgroundColor: '#08000F',
     borderWidth: 1,
     borderColor: '#000000',
   },
@@ -4325,7 +4325,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+    backgroundColor: 'rgba(8, 0, 15, 0.7)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -4333,7 +4333,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.3)', 
     ...Platform.select({
       ios: {
-    shadowColor: '#000',
+    shadowColor: '#08000F',
         shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -4358,7 +4358,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 40,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(8, 0, 15, 0.8)',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
@@ -4500,7 +4500,7 @@ const styles = StyleSheet.create({
   },
   // Стили для секции запроса дружбы
   friendRequestSection: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(8, 0, 15, 0.8)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -4508,7 +4508,7 @@ const styles = StyleSheet.create({
     borderColor: '#fa2f40',
     ...Platform.select({
       ios: {
-    shadowColor: '#000',
+    shadowColor: '#08000F',
         shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -4555,7 +4555,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     ...Platform.select({
       ios: {
-    shadowColor: '#000',
+    shadowColor: '#08000F',
         shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -4621,7 +4621,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     minHeight: 40,
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4640,7 +4640,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 40,
     paddingRight: 20, // Добавляем отступ справа для стрелочки
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4661,7 +4661,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 8,
     alignSelf: 'flex-start', // Убираем растягивание по вертикали
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4691,7 +4691,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     minHeight: 40,
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4725,7 +4725,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     minHeight: 40,
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4745,7 +4745,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     minHeight: 40,
     textAlign: 'center',
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -4857,7 +4857,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(8, 0, 15, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -4894,7 +4894,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   teamsSection: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+    backgroundColor: 'rgba(8, 0, 15, 0.7)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -4902,7 +4902,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.3)', 
     ...Platform.select({
       ios: {
-    shadowColor: '#000',
+    shadowColor: '#08000F',
         shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -4991,7 +4991,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   datePickerModal: {
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,
@@ -5006,7 +5006,7 @@ const styles = StyleSheet.create({
   },
   datePickerButton: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#08000F',
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
@@ -5132,7 +5132,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editButtonText: {
-    color: '#000',
+    color: '#08000F',
   },
   compactButton: {
     paddingVertical: 8,
@@ -5204,7 +5204,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     ...Platform.select({
       ios: {
-    shadowColor: '#000',
+    shadowColor: '#08000F',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
         shadowRadius: 3.84,
@@ -5227,7 +5227,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   qrCodeContainer: {
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
     padding: 20,
     borderRadius: 12,
     borderWidth: 1,
@@ -5251,7 +5251,7 @@ const styles = StyleSheet.create({
   shareCard: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
   },
   shareCardGradient: {
     flex: 1,
@@ -5345,7 +5345,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   shareCardQRContainer: {
-    backgroundColor: '#000',
+    backgroundColor: '#08000F',
     padding: 15,
     borderRadius: 12,
     borderWidth: 2,
