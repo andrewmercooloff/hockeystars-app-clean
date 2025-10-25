@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   chatsContainer: {
     flex: 1,
-    paddingTop: 91, // Отступ для заголовка + поиска (еще на 1px выше)
+    paddingTop: 84, // Подняли чаты ближе к строке поиска на 7px
   },
   chatsContent: {
     paddingVertical: 8,
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   // Стили для поиска
   searchContainer: {
     position: 'absolute',
-    top: 36, // Подняли на 5px выше
+    top: 41, // Вернули обратно
     left: 0,
     right: 0,
     zIndex: 1001,
