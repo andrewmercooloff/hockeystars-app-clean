@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   chatsContainer: {
     flex: 1,
-    paddingTop: 84, // Подняли чаты ближе к строке поиска на 7px
+    paddingTop: 81, // Еще на 3px ближе к строке поиска
   },
   chatsContent: {
     paddingVertical: 8,
