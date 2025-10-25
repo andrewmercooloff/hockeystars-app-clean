@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   // Стили для поиска
   searchContainer: {
     position: 'absolute',
-    top: 41, // Еще на 1px выше
+    top: 36, // Подняли на 5px выше
     left: 0,
     right: 0,
     zIndex: 1001,
