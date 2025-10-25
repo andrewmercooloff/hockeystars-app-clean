@@ -838,6 +838,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginRight: 12,
+    marginTop: 3, // Опускаем поле ввода на 3 пикселя вниз
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
@@ -846,7 +847,7 @@ const styles = StyleSheet.create({
     borderColor: '#fa2f40',
   },
   sendButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     width: 40,
     height: 40,
     borderRadius: 20,
