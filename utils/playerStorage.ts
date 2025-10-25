@@ -2967,17 +2967,6 @@ export const clearPlayerExerciseStatsCache = async (playerId: string): Promise<v
   }
 };
 
-// Очистить кеш игрока
-export const clearPlayerCache = async (playerId: string): Promise<void> => {
-  try {
-    const cacheKey = `player_${playerId}`;
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    await AsyncStorage.removeItem(cacheKey);
-    console.log('💪 Кеш игрока очищен:', playerId);
-  } catch (error) {
-    console.error('❌ Ошибка очистки кеша игрока:', error);
-  }
-};
 
 // Получить статистику упражнений игрока с кешированием
 export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerExerciseStats | null> => {
