@@ -853,6 +853,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: -2,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
