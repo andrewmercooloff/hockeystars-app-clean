@@ -608,7 +608,8 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1001,
     paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingTop: 8,
+    paddingBottom: 0,
   },
   searchInputContainer: {
     flexDirection: 'row',
