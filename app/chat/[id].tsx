@@ -355,6 +355,23 @@ export default function ChatScreen() {
     return grouped;
   };
 
+  // Ответ на сообщение
+  const handleReplyToMessage = (message: Message) => {
+    try {
+      // Устанавливаем текст ответа в поле ввода
+      const replyText = `> ${message.text}\n\n`;
+      setNewMessage(replyText);
+      
+      // Прокручиваем к полю ввода
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+        console.log('Ответ на сообщение:', message.text);
+      }, 100);
+    } catch (error) {
+      console.error('Ошибка ответа на сообщение:', error);
+    }
+  };
+
   // Удаление одного сообщения
   const handleDeleteMessage = async (messageId: string) => {
     try {
@@ -418,6 +435,15 @@ export default function ChatScreen() {
           }
         }
       ]
+    );
+  };
+
+  // Рендер левой кнопки ответа при свайпе
+  const renderLeftActions = (message: Message) => {
+    return (
+      <View style={styles.replyButton}>
+        <Ionicons name="arrow-undo-outline" size={24} color="#fff" />
+      </View>
     );
   };
 
@@ -542,11 +568,15 @@ export default function ChatScreen() {
                         return (
                           <Swipeable
                             key={message.id}
+                            renderLeftActions={() => renderLeftActions(message)}
                             renderRightActions={renderRightActions}
-                            onSwipeableOpen={() => handleDeleteMessage(message.id)}
+                            onSwipeableLeftOpen={() => handleReplyToMessage(message)}
+                            onSwipeableRightOpen={() => handleDeleteMessage(message.id)}
                             overshootRight={false}
+                            overshootLeft={false}
                             friction={2}
                             rightThreshold={40}
+                            leftThreshold={40}
                           >
                             <View 
                               style={[
@@ -835,6 +865,13 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: 'rgba(255, 68, 68, 0.5)',
+  },
+  replyButton: {
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 60,
+    height: '100%',
   },
   deleteButton: {
     backgroundColor: 'transparent',
