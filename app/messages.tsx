@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 8,
   },
