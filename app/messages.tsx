@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1001,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   searchInputContainer: {
