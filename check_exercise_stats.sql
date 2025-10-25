@@ -10,11 +10,12 @@ SELECT
   CASE 
     WHEN exercise_stats IS NULL THEN 'NULL'
     WHEN exercise_stats = '' THEN 'EMPTY'
+    WHEN exercise_stats = 'null' THEN 'NULL_STRING'
     ELSE 'HAS_DATA'
   END as stats_status
 FROM players 
 WHERE status = 'player' 
-  AND (exercise_stats IS NOT NULL OR exercise_stats != '')
+  AND (exercise_stats IS NOT NULL AND exercise_stats != '')
 LIMIT 10;
 
 -- 2. Проверяем примеры данных exercise_stats

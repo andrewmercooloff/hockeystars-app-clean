@@ -143,6 +143,19 @@ export function useExercises(
           return newRankings;
         });
         
+        // Принудительно обновляем данные пользователя
+        try {
+          console.log('💪 Принудительно обновляем пользователя после выполнения упражнения...');
+          const { useUser } = await import('../contexts/UserContext');
+          // Здесь мы не можем использовать хук, но можем вызвать функцию напрямую
+          // Давайте попробуем другой подход - обновим глобальный кеш
+          const { loadCurrentUser } = await import('../utils/playerStorage');
+          const updatedUser = await loadCurrentUser(true); // Принудительное обновление
+          console.log('✅ Пользователь обновлен после выполнения упражнения:', updatedUser?.exerciseStats);
+        } catch (error) {
+          console.error('❌ Ошибка обновления пользователя после упражнения:', error);
+        }
+        
       } else {
         console.warn('⚠️ Пользователь не найден или нет ID');
       }

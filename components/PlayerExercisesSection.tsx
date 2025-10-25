@@ -25,7 +25,9 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   const loadExerciseStats = async () => {
     try {
+      console.log('💪 Загружаем статистику упражнений для игрока:', player.id);
       const stats = await getPlayerExerciseStats(player.id);
+      console.log('💪 Получена статистика упражнений:', stats);
       setExerciseStats(stats);
       
       // Загружаем названия упражнений только если их нет в кеше

@@ -6,6 +6,7 @@ interface UserContextType {
   currentUser: Player | null;
   setCurrentUser: (user: Player | null) => void;
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
+  refreshUserAfterExercise: () => Promise<void>;
   isUserLoading: boolean;
 }
 
@@ -83,6 +84,28 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [setCurrentUser]);
 
+  const refreshUserAfterExercise = useCallback(async () => {
+    try {
+      console.log('💪 Принудительно обновляем пользователя после выполнения упражнения...');
+      
+      // Очищаем все связанные кеши
+      await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+      await dataCache.remove(CACHE_KEYS.USER_STATS);
+      await dataCache.remove(CACHE_KEYS.EXERCISE_RANKINGS);
+      
+      // Очищаем глобальный кеш
+      globalUserCache = null;
+      
+      // Принудительно загружаем пользователя
+      const user = await loadCurrentUser(true);
+      setCurrentUser(user);
+      
+      console.log('✅ Пользователь обновлен после выполнения упражнения:', user?.exerciseStats);
+    } catch (error) {
+      console.error('❌ Ошибка обновления пользователя после упражнения:', error);
+    }
+  }, [setCurrentUser]);
+
   // Автоматическая загрузка пользователя при инициализации
   React.useEffect(() => {
     // Загружаем пользователя только если нет кеша
@@ -99,6 +122,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       currentUser, 
       setCurrentUser, 
       refreshUser, 
+      refreshUserAfterExercise,
       isUserLoading 
     }}>
       {children}

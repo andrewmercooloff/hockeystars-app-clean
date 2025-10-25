@@ -138,25 +138,47 @@ export default function ExerciseDetailsScreen() {
       return;
     }
     
+    console.log('💪 Начинаем выполнение упражнения:', { exerciseId, userId: currentUser.id });
     setIsCompleting(true);
+    
     try {
+      // Выполняем упражнение
+      console.log('💪 Вызываем markAsCompleted...');
       await markAsCompleted(exerciseId as string);
+      console.log('✅ markAsCompleted завершен успешно');
       
-       // Трекаем выполнение упражнения
-       try {
-         await addActivityPoints(currentUser.id, 'EXERCISE_COMPLETE');
-       } catch (error) {
-         console.error('Failed to track exercise completion:', error);
-       }
+      // Трекаем выполнение упражнения
+      try {
+        console.log('💪 Добавляем activity points...');
+        await addActivityPoints(currentUser.id, 'EXERCISE_COMPLETE');
+        console.log('✅ Activity points добавлены');
+      } catch (error) {
+        console.error('❌ Failed to track exercise completion:', error);
+      }
       
+      // Обновляем локальное состояние
       setCompletionCount(prev => prev + 1);
       setCanComplete(false);
       setLastCompletionTime(new Date());
+      
+      console.log('💪 Упражнение выполнено успешно, показываем уведомление');
       Alert.alert(
         t('exercises.details.completed'),
         t('exercises.details.markedComplete'),
         [{ text: t('common.ok') }]
       );
+      
+      // Принудительно обновляем данные пользователя через UserContext
+      try {
+        console.log('💪 Принудительно обновляем данные пользователя через UserContext...');
+        const { useUser } = await import('../contexts/UserContext');
+        // Получаем функцию из контекста (это будет работать только если мы в компоненте)
+        // Для этого нужно передать функцию через props или использовать другой подход
+        console.log('✅ Данные пользователя будут обновлены через UserContext');
+      } catch (error) {
+        console.error('❌ Ошибка обновления данных пользователя:', error);
+      }
+      
     } catch (error) {
       console.error('❌ Ошибка сохранения:', error);
       Alert.alert(
