@@ -11,7 +11,7 @@ export default function SearchGradientBackground({ children, style }: SearchGrad
   return (
     <View style={[styles.container, style]}>
       <LinearGradient
-        colors={['rgba(0, 0, 0, 0.8)', 'rgba(13, 0, 18, 0.8)']}
+        colors={['rgba(128, 128, 140, 0.6)', 'rgba(100, 120, 150, 0.6)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
