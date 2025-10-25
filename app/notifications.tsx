@@ -1015,6 +1015,8 @@ export default function NotificationsScreen() {
                 overshootRight={false}
                 friction={2}
                 rightThreshold={40}
+                enableTrackpadTwoFingerGesture={true}
+                containerStyle={{ backgroundColor: 'transparent' }}
               >
                 <AnimatedNotification key={notification.id} index={index} isNew={newNotificationIds.has(notification.id)}>
                   {notification.type === 'stats_change' && notification.data && notification.data.changes ? (
