@@ -42,7 +42,6 @@ import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
-import GradientOverlay from '../components/GradientOverlay';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -650,7 +649,7 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'exercise_completed') {
         // Для уведомлений о выполненных упражнениях показываем конкретное упражнение
         if (notification.data && notification.data.exerciseId) {
-          router.push(`/exercise/${notification.data.exerciseId}`);
+          router.push(`/exercise-details?id=${notification.data.exerciseId}`);
         } else if (notification.data && notification.data.changedPlayerId) {
           // Fallback на профиль игрока с упражнениями
           router.push(`/player/${notification.data.changedPlayerId}?scrollToExercises=true`);
@@ -938,7 +937,7 @@ export default function NotificationsScreen() {
           style={styles.background} 
           resizeMode="cover"
         >
-          <GradientOverlay>
+          <View style={styles.overlay}>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -948,7 +947,7 @@ export default function NotificationsScreen() {
             <View style={styles.loadingCenter}>
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
-          </GradientOverlay>
+          </View>
         </ImageBackground>
       </View>
     );
@@ -961,7 +960,7 @@ export default function NotificationsScreen() {
         style={styles.container}
       >
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-        <GradientOverlay>
+        <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -1284,7 +1283,7 @@ export default function NotificationsScreen() {
               </View>
             )}
           </ScrollView>
-        </GradientOverlay>
+        </View>
       </ImageBackground>
       </View>
     </GestureHandlerRootView>
@@ -1298,6 +1297,10 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,

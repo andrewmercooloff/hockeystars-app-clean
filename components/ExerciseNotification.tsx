@@ -76,10 +76,7 @@ export default function ExerciseNotification({
                  {t('exerciseNotification.completed')} "{getLocalizedExerciseName(exerciseId)}"
                </Text>
           <View style={styles.exerciseBadge}>
-            <Ionicons name="fitness-outline" size={14} color="#fff" />
-            <Text style={styles.badgeText}>
-              {t('exerciseNotification.exercise')}
-            </Text>
+            <Ionicons name="fitness-outline" size={16} color="#fff" />
           </View>
         </View>
       </View>
@@ -148,11 +145,13 @@ const styles = StyleSheet.create({
   exerciseBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FF9800',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 6,
     borderRadius: 12,
-    minWidth: 32,
+    width: 32,
+    height: 32,
   },
   badgeText: {
     color: '#fff',

@@ -26,9 +26,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
-import GradientOverlay from '../components/GradientOverlay';
-import ChatGradientBackground from '../components/ChatGradientBackground';
-import SearchGradientBackground from '../components/SearchGradientBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -49,9 +46,9 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const focusRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const focusRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
@@ -275,7 +272,7 @@ export default function MessagesScreen() {
           style={styles.background} 
           resizeMode="cover"
         >
-          <GradientOverlay>
+          <View style={styles.overlay}>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -285,7 +282,7 @@ export default function MessagesScreen() {
             <View style={styles.loadingCenter}>
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
-          </GradientOverlay>
+          </View>
         </ImageBackground>
       </View>
     );
@@ -296,7 +293,7 @@ export default function MessagesScreen() {
       style={styles.container}
     >
       <OptimizedBackground useLedBackground style={styles.background} resizeMode="cover">
-        <GradientOverlay>
+        <View style={styles.overlay}>
           {/* Заголовок страницы с поиском */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -307,12 +304,12 @@ export default function MessagesScreen() {
           
           {/* Строка поиска */}
           <View style={styles.searchContainer}>
-            <SearchGradientBackground style={styles.searchInputContainer}>
-              <Ionicons name="search" size={18} color="#fff" style={styles.searchIcon} />
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder={t('messages.searchPlaceholder')}
-                placeholderTextColor="#fff"
+                placeholderTextColor="#888"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoCapitalize="none"
@@ -323,10 +320,10 @@ export default function MessagesScreen() {
                   onPress={() => setSearchQuery('')}
                   style={styles.clearSearchButton}
                 >
-                  <Ionicons name="close-circle" size={18} color="#fff" />
+                  <Ionicons name="close-circle" size={20} color="#888" />
                 </TouchableOpacity>
               )}
-            </SearchGradientBackground>
+            </View>
           </View>
           
           {/* Список чатов */}
@@ -358,11 +355,10 @@ export default function MessagesScreen() {
               filteredChats.map((chat) => (
                 <TouchableOpacity
                   key={chat.player.id}
-                  style={styles.chatItemContainer}
+                  style={styles.chatItem}
                   onPress={() => openChat(chat.player.id)}
                   activeOpacity={0.8}
                 >
-                  <ChatGradientBackground style={styles.chatItem}>
                   <Image 
                     source={{ 
                       uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
@@ -413,12 +409,11 @@ export default function MessagesScreen() {
                        chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                     </Text>
                   </View>
-                  </ChatGradientBackground>
                 </TouchableOpacity>
               ))
             ) : null}
           </ScrollView>
-        </GradientOverlay>
+        </View>
       </OptimizedBackground>
     </View>
   );
@@ -431,6 +426,10 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -490,7 +489,7 @@ const styles = StyleSheet.create({
   },
   chatsContainer: {
     flex: 1,
-    paddingTop: 81, // Еще на 3px ближе к строке поиска
+    paddingTop: 91, // Отступ для заголовка + поиска (еще на 1px выше)
   },
   chatsContent: {
     paddingVertical: 8,
@@ -532,16 +531,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20, // Уменьшили с 40 до 20 (в 2 раза)
   },
-  chatItemContainer: {
-    marginHorizontal: 16,
-    marginVertical: 6,
-  },
   chatItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    marginHorizontal: 16,
+    marginVertical: 6,
     borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 5,
   },
   chatAvatar: {
     width: 50,
@@ -603,25 +609,28 @@ const styles = StyleSheet.create({
   // Стили для поиска
   searchContainer: {
     position: 'absolute',
-    top: 41, // Вернули обратно
+    top: 41, // Еще на 1px выше
     left: 0,
     right: 0,
     zIndex: 1001,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 6,
-    height: 32,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: '#fa2f40',
+    height: 40,
     width: '100%',
   },
   searchIcon: {
     marginRight: 10,
-    color: '#fff',
   },
   searchInput: {
     flex: 1,
