@@ -3637,6 +3637,9 @@ export default function PlayerProfile() {
                     logoSize={80}
                     logoBackgroundColor="#fff"
                     logoBorderRadius={40}
+                    logoMargin={4}
+                    logoBorderWidth={6}
+                    logoBorderColor="#fa2f40"
                   />
                 </View>
               </View>
