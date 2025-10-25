@@ -1771,11 +1771,11 @@ export const getConversation = async (userId1: string, userId2: string): Promise
 // Упрощенная отправка сообщения
 export const sendMessageSimple = async (senderId: string, receiverId: string, text: string): Promise<boolean> => {
   try {
-    console.log('📨 ОТПРАВКА СООБЩЕНИЯ:', {
-      senderId,
-      receiverId,
-      text: text.substring(0, 30) + '...'
-    });
+    // console.log('📨 ОТПРАВКА СООБЩЕНИЯ:', {
+    //   senderId,
+    //   receiverId,
+    //   text: text.substring(0, 30) + '...'
+    // });
     
     const message = {
       senderId,
@@ -1988,14 +1988,14 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     // Если from_id != userId1, то from_id и есть отправитель
     const senderId = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
     
-    console.log('📝 Отправка уведомления о принятии:', {
-      acceptorId: userId1,
-      acceptorName: acceptorData?.name,
-      acceptorAvatar: acceptorData?.avatar,
-      senderId: senderId,
-      requestFromId: requestData?.from_id,
-      requestToId: requestData?.to_id
-    });
+    // console.log('📝 Отправка уведомления о принятии:', {
+    //   acceptorId: userId1,
+    //   acceptorName: acceptorData?.name,
+    //   acceptorAvatar: acceptorData?.avatar,
+    //   senderId: senderId,
+    //   requestFromId: requestData?.from_id,
+    //   requestToId: requestData?.to_id
+    // });
     
     // Создаем уведомление для ОТПРАВИТЕЛЯ запроса о том, что его запрос принят
     if (acceptorData && senderId) {
@@ -2997,10 +2997,10 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
     }
     
     // console.log('💪 Данные игрока загружены:', { 
-      id: player.id, 
-      name: player.name, 
-      exerciseStats: player.exerciseStats 
-    });
+    //   id: player.id, 
+    //   name: player.name, 
+    //   exerciseStats: player.exerciseStats 
+    // });
     
     let stats: PlayerExerciseStats;
     
@@ -4499,13 +4499,13 @@ export const notifyFriendsAboutChanges = async (
         continue;
       }
       
-      console.log('💾 Сохраняем уведомление:', {
-        id: notification.id,
-        user_id: notification.user_id,
-        type: notification.type,
-        title: notification.title,
-        data: notification.data
-      });
+      // console.log('💾 Сохраняем уведомление:', {
+      //   id: notification.id,
+      //   user_id: notification.user_id,
+      //   type: notification.type,
+      //   title: notification.title,
+      //   data: notification.data
+      // });
       
       const { error: insertError } = await supabase
         .from('notifications')
