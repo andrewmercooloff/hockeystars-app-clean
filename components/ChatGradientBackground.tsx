@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 4,
     },
-    shadowOpacity: 1.0,
-    shadowRadius: 12,
-    elevation: 16,
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 8,
   },
   gradient: {
     position: 'absolute',
