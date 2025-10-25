@@ -756,7 +756,7 @@ export default function CreateUserScreen() {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
   },
   background: {
     flex: 1,

@@ -825,7 +825,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#050008',
   },
   modalContainer: {
     flex: 1,
@@ -964,7 +964,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   statusOptionTextSelected: {
-    color: '#000',
+    color: '#050008',
     fontWeight: 'bold',
   },
   modalFooter: {
@@ -1008,7 +1008,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(5, 0, 8, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
@@ -1176,13 +1176,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(5, 0, 8, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
   },
   datePickerModal: {
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,

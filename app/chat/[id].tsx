@@ -653,14 +653,14 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#08000F',
+    backgroundColor: '#050008',
   },
   background: {
     flex: 1,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(8, 0, 15, 0.2)',
+    backgroundColor: 'rgba(5, 0, 8, 0.2)',
   },
   loadingContainer: {
     flex: 1,
@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: 'rgba(8, 0, 15, 0.6)',
+    backgroundColor: 'rgba(5, 0, 8, 0.6)',
   },
   backButton: {
     marginRight: 12,
@@ -747,14 +747,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
-    backgroundColor: 'rgba(8, 0, 15, 0.5)',
+    backgroundColor: 'rgba(5, 0, 8, 0.5)',
     borderRadius: 15,
     marginHorizontal: 60,
     marginVertical: 10,
     padding: 15,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
-    shadowColor: '#08000F',
+    shadowColor: '#050008',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
-    shadowColor: '#08000F',
+    shadowColor: '#050008',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   otherBubble: {
-    backgroundColor: '#08000F',
+    backgroundColor: '#050008',
     borderBottomLeftRadius: 4,
   },
   messageText: {
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: 'rgba(8, 0, 15, 0.8)',
+    backgroundColor: 'rgba(5, 0, 8, 0.8)',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: -2,
-    shadowColor: '#08000F',
+    shadowColor: '#050008',
     shadowOffset: {
       width: 0,
       height: 2,

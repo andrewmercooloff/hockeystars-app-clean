@@ -1140,14 +1140,14 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
   },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(5, 0, 8, 0.75)',
     borderRadius: 20,
     padding: 25,
     marginTop: 20,
@@ -1234,13 +1234,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(5, 0, 8, 0.75)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   datePickerModal: {
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,

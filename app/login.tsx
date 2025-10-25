@@ -579,7 +579,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
   },
   hockeyRinkContainer: {
     flex: 1,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
     borderWidth: 4, // Увеличили толщину границы
     borderColor: 'rgba(255, 255, 255, 0.8)', // Сделали границу более заметной
     overflow: 'hidden', // Обрезаем содержимое по границам
-    boxShadow: '0 8px 8px rgba(0, 0, 0, 0.4)',
+    boxShadow: '0 8px 8px rgba(5, 0, 8, 0.4)',
     elevation: 12,
   },
   innerBorder: {
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(5, 0, 8, 0.9)',
     borderRadius: 20,
     padding: 25,
     margin: 20,
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     maxWidth: Platform.OS === 'web' ? 400 : 'auto', // Ограничиваем максимальную ширину
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
-    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.5)',
+    boxShadow: '0 10px 20px rgba(5, 0, 8, 0.5)',
     elevation: 10,
   },
   modalHeader: {

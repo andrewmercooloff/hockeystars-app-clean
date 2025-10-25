@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: '#050008',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
       web: {
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0px 2px 4px rgba(5, 0, 8, 0.3)',
       },
     }),
   },

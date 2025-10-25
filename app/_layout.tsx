@@ -29,8 +29,8 @@ SplashScreen.preventAutoHideAsync();
 
 // Устанавливаем черный фон для веб-версии
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
-  document.body.style.backgroundColor = '#000000';
-  document.documentElement.style.backgroundColor = '#000000';
+  document.body.style.backgroundColor = '#050008';
+  document.documentElement.style.backgroundColor = '#050008';
 }
 
 // Отключаем все предупреждения
@@ -102,7 +102,7 @@ export default function RootLayout() {
           alignItems: 'center',
           width: size + 4,
           height: size + 4,
-          backgroundColor: '#000',
+          backgroundColor: '#050008',
           borderRadius: 20,
           padding: 2,
         }}
@@ -643,7 +643,7 @@ export default function RootLayout() {
             <GestureHandlerRootView style={{ flex: 1 }}>
               <StatusBar 
                 barStyle="light-content" 
-                backgroundColor="#000000" 
+                backgroundColor="#050008" 
                 translucent={false}
                 hidden={false}
               />
@@ -655,7 +655,7 @@ export default function RootLayout() {
             screenOptions={{
               headerShown: false, // Убираем встроенные хедеры
               tabBarStyle: { 
-                backgroundColor: '#000', 
+                backgroundColor: '#050008', 
                 borderTopWidth: 0,
                 height: 80,
                 paddingBottom: Platform.OS === 'android' ? 0 : 10, // Убираем отступ снизу для Android
@@ -862,7 +862,7 @@ export default function RootLayout() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: '#000',
+              backgroundColor: '#050008',
               justifyContent: 'center',
               alignItems: 'center',
               zIndex: 9999,

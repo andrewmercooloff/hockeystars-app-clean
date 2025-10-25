@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(5, 0, 8, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -789,7 +789,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(5, 0, 8, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -812,7 +812,7 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(5, 0, 8, 0.9)',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     zIndex: 10000,
     elevation: 10000,
-    shadowColor: '#000',
+    shadowColor: '#050008',
     shadowOffset: {
       width: 0,
       height: 4,

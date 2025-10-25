@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(5, 0, 8, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(5, 0, 8, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 0, // Убираем горизонтальные отступы
     paddingVertical: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(5, 0, 8, 0.9)',
   },
   categoriesScroll: {
     flexDirection: 'row',
@@ -571,13 +571,13 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   exerciseCard: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(5, 0, 8, 0.7)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#000',
+    shadowColor: '#050008',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#050008',
     padding: 20,
   },
   errorText: {
@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
     zIndex: 1001, // Выше категорий (999)
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(5, 0, 8, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',
