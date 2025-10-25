@@ -62,7 +62,7 @@ const iceBg = require('../../assets/images/led.jpg');
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises } = useLocalSearchParams();
   const router = useRouter();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
@@ -70,6 +70,11 @@ export default function PlayerProfile() {
   const { currentUser: globalCurrentUser, refreshUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
+  const statsRef = useRef<View>(null);
+  const photosRef = useRef<View>(null);
+  const videosRef = useRef<View>(null);
+  const achievementsRef = useRef<View>(null);
+  const exercisesRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)

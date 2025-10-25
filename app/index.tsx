@@ -109,7 +109,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         leftOffset: 5,
         topOffset: 5,
         rightOffset: 5,
-        bottomOffset: 225 // Уменьшено на 10 для большего пространства снизу
+        bottomOffset: 218 // Уменьшено на 7px чтобы шайбы долетали до нижней границы
       };
     } else if (Platform.OS === 'web') {
       // Для Web используем более строгие границы
