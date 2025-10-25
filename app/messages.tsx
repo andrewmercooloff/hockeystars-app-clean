@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 // Убираем все анимации переходов
 import {
     getPlayerById,
@@ -355,10 +356,15 @@ export default function MessagesScreen() {
               filteredChats.map((chat) => (
                 <TouchableOpacity
                   key={chat.player.id}
-                  style={styles.chatItem}
                   onPress={() => openChat(chat.player.id)}
                   activeOpacity={0.8}
                 >
+                  <LinearGradient
+                    colors={['#090f30', '#000000', '#190631']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.chatItem}
+                  >
                   <Image 
                     source={{ 
                       uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
@@ -409,6 +415,7 @@ export default function MessagesScreen() {
                        chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                     </Text>
                   </View>
+                  </LinearGradient>
                 </TouchableOpacity>
               ))
             ) : null}
@@ -536,7 +543,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
