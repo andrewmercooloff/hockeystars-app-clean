@@ -58,8 +58,8 @@ export const uploadImageToStorage = async (imageUri: string, fileName?: string):
       try {
         const result = await ImageManipulator.manipulateAsync(
           imageUri,
-          [{ resize: { width: 400 } }], // Уменьшенный размер для аватаров (миниатюры 40-120px)
-          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // JPEG для аватаров - экономия места
+          [{ resize: { width: 200 } }], // Уменьшенный размер для аватаров (200px)
+          { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } // JPEG для аватаров с сжатием 0.8
         );
         
         processedImageUri = result.uri;
