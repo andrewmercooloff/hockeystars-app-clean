@@ -308,7 +308,7 @@ export default function MessagesScreen() {
           {/* Строка поиска */}
           <View style={styles.searchContainer}>
             <SearchGradientBackground style={styles.searchInputContainer}>
-              <Ionicons name="search" size={20} color="#fff" style={styles.searchIcon} />
+              <Ionicons name="search" size={18} color="#fff" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder={t('messages.searchPlaceholder')}
@@ -323,7 +323,7 @@ export default function MessagesScreen() {
                   onPress={() => setSearchQuery('')}
                   style={styles.clearSearchButton}
                 >
-                  <Ionicons name="close-circle" size={20} color="#fff" />
+                  <Ionicons name="close-circle" size={18} color="#fff" />
                 </TouchableOpacity>
               )}
             </SearchGradientBackground>
@@ -608,14 +608,14 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1001,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 8,
-    height: 40,
+    paddingVertical: 6,
+    height: 32,
     width: '100%',
   },
   searchIcon: {
