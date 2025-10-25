@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(128, 128, 128, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
