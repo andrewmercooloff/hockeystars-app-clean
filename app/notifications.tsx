@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -1198,34 +1199,43 @@ export default function NotificationsScreen() {
               ) : (
               <TouchableOpacity
                 key={notification.id}
-                style={styles.notificationItem}
                 onPress={() => {
                   handleNotificationPress(notification);
                 }}
                 activeOpacity={0.7}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <View style={styles.notificationIcon}>
-                  <Ionicons 
-                    name={getNotificationIcon(notification.type) as any} 
-                    size={24} 
-                    color="#fa2f40" 
-                  />
-                </View>
-                
-                <View style={styles.notificationContent}>
-                  <View style={styles.notificationHeader}>
-                    <Text style={styles.notificationTitle} numberOfLines={2}>
-                      {notification.title}
-                    </Text>
-                    <Text style={styles.notificationTime}>
-                      {formatTime(notification.timestamp)}
-                    </Text>
+                <View style={styles.notificationGradientShadow}>
+                  <LinearGradient
+                    colors={[
+                      'rgba(8, 0, 15, 0.87)', 
+                      'rgba(20, 0, 7, 0.86)'
+                    ]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.notificationItem}
+                  >
+                  <View style={styles.notificationIcon}>
+                    <Ionicons 
+                      name={getNotificationIcon(notification.type) as any} 
+                      size={24} 
+                      color="#fa2f40" 
+                    />
                   </View>
                   
-                  <Text style={styles.notificationMessage}>
-                    {notification.message}
-                  </Text>
+                  <View style={styles.notificationContent}>
+                    <View style={styles.notificationHeader}>
+                      <Text style={styles.notificationTitle} numberOfLines={2}>
+                        {notification.title}
+                      </Text>
+                      <Text style={styles.notificationTime}>
+                        {formatTime(notification.timestamp)}
+                      </Text>
+                    </View>
+                    
+                    <Text style={styles.notificationMessage}>
+                      {notification.message}
+                    </Text>
                   
                   {notification.playerAvatar && (
                     <View style={styles.playerInfo}>
@@ -1261,6 +1271,8 @@ export default function NotificationsScreen() {
                       </TouchableOpacity>
                     </View>
                   )}
+                  </View>
+                  </LinearGradient>
                 </View>
               </TouchableOpacity>
               )}
@@ -1273,12 +1285,22 @@ export default function NotificationsScreen() {
             {/* Показываем пустое состояние только если нет ни уведомлений, ни запросов в друзья, ни запросов на подарки И не идет загрузка */}
             {notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading && (
               <View style={styles.emptyContainer}>
-                <View style={styles.emptyContent}>
+                <View style={styles.emptyGradientShadow}>
+                  <LinearGradient
+                    colors={[
+                      'rgba(8, 0, 15, 0.87)', 
+                      'rgba(20, 0, 7, 0.86)'
+                    ]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.emptyContent}
+                  >
                   <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
                   <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
                   <Text style={styles.emptySubtitle}>
                     {t('notifications.noNotificationsSubtitle')}
                   </Text>
+                  </LinearGradient>
                 </View>
               </View>
             )}
@@ -1379,21 +1401,23 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
     borderRadius: 15,
     padding: 20, // Точно такой же padding как в сообщениях
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
+    marginHorizontal: 16, // Такая же ширина как у элементов чатов
+  },
+  emptyGradientShadow: {
+    borderRadius: 15,
     shadowColor: '#050008',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 6,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginHorizontal: 16, // Такая же ширина как у элементов чатов
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
   },
   emptyTitle: {
     color: '#FFFFFF', // Изменили с #fff на #FFFFFF (белый)
@@ -1414,21 +1438,25 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
+    minHeight: 80,
+  },
+  notificationGradientShadow: {
+    marginHorizontal: 16,
+    marginVertical: 6,
+    borderRadius: 12,
     shadowColor: '#050008',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 6,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    minHeight: 80,
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
   },
   notificationIcon: {
     width: 40,

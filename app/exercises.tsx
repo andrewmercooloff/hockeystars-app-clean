@@ -12,6 +12,7 @@ import {
     ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -256,19 +257,28 @@ export default function ExercisesScreen() {
                   {sortedExercises.map((exercise) => (
                     <TouchableOpacity
                       key={exercise.id}
-                      style={styles.exerciseCard}
                       onPress={() => router.push(`/exercise-details?id=${exercise.id}`)}
                       activeOpacity={0.8}
                     >
+                      <View style={styles.exerciseGradientShadow}>
+                        <LinearGradient
+                          colors={[
+                            'rgba(8, 0, 15, 0.87)', 
+                            'rgba(20, 0, 7, 0.86)'
+                          ]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={styles.exerciseCard}
+                        >
                       <View style={styles.exerciseHeader}>
                         <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-                        <View style={styles.exerciseBadges}>
-                          <View style={styles.difficultyBadge}>
+                        <View style={styles.exerciseMeta}>
+                          <View style={styles.difficultyContainer}>
                             <Text style={styles.difficultyText}>
                               {translateDifficulty(exercise.difficulty)}
                             </Text>
                           </View>
-                          <View style={styles.categoryBadge}>
+                          <View style={styles.categoryContainer}>
                             <Text style={styles.categoryText}>
                               {translateCategory(exercise.category)}
                             </Text>
@@ -281,19 +291,21 @@ export default function ExercisesScreen() {
                       </Text>
                       
                       <View style={styles.exerciseFooter}>
-                        <View style={styles.exerciseStats}>
+                        <View style={styles.exerciseMeta}>
                           <Ionicons name="time-outline" size={16} color="#888" />
-                          <Text style={styles.exerciseDuration}>{exercise.duration}</Text>
+                          <Text style={styles.difficultyText}>{exercise.duration}</Text>
                         </View>
                         
                         {userStats[exercise.id] > 0 && (
-                          <View style={styles.completionBadge}>
+                          <View style={styles.categoryContainer}>
                             <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                            <Text style={styles.completionText}>
+                            <Text style={styles.categoryText}>
                               {userStats[exercise.id]} {userStats[exercise.id] === 1 ? t('exercises.times') : t('exercises.timesPlural')}
                             </Text>
                           </View>
                         )}
+                      </View>
+                        </LinearGradient>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -393,7 +405,6 @@ export default function ExercisesScreen() {
             {sortedExercises.map((exercise, index) => (
               <TouchableOpacity
                 key={`${exercise.exerciseId}-${index}`}
-                style={styles.exerciseCard}
                 onPress={() => {
                   // Навигация к деталям упражнения
                   try {
@@ -408,6 +419,16 @@ export default function ExercisesScreen() {
                   }
                 }}
               >
+                <View style={styles.exerciseGradientShadow}>
+                  <LinearGradient
+                    colors={[
+                      'rgba(8, 0, 15, 0.87)', 
+                      'rgba(20, 0, 7, 0.86)'
+                    ]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.exerciseCard}
+                  >
                 <View style={styles.exerciseHeader}>
                   <View style={styles.exerciseInfo}>
                     <View style={styles.exerciseTitleRow}>
@@ -465,6 +486,8 @@ export default function ExercisesScreen() {
                     <Ionicons name="checkmark" size={16} color="#fa2f40" />
                     <Text style={styles.categoryText}>{translateCategory(exercise.category)}</Text>
                   </View>
+                </View>
+                  </LinearGradient>
                 </View>
               </TouchableOpacity>
             ))}
@@ -571,20 +594,23 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   exerciseCard: {
-    backgroundColor: 'rgba(5, 0, 8, 0.7)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
+  },
+  exerciseGradientShadow: {
+    marginBottom: 12,
+    borderRadius: 12,
     shadowColor: '#050008',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 6,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
   },
   exerciseHeader: {
     flexDirection: 'row',
