@@ -122,6 +122,9 @@ export function useExercises(
         // Инвалидируем кеш статистики пользователя
         await dataCache.invalidate(`${CACHE_KEYS.USER_STATS}_${user.id}`);
         
+        // Инвалидируем кеш рейтинга упражнений
+        await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
+        
         // Обновляем локальную статистику
         setUserStats(prev => {
           const newStats = {
@@ -129,6 +132,15 @@ export function useExercises(
             [exerciseId]: (prev[exerciseId] || 0) + 1
           };
           return newStats;
+        });
+        
+        // Обновляем локальный рейтинг упражнений
+        setExerciseRankings(prev => {
+          const newRankings = {
+            ...prev,
+            [exerciseId]: (prev[exerciseId] || 0) + 1
+          };
+          return newRankings;
         });
         
       } else {

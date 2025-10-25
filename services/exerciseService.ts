@@ -319,13 +319,18 @@ export class ExerciseService {
         [exerciseId]: (currentStats[exerciseId] || 0) + 1
       };
       
-
       // Обновляем статистику в базе данных
       const exerciseStatsData = {
         completions: newStats,
         totalCompletions: Object.values(newStats).reduce((sum, count) => sum + count, 0)
       };
       
+      console.log('💪 Обновляем статистику упражнений:', {
+        userId,
+        exerciseId,
+        newStats,
+        totalCompletions: exerciseStatsData.totalCompletions
+      });
       
       const { error } = await supabase
         .from('players')
@@ -339,6 +344,16 @@ export class ExerciseService {
         throw error;
       }
       
+      console.log('✅ Статистика упражнений успешно обновлена в базе данных');
+      
+      // Инвалидируем кеш рейтинга упражнений
+      try {
+        const { dataCache, CACHE_KEYS } = await import('../utils/dataCache');
+        await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
+        console.log('✅ Кеш рейтинга упражнений инвалидирован');
+      } catch (cacheError) {
+        console.warn('⚠️ Не удалось инвалидировать кеш рейтинга:', cacheError);
+      }
       
       // Обновляем локальный кэш пользователя
       try {
@@ -351,6 +366,7 @@ export class ExerciseService {
             totalCompletions: exerciseStatsData.totalCompletions
           } as any;
           await saveCurrentUser(currentUser);
+          console.log('✅ Локальный кэш пользователя обновлен');
         }
       } catch (cacheError) {
         console.warn('⚠️ Не удалось обновить локальный кэш:', cacheError);

@@ -21,7 +21,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   useEffect(() => {
     loadExerciseStats();
-  }, [player.id]); // Убираем зависимость от exerciseStats
+  }, [player.id, player.exerciseStats]); // Добавляем зависимость от exerciseStats для обновления
 
   const loadExerciseStats = async () => {
     try {
