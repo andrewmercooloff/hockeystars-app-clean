@@ -197,7 +197,14 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 8,
+        elevation: 12,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
       },
       web: {
         boxShadow: '0 3px 4px rgba(0, 0, 0, 0.8)',
@@ -222,7 +229,14 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 8,
+        elevation: 12,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
       },
       web: {
         boxShadow: '0 3px 4px rgba(0, 0, 0, 0.8)',
@@ -244,7 +258,14 @@ const styles = StyleSheet.create({
         shadowRadius: 1,
       },
       android: {
-        elevation: 3,
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.4,
+        shadowRadius: 3,
       },
       web: {
         boxShadow: '0 1px 1px rgba(0, 0, 0, 0.6)',
@@ -302,7 +323,14 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
       },
       android: {
-        elevation: 4,
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
       },
       web: {
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.7)',
