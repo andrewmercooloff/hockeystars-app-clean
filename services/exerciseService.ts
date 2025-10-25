@@ -377,9 +377,10 @@ export class ExerciseService {
       
       // Очищаем кеш статистики упражнений для пользователя
       try {
-        const { clearPlayerExerciseStatsCache } = await import('../utils/playerStorage');
+        const { clearPlayerExerciseStatsCache, clearPlayerCache } = await import('../utils/playerStorage');
         await clearPlayerExerciseStatsCache(userId);
-        console.log('✅ Кеш статистики упражнений пользователя очищен');
+        await clearPlayerCache(userId); // Очищаем основной кеш игрока
+        console.log('✅ Кеш статистики упражнений и кеш игрока очищены');
       } catch (cacheError) {
         console.warn('⚠️ Не удалось очистить кеш статистики упражнений:', cacheError);
       }

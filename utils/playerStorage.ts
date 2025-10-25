@@ -1331,10 +1331,12 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     if (cachedData) {
       const { player, timestamp } = JSON.parse(cachedData);
       if (Date.now() - timestamp < cacheTime) {
+        console.log('💪 getPlayerById: используем кешированные данные для игрока:', id);
         return player;
       }
     }
     
+    console.log('💪 getPlayerById: загружаем данные игрока из базы:', id);
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -1347,6 +1349,11 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     }
     
     const player = convertSupabaseToPlayer(data);
+    console.log('💪 getPlayerById: данные игрока загружены из базы:', { 
+      id: player.id, 
+      name: player.name, 
+      exerciseStats: player.exerciseStats 
+    });
     
     // Кешируем результат
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
@@ -2957,6 +2964,18 @@ export const clearPlayerExerciseStatsCache = async (playerId: string): Promise<v
     console.log('💪 Кеш статистики упражнений очищен для игрока:', playerId);
   } catch (error) {
     console.error('❌ Ошибка очистки кеша статистики упражнений:', error);
+  }
+};
+
+// Очистить кеш игрока
+export const clearPlayerCache = async (playerId: string): Promise<void> => {
+  try {
+    const cacheKey = `player_${playerId}`;
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    await AsyncStorage.removeItem(cacheKey);
+    console.log('💪 Кеш игрока очищен:', playerId);
+  } catch (error) {
+    console.error('❌ Ошибка очистки кеша игрока:', error);
   }
 };
 
