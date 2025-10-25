@@ -11,7 +11,7 @@ export default function GradientOverlay({ children, style }: GradientOverlayProp
   return (
     <View style={[styles.container, style]}>
       <LinearGradient
-        colors={['rgba(139, 162, 166, 0.82)', 'rgba(135, 120, 148, 0.85)']}
+        colors={['rgba(165, 192, 196, 0.82)', 'rgba(164, 145, 181, 0.85)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
