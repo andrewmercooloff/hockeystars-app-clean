@@ -26,6 +26,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
+import GradientOverlay from '../components/GradientOverlay';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -272,7 +273,7 @@ export default function MessagesScreen() {
           style={styles.background} 
           resizeMode="cover"
         >
-          <View style={styles.overlay}>
+          <GradientOverlay>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -282,7 +283,7 @@ export default function MessagesScreen() {
             <View style={styles.loadingCenter}>
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
-          </View>
+          </GradientOverlay>
         </ImageBackground>
       </View>
     );
@@ -293,7 +294,7 @@ export default function MessagesScreen() {
       style={styles.container}
     >
       <OptimizedBackground useLedBackground style={styles.background} resizeMode="cover">
-        <View style={styles.overlay}>
+        <GradientOverlay>
           {/* Заголовок страницы с поиском */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -413,7 +414,7 @@ export default function MessagesScreen() {
               ))
             ) : null}
           </ScrollView>
-        </View>
+        </GradientOverlay>
       </OptimizedBackground>
     </View>
   );
@@ -426,10 +427,6 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
