@@ -582,7 +582,7 @@ export default function NotificationsScreen() {
         }
       }
       
-      // Обработка нажатия на уведомление
+      // Обработка нажатия на уведомление с правильными deep links
       if (notification.type === 'friend_request') {
         // Для запросов в друзья показываем профиль игрока
         if (notification.playerId) {
@@ -599,19 +599,19 @@ export default function NotificationsScreen() {
           router.push(`/player/${notification.playerId}`);
         }
       } else if (notification.type === 'gift_accepted') {
-        // Для уведомлений о принятых подарках переходим в свой профиль
+        // Для уведомлений о принятых подарках переходим в музей
         if (currentUser) {
-          router.push(`/player/${currentUser.id}`);
+          router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
         }
       } else if (notification.type === 'stats_change') {
-        // Для уведомлений о изменениях статистики показываем профиль игрока
+        // Для уведомлений о изменениях статистики показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
         }
       } else if (notification.type === 'photo_added') {
-        // Для уведомлений о добавленных фото показываем профиль игрока
+        // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToPhotos=true`);
         }
       } else if (notification.type === 'new_friendship') {
         // Для уведомлений о новой дружбе показываем профиль того, кто подтвердил дружбу
@@ -627,9 +627,9 @@ export default function NotificationsScreen() {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
         }
       } else if (notification.type === 'video_added') {
-        // Для уведомлений о добавленных видео показываем профиль игрока
+        // Для уведомлений о добавленных видео показываем видео игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToVideos=true`);
         }
       } else if (notification.type === 'avatar_changed') {
         // Для уведомлений об изменении аватара показываем профиль игрока
@@ -637,15 +637,34 @@ export default function NotificationsScreen() {
           router.push(`/player/${notification.data.changedPlayerId}`);
         }
       } else if (notification.type === 'achievement_added') {
-        // Для уведомлений о новых достижениях показываем профиль игрока
+        // Для уведомлений о новых достижениях показываем достижения игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
         }
       } else if (notification.type === 'physical_data_changed') {
-        // Для уведомлений об изменении роста/веса показываем профиль игрока
+        // Для уведомлений об изменении роста/веса показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
         }
+      } else if (notification.type === 'exercise_completed') {
+        // Для уведомлений о выполненных упражнениях показываем конкретное упражнение
+        if (notification.data && notification.data.exerciseId) {
+          router.push(`/exercise/${notification.data.exerciseId}`);
+        } else if (notification.data && notification.data.changedPlayerId) {
+          // Fallback на профиль игрока с упражнениями
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToExercises=true`);
+        }
+      } else if (notification.type === 'achievement') {
+        // Для уведомлений о достижениях показываем достижения
+        if (notification.data && notification.data.changedPlayerId) {
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+        }
+      } else if (notification.type === 'team_invite') {
+        // Для уведомлений о приглашениях в команду показываем команды
+        router.push('/teams');
+      } else if (notification.type === 'system') {
+        // Для системных уведомлений остаемся в разделе уведомлений
+        // Ничего не делаем, пользователь уже в разделе уведомлений
       }
       
     } catch (error) {
@@ -683,9 +702,19 @@ export default function NotificationsScreen() {
         // Обновляем данные только один раз, без множественных вызовов
         await loadNotificationsData();
         
-        // Если это уведомление о принятом подарке, переходим в музей
+        // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+        } else if (notification.type === 'friend_request') {
+          if (notification.playerId) {
+            router.push(`/player/${notification.playerId}`);
+          }
+        } else if (notification.type === 'achievement') {
+          if (notification.data && notification.data.changedPlayerId) {
+            router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+          }
+        } else if (notification.type === 'team_invite') {
+          router.push('/teams');
         } else {
           Alert.alert('Успех', 'Уведомление обработано!');
         }
@@ -721,16 +750,26 @@ export default function NotificationsScreen() {
         }
       }
       
-      // Убираем обновление счетчика - он уже обновлен в notifyFriendsAboutGiftReceived
-      if (success) {
+        // Убираем обновление счетчика - он уже обновлен в notifyFriendsAboutGiftReceived
+        if (success) {
         // try {
         //   await updateNotificationCount();
         // } catch (updateError) {
         // }
         
-        // Если это уведомление о принятом подарке, переходим в музей
+        // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+        } else if (notification.type === 'friend_request') {
+          if (notification.playerId) {
+            router.push(`/player/${notification.playerId}`);
+          }
+        } else if (notification.type === 'achievement') {
+          if (notification.data && notification.data.changedPlayerId) {
+            router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+          }
+        } else if (notification.type === 'team_invite') {
+          router.push('/teams');
         } else {
           Alert.alert('Успех', 'Уведомление обработано!');
         }
