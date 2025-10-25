@@ -639,7 +639,7 @@ export default function ChatScreen() {
                 <Ionicons 
                   name="send" 
                   size={20} 
-                  color="#fa2f40" 
+                  color="#fff" 
                 />
               </TouchableOpacity>
             </View>
