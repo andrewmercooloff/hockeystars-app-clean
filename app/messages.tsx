@@ -28,6 +28,7 @@ import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import GradientOverlay from '../components/GradientOverlay';
 import ChatGradientBackground from '../components/ChatGradientBackground';
+import SearchGradientBackground from '../components/SearchGradientBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -306,7 +307,7 @@ export default function MessagesScreen() {
           
           {/* Строка поиска */}
           <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
+            <SearchGradientBackground style={styles.searchInputContainer}>
               <Ionicons name="search" size={20} color="#fa2f40" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -325,7 +326,7 @@ export default function MessagesScreen() {
                   <Ionicons name="close-circle" size={20} color="#fa2f40" />
                 </TouchableOpacity>
               )}
-            </View>
+            </SearchGradientBackground>
           </View>
           
           {/* Список чатов */}
@@ -612,8 +613,6 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderWidth: 0.5,

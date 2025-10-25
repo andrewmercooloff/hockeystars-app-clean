@@ -2,12 +2,12 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-interface ChatGradientBackgroundProps {
+interface SearchGradientBackgroundProps {
   children: React.ReactNode;
   style?: any;
 }
 
-export default function ChatGradientBackground({ children, style }: ChatGradientBackgroundProps) {
+export default function SearchGradientBackground({ children, style }: SearchGradientBackgroundProps) {
   return (
     <View style={[styles.container, style]}>
       <LinearGradient
@@ -24,16 +24,8 @@ export default function ChatGradientBackground({ children, style }: ChatGradient
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 10,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 12,
   },
   gradient: {
     position: 'absolute',
