@@ -35,7 +35,7 @@ const LogoHeader = React.memo(() => {
       
       {/* Аватар справа */}
       <TouchableOpacity 
-        style={{ alignItems: 'center', marginRight: 71.5, minHeight: 70, marginBottom: -6 }}
+        style={{ alignItems: 'center', marginRight: 66.5, minHeight: 70, marginBottom: -6 }}
         onPress={() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
