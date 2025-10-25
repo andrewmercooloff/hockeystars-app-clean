@@ -92,7 +92,7 @@ export const preloadAppImages = async (): Promise<void> => {
       imageCache.preloadImage(APP_IMAGES.SPLASH_ICON),
     ]);
     
-    console.log('✅ Предзагрузка изображений завершена');
+    // console.log('✅ Предзагрузка изображений завершена');
   } catch (error) {
     console.error('❌ Ошибка предзагрузки изображений:', error);
   }

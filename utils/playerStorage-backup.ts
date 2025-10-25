@@ -185,7 +185,7 @@ export const initializeStorage = async (): Promise<void> => {
     if (!existingPlayers) {
       console.log('📊 Сохраняем тестовых игроков...');
       await AsyncStorage.setItem(PLAYERS_KEY, JSON.stringify(testPlayers));
-      console.log('✅ Тестовые игроки сохранены');
+      // console.log('✅ Тестовые игроки сохранены');
     } else {
       console.log('📊 Данные игроков уже существуют');
     }
@@ -214,7 +214,7 @@ export const initializeStorage = async (): Promise<void> => {
     // Добавляем администратора к существующим данным
     await addAdminToExistingData();
 
-    console.log('✅ Инициализация завершена');
+    // console.log('✅ Инициализация завершена');
   } catch (error) {
     console.error('❌ Ошибка инициализации:', error);
   }
@@ -256,7 +256,7 @@ export const addPlayer = async (player: Omit<Player, 'id'>): Promise<Player> => 
     players.push(newPlayer);
     await AsyncStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
     
-    console.log('✅ Игрок добавлен:', newPlayer.name);
+    // console.log('✅ Игрок добавлен:', newPlayer.name);
     return newPlayer;
   } catch (error) {
     console.error('❌ Ошибка добавления игрока:', error);
@@ -272,7 +272,7 @@ export const updatePlayer = async (id: string, updates: Partial<Player>): Promis
     if (playerIndex !== -1) {
       players[playerIndex] = { ...players[playerIndex], ...updates };
       await AsyncStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
-      console.log('✅ Игрок обновлен:', players[playerIndex].name);
+      // console.log('✅ Игрок обновлен:', players[playerIndex].name);
       return players[playerIndex];
     }
     
@@ -289,9 +289,9 @@ export const findPlayerByCredentials = async (email: string, password: string): 
     const player = players.find(p => p.email === email && p.password === password);
     
     if (player) {
-      console.log('✅ Пользователь найден:', player.name);
+      // console.log('✅ Пользователь найден:', player.name);
     } else {
-      console.log('❌ Пользователь не найден');
+      // console.log('❌ Пользователь не найден');
     }
     
     return player || null;
@@ -304,7 +304,7 @@ export const findPlayerByCredentials = async (email: string, password: string): 
 export const saveCurrentUser = async (user: Player): Promise<void> => {
   try {
     await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-    console.log('✅ Текущий пользователь сохранен:', user.name);
+    // console.log('✅ Текущий пользователь сохранен:', user.name);
   } catch (error) {
     console.error('❌ Ошибка сохранения пользователя:', error);
   }
@@ -329,7 +329,7 @@ export const loadCurrentUser = async (): Promise<Player | null> => {
 export const logoutUser = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(CURRENT_USER_KEY);
-    console.log('✅ Пользователь вышел из системы');
+    // console.log('✅ Пользователь вышел из системы');
   } catch (error) {
     console.error('❌ Ошибка выхода из системы:', error);
   }
@@ -373,7 +373,7 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     allMessages.push(newMessage);
     
     await AsyncStorage.setItem(MESSAGES_KEY, JSON.stringify(allMessages));
-    console.log('✅ Сообщение отправлено, всего сообщений в системе:', allMessages.length);
+    // console.log('✅ Сообщение отправлено, всего сообщений в системе:', allMessages.length);
     return true;
   } catch (error) {
     console.error('❌ Ошибка отправки сообщения:', error);
@@ -436,7 +436,7 @@ export const markMessagesAsRead = async (userId1: string, userId2: string): Prom
         return msg;
       });
       await AsyncStorage.setItem(MESSAGES_KEY, JSON.stringify(updatedMessages));
-      console.log('✅ Сообщения отмечены как прочитанные');
+      // console.log('✅ Сообщения отмечены как прочитанные');
     }
   } catch (error) {
     console.error('❌ Ошибка отметки сообщений как прочитанных:', error);
@@ -471,7 +471,7 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<F
     // Создаем уведомление о запросе дружбы
     await createFriendRequestNotification(fromId, toId);
     
-    console.log('✅ Запрос дружбы отправлен');
+    // console.log('✅ Запрос дружбы отправлен');
     return newRequest;
   } catch (error) {
     console.error('❌ Ошибка отправки запроса дружбы:', error);
@@ -486,7 +486,7 @@ export const createFriendRequestNotification = async (fromId: string, toId: stri
     
     const fromPlayer = await getPlayerById(fromId);
     if (!fromPlayer) {
-      console.log('❌ Отправитель не найден:', fromId);
+      // console.log('❌ Отправитель не найден:', fromId);
       return;
     }
     
@@ -508,7 +508,7 @@ export const createFriendRequestNotification = async (fromId: string, toId: stri
     
     notifications.push(newNotification);
     await AsyncStorage.setItem('hockeystars_notifications', JSON.stringify(notifications));
-    console.log('✅ Уведомление о запросе дружбы создано для пользователя', toId);
+    // console.log('✅ Уведомление о запросе дружбы создано для пользователя', toId);
   } catch (error) {
     console.error('❌ Ошибка создания уведомления о запросе дружбы:', error);
   }
@@ -554,7 +554,7 @@ export const respondToFriendRequest = async (requestId: string, accept: boolean)
       }
       
       await AsyncStorage.setItem(FRIEND_REQUESTS_KEY, JSON.stringify(requests));
-      console.log('✅ Ответ на запрос дружбы сохранен');
+      // console.log('✅ Ответ на запрос дружбы сохранен');
     }
   } catch (error) {
     console.error('❌ Ошибка ответа на запрос дружбы:', error);
@@ -601,7 +601,7 @@ export const addFriendship = async (userId1: string, userId2: string): Promise<v
     if (!existingFriendship) {
       friendships.push({ userId1, userId2 });
       await AsyncStorage.setItem(FRIENDSHIPS_KEY, JSON.stringify(friendships));
-      console.log('✅ Дружба добавлена');
+      // console.log('✅ Дружба добавлена');
     }
   } catch (error) {
     console.error('❌ Ошибка добавления дружбы:', error);
@@ -617,7 +617,7 @@ export const removeFriendship = async (userId1: string, userId2: string): Promis
     );
     
     await AsyncStorage.setItem(FRIENDSHIPS_KEY, JSON.stringify(filteredFriendships));
-    console.log('✅ Дружба удалена');
+    // console.log('✅ Дружба удалена');
   } catch (error) {
     console.error('❌ Ошибка удаления дружбы:', error);
   }
@@ -663,11 +663,11 @@ export const acceptFriendRequest = async (fromId: string, toId: string): Promise
       // Добавляем дружбу
       await addFriendship(request.fromId, request.toId);
       
-      console.log('✅ Запрос дружбы принят');
+      // console.log('✅ Запрос дружбы принят');
       return true;
     }
     
-    console.log('❌ Запрос дружбы не найден для принятия');
+    // console.log('❌ Запрос дружбы не найден для принятия');
     return false;
   } catch (error) {
     console.error('❌ Ошибка принятия запроса дружбы:', error);
@@ -694,11 +694,11 @@ export const declineFriendRequest = async (fromId: string, toId: string): Promis
       request.status = 'rejected';
       await AsyncStorage.setItem(FRIEND_REQUESTS_KEY, JSON.stringify(requests));
       
-      console.log('✅ Запрос дружбы отклонен');
+      // console.log('✅ Запрос дружбы отклонен');
       return true;
     }
     
-    console.log('❌ Запрос дружбы не найден для отклонения');
+    // console.log('❌ Запрос дружбы не найден для отклонения');
     return false;
   } catch (error) {
     console.error('❌ Ошибка отклонения запроса дружбы:', error);
@@ -789,7 +789,7 @@ export const cancelFriendRequest = async (fromId: string, toId: string): Promise
     );
     
     await AsyncStorage.setItem(FRIEND_REQUESTS_KEY, JSON.stringify(filteredRequests));
-    console.log('✅ Запрос дружбы отменен');
+    // console.log('✅ Запрос дружбы отменен');
     return true;
   } catch (error) {
     console.error('❌ Ошибка отмены запроса дружбы:', error);
@@ -822,7 +822,7 @@ export const fixCorruptedData = async (): Promise<void> => {
   try {
     console.log('🔧 Проверка и исправление данных...');
     // Здесь можно добавить логику исправления данных
-    console.log('✅ Данные проверены');
+    // console.log('✅ Данные проверены');
   } catch (error) {
     console.error('❌ Ошибка исправления данных:', error);
   }
@@ -833,7 +833,7 @@ export const forceInitializeStorage = async (): Promise<boolean> => {
   try {
     console.log('🔧 Принудительная инициализация хранилища...');
     await initializeStorage();
-    console.log('✅ Принудительная инициализация завершена');
+    // console.log('✅ Принудительная инициализация завершена');
     return true;
   } catch (error) {
     console.error('❌ Ошибка принудительной инициализации:', error);
@@ -920,7 +920,7 @@ export const markNotificationAsRead = async (notificationId: string): Promise<vo
     });
     
     await AsyncStorage.setItem('hockeystars_notifications', JSON.stringify(updatedNotifications));
-    console.log('✅ Уведомление отмечено как прочитанное');
+    // console.log('✅ Уведомление отмечено как прочитанное');
   } catch (error) {
     console.error('❌ Ошибка отметки уведомления как прочитанного:', error);
   }
@@ -937,7 +937,7 @@ export const deleteNotification = async (notificationId: string): Promise<void> 
     );
     
     await AsyncStorage.setItem('hockeystars_notifications', JSON.stringify(updatedNotifications));
-    console.log('✅ Уведомление удалено');
+    // console.log('✅ Уведомление удалено');
   } catch (error) {
     console.error('❌ Ошибка удаления уведомления:', error);
   }
@@ -961,7 +961,7 @@ export const clearAllNotifications = async (userId: string): Promise<void> => {
     });
     
     await AsyncStorage.setItem('hockeystars_notifications', JSON.stringify(updatedNotifications));
-    console.log('✅ Все уведомления пользователя очищены');
+    // console.log('✅ Все уведомления пользователя очищены');
   } catch (error) {
     console.error('❌ Ошибка очистки уведомлений:', error);
   }
@@ -970,7 +970,7 @@ export const clearAllNotifications = async (userId: string): Promise<void> => {
 export const clearAllFriendRequests = async (): Promise<void> => {
   try {
     await AsyncStorage.setItem(FRIEND_REQUESTS_KEY, JSON.stringify([]));
-    console.log('✅ Все запросы дружбы очищены');
+    // console.log('✅ Все запросы дружбы очищены');
   } catch (error) {
     console.error('❌ Ошибка очистки запросов дружбы:', error);
   }
@@ -998,10 +998,10 @@ export const addAdminToExistingData = async (): Promise<void> => {
       const adminPlayer = testPlayers.find(p => p.status === 'admin');
       if (adminPlayer) {
         await addPlayer(adminPlayer);
-        console.log('✅ Администратор добавлен');
+        // console.log('✅ Администратор добавлен');
       }
     } else {
-      console.log('✅ Администратор уже существует');
+      // console.log('✅ Администратор уже существует');
     }
   } catch (error) {
     console.error('❌ Ошибка добавления администратора:', error);
@@ -1029,9 +1029,9 @@ export const cleanDuplicateAdmins = async (): Promise<void> => {
       const playersToKeep = players.filter(p => p.status !== 'admin' || p.id === adminToKeep.id);
       
       await AsyncStorage.setItem(PLAYERS_KEY, JSON.stringify(playersToKeep));
-      console.log('✅ Дублирующиеся администраторы удалены. Оставлен:', adminToKeep.name);
+      // console.log('✅ Дублирующиеся администраторы удалены. Оставлен:', adminToKeep.name);
     } else {
-      console.log('✅ Дублирующихся администраторов не найдено');
+      // console.log('✅ Дублирующихся администраторов не найдено');
     }
   } catch (error) {
     console.error('❌ Ошибка очистки дублирующихся администраторов:', error);
@@ -1060,10 +1060,10 @@ export const fixAdminData = async (): Promise<void> => {
         console.log('⚠️ У администратора отсутствует аватар, устанавливаем...');
         const updatedAdmin = { ...admin, avatar: 'admin' };
         await updatePlayer(admin.id, updatedAdmin);
-        console.log('✅ Аватар администратора установлен');
+        // console.log('✅ Аватар администратора установлен');
       }
     } else {
-      console.log('❌ Администратор не найден в системе');
+      // console.log('❌ Администратор не найден в системе');
     }
   } catch (error) {
     console.error('❌ Ошибка исправления данных администратора:', error);
@@ -1085,7 +1085,7 @@ export const recreateAdmin = async (): Promise<void> => {
     const adminPlayer = testPlayers.find(p => p.status === 'admin');
     if (adminPlayer) {
       await addPlayer(adminPlayer);
-      console.log('✅ Новый администратор создан:', adminPlayer.name);
+      // console.log('✅ Новый администратор создан:', adminPlayer.name);
     }
   } catch (error) {
     console.error('❌ Ошибка пересоздания администратора:', error);
@@ -1111,7 +1111,7 @@ export const deleteAllUsers = async (): Promise<boolean> => {
     await AsyncStorage.setItem('hockeystars_notifications', JSON.stringify([]));
     await AsyncStorage.removeItem('hockeystars_current_user');
     
-    console.log('✅ Все пользователи и связанные данные удалены');
+    // console.log('✅ Все пользователи и связанные данные удалены');
     return true;
   } catch (error) {
     console.error('❌ Ошибка при удалении всех пользователей:', error);
@@ -1136,7 +1136,7 @@ export const clearAllAppData = async (): Promise<boolean> => {
     // Удаляем все ключи приложения
     await AsyncStorage.multiRemove(hockeystarsKeys);
     
-    console.log('✅ Все данные приложения очищены');
+    // console.log('✅ Все данные приложения очищены');
     return true;
   } catch (error) {
     console.error('❌ Ошибка при очистке данных приложения:', error);

@@ -99,7 +99,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     }
     
     if (finalStatus !== 'granted') {
-      console.log('❌ Push notifications permission denied. Status:', finalStatus);
+      // console.log('❌ Push notifications permission denied. Status:', finalStatus);
       return null;
     }
     
@@ -117,7 +117,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       console.error('❌ Error stack:', error.stack);
     }
   } else {
-    console.log('❌ Push notifications работают только на физических устройствах');
+    // console.log('❌ Push notifications работают только на физических устройствах');
   }
 
   return token;
@@ -343,7 +343,7 @@ export async function sendNotificationToUser(
     const tokens = await getUserPushTokens(userId);
     
     if (tokens.length === 0) {
-      console.log('❌ У пользователя нет зарегистрированных устройств');
+      // console.log('❌ У пользователя нет зарегистрированных устройств');
       return false;
     }
 
@@ -362,7 +362,7 @@ export async function sendNotificationToUser(
       if (success) successCount++;
     }
 
-    console.log(`✅ Уведомления отправлены на ${successCount}/${uniqueTokens.length} устройств для пользователя ${userId}`);
+    // console.log(`✅ Уведомления отправлены на ${successCount}/${uniqueTokens.length} устройств для пользователя ${userId}`);
     return successCount > 0;
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления пользователю:', error);
@@ -513,7 +513,7 @@ export async function initializePushNotifications(userId: string): Promise<boole
     const token = await registerForPushNotificationsAsync();
     
     if (!token) {
-      console.log('❌ Не удалось получить push token');
+      // console.log('❌ Не удалось получить push token');
       return false;
     }
 
@@ -524,7 +524,7 @@ export async function initializePushNotifications(userId: string): Promise<boole
       initializedUsers.add(userId);
       return true;
     } else {
-      console.log('❌ Не удалось сохранить push token');
+      // console.log('❌ Не удалось сохранить push token');
       return false;
     }
   } catch (error) {

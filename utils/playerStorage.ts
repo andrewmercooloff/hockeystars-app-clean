@@ -1154,7 +1154,7 @@ export const clearExerciseStatsCache = async (playerId: string): Promise<void> =
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const cacheKey = `exercise_stats_${playerId}`;
     await AsyncStorage.removeItem(cacheKey);
-    console.log(`🗑️ Кеш статистики упражнений игрока ${playerId} очищен`);
+    // console.log(`🗑️ Кеш статистики упражнений игрока ${playerId} очищен`);
   } catch (error) {
     console.error('❌ Ошибка очистки кеша статистики упражнений:', error);
   }
@@ -1331,12 +1331,12 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     if (cachedData) {
       const { player, timestamp } = JSON.parse(cachedData);
       if (Date.now() - timestamp < cacheTime) {
-        console.log('💪 getPlayerById: используем кешированные данные для игрока:', id);
+        // // // // console.log('💪 getPlayerById: используем кешированные данные для игрока:', id);
         return player;
       }
     }
     
-    console.log('💪 getPlayerById: загружаем данные игрока из базы:', id);
+    // // // // // console.log('💪 getPlayerById: загружаем данные игрока из базы:', id);
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -1349,11 +1349,11 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     }
     
     const player = convertSupabaseToPlayer(data);
-    console.log('💪 getPlayerById: данные игрока загружены из базы:', { 
-      id: player.id, 
-      name: player.name, 
-      exerciseStats: player.exerciseStats 
-    });
+    // // // // console.log('💪 getPlayerById: данные игрока загружены из базы:', { 
+    //   id: player.id, 
+    //   name: player.name,
+    //   exerciseStats: player.exerciseStats
+    // });
     
     // Кешируем результат
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
@@ -2111,7 +2111,7 @@ export const cancelFriendRequest = async (fromId: string, toId: string): Promise
           .update({ unread_notifications_count: newCount })
           .eq('id', toId);
         
-        console.log('✅ Уведомление о запросе в друзья удалено после отмены и счетчик обновлен:', newCount);
+        // console.log('✅ Уведомление о запросе в друзья удалено после отмены и счетчик обновлен:', newCount);
       }
     } catch (notificationError) {
       console.error('⚠️ Ошибка удаления уведомления (не критично):', notificationError);
@@ -2620,12 +2620,12 @@ export const debugFriendship = async (player1Name: string, player2Name: string):
     const player2 = await findPlayerByName(player2Name);
     
     if (!player1) {
-      console.log(`❌ Игрок ${player1Name} не найден`);
+      // console.log(`❌ Игрок ${player1Name} не найден`);
       return;
     }
     
     if (!player2) {
-      console.log(`❌ Игрок ${player2Name} не найден`);
+      // console.log(`❌ Игрок ${player2Name} не найден`);
       return;
     }
     
@@ -2961,7 +2961,7 @@ export const clearPlayerExerciseStatsCache = async (playerId: string): Promise<v
     const cacheKey = `exercise_stats_${playerId}`;
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     await AsyncStorage.removeItem(cacheKey);
-    console.log('💪 Кеш статистики упражнений очищен для игрока:', playerId);
+    // // console.log('💪 Кеш статистики упражнений очищен для игрока:', playerId);
   } catch (error) {
     console.error('❌ Ошибка очистки кеша статистики упражнений:', error);
   }
@@ -2971,7 +2971,7 @@ export const clearPlayerExerciseStatsCache = async (playerId: string): Promise<v
 // Получить статистику упражнений игрока с кешированием
 export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerExerciseStats | null> => {
   try {
-    console.log('💪 getPlayerExerciseStats вызван для игрока:', playerId);
+    // // console.log('💪 getPlayerExerciseStats вызван для игрока:', playerId);
     
     // Кешируем результат на 10 минут для улучшения производительности
     const cacheKey = `exercise_stats_${playerId}`;
@@ -2984,19 +2984,19 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
     if (cachedData) {
       const { stats, timestamp } = JSON.parse(cachedData);
       if (Date.now() - timestamp < cacheTime) {
-        console.log('💪 Используем кешированные данные статистики:', stats);
+        // // // // console.log('💪 Используем кешированные данные статистики:', stats);
         return stats;
       }
     }
     
-    console.log('💪 Загружаем данные игрока из базы...');
+    // // // console.log('💪 Загружаем данные игрока из базы...');
     const player = await getPlayerById(playerId);
     if (!player) {
-      console.log('💪 Игрок не найден');
+      // // console.log('💪 Игрок не найден');
       return null;
     }
     
-    console.log('💪 Данные игрока загружены:', { 
+    // console.log('💪 Данные игрока загружены:', { 
       id: player.id, 
       name: player.name, 
       exerciseStats: player.exerciseStats 
@@ -3005,18 +3005,18 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
     let stats: PlayerExerciseStats;
     
     if (!player.exerciseStats) {
-      console.log('💪 У игрока нет данных exerciseStats, создаем пустую статистику');
+      // // // console.log('💪 У игрока нет данных exerciseStats, создаем пустую статистику');
       stats = {
         completions: [],
         totalCompletions: 0
       };
     } else {
-      console.log('💪 У игрока есть данные exerciseStats:', player.exerciseStats);
+      // // console.log('💪 У игрока есть данные exerciseStats:', player.exerciseStats);
       
       // Проверяем формат данных и конвертируем если нужно
       if (typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
         // Новый формат: { "exerciseId": count }
-        console.log('💪 Используем новый формат данных, конвертируем в массив');
+        // // console.log('💪 Используем новый формат данных, конвертируем в массив');
         const completionsArray = Object.entries(player.exerciseStats.completions).map(([exerciseId, count]) => ({
           exerciseId,
           count: count as number,
@@ -3027,10 +3027,10 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
           completions: completionsArray,
           totalCompletions: player.exerciseStats.totalCompletions || 0
         };
-        console.log('💪 Конвертированная статистика:', stats);
+        // // console.log('💪 Конвертированная статистика:', stats);
       } else {
         // Старый формат: [{ "exerciseId": "id", "completedAt": "date", "count": number }]
-        console.log('💪 Используем старый формат данных');
+        // // console.log('💪 Используем старый формат данных');
         stats = player.exerciseStats;
       }
     }
@@ -3041,7 +3041,7 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
       timestamp: Date.now()
     }));
     
-    console.log('💪 Статистика упражнений возвращена:', stats);
+    // console.log('💪 Статистика упражнений возвращена:', stats);
     return stats;
   } catch (error) {
     console.error('❌ Ошибка получения статистики упражнений:', error);
@@ -3066,36 +3066,36 @@ export const getExerciseCompletionCount = async (playerId: string, exerciseId: s
 // Получить время последнего выполнения конкретного упражнения
 export const getLastExerciseCompletion = async (playerId: string, exerciseId: string): Promise<ExerciseCompletion | null> => {
   try {
-    console.log('💪 getLastExerciseCompletion вызван для:', { playerId, exerciseId });
+    // console.log('💪 getLastExerciseCompletion вызван для:', { playerId, exerciseId });
     
     // Получаем данные игрока напрямую из базы
     const player = await getPlayerById(playerId);
     if (!player || !player.exerciseStats) {
-      console.log('💪 У игрока нет данных о статистике упражнений');
+      // // console.log('💪 У игрока нет данных о статистике упражнений');
       return null;
     }
     
-    console.log('💪 Данные exerciseStats игрока:', player.exerciseStats);
+    // // console.log('💪 Данные exerciseStats игрока:', player.exerciseStats);
     
     // Проверяем старый формат (массив)
     if (Array.isArray(player.exerciseStats.completions)) {
-      console.log('💪 Используем старый формат данных (массив)');
+      // // console.log('💪 Используем старый формат данных (массив)');
       const completion = player.exerciseStats.completions.find(c => c.exerciseId === exerciseId);
       if (completion) {
-        console.log('💪 Найдена запись в старом формате:', completion);
+        // console.log('💪 Найдена запись в старом формате:', completion);
         return completion;
       }
     }
     
     // Проверяем новый формат (объект) - если есть
     if (player.exerciseStats.completions && typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
-      console.log('💪 Используем новый формат данных (объект)');
+      // // console.log('💪 Используем новый формат данных (объект)');
       // В новом формате нет информации о времени, возвращаем null
       console.log('⚠️ В новом формате нет информации о времени выполнения');
       return null;
     }
     
-    console.log('💪 Упражнение не найдено в статистике');
+    // // console.log('💪 Упражнение не найдено в статистике');
     return null;
   } catch (error) {
     console.error('❌ Ошибка получения времени последнего выполнения:', error);
@@ -3382,7 +3382,7 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
       throw new Error('Нет данных после создания игрока');
     }
     
-    console.log('✅ Игрок успешно создан администратором:', data.name);
+    // console.log('✅ Игрок успешно создан администратором:', data.name);
     const createdPlayer = convertSupabaseToPlayer(data);
     
     // Очищаем кеш всех игроков при создании нового игрока
@@ -3530,7 +3530,7 @@ export const notifyFriendsAboutPhotos = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений о фото:', error);
       } else {
-        console.log('✅ Уведомления о фото сохранены в базу данных');
+        // console.log('✅ Уведомления о фото сохранены в базу данных');
         
         // Отправляем push уведомления и обновляем счетчик для каждого друга
         const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
@@ -3565,7 +3565,7 @@ export const notifyFriendsAboutPhotos = async (
             if (updateError) {
               console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
             } else {
-              console.log(`✅ Счетчик уведомлений увеличен для пользователя ${userId}`);
+              // // // // // // console.log(`✅ Счетчик уведомлений увеличен для пользователя ${userId}`);
             }
           } catch (updateError) {
             console.error('❌ Ошибка обновления счетчика:', updateError);
@@ -3661,7 +3661,7 @@ export const notifyFriendsAboutVideos = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений о видео:', error);
       } else {
-        console.log('✅ Уведомления о видео сохранены:', data?.length);
+        // console.log('✅ Уведомления о видео сохранены:', data?.length);
       }
       
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
@@ -3751,7 +3751,7 @@ export const notifyFriendsAboutVideos = async (
             if (updateError) {
               console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
             } else {
-              console.log(`✅ Счетчик уведомлений обновлен для пользователя ${userId}: ${currentCount} → ${newCount}`);
+              // // // // console.log(`✅ Счетчик уведомлений обновлен для пользователя ${userId}: ${currentCount} → ${newCount}`);
             }
           } catch (updateError) {
             console.error('❌ Ошибка обновления счетчика:', updateError);
@@ -3830,7 +3830,7 @@ export const notifyFriendsAboutAvatarChange = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений об аватаре:', error);
       } else {
-        console.log('✅ Уведомления об аватаре сохранены:', data?.length);
+        // console.log('✅ Уведомления об аватаре сохранены:', data?.length);
       }
       
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
@@ -3996,7 +3996,7 @@ export const notifyFriendsAboutAchievements = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений о достижениях:', error);
       } else {
-        console.log('✅ Уведомления о достижениях сохранены:', data?.length);
+        // console.log('✅ Уведомления о достижениях сохранены:', data?.length);
       }
       
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
@@ -4175,7 +4175,7 @@ export const notifyFriendsAboutPhysicalData = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений о физических данных:', error);
       } else {
-        console.log('✅ Уведомления о физических данных сохранены:', data?.length);
+        // console.log('✅ Уведомления о физических данных сохранены:', data?.length);
       }
       
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
@@ -4514,7 +4514,7 @@ export const notifyFriendsAboutChanges = async (
       if (insertError) {
         console.error('❌ Ошибка сохранения уведомления:', insertError);
       } else {
-        console.log('✅ Уведомление сохранено в базу данных');
+        // console.log('✅ Уведомление сохранено в базу данных');
         // Запоминаем что уведомление отправлено
         notificationsByUserAndType.set(key, notification);
       }
@@ -4522,7 +4522,7 @@ export const notifyFriendsAboutChanges = async (
     
     const statCount = statNotifications.length;
     const normativeCount = normativeNotifications.length;
-    console.log(`📢 Отправлено ${statCount} уведомлений о статистике и ${normativeCount} уведомлений о нормативах`);
+    // console.log(`📢 Отправлено ${statCount} уведомлений о статистике и ${normativeCount} уведомлений о нормативах`);
     
     // Отправляем push уведомления и обновляем счетчик для каждого друга
     const uniqueUserIds = [...new Set(deduplicatedNotifications.map(n => n.user_id))];
@@ -4693,7 +4693,7 @@ export const notifyFriendsAboutNewFriendship = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений о дружбе:', error);
       } else {
-        console.log('✅ Уведомления о дружбе сохранены в базу данных');
+        // console.log('✅ Уведомления о дружбе сохранены в базу данных');
         
         // Отправляем push уведомления и обновляем счетчик для каждого друга
         const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
@@ -4746,7 +4746,7 @@ export const notifyFriendsAboutExercise = async (
   exerciseId: string
 ): Promise<void> => {
   try {
-    console.log('💪 Отправляем уведомления о выполнении упражнения:', { playerId, exerciseId });
+    // console.log('💪 Отправляем уведомления о выполнении упражнения:', { playerId, exerciseId });
 
     // Получаем данные игрока для аватара
     const { data: playerData, error: playerError } = await supabase
@@ -4804,7 +4804,7 @@ export const notifyFriendsAboutExercise = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений об упражнении:', error);
       } else {
-        console.log('✅ Уведомления об упражнении сохранены в базу данных');
+        // console.log('✅ Уведомления об упражнении сохранены в базу данных');
         
         // Обновляем счетчик уведомлений для каждого друга (УПРОЩЕННАЯ ЛОГИКА)
         const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
@@ -5373,7 +5373,7 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
         if (notificationError) {
           console.error(`❌ Ошибка создания уведомления для админа ${admin.name}:`, notificationError);
         } else {
-          console.log(`✅ Уведомление отправлено админу: ${admin.name}`);
+          // console.log(`✅ Уведомление отправлено админу: ${admin.name}`);
         }
       } catch (error) {
         console.error(`❌ Ошибка отправки уведомления админу ${admin.name}:`, error);

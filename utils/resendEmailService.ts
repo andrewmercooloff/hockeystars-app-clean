@@ -9,11 +9,11 @@ export const sendEmailViaResend = async (email: string, code: string): Promise<b
     
     const apiKey = Constants.expoConfig?.extra?.resendApiKey;
     if (!apiKey) {
-      console.log('❌ RESEND_API_KEY не найден в конфигурации Expo');
+      // console.log('❌ RESEND_API_KEY не найден в конфигурации Expo');
       return false;
     }
     
-    console.log('✅ Resend API ключ найден в конфигурации');
+    // console.log('✅ Resend API ключ найден в конфигурации');
 
     // HTML шаблон для email
     const htmlContent = `
@@ -67,7 +67,7 @@ export const sendEmailViaResend = async (email: string, code: string): Promise<b
       return false;
     }
 
-    console.log('✅ Email отправлен через Resend API');
+    // console.log('✅ Email отправлен через Resend API');
     console.log('📧 Message ID:', result.id);
     return true;
 

@@ -15,12 +15,12 @@ export async function configureSystemUI() {
       try {
         await NavigationBar.setVisibilityAsync('hidden');
         await NavigationBar.setBehaviorAsync('overlay-swipe');
-        console.log('✅ Навигационная панель скрыта');
+        // console.log('✅ Навигационная панель скрыта');
       } catch (navError) {
         console.log('⚠️ NavigationBar API недоступен (нормально для Expo Go)');
       }
       
-      console.log('✅ Системный UI настроен для Android');
+      // console.log('✅ Системный UI настроен для Android');
     } catch (error) {
       console.error('❌ Ошибка настройки системного UI:', error);
     }

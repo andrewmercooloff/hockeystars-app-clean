@@ -74,7 +74,7 @@ export const initializeStorage = async (): Promise<void> => {
       throw error;
     }
     
-    console.log('✅ Supabase хранилище инициализировано');
+    // console.log('✅ Supabase хранилище инициализировано');
   } catch (error) {
     console.error('❌ Ошибка инициализации:', error);
     throw error;
@@ -136,7 +136,7 @@ export const addPlayer = async (player: Omit<Player, 'id' | 'created_at' | 'upda
       throw error;
     }
     
-    console.log('✅ Игрок добавлен:', data.name);
+    // console.log('✅ Игрок добавлен:', data.name);
     return data;
   } catch (error) {
     console.error('❌ Ошибка добавления игрока:', error);
@@ -421,7 +421,7 @@ export const clearAllData = async (): Promise<boolean> => {
     await supabase.from('friend_requests').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     await supabase.from('players').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     
-    console.log('✅ Все данные очищены');
+    // console.log('✅ Все данные очищены');
     return true;
   } catch (error) {
     console.error('❌ Ошибка очистки данных:', error);
@@ -464,7 +464,7 @@ export const createAdmin = async (): Promise<Player | null> => {
       return null;
     }
     
-    console.log('✅ Администратор создан:', data.name);
+    // console.log('✅ Администратор создан:', data.name);
     return data;
   } catch (error) {
     console.error('❌ Ошибка создания администратора:', error);

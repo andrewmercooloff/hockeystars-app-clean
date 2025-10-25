@@ -64,7 +64,7 @@ class RealtimeManager {
       // 5. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
       // await this.setupMessagesSubscription(userId);
 
-      console.log('✅ Realtime подписки настроены для пользователя:', userId);
+      // console.log('✅ Realtime подписки настроены для пользователя:', userId);
     } catch (error) {
       console.error('❌ Ошибка настройки Realtime подписок:', error);
     }
@@ -210,7 +210,7 @@ class RealtimeManager {
       name: 'messages-push-notifications-global'
     });
     
-    console.log('✅ Подписка на сообщения создана для пользователя:', userId);
+    // console.log('✅ Подписка на сообщения создана для пользователя:', userId);
   }
 
   /**

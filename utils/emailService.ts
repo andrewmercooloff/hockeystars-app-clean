@@ -89,7 +89,7 @@ CREATE TABLE email_verification_codes (
       return false;
     }
     
-    console.log('✅ Код подтверждения сохранен');
+    // console.log('✅ Код подтверждения сохранен');
     return true;
   } catch (error) {
     console.error('❌ Ошибка сохранения кода подтверждения:', error);
@@ -107,7 +107,7 @@ export const verifyAdminSecretCode = (phone: string, inputCode: string): { succe
     
     // Проверяем, является ли введенный код секретным кодом
     if (inputCode === secretCode) {
-      console.log('✅ Секретный код администратора подтвержден');
+      // console.log('✅ Секретный код администратора подтвержден');
       return { 
         success: true, 
         message: 'Секретный код администратора подтвержден' 
@@ -169,7 +169,7 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
       .delete()
       .eq('id', verificationRecord.id);
     
-    console.log('✅ Код подтвержден успешно');
+    // console.log('✅ Код подтвержден успешно');
     return { success: true, message: 'Код подтвержден успешно' };
     
   } catch (error) {

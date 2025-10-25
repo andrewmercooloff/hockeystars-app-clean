@@ -32,11 +32,11 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
     const twilioPhoneNumber = Constants.expoConfig?.extra?.twilioFromNumber;
     
     if (!accountSid || !authToken || !twilioPhoneNumber) {
-      console.log('❌ Twilio credentials не найдены в конфигурации Expo');
+      // console.log('❌ Twilio credentials не найдены в конфигурации Expo');
       return false;
     }
     
-    console.log('✅ Twilio credentials найдены в конфигурации Expo');
+    // console.log('✅ Twilio credentials найдены в конфигурации Expo');
 
     const formattedPhone = formatPhoneNumber(phone);
 
@@ -67,7 +67,7 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
     const responseData = await response.json();
 
     if (response.ok) {
-      console.log('✅ SMS отправлено успешно:', responseData);
+      // console.log('✅ SMS отправлено успешно:', responseData);
       return true;
     } else {
       console.error('❌ Ошибка Twilio API:', responseData);
@@ -95,11 +95,11 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     const whatsappFrom = Constants.expoConfig?.extra?.twilioWhatsAppFrom;
     
     if (!accountSid || !authToken || !whatsappFrom) {
-      console.log('❌ Twilio WhatsApp credentials не найдены в конфигурации Expo');
+      // console.log('❌ Twilio WhatsApp credentials не найдены в конфигурации Expo');
       return false;
     }
     
-    console.log('✅ Twilio WhatsApp credentials найдены в конфигурации');
+    // console.log('✅ Twilio WhatsApp credentials найдены в конфигурации');
 
     // Форматируем номер для WhatsApp
     const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -142,7 +142,7 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
       return false;
     }
 
-    console.log('✅ WhatsApp отправлен через Twilio');
+    // console.log('✅ WhatsApp отправлен через Twilio');
     console.log('💬 Message SID:', result.sid);
     return true;
 

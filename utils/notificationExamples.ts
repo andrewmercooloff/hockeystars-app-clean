@@ -25,7 +25,7 @@ export async function exampleMessageNotification(
     const tokens = await getUserPushTokens(receiverUserId);
     if (tokens.length > 0) {
       await sendMessageNotification(tokens, senderName, messageText, senderId);
-      console.log('✅ Уведомление о сообщении отправлено');
+      // console.log('✅ Уведомление о сообщении отправлено');
     }
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления о сообщении:', error);
@@ -44,7 +44,7 @@ export async function exampleGiftNotification(
     const tokens = await getUserPushTokens(receiverUserId);
     if (tokens.length > 0) {
       await sendGiftNotification(tokens, senderName, giftType);
-      console.log('✅ Уведомление о подарке отправлено');
+      // console.log('✅ Уведомление о подарке отправлено');
     }
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления о подарке:', error);
@@ -62,7 +62,7 @@ export async function exampleFriendshipNotification(
     const tokens = await getUserPushTokens(receiverUserId);
     if (tokens.length > 0) {
       await sendFriendshipNotification(tokens, senderName);
-      console.log('✅ Уведомление о дружбе отправлено');
+      // console.log('✅ Уведомление о дружбе отправлено');
     }
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления о дружбе:', error);
@@ -80,7 +80,7 @@ export async function exampleExerciseNotification(
     const tokens = await getUserPushTokens(receiverUserId);
     if (tokens.length > 0) {
       await sendExerciseNotification(tokens, exerciseName);
-      console.log('✅ Уведомление о тренировке отправлено');
+      // console.log('✅ Уведомление о тренировке отправлено');
     }
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления о тренировке:', error);
@@ -98,7 +98,7 @@ export async function exampleAchievementNotification(
     const tokens = await getUserPushTokens(receiverUserId);
     if (tokens.length > 0) {
       await sendAchievementNotification(tokens, achievementName);
-      console.log('✅ Уведомление о достижении отправлено');
+      // console.log('✅ Уведомление о достижении отправлено');
     }
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления о достижении:', error);
