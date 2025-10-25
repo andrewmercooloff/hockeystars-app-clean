@@ -310,7 +310,7 @@ export default function MessagesScreen() {
               <TextInput
                 style={styles.searchInput}
                 placeholder={t('messages.searchPlaceholder')}
-                placeholderTextColor="#888"
+                placeholderTextColor="#fa2f40"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoCapitalize="none"
