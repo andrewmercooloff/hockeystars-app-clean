@@ -2948,9 +2948,23 @@ export const completeExercise = async (playerId: string, exerciseId: string): Pr
   }
 };
 
+// Очистить кеш статистики упражнений для игрока
+export const clearPlayerExerciseStatsCache = async (playerId: string): Promise<void> => {
+  try {
+    const cacheKey = `exercise_stats_${playerId}`;
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    await AsyncStorage.removeItem(cacheKey);
+    console.log('💪 Кеш статистики упражнений очищен для игрока:', playerId);
+  } catch (error) {
+    console.error('❌ Ошибка очистки кеша статистики упражнений:', error);
+  }
+};
+
 // Получить статистику упражнений игрока с кешированием
 export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerExerciseStats | null> => {
   try {
+    console.log('💪 getPlayerExerciseStats вызван для игрока:', playerId);
+    
     // Кешируем результат на 10 минут для улучшения производительности
     const cacheKey = `exercise_stats_${playerId}`;
     const cacheTime = 10 * 60 * 1000; // 10 минут
@@ -2962,36 +2976,53 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
     if (cachedData) {
       const { stats, timestamp } = JSON.parse(cachedData);
       if (Date.now() - timestamp < cacheTime) {
+        console.log('💪 Используем кешированные данные статистики:', stats);
         return stats;
       }
     }
     
+    console.log('💪 Загружаем данные игрока из базы...');
     const player = await getPlayerById(playerId);
-    if (!player) return null;
+    if (!player) {
+      console.log('💪 Игрок не найден');
+      return null;
+    }
+    
+    console.log('💪 Данные игрока загружены:', { 
+      id: player.id, 
+      name: player.name, 
+      exerciseStats: player.exerciseStats 
+    });
     
     let stats: PlayerExerciseStats;
     
     if (!player.exerciseStats) {
+      console.log('💪 У игрока нет данных exerciseStats, создаем пустую статистику');
       stats = {
         completions: [],
         totalCompletions: 0
       };
     } else {
-    // Проверяем формат данных и конвертируем если нужно
-    if (typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
-      // Новый формат: { "exerciseId": count }
-      const completionsArray = Object.entries(player.exerciseStats.completions).map(([exerciseId, count]) => ({
-        exerciseId,
-        count: count as number,
-        completedAt: new Date().toISOString() // Используем текущую дату как приблизительную
-      }));
+      console.log('💪 У игрока есть данные exerciseStats:', player.exerciseStats);
       
+      // Проверяем формат данных и конвертируем если нужно
+      if (typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
+        // Новый формат: { "exerciseId": count }
+        console.log('💪 Используем новый формат данных, конвертируем в массив');
+        const completionsArray = Object.entries(player.exerciseStats.completions).map(([exerciseId, count]) => ({
+          exerciseId,
+          count: count as number,
+          completedAt: new Date().toISOString() // Используем текущую дату как приблизительную
+        }));
+        
         stats = {
-        completions: completionsArray,
-        totalCompletions: player.exerciseStats.totalCompletions || 0
-      };
+          completions: completionsArray,
+          totalCompletions: player.exerciseStats.totalCompletions || 0
+        };
+        console.log('💪 Конвертированная статистика:', stats);
       } else {
         // Старый формат: [{ "exerciseId": "id", "completedAt": "date", "count": number }]
+        console.log('💪 Используем старый формат данных');
         stats = player.exerciseStats;
       }
     }
@@ -3002,6 +3033,7 @@ export const getPlayerExerciseStats = async (playerId: string): Promise<PlayerEx
       timestamp: Date.now()
     }));
     
+    console.log('💪 Статистика упражнений возвращена:', stats);
     return stats;
   } catch (error) {
     console.error('❌ Ошибка получения статистики упражнений:', error);

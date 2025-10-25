@@ -264,6 +264,8 @@ export class ExerciseService {
    */
   static async getUserExerciseStats(userId: string): Promise<{ [exerciseId: string]: number }> {
     try {
+      console.log('💪 getUserExerciseStats вызван для пользователя:', userId);
+      
       const { data, error } = await supabase
         .from('players')
         .select('exercise_stats')
@@ -271,11 +273,14 @@ export class ExerciseService {
         .single();
 
       if (error) {
-        console.error('Error fetching user exercise stats:', error);
+        console.error('❌ Error fetching user exercise stats:', error);
         throw error;
       }
 
+      console.log('💪 Получены данные из базы:', { data, exercise_stats: data?.exercise_stats });
+
       if (!data?.exercise_stats) {
+        console.log('💪 Нет данных exercise_stats, возвращаем пустой объект');
         return {};
       }
 
@@ -283,24 +288,30 @@ export class ExerciseService {
         ? JSON.parse(data.exercise_stats) 
         : data.exercise_stats;
 
+      console.log('💪 Парсированные данные exercise_stats:', stats);
+
       // Если stats уже содержит completions, возвращаем их
       // Иначе возвращаем сам stats (для обратной совместимости)
       if (stats.completions && typeof stats.completions === 'object' && !Array.isArray(stats.completions)) {
         // Новый формат: { "exerciseId": count }
+        console.log('💪 Используем новый формат данных:', stats.completions);
         return stats.completions;
       } else if (Array.isArray(stats.completions)) {
         // Старый формат: [{ "exerciseId": "id", "completedAt": "date", "count": number }]
+        console.log('💪 Используем старый формат данных:', stats.completions);
         const result: { [key: string]: number } = {};
         stats.completions.forEach((completion: any) => {
           result[completion.exerciseId] = completion.count;
         });
+        console.log('💪 Конвертированный результат:', result);
         return result;
       } else {
         // Обратная совместимость
+        console.log('💪 Используем обратную совместимость:', stats);
         return stats || {};
       }
     } catch (error) {
-      console.error('Error in getUserExerciseStats:', error);
+      console.error('❌ Error in getUserExerciseStats:', error);
       throw error;
     }
   }
@@ -310,8 +321,12 @@ export class ExerciseService {
    */
   static async markExerciseAsCompleted(userId: string, exerciseId: string): Promise<void> {
     try {
+      console.log('💪 ExerciseService.markExerciseAsCompleted вызван:', { userId, exerciseId });
+      
       // Получаем текущую статистику
+      console.log('💪 Получаем текущую статистику пользователя...');
       const currentStats = await this.getUserExerciseStats(userId);
+      console.log('💪 Текущая статистика:', currentStats);
       
       // Увеличиваем счетчик для упражнения
       const newStats = {
@@ -319,17 +334,21 @@ export class ExerciseService {
         [exerciseId]: (currentStats[exerciseId] || 0) + 1
       };
       
+      console.log('💪 Новая статистика после увеличения:', newStats);
+      
       // Обновляем статистику в базе данных
       const exerciseStatsData = {
         completions: newStats,
         totalCompletions: Object.values(newStats).reduce((sum, count) => sum + count, 0)
       };
       
-      console.log('💪 Обновляем статистику упражнений:', {
+      console.log('💪 Данные для сохранения в базу:', {
         userId,
         exerciseId,
+        currentStats,
         newStats,
-        totalCompletions: exerciseStatsData.totalCompletions
+        exerciseStatsData,
+        jsonString: JSON.stringify(exerciseStatsData)
       });
       
       const { error } = await supabase
@@ -341,6 +360,7 @@ export class ExerciseService {
 
       if (error) {
         console.error('❌ Error updating exercise stats:', error);
+        console.error('❌ Error details:', error.message, error.details, error.hint);
         throw error;
       }
       
@@ -353,6 +373,15 @@ export class ExerciseService {
         console.log('✅ Кеш рейтинга упражнений инвалидирован');
       } catch (cacheError) {
         console.warn('⚠️ Не удалось инвалидировать кеш рейтинга:', cacheError);
+      }
+      
+      // Очищаем кеш статистики упражнений для пользователя
+      try {
+        const { clearPlayerExerciseStatsCache } = await import('../utils/playerStorage');
+        await clearPlayerExerciseStatsCache(userId);
+        console.log('✅ Кеш статистики упражнений пользователя очищен');
+      } catch (cacheError) {
+        console.warn('⚠️ Не удалось очистить кеш статистики упражнений:', cacheError);
       }
       
       // Обновляем локальный кэш пользователя
