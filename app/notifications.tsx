@@ -1322,7 +1322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   headerLeft: {
     flex: 1,
@@ -1377,7 +1377,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 15,
     padding: 20, // Точно такой же padding как в сообщениях
     alignItems: 'center',
@@ -1412,7 +1412,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
@@ -1518,7 +1518,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
     marginHorizontal: 16,
@@ -1538,7 +1538,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
