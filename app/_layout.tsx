@@ -443,8 +443,18 @@ export default function RootLayout() {
           console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
         }
         
-        // Инициализируем только критически важные ресурсы
-        await initializeStorage();
+        // Инициализируем только критически важные ресурсы параллельно
+        const initPromises = [
+          initializeStorage(),
+          // Предзагружаем данные пользователя в фоне, если он есть
+          currentUser ? import('../utils/playerStorage').then(({ preloadUserData }) => 
+            preloadUserData(currentUser.id).catch(err => 
+              console.warn('⚠️ Предзагрузка данных пользователя не удалась:', err)
+            )
+          ) : Promise.resolve()
+        ];
+        
+        await Promise.all(initPromises);
         
         
         // Восстанавливаем счетчик уведомлений из AsyncStorage

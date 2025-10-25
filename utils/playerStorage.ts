@@ -1,5 +1,8 @@
 import { supabase } from './supabase';
 
+// Глобальный кеш для пользователя
+let globalUserCache: Player | null = null;
+
 // Интерфейс для данных из Supabase (snake_case)
 export interface SupabasePlayer {
   id: string;
@@ -1563,10 +1566,19 @@ export const saveCurrentUser = async (user: Player): Promise<void> => {
       // New user
     }
     
-    await AsyncStorage.setItem('hockeystars_current_user', JSON.stringify(user));
+    // Сохраняем пользователя и сразу создаем кеш для быстрого доступа
+    const userWithTimestamp = { ...user, lastUpdated: Date.now() };
     
-    // Очищаем кэш при изменении пользователя
-    await AsyncStorage.removeItem('hockeystars_user_cache');
+    await Promise.all([
+      AsyncStorage.setItem('hockeystars_current_user', JSON.stringify(user)),
+      AsyncStorage.setItem('hockeystars_user_cache', JSON.stringify({
+        user: userWithTimestamp,
+        timestamp: Date.now()
+      }))
+    ]);
+    
+    // Обновляем глобальный кеш
+    globalUserCache = user;
     
   } catch (error) {
     console.error('❌ Ошибка сохранения текущего пользователя:', error);
@@ -1578,7 +1590,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
   try {
     // Кэшируем результат на короткое время, чтобы избежать повторных логов
     const cacheKey = 'hockeystars_user_cache';
-    const cacheTime = 30000; // 30 секунд кэша
+    const cacheTime = 60000; // Увеличиваем до 1 минуты для лучшей производительности
     
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     
@@ -1608,25 +1620,27 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     const user = JSON.parse(userData);
     
-    // Обновляем счетчик непрочитанных сообщений из поля в базе данных
-    try {
-      const { data: playerData, error: playerError } = await supabase
-        .from('players')
-        .select('unread_messages_count')
-        .eq('id', user.id)
-        .single();
-      
-      if (playerError) {
-        console.error('❌ Ошибка получения счетчика сообщений из БД:', playerError);
-        // Fallback к старому методу
-        const unreadCount = await getUnreadMessageCount(user.id);
-        user.unreadMessagesCount = unreadCount;
-      } else {
-        user.unreadMessagesCount = playerData?.unread_messages_count || 0;
+    // Оптимизация: загружаем счетчик сообщений только если это критично
+    // Для первого входа используем кешированное значение или 0
+    if (user.unreadMessagesCount === undefined) {
+      try {
+        // Быстрый запрос только для счетчика сообщений
+        const { data: playerData, error: playerError } = await supabase
+          .from('players')
+          .select('unread_messages_count')
+          .eq('id', user.id)
+          .single();
+        
+        if (playerError) {
+          console.error('❌ Ошибка получения счетчика сообщений из БД:', playerError);
+          user.unreadMessagesCount = 0; // Используем 0 вместо медленного fallback
+        } else {
+          user.unreadMessagesCount = playerData?.unread_messages_count || 0;
+        }
+      } catch (error) {
+        console.error('❌ Ошибка получения счетчика сообщений:', error);
+        user.unreadMessagesCount = 0;
       }
-    } catch (error) {
-      console.error('❌ Ошибка получения счетчика сообщений:', error);
-      user.unreadMessagesCount = 0;
     }
     
     // Логируем детали только при первом заходе или изменении пользователя
@@ -2512,6 +2526,37 @@ export const fixAdminAvatar = async (): Promise<void> => {
     }
   } catch (error) {
     console.error('❌ Ошибка исправления аватара администратора:', error);
+  }
+};
+
+// Функция для предзагрузки критических данных пользователя
+export const preloadUserData = async (userId: string): Promise<void> => {
+  try {
+    // Предзагружаем счетчик сообщений в фоне
+    const { data: playerData, error: playerError } = await supabase
+      .from('players')
+      .select('unread_messages_count')
+      .eq('id', userId)
+      .single();
+    
+    if (!playerError && playerData) {
+      // Обновляем кеш пользователя с актуальным счетчиком
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const userData = await AsyncStorage.getItem('hockeystars_current_user');
+      
+      if (userData) {
+        const user = JSON.parse(userData);
+        user.unreadMessagesCount = playerData.unread_messages_count || 0;
+        
+        // Обновляем кеш
+        await AsyncStorage.setItem('hockeystars_user_cache', JSON.stringify({
+          user,
+          timestamp: Date.now()
+        }));
+      }
+    }
+  } catch (error) {
+    console.error('❌ Ошибка предзагрузки данных пользователя:', error);
   }
 };
 

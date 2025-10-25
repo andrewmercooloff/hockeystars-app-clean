@@ -30,8 +30,8 @@ const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
-  // Всегда начинаем с загрузки, чтобы избежать задержки авторизации
-  const [isUserLoading, setIsUserLoading] = useState(true);
+  // Начинаем с загрузки только если нет кеша
+  const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
@@ -88,6 +88,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     // Загружаем пользователя только если нет кеша
     if (!globalUserCache) {
       refreshUser();
+    } else {
+      // Если есть кеш, сразу устанавливаем его и завершаем загрузку
+      setIsUserLoading(false);
     }
   }, [refreshUser]);
 

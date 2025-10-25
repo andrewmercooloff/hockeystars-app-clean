@@ -1010,6 +1010,15 @@ export default function HomeScreen() {
         )
       ]);
       
+      // Предзагружаем дополнительные данные пользователя в фоне
+      if (user?.id) {
+        import('../utils/playerStorage').then(({ preloadUserData }) => 
+          preloadUserData(user.id).catch(err => 
+            console.warn('⚠️ Предзагрузка данных пользователя не удалась:', err)
+          )
+        );
+      }
+      
       setPlayers(loadedPlayers);
       setCurrentUser(user);
       
