@@ -38,10 +38,16 @@ router.post('/test/:userId', async (req, res) => {
           },
           body: JSON.stringify({
             to: tokenData.token,
-            sound: 'default',
+            sound: 'not.m4a',
             title,
             body,
             data: { test: true, timestamp: new Date().toISOString() },
+            android: {
+              sound: 'not.m4a',
+            },
+            ios: {
+              sound: 'not.m4a',
+            },
           }),
         });
 
@@ -152,10 +158,16 @@ router.post('/broadcast', async (req, res) => {
           },
           body: JSON.stringify({
             to: tokenData.token,
-            sound: 'default',
+            sound: 'not.m4a',
             title,
             body,
             data: data || {},
+            android: {
+              sound: 'not.m4a',
+            },
+            ios: {
+              sound: 'not.m4a',
+            },
           }),
         });
 

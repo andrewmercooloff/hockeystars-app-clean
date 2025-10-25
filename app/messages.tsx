@@ -15,7 +15,6 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 // Убираем все анимации переходов
 import {
     getPlayerById,
@@ -304,17 +303,8 @@ export default function MessagesScreen() {
           </View>
           
           {/* Строка поиска */}
-          <ImageBackground
-            source={require('../assets/images/star.png')}
-            resizeMode="repeat"
-            style={styles.searchContainer}
-            imageStyle={{ opacity: 0.3 }}
-          >
-            <LinearGradient
-              colors={['rgba(26, 26, 26, 0.9)', 'rgba(10, 10, 10, 0.9)']}
-              style={styles.searchGradient}
-            >
-              <View style={styles.searchInputContainer}>
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -333,9 +323,8 @@ export default function MessagesScreen() {
                   <Ionicons name="close-circle" size={20} color="#888" />
                 </TouchableOpacity>
               )}
-              </View>
-            </LinearGradient>
-          </ImageBackground>
+            </View>
+          </View>
           
           {/* Список чатов */}
           <ScrollView 
@@ -626,11 +615,7 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-  },
-  searchGradient: {
-    flex: 1,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',

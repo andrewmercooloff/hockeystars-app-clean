@@ -82,7 +82,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#fa2f40',
-      sound: 'default',
+      sound: 'not.m4a',
       enableVibrate: true,
       enableLights: true,
     });
@@ -232,7 +232,7 @@ export async function sendPushNotification(
     
     const message = {
       to: token,
-      sound: 'default',
+      sound: 'not.m4a',
       title,
       body,
       data: data || {},
@@ -241,7 +241,7 @@ export async function sendPushNotification(
       categoryId: 'hockey_notification',
       // Параметры для Android
       android: {
-        sound: 'default',
+        sound: 'not.m4a',
         priority: 'high',
         vibrate: [0, 250, 250, 250],
         color: '#fa2f40', // Цвет темы приложения
@@ -250,7 +250,7 @@ export async function sendPushNotification(
       },
       // Параметры для iOS
       ios: {
-        sound: 'default',
+        sound: 'not.m4a',
         badge: 1,
         categoryId: 'hockey_notification',
         critical: false,
