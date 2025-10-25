@@ -57,7 +57,7 @@ export default function ExerciseNotification({
             resizeMode="cover"
           />
         ) : (
-          <Ionicons name="fitness-outline" size={24} color="#fff" />
+          <Ionicons name="barbell-outline" size={24} color="#fff" />
         )}
       </View>
 
@@ -76,7 +76,7 @@ export default function ExerciseNotification({
                  {t('exerciseNotification.completed')} "{getLocalizedExerciseName(exerciseId)}"
                </Text>
           <View style={styles.exerciseBadge}>
-            <Ionicons name="fitness-outline" size={16} color="#fff" />
+            <Ionicons name="barbell-outline" size={16} color="#fff" />
           </View>
         </View>
       </View>
