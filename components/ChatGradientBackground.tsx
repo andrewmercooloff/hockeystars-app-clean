@@ -25,15 +25,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     borderRadius: 12,
-    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 8,
     },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 12,
+    shadowOpacity: 1.0,
+    shadowRadius: 12,
+    elevation: 16,
   },
   gradient: {
     position: 'absolute',
@@ -41,5 +40,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    borderRadius: 12,
   },
 });
