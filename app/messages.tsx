@@ -534,16 +534,6 @@ const styles = StyleSheet.create({
   chatItemContainer: {
     marginHorizontal: 16,
     marginVertical: 6,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 12,
   },
   chatItem: {
     flexDirection: 'row',

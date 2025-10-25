@@ -24,6 +24,16 @@ export default function ChatGradientBackground({ children, style }: ChatGradient
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 12,
   },
   gradient: {
     position: 'absolute',
