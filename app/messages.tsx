@@ -540,8 +540,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: '#fa2f40',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
