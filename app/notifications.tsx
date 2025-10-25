@@ -42,6 +42,7 @@ import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
+import GradientOverlay from '../components/GradientOverlay';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -937,7 +938,7 @@ export default function NotificationsScreen() {
           style={styles.background} 
           resizeMode="cover"
         >
-          <View style={styles.overlay}>
+          <GradientOverlay>
             <View style={styles.pageHeader}>
               <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -947,7 +948,7 @@ export default function NotificationsScreen() {
             <View style={styles.loadingCenter}>
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
-          </View>
+          </GradientOverlay>
         </ImageBackground>
       </View>
     );
@@ -960,7 +961,7 @@ export default function NotificationsScreen() {
         style={styles.container}
       >
         <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
-        <View style={styles.overlay}>
+        <GradientOverlay>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -1283,7 +1284,7 @@ export default function NotificationsScreen() {
               </View>
             )}
           </ScrollView>
-        </View>
+        </GradientOverlay>
       </ImageBackground>
       </View>
     </GestureHandlerRootView>
@@ -1297,10 +1298,6 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
