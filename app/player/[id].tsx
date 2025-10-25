@@ -363,21 +363,38 @@ export default function PlayerProfile() {
     }, [setCurrentScreen, refreshUser])
   );
 
-  // Обработка прокрутки к музею
+  // Обработка прокрутки к разным разделам
   useEffect(() => {
-    if (scrollToMuseum === 'true' && player && museumRef.current) {
-      // Небольшая задержка для загрузки контента
-      setTimeout(() => {
-        museumRef.current?.measureLayout(
-          scrollViewRef.current as any,
-          (x, y) => {
-            scrollViewRef.current?.scrollTo({ x: 0, y: y - 100, animated: true });
-          },
-          () => {}
-        );
-      }, 500);
+    if (!player) return;
+
+    const scrollToSection = (ref: React.RefObject<View>, offset: number = 100) => {
+      if (ref.current) {
+        setTimeout(() => {
+          ref.current?.measureLayout(
+            scrollViewRef.current as any,
+            (x, y) => {
+              scrollViewRef.current?.scrollTo({ x: 0, y: y - offset, animated: true });
+            },
+            () => {}
+          );
+        }, 500);
+      }
+    };
+
+    if (scrollToMuseum === 'true') {
+      scrollToSection(museumRef);
+    } else if (scrollToStats === 'true') {
+      scrollToSection(statsRef);
+    } else if (scrollToPhotos === 'true') {
+      scrollToSection(photosRef);
+    } else if (scrollToVideos === 'true') {
+      scrollToSection(videosRef);
+    } else if (scrollToAchievements === 'true') {
+      scrollToSection(achievementsRef);
+    } else if (scrollToExercises === 'true') {
+      scrollToSection(exercisesRef);
     }
-  }, [scrollToMuseum, player]);
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, player]);
 
 
   // Функция для загрузки дополнительных данных в фоне
@@ -1780,7 +1797,7 @@ export default function PlayerProfile() {
               const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
               
               return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
-                <View style={styles.section}>
+                <View style={styles.section} ref={statsRef}>
                   <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                   {isEditing ? (
                     <View style={styles.statsGrid}>
@@ -2788,7 +2805,7 @@ export default function PlayerProfile() {
 
             {/* Видео моментов - только для игроков (не тренеры) */}
             {player.status === 'player' && ((currentUser && currentUser.id === player.id && isEditing) || (player.favoriteGoals && player.favoriteGoals.trim() !== '' && player.favoriteGoals.trim() !== 'null') || (isEditing && currentUser?.status === 'admin')) && (
-              <View style={styles.section}>
+              <View style={styles.section} ref={videosRef}>
                 <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                   <View>
@@ -2897,44 +2914,48 @@ export default function PlayerProfile() {
             {player.status !== 'star' && (
               player.status === 'shop' ? (
                 // Для магазинов фото доступны всем
-            <EditablePhotosSection
-              photos={galleryPhotos}
-              isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-              onPhotosChange={async (newPhotos) => {
-                setGalleryPhotos(newPhotos);
-                // Обновляем фото в базе данных
-                try {
-                  const updatedPlayer = { ...player, photos: newPhotos };
-                  await updatePlayer(player.id, updatedPlayer);
-                  setPlayer(updatedPlayer);
-                } catch (error) {
-                  console.error('Ошибка обновления фото:', error);
-                }
-              }}
-              isShopProfile={true}
-            />
+                <View ref={photosRef}>
+                  <EditablePhotosSection
+                    photos={galleryPhotos}
+                    isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                    onPhotosChange={async (newPhotos) => {
+                      setGalleryPhotos(newPhotos);
+                      // Обновляем фото в базе данных
+                      try {
+                        const updatedPlayer = { ...player, photos: newPhotos };
+                        await updatePlayer(player.id, updatedPlayer);
+                        setPlayer(updatedPlayer);
+                      } catch (error) {
+                        console.error('Ошибка обновления фото:', error);
+                      }
+                    }}
+                    isShopProfile={true}
+                  />
+                </View>
               ) : (
                 // Для остальных - только друзьям
                 (currentUser && currentUser.id === player.id) || 
                 (currentUser?.status === 'admin') ||
                 friendshipStatus === 'friends' ? (
-                <EditablePhotosSection
-                  photos={galleryPhotos}
-                  isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-                  onPhotosChange={async (newPhotos) => {
-                    setGalleryPhotos(newPhotos);
-                    // Обновляем фото в базе данных
-                    try {
-                      const updatedPlayer = { ...player, photos: newPhotos };
-                      await updatePlayer(player.id, updatedPlayer);
-                      setPlayer(updatedPlayer);
-                    } catch (error) {
-                      console.error('Ошибка обновления фото:', error);
-                    }
-                  }}
-                />
+                <View ref={photosRef}>
+                  <EditablePhotosSection
+                    photos={galleryPhotos}
+                    isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                    onPhotosChange={async (newPhotos) => {
+                      setGalleryPhotos(newPhotos);
+                      // Обновляем фото в базе данных
+                      try {
+                        const updatedPlayer = { ...player, photos: newPhotos };
+                        await updatePlayer(player.id, updatedPlayer);
+                        setPlayer(updatedPlayer);
+                      } catch (error) {
+                        console.error('Ошибка обновления фото:', error);
+                      }
+                    }}
+                  />
+                </View>
                 ) : (
-                  <View style={styles.section}>
+                  <View style={styles.section} ref={photosRef}>
                     <Text style={styles.sectionTitle}>
                       {(player.status === 'shop' || player.status === 'skateSharpening') ? t('profile.photos') : t('profile.hockeyPhotos')}
                     </Text>
@@ -2968,7 +2989,7 @@ export default function PlayerProfile() {
                 (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
                   isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                     // Редактируемая версия нормативов
-                    <View style={styles.section}>
+                    <View style={styles.section} ref={exercisesRef}>
                       <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                       <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
@@ -3053,7 +3074,7 @@ export default function PlayerProfile() {
                   )
                 ) : null // Не показываем секцию, если данных нет
               ) : (
-                <View style={styles.section}>
+                <View style={styles.section} ref={exercisesRef}>
                   <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                   <View style={styles.lockedSectionContainer}>
                     <Ionicons name="lock-closed" size={48} color="#fa2f40" />
@@ -3076,11 +3097,13 @@ export default function PlayerProfile() {
 
             {/* Достижения - не показываем для магазинов и заточки коньков */}
             {player.status !== 'shop' && player.status !== 'skateSharpening' && (
-            <AchievementsSection 
-              achievements={achievements}
-              isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-              onAchievementsChange={setAchievements}
-            />
+            <View ref={achievementsRef}>
+              <AchievementsSection 
+                achievements={achievements}
+                isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                onAchievementsChange={setAchievements}
+              />
+            </View>
             )}
 
             {/* Музей игрока - полученные предметы */}
