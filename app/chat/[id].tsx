@@ -838,6 +838,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginRight: 12,
+    marginBottom: -5,
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
