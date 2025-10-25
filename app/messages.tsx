@@ -536,12 +536,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: Platform.OS === 'android' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
-    borderWidth: Platform.OS === 'android' ? 0 : 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
