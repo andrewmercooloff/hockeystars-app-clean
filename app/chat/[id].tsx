@@ -829,9 +829,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 68, 68, 0.3)',
+    backgroundColor: 'transparent',
   },
   textInput: {
     flex: 1,
