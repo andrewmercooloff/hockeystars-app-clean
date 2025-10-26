@@ -45,13 +45,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
 
   const thumbnailSize = getThumbnailSize(size);
   const effectiveAvatarUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
-  
-  console.log(`🔍 CachedAvatar для ${playerId}:`, {
-    size,
-    thumbnailSize,
-    originalUrl: originalAvatarUrl,
-    effectiveUrl: effectiveAvatarUrl
-  });
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -91,8 +84,14 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   return (
     <View style={imageStyle}>
       <Image
-        source={{ uri: effectiveAvatarUrl }}
-        style={imageStyle}
+        source={{ 
+          uri: effectiveAvatarUrl,
+          cache: 'force-cache'
+        }}
+        style={[imageStyle, {
+          // Добавляем оптимизацию для ресайза
+          resizeMode: 'cover'
+        }]}
         onError={handleError}
         onLoad={handleLoad}
       />

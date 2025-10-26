@@ -33,29 +33,9 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    const sizeValue = AVATAR_SIZES[size];
-    console.log(`🔍 Генерируем миниатюру для ${size} (${sizeValue}px):`, originalUrl);
-
-    // Для Supabase Storage пробуем разные варианты параметров
-    if (originalUrl.includes('supabase')) {
-      // Вариант 1: Стандартные параметры Supabase
-      const thumbnailUrl1 = `${originalUrl}?width=${sizeValue}&height=${sizeValue}&resize=cover&quality=80`;
-      console.log(`🔍 Supabase вариант 1:`, thumbnailUrl1);
-      
-      // Вариант 2: Параметры для трансформации изображений
-      const thumbnailUrl2 = `${originalUrl}?transform=resize&width=${sizeValue}&height=${sizeValue}`;
-      console.log(`🔍 Supabase вариант 2:`, thumbnailUrl2);
-      
-      // Возвращаем первый вариант
-      return thumbnailUrl1;
-    }
-
-    // Для других URL добавляем параметры ресайза
-    const separator = originalUrl.includes('?') ? '&' : '?';
-    const thumbnailUrl = `${originalUrl}${separator}w=${sizeValue}&h=${sizeValue}&fit=cover&q=80`;
-    console.log(`🔍 Другой URL:`, thumbnailUrl);
-    
-    return thumbnailUrl;
+    // Supabase Storage не поддерживает серверную трансформацию изображений
+    // Возвращаем оригинальный URL - ресайз будет происходить через CSS
+    return originalUrl;
   }
 
   // Получаем URL миниатюры для конкретного размера
@@ -72,7 +52,6 @@ class ThumbnailCache {
 
     // Генерируем новый URL миниатюры
     const thumbnailUrl = this.generateThumbnailUrl(originalUrl, size);
-    console.log(`🖼️ Создана миниатюра ${size} (${AVATAR_SIZES[size]}px) для ${playerId}:`, thumbnailUrl.substring(0, 80) + '...');
 
     // Сохраняем в кеш
     if (!playerCache) {
@@ -152,7 +131,6 @@ export const useThumbnailUrl = (playerId: string, originalUrl: string, size: Ava
 
   React.useEffect(() => {
     const newUrl = thumbnailCache.getThumbnailUrl(playerId, originalUrl, size);
-    console.log(`🔍 useThumbnailUrl обновлен для ${playerId} (${size}):`, newUrl);
     setThumbnailUrl(newUrl);
   }, [playerId, originalUrl, size]);
 
