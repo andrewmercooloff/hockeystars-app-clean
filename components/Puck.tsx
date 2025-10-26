@@ -138,21 +138,28 @@ const Puck: React.FC<PuckProps> = ({
       
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
         {avatar && playerId ? (
-          <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={avatar}
-            size={dimensions.avatarSize}
-            style={[
-              {
+          <View style={[
+            {
+              width: dimensions.avatarSize,
+              height: dimensions.avatarSize,
+              borderRadius: dimensions.avatarBorderRadius,
+              borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
+              borderColor: avatarBorderColor,
+              overflow: 'hidden'
+            }
+          ]}>
+            <CachedAvatar
+              playerId={playerId}
+              fallbackAvatarUrl={avatar}
+              size={dimensions.avatarSize}
+              style={{
                 width: dimensions.avatarSize,
                 height: dimensions.avatarSize,
                 borderRadius: dimensions.avatarBorderRadius,
-                borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
-                borderColor: avatarBorderColor
-              }
-            ]}
-            onError={() => setImageError(true)}
-          />
+              }}
+              onError={() => setImageError(true)}
+            />
+          </View>
         ) : (
           <View style={[
             styles.avatarPlaceholder,
