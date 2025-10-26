@@ -1,0 +1,119 @@
+warning: in the working copy of 'app/_layout.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/app/_layout.tsx b/app/_layout.tsx[m
+[1mindex ebbbf47..7810b21 100644[m
+[1m--- a/app/_layout.tsx[m
+[1m+++ b/app/_layout.tsx[m
+[36m@@ -28,11 +28,7 @@[m [mimport { realtimeManager } from '../utils/RealtimeManager';[m
+ import { dataCache, CACHE_KEYS } from '../utils/DataCache';[m
+ [m
+ // Предотвращаем автоматическое скрытие заставки[m
+[31m-SplashScreen.preventAutoHideAsync().then(() => {[m
+[31m-  console.log('✅ Splash screen prevented from auto-hiding');[m
+[31m-}).catch((error) => {[m
+[31m-  console.error('❌ Error preventing splash screen auto-hide:', error);[m
+[31m-});[m
+[32m+[m[32mSplashScreen.preventAutoHideAsync();[m
+ [m
+ // Устанавливаем черный фон для веб-версии[m
+ if (Platform.OS === 'web' && typeof document !== 'undefined') {[m
+[36m@@ -73,13 +69,6 @@[m [mexport default function RootLayout() {[m
+   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);[m
+   const splashOpacity = React.useRef(new Animated.Value(1)).current;[m
+   [m
+[31m-  const { [m
+[31m-    currentUser, [m
+[31m-    setCurrentUser, [m
+[31m-    refreshUser, [m
+[31m-    isUserLoading [m
+[31m-  } = useUser();[m
+[31m-[m
+   React.useEffect(() => {[m
+     const subscription = AppState.addEventListener('change', nextAppState => {[m
+       setAppState(nextAppState);[m
+[36m@@ -132,16 +121,18 @@[m [mexport default function RootLayout() {[m
+ [m
+ [m
+ [m
+[32m+[m[32m  const [currentUser, setCurrentUser] = React.useState<Player | null>(null);[m
+   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);[m
+ [m
+   // Внутренний компонент для синхронизации с UserContext[m
+   const UserSync = () => {[m
+[32m+[m[32m    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();[m
+     const params = useLocalSearchParams();[m
+     [m
+     // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)[m
+     React.useEffect(() => {[m
+[31m-      setCurrentUser(currentUser);[m
+[31m-    }, [currentUser]);[m
+[32m+[m[32m      setCurrentUser(globalUser);[m
+[32m+[m[32m    }, [globalUser]);[m
+     [m
+     // Обрабатываем параметр refresh из URL[m
+     React.useEffect(() => {[m
+[36m@@ -172,8 +163,23 @@[m [mexport default function RootLayout() {[m
+         userLoaded=${userLoaded}, [m
+         showSplash=${showSplash}`);[m
+ [m
+[31m-      if (appReady && !isUserLoading) {[m
+[32m+[m[32m      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так[m
+[32m+[m[32m      const forceHideSplashTimeout = setTimeout(() => {[m
+[32m+[m[32m        console.log('⏰ Принудительное скрытие splash screen по таймауту');[m
+[32m+[m[32m        Animated.timing(splashOpacity, {[m
+[32m+[m[32m          toValue: 0,[m
+[32m+[m[32m          duration: 500,[m
+[32m+[m[32m          useNativeDriver: true,[m
+[32m+[m[32m        }).start(() => {[m
+[32m+[m[32m          console.log('🏁 Splash screen скрыт по таймауту');[m
+[32m+[m[32m          setShowSplash(false);[m
+[32m+[m[32m        });[m
+[32m+[m[32m      }, 5000);[m
+[32m+[m
+[32m+[m[32m      if (appReady && !isUserLoading && userLoaded) {[m
+         // Плавно скрываем наш кастомный splash screen когда все загружено[m
+[32m+[m[32m        clearTimeout(forceHideSplashTimeout);[m
+[32m+[m[41m        [m
+         Animated.timing(splashOpacity, {[m
+           toValue: 0,[m
+           duration: 500, // 500ms плавное исчезновение[m
+[36m@@ -183,7 +189,11 @@[m [mexport default function RootLayout() {[m
+           setShowSplash(false);[m
+         });[m
+       }[m
+[31m-    }, [appReady, isUserLoading]);[m
+[32m+[m
+[32m+[m[32m      return () => {[m
+[32m+[m[32m        clearTimeout(forceHideSplashTimeout);[m
+[32m+[m[32m      };[m
+[32m+[m[32m    }, [appReady, isUserLoading, userLoaded, showSplash]);[m
+     [m
+     return null;[m
+   };[m
+[36m@@ -516,15 +526,18 @@[m [mexport default function RootLayout() {[m
+         console.log('🏁 Приложение помечено как готовое после ошибки');[m
+         setAppReady(true);[m
+         [m
+[31m-        // Плавно скрываем splash screen[m
+[31m-        Animated.timing(splashOpacity, {[m
+[31m-          toValue: 0,[m
+[31m-          duration: 500,[m
+[31m-          useNativeDriver: true,[m
+[31m-        }).start(() => {[m
+[31m-          console.log('🏁 Splash screen скрыт');[m
+[31m-          setShowSplash(false);[m
+[31m-        });[m
+[32m+[m[32m        // При ошибке тоже добавляем задержку для консистентности[m
+[32m+[m[32m        setTimeout(() => {[m
+[32m+[m[32m          // При ошибке тоже плавно скрываем splash screen[m
+[32m+[m[32m          Animated.timing(splashOpacity, {[m
+[32m+[m[32m            toValue: 0,[m
+[32m+[m[32m            duration: 500,[m
+[32m+[m[32m            useNativeDriver: true,[m
+[32m+[m[32m          }).start(() => {[m
+[32m+[m[32m            console.log('🏁 Splash screen скрыт');[m
+[32m+[m[32m            setShowSplash(false);[m
+[32m+[m[32m          });[m
+[32m+[m[32m        }, 500); // Та же задержка что и в успешном случае[m
+       }[m
+     };[m
+ [m

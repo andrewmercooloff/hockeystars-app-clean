@@ -67,7 +67,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser: globalCurrentUser, setCurrentUser: setGlobalCurrentUser, refreshUser } = useUser();
+  const { currentUser: globalCurrentUser, refreshUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
@@ -115,6 +115,19 @@ export default function PlayerProfile() {
   useEffect(() => {
     setCurrentUser(globalCurrentUser);
   }, [globalCurrentUser]);
+
+  // Проверяем авторизацию при загрузке компонента
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!globalCurrentUser) {
+        // Если пользователь не авторизован, перенаправляем на главную страницу
+        console.log('🔐 Пользователь не авторизован, перенаправляем на главную страницу');
+        router.replace('/');
+      }
+    };
+    
+    checkAuth();
+  }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
@@ -1438,20 +1451,16 @@ export default function PlayerProfile() {
           const { dataCache, CACHE_KEYS } = await import('../../utils/DataCache');
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           
-          // Очищаем глобальный кеш пользователя
-          const { updateGlobalUserCache } = await import('../../contexts/UserContext');
-          updateGlobalUserCache(null);
+          // Принудительно обновляем глобальное состояние пользователя
+          await refreshUser();
           
-          // Устанавливаем пользователя в null через глобальный контекст
-          setGlobalCurrentUser(null);
-          
-          // Переходим на страницу логина
-          router.push('/login');
+          // Переходим на главную страницу
+          router.replace('/');
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
-          // Даже если произошла ошибка, все равно выходим
-          setGlobalCurrentUser(null);
-          router.push('/login');
+          // Даже если произошла ошибка, все равно переходим на главную
+          await refreshUser();
+          router.replace('/');
         }
       }
     );

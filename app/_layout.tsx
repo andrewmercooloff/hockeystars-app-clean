@@ -28,11 +28,7 @@ import { realtimeManager } from '../utils/RealtimeManager';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 
 // Предотвращаем автоматическое скрытие заставки
-SplashScreen.preventAutoHideAsync().then(() => {
-  console.log('✅ Splash screen prevented from auto-hiding');
-}).catch((error) => {
-  console.error('❌ Error preventing splash screen auto-hide:', error);
-});
+SplashScreen.preventAutoHideAsync();
 
 // Устанавливаем черный фон для веб-версии
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
@@ -73,13 +69,6 @@ export default function RootLayout() {
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   
-  const { 
-    currentUser, 
-    setCurrentUser, 
-    refreshUser, 
-    isUserLoading 
-  } = useUser();
-
   React.useEffect(() => {
     const subscription = AppState.addEventListener('change', nextAppState => {
       setAppState(nextAppState);
@@ -132,16 +121,18 @@ export default function RootLayout() {
 
 
 
+  const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
+    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
     
     // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
     React.useEffect(() => {
-      setCurrentUser(currentUser);
-    }, [currentUser]);
+      setCurrentUser(globalUser);
+    }, [globalUser]);
     
     // Обрабатываем параметр refresh из URL
     React.useEffect(() => {
@@ -172,9 +163,24 @@ export default function RootLayout() {
         userLoaded=${userLoaded}, 
         showSplash=${showSplash}`);
 
+      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
+      const forceHideSplashTimeout = setTimeout(() => {
+        console.log('⏰ Принудительное скрытие splash screen по таймауту');
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          console.log('🏁 Splash screen скрыт по таймауту');
+          setShowSplash(false);
+        });
+      }, 5000);
+
       if (appReady && !isUserLoading) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
-        Animated.timing(splashOpacity, {
+        clearTimeout(forceHideSplashTimeout);
+        
+        Animated.timing(splashOpacity, {  
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
           useNativeDriver: true,
@@ -183,7 +189,11 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-    }, [appReady, isUserLoading]);
+
+      return () => {
+        clearTimeout(forceHideSplashTimeout);
+      };
+    }, [appReady, isUserLoading, showSplash]);
     
     return null;
   };
@@ -516,15 +526,18 @@ export default function RootLayout() {
         console.log('🏁 Приложение помечено как готовое после ошибки');
         setAppReady(true);
         
-        // Плавно скрываем splash screen
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => {
-          console.log('🏁 Splash screen скрыт');
-          setShowSplash(false);
-        });
+        // При ошибке тоже добавляем задержку для консистентности
+        setTimeout(() => {
+          // При ошибке тоже плавно скрываем splash screen
+          Animated.timing(splashOpacity, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log('🏁 Splash screen скрыт');
+            setShowSplash(false);
+          });
+        }, 500); // Та же задержка что и в успешном случае
       }
     };
 

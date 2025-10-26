@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, usePathname, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import HeaderAvatar from './HeaderAvatar';
@@ -9,7 +9,6 @@ const logo = require('../assets/images/logo.png');
 
 const LogoHeader = React.memo(() => {
   const router = useRouter();
-  const pathname = usePathname();
   const params = useLocalSearchParams();
   const { currentUser, refreshUser } = useUser();
 
@@ -38,16 +37,10 @@ const LogoHeader = React.memo(() => {
       <TouchableOpacity 
         style={{ alignItems: 'center', marginRight: 66.5, minHeight: 70, marginBottom: -6 }}
         onPress={() => {
-          if (!currentUser) {
-            router.push('/login');
+          if (currentUser) {
+            router.push(`/player/${currentUser.id}`);
           } else {
-            // Если текущий экран - профиль пользователя, возвращаемся на главную
-            if (pathname.startsWith(`/player/${currentUser.id}`)) {
-              router.replace('/');
-            } else {
-              // В противном случае переходим в профиль
-              router.push(`/player/${currentUser.id}`);
-            }
+            router.push('/login');
           }
         }}
       >
