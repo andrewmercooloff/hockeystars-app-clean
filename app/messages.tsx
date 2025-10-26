@@ -27,6 +27,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
+import CachedBackground from '../components/CachedBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -270,11 +271,15 @@ export default function MessagesScreen() {
   // Если пользователь не авторизован, показываем loading
   if (currentUser === null) {
     return (
-      <OptimizedBackground source={iceBg} style={styles.container}>
+      <CachedBackground 
+        source={iceBg} 
+        style={styles.container}
+        resizeMode="cover"
+      >
         <View style={styles.loadingCenter}>
-          <Text style={styles.loadingText}>Загрузка...</Text>
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
         </View>
-      </OptimizedBackground>
+      </CachedBackground>
     );
   }
 
@@ -282,8 +287,8 @@ export default function MessagesScreen() {
   if (isUserLoading || currentUser === undefined || (loading && filteredChats.length === 0)) {
     return (
       <View style={styles.container}>
-        <ImageBackground 
-          source={require('../assets/images/led.jpg')} 
+        <CachedBackground 
+          source={iceBg} 
           style={styles.background} 
           resizeMode="cover"
         >
@@ -298,7 +303,7 @@ export default function MessagesScreen() {
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }

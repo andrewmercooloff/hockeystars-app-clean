@@ -41,6 +41,7 @@ import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import { preloadPlayerAvatars } from '../utils/AvatarCache';
+import CachedBackground from '../components/CachedBackground';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -1206,20 +1207,24 @@ export default function NotificationsScreen() {
   // Если пользователь не авторизован, показываем loading
   if (currentUser === null) {
     return (
-      <OptimizedBackground source={iceBg} style={styles.container}>
+      <CachedBackground 
+        source={iceBg} 
+        style={styles.container}
+        resizeMode="cover"
+      >
         <View style={styles.loadingCenter}>
-          <Text style={styles.loadingText}>Загрузка...</Text>
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
         </View>
-      </OptimizedBackground>
+      </CachedBackground>
     );
   }
 
   // Если загружается пользователь ИЛИ данные, показываем один loading screen
-  if (isUserLoading || currentUser === undefined || loading) {
+  if (isUserLoading || currentUser === undefined || (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0)) {
     return (
       <View style={styles.container}>
-        <ImageBackground 
-          source={require('../assets/images/led.jpg')} 
+        <CachedBackground 
+          source={iceBg} 
           style={styles.background} 
           resizeMode="cover"
         >
@@ -1234,7 +1239,7 @@ export default function NotificationsScreen() {
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -1245,7 +1250,7 @@ export default function NotificationsScreen() {
       <View 
         style={styles.container}
       >
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
@@ -1318,7 +1323,7 @@ export default function NotificationsScreen() {
               </View>
             )}
         </View>
-      </ImageBackground>
+      </CachedBackground>
       </View>
     </GestureHandlerRootView>
   );
