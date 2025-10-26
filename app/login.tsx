@@ -25,7 +25,7 @@ const iceBg = require('../assets/images/led.jpg');
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { currentUser, refreshUser } = useUser();
+  const { currentUser, isUserLoading, refreshUser } = useUser();
   const phoneRef = useRef<TextInput>(null);
   const codeRef = useRef<TextInput>(null);
   const [step, setStep] = useState<'phone' | 'code'>('phone');
@@ -49,6 +49,11 @@ export default function LoginScreen() {
       router.replace('/');
     }
   }, [currentUser, router]);
+
+  // Не показываем форму входа, пока идет проверка авторизации
+  if (isUserLoading) {
+    return null;
+  }
 
   const closeAlert = () => {
     setAlert({ ...alert, visible: false });
