@@ -24,6 +24,9 @@ import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
 
+// Исправляем импорт с учетом регистра
+import { dataCache, CACHE_KEYS } from '../utils/dataCache';
+
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
@@ -137,7 +140,6 @@ export default function RootLayout() {
         // Очищаем кеш пользователя для принудительной перезагрузки
         const clearUserCache = async () => {
           try {
-            const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           } catch (error) {
             console.error('❌ Ошибка очистки кеша:', error);
@@ -155,17 +157,43 @@ export default function RootLayout() {
     
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
+      console.log(`🔍 Проверка условий скрытия splash screen: 
+        appReady=${appReady}, 
+        isUserLoading=${isUserLoading}, 
+        userLoaded=${userLoaded}, 
+        showSplash=${showSplash}`);
+
+      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
+      const forceHideSplashTimeout = setTimeout(() => {
+        console.log('⏰ Принудительное скрытие splash screen по таймауту');
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          console.log('🏁 Splash screen скрыт по таймауту');
+          setShowSplash(false);
+        });
+      }, 5000);
+
       if (appReady && !isUserLoading && userLoaded) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
+        clearTimeout(forceHideSplashTimeout);
+        
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
           useNativeDriver: true,
         }).start(() => {
+          console.log('🏁 Splash screen скрыт по готовности приложения');
           setShowSplash(false);
         });
       }
-    }, [appReady, isUserLoading, userLoaded]);
+
+      return () => {
+        clearTimeout(forceHideSplashTimeout);
+      };
+    }, [appReady, isUserLoading, userLoaded, showSplash]);
     
     return null;
   };
@@ -435,10 +463,12 @@ export default function RootLayout() {
   React.useEffect(() => {
     const initializeApp = async () => {
       try {
+        console.log('🚀 Начало инициализации приложения');
 
         // Быстро скрываем нативный Metro splash screen
         try {
           await SplashScreen.hideAsync();
+          console.log('✅ Нативный splash screen скрыт');
         } catch (splashError) {
           console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
         }
@@ -454,7 +484,9 @@ export default function RootLayout() {
           ) : Promise.resolve()
         ];
         
+        console.log('🔄 Начало параллельной инициализации');
         await Promise.all(initPromises);
+        console.log('✅ Параллельная инициализация завершена');
         
         
         // Восстанавливаем счетчик уведомлений из AsyncStorage
@@ -467,6 +499,7 @@ export default function RootLayout() {
               // Просто устанавливаем локальное состояние
               // НЕ трогаем базу данных - она управляется SQL функциями
               setUnreadNotificationsCount(parsedCount);
+              console.log(`✅ Восстановлен счетчик уведомлений: ${parsedCount}`);
             }
           } catch (error) {
             console.error('❌ Ошибка восстановления счетчика уведомлений:', error);
@@ -474,9 +507,10 @@ export default function RootLayout() {
         }
         
         // Помечаем приложение как готовое
+        console.log('🏁 Приложение помечено как готовое');
         setAppReady(true);
       } catch (catchError) {
-        console.error('🚨 App Initialization Error:', catchError);
+        console.error('🚨 Ошибка инициализации приложения:', catchError);
         
         // При ошибке быстро скрываем Metro splash и показываем нашу заставку
         try {
@@ -488,6 +522,7 @@ export default function RootLayout() {
         // При ошибке сразу переходим к скрытию заставки
         
         // Помечаем приложение как готовое
+        console.log('🏁 Приложение помечено как готовое после ошибки');
         setAppReady(true);
         
         // При ошибке тоже добавляем задержку для консистентности
@@ -498,12 +533,14 @@ export default function RootLayout() {
             duration: 500,
             useNativeDriver: true,
           }).start(() => {
+            console.log('🏁 Splash screen скрыт');
             setShowSplash(false);
           });
         }, 500); // Та же задержка что и в успешном случае
       }
     };
 
+    console.log(`🔍 Проверка условий: loaded=${loaded}, error=${error}`);
     if (loaded) {
       initializeApp();
     }
