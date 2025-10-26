@@ -40,7 +40,7 @@ const LogoHeader = React.memo(() => {
           if (currentUser) {
             router.push(`/player/${currentUser.id}`);
           } else {
-            router.push('/login');
+            router.replace('/login');
           }
         }}
       >
