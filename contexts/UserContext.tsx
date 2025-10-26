@@ -29,18 +29,18 @@ let globalUserCache: Player | null = null;
 let lastUserLoadTime = 0;
 const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 let isInitializing = false;
-let cacheInitialized = false;
+let cacheInitPromise: Promise<void> | null = null;
 
-// Немедленная синхронная инициализация из кеша (без await)
-(() => {
-  if (typeof window === 'undefined') return; // Только в браузере/RN
-  
-  try {
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    
-    // Немедленно пытаемся загрузить из кеша
-    AsyncStorage.getItem('hockeystars_user_cache')
-      .then((cachedData: string | null) => {
+// Немедленная инициализация кеша пользователя
+const initializeUserCache = (() => {
+  if (!cacheInitPromise) {
+    cacheInitPromise = (async () => {
+      try {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        
+        // Быстро загружаем из кеша
+        const cachedData = await AsyncStorage.getItem('hockeystars_user_cache');
+        
         if (cachedData) {
           const { user, timestamp } = JSON.parse(cachedData);
           const cacheAge = Date.now() - timestamp;
@@ -48,47 +48,40 @@ let cacheInitialized = false;
           // Используем кеш если он свежий (до 1 минуты)
           if (cacheAge < 60000) {
             globalUserCache = user;
-            cacheInitialized = true;
-            console.log('⚡ Пользователь загружен из кеша мгновенно');
+            console.log('⚡ Пользователь загружен из кеша мгновенно:', user?.name);
+            return;
           }
         }
-      })
-      .catch((error: any) => {
-        console.error('Ошибка быстрой загрузки из кеша:', error);
-      });
-  } catch (error) {
-    console.error('Ошибка инициализации кеша:', error);
+        
+        // Если кеш устарел или отсутствует, загружаем полностью
+        const user = await loadCurrentUser();
+        globalUserCache = user;
+        console.log('✅ Пользователь загружен полностью:', user?.name || 'не авторизован');
+      } catch (error) {
+        console.error('Ошибка инициализации кеша пользователя:', error);
+      }
+    })();
   }
+  return cacheInitPromise;
 })();
-
-// Полная загрузка пользователя (для обновления кеша)
-const initializeUserCache = async () => {
-  if (isInitializing) return;
-  isInitializing = true;
-  
-  try {
-    // Небольшая задержка чтобы дать время синхронной загрузке
-    await new Promise(resolve => setTimeout(resolve, 50));
-    
-    if (!globalUserCache) {
-      const user = await loadCurrentUser();
-      globalUserCache = user;
-    }
-  } catch (error) {
-    console.error('Ошибка инициализации кеша пользователя:', error);
-  } finally {
-    isInitializing = false;
-  }
-};
-
-// Запускаем полную инициализацию
-initializeUserCache();
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
-  // Начинаем с загрузки только если нет кеша
-  const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
+  const [isUserLoading, setIsUserLoading] = useState(true);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  // Ждем завершения инициализации кеша перед первым рендером
+  React.useEffect(() => {
+    const waitForCache = async () => {
+      await initializeUserCache;
+      setCurrentUserState(globalUserCache);
+      setIsUserLoading(false);
+      setInitialLoadComplete(true);
+      console.log('✅ Кеш пользователя инициализирован, isUserLoading=false');
+    };
+    
+    waitForCache();
+  }, []);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
@@ -161,17 +154,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       console.error('❌ Ошибка обновления пользователя после упражнения:', error);
     }
   }, [setCurrentUser]);
-
-  // Автоматическая загрузка пользователя при инициализации
-  React.useEffect(() => {
-    // Загружаем пользователя только если нет кеша
-    if (!globalUserCache) {
-      refreshUser();
-    } else {
-      // Если есть кеш, сразу устанавливаем его и завершаем загрузку
-      setIsUserLoading(false);
-    }
-  }, [refreshUser]);
 
   return (
     <UserContext.Provider value={{ 
