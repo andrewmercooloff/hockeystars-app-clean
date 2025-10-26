@@ -33,8 +33,22 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    // Supabase Storage не поддерживает серверную трансформацию изображений
-    // Возвращаем оригинальный URL - ресайз будет происходить через CSS
+    // Пытаемся найти предварительно сгенерированную миниатюру
+    if (originalUrl.includes('supabase') && originalUrl.includes('/avatars/')) {
+      // Извлекаем playerId из URL
+      const urlParts = originalUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      const playerId = fileName.split('_')[1]?.split('.')[0];
+      
+      if (playerId) {
+        // Формируем URL для миниатюры
+        const thumbnailUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${playerId}/avatar_${size}.jpg`;
+        console.log(`🔍 Ищем миниатюру ${size} для ${playerId}:`, thumbnailUrl);
+        return thumbnailUrl;
+      }
+    }
+
+    // Если миниатюра не найдена, возвращаем оригинальный URL
     return originalUrl;
   }
 

@@ -44,7 +44,10 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   };
 
   const thumbnailSize = getThumbnailSize(size);
-  const effectiveAvatarUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
+  const thumbnailUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
+  
+  // Если миниатюра не загрузилась, используем оригинальный URL
+  const effectiveAvatarUrl = imageError ? originalAvatarUrl : thumbnailUrl;
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -53,9 +56,10 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   }, [onLoad]);
 
   const handleError = React.useCallback(() => {
+    console.log(`❌ Ошибка загрузки миниатюры ${thumbnailSize} для ${playerId}, используем оригинальный URL`);
     setImageError(true);
     onError?.();
-  }, [onError]);
+  }, [onError, thumbnailSize, playerId]);
 
   const imageStyle = {
     width: size,
