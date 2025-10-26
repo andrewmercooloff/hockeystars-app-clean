@@ -37,10 +37,16 @@ const LogoHeader = React.memo(() => {
       <TouchableOpacity 
         style={{ alignItems: 'center', marginRight: 66.5, minHeight: 70, marginBottom: -6 }}
         onPress={() => {
-          if (currentUser) {
-            router.push(`/player/${currentUser.id}`);
-          } else {
+          if (!currentUser) {
             router.replace('/login');
+          } else {
+            // Если текущий экран - профиль пользователя, возвращаемся на главную
+            if (router.pathname === `/player/${currentUser.id}`) {
+              router.replace('/');
+            } else {
+              // В противном случае переходим в профиль
+              router.push(`/player/${currentUser.id}`);
+            }
           }
         }}
       >
