@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -1206,15 +1205,7 @@ export default function NotificationsScreen() {
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <View style={styles.notificationGradientShadow}>
-                  <LinearGradient
-                    colors={[
-                      'rgba(8, 0, 15, 0.87)', 
-                      'rgba(20, 0, 7, 0.86)'
-                    ]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.notificationItem}
-                  >
+                  <View style={styles.notificationItem}>
                   <View style={styles.notificationIcon}>
                     <Ionicons 
                       name={getNotificationIcon(notification.type) as any} 
@@ -1272,7 +1263,7 @@ export default function NotificationsScreen() {
                     </View>
                   )}
                   </View>
-                  </LinearGradient>
+                  </View>
                 </View>
               </TouchableOpacity>
               )}
@@ -1286,21 +1277,13 @@ export default function NotificationsScreen() {
             {notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading && (
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyGradientShadow}>
-                  <LinearGradient
-                    colors={[
-                      'rgba(8, 0, 15, 0.87)', 
-                      'rgba(20, 0, 7, 0.86)'
-                    ]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.emptyContent}
-                  >
+                  <View style={styles.emptyContent}>
                   <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
                   <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
                   <Text style={styles.emptySubtitle}>
                     {t('notifications.noNotificationsSubtitle')}
                   </Text>
-                  </LinearGradient>
+                  </View>
                 </View>
               </View>
             )}
@@ -1322,7 +1305,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.2)',
+    backgroundColor: 'rgba(1, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -1346,7 +1329,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
   },
   headerLeft: {
     flex: 1,
@@ -1375,7 +1358,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(5, 0, 8, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -1407,10 +1390,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     marginHorizontal: 16, // Такая же ширина как у элементов чатов
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   emptyGradientShadow: {
     borderRadius: 15,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 6,
@@ -1444,12 +1428,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     minHeight: 80,
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   notificationGradientShadow: {
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 6,
@@ -1548,7 +1533,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
     marginHorizontal: 16,
@@ -1568,13 +1553,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1602,7 +1587,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderWidth: 1,
     borderColor: '#4CAF50',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1621,7 +1606,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1695,7 +1680,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 2,

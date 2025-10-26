@@ -12,7 +12,6 @@ import {
     ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -261,15 +260,7 @@ export default function ExercisesScreen() {
                       activeOpacity={0.8}
                     >
                       <View style={styles.exerciseGradientShadow}>
-                        <LinearGradient
-                          colors={[
-                            'rgba(8, 0, 15, 0.87)', 
-                            'rgba(20, 0, 7, 0.86)'
-                          ]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 1 }}
-                          style={styles.exerciseCard}
-                        >
+                        <View style={styles.exerciseCard}>
                       <View style={styles.exerciseHeader}>
                         <Text style={styles.exerciseTitle}>{exercise.title}</Text>
                         <View style={styles.exerciseMeta}>
@@ -305,7 +296,7 @@ export default function ExercisesScreen() {
                           </View>
                         )}
                       </View>
-                        </LinearGradient>
+                        </View>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -420,15 +411,7 @@ export default function ExercisesScreen() {
                 }}
               >
                 <View style={styles.exerciseGradientShadow}>
-                  <LinearGradient
-                    colors={[
-                      'rgba(8, 0, 15, 0.87)', 
-                      'rgba(20, 0, 7, 0.86)'
-                    ]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.exerciseCard}
-                  >
+                  <View style={styles.exerciseCard}>
                 <View style={styles.exerciseHeader}>
                   <View style={styles.exerciseInfo}>
                     <View style={styles.exerciseTitleRow}>
@@ -487,7 +470,7 @@ export default function ExercisesScreen() {
                     <Text style={styles.categoryText}>{translateCategory(exercise.category)}</Text>
                   </View>
                 </View>
-                  </LinearGradient>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
@@ -511,7 +494,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.2)',
+    backgroundColor: 'rgba(1, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -534,7 +517,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(5, 0, 8, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -558,7 +541,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 0, // Убираем горизонтальные отступы
     paddingVertical: 10,
-    backgroundColor: 'rgba(5, 0, 8, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   categoriesScroll: {
     flexDirection: 'row',
@@ -599,11 +582,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   exerciseGradientShadow: {
     marginBottom: 12,
     borderRadius: 12,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 6,
@@ -712,7 +696,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#050008',
+    backgroundColor: 'rgb(1,0,0)',
     padding: 20,
   },
   errorText: {
@@ -743,7 +727,7 @@ const styles = StyleSheet.create({
     zIndex: 1001, // Выше категорий (999)
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(5, 0, 8, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   searchInputContainer: {
     flexDirection: 'row',

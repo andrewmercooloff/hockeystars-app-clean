@@ -12,7 +12,6 @@ import {
     ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
@@ -533,15 +532,7 @@ export default function SearchScreen() {
         onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
       >
         <View style={styles.playerGradientShadow}>
-          <LinearGradient
-            colors={[
-              'rgba(8, 0, 15, 0.87)', 
-              'rgba(20, 0, 7, 0.86)'
-            ]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.playerItem}
-          >
+          <View style={styles.playerItem}>
         <View style={photoContainerStyle}>
           <Image 
             source={typeof playerPhoto === 'string' ? { 
@@ -583,7 +574,7 @@ export default function SearchScreen() {
             </Text>
           )}
         </View>
-          </LinearGradient>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -650,15 +641,7 @@ export default function SearchScreen() {
           {/* Общий контейнер для поиска и фильтров */}
           <View style={styles.searchSection}>
             {/* Поле поиска */}
-            <LinearGradient
-              colors={[
-                'rgba(8, 0, 15, 0.8)', 
-                'rgba(20, 0, 7, 0.8)'
-              ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.searchContainer}
-            >
+            <View style={styles.searchContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -667,7 +650,7 @@ export default function SearchScreen() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
-            </LinearGradient>
+            </View>
 
             {/* Контейнер фильтров */}
             <View style={styles.filtersContainer}>
@@ -790,7 +773,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.2)',
+    backgroundColor: 'rgba(1, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -809,7 +792,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(5, 0, 8, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -832,12 +815,12 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(5, 0, 8, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(5, 0, 8, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -916,7 +899,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     zIndex: 10000,
     elevation: 10000,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -959,11 +942,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     padding: 10,
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   playerGradientShadow: {
     marginBottom: 10,
     borderRadius: 10,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 6,

@@ -1262,7 +1262,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050008',
+    backgroundColor: 'rgb(1,0,0)',
     overflow: 'hidden', // Добавляем overflow: hidden
   },
   hockeyRink: {
@@ -1295,12 +1295,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: '#050008',
+    backgroundColor: 'rgb(1,0,0)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
     borderColor: '#fa2f40',
-    boxShadow: '0 8px 8px rgba(5, 0, 8, 0.4)',
+    boxShadow: '0 8px 8px rgba(1, 0, 0, 0.4)',
     elevation: 12,
   },
   logoImage: {
@@ -1330,12 +1330,12 @@ const styles = StyleSheet.create({
   
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'rgba(5, 0, 8, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 20,
     padding: 30,
     margin: 20,
@@ -1391,7 +1391,7 @@ const styles = StyleSheet.create({
     left: '50%',
     marginLeft: -150,
     marginTop: -50,
-    backgroundColor: 'rgba(5, 0, 8, 0.85)',
+    backgroundColor: 'rgba(1, 0, 0, 0.85)',
     borderRadius: 20,
     paddingHorizontal: 25,
     paddingVertical: 20,
@@ -1400,7 +1400,7 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 4px 6px rgba(5, 0, 8, 0.3)',
+    boxShadow: '0 4px 6px rgba(1, 0, 0, 0.3)',
     elevation: 6,
   },
   noPlayersText: {
@@ -1409,7 +1409,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
     marginBottom: 8,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.5,
     shadowRadius: 2,
@@ -1420,7 +1420,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 1,

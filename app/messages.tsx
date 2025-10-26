@@ -15,7 +15,6 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 // Убираем все анимации переходов
 import {
     getPlayerById,
@@ -304,15 +303,7 @@ export default function MessagesScreen() {
           </View>
           
           {/* Строка поиска */}
-          <LinearGradient
-            colors={[
-              'rgba(5, 0, 8, 0.8)', 
-              'rgba(20, 0, 7, 0.8)'
-            ]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.searchContainer}
-          >
+          <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
@@ -333,7 +324,7 @@ export default function MessagesScreen() {
                 </TouchableOpacity>
               )}
             </View>
-          </LinearGradient>
+          </View>
           
           {/* Список чатов */}
           <ScrollView 
@@ -368,15 +359,7 @@ export default function MessagesScreen() {
                   activeOpacity={0.8}
                 >
                   <View style={styles.chatGradientShadow}>
-                    <LinearGradient
-                      colors={[
-                        'rgba(5, 0, 8, 0.9)', 
-                        'rgba(20, 0, 7, 0.75)'
-                      ]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.chatItem}
-                    >
+                    <View style={styles.chatItem}>
                   <Image 
                     source={{ 
                       uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
@@ -427,7 +410,7 @@ export default function MessagesScreen() {
                        chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                     </Text>
                   </View>
-                  </LinearGradient>
+                  </View>
                   </View>
                 </TouchableOpacity>
               ))
@@ -449,7 +432,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.2)',
+    backgroundColor: 'rgba(1, 0, 0, 0.2)',
   },
   overlayLoading: {
     flex: 1,
@@ -470,7 +453,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(5, 0, 8, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
   },
@@ -491,7 +474,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(5, 0, 8, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -521,13 +504,13 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(5, 0, 8, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 15,
     padding: 20, // Уменьшили с 40 до 20 (в 2 раза)
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -559,6 +542,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: '#800000',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   chatAvatar: {
     width: 50,
@@ -626,11 +610,12 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(5, 0, 8, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -658,7 +643,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
-    shadowColor: '#050008',
+    shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
       height: 3,
