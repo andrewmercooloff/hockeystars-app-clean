@@ -47,7 +47,7 @@ class AvatarCache {
       try {
         listener(playerId, newAvatarUrl);
       } catch (error) {
-        console.error('❌ Ошибка в слушателе аватара:', error);
+        // Молча игнорируем ошибки
       }
     });
   }
@@ -55,28 +55,24 @@ class AvatarCache {
   // Очищаем кеш для конкретного игрока
   clearAvatar(playerId: string): void {
     this.cache.delete(playerId);
-    console.log('🗑️ Аватар удален из кеша:', playerId);
   }
 
   // Предзагружаем аватары для списка игроков (упрощенная версия)
   async preloadPlayerAvatars(players: { id: string; avatar?: string | null }[]): Promise<void> {
     try {
-      // Предзагружаем только оригинальные URL (быстрее и проще)
       const preloadTasks = players
         .filter(p => p.avatar && p.avatar.startsWith('http'))
         .map(async p => {
           try {
             await Image.prefetch(p.avatar!);
-            console.log('🖼️ Аватар предзагружен:', p.avatar!.substring(0, 50) + '...');
           } catch (error) {
-            console.error('❌ Ошибка предзагрузки аватара:', p.avatar!.substring(0, 50) + '...', error);
+            // Молча игнорируем ошибки
           }
         });
       
       await Promise.allSettled(preloadTasks);
-      console.log('🖼️ Предзагрузка аватаров завершена');
     } catch (error) {
-      console.error('❌ Ошибка предзагрузки аватаров:', error);
+      // Молча игнорируем ошибки
     }
   }
 

@@ -975,11 +975,6 @@ export default function HomeScreen() {
       
       setPlayers(loadedPlayers);
       
-      // Предзагружаем аватары через систему миниатюр
-      const { avatarCache } = await import('../utils/AvatarCache');
-      avatarCache.preloadPlayerAvatars(loadedPlayers).catch(error => {
-        console.error('❌ Ошибка предзагрузки аватаров:', error);
-      });
     } catch (error) {
       console.error('❌ Ошибка обновления игроков:', error);
     }
@@ -1029,11 +1024,6 @@ export default function HomeScreen() {
       setPlayers(loadedPlayers);
       setCurrentUser(user);
       
-      // Предзагружаем аватары через систему миниатюр
-      const { avatarCache } = await import('../utils/AvatarCache');
-      avatarCache.preloadPlayerAvatars(loadedPlayers).catch(error => {
-        console.error('❌ Ошибка предзагрузки аватаров:', error);
-      });
       
       // Устанавливаем значения по умолчанию только если они не установлены
       if (!selectedCountry) {

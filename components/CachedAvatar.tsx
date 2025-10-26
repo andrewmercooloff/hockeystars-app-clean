@@ -1,12 +1,11 @@
 import React from 'react';
-import { Image, View, ActivityIndicator } from 'react-native';
+import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAvatarCache, avatarCache } from '../utils/AvatarCache';
-import { useThumbnailUrl, AvatarSize, AVATAR_SIZES } from '../utils/ThumbnailCache';
+import { useAvatarCache } from '../utils/AvatarCache';
 
 interface CachedAvatarProps {
   playerId: string;
-  fallbackAvatarUrl?: string; // Добавляем fallback URL
+  fallbackAvatarUrl?: string;
   size?: number;
   fallbackIcon?: string;
   fallbackSize?: number;
@@ -19,9 +18,9 @@ interface CachedAvatarProps {
 const CachedAvatar: React.FC<CachedAvatarProps> = ({
   playerId,
   fallbackAvatarUrl,
-  size = 45,
+  size = 50,
   fallbackIcon = 'person',
-  fallbackSize = 25,
+  fallbackSize = 20,
   fallbackColor = '#fff',
   style,
   onError,
@@ -30,38 +29,9 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
-  const [isPrefetched, setIsPrefetched] = React.useState(false);
-  const [isCached, setIsCached] = React.useState(false);
 
   // Используем кешированный аватар или fallback
-  const originalAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
-  
-  // Определяем размер миниатюры на основе размера аватара
-  const getThumbnailSize = (size: number): AvatarSize => {
-    if (size <= AVATAR_SIZES.SMALL) return 'SMALL';
-    if (size <= AVATAR_SIZES.MEDIUM) return 'MEDIUM';
-    if (size <= AVATAR_SIZES.LARGE) return 'LARGE';
-    if (size <= AVATAR_SIZES.XLARGE) return 'XLARGE';
-    return 'XXLARGE';
-  };
-
-  const thumbnailSize = getThumbnailSize(size);
-  const effectiveAvatarUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
-
-  // Упрощенная предзагрузка
-  React.useEffect(() => {
-    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http') && !isPrefetched) {
-      Image.prefetch(effectiveAvatarUrl)
-        .then(() => {
-          setIsPrefetched(true);
-          setIsCached(true);
-        })
-        .catch(() => {
-          setIsPrefetched(false);
-          setIsCached(false);
-        });
-    }
-  }, [effectiveAvatarUrl, isPrefetched]);
+  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -71,7 +41,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
 
   const handleError = React.useCallback(() => {
     setImageError(true);
-    setImageLoaded(false);
     onError?.();
   }, [onError]);
 
@@ -82,18 +51,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
     ...style
   };
 
-  // Если нет аватара или ошибка загрузки, показываем иконку
+  // Если нет URL или ошибка загрузки, показываем fallback
   if (!effectiveAvatarUrl || imageError) {
     return (
-      <View style={[imageStyle, { 
+      <View style={[imageStyle, {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         justifyContent: 'center',
         alignItems: 'center'
       }]}>
-        <Ionicons 
-          name={fallbackIcon as any} 
-          size={fallbackSize} 
-          color={fallbackColor} 
+        <Ionicons
+          name={fallbackIcon as any}
+          size={fallbackSize}
+          color={fallbackColor}
         />
       </View>
     );
@@ -101,22 +70,12 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
 
   return (
     <View style={imageStyle}>
-      {/* Показываем изображение */}
       <Image
-        source={{ 
-          uri: effectiveAvatarUrl,
-          cache: isCached ? 'force-cache' : (isPrefetched ? 'force-cache' : 'default'),
-          headers: {
-            'Cache-Control': 'max-age=3600'
-          }
-        }}
-        style={[imageStyle, { 
-          opacity: imageLoaded ? 1 : (isCached ? 1 : (isPrefetched ? 0.9 : 0.7))
-        }]}
+        source={{ uri: effectiveAvatarUrl }}
+        style={imageStyle}
         onError={handleError}
         onLoad={handleLoad}
       />
-      
     </View>
   );
 };

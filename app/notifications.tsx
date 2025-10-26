@@ -324,22 +324,6 @@ export default function NotificationsScreen() {
       if (currentUser && !isUserLoading) {
         loadNotificationsData();
         
-        // Дополнительная предзагрузка аватаров при фокусе на экран
-        setTimeout(async () => {
-          try {
-            const { avatarCache } = await import('../utils/AvatarCache');
-            // Получаем все аватары из кеша и предзагружаем их
-            const allAvatars = avatarCache.getAllAvatars();
-            const avatarUrls = Array.from(allAvatars.values()).filter((url: string) => url && url.startsWith('http'));
-            
-            if (avatarUrls.length > 0) {
-              console.log('🖼️ Дополнительная предзагрузка аватаров при фокусе на уведомления:', avatarUrls.length);
-              await Promise.allSettled(avatarUrls.map((url: string) => Image.prefetch(url)));
-            }
-          } catch (error) {
-            console.error('❌ Ошибка дополнительной предзагрузки аватаров:', error);
-          }
-        }, 100);
       }
       
       return () => {

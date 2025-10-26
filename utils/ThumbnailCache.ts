@@ -84,13 +84,10 @@ class ThumbnailCache {
     }
 
     try {
-      // Предзагружаем только оригинальный URL
       await Image.prefetch(originalUrl);
       this.preloadedImages.add(cacheKey);
-      
-      console.log(`🖼️ Оригинальный аватар предзагружен для ${playerId}`);
     } catch (error) {
-      console.error(`❌ Ошибка предзагрузки оригинального аватара для ${playerId}:`, error);
+      // Молча игнорируем ошибки
     }
   }
 
@@ -102,25 +99,22 @@ class ThumbnailCache {
         try {
           await this.preloadOriginalUrl(p.id, p.avatar!);
         } catch (error) {
-          console.error(`❌ Ошибка предзагрузки аватара для ${p.id}:`, error);
+          // Молча игнорируем ошибки
         }
       });
 
     await Promise.allSettled(preloadTasks);
-    console.log(`🖼️ Предзагрузка аватаров завершена для ${players.length} игроков`);
   }
 
   // Очищаем кеш для конкретного игрока
   clearPlayerCache(playerId: string): void {
     this.cache.delete(playerId);
-    console.log(`🗑️ Кеш миниатюр очищен для ${playerId}`);
   }
 
   // Очищаем весь кеш
   clearAll(): void {
     this.cache.clear();
     this.preloadedImages.clear();
-    console.log('🗑️ Весь кеш миниатюр очищен');
   }
 
   // Получаем статистику кеша
