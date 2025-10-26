@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Player, loadCurrentUser } from '../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
+import { router } from 'expo-router';
 
 interface UserContextType {
   currentUser: Player | null;
@@ -131,6 +132,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Если в кеше нет актуальных данных, загружаем из хранилища
       const user = await loadCurrentUser(forceRefresh);
       setCurrentUser(user);
+
+      // Если пользователь не авторизован - редиректим на страницу входа
+      if (!user) {
+        console.log('🔐 Пользователь не авторизован, перенаправляем на страницу входа');
+        router.replace('/login');
+      }
     } catch (error) {
       console.error('Ошибка загрузки пользователя:', error);
     }
