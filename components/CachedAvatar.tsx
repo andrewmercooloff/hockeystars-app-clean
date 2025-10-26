@@ -29,9 +29,23 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
+  const [isPrefetched, setIsPrefetched] = React.useState(false);
 
   // Используем кешированный аватар или fallback
   const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
+
+  // Предзагружаем изображение если оно есть
+  React.useEffect(() => {
+    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http')) {
+      Image.prefetch(effectiveAvatarUrl)
+        .then(() => {
+          setIsPrefetched(true);
+        })
+        .catch(() => {
+          setIsPrefetched(false);
+        });
+    }
+  }, [effectiveAvatarUrl]);
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -75,19 +89,34 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
       <Image
         source={{ 
           uri: effectiveAvatarUrl,
-          cache: 'force-cache',
+          cache: isPrefetched ? 'force-cache' : 'default',
           headers: {
             'Cache-Control': 'max-age=3600'
           }
         }}
         style={[imageStyle, { 
-          opacity: imageLoaded ? 1 : 0.8
+          opacity: imageLoaded ? 1 : (isPrefetched ? 0.9 : 0.7)
         }]}
         onError={handleError}
         onLoad={handleLoad}
       />
       
-      {/* Убираем индикатор загрузки - аватары должны загружаться мгновенно */}
+      {/* Показываем индикатор загрузки только если изображение не предзагружено */}
+      {!isPrefetched && !imageLoaded && !imageError && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: size / 2
+        }}>
+          <ActivityIndicator size="small" color="#fff" />
+        </View>
+      )}
     </View>
   );
 };

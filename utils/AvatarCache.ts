@@ -22,7 +22,6 @@ class AvatarCache {
   // Устанавливаем аватар в кеш
   setAvatar(playerId: string, avatarUrl: string): void {
     const oldUrl = this.cache.get(playerId);
-    console.log('🖼️ setAvatar вызван:', { playerId, oldUrl: oldUrl ? 'есть' : 'нет', newUrl: avatarUrl.substring(0, 50) + '...' });
     this.cache.set(playerId, avatarUrl);
     
     // Если аватар изменился, уведомляем всех слушателей
@@ -82,24 +81,16 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   React.useEffect(() => {
     // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
     const currentCachedAvatar = avatarCache.getAvatar(playerId);
-    console.log('🖼️ useAvatarCache для', playerId, ':', { 
-      cached: currentCachedAvatar ? 'есть' : 'нет', 
-      fallback: fallbackUrl ? 'есть' : 'нет' 
-    });
-    
     if (!currentCachedAvatar && fallbackUrl) {
-      console.log('🖼️ Устанавливаем fallback в кеш:', playerId);
       avatarCache.setAvatar(playerId, fallbackUrl);
       setAvatarUrl(fallbackUrl);
     } else if (currentCachedAvatar) {
-      console.log('🖼️ Используем кешированный:', playerId);
       setAvatarUrl(currentCachedAvatar);
     }
 
     // Подписываемся на изменения
     const unsubscribe = avatarCache.subscribe((changedPlayerId, newAvatarUrl) => {
       if (changedPlayerId === playerId) {
-        console.log('🖼️ Аватар обновлен через подписку:', playerId);
         setAvatarUrl(newAvatarUrl);
       }
     });
