@@ -172,23 +172,8 @@ export default function RootLayout() {
         userLoaded=${userLoaded}, 
         showSplash=${showSplash}`);
 
-      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
-      const forceHideSplashTimeout = setTimeout(() => {
-        console.log('⏰ Принудительное скрытие splash screen по таймауту');
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => {
-          console.log('🏁 Splash screen скрыт по таймауту');
-          setShowSplash(false);
-        });
-      }, 5000);
-
-      if (appReady && !isUserLoading && userLoaded) {
+      if (appReady && !isUserLoading) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
-        clearTimeout(forceHideSplashTimeout);
-        
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500, // 500ms плавное исчезновение
@@ -198,11 +183,7 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-
-      return () => {
-        clearTimeout(forceHideSplashTimeout);
-      };
-    }, [appReady, isUserLoading, userLoaded, showSplash]);
+    }, [appReady, isUserLoading]);
     
     return null;
   };
