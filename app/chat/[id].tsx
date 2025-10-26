@@ -619,7 +619,7 @@ export default function ChatScreen() {
                 value={newMessage}
                 onChangeText={setNewMessage}
                 placeholder={t('chat.enterMessage')}
-                placeholderTextColor="#888"
+                placeholderTextColor="#fff"
                 multiline
                 maxLength={500}
                 onFocus={() => {
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.2)',
+    backgroundColor: 'rgba(151, 175, 192, 0.6)',
   },
   loadingContainer: {
     flex: 1,
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.8)',
+    backgroundColor: 'rgba(5, 0, 8, 0.5)',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -847,7 +847,8 @@ const styles = StyleSheet.create({
     borderColor: '#fa2f40',
   },
   sendButton: {
-    backgroundColor: '#B80000',
+    backgroundColor: '#fa2f40',
+    opacity: 1,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -864,7 +865,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sendButtonDisabled: {
-    backgroundColor: 'rgba(255, 68, 68, 0.5)',
+    backgroundColor: '#fa2f40',
+    opacity: 0.7,
   },
   replyButton: {
     backgroundColor: 'transparent',

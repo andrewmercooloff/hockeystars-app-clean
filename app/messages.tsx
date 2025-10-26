@@ -370,8 +370,8 @@ export default function MessagesScreen() {
                   <View style={styles.chatGradientShadow}>
                     <LinearGradient
                       colors={[
-                        'rgba(5, 0, 8, 0.87)', 
-                        'rgba(20, 0, 7, 0.86)'
+                        'rgba(5, 0, 8, 0.9)', 
+                        'rgba(20, 0, 7, 0.75)'
                       ]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
@@ -557,6 +557,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
   },
   chatAvatar: {
     width: 50,
@@ -659,10 +661,10 @@ const styles = StyleSheet.create({
     shadowColor: '#050008',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 3,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
     elevation: 8,
   },
 }); 

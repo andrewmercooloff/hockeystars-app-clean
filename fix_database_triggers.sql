@@ -72,3 +72,4 @@ SELECT
   SUM(unread_messages_count) as total_unread_messages
 FROM players;
 
+
