@@ -1652,6 +1652,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     const cacheTime = 60000; // Увеличиваем до 1 минуты для лучшей производительности
     
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    let wasFromCache = false;
     
     // Очищаем кеш при принудительном обновлении
     if (forceRefresh) {
@@ -1700,6 +1701,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
             if (newCount !== user.unreadMessagesCount) {
               // Обновляем кеш с новым счетчиком
               user.unreadMessagesCount = newCount;
+              const AsyncStorage = require('@react-native-async-storage/async-storage').default;
               await AsyncStorage.setItem(cacheKey, JSON.stringify({
                 user,
                 timestamp: Date.now()
@@ -1712,13 +1714,11 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       }, 500);
     }
     
-    // Кэшируем результат (только если это не из кеша)
-    if (!cachedData || forceRefresh) {
-      await AsyncStorage.setItem(cacheKey, JSON.stringify({
-        user,
-        timestamp: Date.now()
-      }));
-    }
+    // Кэшируем результат
+    await AsyncStorage.setItem(cacheKey, JSON.stringify({
+      user,
+      timestamp: Date.now()
+    }));
     
     return user;
   } catch (error) {
