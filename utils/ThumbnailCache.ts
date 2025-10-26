@@ -33,16 +33,29 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    // Для Supabase Storage добавляем параметры ресайза для всех размеров
+    const sizeValue = AVATAR_SIZES[size];
+    console.log(`🔍 Генерируем миниатюру для ${size} (${sizeValue}px):`, originalUrl);
+
+    // Для Supabase Storage пробуем разные варианты параметров
     if (originalUrl.includes('supabase')) {
-      const sizeValue = AVATAR_SIZES[size];
-      return `${originalUrl}?width=${sizeValue}&height=${sizeValue}&resize=cover&quality=80`;
+      // Вариант 1: Стандартные параметры Supabase
+      const thumbnailUrl1 = `${originalUrl}?width=${sizeValue}&height=${sizeValue}&resize=cover&quality=80`;
+      console.log(`🔍 Supabase вариант 1:`, thumbnailUrl1);
+      
+      // Вариант 2: Параметры для трансформации изображений
+      const thumbnailUrl2 = `${originalUrl}?transform=resize&width=${sizeValue}&height=${sizeValue}`;
+      console.log(`🔍 Supabase вариант 2:`, thumbnailUrl2);
+      
+      // Возвращаем первый вариант
+      return thumbnailUrl1;
     }
 
     // Для других URL добавляем параметры ресайза
-    const sizeValue = AVATAR_SIZES[size];
     const separator = originalUrl.includes('?') ? '&' : '?';
-    return `${originalUrl}${separator}w=${sizeValue}&h=${sizeValue}&fit=cover&q=80`;
+    const thumbnailUrl = `${originalUrl}${separator}w=${sizeValue}&h=${sizeValue}&fit=cover&q=80`;
+    console.log(`🔍 Другой URL:`, thumbnailUrl);
+    
+    return thumbnailUrl;
   }
 
   // Получаем URL миниатюры для конкретного размера
@@ -139,6 +152,7 @@ export const useThumbnailUrl = (playerId: string, originalUrl: string, size: Ava
 
   React.useEffect(() => {
     const newUrl = thumbnailCache.getThumbnailUrl(playerId, originalUrl, size);
+    console.log(`🔍 useThumbnailUrl обновлен для ${playerId} (${size}):`, newUrl);
     setThumbnailUrl(newUrl);
   }, [playerId, originalUrl, size]);
 

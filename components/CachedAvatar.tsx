@@ -45,6 +45,13 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
 
   const thumbnailSize = getThumbnailSize(size);
   const effectiveAvatarUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
+  
+  console.log(`🔍 CachedAvatar для ${playerId}:`, {
+    size,
+    thumbnailSize,
+    originalUrl: originalAvatarUrl,
+    effectiveUrl: effectiveAvatarUrl
+  });
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
