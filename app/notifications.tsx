@@ -1,13 +1,13 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { 
-    Alert, 
+import {
+    Alert,
     FlatList, 
-    ImageBackground, 
-    StyleSheet, 
-    Text, 
-    TouchableOpacity, 
-    View 
+    ImageBackground,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -1301,12 +1301,12 @@ export default function NotificationsScreen() {
                         {t('notifications.noNotificationsSubtitle')}
                       </Text>
                     </View>
-                  </View>
-                </View>
+                    </View>
+                    </View>
               ) : null
             )}
           />
-          
+
 
             {/* Показываем пустое состояние только если нет ни уведомлений, ни запросов в друзья, ни запросов на подарки И не идет загрузка */}
             {notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading && (

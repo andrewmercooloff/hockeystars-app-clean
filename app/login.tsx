@@ -402,7 +402,9 @@ export default function LoginScreen() {
                 {/* Заголовок "Выход на лед" */}
                 <View style={styles.modalHeader}>
                   <Ionicons name="log-in" size={40} color="#FF4444" />
-                  <Text style={styles.modalTitle}>{t('auth.login')}</Text>
+                  <Text style={styles.modalTitle}>
+                    {t('auth.exitToIce')}
+                  </Text>
                 </View>
 
                 {/* Весь существующий контент */}
