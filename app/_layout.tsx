@@ -155,51 +155,24 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Флаг для предотвращения повторного скрытия splash screen
-    const [splashScreenHidden, setSplashScreenHidden] = React.useState(false);
-    
-    // Скрываем splash screen когда приложение готово
+    // Один раз скрываем splash screen при готовности приложения
     React.useEffect(() => {
-      console.log(`🔍 Проверка условий скрытия splash screen: 
-        appReady=${appReady}, 
-        isUserLoading=${isUserLoading}, 
-        showSplash=${showSplash}`);
-
-      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
-      const forceHideSplashTimeout = setTimeout(() => {
-        if (!splashScreenHidden) {
-          console.log('⏰ Принудительное скрытие splash screen по таймауту');
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => {
-            console.log('🏁 Splash screen скрыт по таймауту');
-            setShowSplash(false);
-            setSplashScreenHidden(true);
-          });
-        }
-      }, 5000);
-
-      if (appReady && !splashScreenHidden) {
-        // Плавно скрываем наш кастомный splash screen когда все загружено
-        clearTimeout(forceHideSplashTimeout);
-        
-        Animated.timing(splashOpacity, {  
+      const hideSplashScreen = () => {
+        console.log('🏁 Принудительное скрытие splash screen');
+        Animated.timing(splashOpacity, {
           toValue: 0,
-          duration: 500, // 500ms плавное исчезновение
+          duration: 500,
           useNativeDriver: true,
         }).start(() => {
-          console.log('🏁 Splash screen скрыт по готовности приложения');
           setShowSplash(false);
-          setSplashScreenHidden(true);
         });
-      }
-
-      return () => {
-        clearTimeout(forceHideSplashTimeout);
       };
-    }, [appReady, splashScreenHidden]);
+
+      // Если приложение готово - скрываем splash screen
+      if (appReady) {
+        hideSplashScreen();
+      }
+    }, [appReady]);
     
     return null;
   };
