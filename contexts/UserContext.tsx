@@ -29,15 +29,51 @@ let globalUserCache: Player | null = null;
 let lastUserLoadTime = 0;
 const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 let isInitializing = false;
+let cacheInitialized = false;
 
-// Синхронно загружаем пользователя из AsyncStorage при старте
+// Немедленная синхронная инициализация из кеша (без await)
+(() => {
+  if (typeof window === 'undefined') return; // Только в браузере/RN
+  
+  try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    
+    // Немедленно пытаемся загрузить из кеша
+    AsyncStorage.getItem('hockeystars_user_cache')
+      .then((cachedData: string | null) => {
+        if (cachedData) {
+          const { user, timestamp } = JSON.parse(cachedData);
+          const cacheAge = Date.now() - timestamp;
+          
+          // Используем кеш если он свежий (до 1 минуты)
+          if (cacheAge < 60000) {
+            globalUserCache = user;
+            cacheInitialized = true;
+            console.log('⚡ Пользователь загружен из кеша мгновенно');
+          }
+        }
+      })
+      .catch((error: any) => {
+        console.error('Ошибка быстрой загрузки из кеша:', error);
+      });
+  } catch (error) {
+    console.error('Ошибка инициализации кеша:', error);
+  }
+})();
+
+// Полная загрузка пользователя (для обновления кеша)
 const initializeUserCache = async () => {
-  if (isInitializing || globalUserCache) return;
+  if (isInitializing) return;
   isInitializing = true;
   
   try {
-    const user = await loadCurrentUser();
-    globalUserCache = user;
+    // Небольшая задержка чтобы дать время синхронной загрузке
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    if (!globalUserCache) {
+      const user = await loadCurrentUser();
+      globalUserCache = user;
+    }
   } catch (error) {
     console.error('Ошибка инициализации кеша пользователя:', error);
   } finally {
@@ -45,7 +81,7 @@ const initializeUserCache = async () => {
   }
 };
 
-// Запускаем инициализацию сразу
+// Запускаем полную инициализацию
 initializeUserCache();
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
