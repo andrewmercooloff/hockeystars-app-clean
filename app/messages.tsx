@@ -557,8 +557,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#fa2f40',
+    borderWidth: 0.5,
+    borderColor: '#800000',
   },
   chatAvatar: {
     width: 50,
