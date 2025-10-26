@@ -17,6 +17,12 @@ const OptimizedBackground: React.FC<OptimizedBackgroundProps> = ({
     ? imageCache.getImage(APP_IMAGES.LED_BACKGROUND)
     : source ? imageCache.getImage(source) : source;
 
+  // Проверяем, что imageSource валидный
+  if (!imageSource) {
+    console.warn('⚠️ OptimizedBackground: imageSource is undefined');
+    return null;
+  }
+
   return (
     <ImageBackground
       source={imageSource}

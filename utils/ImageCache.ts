@@ -37,21 +37,38 @@ class ImageCache {
 
   private async performPreload(imageSource: any, key: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      Image.prefetch(Image.resolveAssetSource(imageSource).uri)
-        .then(() => {
-          this.cache.set(key, imageSource);
-          console.log('🖼️ Изображение предзагружено:', key);
+      try {
+        const resolvedSource = Image.resolveAssetSource(imageSource);
+        if (!resolvedSource || !resolvedSource.uri) {
+          console.warn('⚠️ Не удалось разрешить источник изображения:', key);
           resolve();
-        })
-        .catch((error) => {
-          console.error('❌ Ошибка предзагрузки изображения:', key, error);
-          reject(error);
-        });
+          return;
+        }
+
+        Image.prefetch(resolvedSource.uri)
+          .then(() => {
+            this.cache.set(key, imageSource);
+            console.log('🖼️ Изображение предзагружено:', key);
+            resolve();
+          })
+          .catch((error) => {
+            console.error('❌ Ошибка предзагрузки изображения:', key, error);
+            resolve(); // Не отклоняем, чтобы не ломать приложение
+          });
+      } catch (error) {
+        console.error('❌ Ошибка разрешения источника изображения:', key, error);
+        resolve(); // Не отклоняем, чтобы не ломать приложение
+      }
     });
   }
 
   // Получаем изображение из кеша или возвращаем исходное
   getImage(imageSource: any): any {
+    if (!imageSource) {
+      console.warn('⚠️ ImageCache.getImage: imageSource is undefined');
+      return null;
+    }
+    
     const key = this.getImageKey(imageSource);
     return this.cache.get(key) || imageSource;
   }
