@@ -30,7 +30,7 @@ import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import NetInfo from '@react-native-community/netinfo';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
-import { dataCache, CACHE_KEYS } from '../utils/DataCache';
+import { dataCache, CACHE_KEYS } from '../utils/dataCache';
 // Lazy load Puck component to improve initial render performance
 const Puck = React.lazy(() => import('../components/Puck'));
 
@@ -974,6 +974,12 @@ export default function HomeScreen() {
       );
       
       setPlayers(loadedPlayers);
+      
+      // Предзагружаем аватары через систему миниатюр
+      const { avatarCache } = await import('../utils/AvatarCache');
+      avatarCache.preloadPlayerAvatars(loadedPlayers).catch(error => {
+        console.error('❌ Ошибка предзагрузки аватаров:', error);
+      });
     } catch (error) {
       console.error('❌ Ошибка обновления игроков:', error);
     }
@@ -1022,6 +1028,12 @@ export default function HomeScreen() {
       
       setPlayers(loadedPlayers);
       setCurrentUser(user);
+      
+      // Предзагружаем аватары через систему миниатюр
+      const { avatarCache } = await import('../utils/AvatarCache');
+      avatarCache.preloadPlayerAvatars(loadedPlayers).catch(error => {
+        console.error('❌ Ошибка предзагрузки аватаров:', error);
+      });
       
       // Устанавливаем значения по умолчанию только если они не установлены
       if (!selectedCountry) {

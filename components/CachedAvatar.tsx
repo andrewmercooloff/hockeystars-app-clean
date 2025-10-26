@@ -1,7 +1,8 @@
 import React from 'react';
 import { Image, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAvatarCache } from '../utils/AvatarCache';
+import { useAvatarCache, avatarCache } from '../utils/AvatarCache';
+import { useThumbnailUrl, AvatarSize, AVATAR_SIZES } from '../utils/ThumbnailCache';
 
 interface CachedAvatarProps {
   playerId: string;
@@ -33,32 +34,31 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const [isCached, setIsCached] = React.useState(false);
 
   // Используем кешированный аватар или fallback
-  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
+  const originalAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
+  
+  // Определяем размер миниатюры на основе размера аватара
+  const getThumbnailSize = (size: number): AvatarSize => {
+    if (size <= AVATAR_SIZES.SMALL) return 'SMALL';
+    if (size <= AVATAR_SIZES.MEDIUM) return 'MEDIUM';
+    if (size <= AVATAR_SIZES.LARGE) return 'LARGE';
+    if (size <= AVATAR_SIZES.XLARGE) return 'XLARGE';
+    return 'XXLARGE';
+  };
 
-  // Проверяем, есть ли изображение в кеше React Native
+  const thumbnailSize = getThumbnailSize(size);
+  const effectiveAvatarUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
+
+  // Предзагружаем миниатюру
   React.useEffect(() => {
-    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http')) {
-      // Проверяем кеш React Native
-      Image.queryCache([effectiveAvatarUrl])
-        .then(cacheMap => {
-          if (cacheMap[effectiveAvatarUrl]) {
-            setIsCached(true);
-            setIsPrefetched(true);
-          }
+    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http') && !isPrefetched) {
+      Image.prefetch(effectiveAvatarUrl)
+        .then(() => {
+          setIsPrefetched(true);
+          setIsCached(true);
         })
         .catch(() => {
-          // Если проверка кеша не удалась, пробуем предзагрузить
-          if (!isPrefetched) {
-            Image.prefetch(effectiveAvatarUrl)
-              .then(() => {
-                setIsPrefetched(true);
-                setIsCached(true);
-              })
-              .catch(() => {
-                setIsPrefetched(false);
-                setIsCached(false);
-              });
-          }
+          setIsPrefetched(false);
+          setIsCached(false);
         });
     }
   }, [effectiveAvatarUrl, isPrefetched]);
@@ -117,8 +117,8 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
         onLoad={handleLoad}
       />
       
-      {/* Показываем индикатор загрузки только если изображение не кешировано и не предзагружено */}
-      {!isCached && !isPrefetched && !imageLoaded && !imageError && (
+      {/* Показываем индикатор загрузки если изображение еще не загружено */}
+      {!imageLoaded && !imageError && (
         <View style={{
           position: 'absolute',
           top: 0,
