@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
-import { useThumbnailUrl, AvatarSize, AVATAR_SIZES } from '../utils/ThumbnailCache';
 
 interface CachedAvatarProps {
   playerId: string;
@@ -32,22 +31,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const [imageError, setImageError] = React.useState(false);
 
   // Используем кешированный аватар или fallback
-  const originalAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
-  
-  // Определяем размер миниатюры на основе размера аватара
-  const getThumbnailSize = (size: number): AvatarSize => {
-    if (size <= AVATAR_SIZES.SMALL) return 'SMALL';
-    if (size <= AVATAR_SIZES.MEDIUM) return 'MEDIUM';
-    if (size <= AVATAR_SIZES.LARGE) return 'LARGE';
-    if (size <= AVATAR_SIZES.XLARGE) return 'XLARGE';
-    return 'XXLARGE';
-  };
-
-  const thumbnailSize = getThumbnailSize(size);
-  const thumbnailUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
-  
-  // Если миниатюра не загрузилась, используем оригинальный URL
-  const effectiveAvatarUrl = imageError ? originalAvatarUrl : thumbnailUrl;
+  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -56,10 +40,10 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   }, [onLoad]);
 
   const handleError = React.useCallback(() => {
-    console.log(`❌ Ошибка загрузки миниатюры ${thumbnailSize} для ${playerId}, используем оригинальный URL`);
+    console.log(`❌ Ошибка загрузки аватара для ${playerId}`);
     setImageError(true);
     onError?.();
-  }, [onError, thumbnailSize, playerId]);
+  }, [onError, playerId]);
 
   const imageStyle = {
     width: size,
