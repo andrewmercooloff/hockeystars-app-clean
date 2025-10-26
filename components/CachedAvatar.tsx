@@ -5,6 +5,7 @@ import { useAvatarCache } from '../utils/AvatarCache';
 
 interface CachedAvatarProps {
   playerId: string;
+  fallbackAvatarUrl?: string; // Добавляем fallback URL
   size?: number;
   fallbackIcon?: string;
   fallbackSize?: number;
@@ -16,6 +17,7 @@ interface CachedAvatarProps {
 
 const CachedAvatar: React.FC<CachedAvatarProps> = ({
   playerId,
+  fallbackAvatarUrl,
   size = 45,
   fallbackIcon = 'person',
   fallbackSize = 25,
@@ -24,9 +26,12 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   onError,
   onLoad,
 }) => {
-  const avatarUrl = useAvatarCache(playerId);
+  const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
+
+  // Используем кешированный аватар или fallback
+  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -48,7 +53,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   };
 
   // Если нет аватара или ошибка загрузки, показываем иконку
-  if (!avatarUrl || imageError) {
+  if (!effectiveAvatarUrl || imageError) {
     return (
       <View style={[imageStyle, { 
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -69,7 +74,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
       {/* Показываем изображение */}
       <Image
         source={{ 
-          uri: avatarUrl,
+          uri: effectiveAvatarUrl,
           cache: 'force-cache',
           headers: {
             'Cache-Control': 'max-age=3600'
@@ -82,22 +87,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
         onLoad={handleLoad}
       />
       
-      {/* Показываем индикатор загрузки */}
-      {!imageLoaded && !imageError && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          borderRadius: size / 2
-        }}>
-          <ActivityIndicator size="small" color="#fff" />
-        </View>
-      )}
+      {/* Убираем индикатор загрузки - аватары должны загружаться мгновенно */}
     </View>
   );
 };

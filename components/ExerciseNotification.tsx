@@ -56,6 +56,7 @@ export default function ExerciseNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />

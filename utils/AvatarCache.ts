@@ -73,12 +73,18 @@ class AvatarCache {
 export const avatarCache = AvatarCache.getInstance();
 
 // Хук для подписки на изменения аватаров
-export const useAvatarCache = (playerId: string) => {
+export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(() => 
     avatarCache.getAvatar(playerId)
   );
 
   React.useEffect(() => {
+    // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
+    if (!avatarUrl && fallbackUrl) {
+      avatarCache.setAvatar(playerId, fallbackUrl);
+      setAvatarUrl(fallbackUrl);
+    }
+
     // Подписываемся на изменения
     const unsubscribe = avatarCache.subscribe((changedPlayerId, newAvatarUrl) => {
       if (changedPlayerId === playerId) {
@@ -93,7 +99,7 @@ export const useAvatarCache = (playerId: string) => {
     }
 
     return unsubscribe;
-  }, [playerId]);
+  }, [playerId, fallbackUrl]);
 
   return avatarUrl;
 };

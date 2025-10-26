@@ -537,6 +537,7 @@ export default function SearchScreen() {
         <View style={photoContainerStyle}>
           <CachedAvatar 
             playerId={item.id}
+            fallbackAvatarUrl={typeof playerPhoto === 'string' ? playerPhoto : ''}
             size={60}
             style={styles.playerPhoto}
             onError={() => {

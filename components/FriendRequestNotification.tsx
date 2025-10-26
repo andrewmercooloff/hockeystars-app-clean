@@ -47,6 +47,7 @@ export default function FriendRequestNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />

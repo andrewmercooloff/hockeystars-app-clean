@@ -363,6 +363,7 @@ export default function MessagesScreen() {
                     <View style={styles.chatItem}>
                   <CachedAvatar 
                     playerId={chat.player.id}
+                    fallbackAvatarUrl={chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
                     size={50}
                     style={styles.chatAvatar}
                     onError={() => {

@@ -121,23 +121,7 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
         />
       )}
       
-      {/* Показываем индикатор загрузки только если изображение загружается и включен индикатор */}
-      {isLoading && showLoadingIndicator && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 1,
-          borderRadius: size / 2
-        }}>
-          <ActivityIndicator size="small" color="#fff" />
-        </View>
-      )}
+      {/* Убираем индикатор загрузки - аватары должны загружаться мгновенно */}
     </View>
   );
 });

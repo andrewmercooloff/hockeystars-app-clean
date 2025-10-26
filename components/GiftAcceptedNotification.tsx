@@ -31,6 +31,7 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
         {starAvatar ? (
           <CachedAvatar
             playerId={starId}
+            fallbackAvatarUrl={starAvatar}
             size={50}
             style={styles.playerAvatar}
           />

@@ -983,6 +983,7 @@ export default function NotificationsScreen() {
               <View key={request.id} style={styles.friendRequestWrapper}>
                 <FriendRequestNotification
                   playerName={request.playerName}
+                  playerId={request.playerId}
                   timestamp={new Date(request.timestamp).toISOString()}
                   playerAvatar={request.playerAvatar}
                   onAccept={() => handleFriendRequest(request, 'accept')}
@@ -1030,6 +1031,7 @@ export default function NotificationsScreen() {
                   <StatsChangeNotification
                     changes={notification.data.changes}
                     playerName={notification.data.changedPlayerName || 'Игрок'}
+                    playerId={notification.data.changedPlayerId}
                     timestamp={notification.timestamp}
                     playerAvatar={notification.data.changedPlayerAvatar}
                   />
@@ -1084,6 +1086,7 @@ export default function NotificationsScreen() {
                 >
                   <ExerciseNotification
                     playerName={notification.data.playerName || 'Игрок'}
+                    playerId={notification.data.playerId}
                     exerciseId={notification.data.exerciseId || 'unknown'}
                     timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
                     playerAvatar={notification.data.playerAvatar}
@@ -1129,6 +1132,7 @@ export default function NotificationsScreen() {
               ) : notification.type === 'gift_accepted' ? (
                 <GiftAcceptedNotification
                   starName={notification.data?.from_star || t('notifications.star')}
+                  starId={notification.data?.star_id}
                   starAvatar={notification.data?.star_avatar}
                   itemTypeName={getItemTypeName(notification.data?.item_type || 'gift')}
                   message={notification.message}
