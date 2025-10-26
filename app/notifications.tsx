@@ -283,18 +283,6 @@ export default function NotificationsScreen() {
 
       setNotifications(userNotifications);
       setFriendRequests(friendRequestItems);
-      
-      // Предзагружаем аватары для лучшей производительности
-      const { avatarCache } = await import('../utils/AvatarCache');
-      const players = [
-        ...userNotifications.map(n => ({ id: n.data?.playerId || n.data?.changedPlayerId, avatar: n.data?.playerAvatar || n.data?.changedPlayerAvatar })),
-        ...friendRequestItems.map(r => ({ id: r.playerId, avatar: r.playerAvatar })),
-        ...giftRequestItems.map(g => ({ id: g.playerId, avatar: g.playerAvatar }))
-      ].filter(p => p.id && p.avatar);
-      
-      avatarCache.preloadPlayerAvatars(players).catch(error => {
-        console.error('❌ Ошибка предзагрузки аватаров в уведомлениях:', error);
-      });
       // giftRequestItems загружаются асинхронно выше
       
     } catch (error) {

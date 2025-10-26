@@ -95,13 +95,6 @@ export default function MessagesScreen() {
       });
       
       setChats(chatPreviews);
-      
-      // Предзагружаем аватары для лучшей производительности
-      const { avatarCache } = await import('../utils/AvatarCache');
-      const players = chatPreviews.map(chat => ({ id: chat.player.id, avatar: chat.player.avatar }));
-      avatarCache.preloadPlayerAvatars(players).catch(error => {
-        console.error('❌ Ошибка предзагрузки аватаров в сообщениях:', error);
-      });
     } catch (error) {
       console.error('❌ Ошибка загрузки чатов:', error);
       // Не показываем ошибку, просто оставляем пустой список
