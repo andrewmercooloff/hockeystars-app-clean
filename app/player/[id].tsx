@@ -1451,16 +1451,20 @@ export default function PlayerProfile() {
           const { dataCache, CACHE_KEYS } = await import('../../utils/DataCache');
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           
-          // Принудительно обновляем глобальное состояние пользователя
-          await refreshUser();
+          // Очищаем глобальный кеш пользователя
+          const { updateGlobalUserCache } = await import('../../contexts/UserContext');
+          updateGlobalUserCache(null);
           
-          // Переходим на главную страницу
-          router.replace('/');
+          // Устанавливаем пользователя в null (НЕ вызываем refreshUser!)
+          setCurrentUser(null);
+          
+          // Переходим на страницу логина
+          router.replace('/login');
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
-          // Даже если произошла ошибка, все равно переходим на главную
-          await refreshUser();
-          router.replace('/');
+          // Даже если произошла ошибка, все равно выходим
+          setCurrentUser(null);
+          router.replace('/login');
         }
       }
     );
