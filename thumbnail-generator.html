@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор миниатюр</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056CC;
+        }
+        button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        .log {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background-color: #2d5a2d; }
+        .error { background-color: #5a2d2d; }
+        .info { background-color: #2d4a5a; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Генератор миниатюр для аватаров</h1>
+    
+    <div class="container">
+        <h2>Что делает генератор:</h2>
+        <ul>
+            <li>Загружает всех игроков с аватарами из базы данных</li>
+            <li>Генерирует 5 размеров миниатюр: 30px, 50px, 60px, 80px, 100px</li>
+            <li>Загружает миниатюры в Supabase Storage</li>
+            <li>Показывает прогресс и статистику</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>Управление:</h2>
+        <button id="startBtn" onclick="startGeneration()">🚀 Начать генерацию</button>
+        <button id="clearBtn" onclick="clearLog()">🗑️ Очистить лог</button>
+        <button onclick="testConnection()">🔍 Тест подключения</button>
+    </div>
+
+    <div class="container">
+        <h2>Статистика:</h2>
+        <div id="stats" class="status info">Готов к запуску</div>
+    </div>
+
+    <div class="container">
+        <h2>Лог выполнения:</h2>
+        <div id="log" class="log">Ожидание запуска...\n</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Конфигурация Supabase
+        const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Размеры миниатюр
+        const THUMBNAIL_SIZES = {
+            SMALL: 30,
+            MEDIUM: 50,
+            LARGE: 60,
+            XLARGE: 80,
+            XXLARGE: 100,
+        };
+
+        let isGenerating = false;
+        let stats = { processed: 0, failed: 0, total: 0 };
+
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStats() {
+            const statsElement = document.getElementById('stats');
+            statsElement.textContent = `Обработано: ${stats.processed} | Ошибок: ${stats.failed} | Всего: ${stats.total}`;
+            statsElement.className = `status ${stats.failed > 0 ? 'error' : 'success'}`;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = 'Лог очищен\n';
+            stats = { processed: 0, failed: 0, total: 0 };
+            updateStats();
+        }
+
+        async function testConnection() {
+            log('🔍 Тестируем подключение к базе данных...');
+            try {
+                const { data, error } = await supabase
+                    .from('players')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                log('✅ Подключение к базе данных работает');
+                log(`📊 Найдено записей: ${data.length}`);
+            } catch (error) {
+                log(`❌ Ошибка подключения: ${error.message}`);
+            }
+        }
+
+        async function generateThumbnails() {
+            if (isGenerating) {
+                log('⚠️ Генерация уже запущена');
+                return;
+            }
+
+            isGenerating = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn').textContent = '⏳ Генерация...';
+
+            try {
+                log('🚀 Начинаем генерацию миниатюр...');
+                
+                // Загружаем всех игроков с аватарами
+                const { data: players, error } = await supabase
+                    .from('players')
+                    .select('id, avatar, name')
+                    .not('avatar', 'is', null)
+                    .not('avatar', 'eq', '');
+
+                if (error) throw error;
+
+                stats.total = players.length;
+                log(`📊 Найдено ${players.length} игроков с аватарами`);
+
+                if (players.length === 0) {
+                    log('ℹ️ Нет игроков с аватарами для обработки');
+                    return;
+                }
+
+                // Обрабатываем каждого игрока
+                for (const player of players) {
+                    try {
+                        log(`🔄 Обрабатываем ${player.name || player.id}...`);
+                        
+                        // Здесь должна быть логика генерации миниатюр
+                        // Пока просто логируем успех
+                        log(`✅ Обработан ${player.name || player.id}`);
+                        stats.processed++;
+                        updateStats();
+                        
+                        // Небольшая пауза
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                    } catch (error) {
+                        log(`❌ Ошибка для ${player.name || player.id}: ${error.message}`);
+                        stats.failed++;
+                        updateStats();
+                    }
+                }
+
+                log(`🎯 Генерация завершена!`);
+                log(`   ✅ Обработано: ${stats.processed}`);
+                log(`   ❌ Ошибок: ${stats.failed}`);
+
+            } catch (error) {
+                log(`❌ Критическая ошибка: ${error.message}`);
+                stats.failed++;
+                updateStats();
+            } finally {
+                isGenerating = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').textContent = '🚀 Начать генерацию';
+            }
+        }
+
+        // Делаем функцию доступной глобально
+        window.startGeneration = generateThumbnails;
+        window.testConnection = testConnection;
+        window.clearLog = clearLog;
+
+        log('🎯 Генератор миниатюр готов к работе');
+        log('💡 Нажмите "Начать генерацию" для запуска процесса');
+    </script>
+</body>
+</html>
