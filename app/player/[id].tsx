@@ -67,7 +67,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser: globalCurrentUser, refreshUser } = useUser();
+  const { currentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
@@ -113,13 +113,13 @@ export default function PlayerProfile() {
 
   // Синхронизируем локальное состояние с глобальным
   useEffect(() => {
-    setCurrentUser(globalCurrentUser);
-  }, [globalCurrentUser]);
+    setCurrentUser(currentUser);
+  }, [currentUser]);
 
   // Проверяем авторизацию при загрузке компонента
   useEffect(() => {
     const checkAuth = async () => {
-      if (!globalCurrentUser) {
+      if (!currentUser) {
         // Если пользователь не авторизован, перенаправляем на главную страницу
         console.log('🔐 Пользователь не авторизован, перенаправляем на главную страницу');
         router.replace('/');
@@ -127,7 +127,7 @@ export default function PlayerProfile() {
     };
     
     checkAuth();
-  }, [globalCurrentUser, router]);
+  }, [currentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
