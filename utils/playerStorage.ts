@@ -1606,6 +1606,14 @@ export const findPlayerByCredentials = async (email: string, password: string): 
 // Сохранение текущего пользователя (в локальном хранилище для сессии)
 export const saveCurrentUser = async (user: Player): Promise<void> => {
   try {
+    // СРАЗУ обновляем глобальный кеш для мгновенного доступа
+    try {
+      const { updateGlobalUserCache } = require('../contexts/UserContext');
+      updateGlobalUserCache(user);
+    } catch (e) {
+      // Контекст еще не загружен, ничего страшного
+    }
+    
     // Проверяем, изменились ли данные пользователя
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const existingData = await AsyncStorage.getItem('hockeystars_current_user');
@@ -1630,9 +1638,6 @@ export const saveCurrentUser = async (user: Player): Promise<void> => {
         timestamp: Date.now()
       }))
     ]);
-    
-    // Обновляем глобальный кеш
-    globalUserCache = user;
     
   } catch (error) {
     console.error('❌ Ошибка сохранения текущего пользователя:', error);

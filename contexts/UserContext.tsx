@@ -25,11 +25,16 @@ interface UserProviderProps {
 }
 
 // Глобальный кеш для пользователя
-let globalUserCache: Player | null = null;
+export let globalUserCache: Player | null = null;
 let lastUserLoadTime = 0;
 const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
 let isInitializing = false;
 let cacheInitPromise: Promise<void> | null = null;
+
+// Функция для обновления глобального кеша (используется в playerStorage)
+export const updateGlobalUserCache = (user: Player | null) => {
+  globalUserCache = user;
+};
 
 // Немедленная инициализация кеша пользователя
 const initializeUserCache = (() => {
@@ -77,11 +82,23 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setCurrentUserState(globalUserCache);
       setIsUserLoading(false);
       setInitialLoadComplete(true);
-      console.log('✅ Кеш пользователя инициализирован, isUserLoading=false');
+      console.log('✅ Кеш пользователя инициализирован, isUserLoading=false, user:', globalUserCache?.name || 'не авторизован');
     };
     
     waitForCache();
   }, []);
+
+  // Обновляем состояние при изменении глобального кеша
+  React.useEffect(() => {
+    const checkInterval = setInterval(() => {
+      if (globalUserCache !== currentUser) {
+        setCurrentUserState(globalUserCache);
+        console.log('🔄 Синхронизация: глобальный кеш обновлен');
+      }
+    }, 100);
+
+    return () => clearInterval(checkInterval);
+  }, [currentUser]);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
