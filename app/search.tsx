@@ -256,6 +256,12 @@ export default function SearchScreen() {
             );
         
         setPlayers(filteredPlayers);
+        
+        // Предзагружаем аватары для лучшей производительности
+        const { avatarCache } = await import('../utils/AvatarCache');
+        avatarCache.preloadPlayerAvatars(filteredPlayers).catch(error => {
+          console.error('❌ Ошибка предзагрузки аватаров в поиске:', error);
+        });
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
         router.replace('/login');

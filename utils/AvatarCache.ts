@@ -58,15 +58,21 @@ class AvatarCache {
     console.log('🗑️ Аватар удален из кеша:', playerId);
   }
 
-  // Очищаем весь кеш
-  clearAll(): void {
-    this.cache.clear();
-    console.log('🗑️ Весь кеш аватаров очищен');
-  }
-
-  // Получаем все кешированные аватары
-  getAllAvatars(): Map<string, string> {
-    return new Map(this.cache);
+  // Предзагружаем аватары для списка игроков
+  async preloadPlayerAvatars(players: { id: string; avatar?: string | null }[]): Promise<void> {
+    const preloadTasks = players
+      .filter(p => p.avatar && p.avatar.startsWith('http'))
+      .map(async p => {
+        try {
+          await Image.prefetch(p.avatar!);
+          console.log('🖼️ Аватар предзагружен:', p.avatar!.substring(0, 50) + '...');
+        } catch (error) {
+          console.error('❌ Ошибка предзагрузки аватара:', p.avatar!.substring(0, 50) + '...', error);
+        }
+      });
+    
+    await Promise.allSettled(preloadTasks);
+    console.log('🖼️ Предзагрузка аватаров завершена');
   }
 }
 
