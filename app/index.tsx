@@ -30,7 +30,7 @@ import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import NetInfo from '@react-native-community/netinfo';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
-import { dataCache, CACHE_KEYS } from '../utils/dataCache';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 // Lazy load Puck component to improve initial render performance
 const Puck = React.lazy(() => import('../components/Puck'));
 

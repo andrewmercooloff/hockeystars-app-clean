@@ -54,11 +54,14 @@ class ThumbnailCache {
     // Проверяем кеш
     const playerCache = this.cache.get(playerId);
     if (playerCache && playerCache.has(size)) {
-      return playerCache.get(size)!;
+      const cachedUrl = playerCache.get(size)!;
+      console.log(`🖼️ Используем кешированную миниатюру для ${playerId} (${size}):`, cachedUrl.substring(0, 50) + '...');
+      return cachedUrl;
     }
 
     // Генерируем новый URL миниатюры
     const thumbnailUrl = this.generateThumbnailUrl(originalUrl, size);
+    console.log(`🖼️ Создана миниатюра для ${playerId} (${size}):`, thumbnailUrl.substring(0, 50) + '...');
 
     // Сохраняем в кеш
     if (!playerCache) {
@@ -91,7 +94,7 @@ class ThumbnailCache {
       await Promise.allSettled(preloadTasks);
       this.preloadedImages.add(cacheKey);
       
-      console.log(`🖼️ Предзагружены все размеры для ${playerId}`);
+      console.log(`🖼️ Предзагружены все размеры для ${playerId} (${Object.keys(AVATAR_SIZES).length} размеров)`);
     } catch (error) {
       console.error(`❌ Ошибка предзагрузки размеров для ${playerId}:`, error);
     }

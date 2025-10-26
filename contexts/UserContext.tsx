@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Player, loadCurrentUser } from '../utils/playerStorage';
-import { dataCache, CACHE_KEYS } from '../utils/dataCache';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 
 interface UserContextType {
   currentUser: Player | null;

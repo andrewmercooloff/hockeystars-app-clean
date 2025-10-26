@@ -117,22 +117,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
         onLoad={handleLoad}
       />
       
-      {/* Показываем индикатор загрузки если изображение еще не загружено */}
-      {!imageLoaded && !imageError && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          borderRadius: size / 2
-        }}>
-          <ActivityIndicator size="small" color="#fff" />
-        </View>
-      )}
     </View>
   );
 };
