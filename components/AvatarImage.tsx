@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Image, ImageProps, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { avatarCache } from '../utils/AvatarCache';
 
 interface AvatarImageProps extends Omit<ImageProps, 'source'> {
   uri: string;
+  playerId?: string; // Добавляем playerId для кеширования
   size?: number;
   fallbackIcon?: string;
   fallbackSize?: number;
@@ -13,6 +15,7 @@ interface AvatarImageProps extends Omit<ImageProps, 'source'> {
 
 const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
   uri,
+  playerId,
   size = 45,
   fallbackIcon = 'person',
   fallbackSize = 25,
@@ -29,18 +32,22 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
   const lastSuccessfulUriRef = useRef<string | null>(null);
   const currentUriRef = useRef<string | null>(null);
 
+  // Получаем актуальный аватар из кеша, если есть playerId
+  const cachedAvatarUrl = playerId ? avatarCache.getAvatar(playerId) : null;
+  const effectiveUri = cachedAvatarUrl || uri;
+
   useEffect(() => {
-    if (uri !== currentUriRef.current) {
-      currentUriRef.current = uri;
+    if (effectiveUri !== currentUriRef.current) {
+      currentUriRef.current = effectiveUri;
       
       // Если URI изменился, сбрасываем состояние
-      if (uri !== lastSuccessfulUriRef.current) {
+      if (effectiveUri !== lastSuccessfulUriRef.current) {
         setImageLoaded(false);
         setImageError(false);
         // Не устанавливаем isLoading в true сразу, чтобы избежать серого кружка
       }
     }
-  }, [uri]);
+  }, [effectiveUri]);
 
   const handleError = useCallback((error: any) => {
     setImageError(true);
@@ -50,15 +57,15 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
   }, [onError]);
 
   const handleLoad = useCallback(() => {
-    lastSuccessfulUriRef.current = uri;
+    lastSuccessfulUriRef.current = effectiveUri;
     setIsLoading(false);
     setImageError(false);
     setImageLoaded(true);
     onLoad?.();
-  }, [onLoad, uri]);
+  }, [onLoad, effectiveUri]);
 
   // Если есть ошибка и нет предыдущего удачного изображения, показываем fallback
-  if ((imageError || !uri) && !lastSuccessfulUriRef.current) {
+  if ((imageError || !effectiveUri) && !lastSuccessfulUriRef.current) {
     return (
       <View style={[style, { 
         width: size, 
@@ -83,7 +90,7 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
   return (
     <View style={imageStyle}>
       {/* Показываем предыдущее удачное изображение под текущей загрузкой, чтобы не мигало */}
-      {lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== uri && (
+      {lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== effectiveUri && (
         <Image
           source={{ uri: lastSuccessfulUriRef.current, cache: 'force-cache' as const }}
           style={imageStyle}
@@ -92,17 +99,17 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
       )}
       
       {/* Показываем текущее изображение сразу, без ожидания загрузки */}
-      {uri && (
+      {effectiveUri && (
         <Image
           source={{ 
-            uri,
+            uri: effectiveUri,
             cache: 'force-cache',
             headers: {
               'Cache-Control': 'max-age=3600'
             }
           }}
           style={[imageStyle, { 
-            position: lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== uri ? 'absolute' : undefined, 
+            position: lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== effectiveUri ? 'absolute' : undefined, 
             left: 0, 
             top: 0,
             // Добавляем прозрачность для плавного появления

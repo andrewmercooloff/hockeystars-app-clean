@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface FriendRequestNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   timestamp: string;
   playerAvatar?: string | null;
   onAccept: () => void;
@@ -13,6 +15,7 @@ interface FriendRequestNotificationProps {
 
 export default function FriendRequestNotification({
   playerName,
+  playerId,
   timestamp,
   playerAvatar,
   onAccept,
@@ -42,16 +45,10 @@ export default function FriendRequestNotification({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image
-            source={{ 
-              uri: playerAvatar,
-              cache: 'force-cache',
-              headers: {
-                'Cache-Control': 'max-age=3600'
-              }
-            }}
+          <CachedAvatar
+            playerId={playerId}
+            size={50}
             style={styles.playerAvatar}
-            resizeMode="cover"
           />
         ) : (
           <View style={styles.avatarPlaceholder}>

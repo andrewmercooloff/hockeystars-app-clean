@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from './CachedAvatar';
 
 interface GiftAcceptedNotificationProps {
   starName: string; // Имя звезды, которая одобрила подарок
+  starId?: string; // ID звезды для кеширования
   starAvatar?: string; // Аватар звезды
   itemTypeName: string; // Название типа подарка (уже переведенное)
   message: string; // Текст сообщения (уже переведенный)
@@ -14,6 +16,7 @@ interface GiftAcceptedNotificationProps {
 
 const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
   starName,
+  starId,
   starAvatar,
   itemTypeName,
   message,
@@ -26,13 +29,11 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {starAvatar ? (
-          <Image source={{ 
-            uri: starAvatar,
-            cache: 'force-cache',
-            headers: {
-              'Cache-Control': 'max-age=3600'
-            }
-          }} style={styles.playerAvatar} />
+          <CachedAvatar
+            playerId={starId}
+            size={50}
+            style={styles.playerAvatar}
+          />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="person-outline" size={28} color="#666" />

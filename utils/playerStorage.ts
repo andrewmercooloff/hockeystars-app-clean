@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars } from './AvatarCache';
 
 // Глобальный кеш для пользователя
 let globalUserCache: Player | null = null;
@@ -1004,6 +1005,18 @@ export const loadPlayers = async (): Promise<Player[]> => {
       // Преобразуем данные из Supabase в формат приложения
       const players = data.map(convertSupabaseToPlayer);
       
+      // Обновляем кеш аватаров для всех игроков
+      players.forEach(player => {
+        if (player.avatar) {
+          avatarCache.setAvatar(player.id, player.avatar);
+        }
+      });
+      
+      // Предзагружаем аватары в фоне
+      preloadPlayerAvatars(players).catch(error => {
+        console.error('❌ Ошибка предзагрузки аватаров:', error);
+      });
+      
       // Загружаем рейтинги активности для сортировки в поиске
       try {
         const { getPlayersActivityRatings } = await import('../services/activityService');
@@ -1355,6 +1368,11 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     //   exerciseStats: player.exerciseStats
     // });
     
+    // Обновляем кеш аватаров
+    if (player.avatar) {
+      avatarCache.setAvatar(player.id, player.avatar);
+    }
+    
     // Кешируем результат
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
       player,
@@ -1426,6 +1444,35 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     const updatedPlayer = convertSupabaseToPlayer(data);
     
+    // Проверяем изменение аватара и обновляем глобальный кеш
+    if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
+      console.log('🔄 Аватар игрока изменился:', { playerId, oldAvatar: oldPlayer.avatar, newAvatar: updatedPlayer.avatar });
+      
+      // Обновляем кеш аватаров
+      if (updatedPlayer.avatar) {
+        updateAvatarGlobally(playerId, updatedPlayer.avatar);
+      } else {
+        avatarCache.clearAvatar(playerId);
+      }
+      
+      // Отправляем уведомления друзьям об изменении аватара
+      setTimeout(async () => {
+        try {
+          await notifyFriendsAboutAvatarChange(
+            playerId,
+            updatedPlayer.name,
+            updatedPlayer.avatar || '',
+            {
+              avatarNotification: {
+                changed: 'изменил свой аватар'
+              }
+            }
+          );
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомлений об аватаре (не критично):', error);
+        }
+      }, 0);
+    }
     
     // Очищаем кеш игрока при обновлении (только если не пропускаем)
     if (!skipCacheClear) {

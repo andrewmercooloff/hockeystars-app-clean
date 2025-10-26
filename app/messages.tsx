@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from '../components/CachedAvatar';
 // Убираем все анимации переходов
 import {
     getPlayerById,
@@ -360,12 +361,10 @@ export default function MessagesScreen() {
                 >
                   <View style={styles.chatGradientShadow}>
                     <View style={styles.chatItem}>
-                  <Image 
-                    source={{ 
-                      uri: chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player' 
-                    }} 
+                  <CachedAvatar 
+                    playerId={chat.player.id}
+                    size={50}
                     style={styles.chatAvatar}
-                    defaultSource={require('../assets/images/default-avatar.png')}
                     onError={() => {
                       // Fallback для аватарки при ошибке загрузки
                       console.log('Ошибка загрузки аватарки для:', chat.player.name);

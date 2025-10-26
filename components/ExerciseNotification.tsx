@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface ExerciseNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   exerciseId: string;
   timestamp: string;
   playerAvatar?: string | null;
@@ -12,6 +14,7 @@ interface ExerciseNotificationProps {
 
 export default function ExerciseNotification({
   playerName,
+  playerId,
   exerciseId,
   timestamp,
   playerAvatar,
@@ -51,10 +54,10 @@ export default function ExerciseNotification({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image
-            source={{ uri: playerAvatar }}
+          <CachedAvatar
+            playerId={playerId}
+            size={50}
             style={styles.playerAvatar}
-            resizeMode="cover"
           />
         ) : (
           <Ionicons name="barbell-outline" size={24} color="#fff" />

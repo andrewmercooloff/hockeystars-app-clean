@@ -12,6 +12,7 @@ import {
     ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from '../components/CachedAvatar';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
@@ -534,21 +535,13 @@ export default function SearchScreen() {
         <View style={styles.playerGradientShadow}>
           <View style={styles.playerItem}>
         <View style={photoContainerStyle}>
-          <Image 
-            source={typeof playerPhoto === 'string' ? { 
-              uri: playerPhoto,
-              cache: 'force-cache',
-              headers: {
-                'Cache-Control': 'max-age=3600'
-              }
-            } : playerPhoto} 
-            style={styles.playerPhoto} 
-            onError={(e) => {
-              console.warn(`Ошибка загрузки фото для игрока ${item.name}:`, e.nativeEvent.error);
+          <CachedAvatar 
+            playerId={item.id}
+            size={60}
+            style={styles.playerPhoto}
+            onError={() => {
+              console.warn(`Ошибка загрузки фото для игрока ${item.name}`);
             }}
-            defaultSource={require('../assets/images/default-avatar.png')}
-            fadeDuration={0}
-            resizeMode="cover"
           />
         </View>
         <View style={styles.playerDetails}>

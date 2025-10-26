@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface StatChange {
   field: string;
@@ -14,6 +15,7 @@ interface StatChange {
 interface StatsChangeNotificationProps {
   changes: StatChange[];
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   timestamp: number;
   playerAvatar?: string | null;
 }
@@ -21,6 +23,7 @@ interface StatsChangeNotificationProps {
 const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
   changes,
   playerName,
+  playerId,
   timestamp,
   playerAvatar
 }) => {
@@ -75,14 +78,9 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
       {/* Аватар слева */}
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image 
-            source={{ 
-              uri: playerAvatar,
-              cache: 'force-cache',
-              headers: {
-                'Cache-Control': 'max-age=3600'
-              }
-            }} 
+          <CachedAvatar
+            playerId={playerId}
+            size={50}
             style={styles.playerAvatar}
           />
         ) : (
