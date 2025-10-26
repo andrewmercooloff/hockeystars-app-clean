@@ -88,18 +88,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     waitForCache();
   }, []);
 
-  // Обновляем состояние при изменении глобального кеша
-  React.useEffect(() => {
-    const checkInterval = setInterval(() => {
-      if (globalUserCache !== currentUser) {
-        setCurrentUserState(globalUserCache);
-        console.log('🔄 Синхронизация: глобальный кеш обновлен');
-      }
-    }, 100);
-
-    return () => clearInterval(checkInterval);
-  }, [currentUser]);
-
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
     setCurrentUserState(user);
@@ -122,7 +110,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
       lastUserLoadTime = now;
 
-      setIsUserLoading(true);
+      // НЕ устанавливаем isUserLoading=true, чтобы избежать мигания UI
+      // setIsUserLoading(true);
 
       // Если принудительное обновление, очищаем кеш
       if (forceRefresh) {
@@ -135,7 +124,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         const cachedUser = await dataCache.get<Player>(CACHE_KEYS.USER_PROFILE);
         if (cachedUser && (now - (cachedUser as any).lastUpdated || 0) < USER_CACHE_DURATION) {
           setCurrentUser(cachedUser);
-          setIsUserLoading(false);
           return;
         }
       }
@@ -143,10 +131,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Если в кеше нет актуальных данных, загружаем из хранилища
       const user = await loadCurrentUser(forceRefresh);
       setCurrentUser(user);
-      setIsUserLoading(false);
     } catch (error) {
       console.error('Ошибка загрузки пользователя:', error);
-      setIsUserLoading(false);
     }
   }, [setCurrentUser]);
 
