@@ -61,26 +61,27 @@ class AvatarCache {
   // Предзагружаем аватары для списка игроков (используем систему миниатюр)
   async preloadPlayerAvatars(players: { id: string; avatar?: string | null }[]): Promise<void> {
     try {
-      // Импортируем систему миниатюр
-      const { thumbnailCache } = await import('./ThumbnailCache');
-      await thumbnailCache.preloadPlayersAvatars(players);
-    } catch (error) {
-      console.error('❌ Ошибка предзагрузки аватаров через систему миниатюр:', error);
-      
-      // Fallback к старому методу
-      const preloadTasks = players
+      // Сначала предзагружаем оригинальные URL (быстрее)
+      const originalPreloadTasks = players
         .filter(p => p.avatar && p.avatar.startsWith('http'))
         .map(async p => {
           try {
             await Image.prefetch(p.avatar!);
-            console.log('🖼️ Аватар предзагружен (fallback):', p.avatar!.substring(0, 50) + '...');
+            console.log('🖼️ Оригинальный аватар предзагружен:', p.avatar!.substring(0, 50) + '...');
           } catch (error) {
-            console.error('❌ Ошибка предзагрузки аватара (fallback):', p.avatar!.substring(0, 50) + '...', error);
+            console.error('❌ Ошибка предзагрузки оригинального аватара:', p.avatar!.substring(0, 50) + '...', error);
           }
         });
       
-      await Promise.allSettled(preloadTasks);
-      console.log('🖼️ Предзагрузка аватаров завершена (fallback)');
+      await Promise.allSettled(originalPreloadTasks);
+      
+      // Затем предзагружаем через систему миниатюр
+      const { thumbnailCache } = await import('./ThumbnailCache');
+      await thumbnailCache.preloadPlayersAvatars(players);
+      
+      console.log('🖼️ Предзагрузка аватаров завершена (оригинал + миниатюры)');
+    } catch (error) {
+      console.error('❌ Ошибка предзагрузки аватаров:', error);
     }
   }
 

@@ -33,16 +33,19 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    // Для Supabase Storage добавляем параметры ресайза
+    // Для небольших размеров используем оригинальный URL (быстрее)
+    if (size === 'SMALL' || size === 'MEDIUM') {
+      return originalUrl;
+    }
+
+    // Для больших размеров добавляем параметры ресайза только для Supabase
     if (originalUrl.includes('supabase')) {
       const sizeValue = AVATAR_SIZES[size];
       return `${originalUrl}?width=${sizeValue}&height=${sizeValue}&resize=cover&quality=80`;
     }
 
-    // Для других URL добавляем параметры ресайза
-    const sizeValue = AVATAR_SIZES[size];
-    const separator = originalUrl.includes('?') ? '&' : '?';
-    return `${originalUrl}${separator}w=${sizeValue}&h=${sizeValue}&fit=cover&q=80`;
+    // Для других URL используем оригинальный URL
+    return originalUrl;
   }
 
   // Получаем URL миниатюры для конкретного размера
@@ -84,7 +87,11 @@ class ThumbnailCache {
     }
 
     try {
-      const preloadTasks = Object.keys(AVATAR_SIZES).map(async (size) => {
+      // Предзагружаем оригинальный URL (самый важный)
+      await Image.prefetch(originalUrl);
+      
+      // Предзагружаем только большие размеры с параметрами ресайза
+      const preloadTasks = ['LARGE', 'XLARGE', 'XXLARGE'].map(async (size) => {
         const thumbnailUrl = this.getThumbnailUrl(playerId, originalUrl, size as AvatarSize);
         if (thumbnailUrl !== originalUrl) {
           await Image.prefetch(thumbnailUrl);
@@ -94,7 +101,7 @@ class ThumbnailCache {
       await Promise.allSettled(preloadTasks);
       this.preloadedImages.add(cacheKey);
       
-      console.log(`🖼️ Предзагружены все размеры для ${playerId} (${Object.keys(AVATAR_SIZES).length} размеров)`);
+      console.log(`🖼️ Предзагружены все размеры для ${playerId} (оригинал + 3 больших размера)`);
     } catch (error) {
       console.error(`❌ Ошибка предзагрузки размеров для ${playerId}:`, error);
     }

@@ -51,7 +51,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   // Предзагружаем миниатюру
   React.useEffect(() => {
     if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http') && !isPrefetched) {
-      Image.prefetch(effectiveAvatarUrl)
+      // Проверяем, есть ли уже в кеше React Native
+      Image.queryCache([effectiveAvatarUrl])
+        .then(cacheMap => {
+          if (cacheMap[effectiveAvatarUrl]) {
+            setIsPrefetched(true);
+            setIsCached(true);
+            return;
+          }
+          
+          // Если нет в кеше, предзагружаем
+          return Image.prefetch(effectiveAvatarUrl);
+        })
         .then(() => {
           setIsPrefetched(true);
           setIsCached(true);
