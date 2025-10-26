@@ -155,28 +155,33 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Скрываем splash screen когда приложение готово и пользователь загружен
+    // Флаг для предотвращения повторного скрытия splash screen
+    const [splashScreenHidden, setSplashScreenHidden] = React.useState(false);
+    
+    // Скрываем splash screen когда приложение готово
     React.useEffect(() => {
       console.log(`🔍 Проверка условий скрытия splash screen: 
         appReady=${appReady}, 
         isUserLoading=${isUserLoading}, 
-        userLoaded=${userLoaded}, 
         showSplash=${showSplash}`);
 
       // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
       const forceHideSplashTimeout = setTimeout(() => {
-        console.log('⏰ Принудительное скрытие splash screen по таймауту');
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => {
-          console.log('🏁 Splash screen скрыт по таймауту');
-          setShowSplash(false);
-        });
+        if (!splashScreenHidden) {
+          console.log('⏰ Принудительное скрытие splash screen по таймауту');
+          Animated.timing(splashOpacity, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log('🏁 Splash screen скрыт по таймауту');
+            setShowSplash(false);
+            setSplashScreenHidden(true);
+          });
+        }
       }, 5000);
 
-      if (appReady && !isUserLoading) {
+      if (appReady && !isUserLoading && !splashScreenHidden) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
         clearTimeout(forceHideSplashTimeout);
         
@@ -187,13 +192,14 @@ export default function RootLayout() {
         }).start(() => {
           console.log('🏁 Splash screen скрыт по готовности приложения');
           setShowSplash(false);
+          setSplashScreenHidden(true);
         });
       }
 
       return () => {
         clearTimeout(forceHideSplashTimeout);
       };
-    }, [appReady, isUserLoading, showSplash]);
+    }, [appReady, isUserLoading, splashScreenHidden]);
     
     return null;
   };
