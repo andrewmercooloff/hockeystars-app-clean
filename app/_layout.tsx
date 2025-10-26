@@ -73,6 +73,13 @@ export default function RootLayout() {
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   
+  const { 
+    currentUser, 
+    setCurrentUser, 
+    refreshUser, 
+    isUserLoading 
+  } = useUser();
+
   React.useEffect(() => {
     const subscription = AppState.addEventListener('change', nextAppState => {
       setAppState(nextAppState);
@@ -125,18 +132,16 @@ export default function RootLayout() {
 
 
 
-  const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
-    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
     
     // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
     React.useEffect(() => {
-      setCurrentUser(globalUser);
-    }, [globalUser]);
+      setCurrentUser(currentUser);
+    }, [currentUser]);
     
     // Обрабатываем параметр refresh из URL
     React.useEffect(() => {
