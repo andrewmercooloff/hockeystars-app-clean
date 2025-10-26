@@ -25,7 +25,7 @@ const iceBg = require('../assets/images/led.jpg');
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { refreshUser } = useUser();
+  const { currentUser, refreshUser } = useUser();
   const phoneRef = useRef<TextInput>(null);
   const codeRef = useRef<TextInput>(null);
   const [step, setStep] = useState<'phone' | 'code'>('phone');
@@ -42,6 +42,13 @@ export default function LoginScreen() {
     message: '',
     type: 'info' as 'success' | 'error' | 'warning' | 'info'
   });
+
+  // Если пользователь уже авторизован, перенаправляем на главную
+  useEffect(() => {
+    if (currentUser) {
+      router.replace('/');
+    }
+  }, [currentUser, router]);
 
   const closeAlert = () => {
     setAlert({ ...alert, visible: false });
