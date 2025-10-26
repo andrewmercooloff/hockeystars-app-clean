@@ -181,7 +181,7 @@ export default function RootLayout() {
         }
       }, 5000);
 
-      if (appReady && !isUserLoading && !splashScreenHidden) {
+      if (appReady && !splashScreenHidden) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
         clearTimeout(forceHideSplashTimeout);
         
@@ -199,7 +199,7 @@ export default function RootLayout() {
       return () => {
         clearTimeout(forceHideSplashTimeout);
       };
-    }, [appReady, isUserLoading, splashScreenHidden]);
+    }, [appReady, splashScreenHidden]);
     
     return null;
   };
