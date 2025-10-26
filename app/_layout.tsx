@@ -155,30 +155,18 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Флаг для предотвращения многократного скрытия splash screen
-    const [splashScreenHidden, setSplashScreenHidden] = React.useState(false);
-    
     // Один раз скрываем splash screen при готовности приложения
     React.useEffect(() => {
-      const hideSplashScreen = () => {
-        if (!splashScreenHidden) {
-          console.log('🏁 Скрытие splash screen');
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => {
-            setShowSplash(false);
-            setSplashScreenHidden(true);
-          });
-        }
-      };
-
-      // Если приложение готово - скрываем splash screen
-      if (appReady) {
-        hideSplashScreen();
+      if (appReady && showSplash) {
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
       }
-    }, [appReady, splashScreenHidden]);
+    }, [appReady, showSplash]);
     
     return null;
   };
