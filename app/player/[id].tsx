@@ -1446,12 +1446,12 @@ export default function PlayerProfile() {
           setGlobalCurrentUser(null);
           
           // Переходим на страницу логина
-          router.replace('/login');
+          router.push('/login');
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           // Даже если произошла ошибка, все равно выходим
           setGlobalCurrentUser(null);
-          router.replace('/login');
+          router.push('/login');
         }
       }
     );

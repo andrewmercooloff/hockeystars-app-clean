@@ -38,7 +38,7 @@ const LogoHeader = React.memo(() => {
         style={{ alignItems: 'center', marginRight: 66.5, minHeight: 70, marginBottom: -6 }}
         onPress={() => {
           if (!currentUser) {
-            router.replace('/login');
+            router.push('/login');
           } else {
             // Если текущий экран - профиль пользователя, возвращаемся на главную
             if (pathname.startsWith(`/player/${currentUser.id}`)) {
