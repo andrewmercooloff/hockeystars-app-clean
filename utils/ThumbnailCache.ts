@@ -57,14 +57,11 @@ class ThumbnailCache {
     // Проверяем кеш
     const playerCache = this.cache.get(playerId);
     if (playerCache && playerCache.has(size)) {
-      const cachedUrl = playerCache.get(size)!;
-      console.log(`🖼️ Используем кешированную миниатюру для ${playerId} (${size}):`, cachedUrl.substring(0, 50) + '...');
-      return cachedUrl;
+      return playerCache.get(size)!;
     }
 
     // Генерируем новый URL миниатюры
     const thumbnailUrl = this.generateThumbnailUrl(originalUrl, size);
-    console.log(`🖼️ Создана миниатюра для ${playerId} (${size}):`, thumbnailUrl.substring(0, 50) + '...');
 
     // Сохраняем в кеш
     if (!playerCache) {
@@ -75,8 +72,8 @@ class ThumbnailCache {
     return thumbnailUrl;
   }
 
-  // Предзагружаем все размеры для аватара
-  async preloadAllSizes(playerId: string, originalUrl: string): Promise<void> {
+  // Предзагружаем только оригинальный URL (упрощенная версия)
+  async preloadOriginalUrl(playerId: string, originalUrl: string): Promise<void> {
     if (!originalUrl || !originalUrl.startsWith('http')) {
       return;
     }
@@ -87,23 +84,13 @@ class ThumbnailCache {
     }
 
     try {
-      // Предзагружаем оригинальный URL (самый важный)
+      // Предзагружаем только оригинальный URL
       await Image.prefetch(originalUrl);
-      
-      // Предзагружаем только большие размеры с параметрами ресайза
-      const preloadTasks = ['LARGE', 'XLARGE', 'XXLARGE'].map(async (size) => {
-        const thumbnailUrl = this.getThumbnailUrl(playerId, originalUrl, size as AvatarSize);
-        if (thumbnailUrl !== originalUrl) {
-          await Image.prefetch(thumbnailUrl);
-        }
-      });
-
-      await Promise.allSettled(preloadTasks);
       this.preloadedImages.add(cacheKey);
       
-      console.log(`🖼️ Предзагружены все размеры для ${playerId} (оригинал + 3 больших размера)`);
+      console.log(`🖼️ Оригинальный аватар предзагружен для ${playerId}`);
     } catch (error) {
-      console.error(`❌ Ошибка предзагрузки размеров для ${playerId}:`, error);
+      console.error(`❌ Ошибка предзагрузки оригинального аватара для ${playerId}:`, error);
     }
   }
 
@@ -113,7 +100,7 @@ class ThumbnailCache {
       .filter(p => p.avatar && p.avatar.startsWith('http'))
       .map(async p => {
         try {
-          await this.preloadAllSizes(p.id, p.avatar!);
+          await this.preloadOriginalUrl(p.id, p.avatar!);
         } catch (error) {
           console.error(`❌ Ошибка предзагрузки аватара для ${p.id}:`, error);
         }
