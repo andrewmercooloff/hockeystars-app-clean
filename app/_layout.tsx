@@ -126,13 +126,13 @@ export default function RootLayout() {
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
-    const { setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
+    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
     
-    // Синхронизируем локальное состояние с глобальным (layout -> context)
+    // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
     React.useEffect(() => {
-      setGlobalUser(currentUser);
-    }, [currentUser, setGlobalUser]);
+      setCurrentUser(globalUser);
+    }, [globalUser]);
     
     // Обрабатываем параметр refresh из URL
     React.useEffect(() => {
