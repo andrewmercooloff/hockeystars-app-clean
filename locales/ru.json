@@ -1511,7 +1511,8 @@
     "giftRequests": "Запросы подарков"
   },
   "auth": {
-    "login": "Выход на лед",
+    "exitToIce": "Выход на лед",
+    "login": "Вход",
     "register": "Регистрация",
     "phone": "Телефон",
     "phonePlaceholder": "+375296549728",
