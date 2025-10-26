@@ -232,17 +232,27 @@ async function uploadThumbnailsToSupabase(thumbnails, originalUrl, playerId) {
     }
 }
 
-// Основная функция для генерации миниатюр
-async function generateThumbnailsForAllPlayers() {
-    try {
-        console.log('🚀 Начинаем генерацию миниатюр для всех игроков...');
-        
-        // Получаем всех игроков с аватарами
-        const { createClient } = window.supabase;
-        const supabase = createClient(
-            'https://jvsypfwiajuwsyuzkyda.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM'
-        );
+        // Основная функция для генерации миниатюр
+        async function generateThumbnailsForAllPlayers() {
+            try {
+                console.log('🚀 Начинаем генерацию миниатюр для всех игроков...');
+                
+                // Создаем Supabase клиент напрямую
+                let supabase;
+                if (window.supabase && window.supabase.createClient) {
+                    // Если есть глобальный supabase
+                    supabase = window.supabase.createClient(
+                        'https://jvsypfwiajuwsyuzkyda.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM'
+                    );
+                } else {
+                    // Загружаем Supabase динамически
+                    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+                    supabase = createClient(
+                        'https://jvsypfwiajuwsyuzkyda.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM'
+                    );
+                }
         
         const { data: players, error } = await supabase
             .from('players')

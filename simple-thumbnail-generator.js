@@ -1,0 +1,199 @@
+// Простой генератор миниатюр для HockeyStars
+// Скопируйте и вставьте этот код в консоль браузера
+
+console.log('🚀 Загружаем генератор миниатюр...');
+
+// Размеры миниатюр
+const THUMBNAIL_SIZES = {
+    SMALL: 30,
+    MEDIUM: 50,
+    LARGE: 60,
+    XLARGE: 80,
+    XXLARGE: 100,
+};
+
+// Функция для генерации миниатюр из изображения
+async function generateThumbnailsFromImage(imageUrl, playerId) {
+    try {
+        console.log(`🖼️ Генерируем миниатюры для ${playerId} из:`, imageUrl);
+
+        // Создаем canvas для генерации миниатюр
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+            throw new Error('Не удалось получить контекст canvas');
+        }
+
+        // Загружаем изображение
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imageUrl;
+        });
+
+        const thumbnails = {};
+
+        // Генерируем миниатюры для каждого размера
+        for (const [sizeName, sizeValue] of Object.entries(THUMBNAIL_SIZES)) {
+            // Устанавливаем размер canvas
+            canvas.width = sizeValue;
+            canvas.height = sizeValue;
+            
+            // Очищаем canvas
+            ctx.clearRect(0, 0, sizeValue, sizeValue);
+            
+            // Рисуем изображение с правильным масштабированием
+            ctx.drawImage(img, 0, 0, sizeValue, sizeValue);
+            
+            // Конвертируем в base64
+            const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            thumbnails[sizeName] = thumbnailDataUrl;
+            
+            console.log(`✅ Создана миниатюра ${sizeName} (${sizeValue}px)`);
+        }
+
+        console.log(`🎯 Все миниатюры созданы для ${playerId}`);
+        return thumbnails;
+
+    } catch (error) {
+        console.error(`❌ Ошибка генерации миниатюр для ${playerId}:`, error);
+        throw error;
+    }
+}
+
+// Функция для загрузки миниатюр в Supabase
+async function uploadThumbnailsToSupabase(thumbnails, originalUrl, playerId) {
+    try {
+        console.log(`📤 Загружаем миниатюры в Supabase для ${playerId}`);
+
+        const uploadedUrls = {};
+
+        // Извлекаем имя файла из оригинального URL
+        const urlParts = originalUrl.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+
+        // Загружаем каждую миниатюру
+        for (const [sizeName, thumbnailDataUrl] of Object.entries(thumbnails)) {
+            try {
+                // Конвертируем base64 в blob
+                const response = await fetch(thumbnailDataUrl);
+                const blob = await response.blob();
+                
+                // Создаем FormData для загрузки
+                const formData = new FormData();
+                formData.append('file', blob, fileName);
+                
+                // Загружаем в Supabase Storage
+                const uploadResponse = await fetch(
+                    `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/avatars/thumbnails/${sizeName}/${fileName}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM`,
+                        },
+                        body: formData,
+                    }
+                );
+
+                if (uploadResponse.ok) {
+                    const uploadedUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${sizeName}/${fileName}`;
+                    uploadedUrls[sizeName] = uploadedUrl;
+                    console.log(`✅ Загружена миниатюра ${sizeName}:`, uploadedUrl);
+                } else {
+                    console.error(`❌ Ошибка загрузки миниатюры ${sizeName}:`, await uploadResponse.text());
+                }
+            } catch (error) {
+                console.error(`❌ Ошибка загрузки миниатюры ${sizeName}:`, error);
+            }
+        }
+
+        console.log(`🎯 Все миниатюры загружены для ${playerId}`);
+        return uploadedUrls;
+
+    } catch (error) {
+        console.error(`❌ Ошибка загрузки миниатюр для ${playerId}:`, error);
+        throw error;
+    }
+}
+
+// Функция для получения игроков через прямой API вызов
+async function getPlayersWithAvatars() {
+    try {
+        console.log('📊 Загружаем игроков с аватарами...');
+        
+        const response = await fetch('https://jvsypfwiajuwsyuzkyda.supabase.co/rest/v1/players?select=id,avatar,name&avatar=not.is.null&avatar=neq.', {
+            headers: {
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const players = await response.json();
+        console.log(`📊 Найдено ${players.length} игроков с аватарами`);
+        return players;
+
+    } catch (error) {
+        console.error('❌ Ошибка загрузки игроков:', error);
+        throw error;
+    }
+}
+
+// Основная функция для генерации миниатюр
+async function generateThumbnailsForAllPlayers() {
+    try {
+        console.log('🚀 Начинаем генерацию миниатюр для всех игроков...');
+        
+        // Получаем всех игроков с аватарами
+        const players = await getPlayersWithAvatars();
+
+        if (players.length === 0) {
+            console.log('ℹ️ Нет игроков с аватарами для обработки');
+            return;
+        }
+
+        let processed = 0;
+        let failed = 0;
+
+        // Обрабатываем каждого игрока
+        for (const player of players) {
+            try {
+                console.log(`🔄 Обрабатываем ${player.name || player.id}...`);
+                
+                // Генерируем миниатюры
+                const thumbnails = await generateThumbnailsFromImage(player.avatar, player.id);
+                
+                // Загружаем миниатюры в Supabase
+                await uploadThumbnailsToSupabase(thumbnails, player.avatar, player.id);
+                
+                console.log(`✅ Обработан ${player.name || player.id}`);
+                processed++;
+                
+                // Небольшая пауза
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+            } catch (error) {
+                console.error(`❌ Ошибка для ${player.name || player.id}:`, error);
+                failed++;
+            }
+        }
+
+        console.log(`🎯 Генерация завершена:`);
+        console.log(`   ✅ Обработано: ${processed}`);
+        console.log(`   ❌ Ошибок: ${failed}`);
+
+    } catch (error) {
+        console.error('❌ Критическая ошибка:', error);
+    }
+}
+
+console.log('🎯 Генератор миниатюр загружен!');
+console.log('💡 Для запуска выполните: generateThumbnailsForAllPlayers()');
