@@ -29,25 +29,7 @@ class ThumbnailCache {
 
   // Генерируем URL миниатюры для конкретного размера
   private generateThumbnailUrl(originalUrl: string, size: AvatarSize): string {
-    if (!originalUrl || !originalUrl.startsWith('http')) {
-      return originalUrl;
-    }
-
-    // Для Supabase URLs пытаемся найти миниатюру
-    if (originalUrl.includes('supabase') && originalUrl.includes('/avatars/')) {
-      // Извлекаем имя файла из URL
-      const urlParts = originalUrl.split('/');
-      const fileName = urlParts[urlParts.length - 1];
-      
-      if (fileName.startsWith('avatar_')) {
-        // Формируем URL для миниатюры: thumbnails/{size}/{filename}
-        const thumbnailUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${size}/${fileName}`;
-        console.log(`🔍 Ищем миниатюру ${size} для файла ${fileName}:`, thumbnailUrl);
-        return thumbnailUrl;
-      }
-    }
-
-    // Если миниатюра не найдена, возвращаем оригинальный URL
+    // Отключена система миниатюр - возвращаем оригинальный URL
     return originalUrl;
   }
 

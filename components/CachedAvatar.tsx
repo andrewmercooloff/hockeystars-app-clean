@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
-import { useThumbnailUrl, AvatarSize, AVATAR_SIZES } from '../utils/ThumbnailCache';
 
 interface CachedAvatarProps {
   playerId: string;
@@ -31,30 +30,8 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
 
-  const originalAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
-
-  // Определяем размер миниатюры на основе размера аватара
-  const getThumbnailSize = (size: number): AvatarSize => {
-    if (size <= AVATAR_SIZES.SMALL) return 'SMALL';
-    if (size <= AVATAR_SIZES.MEDIUM) return 'MEDIUM';
-    if (size <= AVATAR_SIZES.LARGE) return 'LARGE';
-    if (size <= AVATAR_SIZES.XLARGE) return 'XLARGE';
-    return 'XXLARGE';
-  };
-
-  const thumbnailSize = getThumbnailSize(size);
-  const thumbnailUrl = useThumbnailUrl(playerId, originalAvatarUrl || '', thumbnailSize);
-  
-  // Используем миниатюру, если она доступна и нет ошибки, иначе оригинальный URL
-  const effectiveAvatarUrl = (imageError || thumbnailUrl === originalAvatarUrl) ? originalAvatarUrl : thumbnailUrl;
-  
-  console.log(`🔍 CachedAvatar для ${playerId} (${size}px):`, {
-    thumbnailSize,
-    thumbnailUrl: thumbnailUrl?.substring(0, 80) + '...',
-    originalUrl: originalAvatarUrl?.substring(0, 80) + '...',
-    effectiveUrl: effectiveAvatarUrl?.substring(0, 80) + '...',
-    usingThumbnail: effectiveAvatarUrl !== originalAvatarUrl
-  });
+  // Используем кешированный аватар или fallback
+  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -63,10 +40,10 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   }, [onLoad]);
 
   const handleError = React.useCallback(() => {
-    console.log(`❌ Ошибка загрузки миниатюры ${thumbnailSize} для ${playerId}, переключаемся на оригинальный URL`);
+    console.log(`❌ Ошибка загрузки аватара для ${playerId}`);
     setImageError(true);
     onError?.();
-  }, [onError, thumbnailSize, playerId]);
+  }, [onError, playerId]);
 
   const imageStyle = {
     width: size,
@@ -100,7 +77,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
           cache: 'force-cache'
         }}
         style={[imageStyle, {
-          // Добавляем оптимизацию для ресайза
           resizeMode: 'cover'
         }]}
         onError={handleError}
