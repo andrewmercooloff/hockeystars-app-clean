@@ -33,19 +33,16 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    // Для небольших размеров используем оригинальный URL (быстрее)
-    if (size === 'SMALL' || size === 'MEDIUM') {
-      return originalUrl;
-    }
-
-    // Для больших размеров добавляем параметры ресайза только для Supabase
+    // Для Supabase Storage добавляем параметры ресайза для всех размеров
     if (originalUrl.includes('supabase')) {
       const sizeValue = AVATAR_SIZES[size];
       return `${originalUrl}?width=${sizeValue}&height=${sizeValue}&resize=cover&quality=80`;
     }
 
-    // Для других URL используем оригинальный URL
-    return originalUrl;
+    // Для других URL добавляем параметры ресайза
+    const sizeValue = AVATAR_SIZES[size];
+    const separator = originalUrl.includes('?') ? '&' : '?';
+    return `${originalUrl}${separator}w=${sizeValue}&h=${sizeValue}&fit=cover&q=80`;
   }
 
   // Получаем URL миниатюры для конкретного размера
@@ -62,6 +59,7 @@ class ThumbnailCache {
 
     // Генерируем новый URL миниатюры
     const thumbnailUrl = this.generateThumbnailUrl(originalUrl, size);
+    console.log(`🖼️ Создана миниатюра ${size} (${AVATAR_SIZES[size]}px) для ${playerId}:`, thumbnailUrl.substring(0, 80) + '...');
 
     // Сохраняем в кеш
     if (!playerCache) {
