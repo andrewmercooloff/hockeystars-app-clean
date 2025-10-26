@@ -151,9 +151,9 @@ const Puck: React.FC<PuckProps> = ({
             <CachedAvatar
               playerId={playerId}
               fallbackAvatarUrl={avatar}
-              size={dimensions.avatarSize}
+              size={dimensions.avatarSize - 4}
               style={{
-                borderRadius: dimensions.avatarBorderRadius,
+                borderRadius: dimensions.avatarBorderRadius - 2,
               }}
               onError={() => setImageError(true)}
             />
@@ -172,9 +172,9 @@ const Puck: React.FC<PuckProps> = ({
             <Image 
               source={require('../assets/images/scout.png')} 
               style={{
-                width: dimensions.avatarSize,
-                height: dimensions.avatarSize,
-                borderRadius: dimensions.avatarBorderRadius,
+                width: dimensions.avatarSize - 4,
+                height: dimensions.avatarSize - 4,
+                borderRadius: dimensions.avatarBorderRadius - 2,
               }}
             />
           </View>
