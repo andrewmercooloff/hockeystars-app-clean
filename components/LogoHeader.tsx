@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, usePathname } from 'expo-router';
+import { useRouter, usePathname, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import HeaderAvatar from './HeaderAvatar';
@@ -10,6 +10,7 @@ const logo = require('../assets/images/logo.png');
 const LogoHeader = React.memo(() => {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useLocalSearchParams();
   const { currentUser, refreshUser } = useUser();
 
   // Обновляем данные только при изменении параметров refresh
