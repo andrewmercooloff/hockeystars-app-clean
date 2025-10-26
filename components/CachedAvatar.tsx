@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image } from 'expo-image';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
 
@@ -15,7 +16,7 @@ interface CachedAvatarProps {
   onLoad?: () => void;
 }
 
-const CachedAvatar: React.FC<CachedAvatarProps> = ({
+const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   playerId,
   fallbackAvatarUrl,
   size = 50,
@@ -36,21 +37,22 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
     setImageError(false);
+    console.log(`✅ Аватар загружен из кэша для ${playerId}: ${effectiveAvatarUrl}`);
     onLoad?.();
-  }, [onLoad]);
+  }, [onLoad, playerId, effectiveAvatarUrl]);
 
   const handleError = React.useCallback(() => {
-    console.log(`❌ Ошибка загрузки аватара для ${playerId}`);
+    console.log(`❌ Ошибка загрузки аватара для ${playerId}: ${effectiveAvatarUrl}`);
     setImageError(true);
     onError?.();
-  }, [onError, playerId]);
+  }, [onError, playerId, effectiveAvatarUrl]);
 
-  const imageStyle = {
+  const imageStyle = React.useMemo(() => ({
     width: size,
     height: size,
     borderRadius: style?.borderRadius || size / 2,
     ...style
-  };
+  }), [size, style]);
 
   // Если нет URL или ошибка загрузки, показываем fallback
   if (!effectiveAvatarUrl || imageError) {
@@ -73,17 +75,28 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
     <View style={imageStyle}>
       <Image
         source={{ 
-          uri: effectiveAvatarUrl,
-          cache: 'force-cache'
+          uri: effectiveAvatarUrl
         }}
         style={[imageStyle, {
           resizeMode: 'cover'
         }]}
         onError={handleError}
         onLoad={handleLoad}
+        cachePolicy="memory-disk"
+        priority="high"
       />
     </View>
   );
-};
+}, (prevProps, nextProps) => {
+  // Глубокое сравнение пропсов для мемоизации
+  return (
+    prevProps.playerId === nextProps.playerId &&
+    prevProps.fallbackAvatarUrl === nextProps.fallbackAvatarUrl &&
+    prevProps.size === nextProps.size &&
+    prevProps.fallbackIcon === nextProps.fallbackIcon &&
+    prevProps.fallbackSize === nextProps.fallbackSize &&
+    prevProps.fallbackColor === nextProps.fallbackColor
+  );
+});
 
 export default CachedAvatar;

@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface FriendAcceptedNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   message: string;
   timestamp: string | number;
   playerAvatar?: string | null;
@@ -12,6 +14,7 @@ interface FriendAcceptedNotificationProps {
 
 export default function FriendAcceptedNotification({
   playerName,
+  playerId,
   message,
   timestamp,
   playerAvatar,
@@ -37,7 +40,12 @@ export default function FriendAcceptedNotification({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image source={{ uri: playerAvatar }} style={styles.playerAvatar} resizeMode="cover" />
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
+            size={50}
+            style={styles.playerAvatar}
+          />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="person-outline" size={24} color="#fff" />

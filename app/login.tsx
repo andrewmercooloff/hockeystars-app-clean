@@ -2,7 +2,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    ImageBackground,
     Keyboard,
     Platform,
     StyleSheet,
@@ -15,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import WebTextInput from '../components/WebTextInput';
+import CachedBackground from '../components/CachedBackground';
 import { findPlayerByCredentials, saveCurrentUser, getPlayerByPhone, createPlayer } from '../utils/playerStorage';
 import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -390,187 +390,172 @@ export default function LoginScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.hockeyRinkContainer}>
-          <ImageBackground source={iceBg} style={styles.hockeyRink} resizeMode="cover">
+          <CachedBackground 
+            source={iceBg} 
+            style={styles.hockeyRink}
+          >
             {/* Внутренняя граница хоккейной коробки */}
             <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
             
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
-
-              
-              {/* Заголовок формы */}
-              <View style={styles.modalHeader}>
-                <Ionicons name="log-in" size={40} color="#FF4444" />
-                <Text style={styles.modalTitle}>
-                  {step === 'phone' ? t('auth.login') : t('auth.code')}
-                </Text>
-              </View>
-              
-              {/* Сообщение */}
-              <Text style={styles.modalMessage}>
-                {step === 'phone' 
-                  ? t('auth.phoneHint')
-                  : t('auth.codePlaceholder')
-                }
-              </Text>
-              
-              {step === 'phone' ? (
-                // Шаг 1: Ввод телефона
-                <View style={styles.inputContainer}>
-                  <WebTextInput
-                    ref={phoneRef}
-                    style={styles.input}
-                    value={formData.phone}
-                    onChangeText={handlePhoneChange}
-                    placeholder={t('auth.phonePlaceholder')}
-                    placeholderTextColor="#888"
-                    autoCapitalize="none"
-                    autoComplete="tel"
-                    textContentType="telephoneNumber"
-                    keyboardType="phone-pad"
-                    autoCorrect={false}
-                    returnKeyType="done"
-                    blurOnSubmit={false}
-                    enablesReturnKeyAutomatically={true}
-                    clearButtonMode="while-editing"
-                    onSubmitEditing={handleSendCode}
-                    editable={!loading}
-                    selectTextOnFocus={false}
-                    autoFocus={false}
-                  />
-                </View>
-              ) : (
-                // Шаг 2: Ввод кода подтверждения
-                <>
+                {/* Весь существующий контент */}
+                {step === 'phone' ? (
+                  // Шаг 1: Ввод телефона
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>{t('auth.code')}</Text>
-                    <TextInput
-                      ref={codeRef}
-                      style={[styles.input, styles.codeInput]}
-                      value={formData.code}
-                      onChangeText={handleCodeChange}
-                      placeholder={t('auth.codePlaceholder')}
+                    <WebTextInput
+                      ref={phoneRef}
+                      style={styles.input}
+                      value={formData.phone}
+                      onChangeText={handlePhoneChange}
+                      placeholder={t('auth.phonePlaceholder')}
                       placeholderTextColor="#888"
-                      keyboardType="number-pad"
-                      maxLength={6}
-                      autoComplete="one-time-code"
-                      textContentType="oneTimeCode"
+                      autoCapitalize="none"
+                      autoComplete="tel"
+                      textContentType="telephoneNumber"
+                      keyboardType="phone-pad"
+                      autoCorrect={false}
                       returnKeyType="done"
                       blurOnSubmit={false}
                       enablesReturnKeyAutomatically={true}
-                      onSubmitEditing={handleVerifyCode}
+                      clearButtonMode="while-editing"
+                      onSubmitEditing={handleSendCode}
                       editable={!loading}
-                      selectTextOnFocus={true}
+                      selectTextOnFocus={false}
                       autoFocus={false}
                     />
                   </View>
-                  
-                  
-                  {/* Показываем телефон для справки */}
-                  <Text style={styles.emailHint}>
-                    {t('auth.codeSent')}: {formData.phone}
-                  </Text>
-                  
-                  {/* Кнопка повторной отправки */}
-                  <TouchableOpacity 
-                    style={[styles.resendButton, (!canResend || loading) && styles.resendButtonDisabled]} 
-                    onPress={handleResendCode}
-                    disabled={!canResend || loading}
-                  >
-                    <Text style={[styles.resendButtonText, (!canResend || loading) && styles.resendButtonTextDisabled]}>
-                      {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
-                    </Text>
-                  </TouchableOpacity>
-                </>
-              )}
-
-              {/* Кнопки */}
-              <View style={styles.modalButtons}>
-                {step === 'phone' ? (
-                  <TouchableOpacity 
-                    style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
-                    onPress={handleSendCode}
-                    disabled={loading}
-                  >
-                    <Ionicons 
-                      name={loading ? "hourglass" : "phone-portrait"} 
-                      size={20} 
-                      color="#fff" 
-                    />
-                    <Text style={styles.modalButtonText}>
-                      {loading ? t('common.loading') : t('auth.sendCode')}
-                    </Text>
-                  </TouchableOpacity>
                 ) : (
+                  // Шаг 2: Ввод кода подтверждения
                   <>
-                    <TouchableOpacity 
-                      style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
-                      onPress={handleVerifyCode}
-                      disabled={loading}
-                    >
-                      <Ionicons 
-                        name={loading ? "hourglass" : "checkmark-circle"} 
-                        size={20} 
-                        color="#fff" 
+                    <View style={styles.inputContainer}>
+                      <Text style={styles.label}>{t('auth.code')}</Text>
+                      <TextInput
+                        ref={codeRef}
+                        style={[styles.input, styles.codeInput]}
+                        value={formData.code}
+                        onChangeText={handleCodeChange}
+                        placeholder={t('auth.codePlaceholder')}
+                        placeholderTextColor="#888"
+                        keyboardType="number-pad"
+                        maxLength={6}
+                        autoComplete="one-time-code"
+                        textContentType="oneTimeCode"
+                        returnKeyType="done"
+                        blurOnSubmit={false}
+                        enablesReturnKeyAutomatically={true}
+                        onSubmitEditing={handleVerifyCode}
+                        editable={!loading}
+                        selectTextOnFocus={true}
+                        autoFocus={false}
                       />
-                      <Text style={styles.modalButtonText}>
-                        {loading ? t('common.loading') : t('auth.verifyCode')}
-                      </Text>
-                    </TouchableOpacity>
+                    </View>
                     
+                    {/* Показываем телефон для справки */}
+                    <Text style={styles.emailHint}>
+                      {t('auth.codeSent')}: {formData.phone}
+                    </Text>
+                    
+                    {/* Кнопка повторной отправки */}
                     <TouchableOpacity 
-                      style={[styles.modalButton, styles.modalButtonSecondary]} 
-                      onPress={() => {
-                        setStep('phone');
-                        setFormData({ ...formData, code: '' });
-                      }}
-                      disabled={loading}
+                      style={[styles.resendButton, (!canResend || loading) && styles.resendButtonDisabled]} 
+                      onPress={handleResendCode}
+                      disabled={!canResend || loading}
                     >
-                      <Ionicons name="arrow-back" size={20} color="#FF4444" />
-                      <Text style={[styles.modalButtonText, styles.modalButtonTextSecondary]}>
-                        {t('common.back')}
+                      <Text style={[styles.resendButtonText, (!canResend || loading) && styles.resendButtonTextDisabled]}>
+                        {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
                       </Text>
                     </TouchableOpacity>
                   </>
                 )}
-              </View>
 
-              {/* Кнопка регистрации - показываем только на первом шаге */}
-              {step === 'phone' && (
+                {/* Кнопки */}
+                <View style={styles.modalButtons}>
+                  {step === 'phone' ? (
+                    <TouchableOpacity 
+                      style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
+                      onPress={handleSendCode}
+                      disabled={loading}
+                    >
+                      <Ionicons 
+                        name={loading ? "hourglass" : "phone-portrait"} 
+                        size={20} 
+                        color="#fff" 
+                      />
+                      <Text style={styles.modalButtonText}>
+                        {loading ? t('common.loading') : t('auth.sendCode')}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <>
+                      <TouchableOpacity 
+                        style={[styles.modalButton, loading && styles.modalButtonDisabled]} 
+                        onPress={handleVerifyCode}
+                        disabled={loading}
+                      >
+                        <Ionicons 
+                          name={loading ? "hourglass" : "checkmark-circle"} 
+                          size={20} 
+                          color="#fff" 
+                        />
+                        <Text style={styles.modalButtonText}>
+                          {loading ? t('common.loading') : t('auth.verifyCode')}
+                        </Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[styles.modalButton, styles.modalButtonSecondary]} 
+                        onPress={() => {
+                          setStep('phone');
+                          setFormData({ ...formData, code: '' });
+                        }}
+                        disabled={loading}
+                      >
+                        <Ionicons name="arrow-back" size={20} color="#FF4444" />
+                        <Text style={[styles.modalButtonText, styles.modalButtonTextSecondary]}>
+                          {t('common.back')}
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+
+                {/* Кнопка регистрации - показываем только на первом шаге */}
+                {step === 'phone' && (
+                  <TouchableOpacity 
+                    style={styles.registerButton} 
+                    onPress={() => router.push('/register')}
+                    disabled={loading}
+                  >
+                    <Ionicons name="person-add" size={20} color="#FF4444" />
+                    <Text style={styles.registerButtonText}>
+                      {t('auth.register')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Кнопка отмены */}
                 <TouchableOpacity 
-                  style={styles.registerButton} 
-                  onPress={() => router.push('/register')}
+                  style={styles.modalCancelButton} 
+                  onPress={() => router.back()}
                   disabled={loading}
                 >
-                  <Ionicons name="person-add" size={20} color="#FF4444" />
-                  <Text style={styles.registerButtonText}>
-                    {t('auth.register')}
-                  </Text>
+                  <Text style={styles.modalCancelText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-              )}
-
-              {/* Кнопка отмены */}
-              <TouchableOpacity 
-                style={styles.modalCancelButton} 
-                onPress={() => router.back()}
-                disabled={loading}
-              >
-                <Text style={styles.modalCancelText}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </ImageBackground>
-      </View>
+          </CachedBackground>
+        </View>
 
-      {/* Кастомный алерт */}
-      <CustomAlert
-        visible={alert.visible}
-        title={alert.title}
-        message={alert.message}
-        type={alert.type}
-        onConfirm={handleAlertClose}
-        confirmText={t('common.ok')}
-      />
+        {/* Кастомный алерт */}
+        <CustomAlert
+          visible={alert.visible}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+          onConfirm={handleAlertClose}
+          confirmText={t('common.ok')}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -583,8 +568,7 @@ const styles = StyleSheet.create({
   },
   hockeyRinkContainer: {
     flex: 1,
-    marginHorizontal: 10,
-    marginVertical: 10,
+    // Убираем отступы
   },
   hockeyRink: {
     flex: 1,

@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface PhysicalDataChangedNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   changes: { field: 'height' | 'weight', oldValue: number, newValue: number }[];
   timestamp: string;
   playerAvatar?: string | null;
@@ -12,6 +14,7 @@ interface PhysicalDataChangedNotificationProps {
 
 const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedNotification({
   playerName,
+  playerId,
   changes,
   timestamp,
   playerAvatar
@@ -52,10 +55,11 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image 
-            source={{ uri: playerAvatar }} 
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
+            size={50}
             style={styles.playerAvatar}
-            resizeMode="cover"
           />
         ) : (
           <Ionicons name="body-outline" size={24} color="#fff" />

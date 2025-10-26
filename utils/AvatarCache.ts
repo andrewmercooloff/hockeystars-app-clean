@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { Image } from 'expo-image';
 
 // Глобальный кеш для аватаров
 class AvatarCache {
@@ -20,14 +20,26 @@ class AvatarCache {
   }
 
   // Устанавливаем аватар в кеш
-  setAvatar(playerId: string, avatarUrl: string): void {
+  async setAvatar(playerId: string, avatarUrl: string): Promise<string | null> {
     const oldUrl = this.cache.get(playerId);
-    this.cache.set(playerId, avatarUrl);
     
-    // Если аватар изменился, уведомляем всех слушателей
-    if (oldUrl !== avatarUrl) {
-      console.log('🔄 Аватар обновлен в кеше:', { playerId, oldUrl, newUrl: avatarUrl });
-      this.notifyListeners(playerId, avatarUrl);
+    try {
+      // Предзагружаем изображение с высоким приоритетом
+      await Image.prefetch(avatarUrl);
+
+      // Сохраняем в кэш
+      this.cache.set(playerId, avatarUrl);
+      
+      // Если аватар изменился, уведомляем всех слушателей
+      if (oldUrl !== avatarUrl) {
+        console.log('🔄 Аватар обновлен в кеше:', { playerId, oldUrl, newUrl: avatarUrl });
+        this.notifyListeners(playerId, avatarUrl);
+      }
+      
+      return avatarUrl;
+    } catch (error) {
+      console.error('❌ Ошибка предзагрузки аватара:', error);
+      return null;
     }
   }
 
@@ -47,7 +59,7 @@ class AvatarCache {
       try {
         listener(playerId, newAvatarUrl);
       } catch (error) {
-        // Молча игнорируем ошибки
+        console.error('❌ Ошибка в слушателе кэша аватаров:', error);
       }
     });
   }
@@ -57,23 +69,19 @@ class AvatarCache {
     this.cache.delete(playerId);
   }
 
-  // Предзагружаем аватары для списка игроков (упрощенная версия)
+  // Предзагружаем аватары для списка игроков
   async preloadPlayerAvatars(players: { id: string; avatar?: string | null }[]): Promise<void> {
-    try {
-      const preloadTasks = players
-        .filter(p => p.avatar && p.avatar.startsWith('http'))
-        .map(async p => {
-          try {
-            await Image.prefetch(p.avatar!);
-          } catch (error) {
-            // Молча игнорируем ошибки
-          }
-        });
-      
-      await Promise.allSettled(preloadTasks);
-    } catch (error) {
-      // Молча игнорируем ошибки
-    }
+    const preloadTasks = players
+      .filter(p => p.avatar)
+      .map(async p => {
+        try {
+          await this.setAvatar(p.id, p.avatar!);
+        } catch (error) {
+          console.error(`❌ Ошибка предзагрузки аватара для ${p.id}:`, error);
+        }
+      });
+    
+    await Promise.allSettled(preloadTasks);
   }
 
   // Получаем все кешированные аватары
@@ -94,8 +102,13 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
     // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
     const currentCachedAvatar = avatarCache.getAvatar(playerId);
     if (!currentCachedAvatar && fallbackUrl) {
-      avatarCache.setAvatar(playerId, fallbackUrl);
-      setAvatarUrl(fallbackUrl);
+      avatarCache.setAvatar(playerId, fallbackUrl)
+        .then(localUri => {
+          if (localUri) {
+            setAvatarUrl(localUri);
+          }
+        })
+        .catch(() => {});
     } else if (currentCachedAvatar) {
       setAvatarUrl(currentCachedAvatar);
     }
@@ -114,9 +127,9 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
 };
 
 // Функция для обновления аватара во всех местах
-export const updateAvatarGlobally = (playerId: string, newAvatarUrl: string): void => {
+export const updateAvatarGlobally = async (playerId: string, newAvatarUrl: string): Promise<void> => {
   console.log('🌍 Обновляем аватар глобально:', { playerId, newAvatarUrl });
-  avatarCache.setAvatar(playerId, newAvatarUrl);
+  await avatarCache.setAvatar(playerId, newAvatarUrl);
 };
 
 // Функция для предзагрузки аватара
@@ -135,12 +148,14 @@ export const preloadAvatar = async (avatarUrl: string): Promise<void> => {
 
 // Функция для предзагрузки аватаров игроков
 export const preloadPlayerAvatars = async (players: Array<{ id: string; avatar?: string }>): Promise<void> => {
-  const preloadPromises = players
+  const preloadTasks = players
     .filter(player => player.avatar)
-    .map(player => preloadAvatar(player.avatar!));
+    .map(async player => {
+      await preloadAvatar(player.avatar!);
+    });
 
   try {
-    await Promise.all(preloadPromises);
+    await Promise.all(preloadTasks);
     console.log('🖼️ Предзагрузка аватаров завершена');
   } catch (error) {
     console.error('❌ Ошибка предзагрузки аватаров:', error);

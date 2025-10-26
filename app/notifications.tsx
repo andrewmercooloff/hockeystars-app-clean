@@ -1,16 +1,14 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    Alert,
-    Image,
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { 
+    Alert, 
+    FlatList, 
+    ImageBackground, 
+    StyleSheet, 
+    Text, 
+    TouchableOpacity, 
+    View 
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
@@ -28,13 +26,13 @@ import AvatarChangedNotification from '../components/AvatarChangedNotification';
 import AchievementAddedNotification from '../components/AchievementAddedNotification';
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
+import CachedAvatar from '../components/CachedAvatar';
 import {
     acceptFriendRequest,
     declineFriendRequest,
     getReceivedFriendRequests,
     loadNotifications,
-    markNotificationAsRead,
-    Player
+    markNotificationAsRead
 } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -42,8 +40,327 @@ import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
+import { preloadPlayerAvatars } from '../utils/AvatarCache';
 
 const iceBg = require('../assets/images/led.jpg');
+
+// Мемоизированный компонент для элемента уведомления
+const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete }: {
+  notification: NotificationItem;
+  index: number;
+  isNew: boolean;
+  onPress: (notification: NotificationItem) => void;
+  onSuperAction: (notification: NotificationItem) => void;
+  onDelete: (notificationId: string) => void;
+}) => {
+  const { t } = useLanguage();
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'friend_request':
+        return 'person-add';
+      case 'gift_request':
+        return 'gift';
+      case 'gift_accepted':
+        return 'gift';
+      case 'autograph_request':
+        return 'create';
+      case 'stick_request':
+        return 'key';
+      case 'achievement':
+        return 'trophy';
+      case 'team_invite':
+        return 'people';
+      case 'stats_change':
+        return 'trending-up';
+      case 'system':
+        return 'information-circle';
+      default:
+        return 'notifications';
+    }
+  };
+
+  const formatTime = (timestamp: number | string) => {
+    let date: Date;
+    
+    if (typeof timestamp === 'string') {
+      date = new Date(timestamp);
+    } else {
+      date = new Date(timestamp);
+    }
+    
+    if (isNaN(date.getTime())) {
+      return 'Недавно';
+    }
+    
+    const now = new Date();
+    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
+    
+    if (diffInMinutes < 1) {
+      return 'Только что';
+    } else if (diffInMinutes < 60) {
+      return `${Math.floor(diffInMinutes)} мин назад`;
+    } else if (diffInMinutes < 1440) {
+      return `${Math.floor(diffInMinutes / 60)} ч назад`;
+    } else {
+      return date.toLocaleDateString('ru-RU', { 
+        day: '2-digit', 
+        month: '2-digit' 
+      });
+    }
+  };
+
+  const renderRightActions = () => {
+    return (
+      <View style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={32} color="#fa2f40" />
+      </View>
+    );
+  };
+
+  return (
+    <Swipeable
+      key={notification.id}
+      renderRightActions={renderRightActions}
+      onSwipeableOpen={() => onDelete(notification.id)}
+      overshootRight={false}
+      friction={2}
+      rightThreshold={40}
+      enableTrackpadTwoFingerGesture={true}
+      containerStyle={{ backgroundColor: 'transparent' }}
+    >
+      <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
+        {notification.type === 'stats_change' && notification.data && notification.data.changes ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <StatsChangeNotification
+              changes={notification.data.changes}
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              timestamp={notification.timestamp}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'photo_added' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <PhotoAddedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              photosCount={notification.data.addedPhotosCount || 1}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'new_friendship' ? (
+          <FriendshipNotification
+            friend1Name={notification.data.friend1Name || 'Игрок 1'}
+            friend2Name={notification.data.friend2Name || 'Игрок 2'}
+            timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+            friend1Avatar={notification.data.friend1Avatar}
+            friend2Avatar={notification.data.friend2Avatar}
+            confirmedBy={notification.data.confirmedBy}
+            onPress={() => {
+              const confirmedBy = notification.data?.confirmedBy || notification.data?.friend1Id;
+              
+              if (confirmedBy) {
+                const updatedNotification = {
+                  ...notification,
+                  data: {
+                    ...notification.data,
+                    confirmedBy: confirmedBy
+                  }
+                };
+                onPress(updatedNotification);
+              }
+            }}
+          />
+        ) : notification.type === 'exercise_completed' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <ExerciseNotification
+              playerName={notification.data.playerName || 'Игрок'}
+              playerId={notification.data.playerId}
+              exerciseId={notification.data.exerciseId || 'unknown'}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.playerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'gift_received' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <GiftReceivedNotification
+              playerName={notification.data.playerName || 'Игрок'}
+              starName={notification.data.starName || 'Звезда'}
+              giftName={notification.data.giftName || 'Подарок'}
+              giftType={notification.data.giftType || 'gift'}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.playerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'friend_accepted' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <FriendAcceptedNotification
+              playerName={notification.data?.acceptor_name || 'Игрок'}
+              playerId={notification.data?.acceptor_id}
+              message={notification.message}
+              timestamp={notification.timestamp}
+              playerAvatar={notification.data?.acceptor_avatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'gift_accepted' ? (
+          <GiftAcceptedNotification
+            starName={notification.data?.from_star || t('notifications.star')}
+            starId={notification.data?.star_id}
+            starAvatar={notification.data?.star_avatar}
+            itemTypeName={getItemTypeName(notification.data?.item_type || 'gift')}
+            message={notification.message}
+            formattedTime={formatTime(notification.timestamp)}
+            acknowledgeButtonText={t('common.super')}
+            onAcknowledge={() => onSuperAction(notification)}
+          />
+        ) : notification.type === 'video_added' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <VideoAddedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              videosCount={notification.data.addedVideosCount || 1}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'avatar_changed' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AvatarChangedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'achievement_added' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AchievementAddedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              achievementsCount={notification.data.addedAchievementsCount || 1}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'physical_data_changed' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <PhysicalDataChangedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              changes={notification.data.changes || []}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar}
+            />
+          </TouchableOpacity>
+        ) : (
+        <TouchableOpacity
+          key={notification.id}
+          onPress={() => onPress(notification)}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <View style={styles.notificationGradientShadow}>
+            <View style={styles.notificationItem}>
+            <View style={styles.notificationIcon}>
+              <Ionicons 
+                name={getNotificationIcon(notification.type) as any} 
+                size={24} 
+                color="#fa2f40" 
+              />
+            </View>
+            
+            <View style={styles.notificationContent}>
+              <View style={styles.notificationHeader}>
+                <Text style={styles.notificationTitle} numberOfLines={2}>
+                  {notification.title}
+                </Text>
+                <Text style={styles.notificationTime}>
+                  {formatTime(notification.timestamp)}
+                </Text>
+              </View>
+              
+              <Text style={styles.notificationMessage}>
+                {notification.message}
+              </Text>
+            
+            {notification.playerAvatar && (
+              <View style={styles.playerInfo}>
+                <CachedAvatar
+                  playerId={notification.playerId || ''}
+                  fallbackAvatarUrl={notification.playerAvatar}
+                  size={32}
+                  style={styles.playerAvatar}
+                  onError={() => {
+                    console.log('Ошибка загрузки аватарки для:', notification.playerName);
+                  }}
+                />
+                <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
+                  {notification.playerName}
+                </Text>
+              </View>
+            )}
+            
+            {/* Кнопка "Супер" для actionable уведомлений */}
+            {notification.isActionable && (
+              <View style={styles.superActionContainer}>
+                <TouchableOpacity
+                  style={styles.superActionButton}
+                  onPress={() => onSuperAction(notification)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.superActionButtonText}>Супер!</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+        )}
+      </AnimatedNotification>
+    </Swipeable>
+  );
+});
+
+NotificationItem.displayName = 'NotificationItem';
 
 // Компонент с анимацией для уведомлений (только для новых)
 // Убрали анимацию уведомлений для улучшения производительности
@@ -121,6 +438,11 @@ export default function NotificationsScreen() {
   
   // Состояние для отслеживания новых уведомлений (для анимации)
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
+  
+  // Мемоизируем список уведомлений для предотвращения ненужных перерендеров
+  const memoizedNotifications = React.useMemo(() => notifications, [notifications]);
+  const memoizedFriendRequests = React.useMemo(() => friendRequests, [friendRequests]);
+  const memoizedGiftRequests = React.useMemo(() => giftRequests, [giftRequests]);
 
   // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
   const loadNotificationsData = useCallback(async (isInitialLoad = false) => {
@@ -284,6 +606,20 @@ export default function NotificationsScreen() {
       setNotifications(userNotifications);
       setFriendRequests(friendRequestItems);
       // giftRequestItems загружаются асинхронно выше
+      
+      // Предзагружаем аватары для всех уведомлений в фоне
+      const allPlayers = [
+        ...userNotifications.map(n => ({ id: n.playerId, avatar: n.playerAvatar })),
+        ...friendRequestItems.map(r => ({ id: r.playerId, avatar: r.playerAvatar })),
+        ...giftRequestItems.map(g => ({ id: g.playerId, avatar: g.playerAvatar }))
+      ].filter(p => p.id && p.avatar);
+      
+      if (allPlayers.length > 0) {
+        // Предзагружаем аватары в фоне, не блокируя UI
+        preloadPlayerAvatars(allPlayers).catch(error => {
+          console.log('Предзагрузка аватаров завершена с ошибками:', error);
+        });
+      }
       
     } catch (error) {
       console.error('❌ Ошибка загрузки уведомлений:', error);
@@ -465,14 +801,6 @@ export default function NotificationsScreen() {
     }
   };
 
-  // Рендер правой кнопки удаления при свайпе
-  const renderRightActions = () => {
-    return (
-      <View style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={32} color="#fa2f40" />
-      </View>
-    );
-  };
 
   const handleClearAllNotifications = async () => {
     try {
@@ -865,62 +1193,6 @@ export default function NotificationsScreen() {
     }
   };
 
-  const formatTime = (timestamp: number | string) => {
-    let date: Date;
-    
-    // Обрабатываем разные форматы timestamp
-    if (typeof timestamp === 'string') {
-      date = new Date(timestamp);
-    } else {
-      date = new Date(timestamp);
-    }
-    
-    // Проверяем, что дата валидна
-    if (isNaN(date.getTime())) {
-      return 'Недавно';
-    }
-    
-    const now = new Date();
-    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
-    
-    if (diffInMinutes < 1) {
-      return 'Только что';
-    } else if (diffInMinutes < 60) {
-      return `${Math.floor(diffInMinutes)} мин назад`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)} ч назад`;
-    } else {
-      return date.toLocaleDateString('ru-RU', { 
-        day: '2-digit', 
-        month: '2-digit' 
-      });
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'friend_request':
-        return 'person-add';
-      case 'gift_request':
-        return 'gift';
-      case 'gift_accepted':
-        return 'gift';
-      case 'autograph_request':
-        return 'create';
-      case 'stick_request':
-        return 'key';
-      case 'achievement':
-        return 'trophy';
-      case 'team_invite':
-        return 'people';
-      case 'stats_change':
-        return 'trending-up';
-      case 'system':
-        return 'information-circle';
-      default:
-        return 'notifications';
-    }
-  };
 
 
   // Если пользователь не авторизован (null), перенаправляем на логин
@@ -987,309 +1259,49 @@ export default function NotificationsScreen() {
           </View>
           
           {/* Список уведомлений */}
-          <ScrollView 
-            style={styles.notificationsContainer}
+          <FlatList 
+            data={memoizedNotifications}
+            renderItem={({ item, index }) => (
+              <NotificationItem
+                key={item.id}
+                notification={item}
+                index={index}
+                isNew={newNotificationIds.has(item.id)}
+                onPress={handleNotificationPress}
+                onSuperAction={handleSuperAction}
+                onDelete={handleDeleteNotification}
+              />
+            )}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={styles.notificationsContent}
             removeClippedSubviews={true}
             decelerationRate="fast"
-          >
-            {friendRequests.map((request) => (
-              <View key={request.id} style={styles.friendRequestWrapper}>
-                <FriendRequestNotification
-                  playerName={request.playerName}
-                  playerId={request.playerId}
-                  timestamp={new Date(request.timestamp).toISOString()}
-                  playerAvatar={request.playerAvatar}
-                  onAccept={() => handleFriendRequest(request, 'accept')}
-                  onDecline={() => handleFriendRequest(request, 'decline')}
-                />
-              </View>
-            ))}
-
-            {/* Запросы на подарки */}
-            {giftRequests.map((request) => (
-              <View key={request.id}>
-                <GiftRequestNotification
-                  playerName={request.playerName}
-                  timestamp={new Date(request.timestamp).toISOString()}
-                  playerAvatar={request.playerAvatar}
-                  itemType={request.itemType}
-                  requestMessage={request.requestMessage}
-                  onGift={() => handleGiftRequest(request, 'accept')}
-                />
-              </View>
-            ))}
-            
-
-            
-            {notifications.map((notification, index) => (
-              <Swipeable
-                key={notification.id}
-                renderRightActions={renderRightActions}
-                onSwipeableOpen={() => handleDeleteNotification(notification.id)}
-                overshootRight={false}
-                friction={2}
-                rightThreshold={40}
-                enableTrackpadTwoFingerGesture={true}
-                containerStyle={{ backgroundColor: 'transparent' }}
-              >
-                <AnimatedNotification key={notification.id} index={index} isNew={newNotificationIds.has(notification.id)}>
-                  {notification.type === 'stats_change' && notification.data && notification.data.changes ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <StatsChangeNotification
-                    changes={notification.data.changes}
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    playerId={notification.data.changedPlayerId}
-                    timestamp={notification.timestamp}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'photo_added' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <PhotoAddedNotification
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    photosCount={notification.data.addedPhotosCount || 1}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'new_friendship' ? (
-                <FriendshipNotification
-                  friend1Name={notification.data.friend1Name || 'Игрок 1'}
-                  friend2Name={notification.data.friend2Name || 'Игрок 2'}
-                  timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                  friend1Avatar={notification.data.friend1Avatar}
-                  friend2Avatar={notification.data.friend2Avatar}
-                  confirmedBy={notification.data.confirmedBy}
-                  onPress={() => {
-                    // Используем confirmedBy если есть, иначе fallback на friend1Id
-                    const confirmedBy = notification.data?.confirmedBy || notification.data?.friend1Id;
-                    
-                    if (confirmedBy) {
-                      // Временно обновляем данные уведомления для передачи в handleNotificationPress
-                      const updatedNotification = {
-                        ...notification,
-                        data: {
-                          ...notification.data,
-                          confirmedBy: confirmedBy
-                        }
-                      };
-                      handleNotificationPress(updatedNotification);
-                    }
-                  }}
-                />
-              ) : notification.type === 'exercise_completed' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <ExerciseNotification
-                    playerName={notification.data.playerName || 'Игрок'}
-                    playerId={notification.data.playerId}
-                    exerciseId={notification.data.exerciseId || 'unknown'}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.playerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'gift_received' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <GiftReceivedNotification
-                    playerName={notification.data.playerName || 'Игрок'}
-                    starName={notification.data.starName || 'Звезда'}
-                    giftName={notification.data.giftName || 'Подарок'}
-                    giftType={notification.data.giftType || 'gift'}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.playerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'friend_accepted' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log('🔍 Friend Accepted Notification Data:', {
-                      data: notification.data,
-                      acceptor_name: notification.data?.acceptor_name,
-                      acceptor_avatar: notification.data?.acceptor_avatar
-                    });
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <FriendAcceptedNotification
-                    playerName={notification.data?.acceptor_name || 'Игрок'}
-                    message={notification.message}
-                    timestamp={notification.timestamp}
-                    playerAvatar={notification.data?.acceptor_avatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'gift_accepted' ? (
-                <GiftAcceptedNotification
-                  starName={notification.data?.from_star || t('notifications.star')}
-                  starId={notification.data?.star_id}
-                  starAvatar={notification.data?.star_avatar}
-                  itemTypeName={getItemTypeName(notification.data?.item_type || 'gift')}
-                  message={notification.message}
-                  formattedTime={formatTime(notification.timestamp)}
-                  acknowledgeButtonText={t('common.super')}
-                  onAcknowledge={() => handleSuperAction(notification)}
-                />
-              ) : notification.type === 'video_added' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <VideoAddedNotification
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    videosCount={notification.data.addedVideosCount || 1}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'avatar_changed' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <AvatarChangedNotification
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'achievement_added' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <AchievementAddedNotification
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    achievementsCount={notification.data.addedAchievementsCount || 1}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : notification.type === 'physical_data_changed' ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    handleNotificationPress(notification);
-                  }}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <PhysicalDataChangedNotification
-                    playerName={notification.data.changedPlayerName || 'Игрок'}
-                    changes={notification.data.changes || []}
-                    timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                    playerAvatar={notification.data.changedPlayerAvatar}
-                  />
-                </TouchableOpacity>
-              ) : (
-              <TouchableOpacity
-                key={notification.id}
-                onPress={() => {
-                  handleNotificationPress(notification);
-                }}
-                activeOpacity={0.7}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <View style={styles.notificationGradientShadow}>
-                  <View style={styles.notificationItem}>
-                  <View style={styles.notificationIcon}>
-                    <Ionicons 
-                      name={getNotificationIcon(notification.type) as any} 
-                      size={24} 
-                      color="#fa2f40" 
-                    />
-                  </View>
-                  
-                  <View style={styles.notificationContent}>
-                    <View style={styles.notificationHeader}>
-                      <Text style={styles.notificationTitle} numberOfLines={2}>
-                        {notification.title}
-                      </Text>
-                      <Text style={styles.notificationTime}>
-                        {formatTime(notification.timestamp)}
+            initialNumToRender={15}
+            maxToRenderPerBatch={10}
+            windowSize={10}
+            updateCellsBatchingPeriod={50}
+            getItemLayout={(data, index) => ({
+              length: 100, // Примерная высота элемента
+              offset: 100 * index,
+              index,
+            })}
+            ListEmptyComponent={() => (
+              notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading ? (
+                <View style={styles.emptyContainer}>
+                  <View style={styles.emptyGradientShadow}>
+                    <View style={styles.emptyContent}>
+                      <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
+                      <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
+                      <Text style={styles.emptySubtitle}>
+                        {t('notifications.noNotificationsSubtitle')}
                       </Text>
                     </View>
-                    
-                    <Text style={styles.notificationMessage}>
-                      {notification.message}
-                    </Text>
-                  
-                  {notification.playerAvatar && (
-                    <View style={styles.playerInfo}>
-                      <Image 
-                        source={{ 
-                          uri: notification.playerAvatar,
-                          cache: 'force-cache',
-                          headers: {
-                            'Cache-Control': 'max-age=3600'
-                          }
-                        }} 
-                        style={styles.playerAvatar}
-                        defaultSource={require('../assets/images/default-avatar.png')}
-                        onError={() => {
-                          console.log('Ошибка загрузки аватарки для:', notification.playerName);
-                        }}
-                      />
-                      <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
-                        {notification.playerName}
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {/* Кнопка "Супер" для actionable уведомлений */}
-                  {notification.isActionable && (
-                    <View style={styles.superActionContainer}>
-                      <TouchableOpacity
-                        style={styles.superActionButton}
-                        onPress={() => handleSuperAction(notification)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.superActionButtonText}>Супер!</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                  </View>
                   </View>
                 </View>
-              </TouchableOpacity>
-              )}
-                </AnimatedNotification>
-              </Swipeable>
-            ))}
-            
-
+              ) : null
+            )}
+          />
+          
 
             {/* Показываем пустое состояние только если нет ни уведомлений, ни запросов в друзья, ни запросов на подарки И не идет загрузка */}
             {notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading && (
@@ -1305,7 +1317,6 @@ export default function NotificationsScreen() {
                 </View>
               </View>
             )}
-          </ScrollView>
         </View>
       </ImageBackground>
       </View>

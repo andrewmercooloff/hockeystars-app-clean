@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface AvatarChangedNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   timestamp: string;
   playerAvatar?: string | null;
 }
 
 const AvatarChangedNotification = React.memo(function AvatarChangedNotification({
   playerName,
+  playerId,
   timestamp,
   playerAvatar
 }: AvatarChangedNotificationProps) {
@@ -38,10 +41,11 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image 
-            source={{ uri: playerAvatar }} 
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
+            size={50}
             style={styles.playerAvatar}
-            resizeMode="cover"
           />
         ) : (
           <Ionicons name="person-circle-outline" size={24} color="#fff" />

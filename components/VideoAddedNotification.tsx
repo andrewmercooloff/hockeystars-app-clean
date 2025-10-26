@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface VideoAddedNotificationProps {
   playerName: string;
+  playerId?: string; // Добавляем playerId для кеширования
   videosCount: number;
   timestamp: string;
   playerAvatar?: string | null;
@@ -12,6 +14,7 @@ interface VideoAddedNotificationProps {
 
 const VideoAddedNotification = React.memo(function VideoAddedNotification({
   playerName,
+  playerId,
   videosCount,
   timestamp,
   playerAvatar
@@ -48,10 +51,11 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
-          <Image 
-            source={{ uri: playerAvatar }} 
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
+            size={50}
             style={styles.playerAvatar}
-            resizeMode="cover"
           />
         ) : (
           <Ionicons name="videocam-outline" size={24} color="#fff" />
