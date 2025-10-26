@@ -399,6 +399,12 @@ export default function LoginScreen() {
             
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
+                {/* Заголовок "Выход на лед" */}
+                <View style={styles.modalHeader}>
+                  <Ionicons name="log-in" size={40} color="#FF4444" />
+                  <Text style={styles.modalTitle}>{t('auth.login')}</Text>
+                </View>
+
                 {/* Весь существующий контент */}
                 {step === 'phone' ? (
                   // Шаг 1: Ввод телефона
