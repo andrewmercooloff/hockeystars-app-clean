@@ -312,7 +312,11 @@ export default function MessagesScreen() {
     <View 
       style={styles.container}
     >
-      <OptimizedBackground useLedBackground style={styles.background} resizeMode="cover">
+      <CachedBackground 
+        source={iceBg} 
+        style={styles.background} 
+        resizeMode="cover"
+      >
         <View style={styles.overlay}>
           {/* Заголовок страницы с поиском */}
           <View style={styles.pageHeader}>
@@ -436,7 +440,7 @@ export default function MessagesScreen() {
             ) : null}
           </ScrollView>
         </View>
-      </OptimizedBackground>
+      </CachedBackground>
     </View>
   );
 }
