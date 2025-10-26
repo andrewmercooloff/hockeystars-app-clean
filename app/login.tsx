@@ -407,6 +407,11 @@ export default function LoginScreen() {
                   </Text>
                 </View>
 
+                {/* Сообщение */}
+                <Text style={styles.modalMessage}>
+                  {t('auth.phoneHint')}
+                </Text>
+
                 {/* Весь существующий контент */}
                 {step === 'phone' ? (
                   // Шаг 1: Ввод телефона
