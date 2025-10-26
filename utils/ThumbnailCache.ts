@@ -33,17 +33,15 @@ class ThumbnailCache {
       return originalUrl;
     }
 
-    // Ищем предварительно сгенерированную миниатюру
+    // Для Supabase URLs пытаемся найти миниатюру
     if (originalUrl.includes('supabase') && originalUrl.includes('/avatars/')) {
-      // Извлекаем playerId из URL
+      // Извлекаем имя файла из URL
       const urlParts = originalUrl.split('/');
       const fileName = urlParts[urlParts.length - 1];
       
-      // Пытаемся извлечь playerId из имени файла
-      // Формат: avatar_1234567890.jpg -> playerId из базы данных
       if (fileName.startsWith('avatar_')) {
-        // Формируем URL для миниатюры
-        const thumbnailUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${size}/avatar_${size}.jpg`;
+        // Формируем URL для миниатюры: thumbnails/{size}/{filename}
+        const thumbnailUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${size}/${fileName}`;
         console.log(`🔍 Ищем миниатюру ${size} для файла ${fileName}:`, thumbnailUrl);
         return thumbnailUrl;
       }
