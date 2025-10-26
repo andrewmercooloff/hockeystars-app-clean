@@ -21,6 +21,7 @@ import OptimizedBackground from '../components/OptimizedBackground';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
+import CachedBackground from '../components/CachedBackground';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -591,7 +592,7 @@ export default function SearchScreen() {
       // currentUser === undefined, еще загружается
       return (
         <View style={styles.container}>
-          <ImageBackground
+          <CachedBackground
             source={require('../assets/images/led.jpg')}
             style={styles.backgroundImage}
             resizeMode="cover"
@@ -599,7 +600,7 @@ export default function SearchScreen() {
             <View style={styles.overlayLoading}>
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
-          </ImageBackground>
+          </CachedBackground>
         </View>
       );
     }
@@ -609,7 +610,7 @@ export default function SearchScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ImageBackground
+        <CachedBackground
           source={require('../assets/images/led.jpg')}
           style={styles.backgroundImage}
           resizeMode="cover"
@@ -617,7 +618,7 @@ export default function SearchScreen() {
           <View style={styles.overlayLoading}>
             <Text style={styles.loadingText}>{t('common.loading')}</Text>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -625,8 +626,8 @@ export default function SearchScreen() {
   return (
     <View style={styles.container}>
       {/* Полупрозрачный фон льда */}
-      <OptimizedBackground
-        useLedBackground
+      <CachedBackground
+        source={require('../assets/images/led.jpg')}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -757,7 +758,7 @@ export default function SearchScreen() {
             })}
           />
         </View>
-      </OptimizedBackground>
+      </CachedBackground>
     </View>
   );
 }
