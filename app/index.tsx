@@ -712,10 +712,11 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     >
       <Suspense fallback={null}>
         <Puck
-                        avatar={player.avatar}
+          avatar={player.avatar}
+          playerId={player.id}
           onPress={hasDraggedRef.current ? () => {} : onNav}
-        animatedStyle={animatedStyle}
-        size={position.size}
+          animatedStyle={animatedStyle}
+          size={position.size}
         points={player.goals && player.assists ? 
           (() => {
             try {

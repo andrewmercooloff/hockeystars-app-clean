@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from './CachedAvatar';
 
 interface PuckProps {
   avatar?: string | null;
+  playerId?: string; // Добавляем playerId для кеширования
   onPress: () => void;
   animatedStyle?: any;
   size?: number;
@@ -15,6 +17,7 @@ interface PuckProps {
 
 const Puck: React.FC<PuckProps> = ({ 
   avatar, 
+  playerId,
   onPress, 
   animatedStyle, 
   size = 140, 
@@ -134,11 +137,12 @@ const Puck: React.FC<PuckProps> = ({
       ]} />
       
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-        {imageSource ? (
-          <Image 
-            source={imageSource} 
+        {avatar && playerId ? (
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={avatar}
+            size={dimensions.avatarSize}
             style={[
-              styles.avatar,
               {
                 width: dimensions.avatarSize,
                 height: dimensions.avatarSize,
@@ -147,8 +151,7 @@ const Puck: React.FC<PuckProps> = ({
                 borderColor: avatarBorderColor
               }
             ]}
-            onError={handleError}
-            onLoad={handleLoad}
+            onError={() => setImageError(true)}
           />
         ) : (
           <View style={[

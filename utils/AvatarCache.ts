@@ -82,18 +82,15 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
     // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
     const currentCachedAvatar = avatarCache.getAvatar(playerId);
     if (!currentCachedAvatar && fallbackUrl) {
-      console.log('🖼️ Устанавливаем fallback аватар в кеш:', { playerId, fallbackUrl: fallbackUrl.substring(0, 50) + '...' });
       avatarCache.setAvatar(playerId, fallbackUrl);
       setAvatarUrl(fallbackUrl);
     } else if (currentCachedAvatar) {
-      console.log('🖼️ Используем кешированный аватар:', { playerId, cachedUrl: currentCachedAvatar.substring(0, 50) + '...' });
       setAvatarUrl(currentCachedAvatar);
     }
 
     // Подписываемся на изменения
     const unsubscribe = avatarCache.subscribe((changedPlayerId, newAvatarUrl) => {
       if (changedPlayerId === playerId) {
-        console.log('🖼️ Аватар обновлен через подписку:', { playerId, newUrl: newAvatarUrl?.substring(0, 50) + '...' });
         setAvatarUrl(newAvatarUrl);
       }
     });
