@@ -308,8 +308,9 @@ export default function RootLayout() {
     }
     lastUserLoadTime.current = Date.now(); // Обновляем время последнего вызова
     try {
-      const user = await loadCurrentUser();
+      // НЕ загружаем пользователя здесь - используем UserContext
       setUserLoaded(true);
+      const user = currentUser;
       if (user) {
              // Трекаем вход в приложение ТОЛЬКО ОДИН РАЗ за всю сессию приложения
              if (!loginTracked.current) {

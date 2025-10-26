@@ -368,7 +368,7 @@ export class ExerciseService {
       
       // Инвалидируем кеш рейтинга упражнений
       try {
-        const { dataCache, CACHE_KEYS } = await import('../utils/dataCache');
+        const { dataCache, CACHE_KEYS } = await import('../utils/DataCache');
         await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
         console.log('✅ Кеш рейтинга упражнений инвалидирован');
       } catch (cacheError) {
