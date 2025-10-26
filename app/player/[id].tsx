@@ -67,7 +67,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser: globalCurrentUser, refreshUser } = useUser();
+  const { currentUser: globalCurrentUser, setCurrentUser: setGlobalCurrentUser, refreshUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
@@ -115,19 +115,6 @@ export default function PlayerProfile() {
   useEffect(() => {
     setCurrentUser(globalCurrentUser);
   }, [globalCurrentUser]);
-
-  // Проверяем авторизацию при загрузке компонента
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (!globalCurrentUser) {
-        // Если пользователь не авторизован, перенаправляем на главную страницу
-        console.log('🔐 Пользователь не авторизован, перенаправляем на главную страницу');
-        router.replace('/');
-      }
-    };
-    
-    checkAuth();
-  }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
@@ -1455,15 +1442,15 @@ export default function PlayerProfile() {
           const { updateGlobalUserCache } = await import('../../contexts/UserContext');
           updateGlobalUserCache(null);
           
-          // Устанавливаем пользователя в null (НЕ вызываем refreshUser!)
-          setCurrentUser(null);
+          // Устанавливаем пользователя в null через глобальный контекст
+          setGlobalCurrentUser(null);
           
           // Переходим на страницу логина
           router.replace('/login');
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           // Даже если произошла ошибка, все равно выходим
-          setCurrentUser(null);
+          setGlobalCurrentUser(null);
           router.replace('/login');
         }
       }
