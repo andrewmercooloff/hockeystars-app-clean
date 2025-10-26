@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
@@ -137,7 +137,7 @@ const Puck: React.FC<PuckProps> = ({
       ]} />
       
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-        {avatar && playerId ? (
+        {avatar && playerId && status !== 'scout' ? (
           <View style={[
             {
               width: dimensions.avatarSize,
@@ -153,11 +153,29 @@ const Puck: React.FC<PuckProps> = ({
               fallbackAvatarUrl={avatar}
               size={dimensions.avatarSize}
               style={{
+                borderRadius: dimensions.avatarBorderRadius,
+              }}
+              onError={() => setImageError(true)}
+            />
+          </View>
+        ) : status === 'scout' ? (
+          <View style={[
+            {
+              width: dimensions.avatarSize,
+              height: dimensions.avatarSize,
+              borderRadius: dimensions.avatarBorderRadius,
+              borderWidth: 3,
+              borderColor: avatarBorderColor,
+              overflow: 'hidden'
+            }
+          ]}>
+            <Image 
+              source={require('../assets/images/scout.png')} 
+              style={{
                 width: dimensions.avatarSize,
                 height: dimensions.avatarSize,
                 borderRadius: dimensions.avatarBorderRadius,
               }}
-              onError={() => setImageError(true)}
             />
           </View>
         ) : (

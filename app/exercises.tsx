@@ -579,13 +579,13 @@ const styles = StyleSheet.create({
   exerciseCard: {
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 6,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   exerciseGradientShadow: {
-    marginBottom: 12,
+    marginBottom: 6,
     borderRadius: 12,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 6,
   },
   exerciseInfo: {
     flex: 1,
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: 2,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
     flexWrap: 'wrap',

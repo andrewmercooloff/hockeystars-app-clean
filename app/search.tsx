@@ -933,13 +933,13 @@ const styles = StyleSheet.create({
   playerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
     borderRadius: 10,
     padding: 10,
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   playerGradientShadow: {
-    marginBottom: 10,
+    marginBottom: 5,
     borderRadius: 10,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
