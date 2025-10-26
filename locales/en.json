@@ -1740,7 +1740,8 @@
     "giftRequests": "Gift Requests"
   },
   "auth": {
-    "login": "Hit the Ice",
+    "exitToIce": "Exit to Ice",
+    "login": "Login",
     "register": "Register",
     "phone": "Phone",
     "phonePlaceholder": "+1234567890",

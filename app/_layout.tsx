@@ -25,7 +25,7 @@ import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
 
 // Исправляем импорт с учетом регистра
-import { dataCache, CACHE_KEYS } from '../utils/dataCache';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
