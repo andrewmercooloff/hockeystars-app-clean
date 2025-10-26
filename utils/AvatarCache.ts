@@ -74,6 +74,11 @@ class AvatarCache {
     await Promise.allSettled(preloadTasks);
     console.log('🖼️ Предзагрузка аватаров завершена');
   }
+
+  // Получаем все кешированные аватары
+  getAllAvatars(): Map<string, string> {
+    return new Map(this.cache);
+  }
 }
 
 export const avatarCache = AvatarCache.getInstance();

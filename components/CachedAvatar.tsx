@@ -30,19 +30,35 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
   const [isPrefetched, setIsPrefetched] = React.useState(false);
+  const [isCached, setIsCached] = React.useState(false);
 
   // Используем кешированный аватар или fallback
   const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
 
-  // Предзагружаем изображение если оно есть и еще не предзагружено
+  // Проверяем, есть ли изображение в кеше React Native
   React.useEffect(() => {
-    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http') && !isPrefetched) {
-      Image.prefetch(effectiveAvatarUrl)
-        .then(() => {
-          setIsPrefetched(true);
+    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http')) {
+      // Проверяем кеш React Native
+      Image.queryCache([effectiveAvatarUrl])
+        .then(cacheMap => {
+          if (cacheMap[effectiveAvatarUrl]) {
+            setIsCached(true);
+            setIsPrefetched(true);
+          }
         })
         .catch(() => {
-          setIsPrefetched(false);
+          // Если проверка кеша не удалась, пробуем предзагрузить
+          if (!isPrefetched) {
+            Image.prefetch(effectiveAvatarUrl)
+              .then(() => {
+                setIsPrefetched(true);
+                setIsCached(true);
+              })
+              .catch(() => {
+                setIsPrefetched(false);
+                setIsCached(false);
+              });
+          }
         });
     }
   }, [effectiveAvatarUrl, isPrefetched]);
@@ -89,20 +105,20 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
       <Image
         source={{ 
           uri: effectiveAvatarUrl,
-          cache: isPrefetched ? 'force-cache' : 'default',
+          cache: isCached ? 'force-cache' : (isPrefetched ? 'force-cache' : 'default'),
           headers: {
             'Cache-Control': 'max-age=3600'
           }
         }}
         style={[imageStyle, { 
-          opacity: imageLoaded ? 1 : (isPrefetched ? 0.9 : 0.7)
+          opacity: imageLoaded ? 1 : (isCached ? 1 : (isPrefetched ? 0.9 : 0.7))
         }]}
         onError={handleError}
         onLoad={handleLoad}
       />
       
-      {/* Показываем индикатор загрузки только если изображение не предзагружено */}
-      {!isPrefetched && !imageLoaded && !imageError && (
+      {/* Показываем индикатор загрузки только если изображение не кешировано и не предзагружено */}
+      {!isCached && !isPrefetched && !imageLoaded && !imageError && (
         <View style={{
           position: 'absolute',
           top: 0,
