@@ -28,11 +28,31 @@ interface UserProviderProps {
 let globalUserCache: Player | null = null;
 let lastUserLoadTime = 0;
 const USER_CACHE_DURATION = 2 * 60 * 1000; // 2 минуты
+let isInitializing = false;
+
+// Синхронно загружаем пользователя из AsyncStorage при старте
+const initializeUserCache = async () => {
+  if (isInitializing || globalUserCache) return;
+  isInitializing = true;
+  
+  try {
+    const user = await loadCurrentUser();
+    globalUserCache = user;
+  } catch (error) {
+    console.error('Ошибка инициализации кеша пользователя:', error);
+  } finally {
+    isInitializing = false;
+  }
+};
+
+// Запускаем инициализацию сразу
+initializeUserCache();
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState<Player | null>(globalUserCache);
   // Начинаем с загрузки только если нет кеша
   const [isUserLoading, setIsUserLoading] = useState(!globalUserCache);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   const setCurrentUser = useCallback((user: Player | null) => {
     globalUserCache = user;
