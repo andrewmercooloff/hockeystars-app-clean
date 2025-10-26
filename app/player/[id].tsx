@@ -852,8 +852,17 @@ export default function PlayerProfile() {
   };
 
   const handleSendMessage = () => {
+    console.log('🚨 Попытка отправить сообщение:', {
+      currentUserId: currentUser?.id,
+      currentUserStatus: currentUser ? 'authorized' : 'not_authorized',
+      playerExists: !!player
+    });
+
     if (!currentUser) {
-      showCustomAlert('Ошибка', 'Необходимо войти в профиль для отправки сообщений', 'error', () => router.push('/login'));
+      showCustomAlert('Ошибка', 'Необходимо войти в профиль для отправки сообщений', 'error', () => {
+        console.log('🔄 Перенаправление на страницу входа');
+        router.push('/login');
+      });
       return;
     }
     
@@ -1552,7 +1561,15 @@ export default function PlayerProfile() {
     );
   }
 
-
+  // Добавляем подробное логирование при загрузке страницы профиля
+  useEffect(() => {
+    console.log('🔍 Загрузка страницы профиля:', {
+      currentUserId: currentUser?.id,
+      profileId: id,
+      isCurrentUserDefined: !!currentUser,
+      isProfileIdDefined: !!id
+    });
+  }, [currentUser, id]);
 
   return (
     <View style={styles.container}>
@@ -3483,7 +3500,7 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>{t('profile.cancel')}</Text>
+                      <Text style={styles.actionButtonText}>{t('common.cancel')}</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
