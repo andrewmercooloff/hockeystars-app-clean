@@ -28,7 +28,11 @@ import { realtimeManager } from '../utils/RealtimeManager';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 
 // Предотвращаем автоматическое скрытие заставки
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().then(() => {
+  console.log('✅ Splash screen prevented from auto-hiding');
+}).catch((error) => {
+  console.error('❌ Error preventing splash screen auto-hide:', error);
+});
 
 // Устанавливаем черный фон для веб-версии
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
