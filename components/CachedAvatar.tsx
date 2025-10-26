@@ -29,23 +29,9 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
-  const [isPrefetched, setIsPrefetched] = React.useState(false);
 
   // Используем кешированный аватар или fallback
   const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
-
-  // Предзагружаем изображение если оно есть
-  React.useEffect(() => {
-    if (effectiveAvatarUrl && effectiveAvatarUrl.startsWith('http')) {
-      Image.prefetch(effectiveAvatarUrl)
-        .then(() => {
-          setIsPrefetched(true);
-        })
-        .catch(() => {
-          setIsPrefetched(false);
-        });
-    }
-  }, [effectiveAvatarUrl]);
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -89,13 +75,13 @@ const CachedAvatar: React.FC<CachedAvatarProps> = ({
       <Image
         source={{ 
           uri: effectiveAvatarUrl,
-          cache: isPrefetched ? 'force-cache' : 'default',
+          cache: 'force-cache',
           headers: {
             'Cache-Control': 'max-age=3600'
           }
         }}
         style={[imageStyle, { 
-          opacity: imageLoaded ? 1 : (isPrefetched ? 0.9 : 0.7)
+          opacity: imageLoaded ? 1 : 0.9
         }]}
         onError={handleError}
         onLoad={handleLoad}
