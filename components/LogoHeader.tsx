@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import HeaderAvatar from './HeaderAvatar';
@@ -9,7 +9,7 @@ const logo = require('../assets/images/logo.png');
 
 const LogoHeader = React.memo(() => {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const pathname = usePathname();
   const { currentUser, refreshUser } = useUser();
 
   // Обновляем данные только при изменении параметров refresh
@@ -41,7 +41,7 @@ const LogoHeader = React.memo(() => {
             router.replace('/login');
           } else {
             // Если текущий экран - профиль пользователя, возвращаемся на главную
-            if (router.pathname === `/player/${currentUser.id}`) {
+            if (pathname.startsWith(`/player/${currentUser.id}`)) {
               router.replace('/');
             } else {
               // В противном случае переходим в профиль
