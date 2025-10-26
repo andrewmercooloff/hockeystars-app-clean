@@ -1679,43 +1679,46 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     const user = JSON.parse(userData);
     
-    // Оптимизация: загружаем счетчик сообщений только если это критично
-    // Для первого входа используем кешированное значение или 0
+    // Оптимизация: используем 0 по умолчанию для мгновенной загрузки
+    // Счетчик будет обновлен в фоне после полной загрузки приложения
     if (user.unreadMessagesCount === undefined) {
-      try {
-        // Быстрый запрос только для счетчика сообщений
-        const { data: playerData, error: playerError } = await supabase
-          .from('players')
-          .select('unread_messages_count')
-          .eq('id', user.id)
-          .single();
-        
-        if (playerError) {
-          console.error('❌ Ошибка получения счетчика сообщений из БД:', playerError);
-          user.unreadMessagesCount = 0; // Используем 0 вместо медленного fallback
-        } else {
-          user.unreadMessagesCount = playerData?.unread_messages_count || 0;
+      user.unreadMessagesCount = 0;
+    }
+    
+    // Загружаем счетчик сообщений в фоне (не блокируем загрузку)
+    if (!forceRefresh) {
+      setTimeout(async () => {
+        try {
+          const { data: playerData, error: playerError } = await supabase
+            .from('players')
+            .select('unread_messages_count')
+            .eq('id', user.id)
+            .single();
+          
+          if (!playerError && playerData) {
+            const newCount = playerData.unread_messages_count || 0;
+            if (newCount !== user.unreadMessagesCount) {
+              // Обновляем кеш с новым счетчиком
+              user.unreadMessagesCount = newCount;
+              await AsyncStorage.setItem(cacheKey, JSON.stringify({
+                user,
+                timestamp: Date.now()
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('❌ Ошибка фоновой загрузки счетчика сообщений:', error);
         }
-      } catch (error) {
-        console.error('❌ Ошибка получения счетчика сообщений:', error);
-        user.unreadMessagesCount = 0;
-      }
+      }, 500);
     }
     
-    // Логируем детали только при первом заходе или изменении пользователя
-    const lastUserKey = 'hockeystars_last_user_id';
-    const lastUserId = await AsyncStorage.getItem(lastUserKey);
-    
-    if (lastUserId !== user.id) {
-        // User data logged
-      await AsyncStorage.setItem(lastUserKey, user.id);
+    // Кэшируем результат (только если это не из кеша)
+    if (!cachedData || forceRefresh) {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify({
+        user,
+        timestamp: Date.now()
+      }));
     }
-    
-    // Кэшируем результат
-    await AsyncStorage.setItem(cacheKey, JSON.stringify({
-      user,
-      timestamp: Date.now()
-    }));
     
     return user;
   } catch (error) {
