@@ -1730,7 +1730,6 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
 // Выход пользователя
 export const logoutUser = async (): Promise<void> => {
   try {
-    
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     
     // Проверим, есть ли данные пользователя перед удалением
@@ -1743,6 +1742,22 @@ export const logoutUser = async (): Promise<void> => {
     await AsyncStorage.removeItem('hockeystars_current_user');
     await AsyncStorage.removeItem('hockeystars_user_cache');
     await AsyncStorage.removeItem('hockeystars_last_user_id');
+    
+    // Обновляем глобальный кеш и контекст пользователя
+    try {
+      const { updateGlobalUserCache, globalUserCache } = await import('../contexts/UserContext');
+      updateGlobalUserCache(null);
+    } catch (contextError) {
+      console.error('❌ Ошибка обновления контекста пользователя:', contextError);
+    }
+    
+    // Принудительный редирект на страницу входа
+    try {
+      const { router } = await import('expo-router');
+      router.replace('/login');
+    } catch (routerError) {
+      console.error('❌ Ошибка редиректа:', routerError);
+    }
     
   } catch (error) {
     console.error('❌ Ошибка выхода:', error);
