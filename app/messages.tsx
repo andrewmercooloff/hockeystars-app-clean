@@ -260,9 +260,22 @@ export default function MessagesScreen() {
 
 
   // Если пользователь не авторизован (null), перенаправляем на логин
+  // Используем useEffect для безопасной навигации
+  React.useEffect(() => {
+    if (currentUser === null && !isUserLoading) {
+      router.replace('/login');
+    }
+  }, [currentUser, isUserLoading, router]);
+
+  // Если пользователь не авторизован, показываем loading
   if (currentUser === null) {
-    router.replace('/login');
-    return null;
+    return (
+      <OptimizedBackground source={iceBg} style={styles.container}>
+        <View style={styles.loadingCenter}>
+          <Text style={styles.loadingText}>Загрузка...</Text>
+        </View>
+      </OptimizedBackground>
+    );
   }
 
   // Если загружается пользователь ИЛИ данные, показываем один loading screen

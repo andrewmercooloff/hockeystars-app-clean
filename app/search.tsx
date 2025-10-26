@@ -140,7 +140,7 @@ export default function SearchScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser } = useUser();
+  const { currentUser, isUserLoading } = useUser();
   
   
   // Функция для форматирования даты в формат DD.MM.YYYY
@@ -235,7 +235,8 @@ export default function SearchScreen() {
         
         // Используем пользователя из UserContext
         if (!currentUser) {
-          router.replace('/login');
+          // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
+          // Вместо этого просто возвращаемся
           return;
         }
 
@@ -259,7 +260,8 @@ export default function SearchScreen() {
         
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
-        router.replace('/login');
+        // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
+        // Вместо этого просто логируем ошибку
       } finally {
         await SplashScreen.hideAsync();
         setLoading(false);
@@ -270,8 +272,12 @@ export default function SearchScreen() {
     if (currentUser !== undefined && currentUser !== null) {
       loadData();
     } else if (currentUser === null) {
-      // Если currentUser явно null, перенаправляем на логин
-      router.replace('/login');
+      // Если currentUser явно null, используем useEffect для безопасной навигации
+      React.useEffect(() => {
+        if (currentUser === null && !isUserLoading) {
+          router.replace('/login');
+        }
+      }, [currentUser, isUserLoading, router]);
     }
   }, [router, currentUser]);
 
