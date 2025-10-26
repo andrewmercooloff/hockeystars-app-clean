@@ -530,18 +530,15 @@ export default function RootLayout() {
         console.log('🏁 Приложение помечено как готовое после ошибки');
         setAppReady(true);
         
-        // При ошибке тоже добавляем задержку для консистентности
-        setTimeout(() => {
-          // При ошибке тоже плавно скрываем splash screen
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => {
-            console.log('🏁 Splash screen скрыт');
-            setShowSplash(false);
-          });
-        }, 500); // Та же задержка что и в успешном случае
+        // Плавно скрываем splash screen
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          console.log('🏁 Splash screen скрыт');
+          setShowSplash(false);
+        });
       }
     };
 
