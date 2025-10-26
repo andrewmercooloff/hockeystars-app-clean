@@ -520,7 +520,7 @@ export default function SearchScreen() {
     const playerPhoto = 
       item.avatar || 
       (item.photos && item.photos.length > 0 && item.photos[0]) || 
-      require('../assets/images/default-avatar.png');
+      null; // Убираем require, будем использовать fallback в CachedAvatar
 
     // Определяем стиль контура в зависимости от статуса
     const photoContainerStyle = 
@@ -537,7 +537,7 @@ export default function SearchScreen() {
         <View style={photoContainerStyle}>
           <CachedAvatar 
             playerId={item.id}
-            fallbackAvatarUrl={typeof playerPhoto === 'string' ? playerPhoto : ''}
+            fallbackAvatarUrl={playerPhoto || ''}
             size={60}
             style={styles.playerPhoto}
             onError={() => {
