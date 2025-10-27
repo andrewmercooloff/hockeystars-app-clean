@@ -1446,8 +1446,6 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     // Проверяем изменение аватара и обновляем глобальный кеш
     if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
-      console.log('🔄 Аватар игрока изменился:', { playerId, oldAvatar: oldPlayer.avatar, newAvatar: updatedPlayer.avatar });
-      
       // Очищаем старый аватар из всех кешей
       if (oldPlayer.avatar) {
         try {
@@ -1455,7 +1453,6 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
           // Инвалидируем кеш старого аватара
           await Image.clearMemoryCache();
           await Image.clearDiskCache();
-          console.log('✅ Кеш изображений очищен для аватара');
         } catch (error) {
           console.error('❌ Ошибка очистки кеша изображений:', error);
         }
@@ -1463,15 +1460,12 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
       
       // Очищаем AvatarCache для этого игрока перед обновлением
       avatarCache.clearAvatar(playerId);
-      console.log('✅ AvatarCache очищен для', playerId);
       
       // Обновляем кеш аватаров
       if (updatedPlayer.avatar) {
         await updateAvatarGlobally(playerId, updatedPlayer.avatar);
-        console.log('✅ Глобальный кеш аватаров обновлен');
       } else {
         avatarCache.clearAvatar(playerId);
-        console.log('✅ Аватар очищен из кеша');
       }
       
       // Отправляем уведомления друзьям об изменении аватара

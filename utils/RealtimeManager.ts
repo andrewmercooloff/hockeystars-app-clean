@@ -232,14 +232,11 @@ class RealtimeManager {
           const playerId = playerData.id;
           const newAvatar = playerData.avatar;
           
-          console.log('🔄 Аватар игрока обновлен через Realtime:', { playerId, newAvatar });
-          
           // Обновляем кеш аватара
           if (newAvatar && playerId) {
             try {
               const { avatarCache } = await import('./AvatarCache');
               await avatarCache.setAvatar(playerId, newAvatar);
-              console.log('✅ Аватар обновлен в кеше через Realtime');
             } catch (error) {
               console.error('❌ Ошибка обновления аватара в кеше:', error);
             }
