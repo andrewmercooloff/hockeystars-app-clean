@@ -96,7 +96,7 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: false,
         quality: 0.8,
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
       });
 
       if (!result.canceled && result.assets[0]) {
