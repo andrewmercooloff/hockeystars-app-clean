@@ -711,7 +711,11 @@ export default function PlayerProfile() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        setEditData({...editData, avatar: result.assets[0].uri});
+        const newAvatarUri = result.assets[0].uri;
+        // Очищаем кеш аватара для немедленного обновления
+        const { avatarCache } = await import('../../utils/AvatarCache');
+        avatarCache.clearAvatar(player.id);
+        setEditData({...editData, avatar: newAvatarUri});
       }
     } catch (error) {
       console.error('❌ Ошибка выбора фото из галереи:', error);
@@ -737,7 +741,11 @@ export default function PlayerProfile() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        setEditData({...editData, avatar: result.assets[0].uri});
+        const newAvatarUri = result.assets[0].uri;
+        // Очищаем кеш аватара для немедленного обновления
+        const { avatarCache } = await import('../../utils/AvatarCache');
+        avatarCache.clearAvatar(player.id);
+        setEditData({...editData, avatar: newAvatarUri});
       }
     } catch (error) {
       console.error('❌ Ошибка при съемке фото:', error);
