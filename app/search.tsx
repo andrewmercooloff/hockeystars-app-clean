@@ -23,6 +23,9 @@ import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import CachedBackground from '../components/CachedBackground';
 
+// Фоновый узор для секции поиска
+const starPattern = require('../assets/images/star1.png');
+
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
@@ -638,9 +641,11 @@ export default function SearchScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <View style={styles.searchSection}>
-            {/* Поле поиска */}
-            <View style={styles.searchContainer}>
+          <ImageBackground source={starPattern} style={styles.searchSection} imageStyle={styles.searchSectionPattern}>
+            {/* Полупрозрачный оверлей */}
+            <View style={styles.searchSectionOverlay}>
+              {/* Поле поиска */}
+              <View style={styles.searchContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -734,7 +739,8 @@ export default function SearchScreen() {
               onToggle={toggleFilter}
             />
             </View>
-          </View>
+            </View>
+            </ImageBackground>
 
           {/* Список игроков */}
           <FlatList
@@ -812,9 +818,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1001,
+    overflow: 'hidden',
+  },
+  searchSectionPattern: {
+    opacity: 0.15, // Полупрозрачный паттерн
+    resizeMode: 'repeat',
+  },
+  searchSectionOverlay: {
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   searchContainer: {
     flexDirection: 'row',
