@@ -1022,6 +1022,12 @@ export default function HomeScreen() {
       setPlayers(loadedPlayers);
       setCurrentUser(user);
       
+      // Предзагружаем аватары всех игроков для мгновенного отображения в профилях
+      import('../utils/AvatarCache').then(({ avatarCache }) => {
+        avatarCache.preloadPlayerAvatars(loadedPlayers).catch(err => 
+          console.warn('⚠️ Предзагрузка аватаров не удалась:', err)
+        );
+      });
       
       // Устанавливаем значения по умолчанию только если они не установлены
       if (!selectedCountry) {
