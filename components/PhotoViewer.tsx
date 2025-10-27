@@ -2,7 +2,6 @@ import SafeIcon from './SafeIcon';
 import React, { useEffect, useState } from 'react';
 import {
     Dimensions,
-    Image,
     ImageBackground,
     Modal,
     ScrollView,
@@ -11,6 +10,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CachedImage from './CachedImage';
 

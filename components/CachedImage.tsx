@@ -1,6 +1,7 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 
 interface CachedImageProps {
   imageUrl: string;
@@ -57,13 +58,17 @@ const CachedImage: React.FC<CachedImageProps> = React.memo(({
     <Image
       source={{ 
         uri: imageUrl,
-        cache: 'force-cache' // Принудительное кеширование
+        headers: {
+          'Cache-Control': 'public, max-age=31536000' // Кеш на 1 год
+        }
       }}
       style={style}
-      resizeMode={resizeMode}
+      contentFit={resizeMode}
       onError={handleError}
       onLoad={handleLoad}
-      fadeDuration={0} // Убираем анимацию для мгновенного отображения
+      cachePolicy="memory-disk" // Используем memory-disk кеш
+      priority="normal"
+      transition={0} // Мгновенный переход без анимации
     />
   );
 }, (prevProps, nextProps) => {

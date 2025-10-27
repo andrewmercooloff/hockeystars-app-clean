@@ -2,7 +2,6 @@ import SafeIcon from './SafeIcon';
 import React, { useState } from 'react';
 import {
     Dimensions,
-    Image,
     ScrollView,
     StyleSheet,
     Text,
@@ -10,6 +9,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import PhotoViewer from './PhotoViewer';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -48,9 +48,16 @@ const PhotosSection = React.memo(function PhotosSection({ photos = [] }: PhotosS
             activeOpacity={0.8}
           >
             <Image
-              source={{ uri: photo }}
+              source={{ 
+                uri: photo,
+                headers: {
+                  'Cache-Control': 'public, max-age=31536000'
+                }
+              }}
               style={styles.photo}
-              resizeMode="contain"
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              transition={0}
             />
             <View style={styles.photoOverlay}>
               <Ionicons name="expand-outline" size={20} color="#fff" />
