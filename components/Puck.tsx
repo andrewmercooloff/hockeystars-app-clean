@@ -18,7 +18,7 @@ interface PuckProps {
 const Puck: React.FC<PuckProps> = ({ 
   avatar, 
   playerId,
-  onPress, 
+  onPress,
   animatedStyle, 
   size = 140, 
   points, 
@@ -26,6 +26,7 @@ const Puck: React.FC<PuckProps> = ({
   status 
 }) => {
   const [imageError, setImageError] = useState(false);
+  const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
   
   // Анимация для тени на льду - отключена для лучшей производительности
   // const shadowOpacity = useSharedValue(0.4);
@@ -83,9 +84,11 @@ const Puck: React.FC<PuckProps> = ({
           avatar.startsWith('http') || 
           avatar.startsWith('file://') || 
           avatar.startsWith('content://')) {
+        // Используем avatarCacheKey для обновления изображения при изменении
+        const uriWithCache = avatar.includes('?') ? avatar : `${avatar}?cache=${avatarCacheKey}`;
         return { 
-          uri: avatar,
-          cache: 'force-cache', // Используем кэш для лучшей производительности
+          uri: uriWithCache,
+          cache: 'reload', // Перезагружаем изображение для обновления аватаров
         };
       }
       
@@ -96,16 +99,17 @@ const Puck: React.FC<PuckProps> = ({
       
       // Если это просто строка, но не URI, попробуем как URI
       if (avatar.trim().length > 0) {
+        const uriWithCache = avatar.includes('?') ? avatar : `${avatar}?cache=${avatarCacheKey}`;
         return { 
-          uri: avatar,
-          cache: 'force-cache',
+          uri: uriWithCache,
+          cache: 'reload',
         };
       }
     }
     
     // Для всех остальных случаев показываем силуэт
     return null;
-  }, [avatar, imageError, status]);
+  }, [avatar, imageError, status, avatarCacheKey]);
 
   const handleError = useCallback((error: any) => {
 
