@@ -119,11 +119,26 @@ export function useExercises(
       if (user && user.id) {
         await ExerciseService.markExerciseAsCompleted(user.id, exerciseId);
         
+        // КРИТИЧНО: Инвалидируем кеш профиля пользователя!
+        // Это обновит раздел "выполненные упражнения" в профиле
+        await dataCache.invalidate(CACHE_KEYS.USER_PROFILE);
+        
         // Инвалидируем кеш статистики пользователя
         await dataCache.invalidate(`${CACHE_KEYS.USER_STATS}_${user.id}`);
         
         // Инвалидируем кеш рейтинга упражнений
         await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
+        
+        // Очищаем глобальный кеш пользователя
+        try {
+          const playerStorage = await import('../utils/playerStorage');
+          if (playerStorage.globalUserCache) {
+            console.log('🔍 Очищаем глобальный кеш пользователя');
+            playerStorage.globalUserCache = null;
+          }
+        } catch (cacheError) {
+          console.warn('⚠️ Не удалось очистить глобальный кеш:', cacheError);
+        }
         
         // Обновляем локальную статистику
         setUserStats(prev => {
@@ -143,18 +158,9 @@ export function useExercises(
           return newRankings;
         });
         
-        // Принудительно обновляем данные пользователя
-        try {
-          console.log('💪 Принудительно обновляем пользователя после выполнения упражнения...');
-          const { useUser } = await import('../contexts/UserContext');
-          // Здесь мы не можем использовать хук, но можем вызвать функцию напрямую
-          // Давайте попробуем другой подход - обновим глобальный кеш
-          const { loadCurrentUser } = await import('../utils/playerStorage');
-          const updatedUser = await loadCurrentUser(true); // Принудительное обновление
-          console.log('✅ Пользователь обновлен после выполнения упражнения:', updatedUser?.exerciseStats);
-        } catch (error) {
-          console.error('❌ Ошибка обновления пользователя после упражнения:', error);
-        }
+        // Принудительно обновляем данные пользователя в UserContext
+        // НЕ вызываем loadCurrentUser здесь - это сделает UserContext при следующем обращении
+        console.log('💪 Все кеши очищены - профиль обновится автоматически');
         
       } else {
         console.warn('⚠️ Пользователь не найден или нет ID');

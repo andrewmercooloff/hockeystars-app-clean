@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CachedImage from './CachedImage';
 
 interface MuseumItem {
   id: string;
@@ -444,25 +445,14 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
             <View key={item.id} style={styles.itemCard}>
               {item.item.image_url ? (
                 <>
-                  <Image 
-                    source={{ 
-                      uri: item.item.image_url,
-                      // Принудительное кеширование изображений
-                      cache: 'force-cache',
-                      headers: {
-                        'Accept': 'image/png,image/jpeg,image/*,*/*',
-                        'Cache-Control': 'max-age=31536000' // Кеш на 1 год
-                      }
-                    }} 
+                  <CachedImage
+                    imageUrl={item.item.image_url}
                     style={[
                       styles.itemImage,
                       // Для PNG изображений убираем фон и добавляем поддержку прозрачности
                       item.item.image_url.toLowerCase().includes('.png') && styles.pngImage
                     ]}
                     resizeMode="contain"
-                    // Оптимизация для медленного интернета
-                    loadingIndicatorSource={{ uri: 'https://via.placeholder.com/100/333/fff?text=...' }}
-                    fadeDuration={200}
                   />
                 </>
               ) : (

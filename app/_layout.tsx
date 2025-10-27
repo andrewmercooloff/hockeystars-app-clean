@@ -123,6 +123,7 @@ export default function RootLayout() {
 
   const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
+  const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
@@ -132,6 +133,10 @@ export default function RootLayout() {
     // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
     React.useEffect(() => {
       setCurrentUser(globalUser);
+      // Синхронизируем счетчик из globalUser
+      if (globalUser && globalUser.unreadMessagesCount !== undefined) {
+        // Обновляем только счетчик, не трогая currentUser целиком
+      }
     }, [globalUser]);
     
     // Обрабатываем параметр refresh из URL
@@ -155,9 +160,23 @@ export default function RootLayout() {
       }
     }, [params.refresh]);
     
-    // Один раз скрываем splash screen при готовности приложения
+    // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
-      if (appReady && showSplash) {
+      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
+      const forceHideSplashTimeout = setTimeout(() => {
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
+      }, 5000);
+
+      if (appReady && !isUserLoading && userLoaded) {
+        // Плавно скрываем наш кастомный splash screen когда все загружено
+        clearTimeout(forceHideSplashTimeout);
+        
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 500,
@@ -166,7 +185,11 @@ export default function RootLayout() {
           setShowSplash(false);
         });
       }
-    }, [appReady, showSplash]);
+
+      return () => {
+        clearTimeout(forceHideSplashTimeout);
+      };
+    }, [appReady, isUserLoading, userLoaded, showSplash]);
     
     return null;
   };
@@ -481,7 +504,6 @@ export default function RootLayout() {
         }
         
         // Помечаем приложение как готовое
-        console.log('🏁 Приложение помечено как готовое');
         setAppReady(true);
       } catch (catchError) {
         console.error('🚨 Ошибка инициализации приложения:', catchError);
@@ -490,13 +512,12 @@ export default function RootLayout() {
         try {
           await SplashScreen.hideAsync();
         } catch (finalError) {
-          console.log('ℹ️ Splash screen already hidden or not registered:', finalError.message);
+          // Ignore
         }
         
         // При ошибке сразу переходим к скрытию заставки
         
         // Помечаем приложение как готовое
-        console.log('🏁 Приложение помечено как готовое после ошибки');
         setAppReady(true);
         
         // При ошибке тоже добавляем задержку для консистентности
@@ -507,14 +528,12 @@ export default function RootLayout() {
             duration: 500,
             useNativeDriver: true,
           }).start(() => {
-            console.log('🏁 Splash screen скрыт');
             setShowSplash(false);
           });
-        }, 500); // Та же задержка что и в успешном случае
+        }, 500);
       }
     };
 
-    console.log(`🔍 Проверка условий: loaded=${loaded}, error=${error}`);
     if (loaded) {
       initializeApp();
     }
@@ -586,6 +605,13 @@ export default function RootLayout() {
     }
   }, [currentUser?.id, loadNotificationCount]);
 
+  // Инициализация счетчика при загрузке пользователя
+  React.useEffect(() => {
+    if (currentUser && currentUser.unreadMessagesCount !== undefined) {
+      setUnreadMessagesCount(currentUser.unreadMessagesCount);
+    }
+  }, [currentUser?.id]);
+
   // Realtime подписка на изменения счетчиков
   React.useEffect(() => {
     if (!currentUser) {
@@ -597,11 +623,9 @@ export default function RootLayout() {
       setUnreadNotificationsCount(count);
     });
 
-    // Устанавливаем callback для обновления счетчика сообщений
+    // Обновляем ТОЛЬКО отдельный счетчик, НЕ трогаем currentUser
     realtimeManager.setMessagesCountCallback((count: number) => {
-      console.log('🔄 Счетчик сообщений изменен через RealtimeManager:', count);
-      // Обновляем UserContext для обновления индикатора
-      loadUser();
+      setUnreadMessagesCount(count);
     });
 
     // Используем централизованный менеджер подписок
@@ -611,7 +635,7 @@ export default function RootLayout() {
       // Отключаем подписки при размонтировании
       realtimeManager.disconnect();
     };
-  }, [currentUser?.id]);
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Обновляем счетчики при фокусе на экране сообщений
   React.useEffect(() => {
@@ -719,7 +743,7 @@ export default function RootLayout() {
                   height: size + 4,
                 }}>
                   <Ionicons name="chatbubble-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
-                  {currentUser && (currentUser.unreadMessagesCount || 0) > 0 && (
+                  {unreadMessagesCount > 0 && (
                     <View style={{
                       position: 'absolute',
                       top: -8,
@@ -736,7 +760,7 @@ export default function RootLayout() {
                         fontSize: 12,
                         fontFamily: 'Gilroy-Bold',
                       }}>
-                        {String(currentUser.unreadMessagesCount || 0)}
+                        {String(unreadMessagesCount)}
                       </Text>
                     </View>
                   )}

@@ -48,6 +48,7 @@ import PlayerExercisesSection from '../../components/PlayerExercisesSection';
 import PlayerMuseum from '../../components/PlayerMuseum';
 import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
+import CachedAvatar from '../../components/CachedAvatar';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
@@ -67,7 +68,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser } = useUser();
+  const { currentUser: globalCurrentUser, refreshUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
@@ -113,21 +114,22 @@ export default function PlayerProfile() {
 
   // Синхронизируем локальное состояние с глобальным
   useEffect(() => {
-    setCurrentUser(currentUser);
-  }, [currentUser]);
+    setCurrentUser(globalCurrentUser);
+  }, [globalCurrentUser]);
 
   // Проверяем авторизацию при загрузке компонента
   useEffect(() => {
     const checkAuth = async () => {
-      if (!currentUser) {
-        // Если пользователь не авторизован, перенаправляем на главную страницу
-        console.log('🔐 Пользователь не авторизован, перенаправляем на главную страницу');
-        router.replace('/');
-      }
+      // Ждем немного, чтобы дать время UserContext загрузить данные
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // УБИРАЕМ проверку на авторизацию
+      // Профиль игрока должен быть доступен для просмотра всем
+      // Даже если пользователь не авторизован, он может просматривать профили
     };
     
     checkAuth();
-  }, [currentUser, router]);
+  }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
@@ -341,26 +343,29 @@ export default function PlayerProfile() {
     };
   }, [currentUser?.id, player?.id]);
 
+  // Ref для отслеживания последнего обновления
+  const lastRefreshTime = useRef<number>(0);
+  
   // Отслеживаем, что мы на экране профиля
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
       
-      // Принудительно обновляем пользователя при фокусе на профиле
-      const refreshUserOnFocus = async () => {
-        try {
-          await refreshUser();
-        } catch (error) {
-          console.error('❌ Ошибка обновления пользователя в профиле:', error);
+      // Обновляем данные игрока при возвращении на экран
+      // Это нужно чтобы увидеть актуальную статистику упражнений
+      const now = Date.now();
+      if (player && player.id && globalCurrentUser?.id === player.id) {
+        // Это собственный профиль - обновляем данные, но не слишком часто (раз в 2 секунды)
+        if (now - lastRefreshTime.current > 2000) {
+          lastRefreshTime.current = now;
+          loadPlayerData();
         }
-      };
-      
-      refreshUserOnFocus();
+      }
       
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, refreshUser])
+    }, [setCurrentScreen, player?.id, globalCurrentUser?.id])
   );
 
   // Обработка прокрутки к разным разделам
@@ -546,37 +551,54 @@ export default function PlayerProfile() {
   const loadPlayerData = async () => {
     try {
       if (id) {
+        // Добавляем небольшую задержку для инициализации UserContext
+        // Это предотвращает race condition при первом клике
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
         // Загружаем основные данные параллельно
         const [playerData, userData] = await Promise.all([
           getPlayerById(id as string),
           loadCurrentUser()
         ]);
         
-        // Если игрок не найден, перенаправляем на главную
-        if (!playerData) {
-          router.replace('/');
-          return;
+        // Определяем финальные данные игрока (после retry если нужно)
+        let finalPlayerData = playerData;
+        
+        // Если игрок не найден, делаем retry
+        if (!finalPlayerData) {
+          console.log('⏳ Игрок не найден, ждем...');
+          await new Promise(resolve => setTimeout(resolve, 200));
+          const retryPlayerData = await getPlayerById(id as string);
+          
+          if (!retryPlayerData) {
+            console.log('❌ Игрок не найден после повторной попытки, редиректим на главную');
+            router.replace('/');
+            return;
+          } else {
+            console.log('✅ Игрок найден после повторной попытки');
+            finalPlayerData = retryPlayerData;
+          }
         }
         
         // Сразу устанавливаем основные данные для быстрого отображения
-        setPlayer(playerData);
+        setPlayer(finalPlayerData);
         setCurrentUser(userData);
         
         // Сохраняем в кеш состояния для мгновенного переключения
         setPlayersCache(prev => ({
           ...prev,
-          [id as string]: playerData
+          [id as string]: finalPlayerData
         }));
         
         // Инициализируем годы тренера если это тренер
-        if (playerData?.coach_years && Array.isArray(playerData.coach_years) && playerData.coach_years.length > 0) {
-          setCoachYears(playerData.coach_years);
+        if (finalPlayerData?.coach_years && Array.isArray(finalPlayerData.coach_years) && finalPlayerData.coach_years.length > 0) {
+          setCoachYears(finalPlayerData.coach_years);
         } else {
           setCoachYears([]); // Устанавливаем пустой массив
         }
 
         // Инициализируем индивидуальные тренировки если это тренер
-        const individualTrainingData = (playerData as any)?.individual_training;
+        const individualTrainingData = (finalPlayerData as any)?.individual_training;
         if (individualTrainingData && Array.isArray(individualTrainingData)) {
           setIndividualTraining(individualTrainingData);
         } else {
@@ -584,7 +606,7 @@ export default function PlayerProfile() {
         }
 
         // Инициализируем услуги заточки коньков если это заточка коньков
-        const skateServicesData = (playerData as any)?.skate_services;
+        const skateServicesData = (finalPlayerData as any)?.skate_services;
         if (skateServicesData && Array.isArray(skateServicesData)) {
           setSkateServices(skateServicesData);
         } else {
@@ -592,8 +614,8 @@ export default function PlayerProfile() {
         }
         
         // Инициализируем видео поля сразу
-        if (playerData?.favoriteGoals) {
-          const goals = playerData.favoriteGoals.split('\n').filter(goal => goal.trim());
+        if (finalPlayerData?.favoriteGoals) {
+          const goals = finalPlayerData.favoriteGoals.split('\n').filter(goal => goal.trim());
           const videoData = goals.map(goal => {
             const { url, timeCode } = parseVideoUrl(goal);
             return { url, timeCode: timeCode || '' };
@@ -602,12 +624,12 @@ export default function PlayerProfile() {
         }
         
         // Инициализируем достижения сразу
-        if (playerData?.achievements && Array.isArray(playerData.achievements)) {
-          setAchievements(playerData.achievements);
+        if (finalPlayerData?.achievements && Array.isArray(finalPlayerData.achievements)) {
+          setAchievements(finalPlayerData.achievements);
         }
         
         // Быстро устанавливаем статус дружбы для собственного профиля
-        if (userData && playerData.id === userData.id) {
+        if (userData && finalPlayerData.id === userData.id) {
           setFriendshipStatus('friends');
         }
         
@@ -615,12 +637,14 @@ export default function PlayerProfile() {
         setLoading(false);
         
         // Загружаем дополнительные данные в фоне (асинхронно)
-        loadAdditionalData(playerData, userData);
+        loadAdditionalData(finalPlayerData, userData);
       }
     } catch (error) {
       console.error('Ошибка загрузки данных игрока:', error);
-      // Убираем дублирующееся сообщение об ошибке - пользователь и так попадает на главную
-      router.replace('/');
+      // НЕ делаем редирект при ошибке - может быть временная проблема сети
+      // Показываем ошибку пользователю, но не редиректим
+      setLoading(false);
+      // Можно показать snackbar или alert с ошибкой
     } finally {
       setLoading(false);
     }
@@ -852,17 +876,8 @@ export default function PlayerProfile() {
   };
 
   const handleSendMessage = () => {
-    console.log('🚨 Попытка отправить сообщение:', {
-      currentUserId: currentUser?.id,
-      currentUserStatus: currentUser ? 'authorized' : 'not_authorized',
-      playerExists: !!player
-    });
-
     if (!currentUser) {
-      showCustomAlert('Ошибка', 'Необходимо войти в профиль для отправки сообщений', 'error', () => {
-        console.log('🔄 Перенаправление на страницу входа');
-        router.push('/login');
-      });
+      showCustomAlert('Ошибка', 'Необходимо войти в профиль для отправки сообщений', 'error', () => router.push('/login'));
       return;
     }
     
@@ -1249,7 +1264,6 @@ export default function PlayerProfile() {
         const oldPushUps = parseInt(player.pushUps || '0');
         const newPushUps = parseInt(editData.pushUps || player.pushUps || '0');
         if (oldPushUps !== newPushUps) {
-          console.log('💪 Отжимания:', oldPushUps, '→', newPushUps);
           normativeChanges.push({ field: 'pushUps', oldValue: oldPushUps, newValue: newPushUps, change: newPushUps - oldPushUps });
         }
         
@@ -1257,7 +1271,6 @@ export default function PlayerProfile() {
         const oldPlankTime = parseInt(player.plankTime || '0');
         const newPlankTime = parseInt(editData.plankTime || player.plankTime || '0');
         if (oldPlankTime !== newPlankTime) {
-          console.log('⏱️ Планка:', oldPlankTime, '→', newPlankTime);
           normativeChanges.push({ field: 'plankTime', oldValue: oldPlankTime, newValue: newPlankTime, change: newPlankTime - oldPlankTime });
         }
         
@@ -1265,7 +1278,6 @@ export default function PlayerProfile() {
         const oldSprint100m = parseFloat(player.sprint100m || '0');
         const newSprint100m = parseFloat(editData.sprint100m || player.sprint100m || '0');
         if (oldSprint100m !== newSprint100m) {
-          console.log('🏃 Стометровка:', oldSprint100m, '→', newSprint100m);
           normativeChanges.push({ field: 'sprint100m', oldValue: oldSprint100m, newValue: newSprint100m, change: newSprint100m - oldSprint100m });
         }
         
@@ -1273,7 +1285,6 @@ export default function PlayerProfile() {
         const oldLongJump = parseFloat(player.longJump || '0');
         const newLongJump = parseFloat(editData.longJump || player.longJump || '0');
         if (oldLongJump !== newLongJump) {
-          console.log('🤸 Прыжок в длину:', oldLongJump, '→', newLongJump);
           normativeChanges.push({ field: 'longJump', oldValue: oldLongJump, newValue: newLongJump, change: newLongJump - oldLongJump });
         }
         
@@ -1281,15 +1292,7 @@ export default function PlayerProfile() {
         const oldJumpRope = parseInt(player.jumpRope || '0');
         const newJumpRope = parseInt(editData.jumpRope || player.jumpRope || '0');
         if (oldJumpRope !== newJumpRope) {
-          console.log('🪢 Скакалка:', oldJumpRope, '→', newJumpRope);
           normativeChanges.push({ field: 'jumpRope', oldValue: oldJumpRope, newValue: newJumpRope, change: newJumpRope - oldJumpRope });
-        }
-        
-        if (normativeChanges.length > 0) {
-          console.log('🏃‍♂️ Обнаружены изменения нормативов:', normativeChanges);
-          console.log('ℹ️ Уведомления будут отправлены автоматически через updatePlayer');
-        } else {
-          console.log('ℹ️ Нормативы НЕ изменились, уведомления НЕ отправляются');
         }
         
       } catch (notifyError) {
@@ -1360,11 +1363,6 @@ export default function PlayerProfile() {
           if (freshTeams && Array.isArray(freshTeams)) {
             const currentTeams = freshTeams.filter(team => team.isCurrent);
             const pastTeams = freshTeams.filter(team => !team.isCurrent);
-            console.log('🔄 Дополнительное обновление команд:', { 
-              totalTeams: freshTeams.length,
-              currentTeams: currentTeams.length, 
-              pastTeams: pastTeams.length 
-            });
         setPlayerTeams(currentTeams);
         setPastTeams(pastTeams);
       }
@@ -1561,15 +1559,7 @@ export default function PlayerProfile() {
     );
   }
 
-  // Добавляем подробное логирование при загрузке страницы профиля
-  useEffect(() => {
-    console.log('🔍 Загрузка страницы профиля:', {
-      currentUserId: currentUser?.id,
-      profileId: id,
-      isCurrentUserDefined: !!currentUser,
-      isProfileIdDefined: !!id
-    });
-  }, [currentUser, id]);
+
 
   return (
     <View style={styles.container}>
@@ -1601,14 +1591,10 @@ export default function PlayerProfile() {
                   return (
                     <View style={[styles.profileImage]}>
                         <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                    <Image 
-                      source={{ 
-                        uri: imageSource,
-                        cache: 'force-cache',
-                        headers: {
-                          'Cache-Control': 'max-age=3600'
-                        }
-                      }}
+                    <CachedAvatar
+                      playerId={player.id}
+                      fallbackAvatarUrl={imageSource}
+                      size={100}
                       style={styles.avatarImage}
                     />
                       </View>
@@ -1644,18 +1630,11 @@ export default function PlayerProfile() {
                     return (
                       <View style={[styles.profileImage]}>
                         <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                          <Image 
-                            source={{ 
-                              uri: imageSource, 
-                              cache: 'reload', 
-                              headers: { 
-                                'Cache-Control': 'no-cache' 
-                              } 
-                            }}
+                          <CachedAvatar
+                            playerId={player.id}
+                            fallbackAvatarUrl={imageSource}
+                            size={100}
                             style={styles.avatarImage}
-                            onError={(error) => {
-                              console.error('❌ Ошибка загрузки аватара в профиле игрока:', error);
-                            }}
                           />
                         </View>
                       </View>
@@ -3239,15 +3218,11 @@ export default function PlayerProfile() {
                       style={styles.friendItem}
                       onPress={() => router.push(`/player/${friend.id}`)}
                     >
-                      <Image 
-                        source={{ 
-                          uri: friend.avatar || 'https://via.placeholder.com/60/333/fff?text=Player',
-                          cache: 'force-cache' // Кешируем аватары
-                        }} 
+                      <CachedAvatar
+                        playerId={friend.id}
+                        fallbackAvatarUrl={friend.avatar || 'https://via.placeholder.com/60/333/fff?text=Player'}
+                        size={50}
                         style={styles.friendAvatar}
-                        defaultSource={{ uri: 'https://via.placeholder.com/60/333/fff?text=Player' }}
-                        // Оптимизация для медленного интернета
-                        fadeDuration={200}
                       />
                       <Text style={styles.friendName} numberOfLines={2}>
                         {friend.name?.toUpperCase()}
@@ -3500,7 +3475,7 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>{t('common.cancel')}</Text>
+                      <Text style={styles.actionButtonText}>{t('profile.cancel')}</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (

@@ -37,12 +37,10 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
     setImageError(false);
-    console.log(`✅ Аватар загружен из кэша для ${playerId}: ${effectiveAvatarUrl}`);
     onLoad?.();
   }, [onLoad, playerId, effectiveAvatarUrl]);
 
   const handleError = React.useCallback(() => {
-    console.log(`❌ Ошибка загрузки аватара для ${playerId}: ${effectiveAvatarUrl}`);
     setImageError(true);
     onError?.();
   }, [onError, playerId, effectiveAvatarUrl]);
@@ -77,9 +75,8 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
         source={{ 
           uri: effectiveAvatarUrl
         }}
-        style={[imageStyle, {
-          resizeMode: 'cover'
-        }]}
+        style={imageStyle}
+        contentFit="cover"
         onError={handleError}
         onLoad={handleLoad}
         cachePolicy="memory-disk"

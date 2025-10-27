@@ -112,7 +112,6 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          console.log('🔄 Счетчик уведомлений изменен в БД через Realtime:', payload.new.unread_notifications_count);
           // Эмитируем событие для обновления UI
           this.emitNotificationCountUpdate(payload.new.unread_notifications_count || 0);
         }
@@ -140,7 +139,6 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          console.log('🔄 Счетчик сообщений изменен в БД через Realtime:', payload.new.unread_messages_count);
           // Эмитируем событие для обновления UI
           this.emitMessagesCountUpdate(payload.new.unread_messages_count || 0);
         }

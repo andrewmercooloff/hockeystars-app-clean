@@ -133,10 +133,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       const user = await loadCurrentUser(forceRefresh);
       setCurrentUser(user);
 
-      // Если пользователь не авторизован - редиректим на страницу входа
+      // УБИРАЕМ глобальный редирект на страницу входа
+      // Каждая страница сама решает, нужна ли авторизация
+      // Пользователь может просматривать профили без авторизации
       if (!user) {
-        console.log('🔐 Пользователь не авторизован, перенаправляем на страницу входа');
-        router.replace('/login');
+        console.log('🔍 Пользователь не авторизован (это нормально для просмотра публичных данных)');
       }
     } catch (error) {
       console.error('Ошибка загрузки пользователя:', error);

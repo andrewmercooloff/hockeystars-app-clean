@@ -193,115 +193,60 @@ export default function ExercisesScreen() {
             
             {/* Показываем кешированные данные если они есть, иначе ошибку */}
             {allExercises.length > 0 ? (
-              <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                {/* Фильтры по категориям */}
-                <View style={styles.categoriesContainer}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
-                    <TouchableOpacity
-                      style={[
-                        styles.categoryButton,
-                        selectedCategory === null && styles.categoryButtonActive
-                      ]}
-                      onPress={() => setSelectedCategory(null)}
-                    >
-                      <Text style={[
-                        styles.categoryButtonText,
-                        selectedCategory === null && styles.categoryButtonTextActive
-                      ]}>
-                        {t('exercises.allCategories')}
-                      </Text>
-                    </TouchableOpacity>
-                    
-                    {categories.length > 0 ? categories.map((category) => (
+              <View style={{ flex: 1, paddingTop: 150 }}>
+                <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                  {/* Список упражнений */}
+                  <View style={styles.exercisesContainer}>
+                    {sortedExercises.map((exercise) => (
                       <TouchableOpacity
-                        key={category}
-                        style={[
-                          styles.categoryButton,
-                          selectedCategory === category && styles.categoryButtonActive
-                        ]}
-                        onPress={() => setSelectedCategory(category)}
+                        key={exercise.id}
+                        onPress={() => router.push(`/exercise-details?id=${exercise.id}`)}
+                        activeOpacity={0.8}
                       >
-                        <Text style={[
-                          styles.categoryButtonText,
-                          selectedCategory === category && styles.categoryButtonTextActive
-                        ]}>
-                          {translateCategory(category)}
-                        </Text>
+                        <View style={styles.exerciseGradientShadow}>
+                          <View style={styles.exerciseCard}>
+                            <View style={styles.exerciseHeader}>
+                              <Text style={styles.exerciseTitle}>{exercise.title}</Text>
+                              <View style={styles.exerciseMeta}>
+                                <View style={styles.difficultyContainer}>
+                                  <Text style={styles.difficultyText}>
+                                    {translateDifficulty(exercise.difficulty)}
+                                  </Text>
+                                </View>
+                                <View style={styles.categoryContainer}>
+                                  <Text style={styles.categoryText}>
+                                    {translateCategory(exercise.category)}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                            
+                            <Text style={styles.exerciseDescription} numberOfLines={2}>
+                              {exercise.description}
+                            </Text>
+                            
+                            <View style={styles.exerciseFooter}>
+                              <View style={styles.exerciseMeta}>
+                                <Ionicons name="time-outline" size={16} color="#888" />
+                                <Text style={styles.difficultyText}>{exercise.duration}</Text>
+                              </View>
+                              
+                              {userStats[exercise.id] > 0 && (
+                                <View style={styles.categoryContainer}>
+                                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                                  <Text style={styles.categoryText}>
+                                    {userStats[exercise.id]} {userStats[exercise.id] === 1 ? t('exercises.times') : t('exercises.timesPlural')}
+                                  </Text>
+                                </View>
+                              )}
+                            </View>
+                          </View>
+                        </View>
                       </TouchableOpacity>
-                    )) : (
-                      // Fallback категории если не удалось загрузить
-                      ['skating', 'shooting', 'passing', 'defense'].map((category) => (
-                        <TouchableOpacity
-                          key={category}
-                          style={[
-                            styles.categoryButton,
-                            selectedCategory === category && styles.categoryButtonActive
-                          ]}
-                          onPress={() => setSelectedCategory(category)}
-                        >
-                          <Text style={[
-                            styles.categoryButtonText,
-                            selectedCategory === category && styles.categoryButtonTextActive
-                          ]}>
-                            {translateCategory(category)}
-                          </Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-
-                {/* Список упражнений */}
-                <View style={styles.exercisesContainer}>
-                  {sortedExercises.map((exercise) => (
-                    <TouchableOpacity
-                      key={exercise.id}
-                      onPress={() => router.push(`/exercise-details?id=${exercise.id}`)}
-                      activeOpacity={0.8}
-                    >
-                      <View style={styles.exerciseGradientShadow}>
-                        <View style={styles.exerciseCard}>
-                      <View style={styles.exerciseHeader}>
-                        <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-                        <View style={styles.exerciseMeta}>
-                          <View style={styles.difficultyContainer}>
-                            <Text style={styles.difficultyText}>
-                              {translateDifficulty(exercise.difficulty)}
-                            </Text>
-                          </View>
-                          <View style={styles.categoryContainer}>
-                            <Text style={styles.categoryText}>
-                              {translateCategory(exercise.category)}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      
-                      <Text style={styles.exerciseDescription} numberOfLines={2}>
-                        {exercise.description}
-                      </Text>
-                      
-                      <View style={styles.exerciseFooter}>
-                        <View style={styles.exerciseMeta}>
-                          <Ionicons name="time-outline" size={16} color="#888" />
-                          <Text style={styles.difficultyText}>{exercise.duration}</Text>
-                        </View>
-                        
-                        {userStats[exercise.id] > 0 && (
-                          <View style={styles.categoryContainer}>
-                            <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                            <Text style={styles.categoryText}>
-                              {userStats[exercise.id]} {userStats[exercise.id] === 1 ? t('exercises.times') : t('exercises.timesPlural')}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
             ) : (
               <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>{t('common.error')}: {error}</Text>
@@ -328,9 +273,11 @@ export default function ExercisesScreen() {
             <Text style={styles.pageTitle}>{t('exercises.title')}</Text>
           </View>
           
-          {/* Строка поиска */}
-          <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
+          {/* Общий контейнер для поиска и фильтров */}
+          <View style={styles.searchAndFiltersContainer}>
+            {/* Строка поиска */}
+            <View style={styles.searchInputWrapper}>
+              <View style={styles.searchInputContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -349,11 +296,10 @@ export default function ExercisesScreen() {
                   <Ionicons name="close-circle" size={20} color="#888" />
                 </TouchableOpacity>
               )}
+              </View>
             </View>
-          </View>
-          
-          {/* Фильтры по категориям */}
-          <View style={styles.categoriesContainer}>
+            
+            {/* Фильтры по категориям */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
               <TouchableOpacity
                 style={[
@@ -509,7 +455,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingTop: 157, // Отступ для заголовка + поиск + фильтры
+    paddingTop: 160, // Отступ для заголовка + общий контейнер с поиском и фильтрами + 20
   },
   pageHeader: {
     position: 'absolute',
@@ -533,20 +479,19 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'left',
   },
-  categoriesContainer: {
+  searchAndFiltersContainer: {
     position: 'absolute',
-    top: 93, // Ниже строки поиска
+    top: 41, // Под заголовком
     left: 0,
     right: 0,
     zIndex: 999,
-    paddingHorizontal: 0, // Убираем горизонтальные отступы
     paddingVertical: 10,
     backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   categoriesScroll: {
     flexDirection: 'row',
-    paddingHorizontal: 20, // Отступы для кнопок фильтров
-    paddingRight: 20, // Дополнительный отступ справа
+    paddingTop: 8, // Отступ сверху после поля поиска
+    paddingHorizontal: 20, // Отступы по краям для кнопок фильтров
   },
   categoryButton: {
     paddingHorizontal: 16,
@@ -581,7 +526,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   exerciseGradientShadow: {
@@ -590,11 +535,11 @@ const styles = StyleSheet.create({
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 1,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   exerciseHeader: {
     flexDirection: 'row',
@@ -719,15 +664,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   // Стили для поиска (как в search.tsx)
-  searchContainer: {
-    position: 'absolute',
-    top: 41, // Под заголовком
-    left: 0,
-    right: 0,
-    zIndex: 1001, // Выше категорий (999)
+  searchInputWrapper: {
     paddingHorizontal: 20,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    paddingBottom: 8,
   },
   searchInputContainer: {
     flexDirection: 'row',

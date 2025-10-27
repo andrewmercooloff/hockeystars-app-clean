@@ -12,6 +12,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedImage from './CachedImage';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -66,8 +67,8 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
 
             {/* Основное изображение */}
             <View style={styles.imageContainer}>
-              <Image
-                source={{ uri: photos[currentIndex] }}
+              <CachedImage
+                imageUrl={photos[currentIndex]}
                 style={styles.mainImage}
                 resizeMode="contain"
               />
@@ -108,8 +109,8 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
                       ]}
                       onPress={() => setCurrentIndex(index)}
                     >
-                      <Image
-                        source={{ uri: photo }}
+                      <CachedImage
+                        imageUrl={photo}
                         style={styles.thumbnailImage}
                         resizeMode="cover"
                       />

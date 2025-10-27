@@ -27,20 +27,20 @@ const Puck: React.FC<PuckProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   
-  // Анимация для тени на льду
-  const shadowOpacity = useSharedValue(0.4);
+  // Анимация для тени на льду - отключена для лучшей производительности
+  // const shadowOpacity = useSharedValue(0.4);
   
-  useEffect(() => {
-    shadowOpacity.value = withRepeat(
-      withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-  }, [shadowOpacity]);
+  // useEffect(() => {
+  //   shadowOpacity.value = withRepeat(
+  //     withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+  //     -1,
+  //     true
+  //   );
+  // }, [shadowOpacity]);
   
-  const animatedShadowStyle = useAnimatedStyle(() => ({
-    opacity: shadowOpacity.value,
-  }));
+  // const animatedShadowStyle = useAnimatedStyle(() => ({
+  //   opacity: shadowOpacity.value,
+  // }));
   
   const dimensions = useMemo(() => {
     const avatarSize = size * 0.86;
@@ -126,15 +126,15 @@ const Puck: React.FC<PuckProps> = ({
       },
       animatedStyle
     ]}>
-      {/* Дополнительная тень на льду */}
-      <Animated.View style={[
+      {/* Дополнительная тень на льду - отключена для производительности */}
+      {/* <Animated.View style={[
         styles.iceShadow,
         {
           width: size * 0.8,
           left: size * 0.1,
         },
         animatedShadowStyle
-      ]} />
+      ]} /> */}
       
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
         {avatar && playerId && status !== 'scout' ? (

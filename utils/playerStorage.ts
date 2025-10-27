@@ -1448,11 +1448,25 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
       console.log('🔄 Аватар игрока изменился:', { playerId, oldAvatar: oldPlayer.avatar, newAvatar: updatedPlayer.avatar });
       
+      // Очищаем старый аватар из кеша expo-image
+      if (oldPlayer.avatar) {
+        try {
+          const { Image } = await import('expo-image');
+          // Инвалидируем кеш старого аватара
+          await Image.clearMemoryCache();
+          console.log('✅ Кеш изображений очищен для аватара');
+        } catch (error) {
+          console.error('❌ Ошибка очистки кеша изображений:', error);
+        }
+      }
+      
       // Обновляем кеш аватаров
       if (updatedPlayer.avatar) {
-        updateAvatarGlobally(playerId, updatedPlayer.avatar);
+        await updateAvatarGlobally(playerId, updatedPlayer.avatar);
+        console.log('✅ Глобальный кеш аватаров обновлен');
       } else {
         avatarCache.clearAvatar(playerId);
+        console.log('✅ Аватар очищен из кеша');
       }
       
       // Отправляем уведомления друзьям об изменении аватара
@@ -1468,6 +1482,7 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
               }
             }
           );
+          console.log('✅ Уведомления друзьям отправлены');
         } catch (error) {
           console.error('❌ Ошибка отправки уведомлений об аватаре (не критично):', error);
         }
@@ -1680,38 +1695,23 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     const user = JSON.parse(userData);
     
-    // Оптимизация: используем 0 по умолчанию для мгновенной загрузки
-    // Счетчик будет обновлен в фоне после полной загрузки приложения
-    if (user.unreadMessagesCount === undefined) {
+    // Сразу загружаем счетчик сообщений из базы для мгновенного отображения правильного значения
+    try {
+      const { data: playerData, error: playerError } = await supabase
+        .from('players')
+        .select('unread_messages_count')
+        .eq('id', user.id)
+        .single();
+      
+      if (!playerError && playerData) {
+        user.unreadMessagesCount = playerData.unread_messages_count || 0;
+      } else {
+        // Fallback на 0 если не удалось загрузить
+        user.unreadMessagesCount = 0;
+      }
+    } catch (error) {
+      console.error('❌ Ошибка загрузки счетчика сообщений:', error);
       user.unreadMessagesCount = 0;
-    }
-    
-    // Загружаем счетчик сообщений в фоне (не блокируем загрузку)
-    if (!forceRefresh) {
-      setTimeout(async () => {
-        try {
-          const { data: playerData, error: playerError } = await supabase
-            .from('players')
-            .select('unread_messages_count')
-            .eq('id', user.id)
-            .single();
-          
-          if (!playerError && playerData) {
-            const newCount = playerData.unread_messages_count || 0;
-            if (newCount !== user.unreadMessagesCount) {
-              // Обновляем кеш с новым счетчиком
-              user.unreadMessagesCount = newCount;
-              const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-              await AsyncStorage.setItem(cacheKey, JSON.stringify({
-                user,
-                timestamp: Date.now()
-              }));
-            }
-          }
-        } catch (error) {
-          console.error('❌ Ошибка фоновой загрузки счетчика сообщений:', error);
-        }
-      }, 500);
     }
     
     // Кэшируем результат
@@ -1889,8 +1889,6 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
 // Отметка сообщений как прочитанные
 export const markMessagesAsRead = async (userId: string, otherUserId: string): Promise<void> => {
   try {
-    console.log('📖 Отмечаем сообщения как прочитанные:', { userId, otherUserId });
-    
     // Сначала проверим, сколько непрочитанных сообщений есть
     const { data: unreadData, error: unreadError } = await supabase
       .from('messages')
@@ -1904,10 +1902,7 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
       return;
     }
     
-    console.log('📖 Найдено непрочитанных сообщений:', unreadData?.length || 0);
-    
     if ((unreadData?.length || 0) === 0) {
-      console.log('📖 Нет непрочитанных сообщений для отметки');
       return;
     }
     

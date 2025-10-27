@@ -17,6 +17,7 @@ import { uploadGalleryPhoto } from '../utils/uploadImage';
 import { loadCurrentUser, notifyFriendsAboutPhotos } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedImage from './CachedImage';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -403,14 +404,8 @@ export default function EditablePhotosSection({
                         activeOpacity={0.8}
                         style={styles.photoGridTouchable}
                       >
-                        <Image
-                          source={{ 
-                            uri: photo,
-                            cache: 'force-cache',
-                            headers: {
-                              'Cache-Control': 'max-age=3600'
-                            }
-                          }}
+                        <CachedImage
+                          imageUrl={photo}
                           style={styles.photoGrid}
                           resizeMode="cover"
                         />
@@ -462,14 +457,8 @@ export default function EditablePhotosSection({
                     onPress={() => openPhotoViewer(index)}
                     activeOpacity={0.8}
                   >
-                    <Image
-                      source={{ 
-                        uri: photo,
-                        cache: 'force-cache',
-                        headers: {
-                          'Cache-Control': 'max-age=3600'
-                        }
-                      }}
+                    <CachedImage
+                      imageUrl={photo}
                       style={styles.photo}
                       resizeMode="cover"
                     />

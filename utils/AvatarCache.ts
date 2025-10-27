@@ -32,7 +32,6 @@ class AvatarCache {
       
       // Если аватар изменился, уведомляем всех слушателей
       if (oldUrl !== avatarUrl) {
-        console.log('🔄 Аватар обновлен в кеше:', { playerId, oldUrl, newUrl: avatarUrl });
         this.notifyListeners(playerId, avatarUrl);
       }
       
@@ -140,9 +139,8 @@ export const preloadAvatar = async (avatarUrl: string): Promise<void> => {
 
   try {
     await Image.prefetch(avatarUrl);
-    console.log('🖼️ Аватар предзагружен:', avatarUrl);
   } catch (error) {
-    console.error('❌ Ошибка предзагрузки аватара:', avatarUrl, error);
+    // Ignore prefetch errors
   }
 };
 
@@ -156,8 +154,7 @@ export const preloadPlayerAvatars = async (players: Array<{ id: string; avatar?:
 
   try {
     await Promise.all(preloadTasks);
-    console.log('🖼️ Предзагрузка аватаров завершена');
   } catch (error) {
-    console.error('❌ Ошибка предзагрузки аватаров:', error);
+    // Ignore prefetch errors
   }
 };

@@ -323,30 +323,71 @@ export class ExerciseService {
     try {
       console.log('💪 ExerciseService.markExerciseAsCompleted вызван:', { userId, exerciseId });
       
-      // Получаем текущую статистику
-      console.log('💪 Получаем текущую статистику пользователя...');
-      const currentStats = await this.getUserExerciseStats(userId);
-      console.log('💪 Текущая статистика:', currentStats);
+      // Получаем текущего пользователя для доступа к exercise_stats
+      const { getPlayerById } = await import('../utils/playerStorage');
+      const player = await getPlayerById(userId);
       
-      // Увеличиваем счетчик для упражнения
-      const newStats = {
-        ...currentStats,
-        [exerciseId]: (currentStats[exerciseId] || 0) + 1
-      };
+      if (!player) {
+        throw new Error('Игрок не найден');
+      }
       
-      console.log('💪 Новая статистика после увеличения:', newStats);
+      // Получаем текущую статистику в формате массива
+      let currentCompletions: Array<{ exerciseId: string; count: number; completedAt: string }> = [];
+      
+      if (player.exerciseStats && player.exerciseStats.completions) {
+        if (Array.isArray(player.exerciseStats.completions)) {
+          // Уже в правильном формате массива - сохраняем все даты как есть!
+          currentCompletions = player.exerciseStats.completions.map(c => ({
+            exerciseId: c.exerciseId,
+            count: c.count,
+            completedAt: c.completedAt || new Date().toISOString() // Используем существующую дату
+          }));
+        } else {
+          // Конвертируем из объекта в массив
+          // ⚠️ Для старых данных: ставим дату так, чтобы таймер работал
+          // Устанавливаем дату на (количество выполнений * 12 часов) назад
+          // Это важно для работы таймера 12 часов!
+          currentCompletions = Object.entries(player.exerciseStats.completions).map(([id, count]) => {
+            const hoursBack = (count as number) * 12; // Каждое выполнение = 12 часов назад
+            const completionDate = new Date();
+            completionDate.setHours(completionDate.getHours() - hoursBack);
+            
+            return {
+              exerciseId: id,
+              count: count as number,
+              completedAt: completionDate.toISOString()
+            };
+          });
+        }
+      }
+      
+      // Находим существующее упражнение или увеличиваем счетчик
+      const existingCompletion = currentCompletions.find(c => c.exerciseId === exerciseId);
+      
+      if (existingCompletion) {
+        // Увеличиваем счетчик и обновляем дату
+        existingCompletion.count += 1;
+        existingCompletion.completedAt = new Date().toISOString(); // Обновляем дату на текущую
+      } else {
+        // Добавляем новое упражнение
+        currentCompletions.push({
+          exerciseId,
+          count: 1,
+          completedAt: new Date().toISOString()
+        });
+      }
+      
+      console.log('💪 Новая статистика после выполнения:', currentCompletions);
       
       // Обновляем статистику в базе данных
       const exerciseStatsData = {
-        completions: newStats,
-        totalCompletions: Object.values(newStats).reduce((sum, count) => sum + count, 0)
+        completions: currentCompletions,
+        totalCompletions: currentCompletions.reduce((sum, c) => sum + c.count, 0)
       };
       
       console.log('💪 Данные для сохранения в базу:', {
         userId,
         exerciseId,
-        currentStats,
-        newStats,
         exerciseStatsData,
         jsonString: JSON.stringify(exerciseStatsData)
       });
@@ -392,7 +433,7 @@ export class ExerciseService {
         if (currentUser && currentUser.id === userId) {
           // Обновляем статистику в локальном кэше
           currentUser.exerciseStats = {
-            completions: newStats,
+            completions: currentCompletions,
             totalCompletions: exerciseStatsData.totalCompletions
           } as any;
           await saveCurrentUser(currentUser);

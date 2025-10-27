@@ -37,7 +37,7 @@ export default function ChatScreen() {
   const { t } = useLanguage();
   const { id, scrollToBottom } = useLocalSearchParams();
   const router = useRouter();
-  const { refreshUser } = useUser();
+  const { refreshUser, currentUser: contextUser, setCurrentUser: setContextUser } = useUser();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -166,6 +166,16 @@ export default function ChatScreen() {
     }, [])
   );
 
+  // Синхронизируем счетчик с глобальным контекстом после загрузки
+  // useEffect(() => {
+  //   if (currentUser && contextUser && currentUser.unreadMessagesCount !== contextUser.unreadMessagesCount) {
+  //     // Обновляем глобальный контекст только если счетчики различаются
+  //     if (currentUser.id === contextUser.id) {
+  //       setContextUser({ ...contextUser, unreadMessagesCount: currentUser.unreadMessagesCount });
+  //     }
+  //   }
+  // }, [currentUser, contextUser]);
+
   const loadChatData = async () => {
     try {
       if (id) {
@@ -193,16 +203,8 @@ export default function ChatScreen() {
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
           
-          // Убираем лишние обновления - теперь счетчик управляется через БД и Realtime
-          // setTimeout(async () => {
-          //   console.log('🔄 Обновляем UserContext после markMessagesAsRead');
-          //   await refreshUser(true);
-          // }, 100);
-          
-          // setTimeout(async () => {
-          //   console.log('🔄 Повторное обновление UserContext');
-          //   await refreshUser(true);
-          // }, 1000);
+          // Обновляем локальное состояние
+          setCurrentUser(userData);
           
           // setTimeout(async () => {
           //   console.log('🔄 Автоматическое скрытие индикатора через 2 секунды после захода в чат');

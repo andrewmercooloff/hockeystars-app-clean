@@ -1291,37 +1291,19 @@ export default function NotificationsScreen() {
               index,
             })}
             ListEmptyComponent={() => (
-              notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading ? (
-                <View style={styles.emptyContainer}>
-                  <View style={styles.emptyGradientShadow}>
-                    <View style={styles.emptyContent}>
-                      <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
-                      <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-                      <Text style={styles.emptySubtitle}>
-                        {t('notifications.noNotificationsSubtitle')}
-                      </Text>
-                    </View>
-                    </View>
-                    </View>
-              ) : null
-            )}
-          />
-
-
-            {/* Показываем пустое состояние только если нет ни уведомлений, ни запросов в друзья, ни запросов на подарки И не идет загрузка */}
-            {notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0 && !loading && (
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyGradientShadow}>
                   <View style={styles.emptyContent}>
-                  <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
-                  <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-                  <Text style={styles.emptySubtitle}>
-                    {t('notifications.noNotificationsSubtitle')}
-                  </Text>
+                    <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
+                    <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
+                    <Text style={styles.emptySubtitle}>
+                      {t('notifications.noNotificationsSubtitle')}
+                    </Text>
                   </View>
                 </View>
               </View>
             )}
+          />
         </View>
       </CachedBackground>
       </View>

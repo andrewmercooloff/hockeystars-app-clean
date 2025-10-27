@@ -945,6 +945,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   playerGradientShadow: {
     marginBottom: 5,
@@ -952,11 +954,11 @@ const styles = StyleSheet.create({
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 1,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   playerPhotoContainer: {
     width: 60,

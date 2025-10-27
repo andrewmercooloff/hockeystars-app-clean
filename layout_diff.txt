@@ -1,0 +1,94 @@
+diff --git a/app/_layout.tsx b/app/_layout.tsx
+index b0a9fc5..b05ab60 100644
+--- a/app/_layout.tsx
++++ b/app/_layout.tsx
+@@ -28,11 +28,7 @@ import { realtimeManager } from '../utils/RealtimeManager';
+ import { dataCache, CACHE_KEYS } from '../utils/DataCache';
+ 
+ // ╨Я╤А╨╡╨┤╨╛╤В╨▓╤А╨░╤Й╨░╨╡╨╝ ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╛╨╡ ╤Б╨║╤А╤Л╤В╨╕╨╡ ╨╖╨░╤Б╤В╨░╨▓╨║╨╕
+-SplashScreen.preventAutoHideAsync().then(() => {
+-  console.log('тЬЕ Splash screen prevented from auto-hiding');
+-}).catch((error) => {
+-  console.error('тЭМ Error preventing splash screen auto-hide:', error);
+-});
++SplashScreen.preventAutoHideAsync();
+ 
+ // ╨г╤Б╤В╨░╨╜╨░╨▓╨╗╨╕╨▓╨░╨╡╨╝ ╤З╨╡╤А╨╜╤Л╨╣ ╤Д╨╛╨╜ ╨┤╨╗╤П ╨▓╨╡╨▒-╨▓╨╡╤А╤Б╨╕╨╕
+ if (Platform.OS === 'web' && typeof document !== 'undefined') {
+@@ -159,45 +155,18 @@ export default function RootLayout() {
+       }
+     }, [params.refresh]);
+     
+-    // ╨б╨║╤А╤Л╨▓╨░╨╡╨╝ splash screen ╨║╨╛╨│╨┤╨░ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╨│╨╛╤В╨╛╨▓╨╛ ╨╕ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜
++    // ╨Ю╨┤╨╕╨╜ ╤А╨░╨╖ ╤Б╨║╤А╤Л╨▓╨░╨╡╨╝ splash screen ╨┐╤А╨╕ ╨│╨╛╤В╨╛╨▓╨╜╨╛╤Б╤В╨╕ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П
+     React.useEffect(() => {
+-      console.log(`ЁЯФН ╨Я╤А╨╛╨▓╨╡╤А╨║╨░ ╤Г╤Б╨╗╨╛╨▓╨╕╨╣ ╤Б╨║╤А╤Л╤В╨╕╤П splash screen: 
+-        appReady=${appReady}, 
+-        isUserLoading=${isUserLoading}, 
+-        userLoaded=${userLoaded}, 
+-        showSplash=${showSplash}`);
+-
+-      // ╨Я╤А╨╕╨╜╤Г╨┤╨╕╤В╨╡╨╗╤М╨╜╨╛╨╡ ╤Б╨║╤А╤Л╤В╨╕╨╡ splash screen ╤З╨╡╤А╨╡╨╖ 5 ╤Б╨╡╨║╤Г╨╜╨┤, ╨╡╤Б╨╗╨╕ ╤З╤В╨╛-╤В╨╛ ╨┐╨╛╤И╨╗╨╛ ╨╜╨╡ ╤В╨░╨║
+-      const forceHideSplashTimeout = setTimeout(() => {
+-        console.log('тП░ ╨Я╤А╨╕╨╜╤Г╨┤╨╕╤В╨╡╨╗╤М╨╜╨╛╨╡ ╤Б╨║╤А╤Л╤В╨╕╨╡ splash screen ╨┐╨╛ ╤В╨░╨╣╨╝╨░╤Г╤В╤Г');
++      if (appReady && showSplash) {
+         Animated.timing(splashOpacity, {
+           toValue: 0,
+           duration: 500,
+           useNativeDriver: true,
+         }).start(() => {
+-          console.log('ЁЯПБ Splash screen ╤Б╨║╤А╤Л╤В ╨┐╨╛ ╤В╨░╨╣╨╝╨░╤Г╤В╤Г');
+-          setShowSplash(false);
+-        });
+-      }, 5000);
+-
+-      if (appReady && !isUserLoading && userLoaded) {
+-        // ╨Я╨╗╨░╨▓╨╜╨╛ ╤Б╨║╤А╤Л╨▓╨░╨╡╨╝ ╨╜╨░╤И ╨║╨░╤Б╤В╨╛╨╝╨╜╤Л╨╣ splash screen ╨║╨╛╨│╨┤╨░ ╨▓╤Б╨╡ ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜╨╛
+-        clearTimeout(forceHideSplashTimeout);
+-        
+-        Animated.timing(splashOpacity, {
+-          toValue: 0,
+-          duration: 500, // 500ms ╨┐╨╗╨░╨▓╨╜╨╛╨╡ ╨╕╤Б╤З╨╡╨╖╨╜╨╛╨▓╨╡╨╜╨╕╨╡
+-          useNativeDriver: true,
+-        }).start(() => {
+-          console.log('ЁЯПБ Splash screen ╤Б╨║╤А╤Л╤В ╨┐╨╛ ╨│╨╛╤В╨╛╨▓╨╜╨╛╤Б╤В╨╕ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П');
+           setShowSplash(false);
+         });
+       }
+-
+-      return () => {
+-        clearTimeout(forceHideSplashTimeout);
+-      };
+-    }, [appReady, isUserLoading, userLoaded, showSplash]);
++    }, [appReady, showSplash]);
+     
+     return null;
+   };
+@@ -530,15 +499,18 @@ export default function RootLayout() {
+         console.log('ЁЯПБ ╨Я╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╨┐╨╛╨╝╨╡╤З╨╡╨╜╨╛ ╨║╨░╨║ ╨│╨╛╤В╨╛╨▓╨╛╨╡ ╨┐╨╛╤Б╨╗╨╡ ╨╛╤И╨╕╨▒╨║╨╕');
+         setAppReady(true);
+         
+-        // ╨Я╨╗╨░╨▓╨╜╨╛ ╤Б╨║╤А╤Л╨▓╨░╨╡╨╝ splash screen
+-        Animated.timing(splashOpacity, {
+-          toValue: 0,
+-          duration: 500,
+-          useNativeDriver: true,
+-        }).start(() => {
+-          console.log('ЁЯПБ Splash screen ╤Б╨║╤А╤Л╤В');
+-          setShowSplash(false);
+-        });
++        // ╨Я╤А╨╕ ╨╛╤И╨╕╨▒╨║╨╡ ╤В╨╛╨╢╨╡ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╡╨╝ ╨╖╨░╨┤╨╡╤А╨╢╨║╤Г ╨┤╨╗╤П ╨║╨╛╨╜╤Б╨╕╤Б╤В╨╡╨╜╤В╨╜╨╛╤Б╤В╨╕
++        setTimeout(() => {
++          // ╨Я╤А╨╕ ╨╛╤И╨╕╨▒╨║╨╡ ╤В╨╛╨╢╨╡ ╨┐╨╗╨░╨▓╨╜╨╛ ╤Б╨║╤А╤Л╨▓╨░╨╡╨╝ splash screen
++          Animated.timing(splashOpacity, {
++            toValue: 0,
++            duration: 500,
++            useNativeDriver: true,
++          }).start(() => {
++            console.log('ЁЯПБ Splash screen ╤Б╨║╤А╤Л╤В');
++            setShowSplash(false);
++          });
++        }, 500); // ╨в╨░ ╨╢╨╡ ╨╖╨░╨┤╨╡╤А╨╢╨║╨░ ╤З╤В╨╛ ╨╕ ╨▓ ╤Г╤Б╨┐╨╡╤И╨╜╨╛╨╝ ╤Б╨╗╤Г╤З╨░╨╡
+       }
+     };
+ 

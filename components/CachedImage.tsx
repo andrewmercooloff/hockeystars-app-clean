@@ -1,126 +1,77 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Image, ImageProps, View, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface CachedImageProps extends Omit<ImageProps, 'source'> {
-  uri: string;
+interface CachedImageProps {
+  imageUrl: string;
+  style?: any;
+  resizeMode?: 'cover' | 'contain' | 'stretch' | 'center';
   fallbackIcon?: string;
   fallbackSize?: number;
   fallbackColor?: string;
-  showLoadingIndicator?: boolean;
-  cacheKey?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
-// Упрощенная версия без предзагрузки для React Native
-
 const CachedImage: React.FC<CachedImageProps> = React.memo(({
-  uri,
-  fallbackIcon = 'person',
-  fallbackSize = 25,
-  fallbackColor = '#fff',
-  showLoadingIndicator = true,
-  cacheKey,
+  imageUrl,
   style,
-  onError,
+  resizeMode = 'cover',
+  fallbackIcon = 'image-outline',
+  fallbackSize = 20,
+  fallbackColor = '#fff',
   onLoad,
-  ...props
+  onError,
 }) => {
-  const [imageError, setImageError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Начинаем с false
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const lastSuccessfulUriRef = useRef<string | null>(null);
-  const currentUriRef = useRef<string | null>(null);
+  
+  const [imageError, setImageError] = React.useState(false);
 
-  useEffect(() => {
-    // Если uri поменялся, запускаем загрузку, но показываем прошлое изображение
-    if (uri !== currentUriRef.current) {
-      currentUriRef.current = uri;
-      
-      // Если URI изменился, сбрасываем состояние
-      if (uri !== lastSuccessfulUriRef.current) {
-        setImageLoaded(false);
-        setImageError(false);
-        // Не устанавливаем isLoading в true сразу
-      }
-    }
-  }, [uri]);
-
-  const handleError = useCallback((error: any) => {
-    setImageError(true);
-    setIsLoading(false);
-    setImageLoaded(false);
-    onError?.(error);
-  }, [onError]);
-
-  const handleLoad = useCallback(() => {
-    lastSuccessfulUriRef.current = uri;
-    setIsLoading(false);
+  const handleLoad = React.useCallback(() => {
     setImageError(false);
-    setImageLoaded(true);
     onLoad?.();
-  }, [onLoad, uri]);
+  }, [onLoad, imageUrl]);
 
-  // Если есть ошибка и нет предыдущего удачного изображения, показываем fallback
-  if ((imageError || !uri) && !lastSuccessfulUriRef.current) {
+  const handleError = React.useCallback(() => {
+    setImageError(true);
+    onError?.();
+  }, [onError, imageUrl]);
+
+  // Если нет URL или ошибка загрузки, показываем fallback
+  if (!imageUrl || imageError) {
     return (
-      <View style={[style, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Ionicons name={fallbackIcon} size={fallbackSize} color={fallbackColor} />
+      <View style={[style, {
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }]}>
+        <Ionicons
+          name={fallbackIcon as any}
+          size={fallbackSize}
+          color={fallbackColor}
+        />
       </View>
     );
   }
 
   return (
-    <View style={style}>
-      {/* Показываем предыдущее удачное изображение под текущей загрузкой, чтобы не мигало */}
-      {lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== uri && (
-        <Image
-          source={{ uri: lastSuccessfulUriRef.current, cache: 'force-cache' as const }}
-          style={style}
-          // Не вешаем хендлеры, это фон
-          {...props}
-        />
-      )}
-      
-      {/* Показываем текущее изображение сразу */}
-      {uri && (
-        <Image
-          source={{ 
-            uri,
-            cache: 'force-cache', // Принудительное кеширование
-            headers: {
-              'Cache-Control': 'max-age=3600' // Кеш на 1 час
-            }
-          }}
-          style={[style, { 
-            position: lastSuccessfulUriRef.current && lastSuccessfulUriRef.current !== uri ? 'absolute' : undefined, 
-            left: 0, 
-            top: 0,
-            // Добавляем прозрачность для плавного появления
-            opacity: imageLoaded ? 1 : 0.8
-          }]}
-          onError={handleError}
-          onLoad={handleLoad}
-          {...props}
-        />
-      )}
-      
-      {/* Показываем индикатор загрузки только если изображение загружается и включен индикатор */}
-      {isLoading && showLoadingIndicator && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 1
-        }}>
-          <ActivityIndicator size="small" color="#fff" />
-        </View>
-      )}
-    </View>
+    <Image
+      source={{ 
+        uri: imageUrl,
+        cache: 'force-cache' // Принудительное кеширование
+      }}
+      style={style}
+      resizeMode={resizeMode}
+      onError={handleError}
+      onLoad={handleLoad}
+      fadeDuration={0} // Убираем анимацию для мгновенного отображения
+    />
+  );
+}, (prevProps, nextProps) => {
+  // Глубокое сравнение пропсов для мемоизации
+  return (
+    prevProps.imageUrl === nextProps.imageUrl &&
+    prevProps.style === nextProps.style &&
+    prevProps.resizeMode === nextProps.resizeMode
   );
 });
 
