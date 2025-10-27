@@ -57,9 +57,15 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     const url = cachedAvatarUrl || fallbackAvatarUrl;
     if (!url) return url;
     
-    // Добавляем timestamp для обновления кеша expo-image
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}t=${urlTimestamp}`;
+    // НЕ добавляем timestamp для URL если это не локальный файл
+    // Это позволяет expo-image использовать кеш
+    // Timestamp добавляется только для локальных файлов (file://, content://)
+    if (url.startsWith('file://') || url.startsWith('content://') || url.startsWith('data:')) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}t=${urlTimestamp}`;
+    }
+    
+    return url;
   }, [cachedAvatarUrl, fallbackAvatarUrl, urlTimestamp]);
 
   const handleLoad = React.useCallback(() => {
@@ -102,13 +108,16 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
       <Image
         key={effectiveAvatarUrl} // Key изменяется при изменении URL для принудительного обновления
         source={{ 
-          uri: effectiveAvatarUrl
+          uri: effectiveAvatarUrl,
+          headers: {
+            'Cache-Control': 'public, max-age=31536000' // Кеш на 1 год
+          }
         }}
         style={imageStyle}
         contentFit="cover"
         onError={handleError}
         onLoad={handleLoad}
-        cachePolicy="disk" // Используем disk кеш для мгновенной загрузки
+        cachePolicy="memory-disk" // Используем memory-disk кеш
         priority="high"
         transition={0} // Мгновенный переход без анимации
       />
