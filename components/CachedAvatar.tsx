@@ -29,7 +29,8 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
 }) => {
   // Используем useAvatarCache который подписывается на изменения через Realtime
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
-  const [imageLoaded, setImageLoaded] = React.useState(false);
+  // Предполагаем что изображение уже загружено если есть URL в кеше
+  const [imageLoaded, setImageLoaded] = React.useState(() => !!cachedAvatarUrl);
   const [imageError, setImageError] = React.useState(false);
   const [urlTimestamp, setUrlTimestamp] = React.useState(0);
   
@@ -37,13 +38,15 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   React.useEffect(() => {
     if (fallbackAvatarUrl) {
       setUrlTimestamp(Date.now());
+      setImageLoaded(!!cachedAvatarUrl || !!fallbackAvatarUrl); // Устанавливаем loaded если есть URL
     }
-  }, [fallbackAvatarUrl]);
+  }, [fallbackAvatarUrl, cachedAvatarUrl]);
   
   // Также отслеживаем изменения через Realtime (cachedAvatarUrl)
   React.useEffect(() => {
     if (cachedAvatarUrl && cachedAvatarUrl !== fallbackAvatarUrl) {
       setUrlTimestamp(Date.now());
+      setImageLoaded(true); // Изображение уже загружено через Realtime
     }
   }, [cachedAvatarUrl, fallbackAvatarUrl]);
   
@@ -95,7 +98,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   }
 
   return (
-    <View style={imageStyle}>
+    <View style={[imageStyle, { backgroundColor: 'transparent' }]}>
       <Image
         key={effectiveAvatarUrl} // Key изменяется при изменении URL для принудительного обновления
         source={{ 
@@ -105,8 +108,9 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
         contentFit="cover"
         onError={handleError}
         onLoad={handleLoad}
-        cachePolicy="memory" // Убираем disk кеш чтобы всегда получать свежие изображения
+        cachePolicy="disk" // Используем disk кеш для мгновенной загрузки
         priority="high"
+        transition={0} // Мгновенный переход без анимации
       />
     </View>
   );
