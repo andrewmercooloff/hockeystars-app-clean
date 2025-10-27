@@ -743,6 +743,9 @@ export const getPlayerTeamsAsPastTeams = async (playerId: string): Promise<PastT
 
 // Синхронизация команд игрока с базой данных (оптимизированная версия)
 export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[], pastTeams: PastTeam[]): Promise<boolean> => {
+  // Объявляем переменную для бэкапа вне try/catch для доступа в catch
+  let oldTeamsData: any = null;
+  
   try {
     // Проверяем, что playerId валидный
     if (!playerId) {
@@ -750,68 +753,133 @@ export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[]
       return false;
     }
     
-    // Выполняем операции параллельно для ускорения
-    const [clearPastTeamsResult, deleteTeamsResult] = await Promise.all([
-      // Очищаем поле pastTeams в таблице players
-      supabase
-        .from('players')
-        .update({ past_teams: '[]' })
-        .eq('id', playerId),
-      
-      // Удаляем все существующие команды игрока
-      supabase
-        .from('player_teams')
-        .delete()
-        .eq('player_id', playerId)
-    ]);
+    // 1. Создаем бэкап существующих команд для отката при ошибке
+    const { data, error: backupError } = await supabase
+      .from('player_teams')
+      .select('*')
+      .eq('player_id', playerId);
     
-    // Проверяем результаты операций
-    if (clearPastTeamsResult.error) {
-      console.error('❌ Ошибка очистки поля pastTeams:', clearPastTeamsResult.error);
+    oldTeamsData = data;
+    
+    if (backupError) {
+      console.error('❌ Ошибка создания бэкапа команд:', backupError);
       return false;
     }
     
-    if (deleteTeamsResult.error) {
-      console.error('❌ Ошибка удаления существующих команд:', deleteTeamsResult.error);
-      return false;
-    }
-    
-    // Подготавливаем все команды для добавления
+    // 2. Подготавливаем все команды для добавления
     const allTeams = [
       ...currentTeams.map(team => ({ ...team, isCurrent: true })),
       ...pastTeams.filter(team => !team.isCurrent).map(team => ({ ...team, isCurrent: false }))
     ];
     
-    if (allTeams.length === 0) {
-      return true;
-    }
+    // 3. Проверяем валидность всех ID команд ПЕРЕД удалением
+    console.log('📋 Проверка команд для сохранения:', { 
+      total: allTeams.length, 
+      teams: allTeams.map(t => ({ id: t.id, name: t.teamName, isCurrent: t.isCurrent }))
+    });
     
-    // Проверяем валидность всех ID команд
     const invalidTeams = allTeams.filter(team => !team.id || team.id === 'undefined' || team.id === 'null');
     if (invalidTeams.length > 0) {
       console.error('❌ Найдены невалидные ID команд:', invalidTeams.map(t => ({ name: t.teamName, id: t.id })));
       return false;
     }
     
-    // Добавляем все команды с сохранением порядка
+    // 4. Очищаем поле pastTeams в таблице players
+    const { error: clearPastTeamsError } = await supabase
+      .from('players')
+      .update({ past_teams: '[]' })
+      .eq('id', playerId);
+    
+    if (clearPastTeamsError) {
+      console.error('❌ Ошибка очистки поля pastTeams:', clearPastTeamsError);
+      return false;
+    }
+    
+    // 5. Удаляем все существующие команды игрока
+    const { error: deleteTeamsError } = await supabase
+      .from('player_teams')
+      .delete()
+      .eq('player_id', playerId);
+    
+    if (deleteTeamsError) {
+      console.error('❌ Ошибка удаления существующих команд:', deleteTeamsError);
+      return false;
+    }
+    
+    // 6. Добавляем новые команды
+    if (allTeams.length === 0) {
+      // Если команд нет, операция успешна
+      return true;
+    }
+    
     const addPromises = allTeams.map((team, index) => 
       addPlayerTeam(playerId, team.id, team.isCurrent, team.startYear, team.endYear, index)
     );
     
     const results = await Promise.all(addPromises);
-    const failedTeams = results.filter((success, index) => !success);
+    const failedTeams = results.filter((success) => !success);
     
+    console.log('📊 Результаты добавления команд:', { 
+      total: results.length, 
+      successful: results.filter(r => r).length, 
+      failed: failedTeams.length 
+    });
+    
+    // 7. Если при добавлении произошла ошибка - восстанавливаем старые команды
     if (failedTeams.length > 0) {
-      console.error(`❌ Ошибка добавления ${failedTeams.length} команд`);
+      console.error(`❌ Ошибка добавления ${failedTeams.length} команд, восстанавливаем старые данные...`);
+      console.error('📋 Детали ошибок:', failedTeams);
+      
+      // Восстанавливаем старые команды из бэкапа
+      if (oldTeamsData && oldTeamsData.length > 0) {
+        console.log('🔄 Восстановление команд из бэкапа...', { count: oldTeamsData.length });
+        
+        const restorePromises = oldTeamsData.map(team => {
+          return addPlayerTeam(
+            team.player_id, 
+            team.team_id, 
+            team.is_primary, 
+            team.start_year, 
+            team.end_year, 
+            team.team_order
+          );
+        });
+        
+        await Promise.all(restorePromises);
+        console.log('✅ Старые команды восстановлены');
+      } else {
+        console.warn('⚠️ Нет данных для восстановления');
+      }
+      
       return false;
     }
     
-    // Очищаем кеш команд при успешной синхронизации
+    console.log('✅ Все команды успешно сохранены');
+    
+    // 8. Очищаем кеш команд при успешной синхронизации
     await clearTeamsCache(playerId);
     
     return true;
   } catch (error) {
     console.error('❌ Ошибка синхронизации команд:', error);
+    
+    // Пытаемся восстановить команды из старого бэкапа
+    if (oldTeamsData && oldTeamsData.length > 0) {
+      console.log('🔄 Пытаемся восстановить команды из бэкапа...');
+      const restorePromises = oldTeamsData.map(team => {
+        return addPlayerTeam(
+          team.player_id, 
+          team.team_id, 
+          team.is_primary, 
+          team.start_year, 
+          team.end_year, 
+          team.team_order
+        );
+      });
+      
+      await Promise.all(restorePromises);
+    }
+    
     return false;
   }
 };
