@@ -2300,7 +2300,11 @@
     "error": "Errore",
     "errorLoadingChats": "Impossibile caricare le chat",
     "yesterday": "Ieri",
-    "you": "Voi:"
+    "you": "Voi:",
+    "massSend": "Invio di massa",
+    "recipients": "Destinatari",
+    "typeMessage": "Scrivi un messaggio...",
+    "send": "Invia"
   },
   "notifications": {
     "title": "Notifiche",

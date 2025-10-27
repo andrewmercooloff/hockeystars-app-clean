@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     FlatList,
-    Image,
     StyleSheet,
     Text,
     TextInput,
@@ -22,9 +21,6 @@ import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import CachedBackground from '../components/CachedBackground';
-
-// Фоновый узор для секции поиска
-const starPattern = require('../assets/images/star1.png');
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -450,12 +446,6 @@ export default function SearchScreen() {
   // Фильтрация и сортировка игроков
   const filteredPlayers = useMemo(() => {
     const filtered = players.filter(player => {
-      // Администратор всегда виден
-      if (player.status === 'admin') return true;
-      
-      // Если текущий пользователь - администратор, показываем всех
-      if (currentUser?.status === 'admin') return true;
-
       // Фильтр по поиску
       const matchesSearch = !searchQuery || 
         player.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -641,7 +631,7 @@ export default function SearchScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <ImageBackground source={starPattern} style={styles.searchSection} imageStyle={styles.searchSectionPattern}>
+          <View style={styles.searchSection}>
             {/* Полупрозрачный оверлей */}
             <View style={styles.searchSectionOverlay}>
               {/* Поле поиска */}
@@ -740,7 +730,7 @@ export default function SearchScreen() {
             />
             </View>
             </View>
-            </ImageBackground>
+          </View>
 
           {/* Список игроков */}
           <FlatList
@@ -760,6 +750,26 @@ export default function SearchScreen() {
               index,
             })}
           />
+
+          {/* Кнопка массовой отправки сообщений (только для администратора) */}
+          {currentUser?.status === 'admin' && filteredPlayers.length > 0 && (
+            <View style={styles.sendMessageButtonContainer}>
+              <TouchableOpacity 
+                style={styles.sendMessageButton}
+                onPress={() => {
+                  // Переходим к экрану отправки сообщений со всеми выбранными пользователями
+                  const selectedPlayerIds = filteredPlayers.map(p => p.id);
+                  router.push({
+                    pathname: '/messages/mass',
+                    params: { playerIds: JSON.stringify(selectedPlayerIds) }
+                  });
+                }}
+              >
+                <Ionicons name="mail" size={24} color="#fff" />
+                <Text style={styles.sendMessageButtonText}>{filteredPlayers.length}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </CachedBackground>
     </View>
@@ -818,11 +828,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1001,
-    overflow: 'hidden',
-  },
-  searchSectionPattern: {
-    opacity: 0.5, // Полупрозрачный паттерн
-    resizeMode: 'repeat',
+    overflow: 'visible', // Разрешаем фильтрам выходить за пределы
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
   },
   searchSectionOverlay: {
     backgroundColor: 'rgba(1, 0, 0, 0.9)',
@@ -1037,6 +1044,36 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
+  },
+  sendMessageButtonContainer: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    zIndex: 1000,
+    elevation: 1000,
+  },
+  sendMessageButton: {
+    backgroundColor: '#fa2f40',
+    borderRadius: 35,
+    width: 70,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  sendMessageButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    marginLeft: 5,
   },
 });
 

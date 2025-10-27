@@ -354,7 +354,7 @@ export default function PlayerProfile() {
       // Обновляем данные игрока при возвращении на экран
       // Это нужно чтобы увидеть актуальную статистику упражнений
       const now = Date.now();
-      if (player && player.id && globalCurrentUser?.id === player.id) {
+      if (player && player.id && globalCurrentUser?.id === player.id && !loading) {
         // Это собственный профиль - обновляем данные, но не слишком часто (раз в 2 секунды)
         if (now - lastRefreshTime.current > 2000) {
           lastRefreshTime.current = now;
@@ -1942,8 +1942,8 @@ export default function PlayerProfile() {
                   )}
                 </View>
 
-                {/* Номер телефона - только для админов */}
-                {currentUser?.status === 'admin' && (player.phone || isEditing) && (
+                {/* Номер телефона - админ видит все телефоны, магазины и заточка видны всем, владелец при редактировании */}
+                {((currentUser?.status === 'admin' || player.status === 'shop' || player.status === 'skateSharpening' || isEditing) && (player.phone || isEditing)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.phone')}</Text>
                     {isEditing ? (
@@ -1955,8 +1955,19 @@ export default function PlayerProfile() {
                         placeholderTextColor="#888"
                         keyboardType="phone-pad"
                       />
+                    ) : player.phone ? (
+                      <TouchableOpacity 
+                        onPress={() => Linking.openURL(`tel:${player.phone}`)}
+                        activeOpacity={0.7}
+                        style={styles.phoneButton}
+                      >
+                        <View style={styles.phoneIconContainer}>
+                          <Ionicons name="call" size={12} color="#fff" />
+                        </View>
+                        <Text style={styles.phoneButtonText}>{player.phone}</Text>
+                      </TouchableOpacity>
                     ) : (
-                      <Text style={styles.infoValue}>{player.phone || t('profile.notSpecified')}</Text>
+                      <Text style={styles.infoValue}>{t('profile.notSpecified')}</Text>
                     )}
                   </View>
                 )}
@@ -5357,6 +5368,24 @@ const styles = StyleSheet.create({
   shareCardLogo: {
     width: 150,
     height: 50,
+  },
+  phoneButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  phoneIconContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#fa2f40',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  phoneButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+    marginLeft: 4,
   },
 
 

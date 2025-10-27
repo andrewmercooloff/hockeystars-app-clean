@@ -2300,7 +2300,11 @@
     "error": "Erreur",
     "errorLoadingChats": "Échec du chargement des discussions",
     "yesterday": "Hier",
-    "you": "Toi:"
+    "you": "Toi:",
+    "massSend": "Envoi de masse",
+    "recipients": "Destinataires",
+    "typeMessage": "Tapez un message...",
+    "send": "Envoyer"
   },
   "notifications": {
     "title": "Notifications",

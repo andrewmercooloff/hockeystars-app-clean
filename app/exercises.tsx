@@ -485,12 +485,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 999,
-    paddingVertical: 10,
     backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    overflow: 'visible', // Разрешаем фильтрам выходить за пределы
   },
   categoriesScroll: {
     flexDirection: 'row',
     paddingTop: 8, // Отступ сверху после поля поиска
+    paddingBottom: 10, // Отступ снизу для фильтров
     paddingHorizontal: 20, // Отступы по краям для кнопок фильтров
   },
   categoryButton: {
@@ -666,6 +667,7 @@ const styles = StyleSheet.create({
   // Стили для поиска (как в search.tsx)
   searchInputWrapper: {
     paddingHorizontal: 20,
+    paddingTop: 10,
     paddingBottom: 8,
   },
   searchInputContainer: {

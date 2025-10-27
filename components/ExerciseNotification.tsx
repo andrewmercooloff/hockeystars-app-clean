@@ -80,7 +80,7 @@ export default function ExerciseNotification({
                  {t('exerciseNotification.completed')} "{getLocalizedExerciseName(exerciseId)}"
                </Text>
           <View style={styles.exerciseBadge}>
-            <Ionicons name="barbell-outline" size={16} color="#fff" />
+            <Ionicons name="barbell-outline" size={16} color="#000" />
           </View>
         </View>
       </View>

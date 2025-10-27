@@ -2402,7 +2402,11 @@
     "error": "Error",
     "errorLoadingChats": "Failed to load chats",
     "yesterday": "Yesterday",
-    "you": "You: "
+    "you": "You: ",
+    "massSend": "Mass Send",
+    "recipients": "Recipients",
+    "typeMessage": "Type a message...",
+    "send": "Send"
   },
   "notifications": {
     "title": "Notifications",

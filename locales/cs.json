@@ -2292,7 +2292,11 @@
     "error": "Chyba",
     "errorLoadingChats": "Chaty se nepodařilo načíst",
     "yesterday": "Včera",
-    "you": "Vy:"
+    "you": "Vy:",
+    "massSend": "Hromadné odesílání",
+    "recipients": "Příjemci",
+    "typeMessage": "Napište zprávu...",
+    "send": "Odeslat"
   },
   "notifications": {
     "title": "Oznámení",

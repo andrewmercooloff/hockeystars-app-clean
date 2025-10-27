@@ -26,6 +26,7 @@ import AvatarChangedNotification from '../components/AvatarChangedNotification';
 import AchievementAddedNotification from '../components/AchievementAddedNotification';
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
+import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
 import CachedAvatar from '../components/CachedAvatar';
 import {
     acceptFriendRequest,
@@ -211,6 +212,30 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.playerAvatar}
             />
           </TouchableOpacity>
+        ) : notification.type === 'friend_gift_received' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <FriendGiftReceivedNotification
+              notification={{
+                id: notification.id,
+                title: notification.title,
+                message: notification.message,
+                createdAt: new Date(notification.timestamp).toISOString(),
+                data: {
+                  playerId: notification.data?.playerId || '',
+                  playerName: notification.data?.playerName || 'Игрок',
+                  playerAvatar: notification.data?.playerAvatar || null,
+                  starName: notification.data?.starName || 'Звезда',
+                  giftName: notification.data?.giftName || 'Подарок',
+                }
+              }}
+              isRead={notification.isRead}
+              onPress={() => onPress(notification)}
+            />
+          </TouchableOpacity>
         ) : notification.type === 'friend_accepted' ? (
           <TouchableOpacity
             onPress={() => onPress(notification)}
@@ -382,7 +407,7 @@ const getItemTypeName = (type: string) => {
 
 interface NotificationItem {
   id: string;
-  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'video_added' | 'avatar_changed' | 'achievement_added' | 'physical_data_changed';
+  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'achievement_added' | 'physical_data_changed';
   title: string;
   message: string;
   timestamp: number;
@@ -474,6 +499,7 @@ export default function NotificationsScreen() {
             notification.type === 'new_friendship' ||
             notification.type === 'exercise_completed' ||
             notification.type === 'gift_received' ||
+            notification.type === 'friend_gift_received' ||
             notification.type === 'video_added' ||
             notification.type === 'avatar_changed' ||
             notification.type === 'achievement_added' ||
@@ -658,14 +684,14 @@ export default function NotificationsScreen() {
     }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
   );
 
-  // Автоматически отмечаем все уведомления как прочитанные через 5 секунд ТОЛЬКО когда экран в фокусе
+  // Автоматически отмечаем все уведомления как прочитанные через 7 секунд ТОЛЬКО когда экран в фокусе
   useEffect(() => {
     if (isScreenFocused && currentUser && notifications.length > 0) {
       const timer = setTimeout(async () => {
         await markAllNotificationsAsRead();
         // Обновляем счетчик уведомлений через контекст
         await updateNotificationCount(currentUser);
-      }, 5000);
+      }, 7000);
       
       return () => {
         clearTimeout(timer);
@@ -756,19 +782,34 @@ export default function NotificationsScreen() {
         return isActionable ? n : { ...n, isRead: true };
       }));
       
-      // Обнуляем счетчик уведомлений в таблице players (УПРОЩЕННАЯ ЛОГИКА)
+      // Обновляем счетчик уведомлений в таблице players
       if (currentUser) {
         try {
-          const { error: updateCounterError } = await supabase
-            .rpc('reset_unread_notifications', { user_id: currentUser.id });
-
-          if (updateCounterError) {
-            console.error('❌ Ошибка обнуления счетчика уведомлений:', updateCounterError);
-          } else {
-            console.log('✅ Счетчик уведомлений обнулен после прочтения');
-          }
+          // Подсчитываем количество непрочитанных уведомлений (exclude actionable)
+          const { count } = await supabase
+            .from('notifications')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', currentUser.id)
+            .eq('is_read', false)
+            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
+          
+          const newCount = count || 0;
+          
+          // Обновляем счетчик в БД
+          await supabase
+            .from('players')
+            .update({ 
+              unread_notifications_count: newCount,
+              notifications: JSON.stringify({
+                unread_count: newCount,
+                last_updated: new Date().toISOString()
+              })
+            })
+            .eq('id', currentUser.id);
+          
+          console.log('✅ Счетчик уведомлений обновлен:', newCount);
         } catch (counterError) {
-          console.error('❌ Ошибка обнуления счетчика:', counterError);
+          console.error('❌ Ошибка обновления счетчика:', counterError);
         }
       }
       
@@ -781,12 +822,10 @@ export default function NotificationsScreen() {
   const handleDeleteNotification = async (notificationId: string) => {
     try {
       // Сначала удаляем из UI для плавной анимации
+      const notification = notifications.find(n => n.id === notificationId);
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
       
-      // Убираем обновление счетчика - он уже обновлен в notifyFriendsAboutGiftReceived
-      // updateNotificationCount();
-      
-      // Затем удаляем из базы данных в фоне
+      // Затем удаляем из базы данных и обновляем счетчик
       setTimeout(async () => {
         const { error } = await supabase
           .from('notifications')
@@ -795,6 +834,30 @@ export default function NotificationsScreen() {
 
         if (error) {
           console.error('Ошибка удаления уведомления:', error);
+        }
+        
+        // Обновляем счетчик, если уведомление не было прочитано
+        if (notification && !notification.isRead && currentUser) {
+          // Подсчитываем количество оставшихся непрочитанных уведомлений
+          const { count } = await supabase
+            .from('notifications')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', currentUser.id)
+            .eq('is_read', false)
+            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
+          
+          const newCount = count || 0;
+          
+          await supabase
+            .from('players')
+            .update({ 
+              unread_notifications_count: newCount,
+              notifications: JSON.stringify({
+                unread_count: newCount,
+                last_updated: new Date().toISOString()
+              })
+            })
+            .eq('id', currentUser.id);
         }
       }, 300); // Задержка для плавной анимации
     } catch (error) {
@@ -862,8 +925,29 @@ export default function NotificationsScreen() {
         }
         
         // Обнуляем счетчик непрочитанных уведомлений
-        await supabase.rpc('reset_unread_notifications', { user_id: currentUser.id });
-        console.log('✅ Счетчик уведомлений обнулен после удаления всех уведомлений');
+        // Подсчитываем количество непрочитанных actionable уведомлений
+        const { count: remainingCount } = await supabase
+          .from('notifications')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', currentUser.id)
+          .eq('is_read', false)
+          .in('type', ['gift_accepted', 'friend_request', 'achievement', 'team_invite']);
+        
+        const finalCount = remainingCount || 0;
+        
+        // Обновляем счетчик в таблице players
+        await supabase
+          .from('players')
+          .update({ 
+            unread_notifications_count: finalCount,
+            notifications: JSON.stringify({
+              unread_count: finalCount,
+              last_updated: new Date().toISOString()
+            })
+          })
+          .eq('id', currentUser.id);
+        
+        console.log('✅ Счетчик уведомлений обновлен после удаления всех уведомлений:', finalCount);
         
         // Обновляем локальное состояние
         setNotifications([]);
@@ -955,6 +1039,11 @@ export default function NotificationsScreen() {
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+        }
+      } else if (notification.type === 'friend_gift_received') {
+        // Для уведомлений о подарках, полученных друзьями, переходим в музей игрока
+        if (notification.data && notification.data.playerId) {
+          router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
         }
       } else if (notification.type === 'video_added') {
         // Для уведомлений о добавленных видео показываем видео игрока

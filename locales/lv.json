@@ -52,8 +52,14 @@
     "photos": "foto"
   },
   "achievementNotification": {
-    "added": "pievienots",
-    "oneAchievement": "jauns sasniegums"
+    "added": "pievienoja",
+    "received": "saņēma",
+    "oneAchievement": "jaunu sasniegumu",
+    "multipleAchievements": "{count} jaunus sasniegumus",
+    "achievement": "sasniegums",
+    "achievements": "sasniegumi",
+    "title": "🏆 Sasniegums!",
+    "message": "Apsveicam! Saņēmāt sasniegumu: {achievementName}"
   },
   "friendshipNotification": {
     "title": "Jauna draudzība",
@@ -1774,7 +1780,7 @@
   "profile": {
     "addFriend": "Pievienot kā draugu",
     "addFriendQuestion": "Vai vēlaties pievienot {name} kā draugu?",
-    "sendMessage": "Sūtīt ziņojumu",
+    "sendMessage": "Nosūtīt ziņojumu",
     "loading": "Notiek ielāde...",
     "basicInfo": "Pamatinformācija",
     "physicalData": "Fiziskie dati",
@@ -2017,19 +2023,15 @@
     "qrCodeTitle": "Profila QR kods",
     "qrCodeSubtitle": "Skenējiet, lai ātri piekļūtu",
     "qrCodeInfo": "Pavērsiet telefona kameru uz QR kodu, lai atvērtu profilu",
-    "shareProfile": "Kopīgot profilu",
+    "shareProfile": "Dalīties ar profilu",
     "savedToGallery": "Saglabāts galerijā",
     "noPermission": "Nav piekļuves galerijai",
     "shareError": "Kļūda, veidojot attēlu",
     "currentTeam": "Komanda",
     "hockeyExperience": "Hokeja pieredze",
     "years": "gadi",
-    "currentSeasonStats": "Pašreizējā sezona statistika",
-    "effectiveness": "PPG",
-    "phone": "Tālrunis",
-    "sendMessage": "Nosūtīt ziņojumu",
-    "shareProfile": "Dalīties ar profilu",
-    "currentSeasonStats": "Pašreizējās sezonas statistika"
+    "currentSeasonStats": "Pašreizējās sezonas statistika",
+    "effectiveness": "PPG"
   },
   "register": {
     "title": "Reģistrācija",
@@ -2316,7 +2318,11 @@
     "error": "Kļūda",
     "errorLoadingChats": "Neizdevās ielādēt tērzēšanu",
     "yesterday": "vakar",
-    "you": "Jūs:"
+    "you": "Jūs:",
+    "massSend": "Masveida sūtīšana",
+    "recipients": "Saņēmēji",
+    "typeMessage": "Ievadiet ziņojumu...",
+    "send": "Nosūtīt"
   },
   "notifications": {
     "title": "Paziņojumi",
@@ -2480,14 +2486,14 @@
     "selectExistingGift": "Izvēlēties esošu dāvanu",
     "orCreateNew": "Vai izveidot jaunu",
     "giftName": "Dāvanas nosaukums",
-    "giftNamePlaceholder": "piem. Parakstīta cepure",
+    "giftNamePlaceholder": "piem., Parakstīta cepure",
     "uploadImage": "Augšupielādēt attēlu",
     "selectImage": "Izvēlēties attēlu",
     "send": "Nosūtīt",
     "museum": "Dāvanu muzejs",
     "myGifts": "Manas dāvanas",
     "noGiftsSubtext": "Augšupielādējiet pirmo dāvanu, lai dalītos ar spēlētājiem",
-    "noGiftsUploaded": "Nav augšupielādētu dāvanu",
+    "noGiftsUploaded": "Vēl nav augšupielādētas dāvanas",
     "successDeleted": "Dāvana izdzēsta",
     "errorDelete": "Neizdevās dzēst dāvanu",
     "noImage": "nav attēla",
@@ -2544,13 +2550,6 @@
     "times": "vienreiz",
     "sprint": "100 metru skrējiens",
     "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Nosūtīt dāvanu {playerName}",
-    "selectExistingGift": "Izvēlēties esošu dāvanu",
-    "orCreateNew": "Vai izveidot jaunu",
-    "giftName": "Dāvanas nosaukums",
-    "giftNamePlaceholder": "piem., Parakstīta cepure",
-    "uploadImage": "Augšupielādēt attēlu",
-    "send": "Nosūtīt",
     "selectGift": "Izvēlēties dāvanu",
     "fromAdmin": "Administrators",
     "errorSelectOrCreate": "Izvēlieties dāvanu vai izveidojiet jaunu",
@@ -2558,11 +2557,9 @@
     "successGiftSent": "Dāvana nosūtīta {playerName}!",
     "errorSendingGift": "Neizdevās nosūtīt dāvanu",
     "deleteGiftConfirm": "Vai tiešām vēlaties dzēst šo dāvanu?",
-    "selectImage": "Izvēlēties attēlu",
     "errorPermissionDenied": "Jums nav atļaujas dzēst šo dāvanu",
     "errorGiftNotFound": "Dāvana nav atrasta",
     "errorGiftNotDeleted": "Dāvana netika izdzēsta",
-    "noGiftsUploaded": "Vēl nav augšupielādētas dāvanas",
     "fromStar": "no {starName}",
     "giftReceived": "Saņemta dāvana!",
     "giftReceivedFromAdmin": "Jūs saņēmāt dāvanu no administratora: {giftName}",
@@ -2699,16 +2696,6 @@
     "multipleVideos": "{count} jaunus video",
     "video": "video",
     "videos": "video"
-  },
-  "achievementNotification": {
-    "added": "pievienoja",
-    "received": "saņēma",
-    "oneAchievement": "jaunu sasniegumu",
-    "multipleAchievements": "{count} jaunus sasniegumus",
-    "achievement": "sasniegums",
-    "achievements": "sasniegumi",
-    "title": "🏆 Sasniegums!",
-    "message": "Apsveicam! Saņēmāt sasniegumu: {achievementName}"
   },
   "avatarNotification": {
     "changed": "mainīja savu avataru"

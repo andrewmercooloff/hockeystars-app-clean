@@ -5108,7 +5108,7 @@ export const sendGiftNotification = async (
     // 2. Увеличиваем счетчик уведомлений
     const { data: playerData, error: playerError } = await supabase
       .from('players')
-      .select('notifications')
+      .select('notifications, unread_notifications_count')
       .eq('id', playerId)
       .single();
     
@@ -5120,7 +5120,8 @@ export const sendGiftNotification = async (
           currentCount = notificationsData.unread_count || 0;
         }
       } catch (parseError) {
-        console.error('❌ Ошибка парсинга notifications:', parseError);
+        // Используем unread_notifications_count как fallback
+        currentCount = playerData.unread_notifications_count || 0;
       }
       
       const newCount = currentCount + 1;
@@ -5131,7 +5132,8 @@ export const sendGiftNotification = async (
           notifications: JSON.stringify({
             unread_count: newCount,
             last_updated: new Date().toISOString()
-          })
+          }),
+          unread_notifications_count: newCount
         })
         .eq('id', playerId);
       
@@ -5205,6 +5207,7 @@ export const sendGiftNotification = async (
         message: `${playerName} получил подарок от ${senderName}: ${giftName}`,
         is_read: false,
         data: {
+          playerId: playerId, // Добавляем ID игрока для навигации
           playerName: playerName,
           playerAvatar: playerDataInfo?.avatar || null,
           starName: senderName,
@@ -5227,7 +5230,7 @@ export const sendGiftNotification = async (
         for (const friend of friends) {
           const { data: friendData, error: friendError } = await supabase
             .from('players')
-            .select('notifications')
+            .select('notifications, unread_notifications_count')
             .eq('id', friend.id)
             .single();
           
@@ -5239,7 +5242,8 @@ export const sendGiftNotification = async (
                 currentCount = notificationsData.unread_count || 0;
               }
             } catch (parseError) {
-              continue;
+              // Используем unread_notifications_count как fallback
+              currentCount = friendData.unread_notifications_count || 0;
             }
             
             await supabase
@@ -5248,7 +5252,8 @@ export const sendGiftNotification = async (
                 notifications: JSON.stringify({
                   unread_count: currentCount + 1,
                   last_updated: new Date().toISOString()
-                })
+                }),
+                unread_notifications_count: currentCount + 1
               })
               .eq('id', friend.id);
           }

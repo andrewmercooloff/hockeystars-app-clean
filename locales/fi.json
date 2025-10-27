@@ -2294,7 +2294,11 @@
     "error": "Virhe",
     "errorLoadingChats": "Keskustelujen lataaminen epäonnistui",
     "yesterday": "Eilen",
-    "you": "Sinä:"
+    "you": "Sinä:",
+    "massSend": "Massalähetys",
+    "recipients": "Vastaanottajat",
+    "typeMessage": "Kirjoita viesti...",
+    "send": "Lähetä"
   },
   "notifications": {
     "title": "Ilmoitukset",

@@ -52,8 +52,14 @@
     "photos": "nuotrauka"
   },
   "achievementNotification": {
-    "added": "pridėta",
-    "oneAchievement": "naujas pasiekimas"
+    "added": "pridėjo",
+    "received": "gavo",
+    "oneAchievement": "naują pasiekimą",
+    "multipleAchievements": "{count} naujų pasiekimų",
+    "achievement": "pasiekimas",
+    "achievements": "pasiekimai",
+    "title": "🏆 Pasiekimas!",
+    "message": "Sveikiname! Gavote pasiekimą: {achievementName}"
   },
   "friendshipNotification": {
     "title": "Nauja draugystė",
@@ -2025,11 +2031,7 @@
     "hockeyExperience": "Ledo ritulio patirtis",
     "years": "metai",
     "currentSeasonStats": "Dabartinio sezono statistika",
-    "effectiveness": "PPG",
-    "phone": "Telefonas",
-    "sendMessage": "Siųsti žinutę",
-    "shareProfile": "Dalintis profiliu",
-    "currentSeasonStats": "Dabartinio sezono statistika"
+    "effectiveness": "PPG"
   },
   "register": {
     "title": "Registracija",
@@ -2320,7 +2322,11 @@
     "error": "Klaida",
     "errorLoadingChats": "Nepavyko įkelti pokalbių",
     "yesterday": "vakar",
-    "you": "Jūs:"
+    "you": "Jūs:",
+    "massSend": "Masinis siuntimas",
+    "recipients": "Gavėjai",
+    "typeMessage": "Įveskite žinutę...",
+    "send": "Siųsti"
   },
   "notifications": {
     "title": "Pranešimai",
@@ -2461,13 +2467,11 @@
     "uploadImage": "Įkelti vaizdą",
     "selectImage": "Pasirinkti vaizdą",
     "send": "Siųsti",
-    "uploadImage": "Įkelti vaizdą",
-    "send": "Siųsti",
     "selectGift": "Pasirinkti dovaną",
     "myGifts": "Mano dovanos",
     "noGifts": "Dovanų dar nėra",
     "noGiftsSubtext": "Įkelkite pirmą dovaną, kad galėtumėte dalintis su žaidėjais",
-    "noGiftsUploaded": "Nėra įkeltų dovanų",
+    "noGiftsUploaded": "Dar neįkeltos dovanos",
     "fromAdmin": "Administratorius",
     "errorSelectOrCreate": "Pasirinkite dovaną arba sukurkite naują",
     "errorGiftAlreadyExists": "Ši dovana jau yra žaidėjui {playerName}.\n\nPasirinkite kitą dovaną arba sukurkite naują.",
@@ -2477,11 +2481,9 @@
     "deleteGiftConfirm": "Ar tikrai norite ištrinti šią dovaną?",
     "successDeleted": "Dovana ištrinta",
     "errorDelete": "Nepavyko ištrinti dovanos",
-    "selectImage": "Pasirinkti vaizdą",
     "errorPermissionDenied": "Neturite leidimo ištrinti šią dovaną",
     "errorGiftNotFound": "Dovana nerasta",
     "errorGiftNotDeleted": "Dovana nebuvo ištrinta",
-    "noGiftsUploaded": "Dar neįkeltos dovanos",
     "fromStar": "nuo {starName}",
     "giftReceived": "Gauta dovana!",
     "giftReceivedFromAdmin": "Gavote dovaną iš administratoriaus: {giftName}",
@@ -2496,16 +2498,6 @@
     "multipleVideos": "{count} naujų vaizdo įrašų",
     "video": "vaizdo įrašas",
     "videos": "vaizdo įrašai"
-  },
-  "achievementNotification": {
-    "added": "pridėjo",
-    "received": "gavo",
-    "oneAchievement": "naują pasiekimą",
-    "multipleAchievements": "{count} naujų pasiekimų",
-    "achievement": "pasiekimas",
-    "achievements": "pasiekimai",
-    "title": "🏆 Pasiekimas!",
-    "message": "Sveikiname! Gavote pasiekimą: {achievementName}"
   },
   "avatarNotification": {
     "changed": "pakeitė savo avatarą"

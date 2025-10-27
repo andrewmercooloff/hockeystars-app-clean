@@ -197,19 +197,32 @@ export default function RootLayout() {
   // Функция для загрузки счетчика уведомлений из БД
   const loadNotificationCount = React.useCallback(async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Пересчитываем реальное количество непрочитанных уведомлений
+      const { count } = await supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('is_read', false)
+        .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
+      
+      const realCount = count || 0;
+      
+      // Обновляем счетчик в БД
+      await supabase
         .from('players')
-        .select('unread_notifications_count')
-        .eq('id', userId)
-        .single();
+        .update({ 
+          unread_notifications_count: realCount,
+          notifications: JSON.stringify({
+            unread_count: realCount,
+            last_updated: new Date().toISOString()
+          })
+        })
+        .eq('id', userId);
       
-      if (error) {
-        console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
-        return;
-      }
+      // Устанавливаем правильный счетчик
+      setUnreadNotificationsCount(realCount);
       
-      const count = data?.unread_notifications_count || 0;
-      setUnreadNotificationsCount(count);
+      console.log('✅ Счетчик уведомлений пересчитан и обновлен:', realCount);
     } catch (error) {
       console.error('❌ Ошибка загрузки счетчика:', error);
     }
@@ -428,10 +441,8 @@ export default function RootLayout() {
         // Обновляем пользователя с новыми счетчиками
         setCurrentUser(nextUser);
         
-        // Обновляем счетчик уведомлений после установки currentUser
-        setTimeout(() => {
-          updateNotificationCount(nextUser);
-        }, 100);
+        // Сразу пересчитываем счетчик уведомлений (без задержки)
+        await loadNotificationCount(nextUser.id);
         
       } else {
         setUserLoaded(false);
@@ -486,22 +497,8 @@ export default function RootLayout() {
         console.log('✅ Параллельная инициализация завершена');
         
         
-        // Восстанавливаем счетчик уведомлений из AsyncStorage
-        if (currentUser) {
-          try {
-            const savedCount = await AsyncStorage.getItem(`unreadNotificationsCount_${currentUser.id}`);
-            if (savedCount !== null) {
-              const parsedCount = parseInt(savedCount, 10);
-              
-              // Просто устанавливаем локальное состояние
-              // НЕ трогаем базу данных - она управляется SQL функциями
-              setUnreadNotificationsCount(parsedCount);
-              console.log(`✅ Восстановлен счетчик уведомлений: ${parsedCount}`);
-            }
-          } catch (error) {
-            console.error('❌ Ошибка восстановления счетчика уведомлений:', error);
-          }
-        }
+        // Счетчик уведомлений пересчитывается при загрузке через loadNotificationCount
+        // НЕ восстанавливаем из AsyncStorage, чтобы избежать устаревших значений
         
         // Помечаем приложение как готовое
         setAppReady(true);
@@ -549,8 +546,16 @@ export default function RootLayout() {
 
   // Принудительно обновляем пользователя при переходе на главную страницу
   // Это нужно для корректного выхода из профиля
+  const lastAppStateLoadRef = React.useRef<number>(0);
   React.useEffect(() => {
     const handleFocus = () => {
+      // Добавляем throttling - максимум один раз в 5 секунд
+      const now = Date.now();
+      if (now - lastAppStateLoadRef.current < 5000) {
+        return; // Пропускаем вызов, если прошло меньше 5 секунд
+      }
+      lastAppStateLoadRef.current = now;
+
       // Небольшая задержка для того, чтобы навигация завершилась
       setTimeout(() => {
         loadUser();
@@ -592,11 +597,12 @@ export default function RootLayout() {
   }, []);
 
   // Дополнительная загрузка пользователя при возврате в приложение
-  React.useEffect(() => {
-    if (appState === 'active' && appReady) {
-        loadUser();
-      }
-  }, [appState, appReady]);
+  // ОТКЛЮЧЕНО - вызывает редиректы
+  // React.useEffect(() => {
+  //   if (appState === 'active' && appReady) {
+  //       loadUser();
+  //     }
+  // }, [appState, appReady]);
 
   // Загружаем счетчик уведомлений при смене пользователя
   React.useEffect(() => {
@@ -725,9 +731,14 @@ export default function RootLayout() {
           name="messages"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser) {
+              // Проверяем только если точно известно, что пользователь не зарегистрирован
+              // (не проверяем во время загрузки, чтобы избежать редиректов)
+              if (!currentUser && userLoaded) {
                 e.preventDefault();
                 router.replace('/login');
+              } else if (!currentUser && !userLoaded) {
+                // Во время загрузки просто предотвращаем переход
+                e.preventDefault();
               }
             },
           }}
@@ -773,9 +784,11 @@ export default function RootLayout() {
           name="notifications"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser) {
+              if (!currentUser && userLoaded) {
                 e.preventDefault();
                 router.replace('/login');
+              } else if (!currentUser && !userLoaded) {
+                e.preventDefault();
               }
             },
           }}
@@ -788,9 +801,11 @@ export default function RootLayout() {
           name="search"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser) {
+              if (!currentUser && userLoaded) {
                 e.preventDefault();
                 router.replace('/login');
+              } else if (!currentUser && !userLoaded) {
+                e.preventDefault();
               }
             },
           }}
@@ -806,9 +821,11 @@ export default function RootLayout() {
           name="exercises"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser) {
+              if (!currentUser && userLoaded) {
                 e.preventDefault();
                 router.replace('/login');
+              } else if (!currentUser && !userLoaded) {
+                e.preventDefault();
               }
             },
           }}
@@ -876,6 +893,12 @@ export default function RootLayout() {
         /> */}
         <Tabs.Screen
           name="+not-found"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="messages/mass"
           options={{
             href: null,
           }}

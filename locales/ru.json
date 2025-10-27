@@ -2158,7 +2158,11 @@
     "error": "Ошибка",
     "errorLoadingChats": "Не удалось загрузить чаты",
     "yesterday": "Вчера",
-    "you": "Вы: "
+    "you": "Вы: ",
+    "massSend": "Массовая отправка",
+    "recipients": "Получатели",
+    "typeMessage": "Введите сообщение...",
+    "send": "Отправить"
   },
   "notifications": {
     "title": "Уведомления",

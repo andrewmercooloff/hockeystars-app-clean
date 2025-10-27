@@ -249,16 +249,15 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
         throw museumError;
       }
 
-      // Обновляем статус запроса на "выполнен"
+      // Обновляем статус запроса на "выполнен" (убираем несуществующее поле gift_sent_at)
+      // Примечание: gift_sent_at поле не существует в таблице item_requests
       const { error: requestError } = await supabase
         .from('item_requests')
         .update({ 
-          status: 'accepted',
-          gift_sent_at: new Date().toISOString()
+          status: 'accepted'
         })
         .eq('requester_id', playerId)
-        .eq('owner_id', starId)
-        .eq('status', 'accepted');
+        .eq('owner_id', starId);
 
       if (requestError) {
         console.error('Ошибка обновления запроса:', requestError);

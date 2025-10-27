@@ -53,8 +53,14 @@
     "photos": "zdjęcie"
   },
   "achievementNotification": {
-    "added": "w dodatku",
-    "oneAchievement": "nowe osiągnięcie"
+    "added": "dodał",
+    "received": "otrzymał",
+    "oneAchievement": "nowe osiągnięcie",
+    "multipleAchievements": "{count} nowych osiągnięć",
+    "achievement": "osiągnięcie",
+    "achievements": "osiągnięcia",
+    "title": "🏆 Osiągnięcie!",
+    "message": "Gratulacje! Otrzymałeś osiągnięcie: {achievementName}"
   },
   "friendshipNotification": {
     "title": "Nowa przyjaźń",
@@ -1804,12 +1810,8 @@
     "currentTeam": "Drużyna",
     "hockeyExperience": "Doświadczenie w hokeju",
     "years": "lat",
-    "currentSeasonStats": "Statystyki obecnego sezonu",
-    "effectiveness": "PPG",
-    "phone": "Telefon",
-    "sendMessage": "Wyślij wiadomość",
-    "shareProfile": "Udostępnij profil",
-    "currentSeasonStats": "Statystyki bieżącego sezonu"
+    "currentSeasonStats": "Statystyki bieżącego sezonu",
+    "effectiveness": "PPG"
   },
   "register": {
     "title": "Rejestracja",
@@ -2096,7 +2098,11 @@
     "error": "Błąd",
     "errorLoadingChats": "Nie udało się załadować czatów",
     "yesterday": "Wczoraj",
-    "you": "Ty:"
+    "you": "Ty:",
+    "massSend": "Wysyłanie masowe",
+    "recipients": "Odbiorcy",
+    "typeMessage": "Wpisz wiadomość...",
+    "send": "Wyślij"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -2267,7 +2273,7 @@
     "museum": "Muzeum Darów",
     "myGifts": "Moje prezenty",
     "noGiftsSubtext": "Prześlij pierwszy prezent, aby dzielić się z graczami",
-    "noGiftsUploaded": "Brak przesłanych prezentów",
+    "noGiftsUploaded": "Jeszcze nie przesłano prezentów",
     "successDeleted": "Prezent usunięty",
     "errorDelete": "Nie udało się usunąć prezentu",
     "noImage": "brak obrazu",
@@ -2324,13 +2330,6 @@
     "times": "raz",
     "sprint": "Bieg na 100 metrów",
     "_cache_clear": "2024-01-16-9",
-    "sendGiftTo": "Wyślij prezent do {playerName}",
-    "selectExistingGift": "Wybierz istniejący prezent",
-    "orCreateNew": "Lub utwórz nowy",
-    "giftName": "Nazwa prezentu",
-    "giftNamePlaceholder": "np. Podpisana czapka",
-    "uploadImage": "Prześlij obraz",
-    "send": "Wyślij",
     "selectGift": "Wybierz prezent",
     "fromAdmin": "Administrator",
     "errorSelectOrCreate": "Wybierz prezent lub utwórz nowy",
@@ -2338,11 +2337,9 @@
     "successGiftSent": "Prezent wysłany do {playerName}!",
     "errorSendingGift": "Nie udało się wysłać prezentu",
     "deleteGiftConfirm": "Czy na pewno chcesz usunąć ten prezent?",
-    "selectImage": "Wybierz obraz",
     "errorPermissionDenied": "Nie masz uprawnień do usunięcia tego prezentu",
     "errorGiftNotFound": "Prezent nie znaleziony",
     "errorGiftNotDeleted": "Prezent nie został usunięty",
-    "noGiftsUploaded": "Jeszcze nie przesłano prezentów",
     "fromStar": "od {starName}",
     "giftReceived": "Otrzymano prezent!",
     "giftReceivedFromAdmin": "Otrzymałeś prezent od administratora: {giftName}",
@@ -2479,16 +2476,6 @@
     "multipleVideos": "{count} nowych wideo",
     "video": "wideo",
     "videos": "wideo"
-  },
-  "achievementNotification": {
-    "added": "dodał",
-    "received": "otrzymał",
-    "oneAchievement": "nowe osiągnięcie",
-    "multipleAchievements": "{count} nowych osiągnięć",
-    "achievement": "osiągnięcie",
-    "achievements": "osiągnięcia",
-    "title": "🏆 Osiągnięcie!",
-    "message": "Gratulacje! Otrzymałeś osiągnięcie: {achievementName}"
   },
   "avatarNotification": {
     "changed": "zmienił swój awatar"

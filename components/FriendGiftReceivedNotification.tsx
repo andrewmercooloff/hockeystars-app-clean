@@ -1,26 +1,34 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from './CachedAvatar';
 import { useLanguage } from '../contexts/LanguageContext';
 
-interface GiftReceivedNotificationProps {
-  playerName: string;
-  starName: string;
-  giftName: string;
-  giftType: string;
-  timestamp: string;
-  playerAvatar?: string | null;
+interface FriendGiftReceivedNotificationProps {
+  notification: {
+    id: string;
+    title: string;
+    message: string;
+    createdAt: string;
+    data: {
+      playerId: string;
+      playerName: string;
+      playerAvatar: string | null;
+      starName: string;
+      giftName: string;
+    };
+  };
+  isRead: boolean;
+  onPress: () => void;
 }
 
-export default function GiftReceivedNotification({
-  playerName,
-  starName,
-  giftName,
-  giftType,
-  timestamp,
-  playerAvatar,
-}: GiftReceivedNotificationProps) {
+const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationProps> = ({
+  notification,
+  isRead,
+  onPress
+}) => {
   const { t } = useLanguage();
+  const { playerName, playerAvatar, starName, giftName } = notification.data;
 
   const formatTime = (timestamp: string): string => {
     const now = new Date();
@@ -31,7 +39,7 @@ export default function GiftReceivedNotification({
       return t('justNow');
     } else if (diffInMinutes < 60) {
       return t('minutesAgo', { minutes: diffInMinutes });
-    } else if (diffInMinutes < 1440) { // 24 hours
+    } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
       return t('hoursAgo', { hours });
     } else {
@@ -40,18 +48,12 @@ export default function GiftReceivedNotification({
     }
   };
 
-  const getGiftIcon = (giftType: string) => {
-    switch (giftType) {
-      case 'autograph': return 'create-outline';
-      case 'stick': return 'golf-outline';
-      case 'puck': return 'radio-button-on-outline';
-      case 'jersey': return 'shirt-outline';
-      default: return 'gift-outline';
-    }
-  };
-
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <View style={styles.avatarContainer}>
         {playerAvatar ? (
           <Image
@@ -60,7 +62,12 @@ export default function GiftReceivedNotification({
             resizeMode="cover"
           />
         ) : (
-          <Ionicons name="person-outline" size={24} color="#fff" />
+          <CachedAvatar
+            playerId={notification.data.playerId}
+            fallbackAvatarUrl={playerAvatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
+            size={50}
+            style={styles.playerAvatar}
+          />
         )}
       </View>
 
@@ -70,22 +77,22 @@ export default function GiftReceivedNotification({
             {playerName}
           </Text>
           <Text style={styles.timeText}>
-            {formatTime(timestamp)}
+            {formatTime(notification.createdAt)}
           </Text>
         </View>
 
         <View style={styles.giftItem}>
           <Text style={styles.actionText}>
-            {t('giftNotification.received')} {giftName} {t('giftNotification.from')} {starName}
+            получил подарок от {starName}: {giftName}
           </Text>
           <View style={styles.giftBadge}>
-            <Ionicons name={getGiftIcon(giftType)} size={14} color="#fff" />
+            <Ionicons name="gift" size={14} color="#fff" />
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -157,3 +164,6 @@ const styles = StyleSheet.create({
     height: 32,
   },
 });
+
+export default FriendGiftReceivedNotification;
+

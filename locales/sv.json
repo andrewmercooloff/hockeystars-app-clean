@@ -2302,7 +2302,11 @@
     "error": "Fel",
     "errorLoadingChats": "Det gick inte att läsa in chattar",
     "yesterday": "I går",
-    "you": "Du:"
+    "you": "Du:",
+    "massSend": "Massutskick",
+    "recipients": "Mottagare",
+    "typeMessage": "Skriv ett meddelande...",
+    "send": "Skicka"
   },
   "notifications": {
     "title": "Aviseringar",

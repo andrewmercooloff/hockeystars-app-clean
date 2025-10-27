@@ -2319,7 +2319,11 @@
     "error": "Fehler",
     "errorLoadingChats": "Chats konnten nicht geladen werden",
     "yesterday": "Gestern",
-    "you": "Du:"
+    "you": "Du:",
+    "massSend": "Massensendung",
+    "recipients": "Empfänger",
+    "typeMessage": "Nachricht eingeben...",
+    "send": "Senden"
   },
   "notifications": {
     "title": "Benachrichtigungen",

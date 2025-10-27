@@ -2294,7 +2294,11 @@
     "error": "Chyba",
     "errorLoadingChats": "Načítanie četov zlyhalo",
     "yesterday": "včera",
-    "you": "ty:"
+    "you": "ty:",
+    "massSend": "Hromadné posielanie",
+    "recipients": "Príjemcovia",
+    "typeMessage": "Zadajte správu...",
+    "send": "Odoslať"
   },
   "notifications": {
     "title": "Upozornenia",
