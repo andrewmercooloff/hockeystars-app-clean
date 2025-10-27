@@ -1602,6 +1602,7 @@ export default function PlayerProfile() {
                     <View style={[styles.profileImage]}>
                         <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                     <CachedAvatar
+                      key={imageSource} // Добавляем key для принудительного перерендеринга при изменении аватара
                       playerId={player.id}
                       fallbackAvatarUrl={imageSource}
                       size={100}
