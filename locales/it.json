@@ -2050,6 +2050,8 @@
     "selectDate": "Seleziona la data",
     "cancel": "Cancellare",
     "confirm": "Confermare",
+    "agreeToTerms": "Registrandoti, accetti i termini d'uso:",
+    "termsLink": "Termini d'uso",
     "photoError": "Errore durante il caricamento della foto"
   },
   "navigation": {

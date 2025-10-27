@@ -2042,6 +2042,8 @@
     "selectDate": "Vyberte dátum",
     "cancel": "Zrušiť",
     "confirm": "Potvrďte",
+    "agreeToTerms": "Registráciou súhlasíte s podmienkami použitia:",
+    "termsLink": "Podmienky použitia",
     "photoError": "Chyba pri nahrávaní fotografie"
   },
   "navigation": {

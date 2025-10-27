@@ -1844,6 +1844,8 @@
     "selectDate": "Wybierz datę",
     "cancel": "Anulować",
     "confirm": "Potwierdzać",
+    "agreeToTerms": "Rejestrując się, akceptujesz warunki korzystania:",
+    "termsLink": "Warunki korzystania",
     "photoError": "Błąd podczas przesyłania zdjęcia"
   },
   "navigation": {

@@ -2050,6 +2050,8 @@
     "selectDate": "Välj datum",
     "cancel": "Avboka",
     "confirm": "Bekräfta",
+    "agreeToTerms": "Genom att registrera dig accepterar du användarvillkoren:",
+    "termsLink": "Användarvillkor",
     "photoError": "Fel vid uppladdning av foto"
   },
   "navigation": {

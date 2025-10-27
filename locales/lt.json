@@ -2064,6 +2064,8 @@
     "selectDate": "Pasirinkite datą",
     "cancel": "Atšaukti",
     "confirm": "Patvirtinti",
+    "agreeToTerms": "Registruodamiesi sutinkate su naudojimo sąlygomis:",
+    "termsLink": "Naudojimo sąlygos",
     "photoError": "Įkeliant nuotrauką įvyko klaida"
   },
   "navigation": {

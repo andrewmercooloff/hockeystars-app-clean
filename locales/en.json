@@ -2115,6 +2115,8 @@
     "selectDate": "Select Date",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "agreeToTerms": "By registering, you accept the terms of use:",
+    "termsLink": "Terms of Use",
     "photoError": "Error loading photo",
     "настоящее время": "present",
     "Центральный нападающий": "Center",

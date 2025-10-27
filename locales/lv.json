@@ -2064,6 +2064,8 @@
     "selectDate": "Izvēlieties datumu",
     "cancel": "Atcelt",
     "confirm": "Apstiprināt",
+    "agreeToTerms": "Reģistrējoties, piekrītat lietošanas noteikumiem:",
+    "termsLink": "Lietošanas noteikumi",
     "photoError": "Augšupielādējot fotoattēlu, radās kļūda"
   },
   "navigation": {

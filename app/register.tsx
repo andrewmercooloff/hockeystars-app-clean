@@ -958,7 +958,7 @@ export default function RegisterScreen() {
                 </View>
               </TouchableOpacity>
               <Text style={styles.termsText}>
-                Регистрируясь, вы принимаете условие пользования: 
+                {t('register.agreeToTerms')}
               </Text>
             </View>
           )}
@@ -968,7 +968,7 @@ export default function RegisterScreen() {
               onPress={() => Linking.openURL('https://hockey-stars.com/rules.pdf')}
             >
               <Ionicons name="document-text-outline" size={16} color="#FF4444" />
-              <Text style={styles.termsLinkText}>Правила использования</Text>
+              <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
             </TouchableOpacity>
           )}
           

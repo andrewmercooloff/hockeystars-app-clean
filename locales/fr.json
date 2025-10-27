@@ -2046,10 +2046,12 @@
     "register": "Registre",
     "back": "Dos",
     "welcome": "Accueillir!",
-    "registrationSuccess": "Inscription réussie ! Bienvenue sur HockeyStars !",
+    "registrationSuccess": "Inscription réussie ! Bienvenue sur HockeyStars !",
     "selectDate": "Sélectionnez la date",
     "cancel": "Annuler",
     "confirm": "Confirmer",
+    "agreeToTerms": "En vous inscrivant, vous acceptez les conditions d'utilisation :",
+    "termsLink": "Conditions d'utilisation",
     "photoError": "Erreur lors du téléchargement de la photo"
   },
   "navigation": {

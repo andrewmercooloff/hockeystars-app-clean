@@ -2042,6 +2042,8 @@
     "selectDate": "Valitse päivämäärä",
     "cancel": "Peruuttaa",
     "confirm": "Vahvistaa",
+    "agreeToTerms": "Rekisteröitymällä hyväksyt käyttöehdot:",
+    "termsLink": "Käyttöehdot",
     "photoError": "Virhe kuvan lataamisessa"
   },
   "navigation": {
