@@ -100,14 +100,21 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   React.useEffect(() => {
     // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
     const currentCachedAvatar = avatarCache.getAvatar(playerId);
-    if (!currentCachedAvatar && fallbackUrl) {
-      avatarCache.setAvatar(playerId, fallbackUrl)
-        .then(localUri => {
-          if (localUri) {
-            setAvatarUrl(localUri);
-          }
-        })
-        .catch(() => {});
+    
+    // Всегда обновляем кеш если есть fallbackUrl, чтобы синхронизировать кеш с данными из БД
+    if (fallbackUrl) {
+      // Только если аватар в кеше отличается от fallback, обновляем
+      if (currentCachedAvatar !== fallbackUrl) {
+        avatarCache.setAvatar(playerId, fallbackUrl)
+          .then(localUri => {
+            if (localUri) {
+              setAvatarUrl(localUri);
+            }
+          })
+          .catch(() => {});
+      } else {
+        setAvatarUrl(currentCachedAvatar);
+      }
     } else if (currentCachedAvatar) {
       setAvatarUrl(currentCachedAvatar);
     }
@@ -148,7 +155,10 @@ export const preloadPlayerAvatars = async (players: Array<{ id: string; avatar?:
   const preloadTasks = players
     .filter(player => player.avatar)
     .map(async player => {
+      // Предзагружаем через expo-image
       await preloadAvatar(player.avatar!);
+      // И сохраняем в AvatarCache для мгновенного доступа в профилях
+      await avatarCache.setAvatar(player.id, player.avatar!);
     });
 
   try {
