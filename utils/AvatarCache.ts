@@ -23,15 +23,19 @@ class AvatarCache {
   async setAvatar(playerId: string, avatarUrl: string): Promise<string | null> {
     const oldUrl = this.cache.get(playerId);
     
+    console.log('🔍 AvatarCache.setAvatar:', { playerId, oldUrl, newUrl: avatarUrl });
+    
     try {
       // Предзагружаем изображение с высоким приоритетом
       await Image.prefetch(avatarUrl);
 
       // Сохраняем в кэш
       this.cache.set(playerId, avatarUrl);
+      console.log('✅ Аватар сохранен в кеш:', { playerId, url: avatarUrl });
       
       // Если аватар изменился, уведомляем всех слушателей
       if (oldUrl !== avatarUrl) {
+        console.log('🔄 Аватар изменился, уведомляем слушателей:', { playerId, oldUrl, newUrl: avatarUrl });
         this.notifyListeners(playerId, avatarUrl);
       }
       

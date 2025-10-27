@@ -1448,17 +1448,22 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
       console.log('🔄 Аватар игрока изменился:', { playerId, oldAvatar: oldPlayer.avatar, newAvatar: updatedPlayer.avatar });
       
-      // Очищаем старый аватар из кеша expo-image
+      // Очищаем старый аватар из всех кешей
       if (oldPlayer.avatar) {
         try {
           const { Image } = await import('expo-image');
           // Инвалидируем кеш старого аватара
           await Image.clearMemoryCache();
+          await Image.clearDiskCache();
           console.log('✅ Кеш изображений очищен для аватара');
         } catch (error) {
           console.error('❌ Ошибка очистки кеша изображений:', error);
         }
       }
+      
+      // Очищаем AvatarCache для этого игрока перед обновлением
+      avatarCache.clearAvatar(playerId);
+      console.log('✅ AvatarCache очищен для', playerId);
       
       // Обновляем кеш аватаров
       if (updatedPlayer.avatar) {
