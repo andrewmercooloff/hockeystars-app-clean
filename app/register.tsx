@@ -9,6 +9,7 @@ import {
     Image,
     ImageBackground,
     Keyboard,
+    Linking,
     Platform,
     ScrollView,
     StyleSheet,
@@ -70,6 +71,7 @@ export default function RegisterScreen() {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [countrySearchText, setCountrySearchText] = useState('');
   const [skateServices, setSkateServices] = useState<string[]>([]);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   const filteredCountries = COUNTRIES.filter(country =>
     country.toLowerCase().includes(countrySearchText.toLowerCase())
@@ -280,6 +282,12 @@ export default function RegisterScreen() {
 
   // Отправка кода подтверждения
   const handleSendCode = async () => {
+    // Проверяем, что пользователь согласился с условиями
+    if (!agreedToTerms) {
+      showAlert('Ошибка', 'Пожалуйста, примите условия использования', 'error');
+      return;
+    }
+    
     // Проверяем, что все обязательные поля заполнены
     if (!formData.phone || !formData.name || !formData.status || !formData.country) {
       showAlert('Ошибка', 'Пожалуйста, заполните все обязательные поля', 'error');
@@ -937,12 +945,39 @@ export default function RegisterScreen() {
             </>
           )}
 
+          {/* Чекбокс принятия условий */}
+          {step === 'form' && (
+            <View style={styles.termsContainer}>
+              <TouchableOpacity 
+                style={styles.checkbox}
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkboxSquare, agreedToTerms && styles.checkboxSquareChecked]}>
+                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.termsText}>
+                Регистрируясь, вы принимаете условие пользования: 
+              </Text>
+            </View>
+          )}
+          {step === 'form' && (
+            <TouchableOpacity 
+              style={styles.termsLink}
+              onPress={() => Linking.openURL('https://hockey-stars.com/rules.pdf')}
+            >
+              <Ionicons name="document-text-outline" size={16} color="#FF4444" />
+              <Text style={styles.termsLinkText}>Правила использования</Text>
+            </TouchableOpacity>
+          )}
+          
           {/* Кнопки */}
           {step === 'form' ? (
             <TouchableOpacity 
-              style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+              style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]} 
               onPress={handleSendCode}
-              disabled={loading}
+              disabled={loading || !agreedToTerms}
             >
               <Ionicons 
                 name={loading ? "hourglass" : "mail"} 
@@ -1290,6 +1325,49 @@ const styles = StyleSheet.create({
   },
   registerButtonDisabled: {
     opacity: 0.6,
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  checkbox: {
+    marginRight: 10,
+    marginTop: 2,
+  },
+  checkboxSquare: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#FF4444',
+    borderRadius: 4,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxSquareChecked: {
+    backgroundColor: '#FF4444',
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
+    lineHeight: 18,
+  },
+  termsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    alignSelf: 'flex-start',
+  },
+  termsLinkText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    color: '#FF4444',
+    marginLeft: 6,
+    textDecorationLine: 'underline',
   },
   codeInput: {
     textAlign: 'center',
