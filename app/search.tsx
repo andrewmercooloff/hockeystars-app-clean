@@ -264,7 +264,11 @@ export default function SearchScreen() {
         // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
         // Вместо этого просто логируем ошибку
       } finally {
-        await SplashScreen.hideAsync();
+        try {
+          await SplashScreen.hideAsync();
+        } catch (splashError) {
+          // Игнорируем ошибку splash screen
+        }
         setLoading(false);
       }
     };

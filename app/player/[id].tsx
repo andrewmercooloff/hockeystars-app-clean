@@ -1444,11 +1444,12 @@ export default function PlayerProfile() {
   };
 
   const handleLogout = async () => {
-    showCustomAlert(
-      t('logoutConfirm'),
-      t('logoutConfirmMessage'),
-      'warning',
-      async () => {
+    setAlert({
+      visible: true,
+      title: t('logoutConfirm'),
+      message: t('logoutConfirmMessage'),
+      type: 'warning',
+      onConfirm: async () => {
         try {
           // Очищаем данные текущего пользователя
           const { logoutUser } = await import('../../utils/playerStorage');
@@ -1469,8 +1470,17 @@ export default function PlayerProfile() {
           await refreshUser();
           router.replace('/');
         }
-      }
-    );
+      },
+      onCancel: () => {
+        setAlert({ ...alert, visible: false });
+      },
+      onSecondary: () => {},
+      showCancel: true,
+      showSecondary: false,
+      confirmText: t('common.ok'),
+      cancelText: t('profile.cancel'),
+      secondaryText: t('profile.additional')
+    });
   };
 
   const handleCreateUser = async () => {
