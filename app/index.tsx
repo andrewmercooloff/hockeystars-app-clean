@@ -80,7 +80,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   // Получаем оптимальную частоту обновления
   const getOptimalFrameRate = useCallback(() => {
     if (Platform.OS === 'ios') {
-      return 8; // 120 FPS для iOS
+      return 16; // 60 FPS для iOS (оптимизировано для лучшей производительности)
     } else if (Platform.OS === 'web') {
       return 16; // 60 FPS для Web
     } else if (Platform.OS === 'android') {
@@ -180,7 +180,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Адаптивная скорость в зависимости от производительности устройства
           let speedMultiplier;
           if (Platform.OS === 'ios') {
-            speedMultiplier = 1.2;
+            speedMultiplier = 1.0; // Оптимизировано для лучшей производительности
           } else if (Platform.OS === 'web') {
             speedMultiplier = 1.2;
           } else if (Platform.OS === 'android') {
@@ -346,7 +346,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               
               // Улучшенная физика отталкивания с более реалистичными силами
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 1.0 : (Platform.OS === 'android' ? 0.4 : 0.5));
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.7 : (Platform.OS === 'android' ? 0.4 : 0.5));
               
               // Передача импульса при столкновении - более реалистично
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
@@ -383,7 +383,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Минимальное ускорение при столкновениях для плавности
           const hasCollision = velocityChanges[posIndex].dvx !== 0 || velocityChanges[posIndex].dvy !== 0;
           if (hasCollision) {
-            const speedBoost = 1.02; // 2% ускорение при столкновениях - более плавно
+            const speedBoost = 1.01; // 1% ускорение при столкновениях - оптимизировано
             newVx *= speedBoost;
             newVy *= speedBoost;
           }
@@ -519,7 +519,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           adjustedY += Math.sin(angle) * correctionDistance;
           
           // Улучшенная передача импульса при перетаскивании
-          const pushStrength = Platform.OS === 'ios' ? 0.5 : (Platform.OS === 'android' ? 0.3 : 0.4);
+          const pushStrength = Platform.OS === 'ios' ? 0.35 : (Platform.OS === 'android' ? 0.3 : 0.4);
           
           // Вычисляем общую скорость перетаскивания
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
