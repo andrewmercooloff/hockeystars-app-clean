@@ -30,9 +30,24 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
-
-  // Используем кешированный аватар или fallback
-  const effectiveAvatarUrl = cachedAvatarUrl || fallbackAvatarUrl;
+  const [urlTimestamp, setUrlTimestamp] = React.useState(0);
+  
+  // Отслеживаем изменения URL и добавляем timestamp только при изменении
+  React.useEffect(() => {
+    if (fallbackAvatarUrl) {
+      setUrlTimestamp(Date.now());
+    }
+  }, [fallbackAvatarUrl]);
+  
+  // Используем кешированный аватар или fallback, добавляя timestamp
+  const effectiveAvatarUrl = React.useMemo(() => {
+    const url = cachedAvatarUrl || fallbackAvatarUrl;
+    if (!url) return url;
+    
+    // Добавляем timestamp для обновления кеша expo-image
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}t=${urlTimestamp}`;
+  }, [cachedAvatarUrl, fallbackAvatarUrl, urlTimestamp]);
 
   const handleLoad = React.useCallback(() => {
     setImageLoaded(true);
@@ -72,6 +87,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   return (
     <View style={imageStyle}>
       <Image
+        key={effectiveAvatarUrl} // Key изменяется при изменении URL для принудительного обновления
         source={{ 
           uri: effectiveAvatarUrl
         }}
@@ -79,7 +95,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
         contentFit="cover"
         onError={handleError}
         onLoad={handleLoad}
-        cachePolicy="memory-disk"
+        cachePolicy="memory" // Убираем disk кеш чтобы всегда получать свежие изображения
         priority="high"
       />
     </View>
