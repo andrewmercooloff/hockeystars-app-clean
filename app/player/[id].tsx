@@ -1096,11 +1096,81 @@ export default function PlayerProfile() {
       };
       
       
-      // Выполняем все операции параллельно для ускорения
+      // Проверяем, изменились ли команды, чтобы не перезаписывать их без необходимости
+      let teamsChanged = false;
+      try {
+        const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
+        const savedTeams = await getPlayerTeamsAsPastTeams(player.id);
+        
+        // Преобразуем сохраненные команды в формат для сравнения
+        const savedCurrentTeams = savedTeams.filter(t => t.isCurrent).map(t => ({
+          id: t.id,
+          teamName: t.teamName,
+          startYear: t.startYear,
+          endYear: t.endYear,
+          isCurrent: true
+        }));
+        const savedPastTeams = savedTeams.filter(t => !t.isCurrent).map(t => ({
+          id: t.id,
+          teamName: t.teamName,
+          startYear: t.startYear,
+          endYear: t.endYear,
+          isCurrent: false
+        }));
+        
+        // Сравниваем текущие команды
+        const currentTeamsForCompare = playerTeams.map(t => ({
+          id: t.id,
+          teamName: t.teamName,
+          startYear: t.startYear,
+          endYear: t.endYear,
+          isCurrent: true
+        }));
+        
+        // Сравниваем прошлые команды
+        const pastTeamsForCompare = pastTeams.filter(t => !t.isCurrent).map(t => ({
+          id: t.id,
+          teamName: t.teamName,
+          startYear: t.startYear,
+          endYear: t.endYear,
+          isCurrent: false
+        }));
+        
+        // Проверяем изменились ли команды
+        const currentTeamsEqual = JSON.stringify(savedCurrentTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
+                                   JSON.stringify(currentTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
+        const pastTeamsEqual = JSON.stringify(savedPastTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
+                               JSON.stringify(pastTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
+        
+        teamsChanged = !currentTeamsEqual || !pastTeamsEqual;
+        
+        console.log('📋 Проверка изменения команд:', {
+          teamsChanged,
+          currentChanged: !currentTeamsEqual,
+          pastChanged: !pastTeamsEqual,
+          savedCurrentCount: savedCurrentTeams.length,
+          newCurrentCount: currentTeamsForCompare.length,
+          savedPastCount: savedPastTeams.length,
+          newPastCount: pastTeamsForCompare.length
+        });
+      } catch (error) {
+        console.error('❌ Ошибка проверки изменения команд:', error);
+        teamsChanged = true; // На всякий случай считаем, что команды могли измениться
+      }
+      
+      // Выполняем операции параллельно для ускорения
       const [teamsSyncResult, refreshedPlayer, teams] = await Promise.all([
-        // Синхронизация команд
+        // Синхронизация команд (только если команды изменились)
         (async () => {
       try {
+        // Если команды не изменились, пропускаем синхронизацию
+        if (!teamsChanged) {
+          console.log('✅ Команды не изменились, пропускаем синхронизацию');
+          return { success: true };
+        }
+        
+        console.log('🔄 Команды изменились, выполняем синхронизацию...');
+        
         const { syncPlayerTeams, clearOldPastTeamsData, addTeamOrderField } = await import('../../utils/playerStorage');
         
         // Добавляем поле team_order если его еще нет (выполняется один раз)
@@ -1307,13 +1377,15 @@ export default function PlayerProfile() {
         console.error('❌ Ошибка подготовки уведомлений (не критично):', notifyError);
       }
       
-      // Обновляем состояние команд СРАЗУ после сохранения
-      if (teams && Array.isArray(teams)) {
+      // Обновляем состояние команд СРАЗУ после сохранения (только если команды изменились)
+      if (teamsChanged && teams && Array.isArray(teams)) {
         const currentTeams = teams.filter(team => team.isCurrent);
         const pastTeams = teams.filter(team => !team.isCurrent);
         
         setPlayerTeams(currentTeams);
         setPastTeams(pastTeams);
+      } else if (!teamsChanged) {
+        console.log('✅ Команды не изменились, пропускаем обновление состояния');
       } else {
         console.log('❌ Команды не загружены или не являются массивом:', teams);
       }
@@ -1363,21 +1435,23 @@ export default function PlayerProfile() {
       setIsEditing(false);
       showCustomAlert(t('common.success'), t('playerUpdated'), 'success');
       
-      // Дополнительное обновление команд через небольшую задержку для надежности
-      setTimeout(async () => {
-        try {
-          const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
-          const freshTeams = await getPlayerTeamsAsPastTeams(player.id);
-          if (freshTeams && Array.isArray(freshTeams)) {
-            const currentTeams = freshTeams.filter(team => team.isCurrent);
-            const pastTeams = freshTeams.filter(team => !team.isCurrent);
-        setPlayerTeams(currentTeams);
-        setPastTeams(pastTeams);
+      // Дополнительное обновление команд через небольшую задержку для надежности (только если команды изменились)
+      if (teamsChanged) {
+        setTimeout(async () => {
+          try {
+            const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
+            const freshTeams = await getPlayerTeamsAsPastTeams(player.id);
+            if (freshTeams && Array.isArray(freshTeams)) {
+              const currentTeams = freshTeams.filter(team => team.isCurrent);
+              const pastTeams = freshTeams.filter(team => !team.isCurrent);
+              setPlayerTeams(currentTeams);
+              setPastTeams(pastTeams);
+            }
+          } catch (error) {
+            console.error('❌ Ошибка дополнительного обновления команд:', error);
+          }
+        }, 500);
       }
-        } catch (error) {
-          console.error('❌ Ошибка дополнительного обновления команд:', error);
-        }
-      }, 500);
       
       // Отправляем все уведомления асинхронно
       if (notificationPromises.length > 0) {
