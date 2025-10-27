@@ -339,36 +339,36 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             if (distance < minDistance && distance > 0) {
               const angle = Math.atan2(dy, dx);
               
-              // ЖЕСТКАЯ ГРАНИЦА: принудительно отодвигаем шайбу на минимальное расстояние
-              const correctionDistance = minDistance - distance;
+              // Агрессивная коррекция позиции: отталкиваем сразу на безопасное расстояние
+              const correctionDistance = (minDistance - distance) * 1.2; // Добавляем 20% запаса
               newX += Math.cos(angle) * correctionDistance;
               newY += Math.sin(angle) * correctionDistance;
               
-              // ПРОСТАЯ ФИЗИКА: более плавное отталкивание на основе overlap
+              // Улучшенная физика отталкивания с более реалистичными силами
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.05 : 0.18)); // Еще более минимальная сила отталкивания для Android
+              const pushForce = overlap * (Platform.OS === 'ios' ? 1.0 : (Platform.OS === 'android' ? 0.4 : 0.5));
               
-              // ДОБАВЛЯЕМ ПЕРЕДАЧУ ИМПУЛЬСА: учитываем скорость движущейся шайбы
+              // Передача импульса при столкновении - более реалистично
               const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
+              const otherSpeed = Math.sqrt(otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy);
               
-              // Передаем импульс если текущая шайба движется (независимо от скорости другой)
-              if (currentSpeed > 0.3) {
-                const impulseTransfer = Math.min(currentSpeed * 0.4, 3.0); // Увеличиваем передачу импульса
+              // Передаем импульс в зависимости от скорости обеих шайб
+              if (currentSpeed > 0.3 || otherSpeed > 0.3) {
+                const combinedSpeed = (currentSpeed + otherSpeed) * 0.5;
+                const impulseTransfer = Math.min(combinedSpeed * 0.6, 4.0);
                 const impulseX = Math.cos(angle) * impulseTransfer;
                 const impulseY = Math.sin(angle) * impulseTransfer;
                 
-                // Другая шайба получает импульс от движущейся
-                velocityChanges[otherIndex].dvx += impulseX;
-                velocityChanges[otherIndex].dvy += impulseY;
-                
-                // Убираем логи передачи импульса для чистоты консоли
+                // Другая шайба получает импульс от текущей (в зависимости от кто сильнее)
+                velocityChanges[otherIndex].dvx += impulseX * (currentSpeed > otherSpeed ? 1.2 : 0.8);
+                velocityChanges[otherIndex].dvy += impulseY * (currentSpeed > otherSpeed ? 1.2 : 0.8);
               }
               
-              // Текущая шайба отталкивается от другой
+              // Текущая шайба отталкивается от другой с усилением при столкновении
               newVx += Math.cos(angle) * pushForce;
               newVy += Math.sin(angle) * pushForce;
               
-              // Другая шайба отталкивается от текущей (в обратном направлении) с той же силой
+              // Другая шайба отталкивается от текущей с той же силой
               velocityChanges[otherIndex].dvx -= Math.cos(angle) * pushForce;
               velocityChanges[otherIndex].dvy -= Math.sin(angle) * pushForce;
               
@@ -380,10 +380,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           });
           
           // Применяем изменения скорости от коллизий ПЕРЕД ограничениями
-          // Добавляем небольшое ускорение при столкновениях для динамичности
+          // Минимальное ускорение при столкновениях для плавности
           const hasCollision = velocityChanges[posIndex].dvx !== 0 || velocityChanges[posIndex].dvy !== 0;
           if (hasCollision) {
-            const speedBoost = 1.05; // 5% ускорение при столкновениях
+            const speedBoost = 1.02; // 2% ускорение при столкновениях - более плавно
             newVx *= speedBoost;
             newVy *= speedBoost;
           }
@@ -513,21 +513,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           hasCollision = true; // Обнаружено столкновение
           const angle = Math.atan2(dy, dx);
           
-          // ЖЕСТКАЯ ГРАНИЦА: отодвигаем перетаскиваемую шайбу
-          const targetDistance = minDistance;
-          const correctionDistance = targetDistance - distance;
+          // Агрессивная коррекция: отталкиваем перетаскиваемую шайбу
+          const correctionDistance = (minDistance - distance) * 1.2; // Добавляем 20% запаса
           adjustedX += Math.cos(angle) * correctionDistance;
           adjustedY += Math.sin(angle) * correctionDistance;
           
-          // ТОЛКАЕМ ДРУГУЮ ШАЙБУ только при реальном столкновении
-          // Но не при каждом движении пальца - только когда есть столкновение
-          const pushStrength = Platform.OS === 'ios' ? 0.8 : (Platform.OS === 'android' ? 0.1 : 0.2); // Еще более минимальная сила толчка для Android
+          // Улучшенная передача импульса при перетаскивании
+          const pushStrength = Platform.OS === 'ios' ? 0.5 : (Platform.OS === 'android' ? 0.3 : 0.4);
           
           // Вычисляем общую скорость перетаскивания
           const dragSpeed = Math.sqrt(vx * vx + vy * vy);
           
           // Толкаем только если есть реальная скорость (не при каждом движении пальца)
-          if (dragSpeed > 1.0) { // Еще больше увеличиваем порог для более точного толчка
+          if (dragSpeed > 0.5) { // Понижаем порог для более отзывчивого толчка
             // angle - это угол ОТ другой шайбы К перетаскиваемой
             // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
             const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
