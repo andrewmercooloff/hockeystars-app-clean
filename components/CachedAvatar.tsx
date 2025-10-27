@@ -27,6 +27,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   onError,
   onLoad,
 }) => {
+  // Используем useAvatarCache который подписывается на изменения через Realtime
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
@@ -39,11 +40,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     }
   }, [fallbackAvatarUrl]);
   
-  // Всегда используем fallbackAvatarUrl в первую очередь, так как он актуальнее
-  // cachedAvatarUrl может быть устаревшим
+  // Также отслеживаем изменения через Realtime (cachedAvatarUrl)
+  React.useEffect(() => {
+    if (cachedAvatarUrl && cachedAvatarUrl !== fallbackAvatarUrl) {
+      setUrlTimestamp(Date.now());
+    }
+  }, [cachedAvatarUrl, fallbackAvatarUrl]);
+  
+  // Всегда используем cachedAvatarUrl (из Realtime) в первую очередь, затем fallbackAvatarUrl
+  // cachedAvatarUrl обновляется автоматически через Realtime подписку
   const effectiveAvatarUrl = React.useMemo(() => {
-    // Предпочитаем fallbackAvatarUrl (актуальный из БД) перед cachedAvatarUrl
-    const url = fallbackAvatarUrl || cachedAvatarUrl;
+    // Предпочитаем cachedAvatarUrl (обновляется через Realtime) перед fallbackAvatarUrl
+    const url = cachedAvatarUrl || fallbackAvatarUrl;
     if (!url) return url;
     
     // Добавляем timestamp для обновления кеша expo-image

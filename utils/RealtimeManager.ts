@@ -61,7 +61,10 @@ class RealtimeManager {
       // 4. Подписка на запросы в друзья
       await this.setupFriendRequestsSubscription(userId);
       
-      // 5. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
+      // 5. Подписка на изменения аватаров всех игроков
+      await this.setupAvatarUpdateSubscription();
+      
+      // 6. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
       // await this.setupMessagesSubscription(userId);
 
       // console.log('✅ Realtime подписки настроены для пользователя:', userId);
@@ -209,6 +212,46 @@ class RealtimeManager {
     });
     
     // console.log('✅ Подписка на сообщения создана для пользователя:', userId);
+  }
+
+  /**
+   * Настраивает подписку на изменения аватаров всех игроков
+   */
+  private async setupAvatarUpdateSubscription(): Promise<void> {
+    const channel = supabase
+      .channel('players-avatar-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players'
+        },
+        async (payload) => {
+          const playerData = payload.new as any;
+          const playerId = playerData.id;
+          const newAvatar = playerData.avatar;
+          
+          console.log('🔄 Аватар игрока обновлен через Realtime:', { playerId, newAvatar });
+          
+          // Обновляем кеш аватара
+          if (newAvatar && playerId) {
+            try {
+              const { avatarCache } = await import('./AvatarCache');
+              await avatarCache.setAvatar(playerId, newAvatar);
+              console.log('✅ Аватар обновлен в кеше через Realtime');
+            } catch (error) {
+              console.error('❌ Ошибка обновления аватара в кеше:', error);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    this.subscriptions.set('players-avatar-updates', {
+      channel,
+      name: 'players-avatar-updates'
+    });
   }
 
   /**
