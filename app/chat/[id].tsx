@@ -182,8 +182,8 @@ export default function ChatScreen() {
         const otherPlayerData = await getPlayerById(id as string);
         const userData = await loadCurrentUser();
         
+        // Редирект убран - проверка авторизации происходит в _layout.tsx
         if (!userData) {
-          router.replace('/login');
           return;
         }
 

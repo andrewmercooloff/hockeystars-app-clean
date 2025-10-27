@@ -56,7 +56,6 @@ export default function MessagesScreen() {
   const loadChatsData = useCallback(async () => {
     try {
       if (!currentUser) {
-        router.replace('/login');
         return;
       }
 
@@ -260,13 +259,7 @@ export default function MessagesScreen() {
   };
 
 
-  // Если пользователь не авторизован (null), перенаправляем на логин
-  // Используем useEffect для безопасной навигации
-  React.useEffect(() => {
-    if (currentUser === null && !isUserLoading) {
-      router.replace('/login');
-    }
-  }, [currentUser, isUserLoading, router]);
+  // Редирект убран - проверка авторизации происходит в _layout.tsx
 
   // Если пользователь не авторизован, показываем loading
   if (currentUser === null) {

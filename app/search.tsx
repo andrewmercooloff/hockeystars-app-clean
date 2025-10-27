@@ -272,13 +272,6 @@ export default function SearchScreen() {
     // Запускаем загрузку только если currentUser определен и не null
     if (currentUser !== undefined && currentUser !== null) {
       loadData();
-    } else if (currentUser === null) {
-      // Если currentUser явно null, используем useEffect для безопасной навигации
-      React.useEffect(() => {
-        if (currentUser === null && !isUserLoading) {
-          router.replace('/login');
-        }
-      }, [currentUser, isUserLoading, router]);
     }
   }, [router, currentUser]);
 

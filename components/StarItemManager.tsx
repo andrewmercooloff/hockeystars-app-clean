@@ -78,8 +78,7 @@ export default function StarItemManager({ playerId, isEditing = false, onItemsUp
       const currentUser = await loadCurrentUser();
       
       if (!currentUser) {
-        // Убираем дублирующееся сообщение об ошибке - пользователь и так попадает на вход
-        router.replace('/login');
+        // Редирект убран - проверка авторизации происходит в _layout.tsx
         return;
       }
       

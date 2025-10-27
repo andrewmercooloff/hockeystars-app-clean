@@ -1751,13 +1751,14 @@ export const logoutUser = async (): Promise<void> => {
       console.error('❌ Ошибка обновления контекста пользователя:', contextError);
     }
     
-    // Принудительный редирект на страницу входа
-    try {
-      const { router } = await import('expo-router');
-      router.replace('/login');
-    } catch (routerError) {
-      console.error('❌ Ошибка редиректа:', routerError);
-    }
+    // Редирект убран - проверка авторизации происходит в _layout.tsx
+    // Попытка редиректа может вызвать ошибку навигации при выходе из профиля
+    // try {
+    //   const { router } = await import('expo-router');
+    //   router.replace('/login');
+    // } catch (routerError) {
+    //   console.error('❌ Ошибка редиректа:', routerError);
+    // }
     
   } catch (error) {
     console.error('❌ Ошибка выхода:', error);
