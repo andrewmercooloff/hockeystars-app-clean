@@ -1714,7 +1714,8 @@
     "giftRequests": "Dāvanu pieprasījumi"
   },
   "auth": {
-    "login": "Izejot uz ledus",
+    "exitToIce": "Izejot uz ledus",
+    "login": "Ielogoties",
     "register": "Reģistrācija",
     "phone": "Tālrunis",
     "phonePlaceholder": "+375296549728",

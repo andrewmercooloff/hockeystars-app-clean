@@ -1701,7 +1701,8 @@
     "giftRequests": "Žiadosti o darčeky"
   },
   "auth": {
-    "login": "Ísť na ľad",
+    "exitToIce": "Ísť na ľad",
+    "login": "Prihlásenie",
     "register": "Registrácia",
     "phone": "Telefón",
     "phonePlaceholder": "+375296549728",

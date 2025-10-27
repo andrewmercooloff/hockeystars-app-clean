@@ -1701,7 +1701,8 @@
     "giftRequests": "Gåvoförfrågningar"
   },
   "auth": {
-    "login": "Går ut på isen",
+    "exitToIce": "Går ut på isen",
+    "login": "Logga in",
     "register": "Registrering",
     "phone": "Telefon",
     "phonePlaceholder": "+375296549728",

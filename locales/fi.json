@@ -1701,7 +1701,8 @@
     "giftRequests": "Lahjapyynnöt"
   },
   "auth": {
-    "login": "Jäälle menossa",
+    "exitToIce": "Jäälle menossa",
+    "login": "Kirjaudu",
     "register": "Rekisteröinti",
     "phone": "Puhelin",
     "phonePlaceholder": "+375296549728",

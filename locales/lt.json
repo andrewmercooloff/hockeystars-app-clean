@@ -1714,7 +1714,8 @@
     "giftRequests": "Dovanų prašymai"
   },
   "auth": {
-    "login": "Išeinant ant ledo",
+    "exitToIce": "Išeinant ant ledo",
+    "login": "Prisijungti",
     "register": "Registracija",
     "phone": "Telefonas",
     "phonePlaceholder": "+375296549728",

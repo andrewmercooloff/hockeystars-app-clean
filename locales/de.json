@@ -1701,8 +1701,9 @@
     "giftRequests": "Geschenkwünsche"
   },
   "auth": {
-    "login": "Raus aufs Eis",
-    "register": "Anmeldung",
+    "exitToIce": "Raus aufs Eis",
+    "login": "Anmeldung",
+    "register": "Registrierung",
     "phone": "Telefon",
     "phonePlaceholder": "+375296549728",
     "phoneHint": "Geben Sie Ihre Telefonnummer mit Landesvorwahl ein",

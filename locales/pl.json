@@ -1486,7 +1486,8 @@
     "giftRequests": "Prośby o prezenty"
   },
   "auth": {
-    "login": "Wyjście na lód",
+    "exitToIce": "Wyjście na lód",
+    "login": "Logowanie",
     "register": "Rejestracja",
     "phone": "Telefon",
     "phonePlaceholder": "+375296549728",

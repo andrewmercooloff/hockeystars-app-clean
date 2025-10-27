@@ -1701,7 +1701,8 @@
     "giftRequests": "Žádosti o dárky"
   },
   "auth": {
-    "login": "Jít ven na led",
+    "exitToIce": "Jít ven na led",
+    "login": "Přihlášení",
     "register": "Registrace",
     "phone": "Telefon",
     "phonePlaceholder": "+375296549728",

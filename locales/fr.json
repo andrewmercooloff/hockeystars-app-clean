@@ -1701,7 +1701,8 @@
     "giftRequests": "Demandes de cadeaux"
   },
   "auth": {
-    "login": "Sortir sur la glace",
+    "exitToIce": "Sortir sur la glace",
+    "login": "Connexion",
     "register": "Inscription",
     "phone": "Téléphone",
     "phonePlaceholder": "+375296549728",

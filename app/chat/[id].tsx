@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
   },
   backButton: {
     marginRight: 12,
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -845,8 +845,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     maxHeight: 100,
-    borderWidth: 2,
-    borderColor: '#fa2f40',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.5)',
   },
   sendButton: {
     backgroundColor: '#fa2f40',
@@ -892,8 +892,8 @@ const styles = StyleSheet.create({
   dateHeaderText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'Gilroy-Bold',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    fontFamily: 'Gilroy-Regular',
+    backgroundColor: 'rgba(128, 128, 128, 0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,

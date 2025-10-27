@@ -1701,7 +1701,8 @@
     "giftRequests": "Richieste di regali"
   },
   "auth": {
-    "login": "Uscire sul ghiaccio",
+    "exitToIce": "Uscire sul ghiaccio",
+    "login": "Accesso",
     "register": "Registrazione",
     "phone": "Telefono",
     "phonePlaceholder": "+375296549728",
