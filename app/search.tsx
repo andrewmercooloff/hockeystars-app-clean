@@ -821,7 +821,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   searchSectionPattern: {
-    opacity: 0.15, // Полупрозрачный паттерн
+    opacity: 0.5, // Полупрозрачный паттерн
     resizeMode: 'repeat',
   },
   searchSectionOverlay: {
