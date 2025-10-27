@@ -39,9 +39,11 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     }
   }, [fallbackAvatarUrl]);
   
-  // Используем кешированный аватар или fallback, добавляя timestamp
+  // Всегда используем fallbackAvatarUrl в первую очередь, так как он актуальнее
+  // cachedAvatarUrl может быть устаревшим
   const effectiveAvatarUrl = React.useMemo(() => {
-    const url = cachedAvatarUrl || fallbackAvatarUrl;
+    // Предпочитаем fallbackAvatarUrl (актуальный из БД) перед cachedAvatarUrl
+    const url = fallbackAvatarUrl || cachedAvatarUrl;
     if (!url) return url;
     
     // Добавляем timestamp для обновления кеша expo-image
