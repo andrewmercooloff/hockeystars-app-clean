@@ -260,8 +260,8 @@ export default function SearchScreen() {
         
         // Загрузка игроков
         const allPlayers = await loadPlayers();
-        console.log('📊 Загружено игроков:', allPlayers.length);
-        console.log('🏒 Пример игрока с командами:', allPlayers.find(p => p.teams && p.teams.length > 0));
+        console.warn('📊 Загружено игроков:', allPlayers.length);
+        console.warn('🏒 Пример игрока с командами:', allPlayers.find(p => p.teams && p.teams.length > 0));
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
         const filteredPlayers = currentUser.status === 'admin' 
@@ -519,18 +519,18 @@ export default function SearchScreen() {
       // Фильтр по команде
       const matchesTeam = !selectedTeam || (() => {
         if (!player.teams || player.teams.length === 0) {
-          console.log(`🔍 Игрок ${player.name} не имеет команд`);
+          console.warn(`🔍 Игрок ${player.name} не имеет команд`);
           return false;
         }
         const hasTeam = player.teams.some(team => {
           const matches = team.teamId === selectedTeam;
           if (matches) {
-            console.log(`✅ Игрок ${player.name} найден в команде ${team.teamName} (ID: ${team.teamId})`);
+            console.warn(`✅ Игрок ${player.name} найден в команде ${team.teamName} (ID: ${team.teamId})`);
           }
           return matches;
         });
         if (!hasTeam) {
-          console.log(`❌ Игрок ${player.name} не найден в выбранной команде ${selectedTeam}`);
+          console.warn(`❌ Игрок ${player.name} не найден в выбранной команде ${selectedTeam}`);
         }
         return hasTeam;
       })();
@@ -753,8 +753,8 @@ export default function SearchScreen() {
               }))} 
               selectedValue={selectedTeam}
               onSelect={(value) => {
-                console.log('🎯 Выбрана команда:', value);
-                console.log('📋 Доступные команды в фильтре:', teams.map(t => `${t.name} (ID: ${t.id})`).join(', '));
+                console.warn('🎯 Выбрана команда:', value);
+                console.warn('📋 Доступные команды в фильтре:', teams.map(t => `${t.name} (ID: ${t.id})`).join(', '));
                 setSelectedTeam(value);
                 setActiveFilter(value ? 'team' : null);
               }}

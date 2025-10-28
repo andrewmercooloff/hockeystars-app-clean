@@ -1105,14 +1105,14 @@ export const loadPlayers = async (): Promise<Player[]> => {
       }
       
       // Загружаем команды для каждого игрока
-      console.log('🏒 Начинаем загрузку команд для всех игроков...');
+      console.warn('🏒 Начинаем загрузку команд для всех игроков...');
       try {
         const teamPromises = players.map(async (player) => {
           try {
             const teams = await getPlayerTeamsAsPastTeams(player.id);
-            console.log(`📊 Игрок ${player.name} (${player.id}) имеет ${teams.length} команд`);
+            console.warn(`📊 Игрок ${player.name} (${player.id}) имеет ${teams.length} команд`);
             if (teams.length > 0) {
-              console.log(`  - Команды:`, teams.map(t => `${t.teamName} (ID: ${t.id})`).join(', '));
+              console.warn(`  - Команды:`, teams.map(t => `${t.teamName} (ID: ${t.id})`).join(', '));
             }
             // Преобразуем PastTeam[] в PlayerTeam[] для совместимости
             player.teams = teams.map(team => ({
@@ -1135,7 +1135,7 @@ export const loadPlayers = async (): Promise<Player[]> => {
         });
         
         await Promise.all(teamPromises);
-        console.log('✅ Загрузка команд завершена');
+        console.warn('✅ Загрузка команд завершена');
       } catch (teamsError) {
         console.error('❌ Ошибка загрузки команд:', teamsError);
         // Устанавливаем пустые команды если не удалось загрузить
