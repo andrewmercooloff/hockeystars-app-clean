@@ -9,7 +9,8 @@ import {
     ImageBackground,
     Dimensions,
     Alert,
-    ScrollView
+    ScrollView,
+    Animated
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from '../components/CachedAvatar';
@@ -54,6 +55,8 @@ const FilterButton = React.memo(({
   teams?: any[]
 }) => {
   const { t, language } = useLanguage();
+  const [dropdownOpacity] = useState(new Animated.Value(0));
+  const [dropdownHeight] = useState(new Animated.Value(0));
 
   const toggleDropdown = useCallback(() => {
     onToggle(filterName);
@@ -61,8 +64,53 @@ const FilterButton = React.memo(({
 
   const handleSelect = useCallback((value: string | null) => {
     onSelect(value);
-    onToggle(filterName); // Закрываем фильтр после выбора
-  }, [onSelect, onToggle, filterName]);
+    // Плавно закрываем dropdown перед вызовом onToggle
+    Animated.parallel([
+      Animated.timing(dropdownOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(dropdownHeight, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      })
+    ]).start(() => {
+      onToggle(filterName); // Закрываем фильтр после завершения анимации
+    });
+  }, [onSelect, onToggle, filterName, dropdownOpacity, dropdownHeight]);
+
+  // Анимация открытия/закрытия dropdown
+  useEffect(() => {
+    if (isOpen) {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: 200, // Максимальная высота
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    }
+  }, [isOpen, dropdownOpacity, dropdownHeight]);
 
   return (
     <View style={[styles.filterContainer, isActive && styles.filterContainerActive]}>
@@ -111,8 +159,15 @@ const FilterButton = React.memo(({
         </Text>
       </TouchableOpacity>
       
-      {isOpen && (
-        <View style={[styles.filterDropdown, isActive && styles.filterDropdownActive]}>
+      {(isOpen || dropdownOpacity._value > 0) && (
+        <Animated.View style={[
+          styles.filterDropdown, 
+          isActive && styles.filterDropdownActive,
+          {
+            opacity: dropdownOpacity,
+            height: dropdownHeight,
+          }
+        ]}>
           <ScrollView 
             style={styles.filterDropdownScroll}
             showsVerticalScrollIndicator={false}
@@ -143,7 +198,7 @@ const FilterButton = React.memo(({
               );
             })}
           </ScrollView>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -1036,9 +1091,9 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
-    maxHeight: 200,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
+    overflow: 'hidden', // Важно для анимации высоты
   },
   filterDropdownActive: {
     zIndex: 10001,
