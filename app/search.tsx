@@ -568,7 +568,7 @@ export default function SearchScreen() {
       const matchesWeight = !selectedMinWeight || 
         (player.weight && parseInt(player.weight) >= parseInt(selectedMinWeight));
       
-      return matchesSearch && 
+      const matches = matchesSearch && 
              matchesCountry &&
              matchesTeam &&
              matchesHand && 
@@ -576,6 +576,15 @@ export default function SearchScreen() {
              matchesYear &&
              matchesHeight &&
              matchesWeight;
+      
+      // Логируем результат фильтрации для отладки
+      if (selectedTeam && matches) {
+        console.error(`✅ Игрок ${player.name} прошел фильтр команды ${selectedTeam}`);
+      } else if (selectedTeam && !matches) {
+        console.error(`❌ Игрок ${player.name} НЕ прошел фильтр команды ${selectedTeam}`);
+      }
+      
+      return matches;
     });
 
     // Сортируем по рейтингу активности (убывание)
