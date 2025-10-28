@@ -5562,3 +5562,107 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
     console.error('❌ Ошибка уведомления админов о регистрации:', error);
   }
 };
+
+/**
+ * Умный отбор игроков для главного экрана с ограничением количества
+ * @param players - все игроки
+ * @param currentUserId - ID текущего пользователя
+ * @param selectedCountry - выбранная страна (опционально)
+ * @param selectedYear - выбранный год (опционально)
+ * @returns отобранные игроки для отображения на главном экране
+ */
+export const getSmartPlayerSelection = (
+  players: Player[], 
+  currentUserId?: string,
+  selectedCountry?: string,
+  selectedYear?: number
+): Player[] => {
+  try {
+    // 1. Всегда показываем не-игроков (звезды, тренеры, магазины, заточка коньков, администраторы)
+    const nonPlayers = players.filter(player => 
+      player.status === 'star' || 
+      player.status === 'coach' || 
+      player.status === 'shop' || 
+      player.status === 'skateSharpening' || 
+      player.status === 'admin' ||
+      player.status === 'scout'
+    );
+
+    // 2. Фильтруем игроков по стране и году
+    const filteredPlayers = players.filter(player => {
+      if (player.status !== 'player') return false;
+      
+      // Фильтр по стране
+      const matchesCountry = !selectedCountry || player.country === selectedCountry;
+      
+      // Фильтр по году
+      const matchesYear = !selectedYear || 
+        (player.birthDate && player.birthDate.startsWith(selectedYear.toString()));
+      
+      return matchesCountry && matchesYear;
+    });
+
+    // 3. Всегда показываем текущего пользователя (если он игрок)
+    const currentUser = currentUserId ? filteredPlayers.find(p => p.id === currentUserId) : null;
+    const otherPlayers = filteredPlayers.filter(p => p.id !== currentUserId);
+
+    // 4. Новички (зарегистрировались в последние 5 дней) - до 5 человек
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    
+    const newcomers = otherPlayers
+      .filter(player => {
+        if (!player.createdAt) return false;
+        const createdAt = new Date(player.createdAt);
+        return createdAt >= fiveDaysAgo;
+      })
+      .sort((a, b) => {
+        // Сортируем по дате создания (новые сначала)
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      })
+      .slice(0, 5); // Берем только 5 новичков
+
+    // 5. Топ-10 игроков по рейтингу активности
+    const topPlayers = otherPlayers
+      .filter(player => !newcomers.some(n => n.id === player.id)) // Исключаем новичков
+      .sort((a, b) => (b.activityRating || 0) - (a.activityRating || 0))
+      .slice(0, 10);
+
+    // 6. Оставшиеся игроки для случайного выбора
+    const remainingPlayers = otherPlayers.filter(player => 
+      !newcomers.some(n => n.id === player.id) && 
+      !topPlayers.some(t => t.id === player.id)
+    );
+
+    // 7. Случайные игроки (до 10 человек)
+    const randomPlayers = remainingPlayers
+      .sort(() => Math.random() - 0.5) // Перемешиваем
+      .slice(0, 10);
+
+    // 8. Объединяем всех отобранных игроков
+    const selectedPlayers = [
+      ...nonPlayers,
+      ...(currentUser ? [currentUser] : []),
+      ...newcomers,
+      ...topPlayers,
+      ...randomPlayers
+    ];
+
+    // 9. Убираем дубликаты (на всякий случай)
+    const uniquePlayers = selectedPlayers.filter((player, index, self) => 
+      index === self.findIndex(p => p.id === player.id)
+    );
+
+    console.log(`🎯 Умный отбор игроков: ${uniquePlayers.length} из ${players.length}`);
+    console.log(`📊 Разбивка: не-игроки: ${nonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayers.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
+
+    return uniquePlayers;
+
+  } catch (error) {
+    console.error('❌ Ошибка умного отбора игроков:', error);
+    // В случае ошибки возвращаем всех игроков (fallback)
+    return players;
+  }
+};

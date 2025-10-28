@@ -24,7 +24,7 @@ import YearFilter from '../components/YearFilter';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryUtils';
-import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers } from '../utils/playerStorage';
+import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
@@ -817,84 +817,15 @@ export default function HomeScreen() {
 
 
 
-  // Фильтрация игроков
-  const filteredPlayers = useMemo(() => {
-    const filtered = players.filter(player => {
-      // Администратор всегда виден
-      if (player.status === 'admin') return true;
-    
-    // Фильтр по стране
-      const matchesCountry = !selectedCountry || player.country === selectedCountry;
-      
-      // Фильтр по году (только для игроков и звезд, у которых есть birthDate)
-      const matchesYear = !selectedYear || 
-        (player.birthDate && player.birthDate.startsWith(selectedYear.toString())) ||
-        // Для заточки коньков, магазинов и скаутов показываем во всех годах
-        (player.status === 'skateSharpening' || player.status === 'shop' || player.status === 'scout');
-      
-      return matchesCountry && matchesYear;
-    });
-
-    return filtered;
-  }, [players, selectedCountry, selectedYear]);
-
-  // Объединяем отфильтрованных игроков с тренерами, звездами и магазинами
+  // Умный отбор игроков с ограничением количества
   const allVisiblePlayers = useMemo(() => {
-    const filtered = [...filteredPlayers];
-    
-    // Добавляем тренеров - только если их страна совпадает И год тренировки подходит
-    const coachesList = players.filter(player => {
-      if (player.status !== 'coach') return false;
-      
-      // Проверяем страну
-      const matchesCountry = !selectedCountry || player.country === selectedCountry;
-      if (!matchesCountry) return false;
-      
-      // Проверяем год - если у тренера есть coach_years, показываем только в этих годах
-      if (player.coach_years && Array.isArray(player.coach_years) && player.coach_years.length > 0) {
-        // Если выбран год, проверяем что он есть в списке годов тренера
-        if (selectedYear) {
-          const yearNum = typeof selectedYear === 'string' ? parseInt(selectedYear) : selectedYear;
-          const isIncluded = player.coach_years.includes(yearNum);
-          return isIncluded;
-        }
-        // Если год не выбран, не показываем тренера
-        return false;
-      }
-      
-      // Если у тренера нет coach_years, показываем его везде (для обратной совместимости)
-      return true;
-    });
-    
-    // Добавляем звезд только если их страна совпадает с выбранной
-    const starsList = players.filter(player => 
-      player.status === 'star' &&
-      (!selectedCountry || player.country === selectedCountry)
+    return getSmartPlayerSelection(
+      players, 
+      currentUser?.id,
+      selectedCountry,
+      selectedYear
     );
-    
-    // Объединяем тренеров и звезд
-    const coachesAndStarsList = [...coachesList, ...starsList];
-    
-    // Добавляем магазины - они отображаются во всех возрастных категориях для своего региона
-    const shopsList = players.filter(player => 
-      player.status === 'shop' &&
-      (!selectedCountry || player.country === selectedCountry)
-    );
-    
-    coachesAndStarsList.forEach(player => {
-      if (!filtered.find(p => p.id === player.id)) {
-        filtered.push(player);
-      }
-    });
-    
-    shopsList.forEach(player => {
-      if (!filtered.find(p => p.id === player.id)) {
-        filtered.push(player);
-      }
-    });
-    
-    return filtered;
-  }, [filteredPlayers, players, selectedCountry]);
+  }, [players, currentUser?.id, selectedCountry, selectedYear]);
 
   // Автоматически сбрасываем фильтр по годам, если в выбранной стране нет игроков указанного года
   useEffect(() => {
@@ -1190,7 +1121,7 @@ export default function HomeScreen() {
         )}
 
         {/* Показываем сообщение, если нет игроков по выбранным фильтрам */}
-        {isConnected && filteredPlayers.length === 0 && (selectedCountry || selectedYear) && (
+        {isConnected && allVisiblePlayers.length === 0 && (selectedCountry || selectedYear) && (
           <View style={styles.noPlayersContainer}>
             <Text style={styles.noPlayersText}>
               {selectedCountry && selectedYear 
