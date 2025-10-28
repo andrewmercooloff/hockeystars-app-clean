@@ -15,9 +15,8 @@ interface StatChange {
 interface StatsChangeNotificationProps {
   changes: StatChange[];
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   timestamp: number;
-  playerAvatar?: string | null;
 }
 
 const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
@@ -80,7 +79,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

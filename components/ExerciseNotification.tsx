@@ -6,10 +6,9 @@ import CachedAvatar from './CachedAvatar';
 
 interface ExerciseNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId: string;
   exerciseId: string;
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 export default function ExerciseNotification({

@@ -13,7 +13,6 @@ interface FriendGiftReceivedNotificationProps {
     data: {
       playerId: string;
       playerName: string;
-      playerAvatar: string | null;
       starName: string;
       giftName: string;
     };
@@ -64,7 +63,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
         ) : (
           <CachedAvatar
             playerId={notification.data.playerId}
-            fallbackAvatarUrl={playerAvatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

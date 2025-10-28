@@ -6,7 +6,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface GiftRequestNotificationProps {
   playerName: string;
   timestamp: string;
-  playerAvatar?: string | null;
   itemType: string;
   requestMessage: string;
   onGift: () => void;

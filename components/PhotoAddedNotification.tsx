@@ -6,10 +6,9 @@ import CachedAvatar from './CachedAvatar';
 
 interface PhotoAddedNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   photosCount: number;
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
@@ -53,7 +52,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

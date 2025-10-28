@@ -6,9 +6,8 @@ import CachedAvatar from './CachedAvatar';
 
 interface FriendRequestNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   timestamp: string;
-  playerAvatar?: string | null;
   onAccept: () => void;
   onDecline: () => void;
 }
@@ -47,7 +46,7 @@ export default function FriendRequestNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

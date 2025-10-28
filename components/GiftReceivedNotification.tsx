@@ -9,7 +9,6 @@ interface GiftReceivedNotificationProps {
   giftName: string;
   giftType: string;
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 export default function GiftReceivedNotification({

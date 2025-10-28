@@ -6,10 +6,9 @@ import CachedAvatar from './CachedAvatar';
 
 interface FriendAcceptedNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   message: string;
   timestamp: string | number;
-  playerAvatar?: string | null;
 }
 
 export default function FriendAcceptedNotification({
@@ -42,7 +41,7 @@ export default function FriendAcceptedNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

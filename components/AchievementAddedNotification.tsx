@@ -6,10 +6,9 @@ import CachedAvatar from './CachedAvatar';
 
 interface AchievementAddedNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   achievementsCount: number;
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 const AchievementAddedNotification = React.memo(function AchievementAddedNotification({
@@ -53,7 +52,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />

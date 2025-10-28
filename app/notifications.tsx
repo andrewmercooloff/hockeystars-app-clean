@@ -157,7 +157,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               photosCount={notification.data.addedPhotosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'new_friendship' ? (
@@ -194,7 +193,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.playerId}
               exerciseId={notification.data.exerciseId || 'unknown'}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'gift_received' ? (
@@ -209,7 +207,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               giftName={notification.data.giftName || 'Подарок'}
               giftType={notification.data.giftType || 'gift'}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'friend_gift_received' ? (
@@ -227,7 +224,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 data: {
                   playerId: notification.data?.playerId || '',
                   playerName: notification.data?.playerName || 'Игрок',
-                  playerAvatar: notification.data?.playerAvatar || null,
                   starName: notification.data?.starName || 'Звезда',
                   giftName: notification.data?.giftName || 'Подарок',
                 }
@@ -247,7 +243,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data?.acceptor_id}
               message={notification.message}
               timestamp={notification.timestamp}
-              playerAvatar={notification.data?.acceptor_avatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'gift_accepted' ? (
@@ -272,7 +267,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               videosCount={notification.data.addedVideosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'avatar_changed' ? (
@@ -285,7 +279,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'achievement_added' ? (
@@ -299,7 +292,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               achievementsCount={notification.data.addedAchievementsCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'physical_data_changed' ? (
@@ -313,7 +305,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               changes={notification.data.changes || []}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : (

@@ -6,18 +6,16 @@ import CachedAvatar from './CachedAvatar';
 
 interface PhysicalDataChangedNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId: string;
   changes: { field: 'height' | 'weight', oldValue: number, newValue: number }[];
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedNotification({
   playerName,
   playerId,
   changes,
-  timestamp,
-  playerAvatar
+  timestamp
 }: PhysicalDataChangedNotificationProps) {
   const { t } = useLanguage();
 
@@ -54,16 +52,12 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
-          <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
-            size={50}
-            style={styles.playerAvatar}
-          />
-        ) : (
-          <Ionicons name="body-outline" size={24} color="#fff" />
-        )}
+        <CachedAvatar
+          playerId={playerId}
+          fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+          size={50}
+          style={styles.playerAvatar}
+        />
       </View>
       
       <View style={styles.contentContainer}>

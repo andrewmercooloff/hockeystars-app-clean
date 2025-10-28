@@ -6,10 +6,9 @@ import CachedAvatar from './CachedAvatar';
 
 interface VideoAddedNotificationProps {
   playerName: string;
-  playerId?: string; // Добавляем playerId для кеширования
+  playerId?: string;
   videosCount: number;
   timestamp: string;
-  playerAvatar?: string | null;
 }
 
 const VideoAddedNotification = React.memo(function VideoAddedNotification({
@@ -53,7 +52,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
             size={50}
             style={styles.playerAvatar}
           />
