@@ -753,6 +753,8 @@ export default function SearchScreen() {
               }))} 
               selectedValue={selectedTeam}
               onSelect={(value) => {
+                console.log('🎯 Выбрана команда:', value);
+                console.log('📋 Доступные команды в фильтре:', teams.map(t => `${t.name} (ID: ${t.id})`).join(', '));
                 setSelectedTeam(value);
                 setActiveFilter(value ? 'team' : null);
               }}
