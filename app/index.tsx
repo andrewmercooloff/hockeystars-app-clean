@@ -822,8 +822,8 @@ export default function HomeScreen() {
     return getSmartPlayerSelection(
       players, 
       currentUser?.id,
-      selectedCountry,
-      selectedYear
+      selectedCountry || undefined,
+      selectedYear || undefined
     );
   }, [players, currentUser?.id, selectedCountry, selectedYear]);
 
@@ -1005,7 +1005,7 @@ export default function HomeScreen() {
       console.error('❌ Ошибка инициализации приложения:', error);
       setLoading(false);
     }
-  }, [selectedCountry, selectedYear, setSelectedCountry, setSelectedYear]);
+  }, []); // Убираем зависимости, чтобы избежать циклов
 
   // Отслеживание подключения к интернету
   useEffect(() => {
@@ -1022,11 +1022,11 @@ export default function HomeScreen() {
     });
 
     return () => unsubscribe();
-  }, [players.length, loading, initializeApp]);
+  }, [players.length, loading]);
 
   useEffect(() => {
     initializeApp();
-  }, [initializeApp]);
+  }, []); // Запускаем только один раз при монтировании
 
   useFocusEffect(
     useCallback(() => {
