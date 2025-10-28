@@ -262,10 +262,6 @@ export default function SearchScreen() {
         // Загрузка игроков
         const allPlayers = await loadPlayers();
         console.error('📊 Загружено игроков:', allPlayers.length);
-        console.error('🏒 Пример игрока с командами:', allPlayers.find(p => p.teams && p.teams.length > 0));
-        
-        // Показываем Alert для отладки
-        Alert.alert('Отладка', `Загружено игроков: ${allPlayers.length}`);
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
         const filteredPlayers = currentUser.status === 'admin' 
@@ -745,110 +741,110 @@ export default function SearchScreen() {
 
             {/* Контейнер фильтров */}
             <View style={styles.filtersContainer}>
-            <FilterButton 
-              title={t('search.country')} 
-              options={countries} 
-              selectedValue={selectedCountry}
-              onSelect={(value) => {
-                setSelectedCountry(value);
-                setActiveFilter(value ? 'country' : null);
-              }}
-              isActive={activeFilter === 'country'}
-              filterName="country"
-              isOpen={isFilterOpen('country')}
-              onToggle={toggleFilter}
-              countries={countries}
-            />
-            <FilterButton 
-              title={t('search.team')} 
-              options={teams.map(team => ({
-                translated: language === 'ru' ? (team.name_ru || team.name) : team.name,
-                original: team.id
-              }))} 
-              selectedValue={selectedTeam}
-              onSelect={(value) => {
-                console.error('🎯 Выбрана команда:', value);
-                console.error('📋 Доступные команды в фильтре:', teams.map(t => `${t.name} (ID: ${t.id})`).join(', '));
-                
-                // Показываем Alert для отладки
-                const selectedTeamName = teams.find(t => t.id === value)?.name || 'Неизвестная команда';
-                Alert.alert('Выбор команды', `Выбрана команда: ${selectedTeamName}\nID: ${value}`);
-                
-                setSelectedTeam(value);
-                setActiveFilter(value ? 'team' : null);
-              }}
-              isActive={activeFilter === 'team'}
-              filterName="team"
-              isOpen={isFilterOpen('team')}
-              onToggle={toggleFilter}
-              teams={teams}
-            />
-            <FilterButton 
-              title={t('search.grip')} 
-              options={hands} 
-              selectedValue={selectedHand}
-              onSelect={(value) => {
-                setSelectedHand(value);
-                setActiveFilter(value ? 'grip' : null);
-              }}
-              isActive={activeFilter === 'grip'}
-              filterName="grip"
-              isOpen={isFilterOpen('grip')}
-              onToggle={toggleFilter}
-            />
-            <FilterButton 
-              title={t('search.position')} 
-              options={positions} 
-              selectedValue={selectedPosition}
-              onSelect={(value) => {
-                setSelectedPosition(value);
-                setActiveFilter(value ? 'position' : null);
-              }}
-              isActive={activeFilter === 'position'}
-              filterName="position"
-              isOpen={isFilterOpen('position')}
-              onToggle={toggleFilter}
-              positions={positions}
-            />
-            <FilterButton 
-              title={t('search.year')} 
-              options={years} 
-              selectedValue={selectedYear}
-              onSelect={(value) => {
-                setSelectedYear(value);
-                setActiveFilter(value ? 'year' : null);
-              }}
-              isActive={activeFilter === 'year'}
-              filterName="year"
-              isOpen={isFilterOpen('year')}
-              onToggle={toggleFilter}
-            />
-            <FilterButton 
-              title={t('search.heightFrom')} 
-              options={heights} 
-              selectedValue={selectedMinHeight}
-              onSelect={(value) => {
-                setSelectedMinHeight(value);
-                setActiveFilter(value ? 'height' : null);
-              }}
-              isActive={activeFilter === 'height'}
-              filterName="height"
-              isOpen={isFilterOpen('height')}
-              onToggle={toggleFilter}
-            />
-            <FilterButton 
-              title={t('search.weightFrom')} 
-              options={weights} 
-              selectedValue={selectedMinWeight}
-              onSelect={(value) => {
-                setSelectedMinWeight(value);
-                setActiveFilter(value ? 'weight' : null);
-              }}
-              isActive={activeFilter === 'weight'}
-              filterName="weight"
-              isOpen={isFilterOpen('weight')}
-              onToggle={toggleFilter}
-            />
+              {/* Первая строка: Страна, Команда, Позиция */}
+              <View style={styles.filterRow}>
+                <FilterButton 
+                  title={t('search.country')} 
+                  options={countries} 
+                  selectedValue={selectedCountry}
+                  onSelect={(value) => {
+                    setSelectedCountry(value);
+                    setActiveFilter(value ? 'country' : null);
+                  }}
+                  isActive={activeFilter === 'country'}
+                  filterName="country"
+                  isOpen={isFilterOpen('country')}
+                  onToggle={toggleFilter}
+                  countries={countries}
+                />
+                <FilterButton 
+                  title={t('search.team')} 
+                  options={teams.map(team => ({
+                    translated: language === 'ru' ? (team.name_ru || team.name) : team.name,
+                    original: team.id
+                  }))} 
+                  selectedValue={selectedTeam}
+                  onSelect={(value) => {
+                    setSelectedTeam(value);
+                    setActiveFilter(value ? 'team' : null);
+                  }}
+                  isActive={activeFilter === 'team'}
+                  filterName="team"
+                  isOpen={isFilterOpen('team')}
+                  onToggle={toggleFilter}
+                  teams={teams}
+                />
+                <FilterButton 
+                  title={t('search.position')} 
+                  options={positions} 
+                  selectedValue={selectedPosition}
+                  onSelect={(value) => {
+                    setSelectedPosition(value);
+                    setActiveFilter(value ? 'position' : null);
+                  }}
+                  isActive={activeFilter === 'position'}
+                  filterName="position"
+                  isOpen={isFilterOpen('position')}
+                  onToggle={toggleFilter}
+                  positions={positions}
+                />
+              </View>
+
+              {/* Вторая строка: Год, Хват, Рост, Вес */}
+              <View style={styles.filterRow}>
+                <FilterButton 
+                  title={t('search.year')} 
+                  options={years} 
+                  selectedValue={selectedYear}
+                  onSelect={(value) => {
+                    setSelectedYear(value);
+                    setActiveFilter(value ? 'year' : null);
+                  }}
+                  isActive={activeFilter === 'year'}
+                  filterName="year"
+                  isOpen={isFilterOpen('year')}
+                  onToggle={toggleFilter}
+                />
+                <FilterButton 
+                  title={t('search.grip')} 
+                  options={hands} 
+                  selectedValue={selectedHand}
+                  onSelect={(value) => {
+                    setSelectedHand(value);
+                    setActiveFilter(value ? 'grip' : null);
+                  }}
+                  isActive={activeFilter === 'grip'}
+                  filterName="grip"
+                  isOpen={isFilterOpen('grip')}
+                  onToggle={toggleFilter}
+                />
+                <FilterButton 
+                  title={t('search.heightFrom')} 
+                  options={heights} 
+                  selectedValue={selectedMinHeight}
+                  onSelect={(value) => {
+                    setSelectedMinHeight(value);
+                    setActiveFilter(value ? 'height' : null);
+                  }}
+                  isActive={activeFilter === 'height'}
+                  filterName="height"
+                  isOpen={isFilterOpen('height')}
+                  onToggle={toggleFilter}
+                />
+                <FilterButton 
+                  title={t('search.weightFrom')} 
+                  options={weights} 
+                  selectedValue={selectedMinWeight}
+                  onSelect={(value) => {
+                    setSelectedMinWeight(value);
+                    setActiveFilter(value ? 'weight' : null);
+                  }}
+                  isActive={activeFilter === 'weight'}
+                  filterName="weight"
+                  isOpen={isFilterOpen('weight')}
+                  onToggle={toggleFilter}
+                />
+              </View>
             </View>
             </View>
           </View>
@@ -982,20 +978,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   filtersContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     paddingHorizontal: 0,
     marginTop: 8,
     marginBottom: 0,
     zIndex: 1000,
     elevation: 1000,
-    minHeight: 80,
     position: 'relative',
   },
-  filterContainer: {
-    width: '30%',
+  filterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10,
+  },
+  filterContainer: {
+    flex: 1,
+    marginHorizontal: 2,
     zIndex: 1000,
     elevation: 1000,
     position: 'relative',
