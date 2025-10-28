@@ -23,7 +23,7 @@ export default function YearFilter({ players }: { players: any[] }) {
 
   // Анимированные значения для dropdown
   const [dropdownOpacity] = useState(new Animated.Value(0));
-  const [dropdownHeight] = useState(new Animated.Value(0));
+  const [dropdownScale] = useState(new Animated.Value(0));
 
   // Получаем доступные годы рождения (только те, для которых есть игроки)
   const availableYears = useMemo(() => {
@@ -80,15 +80,15 @@ export default function YearFilter({ players }: { players: any[] }) {
         duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(dropdownHeight, {
+      Animated.timing(dropdownScale, {
         toValue: 0,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: true,
       })
     ]).start(() => {
       setShowYearFilter(false); // Закрываем фильтр после завершения анимации
     });
-  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownHeight]);
+  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownScale]);
 
   const handleFilterToggle = useCallback(() => {
     setShowYearFilter(!showYearFilter);
@@ -103,10 +103,10 @@ export default function YearFilter({ players }: { players: any[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
-          toValue: availableYears.length * 30, // Примерная высота на основе количества лет
+        Animated.timing(dropdownScale, {
+          toValue: 1,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     } else {
@@ -116,14 +116,14 @@ export default function YearFilter({ players }: { players: any[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
+        Animated.timing(dropdownScale, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     }
-  }, [showYearFilter, dropdownOpacity, dropdownHeight, availableYears.length]);
+  }, [showYearFilter, dropdownOpacity, dropdownScale]);
 
   return (
     <View style={styles.container}>
@@ -139,12 +139,12 @@ export default function YearFilter({ players }: { players: any[] }) {
         </Text>
       </TouchableOpacity>
 
-      {(showYearFilter || dropdownOpacity._value > 0) && (
+      {showYearFilter && (
         <Animated.View style={[
           styles.yearsList,
           {
             opacity: dropdownOpacity,
-            height: dropdownHeight,
+            transform: [{ scaleY: dropdownScale }],
           }
         ]}>
           {availableYears.map(({ year }, index) => {
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
-    overflow: 'hidden', // Важно для анимации высоты
+    transformOrigin: 'top', // Важно для правильной анимации scaleY
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени

@@ -56,7 +56,7 @@ const FilterButton = React.memo(({
 }) => {
   const { t, language } = useLanguage();
   const [dropdownOpacity] = useState(new Animated.Value(0));
-  const [dropdownHeight] = useState(new Animated.Value(0));
+  const [dropdownScale] = useState(new Animated.Value(0));
 
   const toggleDropdown = useCallback(() => {
     onToggle(filterName);
@@ -71,15 +71,15 @@ const FilterButton = React.memo(({
         duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(dropdownHeight, {
+      Animated.timing(dropdownScale, {
         toValue: 0,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: true,
       })
     ]).start(() => {
       onToggle(filterName); // Закрываем фильтр после завершения анимации
     });
-  }, [onSelect, onToggle, filterName, dropdownOpacity, dropdownHeight]);
+  }, [onSelect, onToggle, filterName, dropdownOpacity, dropdownScale]);
 
   // Анимация открытия/закрытия dropdown
   useEffect(() => {
@@ -90,10 +90,10 @@ const FilterButton = React.memo(({
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
-          toValue: 200, // Максимальная высота
+        Animated.timing(dropdownScale, {
+          toValue: 1,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     } else {
@@ -103,14 +103,14 @@ const FilterButton = React.memo(({
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
+        Animated.timing(dropdownScale, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     }
-  }, [isOpen, dropdownOpacity, dropdownHeight]);
+  }, [isOpen, dropdownOpacity, dropdownScale]);
 
   return (
     <View style={[styles.filterContainer, isActive && styles.filterContainerActive]}>
@@ -159,13 +159,13 @@ const FilterButton = React.memo(({
         </Text>
       </TouchableOpacity>
       
-      {(isOpen || dropdownOpacity._value > 0) && (
+      {isOpen && (
         <Animated.View style={[
           styles.filterDropdown, 
           isActive && styles.filterDropdownActive,
           {
             opacity: dropdownOpacity,
-            height: dropdownHeight,
+            transform: [{ scaleY: dropdownScale }],
           }
         ]}>
           <ScrollView 
@@ -1093,7 +1093,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-    overflow: 'hidden', // Важно для анимации высоты
+    maxHeight: 200, // Фиксированная максимальная высота
   },
   filterDropdownActive: {
     zIndex: 10001,

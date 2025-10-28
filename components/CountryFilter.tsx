@@ -22,7 +22,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
 
   // Анимированные значения для dropdown
   const [dropdownOpacity] = useState(new Animated.Value(0));
-  const [dropdownHeight] = useState(new Animated.Value(0));
+  const [dropdownScale] = useState(new Animated.Value(0));
 
   // Получаем уникальные страны из игроков
   const countries = useMemo(() => {
@@ -40,15 +40,15 @@ export default function CountryFilter({ players }: { players: Player[] }) {
         duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(dropdownHeight, {
+      Animated.timing(dropdownScale, {
         toValue: 0,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: true,
       })
     ]).start(() => {
       setShowCountryFilter(false); // Закрываем фильтр после завершения анимации
     });
-  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownHeight]);
+  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownScale]);
 
   const handleFilterToggle = useCallback(() => {
     setShowCountryFilter(!showCountryFilter);
@@ -63,10 +63,10 @@ export default function CountryFilter({ players }: { players: Player[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
-          toValue: countries.length * 30, // Примерная высота на основе количества стран
+        Animated.timing(dropdownScale, {
+          toValue: 1,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     } else {
@@ -76,14 +76,14 @@ export default function CountryFilter({ players }: { players: Player[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownHeight, {
+        Animated.timing(dropdownScale, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         })
       ]).start();
     }
-  }, [showCountryFilter, dropdownOpacity, dropdownHeight, countries.length]);
+  }, [showCountryFilter, dropdownOpacity, dropdownScale]);
 
   // Мемоизируем текст кнопки
   const filterButtonText = useMemo(() => {
@@ -104,12 +104,12 @@ export default function CountryFilter({ players }: { players: Player[] }) {
         </Text>
       </TouchableOpacity>
 
-      {(showCountryFilter || dropdownOpacity._value > 0) && (
+      {showCountryFilter && (
         <Animated.View style={[
           styles.countriesList,
           {
             opacity: dropdownOpacity,
-            height: dropdownHeight,
+            transform: [{ scaleY: dropdownScale }],
           }
         ]}>
           {countries.map((country, index) => {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
-    overflow: 'hidden', // Важно для анимации высоты
+    transformOrigin: 'top', // Важно для правильной анимации scaleY
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени
