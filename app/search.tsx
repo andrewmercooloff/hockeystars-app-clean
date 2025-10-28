@@ -37,7 +37,8 @@ const FilterButton = React.memo(({
   isOpen,
   onToggle,
   positions,
-  countries
+  countries,
+  teams
 }: { 
   title: string, 
   options: any[], 
@@ -48,7 +49,8 @@ const FilterButton = React.memo(({
   isOpen: boolean,
   onToggle: (filterName: string) => void,
   positions?: any[],
-  countries?: any[]
+  countries?: any[],
+  teams?: any[]
 }) => {
   const { t, language } = useLanguage();
 
@@ -70,6 +72,15 @@ const FilterButton = React.memo(({
         <Text style={styles.filterButtonText}>
           {(() => {
             if (selectedValue) {
+              // Для команд нужно найти название по ID
+              if (title === t('search.team') && teams) {
+                const teamMapping = teams.find(t => t.id === selectedValue);
+                if (teamMapping) {
+                  return teamMapping.name;
+                }
+                return selectedValue;
+              }
+              
               // Для позиций нужно найти переведенное название
               if (title === t('search.position') && positions) {
                 const positionMapping = positions.find(p => p.original === selectedValue);
@@ -736,6 +747,7 @@ export default function SearchScreen() {
               filterName="team"
               isOpen={isFilterOpen('team')}
               onToggle={toggleFilter}
+              teams={teams}
             />
             <FilterButton 
               title={t('search.grip')} 
