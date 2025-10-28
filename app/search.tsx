@@ -261,7 +261,6 @@ export default function SearchScreen() {
         
         // Загрузка игроков
         const allPlayers = await loadPlayers();
-        console.error('📊 Загружено игроков:', allPlayers.length);
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
         const filteredPlayers = currentUser.status === 'admin' 
@@ -508,7 +507,6 @@ export default function SearchScreen() {
 
   // Фильтрация и сортировка игроков
   const filteredPlayers = useMemo(() => {
-    console.error('🔄 useMemo пересчитывается! selectedTeam:', selectedTeam);
     const filtered = players.filter(player => {
       // Фильтр по поиску
       const matchesSearch = !searchQuery || 
@@ -574,12 +572,6 @@ export default function SearchScreen() {
              matchesHeight &&
              matchesWeight;
       
-      // Логируем результат фильтрации для отладки
-      if (selectedTeam && matches) {
-        console.error(`✅ Игрок ${player.name} прошел фильтр команды ${selectedTeam}`);
-      } else if (selectedTeam && !matches) {
-        console.error(`❌ Игрок ${player.name} НЕ прошел фильтр команды ${selectedTeam}`);
-      }
       
       return matches;
     });
