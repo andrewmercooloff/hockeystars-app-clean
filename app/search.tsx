@@ -981,10 +981,11 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 0,
     marginTop: 8,
-    marginBottom: 0,
+    marginBottom: 15, // Добавляем отступ снизу
     zIndex: 1000,
     elevation: 1000,
     position: 'relative',
+    minHeight: 100, // Минимальная высота для контейнера фильтров
   },
   filterRow: {
     flexDirection: 'row',
