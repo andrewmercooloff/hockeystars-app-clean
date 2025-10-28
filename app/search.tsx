@@ -981,11 +981,10 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 0,
     marginTop: 8,
-    marginBottom: 15, // Добавляем отступ снизу
+    marginBottom: 0,
     zIndex: 1000,
     elevation: 1000,
     position: 'relative',
-    minHeight: 100, // Минимальная высота для контейнера фильтров
   },
   filterRow: {
     flexDirection: 'row',
@@ -1073,7 +1072,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     zIndex: 1,
     elevation: 1,
-    marginTop: 200, // Отступ для поиска и фильтров
+    marginTop: 210, // Отступ для поиска и фильтров + 10px
   },
   playerItem: {
     flexDirection: 'row',
