@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-    Platform
+    Platform,
+    Animated
 } from 'react-native';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
@@ -19,6 +20,10 @@ export default function YearFilter({ players }: { players: any[] }) {
     setShowYearFilter 
   } = useYearFilter();
   const { selectedCountry } = useCountryFilter();
+
+  // Анимированные значения для dropdown
+  const [dropdownOpacity] = useState(new Animated.Value(0));
+  const [dropdownHeight] = useState(new Animated.Value(0));
 
   // Получаем доступные годы рождения (только те, для которых есть игроки)
   const availableYears = useMemo(() => {
@@ -66,16 +71,65 @@ export default function YearFilter({ players }: { players: any[] }) {
     return years;
   }, [players, selectedCountry]);
 
-  const handleYearSelect = (year: number) => {
+  const handleYearSelect = useCallback((year: number) => {
     setSelectedYear(year);
-    setShowYearFilter(false);
-  };
+    // Плавно закрываем dropdown перед вызовом setShowYearFilter
+    Animated.parallel([
+      Animated.timing(dropdownOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(dropdownHeight, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      })
+    ]).start(() => {
+      setShowYearFilter(false); // Закрываем фильтр после завершения анимации
+    });
+  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownHeight]);
+
+  const handleFilterToggle = useCallback(() => {
+    setShowYearFilter(!showYearFilter);
+  }, [showYearFilter, setShowYearFilter]);
+
+  // Анимация открытия/закрытия dropdown
+  useEffect(() => {
+    if (showYearFilter) {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: availableYears.length * 30, // Примерная высота на основе количества лет
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    }
+  }, [showYearFilter, dropdownOpacity, dropdownHeight, availableYears.length]);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.filterButton}
-        onPress={() => setShowYearFilter(!showYearFilter)}
+        onPress={handleFilterToggle}
       >
         <Text style={styles.filterButtonText}>
           {selectedYear ? `${selectedYear}` : t('filters.yearDefault')}
@@ -85,8 +139,14 @@ export default function YearFilter({ players }: { players: any[] }) {
         </Text>
       </TouchableOpacity>
 
-      {showYearFilter && (
-        <View style={styles.yearsList}>
+      {(showYearFilter || dropdownOpacity._value > 0) && (
+        <Animated.View style={[
+          styles.yearsList,
+          {
+            opacity: dropdownOpacity,
+            height: dropdownHeight,
+          }
+        ]}>
           {availableYears.map(({ year }, index) => {
             const isSelected = selectedYear === year;
             const isFirst = index === 0;
@@ -120,7 +180,7 @@ export default function YearFilter({ players }: { players: any[] }) {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -163,6 +223,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
+    overflow: 'hidden', // Важно для анимации высоты
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени

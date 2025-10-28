@@ -4,7 +4,8 @@ import {
     Text,
     TouchableOpacity,
     View,
-    Platform
+    Platform,
+    Animated
 } from 'react-native';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { Player } from '../utils/playerStorage';
@@ -19,6 +20,10 @@ export default function CountryFilter({ players }: { players: Player[] }) {
     setShowCountryFilter 
   } = useCountryFilter();
 
+  // Анимированные значения для dropdown
+  const [dropdownOpacity] = useState(new Animated.Value(0));
+  const [dropdownHeight] = useState(new Animated.Value(0));
+
   // Получаем уникальные страны из игроков
   const countries = useMemo(() => {
     return Array.from(
@@ -28,12 +33,57 @@ export default function CountryFilter({ players }: { players: Player[] }) {
 
   const handleCountrySelect = useCallback((country: string) => {
     setSelectedCountry(country);
-    setShowCountryFilter(false);
-  }, [setSelectedCountry, setShowCountryFilter]);
+    // Плавно закрываем dropdown перед вызовом setShowCountryFilter
+    Animated.parallel([
+      Animated.timing(dropdownOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(dropdownHeight, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      })
+    ]).start(() => {
+      setShowCountryFilter(false); // Закрываем фильтр после завершения анимации
+    });
+  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownHeight]);
 
   const handleFilterToggle = useCallback(() => {
     setShowCountryFilter(!showCountryFilter);
   }, [showCountryFilter, setShowCountryFilter]);
+
+  // Анимация открытия/закрытия dropdown
+  useEffect(() => {
+    if (showCountryFilter) {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: countries.length * 30, // Примерная высота на основе количества стран
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(dropdownOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dropdownHeight, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        })
+      ]).start();
+    }
+  }, [showCountryFilter, dropdownOpacity, dropdownHeight, countries.length]);
 
   // Мемоизируем текст кнопки
   const filterButtonText = useMemo(() => {
@@ -54,8 +104,14 @@ export default function CountryFilter({ players }: { players: Player[] }) {
         </Text>
       </TouchableOpacity>
 
-      {showCountryFilter && (
-        <View style={styles.countriesList}>
+      {(showCountryFilter || dropdownOpacity._value > 0) && (
+        <Animated.View style={[
+          styles.countriesList,
+          {
+            opacity: dropdownOpacity,
+            height: dropdownHeight,
+          }
+        ]}>
           {countries.map((country, index) => {
             const isSelected = selectedCountry === country;
             const isFirst = index === 0;
@@ -89,7 +145,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -132,6 +188,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
+    overflow: 'hidden', // Важно для анимации высоты
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени
