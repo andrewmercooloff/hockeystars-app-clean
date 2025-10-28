@@ -263,6 +263,10 @@ export default function SearchScreen() {
         console.warn('📊 Загружено игроков:', allPlayers.length);
         console.warn('🏒 Пример игрока с командами:', allPlayers.find(p => p.teams && p.teams.length > 0));
         
+        // Показываем информацию в Alert для отладки
+        const playersWithTeams = allPlayers.filter(p => p.teams && p.teams.length > 0);
+        Alert.alert('Отладка', `Загружено игроков: ${allPlayers.length}\nИгроков с командами: ${playersWithTeams.length}`);
+        
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
         const filteredPlayers = currentUser.status === 'admin' 
           ? allPlayers // Администратор видит всех
@@ -755,6 +759,11 @@ export default function SearchScreen() {
               onSelect={(value) => {
                 console.warn('🎯 Выбрана команда:', value);
                 console.warn('📋 Доступные команды в фильтре:', teams.map(t => `${t.name} (ID: ${t.id})`).join(', '));
+                
+                // Показываем информацию в Alert для отладки
+                const selectedTeamName = teams.find(t => t.id === value)?.name || 'Неизвестная команда';
+                Alert.alert('Выбор команды', `Выбрана команда: ${selectedTeamName}\nID: ${value}\nВсего команд: ${teams.length}`);
+                
                 setSelectedTeam(value);
                 setActiveFilter(value ? 'team' : null);
               }}
