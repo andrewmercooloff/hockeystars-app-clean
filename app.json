@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#050008"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,7 +22,7 @@
       "splash": {
         "image": "./assets/images/splash-icon.png",
         "resizeMode": "contain",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#050008"
       },
       "infoPlist": {
         "UIBackgroundModes": [
@@ -46,7 +46,7 @@
         "xhdpi": "./assets/images/splash-icon.png",
         "xxhdpi": "./assets/images/splash-icon.png",
         "xxxhdpi": "./assets/images/splash-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#050008"
       },
       "permissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",
@@ -78,7 +78,7 @@
       "splash": {
         "image": "./assets/images/splash-icon.png",
         "resizeMode": "contain",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#050008"
       },
       "build": {
         "babel": {

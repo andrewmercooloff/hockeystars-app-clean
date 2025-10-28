@@ -930,8 +930,8 @@ export default function RootLayout() {
               <Image 
                 source={require('../assets/images/splash-icon.png')} 
                 style={{ 
-                  width: 300, // Увеличено в 1.5 раза (200 * 1.5 = 300)
-                  height: 300
+                  width: 250, // Оптимизированный размер для лучшего соответствия нативному splash
+                  height: 250
                 }}
                 resizeMode="contain"
               />
