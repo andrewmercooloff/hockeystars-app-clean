@@ -294,26 +294,49 @@ export default function SearchScreen() {
   const [teams, setTeams] = useState<Array<{id: string, name: string, name_ru?: string}>>([]);
   
   useEffect(() => {
-    const loadTeams = async () => {
+    const loadTeamsFromDatabase = async () => {
       try {
+        const { supabase } = await import('../utils/supabase');
+        
+        // Получаем команды, которые реально есть у игроков
         const { data, error } = await supabase
-          .from('teams')
-          .select('id, name, name_ru')
-          .order('name', { ascending: true });
+          .from('player_teams')
+          .select(`
+            teams!inner(
+              id,
+              name,
+              name_ru
+            )
+          `)
+          .order('teams(name)');
         
         if (error) {
           console.error('❌ Ошибка загрузки команд:', error);
+          setTeams([]);
           return;
         }
         
-        setTeams(data || []);
+        // Собираем уникальные команды
+        const uniqueTeams = new Map();
+        data?.forEach((item: any) => {
+          const team = item.teams;
+          if (team && !uniqueTeams.has(team.id)) {
+            uniqueTeams.set(team.id, {
+              id: team.id,
+              name: language === 'ru' ? team.name_ru || team.name : team.name
+            });
+          }
+        });
+        
+        setTeams(Array.from(uniqueTeams.values()));
       } catch (error) {
         console.error('❌ Ошибка загрузки команд:', error);
+        setTeams([]);
       }
     };
     
-    loadTeams();
-  }, []);
+    loadTeamsFromDatabase();
+  }, [language]);
   
   // Мемоизированные фильтры
   const countries = useMemo(() => {
