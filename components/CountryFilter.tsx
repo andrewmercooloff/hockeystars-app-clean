@@ -22,7 +22,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
 
   // Анимированные значения для dropdown
   const [dropdownOpacity] = useState(new Animated.Value(0));
-  const [dropdownScale] = useState(new Animated.Value(0));
+  const [dropdownTranslateY] = useState(new Animated.Value(-20));
 
   // Получаем уникальные страны из игроков
   const countries = useMemo(() => {
@@ -40,15 +40,15 @@ export default function CountryFilter({ players }: { players: Player[] }) {
         duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(dropdownScale, {
-        toValue: 0,
+      Animated.timing(dropdownTranslateY, {
+        toValue: -20,
         duration: 200,
         useNativeDriver: true,
       })
     ]).start(() => {
       setShowCountryFilter(false); // Закрываем фильтр после завершения анимации
     });
-  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownScale]);
+  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownTranslateY]);
 
   const handleFilterToggle = useCallback(() => {
     setShowCountryFilter(!showCountryFilter);
@@ -63,8 +63,8 @@ export default function CountryFilter({ players }: { players: Player[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownScale, {
-          toValue: 1,
+        Animated.timing(dropdownTranslateY, {
+          toValue: 0,
           duration: 200,
           useNativeDriver: true,
         })
@@ -76,14 +76,14 @@ export default function CountryFilter({ players }: { players: Player[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownScale, {
-          toValue: 0,
+        Animated.timing(dropdownTranslateY, {
+          toValue: -20,
           duration: 200,
           useNativeDriver: true,
         })
       ]).start();
     }
-  }, [showCountryFilter, dropdownOpacity, dropdownScale]);
+  }, [showCountryFilter, dropdownOpacity, dropdownTranslateY]);
 
   // Мемоизируем текст кнопки
   const filterButtonText = useMemo(() => {
@@ -109,7 +109,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
           styles.countriesList,
           {
             opacity: dropdownOpacity,
-            transform: [{ scaleY: dropdownScale }],
+            transform: [{ translateY: dropdownTranslateY }],
           }
         ]}>
           {countries.map((country, index) => {
@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
-    transformOrigin: 'top', // Важно для правильной анимации scaleY
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени

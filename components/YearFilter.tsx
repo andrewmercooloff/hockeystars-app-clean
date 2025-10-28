@@ -23,7 +23,7 @@ export default function YearFilter({ players }: { players: any[] }) {
 
   // Анимированные значения для dropdown
   const [dropdownOpacity] = useState(new Animated.Value(0));
-  const [dropdownScale] = useState(new Animated.Value(0));
+  const [dropdownTranslateY] = useState(new Animated.Value(-20));
 
   // Получаем доступные годы рождения (только те, для которых есть игроки)
   const availableYears = useMemo(() => {
@@ -80,15 +80,15 @@ export default function YearFilter({ players }: { players: any[] }) {
         duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(dropdownScale, {
-        toValue: 0,
+      Animated.timing(dropdownTranslateY, {
+        toValue: -20,
         duration: 200,
         useNativeDriver: true,
       })
     ]).start(() => {
       setShowYearFilter(false); // Закрываем фильтр после завершения анимации
     });
-  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownScale]);
+  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownTranslateY]);
 
   const handleFilterToggle = useCallback(() => {
     setShowYearFilter(!showYearFilter);
@@ -103,8 +103,8 @@ export default function YearFilter({ players }: { players: any[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownScale, {
-          toValue: 1,
+        Animated.timing(dropdownTranslateY, {
+          toValue: 0,
           duration: 200,
           useNativeDriver: true,
         })
@@ -116,14 +116,14 @@ export default function YearFilter({ players }: { players: any[] }) {
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(dropdownScale, {
-          toValue: 0,
+        Animated.timing(dropdownTranslateY, {
+          toValue: -20,
           duration: 200,
           useNativeDriver: true,
         })
       ]).start();
     }
-  }, [showYearFilter, dropdownOpacity, dropdownScale]);
+  }, [showYearFilter, dropdownOpacity, dropdownTranslateY]);
 
   return (
     <View style={styles.container}>
@@ -144,7 +144,7 @@ export default function YearFilter({ players }: { players: any[] }) {
           styles.yearsList,
           {
             opacity: dropdownOpacity,
-            transform: [{ scaleY: dropdownScale }],
+            transform: [{ translateY: dropdownTranslateY }],
           }
         ]}>
           {availableYears.map(({ year }, index) => {
@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
     zIndex: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
-    transformOrigin: 'top', // Важно для правильной анимации scaleY
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени
