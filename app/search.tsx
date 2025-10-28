@@ -512,6 +512,7 @@ export default function SearchScreen() {
 
   // Фильтрация и сортировка игроков
   const filteredPlayers = useMemo(() => {
+    console.error('🔄 useMemo пересчитывается! selectedTeam:', selectedTeam);
     const filtered = players.filter(player => {
       // Фильтр по поиску
       const matchesSearch = !searchQuery || 
@@ -596,7 +597,7 @@ export default function SearchScreen() {
     
     
     return sorted;
-  }, [players, searchQuery, selectedCountry, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, currentUser]);
+  }, [players, searchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, currentUser]);
 
   // Key extractor для FlatList
   const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
