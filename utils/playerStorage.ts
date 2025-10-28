@@ -1104,6 +1104,40 @@ export const loadPlayers = async (): Promise<Player[]> => {
         });
       }
       
+      // Загружаем команды для каждого игрока
+      try {
+        const teamPromises = players.map(async (player) => {
+          try {
+            const teams = await getPlayerTeamsAsPastTeams(player.id);
+            // Преобразуем PastTeam[] в PlayerTeam[] для совместимости
+            player.teams = teams.map(team => ({
+              teamId: team.id,
+              teamName: team.teamName,
+              teamNameRu: team.teamNameRu,
+              teamType: team.teamType || 'club',
+              teamCountry: team.teamCountry,
+              teamCity: team.teamCity,
+              isPrimary: team.isCurrent,
+              joinedDate: team.joinedDate,
+              startYear: team.startYear,
+              endYear: team.endYear,
+              teamOrder: team.teamOrder || 0
+            }));
+          } catch (error) {
+            console.error(`❌ Ошибка загрузки команд для игрока ${player.id}:`, error);
+            player.teams = [];
+          }
+        });
+        
+        await Promise.all(teamPromises);
+      } catch (teamsError) {
+        console.error('❌ Ошибка загрузки команд:', teamsError);
+        // Устанавливаем пустые команды если не удалось загрузить
+        players.forEach(player => {
+          player.teams = [];
+        });
+      }
+      
       // Кешируем результат
       await AsyncStorage.setItem(cacheKey, JSON.stringify({
         players,
