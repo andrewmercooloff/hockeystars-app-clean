@@ -265,7 +265,13 @@ export default function SearchScreen() {
         
         // Показываем информацию в Alert для отладки
         const playersWithTeams = allPlayers.filter(p => p.teams && p.teams.length > 0);
-        Alert.alert('Отладка', `Загружено игроков: ${allPlayers.length}\nИгроков с командами: ${playersWithTeams.length}`);
+        console.warn('DEBUG: Загружено игроков:', allPlayers.length);
+        console.warn('DEBUG: Игроков с командами:', playersWithTeams.length);
+        
+        // Показываем Alert только если есть игроки
+        if (allPlayers.length > 0) {
+          Alert.alert('Отладка', `Загружено игроков: ${allPlayers.length}\nИгроков с командами: ${playersWithTeams.length}`);
+        }
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
         const filteredPlayers = currentUser.status === 'admin' 
@@ -345,10 +351,23 @@ export default function SearchScreen() {
           }
         });
         
-        setTeams(Array.from(uniqueTeams.values()));
+        const teamsArray = Array.from(uniqueTeams.values());
+        setTeams(teamsArray);
+        
+        // Отладка загрузки команд
+        console.warn('DEBUG: Загружено команд из БД:', teamsArray.length);
+        console.warn('DEBUG: Команды:', teamsArray.map(t => `${t.name} (ID: ${t.id})`).join(', '));
+        
+        // Показываем Alert с информацией о командах
+        if (teamsArray.length > 0) {
+          Alert.alert('Команды загружены', `Найдено команд: ${teamsArray.length}\nПервая команда: ${teamsArray[0]?.name}`);
+        } else {
+          Alert.alert('Команды не найдены', 'В базе данных нет команд, связанных с игроками');
+        }
       } catch (error) {
         console.error('❌ Ошибка загрузки команд:', error);
         setTeams([]);
+        Alert.alert('Ошибка загрузки команд', `Ошибка: ${error.message}`);
       }
     };
     
