@@ -351,7 +351,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               <View style={styles.playerInfo}>
                 <CachedAvatar
                   playerId={notification.playerId || ''}
-                  fallbackAvatarUrl={notification.playerAvatar}
+                  fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
                   size={32}
                   style={styles.playerAvatar}
                   onError={() => {

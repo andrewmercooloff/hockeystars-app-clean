@@ -53,16 +53,12 @@ export default function ExerciseNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
-          <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
-            size={50}
-            style={styles.playerAvatar}
-          />
-        ) : (
-          <Ionicons name="barbell-outline" size={24} color="#fff" />
-        )}
+        <CachedAvatar
+          playerId={playerId}
+          fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+          size={50}
+          style={styles.playerAvatar}
+        />
       </View>
 
       <View style={styles.contentContainer}>
