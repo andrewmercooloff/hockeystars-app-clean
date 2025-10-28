@@ -14,7 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from '../components/CachedAvatar';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { loadPlayers, Player, loadCurrentUser } from '../utils/playerStorage';
+import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam } from '../utils/playerStorage';
+import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -183,6 +184,7 @@ export default function SearchScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [selectedHand, setSelectedHand] = useState<string | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
@@ -288,6 +290,31 @@ export default function SearchScreen() {
     }, [setCurrentScreen])
   );
 
+  // Загрузка списка команд
+  const [teams, setTeams] = useState<Array<{id: string, name: string, name_ru?: string}>>([]);
+  
+  useEffect(() => {
+    const loadTeams = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('teams')
+          .select('id, name, name_ru')
+          .order('name', { ascending: true });
+        
+        if (error) {
+          console.error('❌ Ошибка загрузки команд:', error);
+          return;
+        }
+        
+        setTeams(data || []);
+      } catch (error) {
+        console.error('❌ Ошибка загрузки команд:', error);
+      }
+    };
+    
+    loadTeams();
+  }, []);
+  
   // Мемоизированные фильтры
   const countries = useMemo(() => {
     const rawCountries = Array.from(new Set(players.map(p => p.country).filter((country): country is string => Boolean(country))));
@@ -453,6 +480,14 @@ export default function SearchScreen() {
       // Фильтр по стране
       const matchesCountry = !selectedCountry || player.country === selectedCountry;
       
+      // Фильтр по команде
+      const matchesTeam = !selectedTeam || (() => {
+        if (!player.teams || player.teams.length === 0) {
+          return false;
+        }
+        return player.teams.some(team => team.teamId === selectedTeam);
+      })();
+      
       // Фильтр по хвату
       const matchesHand = !selectedHand || 
         (selectedHand === t('search.left') && player.grip === 'Левый') || 
@@ -483,7 +518,8 @@ export default function SearchScreen() {
         (player.weight && parseInt(player.weight) >= parseInt(selectedMinWeight));
       
       return matchesSearch && 
-             matchesCountry && 
+             matchesCountry &&
+             matchesTeam &&
              matchesHand && 
              matchesPosition && 
              matchesYear &&
@@ -661,6 +697,22 @@ export default function SearchScreen() {
               isOpen={isFilterOpen('country')}
               onToggle={toggleFilter}
               countries={countries}
+            />
+            <FilterButton 
+              title={t('search.team')} 
+              options={teams.map(team => ({
+                translated: language === 'ru' ? (team.name_ru || team.name) : team.name,
+                original: team.id
+              }))} 
+              selectedValue={selectedTeam}
+              onSelect={(value) => {
+                setSelectedTeam(value);
+                setActiveFilter(value ? 'team' : null);
+              }}
+              isActive={activeFilter === 'team'}
+              filterName="team"
+              isOpen={isFilterOpen('team')}
+              onToggle={toggleFilter}
             />
             <FilterButton 
               title={t('search.grip')} 
