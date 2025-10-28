@@ -216,6 +216,7 @@ class RealtimeManager {
 
   /**
    * Настраивает подписку на изменения аватаров всех игроков
+   * Обновляет кеш только при реальном изменении аватара, не при других обновлениях профиля
    */
   private async setupAvatarUpdateSubscription(): Promise<void> {
     const channel = supabase
@@ -229,14 +230,22 @@ class RealtimeManager {
         },
         async (payload) => {
           const playerData = payload.new as any;
+          const oldPlayerData = payload.old as any;
           const playerId = playerData.id;
           const newAvatar = playerData.avatar;
+          const oldAvatar = oldPlayerData?.avatar;
           
-          // Обновляем кеш аватара
-          if (newAvatar && playerId) {
+          // Обновляем кеш аватара только если аватар действительно изменился
+          if (newAvatar && playerId && newAvatar !== oldAvatar) {
             try {
               const { avatarCache } = await import('./AvatarCache');
-              await avatarCache.setAvatar(playerId, newAvatar);
+              const currentCachedAvatar = avatarCache.getAvatar(playerId);
+              
+              // Обновляем кеш только если новый аватар отличается от текущего в кеше
+              if (currentCachedAvatar !== newAvatar) {
+                await avatarCache.setAvatar(playerId, newAvatar);
+                console.log('🔄 Обновлен аватар в кеше через Realtime:', { playerId, newAvatar });
+              }
             } catch (error) {
               console.error('❌ Ошибка обновления аватара в кеше:', error);
             }

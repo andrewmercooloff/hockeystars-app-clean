@@ -23,6 +23,11 @@ class AvatarCache {
   async setAvatar(playerId: string, avatarUrl: string): Promise<string | null> {
     const oldUrl = this.cache.get(playerId);
     
+    // Если URL не изменился, не обновляем кеш
+    if (oldUrl === avatarUrl) {
+      return avatarUrl;
+    }
+    
     try {
       // Предзагружаем изображение с высоким приоритетом
       await Image.prefetch(avatarUrl);
@@ -30,10 +35,8 @@ class AvatarCache {
       // Сохраняем в кэш
       this.cache.set(playerId, avatarUrl);
       
-      // Если аватар изменился, уведомляем всех слушателей
-      if (oldUrl !== avatarUrl) {
-        this.notifyListeners(playerId, avatarUrl);
-      }
+      // Уведомляем всех слушателей об изменении
+      this.notifyListeners(playerId, avatarUrl);
       
       return avatarUrl;
     } catch (error) {
@@ -101,22 +104,19 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
     // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
     const currentCachedAvatar = avatarCache.getAvatar(playerId);
     
-    // Всегда обновляем кеш если есть fallbackUrl, чтобы синхронизировать кеш с данными из БД
-    if (fallbackUrl) {
-      // Только если аватар в кеше отличается от fallback, обновляем
-      if (currentCachedAvatar !== fallbackUrl) {
-        avatarCache.setAvatar(playerId, fallbackUrl)
-          .then(localUri => {
-            if (localUri) {
-              setAvatarUrl(localUri);
-            }
-          })
-          .catch(() => {});
-      } else {
-        setAvatarUrl(currentCachedAvatar);
-      }
+    // Обновляем кеш только если fallbackUrl отличается от текущего кеша
+    if (fallbackUrl && currentCachedAvatar !== fallbackUrl) {
+      avatarCache.setAvatar(playerId, fallbackUrl)
+        .then(localUri => {
+          if (localUri) {
+            setAvatarUrl(localUri);
+          }
+        })
+        .catch(() => {});
     } else if (currentCachedAvatar) {
       setAvatarUrl(currentCachedAvatar);
+    } else if (fallbackUrl) {
+      setAvatarUrl(fallbackUrl);
     }
 
     // Подписываемся на изменения
