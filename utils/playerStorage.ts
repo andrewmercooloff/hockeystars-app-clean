@@ -1046,7 +1046,6 @@ export const initializeStorage = async (): Promise<void> => {
 // Загрузка всех игроков
 export const loadPlayers = async (): Promise<Player[]> => {
   try {
-    console.warn('🚀 loadPlayers: Начинаем загрузку игроков...');
     const cacheKey = 'all_players';
     const cacheTime = 10 * 60 * 1000; // 10 минут
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
@@ -1060,7 +1059,6 @@ export const loadPlayers = async (): Promise<Player[]> => {
       }
     }
     
-    console.warn('🔍 loadPlayers: Запрашиваем данные из Supabase...');
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -1068,17 +1066,12 @@ export const loadPlayers = async (): Promise<Player[]> => {
     
     if (error) {
       console.error('❌ Ошибка загрузки игроков из Supabase:', error);
-      console.warn('🔍 loadPlayers: Ошибка Supabase:', error.message);
       return [];
     }
     
-    console.warn('📊 loadPlayers: Получено данных из Supabase:', data?.length || 0);
-    
     if (data) {
-      console.warn('🔄 loadPlayers: Преобразуем данные из Supabase...');
       // Преобразуем данные из Supabase в формат приложения
       const players = data.map(convertSupabaseToPlayer);
-      console.warn('✅ loadPlayers: Преобразовано игроков:', players.length);
       
       // Обновляем кеш аватаров для всех игроков
       players.forEach(player => {
