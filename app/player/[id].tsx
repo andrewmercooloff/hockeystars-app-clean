@@ -1082,14 +1082,18 @@ export default function PlayerProfile() {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends || player.discountForFriends
+          discountForFriends: editData.discountForFriends ? 
+            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
+            : player.discountForFriends
         } : {}),
         // Добавляем поля для заточки коньков
         ...(player.status === 'skateSharpening' ? {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends || player.discountForFriends,
+          discountForFriends: editData.discountForFriends ? 
+            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
+            : player.discountForFriends,
           skate_services: skateServices.length > 0 ? skateServices : undefined
         } : {})
         // Убираем pastTeams, так как команды сохраняются в отдельной таблице
@@ -1478,7 +1482,9 @@ export default function PlayerProfile() {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends || player.discountForFriends
+          discountForFriends: editData.discountForFriends ? 
+            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
+            : player.discountForFriends
         }, true); // Пропускаем очистку кеша для миграции
       }
       
@@ -2165,12 +2171,23 @@ export default function PlayerProfile() {
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.discountForFriends')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TextInput
-                        style={styles.editInput}
-                        value={editData.discountForFriends !== undefined ? editData.discountForFriends : (player.discountForFriends || '')}
-                        onChangeText={(text) => setEditData({...editData, discountForFriends: text})}
-                        placeholder={t('profile.discountForFriends')}
-                      />
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TextInput
+                          style={styles.editInput}
+                          value={
+                            editData.discountForFriends !== undefined 
+                              ? String(editData.discountForFriends).replace('%', '') 
+                              : String(player.discountForFriends || '').replace('%', '')
+                          }
+                          onChangeText={(text) => {
+                            const numbersOnly = text.replace(/[^0-9]/g, '');
+                            setEditData({...editData, discountForFriends: numbersOnly});
+                          }}
+                          placeholder="10"
+                          keyboardType="numeric"
+                        />
+                        <Text style={{ color: '#fff', marginLeft: 5 }}>%</Text>
+                      </View>
                     ) : (
                       <Text style={styles.infoValue}>{player.discountForFriends}</Text>
                     )}
@@ -2432,19 +2449,24 @@ export default function PlayerProfile() {
                   {t('profile.discountForFriendsHint')}
                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                  <View style={styles.discountEditContainer}>
+                  <View style={[styles.discountEditContainer, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
                     <TextInput
                       style={styles.discountEditInput}
-                      value={editData.discountForFriends !== undefined ? editData.discountForFriends : (player.discountForFriends || '')}
+                      value={
+                        editData.discountForFriends !== undefined 
+                          ? String(editData.discountForFriends).replace('%', '') 
+                          : String(player.discountForFriends || '').replace('%', '')
+                      }
                       onChangeText={(text) => {
+                        // Разрешаем только цифры, без процента
                         const numbersOnly = text.replace(/[^0-9]/g, '');
-                        const withPercent = numbersOnly ? `${numbersOnly}%` : '';
-                        setEditData({...editData, discountForFriends: withPercent});
+                        setEditData({...editData, discountForFriends: numbersOnly});
                       }}
-                      placeholder="10%"
+                      placeholder="10"
                       keyboardType="numeric"
                       placeholderTextColor="#FFFFFF"
                     />
+                    <Text style={{ fontSize: 128, fontFamily: 'Gilroy-Bold', color: '#FFFFFF', marginLeft: 10 }}>%</Text>
                   </View>
                 ) : (
                   <ImageBackground 
@@ -2640,19 +2662,24 @@ export default function PlayerProfile() {
                   {t('profile.discountForFriendsHint')}
                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                  <View style={styles.discountEditContainer}>
+                  <View style={[styles.discountEditContainer, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
                     <TextInput
                       style={styles.discountEditInput}
-                      value={editData.discountForFriends !== undefined ? editData.discountForFriends : (player.discountForFriends || '')}
+                      value={
+                        editData.discountForFriends !== undefined 
+                          ? String(editData.discountForFriends).replace('%', '') 
+                          : String(player.discountForFriends || '').replace('%', '')
+                      }
                       onChangeText={(text) => {
+                        // Разрешаем только цифры, без процента
                         const numbersOnly = text.replace(/[^0-9]/g, '');
-                        const withPercent = numbersOnly ? `${numbersOnly}%` : '';
-                        setEditData({...editData, discountForFriends: withPercent});
+                        setEditData({...editData, discountForFriends: numbersOnly});
                       }}
-                      placeholder="10%"
+                      placeholder="10"
                       keyboardType="numeric"
                       placeholderTextColor="#FFFFFF"
                     />
+                    <Text style={{ fontSize: 128, fontFamily: 'Gilroy-Bold', color: '#FFFFFF', marginLeft: 10 }}>%</Text>
                   </View>
                 ) : (
                   <ImageBackground 

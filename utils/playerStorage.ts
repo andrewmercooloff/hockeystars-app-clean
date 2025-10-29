@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars } from './AvatarCache';
+import { dataCache, CACHE_KEYS } from './DataCache';
 
 // Глобальный кеш для пользователя
 let globalUserCache: Player | null = null;
@@ -2428,6 +2429,21 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
     }
     
     console.log(`✅ Игрок успешно удален. Результат:`, data);
+    
+    // Очищаем кеши после успешного удаления
+    try {
+      // Очищаем AvatarCache для удаленного игрока
+      avatarCache.clearAvatar(playerId);
+      
+      // Очищаем DataCache для списка игроков
+      dataCache.invalidate(CACHE_KEYS.PLAYERS);
+      
+      console.log(`✅ Кеши очищены для удаленного игрока`);
+    } catch (cacheError) {
+      console.warn('⚠️ Ошибка очистки кешей:', cacheError);
+      // Не считаем это критической ошибкой, так как основное удаление прошло успешно
+    }
+    
     return true;
   } catch (error) {
     console.error('❌ Ошибка удаления игрока:', error);
