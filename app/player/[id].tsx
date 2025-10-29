@@ -2161,7 +2161,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Скидка для друзей - для заточки коньков */}
-                {player.status === 'skateSharpening' && (player.discountForFriends || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'skateSharpening' && (player.discountForFriends || isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.discountForFriends')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -2425,7 +2425,7 @@ export default function PlayerProfile() {
             )}
 
             {/* Скидка для друзей - только для магазинов */}
-            {player.status === 'shop' && (
+            {player.status === 'shop' && (player.discountForFriends || isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
                 <Text style={styles.discountExplanation}>
@@ -3841,7 +3841,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Статистика текущего сезона */}
-                {(player.goals || player.assists || player.games) && (
+                {(player.goals || player.assists || player.games) && player.status === 'player' && (
                   <>
                     <Text style={styles.shareCardStatsTitle}>
                       {t('profile.currentSeasonStats') || 'Статистика текущего сезона'}

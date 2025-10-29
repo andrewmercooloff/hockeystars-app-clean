@@ -2395,7 +2395,7 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
     console.log(`🗑️ Удаляем игрока с ID: ${playerId}`);
     
     // Удаляем связанные данные
-    await Promise.all([
+    const [notifResult, messagesResult, friendRequestsResult, teamsResult, exercisesResult] = await Promise.all([
       // Удаляем уведомления игрока
       supabase.from('notifications').delete().eq('user_id', playerId),
       // Удаляем сообщения игрока
@@ -2408,17 +2408,26 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
       supabase.from('exercise_completions').delete().eq('player_id', playerId)
     ]);
     
+    // Проверяем ошибки при удалении связанных данных
+    if (notifResult.error) console.error('❌ Ошибка удаления уведомлений:', notifResult.error);
+    if (messagesResult.error) console.error('❌ Ошибка удаления сообщений:', messagesResult.error);
+    if (friendRequestsResult.error) console.error('❌ Ошибка удаления запросов дружбы:', friendRequestsResult.error);
+    if (teamsResult.error) console.error('❌ Ошибка удаления команд:', teamsResult.error);
+    if (exercisesResult.error) console.error('❌ Ошибка удаления упражнений:', exercisesResult.error);
+    
     // Удаляем самого игрока
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('players')
       .delete()
-      .eq('id', playerId);
+      .eq('id', playerId)
+      .select(); // Добавляем select для получения результата
     
     if (error) {
       console.error('❌ Ошибка удаления игрока:', error);
       return false;
     }
     
+    console.log(`✅ Игрок успешно удален. Результат:`, data);
     return true;
   } catch (error) {
     console.error('❌ Ошибка удаления игрока:', error);
