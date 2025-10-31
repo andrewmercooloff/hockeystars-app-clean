@@ -174,31 +174,19 @@ export default function CreateUserScreen() {
       return;
     }
 
-    // Проверяем обязательные поля
-    if (!formData.name || !formData.phone || !formData.status || !formData.country) {
-      Alert.alert(t('createUser.error'), t('createUser.fillRequiredFields'));
-      return;
-    }
-
-    // Проверка формата телефона
+  // Для админа: все поля необязательны. Если телефон указан, проверим формат
+  if (formData.phone) {
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
       Alert.alert(t('createUser.error'), t('createUser.enterValidPhone'));
       return;
     }
-
-    // Дополнительные проверки в зависимости от статуса
-    if ((formData.status === 'player' || formData.status === 'star') && 
-        (!formData.birthDate || !formData.position)) {
-      Alert.alert(t('createUser.error'), t('createUser.requiredForPlayers'));
-      return;
-    }
+  }
 
     try {
       const createdPlayer = await createPlayerManually(
         {
           ...formData,
-          id: Date.now().toString(),
           age: 0,
           goals: '',
           assists: '',

@@ -294,17 +294,19 @@ export default function AdminScreen() {
       return;
     }
 
-    // Проверяем обязательные поля
-    if (!newUserData.name || !newUserData.phone) {
-      Alert.alert('Ошибка', 'Пожалуйста, заполните имя и номер телефона');
-      return;
+    // Для админа: все поля необязательны. Если телефон указан, проверим формат
+    if (newUserData.phone) {
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(newUserData.phone.replace(/\s/g, ''))) {
+        Alert.alert('Ошибка', 'Пожалуйста, введите корректный номер телефона с кодом страны');
+        return;
+      }
     }
 
     try {
       const createdPlayer = await createPlayerManually(
         {
           ...newUserData,
-          id: Date.now().toString(),
           age: 0,
           goals: '',
           assists: '',

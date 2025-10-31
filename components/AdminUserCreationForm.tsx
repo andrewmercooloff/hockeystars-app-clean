@@ -158,31 +158,19 @@ export default function AdminUserCreationForm({
       return;
     }
 
-    // Проверяем обязательные поля
-    if (!formData.name || !formData.phone || !formData.status || !formData.country) {
-      Alert.alert('Ошибка', 'Пожалуйста, заполните все обязательные поля');
-      return;
-    }
-
-    // Проверка формата телефона
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      Alert.alert('Ошибка', 'Пожалуйста, введите корректный номер телефона с кодом страны');
-      return;
-    }
-
-    // Дополнительные проверки в зависимости от статуса
-    if ((formData.status === 'player' || formData.status === 'star') && 
-        (!formData.birthDate || !formData.position)) {
-      Alert.alert('Ошибка', 'Для игроков и звезд обязательно указать дату рождения и позицию');
-      return;
+    // Для админа: все поля необязательны. Проверяем только, если введены
+    if (formData.phone) {
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+        Alert.alert('Ошибка', 'Пожалуйста, введите корректный номер телефона с кодом страны');
+        return;
+      }
     }
 
     try {
       const createdPlayer = await createPlayerManually(
         {
           ...formData,
-          id: Date.now().toString(),
           age: 0,
           goals: '',
           assists: '',

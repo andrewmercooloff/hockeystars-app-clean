@@ -15,10 +15,9 @@ export const sendEmailViaGmail = async (email: string, code: string): Promise<bo
     3. SMTP соединения должны выполняться на сервере
     
     Решения:
-    1. Используйте Cloudflare Worker (уже настроен)
-    2. Используйте Supabase Edge Function
-    3. Создайте собственный API endpoint
-    4. Используйте Resend API или SendGrid
+    1. Используйте Supabase Edge Function
+    2. Создайте собственный API endpoint
+    3. Используйте Resend API или SendGrid
     
     Подробности: https://docs.expo.dev/workflow/using-libraries/
     `);
@@ -50,9 +49,9 @@ export const getGmailSMTPInstructions = () => `
    npm install nodemailer @types/nodemailer
 
 4. 📱 Для мобильного приложения используйте:
-   - Cloudflare Worker (рекомендуется)
    - Supabase Edge Function
    - Собственный API endpoint
+   - Resend API или SendGrid
 `;
 
 // Проверка корректности настройки
@@ -61,9 +60,9 @@ export const checkGmailSMTPConfig = () => {
   ⚠️ Gmail SMTP недоступен в React Native окружении
   
   Используйте альтернативные решения:
-  1. Cloudflare Worker (уже настроен)
-  2. Supabase Edge Function
-  3. Собственный API endpoint
+  1. Supabase Edge Function
+  2. Собственный API endpoint
+  3. Resend API или SendGrid
     `);
     return false;
 };
