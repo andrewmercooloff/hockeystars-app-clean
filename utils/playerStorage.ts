@@ -5668,7 +5668,9 @@ export const getSmartPlayerSelection = (
   try {
     // 1. Показываем не-игроков (звезды, тренеры, магазины, заточка коньков, администраторы)
     // ВАЖНО: если выбран фильтр по стране, показываем только не-игроков из этой страны
+    // ИСКЛЮЧЕНИЕ: администраторы показываются везде независимо от фильтра
     const nonPlayers = players.filter(player => {
+      const isAdmin = player.status === 'admin';
       const isNonPlayer = player.status === 'star' || 
         player.status === 'coach' || 
         player.status === 'shop' || 
@@ -5678,7 +5680,10 @@ export const getSmartPlayerSelection = (
       
       if (!isNonPlayer) return false;
       
-      // Если выбран фильтр по стране, фильтруем не-игроков тоже
+      // Администраторы всегда показываются
+      if (isAdmin) return true;
+      
+      // Если выбран фильтр по стране, фильтруем остальных не-игроков
       if (selectedCountry) {
         return player.country === selectedCountry;
       }
