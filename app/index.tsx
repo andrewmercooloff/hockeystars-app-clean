@@ -24,7 +24,7 @@ import YearFilter from '../components/YearFilter';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryUtils';
-import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection } from '../utils/playerStorage';
+import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection, clearAllPlayersCache } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
@@ -817,15 +817,51 @@ export default function HomeScreen() {
 
 
 
+  // Ключ для перегенерации случайной части выборки
+  const [shuffleKey, setShuffleKey] = useState(0);
+
   // Умный отбор игроков с ограничением количества
   const allVisiblePlayers = useMemo(() => {
-    return getSmartPlayerSelection(
+    const selected = getSmartPlayerSelection(
       players, 
       currentUser?.id,
       selectedCountry || undefined,
       selectedYear || undefined
     );
-  }, [players, currentUser?.id, selectedCountry, selectedYear]);
+    return selected;
+  }, [players, currentUser?.id, selectedCountry, selectedYear, shuffleKey]);
+
+  // Детектор тряски: «потряси, чтобы обновить рандомных игроков»
+  useEffect(() => {
+    let lastShakeTs = 0;
+    let subscription: any;
+
+    const SHAKE_THRESHOLD = 2.2; // сила тряски
+    const SHAKE_DEBOUNCE_MS = 1200; // защита от повторов
+
+    (async () => {
+      try {
+        // @ts-ignore: optional dependency at runtime, types may be missing in dev env
+        const sensors: any = await import('expo-sensors');
+        const Accelerometer = sensors?.Accelerometer;
+        if (!Accelerometer) return;
+        Accelerometer.setUpdateInterval(100);
+        subscription = Accelerometer.addListener(({ x, y, z }: any) => {
+          const magnitude = Math.abs(x) + Math.abs(y) + Math.abs(z);
+          const now = Date.now();
+          if (magnitude > SHAKE_THRESHOLD && now - lastShakeTs > SHAKE_DEBOUNCE_MS) {
+            lastShakeTs = now;
+            try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+            setShuffleKey(prev => prev + 1);
+          }
+        });
+      } catch {}
+    })();
+
+    return () => {
+      try { subscription && subscription.remove && subscription.remove(); } catch {}
+    };
+  }, []);
 
   // Автоматически сбрасываем фильтр по годам, если в выбранной стране нет игроков указанного года
   useEffect(() => {
@@ -893,14 +929,23 @@ export default function HomeScreen() {
 
 
 
-  const refreshPlayers = useCallback(async () => {
+  const refreshPlayers = useCallback(async (forceRefresh = false) => {
     try {
-      // Используем кеширование для загрузки игроков
-      const loadedPlayers = await dataCache.getOrLoad(
-        CACHE_KEYS.PLAYERS,
-        () => loadPlayers(),
-        5 * 60 * 1000 // 5 минут
-      );
+      let loadedPlayers: Player[];
+      
+      if (forceRefresh) {
+        // Принудительная загрузка без кэша
+        loadedPlayers = await loadPlayers();
+        // Обновляем кэш с новыми данными
+        dataCache.set(CACHE_KEYS.PLAYERS, loadedPlayers, 5 * 60 * 1000);
+      } else {
+        // Используем кеширование для загрузки игроков
+        loadedPlayers = await dataCache.getOrLoad(
+          CACHE_KEYS.PLAYERS,
+          () => loadPlayers(),
+          5 * 60 * 1000 // 5 минут
+        );
+      }
       
       setPlayers(loadedPlayers);
       
@@ -1028,29 +1073,59 @@ export default function HomeScreen() {
     initializeApp();
   }, []); // Запускаем только один раз при монтировании
 
+  // Функция для принудительного обновления игроков
+  const forceRefreshPlayers = useCallback(async () => {
+    // Принудительно инвалидируем кэш перед обновлением
+    dataCache.invalidate(CACHE_KEYS.PLAYERS);
+    // Очищаем AsyncStorage кэш всех игроков
+    await clearAllPlayersCache();
+    // Принудительно обновляем данные без использования кэша
+    const loadedPlayers = await loadPlayers(true); // forceRefresh = true
+    setPlayers(loadedPlayers);
+    checkForNewUser();
+  }, []);
+
+  const lastRefreshTimeRef = useRef<number>(0);
+
   useFocusEffect(
     useCallback(() => {
       // Устанавливаем, что мы на главном экране
       setCurrentScreen('index');
       
+      // Если есть параметр refresh или прошло больше 2 секунд с последнего обновления - обновляем
+      const now = Date.now();
+      const shouldRefresh = params.refresh || (now - lastRefreshTimeRef.current > 2000);
+      
+      if (shouldRefresh) {
+        lastRefreshTimeRef.current = now;
+        forceRefreshPlayers().then(() => {
+          // Очищаем параметр refresh после использования
+          if (params.refresh) {
+            setTimeout(() => {
+              router.setParams({ refresh: undefined });
+            }, 100);
+          }
+        });
+      }
+      
       // Возвращаем функцию очистки
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen])
+    }, [setCurrentScreen, params.refresh, forceRefreshPlayers, router])
   );
 
-  // Обработка параметра refresh для принудительного обновления
+  // Отдельный useEffect для обработки параметра refresh (работает даже если мы уже на главном экране)
   useEffect(() => {
     if (params.refresh) {
-      refreshPlayers();
-      checkForNewUser();
-      // Очищаем параметр refresh после использования
-      setTimeout(() => {
-        router.setParams({ refresh: undefined });
-      }, 1000);
+      forceRefreshPlayers().then(() => {
+        // Очищаем параметр refresh после использования
+        setTimeout(() => {
+          router.setParams({ refresh: undefined });
+        }, 100);
+      });
     }
-  }, [params.refresh, refreshPlayers, checkForNewUser, router]);
+  }, [params.refresh, forceRefreshPlayers, router]);
 
   // Убираем частую проверку обновлений данных - только при необходимости
   // useEffect(() => {

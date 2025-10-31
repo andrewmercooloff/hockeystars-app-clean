@@ -448,6 +448,7 @@ export default function RegisterScreen() {
         plankTime: '',
         sprint100m: '',
         longJump: '',
+        createdAt: new Date().toISOString(), // Устанавливаем createdAt для логики "новички на льду"
         // Добавляем поля для магазина
         ...(formData.status === 'shop' ? {
           address: formData.address || '',

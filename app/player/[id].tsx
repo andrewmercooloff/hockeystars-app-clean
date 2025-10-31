@@ -1082,18 +1082,28 @@ export default function PlayerProfile() {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends ? 
-            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
-            : player.discountForFriends
+          discountForFriends:
+            editData.discountForFriends === ''
+              ? null
+              : (editData.discountForFriends
+                  ? (String(editData.discountForFriends).includes('%')
+                      ? editData.discountForFriends
+                      : `${editData.discountForFriends}%`)
+                  : player.discountForFriends)
         } : {}),
         // Добавляем поля для заточки коньков
         ...(player.status === 'skateSharpening' ? {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends ? 
-            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
-            : player.discountForFriends,
+          discountForFriends:
+            editData.discountForFriends === ''
+              ? null
+              : (editData.discountForFriends
+                  ? (String(editData.discountForFriends).includes('%')
+                      ? editData.discountForFriends
+                      : `${editData.discountForFriends}%`)
+                  : player.discountForFriends),
           skate_services: skateServices.length > 0 ? skateServices : undefined
         } : {})
         // Убираем pastTeams, так как команды сохраняются в отдельной таблице
@@ -1482,9 +1492,14 @@ export default function PlayerProfile() {
           address: editData.address || player.address,
           workingHours: editData.workingHours || player.workingHours,
           email: editData.email || player.email,
-          discountForFriends: editData.discountForFriends ? 
-            (String(editData.discountForFriends).includes('%') ? editData.discountForFriends : `${editData.discountForFriends}%`) 
-            : player.discountForFriends
+          discountForFriends:
+            editData.discountForFriends === ''
+              ? null
+              : (editData.discountForFriends
+                  ? (String(editData.discountForFriends).includes('%')
+                      ? editData.discountForFriends
+                      : `${editData.discountForFriends}%`)
+                  : player.discountForFriends)
         }, true); // Пропускаем очистку кеша для миграции
       }
       
@@ -1520,9 +1535,9 @@ export default function PlayerProfile() {
         if (success) {
             showCustomAlert(
               t('success'), 
-            t('profile.userDeleted', { name: player.name }),
+              t('profile.userDeleted', { name: player.name }),
               'success',
-              () => router.push('/')
+              () => router.push({ pathname: '/', params: { refresh: String(Date.now()) } })
             );
         } else {
           showCustomAlert('Ошибка', 'Не удалось удалить пользователя', 'error');
@@ -1587,7 +1602,6 @@ export default function PlayerProfile() {
       const createdPlayer = await createPlayerManually(
         {
           ...newUserData,
-          id: Date.now().toString(),
           age: 0,
           goals: '',
           assists: '',
@@ -1602,8 +1616,6 @@ export default function PlayerProfile() {
       );
 
       if (createdPlayer) {
-        Alert.alert('Успех', `Пользователь ${createdPlayer.name} создан`);
-        
         // Сбрасываем форму и закрываем модальное окно
         setNewUserData({
           name: '',
@@ -1616,6 +1628,18 @@ export default function PlayerProfile() {
           avatar: undefined
         });
         setShowCreateUserModal(false);
+        
+        // Используем тот же паттерн, что и при удалении - showCustomAlert с callback
+        showCustomAlert(
+          t('success'), 
+          `Пользователь ${createdPlayer.name} создан`,
+          'success',
+          () => {
+            // Переходим на главный экран - useFocusEffect автоматически обновит данные
+            // так как с момента последнего обновления прошло >2 секунд
+            router.replace('/');
+          }
+        );
       } else {
         Alert.alert('Ошибка', 'Не удалось создать пользователя');
       }
@@ -2053,7 +2077,10 @@ export default function PlayerProfile() {
                         <View style={styles.phoneIconContainer}>
                           <Ionicons name="call" size={12} color="#fff" />
                         </View>
-                        <Text style={styles.phoneButtonText}>{player.phone}</Text>
+                        <Text style={[
+                          styles.phoneButtonText,
+                          (player.status === 'shop' || player.status === 'skateSharpening') ? { color: '#FFFFFF' } : null
+                        ]}>{player.phone}</Text>
                       </TouchableOpacity>
                     ) : (
                       <Text style={styles.infoValue}>{t('profile.notSpecified')}</Text>
@@ -2183,7 +2210,7 @@ export default function PlayerProfile() {
                             const numbersOnly = text.replace(/[^0-9]/g, '');
                             setEditData({...editData, discountForFriends: numbersOnly});
                           }}
-                          placeholder="10"
+                          placeholder=""
                           keyboardType="numeric"
                         />
                         <Text style={{ color: '#fff', marginLeft: 5 }}>%</Text>
@@ -2462,7 +2489,7 @@ export default function PlayerProfile() {
                         const numbersOnly = text.replace(/[^0-9]/g, '');
                         setEditData({...editData, discountForFriends: numbersOnly});
                       }}
-                      placeholder="10"
+                      placeholder=""
                       keyboardType="numeric"
                       placeholderTextColor="#FFFFFF"
                     />
@@ -2655,7 +2682,7 @@ export default function PlayerProfile() {
             )}
 
             {/* Скидка для друзей - для заточки коньков */}
-            {player.status === 'skateSharpening' && (
+            {player.status === 'skateSharpening' && (player.discountForFriends || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
                 <Text style={styles.discountExplanation}>
@@ -2675,7 +2702,7 @@ export default function PlayerProfile() {
                         const numbersOnly = text.replace(/[^0-9]/g, '');
                         setEditData({...editData, discountForFriends: numbersOnly});
                       }}
-                      placeholder="10"
+                      placeholder=""
                       keyboardType="numeric"
                       placeholderTextColor="#FFFFFF"
                     />

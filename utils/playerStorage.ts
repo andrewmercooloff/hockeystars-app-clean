@@ -199,6 +199,8 @@ export interface Player {
   skate_services?: string[]; // услуги заточки коньков
   // Рейтинг активности
   activityRating?: number; // рейтинг активности игрока
+  // Дата создания
+  createdAt?: string; // дата создания игрока в БД
 }
 
 export interface Message {
@@ -352,7 +354,9 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     coach_years: supabasePlayer.coach_years || undefined,
     // Поля для индивидуальных тренировок и услуг заточки коньков
     individual_training: supabasePlayer.individual_training || undefined,
-    skate_services: supabasePlayer.skate_services || undefined
+    skate_services: supabasePlayer.skate_services || undefined,
+    // Дата создания
+    createdAt: supabasePlayer.created_at
   };
   
   
@@ -1045,18 +1049,21 @@ export const initializeStorage = async (): Promise<void> => {
 };
 
 // Загрузка всех игроков
-export const loadPlayers = async (): Promise<Player[]> => {
+export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
   try {
     const cacheKey = 'all_players';
     const cacheTime = 10 * 60 * 1000; // 10 минут
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-    
-    if (cachedData) {
-      const { players, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < cacheTime) {
-        return players;
+    // Если forceRefresh = true, пропускаем проверку кэша
+    if (!forceRefresh) {
+      const cachedData = await AsyncStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        const { players, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < cacheTime) {
+          return players;
+        }
       }
     }
     
@@ -1463,10 +1470,14 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
       .from('players')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error('❌ Ошибка получения игрока:', error);
+      return null;
+    }
+    if (!data) {
+      // Нет строки — игрок не найден
       return null;
     }
     
@@ -1539,7 +1550,7 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
       .update(supabaseData)
       .eq('id', playerId)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error('❌ Ошибка обновления игрока:', error);
@@ -2395,8 +2406,22 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
   try {
     console.log(`🗑️ Удаляем игрока с ID: ${playerId}`);
     
+    // Проверяем, существует ли игрок перед удалением
+    const { data: existingBefore, error: existErr } = await supabase
+      .from('players')
+      .select('id')
+      .eq('id', playerId)
+      .limit(1);
+    if (existErr) {
+      console.error('❌ Ошибка проверки существования игрока перед удалением:', existErr);
+    }
+    if (!existingBefore || existingBefore.length === 0) {
+      console.warn('⚠️ Игрок с таким ID не найден перед удалением. Отменяем операцию.');
+      return false;
+    }
+
     // Удаляем связанные данные
-    const [notifResult, messagesResult, friendRequestsResult, teamsResult, exercisesResult] = await Promise.all([
+    const [notifResult, messagesResult, friendRequestsResult, teamsResult] = await Promise.all([
       // Удаляем уведомления игрока
       supabase.from('notifications').delete().eq('user_id', playerId),
       // Удаляем сообщения игрока
@@ -2404,9 +2429,7 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
       // Удаляем запросы дружбы игрока
       supabase.from('friend_requests').delete().or(`from_id.eq.${playerId},to_id.eq.${playerId}`),
       // Удаляем команды игрока
-      supabase.from('player_teams').delete().eq('player_id', playerId),
-      // Удаляем статистику упражнений игрока
-      supabase.from('exercise_completions').delete().eq('player_id', playerId)
+      supabase.from('player_teams').delete().eq('player_id', playerId)
     ]);
     
     // Проверяем ошибки при удалении связанных данных
@@ -2414,8 +2437,20 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
     if (messagesResult.error) console.error('❌ Ошибка удаления сообщений:', messagesResult.error);
     if (friendRequestsResult.error) console.error('❌ Ошибка удаления запросов дружбы:', friendRequestsResult.error);
     if (teamsResult.error) console.error('❌ Ошибка удаления команд:', teamsResult.error);
-    if (exercisesResult.error) console.error('❌ Ошибка удаления упражнений:', exercisesResult.error);
+
+    // Пытаемся удалить статистику упражнений, если таблица есть
+    try {
+      const exDel = await supabase.from('exercise_completions').delete().eq('player_id', playerId);
+      if ((exDel as any)?.error && (exDel as any).error.code !== '42P01') {
+        console.error('❌ Ошибка удаления упражнений:', (exDel as any).error);
+      }
+    } catch {}
     
+    // Пытаемся удалить записи из дополнительных таблиц (не критично, оборачиваем в try)
+    try { await supabase.from('player_museum').delete().eq('player_id', playerId); } catch {}
+    try { await supabase.from('photos').delete().eq('player_id', playerId); } catch {}
+    try { await supabase.from('videos').delete().eq('player_id', playerId); } catch {}
+
     // Удаляем самого игрока
     const { error, data } = await supabase
       .from('players')
@@ -2427,7 +2462,12 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
       console.error('❌ Ошибка удаления игрока:', error);
       return false;
     }
-    
+    // Проверяем, что запись действительно удалена
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.error('❌ Удаление не произошло: запись не удалена (пустой результат).');
+      return false;
+    }
+
     console.log(`✅ Игрок успешно удален. Результат:`, data);
     
     // Очищаем кеши после успешного удаления
@@ -2435,8 +2475,14 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
       // Очищаем AvatarCache для удаленного игрока
       avatarCache.clearAvatar(playerId);
       
+      // Очищаем AsyncStorage кэш конкретного игрока
+      await clearPlayerCache(playerId);
+      
       // Очищаем DataCache для списка игроков
       dataCache.invalidate(CACHE_KEYS.PLAYERS);
+      
+      // Очищаем кэш всех игроков для гарантии
+      await clearAllPlayersCache();
       
       console.log(`✅ Кеши очищены для удаленного игрока`);
     } catch (cacheError) {
@@ -3448,8 +3494,16 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     const createdPlayer = convertSupabaseToPlayer(data);
     
-    // Очищаем кеш всех игроков при создании нового игрока
+    // Очищаем кеш всех игроков и инвалидация dataCache, чтобы главный экран увидел нового игрока
     await clearAllPlayersCache();
+    try { 
+      dataCache.invalidate(CACHE_KEYS.PLAYERS);
+    } catch (e) {
+      console.error('❌ Ошибка dataCache.invalidate:', e);
+    }
+    
+    // Также очищаем кэш конкретного игрока (на случай если он был в кэше ранее)
+    await clearPlayerCache(createdPlayer.id);
     
     // Отправляем уведомление админам о новой регистрации
     try {
@@ -3509,11 +3563,13 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
     console.log('📞 Телефон:', playerData.phone);
     console.log('📧 Email:', playerData.email || '(пустой)');
     
-    // Проверяем, существует ли уже пользователь с таким телефоном
-    const existingPlayer = await getPlayerByPhone(playerData.phone || '');
-    if (existingPlayer) {
-      console.error('❌ Пользователь с таким номером телефона уже существует:', playerData.phone);
-      throw new Error('Пользователь с таким номером телефона уже существует');
+    // Проверяем, существует ли уже пользователь с таким телефоном (если он указан)
+    if (playerData.phone && playerData.phone.trim() !== '') {
+      const existingPlayer = await getPlayerByPhone(playerData.phone);
+      if (existingPlayer) {
+        console.error('❌ Пользователь с таким номером телефона уже существует:', playerData.phone);
+        throw new Error('Пользователь с таким номером телефона уже существует');
+      }
     }
     
     // Если указан email, проверяем его уникальность
@@ -3530,10 +3586,7 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
       }
     }
     
-    // Генерируем уникальный ID, если не передан
-    if (!playerData.id) {
-      playerData.id = Date.now().toString();
-    }
+    // ID генерируется в БД, не проставляем его на клиенте
 
     // Устанавливаем значения по умолчанию, если не указаны
     const completePlayerData: Player = {
@@ -3550,6 +3603,9 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
       longJump: playerData.longJump || '',
       status: playerData.status || 'player'
     };
+
+    // Проставляем createdAt для корректной логики «новички на льду»
+    try { (completePlayerData as any).createdAt = (completePlayerData as any).createdAt || new Date().toISOString(); } catch {}
 
     // Конвертируем данные игрока в формат Supabase
     const supabaseData = convertPlayerToSupabase(completePlayerData);
@@ -3580,11 +3636,18 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
       throw new Error('Нет данных после создания игрока');
     }
     
-    // console.log('✅ Игрок успешно создан администратором:', data.name);
     const createdPlayer = convertSupabaseToPlayer(data);
     
-    // Очищаем кеш всех игроков при создании нового игрока
+    // Очищаем кеш всех игроков и инвалидация dataCache, чтобы главный экран увидел нового игрока
     await clearAllPlayersCache();
+    try { 
+      dataCache.invalidate(CACHE_KEYS.PLAYERS);
+    } catch (e) {
+      console.error('❌ Ошибка dataCache.invalidate:', e);
+    }
+    
+    // Также очищаем кэш конкретного игрока (на случай если он был в кэше ранее)
+    await clearPlayerCache(createdPlayer.id);
     
     return createdPlayer;
     
@@ -5632,6 +5695,8 @@ export const getSmartPlayerSelection = (
     const otherPlayers = filteredPlayers.filter(p => p.id !== currentUserId);
 
     // 4. Новички (зарегистрировались в последние 5 дней) - до 5 человек
+    // ВАЖНО: новички берутся из filteredPlayers, чтобы учитывать фильтры по стране и году
+    // Но они всегда имеют приоритет и показываются независимо от рейтинга
     const fiveDaysAgo = new Date();
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
     
