@@ -5666,15 +5666,25 @@ export const getSmartPlayerSelection = (
   selectedYear?: number
 ): Player[] => {
   try {
-    // 1. Всегда показываем не-игроков (звезды, тренеры, магазины, заточка коньков, администраторы)
-    const nonPlayers = players.filter(player => 
-      player.status === 'star' || 
-      player.status === 'coach' || 
-      player.status === 'shop' || 
-      player.status === 'skateSharpening' || 
-      player.status === 'admin' ||
-      player.status === 'scout'
-    );
+    // 1. Показываем не-игроков (звезды, тренеры, магазины, заточка коньков, администраторы)
+    // ВАЖНО: если выбран фильтр по стране, показываем только не-игроков из этой страны
+    const nonPlayers = players.filter(player => {
+      const isNonPlayer = player.status === 'star' || 
+        player.status === 'coach' || 
+        player.status === 'shop' || 
+        player.status === 'skateSharpening' || 
+        player.status === 'admin' ||
+        player.status === 'scout';
+      
+      if (!isNonPlayer) return false;
+      
+      // Если выбран фильтр по стране, фильтруем не-игроков тоже
+      if (selectedCountry) {
+        return player.country === selectedCountry;
+      }
+      
+      return true;
+    });
 
     // 2. Фильтруем игроков по стране и году
     const filteredPlayers = players.filter(player => {
