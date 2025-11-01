@@ -82,6 +82,17 @@ export default function RootLayout() {
     'SpaceMono': require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  // Скрываем нативный splash screen сразу при монтировании компонента для iOS
+  // Это позволяет избежать двойного показа (нативный + кастомный)
+  React.useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // Скрываем нативный splash screen немедленно, чтобы показывался только наш кастомный
+      SplashScreen.hideAsync().catch(() => {
+        // Игнорируем ошибки, если splash screen уже скрыт
+      });
+    }
+  }, []); // Выполняется один раз при монтировании
+
   // Принудительно загружаем Ionicons и устанавливаем глобальный шрифт
   React.useEffect(() => {
     if (loaded) {
@@ -473,12 +484,15 @@ export default function RootLayout() {
       try {
         console.log('🚀 Начало инициализации приложения');
 
-        // Быстро скрываем нативный Metro splash screen
-        try {
-          await SplashScreen.hideAsync();
-          console.log('✅ Нативный splash screen скрыт');
-        } catch (splashError) {
-          console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
+        // Нативный splash screen уже скрыт в начале файла для iOS
+        // Здесь дополнительно скрываем для других платформ
+        if (Platform.OS !== 'ios') {
+          try {
+            await SplashScreen.hideAsync();
+            console.log('✅ Нативный splash screen скрыт');
+          } catch (splashError) {
+            console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
+          }
         }
         
         // Инициализируем только критически важные ресурсы параллельно
@@ -506,10 +520,12 @@ export default function RootLayout() {
         console.error('🚨 Ошибка инициализации приложения:', catchError);
         
         // При ошибке быстро скрываем Metro splash и показываем нашу заставку
-        try {
-          await SplashScreen.hideAsync();
-        } catch (finalError) {
-          // Ignore
+        if (Platform.OS !== 'ios') {
+          try {
+            await SplashScreen.hideAsync();
+          } catch (finalError) {
+            // Ignore
+          }
         }
         
         // При ошибке сразу переходим к скрытию заставки
