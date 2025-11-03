@@ -18,12 +18,14 @@ import {
     ImageBackground,
     Linking,
     Modal,
+    PanResponder,
     Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View
 } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -50,6 +52,7 @@ import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import VideoCarousel from '../../components/VideoCarousel';
+import YouTubeVideo from '../../components/YouTubeVideo';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -135,6 +138,23 @@ export default function PlayerProfile() {
   }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  
+  const videoPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Реагируем на движение вниз (swipe down)
+        return Math.abs(gestureState.dy) > 10 && gestureState.dy > 0;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        // Если свайп вниз достаточно большой (больше 50 пикселей), закрываем модальное окно
+        if (gestureState.dy > 50) {
+          setSelectedVideo(null);
+        }
+      },
+    })
+  ).current;
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -3386,6 +3406,7 @@ export default function PlayerProfile() {
                     return (
                   <VideoCarousel
                         videos={parsedVideos}
+                    onVideoPress={(video) => setSelectedVideo(video)}
                   />
                     );
                   })()
@@ -4276,6 +4297,37 @@ export default function PlayerProfile() {
         </View>
       </View>
       
+      {/* Модальное окно для видео */}
+      <Modal
+        visible={selectedVideo !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setSelectedVideo(null)}
+      >
+        <TouchableWithoutFeedback onPress={() => setSelectedVideo(null)}>
+          <View style={styles.videoModalOverlay} {...videoPanResponder.panHandlers}>
+            <View style={styles.videoModalContainer} pointerEvents="box-none">
+              <TouchableOpacity
+                style={styles.videoModalCloseButton}
+                onPress={() => setSelectedVideo(null)}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+              {selectedVideo && (
+                <View pointerEvents="box-only">
+                  <YouTubeVideo 
+                    url={selectedVideo.url}
+                    title={t('myMoment')}
+                    timeCode={selectedVideo.timeCode}
+                    onClose={() => setSelectedVideo(null)}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
       {/* Модальное окно для уведомлений */}
       <CustomAlert
         visible={alert.visible}
@@ -5043,9 +5095,12 @@ const styles = StyleSheet.create({
   },
   videoModalCloseButton: {
     position: 'absolute',
-    top: 20,
+    top: 30,
     right: 20,
     zIndex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 20,
+    padding: 8,
   },
   editInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',

@@ -1,37 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     Dimensions,
     Image,
+    Modal,
+    PanResponder,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import YouTubeVideo from './YouTubeVideo';
 import { useLanguage } from '../contexts/LanguageContext';
 
-// Функция для конвертации таймкода в секунды
-const timeCodeToSeconds = (timeCode: string): number => {
-  const parts = timeCode.split(':');
-  if (parts.length === 3) {
-    // Формат ЧЧ:ММ:СС
-    const hours = parseInt(parts[0]) || 0;
-    const minutes = parseInt(parts[1]) || 0;
-    const seconds = parseInt(parts[2]) || 0;
-    return hours * 3600 + minutes * 60 + seconds;
-  } else if (parts.length === 2) {
-    // Формат ММ:СС
-    const minutes = parseInt(parts[0]) || 0;
-    const seconds = parseInt(parts[1]) || 0;
-    return minutes * 60 + seconds;
-  }
-  return 0;
-};
-
 // Компонент для изображения с fallback
-const VideoThumbnail = ({ videoUrl, timeCode }: { videoUrl: string; timeCode?: string }) => {
+const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Функция для проверки YouTube ссылки
@@ -64,39 +49,26 @@ const VideoThumbnail = ({ videoUrl, timeCode }: { videoUrl: string; timeCode?: s
   
   // Для YouTube видео
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
-    // Если есть таймкод, пытаемся получить кадр с нужного момента
-    // Используем YouTube Data API v3 для получения thumbnail с определенного времени
-    // Если timeCode есть, используем специальный формат
-    let thumbnailUrl: string;
+    // Разные форматы превью в порядке приоритета
+    const thumbnailFormats = [
+      `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/mqdefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/sddefault.jpg`,
+      `https://img.youtube.com/vi/${youtubeVideoId}/default.jpg`
+    ];
     
-    if (timeCode) {
-      const seconds = timeCodeToSeconds(timeCode);
-      // YouTube позволяет получить кадр используя параметр t в URL
-      // Формат: https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg?t=SECONDS
-      // Но более надежно использовать YouTube Data API v3
-      // Пока используем стандартный thumbnail, но можно улучшить с API ключом
-      thumbnailUrl = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`;
-    } else {
-      // Стандартные форматы превью
-      const thumbnailFormats = [
-        `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
-        `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
-        `https://img.youtube.com/vi/${youtubeVideoId}/mqdefault.jpg`,
-        `https://img.youtube.com/vi/${youtubeVideoId}/sddefault.jpg`,
-        `https://img.youtube.com/vi/${youtubeVideoId}/default.jpg`
-      ];
-      thumbnailUrl = thumbnailFormats[currentImageIndex] || thumbnailFormats[0];
-    }
+    const currentThumbnail = thumbnailFormats[currentImageIndex];
     
     const handleError = () => {
-      if (!timeCode && currentImageIndex < 4) {
+      if (currentImageIndex < thumbnailFormats.length - 1) {
         setCurrentImageIndex(currentImageIndex + 1);
       }
     };
     
     return (
       <Image
-        source={{ uri: thumbnailUrl }}
+        source={{ uri: currentThumbnail }}
         style={styles.thumbnail}
         resizeMode="cover"
         onError={handleError}
@@ -122,17 +94,35 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselProps) {
   const { t } = useLanguage();
+  const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [expandedVideoIndex, setExpandedVideoIndex] = useState<number | null>(null);
   
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Реагируем на движение вниз (swipe down)
+        return Math.abs(gestureState.dy) > 10 && gestureState.dy > 0;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        // Если свайп вниз достаточно большой (больше 50 пикселей), закрываем модальное окно
+        if (gestureState.dy > 50) {
+          setSelectedVideo(null);
+        }
+      },
+    })
+  ).current;
 
-  const handleVideoPress = (video: { url: string; timeCode?: string }, index: number) => {
+  const handleVideoPress = (video: { url: string; timeCode?: string }) => {
     if (onVideoPress) {
       onVideoPress(video);
     } else {
-      // Разворачиваем видео прямо в карусели
-      setExpandedVideoIndex(expandedVideoIndex === index ? null : index);
+      setSelectedVideo(video);
     }
+  };
+
+  const closeModal = () => {
+    setSelectedVideo(null);
   };
 
   if (!videos || videos.length === 0) {
@@ -162,40 +152,24 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
         decelerationRate="fast"
       >
         {videos.map((video, index) => (
-          <View key={index} style={styles.videoCard}>
-            {expandedVideoIndex === index ? (
-              <View style={styles.expandedVideoContainer}>
-                <TouchableOpacity 
-                  style={styles.collapseButton}
-                  onPress={() => setExpandedVideoIndex(null)}
-                >
-                  <Ionicons name="close-circle" size={30} color="#fff" />
-                </TouchableOpacity>
-                <YouTubeVideo
-                  url={video.url}
-                  timeCode={video.timeCode}
-                />
+          <TouchableOpacity
+            key={index}
+            style={styles.videoCard}
+            onPress={() => handleVideoPress(video)}
+          >
+            <VideoThumbnail videoUrl={video.url} />
+            <View style={styles.playButton}>
+              <Ionicons name="play-circle" size={40} color="#FF4444" />
+            </View>
+            {video.timeCode && (
+              <View style={styles.timeCodeBadge}>
+                <Text style={styles.timeCodeText}>{video.timeCode}</Text>
               </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.thumbnailContainer}
-                onPress={() => handleVideoPress(video, index)}
-              >
-                <VideoThumbnail videoUrl={video.url} timeCode={video.timeCode} />
-                <View style={styles.playButton}>
-                  <Ionicons name="play-circle" size={40} color="#FF4444" />
-                </View>
-                {video.timeCode && (
-                  <View style={styles.timeCodeBadge}>
-                    <Text style={styles.timeCodeText}>{video.timeCode}</Text>
-                  </View>
-                )}
-                <View style={styles.videoInfo}>
-                  <Text style={styles.videoTitle}>{index + 1}</Text>
-                </View>
-              </TouchableOpacity>
             )}
-          </View>
+            <View style={styles.videoInfo}>
+              <Text style={styles.videoTitle}>{index + 1}</Text>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -213,6 +187,33 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
           ))}
         </View>
       )}
+
+      {/* Модальное окно для просмотра видео */}
+      <Modal
+        visible={selectedVideo !== null}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={closeModal}
+      >
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalOverlay} {...panResponder.panHandlers}>
+            <View style={styles.modalContent} pointerEvents="box-none">
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+              {selectedVideo && (
+                <View pointerEvents="box-only">
+                  <YouTubeVideo
+                    key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
+                    url={selectedVideo.url}
+                    timeCode={selectedVideo.timeCode}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 }
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   },
   videoCard: {
     width: screenWidth * 0.65,
-    minHeight: 180,
+    height: 180,
     marginHorizontal: 8,
     borderRadius: 12,
     backgroundColor: 'rgba(255, 68, 68, 0.1)',
@@ -234,25 +235,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 68, 68, 0.2)',
     overflow: 'hidden',
     position: 'relative',
-  },
-  thumbnailContainer: {
-    width: '100%',
-    height: 180,
-    position: 'relative',
-  },
-  expandedVideoContainer: {
-    width: '100%',
-    minHeight: 300,
-    position: 'relative',
-  },
-  collapseButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 15,
-    padding: 2,
   },
   thumbnail: {
     width: '100%',
@@ -304,6 +286,37 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     marginTop: 10,
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#000',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 10,
+    zIndex: 1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  carouselIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
+
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
