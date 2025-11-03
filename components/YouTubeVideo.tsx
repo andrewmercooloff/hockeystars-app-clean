@@ -1,7 +1,7 @@
 import SafeIcon from './SafeIcon';
-import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useState } from 'react';
+import { Dimensions, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -16,6 +16,7 @@ const { width, height } = Dimensions.get('window');
 
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCode }) => {
   const { t } = useLanguage();
+  const [loading, setLoading] = useState(true);
 
   console.log('YouTubeVideo component:', { url, title, timeCode });
 
@@ -89,34 +90,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
     );
   }
 
-  // Создаем простой HTML с YouTube iframe - используем nocookie домен для лучшей совместимости
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeVideoId}?${startSeconds > 0 ? `start=${startSeconds}&` : ''}autoplay=0&rel=0&modestbranding=1`;
-  
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
-    .container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-    iframe { width: 100%; height: 100%; border: 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <iframe 
-      src="${embedUrl}" 
-      frameborder="0"
-      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-      allowfullscreen
-    ></iframe>
-  </div>
-</body>
-</html>`;
-
-  console.log('Embed URL:', embedUrl);
+  console.log('Final video ID:', youtubeVideoId, 'Start at:', startSeconds);
 
   return (
     <View style={styles.container}>
@@ -130,19 +104,29 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
 
       {/* Видео плеер */}
       <View style={styles.videoContainer}>
-        <WebView
-          style={styles.webView}
-          source={{ html }}
-          allowsFullscreenVideo={true}
-          allowsInlineMediaPlayback={true}
-          mediaPlaybackRequiresUserAction={false}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          mixedContentMode="always"
-          originWhitelist={['*']}
-          onError={(syntheticEvent) => {
-            const { nativeEvent } = syntheticEvent;
-            console.error('WebView error:', nativeEvent);
+        {loading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#FF4444" />
+          </View>
+        )}
+        <YoutubePlayer
+          height={300}
+          videoId={youtubeVideoId}
+          play={false}
+          initialPlayerParams={{
+            start: startSeconds,
+            modestbranding: true,
+            rel: false,
+            showClosedCaptions: false,
+            preventFullScreen: false,
+          }}
+          onReady={() => {
+            console.log('YouTube player ready');
+            setLoading(false);
+          }}
+          onError={(error) => {
+            console.error('YouTube player error:', error);
+            setLoading(false);
           }}
         />
       </View>
@@ -177,6 +161,17 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
     backgroundColor: '#000',
     position: 'relative',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    zIndex: 10,
   },
   thumbnail: {
     width: '100%',
