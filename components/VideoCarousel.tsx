@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     Dimensions,
     Image,
-    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -123,7 +122,6 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselProps) {
   const { t } = useLanguage();
-  const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedVideoIndex, setExpandedVideoIndex] = useState<number | null>(null);
   
@@ -135,10 +133,6 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
       // Разворачиваем видео прямо в карусели
       setExpandedVideoIndex(expandedVideoIndex === index ? null : index);
     }
-  };
-
-  const closeModal = () => {
-    setSelectedVideo(null);
   };
 
   if (!videos || videos.length === 0) {
@@ -219,29 +213,6 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
           ))}
         </View>
       )}
-
-      {/* Модальное окно для просмотра видео */}
-      <Modal
-        visible={selectedVideo !== null}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-            {selectedVideo && (
-              <YouTubeVideo
-                key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
-                url={selectedVideo.url}
-                timeCode={selectedVideo.timeCode}
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -333,37 +304,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     marginTop: 10,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#000',
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 20,
-    padding: 8,
-  },
-  carouselIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    paddingHorizontal: 20,
-  },
-
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
