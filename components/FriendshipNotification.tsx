@@ -95,10 +95,7 @@ export default function FriendshipNotification({
             {t('friendshipNotification.became')}
           </Text>
           <View style={styles.friendshipBadge}>
-            <Ionicons name="people-outline" size={14} color="#fff" />
-            <Text style={styles.badgeText}>
-              {t('friendshipNotification.title')}
-            </Text>
+            <Ionicons name="people-outline" size={18} color="#fff" />
           </View>
         </View>
       </View>
@@ -185,16 +182,12 @@ const styles = StyleSheet.create({
   friendshipBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FF4444',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 8,
     borderRadius: 12,
-    minWidth: 32,
-  },
-  badgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-    marginLeft: 4,
+    width: 36,
+    height: 36,
   },
 });
