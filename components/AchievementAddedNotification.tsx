@@ -9,6 +9,7 @@ interface AchievementAddedNotificationProps {
   playerId?: string;
   achievementsCount: number;
   timestamp: string;
+  playerAvatar?: string;
 }
 
 const AchievementAddedNotification = React.memo(function AchievementAddedNotification({
@@ -49,15 +50,17 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />
         ) : (
-          <Ionicons name="trophy-outline" size={24} color="#fff" />
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="trophy-outline" size={24} color="#fff" />
+          </View>
         )}
       </View>
       
@@ -105,10 +108,16 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+  avatarPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   playerAvatar: {
     width: 50,

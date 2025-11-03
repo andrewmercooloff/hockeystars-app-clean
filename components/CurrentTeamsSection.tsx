@@ -39,12 +39,15 @@ export default function CurrentTeamsSection({
     // Сначала пробуем получить перевод из локализации
     const translationKey = `teams.${teamName}`;
     const translated = t(translationKey);
-    if (translated !== translationKey) {
+    // Если функция t() вернула сам ключ или ключ с префиксом, значит перевода нет
+    if (translated !== translationKey && !translated.startsWith('teams.')) {
       return translated;
     }
     
     // Если нет в локализации, используем наш словарь переводов
-    return getTeamTranslation(teamName, language);
+    const teamTranslation = getTeamTranslation(teamName, language);
+    // Если и в словаре нет, возвращаем оригинальное название
+    return teamTranslation || teamName;
   };
   const [editingTeam, setEditingTeam] = useState<PastTeam | null>(null);
   const [newTeam, setNewTeam] = useState({

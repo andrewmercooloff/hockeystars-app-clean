@@ -1,31 +1,44 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
-interface FriendRequestNotificationProps {
-  playerName: string;
-  playerId?: string;
-  timestamp: string | number;
-  playerAvatar?: string;
+interface LikeNotificationProps {
+  likedByName: string;
+  likedByAvatar?: string;
+  likedById: string;
+  contentType: 'video' | 'photo';
+  timestamp: number | string;
+  onPress?: () => void;
 }
 
-export default function FriendRequestNotification({
-  playerName,
-  playerId,
+const LikeNotification = React.memo(function LikeNotification({
+  likedByName,
+  likedByAvatar,
+  likedById,
+  contentType,
   timestamp,
-  playerAvatar,
-}: FriendRequestNotificationProps) {
+  onPress,
+}: LikeNotificationProps) {
   const { t } = useLanguage();
 
-  const formatTime = (timestamp: string | number): string => {
+  const formatTime = (timestamp: number | string): string => {
+    let date: Date;
+    
+    if (typeof timestamp === 'string') {
+      date = new Date(timestamp);
+    } else {
+      date = new Date(timestamp);
+    }
+    
+    if (isNaN(date.getTime())) {
+      return t('justNow');
+    }
+    
     const now = new Date();
-    const time = typeof timestamp === 'number' 
-      ? new Date(timestamp) 
-      : new Date(timestamp);
-    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
-
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
     if (diffInMinutes < 1) {
       return t('justNow');
     } else if (diffInMinutes < 60) {
@@ -39,51 +52,59 @@ export default function FriendRequestNotification({
     }
   };
 
+  const notificationKey = contentType === 'video' ? 'video_liked' : 'photo_liked';
+  const message = t(`notifications.${notificationKey}.message`)?.replace('{name}', likedByName) ||
+                 (contentType === 'video' 
+                   ? `${likedByName} лайкнул ваше видео` 
+                   : `${likedByName} лайкнул ваше фото`);
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerId ? (
+        {likedById ? (
           <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
+            playerId={likedById}
+            fallbackAvatarUrl={likedByAvatar}
             size={50}
             style={styles.playerAvatar}
           />
-        ) : playerAvatar ? (
-          <Image
-            source={{ uri: playerAvatar }}
-            style={styles.playerAvatar}
-            resizeMode="cover"
-          />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <Ionicons name="person-outline" size={24} color="#fff" />
+            <Ionicons name="heart-outline" size={24} color="#fff" />
           </View>
         )}
       </View>
-
+      
       <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.playerName} numberOfLines={1}>
-            {playerName}
+            {likedByName}
           </Text>
           <Text style={styles.timeText}>
             {formatTime(timestamp)}
           </Text>
         </View>
-
-        <View style={styles.requestItem}>
+        
+        <View style={styles.actionItem}>
           <Text style={styles.actionText}>
-            {t('notifications.wantsToAddAsFriend')}
+            {message}
           </Text>
-          <View style={styles.friendshipBadge}>
-            <Ionicons name="people-outline" size={16} color="#fff" />
+          <View style={styles.likeBadge}>
+            <Ionicons name="heart" size={16} color="#fff" />
           </View>
         </View>
       </View>
     </View>
   );
-}
+});
+
+export default LikeNotification;
 
 const styles = StyleSheet.create({
   container: {
@@ -95,21 +116,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
+    borderLeftColor: '#E91E63', // Розовый цвет для лайков (уникальный, не используется в других уведомлениях)
   },
   avatarContainer: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: 12,
-  },
-  playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    overflow: 'hidden',
   },
   avatarPlaceholder: {
     width: 50,
@@ -118,6 +132,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  playerAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   contentContainer: {
     flex: 1,
@@ -136,9 +155,10 @@ const styles = StyleSheet.create({
   timeText: {
     color: '#aaa',
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
-  requestItem: {
+  actionItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -147,17 +167,18 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
-  friendshipBadge: {
+  likeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
-    paddingHorizontal: 6,
-    paddingVertical: 6,
+    backgroundColor: '#E91E63', // Такой же цвет, как граница слева
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 12,
-    width: 28,
-    height: 28,
+    minWidth: 28,
+    justifyContent: 'center',
   },
 });
+

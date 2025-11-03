@@ -18,6 +18,8 @@ import { loadCurrentUser, notifyFriendsAboutPhotos } from '../utils/playerStorag
 import PhotoViewer from './PhotoViewer';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedImage from './CachedImage';
+import LikeButton from './LikeButton';
+import { generatePhotoContentId } from '../utils/likesService';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -26,13 +28,15 @@ interface EditablePhotosSectionProps {
   isEditing?: boolean;
   onPhotosChange?: (photos: string[]) => void;
   isShopProfile?: boolean;
+  playerId?: string; // ID игрока, владельца фото
 }
 
 export default function EditablePhotosSection({ 
   photos = [], 
   isEditing = false,
   onPhotosChange,
-  isShopProfile
+  isShopProfile,
+  playerId
 }: EditablePhotosSectionProps) {
   const { t } = useLanguage();
 
@@ -450,21 +454,35 @@ export default function EditablePhotosSection({
               removeClippedSubviews={true}
               decelerationRate="fast"
             >
-              {photos.map((photo, index) => (
-                <View key={photo} style={styles.photoContainer}>
-                  <TouchableOpacity
-                    style={styles.photoWrapper}
-                    onPress={() => openPhotoViewer(index)}
-                    activeOpacity={0.8}
-                  >
-                    <CachedImage
-                      imageUrl={photo}
-                      style={styles.photo}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))}
+              {photos.map((photo, index) => {
+                const contentId = generatePhotoContentId(photo);
+                
+                return (
+                  <View key={photo} style={styles.photoContainer}>
+                    <TouchableOpacity
+                      style={styles.photoWrapper}
+                      onPress={() => openPhotoViewer(index)}
+                      activeOpacity={0.8}
+                    >
+                      <CachedImage
+                        imageUrl={photo}
+                        style={styles.photo}
+                        resizeMode="cover"
+                      />
+                      {playerId && (
+                        <View style={styles.photoLikeButtonContainer}>
+                          <LikeButton
+                            playerId={playerId}
+                            contentId={contentId}
+                            contentType="photo"
+                            size="small"
+                          />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
             </ScrollView>
           )}
         </View>
@@ -483,6 +501,7 @@ export default function EditablePhotosSection({
         visible={photoViewerVisible}
         onClose={() => setPhotoViewerVisible(false)}
         initialIndex={selectedPhotoIndex}
+        playerId={playerId}
       />
     </View>
   );
@@ -598,6 +617,12 @@ const styles = StyleSheet.create({
   },
   photoWrapper: {
     position: 'relative',
+  },
+  photoLikeButtonContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    zIndex: 10,
   },
   photo: {
     width: 120,

@@ -43,7 +43,6 @@ import SocialLinks from '../../components/SocialLinks';
 
 
 
-import ItemRequestButtons from '../../components/ItemRequestButtons';
 import NormativesSection from '../../components/NormativesSection';
 import PastTeamsSection from '../../components/PastTeamsSection';
 import PlayerExercisesSection from '../../components/PlayerExercisesSection';
@@ -53,6 +52,8 @@ import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
+import LikeButton from '../../components/LikeButton';
+import { generateVideoContentId } from '../../utils/likesService';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -65,7 +66,7 @@ const iceBg = require('../../assets/images/led.jpg');
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift } = useLocalSearchParams();
   const router = useRouter();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
@@ -80,6 +81,7 @@ export default function PlayerProfile() {
   const exercisesRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
   const friendsRef = useRef<View>(null);
+  const giftButtonRef = useRef<View>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -139,22 +141,6 @@ export default function PlayerProfile() {
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
-  
-  const videoPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Реагируем на движение вниз (swipe down)
-        return Math.abs(gestureState.dy) > 10 && gestureState.dy > 0;
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        // Если свайп вниз достаточно большой (больше 50 пикселей), закрываем модальное окно
-        if (gestureState.dy > 50) {
-          setSelectedVideo(null);
-        }
-      },
-    })
-  ).current;
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -190,6 +176,9 @@ export default function PlayerProfile() {
   const [skateServices, setSkateServices] = useState<string[]>([]);
   const [showGiftModal, setShowGiftModal] = useState(false);
   const [showStarGiftModal, setShowStarGiftModal] = useState(false);
+  const [showRequestGiftModal, setShowRequestGiftModal] = useState(false);
+  const [requestGiftMessage, setRequestGiftMessage] = useState('');
+  const [requestGiftLoading, setRequestGiftLoading] = useState(false);
   
   // Массивы для селекторов
   const positions = [t('profile.center'), t('profile.winger'), t('profile.defender'), t('profile.goalie')];
@@ -276,209 +265,50 @@ export default function PlayerProfile() {
   // Используем ref для отслеживания предыдущего id, чтобы избежать показа неправильного профиля
   const previousIdRef = useRef<string | string[] | undefined>(undefined);
   
-  useEffect(() => {
-    // Нормализуем id (может быть массивом из useLocalSearchParams)
-    const normalizedId = Array.isArray(id) ? id[0] : id;
-    const previousId = Array.isArray(previousIdRef.current) ? previousIdRef.current[0] : previousIdRef.current;
-    
-    if (!normalizedId) {
-      return;
-    }
-    
-    // Проверяем, изменился ли id
-    const idChanged = normalizedId !== previousId && previousId !== undefined;
-    
-    // Проверяем кеш для мгновенного отображения (работает даже при смене id, если профиль был в кеше)
-    const cachedPlayer = playersCache[normalizedId as string];
-    
-    // Если профиль есть в кеше и соответствует id - показываем мгновенно
-    if (cachedPlayer && cachedPlayer.id === normalizedId && !idChanged) {
-      // Мгновенно показываем данные из кеша только если ID не изменился
-      // (если ID изменился, нужно загрузить заново, даже если есть в кеше)
-      setPlayer(cachedPlayer);
-      setLoading(false);
+  // Функция для миграции фото в фоне
+  const migratePhotosInBackground = async (playerData: Player, userData: Player | null) => {
+    try {
+      const migratedPhotos: string[] = [];
+      for (const photo of playerData.photos || []) {
+            if (photo.startsWith('file://') || photo.startsWith('content://') || photo.startsWith('data:')) {
+              const { uploadGalleryPhoto } = await import('../../utils/uploadImage');
+              const migratedUrl = await uploadGalleryPhoto(photo);
+              if (migratedUrl) {
+                migratedPhotos.push(migratedUrl);
+              }
+            } else {
+              migratedPhotos.push(photo);
+            }
+          }
       
-      // Восстанавливаем друзей и статус дружбы из кеша
-      if (friendsCache[normalizedId as string]) {
-        setFriends(friendsCache[normalizedId as string]);
-      } else {
-        setFriends([]);
-      }
-      
-      // Восстанавливаем фото из кеша
-      if (photosCache[normalizedId as string]) {
-        setGalleryPhotos(photosCache[normalizedId as string]);
-      } else {
-        setGalleryPhotos([]);
-      }
-      
-      // Для статуса дружбы нужен currentUser, поэтому показываем 'none'
-      // Статус дружбы будет загружен в loadAdditionalData
-      setFriendshipStatus('none');
-      
-      setIsEditing(false);
-      setEditData({});
-      
-      // Устанавливаем текущий загружаемый ID
-      currentLoadingIdRef.current = normalizedId;
-      
-      // Обновляем данные в фоне (без показа loading), если id не изменился
-      // Если id не изменился - тоже обновляем для актуальности данных
-      loadPlayerData();
-      
-      // Обновляем предыдущий id
-      previousIdRef.current = normalizedId;
-    } else {
-      // Если id изменился, очищаем состояние, чтобы не показывать старые данные
-      if (idChanged) {
-        console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
-        // Отменяем любые текущие загрузки для старого ID
-        currentLoadingIdRef.current = null;
-        // Полностью очищаем все состояние
-        setPlayer(null);
-        setFriends([]);
-        setFriendshipStatus('none');
-        setIsEditing(false);
-        setEditData({});
-        setGalleryPhotos([]);
-        setAchievements([]);
-        setCoachYears([]);
-        setIndividualTraining([]);
-        setSkateServices([]);
-        setVideoFields([{ url: '', timeCode: '' }]);
-        previousIdRef.current = normalizedId;
-      } else if (previousId === undefined) {
-        // Первая загрузка - устанавливаем previousId
-        previousIdRef.current = normalizedId;
-      }
-      
-      // Нет в кеше или данные не соответствуют - показываем loading и загружаем данные
-      // Устанавливаем текущий загружаемый ID
-      currentLoadingIdRef.current = normalizedId;
-      setLoading(true);
-      setFriends([]);
-      setFriendshipStatus('none');
-      setIsEditing(false);
-      setEditData({});
-      
-      // Загружаем данные игрока (используется кеш из getPlayerById на уровне БД)
-      loadPlayerData();
-    }
-    // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
-  }, [id, loadPlayerData]);
-
-  // Восстанавливаем статус дружбы из кеша после загрузки currentUser
-  useEffect(() => {
-    if (currentUser && player && currentUser.id !== player.id) {
-      const cacheKey = `${currentUser.id}_${player.id}`;
-      if (friendshipStatusCache[cacheKey]) {
-        setFriendshipStatus(friendshipStatusCache[cacheKey]);
-      }
-    }
-  }, [currentUser, player, friendshipStatusCache]);
-
-  // Realtime подписка на изменения friend_requests для обновления кнопки
-  useEffect(() => {
-    if (!currentUser || !player) return;
-
-
-    const friendRequestsChannel = supabase
-      .channel(`friend-requests-${player.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Слушаем все события (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'friend_requests',
-          filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}` // Запросы ОТ текущего пользователя К просматриваемому
-        },
-        async (payload) => {
-          // Перезагружаем статус дружбы
-          const status = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(status);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'friend_requests',
-          filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}` // Запросы ОТ просматриваемого К текущему пользователю
-        },
-        async (payload) => {
-          // Перезагружаем статус дружбы
-          const status = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(status);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(friendRequestsChannel);
-    };
-  }, [currentUser?.id, player?.id]);
-
-  // Ref для отслеживания последнего обновления
-  const lastRefreshTime = useRef<number>(0);
-  
-  // Отслеживаем, что мы на экране профиля
-  useFocusEffect(
-    useCallback(() => {
-      setCurrentScreen('player');
-      
-      // Обновляем данные игрока при возвращении на экран
-      // Это нужно чтобы увидеть актуальную статистику упражнений
-      const now = Date.now();
-      if (player && player.id && globalCurrentUser?.id === player.id && !loading) {
-        // Это собственный профиль - обновляем данные, но не слишком часто (раз в 2 секунды)
-        if (now - lastRefreshTime.current > 2000) {
-          lastRefreshTime.current = now;
-          loadPlayerData();
+      if (migratedPhotos.length > 0) {
+          setGalleryPhotos(migratedPhotos);
+          
+        if (migratedPhotos.length !== (playerData.photos || []).length) {
+          const updatedPlayer = { ...playerData, photos: migratedPhotos };
+          await updatePlayer(playerData.id, updatedPlayer, true); // Пропускаем очистку кеша для миграции
+          setPlayer(updatedPlayer);
         }
       }
-      
-      return () => {
-        setCurrentScreen(null);
-      };
-    }, [setCurrentScreen, player?.id, globalCurrentUser?.id])
-  );
-
-  // Обработка прокрутки к разным разделам
-  useEffect(() => {
-    if (!player) return;
-
-    const scrollToSection = (ref: React.RefObject<View>, offset: number = 100) => {
-      if (ref.current) {
-        setTimeout(() => {
-          ref.current?.measureLayout(
-            scrollViewRef.current as any,
-            (x, y) => {
-              scrollViewRef.current?.scrollTo({ x: 0, y: y - offset, animated: true });
-            },
-            () => {}
-          );
-        }, 500);
-      }
-    };
-
-    if (scrollToMuseum === 'true') {
-      scrollToSection(museumRef);
-    } else if (scrollToStats === 'true') {
-      scrollToSection(statsRef);
-    } else if (scrollToPhotos === 'true') {
-      scrollToSection(photosRef);
-    } else if (scrollToVideos === 'true') {
-      scrollToSection(videosRef);
-    } else if (scrollToAchievements === 'true') {
-      scrollToSection(achievementsRef);
-    } else if (scrollToExercises === 'true') {
-      scrollToSection(exercisesRef);
-    } else if (scrollToFriends === 'true') {
-      scrollToSection(friendsRef);
+    } catch (error) {
+      console.error('Ошибка миграции фото:', error);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, player]);
+  };
 
+  // Функция для миграции аватара в фоне
+  const migrateAvatarInBackground = async (playerData: Player, userData: Player | null) => {
+    try {
+      const { uploadImageToStorage } = await import('../../utils/uploadImage');
+      const migratedAvatarUrl = await uploadImageToStorage(playerData.avatar!);
+      if (migratedAvatarUrl) {
+        const updatedPlayer = { ...playerData, avatar: migratedAvatarUrl };
+        await updatePlayer(playerData.id, updatedPlayer, true); // Пропускаем очистку кеша для миграции
+        setPlayer(updatedPlayer);
+      }
+    } catch (error) {
+      console.error('Ошибка миграции аватара:', error);
+    }
+  };
 
   // Функция для загрузки дополнительных данных в фоне
   const loadAdditionalData = async (playerData: Player, userData: Player | null) => {
@@ -614,51 +444,6 @@ export default function PlayerProfile() {
       
     } catch (error) {
       console.error('Ошибка загрузки дополнительных данных:', error);
-    }
-  };
-
-  // Функция для миграции фото в фоне
-  const migratePhotosInBackground = async (playerData: Player, userData: Player | null) => {
-    try {
-      const migratedPhotos: string[] = [];
-      for (const photo of playerData.photos || []) {
-            if (photo.startsWith('file://') || photo.startsWith('content://') || photo.startsWith('data:')) {
-              const { uploadGalleryPhoto } = await import('../../utils/uploadImage');
-              const migratedUrl = await uploadGalleryPhoto(photo);
-              if (migratedUrl) {
-                migratedPhotos.push(migratedUrl);
-              }
-            } else {
-              migratedPhotos.push(photo);
-            }
-          }
-      
-      if (migratedPhotos.length > 0) {
-          setGalleryPhotos(migratedPhotos);
-          
-        if (migratedPhotos.length !== (playerData.photos || []).length) {
-          const updatedPlayer = { ...playerData, photos: migratedPhotos };
-          await updatePlayer(playerData.id, updatedPlayer, true); // Пропускаем очистку кеша для миграции
-          setPlayer(updatedPlayer);
-        }
-      }
-    } catch (error) {
-      console.error('Ошибка миграции фото:', error);
-    }
-  };
-
-  // Функция для миграции аватара в фоне
-  const migrateAvatarInBackground = async (playerData: Player, userData: Player | null) => {
-    try {
-      const { uploadImageToStorage } = await import('../../utils/uploadImage');
-      const migratedAvatarUrl = await uploadImageToStorage(playerData.avatar!);
-      if (migratedAvatarUrl) {
-        const updatedPlayer = { ...playerData, avatar: migratedAvatarUrl };
-        await updatePlayer(playerData.id, updatedPlayer, true); // Пропускаем очистку кеша для миграции
-        setPlayer(updatedPlayer);
-      }
-    } catch (error) {
-      console.error('Ошибка миграции аватара:', error);
     }
   };
 
@@ -815,21 +600,316 @@ export default function PlayerProfile() {
           return;
         }
         
-        // Отмечаем основную загрузку как завершенную
         setLoading(false);
         
-        // Загружаем дополнительные данные в фоне (асинхронно)
+        // Загружаем дополнительные данные в фоне
         loadAdditionalData(finalPlayerData, userData);
     } catch (error) {
-      console.error('Ошибка загрузки данных игрока:', error);
-      // НЕ делаем редирект при ошибке - может быть временная проблема сети
-      // Показываем ошибку пользователю, но не редиректим
-      setLoading(false);
-      // Можно показать snackbar или alert с ошибкой
-    } finally {
+      console.error('❌ Ошибка загрузки данных игрока:', error);
       setLoading(false);
     }
   }, [id, router]);
+  
+  useEffect(() => {
+    // Нормализуем id (может быть массивом из useLocalSearchParams)
+    const normalizedId = Array.isArray(id) ? id[0] : id;
+    const previousId = Array.isArray(previousIdRef.current) ? previousIdRef.current[0] : previousIdRef.current;
+    
+    if (!normalizedId) {
+      return;
+    }
+    
+    // Проверяем, изменился ли id
+    const idChanged = normalizedId !== previousId && previousId !== undefined;
+    
+    // Проверяем кеш для мгновенного отображения (работает даже при смене id, если профиль был в кеше)
+    const cachedPlayer = playersCache[normalizedId as string];
+    
+    // Если профиль есть в кеше и соответствует id - показываем мгновенно
+    if (cachedPlayer && cachedPlayer.id === normalizedId && !idChanged) {
+      // Мгновенно показываем данные из кеша только если ID не изменился
+      // (если ID изменился, нужно загрузить заново, даже если есть в кеше)
+      setPlayer(cachedPlayer);
+      setLoading(false);
+      
+      // Восстанавливаем друзей и статус дружбы из кеша
+      if (friendsCache[normalizedId as string]) {
+        setFriends(friendsCache[normalizedId as string]);
+      } else {
+        setFriends([]);
+      }
+      
+      // Восстанавливаем фото из кеша
+      if (photosCache[normalizedId as string]) {
+        setGalleryPhotos(photosCache[normalizedId as string]);
+      } else {
+        setGalleryPhotos([]);
+      }
+      
+      // Для статуса дружбы нужен currentUser, поэтому показываем 'none'
+      // Статус дружбы будет загружен в loadAdditionalData
+      setFriendshipStatus('none');
+      
+      setIsEditing(false);
+      setEditData({});
+      
+      // Устанавливаем текущий загружаемый ID
+      currentLoadingIdRef.current = normalizedId;
+      
+      // Обновляем данные в фоне (без показа loading), если id не изменился
+      // Если id не изменился - тоже обновляем для актуальности данных
+      loadPlayerData();
+      
+      // Обновляем предыдущий id
+      previousIdRef.current = normalizedId;
+    } else {
+      // Если id изменился, очищаем состояние, чтобы не показывать старые данные
+      if (idChanged) {
+        console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
+        // Отменяем любые текущие загрузки для старого ID
+        currentLoadingIdRef.current = null;
+        // Полностью очищаем все состояние
+        setPlayer(null);
+        setFriends([]);
+        setFriendshipStatus('none');
+        setIsEditing(false);
+        setEditData({});
+        setGalleryPhotos([]);
+        setAchievements([]);
+        setCoachYears([]);
+        setIndividualTraining([]);
+        setSkateServices([]);
+        setVideoFields([{ url: '', timeCode: '' }]);
+        previousIdRef.current = normalizedId;
+      } else if (previousId === undefined) {
+        // Первая загрузка - устанавливаем previousId
+        previousIdRef.current = normalizedId;
+      }
+      
+      // Нет в кеше или данные не соответствуют - показываем loading и загружаем данные
+      // Устанавливаем текущий загружаемый ID
+      currentLoadingIdRef.current = normalizedId;
+      setLoading(true);
+      setFriends([]);
+      setFriendshipStatus('none');
+      setIsEditing(false);
+      setEditData({});
+      
+      // Загружаем данные игрока (используется кеш из getPlayerById на уровне БД)
+      loadPlayerData();
+    }
+    // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
+  }, [id, loadPlayerData]);
+
+  // Восстанавливаем статус дружбы из кеша после загрузки currentUser
+  useEffect(() => {
+    if (currentUser && player && currentUser.id !== player.id) {
+      const cacheKey = `${currentUser.id}_${player.id}`;
+      if (friendshipStatusCache[cacheKey]) {
+        setFriendshipStatus(friendshipStatusCache[cacheKey]);
+      }
+    }
+  }, [currentUser, player, friendshipStatusCache]);
+
+  // Realtime подписка на изменения friend_requests для обновления кнопки
+  useEffect(() => {
+    if (!currentUser || !player) return;
+
+
+    const friendRequestsChannel = supabase
+      .channel(`friend-requests-${player.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Слушаем все события (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}` // Запросы ОТ текущего пользователя К просматриваемому
+        },
+        async (payload) => {
+          // Перезагружаем статус дружбы
+          const status = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(status);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}` // Запросы ОТ просматриваемого К текущему пользователю
+        },
+        async (payload) => {
+          // Перезагружаем статус дружбы
+          const status = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(status);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(friendRequestsChannel);
+    };
+  }, [currentUser?.id, player?.id]);
+
+  // Realtime подписка на изменения friend_requests для обновления списка друзей
+  useEffect(() => {
+    if (!player) return;
+
+    const reloadFriendsList = async () => {
+      console.log('🔄 Обновляем список друзей через Realtime');
+      // Перезагружаем список друзей
+      const friendsList = await getFriends(player.id);
+      
+      // Проверяем, что ID не изменился
+      const checkId = Array.isArray(id) ? id[0] : id;
+      if (checkId === player.id && currentLoadingIdRef.current === player.id) {
+        setFriends(friendsList);
+        // Обновляем кеш
+        setFriendsCache(prev => ({
+          ...prev,
+          [player.id]: friendsList
+        }));
+      }
+    };
+
+    const friendsChannel = supabase
+      .channel(`friends-list-${player.id}`)
+      // Слушаем INSERT где from_id = player.id
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `from_id=eq.${player.id}`
+        },
+        async (payload) => {
+          // Проверяем, что статус 'accepted'
+          if (payload.new && (payload.new as any).status === 'accepted') {
+            await reloadFriendsList();
+          }
+        }
+      )
+      // Слушаем INSERT где to_id = player.id
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `to_id=eq.${player.id}`
+        },
+        async (payload) => {
+          // Проверяем, что статус 'accepted'
+          if (payload.new && (payload.new as any).status === 'accepted') {
+            await reloadFriendsList();
+          }
+        }
+      )
+      // Слушаем UPDATE где from_id = player.id
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `from_id=eq.${player.id}`
+        },
+        async (payload) => {
+          // Проверяем, что статус изменился на 'accepted'
+          if (payload.new && (payload.new as any).status === 'accepted' && 
+              payload.old && (payload.old as any).status !== 'accepted') {
+            await reloadFriendsList();
+          }
+        }
+      )
+      // Слушаем UPDATE где to_id = player.id
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `to_id=eq.${player.id}`
+        },
+        async (payload) => {
+          // Проверяем, что статус изменился на 'accepted'
+          if (payload.new && (payload.new as any).status === 'accepted' && 
+              payload.old && (payload.old as any).status !== 'accepted') {
+            await reloadFriendsList();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(friendsChannel);
+    };
+  }, [player?.id, id]);
+
+  // Ref для отслеживания последнего обновления
+  const lastRefreshTime = useRef<number>(0);
+  
+  // Отслеживаем, что мы на экране профиля
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('player');
+      
+      // Обновляем данные игрока при возвращении на экран
+      // Это нужно чтобы увидеть актуальную статистику упражнений
+      const now = Date.now();
+      if (player && player.id && globalCurrentUser?.id === player.id && !loading) {
+        // Это собственный профиль - обновляем данные, но не слишком часто (раз в 2 секунды)
+        if (now - lastRefreshTime.current > 2000) {
+          lastRefreshTime.current = now;
+          loadPlayerData();
+        }
+      }
+      
+      return () => {
+        setCurrentScreen(null);
+      };
+    }, [setCurrentScreen, player?.id, globalCurrentUser?.id])
+  );
+
+  // Обработка прокрутки к разным разделам
+  useEffect(() => {
+    if (!player) return;
+
+    const scrollToSection = (ref: React.RefObject<View>, offset: number = 100) => {
+      if (ref.current) {
+        setTimeout(() => {
+          ref.current?.measureLayout(
+            scrollViewRef.current as any,
+            (x, y) => {
+              scrollViewRef.current?.scrollTo({ x: 0, y: y - offset, animated: true });
+            },
+            () => {}
+          );
+        }, 500);
+      }
+    };
+
+    if (scrollToMuseum === 'true') {
+      scrollToSection(museumRef);
+    } else if (scrollToStats === 'true') {
+      scrollToSection(statsRef);
+    } else if (scrollToPhotos === 'true') {
+      scrollToSection(photosRef);
+    } else if (scrollToVideos === 'true') {
+      scrollToSection(videosRef);
+    } else if (scrollToAchievements === 'true') {
+      scrollToSection(achievementsRef);
+    } else if (scrollToExercises === 'true') {
+      scrollToSection(exercisesRef);
+    } else if (scrollToFriends === 'true') {
+      scrollToSection(friendsRef);
+    } else if (scrollToGift === 'true') {
+      scrollToSection(giftButtonRef);
+    }
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, player]);
 
   const showCustomAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
     setAlert({
@@ -851,23 +931,23 @@ export default function PlayerProfile() {
   const pickImage = async () => {
     // Показываем системное окно выбора источника фото
     Alert.alert(
-      'Выберите источник фото',
-      'Откуда хотите загрузить фото?',
+      t('selectPhotoSource'),
+      t('selectPhotoMessage') || t('selectPhotoSource'),
       [
         {
-          text: 'Галерея',
+          text: t('gallery'),
           onPress: () => {
             pickFromGallery();
           }
         },
         {
-          text: 'Камера',
+          text: t('camera'),
           onPress: () => {
             takePhoto();
           }
         },
         {
-          text: 'Отмена',
+          text: t('cancel'),
           style: 'cancel'
         }
       ]
@@ -1198,6 +1278,129 @@ export default function PlayerProfile() {
       showCustomAlert('Ошибка', 'Произошла ошибка при управлении друзьями', 'error');
     } finally {
       setFriendLoading(false);
+    }
+  };
+
+  const handleRequestGift = async () => {
+    if (!requestGiftMessage.trim()) {
+      Alert.alert(t('common.error'), t('gifts.pleaseWriteMessage') || 'Пожалуйста, напишите сообщение');
+      return;
+    }
+
+    if (!currentUser || !player) return;
+
+    try {
+      setRequestGiftLoading(true);
+      
+      const { error } = await supabase
+        .from('item_requests')
+        .insert([{
+          requester_id: currentUser.id,
+          owner_id: player.id,
+          item_type: 'jersey', // Используем 'jersey' как универсальный тип (так как 'custom' не поддерживается в БД)
+          message: requestGiftMessage.trim(),
+          status: 'pending'
+        }]);
+
+      if (error) {
+        console.error('Ошибка создания запроса:', error);
+        Alert.alert(t('common.error'), t('gifts.failedToSendRequest') || 'Не удалось отправить запрос');
+        return;
+      }
+
+      // Создаем уведомление для звезды
+      try {
+        const { getUserLanguage, loadTranslations } = await import('../../utils/languageHelper');
+        const { getUserPushTokens, sendPushNotification } = await import('../../utils/notificationService');
+        
+        // Функция для генерации UUID v4
+        const generateUUID = (): string => {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        };
+        
+        const starLanguage = await getUserLanguage(player.id);
+        const starTranslations = loadTranslations(starLanguage);
+        
+        const notificationTitle = starTranslations?.notifications?.giftRequest || (starLanguage === 'ru' ? 'Запрос на подарок' : 'Gift request');
+        const notificationMessage = starTranslations?.notifications?.giftRequestMessage 
+          ? starTranslations.notifications.giftRequestMessage.replace('{playerName}', currentUser.name || 'Игрок')
+          : starLanguage === 'ru'
+            ? `${currentUser.name || 'Игрок'} просит подарок`
+            : `${currentUser.name || 'Player'} requests a gift`;
+
+        // Создаем in-app уведомление
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert([{
+            id: generateUUID(),
+            user_id: player.id,
+            type: 'gift_request',
+            title: notificationTitle,
+            message: notificationMessage,
+            is_read: false,
+            data: {
+              requesterId: currentUser.id,
+              requesterName: currentUser.name,
+              requesterAvatar: currentUser.avatar,
+              requestMessage: requestGiftMessage.trim(),
+              itemType: 'jersey',
+              timestamp: new Date().toISOString()
+            }
+          }]);
+
+        if (notificationError) {
+          console.error('Ошибка создания уведомления:', notificationError);
+        } else {
+          // Обновляем счетчик уведомлений
+          const { data: playerData } = await supabase
+            .from('players')
+            .select('unread_notifications_count')
+            .eq('id', player.id)
+            .single();
+
+          const currentCount = playerData?.unread_notifications_count || 0;
+          const newCount = currentCount + 1;
+
+          await supabase
+            .from('players')
+            .update({ unread_notifications_count: newCount })
+            .eq('id', player.id);
+
+          // Отправляем push-уведомление
+          try {
+            const pushTokens = await getUserPushTokens(player.id);
+            if (pushTokens && pushTokens.length > 0) {
+              await sendPushNotification(
+                pushTokens,
+                notificationTitle,
+                notificationMessage,
+                { sound: 'not.m4a' }
+              );
+            }
+          } catch (pushError) {
+            console.error('Ошибка отправки push-уведомления:', pushError);
+          }
+        }
+      } catch (notificationError) {
+        console.error('Ошибка создания уведомления:', notificationError);
+        // Не прерываем выполнение, если уведомление не создалось
+      }
+
+      setShowRequestGiftModal(false);
+      setRequestGiftMessage('');
+      Alert.alert(
+        t('gifts.requestSent') || 'Запрос отправлен', 
+        t('gifts.requestSentMessage', { itemType: t('gifts.customGift') || 'подарок' }) || 'Ваш запрос отправлен звезде'
+      );
+    } catch (error) {
+      console.error('Ошибка создания запроса:', error);
+      Alert.alert(t('common.error'), t('gifts.failedToSendRequest') || 'Не удалось отправить запрос');
+    } finally {
+      setRequestGiftLoading(false);
     }
   };
 
@@ -2203,14 +2406,22 @@ export default function PlayerProfile() {
               </View>
               {playerTeams.length > 0 && (
                 <View style={styles.playerTeamsContainer}>
-                  {playerTeams.map((team, index) => (
-                    <Text key={index} style={styles.playerTeam}>
-                      {(() => {
-                        const translationKey = `teams.${team.teamName}`;
-                        return t(translationKey, { defaultValue: team.teamName });
-                      })()}{index < playerTeams.length - 1 ? ', ' : ''}
-                    </Text>
-                  ))}
+                  {playerTeams.map((team, index) => {
+                    const getTeamName = () => {
+                      const translationKey = `teams.${team.teamName}`;
+                      const translated = t(translationKey);
+                      // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                      if (translated === translationKey || translated.startsWith('teams.')) {
+                        return team.teamName;
+                      }
+                      return translated;
+                    };
+                    return (
+                      <Text key={index} style={styles.playerTeam}>
+                        {getTeamName()}{index < playerTeams.length - 1 ? ', ' : ''}
+                      </Text>
+                    );
+                  })}
                 </View>
               )}
               
@@ -2243,8 +2454,9 @@ export default function PlayerProfile() {
             )}
 
 
-            {/* Статистика текущего сезона - только для обычных игроков с данными */}
-            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && (() => {
+            {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) */}
+            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && 
+             !(player.status === 'scout' && currentUser?.status !== 'admin') && (() => {
               const goalsNum = parseInt(player.goals || '0') || 0;
               const assistsNum = parseInt(player.assists || '0') || 0;
               const gamesNum = parseInt(player.games || '0') || 0;
@@ -2375,7 +2587,8 @@ export default function PlayerProfile() {
               ) : null;
             })(            )}
 
-            {/* Основная информация */}
+            {/* Основная информация - скрыта для скаутов (кроме админа) */}
+            {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t('profile.basicInfo')}</Text>
               <View style={styles.infoGrid}>
@@ -2690,6 +2903,7 @@ export default function PlayerProfile() {
                 )}
               </View>
             </View>
+            )}
 
             {/* Карта - только для магазинов */}
             {player.status === 'shop' && player.address && (
@@ -3170,7 +3384,12 @@ export default function PlayerProfile() {
                               <Text style={styles.teamsListText}>
                                 {(() => {
                         const translationKey = `teams.${team.teamName}`;
-                        return t(translationKey, { defaultValue: team.teamName });
+                        const translated = t(translationKey);
+                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                        if (translated === translationKey || translated.startsWith('teams.')) {
+                          return team.teamName;
+                        }
+                        return translated;
                       })()} ({team.startYear} - {t('profile.настоящее время')})
                               </Text>
                             </View>
@@ -3192,7 +3411,12 @@ export default function PlayerProfile() {
                               <Text style={styles.teamsListText}>
                                 {(() => {
                         const translationKey = `teams.${team.teamName}`;
-                        return t(translationKey, { defaultValue: team.teamName });
+                        const translated = t(translationKey);
+                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                        if (translated === translationKey || translated.startsWith('teams.')) {
+                          return team.teamName;
+                        }
+                        return translated;
                       })()} ({team.startYear}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
                               </Text>
                             </View>
@@ -3260,43 +3484,61 @@ export default function PlayerProfile() {
             )}
 
             {/* Физические данные - только для игроков (не тренеры) */}
-            {player.status === 'player' && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
-                <View style={styles.infoGrid}>
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('profile.height')}</Text>
-                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TextInput
-                        style={styles.editInput}
-                        value={editData.height !== undefined ? editData.height : (player.height || '')}
-                        onChangeText={(text) => setEditData({...editData, height: text})}
-                        placeholder={`${t('profile.height')} (${t('profile.cm')})`}
-                        placeholderTextColor="#888"
-                        keyboardType="numeric"
-                      />
-                    ) : (
-                      <Text style={styles.infoValue}>{player.height ? `${player.height} ${t('profile.cm')}` : t('profile.notSpecified')}</Text>
+            {player.status === 'player' && (() => {
+              // Проверяем, есть ли хотя бы один параметр или мы в режиме редактирования
+              const hasHeight = player.height && parseInt(player.height) > 0;
+              const hasWeight = player.weight && parseInt(player.weight) > 0;
+              const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              
+              // Показываем раздел только если есть хотя бы один параметр или мы в режиме редактирования
+              if (!isEditingMode && !hasHeight && !hasWeight) {
+                return null;
+              }
+              
+              return (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
+                  <View style={styles.infoGrid}>
+                    {/* Рост - показываем только если указан или в режиме редактирования */}
+                    {(hasHeight || isEditingMode) && (
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.height')}</Text>
+                        {isEditingMode ? (
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.height !== undefined ? editData.height : (player.height || '')}
+                            onChangeText={(text) => setEditData({...editData, height: text})}
+                            placeholder={`${t('profile.height')} (${t('profile.cm')})`}
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
+                        ) : (
+                          <Text style={styles.infoValue}>{`${player.height} ${t('profile.cm')}`}</Text>
+                        )}
+                      </View>
                     )}
-                  </View>
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
-                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TextInput
-                        style={styles.editInput}
-                        value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
-                        onChangeText={(text) => setEditData({...editData, weight: text})}
-                        placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
-                        placeholderTextColor="#888"
-                        keyboardType="numeric"
-                      />
-                    ) : (
-                      <Text style={styles.infoValue}>{player.weight ? `${player.weight} ${t('profile.kg')}` : t('profile.notSpecified')}</Text>
+                    {/* Вес - показываем только если указан или в режиме редактирования */}
+                    {(hasWeight || isEditingMode) && (
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
+                        {isEditingMode ? (
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
+                            onChangeText={(text) => setEditData({...editData, weight: text})}
+                            placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
+                        ) : (
+                          <Text style={styles.infoValue}>{`${player.weight} ${t('profile.kg')}`}</Text>
+                        )}
+                      </View>
                     )}
                   </View>
                 </View>
-              </View>
-            )}
+              );
+            })()}
 
             {/* Видео моментов - только для игроков (не тренеры) */}
             {player.status === 'player' && ((currentUser && currentUser.id === player.id && isEditing) || (player.favoriteGoals && player.favoriteGoals.trim() !== '' && player.favoriteGoals.trim() !== 'null') || (isEditing && currentUser?.status === 'admin')) && (
@@ -3407,6 +3649,7 @@ export default function PlayerProfile() {
                   <VideoCarousel
                         videos={parsedVideos}
                     onVideoPress={(video) => setSelectedVideo(video)}
+                    playerId={player.id}
                   />
                     );
                   })()
@@ -3420,6 +3663,7 @@ export default function PlayerProfile() {
                 // Для магазинов фото доступны всем
                 <View ref={photosRef}>
                   <EditablePhotosSection
+                    playerId={player.id}
                     photos={galleryPhotos}
                     isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
                     onPhotosChange={async (newPhotos) => {
@@ -3443,6 +3687,7 @@ export default function PlayerProfile() {
                 friendshipStatus === 'friends' ? (
                 <View ref={photosRef}>
                   <EditablePhotosSection
+                    playerId={player.id}
                     photos={galleryPhotos}
                     isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
                     onPhotosChange={async (newPhotos) => {
@@ -3527,7 +3772,7 @@ export default function PlayerProfile() {
                           />
                         </View>
                         <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>100 метров</Text>
+                          <Text style={styles.infoLabel}>{t('profile.sprint')}</Text>
                           <TextInput
                             style={styles.editInput}
                             value={editData.sprint100m !== undefined ? editData.sprint100m : (player.sprint100m || '')}
@@ -3618,10 +3863,11 @@ export default function PlayerProfile() {
               (currentUser?.status === 'star') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
-                // 1. Есть подарки (для всех друзей)
+                // 1. Есть подарки (для всех друзей) ИЛИ данные еще не загрузились (undefined) - даем время загрузиться
                 // 2. Это админ или звезда (для кнопки "Отправить подарок")
                 // 3. Это владелец профиля (даже если нет подарков - чтобы видеть пустой музей)
-                (museumItemsCount[player.id] && museumItemsCount[player.id] > 0) || 
+                // Скрываем музей только если явно известно, что он пустой (count === 0)
+                (museumItemsCount[player.id] === undefined || museumItemsCount[player.id] > 0) || 
                 (currentUser?.status === 'admin') ||
                 (currentUser?.status === 'star') ||
                 (currentUser?.id === player.id) ? (
@@ -3637,6 +3883,7 @@ export default function PlayerProfile() {
                     isEditing={isEditing}
                     updateTrigger={museumUpdateKey}
                     cachedMuseumItems={museumCache[player.id]} // Передаем undefined если нет кеша
+                    playerName={player.name} // Передаем имя игрока для сообщения о пустом музее
                     onMuseumItemsLoaded={(items) => {
                       // Сохраняем загруженные данные в кеш состояния
                       setMuseumCache(prev => ({
@@ -3677,7 +3924,7 @@ export default function PlayerProfile() {
                   
                   {/* Кнопка отправки подарка для звезд и администраторов */}
                   {(currentUser?.status === 'admin' || currentUser?.status === 'star') && (
-                    <View style={styles.giftButtonContainer}>
+                    <View ref={giftButtonRef} style={styles.giftButtonContainer}>
                       <TouchableOpacity 
                         style={styles.giftButtonFull} 
                         onPress={() => {
@@ -3711,8 +3958,8 @@ export default function PlayerProfile() {
               )
             )}
 
-            {/* Друзья - не показываем для скаутов */}
-            {player.status !== 'scout' && (
+            {/* Друзья - скрыты для скаутов (кроме админа) */}
+            {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
                 {t('profile.friends')} ({friends.length})
@@ -3869,17 +4116,17 @@ export default function PlayerProfile() {
               ) : null}
             </View>
 
-            {/* Секция запроса подарков у звезды - только для игроков */}
+            {/* Кнопка запроса подарка у звезды - только для игроков */}
             {player.status === 'star' && currentUser && currentUser.id !== player.id && currentUser.status === 'player' && (
-              <View style={styles.section}>
-                <ItemRequestButtons
-                  starId={player.id}
-                  playerId={currentUser.id}
-                  onRequestSent={() => {
-                    // Можно добавить логику после отправки запроса
-                  }}
-                />
-              </View>
+              <TouchableOpacity 
+                style={[styles.actionButton, { backgroundColor: '#FF8243', marginBottom: 10 }]} 
+                onPress={() => setShowRequestGiftModal(true)}
+              >
+                <Ionicons name="gift-outline" size={20} color="#fff" />
+                <Text style={styles.actionButtonText}>
+                  {t('gifts.requestGift')}
+                </Text>
+              </TouchableOpacity>
             )}
 
             {/* Кнопка управления дружбой для звезд - в самом низу профиля */}
@@ -4296,6 +4543,17 @@ export default function PlayerProfile() {
           </ImageBackground>
         </View>
       </View>
+
+      {/* Плавающая кнопка сохранения в режиме редактирования */}
+      {isEditing && currentUser && currentUser.id === player?.id && (
+        <TouchableOpacity
+          style={styles.floatingSaveButton}
+          onPress={handleSave}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="checkmark" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
       
       {/* Модальное окно для видео */}
       <Modal
@@ -4304,28 +4562,38 @@ export default function PlayerProfile() {
         animationType="fade"
         onRequestClose={() => setSelectedVideo(null)}
       >
-        <TouchableWithoutFeedback onPress={() => setSelectedVideo(null)}>
-          <View style={styles.videoModalOverlay} {...videoPanResponder.panHandlers}>
-            <View style={styles.videoModalContainer} pointerEvents="box-none">
-              <TouchableOpacity
-                style={styles.videoModalCloseButton}
-                onPress={() => setSelectedVideo(null)}
-              >
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-              {selectedVideo && (
-                <View pointerEvents="box-only">
-                  <YouTubeVideo 
-                    url={selectedVideo.url}
-                    title={t('myMoment')}
-                    timeCode={selectedVideo.timeCode}
-                    onClose={() => setSelectedVideo(null)}
-                  />
-                </View>
-              )}
-            </View>
+        <View style={styles.videoModalOverlay}>
+          <TouchableWithoutFeedback onPress={() => setSelectedVideo(null)}>
+            <View style={styles.videoModalOverlayTouchable} />
+          </TouchableWithoutFeedback>
+          <View style={styles.videoModalContainer} pointerEvents="box-none">
+            <TouchableOpacity
+              style={styles.videoModalCloseButton}
+              onPress={() => setSelectedVideo(null)}
+            >
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {selectedVideo && (
+              <View pointerEvents="box-only" style={styles.videoModalContent}>
+                <YouTubeVideo 
+                  url={selectedVideo.url}
+                  title={t('myMoment')}
+                  timeCode={selectedVideo.timeCode}
+                  onClose={() => setSelectedVideo(null)}
+                />
+                {player && (
+                  <View style={styles.videoModalLikeButton}>
+                    <LikeButton
+                      playerId={player.id}
+                      contentId={generateVideoContentId(selectedVideo.url, selectedVideo.timeCode)}
+                      contentType="video"
+                    />
+                  </View>
+                )}
+              </View>
+            )}
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </Modal>
 
       {/* Модальное окно для уведомлений */}
@@ -4584,6 +4852,70 @@ export default function PlayerProfile() {
           playerName={player.name}
           updateNotificationCount={updateNotificationCount}
         />
+      )}
+
+      {/* Модал для запроса подарка у звезды */}
+      {player.status === 'star' && currentUser && currentUser.id !== player.id && currentUser.status === 'player' && (
+        <Modal
+          visible={showRequestGiftModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {t('gifts.requestGift')}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowRequestGiftModal(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>{t('gifts.requestMessage')} *</Text>
+                <Text style={styles.helperText}>
+                  {t('gifts.requestMessageHelper') || 'Напишите сообщение звезде, какой подарок вы хотели бы получить'}
+                </Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={requestGiftMessage}
+                  onChangeText={setRequestGiftMessage}
+                  placeholder={t('gifts.requestMessagePlaceholder') || 'Напишите ваше сообщение...'}
+                  placeholderTextColor="#666"
+                  multiline
+                  numberOfLines={6}
+                  maxLength={500}
+                />
+                <Text style={styles.characterCount}>
+                  {requestGiftMessage.length}/500 {t('gifts.characters') || 'символов'}
+                </Text>
+              </View>
+
+              <View style={styles.formGroup}>
+                <TouchableOpacity
+                  style={[styles.submitButton, requestGiftLoading && styles.submitButtonDisabled]}
+                  onPress={handleRequestGift}
+                  disabled={requestGiftLoading}
+                >
+                  <Text style={styles.submitButtonText}>
+                    {requestGiftLoading ? (t('gifts.sending') || 'Отправка...') : (t('gifts.sendRequest') || 'Отправить запрос')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.infoBox}>
+                <Ionicons name="information-circle" size={18} color="#FF8243" />
+                <Text style={styles.infoText}>
+                  {t('gifts.requestInfo') || 'Звезда получит ваше сообщение и сможет выбрать подарок для вас'}
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
       )}
 
     </View>
@@ -5083,24 +5415,64 @@ const styles = StyleSheet.create({
 
   videoModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+  },
+  videoModalOverlayTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   videoModalContainer: {
     width: '90%',
-    height: '80%',
+    maxHeight: '80%',
     borderRadius: 12,
     overflow: 'hidden',
+    position: 'relative',
+    zIndex: 1,
+  },
+  videoModalContent: {
+    width: '100%',
+    position: 'relative',
+  },
+  videoModalLikeButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    zIndex: 1000,
   },
   videoModalCloseButton: {
     position: 'absolute',
     top: 30,
     right: 20,
-    zIndex: 1,
+    zIndex: 1001,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 20,
     padding: 8,
+  },
+  floatingSaveButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#fa2f40',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   editInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -5384,20 +5756,97 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   modalContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
     backgroundColor: '#1a1a1a',
-    borderRadius: 15,
-    padding: 20,
-    width: '80%',
-    maxHeight: '70%',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   modalTitle: {
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    textAlign: 'center',
+    flex: 1,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 16,
+  },
+  formGroup: {
     marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 8,
+    lineHeight: 16,
+    fontFamily: 'Gilroy-Regular',
+  },
+  input: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#fff',
+    fontFamily: 'Gilroy-Regular',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  textArea: {
+    height: 120,
+    textAlignVertical: 'top',
+  },
+  characterCount: {
+    fontSize: 11,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 4,
+    fontFamily: 'Gilroy-Regular',
+  },
+  submitButton: {
+    backgroundColor: '#FF8243',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#666',
+    opacity: 0.6,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 16,
+  },
+  infoText: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 12,
+    color: '#fff',
+    lineHeight: 16,
+    fontFamily: 'Gilroy-Regular',
   },
   modalScroll: {
     maxHeight: 300,

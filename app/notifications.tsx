@@ -27,6 +27,7 @@ import AchievementAddedNotification from '../components/AchievementAddedNotifica
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
 import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
+import LikeNotification from '../components/LikeNotification';
 import CachedAvatar from '../components/CachedAvatar';
 import {
     acceptFriendRequest,
@@ -311,6 +312,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               achievementsCount={notification.data.addedAchievementsCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'physical_data_changed' ? (
@@ -324,6 +326,34 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               changes={notification.data.changes || []}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <LikeNotification
+              likedByName={notification.data?.likedByName || notification.data?.likedByUserName || 'Игрок'}
+              likedByAvatar={notification.data?.likedByAvatar}
+              likedById={notification.data?.likedByUserId || notification.data?.likedByUser || ''}
+              contentType={notification.type === 'video_liked' ? 'video' : 'photo'}
+              timestamp={notification.timestamp || notification.created_at || Date.now()}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'gift_request' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <GiftRequestNotification
+              requesterName={notification.playerName || notification.data?.requesterName || 'Игрок'}
+              requesterId={notification.playerId || notification.data?.requesterId}
+              requesterAvatar={notification.playerAvatar || notification.data?.requesterAvatar}
+              requestMessage={notification.data?.requestMessage}
+              timestamp={notification.timestamp || notification.created_at || Date.now()}
             />
           </TouchableOpacity>
         ) : (
@@ -499,6 +529,13 @@ export default function NotificationsScreen() {
                  notification.receiverId === currentUser.id;
         }
         
+        // Уведомления о запросах на подарки показываем только если они предназначены для этого пользователя (звезды)
+        if (notification.type === 'gift_request') {
+          return notification.user_id === currentUser.id || 
+                 notification.receiver_id === currentUser.id || 
+                 notification.receiverId === currentUser.id;
+        }
+        
         // Уведомления о подарках и других действиях
         if (notification.type === 'friend_accepted' ||
             notification.type === 'gift_accepted' || 
@@ -516,7 +553,9 @@ export default function NotificationsScreen() {
             notification.type === 'video_added' ||
             notification.type === 'avatar_changed' ||
             notification.type === 'achievement_added' ||
-            notification.type === 'physical_data_changed') {
+            notification.type === 'physical_data_changed' ||
+            notification.type === 'video_liked' ||
+            notification.type === 'photo_liked') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
         }
         
@@ -543,9 +582,16 @@ export default function NotificationsScreen() {
           message: notification.message,
           timestamp,
           isRead: notification.is_read || notification.isRead || false,
-          playerId: notification.data?.sender_id || notification.data?.playerId || notification.player_id || notification.playerId,
-          playerName: notification.data?.sender_name || notification.data?.playerName || notification.player_name || notification.playerName,
-          playerAvatar: notification.data?.sender_avatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar,
+          // Для gift_request используем requesterId из data, для остальных - стандартную логику
+          playerId: notification.type === 'gift_request' 
+            ? (notification.data?.requesterId || notification.data?.playerId || notification.player_id || notification.playerId)
+            : (notification.data?.sender_id || notification.data?.playerId || notification.player_id || notification.playerId),
+          playerName: notification.type === 'gift_request'
+            ? (notification.data?.requesterName || notification.data?.playerName || notification.player_name || notification.playerName)
+            : (notification.data?.sender_name || notification.data?.playerName || notification.player_name || notification.playerName),
+          playerAvatar: notification.type === 'gift_request'
+            ? (notification.data?.requesterAvatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar)
+            : (notification.data?.sender_avatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar),
           receiverId: notification.receiver_id || notification.receiverId,
           // Помечаем уведомления как actionable, если они требуют действия
           isActionable: notification.type === 'gift_accepted' || 
@@ -1136,6 +1182,27 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'team_invite') {
         // Для уведомлений о приглашениях в команду показываем команды
         router.push('/teams');
+      } else if (notification.type === 'video_liked') {
+        // Для уведомлений о лайках видео переходим на профиль владельца контента с прокруткой к видео
+        if (notification.data && notification.data.playerId) {
+          router.push(`/player/${notification.data.playerId}?scrollToVideos=true`);
+        } else if (currentUser) {
+          // Fallback на текущего пользователя, если playerId не найден
+          router.push(`/player/${currentUser.id}?scrollToVideos=true`);
+        }
+      } else if (notification.type === 'photo_liked') {
+        // Для уведомлений о лайках фото переходим на профиль владельца контента с прокруткой к фото
+        if (notification.data && notification.data.playerId) {
+          router.push(`/player/${notification.data.playerId}?scrollToPhotos=true`);
+        } else if (currentUser) {
+          // Fallback на текущего пользователя, если playerId не найден
+          router.push(`/player/${currentUser.id}?scrollToPhotos=true`);
+        }
+      } else if (notification.type === 'gift_request') {
+        // Для уведомлений о запросе подарка переходим на профиль игрока для отправки подарка
+        if (notification.data && notification.data.requesterId) {
+          router.push(`/player/${notification.data.requesterId}?scrollToGift=true`);
+        }
       } else if (notification.type === 'system') {
         // Для системных уведомлений остаемся в разделе уведомлений
         // Ничего не делаем, пользователь уже в разделе уведомлений
@@ -1189,6 +1256,13 @@ export default function NotificationsScreen() {
         } else if (notification.type === 'friend_request') {
           if (notification.playerId) {
             router.push(`/player/${notification.playerId}`);
+          }
+        } else if (notification.type === 'friend_gift_received') {
+          // Переходим на профиль друга с прокруткой к разделу подарков (музей)
+          if (notification.data && notification.data.playerId) {
+            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          } else if (notification.playerId) {
+            router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
@@ -1251,6 +1325,13 @@ export default function NotificationsScreen() {
         } else if (notification.type === 'friend_request') {
           if (notification.playerId) {
             router.push(`/player/${notification.playerId}`);
+          }
+        } else if (notification.type === 'friend_gift_received') {
+          // Переходим на профиль друга с прокруткой к разделу подарков (музей)
+          if (notification.data && notification.data.playerId) {
+            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          } else if (notification.playerId) {
+            router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
@@ -1324,31 +1405,11 @@ export default function NotificationsScreen() {
 
   const handleGiftRequest = async (request: GiftRequestItem, action: 'accept' | 'decline') => {
     try {
-      const requestId = request.id.replace('gift_request_', '');
+      // При нажатии на запрос подарка переходим на профиль игрока с прокруткой к кнопке подарка
+      router.push(`/player/${request.playerId}?scrollToGift=true`);
       
-      if (action === 'accept') {
-        // В новой системе просто переходим на профиль игрока с прокруткой к музею
-        router.push({
-          pathname: '/player/[id]',
-          params: { 
-            id: request.playerId,
-            scrollToMuseum: 'true'
-          }
-        });
-        
-        // Обновляем статус запроса на "принят" (но подарок еще не отправлен)
-        const { error: updateError } = await supabase
-          .from('item_requests')
-          .update({ status: 'accepted' })
-          .eq('id', requestId);
-
-        if (updateError) {
-          console.error('❌ Ошибка обновления статуса запроса:', updateError);
-        }
-        
-        // Удаляем уведомление из списка
-        setGiftRequests(prev => prev.filter(req => req.id !== request.id));
-      }
+      // Удаляем уведомление из списка после перехода
+      setGiftRequests(prev => prev.filter(req => req.id !== request.id));
     } catch (error) {
       console.error('❌ Ошибка обработки запроса на подарок:', error);
       Alert.alert('Ошибка', 'Не удалось обработать запрос');

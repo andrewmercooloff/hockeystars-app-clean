@@ -82,6 +82,7 @@
   },
   "addPhoto": "Dodaj zdjęcie",
   "selectPhotoSource": "Wybierz źródło zdjęcia",
+  "selectPhotoMessage": "Skąd chcesz przesłać zdjęcie?",
   "gallery": "Galeria",
   "camera": "Kamera",
   "cancel": "Anulować",
@@ -1613,6 +1614,7 @@
     "hockeyPhotos": "Zdjęcia hokejowe",
     "photos": "Zdjęcie",
     "museum": "Muzeum",
+    "museumEmpty": "{playerName} nie otrzymał jeszcze żadnych prezentów",
     "youAreFriendsWith": "Czy jesteś przyjacielem?",
     "addToFriends": "Dodaj jako znajomego",
     "addToFriendsToSeeStandards": "Dodaj {name} jako znajomego, aby zobaczyć standardy",
@@ -2122,14 +2124,22 @@
     "friendRequestAccepted": "Prośba o dodanie do znajomych przyjęta!",
     "friendRequestDeclined": "Prośba o dodanie do znajomych odrzucona",
     "giftRequest": "Prośba o prezent",
-    "giftRequestMessage": "{playerName} prosi o {itemType}",
+    "giftRequestMessage": "{playerName} prosi o prezent",
     "giftRequestApproved": "Prośba zatwierdzona",
     "giftRequestApprovedMessage": "{starName} zatwierdził twoją prośbę o {itemType}",
     "giftRequestAccepted": "Prośba o prezent przyjęta!",
     "giftRequestRejected": "Prośba o prezent odrzucona",
     "player": "Gracz",
     "unknownPlayer": "Nieznany gracz",
-    "star": "Gwiazda"
+    "star": "Gwiazda",
+    "video_liked": {
+      "title": "Polubiono Twoje wideo",
+      "message": "{name} polubił Twoje wideo"
+    },
+    "photo_liked": {
+      "title": "Polubiono Twoje zdjęcie",
+      "message": "{name} polubił Twoje zdjęcie"
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Wybierz źródło zdjęcia",

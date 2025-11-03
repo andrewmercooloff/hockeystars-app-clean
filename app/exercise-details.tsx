@@ -119,6 +119,11 @@ export default function ExerciseDetailsScreen() {
       return;
     }
     
+    // Защита от повторного вызова
+    if (isCompleting) {
+      return;
+    }
+    
     if (currentUser.status !== 'player') {
       console.warn('⚠️ Упражнения доступны только для игроков');
       Alert.alert(
@@ -138,25 +143,15 @@ export default function ExerciseDetailsScreen() {
       return;
     }
     
-    console.log('💪 Начинаем выполнение упражнения:', { exerciseId, userId: currentUser.id });
     setIsCompleting(true);
     
     try {
       // Выполняем упражнение
-      console.warn('💪 [EXERCISE-DETAILS] Вызываем markAsCompleted для exerciseId:', exerciseId);
-      console.error('💪 [EXERCISE-DETAILS] currentUser:', currentUser ? { id: currentUser.id, name: currentUser.name } : 'null');
-      
-      // ВРЕМЕННО: визуальная отладка - показываем Alert для подтверждения
-      Alert.alert('DEBUG', `Начинаем выполнение упражнения ${exerciseId}`);
-      
       await markAsCompleted(exerciseId as string);
-      console.warn('✅ [EXERCISE-DETAILS] markAsCompleted завершен успешно');
       
       // Трекаем выполнение упражнения
       try {
-        console.log('💪 Добавляем activity points...');
         await addActivityPoints(currentUser.id, 'EXERCISE_COMPLETE');
-        console.log('✅ Activity points добавлены');
       } catch (error) {
         console.error('❌ Failed to track exercise completion:', error);
       }
@@ -166,7 +161,6 @@ export default function ExerciseDetailsScreen() {
       setCanComplete(false);
       setLastCompletionTime(new Date());
       
-      console.log('💪 Упражнение выполнено успешно, показываем уведомление');
       Alert.alert(
         t('exercises.details.completed'),
         t('exercises.details.markedComplete'),
@@ -175,11 +169,9 @@ export default function ExerciseDetailsScreen() {
       
       // Принудительно обновляем данные пользователя через UserContext
       try {
-        console.log('💪 Принудительно обновляем данные пользователя через UserContext...');
         const { useUser } = await import('../contexts/UserContext');
         // Получаем функцию из контекста (это будет работать только если мы в компоненте)
         // Для этого нужно передать функцию через props или использовать другой подход
-        console.log('✅ Данные пользователя будут обновлены через UserContext');
       } catch (error) {
         console.error('❌ Ошибка обновления данных пользователя:', error);
       }

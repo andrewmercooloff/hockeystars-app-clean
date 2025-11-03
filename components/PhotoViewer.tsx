@@ -13,6 +13,8 @@ import {
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CachedImage from './CachedImage';
+import LikeButton from './LikeButton';
+import { generatePhotoContentId } from '../utils/likesService';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -21,9 +23,10 @@ interface PhotoViewerProps {
   visible: boolean;
   onClose: () => void;
   initialIndex?: number;
+  playerId?: string; // ID игрока, владельца фото
 }
 
-export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0 }: PhotoViewerProps) {
+export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0, playerId }: PhotoViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
   // Обновляем currentIndex при изменении initialIndex
@@ -72,6 +75,15 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
                 style={styles.mainImage}
                 resizeMode="contain"
               />
+              {playerId && (
+                <View style={styles.photoLikeButton}>
+                  <LikeButton
+                    playerId={playerId}
+                    contentId={generatePhotoContentId(photos[currentIndex])}
+                    contentType="photo"
+                  />
+                </View>
+              )}
             </View>
 
             {/* Навигационные кнопки */}
@@ -210,5 +222,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  photoLikeButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    zIndex: 1000,
   },
 }); 

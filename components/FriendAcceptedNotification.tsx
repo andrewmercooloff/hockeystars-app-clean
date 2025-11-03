@@ -65,9 +65,14 @@ export default function FriendAcceptedNotification({
           <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
         </View>
 
-        <View style={styles.row}>
-          <Ionicons name="checkmark-circle" size={18} color="#4CAF50" style={{ marginRight: 8 }} />
-          <Text style={styles.titleText}>{t('notifications.friendRequestAccepted')}</Text>
+        <View style={styles.actionItem}>
+          <View style={styles.row}>
+            <Ionicons name="checkmark-circle" size={18} color="#4CAF50" style={{ marginRight: 8 }} />
+            <Text style={styles.titleText}>{t('notifications.friendRequestAccepted')}</Text>
+          </View>
+          <View style={styles.friendshipBadge}>
+            <Ionicons name="people-outline" size={16} color="#fff" />
+          </View>
         </View>
       </View>
     </View>
@@ -84,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#FFC107', // same accent as friend request
+    borderLeftColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
   },
   avatarContainer: {
     width: 50,
@@ -128,10 +133,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
+  actionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    flex: 1,
   },
   titleText: {
     color: '#fff',
@@ -143,6 +154,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 2,
+  },
+  friendshipBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    borderRadius: 12,
+    width: 28,
+    height: 28,
   },
 });
 

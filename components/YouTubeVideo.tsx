@@ -1,9 +1,9 @@
 import SafeIcon from './SafeIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import { Dimensions, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import YoutubePlayer from 'react-native-youtube-iframe';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 interface YouTubeVideoProps {
   url: string;
@@ -20,6 +20,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const playerRef = useRef<any>(null);
+  const hasAttemptedPlay = useRef(false); // Флаг для предотвращения множественных попыток запуска
 
   console.log('YouTubeVideo component:', { url, title, timeCode });
 
@@ -80,25 +81,10 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   const sessionId = getSessionId(url);
   const startSeconds = timeCode ? timeCodeToSeconds(timeCode) : 0;
 
-  // Автоматически запускаем видео при монтировании компонента
+  // Сбрасываем флаг при изменении видео
   useEffect(() => {
-    setIsPlaying(true);
-    // Попытка принудительного запуска через небольшую задержку
-    if (playerRef.current && youtubeVideoId) {
-      setTimeout(() => {
-        try {
-          if (playerRef.current?.seekTo && startSeconds > 0) {
-            playerRef.current.seekTo(startSeconds, true);
-          }
-          if (playerRef.current?.playVideo) {
-            playerRef.current.playVideo();
-          }
-        } catch (error) {
-          console.log('Error trying to auto-play:', error);
-        }
-      }, 500);
-    }
-  }, [youtubeVideoId, startSeconds]);
+    hasAttemptedPlay.current = false;
+  }, [youtubeVideoId]);
 
   console.log('YouTubeVideo parsed:', { 
     youtubeVideoId, 
@@ -132,69 +118,68 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
           </View>
         )}
         <YoutubePlayer
-          ref={playerRef}
-          height={videoHeight}
-          videoId={youtubeVideoId}
-          play={isPlaying}
-          initialPlayerParams={{
-            start: startSeconds,
-            modestbranding: true,
-            rel: false,
-            showClosedCaptions: false,
-            preventFullScreen: false,
-            autoplay: 1,
-            controls: 1,
-            playsinline: 1,
-          }}
-          webViewProps={{
-            allowsInlineMediaPlayback: true,
-            mediaPlaybackRequiresUserAction: false,
-          }}
-          onReady={() => {
-            console.log('YouTube player ready, starting playback');
-            setLoading(false);
-            setIsPlaying(true);
-            // Принудительный запуск после готовности с несколькими попытками
-            const tryPlay = (attempt = 1) => {
-              if (attempt > 3) return; // Максимум 3 попытки
+            ref={playerRef}
+            height={videoHeight}
+            videoId={youtubeVideoId}
+            play={isPlaying}
+            initialPlayerParams={{
+              start: startSeconds,
+              modestbranding: true,
+              rel: false,
+              showClosedCaptions: false,
+              preventFullScreen: false,
+              autoplay: 1,
+              controls: 1,
+              playsinline: 1,
+            }}
+            webViewProps={{
+              allowsInlineMediaPlayback: true,
+              mediaPlaybackRequiresUserAction: false,
+            }}
+            onReady={() => {
+              // Предотвращаем множественные вызовы
+              if (hasAttemptedPlay.current) {
+                return;
+              }
               
+              console.log('YouTube player ready, starting playback');
+              setLoading(false);
+              setIsPlaying(true);
+              hasAttemptedPlay.current = true;
+              
+              // Одна попытка запуска после небольшой задержки
               setTimeout(() => {
                 try {
                   if (playerRef.current) {
-                    // Сначала переходим к нужной секунде
+                    // Сначала переходим к нужной секунде, если указан таймкод
                     if (startSeconds > 0) {
                       playerRef.current.seekTo(startSeconds, true);
                     }
-                    // Затем запускаем воспроизведение
-                    playerRef.current.playVideo();
-                    console.log(`Auto-play attempt ${attempt}`);
-                  } else if (attempt < 3) {
-                    tryPlay(attempt + 1);
+                    // Затем запускаем воспроизведение (если autoplay не сработал)
+                    // Проверяем, что playVideo доступен
+                    if (typeof playerRef.current.playVideo === 'function') {
+                      playerRef.current.playVideo();
+                    }
                   }
                 } catch (error) {
-                  console.log(`Error in onReady auto-play attempt ${attempt}:`, error);
-                  if (attempt < 3) {
-                    tryPlay(attempt + 1);
-                  }
+                  console.log('Error in onReady auto-play:', error);
                 }
-              }, attempt === 1 ? 500 : attempt * 300);
-            };
-            tryPlay();
-          }}
-          onError={(error) => {
-            console.error('YouTube player error:', error);
-            setLoading(false);
-          }}
-          onChangeState={(state) => {
-            console.log('YouTube player state:', state);
-            // Если видео остановилось, пытаемся запустить снова
-            if (state === 'ended' || state === 'paused') {
-              // Не перезапускаем автоматически, только логируем
-            } else if (state === 'playing') {
+              }, 300);
+            }}
+            onError={(error) => {
+              console.error('YouTube player error:', error);
               setLoading(false);
-            }
-          }}
-        />
+            }}
+            onChangeState={(state) => {
+              console.log('YouTube player state:', state);
+              // Если видео остановилось, пытаемся запустить снова
+              if (state === 'ended' || state === 'paused') {
+                // Не перезапускаем автоматически, только логируем
+              } else if (state === 'playing') {
+                setLoading(false);
+              }
+            }}
+          />
       </View>
     </View>
   );

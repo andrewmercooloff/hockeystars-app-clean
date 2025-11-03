@@ -4044,10 +4044,11 @@ export const notifyFriendsAboutVideos = async (
 
             const newCount = currentCount + 1;
 
-            // Обновляем счетчик в базе данных
+            // Обновляем счетчик в базе данных (обновляем и unread_notifications_count и notifications JSON)
             const { error: updateError } = await supabase
               .from('players')
               .update({ 
+                unread_notifications_count: newCount,
                 notifications: JSON.stringify({
                   unread_count: newCount,
                   last_updated: new Date().toISOString()
@@ -4176,7 +4177,7 @@ export const notifyFriendsAboutAvatarChange = async (
             // Получаем текущий счетчик из БД
             const { data: playerData, error: fetchError } = await supabase
               .from('players')
-              .select('notifications')
+              .select('notifications, unread_notifications_count')
               .eq('id', userId)
               .single();
 
@@ -4187,12 +4188,18 @@ export const notifyFriendsAboutAvatarChange = async (
 
             let currentCount = 0;
             try {
-              const notifData = playerData?.notifications;
-              if (typeof notifData === 'string') {
-                const parsed = JSON.parse(notifData);
-                currentCount = parsed.unread_count || 0;
-              } else if (typeof notifData === 'object' && notifData !== null) {
-                currentCount = notifData.unread_count || 0;
+              // Пробуем получить из unread_notifications_count
+              if (playerData?.unread_notifications_count !== undefined && playerData?.unread_notifications_count !== null) {
+                currentCount = playerData.unread_notifications_count;
+              } else {
+                // Fallback на JSON поле notifications
+                const notifData = playerData?.notifications;
+                if (typeof notifData === 'string') {
+                  const parsed = JSON.parse(notifData);
+                  currentCount = parsed.unread_count || 0;
+                } else if (typeof notifData === 'object' && notifData !== null) {
+                  currentCount = notifData.unread_count || 0;
+                }
               }
             } catch (parseError) {
               console.error('❌ Ошибка парсинга notifications:', parseError);
@@ -4201,10 +4208,11 @@ export const notifyFriendsAboutAvatarChange = async (
 
             const newCount = currentCount + 1;
 
-            // Обновляем счетчик в базе данных
+            // Обновляем счетчик в базе данных (обновляем и unread_notifications_count и notifications JSON)
             const { error: updateError } = await supabase
               .from('players')
               .update({ 
+                unread_notifications_count: newCount,
                 notifications: JSON.stringify({
                   unread_count: newCount,
                   last_updated: new Date().toISOString()
@@ -4360,7 +4368,7 @@ export const notifyFriendsAboutAchievements = async (
             // Получаем текущий счетчик из БД
             const { data: playerData, error: fetchError } = await supabase
               .from('players')
-              .select('notifications')
+              .select('notifications, unread_notifications_count')
               .eq('id', userId)
               .single();
 
@@ -4371,12 +4379,18 @@ export const notifyFriendsAboutAchievements = async (
 
             let currentCount = 0;
             try {
-              const notifData = playerData?.notifications;
-              if (typeof notifData === 'string') {
-                const parsed = JSON.parse(notifData);
-                currentCount = parsed.unread_count || 0;
-              } else if (typeof notifData === 'object' && notifData !== null) {
-                currentCount = notifData.unread_count || 0;
+              // Пробуем получить из unread_notifications_count
+              if (playerData?.unread_notifications_count !== undefined && playerData?.unread_notifications_count !== null) {
+                currentCount = playerData.unread_notifications_count;
+              } else {
+                // Fallback на JSON поле notifications
+                const notifData = playerData?.notifications;
+                if (typeof notifData === 'string') {
+                  const parsed = JSON.parse(notifData);
+                  currentCount = parsed.unread_count || 0;
+                } else if (typeof notifData === 'object' && notifData !== null) {
+                  currentCount = notifData.unread_count || 0;
+                }
               }
             } catch (parseError) {
               console.error('❌ Ошибка парсинга notifications:', parseError);
@@ -4385,10 +4399,11 @@ export const notifyFriendsAboutAchievements = async (
 
             const newCount = currentCount + 1;
 
-            // Обновляем счетчик в базе данных
+            // Обновляем счетчик в базе данных (обновляем и unread_notifications_count и notifications JSON)
             const { error: updateError } = await supabase
               .from('players')
               .update({ 
+                unread_notifications_count: newCount,
                 notifications: JSON.stringify({
                   unread_count: newCount,
                   last_updated: new Date().toISOString()
@@ -4596,10 +4611,11 @@ export const notifyFriendsAboutPhysicalData = async (
 
             const newCount = currentCount + 1;
 
-            // Обновляем счетчик в базе данных
+            // Обновляем счетчик в базе данных (обновляем и unread_notifications_count и notifications JSON)
             const { error: updateError } = await supabase
               .from('players')
               .update({ 
+                unread_notifications_count: newCount,
                 notifications: JSON.stringify({
                   unread_count: newCount,
                   last_updated: new Date().toISOString()
@@ -5467,10 +5483,11 @@ export const notifyFriendsAboutGiftReceived = async (
 
             const newCount = currentCount + 1;
 
-            // Обновляем счетчик в базе данных
+            // Обновляем счетчик в базе данных (обновляем и unread_notifications_count и notifications JSON)
             const { error: updateError } = await supabase
               .from('players')
               .update({ 
+                unread_notifications_count: newCount,
                 notifications: JSON.stringify({
                   unread_count: newCount,
                   last_updated: new Date().toISOString()

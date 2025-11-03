@@ -106,6 +106,7 @@
   },
   "addPhoto": "Добавить фотографию",
   "selectPhotoSource": "Выберите источник фотографии",
+  "selectPhotoMessage": "Откуда хотите загрузить фото?",
   "gallery": "Галерея",
   "camera": "Камера",
   "cancel": "Отмена",
@@ -1660,6 +1661,7 @@
     "hockeyPhotos": "Хоккейные фото",
     "photos": "Фото",
     "museum": "Музей",
+    "museumEmpty": "{playerName} пока не получил подарков",
     "youAreFriendsWith": "Вы друзья с",
     "addToFriends": "Добавить в друзья",
     "addToFriendsToSeeStandards": "Добавьте {name} в друзья, чтобы увидеть нормативы",
@@ -2182,7 +2184,7 @@
     "friendRequestAccepted": "Запрос в друзья принят!",
     "friendRequestDeclined": "Запрос в друзья отклонен",
     "giftRequest": "Запрос подарка",
-    "giftRequestMessage": "{playerName} просит {itemType}",
+    "giftRequestMessage": "{playerName} просит подарок",
     "giftRequestApproved": "Запрос одобрен",
     "giftRequestApprovedMessage": "{starName} одобрил ваш запрос на {itemType}",
     "giftRequestAccepted": "Запрос на подарок принят!",
@@ -2192,7 +2194,15 @@
     "unknownPlayer": "Неизвестный игрок",
     "star": "Звезда",
     "newRegistration": "Новая регистрация",
-    "newUserRegistered": "Зарегистрировался новый пользователь: {name}"
+    "newUserRegistered": "Зарегистрировался новый пользователь: {name}",
+    "video_liked": {
+      "title": "Ваше видео лайкнули",
+      "message": "{name} лайкнул ваше видео"
+    },
+    "photo_liked": {
+      "title": "Ваше фото лайкнули",
+      "message": "{name} лайкнул ваше фото"
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Выберите источник фото",

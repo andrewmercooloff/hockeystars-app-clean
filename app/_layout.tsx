@@ -401,12 +401,15 @@ export default function RootLayout() {
           return n.type === 'friend_request' || 
                  n.type === 'autograph_request' || 
                  n.type === 'stick_request' || 
+                 n.type === 'gift_request' ||
                  n.type === 'gift_accepted' ||
                  n.type === 'achievement' || 
                  n.type === 'team_invite' || 
                  n.type === 'system' ||
                  n.type === 'stats_change' ||
-               n.type === 'photo_added';
+                 n.type === 'photo_added' ||
+                 n.type === 'video_liked' ||
+                 n.type === 'photo_liked';
         });
         
         // Считаем только непрочитанные уведомления (запросы в друзья показываются отдельно)

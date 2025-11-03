@@ -106,6 +106,7 @@
   },
   "addPhoto": "Add photo",
   "selectPhotoSource": "Select photo source",
+  "selectPhotoMessage": "Where would you like to upload the photo from?",
   "gallery": "Gallery",
   "camera": "Camera",
   "cancel": "Cancel",
@@ -1991,6 +1992,7 @@
     "teamInfo": "Team information",
     "standards": "Standards",
     "museum": "Museum",
+    "museumEmpty": "{playerName} has not received any gifts yet",
     "youAreFriendsWith": "You are friends with",
     "addToFriends": "Add to friends",
     "addFriend": "Add Friend",
@@ -2426,12 +2428,20 @@
     "friendRequestAccepted": "Friend request accepted!",
     "friendRequestDeclined": "Friend request declined",
     "giftRequest": "Gift Request",
-    "giftRequestMessage": "{playerName} is requesting {itemType}",
+    "giftRequestMessage": "{playerName} is requesting a gift",
     "player": "Player",
     "unknownPlayer": "Unknown player",
     "star": "Star",
     "newRegistration": "New registration",
     "newUserRegistered": "New user registered: {name}",
+    "video_liked": {
+      "title": "Your video was liked",
+      "message": "{name} liked your video"
+    },
+    "photo_liked": {
+      "title": "Your photo was liked",
+      "message": "{name} liked your photo"
+    },
     "shop": "Hockey Shop",
     "giftRequestApproved": "Request Approved",
     "giftRequestApprovedMessage": "{starName} approved your request for {itemType}",

@@ -14,6 +14,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import YouTubeVideo from './YouTubeVideo';
 import { useLanguage } from '../contexts/LanguageContext';
+import LikeButton from './LikeButton';
+import { generateVideoContentId } from '../utils/likesService';
 
 // Компонент для изображения с fallback
 const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
@@ -88,11 +90,12 @@ const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
 interface VideoCarouselProps {
   videos: Array<{ url: string; timeCode?: string }>;
   onVideoPress?: (video: { url: string; timeCode?: string }) => void;
+  playerId?: string; // ID игрока, владельца видео
 }
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselProps) {
+export default function VideoCarousel({ videos, onVideoPress, playerId }: VideoCarouselProps) {
   const { t } = useLanguage();
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -151,26 +154,40 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
         removeClippedSubviews={true}
         decelerationRate="fast"
       >
-        {videos.map((video, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.videoCard}
-            onPress={() => handleVideoPress(video)}
-          >
-            <VideoThumbnail videoUrl={video.url} />
-            <View style={styles.playButton}>
-              <Ionicons name="play-circle" size={40} color="#FF4444" />
-            </View>
-            {video.timeCode && (
-              <View style={styles.timeCodeBadge}>
-                <Text style={styles.timeCodeText}>{video.timeCode}</Text>
+        {videos.map((video, index) => {
+          const contentId = generateVideoContentId(video.url, video.timeCode);
+          
+          return (
+            <TouchableOpacity
+              key={index}
+              style={styles.videoCard}
+              onPress={() => handleVideoPress(video)}
+            >
+              <VideoThumbnail videoUrl={video.url} />
+              <View style={styles.playButton}>
+                <Ionicons name="play-circle" size={40} color="#FF4444" />
               </View>
-            )}
-            <View style={styles.videoInfo}>
-              <Text style={styles.videoTitle}>{index + 1}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+              {video.timeCode && (
+                <View style={styles.timeCodeBadge}>
+                  <Text style={styles.timeCodeText}>{video.timeCode}</Text>
+                </View>
+              )}
+              {playerId && (
+                <View style={styles.likeButtonContainer}>
+                  <LikeButton
+                    playerId={playerId}
+                    contentId={contentId}
+                    contentType="video"
+                    size="small"
+                  />
+                </View>
+              )}
+              <View style={styles.videoInfo}>
+                <Text style={styles.videoTitle}>{index + 1}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       {/* Точки-индикаторы */}
@@ -261,6 +278,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
+  },
+  likeButtonContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    zIndex: 10,
   },
   videoInfo: {
     position: 'absolute',

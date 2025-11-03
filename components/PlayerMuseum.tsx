@@ -46,6 +46,7 @@ interface PlayerMuseumProps {
   cachedMuseumItems?: MuseumItem[]; // Кешированные данные музея для мгновенного отображения
   onMuseumItemsLoaded?: (items: MuseumItem[]) => void; // Callback для сохранения загруженных данных в кеш
   updateTrigger?: number; // Триггер для принудительного обновления музея
+  playerName?: string; // Имя игрока для отображения в сообщении о пустом музее
 }
 
 const { width } = Dimensions.get('window');
@@ -59,7 +60,8 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   onMuseumUpdated,
   cachedMuseumItems,
   onMuseumItemsLoaded,
-  updateTrigger
+  updateTrigger,
+  playerName
 }) => {
   // console.log('🎁 МУЗЕЙ: PROPS:', { playerId, isOwner, isAdmin, isEditing });
   
@@ -433,9 +435,13 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
 
   if (loading) return <Text style={styles.loadingText}>{t('common.loading')}</Text>;
   
-  // Не показываем музей, если нет подарков
+  // Если нет подарков, показываем сообщение
   if (museumItems.length === 0) {
-    return null;
+    return (
+      <Text style={styles.emptyText}>
+        {t('profile.museumEmpty', { playerName: playerName || t('profile.player') })}
+      </Text>
+    );
   }
 
   return (

@@ -95,7 +95,7 @@ export default function FriendshipNotification({
             {t('friendshipNotification.became')}
           </Text>
           <View style={styles.friendshipBadge}>
-            <Ionicons name="people-outline" size={18} color="#fff" />
+            <Ionicons name="people-outline" size={16} color="#fff" />
           </View>
         </View>
       </View>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#FF4444',
+    borderLeftColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
   },
   avatarsContainer: {
     width: 50,
@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4444',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    backgroundColor: '#FF8243', // Оранжевый цвет для уведомлений о дружбе (RGB: 255,130,67)
+    paddingHorizontal: 6,
+    paddingVertical: 6,
     borderRadius: 12,
-    width: 36,
-    height: 36,
+    width: 28,
+    height: 28,
   },
 });
