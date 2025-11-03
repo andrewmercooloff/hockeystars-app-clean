@@ -94,14 +94,6 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
 
   return (
     <View style={styles.container}>
-      {/* Заголовок */}
-      <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>
-          {title || t('myMoment')}
-          {timeCode ? ` (${timeCode})` : ''}
-        </Text>
-      </View>
-
       {/* Видео плеер */}
       <View style={styles.videoContainer}>
         {loading && (
@@ -139,22 +131,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     borderRadius: 12,
     overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 68, 68, 0.3)',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
   },
   videoContainer: {
     width: '100%',
