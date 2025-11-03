@@ -4459,27 +4459,35 @@ export const notifyFriendsAboutPhysicalData = async (
       });
     };
 
-    // Создаем уведомления для каждого друга
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
     const notifications = friends.map(friend => {
-      // Формируем текст изменений
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
+      
+      // Формируем текст изменений на языке друга
       const changesText = changes.map(change => {
         const fieldName = change.field === 'height' 
-          ? (translations?.height || 'рост')
-          : (translations?.weight || 'вес');
+          ? (friendTranslations?.height || 'рост')
+          : (friendTranslations?.weight || 'вес');
         const unit = change.field === 'height' 
-          ? (translations?.cm || 'см')
-          : (translations?.kg || 'кг');
+          ? (friendTranslations?.cm || 'см')
+          : (friendTranslations?.kg || 'кг');
         return `${fieldName}: ${change.oldValue}${unit} → ${change.newValue}${unit}`;
       }).join(', ');
       
-      const updatedText = translations?.statsNotification?.updated || 'обновил';
-      const physicalDataText = translations?.statsNotification?.physicalData || 'физические данные';
+      const updatedText = friendTranslations?.statsNotification?.updated || 'обновил';
+      const physicalDataText = friendTranslations?.statsNotification?.physicalData || 'физические данные';
+      const title = friendLang === 'ru' ? 'Изменение физических данных' : 'Physical Data Changed';
       
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'physical_data_changed',
-        title: 'Изменение физических данных',
+        title: title,
         message: `${playerName} ${updatedText} ${physicalDataText}: ${changesText}`,
         data: {
           changes: changes,
@@ -4693,75 +4701,112 @@ export const notifyFriendsAboutChanges = async (
       });
     };
 
-    // Создаем уведомления для статистики (если есть изменения)
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+
+    // Создаем уведомления для статистики (если есть изменения) с локализацией
     const statNotifications = [];
     if (statChanges.length > 0) {
-      const statChangesText = statChanges
-        .map(change => {
-          const fieldNames: { [key: string]: string } = {
-            'goals': 'голов',
-            'assists': 'передач', 
-            'games': 'игр'
-          };
-          const fieldName = fieldNames[change.field] || change.field;
-          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-          return `${fieldName}: ${changeText}`;
-        })
-        .join(', ');
-
-      const notifications = friends.map(friend => ({
-        id: generateUUID(),
-        user_id: friend.id,
-        type: 'stats_change',
-        title: 'Изменения в статистике',
-        message: `${playerName} обновил: ${statChangesText}`,
-        data: {
-          changes: statChanges, // Только статистика
-          changedPlayerId: playerId,
-          changedPlayerName: playerName,
-          changedPlayerAvatar: playerAvatar
-        },
-        created_at: new Date().toISOString(),
-        is_read: false
-      }));
+      const notifications = friends.map(friend => {
+        const friendLang = friendLanguages.get(friend.id) || 'en';
+        const friendTranslations = loadTranslations(friendLang);
+        
+        const fieldNamesRu: { [key: string]: string } = {
+          'goals': 'голов',
+          'assists': 'передач', 
+          'games': 'игр'
+        };
+        const fieldNamesEn: { [key: string]: string } = {
+          'goals': 'goals',
+          'assists': 'assists', 
+          'games': 'games'
+        };
+        const fieldNames = friendLang === 'ru' ? fieldNamesRu : fieldNamesEn;
+        
+        const statChangesText = statChanges
+          .map(change => {
+            const fieldName = fieldNames[change.field] || change.field;
+            const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+            return `${fieldName}: ${changeText}`;
+          })
+          .join(', ');
+        
+        const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
+        const title = friendLang === 'ru' ? 'Изменения в статистике' : 'Stats Update';
+        
+        return {
+          id: generateUUID(),
+          user_id: friend.id,
+          type: 'stats_change',
+          title: title,
+          message: `${playerName} ${updatedText}: ${statChangesText}`,
+          data: {
+            changes: statChanges,
+            changedPlayerId: playerId,
+            changedPlayerName: playerName,
+            changedPlayerAvatar: playerAvatar
+          },
+          created_at: new Date().toISOString(),
+          is_read: false
+        };
+      });
       
       statNotifications.push(...notifications);
     }
 
-    // Создаем уведомления для нормативов (если есть изменения)
+    // Создаем уведомления для нормативов (если есть изменения) с локализацией
     const normativeNotifications = [];
     if (normativeChanges.length > 0) {
-      const normativeChangesText = normativeChanges
-        .map(change => {
-          const fieldNames: { [key: string]: string } = {
-            'pullUps': 'подтягиваний',
-            'pushUps': 'отжиманий',
-            'plankTime': 'планки',
-            'sprint100m': 'стометровки',
-            'longJump': 'прыжка в длину',
-            'jumpRope': 'скакалки'
-          };
-          const fieldName = fieldNames[change.field] || change.field;
-          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-          return `${fieldName}: ${changeText}`;
-        })
-        .join(', ');
-
-      const notifications = friends.map(friend => ({
-        id: generateUUID(),
-        user_id: friend.id,
-        type: 'stats_change', // Используем тот же тип для нормативов
-        title: 'Изменения в нормативах',
-        message: `${playerName} обновил: ${normativeChangesText}`,
-        data: {
-          changes: normativeChanges, // Только нормативы
-          changedPlayerId: playerId,
-          changedPlayerName: playerName,
-          changedPlayerAvatar: playerAvatar
-        },
-        created_at: new Date().toISOString(),
-        is_read: false
-      }));
+      const notifications = friends.map(friend => {
+        const friendLang = friendLanguages.get(friend.id) || 'en';
+        const friendTranslations = loadTranslations(friendLang);
+        
+        const fieldNamesRu: { [key: string]: string } = {
+          'pullUps': 'подтягиваний',
+          'pushUps': 'отжиманий',
+          'plankTime': 'планки',
+          'sprint100m': 'стометровки',
+          'longJump': 'прыжка в длину',
+          'jumpRope': 'скакалки'
+        };
+        const fieldNamesEn: { [key: string]: string } = {
+          'pullUps': 'pull-ups',
+          'pushUps': 'push-ups',
+          'plankTime': 'plank',
+          'sprint100m': '100m sprint',
+          'longJump': 'long jump',
+          'jumpRope': 'jump rope'
+        };
+        const fieldNames = friendLang === 'ru' ? fieldNamesRu : fieldNamesEn;
+        
+        const normativeChangesText = normativeChanges
+          .map(change => {
+            const fieldName = fieldNames[change.field] || change.field;
+            const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+            return `${fieldName}: ${changeText}`;
+          })
+          .join(', ');
+        
+        const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
+        const title = friendLang === 'ru' ? 'Изменения в нормативах' : 'Standards Update';
+        
+        return {
+          id: generateUUID(),
+          user_id: friend.id,
+          type: 'stats_change',
+          title: title,
+          message: `${playerName} ${updatedText}: ${normativeChangesText}`,
+          data: {
+            changes: normativeChanges,
+            changedPlayerId: playerId,
+            changedPlayerName: playerName,
+            changedPlayerAvatar: playerAvatar
+          },
+          created_at: new Date().toISOString(),
+          is_read: false
+        };
+      });
       
       normativeNotifications.push(...notifications);
     }
