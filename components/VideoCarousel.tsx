@@ -125,14 +125,15 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
   const { t } = useLanguage();
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+  const [expandedVideoIndex, setExpandedVideoIndex] = useState<number | null>(null);
   
 
-  const handleVideoPress = (video: { url: string; timeCode?: string }) => {
+  const handleVideoPress = (video: { url: string; timeCode?: string }, index: number) => {
     if (onVideoPress) {
       onVideoPress(video);
     } else {
-      setSelectedVideo(video);
+      // Разворачиваем видео прямо в карусели
+      setExpandedVideoIndex(expandedVideoIndex === index ? null : index);
     }
   };
 
@@ -167,24 +168,40 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
         decelerationRate="fast"
       >
         {videos.map((video, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.videoCard}
-            onPress={() => handleVideoPress(video)}
-          >
-            <VideoThumbnail videoUrl={video.url} timeCode={video.timeCode} />
-            <View style={styles.playButton}>
-              <Ionicons name="play-circle" size={40} color="#FF4444" />
-            </View>
-            {video.timeCode && (
-              <View style={styles.timeCodeBadge}>
-                <Text style={styles.timeCodeText}>{video.timeCode}</Text>
+          <View key={index} style={styles.videoCard}>
+            {expandedVideoIndex === index ? (
+              <View style={styles.expandedVideoContainer}>
+                <TouchableOpacity 
+                  style={styles.collapseButton}
+                  onPress={() => setExpandedVideoIndex(null)}
+                >
+                  <Ionicons name="close-circle" size={30} color="#fff" />
+                </TouchableOpacity>
+                <YouTubeVideo
+                  url={video.url}
+                  timeCode={video.timeCode}
+                />
               </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.thumbnailContainer}
+                onPress={() => handleVideoPress(video, index)}
+              >
+                <VideoThumbnail videoUrl={video.url} timeCode={video.timeCode} />
+                <View style={styles.playButton}>
+                  <Ionicons name="play-circle" size={40} color="#FF4444" />
+                </View>
+                {video.timeCode && (
+                  <View style={styles.timeCodeBadge}>
+                    <Text style={styles.timeCodeText}>{video.timeCode}</Text>
+                  </View>
+                )}
+                <View style={styles.videoInfo}>
+                  <Text style={styles.videoTitle}>{index + 1}</Text>
+                </View>
+              </TouchableOpacity>
             )}
-            <View style={styles.videoInfo}>
-              <Text style={styles.videoTitle}>{index + 1}</Text>
-            </View>
-          </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
 
@@ -238,7 +255,7 @@ const styles = StyleSheet.create({
   },
   videoCard: {
     width: screenWidth * 0.65,
-    height: 180,
+    minHeight: 180,
     marginHorizontal: 8,
     borderRadius: 12,
     backgroundColor: 'rgba(255, 68, 68, 0.1)',
@@ -246,6 +263,25 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 68, 68, 0.2)',
     overflow: 'hidden',
     position: 'relative',
+  },
+  thumbnailContainer: {
+    width: '100%',
+    height: 180,
+    position: 'relative',
+  },
+  expandedVideoContainer: {
+    width: '100%',
+    minHeight: 300,
+    position: 'relative',
+  },
+  collapseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+    padding: 2,
   },
   thumbnail: {
     width: '100%',
