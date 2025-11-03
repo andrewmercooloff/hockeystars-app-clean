@@ -124,6 +124,29 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     try {
       setLanguageState(lang);
       await AsyncStorage.setItem('selectedLanguage', lang);
+      
+      // ВАЖНО: Сохраняем язык в БД для правильной локализации уведомлений
+      // Получаем текущего пользователя и обновляем его язык
+      try {
+        const { loadCurrentUser } = await import('../utils/playerStorage');
+        const currentUser = await loadCurrentUser();
+        
+        if (currentUser?.id) {
+          const { supabase } = await import('../utils/supabase');
+          const { error } = await supabase
+            .from('players')
+            .update({ language: lang })
+            .eq('id', currentUser.id);
+          
+          if (error) {
+            console.error('❌ Ошибка сохранения языка в БД:', error);
+          } else {
+            console.log('✅ Язык сохранен в БД:', lang);
+          }
+        }
+      } catch (dbError) {
+        console.warn('⚠️ Не удалось сохранить язык в БД:', dbError);
+      }
     } catch (error) {
       console.warn('Ошибка сохранения языка:', error);
     }

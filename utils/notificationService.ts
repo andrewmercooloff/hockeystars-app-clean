@@ -279,12 +279,18 @@ export async function sendPushNotification(
         return false;
       }
 
-      const result = await response.json();
+        const result = await response.json();
+      
+      console.log(`📡 Ответ от Expo Push API для токена ${token.substring(0, 20)}:`, JSON.stringify(result, null, 2));
       
       if (result.data && result.data.status === 'ok') {
+        console.log(`✅ Expo Push API подтвердил отправку уведомления на токен ${token.substring(0, 20)}`);
         return true;
       } else {
-        console.error('❌ Ошибка отправки push-уведомления:', result);
+        console.error('❌ Expo Push API вернул ошибку:', result);
+        if (result.data && result.data.details && result.data.details.error) {
+          console.error('❌ Детали ошибки Expo:', result.data.details.error);
+        }
         return false;
       }
     } catch (fetchError) {
@@ -340,12 +346,15 @@ export async function sendNotificationToUser(
   data?: any
 ): Promise<boolean> {
   try {
+    console.log(`📱 Получаем push-токены для пользователя ${userId}...`);
     const tokens = await getUserPushTokens(userId);
     
     if (tokens.length === 0) {
-      // console.log('❌ У пользователя нет зарегистрированных устройств');
+      console.warn(`⚠️ У пользователя ${userId} нет зарегистрированных push-токенов для отправки уведомления`);
       return false;
     }
+
+    console.log(`📱 Найдено ${tokens.length} токен(ов) для пользователя ${userId}`);
 
     // Дедупликация токенов - убираем дубликаты
     const uniqueTokens = [...new Set(tokens)];
@@ -358,14 +367,21 @@ export async function sendNotificationToUser(
     
     // Отправляем на все уникальные устройства пользователя
     for (const token of uniqueTokens) {
+      console.log(`📤 Отправляем push-уведомление на токен ${token.substring(0, 20)}...`);
       const success = await sendPushNotification(token, title, body, data);
-      if (success) successCount++;
+      if (success) {
+        successCount++;
+        console.log(`✅ Push-уведомление успешно отправлено на токен ${token.substring(0, 20)}`);
+      } else {
+        console.warn(`⚠️ Не удалось отправить push-уведомление на токен ${token.substring(0, 20)}`);
+      }
     }
 
-    // console.log(`✅ Уведомления отправлены на ${successCount}/${uniqueTokens.length} устройств для пользователя ${userId}`);
+    console.log(`📊 Итог отправки: ${successCount}/${uniqueTokens.length} уведомлений успешно отправлено пользователю ${userId}`);
     return successCount > 0;
   } catch (error) {
     console.error('❌ Ошибка отправки уведомления пользователю:', error);
+    console.error('❌ Детали ошибки:', error instanceof Error ? error.stack : JSON.stringify(error, null, 2));
     return false;
   }
 }

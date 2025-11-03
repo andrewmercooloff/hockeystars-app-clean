@@ -47,13 +47,14 @@ import CachedBackground from '../components/CachedBackground';
 const iceBg = require('../assets/images/led.jpg');
 
 // Мемоизированный компонент для элемента уведомления
-const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete }: {
+const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete, currentUserId }: {
   notification: NotificationItem;
   index: number;
   isNew: boolean;
   onPress: (notification: NotificationItem) => void;
   onSuperAction: (notification: NotificationItem) => void;
   onDelete: (notificationId: string) => void;
+  currentUserId?: string;
 }) => {
   const { t } = useLanguage();
 
@@ -143,7 +144,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
               timestamp={notification.timestamp}
-              playerAvatar={notification.data.changedPlayerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'photo_added' ? (
@@ -157,6 +157,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               photosCount={notification.data.addedPhotosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'new_friendship' ? (
@@ -207,6 +208,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               giftName={notification.data.giftName || 'Подарок'}
               giftType={notification.data.giftType || 'gift'}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerId={notification.data.playerId}
+              playerAvatar={notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'friend_gift_received' ? (
@@ -232,6 +235,19 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               onPress={() => onPress(notification)}
             />
           </TouchableOpacity>
+        ) : notification.type === 'friend_request' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <FriendRequestNotification
+              playerName={notification.playerName || notification.data?.sender_name || notification.data?.playerName || 'Игрок'}
+              playerId={notification.playerId || notification.data?.sender_id || notification.data?.playerId}
+              timestamp={notification.timestamp}
+              playerAvatar={notification.playerAvatar || notification.data?.sender_avatar || notification.data?.playerAvatar}
+            />
+          </TouchableOpacity>
         ) : notification.type === 'friend_accepted' ? (
           <TouchableOpacity
             onPress={() => onPress(notification)}
@@ -243,6 +259,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data?.acceptor_id}
               message={notification.message}
               timestamp={notification.timestamp}
+              playerAvatar={notification.data?.acceptor_avatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'gift_accepted' ? (
@@ -267,6 +284,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               videosCount={notification.data.addedVideosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
             />
           </TouchableOpacity>
         ) : notification.type === 'avatar_changed' ? (
@@ -473,8 +491,11 @@ export default function NotificationsScreen() {
       // Фильтруем уведомления, которые относятся к текущему пользователю (поддерживаем обе структуры)
       const userNotifications = storedNotifications.filter(notification => {
         // Уведомления о запросах дружбы показываем только если они предназначены для этого пользователя
+        // Проверяем user_id (для уведомлений из БД) или receiver_id/receiverId (для совместимости)
         if (notification.type === 'friend_request') {
-          return notification.receiver_id === currentUser.id || notification.receiverId === currentUser.id;
+          return notification.user_id === currentUser.id || 
+                 notification.receiver_id === currentUser.id || 
+                 notification.receiverId === currentUser.id;
         }
         
         // Уведомления о подарках и других действиях
@@ -521,9 +542,9 @@ export default function NotificationsScreen() {
           message: notification.message,
           timestamp,
           isRead: notification.is_read || notification.isRead || false,
-          playerId: notification.player_id || notification.playerId,
-          playerName: notification.player_name || notification.playerName,
-          playerAvatar: notification.player_avatar || notification.playerAvatar,
+          playerId: notification.data?.sender_id || notification.data?.playerId || notification.player_id || notification.playerId,
+          playerName: notification.data?.sender_name || notification.data?.playerName || notification.player_name || notification.playerName,
+          playerAvatar: notification.data?.sender_avatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar,
           receiverId: notification.receiver_id || notification.receiverId,
           // Помечаем уведомления как actionable, если они требуют действия
           isActionable: notification.type === 'gift_accepted' || 
@@ -596,6 +617,36 @@ export default function NotificationsScreen() {
         // Обрабатываем ошибки отдельно, так как .then() возвращает Promise<void>
       }
       
+      // ВАЖНО: Ограничиваем количество уведомлений до 20
+      // Удаляем самые старые уведомления, если их больше 20
+      const MAX_NOTIFICATIONS = 20;
+      
+      let limitedNotifications = userNotifications;
+      if (userNotifications.length > MAX_NOTIFICATIONS) {
+        // Сортируем по времени (новые первыми) и берем первые 20
+        limitedNotifications = userNotifications
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .slice(0, MAX_NOTIFICATIONS);
+        
+        // Удаляем старые уведомления из базы данных в фоне
+        const notificationsToDelete = userNotifications.slice(MAX_NOTIFICATIONS);
+        if (notificationsToDelete.length > 0) {
+          // Удаляем асинхронно в фоне, не блокируя UI
+          const idsToDelete = notificationsToDelete.map(n => n.id);
+          supabase
+            .from('notifications')
+            .delete()
+            .in('id', idsToDelete)
+            .then(({ error }) => {
+              if (error) {
+                console.error('Ошибка удаления старых уведомлений:', error);
+              } else {
+                console.log(`🗑️ Удалено ${notificationsToDelete.length} старых уведомлений, оставлено ${MAX_NOTIFICATIONS}`);
+              }
+            });
+        }
+      }
+      
       // Если это первая загрузка, помечаем все уведомления как "старые" (без анимации)
       if (isInitialLoad) {
         setNewNotificationIds(new Set());
@@ -608,7 +659,7 @@ export default function NotificationsScreen() {
         ]);
         
         const newIds = new Set([
-          ...userNotifications.map(n => n.id),
+          ...limitedNotifications.map(n => n.id),
           ...friendRequestItems.map(r => r.id),
           ...giftRequestItems.map(g => g.id)
         ].filter(id => !currentIds.has(id)));
@@ -621,27 +672,33 @@ export default function NotificationsScreen() {
         }, 1000);
       }
 
-      setNotifications(userNotifications);
+      setNotifications(limitedNotifications);
       setFriendRequests(friendRequestItems);
       // giftRequestItems загружаются асинхронно выше
       
-      // Предзагружаем аватары для всех уведомлений в фоне
-      const allPlayers = [
-        ...userNotifications.map(n => ({ id: n.playerId, avatar: n.playerAvatar })),
-        ...friendRequestItems.map(r => ({ id: r.playerId, avatar: r.playerAvatar })),
-        ...giftRequestItems.map(g => ({ id: g.playerId, avatar: g.playerAvatar }))
-      ].filter(p => p.id && p.avatar);
+      // НЕ предзагружаем аватары из уведомлений - они могут быть устаревшими
+      // Аватары загрузятся из кеша или через Realtime при отображении
+      // Это предотвращает перезапись актуальных аватаров старыми из уведомлений
       
-      if (allPlayers.length > 0) {
-        // Предзагружаем аватары в фоне, не блокируя UI
-        preloadPlayerAvatars(allPlayers).catch(error => {
-          console.log('Предзагрузка аватаров завершена с ошибками:', error);
-        });
-      }
+      // const allPlayers = [
+      //   ...userNotifications.map(n => ({ id: n.playerId, avatar: n.playerAvatar })),
+      //   ...friendRequestItems.map(r => ({ id: r.playerId, avatar: r.playerAvatar })),
+      //   ...giftRequestItems.map(g => ({ id: g.playerId, avatar: g.playerAvatar }))
+      // ].filter(p => p.id && p.avatar);
+      // 
+      // if (allPlayers.length > 0) {
+      //   // Предзагружаем аватары в фоне, не блокируя UI
+      //   preloadPlayerAvatars(allPlayers).catch(error => {
+      //     console.log('Предзагрузка аватаров завершена с ошибками:', error);
+      //   });
+      // }
       
     } catch (error) {
       console.error('❌ Ошибка загрузки уведомлений:', error);
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
+    } finally {
+      // ВАЖНО: Всегда выключаем loading, даже если произошла ошибка
+      setLoading(false);
     }
   }, [currentUser, t]);
 
@@ -963,7 +1020,8 @@ export default function NotificationsScreen() {
     try {
       // Для actionable уведомлений не выполняем автоматическую отметку как прочитанное
       // так как для них есть кнопка "Супер"
-      if (notification.isActionable) {
+      // Исключение: friend_request - для него нужно обрабатывать навигацию
+      if (notification.isActionable && notification.type !== 'friend_request') {
         // Просто обрабатываем нажатие без изменения статуса
         return;
       }
@@ -989,9 +1047,14 @@ export default function NotificationsScreen() {
       
       // Обработка нажатия на уведомление с правильными deep links
       if (notification.type === 'friend_request') {
-        // Для запросов в друзья показываем профиль игрока
-        if (notification.playerId) {
-          router.push(`/player/${notification.playerId}`);
+        // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
+        // Используем тот же fallback механизм, что и в отображении уведомления
+        const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
+        if (senderId) {
+          console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
+          router.push(`/player/${senderId}?scrollToFriends=true`);
+        } else {
+          console.warn('⚠️ Не удалось определить ID отправителя запроса дружбы');
         }
       } else if (notification.type === 'friend_accepted') {
         // Для уведомлений о принятом запросе показываем профиль игрока, который принял
@@ -1115,6 +1178,13 @@ export default function NotificationsScreen() {
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+        } else if (notification.type === 'gift_received') {
+          // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
+          if (notification.data && notification.data.playerId) {
+            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          } else if (currentUser) {
+            router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          }
         } else if (notification.type === 'friend_request') {
           if (notification.playerId) {
             router.push(`/player/${notification.playerId}`);
@@ -1170,6 +1240,13 @@ export default function NotificationsScreen() {
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+        } else if (notification.type === 'gift_received') {
+          // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
+          if (notification.data && notification.data.playerId) {
+            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          } else if (currentUser) {
+            router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          }
         } else if (notification.type === 'friend_request') {
           if (notification.playerId) {
             router.push(`/player/${notification.playerId}`);
@@ -1229,8 +1306,11 @@ export default function NotificationsScreen() {
         Alert.alert(t('common.success'), t('notifications.friendRequestDeclined'));
       }
       
-      // Обновляем список запросов
+      // Удаляем из списка запросов
       setFriendRequests(prev => prev.filter(req => req.id !== request.id));
+      
+      // Удаляем из списка уведомлений, если оно там есть
+      setNotifications(prev => prev.filter(n => n.id !== request.id));
       
       // Обновляем данные только один раз для синхронизации счетчика
       await loadNotificationsData();
@@ -1349,6 +1429,7 @@ export default function NotificationsScreen() {
                 onPress={handleNotificationPress}
                 onSuperAction={handleSuperAction}
                 onDelete={handleDeleteNotification}
+                currentUserId={currentUser?.id}
               />
             )}
             keyExtractor={(item) => item.id}

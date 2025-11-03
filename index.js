@@ -15,5 +15,8 @@ if (Platform.OS === 'web') {
   }
 }
 
-// Отключаем все предупреждения
-LogBox.ignoreAllLogs(); 
+// В режиме разработки показываем предупреждения для отладки
+// Отключаем только в продакшене
+if (typeof __DEV__ === 'undefined' || !__DEV__) {
+  LogBox.ignoreAllLogs();
+} 

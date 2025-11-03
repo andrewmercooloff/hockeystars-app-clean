@@ -149,6 +149,15 @@ const FilterButton = React.memo(({
                 // Если не найдено, используем оригинальное название
                 return selectedValue;
               }
+              
+              // Для роста и веса добавляем ">" перед числом
+              const heightTitle = t('search.heightFrom');
+              const weightTitle = t('search.weightFrom');
+              if (title === heightTitle || title === weightTitle) {
+                // Добавляем ">" только если selectedValue не пустой
+                return `> ${selectedValue}`;
+              }
+              
               return selectedValue;
             }
             return title;
@@ -183,6 +192,12 @@ const FilterButton = React.memo(({
               const displayText = typeof option === 'string' ? option : option.translated;
               const optionValue = typeof option === 'string' ? option : option.original;
               
+              // Для роста и веса добавляем ">" перед значением в dropdown
+              const heightTitle = t('search.heightFrom');
+              const weightTitle = t('search.weightFrom');
+              const finalDisplayText = (title === heightTitle || title === weightTitle) 
+                ? `> ${displayText}` 
+                : displayText;
               
               return (
             <TouchableOpacity 
@@ -193,7 +208,7 @@ const FilterButton = React.memo(({
               ]} 
                   onPress={() => handleSelect(optionValue)}
             >
-                  <Text style={styles.filterDropdownItemText}>{displayText}</Text>
+                  <Text style={styles.filterDropdownItemText}>{finalDisplayText}</Text>
             </TouchableOpacity>
               );
             })}

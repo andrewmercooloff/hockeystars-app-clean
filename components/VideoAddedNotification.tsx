@@ -9,6 +9,7 @@ interface VideoAddedNotificationProps {
   playerId?: string;
   videosCount: number;
   timestamp: string;
+  playerAvatar?: string;
 }
 
 const VideoAddedNotification = React.memo(function VideoAddedNotification({
@@ -49,10 +50,10 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar} // Используем аватар из уведомления как fallback
             size={50}
             style={styles.playerAvatar}
           />

@@ -143,9 +143,14 @@ export default function ExerciseDetailsScreen() {
     
     try {
       // Выполняем упражнение
-      console.log('💪 Вызываем markAsCompleted...');
+      console.warn('💪 [EXERCISE-DETAILS] Вызываем markAsCompleted для exerciseId:', exerciseId);
+      console.error('💪 [EXERCISE-DETAILS] currentUser:', currentUser ? { id: currentUser.id, name: currentUser.name } : 'null');
+      
+      // ВРЕМЕННО: визуальная отладка - показываем Alert для подтверждения
+      Alert.alert('DEBUG', `Начинаем выполнение упражнения ${exerciseId}`);
+      
       await markAsCompleted(exerciseId as string);
-      console.log('✅ markAsCompleted завершен успешно');
+      console.warn('✅ [EXERCISE-DETAILS] markAsCompleted завершен успешно');
       
       // Трекаем выполнение упражнения
       try {

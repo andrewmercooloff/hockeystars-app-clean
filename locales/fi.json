@@ -208,7 +208,7 @@
         "title": "Intervallijuoksu",
         "description": "Vuorotellen nopean (30 sekuntia) ja hitaan juoksun (30 sekuntia) välillä 20 minuutin ajan. Erinomainen kardiokestävyyden kehittämiseen jääkiekkoon.",
         "equipment": "Juoksumatto tai stadion",
-        "calories": "250-350 kcal per harjoitus",
+        "calories": "250-350 kcal",
         "benefits": [
           "Parantaa kardiovaskulaarista kestävyyttä",
           "Kehittää kykyä toipua nopeasti",
@@ -233,7 +233,7 @@
         "title": "Burpee-hyppy",
         "description": "Monimutkainen harjoitus: kyykky → lankku → punnerrus → kyykky → hyppy. Suorita 3 sarjaa 10-15 toistoa.",
         "equipment": "Treenimatto (valinnainen)",
-        "calories": "200-300 kcal per harjoitus",
+        "calories": "200-300 kcal",
         "benefits": [
           "Kehittää yleistä kestävyyttä",
           "Vahvistaa lihaksia koko kehossa",
@@ -260,7 +260,7 @@
         "title": "Pyörä",
         "description": "Intensiivinen pyöräily tai paikallaan pyöräily korkean intensiteetin intervalleilla. 5 minuuttia lämmittelyä, 20 minuutin tauko.",
         "equipment": "Polkupyörä tai kuntopyörä",
-        "calories": "300-400 kcal per harjoitus",
+        "calories": "300-400 kcal",
         "benefits": [
           "Kehittää kardiokestävyyttä",
           "Vahvistaa jalkojen lihaksia",
@@ -285,7 +285,7 @@
         "title": "Plyometriset hyppyt",
         "description": "Hyppy paikalleen mahdollisimman korkealle, laskeudu polvilleen. 3 sarjaa 15-20 hyppyä.",
         "equipment": "Treenimatto (valinnainen)",
-        "calories": "150-200 kcal per harjoitus",
+        "calories": "150-200 kcal",
         "benefits": [
           "Kehittää räjähtävää jalkavoimaa",
           "Parantaa reaktiota ja nopeutta",
@@ -311,7 +311,7 @@
         "title": "Lyhyen matkan sprintit",
         "description": "Juokse maksiminopeudella 20-30 metrin matka 30 sekunnin taukolla juoksujen välillä. 8-10 juoksua.",
         "equipment": "Avoin tila tai juoksurata",
-        "calories": "200-250 kcal per harjoitus",
+        "calories": "200-250 kcal",
         "benefits": [
           "Kehittää maksiminopeutta",
           "Parantaa kiihtyvyyttä",
@@ -337,7 +337,7 @@
         "title": "Pallon heittäminen seinää vasten",
         "description": "Heitä lääkepallo seinää vasten suurimmalla voimalla, ota kiinni ja heitä uudelleen. 3 sarjaa 20 heittoa.",
         "equipment": "Lääkepallo 2-4 kg, seinä",
-        "calories": "120-180 kcal per harjoitus",
+        "calories": "120-180 kcal",
         "benefits": [
           "Kehittää räjähtävää käsivarren voimaa",
           "Parantaa koordinaatiota",
@@ -363,7 +363,7 @@
         "title": "Dynaamiset jalkavenytykset",
         "description": "Jalka heiluu eteenpäin, taaksepäin ja sivuille pyörivin liikkein lonkkanivelissä. 10-15 toistoa jokaiselle jalalle.",
         "equipment": "Seinä tai tuoli tueksi",
-        "calories": "50-80 kcal per lämmittely",
+        "calories": "50-80 kcal",
         "benefits": [
           "Lämmittää jalkojen lihaksia",
           "Parantaa nivelten liikkuvuutta",
@@ -389,7 +389,7 @@
         "title": "Ylävartalon lämmittely",
         "description": "Käsivarsien ympyröitä, vartalon taivutuksia ja kiertymiä. Olkanivelten ja selän lämmittely.",
         "equipment": "Ei vaadita",
-        "calories": "40-60 kcal per lämmittely",
+        "calories": "40-60 kcal",
         "benefits": [
           "Lämmittää ylävartalon lihaksia",
           "Parantaa olkanivelten liikkuvuutta",
@@ -415,7 +415,7 @@
         "title": "Kevyt lenkkeily paikallaan",
         "description": "Lenkkeily paikallaan korkeilla polvilla, asteittain lisäämällä vauhtia. 5-7 minuuttia.",
         "equipment": "Ei vaadita",
-        "calories": "60-80 kcal per lämmittely",
+        "calories": "60-80 kcal",
         "benefits": [
           "Lisää sykettä",
           "Lämmittää jalkojen lihaksia",
@@ -441,7 +441,7 @@
         "title": "Jalkalihasten staattinen venyttely",
         "description": "Pidä nelipäisen reisilihaksen, pohkeiden ja adduktoreiden venytysasentoja. 30 sekuntia per ryhmä.",
         "equipment": "Harjoitusmatto",
-        "calories": "80-100 kcal per venytys",
+        "calories": "80-100 kcal",
         "benefits": [
           "Parantaa jalkojen lihasten joustavuutta",
           "Vähentää lihasjännitystä",
@@ -598,7 +598,7 @@
         "title": "Hyppynaru väliajoin",
         "description": "Vuorotellen nopeita (30 s) ja hitaita (30 s) hyppyjä. 20 minuuttia sydämen kestävyyden kehittämiseen.",
         "equipment": "hyppynaru",
-        "calories": "200-300 kcal per harjoitus",
+        "calories": "200-300 kcal",
         "benefits": [
           "Kehittää kardiokestävyyttä",
           "Parantaa liikkeiden koordinaatiota",
@@ -623,7 +623,7 @@
         "title": "Juoksemassa portaita ylös",
         "description": "Juokse portaat ylös niin nopeasti kuin pystyt ja kävele sitten alas. 10-15 toistoa kehittää jalkojen kestävyyttä.",
         "equipment": "Tikapuut",
-        "calories": "250-350 kcal per harjoitus",
+        "calories": "250-350 kcal",
         "benefits": [
           "Kehittää jalkojen kestävyyttä",
           "Vahvistaa reisien ja pakaroiden lihaksia",
@@ -2281,9 +2281,9 @@
     "position": "asema",
     "year": "vuosi",
     "height": "Korkeus",
-    "heightFrom": "Korkeus alkaen",
+    "heightFrom": "Korkeus",
     "weight": "Paino",
-    "weightFrom": "Paino alkaen",
+    "weightFrom": "Paino",
     "all": "Kaikki",
     "noPlayersFound": "Pelaajia ei löytynyt",
     "left": "Vasen",

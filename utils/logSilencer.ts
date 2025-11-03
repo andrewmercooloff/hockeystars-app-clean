@@ -1,9 +1,12 @@
 // Global log silencer
-export const LOGS_ENABLED = false;
+// В режиме разработки логи включены для отладки
+export const LOGS_ENABLED = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 (function silenceLogs() {
-  // Отключаем все логи кроме критических ошибок
-  const silentNonError = true; // Отключаем все логи
+  // В режиме разработки показываем все логи
+  // В продакшене отключаем логи кроме критических ошибок
+  const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+  const silentNonError = !isDev; // Отключаем логи только в продакшене
   
   const methods: Array<'log'|'info'|'warn'|'error'|'debug'> = ['log','info','warn','debug','error'];
   for (const m of methods) {
@@ -20,7 +23,7 @@ export const LOGS_ENABLED = false;
         return;
       }
       if (silentNonError) {
-        // Отключаем все логи
+        // Отключаем все логи только в продакшене
         return;
       }
       original(...args);

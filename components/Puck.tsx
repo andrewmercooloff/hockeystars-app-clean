@@ -70,46 +70,10 @@ const Puck: React.FC<PuckProps> = ({
   }, [status]);
 
   const imageSource = useMemo(() => {
-    if (!avatar || imageError) {
-      // Если нет аватара и статус скаут - показываем scout.png как полноценное изображение
-      if (status === 'scout') {
-        return require('../assets/images/scout.png');
-      }
-      return null;
-    }
-    
-    if (typeof avatar === 'string') {
-      // Проверяем корректные URI
-      if (avatar.startsWith('data:image/') || 
-          avatar.startsWith('http') || 
-          avatar.startsWith('file://') || 
-          avatar.startsWith('content://')) {
-        // Используем avatarCacheKey для обновления изображения при изменении
-        const uriWithCache = avatar.includes('?') ? avatar : `${avatar}?cache=${avatarCacheKey}`;
-        return { 
-          uri: uriWithCache,
-          cache: 'reload', // Перезагружаем изображение для обновления аватаров
-        };
-      }
-      
-      // Проверяем старые пути к файлам
-      if (avatar.includes('me.jpg')) {
-        return require('../assets/images/me.jpg');
-      }
-      
-      // Если это просто строка, но не URI, попробуем как URI
-      if (avatar.trim().length > 0) {
-        const uriWithCache = avatar.includes('?') ? avatar : `${avatar}?cache=${avatarCacheKey}`;
-        return { 
-          uri: uriWithCache,
-          cache: 'reload',
-        };
-      }
-    }
-    
-    // Для всех остальных случаев показываем силуэт
+    // Эта функция больше не используется, так как мы используем CachedAvatar для кеширования
+    // Оставляем для совместимости со старым кодом, но она не должна вызываться
     return null;
-  }, [avatar, imageError, status, avatarCacheKey]);
+  }, []);
 
   const handleError = useCallback((error: any) => {
 

@@ -208,7 +208,7 @@
         "title": "Intervalový běh",
         "description": "Střídání rychlého běhu (30 sekund) a pomalého běhu (30 sekund) po dobu 20 minut. Vynikající pro rozvoj kardio vytrvalosti pro hokej.",
         "equipment": "Běžecký pás nebo stadion",
-        "calories": "250-350 kcal na trénink",
+        "calories": "250-350 kcal",
         "benefits": [
           "Zlepšuje kardiovaskulární vytrvalost",
           "Rozvíjí schopnost rychlého zotavení",
@@ -233,7 +233,7 @@
         "title": "Burpee skok",
         "description": "Komplexní cvik: dřep → plank → klik → dřep → výskok. Proveďte 3 sady po 10-15 opakováních.",
         "equipment": "Podložka na cvičení (volitelné)",
-        "calories": "200-300 kcal na trénink",
+        "calories": "200-300 kcal",
         "benefits": [
           "Rozvíjí celkovou vytrvalost",
           "Posiluje svaly celého těla",
@@ -260,7 +260,7 @@
         "title": "Kolo",
         "description": "Intenzivní jízda na kole nebo stacionární jízda s intervaly vysoké intenzity. 5 minut zahřívání, 20 minut intervaly.",
         "equipment": "Kolo nebo rotoped",
-        "calories": "300-400 kcal na trénink",
+        "calories": "300-400 kcal",
         "benefits": [
           "Rozvíjí kardio vytrvalost",
           "Posiluje svaly nohou",
@@ -285,7 +285,7 @@
         "title": "Plyometrické skoky",
         "description": "Skákání na místě co nejvýše, přistání na pokrčená kolena. 3 sady 15-20 skoků.",
         "equipment": "Podložka na cvičení (volitelné)",
-        "calories": "150-200 kcal na trénink",
+        "calories": "150-200 kcal",
         "benefits": [
           "Rozvíjí výbušnou sílu nohou",
           "Zlepšuje reakci a rychlost",
@@ -311,7 +311,7 @@
         "title": "Sprinty na krátkou vzdálenost",
         "description": "Běžte maximální rychlostí na vzdálenost 20-30 metrů s 30sekundovou přestávkou mezi běhy. 8-10 běhů.",
         "equipment": "Otevřený prostor nebo běžecká dráha",
-        "calories": "200-250 kcal na trénink",
+        "calories": "200-250 kcal",
         "benefits": [
           "Vyvíjí maximální rychlost",
           "Zlepšuje zrychlení",
@@ -337,7 +337,7 @@
         "title": "Házení míče o zeď",
         "description": "Hoďte medicinbal na zeď maximální silou, chyťte se a znovu házejte. 3 sady po 20 hodech.",
         "equipment": "Medicinbal 2-4 kg, stěna",
-        "calories": "120-180 kcal na trénink",
+        "calories": "120-180 kcal",
         "benefits": [
           "Rozvíjí výbušnou sílu paží",
           "Zlepšuje koordinaci",
@@ -363,7 +363,7 @@
         "title": "Dynamické protažení nohou",
         "description": "Noha se kývá dopředu, dozadu a do stran krouživými pohyby v kyčelních kloubech. 10-15 opakování pro každou nohu.",
         "equipment": "Stěna nebo židle na podporu",
-        "calories": "50-80 kcal na zahřátí",
+        "calories": "50-80 kcal",
         "benefits": [
           "Prohřívá svaly nohou",
           "Zlepšuje pohyblivost kloubů",
@@ -389,7 +389,7 @@
         "title": "Zahřátí horní části těla",
         "description": "Kruhy paží, ohyby trupu a zkroucení. Zahřátí pro ramenní klouby a záda.",
         "equipment": "Není vyžadováno",
-        "calories": "40-60 kcal na zahřátí",
+        "calories": "40-60 kcal",
         "benefits": [
           "Prohřívá svaly horní části těla",
           "Zlepšuje pohyblivost ramenního kloubu",
@@ -415,7 +415,7 @@
         "title": "Lehké běhání na místě",
         "description": "Běhání na místě s vysokými koleny, postupné zvyšování tempa. 5-7 minut.",
         "equipment": "Není vyžadováno",
-        "calories": "60-80 kcal na zahřátí",
+        "calories": "60-80 kcal",
         "benefits": [
           "Zvyšuje srdeční frekvenci",
           "Prohřívá svaly nohou",
@@ -441,7 +441,7 @@
         "title": "Statické protažení svalů nohou",
         "description": "Držte protahovací pozice pro kvadricepsy, lýtka a adduktory. 30 sekund na skupinu.",
         "equipment": "Podložka na cvičení",
-        "calories": "80-100 kcal na jeden úsek",
+        "calories": "80-100 kcal",
         "benefits": [
           "Zlepšuje pružnost svalů nohou",
           "Snižuje svalové napětí",
@@ -598,7 +598,7 @@
         "title": "Švihadlo s intervaly",
         "description": "Střídání mezi rychlými (30 sekund) a pomalými (30 sekund) skoky. 20 minut na rozvoj kardio vytrvalosti.",
         "equipment": "Švihadlo",
-        "calories": "200-300 kcal na trénink",
+        "calories": "200-300 kcal",
         "benefits": [
           "Rozvíjí kardio vytrvalost",
           "Zlepšuje koordinaci pohybů",
@@ -623,7 +623,7 @@
         "title": "Běh po schodech",
         "description": "Vyběhněte po schodech co nejrychleji nahoru a pak sejděte dolů. 10-15 opakování pro rozvoj vytrvalosti nohou.",
         "equipment": "Žebřík",
-        "calories": "250-350 kcal na trénink",
+        "calories": "250-350 kcal",
         "benefits": [
           "Rozvíjí vytrvalost nohou",
           "Posiluje svaly stehen a hýždí",
@@ -2279,9 +2279,9 @@
     "position": "Pozice",
     "year": "Rok",
     "height": "Výška",
-    "heightFrom": "Výška od",
+    "heightFrom": "Výška",
     "weight": "Hmotnost",
-    "weightFrom": "Hmotnost od",
+    "weightFrom": "Hmotnost",
     "all": "Vše",
     "noPlayersFound": "Nebyli nalezeni žádní hráči",
     "left": "Vlevo",

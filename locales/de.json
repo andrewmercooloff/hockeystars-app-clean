@@ -208,7 +208,7 @@
         "title": "Intervalllauf",
         "description": "Wechseln Sie 20 Minuten lang zwischen schnellem Laufen (30 Sekunden) und langsamem Laufen (30 Sekunden). Hervorragend geeignet, um die Ausdauer für Hockey zu entwickeln.",
         "equipment": "Laufband oder Stadion",
-        "calories": "250-350 kcal pro Training",
+        "calories": "250-350 kcal",
         "benefits": [
           "Verbessert die kardiovaskuläre Ausdauer",
           "Entwickelt die Fähigkeit, sich schnell zu erholen",
@@ -233,7 +233,7 @@
         "title": "Burpee-Sprung",
         "description": "Komplexe Übung: Kniebeuge → Plank → Liegestütz → Kniebeuge → Sprung. Führen Sie 3 Sätze mit 10–15 Wiederholungen durch.",
         "equipment": "Trainingsmatte (optional)",
-        "calories": "200-300 kcal pro Training",
+        "calories": "200-300 kcal",
         "benefits": [
           "Entwickelt allgemeine Ausdauer",
           "Stärkt die Muskeln im ganzen Körper",
@@ -260,7 +260,7 @@
         "title": "Fahrrad",
         "description": "Intensives Radfahren oder stationäres Radfahren mit hochintensiven Intervallen. 5 Minuten Aufwärmen, 20 Minuten Intervalle.",
         "equipment": "Fahrrad oder Heimtrainer",
-        "calories": "300-400 kcal pro Training",
+        "calories": "300-400 kcal",
         "benefits": [
           "Entwickelt die kardiovaskuläre Ausdauer",
           "Stärkt die Beinmuskulatur",
@@ -285,7 +285,7 @@
         "title": "Plyometrische Sprünge",
         "description": "Springen Sie so hoch wie möglich auf der Stelle und landen Sie auf gebeugten Knien. 3 Sätze mit 15–20 Sprüngen.",
         "equipment": "Trainingsmatte (optional)",
-        "calories": "150-200 kcal pro Training",
+        "calories": "150-200 kcal",
         "benefits": [
           "Entwickelt explosive Beinkraft",
           "Verbessert Reaktion und Geschwindigkeit",
@@ -311,7 +311,7 @@
         "title": "Kurzstreckensprints",
         "description": "Laufen Sie mit maximaler Geschwindigkeit über eine Distanz von 20–30 Metern und machen Sie zwischen den Läufen eine Pause von 30 Sekunden. 8–10 Läufe.",
         "equipment": "Freifläche oder Laufstrecke",
-        "calories": "200-250 kcal pro Training",
+        "calories": "200-250 kcal",
         "benefits": [
           "Entwickelt maximale Geschwindigkeit",
           "Verbessert die Beschleunigung",
@@ -337,7 +337,7 @@
         "title": "Einen Ball gegen eine Wand werfen",
         "description": "Wirf einen Medizinball mit maximaler Kraft gegen eine Wand, fang ihn und wirf ihn erneut. 3 Sätze mit je 20 Würfen.",
         "equipment": "Medizinball 2-4 kg, Wand",
-        "calories": "120-180 kcal pro Training",
+        "calories": "120-180 kcal",
         "benefits": [
           "Entwickelt explosive Armkraft",
           "Verbessert die Koordination",
@@ -363,7 +363,7 @@
         "title": "Dynamische Beindehnungen",
         "description": "Beinschwingen nach vorne, hinten und zur Seite, mit kreisenden Bewegungen in den Hüftgelenken. 10–15 Wiederholungen pro Bein.",
         "equipment": "Eine Wand oder ein Stuhl zur Unterstützung",
-        "calories": "50-80 kcal pro Aufwärmübung",
+        "calories": "50-80 kcal",
         "benefits": [
           "Wärmt die Beinmuskulatur auf",
           "Verbessert die Beweglichkeit der Gelenke",
@@ -389,7 +389,7 @@
         "title": "Aufwärmen des Oberkörpers",
         "description": "Armkreisen, Rumpfbeugen und Drehungen. Aufwärmen für die Schultergelenke und den Rücken.",
         "equipment": "Nicht erforderlich",
-        "calories": "40-60 kcal pro Aufwärmübung",
+        "calories": "40-60 kcal",
         "benefits": [
           "Wärmt die Muskulatur des Oberkörpers auf",
           "Verbessert die Beweglichkeit des Schultergelenks",
@@ -415,7 +415,7 @@
         "title": "Leichtes Joggen auf der Stelle",
         "description": "Joggen auf der Stelle mit hochgezogenen Knien, wobei das Tempo allmählich gesteigert wird. 5–7 Minuten.",
         "equipment": "Nicht erforderlich",
-        "calories": "60-80 kcal pro Aufwärmübung",
+        "calories": "60-80 kcal",
         "benefits": [
           "Erhöht die Herzfrequenz",
           "Wärmt die Beinmuskulatur auf",
@@ -441,7 +441,7 @@
         "title": "Statische Dehnung der Beinmuskulatur",
         "description": "Halten Sie die Dehnungspositionen für Quadrizeps, Waden und Adduktoren. 30 Sekunden pro Gruppe.",
         "equipment": "Trainingsmatte",
-        "calories": "80-100 kcal pro Dehnung",
+        "calories": "80-100 kcal",
         "benefits": [
           "Verbessert die Flexibilität der Beinmuskulatur",
           "Reduziert Muskelverspannungen",
@@ -598,7 +598,7 @@
         "title": "Seilspringen mit Intervallen",
         "description": "Wechseln Sie zwischen schnellen (30 Sek.) und langsamen (30 Sek.) Sprüngen. 20 Minuten zum Aufbau der kardiovaskulären Ausdauer.",
         "equipment": "Springseil",
-        "calories": "200-300 kcal pro Training",
+        "calories": "200-300 kcal",
         "benefits": [
           "Entwickelt die kardiovaskuläre Ausdauer",
           "Verbessert die Bewegungskoordination",
@@ -623,7 +623,7 @@
         "title": "Die Treppe hochlaufen",
         "description": "Laufen Sie die Treppe so schnell wie möglich hoch und gehen Sie dann wieder hinunter. 10–15 Wiederholungen, um die Ausdauer der Beine zu trainieren.",
         "equipment": "Leiter",
-        "calories": "250-350 kcal pro Training",
+        "calories": "250-350 kcal",
         "benefits": [
           "Fördert die Ausdauer der Beine",
           "Stärkt die Oberschenkel- und Gesäßmuskulatur",
@@ -2306,9 +2306,9 @@
     "position": "Position",
     "year": "Jahr",
     "height": "Höhe",
-    "heightFrom": "Höhe von",
+    "heightFrom": "Höhe",
     "weight": "Gewicht",
-    "weightFrom": "Gewicht ab",
+    "weightFrom": "Gewicht",
     "all": "Alle",
     "noPlayersFound": "Keine Spieler gefunden",
     "left": "Links",

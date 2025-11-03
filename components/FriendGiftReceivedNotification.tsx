@@ -27,7 +27,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
   onPress
 }) => {
   const { t } = useLanguage();
-  const { playerName, playerAvatar, starName, giftName } = notification.data;
+  const { playerId, playerName, playerAvatar, starName, giftName } = notification.data;
 
   const formatTime = (timestamp: string): string => {
     const now = new Date();
@@ -76,13 +76,17 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
             {playerName}
           </Text>
           <Text style={styles.timeText}>
-            {formatTime(notification.createdAt)}
+            {formatTime(notification.createdAt || notification.timestamp || new Date().toISOString())}
           </Text>
         </View>
 
         <View style={styles.giftItem}>
           <Text style={styles.actionText}>
-            получил подарок от {starName}: {giftName}
+            {notification.message || t('giftNotification.message', {
+              playerName: playerName,
+              giftName: giftName,
+              starName: starName
+            })}
           </Text>
           <View style={styles.giftBadge}>
             <Ionicons name="gift" size={14} color="#fff" />

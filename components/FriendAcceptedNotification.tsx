@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
@@ -9,6 +9,7 @@ interface FriendAcceptedNotificationProps {
   playerId?: string;
   message: string;
   timestamp: string | number;
+  playerAvatar?: string;
 }
 
 export default function FriendAcceptedNotification({
@@ -38,12 +39,18 @@ export default function FriendAcceptedNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
+          />
+        ) : playerAvatar ? (
+          <Image
+            source={{ uri: playerAvatar }}
+            style={styles.playerAvatar}
+            resizeMode="cover"
           />
         ) : (
           <View style={styles.avatarPlaceholder}>
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     marginHorizontal: 20,
+    marginVertical: 8,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',

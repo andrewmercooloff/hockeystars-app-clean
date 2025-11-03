@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
@@ -7,9 +7,8 @@ import CachedAvatar from './CachedAvatar';
 interface FriendRequestNotificationProps {
   playerName: string;
   playerId?: string;
-  timestamp: string;
-  onAccept: () => void;
-  onDecline: () => void;
+  timestamp: string | number;
+  playerAvatar?: string;
 }
 
 export default function FriendRequestNotification({
@@ -17,14 +16,14 @@ export default function FriendRequestNotification({
   playerId,
   timestamp,
   playerAvatar,
-  onAccept,
-  onDecline,
 }: FriendRequestNotificationProps) {
   const { t } = useLanguage();
 
-  const formatTime = (timestamp: string): string => {
+  const formatTime = (timestamp: string | number): string => {
     const now = new Date();
-    const time = new Date(timestamp);
+    const time = typeof timestamp === 'number' 
+      ? new Date(timestamp) 
+      : new Date(timestamp);
     const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
 
     if (diffInMinutes < 1) {
@@ -43,12 +42,18 @@ export default function FriendRequestNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
+          />
+        ) : playerAvatar ? (
+          <Image
+            source={{ uri: playerAvatar }}
+            style={styles.playerAvatar}
+            resizeMode="cover"
           />
         ) : (
           <View style={styles.avatarPlaceholder}>
@@ -68,29 +73,9 @@ export default function FriendRequestNotification({
         </View>
 
         <View style={styles.requestItem}>
-          <View style={styles.messageRow}>
-            <Text style={styles.actionText}>
-              {t('notifications.wantsToAddAsFriend')}
-            </Text>
-            
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.acceptButton]}
-                onPress={onAccept}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.acceptButtonText}>{t('notifications.accept')}</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.actionButton, styles.declineButton]}
-                onPress={onDecline}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.declineButtonText}>{t('notifications.decline')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Text style={styles.actionText}>
+            {t('notifications.wantsToAddAsFriend')}
+          </Text>
         </View>
       </View>
     </View>
@@ -101,6 +86,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     marginHorizontal: 20,
+    marginVertical: 8,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -153,43 +139,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingVertical: 4,
   },
-  messageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flex: 1,
-  },
   actionText: {
     color: '#ddd',
     fontSize: 14,
-    flex: 1,
-    marginRight: 12,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    minWidth: 70,
-  },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-  },
-  declineButton: {
-    backgroundColor: '#FF4444',
-  },
-  acceptButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-  },
-  declineButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
   },
 });

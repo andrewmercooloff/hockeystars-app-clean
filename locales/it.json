@@ -208,7 +208,7 @@
         "title": "Corsa a intervalli",
         "description": "Alternare corsa veloce (30 secondi) e corsa lenta (30 secondi) per 20 minuti. Ottimo per sviluppare la resistenza cardiovascolare nell'hockey.",
         "equipment": "Tapis roulant o stadio",
-        "calories": "250-350 kcal per allenamento",
+        "calories": "250-350 kcal",
         "benefits": [
           "Migliora la resistenza cardiovascolare",
           "Sviluppa la capacità di recuperare rapidamente",
@@ -233,7 +233,7 @@
         "title": "Burpee jump",
         "description": "Esercizio complesso: squat → plank → flessioni → squat → salto. Eseguire 3 serie da 10-15 ripetizioni.",
         "equipment": "Tappetino per esercizi (facoltativo)",
-        "calories": "200-300 kcal per allenamento",
+        "calories": "200-300 kcal",
         "benefits": [
           "Sviluppa la resistenza generale",
           "Rafforza i muscoli di tutto il corpo",
@@ -260,7 +260,7 @@
         "title": "Bicicletta",
         "description": "Ciclismo intenso o cyclette con intervalli ad alta intensità. 5 minuti di riscaldamento, 20 minuti di intervalli.",
         "equipment": "Bicicletta o cyclette",
-        "calories": "300-400 kcal per allenamento",
+        "calories": "300-400 kcal",
         "benefits": [
           "Sviluppa la resistenza cardiovascolare",
           "Rafforza i muscoli delle gambe",
@@ -285,7 +285,7 @@
         "title": "Salti pliometrici",
         "description": "Saltare sul posto il più in alto possibile, atterrando sulle ginocchia piegate. 3 serie da 15-20 salti.",
         "equipment": "Tappetino per esercizi (facoltativo)",
-        "calories": "150-200 kcal per allenamento",
+        "calories": "150-200 kcal",
         "benefits": [
           "Sviluppa la forza esplosiva delle gambe",
           "Migliora la reazione e la velocità",
@@ -311,7 +311,7 @@
         "title": "Sprint di breve distanza",
         "description": "Correre alla massima velocità per una distanza di 20-30 metri con una pausa di 30 secondi tra una corsa e l'altra. 8-10 corse.",
         "equipment": "Spazio aperto o pista da corsa",
-        "calories": "200-250 kcal per allenamento",
+        "calories": "200-250 kcal",
         "benefits": [
           "Sviluppa la massima velocità",
           "Migliora l'accelerazione",
@@ -337,7 +337,7 @@
         "title": "Lanciare una palla contro un muro",
         "description": "Lancia una palla medica contro un muro con la massima forza, afferrala e lanciala di nuovo. 3 serie da 20 lanci.",
         "equipment": "Palla medica 2-4 kg, da parete",
-        "calories": "120-180 kcal per allenamento",
+        "calories": "120-180 kcal",
         "benefits": [
           "Sviluppa la forza esplosiva del braccio",
           "Migliora la coordinazione",
@@ -363,7 +363,7 @@
         "title": "Allungamenti dinamici delle gambe",
         "description": "Oscillazioni delle gambe in avanti, indietro e lateralmente, con movimenti circolari delle articolazioni dell'anca. 10-15 ripetizioni per ciascuna gamba.",
         "equipment": "Un muro o una sedia per supporto",
-        "calories": "50-80 kcal per riscaldamento",
+        "calories": "50-80 kcal",
         "benefits": [
           "Riscalda i muscoli delle gambe",
           "Migliora la mobilità articolare",
@@ -389,7 +389,7 @@
         "title": "Riscaldamento della parte superiore del corpo",
         "description": "Rotazioni delle braccia, piegamenti e torsioni del busto. Riscaldamento per le articolazioni delle spalle e della schiena.",
         "equipment": "Non richiesto",
-        "calories": "40-60 kcal per riscaldamento",
+        "calories": "40-60 kcal",
         "benefits": [
           "Riscalda i muscoli della parte superiore del corpo",
           "Migliora la mobilità dell'articolazione della spalla",
@@ -415,7 +415,7 @@
         "title": "Corsa leggera sul posto",
         "description": "Correre sul posto con le ginocchia alte, aumentando gradualmente il ritmo. 5-7 minuti.",
         "equipment": "Non richiesto",
-        "calories": "60-80 kcal per riscaldamento",
+        "calories": "60-80 kcal",
         "benefits": [
           "Aumenta la frequenza cardiaca",
           "Riscalda i muscoli delle gambe",
@@ -441,7 +441,7 @@
         "title": "Allungamento statico dei muscoli delle gambe",
         "description": "Mantenere le posizioni di allungamento per quadricipiti, polpacci e adduttori. 30 secondi per gruppo.",
         "equipment": "Tappetino per esercizi",
-        "calories": "80-100 kcal per tratto",
+        "calories": "80-100 kcal",
         "benefits": [
           "Migliora la flessibilità dei muscoli delle gambe",
           "Riduce la tensione muscolare",
@@ -598,7 +598,7 @@
         "title": "Salto con la corda a intervalli",
         "description": "Alternare salti veloci (30 sec) e lenti (30 sec). 20 minuti per sviluppare la resistenza cardiovascolare.",
         "equipment": "saltare la corda",
-        "calories": "200-300 kcal per allenamento",
+        "calories": "200-300 kcal",
         "benefits": [
           "Sviluppa la resistenza cardiovascolare",
           "Migliora la coordinazione dei movimenti",
@@ -623,7 +623,7 @@
         "title": "Correre su per le scale",
         "description": "Sali le scale il più velocemente possibile, poi scendi. Esegui 10-15 ripetizioni per sviluppare la resistenza delle gambe.",
         "equipment": "Scala",
-        "calories": "250-350 kcal per allenamento",
+        "calories": "250-350 kcal",
         "benefits": [
           "Sviluppa la resistenza delle gambe",
           "Rafforza i muscoli delle cosce e dei glutei",
@@ -2287,9 +2287,9 @@
     "position": "Posizione",
     "year": "Anno",
     "height": "Altezza",
-    "heightFrom": "Altezza da",
+    "heightFrom": "Altezza",
     "weight": "Peso",
-    "weightFrom": "Peso da",
+    "weightFrom": "Peso",
     "all": "Tutto",
     "noPlayersFound": "Nessun giocatore trovato",
     "left": "Sinistra",

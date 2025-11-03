@@ -239,13 +239,16 @@ class RealtimeManager {
           if (newAvatar && playerId && newAvatar !== oldAvatar) {
             try {
               const { avatarCache } = await import('./AvatarCache');
-              const currentCachedAvatar = avatarCache.getAvatar(playerId);
               
-              // Обновляем кеш только если новый аватар отличается от текущего в кеше
-              if (currentCachedAvatar !== newAvatar) {
-                await avatarCache.setAvatar(playerId, newAvatar);
-                console.log('🔄 Обновлен аватар в кеше через Realtime:', { playerId, newAvatar });
-              }
+              // ВАЖНО: Всегда обновляем кеш при изменении аватара через Realtime
+              // Это гарантирует, что используется только последний актуальный аватар
+              // setAvatar предзагрузит новое изображение для мгновенного отображения
+              await avatarCache.setAvatar(playerId, newAvatar);
+              console.log('🔄 Обновлен аватар в кеше через Realtime:', { 
+                playerId, 
+                oldAvatar: oldAvatar?.substring(0, 50) || 'нет', 
+                newAvatar: newAvatar.substring(0, 50) 
+              });
             } catch (error) {
               console.error('❌ Ошибка обновления аватара в кеше:', error);
             }

@@ -6,6 +6,8 @@ class AvatarCache {
   private static instance: AvatarCache;
   private cache: Map<string, string> = new Map(); // playerId -> avatarUrl
   private listeners: Set<(playerId: string, newAvatarUrl: string) => void> = new Set();
+  // Храним версии аватаров для каждого игрока, чтобы предотвратить использование старых кешей
+  private avatarVersions: Map<string, number> = new Map();
 
   static getInstance(): AvatarCache {
     if (!AvatarCache.instance) {
@@ -14,8 +16,24 @@ class AvatarCache {
     return AvatarCache.instance;
   }
 
-  // Получаем аватар из кеша
+  // Получаем аватар из кеша с версией для предотвращения использования старого кеша
   getAvatar(playerId: string): string | null {
+    const url = this.cache.get(playerId);
+    if (!url) return null;
+    
+    // Если это HTTP/HTTPS URL - добавляем версию для принудительного обновления
+    // Это гарантирует, что expo-image не будет использовать старый кеш
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      const version = this.avatarVersions.get(playerId) || 1;
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}_v=${version}`;
+    }
+    
+    return url;
+  }
+  
+  // Получаем чистый URL без версии (для сравнения)
+  getRawAvatar(playerId: string): string | null {
     return this.cache.get(playerId) || null;
   }
 
@@ -23,22 +41,60 @@ class AvatarCache {
   async setAvatar(playerId: string, avatarUrl: string): Promise<string | null> {
     const oldUrl = this.cache.get(playerId);
     
-    // Если URL не изменился, не обновляем кеш
+    // КРИТИЧНО: Если URL не изменился, не обновляем версию и не вызываем уведомления
+    // Это предотвращает бесконечный цикл обновлений
     if (oldUrl === avatarUrl) {
-      return avatarUrl;
+      return this.getAvatar(playerId); // Возвращаем URL с текущей версией
+    }
+    
+    // КРИТИЧНО: Если в кеше уже есть URL и новый URL содержит тот же файл
+    // НЕ обновляем кеш - игнорируем дублирующие аватары из уведомлений
+    if (oldUrl && avatarUrl) {
+      // Извлекаем имя файла из URL (последняя часть после последнего /)
+      const getFilename = (url: string) => {
+        const parts = url.split('/');
+        const lastPart = parts[parts.length - 1];
+        // Удаляем параметры запроса, если есть
+        return lastPart.split('?')[0];
+      };
+      
+      const oldFilename = getFilename(oldUrl);
+      const newFilename = getFilename(avatarUrl);
+      
+      // Если имена файлов одинаковы - это тот же аватар, не обновляем
+      if (oldFilename === newFilename) {
+        // Возвращаем текущий URL с версией без обновления
+        return this.getAvatar(playerId);
+      }
     }
     
     try {
-      // Предзагружаем изображение с высоким приоритетом
-      await Image.prefetch(avatarUrl);
+      // КРИТИЧНО: Инкрементируем версию ТОЛЬКО когда URL действительно изменился
+      // Это гарантирует, что expo-image НЕ будет использовать старый кеш
+      const currentVersion = this.avatarVersions.get(playerId) || 0;
+      const newVersion = currentVersion + 1;
+      this.avatarVersions.set(playerId, newVersion);
+      
+      console.log(`🔄 Обновление версии аватара для ${playerId.substring(0, 8)}: v${currentVersion} -> v${newVersion}
+        Старый: ${oldUrl?.substring(oldUrl.length - 20) || 'нет'}
+        Новый: ${avatarUrl.substring(avatarUrl.length - 20)}`);
+      
+      // Предзагружаем новое изображение с версией для гарантии обновления
+      let urlToPreload = avatarUrl;
+      if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+        const separator = avatarUrl.includes('?') ? '&' : '?';
+        urlToPreload = `${avatarUrl}${separator}_v=${newVersion}`;
+      }
+      
+      await Image.prefetch(urlToPreload);
 
-      // Сохраняем в кэш
+      // Сохраняем чистый URL в кэш (без версии)
       this.cache.set(playerId, avatarUrl);
       
-      // Уведомляем всех слушателей об изменении
-      this.notifyListeners(playerId, avatarUrl);
+      // Уведомляем всех слушателей об изменении (отправляем URL с версией)
+      this.notifyListeners(playerId, this.getAvatar(playerId)!);
       
-      return avatarUrl;
+      return this.getAvatar(playerId);
     } catch (error) {
       console.error('❌ Ошибка предзагрузки аватара:', error);
       return null;
@@ -69,6 +125,8 @@ class AvatarCache {
   // Очищаем кеш для конкретного игрока
   clearAvatar(playerId: string): void {
     this.cache.delete(playerId);
+    this.avatarVersions.delete(playerId);
+    this.notifyListeners(playerId, '');
   }
 
   // Предзагружаем аватары для списка игроков
@@ -97,32 +155,84 @@ export const avatarCache = AvatarCache.getInstance();
 // Хук для подписки на изменения аватаров
 export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(() => 
-    avatarCache.getAvatar(playerId)
+    avatarCache.getAvatar(playerId) || fallbackUrl || null
   );
 
   React.useEffect(() => {
-    // Если нет аватара в кеше, но есть fallback URL, устанавливаем его
-    const currentCachedAvatar = avatarCache.getAvatar(playerId);
+    // КРИТИЧНО: Приоритет актуального кеша над fallbackUrl
+    // Кеш обновляется через Realtime и содержит самый актуальный аватар (с версией)
+    const currentCachedAvatar = avatarCache.getAvatar(playerId); // Возвращает URL с версией
+    const rawCachedAvatar = avatarCache.getRawAvatar(playerId); // Возвращает чистый URL
     
-    // Обновляем кеш только если fallbackUrl отличается от текущего кеша
-    if (fallbackUrl && currentCachedAvatar !== fallbackUrl) {
-      avatarCache.setAvatar(playerId, fallbackUrl)
-        .then(localUri => {
-          if (localUri) {
-            setAvatarUrl(localUri);
-          }
-        })
-        .catch(() => {});
-    } else if (currentCachedAvatar) {
-      setAvatarUrl(currentCachedAvatar);
-    } else if (fallbackUrl) {
-      setAvatarUrl(fallbackUrl);
+    // КРИТИЧНО: Если в кеше есть аватар - используем ТОЛЬКО его (с версией)
+    // Игнорируем fallbackUrl ПОЛНОСТЬЮ, даже если он изменяется
+    // Это предотвращает переключение между старым и новым аватаром
+    setAvatarUrl(prevUrl => {
+      // Если есть кеш - используем ТОЛЬКО его, полностью игнорируем fallbackUrl
+      if (currentCachedAvatar) {
+        // Обновляем только если кеш действительно изменился (версия изменилась)
+        if (currentCachedAvatar !== prevUrl) {
+          return currentCachedAvatar;
+        }
+        return prevUrl;
+      }
+      
+      // ТОЛЬКО если в кеше нет аватара - используем fallbackUrl
+      if (!currentCachedAvatar && fallbackUrl && fallbackUrl !== prevUrl) {
+        return fallbackUrl;
+      }
+      
+      return prevUrl;
+    });
+    
+    // ВАЖНО: Обновляем кеш fallbackUrl ТОЛЬКО если:
+    // 1. В кеше нет аватара И fallbackUrl существует
+    // НЕ обновляем если в кеше уже есть аватар, даже если fallbackUrl отличается
+    // Это предотвращает перезапись актуального аватара старым fallbackUrl
+    // КРИТИЧНО: НЕ вызываем setAvatar, если fallbackUrl уже установлен в кеш
+    // Это предотвращает бесконечный цикл инкрементирования версий
+    if (fallbackUrl && !rawCachedAvatar) {
+      // Проверяем, что fallbackUrl действительно новый
+      const cachedRawUrl = avatarCache.getRawAvatar(playerId);
+      if (cachedRawUrl !== fallbackUrl) {
+        // Если в кеше нет аватара или URL отличается, устанавливаем fallbackUrl
+        avatarCache.setAvatar(playerId, fallbackUrl)
+          .then(localUri => {
+            // Используем функциональное обновление, чтобы сравнить с актуальным состоянием
+            if (localUri) {
+              setAvatarUrl(prevUrl => {
+                // Обновляем состояние только если URL изменился
+                // НО: если в кеше появился более новый аватар - используем его
+                const latestCached = avatarCache.getAvatar(playerId);
+                if (latestCached && latestCached !== localUri) {
+                  return latestCached; // Используем более новый из кеша
+                }
+                if (localUri !== prevUrl) {
+                  return localUri;
+                }
+                return prevUrl;
+              });
+            }
+          })
+          .catch(() => {});
+      }
     }
+    // Если fallbackUrl отличается от кеша - ИГНОРИРУЕМ fallbackUrl полностью
+    // Кеш имеет абсолютный приоритет, так как обновляется через Realtime
 
-    // Подписываемся на изменения
+    // Подписываемся на изменения через Realtime
     const unsubscribe = avatarCache.subscribe((changedPlayerId, newAvatarUrl) => {
-      if (changedPlayerId === playerId) {
-        setAvatarUrl(newAvatarUrl);
+      if (changedPlayerId === playerId && newAvatarUrl) {
+        // КРИТИЧНО: При получении обновления через Realtime ВСЕГДА используем новый аватар
+        // newAvatarUrl уже содержит версию, что гарантирует обновление
+        // fallbackUrl полностью игнорируется при наличии кеша
+        setAvatarUrl(prevUrl => {
+          // Обновляем состояние только если URL действительно изменился (версия изменилась)
+          if (newAvatarUrl !== prevUrl) {
+            return newAvatarUrl;
+          }
+          return prevUrl;
+        });
       }
     });
 

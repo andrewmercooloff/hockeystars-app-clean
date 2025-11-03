@@ -78,11 +78,13 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   }, []);
   
   // Получаем оптимальную частоту обновления
+  // Восстановлено оригинальное значение для iOS
   const getOptimalFrameRate = useCallback(() => {
     if (Platform.OS === 'ios') {
-      return 16; // 60 FPS для iOS (оптимизировано для лучшей производительности)
+      // Вернули оригинальные 60 FPS для iOS - максимальная плавность
+      return 16; // 60 FPS для iOS (оригинальное значение)
     } else if (Platform.OS === 'web') {
-      return 16; // 60 FPS для Web
+      return 16; // 60 FPS для Web (обычно мощные устройства)
     } else if (Platform.OS === 'android') {
       const performanceLevel = getAndroidPerformanceLevel();
       switch (performanceLevel) {
@@ -279,15 +281,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
 
           // Обработка коллизий со стенами (платформо-зависимые границы)
+          // Оптимизация: кешируем вычисления границ
           const wallMaxX = width - boundaries.rightOffset - puckSize;
           const wallMaxY = height - boundaries.bottomOffset - puckSize;
           
+          // Физика отскока - оптимизирована для плавности
+          const bounceMultiplier = Platform.OS === 'ios' ? 1.05 : (Platform.OS === 'android' ? 1.1 : 1.05);
+          
           if (newX <= boundaries.leftOffset || newX >= wallMaxX) {
-            newVx = -newVx * (Platform.OS === 'android' ? 1.1 : 1.05); // Увеличиваем скорость при отскоке от стен
+            newVx = -newVx * bounceMultiplier; // Отскок от стен
             newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
           }
           if (newY <= boundaries.topOffset || newY >= wallMaxY) {
-            newVy = -newVy * (Platform.OS === 'android' ? 1.1 : 1.05); // Увеличиваем скорость при отскоке от стен
+            newVy = -newVy * bounceMultiplier; // Отскок от стен
             newY = Math.max(boundaries.topOffset, Math.min(wallMaxY, newY));
           }
 
@@ -326,42 +332,49 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           }
 
           // Жесткая система коллизий - шайбы не могут накладываться
+          // Оптимизация: проверяем только близкие шайбы (квадрат расстояния быстрее чем sqrt)
+          const minDistance = Platform.OS === 'android' ? puckSize * 0.5 : puckSize;
+          const minDistanceSq = minDistance ** 2;
+          
           currentPositions.forEach((otherPos, otherIndex) => {
-            if (otherPos.id === pos.id) return;
+            if (otherPos.id === pos.id || otherPos.isDragging) return;
             
             const dx = newX - otherPos.x;
             const dy = newY - otherPos.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distanceSq = dx * dx + dy * dy; // Используем квадрат расстояния - быстрее
             
             // Минимальное расстояние между центрами шайб (диаметр шайбы)
-            const minDistance = Platform.OS === 'android' ? puckSize * 0.5 : puckSize;
-            
-            if (distance < minDistance && distance > 0) {
+            if (distanceSq < minDistanceSq && distanceSq > 0) {
+              const distance = Math.sqrt(distanceSq); // Вычисляем sqrt только при коллизии
               const angle = Math.atan2(dy, dx);
               
               // Агрессивная коррекция позиции: отталкиваем сразу на безопасное расстояние
-              const correctionDistance = (minDistance - distance) * 1.2; // Добавляем 20% запаса
+              const correctionDistance = (minDistance - distance) * 1.15; // Немного снижено для производительности
               newX += Math.cos(angle) * correctionDistance;
               newY += Math.sin(angle) * correctionDistance;
               
-              // Улучшенная физика отталкивания с более реалистичными силами
+              // Оптимизированная физика отталкивания - баланс между плавностью и производительностью
               const overlap = minDistance - distance;
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.7 : (Platform.OS === 'android' ? 0.4 : 0.5));
+              // Сбалансированные коэффициенты для плавного движения
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.65 : (Platform.OS === 'android' ? 0.4 : 0.5));
               
-              // Передача импульса при столкновении - более реалистично
-              const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
-              const otherSpeed = Math.sqrt(otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy);
+              // Оптимизированная передача импульса - баланс между реализмом и производительностью
+              const currentSpeedSq = pos.vx * pos.vx + pos.vy * pos.vy;
+              const otherSpeedSq = otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy;
               
-              // Передаем импульс в зависимости от скорости обеих шайб
-              if (currentSpeed > 0.3 || otherSpeed > 0.3) {
+              // Передаем импульс только если скорости достаточно высокие (быстрая проверка)
+              if (currentSpeedSq > 0.09 || otherSpeedSq > 0.09) { // 0.3^2 = 0.09
+                const currentSpeed = Math.sqrt(currentSpeedSq);
+                const otherSpeed = Math.sqrt(otherSpeedSq);
                 const combinedSpeed = (currentSpeed + otherSpeed) * 0.5;
-                const impulseTransfer = Math.min(combinedSpeed * 0.6, 4.0);
+                const impulseTransfer = Math.min(combinedSpeed * 0.55, 3.5); // Восстановлено для более плавной физики
                 const impulseX = Math.cos(angle) * impulseTransfer;
                 const impulseY = Math.sin(angle) * impulseTransfer;
                 
-                // Другая шайба получает импульс от текущей (в зависимости от кто сильнее)
-                velocityChanges[otherIndex].dvx += impulseX * (currentSpeed > otherSpeed ? 1.2 : 0.8);
-                velocityChanges[otherIndex].dvy += impulseY * (currentSpeed > otherSpeed ? 1.2 : 0.8);
+                // Сбалансированная передача импульса
+                const speedFactor = currentSpeed > otherSpeed ? 1.15 : 0.85;
+                velocityChanges[otherIndex].dvx += impulseX * speedFactor;
+                velocityChanges[otherIndex].dvy += impulseY * speedFactor;
               }
               
               // Текущая шайба отталкивается от другой с усилением при столкновении
@@ -380,22 +393,23 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           });
           
           // Применяем изменения скорости от коллизий ПЕРЕД ограничениями
-          // Минимальное ускорение при столкновениях для плавности
+          // Упрощенная обработка коллизий для лучшей производительности
           const hasCollision = velocityChanges[posIndex].dvx !== 0 || velocityChanges[posIndex].dvy !== 0;
           if (hasCollision) {
-            const speedBoost = 1.01; // 1% ускорение при столкновениях - оптимизировано
-            newVx *= speedBoost;
-            newVy *= speedBoost;
+            // Убрано дополнительное ускорение - экономит вычисления и улучшает стабильность
+            // newVx и newVy уже имеют изменения от velocityChanges
           }
           
           newVx += velocityChanges[posIndex].dvx;
           newVy += velocityChanges[posIndex].dvy;
           
-          // Адаптивные ограничения скорости в зависимости от производительности устройства
+              // Адаптивные ограничения скорости в зависимости от производительности устройства
+          // Оптимизировано для плавности и производительности
           let maxSpeed, minSpeed;
           if (Platform.OS === 'ios') {
-            maxSpeed = 5.0;
-            minSpeed = 0.8;
+            // Оптимизированные скорости для iOS - баланс между плавностью и производительностью
+            maxSpeed = 4.5; // Восстановлено для более плавного движения
+            minSpeed = 0.7; // Восстановлено
           } else if (Platform.OS === 'web') {
             maxSpeed = 5.5;
             minSpeed = 0.8;
@@ -403,22 +417,22 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const performanceLevel = getAndroidPerformanceLevel();
             switch (performanceLevel) {
               case 'high':
-                maxSpeed = 4.0; // Высокая максимальная скорость для мощных Android
+                maxSpeed = 4.0; // Восстановлено для плавности
                 minSpeed = 0.6;
                 break;
               case 'medium':
-                maxSpeed = 2.5; // Средняя максимальная скорость для средних Android
+                maxSpeed = 2.5; // Восстановлено
                 minSpeed = 0.4;
                 break;
               case 'low':
               default:
-                maxSpeed = 1.5; // Низкая максимальная скорость для слабых Android
+                maxSpeed = 1.5; // Восстановлено
                 minSpeed = 0.3;
                 break;
             }
           } else {
-            maxSpeed = 5.0;
-            minSpeed = 0.8;
+            maxSpeed = 4.5;
+            minSpeed = 0.7;
           }
           const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
           if (currentSpeed > maxSpeed) {
@@ -625,24 +639,24 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     const newY = touch.pageY - dragStartRef.current.y;
     
     // Вычисляем скорость на основе изменения позиции для толчка других шайб
-    // Адаптивный коэффициент в зависимости от производительности устройства
+    // Восстановлены коэффициенты для более отзывчивого движения
     let speedMultiplier;
     if (Platform.OS === 'android') {
       const performanceLevel = getAndroidPerformanceLevel();
       switch (performanceLevel) {
         case 'high':
-          speedMultiplier = 0.8; // Высокий коэффициент для мощных Android
+          speedMultiplier = 1.0; // Восстановлено для отзывчивости
           break;
         case 'medium':
-          speedMultiplier = 0.6; // Средний коэффициент для средних Android
+          speedMultiplier = 0.9; // Восстановлено
           break;
         case 'low':
         default:
-          speedMultiplier = 0.5; // Низкий коэффициент для слабых Android
+          speedMultiplier = 0.8; // Восстановлено
           break;
       }
     } else {
-      speedMultiplier = 0.8;
+      speedMultiplier = 1.0; // Восстановлено для iOS - полная отзывчивость
     }
     const vx = (newX - lastPositionRef.current.x) * speedMultiplier;
     const vy = (newY - lastPositionRef.current.y) * speedMultiplier;
@@ -670,24 +684,24 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
       const timeDiff = now - dragStartRef.current.time;
       
       // Простое решение: используем накопленную скорость, но с правильным направлением
-      // Адаптивный финальный импульс в зависимости от производительности устройства
+      // Восстановлены коэффициенты для более отзывчивого толчка
       let impulseMultiplier;
       if (Platform.OS === 'android') {
         const performanceLevel = getAndroidPerformanceLevel();
         switch (performanceLevel) {
           case 'high':
-            impulseMultiplier = 0.5; // Высокий импульс для мощных Android
+            impulseMultiplier = 0.7; // Восстановлено для сильного импульса
             break;
           case 'medium':
-            impulseMultiplier = 0.4; // Средний импульс для средних Android
+            impulseMultiplier = 0.6; // Восстановлено
             break;
           case 'low':
           default:
-            impulseMultiplier = 0.3; // Низкий импульс для слабых Android
+            impulseMultiplier = 0.5; // Восстановлено
             break;
         }
       } else {
-        impulseMultiplier = 0.5;
+        impulseMultiplier = 0.7; // Восстановлено для iOS - более сильный импульс
       }
       const finalVx = dragVelocityRef.current.vx * impulseMultiplier;
       const finalVy = dragVelocityRef.current.vy * impulseMultiplier;
@@ -826,10 +840,26 @@ export default function HomeScreen() {
       players, 
       currentUser?.id,
       selectedCountry || undefined,
-      selectedYear || undefined
+      selectedYear || undefined,
+      shuffleKey // Передаем shuffleKey как seed для детерминированного рандома
     );
     return selected;
   }, [players, currentUser?.id, selectedCountry, selectedYear, shuffleKey]);
+
+  // Автоматическое обновление рандомных участников каждый час
+  useEffect(() => {
+    const ONE_HOUR_MS = 60 * 60 * 1000; // 1 час в миллисекундах
+    
+    // Устанавливаем интервал для автоматического обновления
+    const autoUpdateInterval = setInterval(() => {
+      console.log('🔄 Автоматическое обновление рандомных участников (каждый час)');
+      setShuffleKey(prev => prev + 1);
+    }, ONE_HOUR_MS);
+    
+    return () => {
+      clearInterval(autoUpdateInterval);
+    };
+  }, []);
 
   // Детектор тряски: «потряси, чтобы обновить рандомных игроков»
   useEffect(() => {

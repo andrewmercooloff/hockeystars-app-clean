@@ -51,7 +51,7 @@ import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -63,7 +63,7 @@ const iceBg = require('../../assets/images/led.jpg');
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends } = useLocalSearchParams();
   const router = useRouter();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
@@ -77,6 +77,7 @@ export default function PlayerProfile() {
   const achievementsRef = useRef<View>(null);
   const exercisesRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
+  const friendsRef = useRef<View>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -104,6 +105,9 @@ export default function PlayerProfile() {
   const [friendshipStatusCache, setFriendshipStatusCache] = useState<Record<string, 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>>({});
   const [museumCache, setMuseumCache] = useState<Record<string, any[]>>({});
   const [museumItemsCount, setMuseumItemsCount] = useState<Record<string, number>>({});
+  
+  // Ref для отслеживания текущего запрошенного ID, чтобы отменять устаревшие загрузки
+  const currentLoadingIdRef = useRef<string | null>(null);
   const [museumUpdateKey, setMuseumUpdateKey] = useState<number>(0);
   const [photosCache, setPhotosCache] = useState<Record<string, string[]>>({});
   const [player, setPlayer] = useState<Player | null>(null);
@@ -251,23 +255,41 @@ export default function PlayerProfile() {
     });
   };
 
+  // Используем ref для отслеживания предыдущего id, чтобы избежать показа неправильного профиля
+  const previousIdRef = useRef<string | string[] | undefined>(undefined);
+  
   useEffect(() => {
-    // Проверяем кеш состояния для мгновенного переключения
-    if (id && playersCache[id as string]) {
-      // Мгновенно устанавливаем данные из кеша состояния
-      setPlayer(playersCache[id as string]);
+    // Нормализуем id (может быть массивом из useLocalSearchParams)
+    const normalizedId = Array.isArray(id) ? id[0] : id;
+    const previousId = Array.isArray(previousIdRef.current) ? previousIdRef.current[0] : previousIdRef.current;
+    
+    if (!normalizedId) {
+      return;
+    }
+    
+    // Проверяем, изменился ли id
+    const idChanged = normalizedId !== previousId && previousId !== undefined;
+    
+    // Проверяем кеш для мгновенного отображения (работает даже при смене id, если профиль был в кеше)
+    const cachedPlayer = playersCache[normalizedId as string];
+    
+    // Если профиль есть в кеше и соответствует id - показываем мгновенно
+    if (cachedPlayer && cachedPlayer.id === normalizedId && !idChanged) {
+      // Мгновенно показываем данные из кеша только если ID не изменился
+      // (если ID изменился, нужно загрузить заново, даже если есть в кеше)
+      setPlayer(cachedPlayer);
       setLoading(false);
       
       // Восстанавливаем друзей и статус дружбы из кеша
-      if (friendsCache[id as string]) {
-        setFriends(friendsCache[id as string]);
+      if (friendsCache[normalizedId as string]) {
+        setFriends(friendsCache[normalizedId as string]);
       } else {
         setFriends([]);
       }
       
       // Восстанавливаем фото из кеша
-      if (photosCache[id as string]) {
-        setGalleryPhotos(photosCache[id as string]);
+      if (photosCache[normalizedId as string]) {
+        setGalleryPhotos(photosCache[normalizedId as string]);
       } else {
         setGalleryPhotos([]);
       }
@@ -278,18 +300,54 @@ export default function PlayerProfile() {
       
       setIsEditing(false);
       setEditData({});
+      
+      // Устанавливаем текущий загружаемый ID
+      currentLoadingIdRef.current = normalizedId;
+      
+      // Обновляем данные в фоне (без показа loading), если id не изменился
+      // Если id не изменился - тоже обновляем для актуальности данных
+      loadPlayerData();
+      
+      // Обновляем предыдущий id
+      previousIdRef.current = normalizedId;
     } else {
-      // Если нет в кеше состояния, загружаем данные
+      // Если id изменился, очищаем состояние, чтобы не показывать старые данные
+      if (idChanged) {
+        console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
+        // Отменяем любые текущие загрузки для старого ID
+        currentLoadingIdRef.current = null;
+        // Полностью очищаем все состояние
+        setPlayer(null);
+        setFriends([]);
+        setFriendshipStatus('none');
+        setIsEditing(false);
+        setEditData({});
+        setGalleryPhotos([]);
+        setAchievements([]);
+        setCoachYears([]);
+        setIndividualTraining([]);
+        setSkateServices([]);
+        setVideoFields([{ url: '', timeCode: '' }]);
+        previousIdRef.current = normalizedId;
+      } else if (previousId === undefined) {
+        // Первая загрузка - устанавливаем previousId
+        previousIdRef.current = normalizedId;
+      }
+      
+      // Нет в кеше или данные не соответствуют - показываем loading и загружаем данные
+      // Устанавливаем текущий загружаемый ID
+      currentLoadingIdRef.current = normalizedId;
       setLoading(true);
       setFriends([]);
       setFriendshipStatus('none');
       setIsEditing(false);
       setEditData({});
+      
+      // Загружаем данные игрока (используется кеш из getPlayerById на уровне БД)
+      loadPlayerData();
     }
-    
-    // Загружаем/обновляем данные игрока (используется кеш из getPlayerById)
-    loadPlayerData();
-  }, [id]);
+    // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
+  }, [id, loadPlayerData]);
 
   // Восстанавливаем статус дружбы из кеша после загрузки currentUser
   useEffect(() => {
@@ -398,17 +456,33 @@ export default function PlayerProfile() {
       scrollToSection(achievementsRef);
     } else if (scrollToExercises === 'true') {
       scrollToSection(exercisesRef);
+    } else if (scrollToFriends === 'true') {
+      scrollToSection(friendsRef);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, player]);
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, player]);
 
 
   // Функция для загрузки дополнительных данных в фоне
   const loadAdditionalData = async (playerData: Player, userData: Player | null) => {
     try {
-        // Загружаем команды игрока
-          try {
-            const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
-            const teams = await getPlayerTeamsAsPastTeams(playerData.id);
+      // Проверяем, что ID не изменился перед загрузкой дополнительных данных
+      const currentId = Array.isArray(id) ? id[0] : id;
+      if (currentId !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+        console.log('⚠️ ID изменился перед загрузкой дополнительных данных, отменяем:', playerData.id, '->', currentId, 'currentLoadingId:', currentLoadingIdRef.current);
+        return;
+      }
+      
+      // Загружаем команды игрока
+      try {
+        const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
+        const teams = await getPlayerTeamsAsPastTeams(playerData.id);
+        
+        // Проверяем ID после загрузки команд
+        const checkIdAfterTeams = Array.isArray(id) ? id[0] : id;
+        if (checkIdAfterTeams !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+          console.log('⚠️ ID изменился после загрузки команд, отменяем');
+          return;
+        }
             
             // Разделяем команды на текущие и прошлые
             const currentTeams = teams.filter(team => team.isCurrent);
@@ -444,12 +518,26 @@ export default function PlayerProfile() {
         }));
       }
 
+      // Проверяем ID перед загрузкой статуса дружбы и друзей
+      const checkIdBeforeFriends = Array.isArray(id) ? id[0] : id;
+      if (checkIdBeforeFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+        console.log('⚠️ ID изменился перед загрузкой друзей, отменяем');
+        return;
+      }
+      
       // Загружаем статус дружбы и друзей параллельно
       if (userData && playerData.id !== userData.id) {
         const [friendsStatus, friendsList] = await Promise.all([
           getFriendshipStatus(userData.id, playerData.id),
           getFriends(playerData.id)
         ]);
+        
+        // Проверяем ID после загрузки друзей перед установкой состояния
+        const checkIdAfterFriends = Array.isArray(id) ? id[0] : id;
+        if (checkIdAfterFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+          console.log('⚠️ ID изменился после загрузки друзей, отменяем установку');
+          return;
+        }
         
         setFriendshipStatus(friendsStatus);
         setFriends(friendsList);
@@ -475,6 +563,14 @@ export default function PlayerProfile() {
       } else {
         // Для собственного профиля загружаем только друзей
         const friendsList = await getFriends(playerData.id);
+        
+        // Проверяем ID перед установкой друзей для собственного профиля
+        const checkIdAfterOwnFriends = Array.isArray(id) ? id[0] : id;
+        if (checkIdAfterOwnFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+          console.log('⚠️ ID изменился после загрузки друзей (собственный профиль), отменяем установку');
+          return;
+        }
+        
         setFriends(friendsList);
         
         // Предзагружаем аватары друзей для быстрого отображения
@@ -548,47 +644,108 @@ export default function PlayerProfile() {
     }
   };
 
-  const loadPlayerData = async () => {
+  const loadPlayerData = useCallback(async () => {
     try {
-      if (id) {
-        // Добавляем небольшую задержку для инициализации UserContext
-        // Это предотвращает race condition при первом клике
-        await new Promise(resolve => setTimeout(resolve, 50));
+      // Нормализуем id (может быть массивом из useLocalSearchParams)
+      const normalizedId = Array.isArray(id) ? id[0] : id;
+      
+      if (!normalizedId) {
+        console.log('⚠️ ID не определен, пропускаем загрузку');
+        return;
+      }
+      
+      // Проверяем, что это именно тот ID, который мы сейчас загружаем
+      if (currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился, отменяем загрузку для старого ID:', currentLoadingIdRef.current, '->', normalizedId);
+        return;
+      }
+      
+      // Проверяем, что id не изменился во время загрузки
+      const currentId = Array.isArray(id) ? id[0] : id;
+      if (currentId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился во время загрузки, отменяем:', normalizedId, '->', currentId, 'currentLoadingId:', currentLoadingIdRef.current);
+        return;
+      }
+      
+      // Добавляем небольшую задержку для инициализации UserContext
+      // Это предотвращает race condition при первом клике
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Проверяем еще раз после задержки
+      const checkId = Array.isArray(id) ? id[0] : id;
+      if (checkId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился после задержки, отменяем:', normalizedId, '->', checkId, 'currentLoadingId:', currentLoadingIdRef.current);
+        return;
+      }
+      
+      // Загружаем основные данные параллельно
+      const [playerData, userData] = await Promise.all([
+        getPlayerById(normalizedId as string),
+        loadCurrentUser()
+      ]);
+      
+      // Проверяем еще раз после загрузки данных
+      const finalCheckId = Array.isArray(id) ? id[0] : id;
+      if (finalCheckId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился после загрузки данных, отменяем:', normalizedId, '->', finalCheckId, 'currentLoadingId:', currentLoadingIdRef.current);
+        return;
+      }
+      
+      // Определяем финальные данные игрока (после retry если нужно)
+      let finalPlayerData = playerData;
+      
+      // Если игрок не найден, делаем retry
+      if (!finalPlayerData) {
+        console.log('⏳ Игрок не найден, ждем...');
+        await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Загружаем основные данные параллельно
-        const [playerData, userData] = await Promise.all([
-          getPlayerById(id as string),
-          loadCurrentUser()
-        ]);
-        
-        // Определяем финальные данные игрока (после retry если нужно)
-        let finalPlayerData = playerData;
-        
-        // Если игрок не найден, делаем retry
-        if (!finalPlayerData) {
-          console.log('⏳ Игрок не найден, ждем...');
-          await new Promise(resolve => setTimeout(resolve, 200));
-          const retryPlayerData = await getPlayerById(id as string);
-          
-          if (!retryPlayerData) {
-            console.log('❌ Игрок не найден после повторной попытки, редиректим на главную');
-            router.replace('/');
-            return;
-          } else {
-            console.log('✅ Игрок найден после повторной попытки');
-            finalPlayerData = retryPlayerData;
-          }
+        // Проверяем еще раз перед retry
+        const retryCheckId = Array.isArray(id) ? id[0] : id;
+        if (retryCheckId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+          console.log('⚠️ ID изменился перед retry, отменяем. currentLoadingId:', currentLoadingIdRef.current);
+          return;
         }
         
-        // Сразу устанавливаем основные данные для быстрого отображения
-        setPlayer(finalPlayerData);
-        setCurrentUser(userData);
+        const retryPlayerData = await getPlayerById(normalizedId as string);
         
-        // Сохраняем в кеш состояния для мгновенного переключения
-        setPlayersCache(prev => ({
-          ...prev,
-          [id as string]: finalPlayerData
-        }));
+        if (!retryPlayerData) {
+          console.log('❌ Игрок не найден после повторной попытки, редиректим на главную');
+          router.replace('/');
+          return;
+        } else {
+          console.log('✅ Игрок найден после повторной попытки');
+          finalPlayerData = retryPlayerData;
+        }
+      }
+      
+      // Финальная проверка перед установкой состояния - проверяем и через ref и через параметр
+      const beforeSetId = Array.isArray(id) ? id[0] : id;
+      if (beforeSetId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился перед установкой состояния, отменяем:', normalizedId, '->', beforeSetId, 'currentLoadingId:', currentLoadingIdRef.current);
+        return;
+      }
+      
+      // Убеждаемся, что загружаем правильного игрока
+      if (finalPlayerData.id !== normalizedId) {
+        console.error('❌ Несоответствие ID: ожидали', normalizedId, 'получили', finalPlayerData.id);
+        return;
+      }
+      
+      // Финальная проверка перед установкой состояния через ref
+      if (currentLoadingIdRef.current !== normalizedId) {
+        console.log('⚠️ ID изменился в самом конце, отменяем установку состояния');
+        return;
+      }
+      
+      // Сразу устанавливаем основные данные для быстрого отображения
+      setPlayer(finalPlayerData);
+      setCurrentUser(userData);
+      
+      // Сохраняем в кеш состояния для мгновенного переключения
+      setPlayersCache(prev => ({
+        ...prev,
+        [normalizedId as string]: finalPlayerData
+      }));
         
         // Инициализируем годы тренера если это тренер
         if (finalPlayerData?.coach_years && Array.isArray(finalPlayerData.coach_years) && finalPlayerData.coach_years.length > 0) {
@@ -633,12 +790,18 @@ export default function PlayerProfile() {
           setFriendshipStatus('friends');
         }
         
+        // Финальная проверка перед завершением загрузки
+        const finalVerifyId = Array.isArray(id) ? id[0] : id;
+        if (finalVerifyId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
+          console.log('⚠️ ID изменился перед завершением загрузки, отменяем установку:', normalizedId, '->', finalVerifyId, 'currentLoadingId:', currentLoadingIdRef.current);
+          return;
+        }
+        
         // Отмечаем основную загрузку как завершенную
         setLoading(false);
         
         // Загружаем дополнительные данные в фоне (асинхронно)
         loadAdditionalData(finalPlayerData, userData);
-      }
     } catch (error) {
       console.error('Ошибка загрузки данных игрока:', error);
       // НЕ делаем редирект при ошибке - может быть временная проблема сети
@@ -648,7 +811,7 @@ export default function PlayerProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router]);
 
   const showCustomAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
     setAlert({
@@ -906,7 +1069,18 @@ export default function PlayerProfile() {
         // Удаляем из друзей
         const success = await removeFriend(currentUser.id, player.id);
         if (success) {
-          setFriendshipStatus('none');
+          // Небольшая задержка для обновления базы данных
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Обновляем статус дружбы из базы данных
+          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(newStatus);
+          // Очищаем кеш статуса дружбы для этого игрока
+          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+          setFriendshipStatusCache(prev => {
+            const updated = { ...prev };
+            delete updated[cacheKey];
+            return updated;
+          });
           showCustomAlert(t('common.success'), t('profile.removedFromFriends', { name: player?.name || 'Player' }), 'success');
         } else {
           showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
@@ -917,15 +1091,26 @@ export default function PlayerProfile() {
         const success = await sendFriendRequest(currentUser.id, player.id);
 
         if (success) {
-          setFriendshipStatus('pending');
-          const playerName = player?.name || 'Player';
+          // Небольшая задержка для обновления базы данных
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Обновляем статус дружбы из базы данных
+          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(newStatus);
+          // Очищаем кеш статуса дружбы для этого игрока
+          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+          setFriendshipStatusCache(prev => {
+            const updated = { ...prev };
+            delete updated[cacheKey];
+            return updated;
+          });
           
-         // Трекаем добавление в друзья
-         try {
-           await addActivityPoints(currentUser.id, 'FRIEND_ADD');
-         } catch (error) {
-           console.error('Failed to track friend add:', error);
-         }
+          // Трекаем добавление в друзья (не критично, если упадет - не должно влиять на работу)
+          try {
+            await addActivityPoints(currentUser.id, 'FRIEND_ADD');
+          } catch (error) {
+            console.error('⚠️ Failed to track friend add (не критично):', error);
+            // Не показываем ошибку пользователю, так как это не критично
+          }
           
           showCustomAlert(t('common.success'), t('profile.friendRequestSent'), 'success');
         } else {
@@ -935,7 +1120,18 @@ export default function PlayerProfile() {
         // Отменяем запрос
         const success = await cancelFriendRequest(currentUser.id, player.id);
         if (success) {
-          setFriendshipStatus('none');
+          // Небольшая задержка для обновления базы данных
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Обновляем статус дружбы из базы данных
+          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(newStatus);
+          // Очищаем кеш статуса дружбы для этого игрока
+          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+          setFriendshipStatusCache(prev => {
+            const updated = { ...prev };
+            delete updated[cacheKey];
+            return updated;
+          });
           showCustomAlert(t('common.success'), t('profile.friendRequestCancelled'), 'info');
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
@@ -944,15 +1140,41 @@ export default function PlayerProfile() {
         // Принимаем запрос
         const success = await acceptFriendRequest(currentUser.id, player.id);
         if (success) {
-          setFriendshipStatus('friends');
+          // Небольшая задержка для обновления базы данных
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Обновляем статус дружбы из базы данных
+          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+          setFriendshipStatus(newStatus);
+          // Очищаем кеш статуса дружбы для этого игрока
+          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+          setFriendshipStatusCache(prev => {
+            const updated = { ...prev };
+            delete updated[cacheKey];
+            return updated;
+          });
+          // Очищаем кеш игрока и аватара перед обновлением данных, чтобы получить свежие данные с актуальным аватаром
+          await clearPlayerCache(player.id);
+          // Также очищаем кеш аватара для этого игрока
+          try {
+            const { avatarCache } = await import('../../utils/AvatarCache');
+            avatarCache.clearAvatar(player.id);
+            console.log('🗑️ Кеш аватара игрока очищен после принятия запроса дружбы');
+          } catch (error) {
+            console.error('⚠️ Ошибка очистки кеша аватара (не критично):', error);
+          }
+          console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
+          
           showCustomAlert(t('common.success'), t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 'success');
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
       }
       
-      // Обновляем данные игрока после изменения друзей
-      await loadPlayerData();
+      // Обновляем данные игрока после изменения друзей (с задержкой, чтобы дать время БД синхронизироваться)
+      // Не обновляем статус дружбы здесь, так как он уже обновлен выше
+      setTimeout(async () => {
+        await loadPlayerData();
+      }, 200);
     } catch (error) {
       console.error('❌ Ошибка управления друзьями:', error);
       showCustomAlert('Ошибка', 'Произошла ошибка при управлении друзьями', 'error');
@@ -989,20 +1211,43 @@ export default function PlayerProfile() {
 
   // Функция для парсинга URL и таймкода
   const parseVideoUrl = (input: string): { url: string; timeCode?: string } => {
+    if (!input || typeof input !== 'string') {
+      return { url: '', timeCode: undefined };
+    }
+    
     // Регулярное выражение для извлечения таймкода
     const timeMatch = input.match(/\(время:\s*(\d{1,2}:\d{2})\)/);
     const timeCode = timeMatch ? timeMatch[1] : undefined;
     
-    // Удаляем таймкод из строки
-    const urlWithoutTimeCode = input.replace(/\s*\(время:\s*\d{1,2}:\d{2}\)/, '').trim();
+    // Удаляем таймкод из строки и очищаем пробелы
+    let urlWithoutTimeCode = input.replace(/\s*\(время:\s*\d{1,2}:\d{2}\)/, '').trim();
     
-    // Проверяем, является ли ссылка YouTube
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/|m\.youtube\.com\/)/;
+    // Убираем пробелы в начале и конце
+    urlWithoutTimeCode = urlWithoutTimeCode.trim();
     
-    if (youtubeRegex.test(urlWithoutTimeCode)) {
+    // Если нет протокола, добавляем https://
+    if (urlWithoutTimeCode && !urlWithoutTimeCode.startsWith('http://') && !urlWithoutTimeCode.startsWith('https://')) {
+      urlWithoutTimeCode = 'https://' + urlWithoutTimeCode;
+    }
+    
+    // Проверяем, является ли ссылка YouTube с помощью более строгих паттернов
+    const youtubePatterns = [
+      /^https?:\/\/(www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i,
+      /^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/i,
+      /^https?:\/\/(www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i,
+      /^https?:\/\/(www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i,
+      /^https?:\/\/(www\.)?youtube\.com\/live\/([a-zA-Z0-9_-]+)/i,
+      /^https?:\/\/m\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i
+    ];
+    
+    // Проверяем URL на соответствие хотя бы одному паттерну
+    const isValidYouTubeUrl = youtubePatterns.some(pattern => pattern.test(urlWithoutTimeCode));
+    
+    if (isValidYouTubeUrl) {
       return { url: urlWithoutTimeCode, timeCode };
     }
     
+    console.warn('Неверный формат YouTube URL:', urlWithoutTimeCode);
     // Если ссылка не соответствует YouTube, возвращаем пустую строку
     return { url: '', timeCode: undefined };
   };
@@ -3411,7 +3656,7 @@ export default function PlayerProfile() {
 
             {/* Кнопка управления дружбой - для не-звезд и не-скаутов показываем здесь */}
             {player.status !== 'star' && player.status !== 'scout' && currentUser && currentUser.id !== player.id && (
-              <>
+              <View ref={friendsRef}>
                 {friendshipStatus === 'received_request' ? (
                   // Запрос дружбы получен
                   <View style={{ gap: 10, marginTop: 10, marginBottom: 20 }}>
@@ -3480,7 +3725,7 @@ export default function PlayerProfile() {
                     </TouchableOpacity>
                   </View>
                 )}
-              </>
+              </View>
             )}
 
             {/* Кнопки действий для взаимодействия с профилем */}

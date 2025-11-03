@@ -36,10 +36,11 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   document.documentElement.style.backgroundColor = '#050008';
 }
 
-// Отключаем все предупреждения
-LogBox.ignoreAllLogs();
-// In production, silence runtime logs to avoid noisy output
-if (typeof __DEV__ !== 'undefined' && !__DEV__) {
+// В режиме разработки показываем предупреждения для отладки
+// Отключаем только в продакшене
+if (typeof __DEV__ === 'undefined' || !__DEV__) {
+  LogBox.ignoreAllLogs();
+  // In production, silence runtime logs to avoid noisy output
   // @ts-ignore
   (console as any).log = () => {};
   // @ts-ignore

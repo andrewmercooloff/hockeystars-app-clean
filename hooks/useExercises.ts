@@ -112,12 +112,17 @@ export function useExercises(
   // Отмечаем упражнение как выполненное
   const markAsCompleted = useCallback(async (exerciseId: string) => {
     try {
+      console.warn('💪 [USE-EXERCISES] markAsCompleted вызван для exerciseId:', exerciseId);
       // Импортируем функцию загрузки текущего пользователя
       const { loadCurrentUser } = await import('../utils/playerStorage');
+      console.warn('💪 [USE-EXERCISES] Загружаем текущего пользователя...');
       const user = await loadCurrentUser();
+      console.error('💪 [USE-EXERCISES] Пользователь загружен:', user ? { id: user.id, name: user.name } : 'null');
       
       if (user && user.id) {
+        console.warn('💪 [USE-EXERCISES] Вызываем ExerciseService.markExerciseAsCompleted...');
         await ExerciseService.markExerciseAsCompleted(user.id, exerciseId);
+        console.warn('✅ [USE-EXERCISES] ExerciseService.markExerciseAsCompleted завершен');
         
         // КРИТИЧНО: Инвалидируем кеш профиля пользователя!
         // Это обновит раздел "выполненные упражнения" в профиле
@@ -160,10 +165,10 @@ export function useExercises(
         
         // Принудительно обновляем данные пользователя в UserContext
         // НЕ вызываем loadCurrentUser здесь - это сделает UserContext при следующем обращении
-        console.log('💪 Все кеши очищены - профиль обновится автоматически');
+        console.log('✅ [USE-EXERCISES] Все кеши очищены - профиль обновится автоматически');
         
       } else {
-        console.warn('⚠️ Пользователь не найден или нет ID');
+        console.warn('⚠️ [USE-EXERCISES] Пользователь не найден или нет ID');
       }
     } catch (err) {
       console.error('❌ Error marking exercise as completed:', err);

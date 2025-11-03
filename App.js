@@ -3,8 +3,11 @@ import 'expo-router/entry';
 // Отключаем предупреждения в консоли
 import { LogBox } from 'react-native';
 
-// Отключаем все предупреждения
-LogBox.ignoreAllLogs();
+// В режиме разработки показываем предупреждения для отладки
+// Отключаем только в продакшене
+if (typeof __DEV__ === 'undefined' || !__DEV__) {
+  LogBox.ignoreAllLogs();
+}
 
 // Отключаем console.warn
 const originalWarn = console.warn;

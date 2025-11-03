@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import CachedAvatar from './CachedAvatar';
 
 interface GiftReceivedNotificationProps {
   playerName: string;
@@ -9,6 +10,8 @@ interface GiftReceivedNotificationProps {
   giftName: string;
   giftType: string;
   timestamp: string;
+  playerId?: string;
+  playerAvatar?: string;
 }
 
 export default function GiftReceivedNotification({
@@ -17,6 +20,7 @@ export default function GiftReceivedNotification({
   giftName,
   giftType,
   timestamp,
+  playerId,
   playerAvatar,
 }: GiftReceivedNotificationProps) {
   const { t } = useLanguage();
@@ -52,7 +56,14 @@ export default function GiftReceivedNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
+          <CachedAvatar
+            playerId={playerId}
+            fallbackAvatarUrl={playerAvatar}
+            size={50}
+            style={styles.playerAvatar}
+          />
+        ) : playerAvatar ? (
           <Image
             source={{ uri: playerAvatar }}
             style={styles.playerAvatar}

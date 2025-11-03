@@ -208,7 +208,7 @@
         "title": "Course à intervalles",
         "description": "Alternance de course rapide (30 secondes) et lente (30 secondes) pendant 20 minutes. Excellent pour développer l'endurance cardio au hockey.",
         "equipment": "Tapis roulant ou stade",
-        "calories": "250-350 kcal par séance d'entraînement",
+        "calories": "250-350 kcal",
         "benefits": [
           "Améliore l'endurance cardiovasculaire",
           "Développe la capacité de récupérer rapidement",
@@ -233,7 +233,7 @@
         "title": "Saut burpee",
         "description": "Exercice complexe : squat → planche → pompes → squat → saut. Effectuez 3 séries de 10 à 15 répétitions.",
         "equipment": "Tapis d'exercice (facultatif)",
-        "calories": "200 à 300 kcal par séance d'entraînement",
+        "calories": "200-300 kcal",
         "benefits": [
           "Développe l'endurance globale",
           "Renforce les muscles de tout le corps",
@@ -260,7 +260,7 @@
         "title": "Vélo",
         "description": "Vélo intense ou vélo stationnaire avec intervalles à haute intensité. 5 minutes d'échauffement, 20 minutes d'intervalles.",
         "equipment": "Vélo ou vélo d'appartement",
-        "calories": "300 à 400 kcal par séance d'entraînement",
+        "calories": "300-400 kcal",
         "benefits": [
           "Développe l'endurance cardio",
           "Renforce les muscles des jambes",
@@ -285,7 +285,7 @@
         "title": "Sauts pliométriques",
         "description": "Sauter sur place le plus haut possible, atterrir sur les genoux pliés. 3 séries de 15 à 20 sauts.",
         "equipment": "Tapis d'exercice (facultatif)",
-        "calories": "150-200 kcal par séance d'entraînement",
+        "calories": "150-200 kcal",
         "benefits": [
           "Développe la force explosive des jambes",
           "Améliore la réaction et la vitesse",
@@ -311,7 +311,7 @@
         "title": "Sprints sur courte distance",
         "description": "Courez à vitesse maximale sur une distance de 20 à 30 mètres avec un repos de 30 secondes entre les courses. 8 à 10 courses.",
         "equipment": "Espace ouvert ou piste de course",
-        "calories": "200-250 kcal par séance d'entraînement",
+        "calories": "200-250 kcal",
         "benefits": [
           "Développe une vitesse maximale",
           "Améliore l'accélération",
@@ -337,7 +337,7 @@
         "title": "Lancer une balle contre un mur",
         "description": "Lancez un ballon médicinal contre un mur avec une force maximale, attrapez-le et relancez-le. 3 séries de 20 lancers.",
         "equipment": "Médecine ball 2-4 kg, mur",
-        "calories": "120-180 kcal par séance d'entraînement",
+        "calories": "120-180 kcal",
         "benefits": [
           "Développe la force explosive des bras",
           "Améliore la coordination",
@@ -363,7 +363,7 @@
         "title": "Étirements dynamiques des jambes",
         "description": "Balancements des jambes vers l'avant, vers l'arrière et sur les côtés, avec des mouvements circulaires dans les articulations de la hanche. 10 à 15 répétitions pour chaque jambe.",
         "equipment": "Un mur ou une chaise pour se soutenir",
-        "calories": "50-80 kcal par échauffement",
+        "calories": "50-80 kcal",
         "benefits": [
           "Échauffe les muscles des jambes",
           "Améliore la mobilité articulaire",
@@ -389,7 +389,7 @@
         "title": "Échauffement du haut du corps",
         "description": "Cercles des bras, flexions et torsions du torse. Échauffement des épaules et du dos.",
         "equipment": "Non requis",
-        "calories": "40 à 60 kcal par échauffement",
+        "calories": "40-60 kcal",
         "benefits": [
           "Échauffe les muscles du haut du corps",
           "Améliore la mobilité de l'articulation de l'épaule",
@@ -415,7 +415,7 @@
         "title": "Jogging léger sur place",
         "description": "Jogging sur place avec les genoux hauts, en augmentant progressivement le rythme. 5 à 7 minutes.",
         "equipment": "Non requis",
-        "calories": "60-80 kcal par échauffement",
+        "calories": "60-80 kcal",
         "benefits": [
           "Augmente la fréquence cardiaque",
           "Échauffe les muscles des jambes",
@@ -441,7 +441,7 @@
         "title": "Étirements statiques des muscles des jambes",
         "description": "Maintenez les positions d’étirement pour les quadriceps, les mollets et les adducteurs. 30 secondes par groupe.",
         "equipment": "Tapis d'exercice",
-        "calories": "80-100 kcal par séance",
+        "calories": "80-100 kcal",
         "benefits": [
           "Améliore la flexibilité des muscles des jambes",
           "Réduit la tension musculaire",
@@ -598,7 +598,7 @@
         "title": "Corde à sauter avec intervalles",
         "description": "Alternance de sauts rapides (30 sec) et lents (30 sec). 20 minutes pour développer l'endurance cardio.",
         "equipment": "Corde à sauter",
-        "calories": "200 à 300 kcal par séance d'entraînement",
+        "calories": "200-300 kcal",
         "benefits": [
           "Développe l'endurance cardio",
           "Améliore la coordination des mouvements",
@@ -623,7 +623,7 @@
         "title": "Monter les escaliers en courant",
         "description": "Montez les escaliers aussi vite que possible, puis descendez. 10 à 15 répétitions pour développer l'endurance des jambes.",
         "equipment": "Échelle",
-        "calories": "250-350 kcal par séance d'entraînement",
+        "calories": "250-350 kcal",
         "benefits": [
           "Développe l'endurance des jambes",
           "Renforce les muscles des cuisses et des fesses",
@@ -2287,9 +2287,9 @@
     "position": "Position",
     "year": "Année",
     "height": "Hauteur",
-    "heightFrom": "Hauteur à partir de",
+    "heightFrom": "Hauteur",
     "weight": "Poids",
-    "weightFrom": "Poids de",
+    "weightFrom": "Poids",
     "all": "Tous",
     "noPlayersFound": "Aucun joueur trouvé",
     "left": "Gauche",

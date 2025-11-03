@@ -218,7 +218,7 @@
         "title": "Bieganie interwałowe",
         "description": "Naprzemienne bieganie w szybkim tempie (30 sekund) i wolnym tempie (30 sekund) przez 20 minut. Doskonałe do rozwijania wytrzymałości krążeniowo-oddechowej przed grą w hokeja.",
         "equipment": "Bieżnia lub stadion",
-        "calories": "250-350 kcal na trening",
+        "calories": "250-350 kcal",
         "benefits": [
           "Poprawia wytrzymałość układu sercowo-naczyniowego",
           "Rozwija zdolność do szybkiego powrotu do zdrowia",
@@ -243,7 +243,7 @@
         "title": "Skok burpee",
         "description": "Ćwiczenie złożone: przysiad → deska → pompka → przysiad → wyskok. Wykonaj 3 serie po 10–15 powtórzeń.",
         "equipment": "Mata do ćwiczeń (opcjonalnie)",
-        "calories": "200-300 kcal na trening",
+        "calories": "200-300 kcal",
         "benefits": [
           "Rozwija ogólną wytrzymałość",
           "Wzmacnia mięśnie całego ciała",
@@ -270,7 +270,7 @@
         "title": "Rower",
         "description": "Intensywna jazda na rowerze lub jazda stacjonarna z interwałami o wysokiej intensywności. 5 minut rozgrzewki, 20 minut interwałów.",
         "equipment": "Rower lub rower treningowy",
-        "calories": "300-400 kcal na trening",
+        "calories": "300-400 kcal",
         "benefits": [
           "Rozwija wytrzymałość sercowo-naczyniową",
           "Wzmacnia mięśnie nóg",
@@ -295,7 +295,7 @@
         "title": "Skoki plyometryczne",
         "description": "Skakanie w miejscu tak wysoko, jak to możliwe, lądowanie na zgiętych kolanach. 3 serie po 15-20 skoków.",
         "equipment": "Mata do ćwiczeń (opcjonalnie)",
-        "calories": "150-200 kcal na trening",
+        "calories": "150-200 kcal",
         "benefits": [
           "Rozwija wybuchową siłę nóg",
           "Poprawia reakcję i szybkość",
@@ -321,7 +321,7 @@
         "title": "Sprinty krótkodystansowe",
         "description": "Biegnij z maksymalną prędkością na dystansie 20-30 metrów, robiąc 30-sekundową przerwę między biegami. 8-10 biegów.",
         "equipment": "Otwarta przestrzeń lub bieżnia",
-        "calories": "200-250 kcal na trening",
+        "calories": "200-250 kcal",
         "benefits": [
           "Rozwija maksymalną prędkość",
           "Poprawia przyspieszenie",
@@ -347,7 +347,7 @@
         "title": "Rzucanie piłką o ścianę",
         "description": "Rzuć piłką lekarską o ścianę z maksymalną siłą, złap ją i rzuć ponownie. 3 serie po 20 rzutów.",
         "equipment": "Piłka lekarska 2-4 kg, ściana",
-        "calories": "120-180 kcal na trening",
+        "calories": "120-180 kcal",
         "benefits": [
           "Rozwija wybuchową siłę ramion",
           "Poprawia koordynację",
@@ -373,7 +373,7 @@
         "title": "Dynamiczne rozciąganie nóg",
         "description": "Wymachy nóg do przodu, do tyłu i na boki, z okrężnymi ruchami w stawach biodrowych. 10–15 powtórzeń na każdą nogę.",
         "equipment": "Ściana lub krzesło jako wsparcie",
-        "calories": "50-80 kcal na rozgrzewkę",
+        "calories": "50-80 kcal",
         "benefits": [
           "Rozgrzewa mięśnie nóg",
           "Poprawia ruchomość stawów",
@@ -399,7 +399,7 @@
         "title": "Rozgrzewka górnej części ciała",
         "description": "Krążenia ramion, zginanie tułowia i skręty tułowia. Rozgrzewka dla stawów barkowych i pleców.",
         "equipment": "Nie wymagane",
-        "calories": "40-60 kcal na rozgrzewkę",
+        "calories": "40-60 kcal",
         "benefits": [
           "Rozgrzewa mięśnie górnej części ciała",
           "Poprawia ruchomość stawu barkowego",
@@ -425,7 +425,7 @@
         "title": "Lekki trucht w miejscu",
         "description": "Trucht w miejscu z wysoko uniesionymi kolanami, stopniowo zwiększając tempo. 5-7 minut.",
         "equipment": "Nie wymagane",
-        "calories": "60-80 kcal na rozgrzewkę",
+        "calories": "60-80 kcal",
         "benefits": [
           "Zwiększa tętno",
           "Rozgrzewa mięśnie nóg",
@@ -451,7 +451,7 @@
         "title": "Rozciąganie statyczne mięśni nóg",
         "description": "Utrzymaj pozycję rozciągającą mięśnie czworogłowe, łydki i przywodziciele. 30 sekund na grupę.",
         "equipment": "Mata do ćwiczeń",
-        "calories": "80-100 kcal na rozciąganie",
+        "calories": "80-100 kcal",
         "benefits": [
           "Poprawia elastyczność mięśni nóg",
           "Zmniejsza napięcie mięśni",
@@ -608,7 +608,7 @@
         "title": "Skakanka z przerwami",
         "description": "Naprzemienne skoki szybkie (30 sek.) i wolne (30 sek.). 20 minut rozwijające wytrzymałość sercowo-naczyniową.",
         "equipment": "Skakanka",
-        "calories": "200-300 kcal na trening",
+        "calories": "200-300 kcal",
         "benefits": [
           "Rozwija wytrzymałość sercowo-naczyniową",
           "Poprawia koordynację ruchów",
@@ -633,7 +633,7 @@
         "title": "Bieganie po schodach",
         "description": "Wbiegaj po schodach tak szybko, jak potrafisz, a następnie zejdź. Wykonaj 10–15 powtórzeń, aby wytrenować wytrzymałość nóg.",
         "equipment": "Drabina",
-        "calories": "250-350 kcal na trening",
+        "calories": "250-350 kcal",
         "benefits": [
           "Rozwija wytrzymałość nóg",
           "Wzmacnia mięśnie ud i pośladków",
@@ -2085,9 +2085,9 @@
     "position": "Pozycja",
     "year": "Rok",
     "height": "Wysokość",
-    "heightFrom": "Wysokość od",
+    "heightFrom": "Wysokość",
     "weight": "Waga",
-    "weightFrom": "Waga od",
+    "weightFrom": "Waga",
     "all": "Wszystko",
     "noPlayersFound": "Nie znaleziono graczy",
     "left": "Lewy",
@@ -2482,7 +2482,7 @@
     "videos": "wideo"
   },
   "avatarNotification": {
-    "changed": "zmienił swój awatar"
+    "changed": "zmienił awatar"
   },
   "statsNotification": {
     "updated": "zaktualizował",

@@ -246,7 +246,7 @@
           "Atlikite 2-3 kartus per savaitę"
         ],
         "equipment": "Bėgimo takelis arba stadionas",
-        "calories": "250-350 kcal per treniruotę"
+        "calories": "250-350 kcal"
       },
       "2": {
         "title": "Burpee šuolis",
@@ -273,7 +273,7 @@
           "Tarp rinkinių pailsėkite 60-90 sekundžių"
         ],
         "equipment": "Mankštos kilimėlis (neprivaloma)",
-        "calories": "200-300 kcal per treniruotę"
+        "calories": "200-300 kcal"
       },
       "3": {
         "title": "Dviratis",
@@ -298,7 +298,7 @@
           "Treniruotės metu gerkite vandenį."
         ],
         "equipment": "Dviratis arba treniruoklis",
-        "calories": "300-400 kcal per treniruotę"
+        "calories": "300-400 kcal"
       },
       "4": {
         "title": "Pliometriniai šuoliai",
@@ -324,7 +324,7 @@
           "Tarp rinkinių pailsėkite 2-3 minutes"
         ],
         "equipment": "Mankštos kilimėlis (neprivaloma)",
-        "calories": "150-200 kcal per treniruotę"
+        "calories": "150-200 kcal"
       },
       "5": {
         "title": "Trumpų nuotolių sprintas",
@@ -350,7 +350,7 @@
           "Netrumpinkite savo poilsio laiko"
         ],
         "equipment": "Atvira erdvė arba bėgimo takas",
-        "calories": "200-250 kcal per treniruotę"
+        "calories": "200-250 kcal"
       },
       "6": {
         "title": "Kamuolio metimas į sieną",
@@ -376,7 +376,7 @@
           "Dirbkite visu kūnu, o ne tik rankomis"
         ],
         "equipment": "Medicininis kamuolys 2-4 kg, sieninis",
-        "calories": "120-180 kcal per treniruotę"
+        "calories": "120-180 kcal"
       },
       "7": {
         "title": "Dinaminis kojų tempimas",
@@ -402,7 +402,7 @@
           "Kvėpuokite giliai ir ritmingai"
         ],
         "equipment": "Siena ar kėdė atramai",
-        "calories": "50-80 kcal per apšilimą"
+        "calories": "50-80 kcal"
       },
       "8": {
         "title": "Viršutinės kūno dalies apšilimas",
@@ -428,7 +428,7 @@
           "Palaipsniui didinkite judesių diapazoną"
         ],
         "equipment": "Nereikalaujama",
-        "calories": "40-60 kcal per apšilimą"
+        "calories": "40-60 kcal"
       },
       "9": {
         "title": "Lengvas bėgiojimas vietoje",
@@ -454,7 +454,7 @@
           "Nešokti per aukštai"
         ],
         "equipment": "Nereikalaujama",
-        "calories": "60-80 kcal per apšilimą"
+        "calories": "60-80 kcal"
       },
       "10": {
         "title": "Statinis kojų raumenų tempimas",
@@ -479,7 +479,7 @@
           "Atlikite po treniruotės"
         ],
         "equipment": "Mankštos kilimėlis",
-        "calories": "80-100 kcal per ruožą"
+        "calories": "80-100 kcal"
       },
       "11": {
         "title": "Nugaros ir pečių tempimas",
@@ -636,7 +636,7 @@
           "Pradėkite lėtu tempu"
         ],
         "equipment": "Šokinėja virvė",
-        "calories": "200-300 kcal per treniruotę"
+        "calories": "200-300 kcal"
       },
       "18": {
         "title": "Bėgimas laiptais aukštyn",
@@ -661,7 +661,7 @@
           "Neviršykite savo galimybių"
         ],
         "equipment": "Kopėčios",
-        "calories": "250-350 kcal per treniruotę"
+        "calories": "250-350 kcal"
       },
       "19": {
         "title": "Lenta su judesiais",
@@ -2309,9 +2309,9 @@
     "position": "Padėtis",
     "year": "Metai",
     "height": "Aukštis",
-    "heightFrom": "Aukštis nuo",
+    "heightFrom": "Aukštis",
     "weight": "Svoris",
-    "weightFrom": "Svoris nuo",
+    "weightFrom": "Svoris",
     "all": "Visi",
     "noPlayersFound": "Žaidėjų nerasta",
     "left": "Kairė",
@@ -2504,7 +2504,7 @@
     "videos": "vaizdo įrašai"
   },
   "avatarNotification": {
-    "changed": "pakeitė savo avatarą"
+    "changed": "pakeitė avatarą"
   },
   "statsNotification": {
     "updated": "atnaujino",

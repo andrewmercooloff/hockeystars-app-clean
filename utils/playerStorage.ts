@@ -1333,40 +1333,70 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
       .single();
     
     if (senderData) {
+      // Получаем язык получателя из БД
+      const { getUserLanguage, loadTranslations } = await import('./languageHelper');
+      const receiverLanguage = await getUserLanguage(toId);
+      const translations = loadTranslations(receiverLanguage);
+      
+      // Локализованные тексты
+      const title = translations?.notifications?.friendRequest || 'Friend Request';
+      const message = translations?.notifications?.wantsToAddYou?.replace('{name}', senderData.name) 
+        || `${senderData.name} sent you a friend request`;
+      const pushTitle = `👋 ${title}`;
+      const pushBody = translations?.notifications?.wantsToAddYou?.replace('{name}', senderData.name)
+        || `${senderData.name} wants to add you as a friend`;
+      
       // Создаем уведомление для получателя
       try {
-        await supabase
+        const { error: notificationError } = await supabase
           .from('notifications')
           .insert([{
             user_id: toId,
             type: 'friend_request',
-            title: 'Friend Request',
-            message: `${senderData.name} sent you a friend request`,
+            title: title,
+            message: message,
             is_read: false,
             data: {
               sender_id: fromId,
               sender_name: senderData.name,
-              sender_avatar: senderData.avatar
+              sender_avatar: senderData.avatar,
+              playerId: fromId,
+              playerName: senderData.name,
+              playerAvatar: senderData.avatar
             }
           }]);
         
-        // Увеличиваем счетчик уведомлений для получателя
-        await supabase.rpc('increment_unread_notifications', { user_id: toId });
+        if (notificationError) {
+          console.error('❌ Ошибка создания in-app уведомления о запросе:', notificationError);
+        } else {
+          console.log('✅ In-app уведомление о запросе дружбы создано для:', toId);
+        }
         
+        // Увеличиваем счетчик уведомлений для получателя
+        const { error: counterError } = await supabase.rpc('increment_unread_notifications', { user_id: toId });
+        if (counterError) {
+          console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
+        }
         
         // Отправляем push уведомление
         try {
           const { sendNotificationToUser } = await import('./notificationService');
-          await sendNotificationToUser(
+          const pushResult = await sendNotificationToUser(
             toId,
-            '👋 Новый запрос в друзья',
-            `${senderData.name} хочет добавить вас в друзья`,
+            pushTitle,
+            pushBody,
             {
               type: 'friend_request',
               sender_id: fromId,
+              playerId: fromId,
               action: 'open_notifications'
             }
           );
+          if (pushResult) {
+            console.log('✅ Push-уведомление о запросе дружбы отправлено');
+          } else {
+            console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
+          }
         } catch (pushError) {
           console.error('⚠️ Ошибка отправки push уведомления:', pushError);
         }
@@ -1588,24 +1618,8 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
         avatarCache.clearAvatar(playerId);
       }
       
-      // Отправляем уведомления друзьям об изменении аватара
-      setTimeout(async () => {
-        try {
-          await notifyFriendsAboutAvatarChange(
-            playerId,
-            updatedPlayer.name,
-            updatedPlayer.avatar || '',
-            {
-              avatarNotification: {
-                changed: 'изменил свой аватар'
-              }
-            }
-          );
-          console.log('✅ Уведомления друзьям отправлены');
-        } catch (error) {
-          console.error('❌ Ошибка отправки уведомлений об аватаре (не критично):', error);
-        }
-      }, 0);
+      // Уведомления об изменении аватара отправляются из handleSave в app/player/[id].tsx
+      // Убрали дублирующий вызов отсюда, чтобы избежать двойных push-уведомлений
     }
     
     // Очищаем кеш игрока при обновлении (только если не пропускаем)
@@ -2161,6 +2175,10 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
       return false;
     }
     
+    // Очищаем кеш статуса дружбы после принятия запроса
+    await clearFriendshipCache(userId1, userId2);
+    console.log('✅ Кеш статуса дружбы очищен после принятия запроса');
+    
     // Получаем имя и аватар того, кто принял запрос (userId1 - тот кто принимает)
     const { data: acceptorData } = await supabase
       .from('players')
@@ -2249,6 +2267,10 @@ export const declineFriendRequest = async (userId1: string, userId2: string): Pr
       return false;
     }
     
+    // Очищаем кеш статуса дружбы после отклонения запроса
+    await clearFriendshipCache(userId1, userId2);
+    console.log('✅ Кеш статуса дружбы очищен после отклонения запроса');
+    
     return true;
   } catch (error) {
     console.error('❌ Ошибка отклонения запроса дружбы:', error);
@@ -2302,6 +2324,10 @@ export const cancelFriendRequest = async (fromId: string, toId: string): Promise
       console.error('⚠️ Ошибка удаления уведомления (не критично):', notificationError);
     }
     
+    // Очищаем кеш статуса дружбы после отмены запроса
+    await clearFriendshipCache(fromId, toId);
+    console.log('✅ Кеш статуса дружбы очищен после отмены запроса');
+    
     return true;
   } catch (error) {
     console.error('❌ Ошибка отмены запроса дружбы:', error);
@@ -2322,6 +2348,10 @@ export const removeFriend = async (userId1: string, userId2: string): Promise<bo
       console.error('❌ Ошибка удаления из друзей:', error);
       return false;
     }
+    
+    // Очищаем кеш статуса дружбы после удаления из друзей
+    await clearFriendshipCache(userId1, userId2);
+    console.log('✅ Кеш статуса дружбы очищен после удаления из друзей');
     
     return true;
   } catch (error) {
@@ -3753,19 +3783,27 @@ export const notifyFriendsAboutPhotos = async (
       });
     };
 
-    // Создаем уведомления для каждого друга
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
     const notifications = friends.map(friend => {
-      const photoText = photosCount === 1 
-        ? (translations?.photoNotification?.onePhoto || 'новое фото')
-        : (translations?.photoNotification?.multiplePhotos?.replace('{count}', photosCount.toString()) || `${photosCount} новых фото`);
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
       
-      const addedText = translations?.photoNotification?.added || 'добавил';
+      const photoText = photosCount === 1 
+        ? (friendTranslations?.photoNotification?.onePhoto || translations?.photoNotification?.onePhoto || 'новое фото')
+        : ((friendTranslations?.photoNotification?.multiplePhotos || translations?.photoNotification?.multiplePhotos)?.replace('{count}', photosCount.toString()) || `${photosCount} новых фото`);
+      
+      const addedText = friendTranslations?.photoNotification?.added || translations?.photoNotification?.added || 'добавил';
+      const title = friendLang === 'ru' ? 'Новые фото' : 'New Photos';
       
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'photo_added',
-        title: 'Новые фото',
+        title: title,
         message: `${playerName} ${addedText} ${photoText}`,
         data: {
           addedPhotosCount: photosCount,
@@ -3884,19 +3922,27 @@ export const notifyFriendsAboutVideos = async (
       });
     };
 
-    // Создаем уведомления для каждого друга
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
     const notifications = friends.map(friend => {
-      const videoText = videosCount === 1 
-        ? (translations?.videoNotification?.oneVideo || 'новое видео')
-        : (translations?.videoNotification?.multipleVideos?.replace('{count}', videosCount.toString()) || `${videosCount} новых видео`);
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
       
-      const addedText = translations?.videoNotification?.added || 'добавил';
+      const videoText = videosCount === 1 
+        ? (friendTranslations?.videoNotification?.oneVideo || translations?.videoNotification?.oneVideo || 'новое видео')
+        : ((friendTranslations?.videoNotification?.multipleVideos || translations?.videoNotification?.multipleVideos)?.replace('{count}', videosCount.toString()) || `${videosCount} новых видео`);
+      
+      const addedText = friendTranslations?.videoNotification?.added || translations?.videoNotification?.added || 'добавил';
+      const title = friendLang === 'ru' ? 'Новые видео моменты' : 'New Videos';
       
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'video_added',
-        title: 'Новые видео моменты',
+        title: title,
         message: `${playerName} ${addedText} ${videoText}`,
         data: {
           addedVideosCount: videosCount,
@@ -4058,15 +4104,23 @@ export const notifyFriendsAboutAvatarChange = async (
       });
     };
 
-    // Создаем уведомления для каждого друга
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
     const notifications = friends.map(friend => {
-      const changedText = translations?.avatarNotification?.changed || 'изменил свой аватар';
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
+      
+      const changedText = friendTranslations?.avatarNotification?.changed || translations?.avatarNotification?.changed || 'изменил свой аватар';
+      const title = friendLang === 'ru' ? 'Новый аватар' : 'New Avatar';
       
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'avatar_changed',
-        title: 'Новый аватар',
+        title: title,
         message: `${playerName} ${changedText}`,
         data: {
           changedPlayerId: playerId,
@@ -4219,19 +4273,27 @@ export const notifyFriendsAboutAchievements = async (
       });
     };
 
-    // Создаем уведомления для каждого друга
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
     const notifications = friends.map(friend => {
-      const achievementText = achievementsCount === 1 
-        ? (translations?.achievementNotification?.oneAchievement || 'новое достижение')
-        : (translations?.achievementNotification?.multipleAchievements?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
       
-      const addedText = translations?.achievementNotification?.added || 'добавил';
+      const achievementText = achievementsCount === 1 
+        ? (friendTranslations?.achievementNotification?.oneAchievement || translations?.achievementNotification?.oneAchievement || 'новое достижение')
+        : ((friendTranslations?.achievementNotification?.multipleAchievements || translations?.achievementNotification?.multipleAchievements)?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
+      
+      const addedText = friendTranslations?.achievementNotification?.added || translations?.achievementNotification?.added || 'добавил';
+      const title = friendLang === 'ru' ? 'Новые достижения' : 'New Achievements';
       
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'achievement_added',
-        title: 'Новые достижения',
+        title: title,
         message: `${playerName} ${addedText} ${achievementText}`,
         data: {
           addedAchievementsCount: achievementsCount,
@@ -4263,16 +4325,23 @@ export const notifyFriendsAboutAchievements = async (
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
       for (const notification of notifications) {
         if (notification.user_id) {
-          // Отправляем push уведомление
+          // Отправляем push уведомление с локализацией
           try {
             const { sendNotificationToUser } = await import('./notificationService');
+            
+            // Получаем язык получателя и переводы
+            const friendLang = friendLanguages.get(notification.user_id) || 'en';
+            const friendTranslations = loadTranslations(friendLang);
+            
             const achievementText = achievementsCount === 1 
-              ? (translations?.achievementNotification?.oneAchievement || 'новое достижение')
-              : (translations?.achievementNotification?.multipleAchievements?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
-            const receivedText = translations?.achievementNotification?.received || 'получил';
+              ? (friendTranslations?.achievementNotification?.oneAchievement || translations?.achievementNotification?.oneAchievement || 'новое достижение')
+              : ((friendTranslations?.achievementNotification?.multipleAchievements || translations?.achievementNotification?.multipleAchievements)?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
+            const receivedText = friendTranslations?.achievementNotification?.received || translations?.achievementNotification?.received || 'получил';
+            const pushTitle = friendLang === 'ru' ? '🏆 Новые достижения' : '🏆 New Achievements';
+            
             await sendNotificationToUser(
               notification.user_id,
-              '🏆 Новые достижения',
+              pushTitle,
               `${playerName} ${receivedText} ${achievementText}`,
               {
                 type: 'achievement_added',
@@ -5006,8 +5075,11 @@ export const notifyFriendsAboutExercise = async (
   playerName: string,
   exerciseId: string
 ): Promise<void> => {
+  console.error('🚨🚨🚨 notifyFriendsAboutExercise ВЫЗВАНА 🚨🚨🚨');
+  console.error('🚨 Параметры:', { playerId, playerName, exerciseId });
   try {
-    // console.log('💪 Отправляем уведомления о выполнении упражнения:', { playerId, exerciseId });
+    console.warn('💪 NOTIFY EXERCISE: Начало отправки уведомлений о выполнении упражнения:', { playerId, playerName, exerciseId });
+    console.error('💪 NOTIFY EXERCISE: Начало отправки уведомлений о выполнении упражнения:', { playerId, playerName, exerciseId });
 
     // Получаем данные игрока для аватара
     const { data: playerData, error: playerError } = await supabase
@@ -5021,7 +5093,7 @@ export const notifyFriendsAboutExercise = async (
     // Получаем друзей игрока
     const friends = await getFriends(playerId);
 
-    console.log('👥 Друзья для уведомлений об упражнении:', friends.length);
+    console.error('👥 Друзья для уведомлений об упражнении:', friends.length);
 
     if (friends.length === 0) {
       console.log('👥 У игрока нет друзей для отправки уведомлений об упражнении');
@@ -5057,7 +5129,7 @@ export const notifyFriendsAboutExercise = async (
 
     // Сохраняем уведомления в базу данных
     if (notifications.length > 0) {
-      console.log('💾 Сохраняем уведомления об упражнении в БД:', notifications.length);
+      console.warn('💾 Сохраняем уведомления об упражнении в БД:', notifications.length);
       const { error } = await supabase
         .from('notifications')
         .insert(notifications);
@@ -5065,25 +5137,132 @@ export const notifyFriendsAboutExercise = async (
       if (error) {
         console.error('❌ Ошибка сохранения уведомлений об упражнении:', error);
       } else {
-        // console.log('✅ Уведомления об упражнении сохранены в базу данных');
+        console.log('✅ Уведомления об упражнении сохранены в базу данных');
         
-        // Обновляем счетчик уведомлений для каждого друга (УПРОЩЕННАЯ ЛОГИКА)
+        // Обновляем счетчик уведомлений для каждого друга и отправляем push-уведомления
         const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
+        console.error(`👥 Уникальных друзей для отправки push-уведомлений: ${uniqueUserIds.length}`);
+        
+        // Импортируем функцию отправки push-уведомлений один раз для всех друзей
+        let sendNotificationToUser: any = null;
+        try {
+          console.error('📦 Импортируем sendNotificationToUser...');
+          const notificationModule = await import('./notificationService');
+          sendNotificationToUser = notificationModule.sendNotificationToUser;
+          if (!sendNotificationToUser) {
+            console.error('❌ sendNotificationToUser не найдена в модуле notificationService');
+            throw new Error('sendNotificationToUser не экспортирована');
+          }
+          console.error('✅ sendNotificationToUser успешно импортирована');
+        } catch (importError) {
+          console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось импортировать sendNotificationToUser:', importError);
+          console.error('❌ Детали ошибки импорта:', importError instanceof Error ? importError.stack : JSON.stringify(importError, null, 2));
+          // Продолжаем выполнение, но без push-уведомлений
+        }
+        
         for (const userId of uniqueUserIds) {
+          console.error(`🔄 Обрабатываем пользователя ${userId}...`);
+          
+          // ОБНОВЛЕНИЕ СЧЕТЧИКА - независимый блок
           try {
-            // Просто увеличиваем счетчик на 1 используя SQL функцию
             const { error: updateError } = await supabase
               .rpc('increment_unread_notifications', { user_id: userId });
 
             if (updateError) {
-              console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
+              console.error(`❌ Ошибка обновления счетчика уведомлений для ${userId}:`, updateError);
             } else {
               console.log(`✅ Счетчик уведомлений увеличен для пользователя ${userId}`);
             }
           } catch (updateError) {
-            console.error('❌ Ошибка обновления счетчика:', updateError);
+            console.error(`❌ Ошибка обновления счетчика уведомлений для ${userId}:`, updateError);
+            // Продолжаем выполнение, даже если счетчик не обновлен
+          }
+          
+          // ОТПРАВКА PUSH-УВЕДОМЛЕНИЯ - независимый блок (всегда выполняется, если функция импортирована)
+          if (!sendNotificationToUser) {
+            console.error(`⚠️ [${userId}] Пропускаем отправку push-уведомления: функция не импортирована`);
+            continue;
+          }
+          
+          try {
+            // ВАЖНО: Получаем язык пользователя из БД
+            const { getUserLanguage } = await import('./languageHelper');
+            const userLanguage = await getUserLanguage(userId);
+            
+            // Загружаем переводы для нужного языка
+            let pushTitle = '💪 Exercise completed';
+            let pushBody = `${playerName} completed an exercise`;
+            
+            try {
+              const translations: any = {
+                ru: require('../locales/ru.json'),
+                en: require('../locales/en.json'),
+                lt: require('../locales/lt.json'),
+                lv: require('../locales/lv.json'),
+                pl: require('../locales/pl.json'),
+                sv: require('../locales/sv.json'),
+                cs: require('../locales/cs.json'),
+                sk: require('../locales/sk.json'),
+                fi: require('../locales/fi.json'),
+                it: require('../locales/it.json'),
+                de: require('../locales/de.json'),
+                fr: require('../locales/fr.json'),
+              };
+              
+              const userTranslations = translations[userLanguage] || translations.en;
+              const exerciseNotification = userTranslations?.exerciseNotification;
+              
+              if (exerciseNotification) {
+                // Используем локализованный текст
+                pushTitle = `💪 ${exerciseNotification.title || 'Exercise completed'}`;
+                // Для body используем шаблон с именем игрока
+                const completedText = exerciseNotification.completed || 'completed an exercise';
+                pushBody = `${playerName} ${completedText}`;
+              }
+            } catch (translationError) {
+              console.error(`⚠️ [${userId}] Ошибка загрузки переводов, используем английский:`, translationError);
+            }
+            
+            console.error(`📤 [${userId}] Начинаем отправку push-уведомления об упражнении...`);
+            console.error(`📤 [${userId}] Язык: ${userLanguage}, Данные для отправки:`, {
+              userId,
+              title: pushTitle,
+              body: pushBody,
+              data: {
+                type: 'exercise_completed',
+                player_id: playerId,
+                exercise_id: exerciseId,
+                action: 'open_exercise'
+              }
+            });
+            
+            const pushResult = await sendNotificationToUser(
+              userId,
+              pushTitle,
+              pushBody,
+              {
+                type: 'exercise_completed',
+                player_id: playerId,
+                exercise_id: exerciseId,
+                action: 'open_exercise'
+              }
+            );
+            
+            console.error(`📤 [${userId}] Результат отправки push-уведомления:`, pushResult);
+            
+            if (pushResult) {
+              console.error(`✅ [${userId}] Push-уведомление об упражнении успешно отправлено`);
+            } else {
+              console.error(`⚠️ [${userId}] Push-уведомление об упражнении НЕ отправлено (вернулось false)`);
+            }
+          } catch (pushError) {
+            console.error(`❌ [${userId}] Ошибка отправки push-уведомления об упражнении:`, pushError);
+            console.error(`❌ [${userId}] Детали ошибки:`, pushError instanceof Error ? pushError.stack : JSON.stringify(pushError, null, 2));
+            // Продолжаем выполнение для других пользователей
           }
         }
+        
+        console.log(`✅ Завершена обработка всех друзей для push-уведомлений об упражнении`);
       }
     }
 
@@ -5133,13 +5312,40 @@ export const notifyFriendsAboutGiftReceived = async (
     const giftTypeName = giftTypeNames[giftType] || giftType;
     const displayName = giftName || giftTypeName;
 
-    // Создаем уведомления для друзей
-    const friendNotifications = friends.map(friend => ({
-      id: generateUUID(),
-      user_id: friend.id,
-      type: 'gift_received',
-      title: 'Подарок от звезды',
-      message: `${playerName} получил ${displayName} от ${starName}`,
+    // ВАЖНО: Получаем язык игрока из БД
+    const { getUserLanguage, loadTranslations, getUserLanguages } = await import('./languageHelper');
+    const playerLanguage = await getUserLanguage(playerId);
+    const playerTranslations = loadTranslations(playerLanguage);
+
+    const playerTitle = playerTranslations?.giftNotification?.title || (playerLanguage === 'ru' ? 'Подарок от администратора' : 'Gift from administrator');
+    const playerMessage = playerTranslations?.giftNotification?.message 
+      ? playerTranslations.giftNotification.message.replace('{playerName}', 'Вы').replace('{giftName}', displayName).replace('{starName}', starName)
+      : playerLanguage === 'ru' 
+        ? `Вы получили ${displayName} от ${starName}`
+        : `You received ${displayName} from ${starName}`;
+
+    // Получаем языки всех друзей для локализации
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для друзей - определяем язык для каждого друга индивидуально
+    const friendNotifications = await Promise.all(friends.map(async (friend) => {
+      // ВАЖНО: Получаем язык из БД
+      const friendLanguage = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLanguage);
+      
+      const friendTitle = friendTranslations?.giftNotification?.title || (friendLanguage === 'ru' ? 'Подарок от звезды' : 'Gift from star');
+      const friendMessage = friendTranslations?.giftNotification?.message 
+        ? friendTranslations.giftNotification.message.replace('{playerName}', playerName).replace('{giftName}', displayName).replace('{starName}', starName)
+        : friendLanguage === 'ru' 
+          ? `${playerName} получил ${displayName} от ${starName}`
+          : `${playerName} received ${displayName} from ${starName}`;
+      
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'friend_gift_received',
+        title: friendTitle,
+        message: friendMessage,
       data: {
         playerId,
         playerName,
@@ -5149,17 +5355,18 @@ export const notifyFriendsAboutGiftReceived = async (
         giftName: displayName,
         timestamp: new Date().toISOString()
       },
-      created_at: new Date().toISOString(),
-      is_read: false
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
     }));
-
+    
     // Создаем уведомление для самого игрока
     const playerNotification = {
       id: generateUUID(),
       user_id: playerId,
       type: 'gift_received',
-      title: 'Подарок от администратора',
-      message: `Вы получили ${displayName} от ${starName}`,
+      title: playerTitle,
+      message: playerMessage,
       data: {
         playerId,
         playerName,
@@ -5256,128 +5463,174 @@ export const sendGiftNotification = async (
   senderId?: string
 ): Promise<void> => {
   try {
-    // Дефолтные тексты на русском
-    const title = translations?.giftReceived || 'Подарок получен!';
-    const message = translations?.giftReceivedMessage || `Вы получили подарок от ${senderName}: ${giftName}`;
-    const pushTitle = translations?.giftReceivedPushTitle || '🎁 Подарок получен!';
-    const pushBody = translations?.giftReceivedPushBody || `Вы получили подарок от ${senderName}: ${giftName}`;
+    // ВАЖНО: Получаем язык получателя из БД
+    const { getUserLanguage } = await import('./languageHelper');
+    const userLanguage = await getUserLanguage(playerId);
+    
+    // Загружаем переводы
+    let giftNotificationTranslations: any = null;
+    try {
+      const translationsMap: any = {
+        ru: require('../locales/ru.json'),
+        en: require('../locales/en.json'),
+        lt: require('../locales/lt.json'),
+        lv: require('../locales/lv.json'),
+        pl: require('../locales/pl.json'),
+        sv: require('../locales/sv.json'),
+        cs: require('../locales/cs.json'),
+        sk: require('../locales/sk.json'),
+        fi: require('../locales/fi.json'),
+        it: require('../locales/it.json'),
+        de: require('../locales/de.json'),
+        fr: require('../locales/fr.json'),
+      };
+      giftNotificationTranslations = translationsMap[userLanguage]?.giftNotification || translationsMap.en?.giftNotification;
+    } catch (translationError) {
+      // Используем английский fallback
+    }
+    
+    // Используем локализованные тексты или переданные translations, или fallback на русский/английский
+    const title = translations?.giftReceived || giftNotificationTranslations?.title || (userLanguage === 'ru' ? 'Подарок получен!' : 'Gift received!');
+    const message = translations?.giftReceivedMessage || 
+      (giftNotificationTranslations?.message 
+        ? giftNotificationTranslations.message.replace('{playerName}', 'Вы').replace('{giftName}', giftName).replace('{starName}', senderName)
+        : userLanguage === 'ru' ? `Вы получили подарок от ${senderName}: ${giftName}` : `You received a gift from ${senderName}: ${giftName}`);
+    const pushTitle = translations?.giftReceivedPushTitle || `🎁 ${giftNotificationTranslations?.title || (userLanguage === 'ru' ? 'Подарок получен!' : 'Gift received!')}`;
+    const pushBody = translations?.giftReceivedPushBody || 
+      (giftNotificationTranslations?.message 
+        ? giftNotificationTranslations.message.replace('{playerName}', 'Вы').replace('{giftName}', giftName).replace('{starName}', senderName)
+        : userLanguage === 'ru' ? `Вы получили подарок от ${senderName}: ${giftName}` : `You received a gift from ${senderName}: ${giftName}`);
     
     console.log('🎁 NOTIFICATIONS: Отправка уведомлений о подарке');
     console.log('🎁 NOTIFICATIONS: player:', playerName, playerId);
     console.log('🎁 NOTIFICATIONS: sender:', senderName);
     console.log('🎁 NOTIFICATIONS: gift:', giftName);
     
-    // 1. Создаем in-app уведомление
-    // Получаем данные игрока для аватара
-    const { data: playerDataInfo, error: playerInfoError } = await supabase
-      .from('players')
-      .select('avatar, name')
-      .eq('id', playerId)
-      .single();
-    
-    const { error: notificationError } = await supabase
-      .from('notifications')
-      .insert([{
-        user_id: playerId,
-        type: 'gift_received',
-        title: title,
-        message: message,
-        is_read: false,
-        data: {
-          playerName: playerName,
-          playerAvatar: playerDataInfo?.avatar || null,
-          starName: senderName,
-          giftName: giftName,
-          giftType: 'gift',
-          timestamp: new Date().toISOString()
-        }
-      }]);
-    
-    if (notificationError) {
-      console.error('🎁 NOTIFICATIONS: ❌ Ошибка создания уведомления:', notificationError);
-      throw notificationError;
-    }
-    
-    console.log('🎁 NOTIFICATIONS: ✅ In-app уведомление создано');
-    
-    // 2. Увеличиваем счетчик уведомлений
-    const { data: playerData, error: playerError } = await supabase
-      .from('players')
-      .select('notifications, unread_notifications_count')
-      .eq('id', playerId)
-      .single();
-    
-    if (!playerError && playerData) {
-      let currentCount = 0;
-      try {
-        if (playerData.notifications && typeof playerData.notifications === 'string') {
-          const notificationsData = JSON.parse(playerData.notifications);
-          currentCount = notificationsData.unread_count || 0;
-        }
-      } catch (parseError) {
-        // Используем unread_notifications_count как fallback
-        currentCount = playerData.unread_notifications_count || 0;
-      }
-      
-      const newCount = currentCount + 1;
-      
-      const { error: updateError } = await supabase
-        .from('players')
-        .update({
-          notifications: JSON.stringify({
-            unread_count: newCount,
-            last_updated: new Date().toISOString()
-          }),
-          unread_notifications_count: newCount
-        })
-        .eq('id', playerId);
-      
-      if (updateError) {
-        console.error('🎁 NOTIFICATIONS: ❌ Ошибка обновления счетчика:', updateError);
-      } else {
-        console.log('🎁 NOTIFICATIONS: ✅ Счетчик увеличен:', currentCount, '→', newCount);
-      }
-    }
-    
-    // 3. Отправляем push-уведомление получателю подарка
+    // Получаем данные игрока для аватара (нужно для всех уведомлений)
+    let playerDataInfo: any = null;
     try {
-      const { sendPushNotification } = await import('./notificationService');
-      const { data: deviceData, error: deviceError } = await supabase
-        .from('push_tokens')
-        .select('token')
-        .eq('user_id', playerId);
+      const { data, error: playerInfoError } = await supabase
+        .from('players')
+        .select('avatar, name')
+        .eq('id', playerId)
+        .single();
+      if (!playerInfoError && data) {
+        playerDataInfo = data;
+      }
+    } catch (error) {
+      console.error('🎁 NOTIFICATIONS: ⚠️ Ошибка получения данных игрока для аватара:', error);
+    }
+    
+    // Проверяем, что получатель подарка не является отправителем
+    if (senderId && playerId === senderId) {
+      console.log('🎁 NOTIFICATIONS: Отправитель и получатель совпадают, пропускаем создание уведомления для получателя');
+    } else {
+      // 1. Создаем in-app уведомление
       
-      console.log('🎁 NOTIFICATIONS: Поиск push-токенов для получателя:', playerId);
-      console.log('🎁 NOTIFICATIONS: deviceData:', deviceData);
-      console.log('🎁 NOTIFICATIONS: deviceError:', deviceError);
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert([{
+          user_id: playerId,
+          type: 'gift_received',
+          title: title,
+          message: message,
+          is_read: false,
+          data: {
+            playerName: playerName,
+            playerAvatar: playerDataInfo?.avatar || null,
+            starName: senderName,
+            giftName: giftName,
+            giftType: 'gift',
+            timestamp: new Date().toISOString()
+          }
+        }]);
+    
+      if (notificationError) {
+        console.error('🎁 NOTIFICATIONS: ❌ Ошибка создания уведомления:', notificationError);
+        throw notificationError;
+      }
       
-      if (!deviceError && deviceData && deviceData.length > 0) {
-        const pushTokens = deviceData.map(d => d.token);
-        console.log('🎁 NOTIFICATIONS: Найдено', pushTokens.length, 'push-токенов для получателя');
-        console.log('🎁 NOTIFICATIONS: Отправляем push получателю:', pushTitle, pushBody);
+      console.log('🎁 NOTIFICATIONS: ✅ In-app уведомление создано');
+      
+      // 2. Увеличиваем счетчик уведомлений
+      const { data: playerData, error: playerError } = await supabase
+        .from('players')
+        .select('notifications, unread_notifications_count')
+        .eq('id', playerId)
+        .single();
+      
+      if (!playerError && playerData) {
+        let currentCount = 0;
+        try {
+          if (playerData.notifications && typeof playerData.notifications === 'string') {
+            const notificationsData = JSON.parse(playerData.notifications);
+            currentCount = notificationsData.unread_count || 0;
+          }
+        } catch (parseError) {
+          // Используем unread_notifications_count как fallback
+          currentCount = playerData.unread_notifications_count || 0;
+        }
         
-        for (const token of pushTokens) {
-          try {
-            await sendPushNotification(token, pushTitle, pushBody, {
-              type: 'gift_received',
-              sender_name: senderName,
-              gift_name: giftName
-            });
-            console.log('🎁 NOTIFICATIONS: ✅ Push отправлен получателю на токен:', token.substring(0, 20) + '...');
-          } catch (pushError) {
-            console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
+        const newCount = currentCount + 1;
+        
+        const { error: updateError } = await supabase
+          .from('players')
+          .update({
+            notifications: JSON.stringify({
+              unread_count: newCount,
+              last_updated: new Date().toISOString()
+            }),
+            unread_notifications_count: newCount
+          })
+          .eq('id', playerId);
+        
+        if (updateError) {
+          console.error('🎁 NOTIFICATIONS: ❌ Ошибка обновления счетчика:', updateError);
+        } else {
+          console.log('🎁 NOTIFICATIONS: ✅ Счетчик увеличен:', currentCount, '→', newCount);
+        }
+      }
+      
+      // 3. Отправляем push-уведомление получателю подарка
+      try {
+        const { sendPushNotification } = await import('./notificationService');
+        const { data: deviceData, error: deviceError } = await supabase
+          .from('push_tokens')
+          .select('token')
+          .eq('user_id', playerId);
+        
+        console.log('🎁 NOTIFICATIONS: Поиск push-токенов для получателя:', playerId);
+        console.log('🎁 NOTIFICATIONS: deviceData:', deviceData);
+        console.log('🎁 NOTIFICATIONS: deviceError:', deviceError);
+        
+        if (!deviceError && deviceData && deviceData.length > 0) {
+          const pushTokens = deviceData.map(d => d.token);
+          console.log('🎁 NOTIFICATIONS: Найдено', pushTokens.length, 'push-токенов для получателя');
+          console.log('🎁 NOTIFICATIONS: Отправляем push получателю:', pushTitle, pushBody);
+          
+          for (const token of pushTokens) {
+            try {
+              await sendPushNotification(token, pushTitle, pushBody, {
+                type: 'gift_received',
+                sender_name: senderName,
+                gift_name: giftName
+              });
+              console.log('🎁 NOTIFICATIONS: ✅ Push отправлен получателю на токен:', token.substring(0, 20) + '...');
+            } catch (pushError) {
+              console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
+            }
+          }
+          
+          console.log('🎁 NOTIFICATIONS: ✅ Push-уведомления получателю отправлены');
+        } else {
+          console.log('🎁 NOTIFICATIONS: ⚠️ У получателя нет зарегистрированных устройств для push');
+          if (deviceError) {
+            console.error('🎁 NOTIFICATIONS: ❌ Ошибка получения push-токенов:', deviceError);
           }
         }
-        
-        console.log('🎁 NOTIFICATIONS: ✅ Push-уведомления получателю отправлены');
-      } else {
-        console.log('🎁 NOTIFICATIONS: ⚠️ У получателя нет зарегистрированных устройств для push');
-        if (deviceError) {
-          console.error('🎁 NOTIFICATIONS: ❌ Ошибка получения push-токенов:', deviceError);
-        }
+      } catch (pushError) {
+        console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
       }
-    } catch (pushError) {
-      console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push получателю:', pushError);
     }
     
     // 4. Уведомляем друзей игрока (исключая отправителя)
@@ -5395,21 +5648,65 @@ export const sendGiftNotification = async (
     }
     
     if (friends.length > 0) {
-      const friendNotifications = friends.map(friend => ({
-        user_id: friend.id,
-        type: 'friend_gift_received',
-        title: translations?.giftReceived || 'Подарок от звезды',
-        message: `${playerName} получил подарок от ${senderName}: ${giftName}`,
-        is_read: false,
-        data: {
-          playerId: playerId, // Добавляем ID игрока для навигации
-          playerName: playerName,
-          playerAvatar: playerDataInfo?.avatar || null,
-          starName: senderName,
-          giftName: giftName,
-          giftType: 'gift',
-          timestamp: new Date().toISOString()
+      // Определяем язык для каждого друга и создаем локализованные уведомления
+      const friendNotifications = await Promise.all(friends.map(async (friend) => {
+        // Для каждого друга определяем язык (в идеале из БД, пока используем язык устройства)
+        let friendLanguage: string = 'en';
+        try {
+          const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+          const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
+          if (savedLanguage && ['ru', 'en', 'lt', 'lv', 'pl', 'sv', 'cs', 'sk', 'fi', 'it', 'de', 'fr'].includes(savedLanguage)) {
+            friendLanguage = savedLanguage;
+          }
+        } catch (langError) {
+          // Используем английский по умолчанию
         }
+        
+        // Загружаем переводы для друга
+        let friendTranslations: any = null;
+        try {
+          const translationsMap: any = {
+            ru: require('../locales/ru.json'),
+            en: require('../locales/en.json'),
+            lt: require('../locales/lt.json'),
+            lv: require('../locales/lv.json'),
+            pl: require('../locales/pl.json'),
+            sv: require('../locales/sv.json'),
+            cs: require('../locales/cs.json'),
+            sk: require('../locales/sk.json'),
+            fi: require('../locales/fi.json'),
+            it: require('../locales/it.json'),
+            de: require('../locales/de.json'),
+            fr: require('../locales/fr.json'),
+          };
+          friendTranslations = translationsMap[friendLanguage]?.giftNotification || translationsMap.en?.giftNotification;
+        } catch (translationError) {
+          // Используем английский fallback
+        }
+        
+        const friendTitle = friendTranslations?.title || (friendLanguage === 'ru' ? 'Подарок от звезды' : 'Gift from star');
+        const friendMessage = friendTranslations?.message 
+          ? friendTranslations.message.replace('{playerName}', playerName).replace('{giftName}', giftName).replace('{starName}', senderName)
+          : friendLanguage === 'ru' 
+            ? `${playerName} получил подарок от ${senderName}: ${giftName}`
+            : `${playerName} received a gift from ${senderName}: ${giftName}`;
+        
+        return {
+          user_id: friend.id,
+          type: 'friend_gift_received',
+          title: friendTitle,
+          message: friendMessage,
+          is_read: false,
+          data: {
+            playerId: playerId, // Добавляем ID игрока для навигации
+            playerName: playerName,
+            playerAvatar: playerDataInfo?.avatar || null,
+            starName: senderName,
+            giftName: giftName,
+            giftType: 'gift',
+            timestamp: new Date().toISOString()
+          }
+        };
       }));
       
       const { error: friendsError } = await supabase
@@ -5457,6 +5754,11 @@ export const sendGiftNotification = async (
         // Отправляем push-уведомления друзьям
         try {
           const { sendPushNotification } = await import('./notificationService');
+          
+          // Получаем языки всех друзей для push-уведомлений
+          const { getUserLanguages: getLanguages, loadTranslations: loadTrans } = await import('./languageHelper');
+          const friendLangs = await getLanguages(friends.map(f => f.id));
+          
           for (const friend of friends) {
             const { data: friendDeviceData, error: friendDeviceError } = await supabase
               .from('push_tokens')
@@ -5464,9 +5766,22 @@ export const sendGiftNotification = async (
               .eq('user_id', friend.id);
             
             if (!friendDeviceError && friendDeviceData && friendDeviceData.length > 0) {
+              // ВАЖНО: Получаем язык друга из БД
+              const friendLanguage = friendLangs.get(friend.id) || 'en';
+              const friendTranslations = loadTrans(friendLanguage);
+              
+              const friendPushTitle = friendTranslations?.giftNotification?.title 
+                ? `🎁 ${friendTranslations.giftNotification.title}`
+                : friendLanguage === 'ru' 
+                  ? `🎁 ${playerName} получил подарок!`
+                  : `🎁 ${playerName} received a gift!`;
+              const friendPushBody = friendTranslations?.giftNotification?.message 
+                ? friendTranslations.giftNotification.message.replace('{playerName}', playerName).replace('{giftName}', giftName).replace('{starName}', senderName)
+                : friendLanguage === 'ru' 
+                  ? `${playerName} получил подарок от ${senderName}: ${giftName}`
+                  : `${playerName} received a gift from ${senderName}: ${giftName}`;
+              
               const friendPushTokens = friendDeviceData.map(d => d.token);
-              const friendPushTitle = `🎁 ${playerName} получил подарок!`;
-              const friendPushBody = `${playerName} получил подарок от ${senderName}: ${giftName}`;
               
               for (const token of friendPushTokens) {
                 try {
@@ -5663,25 +5978,34 @@ export const getSmartPlayerSelection = (
   players: Player[], 
   currentUserId?: string,
   selectedCountry?: string,
-  selectedYear?: number
+  selectedYear?: number,
+  randomSeed?: number // Добавляем seed для детерминированного рандома
 ): Player[] => {
   try {
-    // 1. Показываем не-игроков (звезды, тренеры, магазины, заточка коньков, администраторы)
-    // ВАЖНО: если выбран фильтр по стране, показываем только не-игроков из этой страны
-    // ИСКЛЮЧЕНИЕ: администраторы показываются везде независимо от фильтра
-    const nonPlayers = players.filter(player => {
-      const isAdmin = player.status === 'admin';
-      const isNonPlayer = player.status === 'star' || 
-        player.status === 'coach' || 
+    // 1. Разделяем не-игроков на категории
+    // Администраторы всегда показываются везде
+    const admins = players.filter(player => player.status === 'admin');
+    
+    // Звезды и скауты - показываем рандомно (обрабатываются отдельно)
+    const starsAndScouts = players.filter(player => {
+      const isStarOrScout = player.status === 'star' || player.status === 'scout';
+      if (!isStarOrScout) return false;
+      
+      // Если выбран фильтр по стране, фильтруем по стране
+      if (selectedCountry) {
+        return player.country === selectedCountry;
+      }
+      
+      return true;
+    });
+    
+    // Остальные не-игроки (тренеры, магазины, заточка коньков)
+    const otherNonPlayers = players.filter(player => {
+      const isOtherNonPlayer = player.status === 'coach' || 
         player.status === 'shop' || 
-        player.status === 'skateSharpening' || 
-        player.status === 'admin' ||
-        player.status === 'scout';
+        player.status === 'skateSharpening';
       
-      if (!isNonPlayer) return false;
-      
-      // Администраторы всегда показываются
-      if (isAdmin) return true;
+      if (!isOtherNonPlayer) return false;
       
       // Если выбран фильтр по стране, фильтруем остальных не-игроков
       if (selectedCountry) {
@@ -5690,6 +6014,27 @@ export const getSmartPlayerSelection = (
       
       return true;
     });
+    
+    // Звезды и скауты показываем рандомно
+    // Каждая звезда/скаут случайно решает, показываться ей или нет (50% вероятность)
+    // Используем детерминированный рандом на основе seed для стабильности
+    const effectiveSeed = randomSeed !== undefined 
+      ? randomSeed 
+      : `${selectedCountry || 'all'}_${selectedYear || 'all'}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
+    // Для каждой звезды/скаута определяем случайно, показывать её или нет
+    // Используем хеш от playerId + seed для детерминированного, но случайного решения
+    const starsAndScoutsRandom = starsAndScouts.filter((player, index) => {
+      // Создаем уникальный seed для каждого игрока на основе его ID и общего seed
+      const playerSeed = `${player.id}_${effectiveSeed}_${index}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      // Используем синус для получения значения от -1 до 1, затем преобразуем в вероятность
+      const randomValue = Math.sin(playerSeed * 1.5) * 0.5 + 0.5; // От 0 до 1
+      // 50% вероятность показать звезду/скаута
+      return randomValue > 0.5;
+    });
+    
+    // Ограничиваем максимум 10 звезд/скаутов (на случай если случайно выбралось больше)
+    const limitedStarsAndScouts = starsAndScoutsRandom.slice(0, 10);
 
     // 2. Фильтруем игроков по стране и году
     const filteredPlayers = players.filter(player => {
@@ -5742,28 +6087,77 @@ export const getSmartPlayerSelection = (
     );
 
     // 7. Случайные игроки (до 10 человек)
+    // Используем детерминированный рандом на основе seed для стабильности между пересчетами
     const randomPlayers = remainingPlayers
-      .sort(() => Math.random() - 0.5) // Перемешиваем
+      .sort(() => {
+        // Детерминированный рандом на основе seed
+        const effectiveSeed = randomSeed !== undefined 
+          ? randomSeed 
+          : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        // Используем другую функцию для другого рандома, чтобы звезды и случайные игроки различались
+        return Math.cos(effectiveSeed * 1.5) * 10000 % 1 - 0.5;
+      })
       .slice(0, 10);
 
-    // 8. Объединяем всех отобранных игроков
+    // 8. Максимальное количество игроков для отображения (применяется к фильтру)
+    const MAX_PLAYERS = 30;
+
+    // 9. Определяем постоянных игроков с приоритетами (в порядке важности)
+    // Порядок важен: сначала самые важные, потом менее важные
+    const permanentPlayers: Player[] = [];
+    
+    // 9.1. Администраторы (всегда в первую очередь)
+    // admins уже объявлен выше, просто используем его
+    permanentPlayers.push(...admins);
+    
+    // 9.2. Текущий пользователь (если он игрок)
+    if (currentUser) {
+      permanentPlayers.push(currentUser);
+    }
+    
+    // 9.3. Новички (приоритетные игроки)
+    permanentPlayers.push(...newcomers);
+    
+    // 9.4. Топ игроки (по рейтингу)
+    permanentPlayers.push(...topPlayers);
+    
+    // 9.5. Остальные не-игроки (тренеры, магазины и т.д.)
+    // otherNonPlayers уже объявлен выше, просто используем его
+    permanentPlayers.push(...otherNonPlayers);
+    
+    // 9.6. Рандомные звезды и скауты (до 10 человек, выбираются случайно)
+    permanentPlayers.push(...limitedStarsAndScouts);
+
+    // 10. Если постоянных игроков больше максимума, обрезаем до максимума
+    // Приоритет: администраторы > текущий пользователь > новички > топ > остальные не-игроки
+    const permanentPlayersLimited = permanentPlayers.slice(0, MAX_PLAYERS);
+
+    // 11. Вычисляем сколько мест осталось для случайных игроков
+    const permanentCount = permanentPlayersLimited.length;
+    const remainingSlots = Math.max(0, MAX_PLAYERS - permanentCount);
+
+    // 12. Берем случайных игроков в пределах оставшихся мест
+    const randomPlayersLimited = randomPlayers.slice(0, remainingSlots);
+
+    // 13. Объединяем всех отобранных игроков
     const selectedPlayers = [
-      ...nonPlayers,
-      ...(currentUser ? [currentUser] : []),
-      ...newcomers,
-      ...topPlayers,
-      ...randomPlayers
+      ...permanentPlayersLimited,
+      ...randomPlayersLimited
     ];
 
-    // 9. Убираем дубликаты (на всякий случай)
+    // 14. Убираем дубликаты (на всякий случай)
     const uniquePlayers = selectedPlayers.filter((player, index, self) => 
       index === self.findIndex(p => p.id === player.id)
     );
+    
+    // 15. Финальное ограничение на 30 (на всякий случай, если после удаления дубликатов стало больше)
+    const finalPlayers = uniquePlayers.slice(0, MAX_PLAYERS);
 
-    console.log(`🎯 Умный отбор игроков: ${uniquePlayers.length} из ${players.length}`);
-    console.log(`📊 Разбивка: не-игроки: ${nonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayers.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
+    console.log(`🎯 Умный отбор игроков: ${finalPlayers.length} из ${players.length} (фильтр: ${selectedCountry || 'все страны'}, ${selectedYear || 'все годы'})`);
+    console.log(`📊 Разбивка: админы: ${admins.length}, звезды/скауты (рандом ${starsAndScouts.length > 0 ? `${limitedStarsAndScouts.length}/${starsAndScouts.length}` : '0'}, показывается случайно): ${limitedStarsAndScouts.length}, другие не-игроки: ${otherNonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayersLimited.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
+    console.log(`🔢 Лимит: ${MAX_PLAYERS} (постоянные: ${permanentCount}, доступно для случайных: ${remainingSlots}, итого: ${finalPlayers.length})`);
 
-    return uniquePlayers;
+    return finalPlayers;
 
   } catch (error) {
     console.error('❌ Ошибка умного отбора игроков:', error);

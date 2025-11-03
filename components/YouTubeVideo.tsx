@@ -17,21 +17,18 @@ const { width, height } = Dimensions.get('window');
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCode }) => {
   const { t } = useLanguage();
 
+  console.log('YouTubeVideo component:', { url, title, timeCode });
+
   // Функция для проверки YouTube ссылки
   const isYouTubeUrl = (url: string): boolean => {
     const cleanUrl = url.trim().toLowerCase();
     return cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
   };
 
-  // Универсальная функция для извлечения ID видео из YouTube URL
+  // Универсальная функция для извлечения ID видео и параметров из YouTube URL
   const getYouTubeVideoId = (url: string): string | null => {
-    // Простая и надежная функция для извлечения YouTube ID
-    // Поддерживает все форматы YouTube ссылок
-    
-    // Убираем лишние пробелы, но НЕ меняем регистр
     const cleanUrl = url.trim();
     
-    // Паттерны для извлечения ID (регистронезависимые)
     const patterns = [
       /youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i,
       /youtu\.be\/([a-zA-Z0-9_-]+)/i,
@@ -44,11 +41,17 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
     for (const pattern of patterns) {
       const match = cleanUrl.match(pattern);
       if (match && match[1]) {
-        return match[1]; // Возвращаем ID в оригинальном регистре
+        return match[1];
       }
     }
     
     return null;
+  };
+
+  // Извлекаем параметр si (session ID) из URL если есть
+  const getSessionId = (url: string): string | null => {
+    const siMatch = url.match(/[?&]si=([a-zA-Z0-9_-]+)/i);
+    return siMatch ? siMatch[1] : null;
   };
 
   // Функция для конвертации таймкода в секунды
@@ -62,95 +65,58 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
     return 0;
   };
 
-  // Функция для форматирования таймкода для YouTube
-  const formatTimeCodeForYouTube = (timeCode: string): string => {
-    const seconds = timeCodeToSeconds(timeCode);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m${remainingSeconds.toString().padStart(2, '0')}s`;
-  };
-
   const youtubeVideoId = getYouTubeVideoId(url);
+  const sessionId = getSessionId(url);
   const startSeconds = timeCode ? timeCodeToSeconds(timeCode) : 0;
+
+  console.log('YouTubeVideo parsed:', { 
+    youtubeVideoId, 
+    sessionId,
+    startSeconds, 
+    isYouTube: isYouTubeUrl(url) 
+  });
 
   // Проверяем, что это YouTube ссылка
   if (!isYouTubeUrl(url) || !youtubeVideoId) {
+    console.error('Invalid YouTube URL:', { url, isYouTube: isYouTubeUrl(url), videoId: youtubeVideoId });
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color="#FF4444" />
         <Text style={styles.errorText}>Неверная ссылка на YouTube</Text>
         <Text style={styles.errorSubtext}>Поддерживаются только YouTube ссылки</Text>
+        <Text style={styles.errorSubtext}>{url}</Text>
       </View>
     );
   }
 
-  const embedUrl = `https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&rel=0&modestbranding=1&start=${startSeconds}`;
+  // Создаем простой HTML с YouTube iframe - используем nocookie домен для лучшей совместимости
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeVideoId}?${startSeconds > 0 ? `start=${startSeconds}&` : ''}autoplay=0&rel=0&modestbranding=1`;
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+    .container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    iframe { width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <iframe 
+      src="${embedUrl}" 
+      frameborder="0"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+      allowfullscreen
+    ></iframe>
+  </div>
+</body>
+</html>`;
 
-  // Создаем HTML для встроенного YouTube плеера
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-          }
-          .video-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-          }
-          iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-          }
-        </style>
-        <script src="https://www.youtube.com/iframe_api"></script>
-      </head>
-      <body>
-        <div class="video-container">
-          <div id="player"></div>
-        </div>
-        <script>
-          var player;
-          var startTime = ${startSeconds};
-          
-          function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-              height: '100%',
-              width: '100%',
-              videoId: '${youtubeVideoId}',
-              playerVars: {
-                'autoplay': 1,
-                'rel': 0,
-                'modestbranding': 1,
-                'start': startTime
-              },
-              events: {
-                'onReady': onPlayerReady
-              }
-            });
-          }
-          
-          function onPlayerReady(event) {
-            if (startTime > 0) {
-              setTimeout(function() {
-                event.target.seekTo(startTime);
-              }, 2000);
-            }
-          }
-        </script>
-      </body>
-    </html>
-  `;
+  console.log('Embed URL:', embedUrl);
 
   return (
     <View style={styles.container}>
@@ -165,14 +131,19 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
       {/* Видео плеер */}
       <View style={styles.videoContainer}>
         <WebView
-          source={{ html: htmlContent }}
-          style={styles.webview}
+          style={styles.webView}
+          source={{ html }}
           allowsFullscreenVideo={true}
+          allowsInlineMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
           javaScriptEnabled={true}
           domStorageEnabled={true}
-          startInLoadingState={true}
-          scalesPageToFit={true}
+          mixedContentMode="always"
+          originWhitelist={['*']}
+          onError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            console.error('WebView error:', nativeEvent);
+          }}
         />
       </View>
     </View>
@@ -184,9 +155,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     borderRadius: 12,
     overflow: 'hidden',
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   header: {
     flexDirection: 'row',
@@ -208,10 +176,45 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 16 / 9,
     backgroundColor: '#000',
+    position: 'relative',
   },
-  webview: {
-    flex: 1,
+  thumbnail: {
+    width: '100%',
+    height: '100%',
     backgroundColor: '#000',
+  },
+  playButtonOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  playButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 68, 68, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  openText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    marginTop: 12,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   errorContainer: {
     padding: 20,
@@ -237,4 +240,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default YouTubeVideo; 
+export default YouTubeVideo;

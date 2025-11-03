@@ -9,6 +9,7 @@ interface PhotoAddedNotificationProps {
   playerId?: string;
   photosCount: number;
   timestamp: string;
+  playerAvatar?: string;
 }
 
 const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
@@ -49,10 +50,10 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {playerId ? (
           <CachedAvatar
             playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar} // Используем аватар из уведомления как fallback
             size={50}
             style={styles.playerAvatar}
           />

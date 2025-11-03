@@ -214,7 +214,7 @@
         "title": "Intervalllöpning",
         "description": "Växlar mellan snabb löpning (30 sekunder) och långsam löpning (30 sekunder) i 20 minuter. Utmärkt för att utveckla konditionsuthållighet för hockey.",
         "equipment": "Löpband eller stadion",
-        "calories": "250-350 kcal per träningspass",
+        "calories": "250-350 kcal",
         "benefits": [
           "Förbättrar kardiovaskulär uthållighet",
           "Utvecklar förmågan att snabbt återhämta sig",
@@ -239,7 +239,7 @@
         "title": "Burpee hoppa",
         "description": "Komplex övning: knäböj → planka → armhävning → knäböj → hopp. Utför 3 set med 10-15 reps.",
         "equipment": "Träningsmatta (tillval)",
-        "calories": "200-300 kcal per träningspass",
+        "calories": "200-300 kcal",
         "benefits": [
           "Utvecklar övergripande uthållighet",
           "Stärker musklerna i hela kroppen",
@@ -266,7 +266,7 @@
         "title": "Cykel",
         "description": "Intensiv cykling eller stationär cykling med högintensiva intervaller. 5 minuters uppvärmning, 20 minuters intervall.",
         "equipment": "Cykel eller motionscykel",
-        "calories": "300-400 kcal per träningspass",
+        "calories": "300-400 kcal",
         "benefits": [
           "Utvecklar konditionsuthållighet",
           "Stärker benmusklerna",
@@ -291,7 +291,7 @@
         "title": "Plyometriska hopp",
         "description": "Hoppar på plats så högt som möjligt, landar på böjda knän. 3 set med 15-20 hopp.",
         "equipment": "Träningsmatta (tillval)",
-        "calories": "150-200 kcal per träningspass",
+        "calories": "150-200 kcal",
         "benefits": [
           "Utvecklar explosiv benstyrka",
           "Förbättrar reaktion och hastighet",
@@ -317,7 +317,7 @@
         "title": "Kortdistansspurter",
         "description": "Spring i maxhastighet över en sträcka på 20-30 meter med 30 sekunders vila mellan löpningarna. 8-10 löpningar.",
         "equipment": "Öppen plats eller löparbana",
-        "calories": "200-250 kcal per träningspass",
+        "calories": "200-250 kcal",
         "benefits": [
           "Utvecklar maximal hastighet",
           "Förbättrar accelerationen",
@@ -343,7 +343,7 @@
         "title": "Att kasta en boll mot en vägg",
         "description": "Kasta en medicinboll mot en vägg med maximal kraft, fånga och kasta igen. 3 set med 20 kast.",
         "equipment": "Medicinboll 2-4 kg, vägg",
-        "calories": "120-180 kcal per träningspass",
+        "calories": "120-180 kcal",
         "benefits": [
           "Utvecklar explosiv armstyrka",
           "Förbättrar koordinationen",
@@ -369,7 +369,7 @@
         "title": "Dynamiska bensträckningar",
         "description": "Benet svänger framåt, bakåt och åt sidorna, med cirkulära rörelser i höftlederna. 10-15 repetitioner för varje ben.",
         "equipment": "En vägg eller stol för stöd",
-        "calories": "50-80 kcal per uppvärmning",
+        "calories": "50-80 kcal",
         "benefits": [
           "Värmer upp benmusklerna",
           "Förbättrar rörligheten i lederna",
@@ -395,7 +395,7 @@
         "title": "Uppvärmning av överkroppen",
         "description": "Armcirklar, bålböjningar och vridningar. Uppvärmning för axelleder och rygg.",
         "equipment": "Krävs inte",
-        "calories": "40-60 kcal per uppvärmning",
+        "calories": "40-60 kcal",
         "benefits": [
           "Värmer upp musklerna i överkroppen",
           "Förbättrar axelledens rörlighet",
@@ -421,7 +421,7 @@
         "title": "Lätt jogging på plats",
         "description": "Joggar på plats med höga knän, ökar gradvis takten. 5-7 minuter.",
         "equipment": "Krävs inte",
-        "calories": "60-80 kcal per uppvärmning",
+        "calories": "60-80 kcal",
         "benefits": [
           "Ökar hjärtfrekvensen",
           "Värmer upp benmusklerna",
@@ -447,7 +447,7 @@
         "title": "Statisk sträckning av benmusklerna",
         "description": "Håll stretchpositioner för quadriceps, vader och adduktorer. 30 sekunder per grupp.",
         "equipment": "Träningsmatta",
-        "calories": "80-100 kcal per sträcka",
+        "calories": "80-100 kcal",
         "benefits": [
           "Förbättrar benmusklernas flexibilitet",
           "Minskar muskelspänningar",
@@ -604,7 +604,7 @@
         "title": "Hopprep med intervaller",
         "description": "Växlar mellan snabba (30 sek) och långsamma (30 sek) hopp. 20 minuter för att utveckla konditionsuthållighet.",
         "equipment": "Hopprep",
-        "calories": "200-300 kcal per träningspass",
+        "calories": "200-300 kcal",
         "benefits": [
           "Utvecklar konditionsuthållighet",
           "Förbättrar koordinationen av rörelser",
@@ -629,7 +629,7 @@
         "title": "Springer uppför trappan",
         "description": "Spring upp för trappan så fort du kan och gå sedan ner. 10-15 repetitioner för att utveckla benuthålligheten.",
         "equipment": "Stege",
-        "calories": "250-350 kcal per träningspass",
+        "calories": "250-350 kcal",
         "benefits": [
           "Utvecklar benens uthållighet",
           "Stärker musklerna i lår och rumpa",
@@ -2289,9 +2289,9 @@
     "position": "Placera",
     "year": "År",
     "height": "Höjd",
-    "heightFrom": "Höjd från",
+    "heightFrom": "Höjd",
     "weight": "Vikt",
-    "weightFrom": "Vikt från",
+    "weightFrom": "Vikt",
     "all": "Alla",
     "noPlayersFound": "Inga spelare hittades",
     "left": "Vänster",

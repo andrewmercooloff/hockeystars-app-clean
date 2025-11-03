@@ -28,43 +28,65 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   onLoad,
 }) => {
   // Используем useAvatarCache который подписывается на изменения через Realtime
+  // ВАЖНО: Кеш имеет приоритет над fallbackAvatarUrl, даже если fallbackAvatarUrl изменился
   const cachedAvatarUrl = useAvatarCache(playerId, fallbackAvatarUrl);
   // Предполагаем что изображение уже загружено если есть URL в кеше
   const [imageLoaded, setImageLoaded] = React.useState(() => !!cachedAvatarUrl);
   const [imageError, setImageError] = React.useState(false);
   const [urlTimestamp, setUrlTimestamp] = React.useState(0);
   
-  // Отслеживаем изменения URL и добавляем timestamp только при изменении
-  React.useEffect(() => {
-    if (fallbackAvatarUrl) {
-      setUrlTimestamp(Date.now());
-      setImageLoaded(!!cachedAvatarUrl || !!fallbackAvatarUrl); // Устанавливаем loaded если есть URL
-    }
-  }, [fallbackAvatarUrl, cachedAvatarUrl]);
+  // Отслеживаем изменения URL и добавляем timestamp только при реальном изменении
+  const prevUrlRef = React.useRef<string | null>(null);
   
-  // Также отслеживаем изменения через Realtime (cachedAvatarUrl)
   React.useEffect(() => {
-    if (cachedAvatarUrl && cachedAvatarUrl !== fallbackAvatarUrl) {
-      setUrlTimestamp(Date.now());
-      setImageLoaded(true); // Изображение уже загружено через Realtime
+    // КРИТИЧНО: Используем только cachedAvatarUrl, fallbackAvatarUrl игнорируется если есть кеш
+    const currentUrl = cachedAvatarUrl || fallbackAvatarUrl;
+    
+    // Обновляем timestamp только если URL действительно изменился
+    // И только для локальных файлов - для HTTP URL используем кеш для мгновенного отображения
+    if (currentUrl && currentUrl !== prevUrlRef.current) {
+      prevUrlRef.current = currentUrl;
+      // Timestamp нужен только для локальных файлов для принудительного обновления
+      if (currentUrl.startsWith('file://') || currentUrl.startsWith('content://') || currentUrl.startsWith('data:')) {
+        setUrlTimestamp(Date.now());
+      } else {
+        // Для HTTP URL не используем timestamp - кеш expo-image обеспечит мгновенное отображение
+        setUrlTimestamp(0);
+      }
+      setImageLoaded(true);
+    } else if (currentUrl) {
+      setImageLoaded(true);
     }
   }, [cachedAvatarUrl, fallbackAvatarUrl]);
   
-  // Всегда используем cachedAvatarUrl (из Realtime) в первую очередь, затем fallbackAvatarUrl
-  // cachedAvatarUrl обновляется автоматически через Realtime подписку
+  // ВАЖНО: Всегда используем cachedAvatarUrl (из Realtime) в первую очередь
+  // cachedAvatarUrl обновляется автоматически через Realtime подписку и имеет приоритет
+  // НЕ используем fallbackAvatarUrl если cachedAvatarUrl существует, даже если fallbackAvatarUrl отличается
+  // Это предотвращает переключение между старым и новым аватаром при повторной загрузке данных
   const effectiveAvatarUrl = React.useMemo(() => {
-    // Предпочитаем cachedAvatarUrl (обновляется через Realtime) перед fallbackAvatarUrl
-    const url = cachedAvatarUrl || fallbackAvatarUrl;
-    if (!url) return url;
+    // КРИТИЧНО: Если cachedAvatarUrl существует - используем ТОЛЬКО его
+    // Игнорируем fallbackAvatarUrl полностью, чтобы избежать переключений
+    if (cachedAvatarUrl) {
+      // Для локальных файлов добавляем timestamp только если он был обновлен
+      if ((cachedAvatarUrl.startsWith('file://') || cachedAvatarUrl.startsWith('content://') || cachedAvatarUrl.startsWith('data:')) && urlTimestamp > 0) {
+        const separator = cachedAvatarUrl.includes('?') ? '&' : '?';
+        return `${cachedAvatarUrl}${separator}t=${urlTimestamp}`;
+      }
+      // Для HTTP/HTTPS URL НЕ добавляем версию - используем кеш для мгновенного отображения
+      return cachedAvatarUrl;
+    }
     
-    // НЕ добавляем timestamp для URL если это не локальный файл
-    // Это позволяет expo-image использовать кеш
-    // Timestamp добавляется только для локальных файлов (file://, content://)
-    if (url.startsWith('file://') || url.startsWith('content://') || url.startsWith('data:')) {
+    // Только если cachedAvatarUrl отсутствует - используем fallbackAvatarUrl
+    const url = fallbackAvatarUrl;
+    if (!url) return null;
+    
+    // Для локальных файлов добавляем timestamp только если он был обновлен
+    if ((url.startsWith('file://') || url.startsWith('content://') || url.startsWith('data:')) && urlTimestamp > 0) {
       const separator = url.includes('?') ? '&' : '?';
       return `${url}${separator}t=${urlTimestamp}`;
     }
     
+    // Для HTTP/HTTPS URL НЕ добавляем версию - используем кеш для мгновенного отображения
     return url;
   }, [cachedAvatarUrl, fallbackAvatarUrl, urlTimestamp]);
 
@@ -106,20 +128,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   return (
     <View style={[imageStyle, { backgroundColor: 'transparent' }]}>
       <Image
-        key={effectiveAvatarUrl} // Key изменяется при изменении URL для принудительного обновления
+        key={`${playerId}-${effectiveAvatarUrl}`} // Key изменяется при изменении URL для принудительного обновления
         source={{ 
-          uri: effectiveAvatarUrl,
-          headers: {
-            'Cache-Control': 'public, max-age=31536000' // Кеш на 1 год
-          }
+          uri: effectiveAvatarUrl
         }}
         style={imageStyle}
         contentFit="cover"
         onError={handleError}
         onLoad={handleLoad}
-        cachePolicy="memory-disk" // Используем memory-disk кеш
+        cachePolicy="memory-disk" // Используем memory-disk кеш для мгновенного отображения
         priority="high"
         transition={0} // Мгновенный переход без анимации
+        recyclingKey={playerId} // Используем playerId для правильного переиспользования компонента
       />
     </View>
   );

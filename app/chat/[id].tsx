@@ -110,6 +110,34 @@ export default function ChatScreen() {
               return [...prevMessages, newMessage];
             });
             
+            // Помечаем сообщение как прочитанное, так как чат открыт
+            // Это предотвратит обновление счетчика непрочитанных сообщений
+            if (newMessage.receiver_id === currentUser.id && !newMessage.read) {
+              setTimeout(async () => {
+                try {
+                  await supabase
+                    .from('messages')
+                    .update({ read: true })
+                    .eq('id', newMessage.id);
+                  
+                  // Обновляем счетчик, уменьшая его на 1, так как сообщение прочитано
+                  const { getUnreadMessageCount } = await import('../../utils/playerStorage');
+                  const newCount = await getUnreadMessageCount(currentUser.id);
+                  
+                  // Обновляем счетчик в базе данных
+                  await supabase
+                    .from('players')
+                    .update({ 
+                      unread_messages_count: Math.max(0, newCount),
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id);
+                } catch (error) {
+                  console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
+                }
+              }, 100);
+            }
+            
             // Прокручиваем вниз после получения нового сообщения
             setTimeout(() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
