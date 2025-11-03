@@ -50,7 +50,6 @@ import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import VideoCarousel from '../../components/VideoCarousel';
-import YouTubeVideo from '../../components/YouTubeVideo';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -136,7 +135,6 @@ export default function PlayerProfile() {
   }, [globalCurrentUser, router]);
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
-  const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -3388,7 +3386,6 @@ export default function PlayerProfile() {
                     return (
                   <VideoCarousel
                         videos={parsedVideos}
-                    onVideoPress={(video) => setSelectedVideo(video)}
                   />
                     );
                   })()
@@ -4279,33 +4276,6 @@ export default function PlayerProfile() {
         </View>
       </View>
       
-      {/* Модальное окно для видео */}
-      <Modal
-        visible={selectedVideo !== null}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setSelectedVideo(null)}
-      >
-        <View style={styles.videoModalOverlay}>
-          <View style={styles.videoModalContainer}>
-            <TouchableOpacity
-              style={styles.videoModalCloseButton}
-              onPress={() => setSelectedVideo(null)}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-            {selectedVideo && (
-              <YouTubeVideo 
-                url={selectedVideo.url}
-                title={t('myMoment')}
-                timeCode={selectedVideo.timeCode}
-                onClose={() => setSelectedVideo(null)}
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
-
       {/* Модальное окно для уведомлений */}
       <CustomAlert
         visible={alert.visible}
