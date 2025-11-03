@@ -16,6 +16,7 @@ interface StatsChangeNotificationProps {
   changes: StatChange[];
   playerName: string;
   playerId?: string;
+  playerAvatar?: string;
   timestamp: number;
 }
 

@@ -143,6 +143,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               changes={notification.data.changes}
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar}
               timestamp={notification.timestamp}
             />
           </TouchableOpacity>
