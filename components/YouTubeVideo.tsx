@@ -14,7 +14,6 @@ interface YouTubeVideoProps {
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCode }) => {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
-  const [isMuted, setIsMuted] = useState(true); // Начинаем с muted для автозапуска
   const playerRef = useRef<any>(null);
 
   console.log('YouTubeVideo component:', { url, title, timeCode });
@@ -104,80 +103,24 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
           height={300}
           videoId={youtubeVideoId}
           play={true}
-          mute={isMuted}
           initialPlayerParams={{
             start: startSeconds,
-            autoplay: 1,
-            mute: 1, // Начинаем с muted для обхода политики автозапуска
-            controls: 1,
-            rel: 0,
-            modestbranding: 1,
-            playsinline: 1,
-            iv_load_policy: 3,
-            cc_load_policy: 0,
-            fs: 1,
-            loop: 0,
+            modestbranding: true,
+            rel: false,
+            controls: true,
+            preventFullScreen: false,
           }}
           webViewProps={{
             allowsInlineMediaPlayback: true,
             mediaPlaybackRequiresUserAction: false,
           }}
           onReady={() => {
-            console.log('YouTube player ready, attempting auto-play');
+            console.log('YouTube player ready');
             setLoading(false);
-            // Несколько попыток запуска
-            const attemptPlay = (attempt: number) => {
-              if (attempt > 3) {
-                // После нескольких попыток включаем звук
-                setTimeout(() => {
-                  setIsMuted(false);
-                  try {
-                    if (playerRef.current) {
-                      playerRef.current.unMute();
-                    }
-                  } catch (e) {
-                    console.log('Cannot unmute via ref');
-                  }
-                }, 500);
-                return;
-              }
-              
-              setTimeout(() => {
-                try {
-                  if (playerRef.current) {
-                    playerRef.current.playVideo();
-                    console.log(`Auto-play attempt ${attempt}`);
-                  }
-                } catch (error) {
-                  console.log(`Ref playVideo attempt ${attempt} failed`);
-                }
-                if (attempt < 3) {
-                  attemptPlay(attempt + 1);
-                }
-              }, attempt === 1 ? 200 : attempt * 200);
-            };
-            attemptPlay(1);
           }}
           onError={(error) => {
             console.error('YouTube player error:', error);
             setLoading(false);
-          }}
-          onChangeState={(state) => {
-            console.log('YouTube player state:', state);
-            if (state === 'playing') {
-              setLoading(false);
-              // Включаем звук после начала воспроизведения
-              setTimeout(() => {
-                setIsMuted(false);
-                try {
-                  if (playerRef.current) {
-                    playerRef.current.unMute();
-                  }
-                } catch (e) {
-                  console.log('Cannot unmute');
-                }
-              }, 1000);
-            }
           }}
         />
       </View>
