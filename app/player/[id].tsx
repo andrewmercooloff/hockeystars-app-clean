@@ -3513,14 +3513,13 @@ export default function PlayerProfile() {
               (currentUser?.status === 'star') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
-                // 1. Есть подарки
+                // 1. Есть подарки (для всех друзей)
                 // 2. Это админ или звезда (для кнопки "Отправить подарок")
-                // 3. Это админ в режиме редактирования
-                // 4. Это друг (даже если нет подарков)
+                // 3. Это владелец профиля (даже если нет подарков - чтобы видеть пустой музей)
                 (museumItemsCount[player.id] && museumItemsCount[player.id] > 0) || 
                 (currentUser?.status === 'admin') ||
                 (currentUser?.status === 'star') ||
-                (friendshipStatus === 'friends') ? (
+                (currentUser?.id === player.id) ? (
                   <View style={styles.section} ref={museumRef}>
                   {/* Заголовок музея - показываем всегда */}
                     <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
