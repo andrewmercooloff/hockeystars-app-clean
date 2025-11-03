@@ -9,3 +9,6 @@ export const COUNTRIES = [
 export const GRIPS = ['Левый', 'Правый'];
 
 export const POSITIONS = ['Center', 'Winger', 'Defender', 'Goalie'];
+
+// YouTube API ключ для получения информации о видео
+export const YOUTUBE_API_KEY = '***REDACTED_YOUTUBE_API_KEY***';

@@ -13,8 +13,26 @@ import { Ionicons } from '@expo/vector-icons';
 import YouTubeVideo from './YouTubeVideo';
 import { useLanguage } from '../contexts/LanguageContext';
 
+// Функция для конвертации таймкода в секунды
+const timeCodeToSeconds = (timeCode: string): number => {
+  const parts = timeCode.split(':');
+  if (parts.length === 3) {
+    // Формат ЧЧ:ММ:СС
+    const hours = parseInt(parts[0]) || 0;
+    const minutes = parseInt(parts[1]) || 0;
+    const seconds = parseInt(parts[2]) || 0;
+    return hours * 3600 + minutes * 60 + seconds;
+  } else if (parts.length === 2) {
+    // Формат ММ:СС
+    const minutes = parseInt(parts[0]) || 0;
+    const seconds = parseInt(parts[1]) || 0;
+    return minutes * 60 + seconds;
+  }
+  return 0;
+};
+
 // Компонент для изображения с fallback
-const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
+const VideoThumbnail = ({ videoUrl, timeCode }: { videoUrl: string; timeCode?: string }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Функция для проверки YouTube ссылки
@@ -47,26 +65,39 @@ const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
   
   // Для YouTube видео
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
-    // Разные форматы превью в порядке приоритета
-    const thumbnailFormats = [
-      `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
-      `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
-      `https://img.youtube.com/vi/${youtubeVideoId}/mqdefault.jpg`,
-      `https://img.youtube.com/vi/${youtubeVideoId}/sddefault.jpg`,
-      `https://img.youtube.com/vi/${youtubeVideoId}/default.jpg`
-    ];
+    // Если есть таймкод, пытаемся получить кадр с нужного момента
+    // Используем YouTube Data API v3 для получения thumbnail с определенного времени
+    // Если timeCode есть, используем специальный формат
+    let thumbnailUrl: string;
     
-    const currentThumbnail = thumbnailFormats[currentImageIndex];
+    if (timeCode) {
+      const seconds = timeCodeToSeconds(timeCode);
+      // YouTube позволяет получить кадр используя параметр t в URL
+      // Формат: https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg?t=SECONDS
+      // Но более надежно использовать YouTube Data API v3
+      // Пока используем стандартный thumbnail, но можно улучшить с API ключом
+      thumbnailUrl = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`;
+    } else {
+      // Стандартные форматы превью
+      const thumbnailFormats = [
+        `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
+        `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+        `https://img.youtube.com/vi/${youtubeVideoId}/mqdefault.jpg`,
+        `https://img.youtube.com/vi/${youtubeVideoId}/sddefault.jpg`,
+        `https://img.youtube.com/vi/${youtubeVideoId}/default.jpg`
+      ];
+      thumbnailUrl = thumbnailFormats[currentImageIndex] || thumbnailFormats[0];
+    }
     
     const handleError = () => {
-      if (currentImageIndex < thumbnailFormats.length - 1) {
+      if (!timeCode && currentImageIndex < 4) {
         setCurrentImageIndex(currentImageIndex + 1);
       }
     };
     
     return (
       <Image
-        source={{ uri: currentThumbnail }}
+        source={{ uri: thumbnailUrl }}
         style={styles.thumbnail}
         resizeMode="cover"
         onError={handleError}
@@ -141,7 +172,7 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
             style={styles.videoCard}
             onPress={() => handleVideoPress(video)}
           >
-            <VideoThumbnail videoUrl={video.url} />
+            <VideoThumbnail videoUrl={video.url} timeCode={video.timeCode} />
             <View style={styles.playButton}>
               <Ionicons name="play-circle" size={40} color="#FF4444" />
             </View>
@@ -186,6 +217,7 @@ export default function VideoCarousel({ videos, onVideoPress }: VideoCarouselPro
             </TouchableOpacity>
             {selectedVideo && (
               <YouTubeVideo
+                key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
                 url={selectedVideo.url}
                 timeCode={selectedVideo.timeCode}
               />
@@ -272,11 +304,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
-    height: '60%',
+    width: '100%',
+    height: '100%',
     backgroundColor: '#000',
-    borderRadius: 12,
     position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   closeButton: {
     position: 'absolute',

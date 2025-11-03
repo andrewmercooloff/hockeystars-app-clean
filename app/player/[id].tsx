@@ -162,7 +162,7 @@ export default function PlayerProfile() {
   const [showGripPicker, setShowGripPicker] = useState(false);
   const [showBirthDatePicker, setShowBirthDatePicker] = useState(false);
   const [selectedBirthDate, setSelectedBirthDate] = useState(new Date());
-  const [videoFields, setVideoFields] = useState<Array<{url: string, timeCode: string}>>([{ url: '', timeCode: '' }]);
+  const [videoFields, setVideoFields] = useState<Array<{url: string, hours: string, minutes: string, seconds: string}>>([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -774,10 +774,10 @@ export default function PlayerProfile() {
         if (finalPlayerData?.favoriteGoals) {
           const goals = finalPlayerData.favoriteGoals.split('\n').filter(goal => goal.trim());
           const videoData = goals.map(goal => {
-            const { url, timeCode } = parseVideoUrl(goal);
-            return { url, timeCode: timeCode || '' };
+            const { url, hours, minutes, seconds } = parseVideoUrl(goal);
+            return { url, hours: hours || '0', minutes: minutes || '0', seconds: seconds || '0' };
           });
-          setVideoFields(videoData.length > 0 ? videoData : [{ url: '', timeCode: '' }]);
+          setVideoFields(videoData.length > 0 ? videoData : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
         }
         
         // Инициализируем достижения сразу
@@ -1210,17 +1210,36 @@ export default function PlayerProfile() {
   };
 
   // Функция для парсинга URL и таймкода
-  const parseVideoUrl = (input: string): { url: string; timeCode?: string } => {
+  const parseVideoUrl = (input: string): { url: string; timeCode?: string; hours?: string; minutes?: string; seconds?: string } => {
     if (!input || typeof input !== 'string') {
-      return { url: '', timeCode: undefined };
+      return { url: '', hours: '0', minutes: '0', seconds: '0' };
     }
     
-    // Регулярное выражение для извлечения таймкода
-    const timeMatch = input.match(/\(время:\s*(\d{1,2}:\d{2})\)/);
-    const timeCode = timeMatch ? timeMatch[1] : undefined;
+    // Регулярное выражение для извлечения таймкода (поддерживаем форматы ЧЧ:ММ:СС и ММ:СС)
+    const timeMatchHHMMSS = input.match(/\(время:\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\)/);
+    const timeMatchMMSS = input.match(/\(время:\s*(\d{1,2}):(\d{1,2})\)/);
     
-    // Удаляем таймкод из строки и очищаем пробелы
-    let urlWithoutTimeCode = input.replace(/\s*\(время:\s*\d{1,2}:\d{2}\)/, '').trim();
+    let hours = '0';
+    let minutes = '0';
+    let seconds = '0';
+    let timeCode: string | undefined;
+    
+    if (timeMatchHHMMSS) {
+      // Формат ЧЧ:ММ:СС
+      hours = timeMatchHHMMSS[1];
+      minutes = timeMatchHHMMSS[2];
+      seconds = timeMatchHHMMSS[3];
+      timeCode = `${hours}:${minutes}:${seconds}`;
+    } else if (timeMatchMMSS) {
+      // Формат ММ:СС (для обратной совместимости)
+      hours = '0';
+      minutes = timeMatchMMSS[1];
+      seconds = timeMatchMMSS[2];
+      timeCode = `${minutes}:${seconds}`;
+    }
+    
+    // Удаляем таймкод из строки и очищаем пробелы (обрабатываем оба формата)
+    let urlWithoutTimeCode = input.replace(/\s*\(время:\s*\d{1,2}:\d{1,2}:\d{1,2}\)/, '').replace(/\s*\(время:\s*\d{1,2}:\d{1,2}\)/, '').trim();
     
     // Убираем пробелы в начале и конце
     urlWithoutTimeCode = urlWithoutTimeCode.trim();
@@ -1244,12 +1263,61 @@ export default function PlayerProfile() {
     const isValidYouTubeUrl = youtubePatterns.some(pattern => pattern.test(urlWithoutTimeCode));
     
     if (isValidYouTubeUrl) {
-      return { url: urlWithoutTimeCode, timeCode };
+      // Конвертируем обычные YouTube URL в embed формат для автоматического запуска
+      let embedUrl = urlWithoutTimeCode;
+      
+      // Извлекаем ID видео из разных форматов
+      let videoId: string | null = null;
+      
+      // youtube.com/watch?v=...
+      const watchMatch = urlWithoutTimeCode.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i);
+      if (watchMatch && watchMatch[1]) {
+        videoId = watchMatch[1];
+      }
+      
+      // youtu.be/...
+      if (!videoId) {
+        const shortMatch = urlWithoutTimeCode.match(/youtu\.be\/([a-zA-Z0-9_-]+)/i);
+        if (shortMatch && shortMatch[1]) {
+          videoId = shortMatch[1];
+        }
+      }
+      
+      // m.youtube.com/watch?v=...
+      if (!videoId) {
+        const mobileMatch = urlWithoutTimeCode.match(/m\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i);
+        if (mobileMatch && mobileMatch[1]) {
+          videoId = mobileMatch[1];
+        }
+      }
+      
+      // youtube.com/shorts/...
+      if (!videoId) {
+        const shortsMatch = urlWithoutTimeCode.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+        if (shortsMatch && shortsMatch[1]) {
+          videoId = shortsMatch[1];
+        }
+      }
+      
+      // youtube.com/live/...
+      if (!videoId) {
+        const liveMatch = urlWithoutTimeCode.match(/youtube\.com\/live\/([a-zA-Z0-9_-]+)/i);
+        if (liveMatch && liveMatch[1]) {
+          videoId = liveMatch[1];
+        }
+      }
+      
+      // Если нашли ID и URL еще не в embed формате, конвертируем
+      if (videoId && !urlWithoutTimeCode.includes('/embed/')) {
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      }
+      
+      return { url: embedUrl, timeCode, hours, minutes, seconds };
     }
     
     console.warn('Неверный формат YouTube URL:', urlWithoutTimeCode);
     // Если ссылка не соответствует YouTube, возвращаем пустую строку
-    return { url: '', timeCode: undefined };
+    return { url: '', hours: '0', minutes: '0', seconds: '0' };
   };
 
   const openVideoLink = (url: string) => {
@@ -1291,8 +1359,18 @@ export default function PlayerProfile() {
       const goalsText = videoFields
         .filter(video => video.url.trim())
         .map(video => {
-          const timeCodePart = video.timeCode.trim() ? ` (время: ${video.timeCode})` : '';
-          return video.url + timeCodePart;
+          // Конвертируем URL в embed формат перед сохранением
+          const parsed = parseVideoUrl(video.url);
+          const embedUrl = parsed.url || video.url;
+          
+          const hours = parseInt(video.hours || '0');
+          const minutes = parseInt(video.minutes || '0');
+          const seconds = parseInt(video.seconds || '0');
+          // Формируем таймкод в формате ЧЧ:ММ:СС с ведущими нулями, но если все поля 0, то не добавляем таймкод
+          const timeCode = (hours > 0 || minutes > 0 || seconds > 0) 
+            ? ` (время: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')})` 
+            : '';
+          return embedUrl + timeCode;
         })
         .join('\n');
       
@@ -3226,55 +3304,64 @@ export default function PlayerProfile() {
                             placeholder={t('videoUrlPlaceholder')}
                             placeholderTextColor="#888"
                           />
-                          <TextInput
-                            style={styles.timeCodeInput}
-                            value={video.timeCode}
-                            onChangeText={(text) => {
-                              // Валидация формата времени (минуты:секунды)
-                              const timeRegex = /^(\d{0,2}):?(\d{0,2})$/;
-                              const match = text.match(timeRegex);
-                              
-                              if (match) {
-                                let formattedText = text;
-                                // Автоматически добавляем двоеточие если его нет и есть цифры
-                                if (!text.includes(':') && text.length > 0) {
-                                  if (text.length <= 2) {
-                                    formattedText = text;
-                                  } else {
-                                    formattedText = text.slice(0, 2) + ':' + text.slice(2);
-                                  }
-                                }
-                                
-                                // Ограничиваем минуты до 59, секунды до 59
-                                const parts = formattedText.split(':');
-                                if (parts.length === 2) {
-                                  const minutes = parseInt(parts[0]) || 0;
-                                  const seconds = parseInt(parts[1]) || 0;
-                                  if (minutes > 59) formattedText = '59:' + parts[1];
-                                  if (seconds > 59) formattedText = parts[0] + ':59';
-                                }
-                                
+                          <View style={styles.timeInputContainer}>
+                            <TextInput
+                              style={styles.timeInputField}
+                              value={video.hours}
+                              onChangeText={(text) => {
+                                // Разрешаем только цифры и ограничиваем до 99
+                                const numericText = text.replace(/[^0-9]/g, '');
+                                const value = numericText === '' ? '0' : Math.min(99, parseInt(numericText)).toString();
                                 const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], timeCode: formattedText };
+                                newVideoFields[index] = { ...newVideoFields[index], hours: value };
                                 setVideoFields(newVideoFields);
-                              } else if (text === '' || text === ':') {
-                                // Разрешаем пустую строку и двоеточие
+                              }}
+                              placeholder="0"
+                              placeholderTextColor="#888"
+                              keyboardType="numeric"
+                              maxLength={2}
+                            />
+                            <Text style={styles.timeSeparator}>:</Text>
+                            <TextInput
+                              style={styles.timeInputField}
+                              value={video.minutes}
+                              onChangeText={(text) => {
+                                // Разрешаем только цифры и ограничиваем до 59
+                                const numericText = text.replace(/[^0-9]/g, '');
+                                const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
                                 const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], timeCode: text };
+                                newVideoFields[index] = { ...newVideoFields[index], minutes: value };
                                 setVideoFields(newVideoFields);
-                              }
-                            }}
-                            placeholder={t('timeCodePlaceholder')}
-                            placeholderTextColor="#888"
-                            keyboardType="default"
-                            maxLength={5}
-                          />
+                              }}
+                              placeholder="0"
+                              placeholderTextColor="#888"
+                              keyboardType="numeric"
+                              maxLength={2}
+                            />
+                            <Text style={styles.timeSeparator}>:</Text>
+                            <TextInput
+                              style={styles.timeInputField}
+                              value={video.seconds}
+                              onChangeText={(text) => {
+                                // Разрешаем только цифры и ограничиваем до 59
+                                const numericText = text.replace(/[^0-9]/g, '');
+                                const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
+                                const newVideoFields = [...videoFields];
+                                newVideoFields[index] = { ...newVideoFields[index], seconds: value };
+                                setVideoFields(newVideoFields);
+                              }}
+                              placeholder="0"
+                              placeholderTextColor="#888"
+                              keyboardType="numeric"
+                              maxLength={2}
+                            />
+                          </View>
                           {videoFields.length > 1 && (
                             <TouchableOpacity
                               style={styles.removeVideoButton}
                               onPress={() => {
                                 const newVideoFields = videoFields.filter((_, i) => i !== index);
-                                setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', timeCode: '' }]);
+                                setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
                               }}
                             >
                               <Ionicons name="close-circle" size={20} color="#fa2f40" />
@@ -3285,7 +3372,7 @@ export default function PlayerProfile() {
                       <TouchableOpacity
                         style={styles.addMoreButton}
                         onPress={() => {
-                          setVideoFields([...videoFields, { url: '', timeCode: '' }]);
+                          setVideoFields([...videoFields, { url: '', hours: '0', minutes: '0', seconds: '0' }]);
                         }}
                       >
                         <Ionicons name="add-circle" size={24} color="#fff" />
@@ -3629,16 +3716,6 @@ export default function PlayerProfile() {
                       <Text style={styles.friendName} numberOfLines={2}>
                         {friend.name?.toUpperCase()}
                       </Text>
-                      {friend.team && (
-                        <Text style={styles.friendTeam} numberOfLines={1}>
-                          {(() => {
-                            const team = friend.team;
-                            if (team === 'Minsk Region Team') return t('teams.Сборная Минской области');
-                            if (team === 'Piranhas') return t('teams.Пираньи');
-                            return t(`teams.${team}`, { defaultValue: team });
-                          })()}
-                        </Text>
-                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -4882,12 +4959,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 2,
   },
-  friendTeam: {
-    fontSize: 10,
-    fontFamily: 'Gilroy-Regular',
-    color: '#fff',
-    textAlign: 'center',
-  },
   friendsContainer: {
     alignItems: 'center',
     padding: 20,
@@ -5147,6 +5218,37 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  timeInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  timeInputField: {
+    width: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    minHeight: 40,
+    textAlign: 'center',
+    shadowColor: 'rgb(1,0,0)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  timeSeparator: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    fontWeight: 'bold',
   },
   removeVideoButton: {
     padding: 4,

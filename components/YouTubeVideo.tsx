@@ -1,6 +1,5 @@
-import SafeIcon from './SafeIcon';
-import React, { useState } from 'react';
-import { Dimensions, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -12,11 +11,11 @@ interface YouTubeVideoProps {
   timeCode?: string; // Формат: "1:25" или "01:25"
 }
 
-const { width, height } = Dimensions.get('window');
-
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCode }) => {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(true); // Начинаем с muted для автозапуска
+  const playerRef = useRef<any>(null);
 
   console.log('YouTubeVideo component:', { url, title, timeCode });
 
@@ -49,16 +48,17 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
     return null;
   };
 
-  // Извлекаем параметр si (session ID) из URL если есть
-  const getSessionId = (url: string): string | null => {
-    const siMatch = url.match(/[?&]si=([a-zA-Z0-9_-]+)/i);
-    return siMatch ? siMatch[1] : null;
-  };
-
-  // Функция для конвертации таймкода в секунды
+  // Функция для конвертации таймкода в секунды (поддерживает форматы ЧЧ:ММ:СС и ММ:СС)
   const timeCodeToSeconds = (timeCode: string): number => {
     const parts = timeCode.split(':');
-    if (parts.length === 2) {
+    if (parts.length === 3) {
+      // Формат ЧЧ:ММ:СС
+      const hours = parseInt(parts[0]) || 0;
+      const minutes = parseInt(parts[1]) || 0;
+      const seconds = parseInt(parts[2]) || 0;
+      return hours * 3600 + minutes * 60 + seconds;
+    } else if (parts.length === 2) {
+      // Формат ММ:СС (для обратной совместимости)
       const minutes = parseInt(parts[0]) || 0;
       const seconds = parseInt(parts[1]) || 0;
       return minutes * 60 + seconds;
@@ -67,12 +67,10 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   };
 
   const youtubeVideoId = getYouTubeVideoId(url);
-  const sessionId = getSessionId(url);
   const startSeconds = timeCode ? timeCodeToSeconds(timeCode) : 0;
 
   console.log('YouTubeVideo parsed:', { 
     youtubeVideoId, 
-    sessionId,
     startSeconds, 
     isYouTube: isYouTubeUrl(url) 
   });
@@ -102,23 +100,84 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
           </View>
         )}
         <YoutubePlayer
+          ref={playerRef}
           height={300}
           videoId={youtubeVideoId}
-          play={false}
+          play={true}
+          mute={isMuted}
           initialPlayerParams={{
             start: startSeconds,
-            modestbranding: true,
-            rel: false,
-            showClosedCaptions: false,
-            preventFullScreen: false,
+            autoplay: 1,
+            mute: 1, // Начинаем с muted для обхода политики автозапуска
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            iv_load_policy: 3,
+            cc_load_policy: 0,
+            fs: 1,
+            loop: 0,
+          }}
+          webViewProps={{
+            allowsInlineMediaPlayback: true,
+            mediaPlaybackRequiresUserAction: false,
           }}
           onReady={() => {
-            console.log('YouTube player ready');
+            console.log('YouTube player ready, attempting auto-play');
             setLoading(false);
+            // Несколько попыток запуска
+            const attemptPlay = (attempt: number) => {
+              if (attempt > 3) {
+                // После нескольких попыток включаем звук
+                setTimeout(() => {
+                  setIsMuted(false);
+                  try {
+                    if (playerRef.current) {
+                      playerRef.current.unMute();
+                    }
+                  } catch (e) {
+                    console.log('Cannot unmute via ref');
+                  }
+                }, 500);
+                return;
+              }
+              
+              setTimeout(() => {
+                try {
+                  if (playerRef.current) {
+                    playerRef.current.playVideo();
+                    console.log(`Auto-play attempt ${attempt}`);
+                  }
+                } catch (error) {
+                  console.log(`Ref playVideo attempt ${attempt} failed`);
+                }
+                if (attempt < 3) {
+                  attemptPlay(attempt + 1);
+                }
+              }, attempt === 1 ? 200 : attempt * 200);
+            };
+            attemptPlay(1);
           }}
           onError={(error) => {
             console.error('YouTube player error:', error);
             setLoading(false);
+          }}
+          onChangeState={(state) => {
+            console.log('YouTube player state:', state);
+            if (state === 'playing') {
+              setLoading(false);
+              // Включаем звук после начала воспроизведения
+              setTimeout(() => {
+                setIsMuted(false);
+                try {
+                  if (playerRef.current) {
+                    playerRef.current.unMute();
+                  }
+                } catch (e) {
+                  console.log('Cannot unmute');
+                }
+              }, 1000);
+            }
           }}
         />
       </View>
