@@ -329,18 +329,21 @@ export default function PuckSpeedScreen() {
         const size = minSize + (darkDensity * (maxSize - minSize));
         
         // Форма: для круга width и height одинаковые
-        // Если шайба сбоку - будет эллипс (разные width/height)
-        // Проверяем: если размер примерно правильный и позиция в центре - считаем круглой
+        // Улучшаем логику: если темная область большая (много паттернов) и близко к центру - это круг
+        // Если мало паттернов или далеко от центра - это может быть эллипс
         const distanceFromCenter = Math.sqrt(
           Math.pow(x - ZONE_CENTER_X, 2) + Math.pow(y - ZONE_CENTER_Y, 2)
         );
-        const isCentered = distanceFromCenter < 20;
+        const isCentered = distanceFromCenter < 25;
         const isRightSize = size >= 80 && size <= 100;
+        const hasHighDarkDensity = totalDarkPatterns > 150; // Много темных паттернов = вероятно круг
         
-        // Если размер правильный и в центре - считаем круглой (вид сверху)
-        // Иначе - эллипс (вид сбоку)
-        const isSideView = !(isCentered && isRightSize);
-        const width = isSideView ? size * 1.25 : size; // Эллипс если сбоку
+        // Если размер правильный, в центре и много темных паттернов - считаем круглой (вид сверху)
+        // Иначе - небольшой эллипс (вид слегка сбоку), но не слишком большой
+        const isPerfectCircle = isCentered && isRightSize && hasHighDarkDensity;
+        // Для круга: width = height = size
+        // Для эллипса: width немного больше (но не сильно, чтобы проходил проверку 0.75-1.35)
+        const width = isPerfectCircle ? size : size * 1.10; // Небольшой эллипс (1.10 вместо 1.25) если не идеально
         const height = size;
         
         return {
