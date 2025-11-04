@@ -250,29 +250,55 @@ export default function PuckSpeedScreen() {
       } catch (encodingError) {
         console.warn('⚠️ Ошибка с EncodingType, пробуем альтернативный способ:', encodingError);
         // Альтернативный способ: используем fetch и конвертируем в base64
-        const response = await fetch(processed.uri);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        base64 = await new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-            const result = reader.result as string;
-            // Убираем префикс data:image/jpeg;base64,
-            const base64Data = result.split(',')[1] || result;
-            resolve(base64Data);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
+        try {
+          const response = await fetch(processed.uri);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const blob = await response.blob();
+          
+          // Проверяем, доступен ли FileReader (может быть недоступен в React Native)
+          if (typeof FileReader !== 'undefined') {
+            const reader = new FileReader();
+            base64 = await new Promise((resolve, reject) => {
+              reader.onloadend = () => {
+                const result = reader.result as string;
+                // Убираем префикс data:image/jpeg;base64,
+                const base64Data = result.split(',')[1] || result;
+                resolve(base64Data);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          } else {
+            // Если FileReader недоступен, используем упрощенный подход
+            // Для React Native можем использовать другой способ
+            throw new Error('FileReader недоступен в этой среде');
+          }
+        } catch (fetchError) {
+          console.error('❌ Ошибка альтернативного чтения:', fetchError);
+          // В крайнем случае возвращаем пустую строку или минимальный base64
+          // Это позволит системе продолжить работу, хотя и не найдет шайбу
+          base64 = '';
+        }
       }
       
       console.log('✅ Base64 получен, длина:', base64.length);
       
       // 3. Упрощенный анализ: проверяем наличие темных областей
       // Шайба черная, поэтому в Base64 будет много темных паттернов
-      const darkPatterns = (base64.match(/[A-F0-9]{6,}/g) || []).length;
-      const hasSignificantDarkArea = darkPatterns > base64.length / 50;
+      // Используем более чувствительный алгоритм:
+      // - Ищем паттерны с меньшими символами (4+ вместо 6+)
+      // - Снижаем порог (base64.length / 100 вместо /50)
+      const darkPatterns4 = (base64.match(/[A-F0-9]{4,}/g) || []).length;
+      const darkPatterns6 = (base64.match(/[A-F0-9]{6,}/g) || []).length;
       
-      console.log(`📊 Анализ: темных паттернов=${darkPatterns}, порог=${Math.floor(base64.length / 50)}, есть темная область=${hasSignificantDarkArea}`);
+      // Порог: более чувствительный (1/100 длины строки)
+      const threshold = Math.floor(base64.length / 100);
+      // Проверяем оба типа паттернов
+      const hasSignificantDarkArea = darkPatterns4 > threshold || darkPatterns6 > threshold / 2;
+      
+      console.log(`📊 Анализ: паттернов4=${darkPatterns4}, паттернов6=${darkPatterns6}, порог=${threshold}, есть темная область=${hasSignificantDarkArea}`);
       
       if (hasSignificantDarkArea) {
         console.log('✅ Темная область обнаружена!');
