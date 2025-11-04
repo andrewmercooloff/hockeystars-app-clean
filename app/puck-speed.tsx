@@ -605,15 +605,13 @@ export default function PuckSpeedScreen() {
                   </Text>
                 </View>
               ) : isCalibrated ? (
-                <View style={{ backgroundColor: 'rgba(76, 175, 80, 0.95)', paddingVertical: 20, paddingHorizontal: 20, borderRadius: 16 }}>
-                  <Text style={[styles.cameraInstructionText, { fontSize: 18 }]}>
-                    {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
-                  </Text>
-                </View>
+                <Text style={[styles.cameraInstructionText, { fontSize: 18 }]}>
+                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
+                </Text>
               ) : (
                 <View>
                   <Text style={[styles.cameraInstructionText, { fontSize: 19, marginBottom: 12, fontFamily: 'Gilroy-Bold' }]}>
-                    {t('puckSpeed.step1Side') || '1. Совместите шайбу с эллипсом'}
+                    {t('puckSpeed.step1Side') || 'Совместите шайбу с эллипсом'}
                   </Text>
                   <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.9, lineHeight: 20 }]}>
                     {t('puckSpeed.step1SideDetails') || '• Вид СБОКУ (эллипс)\n• Телефон горизонтально\n• Расстояние ~1 метр'}
@@ -791,7 +789,7 @@ const styles = StyleSheet.create({
     top: Platform.OS === 'ios' ? 100 : 80,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(250, 47, 64, 0.95)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 16,
@@ -801,8 +799,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 2,
+    borderColor: 'rgba(250, 47, 64, 0.8)',
   },
   cameraInstructionText: {
     fontSize: 16,
