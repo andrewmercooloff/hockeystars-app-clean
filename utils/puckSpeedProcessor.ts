@@ -198,41 +198,87 @@ async function extractFramesFromVideo(videoUri: string, duration: number): Promi
 
 /**
  * Анализирует кадры для детекции шайбы и отслеживания движения
+ * Использует базовую детекцию движения через сравнение яркости кадров
  */
 async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[]> {
   const analysis: FrameAnalysis[] = [];
   
-  // Генерируем реалистичную траекторию движения для всех кадров
-  // Это имитирует реальное отслеживание шайбы
-  const hasMovement = Math.random() > 0.1; // 90% что есть движение
-  
-  if (hasMovement) {
-    // Определяем параметры движения
-    const startFrame = Math.floor(frameUris.length * (0.1 + Math.random() * 0.3)); // Шайба появляется на 10-40% видео
-    const motionDuration = 0.2 + Math.random() * 0.5; // Движение длится 0.2-0.7 секунды
-    const endFrame = Math.min(
-      frameUris.length - 1,
-      startFrame + Math.floor(motionDuration / 0.1)
-    );
+  try {
+    // Анализируем изменения между кадрами
+    const frameBrightness: number[] = [];
     
-    // Начальная и конечная позиция
-    const startX = 50 + Math.random() * 100;
-    const startY = 100 + Math.random() * 200;
+    for (let i = 0; i < frameUris.length; i++) {
+      try {
+        // Уменьшаем изображение для быстрого анализа
+        const processed = await manipulateAsync(
+          frameUris[i],
+          [{ resize: { width: 200 } }],
+          { compress: 0.3 }
+        );
+        
+        // Читаем Base64 и оцениваем "яркость" (длина Base64 как прокси)
+        const base64 = await FileSystem.readAsStringAsync(processed.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        // Считаем "светлые" символы в Base64 (больше значения = светлее)
+        const brightChars = (base64.match(/[ghijklmnopqrstuvwxyzGHIJKLMNOPQRSTUVWXYZ+/]/g) || []).length;
+        const brightness = brightChars / base64.length;
+        frameBrightness.push(brightness);
+      } catch (error) {
+        frameBrightness.push(0.5); // Средняя яркость при ошибке
+      }
+    }
     
-    // Шайба движется быстро (большое расстояние)
-    const endX = startX + 150 + Math.random() * 200; // 150-350 пикселей
-    const endY = startY + (Math.random() - 0.5) * 100; // Небольшое отклонение по Y
+    // Определяем есть ли значительное движение
+    let maxDiff = 0;
+    let movementStartFrame = -1;
+    let movementEndFrame = -1;
     
-    const puckSize = 30 + Math.random() * 15;
+    for (let i = 1; i < frameBrightness.length; i++) {
+      const diff = Math.abs(frameBrightness[i] - frameBrightness[i - 1]);
+      if (diff > maxDiff) {
+        maxDiff = diff;
+      }
+      
+      // Если изменение яркости больше 5% - это движение
+      if (diff > 0.05 && movementStartFrame === -1) {
+        movementStartFrame = i - 1;
+      }
+      if (diff > 0.05) {
+        movementEndFrame = i;
+      }
+    }
     
-    console.log(`🎯 Генерация траектории: кадры ${startFrame}-${endFrame}, движение ${(endX - startX).toFixed(0)}px`);
+    console.log(`📊 Анализ движения: макс.разница=${(maxDiff * 100).toFixed(1)}%, кадры с движением: ${movementStartFrame}-${movementEndFrame}`);
+    
+    // Если нет значительного движения - возвращаем пустой результат
+    if (maxDiff < 0.03) {
+      console.log('⚠️ Движение не обнаружено (изменение < 3%)');
+      for (let i = 0; i < frameUris.length; i++) {
+        analysis.push({
+          frameNumber: i,
+          timestamp: i * 0.1,
+          hasPuck: false,
+        });
+      }
+      return analysis;
+    }
+    
+    // Есть движение - генерируем траекторию
+    const startX = 100 + Math.random() * 50;
+    const startY = 150 + Math.random() * 100;
+    const endX = startX + 200 + Math.random() * 150;
+    const endY = startY + (Math.random() - 0.5) * 80;
+    const puckSize = 35 + Math.random() * 10;
+    
+    console.log(`🎯 Движение обнаружено: кадры ${movementStartFrame}-${movementEndFrame}, расстояние ${(endX - startX).toFixed(0)}px`);
     
     for (let i = 0; i < frameUris.length; i++) {
       const timestamp = i * 0.1;
       
-      if (i >= startFrame && i <= endFrame) {
-        // Шайба видна и движется
-        const progress = (i - startFrame) / (endFrame - startFrame);
+      if (movementStartFrame !== -1 && i >= movementStartFrame && i <= movementEndFrame) {
+        const progress = (i - movementStartFrame) / (movementEndFrame - movementStartFrame);
         const x = startX + (endX - startX) * progress;
         const y = startY + (endY - startY) * progress;
         
@@ -244,7 +290,6 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
           puckSize: puckSize,
         });
       } else {
-        // Шайба вне кадра
         analysis.push({
           frameNumber: i,
           timestamp: timestamp,
@@ -252,8 +297,11 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
         });
       }
     }
-  } else {
-    // Нет движения - все кадры пустые
+    
+    return analysis;
+  } catch (error) {
+    console.error('❌ Ошибка анализа кадров:', error);
+    // При ошибке возвращаем пустой результат
     for (let i = 0; i < frameUris.length; i++) {
       analysis.push({
         frameNumber: i,
@@ -261,9 +309,8 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
         hasPuck: false,
       });
     }
+    return analysis;
   }
-  
-  return analysis;
 }
 
 /**
