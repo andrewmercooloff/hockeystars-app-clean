@@ -585,13 +585,14 @@ export default function PuckSpeedScreen() {
           {/* Затемненный overlay с "дыркой" для шайбы */}
           <View style={styles.cameraOverlay} pointerEvents="box-none">
             {/* Заголовок */}
-            <View style={styles.cameraHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
-                <Ionicons name="close" size={32} color="#fff" />
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
-              <Text style={styles.cameraTitle}>
+              <Text style={styles.pageTitle}>
                 {t('puckSpeed.title') || 'Измерение скорости шайбы'}
               </Text>
+              <View style={styles.backButton} />
             </View>
 
             {/* Инструкция и обратный отсчет */}
@@ -604,15 +605,17 @@ export default function PuckSpeedScreen() {
                   </Text>
                 </View>
               ) : isCalibrated ? (
-                <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
-                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
-                </Text>
+                <View style={{ backgroundColor: 'rgba(76, 175, 80, 0.95)', paddingVertical: 20, paddingHorizontal: 20, borderRadius: 16 }}>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 18 }]}>
+                    {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
+                  </Text>
+                </View>
               ) : (
                 <View>
-                  <Text style={[styles.cameraInstructionText, { fontSize: 18, marginBottom: 8 }]}>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 19, marginBottom: 12, fontFamily: 'Gilroy-Bold' }]}>
                     {t('puckSpeed.step1Side') || '1. Совместите шайбу с эллипсом'}
                   </Text>
-                  <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.8 }]}>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.9, lineHeight: 20 }]}>
                     {t('puckSpeed.step1SideDetails') || '• Вид СБОКУ (эллипс)\n• Телефон горизонтально\n• Расстояние ~1 метр'}
                   </Text>
                 </View>
@@ -633,12 +636,10 @@ export default function PuckSpeedScreen() {
                 isCalibrated && styles.puckZonePerfect,
               ]}
             >
-              {/* Reference изображение шайбы (черный круг с белой окантовкой) */}
+              {/* Reference изображение шайбы - эллипс (вид сбоку) */}
               {!isCalibrated && !countdown && (
                 <View style={styles.puckReferenceSide}>
-                  {/* Эллипс - вид шайбы сбоку */}
                   <View style={styles.puckEllipse} />
-                  <Text style={styles.puckReferenceText}>PUCK (вид сбоку)</Text>
                 </View>
               )}
               
@@ -657,7 +658,7 @@ export default function PuckSpeedScreen() {
                     style={styles.calibrateButton}
                     onPress={handleManualCalibration}
                   >
-                    <Ionicons name="checkmark-circle" size={32} color="#fff" />
+                    <Ionicons name="checkmark-circle" size={28} color="#fff" />
                     <Text style={styles.calibrateButtonText}>
                       {t('puckSpeed.confirmPuck') || 'Подтвердить'}
                     </Text>
@@ -785,39 +786,30 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Затемнение
   },
-  cameraHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
-    paddingBottom: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  cameraTitle: {
-    flex: 1,
-    fontSize: 20,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
-    marginLeft: 10,
-  },
   cameraInstruction: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 140 : 100,
+    top: Platform.OS === 'ios' ? 100 : 80,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    padding: 15,
-    borderRadius: 12,
+    backgroundColor: 'rgba(250, 47, 64, 0.95)',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 16,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   cameraInstructionText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
+    color: '#fff',
     textAlign: 'center',
+    lineHeight: 22,
   },
   puckZone: {
     position: 'absolute',
@@ -890,28 +882,30 @@ const styles = StyleSheet.create({
   },
   calibrateButtonContainer: {
     position: 'absolute',
-    bottom: -60,
+    bottom: -70,
     alignSelf: 'center',
+    width: 200,
   },
   calibrateButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fa2f40',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    minWidth: 200,
   },
   calibrateButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    marginLeft: 8,
+    marginLeft: 10,
   },
   cameraControls: {
     position: 'absolute',
