@@ -70,10 +70,10 @@ export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
     
     // Шаг 6: Калибруем расстояние (переводим пиксели в метры)
     // Используем известное расстояние калибровки и размер шайбы
-    // При калибровке: шайба на расстоянии CALIBRATION_DISTANCE_CM занимает PUCK_DIAMETER_PIXELS_AT_CALIBRATION пикселей
-    // Значит 1 метр реального расстояния = (PUCK_DIAMETER_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM пикселей
+    // При калибровке: шайба на расстоянии CALIBRATION_DISTANCE_CM занимает PUCK_WIDTH_PIXELS_AT_CALIBRATION пикселей (вид сбоку)
+    // Значит 1 метр реального расстояния = (PUCK_WIDTH_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM пикселей
     
-    const pixelsPerMeter = (PUCK_DIAMETER_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM;
+    const pixelsPerMeter = (PUCK_WIDTH_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM;
     const distanceMeters = distancePixels / pixelsPerMeter;
     
     console.log(`📏 Калибровка: ${pixelsPerMeter.toFixed(2)} пикселей = 1 метр (при расстоянии ${CALIBRATION_DISTANCE_CM}см)`);
