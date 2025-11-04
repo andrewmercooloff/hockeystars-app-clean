@@ -5,7 +5,12 @@ import { manipulateAsync } from 'expo-image-manipulator';
 
 // Эталонный размер шайбы в см (стандартная хоккейная шайба)
 const PUCK_DIAMETER_CM = 7.62; // 3 дюйма
-const PUCK_DIAMETER_PIXELS = 100; // Примерный размер в зоне калибровки
+
+// КАЛИБРОВКА: Измерьте точное расстояние от телефона до шайбы
+// когда шайба точно совпадает с кругом на экране
+// См. файл PUCK_SPEED_CALIBRATION.md для инструкций
+const CALIBRATION_DISTANCE_CM = 100; // Расстояние от камеры до шайбы в см (НАСТРОЙТЕ!)
+const PUCK_DIAMETER_PIXELS_AT_CALIBRATION = 90; // Размер шайбы в пикселях на экране
 
 interface VideoMetadata {
   duration: number; // секунды
@@ -64,11 +69,14 @@ export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
     const distancePixels = Math.sqrt(dx * dx + dy * dy);
     
     // Шаг 6: Калибруем расстояние (переводим пиксели в метры)
-    // Используем размер шайбы для калибровки
-    const puckSizePixels = firstFrame.puckSize || PUCK_DIAMETER_PIXELS;
-    const pixelsPerCm = puckSizePixels / PUCK_DIAMETER_CM;
-    const distanceCm = distancePixels / pixelsPerCm;
-    const distanceMeters = distanceCm / 100;
+    // Используем известное расстояние калибровки и размер шайбы
+    // При калибровке: шайба на расстоянии CALIBRATION_DISTANCE_CM занимает PUCK_DIAMETER_PIXELS_AT_CALIBRATION пикселей
+    // Значит 1 метр реального расстояния = (PUCK_DIAMETER_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM пикселей
+    
+    const pixelsPerMeter = (PUCK_DIAMETER_PIXELS_AT_CALIBRATION * 100) / CALIBRATION_DISTANCE_CM;
+    const distanceMeters = distancePixels / pixelsPerMeter;
+    
+    console.log(`📏 Калибровка: ${pixelsPerMeter.toFixed(2)} пикселей = 1 метр (при расстоянии ${CALIBRATION_DISTANCE_CM}см)`);
     
     // Шаг 7: Вычисляем время
     const timeSeconds = lastFrame.timestamp - firstFrame.timestamp;
