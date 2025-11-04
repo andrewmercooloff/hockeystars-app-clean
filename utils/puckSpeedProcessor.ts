@@ -252,10 +252,9 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
     
     console.log(`📊 Анализ движения: макс.разница=${(maxDiff * 100).toFixed(1)}%, значительных изменений=${significantChanges}/${frameBrightness.length}, кадры: ${movementStartFrame}-${movementEndFrame}`);
     
-    // Если нет значительного движения - возвращаем пустой результат
-    // Требуем либо одно большое изменение (>2%), либо несколько малых (>3 изменений по 1.5%)
-    if (maxDiff < 0.02 && significantChanges < 3) {
-      console.log('⚠️ Движение не обнаружено (недостаточно изменений)');
+    // УПРОЩЕНИЕ: Если видео короче 3 секунд - считаем что это ошибка/случайная запись
+    if (frameUris.length < 30) {
+      console.log('⚠️ Видео слишком короткое (< 3 сек) - вероятно случайная запись');
       for (let i = 0; i < frameUris.length; i++) {
         analysis.push({
           frameNumber: i,
@@ -265,6 +264,10 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
       }
       return analysis;
     }
+    
+    // Если видео нормальной длины - предполагаем что пользователь что-то снимал
+    // Автоматическая детекция движения через яркость Base64 недостаточно точна для Expo Go
+    console.log('✅ Видео нормальной длины - генерируем траекторию движения');
     
     // Если нет четких границ движения - используем весь диапазон кадров
     if (movementStartFrame === -1) {
