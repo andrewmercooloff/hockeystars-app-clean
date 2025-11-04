@@ -307,7 +307,9 @@ export default function PuckSpeedScreen() {
         // Размер зависит от плотности темных пикселей
         
         const hash = base64.length % 1000;
-        const darkDensity = Math.min(darkPatterns / (base64.length / 100), 1); // Нормализуем 0-1
+        // Используем общее количество паттернов для расчета плотности
+        const totalDarkPatterns = darkPatterns4 + darkPatterns6;
+        const darkDensity = Math.min(totalDarkPatterns / (base64.length / 100), 1); // Нормализуем 0-1
         
         // Позиция: предполагаем что шайба в центре зоны (или близко)
         // Небольшое случайное отклонение для реалистичности
