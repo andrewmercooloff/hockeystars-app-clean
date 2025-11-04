@@ -625,14 +625,20 @@ export default function PuckSpeedScreen() {
                   height: ZONE_SIZE,
                   borderRadius: ZONE_SIZE / 2,
                 },
-                puckSizeMatch === 'perfect' && styles.puckZonePerfect,
-                puckSizeMatch && puckSizeMatch !== 'perfect' && styles.puckZoneWrong,
+                isCalibrated && styles.puckZonePerfect,
               ]}
             >
-              {puckSizeMatch === 'perfect' && (
-                <View style={styles.puckZoneCheck}>
-                  <Ionicons name="checkmark" size={48} color="#4CAF50" />
-                </View>
+              {/* Кнопка подтверждения калибровки в центре круга */}
+              {!isCalibrated && !countdown && isCameraReady && (
+                <TouchableOpacity 
+                  style={styles.calibrateButton}
+                  onPress={handleManualCalibration}
+                >
+                  <Ionicons name="checkmark-circle" size={40} color="#fa2f40" />
+                  <Text style={styles.calibrateButtonText}>
+                    {t('puckSpeed.confirmPuck') || 'Подтвердить'}
+                  </Text>
+                </TouchableOpacity>
               )}
             </View>
 
