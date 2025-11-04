@@ -69,21 +69,20 @@ export default function PuckSpeedScreen() {
     };
   }, [permission, requestPermission]);
 
-  // Автоматическая проверка размера шайбы каждые 1 секунду (увеличили интервал для стабильности)
-  useEffect(() => {
-    if (isCameraReady && !recordingUri && !isRecording && !isProcessing && !countdown) {
-      // Запускаем автопроверку
-      autoCheckIntervalRef.current = setInterval(() => {
-        checkPuckSize();
-      }, 1000); // Проверка каждые 1 секунду (было 0.5 секунды)
+  // Убрали автоматическую проверку - теперь пользователь вручную подтверждает калибровку
+  // useEffect(() => {
+  //   if (isCameraReady && !recordingUri && !isRecording && !isProcessing && !countdown) {
+  //     autoCheckIntervalRef.current = setInterval(() => {
+  //       checkPuckSize();
+  //     }, 1000);
       
-      return () => {
-        if (autoCheckIntervalRef.current) {
-          clearInterval(autoCheckIntervalRef.current);
-        }
-      };
-    }
-  }, [isCameraReady, recordingUri, isRecording, isProcessing, countdown]);
+  //     return () => {
+  //       if (autoCheckIntervalRef.current) {
+  //         clearInterval(autoCheckIntervalRef.current);
+  //       }
+  //     };
+  //   }
+  // }, [isCameraReady, recordingUri, isRecording, isProcessing, countdown]);
 
   // Реальная детекция шайбы через анализ кадров с камеры
   const checkPuckSize = async () => {
@@ -604,25 +603,13 @@ export default function PuckSpeedScreen() {
                     {t('puckSpeed.getReady') || 'Приготовьтесь!'}
                   </Text>
                 </View>
-              ) : perfectMatchCountRef.current > 0 && perfectMatchCountRef.current < 2 ? (
+              ) : isCalibrated ? (
                 <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
-                  {t('puckSpeed.almostPerfect') || `Почти идеально! (${perfectMatchCountRef.current}/2)`}
-                </Text>
-              ) : !puckSizeMatch ? (
-                <Text style={styles.cameraInstructionText}>
-                  {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом (сверху, чтобы была круглая, а не эллипс)'}
-                </Text>
-              ) : puckSizeMatch === 'perfect' ? (
-                <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
-                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется через 3 сек...'}
-                </Text>
-              ) : puckSizeMatch === 'too-small' ? (
-                <Text style={[styles.cameraInstructionText, { color: '#FFC107' }]}>
-                  {t('puckSpeed.moveFurther') || 'Отодвиньте телефон дальше'}
+                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
                 </Text>
               ) : (
-                <Text style={[styles.cameraInstructionText, { color: '#FFC107' }]}>
-                  {t('puckSpeed.moveCloser') || 'Приблизьте телефон ближе'}
+                <Text style={styles.cameraInstructionText}>
+                  {t('puckSpeed.placePuckInCircle') || 'Поместите шайбу в круг сверху (вид сверху)'}
                 </Text>
               )}
             </View>
