@@ -291,16 +291,19 @@ export default function PuckSpeedScreen() {
       // Шайба черная, поэтому в Base64 будет много темных паттернов
       // Используем более чувствительный алгоритм:
       // - Ищем паттерны с меньшими символами (4+ вместо 6+)
-      // - Снижаем порог (base64.length / 100 вместо /50)
+      // - Используем относительный процент вместо абсолютного порога
       const darkPatterns4 = (base64.match(/[A-F0-9]{4,}/g) || []).length;
       const darkPatterns6 = (base64.match(/[A-F0-9]{6,}/g) || []).length;
       
-      // Порог: более чувствительный (1/100 длины строки)
-      const threshold = Math.floor(base64.length / 100);
-      // Проверяем оба типа паттернов
-      const hasSignificantDarkArea = darkPatterns4 > threshold || darkPatterns6 > threshold / 2;
+      // Используем процент темных паттернов от общей длины
+      // Если >1% паттернов4 или >0.3% паттернов6 - считаем что есть темная область
+      const darkPatterns4Percent = (darkPatterns4 / base64.length) * 100;
+      const darkPatterns6Percent = (darkPatterns6 / base64.length) * 100;
       
-      console.log(`📊 Анализ: паттернов4=${darkPatterns4}, паттернов6=${darkPatterns6}, порог=${threshold}, есть темная область=${hasSignificantDarkArea}`);
+      // Более чувствительный порог: 0.7% для паттернов4 или 0.25% для паттернов6
+      const hasSignificantDarkArea = darkPatterns4Percent > 0.7 || darkPatterns6Percent > 0.25;
+      
+      console.log(`📊 Анализ: паттернов4=${darkPatterns4} (${darkPatterns4Percent.toFixed(2)}%), паттернов6=${darkPatterns6} (${darkPatterns6Percent.toFixed(2)}%), есть темная область=${hasSignificantDarkArea}`);
       
       if (hasSignificantDarkArea) {
         console.log('✅ Темная область обнаружена!');
