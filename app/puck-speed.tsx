@@ -304,22 +304,28 @@ export default function PuckSpeedScreen() {
       console.log('✅ Base64 получен, длина:', base64.length);
       
       // 3. Упрощенный анализ: проверяем наличие темных областей
-      // Шайба черная, поэтому в Base64 будет много темных паттернов
-      // Используем более чувствительный алгоритм:
-      // - Ищем паттерны с меньшими символами (4+ вместо 6+)
-      // - Используем относительный процент вместо абсолютного порога
-      const darkPatterns4 = (base64.match(/[A-F0-9]{4,}/g) || []).length;
-      const darkPatterns6 = (base64.match(/[A-F0-9]{6,}/g) || []).length;
+      // Шайба ЧЕРНАЯ, поэтому в Base64 будет много паттернов с НИЗКИМИ значениями
+      // В Base64: низкие значения (0-3, a-d) = темные пиксели, высокие (4-9, A-F, E-Z) = светлые
+      // Ищем паттерны с НИЗКИМИ значениями для темных областей
+      // Используем паттерны с символами 0-3 и a-d (низкие значения в Base64)
+      const darkPatterns4 = (base64.match(/[0-3a-d]{4,}/gi) || []).length;
+      const darkPatterns6 = (base64.match(/[0-3a-d]{6,}/gi) || []).length;
+      
+      // Также проверяем наличие очень темных областей (символы 0-1, a-b)
+      const veryDarkPatterns = (base64.match(/[01ab]{8,}/gi) || []).length;
       
       // Используем процент темных паттернов от общей длины
-      // Если >1% паттернов4 или >0.3% паттернов6 - считаем что есть темная область
       const darkPatterns4Percent = (darkPatterns4 / base64.length) * 100;
       const darkPatterns6Percent = (darkPatterns6 / base64.length) * 100;
+      const veryDarkPercent = (veryDarkPatterns / base64.length) * 100;
       
-      // Более чувствительный порог: 0.7% для паттернов4 или 0.25% для паттернов6
-      const hasSignificantDarkArea = darkPatterns4Percent > 0.7 || darkPatterns6Percent > 0.25;
+      // Темная область есть если:
+      // - >0.5% паттернов4 (низкие значения) ИЛИ
+      // - >0.15% паттернов6 ИЛИ  
+      // - >0.1% очень темных паттернов (0-1, a-b)
+      const hasSignificantDarkArea = darkPatterns4Percent > 0.5 || darkPatterns6Percent > 0.15 || veryDarkPercent > 0.1;
       
-      console.log(`📊 Анализ: паттернов4=${darkPatterns4} (${darkPatterns4Percent.toFixed(2)}%), паттернов6=${darkPatterns6} (${darkPatterns6Percent.toFixed(2)}%), есть темная область=${hasSignificantDarkArea}`);
+      console.log(`📊 Анализ: темных паттернов4=${darkPatterns4} (${darkPatterns4Percent.toFixed(2)}%), паттернов6=${darkPatterns6} (${darkPatterns6Percent.toFixed(2)}%), очень темных=${veryDarkPatterns} (${veryDarkPercent.toFixed(2)}%), есть темная область=${hasSignificantDarkArea}`);
       
       if (hasSignificantDarkArea) {
         console.log('✅ Темная область обнаружена!');
