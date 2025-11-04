@@ -232,6 +232,7 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
     let maxDiff = 0;
     let movementStartFrame = -1;
     let movementEndFrame = -1;
+    let significantChanges = 0;
     
     for (let i = 1; i < frameBrightness.length; i++) {
       const diff = Math.abs(frameBrightness[i] - frameBrightness[i - 1]);
@@ -239,20 +240,22 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
         maxDiff = diff;
       }
       
-      // Если изменение яркости больше 5% - это движение
-      if (diff > 0.05 && movementStartFrame === -1) {
-        movementStartFrame = i - 1;
-      }
-      if (diff > 0.05) {
+      // Считаем количество значительных изменений (снижаем порог до 1.5%)
+      if (diff > 0.015) {
+        significantChanges++;
+        if (movementStartFrame === -1) {
+          movementStartFrame = i - 1;
+        }
         movementEndFrame = i;
       }
     }
     
-    console.log(`📊 Анализ движения: макс.разница=${(maxDiff * 100).toFixed(1)}%, кадры с движением: ${movementStartFrame}-${movementEndFrame}`);
+    console.log(`📊 Анализ движения: макс.разница=${(maxDiff * 100).toFixed(1)}%, значительных изменений=${significantChanges}/${frameBrightness.length}, кадры: ${movementStartFrame}-${movementEndFrame}`);
     
     // Если нет значительного движения - возвращаем пустой результат
-    if (maxDiff < 0.03) {
-      console.log('⚠️ Движение не обнаружено (изменение < 3%)');
+    // Требуем либо одно большое изменение (>2%), либо несколько малых (>3 изменений по 1.5%)
+    if (maxDiff < 0.02 && significantChanges < 3) {
+      console.log('⚠️ Движение не обнаружено (недостаточно изменений)');
       for (let i = 0; i < frameUris.length; i++) {
         analysis.push({
           frameNumber: i,
@@ -261,6 +264,12 @@ async function analyzeFramesForPuck(frameUris: string[]): Promise<FrameAnalysis[
         });
       }
       return analysis;
+    }
+    
+    // Если нет четких границ движения - используем весь диапазон кадров
+    if (movementStartFrame === -1) {
+      movementStartFrame = Math.floor(frameUris.length * 0.2); // Начало на 20% видео
+      movementEndFrame = Math.floor(frameUris.length * 0.8); // Конец на 80% видео
     }
     
     // Есть движение - генерируем траекторию
