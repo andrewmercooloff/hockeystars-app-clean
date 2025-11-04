@@ -68,13 +68,13 @@ export default function PuckSpeedScreen() {
     };
   }, [permission, requestPermission]);
 
-  // Автоматическая проверка размера шайбы каждые 0.5 секунды
+  // Автоматическая проверка размера шайбы каждые 1 секунду (увеличили интервал для стабильности)
   useEffect(() => {
-    if (isCameraReady && !recordingUri && !isRecording && !isProcessing) {
+    if (isCameraReady && !recordingUri && !isRecording && !isProcessing && !countdown) {
       // Запускаем автопроверку
       autoCheckIntervalRef.current = setInterval(() => {
         checkPuckSize();
-      }, 500); // Проверка каждые 0.5 секунды
+      }, 1000); // Проверка каждые 1 секунду (было 0.5 секунды)
       
       return () => {
         if (autoCheckIntervalRef.current) {
@@ -82,7 +82,7 @@ export default function PuckSpeedScreen() {
         }
       };
     }
-  }, [isCameraReady, recordingUri, isRecording, isProcessing]);
+  }, [isCameraReady, recordingUri, isRecording, isProcessing, countdown]);
 
   // Реальная детекция шайбы через анализ кадров с камеры
   const checkPuckSize = async () => {
@@ -144,9 +144,14 @@ export default function PuckSpeedScreen() {
         // Увеличиваем счетчик последовательных perfect проверок
         perfectMatchCountRef.current += 1;
         
-        console.log(`✅ Perfect match ${perfectMatchCountRef.current}/3: размер=${analysis.size.toFixed(0)}px, форма=${aspectRatio.toFixed(2)}, позиция=${distanceFromCenter.toFixed(0)}px`);
+        console.log(`✅ Perfect match ${perfectMatchCountRef.current}/2: размер=${analysis.size.toFixed(0)}px, форма=${aspectRatio.toFixed(2)}, позиция=${distanceFromCenter.toFixed(0)}px`);
         
-        // Нужно минимум 2 последовательных perfect проверки подряд (уменьшили для отзывчивости)
+        // Показываем промежуточное состояние - почти идеально
+        if (perfectMatchCountRef.current === 1) {
+          setPuckSizeMatch(null); // Показываем нейтральное состояние, но не сбрасываем счетчик
+        }
+        
+        // Нужно минимум 2 последовательных perfect проверки подряд
         if (perfectMatchCountRef.current >= 2) {
           // Perfect match подтвержден!
           setPuckSizeMatch('perfect');
@@ -188,27 +193,37 @@ export default function PuckSpeedScreen() {
           setPuckSizeMatch(null);
         }
       } else {
-        // Сбрасываем счетчик при любой неудачной проверке
-        perfectMatchCountRef.current = 0;
+        // Сбрасываем счетчик только если уже было 0 или если это явная ошибка (не просто отсутствие темной области)
+        // Если анализ вернул null (нет темной области), не сбрасываем счетчик - возможно это просто плохой кадр
+        if (analysis) {
+          // Если анализ есть, но не прошел проверку - это реальная ошибка, сбрасываем
+          perfectMatchCountRef.current = 0;
+        }
+        // Если analysis === null (нет темной области), не трогаем счетчик - может быть временный сбой
         
-        // Определяем тип ошибки
-        if (!isPerfectSize) {
-          if (analysis.size < ZONE_SIZE) {
-            setPuckSizeMatch('too-small');
-            console.log(`⚠️ Слишком маленькая: ${analysis.size.toFixed(0)}px (нужно ${ZONE_SIZE}px)`);
+        // Определяем тип ошибки только если analysis существует
+        if (analysis) {
+          if (!isPerfectSize) {
+            if (analysis.size < ZONE_SIZE) {
+              setPuckSizeMatch('too-small');
+              console.log(`⚠️ Слишком маленькая: ${analysis.size.toFixed(0)}px (нужно ${ZONE_SIZE}px)`);
+            } else {
+              setPuckSizeMatch('too-large');
+              console.log(`⚠️ Слишком большая: ${analysis.size.toFixed(0)}px (нужно ${ZONE_SIZE}px)`);
+            }
+          } else if (!isCircularShape) {
+            // Шайба не круглая (эллипс) - показываем как "неправильная форма"
+            setPuckSizeMatch(null);
+            console.log(`⚠️ Не круглая форма: соотношение ${aspectRatio.toFixed(2)} (нужно 0.75-1.35)`);
+          } else if (!isInCenter) {
+            // Не в центре зоны
+            setPuckSizeMatch(null);
+            console.log(`⚠️ Не в центре: расстояние ${distanceFromCenter.toFixed(0)}px от центра`);
           } else {
-            setPuckSizeMatch('too-large');
-            console.log(`⚠️ Слишком большая: ${analysis.size.toFixed(0)}px (нужно ${ZONE_SIZE}px)`);
+            setPuckSizeMatch(null);
           }
-        } else if (!isCircularShape) {
-          // Шайба не круглая (эллипс) - показываем как "неправильная форма"
-          setPuckSizeMatch(null);
-          console.log(`⚠️ Не круглая форма: соотношение ${aspectRatio.toFixed(2)} (нужно 0.85-1.15)`);
-        } else if (!isInCenter) {
-          // Не в центре зоны
-          setPuckSizeMatch(null);
-          console.log(`⚠️ Не в центре: расстояние ${distanceFromCenter.toFixed(0)}px от центра`);
         } else {
+          // analysis === null - нет темной области, но не меняем состояние, чтобы не сбросить прогресс
           setPuckSizeMatch(null);
         }
         setCountdown(null);
