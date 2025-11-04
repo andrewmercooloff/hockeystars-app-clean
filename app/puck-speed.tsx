@@ -610,10 +610,10 @@ export default function PuckSpeedScreen() {
               ) : (
                 <View>
                   <Text style={[styles.cameraInstructionText, { fontSize: 18, marginBottom: 8 }]}>
-                    {t('puckSpeed.step1') || '1. Совместите шайбу с кругом'}
+                    {t('puckSpeed.step1Side') || '1. Совместите шайбу с эллипсом'}
                   </Text>
                   <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.8 }]}>
-                    {t('puckSpeed.step1Details') || '• Вид строго сверху\n• Телефон параллельно шайбе\n• Расстояние ~1 метр'}
+                    {t('puckSpeed.step1SideDetails') || '• Вид СБОКУ (эллипс)\n• Телефон горизонтально\n• Расстояние ~1 метр'}
                   </Text>
                 </View>
               )}
@@ -635,9 +635,10 @@ export default function PuckSpeedScreen() {
             >
               {/* Reference изображение шайбы (черный круг с белой окантовкой) */}
               {!isCalibrated && !countdown && (
-                <View style={styles.puckReference}>
-                  <View style={styles.puckReferenceInner} />
-                  <Text style={styles.puckReferenceText}>PUCK</Text>
+                <View style={styles.puckReferenceSide}>
+                  {/* Эллипс - вид шайбы сбоку */}
+                  <View style={styles.puckEllipse} />
+                  <Text style={styles.puckReferenceText}>PUCK (вид сбоку)</Text>
                 </View>
               )}
               
@@ -842,21 +843,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  puckReference: {
+  puckReferenceSide: {
     width: '85%',
     height: '85%',
-    borderRadius: 1000,
-    backgroundColor: 'rgba(30, 30, 30, 0.6)', // Темный круг (шайба)
-    borderWidth: 3,
-    borderColor: 'rgba(255, 255, 255, 0.6)', // Белая окантовка
     justifyContent: 'center',
     alignItems: 'center',
   },
-  puckReferenceInner: {
-    width: '70%',
-    height: '70%',
-    borderRadius: 1000,
-    backgroundColor: 'rgba(10, 10, 10, 0.8)', // Очень темный центр
+  puckEllipse: {
+    width: '85%', // Широкий
+    height: '35%', // Узкий - это вид шайбы сбоку
+    borderRadius: 100,
+    backgroundColor: 'rgba(30, 30, 30, 0.7)', // Темный эллипс
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.6)', // Белая окантовка
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
   puckReferenceText: {
     position: 'absolute',
