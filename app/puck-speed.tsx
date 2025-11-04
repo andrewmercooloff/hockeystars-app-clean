@@ -521,6 +521,21 @@ export default function PuckSpeedScreen() {
   };
 
   const retakeVideo = () => {
+    // Сначала очищаем все таймеры
+    if (autoStartTimerRef.current) {
+      clearTimeout(autoStartTimerRef.current);
+      autoStartTimerRef.current = null;
+    }
+    if (autoCheckIntervalRef.current) {
+      clearInterval(autoCheckIntervalRef.current);
+      autoCheckIntervalRef.current = null;
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    
+    // Затем сбрасываем все состояния
     setRecordingUri(null);
     setMeasuredSpeed(null);
     setShowResultModal(false);
@@ -528,18 +543,10 @@ export default function PuckSpeedScreen() {
     setIsRecording(false);
     setIsProcessing(false);
     setCountdown(null);
+    setIsCalibrated(false); // Сбрасываем флаг калибровки
     perfectMatchCountRef.current = 0; // Сбрасываем счетчик
     
-    // Очищаем все таймеры
-    if (autoStartTimerRef.current) {
-      clearTimeout(autoStartTimerRef.current);
-    }
-    if (autoCheckIntervalRef.current) {
-      clearInterval(autoCheckIntervalRef.current);
-    }
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-    }
+    console.log('🔄 Состояние сброшено, возврат к калибровке');
   };
 
   if (!permission) {
