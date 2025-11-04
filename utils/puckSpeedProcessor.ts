@@ -30,7 +30,7 @@ interface FrameAnalysis {
  * Обрабатывает видео и вычисляет скорость шайбы
  * Отслеживает момент начала движения и момент вылета
  */
-export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
+export async function processPuckSpeedVideo(videoUri: string): Promise<number | null> {
   try {
     console.log('🎬 Начинаем обработку видео:', videoUri);
     
@@ -55,9 +55,8 @@ export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
     const puckFrames = analysis.filter(f => f.hasPuck && f.puckPosition);
     
     if (puckFrames.length < 2) {
-      console.warn('⚠️ Недостаточно кадров с шайбой, используем fallback алгоритм');
-      // Fallback: используем длительность видео
-      return calculateSpeedFromDuration(metadata.duration);
+      console.warn('⚠️ Недостаточно кадров с шайбой - движение не обнаружено');
+      return null; // Возвращаем null вместо fallback
     }
     
     const firstFrame = puckFrames[0];
@@ -82,8 +81,8 @@ export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
     const timeSeconds = lastFrame.timestamp - firstFrame.timestamp;
     
     if (timeSeconds <= 0) {
-      console.warn('⚠️ Неверное время, используем fallback');
-      return calculateSpeedFromDuration(metadata.duration);
+      console.warn('⚠️ Неверное время');
+      return null;
     }
     
     // Шаг 8: Вычисляем скорость
@@ -95,15 +94,14 @@ export async function processPuckSpeedVideo(videoUri: string): Promise<number> {
     
     // Проверяем на разумность результата
     if (speedKmh < 20 || speedKmh > 200) {
-      console.warn(`⚠️ Скорость ${speedKmh.toFixed(1)} км/ч выходит за разумные пределы, используем fallback`);
-      return calculateSpeedFromDuration(metadata.duration);
+      console.warn(`⚠️ Скорость ${speedKmh.toFixed(1)} км/ч выходит за разумные пределы`);
+      return null; // Возвращаем null вместо fallback
     }
     
     return speedKmh;
   } catch (error) {
     console.error('❌ Ошибка обработки видео:', error);
-    // Fallback: используем случайное значение
-    return 80 + Math.random() * 40;
+    return null; // Возвращаем null при ошибке
   }
 }
 
