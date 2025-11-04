@@ -39,6 +39,7 @@ export default function PuckSpeedScreen() {
   const [puckSizeMatch, setPuckSizeMatch] = useState<'too-small' | 'too-large' | 'perfect' | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [isCalibrated, setIsCalibrated] = useState(false); // Флаг ручной калибровки
   const autoStartTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -388,6 +389,39 @@ export default function PuckSpeedScreen() {
     }
   };
 
+
+  // Ручная калибровка - пользователь подтверждает, что шайба в круге
+  const handleManualCalibration = () => {
+    console.log('🎯 Пользователь подтвердил калибровку');
+    setIsCalibrated(true);
+    setPuckSizeMatch('perfect');
+    
+    // Запускаем обратный отсчет 3 секунды
+    let count = 3;
+    setCountdown(count);
+    
+    countdownIntervalRef.current = setInterval(() => {
+      count--;
+      setCountdown(count);
+      
+      if (count <= 0) {
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+        setCountdown(null);
+      }
+    }, 1000);
+    
+    // Автоматический старт записи через 3 секунды
+    if (autoStartTimerRef.current) {
+      clearTimeout(autoStartTimerRef.current);
+    }
+    autoStartTimerRef.current = setTimeout(() => {
+      console.log('✅ Калибровка подтверждена! Автоматический старт записи...');
+      startRecording();
+    }, 3000);
+  };
 
   const startRecording = async () => {
     try {
@@ -784,6 +818,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  calibrateButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+  },
+  calibrateButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+    marginTop: 5,
   },
   cameraControls: {
     position: 'absolute',
