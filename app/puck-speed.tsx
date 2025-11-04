@@ -40,6 +40,7 @@ export default function PuckSpeedScreen() {
   const autoStartTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const perfectMatchCountRef = useRef<number>(0); // Счетчик последовательных "perfect" проверок
   
   // Размеры и позиция зоны для шайбы (круг в центре, чуть ниже)
   const ZONE_SIZE = 90; // Диаметр зоны (точный размер шайбы на расстоянии 1м)
@@ -83,54 +84,91 @@ export default function PuckSpeedScreen() {
 
   // Имитация детекции размера шайбы
   // В реальности здесь был бы анализ кадра с камеры в реальном времени
+  // Проверяем: размер (должен быть ~90px), форма (круг, а не эллипс), позиция (центр зоны)
   const checkPuckSize = () => {
-    // Если уже perfect - не проверяем повторно
-    if (puckSizeMatch === 'perfect') return;
+    // Если уже perfect и идет отсчет - не проверяем повторно
+    if (puckSizeMatch === 'perfect' && countdown !== null) return;
     
-    // Симулируем проверку размера
-    const random = Math.random();
-    if (random < 0.3) {
-      setPuckSizeMatch('too-small');
-      setCountdown(null);
-    } else if (random < 0.6) {
-      setPuckSizeMatch('too-large');
-      setCountdown(null);
-    } else {
-      // Perfect match!
-      setPuckSizeMatch('perfect');
+    // Строгая симуляция проверки:
+    // 1. Размер должен быть правильным (90px ± 5px)
+    // 2. Форма должна быть круглой (не эллипс - шайба сбоку выглядит как эллипс)
+    // 3. Позиция должна быть в центре зоны
+    // 4. Нужно несколько последовательных успешных проверок
+    
+    // Независимые проверки для каждой характеристики
+    // Вероятность должна быть низкой, так как нужно:
+    // - Правильный размер (90px ± 5px)
+    // - Круглая форма (не эллипс - шайба сбоку выглядит как эллипс)
+    // - Правильная позиция (в центре зоны)
+    const sizeCheck = Math.random();
+    const shapeCheck = Math.random();
+    const positionCheck = Math.random();
+    
+    const isPerfectSize = sizeCheck > 0.95; // 5% вероятность правильного размера
+    const isCircularShape = shapeCheck > 0.95; // 5% вероятность круглой формы (шайба сбоку = эллипс)
+    const isInCenter = positionCheck > 0.95; // 5% вероятность правильной позиции
+    
+    // Все три условия должны быть выполнены одновременно
+    // Вероятность одновременного выполнения: 0.05 * 0.05 * 0.05 = 0.0125% (очень редко!)
+    if (isPerfectSize && isCircularShape && isInCenter) {
+      // Увеличиваем счетчик последовательных perfect проверок
+      perfectMatchCountRef.current += 1;
       
-      // Останавливаем автопроверку
-      if (autoCheckIntervalRef.current) {
-        clearInterval(autoCheckIntervalRef.current);
-        autoCheckIntervalRef.current = null;
-      }
-      
-      // Запускаем обратный отсчет 3 секунды
-      let count = 3;
-      setCountdown(count);
-      
-      countdownIntervalRef.current = setInterval(() => {
-        count--;
+      // Нужно минимум 3 последовательных perfect проверки подряд
+      if (perfectMatchCountRef.current >= 3) {
+        // Perfect match подтвержден!
+        setPuckSizeMatch('perfect');
+        
+        // Останавливаем автопроверку
+        if (autoCheckIntervalRef.current) {
+          clearInterval(autoCheckIntervalRef.current);
+          autoCheckIntervalRef.current = null;
+        }
+        
+        // Запускаем обратный отсчет 3 секунды
+        let count = 3;
         setCountdown(count);
         
-        if (count <= 0) {
-          if (countdownIntervalRef.current) {
-            clearInterval(countdownIntervalRef.current);
-            countdownIntervalRef.current = null;
+        countdownIntervalRef.current = setInterval(() => {
+          count--;
+          setCountdown(count);
+          
+          if (count <= 0) {
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = null;
+            }
+            setCountdown(null);
           }
-          setCountdown(null);
+        }, 1000);
+        
+        // Автоматический старт через 3 секунды после perfect match
+        if (autoStartTimerRef.current) {
+          clearTimeout(autoStartTimerRef.current);
         }
-      }, 1000);
-      
-      // Автоматический старт через 3 секунды после perfect match
-      if (autoStartTimerRef.current) {
-        clearTimeout(autoStartTimerRef.current);
+        
+        autoStartTimerRef.current = setTimeout(() => {
+          console.log('✅ Размер и форма совпали! Автоматический старт записи...');
+          startRecording();
+        }, 3000); // 3 секунды
+      } else {
+        // Показываем промежуточное состояние "почти идеально"
+        setPuckSizeMatch(null);
       }
+    } else {
+      // Сбрасываем счетчик при любой неудачной проверке
+      perfectMatchCountRef.current = 0;
       
-      autoStartTimerRef.current = setTimeout(() => {
-        console.log('✅ Размер совпал! Автоматический старт записи...');
-        startRecording();
-      }, 3000); // 3 секунды
+      // Определяем тип ошибки
+      if (random < 0.3) {
+        setPuckSizeMatch('too-small');
+      } else if (random < 0.6) {
+        setPuckSizeMatch('too-large');
+      } else {
+        // Шайба не круглая или не в центре
+        setPuckSizeMatch(null);
+      }
+      setCountdown(null);
     }
   };
 
@@ -237,6 +275,7 @@ export default function PuckSpeedScreen() {
     setIsRecording(false);
     setIsProcessing(false);
     setCountdown(null);
+    perfectMatchCountRef.current = 0; // Сбрасываем счетчик
     
     // Очищаем все таймеры
     if (autoStartTimerRef.current) {
@@ -317,7 +356,7 @@ export default function PuckSpeedScreen() {
                 </View>
               ) : !puckSizeMatch ? (
                 <Text style={styles.cameraInstructionText}>
-                  {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом'}
+                  {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом (сверху, чтобы была круглая, а не эллипс)'}
                 </Text>
               ) : puckSizeMatch === 'perfect' ? (
                 <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
