@@ -36,7 +36,10 @@ export default function PuckSpeedScreen() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [puckSizeMatch, setPuckSizeMatch] = useState<'too-small' | 'too-large' | 'perfect' | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const autoStartTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Размеры и позиция зоны для шайбы (круг в центре, чуть ниже)
   const ZONE_SIZE = 90; // Диаметр зоны (точный размер шайбы на расстоянии 1м)
@@ -48,27 +51,78 @@ export default function PuckSpeedScreen() {
       requestPermission();
     }
     
-    // Очищаем таймер при размонтировании
+    // Очищаем таймеры при размонтировании
     return () => {
       if (autoStartTimerRef.current) {
         clearTimeout(autoStartTimerRef.current);
       }
+      if (autoCheckIntervalRef.current) {
+        clearInterval(autoCheckIntervalRef.current);
+      }
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
     };
   }, [permission, requestPermission]);
 
+  // Автоматическая проверка размера шайбы каждые 0.5 секунды
+  useEffect(() => {
+    if (isCameraReady && !recordingUri && !isRecording && !isProcessing) {
+      // Запускаем автопроверку
+      autoCheckIntervalRef.current = setInterval(() => {
+        checkPuckSize();
+      }, 500); // Проверка каждые 0.5 секунды
+      
+      return () => {
+        if (autoCheckIntervalRef.current) {
+          clearInterval(autoCheckIntervalRef.current);
+        }
+      };
+    }
+  }, [isCameraReady, recordingUri, isRecording, isProcessing]);
+
   // Имитация детекции размера шайбы
-  // В реальности здесь был бы анализ кадра с камеры
+  // В реальности здесь был бы анализ кадра с камеры в реальном времени
   const checkPuckSize = () => {
+    // Если уже perfect - не проверяем повторно
+    if (puckSizeMatch === 'perfect') return;
+    
     // Симулируем проверку размера
     const random = Math.random();
     if (random < 0.3) {
       setPuckSizeMatch('too-small');
+      setCountdown(null);
     } else if (random < 0.6) {
       setPuckSizeMatch('too-large');
+      setCountdown(null);
     } else {
+      // Perfect match!
       setPuckSizeMatch('perfect');
       
-      // Автоматический старт через 1 секунду после perfect match
+      // Останавливаем автопроверку
+      if (autoCheckIntervalRef.current) {
+        clearInterval(autoCheckIntervalRef.current);
+        autoCheckIntervalRef.current = null;
+      }
+      
+      // Запускаем обратный отсчет 3 секунды
+      let count = 3;
+      setCountdown(count);
+      
+      countdownIntervalRef.current = setInterval(() => {
+        count--;
+        setCountdown(count);
+        
+        if (count <= 0) {
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          setCountdown(null);
+        }
+      }, 1000);
+      
+      // Автоматический старт через 3 секунды после perfect match
       if (autoStartTimerRef.current) {
         clearTimeout(autoStartTimerRef.current);
       }
@@ -76,14 +130,10 @@ export default function PuckSpeedScreen() {
       autoStartTimerRef.current = setTimeout(() => {
         console.log('✅ Размер совпал! Автоматический старт записи...');
         startRecording();
-      }, 1000);
+      }, 3000); // 3 секунды
     }
   };
 
-  const handleCheckSize = () => {
-    // Пользователь нажимает кнопку для проверки размера шайбы
-    checkPuckSize();
-  };
 
   const startRecording = async () => {
     try {
@@ -186,10 +236,17 @@ export default function PuckSpeedScreen() {
     setPuckSizeMatch(null);
     setIsRecording(false);
     setIsProcessing(false);
+    setCountdown(null);
     
-    // Очищаем таймер автостарта
+    // Очищаем все таймеры
     if (autoStartTimerRef.current) {
       clearTimeout(autoStartTimerRef.current);
+    }
+    if (autoCheckIntervalRef.current) {
+      clearInterval(autoCheckIntervalRef.current);
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
     }
   };
 
@@ -249,15 +306,22 @@ export default function PuckSpeedScreen() {
               </Text>
             </View>
 
-            {/* Инструкция */}
+            {/* Инструкция и обратный отсчет */}
             <View style={styles.cameraInstruction}>
-              {!puckSizeMatch ? (
+              {countdown !== null ? (
+                <View style={styles.countdownContainer}>
+                  <Text style={styles.countdownNumber}>{countdown}</Text>
+                  <Text style={styles.countdownText}>
+                    {t('puckSpeed.getReady') || 'Приготовьтесь!'}
+                  </Text>
+                </View>
+              ) : !puckSizeMatch ? (
                 <Text style={styles.cameraInstructionText}>
                   {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом'}
                 </Text>
               ) : puckSizeMatch === 'perfect' ? (
                 <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
-                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
+                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется через 3 сек...'}
                 </Text>
               ) : puckSizeMatch === 'too-small' ? (
                 <Text style={[styles.cameraInstructionText, { color: '#FFC107' }]}>
@@ -292,41 +356,27 @@ export default function PuckSpeedScreen() {
               )}
             </View>
 
-            {/* Кнопка проверки размера */}
-            <View style={styles.cameraControls}>
-              <TouchableOpacity
-                style={[
-                  styles.confirmButton,
-                  puckSizeMatch === 'perfect' && styles.confirmButtonPerfect,
-                  isRecording && styles.confirmButtonRecording,
-                ]}
-                onPress={handleCheckSize}
-                disabled={!isCameraReady || puckSizeMatch === 'perfect' || isRecording}
-              >
-                {isRecording ? (
-                  <>
-                    <Ionicons name="radio-button-on" size={32} color="#fff" />
-                    <Text style={styles.confirmButtonText}>
-                      {t('puckSpeed.recording') || 'Идет запись...'}
-                    </Text>
-                  </>
-                ) : puckSizeMatch === 'perfect' ? (
-                  <>
-                    <Ionicons name="checkmark-circle" size={32} color="#fff" />
-                    <Text style={styles.confirmButtonText}>
-                      {t('puckSpeed.autoStarting') || 'Автозапуск через 1 сек...'}
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Ionicons name="scan-circle" size={32} color="#fff" />
-                    <Text style={styles.confirmButtonText}>
-                      {isCameraReady ? (t('puckSpeed.checkSize') || 'Проверить размер') : (t('puckSpeed.preparingCamera') || 'Подготовка...')}
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
+            {/* Статус автопроверки */}
+            {!isCameraReady && (
+              <View style={styles.cameraControls}>
+                <View style={styles.statusIndicator}>
+                  <ActivityIndicator size="small" color="#fa2f40" />
+                  <Text style={styles.statusText}>
+                    {t('puckSpeed.preparingCamera') || 'Подготовка камеры...'}
+                  </Text>
+                </View>
+              </View>
+            )}
+            {isRecording && (
+              <View style={styles.cameraControls}>
+                <View style={[styles.statusIndicator, { backgroundColor: 'rgba(250, 47, 64, 0.8)' }]}>
+                  <Ionicons name="radio-button-on" size={24} color="#fff" />
+                  <Text style={styles.statusText}>
+                    {t('puckSpeed.recording') || 'Идет запись...'}
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       ) : (
@@ -483,27 +533,34 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
   },
-  confirmButton: {
+  statusIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fa2f40',
-    paddingHorizontal: 30,
-    paddingVertical: 18,
-    borderRadius: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
     gap: 10,
-    minWidth: 250,
   },
-  confirmButtonPerfect: {
-    backgroundColor: '#4CAF50',
-  },
-  confirmButtonRecording: {
-    backgroundColor: '#fa2f40',
-  },
-  confirmButtonText: {
+  statusText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+  },
+  countdownContainer: {
+    alignItems: 'center',
+  },
+  countdownNumber: {
+    fontSize: 64,
+    fontFamily: 'Gilroy-Bold',
+    color: '#4CAF50',
+  },
+  countdownText: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#4CAF50',
+    marginTop: 10,
   },
   resultBackground: {
     flex: 1,
