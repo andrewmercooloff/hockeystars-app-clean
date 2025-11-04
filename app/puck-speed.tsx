@@ -1130,10 +1130,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  saveButton: {
-    backgroundColor: '#fa2f40',
-  },
-  cancelButton: {
+  modalButtonSecondary: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   modalButtonText: {
