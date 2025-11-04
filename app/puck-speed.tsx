@@ -608,13 +608,18 @@ export default function PuckSpeedScreen() {
                   {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
                 </Text>
               ) : (
-                <Text style={styles.cameraInstructionText}>
-                  {t('puckSpeed.placePuckInCircle') || 'Поместите шайбу в круг сверху (вид сверху)'}
-                </Text>
+                <View>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 18, marginBottom: 8 }]}>
+                    {t('puckSpeed.step1') || '1. Совместите шайбу с кругом'}
+                  </Text>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.8 }]}>
+                    {t('puckSpeed.step1Details') || '• Вид строго сверху\n• Телефон параллельно шайбе\n• Расстояние ~1 метр'}
+                  </Text>
+                </View>
               )}
             </View>
 
-            {/* Зона для шайбы (круг в центре экрана) */}
+            {/* Зона для шайбы (круг в центре экрана) с улучшенной визуализацией */}
             <View
               style={[
                 styles.puckZone,
@@ -628,17 +633,42 @@ export default function PuckSpeedScreen() {
                 isCalibrated && styles.puckZonePerfect,
               ]}
             >
-              {/* Кнопка подтверждения калибровки в центре круга */}
+              {/* Reference изображение шайбы (черный круг с белой окантовкой) */}
+              {!isCalibrated && !countdown && (
+                <View style={styles.puckReference}>
+                  <View style={styles.puckReferenceInner} />
+                  <Text style={styles.puckReferenceText}>PUCK</Text>
+                </View>
+              )}
+              
+              {/* Крестик для точного центрирования */}
+              {!isCalibrated && !countdown && (
+                <View style={styles.centerCross}>
+                  <View style={styles.crossHorizontal} />
+                  <View style={styles.crossVertical} />
+                </View>
+              )}
+              
+              {/* Кнопка подтверждения калибровки снизу круга */}
               {!isCalibrated && !countdown && isCameraReady && (
-                <TouchableOpacity 
-                  style={styles.calibrateButton}
-                  onPress={handleManualCalibration}
-                >
-                  <Ionicons name="checkmark-circle" size={40} color="#fa2f40" />
-                  <Text style={styles.calibrateButtonText}>
-                    {t('puckSpeed.confirmPuck') || 'Подтвердить'}
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.calibrateButtonContainer}>
+                  <TouchableOpacity 
+                    style={styles.calibrateButton}
+                    onPress={handleManualCalibration}
+                  >
+                    <Ionicons name="checkmark-circle" size={32} color="#fff" />
+                    <Text style={styles.calibrateButtonText}>
+                      {t('puckSpeed.confirmPuck') || 'Подтвердить'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              {/* Иконка успешной калибровки */}
+              {isCalibrated && !countdown && (
+                <View style={styles.puckZoneCheck}>
+                  <Ionicons name="checkmark" size={48} color="#4CAF50" />
+                </View>
               )}
             </View>
 
@@ -812,19 +842,72 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  calibrateButton: {
+  puckReference: {
+    width: '85%',
+    height: '85%',
+    borderRadius: 1000,
+    backgroundColor: 'rgba(30, 30, 30, 0.6)', // Темный круг (шайба)
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.6)', // Белая окантовка
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 25,
+  },
+  puckReferenceInner: {
+    width: '70%',
+    height: '70%',
+    borderRadius: 1000,
+    backgroundColor: 'rgba(10, 10, 10, 0.8)', // Очень темный центр
+  },
+  puckReferenceText: {
+    position: 'absolute',
+    fontSize: 10,
+    fontFamily: 'Gilroy-Bold',
+    color: 'rgba(255, 255, 255, 0.5)',
+    letterSpacing: 2,
+  },
+  centerCross: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  crossHorizontal: {
+    position: 'absolute',
+    width: 30,
+    height: 2,
+    backgroundColor: 'rgba(250, 47, 64, 0.8)',
+  },
+  crossVertical: {
+    position: 'absolute',
+    width: 2,
+    height: 30,
+    backgroundColor: 'rgba(250, 47, 64, 0.8)',
+  },
+  calibrateButtonContainer: {
+    position: 'absolute',
+    bottom: -60,
+    alignSelf: 'center',
+  },
+  calibrateButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fa2f40',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   calibrateButtonText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#fa2f40',
-    marginTop: 5,
+    color: '#fff',
+    marginLeft: 8,
   },
   cameraControls: {
     position: 'absolute',
