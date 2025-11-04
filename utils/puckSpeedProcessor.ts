@@ -4,13 +4,13 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import { manipulateAsync } from 'expo-image-manipulator';
 
 // Эталонный размер шайбы в см (стандартная хоккейная шайба)
-const PUCK_DIAMETER_CM = 7.62; // 3 дюйма
+const PUCK_DIAMETER_CM = 7.62; // 3 дюйма (диаметр)
 
 // КАЛИБРОВКА: Измерьте точное расстояние от телефона до шайбы
-// когда шайба точно совпадает с кругом на экране
+// когда шайба точно совпадает с ЭЛЛИПСОМ на экране (вид сбоку!)
 // См. файл PUCK_SPEED_CALIBRATION.md для инструкций
 const CALIBRATION_DISTANCE_CM = 100; // Расстояние от камеры до шайбы в см (НАСТРОЙТЕ!)
-const PUCK_DIAMETER_PIXELS_AT_CALIBRATION = 90; // Размер шайбы в пикселях на экране
+const PUCK_WIDTH_PIXELS_AT_CALIBRATION = 90; // Ширина шайбы (диаметр) в пикселях при виде сбоку
 
 interface VideoMetadata {
   duration: number; // секунды
