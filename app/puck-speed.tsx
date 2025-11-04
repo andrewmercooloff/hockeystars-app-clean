@@ -319,11 +319,16 @@ export default function PuckSpeedScreen() {
       const darkPatterns6Percent = (darkPatterns6 / base64.length) * 100;
       const veryDarkPercent = (veryDarkPatterns / base64.length) * 100;
       
-      // Темная область есть если:
-      // - >0.5% паттернов4 (низкие значения) ИЛИ
-      // - >0.15% паттернов6 ИЛИ  
-      // - >0.1% очень темных паттернов (0-1, a-b)
-      const hasSignificantDarkArea = darkPatterns4Percent > 0.5 || darkPatterns6Percent > 0.15 || veryDarkPercent > 0.1;
+      // Темная область есть если (понизили пороги, т.к. в реальных условиях темные паттерны меньше):
+      // - >0.2% паттернов4 (низкие значения) ИЛИ
+      // - >0.08% паттернов6 ИЛИ  
+      // - >0.04% очень темных паттернов (0-1, a-b)
+      // ИЛИ если общее количество темных паттернов достаточно велико (абсолютное значение)
+      const hasSignificantDarkArea = 
+        darkPatterns4Percent > 0.2 || 
+        darkPatterns6Percent > 0.08 || 
+        veryDarkPercent > 0.04 ||
+        (darkPatterns4 + darkPatterns6 + veryDarkPatterns) > 50; // Абсолютное значение
       
       console.log(`📊 Анализ: темных паттернов4=${darkPatterns4} (${darkPatterns4Percent.toFixed(2)}%), паттернов6=${darkPatterns6} (${darkPatterns6Percent.toFixed(2)}%), очень темных=${veryDarkPatterns} (${veryDarkPercent.toFixed(2)}%), есть темная область=${hasSignificantDarkArea}`);
       
