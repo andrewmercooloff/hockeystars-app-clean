@@ -117,20 +117,20 @@ export default function PuckSpeedScreen() {
         return;
       }
 
-      // Проверяем размер (должен быть ~90px ± 10px)
+      // Проверяем размер (должен быть ~90px ± 15px для большей толерантности)
       const sizeDiff = Math.abs(analysis.size - ZONE_SIZE);
-      const isPerfectSize = sizeDiff <= 10;
+      const isPerfectSize = sizeDiff <= 15;
       
       // Проверяем форму (соотношение сторон должно быть близко к 1:1 для круга)
       const aspectRatio = analysis.width / analysis.height;
-      const isCircularShape = aspectRatio >= 0.85 && aspectRatio <= 1.15; // Круг, а не эллипс
+      const isCircularShape = aspectRatio >= 0.80 && aspectRatio <= 1.20; // Более толерантная проверка формы
       
-      // Проверяем позицию (должна быть в центре зоны ± 20px)
+      // Проверяем позицию (должна быть в центре зоны ± 40px для большей толерантности)
       const distanceFromCenter = Math.sqrt(
         Math.pow(analysis.position.x - ZONE_CENTER_X, 2) + 
         Math.pow(analysis.position.y - ZONE_CENTER_Y, 2)
       );
-      const isInCenter = distanceFromCenter <= 30; // В пределах 30px от центра
+      const isInCenter = distanceFromCenter <= 40; // В пределах 40px от центра
       
       // Все три условия должны быть выполнены одновременно
       if (isPerfectSize && isCircularShape && isInCenter) {
@@ -139,8 +139,8 @@ export default function PuckSpeedScreen() {
         
         console.log(`✅ Perfect match ${perfectMatchCountRef.current}/3: размер=${analysis.size.toFixed(0)}px, форма=${aspectRatio.toFixed(2)}, позиция=${distanceFromCenter.toFixed(0)}px`);
         
-        // Нужно минимум 3 последовательных perfect проверки подряд
-        if (perfectMatchCountRef.current >= 3) {
+        // Нужно минимум 2 последовательных perfect проверки подряд (уменьшили для отзывчивости)
+        if (perfectMatchCountRef.current >= 2) {
           // Perfect match подтвержден!
           setPuckSizeMatch('perfect');
           
