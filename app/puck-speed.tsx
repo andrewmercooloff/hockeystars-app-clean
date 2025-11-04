@@ -159,13 +159,22 @@ export default function PuckSpeedScreen() {
       // Сбрасываем счетчик при любой неудачной проверке
       perfectMatchCountRef.current = 0;
       
-      // Определяем тип ошибки
-      if (random < 0.3) {
-        setPuckSizeMatch('too-small');
-      } else if (random < 0.6) {
-        setPuckSizeMatch('too-large');
+      // Определяем тип ошибки на основе проверок
+      if (!isPerfectSize) {
+        // Неправильный размер
+        if (sizeCheck < 0.5) {
+          setPuckSizeMatch('too-small');
+        } else {
+          setPuckSizeMatch('too-large');
+        }
+      } else if (!isCircularShape) {
+        // Шайба не круглая (эллипс) - показываем как "неправильная форма"
+        setPuckSizeMatch(null);
+      } else if (!isInCenter) {
+        // Не в центре зоны
+        setPuckSizeMatch(null);
       } else {
-        // Шайба не круглая или не в центре
+        // Другая причина
         setPuckSizeMatch(null);
       }
       setCountdown(null);
