@@ -136,6 +136,8 @@ export default function PuckSpeedScreen() {
       );
       const isInCenter = distanceFromCenter <= 40; // В пределах 40px от центра
       
+      console.log(`🔍 Проверка: размер=${analysis.size.toFixed(0)}px (нужно ${ZONE_SIZE}±15, разница=${sizeDiff.toFixed(0)}, OK=${isPerfectSize}), форма=${aspectRatio.toFixed(2)} (OK=${isCircularShape}), позиция=${distanceFromCenter.toFixed(0)}px (OK=${isInCenter})`);
+      
       // Все три условия должны быть выполнены одновременно
       if (isPerfectSize && isCircularShape && isInCenter) {
         // Увеличиваем счетчик последовательных perfect проверок
