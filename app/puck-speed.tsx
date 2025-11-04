@@ -559,6 +559,10 @@ export default function PuckSpeedScreen() {
                     {t('puckSpeed.getReady') || 'Приготовьтесь!'}
                   </Text>
                 </View>
+              ) : perfectMatchCountRef.current > 0 && perfectMatchCountRef.current < 2 ? (
+                <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
+                  {t('puckSpeed.almostPerfect') || `Почти идеально! (${perfectMatchCountRef.current}/2)`}
+                </Text>
               ) : !puckSizeMatch ? (
                 <Text style={styles.cameraInstructionText}>
                   {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом (сверху, чтобы была круглая, а не эллипс)'}
