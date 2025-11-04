@@ -92,10 +92,12 @@ export default function PuckSpeedScreen() {
     try {
       // Пытаемся захватить кадр с камеры
       if (!cameraRef.current || !isCameraReady) {
-        // Камера не готова - используем fallback
+        // Камера не готова - пропускаем проверку
         return;
       }
 
+      console.log('📸 Захватываем кадр с камеры...');
+      
       // Захватываем снимок с камеры (быстро, без звука)
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.3, // Низкое качество для скорости
@@ -107,6 +109,8 @@ export default function PuckSpeedScreen() {
         return;
       }
 
+      console.log('✅ Кадр захвачен:', photo.uri);
+      
       // Анализируем изображение
       const analysis = await analyzePuckInImage(photo.uri);
       
@@ -223,6 +227,8 @@ export default function PuckSpeedScreen() {
     height: number;
   } | null> => {
     try {
+      console.log('🔍 Начинаем анализ изображения:', imageUri);
+      
       // 1. Уменьшаем размер изображения для быстрой обработки
       const processed = await manipulateAsync(
         imageUri,
@@ -232,17 +238,44 @@ export default function PuckSpeedScreen() {
         { format: 'jpeg', compress: 0.5 }
       );
       
+      console.log('✅ Изображение обработано:', processed.uri);
+      
       // 2. Читаем данные изображения в Base64
-      const base64 = await FileSystem.readAsStringAsync(processed.uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      // Используем альтернативный способ если EncodingType не работает
+      let base64: string;
+      try {
+        base64 = await FileSystem.readAsStringAsync(processed.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+      } catch (encodingError) {
+        console.warn('⚠️ Ошибка с EncodingType, пробуем альтернативный способ:', encodingError);
+        // Альтернативный способ: используем fetch и конвертируем в base64
+        const response = await fetch(processed.uri);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        base64 = await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            // Убираем префикс data:image/jpeg;base64,
+            const base64Data = result.split(',')[1] || result;
+            resolve(base64Data);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
+      
+      console.log('✅ Base64 получен, длина:', base64.length);
       
       // 3. Упрощенный анализ: проверяем наличие темных областей
       // Шайба черная, поэтому в Base64 будет много темных паттернов
       const darkPatterns = (base64.match(/[A-F0-9]{6,}/g) || []).length;
       const hasSignificantDarkArea = darkPatterns > base64.length / 50;
       
+      console.log(`📊 Анализ: темных паттернов=${darkPatterns}, порог=${Math.floor(base64.length / 50)}, есть темная область=${hasSignificantDarkArea}`);
+      
       if (hasSignificantDarkArea) {
+        console.log('✅ Темная область обнаружена!');
         // Обнаружили темную область - предполагаем что это шайба
         // Для упрощения: если есть темная область, считаем что шайба в центре зоны
         // Размер зависит от плотности темных пикселей
@@ -284,9 +317,10 @@ export default function PuckSpeedScreen() {
         };
       }
       
+      console.log('⚠️ Темная область не обнаружена');
       return null;
     } catch (error) {
-      console.warn('⚠️ Ошибка анализа изображения:', error);
+      console.error('❌ Ошибка анализа изображения:', error);
       return null;
     }
   };
