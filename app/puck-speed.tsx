@@ -253,7 +253,7 @@ export default function PuckSpeedScreen() {
         [
           { resize: { width: 400 } }, // Уменьшаем для быстрой обработки
         ],
-        { format: 'jpeg', compress: 0.5 }
+        { compress: 0.5 }
       );
       
       console.log('✅ Изображение обработано:', processed.uri);
