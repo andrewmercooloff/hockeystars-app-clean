@@ -335,8 +335,8 @@ export default function PuckSpeedScreen() {
           Math.pow(x - ZONE_CENTER_X, 2) + Math.pow(y - ZONE_CENTER_Y, 2)
         );
         const isCentered = distanceFromCenter < 25;
-        const isRightSize = size >= 80 && size <= 100;
-        const hasHighDarkDensity = totalDarkPatterns > 150; // Много темных паттернов = вероятно круг
+        const isRightSize = size >= 75 && size <= 105; // Увеличиваем диапазон для размера
+        const hasHighDarkDensity = totalDarkPatterns > 140; // Снижаем порог для высокой плотности (было 150)
         
         // Если размер правильный, в центре и много темных паттернов - считаем круглой (вид сверху)
         // Иначе - небольшой эллипс (вид слегка сбоку), но не слишком большой
