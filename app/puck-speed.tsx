@@ -127,7 +127,8 @@ export default function PuckSpeedScreen() {
       
       // Проверяем форму (соотношение сторон должно быть близко к 1:1 для круга)
       const aspectRatio = analysis.width / analysis.height;
-      const isCircularShape = aspectRatio >= 0.80 && aspectRatio <= 1.20; // Более толерантная проверка формы
+      // Увеличиваем толерантность для формы: 0.75-1.35 (шайба сбоку может быть эллипсом)
+      const isCircularShape = aspectRatio >= 0.75 && aspectRatio <= 1.35;
       
       // Проверяем позицию (должна быть в центре зоны ± 40px для большей толерантности)
       const distanceFromCenter = Math.sqrt(
