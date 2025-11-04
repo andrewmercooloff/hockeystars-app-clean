@@ -30,10 +30,31 @@ export default function PuckSpeedScreen() {
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [measuredSpeed, setMeasuredSpeed] = useState<number | null>(null);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [puckInZone, setPuckInZone] = useState(false); // Шайба в зоне калибровки
+  const [isCalibrated, setIsCalibrated] = useState(false); // Калибровка завершена
+
+  const handleCalibrate = () => {
+    // Имитируем детекцию шайбы в зоне
+    setPuckInZone(true);
+    setTimeout(() => {
+      setIsCalibrated(true);
+      // Через секунду автоматически запускаем запись
+      setTimeout(() => {
+        startRecording();
+      }, 500);
+    }, 500);
+  };
 
   const startRecording = async () => {
-    // АЛЬТЕРНАТИВНЫЙ ПОДХОД: Используем ImagePicker вместо прямой записи через CameraView
-    // Это более надежно и работает в Expo Go
+    // Проверяем калибровку
+    if (!isCalibrated) {
+      Alert.alert(
+        t('error') || 'Ошибка', 
+        t('puckSpeed.calibrationRequired') || 'Сначала необходимо откалибровать размер шайбы'
+      );
+      return;
+    }
+
     try {
       if (Platform.OS === 'web') {
         Alert.alert(t('error') || 'Ошибка', 'Запись видео не поддерживается в веб-версии');
@@ -49,24 +70,32 @@ export default function PuckSpeedScreen() {
 
       console.log('🎬 Запускаем запись видео через ImagePicker');
       
-      // Запускаем камеру для записи видео
+      // Запускаем камеру для записи видео - только задняя камера
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: ['videos'],
         allowsEditing: false,
         quality: 0.8,
         videoMaxDuration: 10, // Максимум 10 секунд
-        videoQuality: ImagePicker.UIImagePickerControllerQualityType.High,
+        cameraType: ImagePicker.CameraType.back, // Только задняя камера
       });
 
       if (!result.canceled && result.assets[0]) {
         console.log('✅ Видео записано успешно:', result.assets[0].uri);
         setRecordingUri(result.assets[0].uri);
+        // Сбрасываем калибровку для следующего измерения
+        setIsCalibrated(false);
+        setPuckInZone(false);
       } else {
         console.log('ℹ️ Запись видео отменена пользователем');
+        // Сбрасываем калибровку
+        setIsCalibrated(false);
+        setPuckInZone(false);
       }
     } catch (error: any) {
       console.error('❌ Ошибка записи видео:', error);
       Alert.alert(t('error') || 'Ошибка', t('puckSpeed.recordingError') || 'Не удалось записать видео');
+      setIsCalibrated(false);
+      setPuckInZone(false);
     }
   };
 
@@ -133,6 +162,13 @@ export default function PuckSpeedScreen() {
     setRecordingUri(null);
     setMeasuredSpeed(null);
     setShowResultModal(false);
+    setIsCalibrated(false);
+    setPuckInZone(false);
+  };
+
+  const resetCalibration = () => {
+    setIsCalibrated(false);
+    setPuckInZone(false);
   };
 
   return (
@@ -155,39 +191,77 @@ export default function PuckSpeedScreen() {
             contentContainerStyle={styles.scrollContent}
           >
             {/* Инструкции для пользователя */}
-            <View style={styles.instructionsContainer}>
-              <View style={{ alignSelf: 'center', marginBottom: 10 }}>
-                <Ionicons name="information-circle" size={40} color="#fa2f40" />
+            {!isCalibrated && !recordingUri && (
+              <View style={styles.instructionsContainer}>
+                <View style={{ alignSelf: 'center', marginBottom: 10 }}>
+                  <Ionicons name="information-circle" size={40} color="#fa2f40" />
+                </View>
+                <Text style={styles.instructionsTitle}>
+                  {t('puckSpeed.instructions') || 'Инструкции:'}
+                </Text>
+                <Text style={styles.instructionsText}>
+                  {t('puckSpeed.instruction1') || '1. Расположите телефон в метре от места удара'}
+                </Text>
+                <Text style={styles.instructionsText}>
+                  {t('puckSpeed.instruction2_new') || '2. Поместите шайбу в зону калибровки (круг снизу слева экрана записи)'}
+                </Text>
+                <Text style={styles.instructionsText}>
+                  {t('puckSpeed.instruction3_new') || '3. Когда шайба в зоне, нажмите "Калибровать"'}
+                </Text>
+                <Text style={styles.instructionsText}>
+                  {t('puckSpeed.instruction4_new') || '4. После калибровки выполните удар и видео запишется автоматически'}
+                </Text>
               </View>
-              <Text style={styles.instructionsTitle}>
-                {t('puckSpeed.instructions') || 'Инструкции:'}
-              </Text>
-              <Text style={styles.instructionsText}>
-                {t('puckSpeed.instruction1') || '1. Расположите телефон в метре от места удара'}
-              </Text>
-              <Text style={styles.instructionsText}>
-                {t('puckSpeed.instruction2') || '2. Нажмите "Начать запись" и выполните удар'}
-              </Text>
-              <Text style={styles.instructionsText}>
-                {t('puckSpeed.instruction3') || '3. Шайба должна быть видна на белом/синтетическом льду'}
-              </Text>
-              <Text style={styles.instructionsText}>
-                {t('puckSpeed.instruction4') || '4. Запись автоматически остановится через 10 секунд'}
-              </Text>
-            </View>
+            )}
+
+            {/* Зона калибровки */}
+            {isCalibrated && !recordingUri && (
+              <View style={styles.calibrationSuccess}>
+                <Ionicons name="checkmark-circle" size={64} color="#4CAF50" />
+                <Text style={styles.calibrationSuccessText}>
+                  {t('puckSpeed.calibrationComplete') || 'Калибровка завершена!'}
+                </Text>
+                <Text style={styles.calibrationInfoText}>
+                  {t('puckSpeed.calibrationInfo') || 'Нажмите "Начать запись" когда будете готовы выполнить удар'}
+                </Text>
+                <TouchableOpacity
+                  style={styles.recalibrateButton}
+                  onPress={resetCalibration}
+                >
+                  <Ionicons name="refresh" size={20} color="#fff" />
+                  <Text style={styles.recalibrateButtonText}>
+                    {t('puckSpeed.recalibrate') || 'Откалибровать заново'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             {/* Кнопки управления */}
             <View style={styles.controlsContainer}>
           {!recordingUri ? (
-            <TouchableOpacity
-              style={styles.recordButton}
-              onPress={startRecording}
-            >
-              <Ionicons name="videocam" size={64} color="#fff" />
-              <Text style={styles.recordButtonText}>
-                {t('puckSpeed.startRecording') || 'Начать запись'}
-              </Text>
-            </TouchableOpacity>
+            <>
+              {!isCalibrated ? (
+                <TouchableOpacity
+                  style={styles.calibrateButton}
+                  onPress={handleCalibrate}
+                >
+                  <Ionicons name="scan" size={48} color="#fff" />
+                  <Text style={styles.calibrateButtonText}>
+                    {t('puckSpeed.calibrate') || 'Калибровать шайбу'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.recordButton}
+                  onPress={startRecording}
+                >
+                  <Ionicons name="videocam" size={64} color="#fff" />
+                  <Text style={styles.recordButtonText}>
+                    {t('puckSpeed.startRecording') || 'Начать запись'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </>
           ) : (
             <View style={styles.processContainer}>
               <View style={styles.videoRecordedInfo}>
@@ -368,6 +442,63 @@ const styles = StyleSheet.create({
   recordButtonText: {
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  calibrateButton: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 40,
+    paddingVertical: 25,
+    borderRadius: 15,
+    width: '100%',
+    gap: 12,
+  },
+  calibrateButtonText: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  calibrationSuccess: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    padding: 25,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    marginBottom: 30,
+    width: '100%',
+    maxWidth: 500,
+  },
+  calibrationSuccessText: {
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    color: '#4CAF50',
+    marginTop: 15,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  calibrationInfoText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  recalibrateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  recalibrateButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     color: '#fff',
   },
   processContainer: {
