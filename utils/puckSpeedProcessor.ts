@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { Video } from 'expo-av';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { manipulateAsync } from 'expo-image-manipulator';
@@ -165,20 +165,22 @@ async function extractFramesFromVideo(videoUri: string, duration: number): Promi
     const totalFrames = Math.min(Math.floor(duration / frameInterval), 100); // Максимум 100 кадров
     
     for (let i = 0; i < totalFrames; i++) {
-      const timestamp = i * frameInterval * 1000; // в миллисекундах
+      const timestamp = Math.round(i * frameInterval * 1000); // Округляем до целого числа
       
       try {
         const { uri } = await VideoThumbnails.getThumbnailAsync(videoUri, {
           time: timestamp,
-          quality: 0.5, // Средне качество для быстрой обработки
+          quality: 0.5,
         });
         
         frames.push(uri);
       } catch (error) {
-        console.warn(`⚠️ Не удалось извлечь кадр на ${timestamp}мс:`, error);
+        // Игнорируем ошибки отдельных кадров
+        // console.warn(`⚠️ Не удалось извлечь кадр на ${timestamp}мс`);
       }
     }
     
+    console.log(`✅ Успешно извлечено ${frames.length} кадров из ${totalFrames}`);
     return frames;
   } catch (error) {
     console.error('❌ Ошибка извлечения кадров:', error);

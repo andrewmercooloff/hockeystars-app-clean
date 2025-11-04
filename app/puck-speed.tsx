@@ -78,18 +78,26 @@ export default function PuckSpeedScreen() {
 
       if (!result.canceled && result.assets[0]) {
         console.log('✅ Видео записано успешно:', result.assets[0].uri);
-        setRecordingUri(result.assets[0].uri);
+        const videoUri = result.assets[0].uri;
+        setRecordingUri(videoUri);
         setPuckInZone(false);
         
         // АВТОМАТИЧЕСКИ начинаем обработку сразу после записи
         setIsProcessing(true);
+        
+        // Небольшая задержка для UI
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         try {
-          const speed = await processPuckSpeedVideo(result.assets[0].uri);
+          const speed = await processPuckSpeedVideo(videoUri);
           
           if (speed && speed > 0) {
             setMeasuredSpeed(speed);
-            setShowResultModal(true);
+            setIsProcessing(false); // Убираем индикатор обработки
+            setShowResultModal(true); // Показываем результат
           } else {
+            setIsProcessing(false);
+            setRecordingUri(null);
             Alert.alert(
               t('error') || 'Ошибка',
               t('puckSpeed.detectionError') || 'Не удалось определить скорость шайбы.'
@@ -97,16 +105,19 @@ export default function PuckSpeedScreen() {
           }
         } catch (error) {
           console.error('❌ Ошибка обработки видео:', error);
+          setIsProcessing(false);
+          setRecordingUri(null);
           Alert.alert(
             t('error') || 'Ошибка',
             t('puckSpeed.processingError') || 'Ошибка при обработке видео'
           );
-        } finally {
-          setIsProcessing(false);
         }
       } else {
+        // Пользователь отменил запись
         console.log('ℹ️ Запись видео отменена пользователем');
         setPuckInZone(false);
+        setIsProcessing(false); // Важно! Сбрасываем флаг
+        setRecordingUri(null); // Сбрасываем URI
       }
     } catch (error: any) {
       console.error('❌ Ошибка записи видео:', error);
@@ -141,6 +152,7 @@ export default function PuckSpeedScreen() {
     setMeasuredSpeed(null);
     setShowResultModal(false);
     setPuckInZone(false);
+    setIsProcessing(false); // Важно! Сбрасываем флаг обработки
   };
 
   if (!permission) {
