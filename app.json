@@ -60,7 +60,9 @@
         "color": "#fa2f40",
         "androidMode": "default",
         "androidCollapsedTitle": "HockeyStars",
-        "sounds": ["./assets/not.m4a"]
+        "sounds": [
+          "./assets/not.m4a"
+        ]
       },
       "softwareKeyboardLayoutMode": "pan",
       "navigationBar": {
@@ -111,14 +113,19 @@
           "icon": "./assets/images/ic_notification.png",
           "color": "#fa2f40",
           "defaultChannel": "default",
-          "sounds": ["./assets/not.m4a"]
+          "sounds": [
+            "./assets/not.m4a"
+          ]
         }
-      ]
+      ],
+      "react-native-vision-camera"
     ],
     "notification": {
       "icon": "./assets/images/ic_notification.png",
       "color": "#fa2f40",
-      "sounds": ["./assets/not.m4a"]
+      "sounds": [
+        "./assets/not.m4a"
+      ]
     }
   }
 }

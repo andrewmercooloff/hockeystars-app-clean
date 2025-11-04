@@ -47,14 +47,15 @@ export default function PuckSpeedScreen() {
     }
   }, [permission, requestPermission]);
 
-  const confirmPuckInZone = () => {
+  const confirmPuckInZone = async () => {
     // Пользователь подтверждает, что шайба в зоне
     setPuckInZone(true);
     
-    // Через полсекунды автоматически запускаем запись через ImagePicker
-    setTimeout(() => {
-      startRecording();
-    }, 500);
+    // Визуальная обратная связь
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Автоматически запускаем запись
+    startRecording();
   };
 
   const startRecording = async () => {
@@ -70,7 +71,7 @@ export default function PuckSpeedScreen() {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['videos'],
         allowsEditing: false,
-        quality: 0.8,
+        quality: 1.0, // Максимальное качество для лучшего анализа
         videoMaxDuration: 10, // Максимум 10 секунд
         cameraType: ImagePicker.CameraType.front, // ПЕРЕДНЯЯ камера, чтобы видеть экран
       });
@@ -79,6 +80,30 @@ export default function PuckSpeedScreen() {
         console.log('✅ Видео записано успешно:', result.assets[0].uri);
         setRecordingUri(result.assets[0].uri);
         setPuckInZone(false);
+        
+        // АВТОМАТИЧЕСКИ начинаем обработку сразу после записи
+        setIsProcessing(true);
+        try {
+          const speed = await processPuckSpeedVideo(result.assets[0].uri);
+          
+          if (speed && speed > 0) {
+            setMeasuredSpeed(speed);
+            setShowResultModal(true);
+          } else {
+            Alert.alert(
+              t('error') || 'Ошибка',
+              t('puckSpeed.detectionError') || 'Не удалось определить скорость шайбы.'
+            );
+          }
+        } catch (error) {
+          console.error('❌ Ошибка обработки видео:', error);
+          Alert.alert(
+            t('error') || 'Ошибка',
+            t('puckSpeed.processingError') || 'Ошибка при обработке видео'
+          );
+        } finally {
+          setIsProcessing(false);
+        }
       } else {
         console.log('ℹ️ Запись видео отменена пользователем');
         setPuckInZone(false);
@@ -87,34 +112,6 @@ export default function PuckSpeedScreen() {
       console.error('❌ Ошибка записи видео:', error);
       Alert.alert(t('error') || 'Ошибка', t('puckSpeed.recordingError') || 'Не удалось записать видео');
       setPuckInZone(false);
-    }
-  };
-
-  const processVideo = async () => {
-    if (!recordingUri) return;
-
-    setIsProcessing(true);
-    try {
-      // Обрабатываем видео и вычисляем скорость
-      const speed = await processPuckSpeedVideo(recordingUri);
-      
-      if (speed && speed > 0) {
-        setMeasuredSpeed(speed);
-        setShowResultModal(true);
-      } else {
-        Alert.alert(
-          t('error') || 'Ошибка',
-          t('puckSpeed.detectionError') || 'Не удалось определить скорость шайбы. Убедитесь, что шайба видна в кадре.'
-        );
-      }
-    } catch (error) {
-      console.error('❌ Ошибка обработки видео:', error);
-      Alert.alert(
-        t('error') || 'Ошибка',
-        t('puckSpeed.processingError') || 'Ошибка при обработке видео'
-      );
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -272,50 +269,15 @@ export default function PuckSpeedScreen() {
                 <View style={styles.backButton} />
               </View>
 
-              <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-              >
-                <View style={styles.processContainer}>
-              <View style={styles.videoRecordedInfo}>
-                <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
-                <Text style={styles.videoRecordedText}>
-                  {t('puckSpeed.videoRecorded') || 'Видео записано!'}
+              <View style={styles.processingContainer}>
+                <ActivityIndicator size="large" color="#fa2f40" />
+                <Text style={styles.processingText}>
+                  {t('puckSpeed.analyzingVideo') || 'Анализ видео...'}
+                </Text>
+                <Text style={styles.processingSubtext}>
+                  {t('puckSpeed.analyzingDetails') || 'Отслеживание движения шайбы и вычисление скорости'}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={styles.processButton}
-                onPress={processVideo}
-                disabled={isProcessing}
-              >
-                {isProcessing ? (
-                  <>
-                    <ActivityIndicator size="large" color="#fff" />
-                    <Text style={styles.processButtonText}>
-                      {t('puckSpeed.processing') || 'Обработка...'}
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Ionicons name="analytics" size={32} color="#fff" />
-                    <Text style={styles.processButtonText}>
-                      {t('puckSpeed.processVideo') || 'Вычислить скорость'}
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.retakeButton}
-                onPress={retakeVideo}
-              >
-                <Ionicons name="refresh" size={24} color="#fff" />
-                <Text style={styles.retakeButtonText}>
-                  {t('puckSpeed.retake') || 'Переснять'}
-                </Text>
-              </TouchableOpacity>
-                </View>
-              </ScrollView>
-            </View>
           </View>
         </View>
       )}
@@ -496,16 +458,25 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'left',
   },
-  scrollView: {
+  processingContainer: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 52,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 40,
+  },
+  processingText: {
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    marginTop: 30,
+    textAlign: 'center',
+  },
+  processingSubtext: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
+    marginTop: 10,
+    textAlign: 'center',
   },
   loadingContainer: {
     flex: 1,
