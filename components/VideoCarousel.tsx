@@ -91,14 +91,19 @@ interface VideoCarouselProps {
   videos: Array<{ url: string; timeCode?: string }>;
   onVideoPress?: (video: { url: string; timeCode?: string }) => void;
   playerId?: string; // ID игрока, владельца видео
+  externalRefreshTrigger?: number; // Внешний trigger для синхронизации лайков
 }
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function VideoCarousel({ videos, onVideoPress, playerId }: VideoCarouselProps) {
+export default function VideoCarousel({ videos, onVideoPress, playerId, externalRefreshTrigger = 0 }: VideoCarouselProps) {
   const { t } = useLanguage();
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
+  
+  // Используем максимальное значение между внутренним и внешним trigger
+  const effectiveRefreshTrigger = Math.max(likeRefreshTrigger, externalRefreshTrigger);
   
   const panResponder = useRef(
     PanResponder.create({
@@ -126,6 +131,8 @@ export default function VideoCarousel({ videos, onVideoPress, playerId }: VideoC
 
   const closeModal = () => {
     setSelectedVideo(null);
+    // Обновляем trigger для перезагрузки данных лайков в карусели
+    setLikeRefreshTrigger(prev => prev + 1);
   };
 
   if (!videos || videos.length === 0) {
@@ -179,6 +186,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId }: VideoC
                     contentId={contentId}
                     contentType="video"
                     size="small"
+                    refreshTrigger={effectiveRefreshTrigger}
                   />
                 </View>
               )}

@@ -47,10 +47,17 @@ export default function EditablePhotosSection({
   const [uploadingCount, setUploadingCount] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
 
   const openPhotoViewer = (index: number) => {
     setSelectedPhotoIndex(index);
     setPhotoViewerVisible(true);
+  };
+
+  const handlePhotoViewerClose = () => {
+    setPhotoViewerVisible(false);
+    // Обновляем trigger для перезагрузки данных лайков в карусели
+    setLikeRefreshTrigger(prev => prev + 1);
   };
 
   const handleAddPhoto = () => {
@@ -476,6 +483,7 @@ export default function EditablePhotosSection({
                             contentId={contentId}
                             contentType="photo"
                             size="small"
+                            refreshTrigger={likeRefreshTrigger}
                           />
                         </View>
                       )}
@@ -499,7 +507,7 @@ export default function EditablePhotosSection({
       <PhotoViewer
         photos={photos}
         visible={photoViewerVisible}
-        onClose={() => setPhotoViewerVisible(false)}
+        onClose={handlePhotoViewerClose}
         initialIndex={selectedPhotoIndex}
         playerId={playerId}
       />

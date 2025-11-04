@@ -15,6 +15,7 @@ interface LikeButtonProps {
   contentId: string;
   contentType: 'video' | 'photo';
   size?: 'small' | 'medium' | 'large';
+  refreshTrigger?: number; // Принудительная перезагрузка данных при изменении
 }
 
 export default function LikeButton({
@@ -22,6 +23,7 @@ export default function LikeButton({
   contentId,
   contentType,
   size = 'medium',
+  refreshTrigger = 0,
 }: LikeButtonProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -31,7 +33,7 @@ export default function LikeButton({
 
   useEffect(() => {
     loadInitialData();
-  }, [playerId, contentId, contentType]);
+  }, [playerId, contentId, contentType, refreshTrigger]);
 
   const loadInitialData = async () => {
     try {

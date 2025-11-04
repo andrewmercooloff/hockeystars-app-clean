@@ -55,6 +55,8 @@ export interface SupabasePlayer {
   // Поля для индивидуальных тренировок и услуг заточки коньков
   individual_training?: string[] | null;
   skate_services?: string[] | null;
+  // Скорость шайбы (JSON строка с историей)
+  puck_speed_data?: string; // JSON: { maxSpeed: number, history: Array<{speed: number, date: string}> }
 }
 
 // Интерфейс для приложения (camelCase) - совместимый со старым кодом
@@ -201,6 +203,15 @@ export interface Player {
   activityRating?: number; // рейтинг активности игрока
   // Дата создания
   createdAt?: string; // дата создания игрока в БД
+  // Скорость шайбы
+  puckSpeed?: number; // текущая максимальная скорость шайбы (км/ч)
+  puckSpeedHistory?: PuckSpeedRecord[]; // история измерений скорости
+}
+
+// Интерфейс для записи скорости шайбы
+export interface PuckSpeedRecord {
+  speed: number; // скорость в км/ч
+  date: string; // дата измерения (ISO string)
 }
 
 export interface Message {
@@ -356,7 +367,32 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     individual_training: supabasePlayer.individual_training || undefined,
     skate_services: supabasePlayer.skate_services || undefined,
     // Дата создания
-    createdAt: supabasePlayer.created_at
+    createdAt: supabasePlayer.created_at,
+    // Скорость шайбы
+    puckSpeed: (() => {
+      if (supabasePlayer.puck_speed_data) {
+        try {
+          const parsed = JSON.parse(supabasePlayer.puck_speed_data);
+          return parsed.maxSpeed || undefined;
+        } catch (error) {
+          console.warn('⚠️ Ошибка парсинга puck_speed_data:', error);
+          return undefined;
+        }
+      }
+      return undefined;
+    })(),
+    puckSpeedHistory: (() => {
+      if (supabasePlayer.puck_speed_data) {
+        try {
+          const parsed = JSON.parse(supabasePlayer.puck_speed_data);
+          return parsed.history || [];
+        } catch (error) {
+          console.warn('⚠️ Ошибка парсинга puck_speed_data:', error);
+          return [];
+        }
+      }
+      return [];
+    })(),
   };
   
   
@@ -1023,7 +1059,20 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     coach_years: player.coach_years || null,
     // Поля для индивидуальных тренировок и услуг заточки коньков
     individual_training: player.individual_training || null,
-    skate_services: player.skate_services || null
+    skate_services: player.skate_services || null,
+    // Скорость шайбы
+    puck_speed_data: (() => {
+      if (player.puckSpeed !== undefined || (player.puckSpeedHistory && player.puckSpeedHistory.length > 0)) {
+        const maxSpeed = player.puckSpeed || (player.puckSpeedHistory && player.puckSpeedHistory.length > 0 
+          ? Math.max(...player.puckSpeedHistory.map(r => r.speed)) 
+          : 0);
+        return JSON.stringify({
+          maxSpeed: maxSpeed,
+          history: player.puckSpeedHistory || []
+        });
+      }
+      return undefined;
+    })()
   };
 };
 
@@ -6225,5 +6274,49 @@ export const getSmartPlayerSelection = (
     console.error('❌ Ошибка умного отбора игроков:', error);
     // В случае ошибки возвращаем всех игроков (fallback)
     return players;
+  }
+};
+
+/**
+ * Сохраняет результат измерения скорости шайбы
+ * @param playerId ID игрока
+ * @param speed Скорость в км/ч
+ */
+export const savePuckSpeedResult = async (playerId: string, speed: number): Promise<boolean> => {
+  try {
+    // Получаем текущие данные игрока
+    const player = await getPlayerById(playerId);
+    if (!player) {
+      throw new Error('Игрок не найден');
+    }
+
+    // Получаем текущую историю скорости
+    const currentHistory = player.puckSpeedHistory || [];
+    const currentMaxSpeed = player.puckSpeed || 0;
+
+    // Добавляем новую запись
+    const newRecord: PuckSpeedRecord = {
+      speed: speed,
+      date: new Date().toISOString(),
+    };
+
+    const updatedHistory = [...currentHistory, newRecord];
+    
+    // Определяем новую максимальную скорость
+    const newMaxSpeed = Math.max(currentMaxSpeed, speed);
+
+    // Обновляем данные игрока
+    const updatedPlayer = {
+      ...player,
+      puckSpeed: newMaxSpeed,
+      puckSpeedHistory: updatedHistory,
+    };
+
+    const result = await updatePlayer(playerId, updatedPlayer);
+    
+    return result !== null;
+  } catch (error) {
+    console.error('❌ Ошибка сохранения результата скорости шайбы:', error);
+    return false;
   }
 };

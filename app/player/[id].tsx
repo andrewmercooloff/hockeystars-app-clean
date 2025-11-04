@@ -141,6 +141,7 @@ export default function PlayerProfile() {
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [videoLikeRefreshTrigger, setVideoLikeRefreshTrigger] = useState(0);
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -2809,7 +2810,7 @@ export default function PlayerProfile() {
                       onPress={showBirthDatePickerModal}
                     >
                       <Text style={styles.pickerButtonText}>
-                        {editData.birthDate || player.birthDate || 'Выберите дату'}
+                        {editData.birthDate || player.birthDate || t('register.selectDate')}
                       </Text>
                       <Ionicons name="calendar-outline" size={16} color="#fff" />
                     </TouchableOpacity>
@@ -3650,6 +3651,7 @@ export default function PlayerProfile() {
                         videos={parsedVideos}
                     onVideoPress={(video) => setSelectedVideo(video)}
                     playerId={player.id}
+                    externalRefreshTrigger={videoLikeRefreshTrigger}
                   />
                     );
                   })()
@@ -3835,6 +3837,92 @@ export default function PlayerProfile() {
                 </View>
               )
             ) : null}
+
+            {/* Секция измерения скорости шайбы - только для игроков */}
+            {player && player.status === 'player' && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>
+                  {t('puckSpeed.title') || 'Скорость шайбы'}
+                </Text>
+                {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') ? (
+                  <View style={styles.puckSpeedContainer}>
+                    {player.puckSpeed ? (
+                      <View style={styles.puckSpeedDisplay}>
+                        <View style={styles.puckSpeedValueContainer}>
+                          <Text style={styles.puckSpeedValue}>
+                            {player.puckSpeed.toFixed(1)}
+                          </Text>
+                          <Text style={styles.puckSpeedUnit}>
+                            {t('puckSpeed.kmh') || 'км/ч'}
+                          </Text>
+                        </View>
+                        {player.puckSpeedHistory && player.puckSpeedHistory.length > 1 && (
+                          <View style={styles.puckSpeedHistory}>
+                            <Text style={styles.puckSpeedHistoryLabel}>
+                              {t('puckSpeed.lastMeasurement') || 'Последнее измерение:'}
+                            </Text>
+                            <View style={styles.puckSpeedHistoryRow}>
+                              <Text style={styles.puckSpeedHistoryValue}>
+                                {player.puckSpeedHistory[player.puckSpeedHistory.length - 1].speed.toFixed(1)} {t('puckSpeed.kmh') || 'км/ч'}
+                              </Text>
+                              {player.puckSpeedHistory.length >= 2 && (() => {
+                                const lastSpeed = player.puckSpeedHistory[player.puckSpeedHistory.length - 1].speed;
+                                const prevSpeed = player.puckSpeedHistory[player.puckSpeedHistory.length - 2].speed;
+                                const improvement = lastSpeed - prevSpeed;
+                                if (improvement > 0) {
+                                  return (
+                                    <View style={styles.speedImprovement}>
+                                      <Ionicons name="arrow-up" size={16} color="#4CAF50" />
+                                      <Text style={styles.speedImprovementText}>
+                                        +{improvement.toFixed(1)}
+                                      </Text>
+                                    </View>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </View>
+                          </View>
+                        )}
+                        <TouchableOpacity
+                          style={styles.measureSpeedButton}
+                          onPress={() => router.push('/puck-speed')}
+                        >
+                          <Ionicons name="speedometer" size={24} color="#fff" />
+                          <Text style={styles.measureSpeedButtonText}>
+                            {player.puckSpeed ? (t('puckSpeed.measureAgain') || 'Измерить снова') : (t('puckSpeed.measure') || 'Измерить скорость')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View style={styles.puckSpeedEmpty}>
+                        <Ionicons name="speedometer-outline" size={48} color="#666" />
+                        <Text style={styles.puckSpeedEmptyText}>
+                          {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.measureSpeedButton}
+                          onPress={() => router.push('/puck-speed')}
+                        >
+                          <Ionicons name="add-circle" size={24} color="#fff" />
+                          <Text style={styles.measureSpeedButtonText}>
+                            {t('puckSpeed.measure') || 'Измерить скорость'}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                ) : (
+                  <View style={styles.lockedSectionContainer}>
+                    <Ionicons name="lock-closed" size={48} color="#fa2f40" />
+                    <Text style={styles.lockedSectionTitle}>{t('profile.addToFriends')}</Text>
+                    <Text style={styles.lockedSectionText}>
+                      {t('profile.addToFriendsToSeeSpeed', { name: player.name }) || `Добавьте ${player.name} в друзья, чтобы увидеть скорость шайбы`}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
 
             {/* Секция упражнений */}
             {player && (
@@ -4560,16 +4648,25 @@ export default function PlayerProfile() {
         visible={selectedVideo !== null}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setSelectedVideo(null)}
+        onRequestClose={() => {
+          setSelectedVideo(null);
+          setVideoLikeRefreshTrigger(prev => prev + 1);
+        }}
       >
         <View style={styles.videoModalOverlay}>
-          <TouchableWithoutFeedback onPress={() => setSelectedVideo(null)}>
+          <TouchableWithoutFeedback onPress={() => {
+            setSelectedVideo(null);
+            setVideoLikeRefreshTrigger(prev => prev + 1);
+          }}>
             <View style={styles.videoModalOverlayTouchable} />
           </TouchableWithoutFeedback>
           <View style={styles.videoModalContainer} pointerEvents="box-none">
             <TouchableOpacity
               style={styles.videoModalCloseButton}
-              onPress={() => setSelectedVideo(null)}
+              onPress={() => {
+                setSelectedVideo(null);
+                setVideoLikeRefreshTrigger(prev => prev + 1);
+              }}
             >
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
@@ -4579,7 +4676,10 @@ export default function PlayerProfile() {
                   url={selectedVideo.url}
                   title={t('myMoment')}
                   timeCode={selectedVideo.timeCode}
-                  onClose={() => setSelectedVideo(null)}
+                  onClose={() => {
+                    setSelectedVideo(null);
+                    setVideoLikeRefreshTrigger(prev => prev + 1);
+                  }}
                 />
                 {player && (
                   <View style={styles.videoModalLikeButton}>
@@ -5411,6 +5511,94 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginTop: 5,
+  },
+  puckSpeedContainer: {
+    padding: 20,
+  },
+  puckSpeedDisplay: {
+    alignItems: 'center',
+  },
+  puckSpeedValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 15,
+  },
+  puckSpeedValue: {
+    fontSize: 48,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+  },
+  puckSpeedUnit: {
+    fontSize: 24,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    marginLeft: 8,
+  },
+  puckSpeedHistory: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    width: '100%',
+  },
+  puckSpeedHistoryLabel: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
+    marginBottom: 5,
+  },
+  puckSpeedHistoryValue: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  puckSpeedHistoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  speedImprovement: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  speedImprovementText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#4CAF50',
+    marginLeft: 4,
+  },
+  puckSpeedEmpty: {
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  puckSpeedEmptyText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    marginTop: 15,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  measureSpeedButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fa2f40',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+    gap: 10,
+  },
+  measureSpeedButtonText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
   },
 
   videoModalOverlay: {
