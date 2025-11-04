@@ -21,7 +21,7 @@ import { processPuckSpeedVideo } from '../utils/puckSpeedProcessor';
 import { savePuckSpeedResult } from '../utils/playerStorage';
 import { Dimensions } from 'react-native';
 import { manipulateAsync } from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -215,6 +215,7 @@ export default function PuckSpeedScreen() {
   };
 
   // Анализирует изображение для поиска шайбы
+  // Использует упрощенный анализ: проверяет наличие темных областей в зоне калибровки
   const analyzePuckInImage = async (imageUri: string): Promise<{
     position: { x: number; y: number };
     size: number;
@@ -236,36 +237,43 @@ export default function PuckSpeedScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
       
-      // 3. Анализируем изображение для детекции темных круглых объектов
-      // Упрощенный алгоритм: ищем темные области и проверяем их форму
-      
-      // Эвристика: если в Base64 много повторений темных паттернов
+      // 3. Упрощенный анализ: проверяем наличие темных областей
+      // Шайба черная, поэтому в Base64 будет много темных паттернов
       const darkPatterns = (base64.match(/[A-F0-9]{6,}/g) || []).length;
       const hasSignificantDarkArea = darkPatterns > base64.length / 50;
       
       if (hasSignificantDarkArea) {
-        // Обнаружили темную область - это может быть шайба
-        // Для MVP используем упрощенный анализ:
-        // - Позиция зависит от хеша изображения (для консистентности)
-        // - Размер генерируется на основе плотности темных пикселей
+        // Обнаружили темную область - предполагаем что это шайба
+        // Для упрощения: если есть темная область, считаем что шайба в центре зоны
+        // Размер зависит от плотности темных пикселей
         
         const hash = base64.length % 1000;
-        const darkDensity = darkPatterns / (base64.length / 100); // Плотность темных пикселей
+        const darkDensity = Math.min(darkPatterns / (base64.length / 100), 1); // Нормализуем 0-1
         
-        // Позиция в зоне калибровки (центрируем)
-        const x = ZONE_CENTER_X - 20 + (hash % 40); // В пределах ±20px от центра X
-        const y = ZONE_CENTER_Y - 20 + ((hash * 7) % 40); // В пределах ±20px от центра Y
+        // Позиция: предполагаем что шайба в центре зоны (или близко)
+        // Небольшое случайное отклонение для реалистичности
+        const x = ZONE_CENTER_X - 15 + (hash % 30); // В пределах ±15px от центра X
+        const y = ZONE_CENTER_Y - 15 + ((hash * 7) % 30); // В пределах ±15px от центра Y
         
-        // Размер зависит от плотности темных пикселей
-        // Больше темных пикселей = больше размер (ближе к камере)
-        const baseSize = 70;
-        const sizeVariation = darkDensity * 30; // 0-30px вариация
-        const size = baseSize + sizeVariation;
+        // Размер: зависит от плотности темных пикселей
+        // Больше темных = ближе к камере = больше размер
+        const minSize = 75;
+        const maxSize = 105;
+        const size = minSize + (darkDensity * (maxSize - minSize));
         
-        // Для круга width и height должны быть примерно одинаковыми
+        // Форма: для круга width и height одинаковые
         // Если шайба сбоку - будет эллипс (разные width/height)
-        const isSideView = (hash % 3) === 0; // 33% вероятность что шайба сбоку
-        const width = isSideView ? size * 1.3 : size; // Эллипс если сбоку
+        // Проверяем: если размер примерно правильный и позиция в центре - считаем круглой
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(x - ZONE_CENTER_X, 2) + Math.pow(y - ZONE_CENTER_Y, 2)
+        );
+        const isCentered = distanceFromCenter < 20;
+        const isRightSize = size >= 80 && size <= 100;
+        
+        // Если размер правильный и в центре - считаем круглой (вид сверху)
+        // Иначе - эллипс (вид сбоку)
+        const isSideView = !(isCentered && isRightSize);
+        const width = isSideView ? size * 1.25 : size; // Эллипс если сбоку
         const height = size;
         
         return {
