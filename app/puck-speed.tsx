@@ -462,17 +462,22 @@ export default function PuckSpeedScreen() {
             setIsProcessing(false); // Убираем индикатор обработки
             setShowResultModal(true); // Показываем результат
           } else {
+            // Движение не обнаружено - сбрасываем все состояния
             setIsProcessing(false);
             setRecordingUri(null);
+            setIsCalibrated(false);
+            setPuckSizeMatch(null);
             Alert.alert(
               t('error') || 'Ошибка',
-              t('puckSpeed.detectionError') || 'Не удалось определить скорость шайбы.'
+              t('puckSpeed.detectionError') || 'Не удалось определить скорость шайбы. Попробуйте записать видео с движением.'
             );
           }
         } catch (error) {
           console.error('❌ Ошибка обработки видео:', error);
           setIsProcessing(false);
           setRecordingUri(null);
+          setIsCalibrated(false);
+          setPuckSizeMatch(null);
           Alert.alert(
             t('error') || 'Ошибка',
             t('puckSpeed.processingError') || 'Ошибка при обработке видео'
