@@ -741,7 +741,7 @@ export default function PuckSpeedScreen() {
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={styles.modalButton}
                 onPress={saveResult}
               >
                 <Text style={styles.modalButtonText}>
@@ -749,11 +749,12 @@ export default function PuckSpeedScreen() {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowResultModal(false)}
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={retakeVideo}
               >
+                <Ionicons name="refresh" size={20} color="#fff" style={{ marginRight: 8 }} />
                 <Text style={styles.modalButtonText}>
-                  {t('common.cancel') || 'Отмена'}
+                  {t('puckSpeed.retake') || 'Повторить'}
                 </Text>
               </TouchableOpacity>
             </View>
