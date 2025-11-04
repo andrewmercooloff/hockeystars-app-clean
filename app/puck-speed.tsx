@@ -1088,37 +1088,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
   },
-  permissionContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  permissionText: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  permissionButton: {
-    backgroundColor: '#fa2f40',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-  },
-  permissionButtonText: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
-  },
-  loadingText: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
-    color: '#fff',
-    marginTop: 20,
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
