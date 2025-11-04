@@ -255,29 +255,28 @@ export default function PuckSpeedScreen() {
         </View>
       ) : (
         // Экран обработки результата
-        <View style={styles.container}>
-          <View style={styles.resultBackground}>
-            <View style={styles.resultOverlay}>
-              {/* Заголовок */}
-              <View style={styles.pageHeader}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                  <Ionicons name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.pageTitle}>
-                  {t('puckSpeed.title') || 'Измерение скорости шайбы'}
-                </Text>
-                <View style={styles.backButton} />
-              </View>
+        <View style={styles.resultBackground}>
+          <View style={styles.resultOverlay}>
+            {/* Заголовок */}
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>
+                {t('puckSpeed.title') || 'Измерение скорости шайбы'}
+              </Text>
+              <View style={styles.backButton} />
+            </View>
 
-              <View style={styles.processingContainer}>
-                <ActivityIndicator size="large" color="#fa2f40" />
-                <Text style={styles.processingText}>
-                  {t('puckSpeed.analyzingVideo') || 'Анализ видео...'}
-                </Text>
-                <Text style={styles.processingSubtext}>
-                  {t('puckSpeed.analyzingDetails') || 'Отслеживание движения шайбы и вычисление скорости'}
-                </Text>
-              </View>
+            <View style={styles.processingContainer}>
+              <ActivityIndicator size="large" color="#fa2f40" />
+              <Text style={styles.processingText}>
+                {t('puckSpeed.analyzingVideo') || 'Анализ видео...'}
+              </Text>
+              <Text style={styles.processingSubtext}>
+                {t('puckSpeed.analyzingDetails') || 'Отслеживание движения шайбы и вычисление скорости'}
+              </Text>
+            </View>
           </View>
         </View>
       )}
