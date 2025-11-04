@@ -437,7 +437,7 @@ export default function PuckSpeedScreen() {
         mediaTypes: ['videos'],
         allowsEditing: false,
         quality: 1.0, // Максимальное качество для лучшего анализа
-        videoMaxDuration: 10, // Максимум 10 секунд
+        videoMaxDuration: 10, // Автоматически остановится через 10 секунд
         cameraType: ImagePicker.CameraType.front, // ПЕРЕДНЯЯ камера, чтобы видеть экран
       });
 
@@ -485,6 +485,8 @@ export default function PuckSpeedScreen() {
         setPuckSizeMatch(null);
         setIsProcessing(false);
         setRecordingUri(null);
+        setIsCalibrated(false); // Сбрасываем калибровку
+        setCountdown(null);
       }
     } catch (error: any) {
       console.error('❌ Ошибка записи видео:', error);
@@ -492,6 +494,8 @@ export default function PuckSpeedScreen() {
       setIsRecording(false);
       setPuckSizeMatch(null);
       setIsProcessing(false);
+      setIsCalibrated(false); // Сбрасываем калибровку
+      setCountdown(null);
     }
   };
 
@@ -605,17 +609,37 @@ export default function PuckSpeedScreen() {
                   </Text>
                 </View>
               ) : isCalibrated ? (
-                <Text style={[styles.cameraInstructionText, { fontSize: 18 }]}>
-                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
-                </Text>
+                <View style={{ width: '100%', alignItems: 'center' }}>
+                  <Text style={[styles.cameraInstructionText, { fontSize: 18, textAlign: 'center' }]}>
+                    {t('puckSpeed.recordingStartsSoon') || 'Запись начнется через 3 секунды...'}
+                  </Text>
+                </View>
               ) : (
-                <View>
-                  <Text style={[styles.cameraInstructionText, { fontSize: 19, marginBottom: 12, fontFamily: 'Gilroy-Bold' }]}>
-                    {t('puckSpeed.step1Side') || 'Совместите шайбу с эллипсом'}
-                  </Text>
-                  <Text style={[styles.cameraInstructionText, { fontSize: 14, opacity: 0.9, lineHeight: 20 }]}>
-                    {t('puckSpeed.step1SideDetails') || '• Вид СБОКУ (эллипс)\n• Телефон горизонтально\n• Расстояние ~1 метр'}
-                  </Text>
+                <View style={{ width: '100%' }}>
+                  <View style={styles.instructionStep}>
+                    <Text style={styles.instructionStepNumber}>1</Text>
+                    <Text style={styles.instructionStepText}>
+                      {t('puckSpeed.instruction1') || 'Поставьте телефон вертикально в 1 м от шайбы'}
+                    </Text>
+                  </View>
+                  <View style={styles.instructionStep}>
+                    <Text style={styles.instructionStepNumber}>2</Text>
+                    <Text style={styles.instructionStepText}>
+                      {t('puckSpeed.instruction2') || 'Совместите шайбу с шайбой ниже'}
+                    </Text>
+                  </View>
+                  <View style={styles.instructionStep}>
+                    <Text style={styles.instructionStepNumber}>3</Text>
+                    <Text style={styles.instructionStepText}>
+                      {t('puckSpeed.instruction3') || 'Нажмите Подтвердить'}
+                    </Text>
+                  </View>
+                  <View style={styles.instructionStep}>
+                    <Text style={styles.instructionStepNumber}>4</Text>
+                    <Text style={styles.instructionStepText}>
+                      {t('puckSpeed.instruction4') || 'Ударьте по шайбе 1 раз со всей силы'}
+                    </Text>
+                  </View>
                 </View>
               )}
             </View>
@@ -789,18 +813,18 @@ const styles = StyleSheet.create({
     top: Platform.OS === 'ios' ? 100 : 80,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 16,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-    borderWidth: 2,
-    borderColor: 'rgba(250, 47, 64, 0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.6)',
   },
   cameraInstructionText: {
     fontSize: 16,
@@ -808,6 +832,26 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  instructionStep: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    width: '100%',
+  },
+  instructionStepNumber: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+    marginRight: 12,
+    minWidth: 20,
+  },
+  instructionStepText: {
+    fontSize: 15,
+    fontFamily: 'Gilroy-Medium',
+    color: '#fff',
+    lineHeight: 20,
+    flex: 1,
   },
   puckZone: {
     position: 'absolute',
