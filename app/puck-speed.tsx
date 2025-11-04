@@ -34,28 +34,55 @@ export default function PuckSpeedScreen() {
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [measuredSpeed, setMeasuredSpeed] = useState<number | null>(null);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [puckInZone, setPuckInZone] = useState(false); // Шайба в зоне
+  const [puckSizeMatch, setPuckSizeMatch] = useState<'too-small' | 'too-large' | 'perfect' | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const autoStartTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Размеры и позиция зоны для шайбы (круг снизу слева)
-  const ZONE_SIZE = 100; // Диаметр зоны
-  const ZONE_LEFT = 30;
-  const ZONE_BOTTOM = 150;
+  // Размеры и позиция зоны для шайбы (круг в центре, чуть ниже)
+  const ZONE_SIZE = 90; // Диаметр зоны (точный размер шайбы на расстоянии 1м)
+  const ZONE_CENTER_X = SCREEN_WIDTH / 2;
+  const ZONE_CENTER_Y = SCREEN_HEIGHT * 0.6; // Чуть ниже центра
 
   useEffect(() => {
     if (!permission) {
       requestPermission();
     }
+    
+    // Очищаем таймер при размонтировании
+    return () => {
+      if (autoStartTimerRef.current) {
+        clearTimeout(autoStartTimerRef.current);
+      }
+    };
   }, [permission, requestPermission]);
 
-  const confirmPuckInZone = async () => {
-    // Пользователь подтверждает, что шайба в зоне
-    setPuckInZone(true);
-    
-    // Визуальная обратная связь
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Автоматически запускаем запись
-    startRecording();
+  // Имитация детекции размера шайбы
+  // В реальности здесь был бы анализ кадра с камеры
+  const checkPuckSize = () => {
+    // Симулируем проверку размера
+    const random = Math.random();
+    if (random < 0.3) {
+      setPuckSizeMatch('too-small');
+    } else if (random < 0.6) {
+      setPuckSizeMatch('too-large');
+    } else {
+      setPuckSizeMatch('perfect');
+      
+      // Автоматический старт через 1 секунду после perfect match
+      if (autoStartTimerRef.current) {
+        clearTimeout(autoStartTimerRef.current);
+      }
+      
+      autoStartTimerRef.current = setTimeout(() => {
+        console.log('✅ Размер совпал! Автоматический старт записи...');
+        startRecording();
+      }, 1000);
+    }
+  };
+
+  const handleCheckSize = () => {
+    // Пользователь нажимает кнопку для проверки размера шайбы
+    checkPuckSize();
   };
 
   const startRecording = async () => {
@@ -65,6 +92,7 @@ export default function PuckSpeedScreen() {
         return;
       }
 
+      setIsRecording(true); // Устанавливаем флаг записи
       console.log('🎬 Запускаем запись видео через ImagePicker');
       
       // Запускаем камеру для записи видео - только передняя камера (фронтальная)
@@ -80,7 +108,8 @@ export default function PuckSpeedScreen() {
         console.log('✅ Видео записано успешно:', result.assets[0].uri);
         const videoUri = result.assets[0].uri;
         setRecordingUri(videoUri);
-        setPuckInZone(false);
+        setIsRecording(false);
+        setPuckSizeMatch(null); // Сбрасываем проверку размера
         
         // АВТОМАТИЧЕСКИ начинаем обработку сразу после записи
         setIsProcessing(true);
@@ -115,14 +144,17 @@ export default function PuckSpeedScreen() {
       } else {
         // Пользователь отменил запись
         console.log('ℹ️ Запись видео отменена пользователем');
-        setPuckInZone(false);
-        setIsProcessing(false); // Важно! Сбрасываем флаг
-        setRecordingUri(null); // Сбрасываем URI
+        setIsRecording(false);
+        setPuckSizeMatch(null);
+        setIsProcessing(false);
+        setRecordingUri(null);
       }
     } catch (error: any) {
       console.error('❌ Ошибка записи видео:', error);
       Alert.alert(t('error') || 'Ошибка', t('puckSpeed.recordingError') || 'Не удалось записать видео');
-      setPuckInZone(false);
+      setIsRecording(false);
+      setPuckSizeMatch(null);
+      setIsProcessing(false);
     }
   };
 
@@ -151,8 +183,14 @@ export default function PuckSpeedScreen() {
     setRecordingUri(null);
     setMeasuredSpeed(null);
     setShowResultModal(false);
-    setPuckInZone(false);
-    setIsProcessing(false); // Важно! Сбрасываем флаг обработки
+    setPuckSizeMatch(null);
+    setIsRecording(false);
+    setIsProcessing(false);
+    
+    // Очищаем таймер автостарта
+    if (autoStartTimerRef.current) {
+      clearTimeout(autoStartTimerRef.current);
+    }
   };
 
   if (!permission) {
@@ -213,51 +251,77 @@ export default function PuckSpeedScreen() {
 
             {/* Инструкция */}
             <View style={styles.cameraInstruction}>
-              <Text style={styles.cameraInstructionText}>
-                {t('puckSpeed.placePuckInZone') || 'Поместите шайбу в круг снизу слева'}
-              </Text>
+              {!puckSizeMatch ? (
+                <Text style={styles.cameraInstructionText}>
+                  {t('puckSpeed.alignPuckWithCircle') || 'Совместите шайбу с кругом'}
+                </Text>
+              ) : puckSizeMatch === 'perfect' ? (
+                <Text style={[styles.cameraInstructionText, { color: '#4CAF50' }]}>
+                  {t('puckSpeed.perfectAlignment') || 'Идеально! Запись начнется автоматически...'}
+                </Text>
+              ) : puckSizeMatch === 'too-small' ? (
+                <Text style={[styles.cameraInstructionText, { color: '#FFC107' }]}>
+                  {t('puckSpeed.moveFurther') || 'Отодвиньте телефон дальше'}
+                </Text>
+              ) : (
+                <Text style={[styles.cameraInstructionText, { color: '#FFC107' }]}>
+                  {t('puckSpeed.moveCloser') || 'Приблизьте телефон ближе'}
+                </Text>
+              )}
             </View>
 
-            {/* Зона для шайбы (круг снизу слева) */}
+            {/* Зона для шайбы (круг в центре экрана) */}
             <View
               style={[
                 styles.puckZone,
                 {
-                  left: ZONE_LEFT,
-                  bottom: ZONE_BOTTOM,
+                  left: ZONE_CENTER_X - ZONE_SIZE / 2,
+                  top: ZONE_CENTER_Y - ZONE_SIZE / 2,
                   width: ZONE_SIZE,
                   height: ZONE_SIZE,
                   borderRadius: ZONE_SIZE / 2,
                 },
-                puckInZone && styles.puckZoneActive
+                puckSizeMatch === 'perfect' && styles.puckZonePerfect,
+                puckSizeMatch && puckSizeMatch !== 'perfect' && styles.puckZoneWrong,
               ]}
             >
-              {puckInZone && (
+              {puckSizeMatch === 'perfect' && (
                 <View style={styles.puckZoneCheck}>
                   <Ionicons name="checkmark" size={48} color="#4CAF50" />
                 </View>
               )}
             </View>
 
-            {/* Кнопка подтверждения */}
+            {/* Кнопка проверки размера */}
             <View style={styles.cameraControls}>
               <TouchableOpacity
-                style={[styles.confirmButton, puckInZone && styles.confirmButtonActive]}
-                onPress={confirmPuckInZone}
-                disabled={!isCameraReady}
+                style={[
+                  styles.confirmButton,
+                  puckSizeMatch === 'perfect' && styles.confirmButtonPerfect,
+                  isRecording && styles.confirmButtonRecording,
+                ]}
+                onPress={handleCheckSize}
+                disabled={!isCameraReady || puckSizeMatch === 'perfect' || isRecording}
               >
-                {puckInZone ? (
+                {isRecording ? (
+                  <>
+                    <Ionicons name="radio-button-on" size={32} color="#fff" />
+                    <Text style={styles.confirmButtonText}>
+                      {t('puckSpeed.recording') || 'Идет запись...'}
+                    </Text>
+                  </>
+                ) : puckSizeMatch === 'perfect' ? (
                   <>
                     <Ionicons name="checkmark-circle" size={32} color="#fff" />
                     <Text style={styles.confirmButtonText}>
-                      {t('puckSpeed.puckDetected') || 'Шайба обнаружена!'}
+                      {t('puckSpeed.autoStarting') || 'Автозапуск через 1 сек...'}
                     </Text>
                   </>
                 ) : (
                   <>
                     <Ionicons name="scan-circle" size={32} color="#fff" />
                     <Text style={styles.confirmButtonText}>
-                      {isCameraReady ? (t('puckSpeed.confirmPuck') || 'Подтвердить шайбу') : (t('puckSpeed.preparingCamera') || 'Подготовка...')}
+                      {isCameraReady ? (t('puckSpeed.checkSize') || 'Проверить размер') : (t('puckSpeed.preparingCamera') || 'Подготовка...')}
                     </Text>
                   </>
                 )}
@@ -389,17 +453,23 @@ const styles = StyleSheet.create({
   },
   puckZone: {
     position: 'absolute',
-    borderWidth: 3,
+    borderWidth: 4,
     borderColor: 'rgba(250, 47, 64, 0.8)',
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0)', // Прозрачная "дырка"
   },
-  puckZoneActive: {
+  puckZonePerfect: {
     borderColor: '#4CAF50',
     borderStyle: 'solid',
+    borderWidth: 5,
     backgroundColor: 'rgba(76, 175, 80, 0.1)',
+  },
+  puckZoneWrong: {
+    borderColor: '#FFC107',
+    borderStyle: 'solid',
+    borderWidth: 4,
   },
   puckZoneCheck: {
     position: 'absolute',
@@ -424,8 +494,11 @@ const styles = StyleSheet.create({
     gap: 10,
     minWidth: 250,
   },
-  confirmButtonActive: {
+  confirmButtonPerfect: {
     backgroundColor: '#4CAF50',
+  },
+  confirmButtonRecording: {
+    backgroundColor: '#fa2f40',
   },
   confirmButtonText: {
     fontSize: 16,
