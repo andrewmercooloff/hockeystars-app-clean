@@ -2407,7 +2407,9 @@
     "shop": "Hockeyladen",
     "error": "Fehler",
     "errorLoadingChat": "Chatdaten konnten nicht geladen werden",
-    "errorSendingMessage": "Senden der Nachricht fehlgeschlagen"
+    "errorSendingMessage": "Senden der Nachricht fehlgeschlagen",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Erstellen eines Benutzers",
@@ -2670,7 +2672,49 @@
     "vkPlaceholder": "@Benutzername oder Link",
     "websitePlaceholder": "example.com"
   },
+  "puckSpeed": {
+    "title": "Puck-Geschwindigkeitsmessung",
+    "kmh": "km/h",
+    "measure": "Geschwindigkeit messen",
+    "measureAgain": "Erneut messen",
+    "noMeasurement": "Geschwindigkeit wurde noch nicht gemessen",
+    "lastMeasurement": "Letzte Messung:",
+    "top3": "Top 3 Messungen",
+    "myRecord": "Mein Rekord:",
+    "history": "Messhistorie:",
+    "addToProfile": "Zum Profil hinzufügen",
+    "sensitivity": "Empfindlichkeit:",
+    "stop": "Stoppen",
+    "reset": "Zurücksetzen",
+    "start": "Start",
+    "ready": "Bereit zum Messen",
+    "instructions": "Anweisungen:",
+    "instructionWarning": "Achtung! Genaue Geschwindigkeit ist nur bei Abwesenheit von Fremdgeräuschen und bei Verwendung von 2 Ansteckmikrofonen garantiert. Bitte zeichnen Sie nur korrekte Geschwindigkeiten in den Ergebnissen auf!",
+    "instruction1": "Messen Sie die Entfernung vom Puck zum Tornetz und geben Sie sie in das Feld oben ein",
+    "instruction2": "Platzieren Sie das Telefon in der Nähe des Tors oder verwenden Sie 2 Ansteckmikrofone. Platzieren Sie ein Ansteckmikrofon näher am Schuss, das zweite näher am Tor.",
+    "instruction3": "Drücken Sie \"Start\" und beginnen Sie zu schießen.",
+    "instruction4": "Passen Sie die Empfindlichkeit an, wenn die Geschwindigkeit falsch berechnet wird.",
+    "instruction5": "Wählen Sie die richtige und beste Geschwindigkeit zum Hinzufügen zum Profil",
+    "distanceLabel": "Messen und geben Sie die Entfernung vom Schussort zum Tornetz ein",
+    "distancePlaceholder": "Entfernung in Zentimetern",
+    "inCentimeters": "in Zentimetern",
+    "errorNoProfile": "Sie müssen angemeldet sein, um das Ergebnis zu speichern",
+    "errorSaveFailed": "Ergebnis konnte nicht gespeichert werden",
+    "successAdded": "Geschwindigkeit zum Profil hinzugefügt",
+    "successNewMax": "Neue Höchstgeschwindigkeit:",
+    "successAddedToProfile": "Geschwindigkeit zum Profil hinzugefügt",
+    "analyzing": "Analysiere Ton...",
+    "readyForSound": "Bereit für ersten Ton...",
+    "sound1Detected": "Ton 1 erkannt! Bereit für zweiten...",
+    "speedCalculated": "Geschwindigkeit:",
+    "speedExceedsLimit": "Geschwindigkeit überschreitet 120 km/h, Messung wird nicht gezählt",
+    "needMicrophone": "Mikrofonzugriff erforderlich"
+  },
   "logout": "Ausfahrt",
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",
-  "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?"
+  "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?",
+  "puckSpeedNotification": {
+    "title": "Neuer Geschwindigkeitsrekord",
+    "message": "{playerName} hat einen neuen Geschwindigkeitsrekord aufgestellt: {speed} km/h"
+  }
 }

@@ -465,17 +465,17 @@ export default function EditablePhotosSection({
                 const contentId = generatePhotoContentId(photo);
                 
                 return (
-                  <View key={photo} style={styles.photoContainer}>
-                    <TouchableOpacity
-                      style={styles.photoWrapper}
-                      onPress={() => openPhotoViewer(index)}
-                      activeOpacity={0.8}
-                    >
-                      <CachedImage
-                        imageUrl={photo}
-                        style={styles.photo}
-                        resizeMode="cover"
-                      />
+                <View key={photo} style={styles.photoContainer}>
+                  <TouchableOpacity
+                    style={styles.photoWrapper}
+                    onPress={() => openPhotoViewer(index)}
+                    activeOpacity={0.8}
+                  >
+                    <CachedImage
+                      imageUrl={photo}
+                      style={styles.photo}
+                      resizeMode="cover"
+                    />
                       {playerId && (
                         <View style={styles.photoLikeButtonContainer}>
                           <LikeButton
@@ -487,8 +487,8 @@ export default function EditablePhotosSection({
                           />
                         </View>
                       )}
-                    </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
+                </View>
                 );
               })}
             </ScrollView>
@@ -517,7 +517,7 @@ export default function EditablePhotosSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,

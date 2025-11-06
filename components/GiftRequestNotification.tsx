@@ -76,11 +76,11 @@ export default function GiftRequestNotification({
         </View>
 
         <View style={styles.messageContainer}>
-          <Text style={styles.actionText}>
-            {t('notifications.giftRequestMessage', { 
+              <Text style={styles.actionText}>
+                {t('notifications.giftRequestMessage', { 
               playerName: requesterName
             }) || `${requesterName} просит подарок`}
-          </Text>
+              </Text>
           <View style={styles.giftBadge}>
             <Ionicons name="gift-outline" size={16} color="#fff" />
           </View>

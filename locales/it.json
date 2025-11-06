@@ -2388,7 +2388,9 @@
     "shop": "Negozio di hockey",
     "error": "Errore",
     "errorLoadingChat": "Impossibile caricare i dati della chat",
-    "errorSendingMessage": "Impossibile inviare il messaggio"
+    "errorSendingMessage": "Impossibile inviare il messaggio",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Creazione di un utente",
@@ -2651,7 +2653,49 @@
     "vkPlaceholder": "@nomeutente o collegamento",
     "websitePlaceholder": "esempio.com"
   },
+  "puckSpeed": {
+    "title": "Misurazione della velocità del puck",
+    "kmh": "km/h",
+    "measure": "Misura la velocità",
+    "measureAgain": "Misura di nuovo",
+    "noMeasurement": "La velocità non è ancora stata misurata",
+    "lastMeasurement": "Ultima misurazione:",
+    "top3": "Top 3 misurazioni",
+    "myRecord": "Il mio record:",
+    "history": "Storia delle misurazioni:",
+    "addToProfile": "Aggiungi al profilo",
+    "sensitivity": "Sensibilità:",
+    "stop": "Ferma",
+    "reset": "Reimposta",
+    "start": "Avvia",
+    "ready": "Pronto per misurare",
+    "instructions": "Istruzioni:",
+    "instructionWarning": "Attenzione! La velocità precisa è garantita solo in assenza di suoni estranei e quando si utilizzano 2 microfoni a clip. Si prega di registrare nei risultati solo velocità corrette!",
+    "instruction1": "Misura la distanza dal puck alla rete della porta e inseriscila nel campo sopra",
+    "instruction2": "Posiziona il telefono vicino alla porta o usa 2 microfoni a clip. Posiziona un microfono a clip più vicino al tiro, il secondo più vicino alla porta.",
+    "instruction3": "Premi \"Avvia\" e inizia a tirare.",
+    "instruction4": "Regola la sensibilità se la velocità è calcolata in modo errato.",
+    "instruction5": "Scegli la velocità corretta e migliore da aggiungere al profilo",
+    "distanceLabel": "Misura e inserisci la distanza dal punto del tiro alla rete della porta",
+    "distancePlaceholder": "Distanza in centimetri",
+    "inCentimeters": "in centimetri",
+    "errorNoProfile": "Devi essere connesso per salvare il risultato",
+    "errorSaveFailed": "Impossibile salvare il risultato",
+    "successAdded": "Velocità aggiunta al profilo",
+    "successNewMax": "Nuova velocità massima:",
+    "successAddedToProfile": "Velocità aggiunta al profilo",
+    "analyzing": "Analisi del suono...",
+    "readyForSound": "Pronto per il primo suono...",
+    "sound1Detected": "Suono 1 rilevato! Pronto per il secondo...",
+    "speedCalculated": "Velocità:",
+    "speedExceedsLimit": "La velocità supera i 120 km/h, la misurazione non viene conteggiata",
+    "needMicrophone": "Accesso al microfono richiesto"
+  },
   "logout": "Uscita",
   "logoutConfirm": "Esci dal tuo profilo",
-  "logoutConfirmMessage": "Sei sicuro di voler uscire dal tuo profilo?"
+  "logoutConfirmMessage": "Sei sicuro di voler uscire dal tuo profilo?",
+  "puckSpeedNotification": {
+    "title": "Nuovo record di velocità",
+    "message": "{playerName} ha stabilito un nuovo record di velocità: {speed} km/h"
+  }
 }

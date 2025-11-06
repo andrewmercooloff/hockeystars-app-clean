@@ -24,6 +24,7 @@ import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
 import VideoAddedNotification from '../components/VideoAddedNotification';
 import AvatarChangedNotification from '../components/AvatarChangedNotification';
 import AchievementAddedNotification from '../components/AchievementAddedNotification';
+import PuckSpeedChangedNotification from '../components/PuckSpeedChangedNotification';
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
 import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
@@ -328,6 +329,19 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
+        ) : notification.type === 'puck_speed_changed' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <PuckSpeedChangedNotification
+              playerName={notification.data.changedPlayerName || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              newMaxSpeed={notification.data.newMaxSpeed || 0}
+              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+            />
+          </TouchableOpacity>
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
           <TouchableOpacity
             onPress={() => onPress(notification)}
@@ -447,7 +461,7 @@ const getItemTypeName = (type: string) => {
 
 interface NotificationItem {
   id: string;
-  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'achievement_added' | 'physical_data_changed';
+  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'achievement_added' | 'physical_data_changed' | 'puck_speed_changed';
   title: string;
   message: string;
   timestamp: number;
@@ -554,6 +568,7 @@ export default function NotificationsScreen() {
             notification.type === 'avatar_changed' ||
             notification.type === 'achievement_added' ||
             notification.type === 'physical_data_changed' ||
+            notification.type === 'puck_speed_changed' ||
             notification.type === 'video_liked' ||
             notification.type === 'photo_liked') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
@@ -1166,6 +1181,11 @@ export default function NotificationsScreen() {
         if (notification.data && notification.data.changedPlayerId) {
           router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
         }
+      } else if (notification.type === 'puck_speed_changed') {
+        // Для уведомлений об обновлении скорости шайбы показываем профиль игрока и скроллим к разделу скорости
+        if (notification.data && notification.data.changedPlayerId) {
+          router.push(`/player/${notification.data.changedPlayerId}?scrollToSpeed=true`);
+        }
       } else if (notification.type === 'exercise_completed') {
         // Для уведомлений о выполненных упражнениях показываем конкретное упражнение
         if (notification.data && notification.data.exerciseId) {
@@ -1407,9 +1427,9 @@ export default function NotificationsScreen() {
     try {
       // При нажатии на запрос подарка переходим на профиль игрока с прокруткой к кнопке подарка
       router.push(`/player/${request.playerId}?scrollToGift=true`);
-      
+        
       // Удаляем уведомление из списка после перехода
-      setGiftRequests(prev => prev.filter(req => req.id !== request.id));
+        setGiftRequests(prev => prev.filter(req => req.id !== request.id));
     } catch (error) {
       console.error('❌ Ошибка обработки запроса на подарок:', error);
       Alert.alert('Ошибка', 'Не удалось обработать запрос');

@@ -2408,7 +2408,9 @@
     "shop": "Hokeja veikals",
     "error": "Kļūda",
     "errorLoadingChat": "Neizdevās ielādēt tērzēšanas datus",
-    "errorSendingMessage": "Neizdevās nosūtīt ziņojumu"
+    "errorSendingMessage": "Neizdevās nosūtīt ziņojumu",
+    "online": "Tiešsaistē",
+    "offline": "Bezsaistē"
   },
   "createUser": {
     "title": "Lietotāja izveide",
@@ -2688,6 +2690,44 @@
     "vkPlaceholder": "@lietotājvārds vai saite",
     "websitePlaceholder": "example.com"
   },
+  "puckSpeed": {
+    "title": "Rieksta ātruma mērīšana",
+    "kmh": "km/h",
+    "measure": "Izmērīt ātrumu",
+    "measureAgain": "Izmērīt atkārtoti",
+    "noMeasurement": "Ātrums vēl nav izmērīts",
+    "lastMeasurement": "Pēdējais mērījums:",
+    "top3": "Top 3 mērījumi",
+    "myRecord": "Mans rekords:",
+    "history": "Mērījumu vēsture:",
+    "addToProfile": "Pievienot profilam",
+    "sensitivity": "Jutīgums:",
+    "stop": "Apturēt",
+    "reset": "Atiestatīt",
+    "start": "Sākt",
+    "ready": "Gatavs mērīšanai",
+    "instructions": "Instrukcijas:",
+    "instructionWarning": "Uzmanību! Precīzs ātrums ir garantēts tikai bez svešiem skaņām un izmantojot 2 klipsa mikrofona. Lūdzu, ierakstiet rezultātos tikai pareizos ātrumus!",
+    "instruction1": "Izmēriet attālumu no rieksta līdz vārtu tīklam un ievadiet to laukā augšā",
+    "instruction2": "Novietojiet telefonu pie vārtiem vai izmantojiet 2 klipsa mikrofona. Novietojiet vienu klipsa mikrofonu tuvāk sitienam, otro tuvāk vārtiem.",
+    "instruction3": "Nospiediet \"Sākt\" un sāciet šaut.",
+    "instruction4": "Pielāgojiet jutīgumu, ja ātrums ir aprēķināts nepareizi.",
+    "instruction5": "Izvēlieties pareizo un labāko ātrumu, lai pievienotu profilam",
+    "distanceLabel": "Izmēriet un ievadiet attālumu no sitiena vietas līdz vārtu tīklam",
+    "distancePlaceholder": "Attālums centimetros",
+    "inCentimeters": "centimetros",
+    "errorNoProfile": "Jums jāpiesakās, lai saglabātu rezultātu",
+    "errorSaveFailed": "Neizdevās saglabāt rezultātu",
+    "successAdded": "Ātrums pievienots profilam",
+    "successNewMax": "Jauns maksimālais ātrums:",
+    "successAddedToProfile": "Ātrums pievienots profilam",
+    "analyzing": "Analizē skaņu...",
+    "readyForSound": "Gatavs pirmajai skaņai...",
+    "sound1Detected": "Skaņa 1 noteikta! Gatavs otrajai...",
+    "speedCalculated": "Ātrums:",
+    "speedExceedsLimit": "Ātrums pārsniedz 120 km/h, mērījums netiek skaitīts",
+    "needMicrophone": "Nepieciešama piekļuve mikrofonam"
+  },
   "logout": "Iziet",
   "logoutConfirm": "Iziet no sava profila",
   "logoutConfirmMessage": "Vai tiešām vēlaties iziet no sava profila?",
@@ -2705,6 +2745,10 @@
   },
   "avatarNotification": {
     "changed": "mainīja avataru"
+  },
+  "puckSpeedNotification": {
+    "title": "Jauns ātruma rekords",
+    "message": "{playerName} noteica jaunu ātruma rekordu: {speed} km/h"
   },
   "statsNotification": {
     "updated": "atjaunoja",

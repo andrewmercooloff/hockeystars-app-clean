@@ -57,6 +57,8 @@ export interface SupabasePlayer {
   skate_services?: string[] | null;
   // Скорость шайбы (JSON строка с историей)
   puck_speed_data?: string; // JSON: { maxSpeed: number, history: Array<{speed: number, date: string}> }
+  is_online?: boolean; // статус онлайн пользователя
+  last_seen?: string; // время последней активности (ISO string)
 }
 
 // Интерфейс для приложения (camelCase) - совместимый со старым кодом
@@ -206,6 +208,9 @@ export interface Player {
   // Скорость шайбы
   puckSpeed?: number; // текущая максимальная скорость шайбы (км/ч)
   puckSpeedHistory?: PuckSpeedRecord[]; // история измерений скорости
+  // Онлайн статус
+  isOnline?: boolean; // статус онлайн пользователя
+  lastSeen?: string; // последний раз когда пользователь был онлайн
 }
 
 // Интерфейс для записи скорости шайбы
@@ -393,6 +398,9 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
       }
       return [];
     })(),
+    // Онлайн статус
+    isOnline: supabasePlayer.is_online ?? false,
+    lastSeen: supabasePlayer.last_seen || undefined,
   };
   
   
@@ -1803,6 +1811,24 @@ export const findPlayerByCredentials = async (email: string, password: string): 
 // Сохранение текущего пользователя (в локальном хранилище для сессии)
 export const saveCurrentUser = async (user: Player): Promise<void> => {
   try {
+    // Обновляем онлайн-статус в базе данных при входе
+    try {
+      await supabase
+        .from('players')
+        .update({ 
+          is_online: true,
+          last_seen: new Date().toISOString()
+        })
+        .eq('id', user.id);
+      
+      // Обновляем локальный объект пользователя
+      user.isOnline = true;
+      user.lastSeen = new Date().toISOString();
+    } catch (statusError) {
+      // Не критично, если не удалось обновить статус
+      console.warn('⚠️ Не удалось обновить онлайн-статус:', statusError);
+    }
+    
     // СРАЗУ обновляем глобальный кеш для мгновенного доступа
     try {
       const { updateGlobalUserCache } = require('../contexts/UserContext');
@@ -1918,6 +1944,20 @@ export const logoutUser = async (): Promise<void> => {
     const userData = await AsyncStorage.getItem('hockeystars_current_user');
     if (userData) {
       const user = JSON.parse(userData);
+      
+      // Обновляем онлайн-статус в базе данных при выходе
+      try {
+        await supabase
+          .from('players')
+          .update({ 
+            is_online: false,
+            last_seen: new Date().toISOString()
+          })
+          .eq('id', user.id);
+      } catch (statusError) {
+        // Не критично, если не удалось обновить статус
+        console.warn('⚠️ Не удалось обновить офлайн-статус:', statusError);
+      }
     }
     
     // Очищаем все связанные данные
@@ -4242,12 +4282,12 @@ export const notifyFriendsAboutAvatarChange = async (
                 currentCount = playerData.unread_notifications_count;
               } else {
                 // Fallback на JSON поле notifications
-                const notifData = playerData?.notifications;
-                if (typeof notifData === 'string') {
-                  const parsed = JSON.parse(notifData);
-                  currentCount = parsed.unread_count || 0;
-                } else if (typeof notifData === 'object' && notifData !== null) {
-                  currentCount = notifData.unread_count || 0;
+              const notifData = playerData?.notifications;
+              if (typeof notifData === 'string') {
+                const parsed = JSON.parse(notifData);
+                currentCount = parsed.unread_count || 0;
+              } else if (typeof notifData === 'object' && notifData !== null) {
+                currentCount = notifData.unread_count || 0;
                 }
               }
             } catch (parseError) {
@@ -4283,6 +4323,140 @@ export const notifyFriendsAboutAvatarChange = async (
     
   } catch (error) {
     console.error('❌ Ошибка отправки уведомлений об аватаре:', error);
+  }
+};
+
+export const notifyFriendsAboutPuckSpeed = async (
+  playerId: string,
+  playerName: string,
+  newMaxSpeed: number,
+  translations?: {
+    puckSpeedNotification: {
+      title: string;
+      message: string;
+    };
+  }
+): Promise<void> => {
+  try {
+    console.log('⚡ Отправляем уведомления об обновлении максимальной скорости:', { playerId, playerName, newMaxSpeed });
+    
+    // Получаем данные игрока для аватара
+    const { data: playerData, error: playerError } = await supabase
+      .from('players')
+      .select('avatar')
+      .eq('id', playerId)
+      .single();
+    
+    const playerAvatar = playerData?.avatar || null;
+    
+    // Получаем список друзей игрока
+    const friends = await getFriends(playerId);
+    console.log('👥 Друзья для уведомлений о скорости:', friends.length);
+    
+    if (friends.length === 0) {
+      console.log('👥 У игрока нет друзей для отправки уведомлений о скорости');
+      return;
+    }
+    
+    // Функция для генерации UUID v4
+    const generateUUID = (): string => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map(f => f.id));
+    
+    // Создаем уведомления для каждого друга с индивидуальной локализацией
+    const notifications = friends.map(friend => {
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
+      
+      const title = friendTranslations?.puckSpeedNotification?.title || translations?.puckSpeedNotification?.title || 'Новый рекорд скорости';
+      const message = friendTranslations?.puckSpeedNotification?.message?.replace('{playerName}', playerName).replace('{speed}', Math.round(newMaxSpeed).toString()) 
+        || translations?.puckSpeedNotification?.message?.replace('{playerName}', playerName).replace('{speed}', Math.round(newMaxSpeed).toString())
+        || `${playerName} установил новый рекорд скорости: ${Math.round(newMaxSpeed)} км/ч`;
+      
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'puck_speed_changed',
+        title: title,
+        message: message,
+        data: {
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          changedPlayerAvatar: playerAvatar,
+          newMaxSpeed: newMaxSpeed,
+          timestamp: new Date().toISOString()
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
+    });
+    
+    // Сохраняем уведомления в базу данных (только для друзей)
+    if (notifications.length > 0) {
+      console.log('💾 Сохраняем уведомления о скорости в базу данных:', notifications.length);
+      
+      const { data, error } = await supabase
+        .from('notifications')
+        .insert(notifications)
+        .select();
+      
+      if (error) {
+        console.error('❌ Ошибка сохранения уведомлений о скорости:', error);
+      }
+      
+      // Отправляем push уведомления и обновляем счетчик для каждого получателя
+      for (const notification of notifications) {
+        if (notification.user_id) {
+          // Отправляем push уведомление
+          try {
+            const { sendNotificationToUser } = await import('./notificationService');
+            const friendLang = friendLanguages.get(notification.user_id) || 'en';
+            const friendTranslations = loadTranslations(friendLang);
+            
+            const pushTitle = friendTranslations?.puckSpeedNotification?.title || '⚡ Новый рекорд скорости';
+            const pushMessage = friendTranslations?.puckSpeedNotification?.message?.replace('{playerName}', playerName).replace('{speed}', Math.round(newMaxSpeed).toString())
+              || `${playerName} установил новый рекорд: ${Math.round(newMaxSpeed)} км/ч`;
+            
+            await sendNotificationToUser(
+              notification.user_id,
+              pushTitle,
+              pushMessage,
+              {
+                type: 'puck_speed_changed',
+                player_id: playerId,
+                action: 'open_profile',
+                deepLink: `/player/${playerId}`
+              }
+            );
+          } catch (pushError) {
+            console.error('⚠️ Ошибка отправки push уведомления о скорости:', pushError);
+          }
+          
+          // Обновляем счетчик
+          try {
+            const userId = notification.user_id;
+            const { error: updateError } = await supabase
+              .rpc('increment_unread_notifications', { user_id: userId });
+
+            if (updateError) {
+              console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
+            }
+          } catch (updateError) {
+            console.error('❌ Ошибка обновления счетчика:', updateError);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Ошибка отправки уведомлений о скорости:', error);
   }
 };
 
@@ -4433,12 +4607,12 @@ export const notifyFriendsAboutAchievements = async (
                 currentCount = playerData.unread_notifications_count;
               } else {
                 // Fallback на JSON поле notifications
-                const notifData = playerData?.notifications;
-                if (typeof notifData === 'string') {
-                  const parsed = JSON.parse(notifData);
-                  currentCount = parsed.unread_count || 0;
-                } else if (typeof notifData === 'object' && notifData !== null) {
-                  currentCount = notifData.unread_count || 0;
+              const notifData = playerData?.notifications;
+              if (typeof notifData === 'string') {
+                const parsed = JSON.parse(notifData);
+                currentCount = parsed.unread_count || 0;
+              } else if (typeof notifData === 'object' && notifData !== null) {
+                currentCount = notifData.unread_count || 0;
                 }
               }
             } catch (parseError) {
@@ -4778,10 +4952,10 @@ export const notifyFriendsAboutChanges = async (
         const friendTranslations = loadTranslations(friendLang);
         
         const fieldNamesRu: { [key: string]: string } = {
-          'goals': 'голов',
-          'assists': 'передач', 
-          'games': 'игр'
-        };
+            'goals': 'голов',
+            'assists': 'передач', 
+            'games': 'игр'
+          };
         const fieldNamesEn: { [key: string]: string } = {
           'goals': 'goals',
           'assists': 'assists', 
@@ -4791,29 +4965,29 @@ export const notifyFriendsAboutChanges = async (
         
         const statChangesText = statChanges
           .map(change => {
-            const fieldName = fieldNames[change.field] || change.field;
-            const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-            return `${fieldName}: ${changeText}`;
-          })
-          .join(', ');
-        
+          const fieldName = fieldNames[change.field] || change.field;
+          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+          return `${fieldName}: ${changeText}`;
+        })
+        .join(', ');
+
         const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
         const title = friendLang === 'ru' ? 'Изменения в статистике' : 'Stats Update';
         
         return {
-          id: generateUUID(),
-          user_id: friend.id,
-          type: 'stats_change',
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'stats_change',
           title: title,
           message: `${playerName} ${updatedText}: ${statChangesText}`,
-          data: {
+        data: {
             changes: statChanges,
-            changedPlayerId: playerId,
-            changedPlayerName: playerName,
-            changedPlayerAvatar: playerAvatar
-          },
-          created_at: new Date().toISOString(),
-          is_read: false
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          changedPlayerAvatar: playerAvatar
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
         };
       });
       
@@ -4828,13 +5002,13 @@ export const notifyFriendsAboutChanges = async (
         const friendTranslations = loadTranslations(friendLang);
         
         const fieldNamesRu: { [key: string]: string } = {
-          'pullUps': 'подтягиваний',
-          'pushUps': 'отжиманий',
-          'plankTime': 'планки',
-          'sprint100m': 'стометровки',
-          'longJump': 'прыжка в длину',
-          'jumpRope': 'скакалки'
-        };
+            'pullUps': 'подтягиваний',
+            'pushUps': 'отжиманий',
+            'plankTime': 'планки',
+            'sprint100m': 'стометровки',
+            'longJump': 'прыжка в длину',
+            'jumpRope': 'скакалки'
+          };
         const fieldNamesEn: { [key: string]: string } = {
           'pullUps': 'pull-ups',
           'pushUps': 'push-ups',
@@ -4847,29 +5021,29 @@ export const notifyFriendsAboutChanges = async (
         
         const normativeChangesText = normativeChanges
           .map(change => {
-            const fieldName = fieldNames[change.field] || change.field;
-            const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
-            return `${fieldName}: ${changeText}`;
-          })
-          .join(', ');
-        
+          const fieldName = fieldNames[change.field] || change.field;
+          const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+          return `${fieldName}: ${changeText}`;
+        })
+        .join(', ');
+
         const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
         const title = friendLang === 'ru' ? 'Изменения в нормативах' : 'Standards Update';
         
         return {
-          id: generateUUID(),
-          user_id: friend.id,
+        id: generateUUID(),
+        user_id: friend.id,
           type: 'stats_change',
           title: title,
           message: `${playerName} ${updatedText}: ${normativeChangesText}`,
-          data: {
+        data: {
             changes: normativeChanges,
-            changedPlayerId: playerId,
-            changedPlayerName: playerName,
-            changedPlayerAvatar: playerAvatar
-          },
-          created_at: new Date().toISOString(),
-          is_read: false
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          changedPlayerAvatar: playerAvatar
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
         };
       });
       
@@ -6313,6 +6487,18 @@ export const savePuckSpeedResult = async (playerId: string, speed: number): Prom
     };
 
     const result = await updatePlayer(playerId, updatedPlayer);
+    
+    // Если максимальная скорость увеличилась, уведомляем друзей
+    if (newMaxSpeed > currentMaxSpeed && result !== null) {
+      // Отправляем уведомления асинхронно (не блокируем основной поток)
+      setTimeout(async () => {
+        try {
+          await notifyFriendsAboutPuckSpeed(playerId, player.name || 'Игрок', newMaxSpeed);
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомлений о скорости шайбы (не критично):', error);
+        }
+      }, 0);
+    }
     
     return result !== null;
   } catch (error) {

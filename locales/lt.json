@@ -2412,7 +2412,9 @@
     "shop": "Ledo ritulio parduotuvė",
     "error": "Klaida",
     "errorLoadingChat": "Nepavyko įkelti pokalbių duomenų",
-    "errorSendingMessage": "Nepavyko išsiųsti pranešimo"
+    "errorSendingMessage": "Nepavyko išsiųsti pranešimo",
+    "online": "Prisijungęs",
+    "offline": "Atsijungęs"
   },
   "createUser": {
     "title": "Vartotojo kūrimas",
@@ -2455,6 +2457,44 @@
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
     "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+  },
+  "puckSpeed": {
+    "title": "Disko greičio matavimas",
+    "kmh": "km/h",
+    "measure": "Išmatuoti greitį",
+    "measureAgain": "Išmatuoti dar kartą",
+    "noMeasurement": "Greitis dar nebuvo išmatuotas",
+    "lastMeasurement": "Paskutinis matavimas:",
+    "top3": "Top 3 matavimai",
+    "myRecord": "Mano rekordas:",
+    "history": "Matavimų istorija:",
+    "addToProfile": "Pridėti prie profilio",
+    "sensitivity": "Jautrumas:",
+    "stop": "Sustabdyti",
+    "reset": "Atstatyti",
+    "start": "Pradėti",
+    "ready": "Pasiruošę matuoti",
+    "instructions": "Instrukcijos:",
+    "instructionWarning": "Dėmesio! Tikslus greitis garantuojamas tik be pašalinių garsų ir naudojant 2 antkaklės mikrofonus. Prašome įrašyti į rezultatus tik teisingus greičius!",
+    "instruction1": "Išmatuokite atstumą nuo disko iki vartų tinklelio ir įveskite jį į lauką aukščiau",
+    "instruction2": "Padėkite telefoną šalia vartų arba naudokite 2 antkaklės mikrofonus. Vieną antkaklės mikrofoną padėkite arčiau smūgio, antrą arčiau vartų.",
+    "instruction3": "Paspauskite \"Pradėti\" ir pradėkite šaudyti.",
+    "instruction4": "Reguliuokite jautrumą, jei greitis apskaičiuojamas neteisingai.",
+    "instruction5": "Pasirinkite teisingą ir geriausią greitį pridėti prie profilio",
+    "distanceLabel": "Išmatuokite ir įveskite atstumą nuo smūgio vietos iki vartų tinklelio",
+    "distancePlaceholder": "Atstumas centimetrais",
+    "inCentimeters": "centimetrais",
+    "errorNoProfile": "Turite būti prisijungę, kad išsaugotumėte rezultatą",
+    "errorSaveFailed": "Nepavyko išsaugoti rezultato",
+    "successAdded": "Greitis pridėtas prie profilio",
+    "successNewMax": "Naujas maksimalus greitis:",
+    "successAddedToProfile": "Greitis pridėtas prie profilio",
+    "analyzing": "Analizuojamas garsas...",
+    "readyForSound": "Pasiruošę pirmam garsui...",
+    "sound1Detected": "Garsas 1 aptiktas! Pasiruošę antram...",
+    "speedCalculated": "Greitis:",
+    "speedExceedsLimit": "Greitis viršija 120 km/h, matavimas neįskaitomas",
+    "needMicrophone": "Reikalingas prieiga prie mikrofono"
   },
   "logout": "Atsijungti",
   "logoutConfirm": "Atsijungti nuo profilio",
@@ -2507,6 +2547,10 @@
   },
   "avatarNotification": {
     "changed": "pakeitė avatarą"
+  },
+  "puckSpeedNotification": {
+    "title": "Naujas greičio rekordas",
+    "message": "{playerName} nustatė naują greičio rekordą: {speed} km/h"
   },
   "statsNotification": {
     "updated": "atnaujino",

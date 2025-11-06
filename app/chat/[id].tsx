@@ -30,6 +30,7 @@ import { useUser } from '../../contexts/UserContext';
 import { Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../utils/supabase';
+import CachedBackground from '../../components/CachedBackground';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -48,7 +49,6 @@ export default function ChatScreen() {
   const lastMessageCountRef = useRef<number>(0);
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
   const justSentMessageRef = useRef<boolean>(false);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
   useEffect(() => {
@@ -57,12 +57,6 @@ export default function ChatScreen() {
     setNewMessage('');
     setLoading(true);
     loadChatData();
-    
-    // Очищаем polling при смене чата
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
   }, [id]);
 
   // Обработка автоматической прокрутки при переходе через deep link
@@ -80,7 +74,10 @@ export default function ChatScreen() {
       return;
     }
 
+    console.log('🔌 Создаем Realtime подписку для чата:', currentUser.id, '<->', otherPlayer.id);
+
     // Настраиваем Realtime подписку на изменения сообщений
+    // Убираем фильтр на уровне подписки - слушаем все сообщения и фильтруем в коде
     const channel = supabase
       .channel(`messages-chat-${currentUser.id}-${otherPlayer.id}`)
       .on(
@@ -91,94 +88,123 @@ export default function ChatScreen() {
           table: 'messages'
         },
         (payload) => {
+          console.log('📨 Realtime: Получено событие INSERT для сообщения:', payload.new);
+          
+          const rawMessage = payload.new;
+          
           // Проверяем, что сообщение для этого чата
-          const newMessage = payload.new;
           const isForThisChat = (
-            (newMessage.sender_id === currentUser.id && newMessage.receiver_id === otherPlayer.id) ||
-            (newMessage.sender_id === otherPlayer.id && newMessage.receiver_id === currentUser.id)
+            (rawMessage.sender_id === currentUser.id && rawMessage.receiver_id === otherPlayer.id) ||
+            (rawMessage.sender_id === otherPlayer.id && rawMessage.receiver_id === currentUser.id)
           );
           
-          if (isForThisChat) {
-            // Добавляем новое сообщение в состояние
-            setMessages(prevMessages => {
-              // Проверяем, что сообщение еще не добавлено
-              const exists = prevMessages.some(msg => msg.id === newMessage.id);
-              if (exists) {
-                return prevMessages;
-              }
-              
-              return [...prevMessages, newMessage];
-            });
-            
-            // Помечаем сообщение как прочитанное, так как чат открыт
-            // Это предотвратит обновление счетчика непрочитанных сообщений
-            if (newMessage.receiver_id === currentUser.id && !newMessage.read) {
-              setTimeout(async () => {
-                try {
-                  await supabase
-                    .from('messages')
-                    .update({ read: true })
-                    .eq('id', newMessage.id);
-                  
-                  // Обновляем счетчик, уменьшая его на 1, так как сообщение прочитано
-                  const { getUnreadMessageCount } = await import('../../utils/playerStorage');
-                  const newCount = await getUnreadMessageCount(currentUser.id);
-                  
-                  // Обновляем счетчик в базе данных
-                  await supabase
-                    .from('players')
-                    .update({ 
-                      unread_messages_count: Math.max(0, newCount),
-                      updated_at: new Date().toISOString()
-                    })
-                    .eq('id', currentUser.id);
-                } catch (error) {
-                  console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
-                }
-              }, 100);
+          if (!isForThisChat) {
+            console.log('⏭️ Сообщение не для этого чата, пропускаем');
+            return;
+          }
+          
+          console.log('✅ Сообщение для этого чата, обрабатываем');
+          
+          // Преобразуем данные из Supabase формата (snake_case) в формат Message (camelCase)
+          const newMessage: Message = {
+            id: rawMessage.id,
+            senderId: rawMessage.sender_id,
+            receiverId: rawMessage.receiver_id,
+            text: rawMessage.text,
+            timestamp: new Date(rawMessage.created_at),
+            read: rawMessage.read
+          };
+          
+          // Добавляем новое сообщение в состояние
+          setMessages(prevMessages => {
+            // Проверяем, что сообщение еще не добавлено
+            const exists = prevMessages.some(msg => msg.id === newMessage.id);
+            if (exists) {
+              console.log('⚠️ Сообщение уже существует в списке, пропускаем');
+              return prevMessages;
             }
             
-            // Прокручиваем вниз после получения нового сообщения
-            setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, Platform.OS === 'android' ? 200 : 100);
+            // Удаляем временное сообщение, если оно есть (заменяем на реальное из базы)
+            const filteredMessages = prevMessages.filter(msg => !msg.id.startsWith('temp-'));
+            
+            console.log('➕ Добавляем новое сообщение в список. Всего сообщений:', filteredMessages.length + 1);
+            return [...filteredMessages, newMessage];
+          });
+          
+          // Помечаем сообщение как прочитанное, так как чат открыт
+          // Это предотвратит обновление счетчика непрочитанных сообщений
+          if (newMessage.receiverId === currentUser.id && !newMessage.read) {
+            setTimeout(async () => {
+              try {
+                await supabase
+                  .from('messages')
+                  .update({ read: true })
+                  .eq('id', newMessage.id);
+                
+                // Обновляем счетчик, уменьшая его на 1, так как сообщение прочитано
+                const { getUnreadMessageCount } = await import('../../utils/playerStorage');
+                const newCount = await getUnreadMessageCount(currentUser.id);
+                
+                // Обновляем счетчик в базе данных
+                await supabase
+                  .from('players')
+                  .update({ 
+                    unread_messages_count: Math.max(0, newCount),
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', currentUser.id);
+              } catch (error) {
+                console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
+              }
+            }, 100);
+          }
+          
+          // Прокручиваем вниз после получения нового сообщения
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, Platform.OS === 'android' ? 200 : 100);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players',
+          filter: `id=eq.${otherPlayer.id}`
+        },
+        (payload) => {
+          // Обновляем онлайн-статус другого пользователя при изменении
+          if (payload.new) {
+            const updatedPlayer = payload.new as any;
+            if (updatedPlayer.is_online !== undefined || updatedPlayer.last_seen !== undefined) {
+              setOtherPlayer(prev => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  isOnline: updatedPlayer.is_online ?? prev.isOnline,
+                  lastSeen: updatedPlayer.last_seen ?? prev.lastSeen
+                };
+              });
+            }
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Realtime подписка статус:', status);
+      });
 
-    // Запускаем polling как fallback для Realtime
-    pollingIntervalRef.current = setInterval(async () => {
-      if (currentUser && otherPlayer && otherPlayer.id === id) {
-        try {
-          const conversation = await getConversation(currentUser.id, otherPlayer.id);
-          const currentMessageIds = new Set(conversation.map(m => m.id));
-          const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
-          
-          if (newMessageIds.length > 0) {
-            setMessages(conversation);
-            lastMessageIdsRef.current = currentMessageIds;
-            
-            // Прокручиваем вниз
-            setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
-          }
-        } catch (error) {
-          console.error('❌ Ошибка polling:', error);
-        }
-      }
-    }, 2000); // Проверяем каждые 2 секунды
-
+    // Polling убран - используем только Realtime подписку для обновления статуса
+    // Это исключает лишнюю нагрузку на базу данных
+    // Статус обновляется:
+    // 1. При загрузке чата (свежие данные из базы)
+    // 2. Через Realtime подписку (мгновенно при изменении)
+    
     return () => {
+      console.log('🔌 Удаляем Realtime подписку для чата');
       supabase.removeChannel(channel);
-      
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
     };
-  }, [currentUser, otherPlayer, id]);
+  }, [currentUser?.id, otherPlayer?.id, id]);
 
   // Обработка системной кнопки "назад"
   useFocusEffect(
@@ -219,6 +245,29 @@ export default function ChatScreen() {
         setCurrentUser(userData);
         
         if (otherPlayerData) {
+          // Принудительно обновляем статус онлайн при загрузке чата
+          // Получаем актуальные данные из базы напрямую
+          try {
+            const { data: freshPlayerData, error } = await supabase
+              .from('players')
+              .select('is_online, last_seen')
+              .eq('id', otherPlayerData.id)
+              .single();
+            
+            if (!error && freshPlayerData) {
+              setOtherPlayer(prev => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  isOnline: freshPlayerData.is_online ?? prev.isOnline,
+                  lastSeen: freshPlayerData.last_seen ?? prev.lastSeen
+                };
+              });
+            }
+          } catch (statusError) {
+            console.warn('⚠️ Не удалось обновить статус при загрузке чата:', statusError);
+          }
+          
           // Сразу загружаем сообщения
           const conversation = await getConversation(userData.id, otherPlayerData.id);
           setMessages(conversation);
@@ -276,7 +325,7 @@ export default function ChatScreen() {
             justSentMessageRef.current = false;
           } else {
             // Вибрация при получении сообщений от других пользователей
-            const incomingMessages = newMessages.filter(m => m.sender_id !== currentUser.id);
+            const incomingMessages = newMessages.filter(m => m.senderId !== currentUser.id);
             if (incomingMessages.length > 0) {
               try {
                 if (Platform.OS === 'ios') {
@@ -307,12 +356,32 @@ export default function ChatScreen() {
       return;
     }
 
+    const messageText = newMessage.trim();
+    setNewMessage(''); // Очищаем поле сразу для лучшего UX
+    
+    // Оптимистичное обновление - добавляем сообщение сразу в UI
+    const tempMessage: Message = {
+      id: `temp-${Date.now()}`, // Временный ID
+      senderId: currentUser.id,
+      receiverId: otherPlayer.id,
+      text: messageText,
+      timestamp: new Date(),
+      read: false
+    };
+    
+    setMessages(prev => [...prev, tempMessage]);
+    
+    // Прокручиваем вниз сразу
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 50);
+    
+    // Устанавливаем флаг, что только что отправили сообщение
+    justSentMessageRef.current = true;
+
     try {
-      const success = await sendMessageSimple(currentUser.id, otherPlayer.id, newMessage.trim());
+      const success = await sendMessageSimple(currentUser.id, otherPlayer.id, messageText);
       if (success) {
-        // Устанавливаем флаг, что только что отправили сообщение
-        justSentMessageRef.current = true;
-        
         // Вибрация при отправке сообщения
         try {
           if (Platform.OS === 'ios') {
@@ -324,18 +393,25 @@ export default function ChatScreen() {
           console.error('❌ Ошибка вибрации при отправке:', vibError);
         }
         
-        setNewMessage('');
-        // Загружаем сообщения сразу без задержки
-        await loadMessages();
-        // Прокручиваем к последнему сообщению после загрузки
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, Platform.OS === 'android' ? 200 : 100);
+        // Realtime подписка автоматически заменит временное сообщение на реальное
+        // Но на всякий случай обновим список через небольшую задержку
+        setTimeout(async () => {
+          await loadMessages();
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 100);
+        }, 500);
       } else {
+        // Если отправка не удалась - удаляем временное сообщение
+        setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+        setNewMessage(messageText); // Возвращаем текст обратно
         Alert.alert(t('chat.error'), t('chat.errorSendingMessage'));
       }
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
+      // Удаляем временное сообщение при ошибке
+      setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+      setNewMessage(messageText); // Возвращаем текст обратно
       Alert.alert('Ошибка', 'Не удалось отправить сообщение');
     }
   };
@@ -491,13 +567,13 @@ export default function ChatScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>{t('chat.loading')}</Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -512,7 +588,7 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок чата */}
           <View style={styles.header}>
@@ -538,11 +614,11 @@ export default function ChatScreen() {
               </TouchableOpacity>
               <View style={styles.headerText}>
                 <Text style={styles.headerName}>{otherPlayer.name?.toUpperCase()}</Text>
-                <Text style={styles.headerStatus}>
-                  {otherPlayer.status === 'player' ? t('chat.player') : 
-                   otherPlayer.status === 'coach' ? t('chat.coach') : 
-                   otherPlayer.status === 'scout' ? t('chat.scout') : 
-                   otherPlayer.status === 'admin' ? t('chat.admin') : t('chat.star')}
+                <Text style={[
+                  styles.headerStatus,
+                  otherPlayer.isOnline ? styles.headerStatusOnline : styles.headerStatusOffline
+                ]}>
+                  {otherPlayer.isOnline ? (t('chat.online') || 'Онлайн') : (t('chat.offline') || 'Офлайн')}
                 </Text>
               </View>
             </View>
@@ -675,7 +751,7 @@ export default function ChatScreen() {
             </View>
           </KeyboardAvoidingView>
         </View>
-      </ImageBackground>
+      </CachedBackground>
     </View>
   );
 }
@@ -750,9 +826,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   headerStatus: {
-    color: '#FF4444',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
+  },
+  headerStatusOnline: {
+    color: '#4CAF50',
+  },
+  headerStatusOffline: {
+    color: '#888',
   },
   clearChatButton: {
     // Убираем фон и отступы для компактности

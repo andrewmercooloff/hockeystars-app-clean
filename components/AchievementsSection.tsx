@@ -339,7 +339,7 @@ export default function AchievementsSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,

@@ -165,20 +165,20 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
           const contentId = generateVideoContentId(video.url, video.timeCode);
           
           return (
-            <TouchableOpacity
-              key={index}
-              style={styles.videoCard}
-              onPress={() => handleVideoPress(video)}
-            >
-              <VideoThumbnail videoUrl={video.url} />
-              <View style={styles.playButton}>
-                <Ionicons name="play-circle" size={40} color="#FF4444" />
+          <TouchableOpacity
+            key={index}
+            style={styles.videoCard}
+            onPress={() => handleVideoPress(video)}
+          >
+            <VideoThumbnail videoUrl={video.url} />
+            <View style={styles.playButton}>
+              <Ionicons name="play-circle" size={40} color="#FF4444" />
+            </View>
+            {video.timeCode && (
+              <View style={styles.timeCodeBadge}>
+                <Text style={styles.timeCodeText}>{video.timeCode}</Text>
               </View>
-              {video.timeCode && (
-                <View style={styles.timeCodeBadge}>
-                  <Text style={styles.timeCodeText}>{video.timeCode}</Text>
-                </View>
-              )}
+            )}
               {playerId && (
                 <View style={styles.likeButtonContainer}>
                   <LikeButton
@@ -190,10 +190,10 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
                   />
                 </View>
               )}
-              <View style={styles.videoInfo}>
-                <Text style={styles.videoTitle}>{index + 1}</Text>
-              </View>
-            </TouchableOpacity>
+            <View style={styles.videoInfo}>
+              <Text style={styles.videoTitle}>{index + 1}</Text>
+            </View>
+          </TouchableOpacity>
           );
         })}
       </ScrollView>
@@ -223,20 +223,20 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalOverlay} {...panResponder.panHandlers}>
             <View style={styles.modalContent} pointerEvents="box-none">
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-              {selectedVideo && (
+            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {selectedVideo && (
                 <View pointerEvents="box-only">
-                  <YouTubeVideo
+              <YouTubeVideo
                     key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
-                    url={selectedVideo.url}
-                    timeCode={selectedVideo.timeCode}
-                  />
+                url={selectedVideo.url}
+                timeCode={selectedVideo.timeCode}
+              />
                 </View>
-              )}
-            </View>
+            )}
           </View>
+        </View>
         </TouchableWithoutFeedback>
       </Modal>
     </View>

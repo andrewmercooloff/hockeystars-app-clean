@@ -2196,7 +2196,9 @@
     "shop": "Sklep hokejowy",
     "error": "Błąd",
     "errorLoadingChat": "Nie udało się załadować danych czatu",
-    "errorSendingMessage": "Nie udało się wysłać wiadomości"
+    "errorSendingMessage": "Nie udało się wysłać wiadomości",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Tworzenie użytkownika",
@@ -2476,6 +2478,44 @@
     "vkPlaceholder": "@nazwa użytkownika lub link",
     "websitePlaceholder": "example.com"
   },
+  "puckSpeed": {
+    "title": "Pomiar prędkości krążka",
+    "kmh": "km/h",
+    "measure": "Zmierz prędkość",
+    "measureAgain": "Zmierz ponownie",
+    "noMeasurement": "Prędkość nie została jeszcze zmierzona",
+    "lastMeasurement": "Ostatni pomiar:",
+    "top3": "Top 3 pomiary",
+    "myRecord": "Mój rekord:",
+    "history": "Historia pomiarów:",
+    "addToProfile": "Dodaj do profilu",
+    "sensitivity": "Czułość:",
+    "stop": "Zatrzymaj",
+    "reset": "Resetuj",
+    "start": "Start",
+    "ready": "Gotowy do pomiaru",
+    "instructions": "Instrukcje:",
+    "instructionWarning": "Uwaga! Dokładna prędkość jest gwarantowana tylko przy braku obcych dźwięków i przy użyciu 2 mikrofonów klapkowych. Proszę zapisywać w wynikach tylko prawidłowe prędkości!",
+    "instruction1": "Zmierz odległość od krążka do siatki bramki i wpisz ją w pole powyżej",
+    "instruction2": "Umieść telefon przy bramce lub użyj 2 mikrofonów klapkowych. Umieść jeden mikrofon klapkowy bliżej strzału, drugi bliżej bramki.",
+    "instruction3": "Naciśnij \"Start\" i zacznij strzelać.",
+    "instruction4": "Dostosuj czułość, jeśli prędkość jest obliczona nieprawidłowo.",
+    "instruction5": "Wybierz prawidłową i najlepszą prędkość do dodania do profilu",
+    "distanceLabel": "Zmierz i wpisz odległość od miejsca strzału do siatki bramki",
+    "distancePlaceholder": "Odległość w centymetrach",
+    "inCentimeters": "w centymetrach",
+    "errorNoProfile": "Musisz być zalogowany, aby zapisać wynik",
+    "errorSaveFailed": "Nie udało się zapisać wyniku",
+    "successAdded": "Prędkość dodana do profilu",
+    "successNewMax": "Nowa maksymalna prędkość:",
+    "successAddedToProfile": "Prędkość dodana do profilu",
+    "analyzing": "Analizowanie dźwięku...",
+    "readyForSound": "Gotowy na pierwszy dźwięk...",
+    "sound1Detected": "Dźwięk 1 wykryty! Gotowy na drugi...",
+    "speedCalculated": "Prędkość:",
+    "speedExceedsLimit": "Prędkość przekracza 120 km/h, pomiar nie jest liczony",
+    "needMicrophone": "Wymagany dostęp do mikrofonu"
+  },
   "logout": "Wyjście",
   "logoutConfirm": "Wyloguj się ze swojego profilu",
   "logoutConfirmMessage": "Czy na pewno chcesz wylogować się ze swojego profilu?",
@@ -2493,6 +2533,10 @@
   },
   "avatarNotification": {
     "changed": "zmienił awatar"
+  },
+  "puckSpeedNotification": {
+    "title": "Nowy rekord prędkości",
+    "message": "{playerName} ustanowił nowy rekord prędkości: {speed} km/h"
   },
   "statsNotification": {
     "updated": "zaktualizował",

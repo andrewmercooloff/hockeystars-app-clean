@@ -76,6 +76,10 @@
   "avatarNotification": {
     "changed": "changed avatar"
   },
+  "puckSpeedNotification": {
+    "title": "New speed record",
+    "message": "{playerName} set a new speed record: {speed} km/h"
+  },
   "statsNotification": {
     "updated": "updated",
     "stats": "stats",
@@ -2596,7 +2600,9 @@
     "errorLoadingChat": "Failed to load chat data",
     "errorSendingMessage": "Failed to send message",
     "clearChat": "Clear Chat",
-    "clearChatConfirm": "Are you sure you want to delete all messages in this chat? This action cannot be undone."
+    "clearChatConfirm": "Are you sure you want to delete all messages in this chat? This action cannot be undone.",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Create User",
@@ -2865,5 +2871,43 @@
     "tiktokPlaceholder": "@username or link",
     "vkPlaceholder": "@username or link",
     "websitePlaceholder": "example.com"
+  },
+  "puckSpeed": {
+    "title": "Puck Speed Measurement",
+    "kmh": "km/h",
+    "measure": "Measure speed",
+    "measureAgain": "Measure again",
+    "noMeasurement": "Speed not measured yet",
+    "lastMeasurement": "Last measurement:",
+    "top3": "Top 3 Measurements",
+    "myRecord": "My Record:",
+    "history": "Measurement History:",
+    "addToProfile": "Add to Profile",
+    "sensitivity": "Sensitivity:",
+    "stop": "Stop",
+    "reset": "Reset",
+    "start": "Start",
+    "ready": "Ready to measure",
+    "instructions": "Instructions:",
+    "instructionWarning": "Attention! Accurate speed is guaranteed only in the absence of extraneous sounds and when using 2 lapel microphones. Please record only correct speeds in the results!",
+    "instruction1": "Measure the distance from the puck to the goal net and enter it in the field above",
+    "instruction2": "Place the phone near the goal, or use 2 lapel microphones. Place one lapel closer to the shot, the second closer to the goal.",
+    "instruction3": "Press \"Start\" and start shooting.",
+    "instruction4": "Adjust sensitivity if speed is calculated incorrectly.",
+    "instruction5": "Choose the correct and best speed to add to profile",
+    "distanceLabel": "Measure and enter the distance from the shot location to the goal net",
+    "distancePlaceholder": "Distance in centimeters",
+    "inCentimeters": "in centimeters",
+    "errorNoProfile": "You must be logged in to save the result",
+    "errorSaveFailed": "Failed to save result",
+    "successAdded": "Speed added to profile",
+    "successNewMax": "New maximum speed:",
+    "successAddedToProfile": "Speed added to profile",
+    "analyzing": "Analyzing sound...",
+    "readyForSound": "Ready for first sound...",
+    "sound1Detected": "Sound 1 detected! Ready for second...",
+    "speedCalculated": "Speed:",
+    "speedExceedsLimit": "Speed exceeds 120 km/h, measurement not counted",
+    "needMicrophone": "Microphone access required"
   }
 }

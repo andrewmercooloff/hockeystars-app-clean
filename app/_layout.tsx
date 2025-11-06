@@ -81,6 +81,7 @@ export default function RootLayout() {
     'Gilroy-Regular': require('../assets/fonts/gilroy-regular.ttf'),
     'Gilroy-Bold': require('../assets/fonts/gilroy-bold.ttf'),
     'SpaceMono': require('../assets/fonts/SpaceMono-Regular.ttf'),
+    'DigifaceRegular': require('../assets/images/DigifaceRegular.ttf'),
   });
 
   // Скрываем нативный splash screen сразу при монтировании компонента для iOS
@@ -925,6 +926,12 @@ export default function RootLayout() {
         />
         <Tabs.Screen
           name="components/Puck"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="puck-speed-sound"
           options={{
             href: null,
           }}

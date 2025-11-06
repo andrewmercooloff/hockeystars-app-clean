@@ -13,6 +13,7 @@ interface PuckProps {
   points?: string;
   isStar?: boolean;
   status?: string;
+  isOnline?: boolean; // статус онлайн пользователя
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -23,7 +24,8 @@ const Puck: React.FC<PuckProps> = ({
   size = 140, 
   points, 
   isStar, 
-  status 
+  status,
+  isOnline = false
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
@@ -170,6 +172,20 @@ const Puck: React.FC<PuckProps> = ({
           <View style={styles.pointsContainer}>
             <Text style={styles.pointsText}>{points}</Text>
           </View>
+        )}
+        
+        {/* Зеленая точка для онлайн пользователей */}
+        {isOnline && (
+          <View style={[
+            styles.onlineIndicator,
+            {
+              width: size * 0.12,
+              height: size * 0.12,
+              borderRadius: (size * 0.12) / 2,
+              top: (size * 0.05) + 3, // Сдвигаем вниз: увеличиваем top
+              right: (size * 0.05) + 5, // Сдвигаем влево: увеличиваем right
+            }
+          ]} />
         )}
       </TouchableOpacity>
     </Animated.View>
@@ -328,6 +344,13 @@ const styles = StyleSheet.create({
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.7)',
       },
     }),
+  },
+  onlineIndicator: {
+    position: 'absolute',
+    backgroundColor: '#4CAF50',
+    borderWidth: 2,
+    borderColor: '#000',
+    zIndex: 10,
   },
 });
 

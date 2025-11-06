@@ -179,7 +179,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
                 setLoading(false);
               }
             }}
-          />
+        />
       </View>
     </View>
   );

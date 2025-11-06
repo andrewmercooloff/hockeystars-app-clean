@@ -325,11 +325,7 @@ export default function SearchScreen() {
         }
 
 
-        // Очищаем кеш для принудительной перезагрузки рейтингов
-        const { clearAllPlayersCache } = await import('../utils/playerStorage');
-        await clearAllPlayersCache();
-        
-        // Загрузка игроков
+        // Загрузка игроков (без принудительной очистки кеша, чтобы избежать перезагрузки)
         const allPlayers = await loadPlayers();
         
         // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов

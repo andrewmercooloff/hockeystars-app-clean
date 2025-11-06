@@ -50,6 +50,7 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
+import CachedBackground from '../../components/CachedBackground';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
@@ -66,7 +67,7 @@ const iceBg = require('../../assets/images/led.jpg');
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed } = useLocalSearchParams();
   const router = useRouter();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
@@ -82,6 +83,7 @@ export default function PlayerProfile() {
   const shareCardRef = useRef<View>(null);
   const friendsRef = useRef<View>(null);
   const giftButtonRef = useRef<View>(null);
+  const puckSpeedRef = useRef<View>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -277,9 +279,9 @@ export default function PlayerProfile() {
               if (migratedUrl) {
                 migratedPhotos.push(migratedUrl);
               }
-            } else {
+      } else {
               migratedPhotos.push(photo);
-            }
+      }
           }
       
       if (migratedPhotos.length > 0) {
@@ -909,8 +911,10 @@ export default function PlayerProfile() {
       scrollToSection(friendsRef);
     } else if (scrollToGift === 'true') {
       scrollToSection(giftButtonRef);
+    } else if (scrollToSpeed === 'true') {
+      scrollToSection(puckSpeedRef);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, player]);
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, player]);
 
   const showCustomAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
     setAlert({
@@ -2197,7 +2201,7 @@ export default function PlayerProfile() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>
@@ -2205,7 +2209,7 @@ export default function PlayerProfile() {
               </Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -2213,7 +2217,7 @@ export default function PlayerProfile() {
   if (!player) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
@@ -2221,7 +2225,7 @@ export default function PlayerProfile() {
               </Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -2230,7 +2234,7 @@ export default function PlayerProfile() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
             
@@ -2409,7 +2413,7 @@ export default function PlayerProfile() {
                 <View style={styles.playerTeamsContainer}>
                   {playerTeams.map((team, index) => {
                     const getTeamName = () => {
-                      const translationKey = `teams.${team.teamName}`;
+                        const translationKey = `teams.${team.teamName}`;
                       const translated = t(translationKey);
                       // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
                       if (translated === translationKey || translated.startsWith('teams.')) {
@@ -2420,7 +2424,7 @@ export default function PlayerProfile() {
                     return (
                       <Text key={index} style={styles.playerTeam}>
                         {getTeamName()}{index < playerTeams.length - 1 ? ', ' : ''}
-                      </Text>
+                    </Text>
                     );
                   })}
                 </View>
@@ -3497,47 +3501,47 @@ export default function PlayerProfile() {
               }
               
               return (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
-                  <View style={styles.infoGrid}>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
+                <View style={styles.infoGrid}>
                     {/* Рост - показываем только если указан или в режиме редактирования */}
                     {(hasHeight || isEditingMode) && (
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.height')}</Text>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.height')}</Text>
                         {isEditingMode ? (
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.height !== undefined ? editData.height : (player.height || '')}
-                            onChangeText={(text) => setEditData({...editData, height: text})}
-                            placeholder={`${t('profile.height')} (${t('profile.cm')})`}
-                            placeholderTextColor="#888"
-                            keyboardType="numeric"
-                          />
-                        ) : (
+                      <TextInput
+                        style={styles.editInput}
+                        value={editData.height !== undefined ? editData.height : (player.height || '')}
+                        onChangeText={(text) => setEditData({...editData, height: text})}
+                        placeholder={`${t('profile.height')} (${t('profile.cm')})`}
+                        placeholderTextColor="#888"
+                        keyboardType="numeric"
+                      />
+                    ) : (
                           <Text style={styles.infoValue}>{`${player.height} ${t('profile.cm')}`}</Text>
-                        )}
-                      </View>
+                    )}
+                  </View>
                     )}
                     {/* Вес - показываем только если указан или в режиме редактирования */}
                     {(hasWeight || isEditingMode) && (
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
                         {isEditingMode ? (
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
-                            onChangeText={(text) => setEditData({...editData, weight: text})}
-                            placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
-                            placeholderTextColor="#888"
-                            keyboardType="numeric"
-                          />
-                        ) : (
+                      <TextInput
+                        style={styles.editInput}
+                        value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
+                        onChangeText={(text) => setEditData({...editData, weight: text})}
+                        placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
+                        placeholderTextColor="#888"
+                        keyboardType="numeric"
+                      />
+                    ) : (
                           <Text style={styles.infoValue}>{`${player.weight} ${t('profile.kg')}`}</Text>
-                        )}
-                      </View>
                     )}
                   </View>
+                    )}
                 </View>
+              </View>
               );
             })()}
 
@@ -3566,10 +3570,10 @@ export default function PlayerProfile() {
                             placeholderTextColor="#888"
                           />
                           <View style={styles.timeInputContainer}>
-                            <TextInput
+                          <TextInput
                               style={styles.timeInputField}
                               value={video.hours}
-                              onChangeText={(text) => {
+                            onChangeText={(text) => {
                                 // Разрешаем только цифры и ограничиваем до 99
                                 const numericText = text.replace(/[^0-9]/g, '');
                                 const value = numericText === '' ? '0' : Math.min(99, parseInt(numericText)).toString();
@@ -3593,9 +3597,9 @@ export default function PlayerProfile() {
                                 const newVideoFields = [...videoFields];
                                 newVideoFields[index] = { ...newVideoFields[index], minutes: value };
                                 setVideoFields(newVideoFields);
-                              }}
+                            }}
                               placeholder="0"
-                              placeholderTextColor="#888"
+                            placeholderTextColor="#888"
                               keyboardType="numeric"
                               maxLength={2}
                             />
@@ -3615,7 +3619,7 @@ export default function PlayerProfile() {
                               placeholderTextColor="#888"
                               keyboardType="numeric"
                               maxLength={2}
-                            />
+                          />
                           </View>
                           {videoFields.length > 1 && (
                             <TouchableOpacity
@@ -3840,7 +3844,7 @@ export default function PlayerProfile() {
 
             {/* Секция измерения скорости шайбы - только для игроков */}
             {player && player.status === 'player' && (
-              <View style={styles.section}>
+              <View ref={puckSpeedRef} style={styles.section}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
@@ -3850,43 +3854,52 @@ export default function PlayerProfile() {
                       <View style={styles.puckSpeedDisplay}>
                         <View style={styles.puckSpeedValueContainer}>
                           <Text style={styles.puckSpeedValue}>
-                            {player.puckSpeed.toFixed(1)}
+                            {Math.round(player.puckSpeed)}
                           </Text>
                           <Text style={styles.puckSpeedUnit}>
                             {t('puckSpeed.kmh') || 'км/ч'}
                           </Text>
                         </View>
-                        {player.puckSpeedHistory && player.puckSpeedHistory.length > 1 && (
-                          <View style={styles.puckSpeedHistory}>
-                            <Text style={styles.puckSpeedHistoryLabel}>
-                              {t('puckSpeed.lastMeasurement') || 'Последнее измерение:'}
-                            </Text>
-                            <View style={styles.puckSpeedHistoryRow}>
-                              <Text style={styles.puckSpeedHistoryValue}>
-                                {player.puckSpeedHistory[player.puckSpeedHistory.length - 1].speed.toFixed(1)} {t('puckSpeed.kmh') || 'км/ч'}
+                        {player.puckSpeedHistory && player.puckSpeedHistory.length > 0 && (() => {
+                          // Сортируем по скорости (по убыванию) и берем топ-3
+                          const topSpeeds = [...player.puckSpeedHistory]
+                            .sort((a, b) => b.speed - a.speed)
+                            .slice(0, 3);
+                          
+                          // Функция форматирования даты
+                          const formatDate = (dateString: string) => {
+                            try {
+                              const date = new Date(dateString);
+                              const day = date.getDate().toString().padStart(2, '0');
+                              const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                              const year = date.getFullYear();
+                              return `${day}.${month}.${year}`;
+                            } catch {
+                              return dateString;
+                            }
+                          };
+                          
+                          return (
+                            <View style={styles.puckSpeedHistory}>
+                              <Text style={styles.puckSpeedHistoryLabel}>
+                                {t('puckSpeed.top3') || 'Топ 3 измерений'}
                               </Text>
-                              {player.puckSpeedHistory.length >= 2 && (() => {
-                                const lastSpeed = player.puckSpeedHistory[player.puckSpeedHistory.length - 1].speed;
-                                const prevSpeed = player.puckSpeedHistory[player.puckSpeedHistory.length - 2].speed;
-                                const improvement = lastSpeed - prevSpeed;
-                                if (improvement > 0) {
-                                  return (
-                                    <View style={styles.speedImprovement}>
-                                      <Ionicons name="arrow-up" size={16} color="#4CAF50" />
-                                      <Text style={styles.speedImprovementText}>
-                                        +{improvement.toFixed(1)}
-                                      </Text>
-                                    </View>
-                                  );
-                                }
-                                return null;
-                              })()}
+                              {topSpeeds.map((record, index) => (
+                                <View key={index} style={styles.puckSpeedHistoryRow}>
+                                  <Text style={styles.puckSpeedHistoryValue}>
+                                    {Math.round(record.speed)} {t('puckSpeed.kmh') || 'км/ч'}
+                                  </Text>
+                                  <Text style={styles.puckSpeedHistoryDate}>
+                                    {formatDate(record.date)}
+                                  </Text>
+                                </View>
+                              ))}
                             </View>
-                          </View>
-                        )}
+                          );
+                        })()}
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
-                          onPress={() => router.push('/puck-speed')}
+                          onPress={() => router.push('/puck-speed-sound')}
                         >
                           <Ionicons name="speedometer" size={24} color="#fff" />
                           <Text style={styles.measureSpeedButtonText}>
@@ -3902,7 +3915,7 @@ export default function PlayerProfile() {
                         </Text>
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
-                          onPress={() => router.push('/puck-speed')}
+                          onPress={() => router.push('/puck-speed-sound')}
                         >
                           <Ionicons name="add-circle" size={24} color="#fff" />
                           <Text style={styles.measureSpeedButtonText}>
@@ -4484,7 +4497,7 @@ export default function PlayerProfile() {
 
           </ScrollView>
         </View>
-      </ImageBackground>
+      </CachedBackground>
 
       {/* Скрытая карточка для шеринга */}
       <View style={{ position: 'absolute', left: -10000, top: 0 }}>
@@ -4672,15 +4685,15 @@ export default function PlayerProfile() {
             </TouchableOpacity>
             {selectedVideo && (
               <View pointerEvents="box-only" style={styles.videoModalContent}>
-                <YouTubeVideo 
-                  url={selectedVideo.url}
-                  title={t('myMoment')}
-                  timeCode={selectedVideo.timeCode}
+              <YouTubeVideo 
+                url={selectedVideo.url}
+                title={t('myMoment')}
+                timeCode={selectedVideo.timeCode}
                   onClose={() => {
                     setSelectedVideo(null);
                     setVideoLikeRefreshTrigger(prev => prev + 1);
                   }}
-                />
+              />
                 {player && (
                   <View style={styles.videoModalLikeButton}>
                     <LikeButton
@@ -5250,7 +5263,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.7)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -5514,6 +5527,7 @@ const styles = StyleSheet.create({
   },
   puckSpeedContainer: {
     padding: 20,
+    paddingBottom: 0,
   },
   puckSpeedDisplay: {
     alignItems: 'center',
@@ -5540,22 +5554,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
     width: '100%',
+    gap: 10,
   },
   puckSpeedHistoryLabel: {
     fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
-    color: '#ccc',
-    marginBottom: 5,
-  },
-  puckSpeedHistoryValue: {
-    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+    marginBottom: 8,
+  },
+  puckSpeedHistoryValue: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    flex: 1,
+  },
+  puckSpeedHistoryDate: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
   },
   puckSpeedHistoryRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 10,
   },
   speedImprovement: {
     flexDirection: 'row',

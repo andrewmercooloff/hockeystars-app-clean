@@ -2382,7 +2382,9 @@
     "shop": "Jääkiekkokauppa",
     "error": "Virhe",
     "errorLoadingChat": "Chat-tietojen lataaminen epäonnistui",
-    "errorSendingMessage": "Viestin lähettäminen epäonnistui"
+    "errorSendingMessage": "Viestin lähettäminen epäonnistui",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Käyttäjän luominen",
@@ -2645,7 +2647,49 @@
     "vkPlaceholder": "@käyttäjänimi tai linkki",
     "websitePlaceholder": "esimerkki.fi"
   },
+  "puckSpeed": {
+    "title": "Pakin nopeuden mittaus",
+    "kmh": "km/h",
+    "measure": "Mittaa nopeus",
+    "measureAgain": "Mittaa uudelleen",
+    "noMeasurement": "Nopeutta ei ole vielä mitattu",
+    "lastMeasurement": "Viimeisin mittaus:",
+    "top3": "Top 3 mittaukset",
+    "myRecord": "Minun ennätykseni:",
+    "history": "Mittaushistoria:",
+    "addToProfile": "Lisää profiiliin",
+    "sensitivity": "Herkkyys:",
+    "stop": "Lopeta",
+    "reset": "Nollaa",
+    "start": "Aloita",
+    "ready": "Valmis mittaukseen",
+    "instructions": "Ohjeet:",
+    "instructionWarning": "Huomio! Tarkka nopeus on taattu vain ilman vieraita ääniä ja käyttämällä 2 kauluri-mikrofonia. Ole hyvä ja tallenna tuloksiin vain oikeat nopeudet!",
+    "instruction1": "Mittaa etäisyys pakista maalin verkkoon ja kirjoita se yllä olevaan kenttään",
+    "instruction2": "Aseta puhelin maalin lähelle tai käytä 2 kauluri-mikrofonia. Aseta yksi kaulurimikrofoni lähemmäs laukausta, toinen lähemmäs maalia.",
+    "instruction3": "Paina \"Aloita\" ja aloita ampuminen.",
+    "instruction4": "Säädä herkkyyttä, jos nopeus lasketaan väärin.",
+    "instruction5": "Valitse oikea ja paras nopeus lisättäväksi profiiliin",
+    "distanceLabel": "Mittaa ja kirjoita etäisyys laukauspaikasta maalin verkkoon",
+    "distancePlaceholder": "Etäisyys senttimetreinä",
+    "inCentimeters": "senttimetreinä",
+    "errorNoProfile": "Sinun täytyy kirjautua sisään tallentaaksesi tuloksen",
+    "errorSaveFailed": "Tuloksen tallentaminen epäonnistui",
+    "successAdded": "Nopeus lisätty profiiliin",
+    "successNewMax": "Uusi maksiminopeus:",
+    "successAddedToProfile": "Nopeus lisätty profiiliin",
+    "analyzing": "Analysoin ääntä...",
+    "readyForSound": "Valmis ensimmäiselle äänelle...",
+    "sound1Detected": "Ääni 1 havaittu! Valmis toiselle...",
+    "speedCalculated": "Nopeus:",
+    "speedExceedsLimit": "Nopeus ylittää 120 km/h, mittaus ei lasketa",
+    "needMicrophone": "Mikrofonin käyttöoikeus vaaditaan"
+  },
   "logout": "Poistu",
   "logoutConfirm": "Kirjaudu ulos profiilistasi",
-  "logoutConfirmMessage": "Haluatko varmasti kirjautua ulos profiilistasi?"
+  "logoutConfirmMessage": "Haluatko varmasti kirjautua ulos profiilistasi?",
+  "puckSpeedNotification": {
+    "title": "Uusi nopeusennätys",
+    "message": "{playerName} asetti uuden nopeusennätyksen: {speed} km/h"
+  }
 }

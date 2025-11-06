@@ -4,21 +4,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
-interface AchievementAddedNotificationProps {
+interface PuckSpeedChangedNotificationProps {
   playerName: string;
-  playerId?: string;
-  achievementsCount: number;
+  playerId: string;
+  newMaxSpeed: number;
   timestamp: string;
-  playerAvatar?: string;
 }
 
-const AchievementAddedNotification = React.memo(function AchievementAddedNotification({
+const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotification({
   playerName,
   playerId,
-  achievementsCount,
-  timestamp,
-  playerAvatar
-}: AchievementAddedNotificationProps) {
+  newMaxSpeed,
+  timestamp
+}: PuckSpeedChangedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {
@@ -39,29 +37,15 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
     }
   };
 
-  const getAchievementText = (count: number): string => {
-    if (count === 1) {
-      return t('achievementNotification.oneAchievement');
-    } else {
-      return t('achievementNotification.multipleAchievements', { count });
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        {playerId ? (
-          <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={playerAvatar}
-            size={50}
-            style={styles.playerAvatar}
-          />
-        ) : (
-          <View style={styles.avatarPlaceholder}>
-          <Ionicons name="trophy-outline" size={24} color="#fff" />
-          </View>
-        )}
+        <CachedAvatar
+          playerId={playerId}
+          fallbackAvatarUrl={undefined}
+          size={50}
+          style={styles.playerAvatar}
+        />
       </View>
       
       <View style={styles.contentContainer}>
@@ -74,15 +58,13 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
           </Text>
         </View>
         
-        <View style={styles.achievementItem}>
+        <View style={styles.speedItem}>
           <Text style={styles.actionText}>
-            {t('achievementNotification.added')} {getAchievementText(achievementsCount)}
+            {t('puckSpeedNotification.message', { playerName, speed: Math.round(newMaxSpeed).toString() })}
           </Text>
-          <View style={styles.achievementsInfo}>
-            <Ionicons name="trophy" size={14} color="#000" />
-            <Text style={styles.achievementsCountText}>
-              +{achievementsCount}
-            </Text>
+          <View style={styles.speedBadge}>
+            <Ionicons name="speedometer-outline" size={14} color="#fff" />
+            <Text style={styles.speedText}>{Math.round(newMaxSpeed)}</Text>
           </View>
         </View>
       </View>
@@ -90,7 +72,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
   );
 });
 
-export default AchievementAddedNotification;
+export default PuckSpeedChangedNotification;
 
 const styles = StyleSheet.create({
   container: {
@@ -102,22 +84,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 4,
-    borderLeftColor: '#FFD700', // Желтая граница для достижений
+    borderLeftColor: '#888', // Серый цвет слева
   },
   avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
-    overflow: 'hidden',
-  },
-  avatarPlaceholder: {
     width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 12,
+    overflow: 'hidden',
   },
   playerAvatar: {
     width: 50,
@@ -144,7 +121,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
-  achievementItem: {
+  speedItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -156,21 +133,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
-  achievementsInfo: {
+  speedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFD700',
+    backgroundColor: '#888', // Серый фон для иконки
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 12,
-    minWidth: 32,
+    gap: 4,
   },
-  achievementsCountText: {
-    color: '#000',
+  speedText: {
+    color: '#fff',
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
-    marginLeft: 4,
   },
 });
-
 

@@ -75,9 +75,8 @@ class AvatarCache {
       const newVersion = currentVersion + 1;
       this.avatarVersions.set(playerId, newVersion);
       
-      console.log(`🔄 Обновление версии аватара для ${playerId.substring(0, 8)}: v${currentVersion} -> v${newVersion}
-        Старый: ${oldUrl?.substring(oldUrl.length - 20) || 'нет'}
-        Новый: ${avatarUrl.substring(avatarUrl.length - 20)}`);
+      // Логируем только если URL действительно изменился (не тот же файл)
+      // Это предотвращает избыточное логирование при каждой загрузке
       
       // Предзагружаем новое изображение с версией для гарантии обновления
       let urlToPreload = avatarUrl;

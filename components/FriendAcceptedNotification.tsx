@@ -66,9 +66,9 @@ export default function FriendAcceptedNotification({
         </View>
 
         <View style={styles.actionItem}>
-          <View style={styles.row}>
-            <Ionicons name="checkmark-circle" size={18} color="#4CAF50" style={{ marginRight: 8 }} />
-            <Text style={styles.titleText}>{t('notifications.friendRequestAccepted')}</Text>
+        <View style={styles.row}>
+          <Ionicons name="checkmark-circle" size={18} color="#4CAF50" style={{ marginRight: 8 }} />
+          <Text style={styles.titleText}>{t('notifications.friendRequestAccepted')}</Text>
           </View>
           <View style={styles.friendshipBadge}>
             <Ionicons name="people-outline" size={16} color="#fff" />

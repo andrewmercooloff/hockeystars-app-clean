@@ -114,16 +114,13 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         bottomOffset: 218 // Уменьшено на 7px чтобы шайбы долетали до нижней границы
       };
     } else if (Platform.OS === 'web') {
-      // Для Web используем более строгие границы
-      const webRightOffset = Math.max(300, width * 0.35);
-      const webBottomOffset = Math.max(450, height * 0.45);
-      const boundaries = {
-        leftOffset: 20,
-        topOffset: 20,
-        rightOffset: webRightOffset,
-        bottomOffset: webBottomOffset
+      // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
+      return {
+        leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
+        topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
+        rightOffset: 450,  // Значительно увеличено для предотвращения вылета справа (было 350)
+        bottomOffset: 650  // Значительно увеличено для предотвращения вылета снизу (было 550)
       };
-      return boundaries;
     } else {
       // Для Android используем фиксированные границы (сбалансированное пространство по горизонтали)
       return {
@@ -184,7 +181,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           if (Platform.OS === 'ios') {
             speedMultiplier = 1.0; // Оптимизировано для лучшей производительности
           } else if (Platform.OS === 'web') {
-            speedMultiplier = 1.2;
+            speedMultiplier = 1.0; // Снижено с 1.2 для более стабильной работы границ
           } else if (Platform.OS === 'android') {
             const performanceLevel = getAndroidPerformanceLevel();
             switch (performanceLevel) {
@@ -286,7 +283,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           const wallMaxY = height - boundaries.bottomOffset - puckSize;
           
           // Физика отскока - оптимизирована для плавности
-          const bounceMultiplier = Platform.OS === 'ios' ? 1.05 : (Platform.OS === 'android' ? 1.1 : 1.05);
+          const bounceMultiplier = Platform.OS === 'ios' ? 1.05 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 1.1 : 1.05);
           
           if (newX <= boundaries.leftOffset || newX >= wallMaxX) {
             newVx = -newVx * bounceMultiplier; // Отскок от стен
@@ -299,11 +296,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
           // Дополнительная защита для веб-платформы - принудительное ограничение позиции
           if (Platform.OS === 'web') {
-            // Исправляем расчет максимальных координат
-            const maxX = width - boundaries.rightOffset;
-            const maxY = height - boundaries.bottomOffset;
+            // Исправляем расчет максимальных координат с учетом размера шайбы
+            const maxX = width - boundaries.rightOffset - puckSize;
+            const maxY = height - boundaries.bottomOffset - puckSize;
             
-            // Проверяем, если шайба вылетает за границы
+            // Проверяем, если шайба вылетает за границы (с учетом размера)
             if (newX < boundaries.leftOffset || newX > maxX || newY < boundaries.topOffset || newY > maxY) {
               console.warn('🚨 Puck out of bounds BEFORE correction:', { 
                 id: pos.id, 
@@ -311,13 +308,22 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 limits: { maxX, maxY },
                 boundaries,
                 velocity: { vx: newVx, vy: newVy },
-                screenSize: { width, height }
+                screenSize: { width, height },
+                puckSize
               });
+              
+              // Если шайба вылетает, сбрасываем скорость в противоположную сторону
+              if (newX < boundaries.leftOffset || newX > maxX) {
+                newVx = -newVx * 0.5; // Сбрасываем скорость
+              }
+              if (newY < boundaries.topOffset || newY > maxY) {
+                newVy = -newVy * 0.5; // Сбрасываем скорость
+              }
             }
             
-            const correctedX = Math.max(boundaries.leftOffset, Math.min(maxX - puckSize, newX));
-            const correctedY = Math.max(boundaries.topOffset, Math.min(maxY - puckSize, newY));
-            
+            // Строгая коррекция с учетом размера шайбы
+            const correctedX = Math.max(boundaries.leftOffset, Math.min(maxX, newX));
+            const correctedY = Math.max(boundaries.topOffset, Math.min(maxY, newY));
             
             newX = correctedX;
             newY = correctedY;
@@ -333,7 +339,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
           // Жесткая система коллизий - шайбы не могут накладываться
           // Оптимизация: проверяем только близкие шайбы (квадрат расстояния быстрее чем sqrt)
-          const minDistance = Platform.OS === 'android' ? puckSize * 0.5 : puckSize;
+          const minDistance = (Platform.OS === 'android' || Platform.OS === 'web') ? puckSize * 0.5 : puckSize;
           const minDistanceSq = minDistance ** 2;
           
           currentPositions.forEach((otherPos, otherIndex) => {
@@ -356,7 +362,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               // Оптимизированная физика отталкивания - баланс между плавностью и производительностью
               const overlap = minDistance - distance;
               // Сбалансированные коэффициенты для плавного движения
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.65 : (Platform.OS === 'android' ? 0.4 : 0.5));
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.65 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 0.4 : 0.5));
               
               // Оптимизированная передача импульса - баланс между реализмом и производительностью
               const currentSpeedSq = pos.vx * pos.vx + pos.vy * pos.vy;
@@ -742,6 +748,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
           })() : undefined}
         isStar={player.status === 'star'}
         status={player.status}
+        isOnline={player.isOnline}
         />
       </Suspense>
     </Animated.View>
@@ -1208,9 +1215,9 @@ export default function HomeScreen() {
         <View style={styles.filtersContainer}>
           <CountryFilter players={players} />
           <YearFilter players={players} />
-          {/* Кнопка отладки отключена */}
         </View>
         </View>
+
 
         {/* Показываем сообщение, если нет подключения к интернету */}
         {!isConnected && !isCheckingConnection && (

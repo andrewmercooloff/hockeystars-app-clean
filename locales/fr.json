@@ -2388,7 +2388,9 @@
     "shop": "Magasin de hockey",
     "error": "Erreur",
     "errorLoadingChat": "Échec du chargement des données de discussion",
-    "errorSendingMessage": "Échec de l'envoi du message"
+    "errorSendingMessage": "Échec de l'envoi du message",
+    "online": "En ligne",
+    "offline": "Hors ligne"
   },
   "createUser": {
     "title": "Créer un utilisateur",
@@ -2651,7 +2653,49 @@
     "vkPlaceholder": "@nom d'utilisateur ou lien",
     "websitePlaceholder": "exemple.com"
   },
+  "puckSpeed": {
+    "title": "Mesure de la vitesse de la rondelle",
+    "kmh": "km/h",
+    "measure": "Mesurer la vitesse",
+    "measureAgain": "Mesurer à nouveau",
+    "noMeasurement": "La vitesse n'a pas encore été mesurée",
+    "lastMeasurement": "Dernière mesure:",
+    "top3": "Top 3 mesures",
+    "myRecord": "Mon record:",
+    "history": "Historique des mesures:",
+    "addToProfile": "Ajouter au profil",
+    "sensitivity": "Sensibilité:",
+    "stop": "Arrêter",
+    "reset": "Réinitialiser",
+    "start": "Démarrer",
+    "ready": "Prêt à mesurer",
+    "instructions": "Instructions:",
+    "instructionWarning": "Attention! La vitesse précise n'est garantie qu'en l'absence de sons parasites et lors de l'utilisation de 2 microphones-cravates. Veuillez enregistrer uniquement les vitesses correctes dans les résultats!",
+    "instruction1": "Mesurez la distance de la rondelle au filet du but et entrez-la dans le champ ci-dessus",
+    "instruction2": "Placez le téléphone près du but ou utilisez 2 microphones-cravates. Placez un microphone-cravate plus près du tir, le second plus près du but.",
+    "instruction3": "Appuyez sur \"Démarrer\" et commencez à tirer.",
+    "instruction4": "Ajustez la sensibilité si la vitesse est calculée incorrectement.",
+    "instruction5": "Choisissez la vitesse correcte et la meilleure à ajouter au profil",
+    "distanceLabel": "Mesurez et entrez la distance de l'emplacement du tir au filet du but",
+    "distancePlaceholder": "Distance en centimètres",
+    "inCentimeters": "en centimètres",
+    "errorNoProfile": "Vous devez être connecté pour enregistrer le résultat",
+    "errorSaveFailed": "Échec de l'enregistrement du résultat",
+    "successAdded": "Vitesse ajoutée au profil",
+    "successNewMax": "Nouvelle vitesse maximale:",
+    "successAddedToProfile": "Vitesse ajoutée au profil",
+    "analyzing": "Analyse du son...",
+    "readyForSound": "Prêt pour le premier son...",
+    "sound1Detected": "Son 1 détecté! Prêt pour le second...",
+    "speedCalculated": "Vitesse:",
+    "speedExceedsLimit": "La vitesse dépasse 120 km/h, la mesure n'est pas comptée",
+    "needMicrophone": "Accès au microphone requis"
+  },
   "logout": "Sortie",
   "logoutConfirm": "Déconnectez-vous de votre profil",
-  "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de votre profil ?"
+  "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de votre profil ?",
+  "puckSpeedNotification": {
+    "title": "Nouveau record de vitesse",
+    "message": "{playerName} a établi un nouveau record de vitesse: {speed} km/h"
+  }
 }

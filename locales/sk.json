@@ -2382,7 +2382,9 @@
     "shop": "Hokejový obchod",
     "error": "Chyba",
     "errorLoadingChat": "Načítanie údajov četu zlyhalo",
-    "errorSendingMessage": "Odoslanie správy zlyhalo"
+    "errorSendingMessage": "Odoslanie správy zlyhalo",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Vytvorenie používateľa",
@@ -2645,7 +2647,49 @@
     "vkPlaceholder": "@používateľské meno alebo odkaz",
     "websitePlaceholder": "example.com"
   },
+  "puckSpeed": {
+    "title": "Meranie rýchlosti puku",
+    "kmh": "km/h",
+    "measure": "Zmerať rýchlosť",
+    "measureAgain": "Zmerať znova",
+    "noMeasurement": "Rýchlosť ešte nebola zmeraná",
+    "lastMeasurement": "Posledné meranie:",
+    "top3": "Top 3 merania",
+    "myRecord": "Môj rekord:",
+    "history": "História meraní:",
+    "addToProfile": "Pridať do profilu",
+    "sensitivity": "Citlivosť:",
+    "stop": "Zastaviť",
+    "reset": "Resetovať",
+    "start": "Štart",
+    "ready": "Pripravený na meranie",
+    "instructions": "Inštrukcie:",
+    "instructionWarning": "Pozor! Presná rýchlosť je zaručená len pri absencii cudzích zvukov a pri použití 2 mikrofónov-petlíčok. Prosím, zaznamenávajte do výsledkov iba správnu rýchlosť!",
+    "instruction1": "Zmerajte vzdialenosť od puku k sieti bránky a zadajte ju do poľa vyššie",
+    "instruction2": "Umiestnite telefón pri bránke alebo použite 2 náprsné mikrofóny. Jeden náprsný mikrofón umiestnite bližšie k strelu, druhý bližšie k bránke.",
+    "instruction3": "Stlačte \"Štart\" a začnite strieľať.",
+    "instruction4": "Upravte citlivosť, ak je rýchlosť vypočítaná nesprávne.",
+    "instruction5": "Vyberte správnu a najlepšiu rýchlosť na pridanie do profilu",
+    "distanceLabel": "Zmerajte a zadajte vzdialenosť od miesta strelu k sieti bránky",
+    "distancePlaceholder": "Vzdialenosť v centimetroch",
+    "inCentimeters": "v centimetroch",
+    "errorNoProfile": "Musíte sa prihlásiť, aby ste mohli uložiť výsledok",
+    "errorSaveFailed": "Nepodarilo sa uložiť výsledok",
+    "successAdded": "Rýchlosť pridaná do profilu",
+    "successNewMax": "Nová maximálna rýchlosť:",
+    "successAddedToProfile": "Rýchlosť pridaná do profilu",
+    "analyzing": "Analyzujem zvuk...",
+    "readyForSound": "Pripravený na prvý zvuk...",
+    "sound1Detected": "Zvuk 1 zistený! Pripravený na druhý...",
+    "speedCalculated": "Rýchlosť:",
+    "speedExceedsLimit": "Rýchlosť presahuje 120 km/h, meranie sa nepočíta",
+    "needMicrophone": "Vyžaduje sa prístup k mikrofónu"
+  },
   "logout": "VÝCHOD",
   "logoutConfirm": "Odhláste sa zo svojho profilu",
-  "logoutConfirmMessage": "Naozaj sa chcete odhlásiť zo svojho profilu?"
+  "logoutConfirmMessage": "Naozaj sa chcete odhlásiť zo svojho profilu?",
+  "puckSpeedNotification": {
+    "title": "Nový rekord rýchlosti",
+    "message": "{playerName} stanovil nový rekord rýchlosti: {speed} km/h"
+  }
 }

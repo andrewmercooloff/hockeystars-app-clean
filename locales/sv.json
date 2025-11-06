@@ -2390,7 +2390,9 @@
     "shop": "Hockeybutik",
     "error": "Fel",
     "errorLoadingChat": "Det gick inte att läsa in chattdata",
-    "errorSendingMessage": "Det gick inte att skicka meddelandet"
+    "errorSendingMessage": "Det gick inte att skicka meddelandet",
+    "online": "Online",
+    "offline": "Offline"
   },
   "createUser": {
     "title": "Skapa en användare",
@@ -2653,7 +2655,49 @@
     "vkPlaceholder": "@användarnamn eller länk",
     "websitePlaceholder": "exempel.com"
   },
+  "puckSpeed": {
+    "title": "Mätning av puckhastighet",
+    "kmh": "km/h",
+    "measure": "Mät hastighet",
+    "measureAgain": "Mät igen",
+    "noMeasurement": "Hastigheten har inte mätts ännu",
+    "lastMeasurement": "Senaste mätningen:",
+    "top3": "Topp 3 mätningar",
+    "myRecord": "Mitt rekord:",
+    "history": "Mätningshistorik:",
+    "addToProfile": "Lägg till i profil",
+    "sensitivity": "Känslighet:",
+    "stop": "Stoppa",
+    "reset": "Återställ",
+    "start": "Starta",
+    "ready": "Redo att mäta",
+    "instructions": "Instruktioner:",
+    "instructionWarning": "Varning! Exakt hastighet är garanterad endast i frånvaro av främmande ljud och vid användning av 2 kragmikrofoner. Vänligen registrera endast korrekta hastigheter i resultaten!",
+    "instruction1": "Mät avståndet från pucken till målens nät och ange det i fältet ovan",
+    "instruction2": "Placera telefonen vid målet eller använd 2 kragmikrofoner. Placera en kragmikrofon närmare skottet, den andra närmare målet.",
+    "instruction3": "Tryck på \"Starta\" och börja skjuta.",
+    "instruction4": "Justera känsligheten om hastigheten beräknas felaktigt.",
+    "instruction5": "Välj rätt och bästa hastigheten att lägga till i profilen",
+    "distanceLabel": "Mät och ange avståndet från skottplatsen till målens nät",
+    "distancePlaceholder": "Avstånd i centimeter",
+    "inCentimeters": "i centimeter",
+    "errorNoProfile": "Du måste vara inloggad för att spara resultatet",
+    "errorSaveFailed": "Det gick inte att spara resultatet",
+    "successAdded": "Hastighet tillagd i profilen",
+    "successNewMax": "Ny maxhastighet:",
+    "successAddedToProfile": "Hastighet tillagd i profilen",
+    "analyzing": "Analyserar ljud...",
+    "readyForSound": "Redo för första ljudet...",
+    "sound1Detected": "Ljud 1 upptäckt! Redo för andra...",
+    "speedCalculated": "Hastighet:",
+    "speedExceedsLimit": "Hastigheten överstiger 120 km/h, mätningen räknas inte",
+    "needMicrophone": "Mikrofonåtkomst krävs"
+  },
   "logout": "Utgång",
   "logoutConfirm": "Logga ut från din profil",
-  "logoutConfirmMessage": "Är du säker på att du vill logga ut från din profil?"
+  "logoutConfirmMessage": "Är du säker på att du vill logga ut från din profil?",
+  "puckSpeedNotification": {
+    "title": "Nytt hastighetsrekord",
+    "message": "{playerName} satte ett nytt hastighetsrekord: {speed} km/h"
+  }
 }

@@ -117,8 +117,7 @@
             "./assets/not.m4a"
           ]
         }
-      ],
-      "react-native-vision-camera"
+      ]
     ],
     "notification": {
       "icon": "./assets/images/ic_notification.png",
