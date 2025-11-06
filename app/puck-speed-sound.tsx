@@ -236,11 +236,13 @@ export default function PuckSpeedSoundScreen() {
 
     const initializeIOSAudio = async () => {
       try {
+        console.log('🔧 [iOS] Инициализируем AudioRecorderPlayer...');
         const audioRecorderPlayer = new (AudioRecorderPlayer as any)();
         audioRecorderPlayerRef.current = audioRecorderPlayer;
-        console.log('✅ iOS AudioRecorderPlayer инициализирован');
+        console.log('✅ [iOS] AudioRecorderPlayer инициализирован успешно');
       } catch (error) {
-        console.error('❌ Ошибка инициализации iOS AudioRecorderPlayer:', error);
+        console.error('❌ [iOS] Ошибка инициализации AudioRecorderPlayer:', error);
+        console.error('❌ [iOS] Детали ошибки:', JSON.stringify(error, null, 2));
       }
     };
 
@@ -518,15 +520,37 @@ export default function PuckSpeedSoundScreen() {
     const startIOSRecording = async () => {
       try {
         const audioRecorderPlayer = audioRecorderPlayerRef.current;
-        if (!audioRecorderPlayer) return;
+        if (!audioRecorderPlayer) {
+          console.error('❌ [iOS] AudioRecorderPlayer не инициализирован');
+          return;
+        }
 
+        console.log('📹 [iOS] Запускаем запись...');
+        
         // Запускаем запись
         const path = await audioRecorderPlayer.startRecorder();
-        console.log('📹 [iOS] Запись начата:', path);
+        console.log('✅ [iOS] Запись начата, путь:', path);
 
         // Добавляем слушатель для получения данных об амплитуде
+        let callbackCallCount = 0;
         const recordBackListener = audioRecorderPlayer.addRecordBackListener((e: any) => {
+          callbackCallCount++;
+          // Логируем только первые несколько вызовов для диагностики
+          if (callbackCallCount <= 5 || callbackCallCount % 100 === 0) {
+            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, {
+              currentMetering: e?.currentMetering,
+              currentPosition: e?.currentPosition,
+              hasData: !!e,
+              keys: e ? Object.keys(e) : []
+            });
+          }
+          
           if (!isAnalyzingRef.current || !isMeasuringRef.current) {
+            return;
+          }
+          
+          if (!e) {
+            console.warn('⚠️ [iOS] Callback вызван, но данные пустые');
             return;
           }
 
@@ -589,6 +613,11 @@ export default function PuckSpeedSoundScreen() {
         recordBackListenerRef.current = recordBackListener;
       } catch (error) {
         console.error('❌ Ошибка запуска записи на iOS:', error);
+        console.error('❌ Детали ошибки:', JSON.stringify(error, null, 2));
+        Alert.alert(
+          'Ошибка записи',
+          `Не удалось запустить запись звука: ${error instanceof Error ? error.message : String(error)}. Проверьте разрешения на микрофон в настройках.`
+        );
         isAnalyzingRef.current = false;
       }
     };
