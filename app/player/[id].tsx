@@ -16,6 +16,8 @@ import {
     Dimensions,
     Image,
     ImageBackground,
+    Keyboard,
+    KeyboardAvoidingView,
     Linking,
     Modal,
     PanResponder,
@@ -55,7 +57,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -144,6 +146,8 @@ export default function PlayerProfile() {
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [videoLikeRefreshTrigger, setVideoLikeRefreshTrigger] = useState(0);
+  const [deleteSpeedRecordDate, setDeleteSpeedRecordDate] = useState<string | null>(null);
+  const [isDeletingSpeedRecord, setIsDeletingSpeedRecord] = useState(false);
   const [alert, setAlert] = useState({
     visible: false,
     title: '',
@@ -915,6 +919,75 @@ export default function PlayerProfile() {
       scrollToSection(puckSpeedRef);
     }
   }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, player]);
+
+
+  // Ref для активного поля ввода
+  const activeInputRef = useRef<TextInput | null>(null);
+
+  // Глобальный слушатель клавиатуры для прокрутки к активному полю
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        const keyboardHeight = e.endCoordinates?.height || 0;
+        setTimeout(() => {
+          if (activeInputRef.current && scrollViewRef.current) {
+            // Используем measureLayout для получения позиции относительно ScrollView
+            activeInputRef.current.measureLayout(
+              scrollViewRef.current as any,
+              (x, y, width, height) => {
+                // y уже относительно ScrollView, получаем размеры экрана
+                const screenHeight = Dimensions.get('window').height;
+                const visibleArea = screenHeight - keyboardHeight;
+                // Вычисляем позицию низа поля относительно ScrollView
+                const inputBottom = y + height;
+                // Вычисляем, насколько нужно прокрутить, чтобы поле было видно
+                // visibleArea - это видимая область над клавиатурой
+                // Нужно прокрутить так, чтобы низ поля был на visibleArea - 150px от верха
+                const targetY = inputBottom - visibleArea + 130; // 130px отступ сверху (увеличено еще на 3px)
+                
+                if (targetY > 0) {
+                  scrollViewRef.current?.scrollTo({ 
+                    y: targetY, 
+                    animated: true 
+                  });
+                }
+              },
+              () => {
+                // Fallback: используем measure если measureLayout не работает
+                activeInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                  const screenHeight = Dimensions.get('window').height;
+                  const visibleArea = screenHeight - keyboardHeight;
+                  const inputBottom = pageY + height;
+                  const scrollOffset = inputBottom - visibleArea + 130; // 130px отступ сверху (увеличено еще на 3px)
+                  
+                  if (scrollOffset > 0) {
+                    scrollViewRef.current?.scrollTo({ 
+                      y: scrollOffset, 
+                      animated: true 
+                    });
+                  }
+                });
+              }
+            );
+          }
+        }, Platform.OS === 'ios' ? 100 : 300);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+    };
+  }, []);
+
+  // Обработчик фокуса для всех полей ввода
+  const handleInputFocus = (e: any) => {
+    // Сохраняем ref активного поля через event
+    const target = e?.target as any;
+    if (target && target.measure) {
+      activeInputRef.current = target;
+    }
+  };
 
   const showCustomAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
     setAlert({
@@ -1784,6 +1857,14 @@ export default function PlayerProfile() {
         const newVideosCount = goalsText ? goalsText.split('\n').filter(v => v.trim()).length : 0;
         if (newVideosCount > oldVideosCount) {
           const addedVideos = newVideosCount - oldVideosCount;
+          // Начисляем 1 звездочку за каждое добавленное видео
+          for (let i = 0; i < addedVideos; i++) {
+            try {
+              await addActivityPoints(player.id, 'VIDEO_UPLOAD');
+            } catch (error) {
+              console.error('❌ Ошибка начисления очков активности за видео (не критично):', error);
+            }
+          }
           notificationPromises.push(
             notifyFriendsAboutVideos(player.id, player.name, addedVideos, {
               videoNotification: {
@@ -1886,6 +1967,12 @@ export default function PlayerProfile() {
         if (statsChanges.length > 0) {
           console.log('📊 Обнаружены изменения статистики:', statsChanges);
           console.log('ℹ️ Уведомления будут отправлены автоматически через updatePlayer');
+          // Начисляем 1 звездочку за изменение статистики
+          try {
+            await addActivityPoints(player.id, 'STATS_UPDATE');
+          } catch (error) {
+            console.error('❌ Ошибка начисления очков активности за изменение статистики (не критично):', error);
+          }
         } else {
           console.log('ℹ️ Статистика НЕ изменилась, уведомления НЕ отправляются');
         }
@@ -2063,6 +2150,49 @@ export default function PlayerProfile() {
     }
   };
 
+  const handleDeleteSpeedRecord = async (recordDate?: string) => {
+    const dateToDelete = recordDate || deleteSpeedRecordDate;
+    if (!dateToDelete || !player) {
+      return;
+    }
+
+    setIsDeletingSpeedRecord(true);
+    try {
+      const updatedPlayer = await deletePuckSpeedRecord(player.id, dateToDelete);
+      if (updatedPlayer) {
+        // Используем данные, которые вернула функция удаления
+        setPlayer(updatedPlayer);
+        // Обновляем кеш
+        setPlayersCache(prev => ({
+          ...prev,
+          [player.id]: updatedPlayer
+        }));
+        
+        showCustomAlert(
+          t('puckSpeed.deleteSuccess') || 'Запись удалена',
+          t('puckSpeed.deleteSuccessMessage') || 'Запись успешно удалена из истории',
+          'success'
+        );
+      } else {
+        showCustomAlert(
+          t('puckSpeed.deleteError') || 'Ошибка',
+          t('puckSpeed.deleteErrorMessage') || 'Не удалось удалить запись',
+          'error'
+        );
+      }
+    } catch (error) {
+      console.error('❌ Ошибка удаления записи скорости:', error);
+      showCustomAlert(
+        t('puckSpeed.deleteError') || 'Ошибка',
+        t('puckSpeed.deleteErrorMessage') || 'Не удалось удалить запись',
+        'error'
+      );
+    } finally {
+      setIsDeletingSpeedRecord(false);
+      setDeleteSpeedRecordDate(null);
+    }
+  };
+
   const handleDeletePlayer = async () => {
     if (!currentUser || currentUser.status !== 'admin') {
       showCustomAlert('Ошибка', 'Только администратор может удалять пользователей', 'error');
@@ -2233,10 +2363,18 @@ export default function PlayerProfile() {
 
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
+    >
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-          <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
+          <ScrollView 
+            ref={scrollViewRef} 
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
             
 
 
@@ -2347,6 +2485,7 @@ export default function PlayerProfile() {
                   <TextInput
                     style={[styles.editInput, { fontSize: 28, fontFamily: 'Gilroy-Bold', color: '#fff', textAlign: 'center', marginBottom: 5 }]}
                     value={editData.name || player.name || ''}
+                    onFocus={handleInputFocus}
                     onChangeText={(text) => {
                       // Фильтруем только латинские буквы, пробелы и дефисы
                       const latinOnly = text.replace(/[^a-zA-Z\s\-]/g, '');
@@ -2377,6 +2516,7 @@ export default function PlayerProfile() {
                       textAlign: 'center'
                     }]}
                     value={editData.number !== undefined ? editData.number : (player.number || '')}
+                    onFocus={handleInputFocus}
                     onChangeText={(text) => setEditData({...editData, number: text})}
                     placeholder="#"
                     keyboardType="numeric"
@@ -2483,6 +2623,7 @@ export default function PlayerProfile() {
                         <TextInput
                           style={styles.editInput}
                           value={editData.games !== undefined ? editData.games : (player.games || '')}
+                          onFocus={handleInputFocus}
                           onChangeText={(text) => setEditData({...editData, games: text})}
                           placeholder="0"
                           placeholderTextColor="#888"
@@ -2494,6 +2635,7 @@ export default function PlayerProfile() {
                         <TextInput
                           style={styles.editInput}
                           value={editData.goals !== undefined ? editData.goals : (player.goals || '')}
+                          onFocus={handleInputFocus}
                           onChangeText={(text) => setEditData({...editData, goals: text})}
                           placeholder="0"
                           placeholderTextColor="#888"
@@ -2505,6 +2647,7 @@ export default function PlayerProfile() {
                         <TextInput
                           style={styles.editInput}
                           value={editData.assists !== undefined ? editData.assists : (player.assists || '')}
+                          onFocus={handleInputFocus}
                           onChangeText={(text) => setEditData({...editData, assists: text})}
                           placeholder="0"
                           placeholderTextColor="#888"
@@ -2622,6 +2765,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.phone !== undefined ? editData.phone : (player.phone || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, phone: text})}
                         placeholder={t('profile.phone')}
                         placeholderTextColor="#888"
@@ -2655,6 +2799,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.address !== undefined ? editData.address : (player.address || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, address: text})}
                         placeholder={t('profile.address')}
                       />
@@ -2673,6 +2818,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.workingHours !== undefined ? editData.workingHours : (player.workingHours || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, workingHours: text})}
                         placeholder={t('profile.workingHours')}
                       />
@@ -2690,6 +2836,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.email !== undefined ? editData.email : (player.email || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, email: text})}
                         placeholder="Email"
                         keyboardType="email-address"
@@ -2708,6 +2855,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.address !== undefined ? editData.address : (player.address || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, address: text})}
                         placeholder={t('profile.address')}
                       />
@@ -2725,6 +2873,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.workingHours !== undefined ? editData.workingHours : (player.workingHours || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, workingHours: text})}
                         placeholder={t('profile.workingHours')}
                       />
@@ -2742,6 +2891,7 @@ export default function PlayerProfile() {
                       <TextInput
                         style={styles.editInput}
                         value={editData.email !== undefined ? editData.email : (player.email || '')}
+                        onFocus={handleInputFocus}
                         onChangeText={(text) => setEditData({...editData, email: text})}
                         placeholder="Email"
                         keyboardType="email-address"
@@ -3726,177 +3876,190 @@ export default function PlayerProfile() {
               )
             )}
 
-            {/* Нормативы - показываем только игрокам (не тренерам) */}
+            {/* Нормативы - показываем только игрокам (не тренерам), видно всем */}
             {player && player.status === 'player' ? (
-              (currentUser && currentUser.id === player.id) || 
-              friendshipStatus === 'friends' || 
-              currentUser?.status === 'coach' || 
-              currentUser?.status === 'scout' ||
-              currentUser?.status === 'admin' ? (
-                // Для собственного профиля показываем всегда, для других - только если есть данные
-                (currentUser && currentUser.id === player.id) ||
-                (player.pullUps && player.pullUps !== '0' && player.pullUps !== '' && player.pullUps !== 'null') ||
-                (player.pushUps && player.pushUps !== '0' && player.pushUps !== '' && player.pushUps !== 'null') ||
-                (player.plankTime && player.plankTime !== '0' && player.plankTime !== '' && player.plankTime !== 'null') ||
-                (player.sprint100m && player.sprint100m !== '0' && player.sprint100m !== '' && player.sprint100m !== 'null') ||
-                (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
-                (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null') ||
-                (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
-                  isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                    // Редактируемая версия нормативов
-                    <View style={styles.section} ref={exercisesRef}>
-                      <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
-                      <View style={styles.infoGrid}>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.pullUps')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.pullUps !== undefined ? editData.pullUps : (player.pullUps || '')}
-                            onChangeText={(text) => setEditData({...editData, pullUps: text})}
-                            placeholder={t('countPlaceholder')}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.pushUps')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.pushUps !== undefined ? editData.pushUps : (player.pushUps || '')}
-                            onChangeText={(text) => setEditData({...editData, pushUps: text})}
-                            placeholder={t('countPlaceholder')}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.plank')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.plankTime !== undefined ? editData.plankTime : (player.plankTime || '')}
-                            onChangeText={(text) => setEditData({...editData, plankTime: text})}
-                            placeholder={t('timePlaceholder')}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.sprint')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.sprint100m !== undefined ? editData.sprint100m : (player.sprint100m || '')}
-                            onChangeText={(text) => setEditData({...editData, sprint100m: text})}
-                            placeholder={t('timePlaceholder')}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.longJump')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.longJump !== undefined ? editData.longJump : (player.longJump || '')}
-                            onChangeText={(text) => setEditData({...editData, longJump: text})}
-                            placeholder={t('profile.lengthInCm')}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                        <View style={styles.infoItem}>
-                          <Text style={styles.infoLabel}>{t('profile.jumpRope')}</Text>
-                          <TextInput
-                            style={styles.editInput}
-                            value={editData.jumpRope !== undefined ? editData.jumpRope : (player.jumpRope || '')}
-                            onChangeText={(text) => setEditData({...editData, jumpRope: text})}
-                            placeholder={t('countPlaceholder')}
-                            keyboardType="numeric"
-                          />
-                        </View>
+              // Всегда показываем нормативы всем (убрана проверка дружбы)
+              // Для собственного профиля показываем всегда, для других - только если есть данные
+              (currentUser && currentUser.id === player.id) ||
+              (player.pullUps && player.pullUps !== '0' && player.pullUps !== '' && player.pullUps !== 'null') ||
+              (player.pushUps && player.pushUps !== '0' && player.pushUps !== '' && player.pushUps !== 'null') ||
+              (player.plankTime && player.plankTime !== '0' && player.plankTime !== '' && player.plankTime !== 'null') ||
+              (player.sprint100m && player.sprint100m !== '0' && player.sprint100m !== '' && player.sprint100m !== 'null') ||
+              (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
+              (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null') ||
+              (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
+                isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                  // Редактируемая версия нормативов
+                  <View style={styles.section} ref={exercisesRef}>
+                    <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
+                    <View style={styles.infoGrid}>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.pullUps')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.pullUps !== undefined ? editData.pullUps : (player.pullUps || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, pullUps: text})}
+                          placeholder={t('countPlaceholder')}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.pushUps')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.pushUps !== undefined ? editData.pushUps : (player.pushUps || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, pushUps: text})}
+                          placeholder={t('countPlaceholder')}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.plank')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.plankTime !== undefined ? editData.plankTime : (player.plankTime || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, plankTime: text})}
+                          placeholder={t('timePlaceholder')}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.sprint')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.sprint100m !== undefined ? editData.sprint100m : (player.sprint100m || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, sprint100m: text})}
+                          placeholder={t('timePlaceholder')}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.longJump')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.longJump !== undefined ? editData.longJump : (player.longJump || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, longJump: text})}
+                          placeholder={t('profile.lengthInCm')}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>{t('profile.jumpRope')}</Text>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editData.jumpRope !== undefined ? editData.jumpRope : (player.jumpRope || '')}
+                          onFocus={handleInputFocus}
+                          onChangeText={(text) => setEditData({...editData, jumpRope: text})}
+                          placeholder={t('countPlaceholder')}
+                          keyboardType="numeric"
+                        />
                       </View>
                     </View>
-                  ) : (
-                    <NormativesSection
-                      pullUps={player.pullUps}
-                      pushUps={player.pushUps}
-                      plankTime={player.plankTime}
-                      sprint100m={player.sprint100m}
-                      longJump={player.longJump}
-                      jumpRope={player.jumpRope}
-                      changes={{
-                        pullUps: getChangeForField('pullUps'),
-                        pushUps: getChangeForField('pushUps'),
-                        plankTime: getChangeForField('plankTime'),
-                        sprint100m: getChangeForField('sprint100m'),
-                        longJump: getChangeForField('longJump'),
-                        jumpRope: getChangeForField('jumpRope'),
-                      }}
-                    />
-                  )
-                ) : null // Не показываем секцию, если данных нет
-              ) : (
-                <View style={styles.section} ref={exercisesRef}>
-                  <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
-                  <View style={styles.lockedSectionContainer}>
-                    <Ionicons name="lock-closed" size={48} color="#fa2f40" />
-                    <Text style={styles.lockedSectionTitle}>{t('profile.addToFriends')}</Text>
-                    <Text style={styles.lockedSectionText}>
-                      {t('profile.addToFriendsToSeeStandards', { name: player.name })}
-                    </Text>
                   </View>
-                </View>
-              )
+                ) : (
+                  <NormativesSection
+                    pullUps={player.pullUps}
+                    pushUps={player.pushUps}
+                    plankTime={player.plankTime}
+                    sprint100m={player.sprint100m}
+                    longJump={player.longJump}
+                    jumpRope={player.jumpRope}
+                    changes={{
+                      pullUps: getChangeForField('pullUps'),
+                      pushUps: getChangeForField('pushUps'),
+                      plankTime: getChangeForField('plankTime'),
+                      sprint100m: getChangeForField('sprint100m'),
+                      longJump: getChangeForField('longJump'),
+                      jumpRope: getChangeForField('jumpRope'),
+                    }}
+                  />
+                )
+              ) : null // Не показываем секцию, если данных нет
             ) : null}
 
-            {/* Секция измерения скорости шайбы - только для игроков */}
+            {/* Секция измерения скорости шайбы - только для игроков, видно всем */}
             {player && player.status === 'player' && (
               <View ref={puckSpeedRef} style={styles.section}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
-                {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') ? (
-                  <View style={styles.puckSpeedContainer}>
-                    {player.puckSpeed ? (
-                      <View style={styles.puckSpeedDisplay}>
-                        <View style={styles.puckSpeedValueContainer}>
-                          <Text style={styles.puckSpeedValue}>
-                            {Math.round(player.puckSpeed)}
+                <View style={styles.puckSpeedContainer}>
+                  {player.puckSpeed ? (
+                    <View style={styles.puckSpeedDisplay}>
+                      <View style={styles.puckSpeedValueContainer}>
+                        <Text style={styles.puckSpeedValue}>
+                          {Math.round(player.puckSpeed)}
+                        </Text>
+                        <Text style={styles.puckSpeedUnit}>
+                          {t('puckSpeed.kmh') || 'км/ч'}
+                        </Text>
+                      </View>
+                      {player.puckSpeedHistory && player.puckSpeedHistory.length > 0 && (() => {
+                        // Сортируем по скорости (по убыванию) и берем топ-3
+                        const topSpeeds = [...player.puckSpeedHistory]
+                          .sort((a, b) => b.speed - a.speed)
+                          .slice(0, 3);
+                        
+                        // Функция форматирования даты
+                        const formatDate = (dateString: string) => {
+                          try {
+                            const date = new Date(dateString);
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const year = date.getFullYear();
+                            return `${day}.${month}.${year}`;
+                          } catch {
+                            return dateString;
+                          }
+                        };
+                        
+                        return (
+                        <View style={styles.puckSpeedHistory}>
+                          <Text style={styles.puckSpeedHistoryLabel}>
+                              {t('puckSpeed.top3') || 'Топ 3 измерений'}
                           </Text>
-                          <Text style={styles.puckSpeedUnit}>
-                            {t('puckSpeed.kmh') || 'км/ч'}
-                          </Text>
-                        </View>
-                        {player.puckSpeedHistory && player.puckSpeedHistory.length > 0 && (() => {
-                          // Сортируем по скорости (по убыванию) и берем топ-3
-                          const topSpeeds = [...player.puckSpeedHistory]
-                            .sort((a, b) => b.speed - a.speed)
-                            .slice(0, 3);
-                          
-                          // Функция форматирования даты
-                          const formatDate = (dateString: string) => {
-                            try {
-                              const date = new Date(dateString);
-                              const day = date.getDate().toString().padStart(2, '0');
-                              const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                              const year = date.getFullYear();
-                              return `${day}.${month}.${year}`;
-                            } catch {
-                              return dateString;
-                            }
-                          };
-                          
-                          return (
-                            <View style={styles.puckSpeedHistory}>
-                              <Text style={styles.puckSpeedHistoryLabel}>
-                                {t('puckSpeed.top3') || 'Топ 3 измерений'}
-                              </Text>
-                              {topSpeeds.map((record, index) => (
-                                <View key={index} style={styles.puckSpeedHistoryRow}>
-                                  <Text style={styles.puckSpeedHistoryValue}>
-                                    {Math.round(record.speed)} {t('puckSpeed.kmh') || 'км/ч'}
-                                  </Text>
+                            {topSpeeds.map((record, index) => (
+                              <View key={index} style={styles.puckSpeedHistoryRow}>
+                            <Text style={styles.puckSpeedHistoryValue}>
+                                  {Math.round(record.speed)}{' '}{t('puckSpeed.kmh') || 'км/ч'}
+                            </Text>
+                                <View style={styles.puckSpeedHistoryDateContainer}>
                                   <Text style={styles.puckSpeedHistoryDate}>
                                     {formatDate(record.date)}
                                   </Text>
+                                  {isEditing && (currentUser?.id === player.id || currentUser?.status === 'admin') && (
+                                    <TouchableOpacity
+                                      style={styles.deleteSpeedRecordButton}
+                                      onPress={() => {
+                                        showCustomAlert(
+                                          t('puckSpeed.deleteConfirm') || 'Удалить запись?',
+                                          t('puckSpeed.deleteConfirmMessage') || 'Вы уверены, что хотите удалить эту запись?',
+                                          'warning',
+                                          () => handleDeleteSpeedRecord(record.date)
+                                        );
+                                      }}
+                                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                      disabled={isDeletingSpeedRecord}
+                                    >
+                                      <Ionicons 
+                                        name="trash-outline" 
+                                        size={18} 
+                                        color={isDeletingSpeedRecord ? "#888" : "#fa2f40"} 
+                                      />
+                                    </TouchableOpacity>
+                                  )}
                                 </View>
-                              ))}
-                            </View>
-                          );
-                        })()}
+                              </View>
+                            ))}
+                                  </View>
+                                );
+                            })()}
+                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
                           onPress={() => router.push('/puck-speed-sound')}
@@ -3906,13 +4069,15 @@ export default function PlayerProfile() {
                             {player.puckSpeed ? (t('puckSpeed.measureAgain') || 'Измерить снова') : (t('puckSpeed.measure') || 'Измерить скорость')}
                           </Text>
                         </TouchableOpacity>
-                      </View>
-                    ) : (
-                      <View style={styles.puckSpeedEmpty}>
-                        <Ionicons name="speedometer-outline" size={48} color="#666" />
-                        <Text style={styles.puckSpeedEmptyText}>
-                          {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
-                        </Text>
+                      )}
+                    </View>
+                  ) : (
+                    <View style={styles.puckSpeedEmpty}>
+                      <Ionicons name="speedometer-outline" size={48} color="#666" />
+                      <Text style={styles.puckSpeedEmptyText}>
+                        {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
+                      </Text>
+                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
                           onPress={() => router.push('/puck-speed-sound')}
@@ -3922,18 +4087,10 @@ export default function PlayerProfile() {
                             {t('puckSpeed.measure') || 'Измерить скорость'}
                           </Text>
                         </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                ) : (
-                  <View style={styles.lockedSectionContainer}>
-                    <Ionicons name="lock-closed" size={48} color="#fa2f40" />
-                    <Text style={styles.lockedSectionTitle}>{t('profile.addToFriends')}</Text>
-                    <Text style={styles.lockedSectionText}>
-                      {t('profile.addToFriendsToSeeSpeed', { name: player.name }) || `Добавьте ${player.name} в друзья, чтобы увидеть скорость шайбы`}
-                    </Text>
-                  </View>
-                )}
+                      )}
+                    </View>
+                  )}
+                </View>
               </View>
             )}
 
@@ -4489,7 +4646,7 @@ export default function PlayerProfile() {
                 >
                   <Ionicons name="share-outline" size={20} color="#fff" />
                   <Text style={styles.shareButtonText}>
-                    {t('profile.shareProfile') || 'Поделиться профилем'}
+                    {t('profile.shareProfileSocial') || 'Поделиться профилем в соц. сетях'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -4498,8 +4655,6 @@ export default function PlayerProfile() {
           </ScrollView>
         </View>
       </CachedBackground>
-
-      {/* Скрытая карточка для шеринга */}
       <View style={{ position: 'absolute', left: -10000, top: 0 }}>
         <View 
           ref={shareCardRef} 
@@ -4591,19 +4746,25 @@ export default function PlayerProfile() {
                       {player.games && (
                         <View style={styles.shareCardMiniStat}>
                           <Text style={styles.shareCardMiniStatValue}>{player.games}</Text>
-                          <Text style={styles.shareCardMiniStatLabel}>{t('profile.games')}</Text>
+                          <Text style={styles.shareCardMiniStatLabel}>
+                            {(t('profile.games') || 'Игры').toLowerCase()}
+                          </Text>
                         </View>
                       )}
                       {player.goals && (
                         <View style={styles.shareCardMiniStat}>
                           <Text style={styles.shareCardMiniStatValue}>{player.goals}</Text>
-                          <Text style={styles.shareCardMiniStatLabel}>{t('profile.goals')}</Text>
+                          <Text style={styles.shareCardMiniStatLabel}>
+                            {(t('profile.goals') || 'Голы').toLowerCase()}
+                          </Text>
                         </View>
                       )}
                       {player.assists && (
                         <View style={styles.shareCardMiniStat}>
                           <Text style={styles.shareCardMiniStatValue}>{player.assists}</Text>
-                          <Text style={styles.shareCardMiniStatLabel}>{t('profile.assists')}</Text>
+                          <Text style={styles.shareCardMiniStatLabel}>
+                            {(t('profile.assists') || 'Передачи').toLowerCase()}
+                          </Text>
                         </View>
                       )}
                       {(player.goals || player.assists) && (
@@ -4611,11 +4772,38 @@ export default function PlayerProfile() {
                           <Text style={styles.shareCardMiniStatValue}>
                             {(parseInt(player.goals || '0') + parseInt(player.assists || '0'))}
                           </Text>
-                          <Text style={styles.shareCardMiniStatLabel}>{t('profile.points') || 'Очки'}</Text>
+                          <Text style={styles.shareCardMiniStatLabel}>
+                            {(t('profile.points') || 'Очки').toLowerCase()}
+                          </Text>
+                        </View>
+                      )}
+                      {(player.goals || player.assists) && player.games && (
+                        <View style={styles.shareCardMiniStat}>
+                          <Text style={styles.shareCardMiniStatValue}>
+                            {parseInt(player.games) > 0 
+                              ? ((parseInt(player.goals || '0') + parseInt(player.assists || '0')) / parseInt(player.games)).toFixed(1)
+                              : '0.0'
+                            }
+                          </Text>
+                          <Text style={styles.shareCardMiniStatLabel}>
+                            {(t('profile.effectiveness') || 'PPG').toLowerCase()}
+                          </Text>
                         </View>
                       )}
                     </View>
                   </>
+                )}
+
+                {/* Рекорд скорости шайбы */}
+                {player.puckSpeed && player.puckSpeed > 0 && (
+                  <View style={styles.shareCardPuckSpeedContainer}>
+                    <Text style={styles.shareCardPuckSpeedLabel}>
+                      {t('puckSpeed.speedLabel') || 'Скорость шайбы'}
+                    </Text>
+                    <Text style={styles.shareCardPuckSpeedValue}>
+                      {player.puckSpeed} {t('puckSpeed.kmh') || 'км/ч'}
+                    </Text>
+                  </View>
                 )}
 
                 {/* QR-код */}
@@ -5031,7 +5219,7 @@ export default function PlayerProfile() {
         </Modal>
       )}
 
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -5052,7 +5240,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingTop: 0,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 50, // Уменьшено для устранения большого отступа внизу
   },
   editButtonContainer: {
     flexDirection: 'row',
@@ -5555,6 +5743,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: '100%',
     gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.3)',
   },
   puckSpeedHistoryLabel: {
     fontSize: 14,
@@ -5577,6 +5767,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  puckSpeedHistoryDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deleteSpeedRecordButton: {
+    padding: 4,
   },
   speedImprovement: {
     flexDirection: 'row',
@@ -6522,6 +6720,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 2,
+  },
+  shareCardPuckSpeedContainer: {
+    marginTop: 15,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  shareCardPuckSpeedLabel: {
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 14,
+    color: '#fff',
+    marginBottom: 5,
+  },
+  shareCardPuckSpeedValue: {
+    fontFamily: 'Gilroy-Bold',
+    fontSize: 24,
+    color: '#fa2f40',
   },
   shareCardQRContainer: {
     backgroundColor: 'rgb(1,0,0)',

@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
+import { addActivityPoints } from '../services/activityService';
 
 // Глобальный кеш для пользователя
 let globalUserCache: Player | null = null;
@@ -3631,6 +3632,13 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
       console.error('❌ Ошибка отправки уведомления админам о регистрации:', notificationError);
     }
     
+    // Начисляем 50 звездочек за регистрацию профиля
+    try {
+      await addActivityPoints(createdPlayer.id, 'REGISTRATION', `Регистрация профиля: ${createdPlayer.name}`);
+    } catch (error) {
+      console.error('❌ Ошибка начисления очков активности за регистрацию (не критично):', error);
+    }
+    
     return createdPlayer;
     
   } catch (error) {
@@ -6488,6 +6496,17 @@ export const savePuckSpeedResult = async (playerId: string, speed: number): Prom
 
     const result = await updatePlayer(playerId, updatedPlayer);
     
+    // Начисляем 5 звездочек за сохранение скорости шайбы в профиль
+    if (result !== null) {
+      setTimeout(async () => {
+        try {
+          await addActivityPoints(playerId, 'PUCK_SPEED_SAVE', `Сохранение скорости шайбы: ${speed} км/ч`);
+        } catch (error) {
+          console.error('❌ Ошибка начисления очков активности за скорость шайбы (не критично):', error);
+        }
+      }, 0);
+    }
+    
     // Если максимальная скорость увеличилась, уведомляем друзей
     if (newMaxSpeed > currentMaxSpeed && result !== null) {
       // Отправляем уведомления асинхронно (не блокируем основной поток)
@@ -6504,5 +6523,55 @@ export const savePuckSpeedResult = async (playerId: string, speed: number): Prom
   } catch (error) {
     console.error('❌ Ошибка сохранения результата скорости шайбы:', error);
     return false;
+  }
+};
+
+/**
+ * Удаляет запись из истории скорости шайбы
+ * @param playerId ID игрока
+ * @param recordDate Дата записи для удаления (ISO string)
+ * @returns Обновленный игрок если удаление успешно, null в противном случае
+ */
+export const deletePuckSpeedRecord = async (playerId: string, recordDate: string): Promise<Player | null> => {
+  try {
+    // Получаем текущие данные игрока
+    const player = await getPlayerById(playerId);
+    if (!player) {
+      throw new Error('Игрок не найден');
+    }
+
+    // Получаем текущую историю скорости
+    const currentHistory = player.puckSpeedHistory || [];
+    const currentMaxSpeed = player.puckSpeed || 0;
+
+    // Находим запись для удаления
+    const recordToDelete = currentHistory.find(r => r.date === recordDate);
+    if (!recordToDelete) {
+      throw new Error('Запись не найдена');
+    }
+
+    // Удаляем запись из истории
+    const updatedHistory = currentHistory.filter(r => r.date !== recordDate);
+    
+    // Пересчитываем максимальную скорость из оставшихся записей
+    let newMaxSpeed = 0;
+    if (updatedHistory.length > 0) {
+      newMaxSpeed = Math.max(...updatedHistory.map(r => r.speed));
+    }
+
+    // Обновляем данные игрока
+    const updatedPlayer = {
+      ...player,
+      puckSpeed: newMaxSpeed,
+      puckSpeedHistory: updatedHistory,
+    };
+
+    const result = await updatePlayer(playerId, updatedPlayer);
+    
+    // Возвращаем обновленного игрока напрямую
+    return result;
+  } catch (error) {
+    console.error('❌ Ошибка удаления записи скорости шайбы:', error);
+    return null;
   }
 };

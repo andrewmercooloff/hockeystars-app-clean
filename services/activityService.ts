@@ -30,6 +30,8 @@ export const ACTIVITY_TYPES = {
   PHOTO_UPLOAD: { type: 'photo_upload', points: 1, description: 'Загрузка фото' },
   VIDEO_UPLOAD: { type: 'video_upload', points: 1, description: 'Загрузка видео' },
   PROFILE_FILL: { type: 'profile_fill', points: 1, description: 'Заполнение профиля' },
+  PUCK_SPEED_SAVE: { type: 'puck_speed_save', points: 5, description: 'Сохранение скорости шайбы в профиль' },
+  REGISTRATION: { type: 'registration', points: 50, description: 'Регистрация профиля' },
 } as const;
 
 export type ActivityType = keyof typeof ACTIVITY_TYPES;

@@ -31,6 +31,7 @@ import { Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../utils/supabase';
 import CachedBackground from '../../components/CachedBackground';
+import { addActivityPoints } from '../../services/activityService';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -115,55 +116,55 @@ export default function ChatScreen() {
             read: rawMessage.read
           };
           
-          // Добавляем новое сообщение в состояние
-          setMessages(prevMessages => {
-            // Проверяем, что сообщение еще не добавлено
-            const exists = prevMessages.some(msg => msg.id === newMessage.id);
-            if (exists) {
+            // Добавляем новое сообщение в состояние
+            setMessages(prevMessages => {
+              // Проверяем, что сообщение еще не добавлено
+              const exists = prevMessages.some(msg => msg.id === newMessage.id);
+              if (exists) {
               console.log('⚠️ Сообщение уже существует в списке, пропускаем');
-              return prevMessages;
-            }
-            
+                return prevMessages;
+              }
+              
             // Удаляем временное сообщение, если оно есть (заменяем на реальное из базы)
             const filteredMessages = prevMessages.filter(msg => !msg.id.startsWith('temp-'));
             
             console.log('➕ Добавляем новое сообщение в список. Всего сообщений:', filteredMessages.length + 1);
             return [...filteredMessages, newMessage];
-          });
-          
-          // Помечаем сообщение как прочитанное, так как чат открыт
-          // Это предотвратит обновление счетчика непрочитанных сообщений
+            });
+            
+            // Помечаем сообщение как прочитанное, так как чат открыт
+            // Это предотвратит обновление счетчика непрочитанных сообщений
           if (newMessage.receiverId === currentUser.id && !newMessage.read) {
-            setTimeout(async () => {
-              try {
-                await supabase
-                  .from('messages')
-                  .update({ read: true })
-                  .eq('id', newMessage.id);
-                
-                // Обновляем счетчик, уменьшая его на 1, так как сообщение прочитано
-                const { getUnreadMessageCount } = await import('../../utils/playerStorage');
-                const newCount = await getUnreadMessageCount(currentUser.id);
-                
-                // Обновляем счетчик в базе данных
-                await supabase
-                  .from('players')
-                  .update({ 
-                    unread_messages_count: Math.max(0, newCount),
-                    updated_at: new Date().toISOString()
-                  })
-                  .eq('id', currentUser.id);
-              } catch (error) {
-                console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
-              }
-            }, 100);
+              setTimeout(async () => {
+                try {
+                  await supabase
+                    .from('messages')
+                    .update({ read: true })
+                    .eq('id', newMessage.id);
+                  
+                  // Обновляем счетчик, уменьшая его на 1, так как сообщение прочитано
+                  const { getUnreadMessageCount } = await import('../../utils/playerStorage');
+                  const newCount = await getUnreadMessageCount(currentUser.id);
+                  
+                  // Обновляем счетчик в базе данных
+                  await supabase
+                    .from('players')
+                    .update({ 
+                      unread_messages_count: Math.max(0, newCount),
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id);
+                } catch (error) {
+                  console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
+                }
+              }, 100);
+            }
+            
+            // Прокручиваем вниз после получения нового сообщения
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, Platform.OS === 'android' ? 200 : 100);
           }
-          
-          // Прокручиваем вниз после получения нового сообщения
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, Platform.OS === 'android' ? 200 : 100);
-        }
       )
       .on(
         'postgres_changes',
@@ -199,7 +200,7 @@ export default function ChatScreen() {
     // Статус обновляется:
     // 1. При загрузке чата (свежие данные из базы)
     // 2. Через Realtime подписку (мгновенно при изменении)
-    
+
     return () => {
       console.log('🔌 Удаляем Realtime подписку для чата');
       supabase.removeChannel(channel);
@@ -376,12 +377,19 @@ export default function ChatScreen() {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 50);
     
-    // Устанавливаем флаг, что только что отправили сообщение
-    justSentMessageRef.current = true;
-
+        // Устанавливаем флаг, что только что отправили сообщение
+        justSentMessageRef.current = true;
+        
     try {
       const success = await sendMessageSimple(currentUser.id, otherPlayer.id, messageText);
       if (success) {
+        // Начисляем 1 звездочку за отправку сообщения
+        try {
+          await addActivityPoints(currentUser.id, 'MESSAGE_SEND');
+        } catch (error) {
+          console.error('❌ Ошибка начисления очков активности за сообщение (не критично):', error);
+        }
+        
         // Вибрация при отправке сообщения
         try {
           if (Platform.OS === 'ios') {
@@ -396,9 +404,9 @@ export default function ChatScreen() {
         // Realtime подписка автоматически заменит временное сообщение на реальное
         // Но на всякий случай обновим список через небольшую задержку
         setTimeout(async () => {
-          await loadMessages();
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
+        await loadMessages();
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
           }, 100);
         }, 500);
       } else {

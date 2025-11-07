@@ -1181,6 +1181,14 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [checkForNewUser]);
 
+  // Сбрасываем состояние dropdown фильтров при загрузке или когда игроков нет
+  useEffect(() => {
+    if (loading || players.length === 0) {
+      setShowCountryFilter(false);
+      setShowYearFilter(false);
+    }
+  }, [loading, players.length, setShowCountryFilter, setShowYearFilter]);
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -1210,13 +1218,15 @@ export default function HomeScreen() {
         {/* Внутренняя граница */}
         <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
 
-        {/* Фильтры */}
-        <View style={styles.filtersWrapper}>
-        <View style={styles.filtersContainer}>
-          <CountryFilter players={players} />
-          <YearFilter players={players} />
-        </View>
-        </View>
+        {/* Фильтры - показываем только когда данные загружены */}
+        {players.length > 0 && (
+          <View style={styles.filtersWrapper}>
+            <View style={styles.filtersContainer}>
+              <CountryFilter players={players} />
+              <YearFilter players={players} />
+            </View>
+          </View>
+        )}
 
 
         {/* Показываем сообщение, если нет подключения к интернету */}

@@ -20,6 +20,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import CachedImage from './CachedImage';
 import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
+import { addActivityPoints } from '../services/activityService';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -117,6 +118,16 @@ export default function EditablePhotosSection({
                                    if (uploadedUrl) {
                     newPhotos.unshift(uploadedUrl);
                     onPhotosChange?.(newPhotos);
+                    
+                    // Начисляем 1 звездочку за загруженное фото
+                    try {
+                      const currentUser = await loadCurrentUser();
+                      if (currentUser) {
+                        await addActivityPoints(currentUser.id, 'PHOTO_UPLOAD');
+                      }
+                    } catch (error) {
+                      console.error('❌ Ошибка начисления очков активности за фото (не критично):', error);
+                    }
                   }
                  
                  uploadedCount++;
@@ -190,6 +201,15 @@ export default function EditablePhotosSection({
              try {
                const currentUser = await loadCurrentUser();
                if (currentUser) {
+                 // Начисляем 1 звездочку за каждое загруженное фото
+                 for (let i = 0; i < addedPhotosCount; i++) {
+                   try {
+                     await addActivityPoints(currentUser.id, 'PHOTO_UPLOAD');
+                   } catch (error) {
+                     console.error('❌ Ошибка начисления очков активности за фото (не критично):', error);
+                   }
+                 }
+                 
                  await notifyFriendsAboutPhotos(
                    currentUser.id,
                    currentUser.name,
@@ -259,6 +279,16 @@ export default function EditablePhotosSection({
                    if (uploadedUrl) {
             const newPhotos = [uploadedUrl, ...photos];
             onPhotosChange?.(newPhotos);
+            
+            // Начисляем 1 звездочку за загруженное фото
+            try {
+              const currentUser = await loadCurrentUser();
+              if (currentUser) {
+                await addActivityPoints(currentUser.id, 'PHOTO_UPLOAD');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка начисления очков активности за фото (не критично):', error);
+            }
           }
          
          setIsUploading(false);

@@ -27,11 +27,13 @@ import {
   TouchableWithoutFeedback,
   Animated,
   PanResponder,
+  KeyboardAvoidingView,
+  Dimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
-import AudioRecorderPlayer, { AudioRecorderPlayer as AudioRecorderPlayerType } from 'react-native-audio-recorder-player';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import CachedBackground from '../components/CachedBackground';
 import { savePuckSpeedResult, getPlayerById } from '../utils/playerStorage';
 import { useUser } from '../contexts/UserContext';
@@ -77,7 +79,7 @@ export default function PuckSpeedSoundScreen() {
   const animationFrameRef = useRef<number | null>(null);
   
   // iOS Audio Recorder Player refs (только для iOS)
-  const audioRecorderPlayerRef = useRef<AudioRecorderPlayerType | null>(null);
+  const audioRecorderPlayerRef = useRef<any | null>(null);
   const recordBackListenerRef = useRef<any>(null);
   
   const isAnalyzingRef = useRef(false);
@@ -97,10 +99,12 @@ export default function PuckSpeedSoundScreen() {
   const [distanceCm, setDistanceCm] = useState<string>('500'); // Расстояние в см (по умолчанию 5м = 500см)
   const [showInstructions, setShowInstructions] = useState(false); // Показывать ли инструкцию
   const [sensitivity, setSensitivity] = useState(50); // Чувствительность (0-100, по умолчанию 50)
-  const scaleAnim = useRef(new Animated.Value(1)).current; // Анимация масштаба для радара
   const prevSpeedResultsLengthRef = useRef(0); // Для отслеживания появления новых результатов
   const blinkAnim = useRef(new Animated.Value(1)).current; // Анимация мигания для радара
   const sliderWidthRef = useRef<number>(300); // Ширина слайдера для вычислений
+  const distanceInputRef = useRef<TextInput>(null); // Ref для поля ввода расстояния
+  const scrollViewRef = useRef<ScrollView>(null); // Ref для ScrollView
+  const distanceInputContainerRef = useRef<View>(null); // Ref для контейнера поля ввода
   const sliderPanResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -132,19 +136,35 @@ export default function PuckSpeedSoundScreen() {
   const MIN_TIME_BETWEEN_SOUNDS_MS = 100; // Минимальное время между звуками (100мс)
   // Расстояние конвертируем из см в метры
   const distanceMeters = parseFloat(distanceCm) / 100 || 5; // По умолчанию 5м если не указано
-  const DEBOUNCE_MS = 100; // Debounce для предотвращения ложных срабатываний
+  const DEBOUNCE_MS = 200; // Debounce для предотвращения ложных срабатываний (увеличено до 200мс)
+  
+  // Ref для отслеживания времени последней детекции звука
+  const lastSoundDetectionTimeRef = useRef<number>(0);
+  // Ref для отслеживания времени последнего расчета скорости (чтобы не детектировать сразу после расчета)
+  const lastSpeedCalculationTimeRef = useRef<number>(0);
+  const COOLDOWN_AFTER_SPEED_MS = 500; // Период покоя после расчета скорости (500мс)
   
   // Вычисляем пороги на основе чувствительности (0 = менее чувствительный, 100 = более чувствительный)
-  // VOLUME_THRESHOLD: от 100 (нечувствительный) до 20 (очень чувствительный)
+  // VOLUME_THRESHOLD: от 180 (нечувствительный) до 120 (очень чувствительный) - ПОВЫШЕНЫ для снижения чувствительности
   // Чем больше чувствительность, тем меньше порог громкости
   const VOLUME_THRESHOLD = React.useMemo(() => {
-    return 100 - (sensitivity * 0.8); // 100 до 20
+    return 180 - (sensitivity * 0.6); // 180 до 120 (было 150 до 80) - повышено для снижения чувствительности
   }, [sensitivity]);
   
-  // PEAK_DETECTION_THRESHOLD: от 60 (нечувствительный) до 10 (очень чувствительный)
+  // PEAK_DETECTION_THRESHOLD: от 100 (нечувствительный) до 50 (очень чувствительный) - ПОВЫШЕНЫ для снижения чувствительности
   const PEAK_DETECTION_THRESHOLD = React.useMemo(() => {
-    return 60 - (sensitivity * 0.5); // 60 до 10
+    return 100 - (sensitivity * 0.5); // 100 до 50 (было 80 до 30) - повышено для снижения чувствительности
   }, [sensitivity]);
+  
+  // Ref для актуальных порогов (чтобы callback всегда использовал актуальные значения)
+  const volumeThresholdRef = useRef<number>(VOLUME_THRESHOLD);
+  const peakDetectionThresholdRef = useRef<number>(PEAK_DETECTION_THRESHOLD);
+  
+  // Обновляем ref при изменении порогов
+  useEffect(() => {
+    volumeThresholdRef.current = VOLUME_THRESHOLD;
+    peakDetectionThresholdRef.current = PEAK_DETECTION_THRESHOLD;
+  }, [VOLUME_THRESHOLD, PEAK_DETECTION_THRESHOLD]);
 
   // Запрос разрешения на микрофон
   useEffect(() => {
@@ -157,6 +177,63 @@ export default function PuckSpeedSoundScreen() {
         setHasPermission(false);
       }
     })();
+  }, []);
+
+  // Автоматическая прокрутка при появлении клавиатуры
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        // Прокручиваем к полю ввода при появлении клавиатуры
+        if (distanceInputRef.current && scrollViewRef.current) {
+          const keyboardHeight = e.endCoordinates?.height || 0;
+          setTimeout(() => {
+            // Используем measureLayout для получения позиции относительно ScrollView
+            distanceInputRef.current?.measureLayout(
+              scrollViewRef.current as any,
+              (x, y, width, height) => {
+                // y уже относительно ScrollView, получаем размеры экрана
+                const screenHeight = Dimensions.get('window').height;
+                const visibleArea = screenHeight - keyboardHeight;
+                // Вычисляем позицию низа поля относительно ScrollView
+                const inputBottom = y + height;
+                // Вычисляем, насколько нужно прокрутить, чтобы поле было видно
+                // visibleArea - это видимая область над клавиатурой
+                // Нужно прокрутить так, чтобы низ поля был на visibleArea - 150px от верха
+                const targetY = inputBottom - visibleArea + 120; // 120px отступ сверху
+                
+                if (targetY > 0) {
+                  scrollViewRef.current?.scrollTo({ 
+                    y: targetY, 
+                    animated: true 
+                  });
+                }
+              },
+              () => {
+                // Fallback: используем measure если measureLayout не работает
+                distanceInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                  const screenHeight = Dimensions.get('window').height;
+                  const visibleArea = screenHeight - keyboardHeight;
+                  const inputBottom = pageY + height;
+                  const scrollOffset = inputBottom - visibleArea + 120; // 120px отступ сверху
+                  
+                  if (scrollOffset > 0) {
+                    scrollViewRef.current?.scrollTo({ 
+                      y: scrollOffset, 
+                      animated: true 
+                    });
+                  }
+                });
+              }
+            );
+          }, Platform.OS === 'ios' ? 100 : 300);
+        }
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+    };
   }, []);
 
   // Инициализация Web Audio API для веб-версии
@@ -175,6 +252,9 @@ export default function PuckSpeedSoundScreen() {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const audioContext = new AudioContextClass({ sampleRate: 44100 });
         audioContextRef.current = audioContext;
+        const initMsg = '🔧 [Web] Создан AudioContext';
+        console.log(initMsg);
+        // Debug logs removed
 
         // Получаем микрофонный поток
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -185,6 +265,9 @@ export default function PuckSpeedSoundScreen() {
           },
         });
         streamRef.current = stream;
+        const streamMsg = '✅ [Web] Получен поток микрофона';
+        console.log(streamMsg);
+        // setDebugLogs(prev => [...prev.slice(-9), streamMsg]);
 
         // Создаём источник из потока
         const source = audioContext.createMediaStreamSource(stream);
@@ -201,7 +284,9 @@ export default function PuckSpeedSoundScreen() {
         // Массив для данных частот
         dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
 
-        console.log('✅ Web Audio API инициализирован');
+        const successMsg = '✅ [Web] Web Audio API инициализирован';
+        console.log(successMsg);
+        // setDebugLogs(prev => [...prev.slice(-9), successMsg]);
       } catch (error) {
         console.error('❌ Ошибка инициализации Web Audio:', error);
         Alert.alert('Ошибка', 'Не удалось инициализировать микрофон. Проверьте разрешения.');
@@ -236,13 +321,23 @@ export default function PuckSpeedSoundScreen() {
 
     const initializeIOSAudio = async () => {
       try {
-        console.log('🔧 [iOS] Инициализируем AudioRecorderPlayer...');
-        const audioRecorderPlayer = new (AudioRecorderPlayer as any)();
+        const logMsg = '🔧 [iOS] Инициализируем AudioRecorderPlayer...';
+        console.log(logMsg);
+        
+        // Используем статический импорт вместо динамического
+        // Это гарантирует, что модуль будет включен в production сборку
+        const audioRecorderPlayer = new AudioRecorderPlayer();
+        
         audioRecorderPlayerRef.current = audioRecorderPlayer;
-        console.log('✅ [iOS] AudioRecorderPlayer инициализирован успешно');
+        const successMsg = '✅ [iOS] AudioRecorderPlayer инициализирован успешно';
+        console.log(successMsg);
       } catch (error) {
+        const errorMsg = `❌ [iOS] Ошибка инициализации: ${error instanceof Error ? error.message : String(error)}`;
         console.error('❌ [iOS] Ошибка инициализации AudioRecorderPlayer:', error);
-        console.error('❌ [iOS] Детали ошибки:', JSON.stringify(error, null, 2));
+        if (error instanceof Error && error.stack) {
+          const stackTrace = error.stack.substring(0, 100);
+          console.error('Stack:', stackTrace);
+        }
       }
     };
 
@@ -304,6 +399,7 @@ export default function PuckSpeedSoundScreen() {
             soundEventsRef.current = [];
             setCurrentStatus((isWeb || isIOS) ? (t('puckSpeed.analyzing') || '🎤 Анализирую звук...') : (t('puckSpeed.readyForSound') || 'Готов к первому звуку...'));
             previousAmplitudeRef.current = 0;
+            lastSoundDetectionTimeRef.current = 0;
           }
           soundTimeoutRef.current = null;
         }, 3000);
@@ -356,7 +452,14 @@ export default function PuckSpeedSoundScreen() {
           setSpeedResults(prevResults => [...prevResults, result]);
           setCurrentStatus(`${t('puckSpeed.speedCalculated') || '⚡ Скорость:'} ${speedKmh.toFixed(1)} ${t('puckSpeed.kmh') || 'км/ч'}`);
 
+          // ВАЖНО: Фиксируем время расчета скорости для периода покоя
+          lastSpeedCalculationTimeRef.current = Date.now();
+
           // Сбрасываем события для следующего измерения
+          // ВАЖНО: также сбрасываем ref синхронно
+          soundEventsRef.current = [];
+          previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду для следующего измерения
+          lastSoundDetectionTimeRef.current = 0; // Сбрасываем время последней детекции
           return [];
         } else {
           console.warn('⚠️ Время между звуками <= 0, пропускаем расчет');
@@ -389,7 +492,9 @@ export default function PuckSpeedSoundScreen() {
       return;
     }
 
+    const startMsg = `🎤 [Web] Запускаем анализ, чувствительность: ${sensitivity}%, порог: ${VOLUME_THRESHOLD.toFixed(1)}`;
     console.log(`🎤 Запускаем анализ звука (Web Audio API), чувствительность: ${sensitivity}%, порог громкости: ${VOLUME_THRESHOLD.toFixed(1)}, порог скачка: ${PEAK_DETECTION_THRESHOLD.toFixed(1)}`);
+    // setDebugLogs removed
     isAnalyzingRef.current = true;
     recordingStartTimeRef.current = Date.now(); // Фиксируем время начала записи
     previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду
@@ -427,16 +532,20 @@ export default function PuckSpeedSoundScreen() {
       const isFirstSound = currentEvents.length === 0;
       const isSecondSound = currentEvents.length === 1;
       
-      // Для первого звука: нужен резкий скачок И высокая амплитуда
-      const firstSoundDetected = isFirstSound && amplitudeJump > PEAK_DETECTION_THRESHOLD && averageAmplitude > VOLUME_THRESHOLD;
+      // Для первого звука: требуем ОБЯЗАТЕЛЬНО резкий скачок И высокую амплитуду
+      // Это фильтрует фоновую музыку и обычные звуки (которые обычно более плавные)
+      const firstSoundDetected = isFirstSound && (
+        amplitudeJump > PEAK_DETECTION_THRESHOLD && // ОБЯЗАТЕЛЬНО резкий скачок
+        averageAmplitude > VOLUME_THRESHOLD && // И высокая амплитуда
+        amplitudeJump > 60 // Повышено (было 40) - скачок должен быть достаточно большим для реального удара
+      );
       
-      // Для второго звука: более мягкие условия
-      // Если амплитуда высокая, считаем это вторым звуком даже без большого скачка
-      // (так как первый звук уже зафиксирован, и previousAmplitudeRef может быть высоким)
+      // Для второго звука: также требуем резкий скачок
+      // Музыка и обычные звуки обычно не дают резких скачков, поэтому это поможет отфильтровать
       const secondSoundDetected = isSecondSound && 
         averageAmplitude > VOLUME_THRESHOLD && 
-        (amplitudeJump > PEAK_DETECTION_THRESHOLD * 0.3 || // Сниженный порог для второго звука (30% от порога)
-         (amplitudeJump > -10 && averageAmplitude > VOLUME_THRESHOLD * 1.2)); // Или просто громкий звук (даже если амплитуда немного упала)
+        amplitudeJump > PEAK_DETECTION_THRESHOLD * 0.5 && // Повышено (было 30%) - требуем скачок минимум 50% от порога
+        amplitudeJump > 50; // Повышено (было 30) - скачок должен быть достаточно большим для реального удара
       
       const isPeak = firstSoundDetected || secondSoundDetected;
       
@@ -463,12 +572,14 @@ export default function PuckSpeedSoundScreen() {
         const lastEvent = currentEvents[currentEvents.length - 1];
         const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
         
-        if (currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) {
-          console.log(`🔊 Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
-          handleSoundDetected(nowMs, averageAmplitude / 255);
-        } else {
-          console.log(`⏸️ Звук игнорирован (слишком близко к предыдущему: ${timeSinceLastEvent.toFixed(0)}мс)`);
-        }
+            if (currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) {
+              const soundMsg = `🔊 [Web] Звук ${currentEvents.length + 1}: ампл=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}`;
+              console.log(`🔊 Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
+              // setDebugLogs(prev => [...prev.slice(-9), soundMsg]);
+              handleSoundDetected(nowMs, averageAmplitude / 255);
+            } else {
+              console.log(`⏸️ Звук игнорирован (слишком близко к предыдущему: ${timeSinceLastEvent.toFixed(0)}мс)`);
+            }
       }
 
       // Продолжаем анализ
@@ -513,36 +624,114 @@ export default function PuckSpeedSoundScreen() {
     }
 
     console.log(`🎤 Запускаем анализ звука (iOS AudioRecorderPlayer), чувствительность: ${sensitivity}%, порог громкости: ${VOLUME_THRESHOLD.toFixed(1)}, порог скачка: ${PEAK_DETECTION_THRESHOLD.toFixed(1)}`);
-    isAnalyzingRef.current = true;
-    recordingStartTimeRef.current = Date.now();
-    previousAmplitudeRef.current = 0;
+      isAnalyzingRef.current = true;
+      recordingStartTimeRef.current = Date.now();
+      previousAmplitudeRef.current = 0; // ВАЖНО: сбрасываем предыдущую амплитуду при старте
 
     const startIOSRecording = async () => {
       try {
         const audioRecorderPlayer = audioRecorderPlayerRef.current;
         if (!audioRecorderPlayer) {
-          console.error('❌ [iOS] AudioRecorderPlayer не инициализирован');
+          const errorMsg = '❌ [iOS] AudioRecorderPlayer не инициализирован';
+          console.error(errorMsg);
+          // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
           return;
         }
 
-        console.log('📹 [iOS] Запускаем запись...');
+        const startMsg = '📹 [iOS] Запускаем запись...';
+        console.log(startMsg);
+        // setDebugLogs(prev => [...prev.slice(-9), startMsg]);
         
-        // Запускаем запись
-        const path = await audioRecorderPlayer.startRecorder();
-        console.log('✅ [iOS] Запись начата, путь:', path);
+        // Настраиваем аудиосессию для записи
+        try {
+          const audioModeMsg = '🎚️ [iOS] Настраиваем аудиосессию...';
+          // setDebugLogs(prev => [...prev.slice(-9), audioModeMsg]);
+          await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true, // ВАЖНО: разрешаем запись
+            staysActiveInBackground: false,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: false,
+            playThroughEarpieceAndroid: false,
+          });
+          const audioModeSuccessMsg = '✅ [iOS] Аудиосессия настроена';
+          // setDebugLogs(prev => [...prev.slice(-9), audioModeSuccessMsg]);
+          // Небольшая задержка для применения настроек
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (audioModeError) {
+          const audioModeErrorMsg = `⚠️ [iOS] Ошибка настройки аудиосессии: ${audioModeError instanceof Error ? audioModeError.message : String(audioModeError)}`;
+          console.warn(audioModeErrorMsg);
+          // setDebugLogs(prev => [...prev.slice(-9), audioModeErrorMsg]);
+          // Продолжаем, возможно аудиосессия уже настроена
+        }
+        
+        // Запускаем запись С ЯВНЫМ ВКЛЮЧЕНИЕМ МЕТЕРИНГА
+        try {
+          const startMsg = '📹 [iOS] Запускаем запись с метерингом...';
+          // setDebugLogs(prev => [...prev.slice(-9), startMsg]);
+          
+          // ВАЖНО: Для iOS нужно использовать формат с тремя параметрами
+          // startRecorder(path, audioSet, meteringEnabled)
+          // meteringEnabled должен быть true для получения currentMetering
+          const uri = await audioRecorderPlayer.startRecorder(
+            undefined, // путь (undefined = автоматический)
+            {
+              sampleRate: 44100,
+              numberOfChannels: 1,
+              bitRate: 128000,
+              encoder: 'aac',
+            },
+            true // ВАЖНО: meteringEnabled = true для получения currentMetering
+          );
+          
+          const pathMsg = `✅ [iOS] Запись начата с метерингом: ${uri || 'путь не получен'}`;
+          console.log('✅ [iOS] Запись начата с метерингом, путь:', uri);
+          // setDebugLogs(prev => [...prev.slice(-9), pathMsg]);
+          
+          // Небольшая задержка для инициализации метеринга
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } catch (startError) {
+          const errorMsg = `❌ [iOS] Ошибка startRecorder: ${startError instanceof Error ? startError.message : String(startError)}`;
+          console.error(errorMsg);
+          // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
+          throw startError;
+        }
+        
+        // Настраиваем частоту обновления метеринга ПОСЛЕ запуска записи
+        try {
+          audioRecorderPlayer.setSubscriptionDuration(0.1); // 100ms = 10 раз в секунду
+          const subMsg = '⏱️ [iOS] Частота обновления метеринга: 100ms';
+          // setDebugLogs(prev => [...prev.slice(-9), subMsg]);
+        } catch (subError) {
+          const subErrorMsg = `⚠️ [iOS] Ошибка setSubscriptionDuration: ${subError instanceof Error ? subError.message : String(subError)}`;
+          console.warn(subErrorMsg);
+          // setDebugLogs(prev => [...prev.slice(-9), subErrorMsg]);
+        }
 
         // Добавляем слушатель для получения данных об амплитуде
+        const listenerMsg = '👂 [iOS] Добавляем слушатель...';
+        console.log(listenerMsg);
+        // setDebugLogs(prev => [...prev.slice(-9), listenerMsg]);
+        
         let callbackCallCount = 0;
         const recordBackListener = audioRecorderPlayer.addRecordBackListener((e: any) => {
           callbackCallCount++;
-          // Логируем только первые несколько вызовов для диагностики
-          if (callbackCallCount <= 5 || callbackCallCount % 100 === 0) {
-            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, {
+          
+          // Логируем первые 10 вызовов для диагностики
+          if (callbackCallCount <= 10) {
+            const logData = {
               currentMetering: e?.currentMetering,
               currentPosition: e?.currentPosition,
               hasData: !!e,
-              keys: e ? Object.keys(e) : []
-            });
+              keys: e ? Object.keys(e) : [],
+              type: typeof e,
+              isNull: e === null,
+              isUndefined: e === undefined
+            };
+            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, logData);
+            // setDebugLogs(prev => [...prev.slice(-9), `🎤 #${callbackCallCount}: metering=${e?.currentMetering ?? 'N/A'}, pos=${e?.currentPosition ?? 'N/A'}, keys=${logData.keys.join(',')}`]);
+          } else if (callbackCallCount % 50 === 0) {
+            // Периодически логируем, что callback работает
+            // setDebugLogs(prev => [...prev.slice(-9), `🎤 Callback работает (#${callbackCallCount}), metering=${e?.currentMetering ?? 'N/A'}`]);
           }
           
           if (!isAnalyzingRef.current || !isMeasuringRef.current) {
@@ -550,41 +739,99 @@ export default function PuckSpeedSoundScreen() {
           }
           
           if (!e) {
-            console.warn('⚠️ [iOS] Callback вызван, но данные пустые');
+            if (callbackCallCount <= 10) {
+              console.warn('⚠️ [iOS] Callback вызван, но данные пустые');
+              // setDebugLogs(prev => [...prev.slice(-9), `⚠️ Callback #${callbackCallCount}: данные пустые`]);
+            }
             return;
           }
 
           // Получаем амплитуду из данных
-          // AudioRecorderPlayer возвращает currentMetering в децибелах, конвертируем в амплитуду 0-255
+          // AudioRecorderPlayer возвращает currentMetering в децибелах (-160 до 0)
+          // -160 = тишина, 0 = максимальная громкость
           let averageAmplitude = 0;
           
-          if (e.currentMetering !== undefined) {
-            // Преобразуем децибелы в амплитуду (примерно: -60dB = 0, 0dB = 255)
+          if (e.currentMetering !== undefined && e.currentMetering !== null) {
             const db = e.currentMetering;
-            averageAmplitude = Math.max(0, Math.min(255, ((db + 60) / 60) * 255));
+            
+            // Если metering = -160, это означает отсутствие данных (тишина или метеринг не работает)
+            if (db <= -160) {
+              averageAmplitude = 0;
+              if (callbackCallCount <= 20) {
+                // setDebugLogs(prev => [...prev.slice(-9), `⚠️ #${callbackCallCount}: metering=${db.toFixed(1)}dB (нет данных)`]);
+              }
+            } else {
+              // Преобразуем децибелы в амплитуду 0-255
+              // Диапазон: -160dB (тишина) до 0dB (максимум)
+              // Используем более широкий диапазон для лучшей детекции: от -80dB до 0dB
+              // -80dB и ниже = 0, 0dB = 255
+              const normalizedDb = Math.max(-80, Math.min(0, db));
+              averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
+              
+              // Логируем детально для первых 30 вызовов
+              if (callbackCallCount <= 30) {
+                const jump = averageAmplitude - previousAmplitudeRef.current;
+                const volThreshold = volumeThresholdRef.current; // Используем ref для актуального значения
+                const peakThreshold = peakDetectionThresholdRef.current; // Используем ref для актуального значения
+                const isAboveVol = averageAmplitude > volThreshold;
+                const isAbovePeak = jump > peakThreshold;
+                // setDebugLogs(prev => [...prev.slice(-9), `📊 #${callbackCallCount}: dB=${db.toFixed(1)}, amp=${averageAmplitude.toFixed(1)}, скачок=${jump.toFixed(1)}, порог_гром=${volThreshold.toFixed(1)}, порог_скачок=${peakThreshold.toFixed(1)}, выше_гром=${isAboveVol}, выше_скачок=${isAbovePeak}`]);
+              }
+            }
           } else {
             // Fallback: используем базовое значение
-            averageAmplitude = 50;
+            averageAmplitude = 0;
+            if (callbackCallCount <= 20) {
+              // setDebugLogs(prev => [...prev.slice(-9), `⚠️ #${callbackCallCount}: currentMetering отсутствует`]);
+            }
           }
 
           setCurrentAmplitude(averageAmplitude / 255);
 
           const currentEvents = soundEventsRef.current;
+          
+          // ВАЖНО: Если событий уже 2, сбрасываем для следующего измерения
+          // (события должны были сброситься после расчета скорости, но на всякий случай)
+          if (currentEvents.length >= 2) {
+            console.log(`🔄 [iOS] Событий уже ${currentEvents.length}, сбрасываем для следующего измерения`);
+            soundEventsRef.current = [];
+            setSoundEvents([]);
+            previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду
+            lastSoundDetectionTimeRef.current = 0; // Сбрасываем время последней детекции
+          }
 
-          // Детекция пика: резкий скачок амплитуды (та же логика, что и на веб)
+          // Детекция пика: резкий скачок амплитуды
           const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
           
           const isFirstSound = currentEvents.length === 0;
           const isSecondSound = currentEvents.length === 1;
           
-          const firstSoundDetected = isFirstSound && amplitudeJump > PEAK_DETECTION_THRESHOLD && averageAmplitude > VOLUME_THRESHOLD;
+          // Используем ref для актуальных порогов (чтобы избежать ошибок при изменении чувствительности)
+          const currentVolumeThreshold = volumeThresholdRef.current;
+          const currentPeakThreshold = peakDetectionThresholdRef.current;
           
+          // Для первого звука: 
+          // Требуем ОБЯЗАТЕЛЬНО резкий скачок И высокую амплитуду
+          // Это фильтрует фоновую музыку и обычные звуки (которые обычно более плавные)
+          const firstSoundDetected = isFirstSound && (
+            amplitudeJump > currentPeakThreshold && // ОБЯЗАТЕЛЬНО резкий скачок
+            averageAmplitude > currentVolumeThreshold && // И высокая амплитуда
+            amplitudeJump > 60 // Повышено (было 40) - скачок должен быть достаточно большим для реального удара
+          );
+          
+          // Для второго звука: также требуем резкий скачок
+          // Музыка и обычные звуки обычно не дают резких скачков, поэтому это поможет отфильтровать
           const secondSoundDetected = isSecondSound && 
-            averageAmplitude > VOLUME_THRESHOLD && 
-            (amplitudeJump > PEAK_DETECTION_THRESHOLD * 0.3 ||
-             (amplitudeJump > -10 && averageAmplitude > VOLUME_THRESHOLD * 1.2));
+            averageAmplitude > currentVolumeThreshold && 
+            amplitudeJump > currentPeakThreshold * 0.5 && // Повышено (было 40%) - требуем скачок минимум 50% от порога
+            amplitudeJump > 50; // Повышено (было 30) - скачок должен быть достаточно большим для реального удара
           
           const isPeak = firstSoundDetected || secondSoundDetected;
+          
+          // Детальное логирование для отладки (только когда есть звук)
+          if (callbackCallCount <= 50 && averageAmplitude > 50) {
+            console.log(`🔍 [iOS] Детекция: amp=${averageAmplitude.toFixed(1)}, jump=${amplitudeJump.toFixed(1)}, prev=${previousAmplitudeRef.current.toFixed(1)}, volThresh=${currentVolumeThreshold.toFixed(1)}, peakThresh=${currentPeakThreshold.toFixed(1)}, events=${currentEvents.length}, first=${firstSoundDetected}, second=${secondSoundDetected}, isPeak=${isPeak}`);
+          }
 
           if (!isPeak) {
             if (averageAmplitude < previousAmplitudeRef.current) {
@@ -600,20 +847,41 @@ export default function PuckSpeedSoundScreen() {
             const nowMs = Date.now();
             const lastEvent = currentEvents[currentEvents.length - 1];
             const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
+            const timeSinceLastDetection = nowMs - lastSoundDetectionTimeRef.current;
+            const timeSinceLastSpeedCalculation = nowMs - lastSpeedCalculationTimeRef.current;
             
-            if (currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) {
+            // ВАЖНО: Проверяем период покоя после расчета скорости
+            // Это предотвращает немедленную детекцию нового звука после расчета
+            if (timeSinceLastSpeedCalculation < COOLDOWN_AFTER_SPEED_MS) {
+              // Игнорируем звуки в период покоя (первые 500мс после расчета скорости)
+              return;
+            }
+            
+            // ВАЖНО: Проверяем и время с последнего события, и время с последней детекции
+            // Это предотвращает множественную детекцию одного звука
+            if ((currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) && 
+                timeSinceLastDetection > DEBOUNCE_MS) {
               console.log(`🔊 [iOS] Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
+              lastSoundDetectionTimeRef.current = nowMs; // Обновляем время последней детекции
               handleSoundDetected(nowMs, averageAmplitude / 255);
             } else {
-              console.log(`⏸️ [iOS] Звук игнорирован (слишком близко к предыдущему: ${timeSinceLastEvent.toFixed(0)}мс)`);
+              console.log(`⏸️ [iOS] Звук игнорирован (слишком близко: событие=${timeSinceLastEvent.toFixed(0)}мс, детекция=${timeSinceLastDetection.toFixed(0)}мс)`);
             }
           }
         });
 
         recordBackListenerRef.current = recordBackListener;
+        const listenerAddedMsg = '✅ [iOS] Слушатель добавлен, ожидаем данные...';
+        console.log(listenerAddedMsg);
+        // setDebugLogs(prev => [...prev.slice(-9), listenerAddedMsg]);
       } catch (error) {
+        const errorMsg = `❌ Ошибка записи: ${error instanceof Error ? error.message : String(error)}`;
         console.error('❌ Ошибка запуска записи на iOS:', error);
-        console.error('❌ Детали ошибки:', JSON.stringify(error, null, 2));
+        // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
+        if (error instanceof Error && error.stack) {
+          const stackTrace = error.stack.substring(0, 150);
+          // setDebugLogs(prev => [...prev.slice(-9), `Stack: ${stackTrace}`]);
+        }
         Alert.alert(
           'Ошибка записи',
           `Не удалось запустить запись звука: ${error instanceof Error ? error.message : String(error)}. Проверьте разрешения на микрофон в настройках.`
@@ -638,23 +906,114 @@ export default function PuckSpeedSoundScreen() {
         audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
       }
     };
-  }, [isIOS, isMeasuring, handleSoundDetected, VOLUME_THRESHOLD, PEAK_DETECTION_THRESHOLD, hasPermission, sensitivity]);
+  }, [isIOS, isMeasuring, handleSoundDetected, hasPermission]); // Убрали VOLUME_THRESHOLD и PEAK_DETECTION_THRESHOLD из зависимостей, используем ref
 
-  // Анимация появления радара при новом результате
+  // Останавливаем микрофон при уходе со страницы (используем useFocusEffect для отслеживания фокуса)
+  useFocusEffect(
+    useCallback(() => {
+      // Экран в фокусе - ничего не делаем, микрофон работает
+      return () => {
+        // Экран потерял фокус - останавливаем микрофон
+        console.log('🛑 [Focus] Останавливаем микрофон при уходе со страницы');
+        
+        // Останавливаем анализ
+        isAnalyzingRef.current = false;
+        isMeasuringRef.current = false;
+        
+        // Для веб-версии: останавливаем анализ
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        
+        // Для веб-версии: закрываем аудио контекст
+        if (audioContextRef.current) {
+          audioContextRef.current.close().catch(() => {});
+          audioContextRef.current = null;
+        }
+        
+        // Для iOS: останавливаем запись и удаляем слушатель
+        if (isIOS && audioRecorderPlayerRef.current) {
+          // Удаляем слушатель
+          if (recordBackListenerRef.current) {
+            try {
+              (audioRecorderPlayerRef.current as any).removeRecordBackListener(recordBackListenerRef.current);
+            } catch (e) {
+              // Игнорируем ошибки
+            }
+            recordBackListenerRef.current = null;
+          }
+          
+          // Останавливаем запись
+          audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+        }
+        
+        // Сбрасываем состояние
+        setCurrentAmplitude(0);
+        setSoundEvents([]);
+        soundEventsRef.current = [];
+        previousAmplitudeRef.current = 0;
+        lastSoundDetectionTimeRef.current = 0;
+        lastSpeedCalculationTimeRef.current = 0;
+      };
+    }, [isIOS])
+  );
+
+  // Cleanup: останавливаем микрофон и анализ при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      console.log('🛑 [Cleanup] Останавливаем микрофон и анализ при размонтировании');
+      
+      // Останавливаем анализ
+      isAnalyzingRef.current = false;
+      isMeasuringRef.current = false;
+      
+      // Для веб-версии: останавливаем анализ
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      
+      // Для веб-версии: закрываем аудио контекст
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+      
+      // Для iOS: останавливаем запись и удаляем слушатель
+      if (isIOS && audioRecorderPlayerRef.current) {
+        // Удаляем слушатель
+        if (recordBackListenerRef.current) {
+          try {
+            (audioRecorderPlayerRef.current as any).removeRecordBackListener(recordBackListenerRef.current);
+          } catch (e) {
+            // Игнорируем ошибки
+          }
+          recordBackListenerRef.current = null;
+        }
+        
+        // Останавливаем запись
+        audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+      }
+      
+      // Сбрасываем состояние
+      setCurrentAmplitude(0);
+      setSoundEvents([]);
+      soundEventsRef.current = [];
+      previousAmplitudeRef.current = 0;
+      lastSoundDetectionTimeRef.current = 0;
+      lastSpeedCalculationTimeRef.current = 0;
+    };
+  }, []); // Пустой массив зависимостей = выполняется только при размонтировании
+
+  // Анимация мигания цифр при новом результате
   useEffect(() => {
     // Анимируем только когда появляется новый результат (длина массива увеличилась)
     if (speedResults.length > prevSpeedResultsLengthRef.current && speedResults.length > 0) {
-      // Сбрасываем анимацию масштаба
-      scaleAnim.setValue(0);
-      // Запускаем анимацию увеличения с 0 до 1
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      }).start();
+      // Обновляем предыдущую длину
+      prevSpeedResultsLengthRef.current = speedResults.length;
       
-      // Запускаем мигание (пару секунд)
+      // Запускаем мигание только цифр (не всего радара)
       blinkAnim.setValue(1);
       Animated.sequence([
         Animated.timing(blinkAnim, {
@@ -688,10 +1047,11 @@ export default function PuckSpeedSoundScreen() {
           useNativeDriver: true,
         }),
       ]).start();
+    } else {
+      // Обновляем предыдущую длину даже если нет нового результата
+      prevSpeedResultsLengthRef.current = speedResults.length;
     }
-    // Обновляем предыдущую длину
-    prevSpeedResultsLengthRef.current = speedResults.length;
-  }, [speedResults.length, scaleAnim, blinkAnim]);
+  }, [speedResults.length, blinkAnim]);
 
   // Начало измерения
   const startMeasuring = () => {
@@ -711,6 +1071,8 @@ export default function PuckSpeedSoundScreen() {
     setSoundEvents([]);
     soundEventsRef.current = []; // Сбрасываем ref тоже
     previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду
+    lastSoundDetectionTimeRef.current = 0; // Сбрасываем время последней детекции
+    lastSpeedCalculationTimeRef.current = 0; // Сбрасываем время последнего расчета скорости
     setCurrentAmplitude(0);
     setCurrentStatus((isWeb || isIOS) ? (t('puckSpeed.analyzing') || '🎤 Анализирую звук...') : (t('puckSpeed.readyForSound') || 'Готов к первому звуку...'));
     
@@ -772,7 +1134,11 @@ export default function PuckSpeedSoundScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
+    >
       <CachedBackground
         source={require('../assets/images/led.jpg')}
         style={styles.backgroundImage}
@@ -808,12 +1174,11 @@ export default function PuckSpeedSoundScreen() {
           {/* Название Hockeystars Radar */}
           <View style={styles.radarTitleContainer}>
             <View style={styles.radarTitleBackground}>
-              <Ionicons name="speedometer" size={36} color="#fff" style={styles.radarTitleIcon} />
               <Text style={styles.radarTitle}>HOCKEYSTARS RADAR</Text>
             </View>
           </View>
 
-          {/* Уровень звука (только для веб-версии при измерении) */}
+          {/* Уровень звука (наложен на название снизу) */}
           {isMeasuring && (isWeb || isIOS) && hasPermission !== null && (
             <View style={styles.amplitudeBarContainer}>
               <View style={styles.amplitudeBar}>
@@ -830,13 +1195,16 @@ export default function PuckSpeedSoundScreen() {
           {/* Последний результат (показываем только при измерении) */}
           {isMeasuring && (
             <View style={styles.latestResult}>
+              {/* Статус "Готов" / "Ready" над радаром */}
+              {soundEvents.length === 0 && (
+                <Text style={styles.readyStatusText}>{t('puckSpeed.ready') || 'Готов'}</Text>
+              )}
+              {soundEvents.length === 1 && (
+                <Text style={styles.readyStatusText}>{t('puckSpeed.waitingForSecond') || 'Ожидание 2-го звука'}</Text>
+              )}
               <View style={styles.speedContainer}>
-                <Animated.View style={[
-                  styles.speedBox, 
-                  { 
-                    transform: [{ scale: scaleAnim }],
-                  }
-                ]}>
+                <View style={styles.speedBox}>
+                  <View style={styles.speedBoxHighlight} />
                   <Animated.Text style={[
                     styles.speedValue,
                     { opacity: blinkAnim }
@@ -847,12 +1215,12 @@ export default function PuckSpeedSoundScreen() {
                     }
                   </Animated.Text>
                   <Text style={styles.speedUnit}>{t('puckSpeed.kmh') || 'км/ч'}</Text>
-                </Animated.View>
+                </View>
               </View>
               
               {/* Ползунок чувствительности (компактный, под радаром) */}
               <View style={styles.sensitivityContainerCompact}>
-                <Text style={styles.sensitivityLabelCompact}>{t('puckSpeed.sensitivity') || 'Чувствительность:'} {isNaN(sensitivity) ? 50 : Math.max(0, Math.min(100, sensitivity))}%</Text>
+                <Text style={styles.sensitivityLabelCompact}>{t('puckSpeed.sensitivity') || 'Чувствительность:'}{' '}{isNaN(sensitivity) ? 50 : Math.max(0, Math.min(100, sensitivity))}%</Text>
                 <View 
                   style={styles.sliderContainerCompact}
                   onLayout={(e) => {
@@ -866,13 +1234,13 @@ export default function PuckSpeedSoundScreen() {
                     <View 
                       style={[
                         styles.sliderFillCompact, 
-                        { width: `${Math.max(0, Math.min(100, sensitivity || 50))}%` }
+                        { width: `${Math.max(0, Math.min(100, sensitivity ?? 50))}%` }
                       ]} 
                     />
                     <View 
                       style={[
                         styles.sliderThumbCompact,
-                        { left: `${Math.max(0, Math.min(100, sensitivity || 50))}%` }
+                        { left: `${Math.max(0, Math.min(100, sensitivity ?? 50))}%` }
                       ]}
                     />
                   </View>
@@ -886,59 +1254,81 @@ export default function PuckSpeedSoundScreen() {
           )}
 
           {/* История результатов (показываем только когда измерение активно) */}
-          {isMeasuring && speedResults.length > 1 && (() => {
-            // Находим максимальную скорость (рекорд)
-            const maxSpeedResult = speedResults.reduce((max, current) => 
-              current.speedKmh > max.speedKmh ? current : max
-            );
-            const maxSpeedKmh = Math.round(maxSpeedResult.speedKmh);
+          {isMeasuring && (() => {
+            // Находим максимальную скорость из текущих измерений
+            const maxSpeedFromResults = speedResults.length > 0 
+              ? speedResults.reduce((max, current) => 
+                  current.speedKmh > max.speedKmh ? current : max
+                ).speedKmh
+              : 0;
             
-            // Остальные результаты в обратном порядке (новые сверху), исключая рекорд
+            // Сравниваем с рекордом из профиля и берем большее значение
+            const profileRecord = currentUser?.puckSpeed || 0;
+            const maxSpeedKmh = Math.round(Math.max(maxSpeedFromResults, profileRecord));
+            
+            // Находим результат с максимальной скоростью для отображения (только из текущих измерений)
+            const maxSpeedResult = speedResults.length > 0
+              ? speedResults.find(r => Math.round(r.speedKmh) === maxSpeedKmh) || null
+              : null;
+            
+            // Определяем, является ли рекорд из профиля (т.е. нет результатов или рекорд из профиля больше)
+            const isRecordFromProfile = profileRecord > 0 && (speedResults.length === 0 || profileRecord > maxSpeedFromResults);
+            
+            // Остальные результаты в обратном порядке (новые сверху), исключая рекорд (если он из текущих измерений)
             const allResults = speedResults.slice().reverse();
-            const otherResults = allResults.filter(result => result.timestamp !== maxSpeedResult.timestamp);
+            const otherResults = maxSpeedResult && maxSpeedResult.timestamp 
+              ? allResults.filter(result => result.timestamp !== maxSpeedResult.timestamp)
+              : allResults;
             
             return (
               <ScrollView 
                 style={styles.historyContainer}
                 showsVerticalScrollIndicator={false}
               >
-                {/* Мой рекорд */}
-                <Text style={styles.historyTitle}>{t('puckSpeed.myRecord') || 'Мой рекорд:'}</Text>
-                <View style={[styles.historyItem, styles.recordHistoryItem]}>
-                  <Text style={styles.historySpeed}>
-                    {maxSpeedKmh} {t('puckSpeed.kmh') || 'км/ч'}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.addToProfileButton}
-                    onPress={async () => {
-                      if (!currentUser?.id) {
-                        Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата');
-                        return;
-                      }
-                      
-                      try {
-                        const previousMaxSpeed = currentUser.puckSpeed || 0;
-                        const success = await savePuckSpeedResult(currentUser.id, maxSpeedKmh);
-                        if (success) {
-                          await refreshUser(true);
-                          const isNewMaxSpeed = maxSpeedKmh > previousMaxSpeed;
-                          if (isNewMaxSpeed) {
-                            Alert.alert(t('puckSpeed.successAdded') || 'Успешно!', `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}\n\n${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
-                          } else {
-                            Alert.alert(t('puckSpeed.successAdded') || 'Успешно', `${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'} ${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
-                          }
-                        } else {
-                          Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат');
-                        }
-                      } catch (error) {
-                        console.error('Ошибка сохранения:', error);
-                        Alert.alert('Ошибка', 'Не удалось сохранить результат');
-                      }
-                    }}
-                  >
-                    <Text style={styles.addToProfileButtonText}>{t('puckSpeed.addToProfile') || 'Добавить в профиль'}</Text>
-                  </TouchableOpacity>
-                </View>
+                {/* Мой рекорд - показываем всегда, если есть рекорд из профиля или текущие измерения */}
+                {(profileRecord > 0 || speedResults.length > 0) && (
+                  <>
+                    <Text style={styles.historyTitle}>{t('puckSpeed.myRecord') || 'Мой рекорд:'}</Text>
+                    <View style={[styles.historyItem, styles.recordHistoryItem]}>
+                      <Text style={styles.historySpeed}>
+                        {maxSpeedKmh}{' '}{t('puckSpeed.kmh') || 'км/ч'}
+                      </Text>
+                      {/* Показываем кнопку только если рекорд из текущих измерений (не из профиля) */}
+                      {maxSpeedResult && maxSpeedResult.timestamp && !isRecordFromProfile && (
+                        <TouchableOpacity
+                          style={styles.addToProfileButton}
+                          onPress={async () => {
+                            if (!currentUser?.id) {
+                              Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата');
+                              return;
+                            }
+                            
+                            try {
+                              const previousMaxSpeed = currentUser.puckSpeed || 0;
+                              const success = await savePuckSpeedResult(currentUser.id, maxSpeedKmh);
+                              if (success) {
+                                await refreshUser(true);
+                                const isNewMaxSpeed = maxSpeedKmh > previousMaxSpeed;
+                                if (isNewMaxSpeed) {
+                                  Alert.alert(t('puckSpeed.successAdded') || 'Успешно!', `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}\n\n${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                } else {
+                                  Alert.alert(t('puckSpeed.successAdded') || 'Успешно', `${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'} ${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                }
+                              } else {
+                                Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат');
+                              }
+                            } catch (error) {
+                              console.error('Ошибка сохранения:', error);
+                              Alert.alert('Ошибка', 'Не удалось сохранить результат');
+                            }
+                          }}
+                        >
+                          <Text style={styles.addToProfileButtonText}>{t('puckSpeed.addToProfile') || 'Добавить в профиль'}</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </>
+                )}
                 
                 {/* Текущие измерения */}
                 {otherResults.length > 0 && (
@@ -949,7 +1339,7 @@ export default function PuckSpeedSoundScreen() {
                       return (
                         <View key={`other-${index}`} style={styles.historyItem}>
                           <Text style={styles.historySpeed}>
-                            {speedKmh} {t('puckSpeed.kmh') || 'км/ч'}
+                            {speedKmh}{' '}{t('puckSpeed.kmh') || 'км/ч'}
                           </Text>
                           <TouchableOpacity
                             style={styles.addToProfileButton}
@@ -992,51 +1382,85 @@ export default function PuckSpeedSoundScreen() {
 
           {/* Поле ввода расстояния и кнопка (когда не измеряется) */}
           {!isMeasuring && (
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={[styles.buttonContainer, speedResults.length > 0 && styles.buttonContainerWithResults]}>
-                <View style={styles.buttonShadow}>
-                <TouchableOpacity style={styles.startButton} onPress={startMeasuring} activeOpacity={0.8}>
-                  <View style={styles.buttonHighlight} />
-                  <View style={styles.iconContainer}>
-                    <Ionicons name="play" size={168} color="#fff" />
+            <ScrollView
+              ref={scrollViewRef}
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 500 }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.buttonContainer}>
+                  <View style={styles.distanceBlockContainer}>
+                    <View 
+                      ref={distanceInputContainerRef}
+                      style={styles.distanceInputContainer}
+                    >
+                      <View style={styles.distanceInputWrapper}>
+                        <TextInput
+                          ref={distanceInputRef}
+                          style={styles.distanceInput}
+                          value={distanceCm}
+                          onChangeText={(text) => {
+                            // Разрешаем только числа
+                            const numericValue = text.replace(/[^0-9]/g, '');
+                            setDistanceCm(numericValue);
+                          }}
+                          keyboardType="numeric"
+                          placeholder={t('puckSpeed.distancePlaceholder') || '500'}
+                          placeholderTextColor="#888"
+                          editable={!isMeasuring}
+                          onBlur={Keyboard.dismiss}
+                          onFocus={() => {
+                            // Ref уже установлен через ref={distanceInputRef}
+                            // Глобальный слушатель клавиатуры автоматически прокрутит к полю
+                          }}
+                        />
+                        <Text style={styles.distanceInputSuffix}>{t('puckSpeed.cm') || 'см'}</Text>
+                      </View>
+                      <Text style={styles.distanceLabel}>{t('puckSpeed.distanceLabel') || 'Расстояние от шайбы до сетки'}</Text>
+                    </View>
                   </View>
-                </TouchableOpacity>
-              </View>
-                <View style={styles.distanceBlockContainer}>
-                  <View style={styles.distanceInputContainer}>
-                    <Text style={styles.distanceLabel}>{t('puckSpeed.distanceLabel') || 'Измерьте и впишите расстояние от места удара по шайбе до сетки ворот'} <Text>{t('puckSpeed.inCentimeters') || 'в сантиметрах'}</Text></Text>
-                    <TextInput
-                      style={styles.distanceInput}
-                      value={distanceCm}
-                      onChangeText={setDistanceCm}
-                      keyboardType="numeric"
-                      placeholder={t('puckSpeed.distancePlaceholder') || '500'}
-                      placeholderTextColor="#888"
-                      editable={!isMeasuring}
-                      onBlur={Keyboard.dismiss}
-                    />
-                  </View>
+                  <View style={styles.buttonShadow}>
+                  <TouchableOpacity style={styles.startButton} onPress={startMeasuring} activeOpacity={0.8}>
+                    <View style={styles.buttonHighlight} />
+                    <View style={styles.iconContainer}>
+                      <Ionicons name="play" size={168} color="#fff" />
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
+                <View style={styles.instructionHintContainer}>
+                  <Text style={styles.instructionHintText}>
+                    {t('puckSpeed.readInstructions') || 'Ознакомьтесь с инструкцией перед использованием'}
+                  </Text>
+                  <TouchableOpacity 
+                    onPress={() => setShowInstructions(!showInstructions)} 
+                    style={styles.instructionHintButton}
+                  >
+                    <Ionicons name="help-circle" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </ScrollView>
           )}
 
           {/* Кнопки управления (когда измеряется) */}
           {isMeasuring && (
             <View style={styles.controls}>
               <TouchableOpacity style={styles.stopButton} onPress={stopMeasuring}>
-                <Ionicons name="stop" size={24} color="#fff" />
+                <Ionicons name="stop" size={18} color="#fff" />
                 <Text style={styles.stopButtonText}>{t('puckSpeed.stop') || 'Остановить'}</Text>
               </TouchableOpacity>
               
               {speedResults.length > 0 && (
                 <TouchableOpacity style={styles.resetButton} onPress={resetResults}>
-                  <Ionicons name="refresh" size={20} color="#fff" />
+                  <Ionicons name="refresh" size={16} color="#fff" />
                   <Text style={styles.resetButtonText}>{t('puckSpeed.reset') || 'Сбросить'}</Text>
                 </TouchableOpacity>
               )}
             </View>
           )}
+
 
           {/* Инструкция (показываем когда открыта) */}
           {showInstructions && (
@@ -1087,7 +1511,7 @@ export default function PuckSpeedSoundScreen() {
           )}
         </View>
       </CachedBackground>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -1103,7 +1527,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   pageHeader: {
     position: 'absolute',
@@ -1140,7 +1564,7 @@ const styles = StyleSheet.create({
   },
   radarTitleContainer: {
     position: 'absolute',
-    top: 80,
+    top: 70, // Поднято на 10px выше (было 80)
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -1148,7 +1572,7 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   radarTitleBackground: {
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'rgba(250, 47, 64, 0.9)',
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -1162,11 +1586,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     flexDirection: 'row',
     gap: 10,
-  },
-  radarTitleIcon: {
-    textShadowColor: '#000',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 0,
   },
   radarTitle: {
     fontSize: 34,
@@ -1198,11 +1617,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
   },
+  readyStatusText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    textAlign: 'center',
+    marginTop: 10, // Опущено еще на 3px (было 7)
+    marginBottom: 10,
+    opacity: 0.9,
+  },
   amplitudeBarContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 80,
-    zIndex: 100,
+    position: 'absolute',
+    top: 112, // Опущено еще на 2px (было 110)
+    left: '50%',
+    marginLeft: -150, // Сдвинуто влево, чтобы начиналась на уровне буквы H
+    alignItems: 'flex-start', // Выравнивание по левому краю
+    zIndex: 51, // Выше названия
   },
   amplitudeText: {
     color: '#fff',
@@ -1211,15 +1641,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   amplitudeBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 4,
+    width: 300, // Уже (было 100%) - полоска громкости уже
+    height: 6, // Немного тоньше (было 8)
+    backgroundColor: 'rgba(255,255,255,0.15)', // Более темный оттенок (было 0.2)
+    borderRadius: 3,
     overflow: 'hidden',
   },
   amplitudeBarFill: {
     height: '100%',
-    backgroundColor: '#fa2f40',
+    backgroundColor: '#d02030', // Более темный оттенок красного (было #fa2f40)
     borderRadius: 4,
   },
   soundButtonContainer: {
@@ -1261,36 +1691,36 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   latestResult: {
-    marginTop: 150,
+    marginTop: 114, // Уменьшено примерно в 1.3 раза (было 150), чтобы не наезжать на название
     paddingHorizontal: 20,
     alignItems: 'center',
     zIndex: 150,
   },
   sensitivityContainerCompact: {
-    marginTop: 15,
+    marginTop: 8, // Уменьшено (было 15)
     width: '100%',
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4, // Уменьшено (было 8)
     backgroundColor: 'transparent',
     borderRadius: 10,
     borderWidth: 0,
   },
   sensitivityLabelCompact: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 11, // Уменьшено (было 12)
     fontFamily: 'Gilroy-Bold',
-    marginBottom: 6,
+    marginBottom: 4, // Уменьшено (было 6)
     textAlign: 'center',
   },
   sliderContainerCompact: {
     position: 'relative',
-    height: 30,
+    height: 24, // Уменьшено (было 30) для компактности
     justifyContent: 'center',
   },
   sliderTrackCompact: {
-    height: 6,
+    height: 4, // Уменьшено (было 6) для компактности
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 3,
+    borderRadius: 2,
     position: 'relative',
     width: '100%',
   },
@@ -1303,15 +1733,15 @@ const styles = StyleSheet.create({
     top: 0,
   },
   sliderThumbCompact: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 14, // Уменьшено (было 16) для компактности
+    height: 14, // Уменьшено (было 16) для компактности
+    borderRadius: 7,
     backgroundColor: '#fa2f40',
     borderWidth: 2,
     borderColor: '#fff',
     position: 'absolute',
-    top: -6,
-    marginLeft: -8,
+    top: -5, // Скорректировано под новую высоту трека
+    marginLeft: -7, // Скорректировано под новый размер
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
@@ -1349,17 +1779,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 12,
     elevation: 12,
+    overflow: 'hidden', // Для эффекта подсветки
+    position: 'relative', // Для позиционирования подсветки
+  },
+  speedBoxHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   speedValue: {
     fontSize: 230,
     fontFamily: 'DigifaceRegular',
     color: '#fa2f40',
-    marginBottom: 5,
+    marginBottom: 0, // Убрано для приближения "км/ч" к числу (было 5)
   },
   speedUnit: {
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+    marginTop: -8, // Уменьшен отступ сверху для приближения к числу
+    marginBottom: -5, // Уменьшен отступ снизу
   },
   resultDetails: {
     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1374,11 +1818,12 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   historyContainer: {
-    marginTop: 20,
+    marginTop: 10, // Уменьшено (было 20) - чтобы таблица начиналась выше
     marginHorizontal: 20,
-    marginBottom: 80,
-    padding: 20,
+    marginBottom: 60, // Уменьшено (было 80) - больше места для таблицы
+    padding: 12, // Уменьшено (было 15) - еще компактнее
     flex: 1,
+    maxHeight: '65%', // Увеличено (было 60%) - больше места для таблицы
     zIndex: 50,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 15,
@@ -1391,23 +1836,23 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   historyTitle: {
-    fontSize: 16,
+    fontSize: 12, // Уменьшено (было 14) - еще компактнее
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    marginBottom: 10,
-    marginTop: 5,
+    marginBottom: 6, // Уменьшено (было 8)
+    marginTop: 3, // Уменьшено (было 5)
   },
   historyTitleSecondary: {
-    marginTop: 15,
+    marginTop: 8, // Уменьшено (было 12)
   },
   historyItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 8,
+    padding: 6, // Уменьшено (было 8) - еще компактнее
+    borderRadius: 6, // Уменьшено (было 8)
+    marginBottom: 4, // Уменьшено (было 6)
   },
   recordHistoryItem: {
     backgroundColor: 'rgba(250, 47, 64, 0.2)',
@@ -1416,20 +1861,20 @@ const styles = StyleSheet.create({
   },
   historySpeed: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12, // Уменьшено (было 13) - еще компактнее
     fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
   addToProfileButton: {
     backgroundColor: '#fa2f40',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginLeft: 10,
+    paddingHorizontal: 8, // Уменьшено (было 10)
+    paddingVertical: 4, // Уменьшено (было 5)
+    borderRadius: 4, // Уменьшено (было 5)
+    marginLeft: 6, // Уменьшено (было 8)
   },
   addToProfileButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 10, // Уменьшено (было 11)
     fontFamily: 'Gilroy-Bold',
   },
   buttonContainer: {
@@ -1441,53 +1886,73 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 200,
+    paddingTop: 200, // Фиксированная позиция, не зависит от результатов
     zIndex: 100,
   },
-  buttonContainerWithResults: {
-    paddingTop: 500,
-  },
   distanceBlockContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 15,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
-    marginTop: 30,
+    backgroundColor: 'transparent',
     width: '100%',
-    maxWidth: 300,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    marginTop: -30, // Опускаем на 30px ниже (было -60)
+    marginBottom: 50, // Отступ снизу до кнопки старт
+    alignItems: 'center',
   },
   distanceInputContainer: {
     width: '100%',
     alignItems: 'center',
   },
+  distanceInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '80%',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#fa2f40',
+    paddingRight: 15,
+  },
+  distanceInput: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    color: '#000',
+    fontSize: 31,
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    backgroundColor: 'transparent',
+  },
+  distanceInputSuffix: {
+    color: '#000',
+    fontSize: 31,
+    fontFamily: 'Gilroy-Regular',
+    marginRight: 10,
+  },
   distanceLabel: {
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
+    marginTop: 10,
     marginBottom: 10,
     textAlign: 'center',
   },
-  distanceInput: {
-    backgroundColor: '#666',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+  instructionHintContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  instructionHintText: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
-    width: '70%',
-    borderWidth: 1,
-    borderColor: '#fa2f40',
+    marginRight: 8,
+  },
+  instructionHintButton: {
+    padding: 4,
   },
   buttonShadow: {
     width: 250,
@@ -1611,44 +2076,44 @@ const styles = StyleSheet.create({
   },
   controls: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 10, // Уменьшено (было 20) - ближе к краю
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    gap: 15,
+    gap: 10, // Уменьшено (было 15)
     zIndex: 200,
   },
   stopButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fa2f40',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-    gap: 10,
+    paddingHorizontal: 20, // Уменьшено (было 30)
+    paddingVertical: 8, // Уменьшено (было 15) - тоньше
+    borderRadius: 20,
+    gap: 6, // Уменьшено (было 10)
   },
   stopButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 13, // Уменьшено (было 16)
     fontWeight: 'bold',
   },
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderWidth: 2,
+    borderWidth: 1.5, // Уменьшено (было 2)
     borderColor: '#fa2f40',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 25,
-    gap: 8,
+    paddingHorizontal: 15, // Уменьшено (было 20)
+    paddingVertical: 8, // Уменьшено (было 15) - тоньше
+    borderRadius: 20,
+    gap: 5, // Уменьшено (было 8)
   },
   resetButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 13, // Уменьшено (было 16)
     fontFamily: 'Gilroy-Bold',
   },
   instructions: {
