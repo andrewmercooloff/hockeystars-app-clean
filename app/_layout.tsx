@@ -5,6 +5,7 @@ import * as React from 'react';
 import { AppState, LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
+import LogViewer from '../components/LogViewer';
 import { UserProvider, useUser } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
@@ -36,9 +37,11 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   document.documentElement.style.backgroundColor = '#050008';
 }
 
+// ВРЕМЕННО: Включаем логи в production для отладки проблемы с записью звука
+// После исправления можно вернуть отключение логов
 // В режиме разработки показываем предупреждения для отладки
-// Отключаем только в продакшене
-if (typeof __DEV__ === 'undefined' || !__DEV__) {
+// Отключаем только в продакшене (ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ОТЛАДКИ)
+if (false && (typeof __DEV__ === 'undefined' || !__DEV__)) {
   LogBox.ignoreAllLogs();
   // In production, silence runtime logs to avoid noisy output
   // @ts-ignore
@@ -965,6 +968,7 @@ export default function RootLayout() {
             </Animated.View>
           )}
           </GestureHandlerRootView>
+          <LogViewer />
               </NotificationProvider>
             </UserProvider>
           </ScreenProvider>
