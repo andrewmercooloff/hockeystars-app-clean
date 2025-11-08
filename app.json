@@ -117,6 +117,12 @@
             "./assets/not.m4a"
           ]
         }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net"
+        }
       ]
     ],
     "notification": {
