@@ -33,7 +33,8 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
-import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+// Пробуем разные способы импорта для совместимости с production
+import AudioRecorderPlayerModule from 'react-native-audio-recorder-player';
 import CachedBackground from '../components/CachedBackground';
 import { savePuckSpeedResult, getPlayerById } from '../utils/playerStorage';
 import { useUser } from '../contexts/UserContext';
@@ -324,9 +325,46 @@ export default function PuckSpeedSoundScreen() {
         const logMsg = '🔧 [iOS] Инициализируем AudioRecorderPlayer...';
         console.log(logMsg);
         
-        // Используем статический импорт вместо динамического
-        // Это гарантирует, что модуль будет включен в production сборку
-        const audioRecorderPlayer = new AudioRecorderPlayer();
+        // Проверяем, как экспортируется модуль в production
+        const AudioRecorderPlayer = AudioRecorderPlayerModule;
+        console.log('📦 [iOS] Тип AudioRecorderPlayerModule:', typeof AudioRecorderPlayerModule);
+        console.log('📦 [iOS] AudioRecorderPlayerModule:', AudioRecorderPlayerModule);
+        console.log('📦 [iOS] AudioRecorderPlayerModule.default:', AudioRecorderPlayerModule.default);
+        console.log('📦 [iOS] Ключи AudioRecorderPlayerModule:', Object.keys(AudioRecorderPlayerModule || {}));
+        
+        let audioRecorderPlayer: any = null;
+        
+        // Пробуем разные способы создания экземпляра
+        if (typeof AudioRecorderPlayerModule === 'function') {
+          // Если это функция/класс, создаем через new
+          console.log('✅ [iOS] AudioRecorderPlayerModule - это функция, создаем через new');
+          audioRecorderPlayer = new AudioRecorderPlayerModule();
+        } else if (AudioRecorderPlayerModule && typeof AudioRecorderPlayerModule === 'object') {
+          // Если это объект, проверяем default
+          if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'function') {
+            console.log('✅ [iOS] Используем AudioRecorderPlayerModule.default как функцию');
+            audioRecorderPlayer = new AudioRecorderPlayerModule.default();
+          } else if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'object') {
+            // Возможно, default уже является экземпляром
+            console.log('✅ [iOS] AudioRecorderPlayerModule.default - это объект, используем напрямую');
+            audioRecorderPlayer = AudioRecorderPlayerModule.default;
+          } else {
+            // Возможно, сам модуль уже является экземпляром
+            console.log('✅ [iOS] AudioRecorderPlayerModule - это объект, используем напрямую');
+            audioRecorderPlayer = AudioRecorderPlayerModule;
+          }
+        } else {
+          throw new Error(`Неожиданный тип AudioRecorderPlayerModule: ${typeof AudioRecorderPlayerModule}`);
+        }
+        
+        // Проверяем, что у объекта есть нужные методы
+        if (!audioRecorderPlayer) {
+          throw new Error('Не удалось создать экземпляр AudioRecorderPlayer');
+        }
+        
+        console.log('📋 [iOS] Методы audioRecorderPlayer:', Object.keys(audioRecorderPlayer));
+        console.log('📋 [iOS] startRecorder:', typeof audioRecorderPlayer.startRecorder);
+        console.log('📋 [iOS] addRecordBackListener:', typeof audioRecorderPlayer.addRecordBackListener);
         
         audioRecorderPlayerRef.current = audioRecorderPlayer;
         const successMsg = '✅ [iOS] AudioRecorderPlayer инициализирован успешно';
@@ -335,7 +373,7 @@ export default function PuckSpeedSoundScreen() {
         const errorMsg = `❌ [iOS] Ошибка инициализации: ${error instanceof Error ? error.message : String(error)}`;
         console.error('❌ [iOS] Ошибка инициализации AudioRecorderPlayer:', error);
         if (error instanceof Error && error.stack) {
-          const stackTrace = error.stack.substring(0, 100);
+          const stackTrace = error.stack.substring(0, 200);
           console.error('Stack:', stackTrace);
         }
       }
