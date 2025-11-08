@@ -83,6 +83,10 @@ export default function PuckSpeedSoundScreen() {
   const audioRecorderPlayerRef = useRef<any | null>(null);
   const recordBackListenerRef = useRef<any>(null);
   
+  // Expo AV Recording refs (альтернатива для iOS с метерингом)
+  const expoRecordingRef = useRef<Audio.Recording | null>(null);
+  const expoMeteringIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
   const isAnalyzingRef = useRef(false);
   const soundEventsRef = useRef<SoundEvent[]>([]); // Ref для синхронного доступа
   const recordingStartTimeRef = useRef<number | null>(null); // Время начала записи
@@ -329,7 +333,8 @@ export default function PuckSpeedSoundScreen() {
         const AudioRecorderPlayer = AudioRecorderPlayerModule;
         console.log('📦 [iOS] Тип AudioRecorderPlayerModule:', typeof AudioRecorderPlayerModule);
         console.log('📦 [iOS] AudioRecorderPlayerModule:', AudioRecorderPlayerModule);
-        console.log('📦 [iOS] AudioRecorderPlayerModule.default:', AudioRecorderPlayerModule.default);
+        const moduleAny = AudioRecorderPlayerModule as any;
+        console.log('📦 [iOS] AudioRecorderPlayerModule.default:', moduleAny.default);
         console.log('📦 [iOS] Ключи AudioRecorderPlayerModule:', Object.keys(AudioRecorderPlayerModule || {}));
         
         let audioRecorderPlayer: any = null;
@@ -341,13 +346,14 @@ export default function PuckSpeedSoundScreen() {
           audioRecorderPlayer = new AudioRecorderPlayerModule();
         } else if (AudioRecorderPlayerModule && typeof AudioRecorderPlayerModule === 'object') {
           // Если это объект, проверяем default
-          if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'function') {
+          const moduleAny = AudioRecorderPlayerModule as any;
+          if (moduleAny.default && typeof moduleAny.default === 'function') {
             console.log('✅ [iOS] Используем AudioRecorderPlayerModule.default как функцию');
-            audioRecorderPlayer = new AudioRecorderPlayerModule.default();
-          } else if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'object') {
+            audioRecorderPlayer = new moduleAny.default();
+          } else if (moduleAny.default && typeof moduleAny.default === 'object') {
             // Возможно, default уже является экземпляром
             console.log('✅ [iOS] AudioRecorderPlayerModule.default - это объект, используем напрямую');
-            audioRecorderPlayer = AudioRecorderPlayerModule.default;
+            audioRecorderPlayer = moduleAny.default;
           } else {
             // Возможно, сам модуль уже является экземпляром
             console.log('✅ [iOS] AudioRecorderPlayerModule - это объект, используем напрямую');
@@ -668,288 +674,125 @@ export default function PuckSpeedSoundScreen() {
 
     const startIOSRecording = async () => {
       try {
-        const audioRecorderPlayer = audioRecorderPlayerRef.current;
-        if (!audioRecorderPlayer) {
-          const errorMsg = '❌ [iOS] AudioRecorderPlayer не инициализирован';
-          console.error(errorMsg);
-          // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
-          return;
-        }
-
-        const startMsg = '📹 [iOS] Запускаем запись...';
-        console.log(startMsg);
-        // setDebugLogs(prev => [...prev.slice(-9), startMsg]);
+        console.log('📹 [iOS] Используем expo-av для записи с метерингом...');
         
         // Настраиваем аудиосессию для записи
         try {
-          const audioModeMsg = '🎚️ [iOS] Настраиваем аудиосессию...';
-          // setDebugLogs(prev => [...prev.slice(-9), audioModeMsg]);
           await Audio.setAudioModeAsync({
-            allowsRecordingIOS: true, // ВАЖНО: разрешаем запись
+            allowsRecordingIOS: true,
             staysActiveInBackground: false,
             playsInSilentModeIOS: true,
             shouldDuckAndroid: false,
             playThroughEarpieceAndroid: false,
           });
-          const audioModeSuccessMsg = '✅ [iOS] Аудиосессия настроена';
-          // setDebugLogs(prev => [...prev.slice(-9), audioModeSuccessMsg]);
-          // Небольшая задержка для применения настроек
+          console.log('✅ [iOS] Аудиосессия настроена');
           await new Promise(resolve => setTimeout(resolve, 200));
         } catch (audioModeError) {
-          const audioModeErrorMsg = `⚠️ [iOS] Ошибка настройки аудиосессии: ${audioModeError instanceof Error ? audioModeError.message : String(audioModeError)}`;
-          console.warn(audioModeErrorMsg);
-          // setDebugLogs(prev => [...prev.slice(-9), audioModeErrorMsg]);
-          // Продолжаем, возможно аудиосессия уже настроена
+          console.warn(`⚠️ [iOS] Ошибка настройки аудиосессии: ${audioModeError instanceof Error ? audioModeError.message : String(audioModeError)}`);
         }
         
-        // Запускаем запись С ЯВНЫМ ВКЛЮЧЕНИЕМ МЕТЕРИНГА
+        // Используем expo-av для записи с метерингом
         try {
-          const startMsg = '📹 [iOS] Запускаем запись с метерингом...';
-          console.log(startMsg);
-          
-          // Настраиваем частоту обновления метеринга ДО запуска записи
-          try {
-            audioRecorderPlayer.setSubscriptionDuration(0.1); // 100ms = 10 раз в секунду
-            console.log('⏱️ [iOS] Частота обновления метеринга установлена: 100ms');
-          } catch (subError) {
-            console.warn(`⚠️ [iOS] Ошибка setSubscriptionDuration: ${subError instanceof Error ? subError.message : String(subError)}`);
+          const { status } = await Audio.requestPermissionsAsync();
+          if (status !== 'granted') {
+            throw new Error('Разрешение на запись не предоставлено');
           }
           
-          // Пробуем разные форматы вызова startRecorder для совместимости
-          let uri: string | null = null;
-          try {
-            // Сначала пробуем формат с тремя параметрами (meteringEnabled)
-            uri = await audioRecorderPlayer.startRecorder(
-              undefined, // путь (undefined = автоматический)
-              {
-                sampleRate: 44100,
-                numberOfChannels: 1,
-                bitRate: 128000,
-                encoder: 'aac',
-              },
-              true // ВАЖНО: meteringEnabled = true для получения currentMetering
-            );
-            console.log('✅ [iOS] Запись начата с метерингом (3 параметра), путь:', uri);
-          } catch (threeParamError) {
-            console.warn('⚠️ [iOS] Формат с 3 параметрами не сработал, пробуем 2 параметра:', threeParamError);
+          // Создаем новый Recording
+          const recording = new Audio.Recording();
+          expoRecordingRef.current = recording;
+          
+          // Настраиваем и запускаем запись с метерингом
+          await recording.prepareToRecordAsync({
+            ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+            isMeteringEnabled: true, // ВАЖНО: включаем метеринг
+          });
+          await recording.startAsync();
+          
+          console.log('✅ [iOS] Запись начата через expo-av с метерингом');
+          
+          // Запускаем цикл опроса метеринга
+          let meteringCallCount = 0;
+          expoMeteringIntervalRef.current = setInterval(async () => {
             try {
-              // Fallback: формат с двумя параметрами
-              uri = await audioRecorderPlayer.startRecorder(
-                undefined,
-                {
-                  sampleRate: 44100,
-                  numberOfChannels: 1,
-                  bitRate: 128000,
-                  encoder: 'aac',
-                }
-              );
-              console.log('✅ [iOS] Запись начата (2 параметра), путь:', uri);
-            } catch (twoParamError) {
-              console.error('❌ [iOS] Оба формата не сработали:', twoParamError);
-              throw twoParamError;
-            }
-          }
-          
-          // Небольшая задержка для инициализации метеринга
-          await new Promise(resolve => setTimeout(resolve, 500));
-          console.log('✅ [iOS] Задержка после запуска записи завершена');
-        } catch (startError) {
-          const errorMsg = `❌ [iOS] Ошибка startRecorder: ${startError instanceof Error ? startError.message : String(startError)}`;
-          console.error(errorMsg);
-          throw startError;
-        }
-
-        // Добавляем слушатель для получения данных об амплитуде
-        const listenerMsg = '👂 [iOS] Добавляем слушатель...';
-        console.log(listenerMsg);
-        
-        let callbackCallCount = 0;
-        const recordBackListener = audioRecorderPlayer.addRecordBackListener((e: any) => {
-          callbackCallCount++;
-          
-          // ВСЕГДА логируем первые 20 вызовов для диагностики в production
-          if (callbackCallCount <= 20) {
-            const logData = {
-              currentMetering: e?.currentMetering,
-              currentPosition: e?.currentPosition,
-              hasData: !!e,
-              keys: e ? Object.keys(e) : [],
-              type: typeof e,
-              isNull: e === null,
-              isUndefined: e === undefined
-            };
-            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, JSON.stringify(logData));
-          } else if (callbackCallCount % 50 === 0) {
-            // Периодически логируем, что callback работает
-            console.log(`🎤 [iOS] Callback работает (#${callbackCallCount}), metering=${e?.currentMetering ?? 'N/A'}`);
-          }
-          
-          // Если callback не вызывается, это будет видно в логах
-          if (callbackCallCount === 1) {
-            console.log('✅ [iOS] Callback вызван впервые - метеринг должен работать!');
-          }
-          
-          if (!isAnalyzingRef.current || !isMeasuringRef.current) {
-            return;
-          }
-          
-          if (!e) {
-            if (callbackCallCount <= 10) {
-              console.warn('⚠️ [iOS] Callback вызван, но данные пустые');
-              // setDebugLogs(prev => [...prev.slice(-9), `⚠️ Callback #${callbackCallCount}: данные пустые`]);
-            }
-            return;
-          }
-
-          // Получаем амплитуду из данных
-          // AudioRecorderPlayer возвращает currentMetering в децибелах (-160 до 0)
-          // -160 = тишина, 0 = максимальная громкость
-          let averageAmplitude = 0;
-          
-          if (e.currentMetering !== undefined && e.currentMetering !== null) {
-            const db = e.currentMetering;
-            
-            // Если metering = -160, это означает отсутствие данных (тишина или метеринг не работает)
-            if (db <= -160) {
-              averageAmplitude = 0;
-              if (callbackCallCount <= 20) {
-                // setDebugLogs(prev => [...prev.slice(-9), `⚠️ #${callbackCallCount}: metering=${db.toFixed(1)}dB (нет данных)`]);
+              if (!expoRecordingRef.current || !isAnalyzingRef.current || !isMeasuringRef.current) {
+                return;
               }
-            } else {
-              // Преобразуем децибелы в амплитуду 0-255
-              // Диапазон: -160dB (тишина) до 0dB (максимум)
-              // Используем более широкий диапазон для лучшей детекции: от -80dB до 0dB
-              // -80dB и ниже = 0, 0dB = 255
-              const normalizedDb = Math.max(-80, Math.min(0, db));
-              averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
               
-              // Логируем детально для первых 30 вызовов
-              if (callbackCallCount <= 30) {
-                const jump = averageAmplitude - previousAmplitudeRef.current;
-                const volThreshold = volumeThresholdRef.current; // Используем ref для актуального значения
-                const peakThreshold = peakDetectionThresholdRef.current; // Используем ref для актуального значения
-                const isAboveVol = averageAmplitude > volThreshold;
-                const isAbovePeak = jump > peakThreshold;
-                // setDebugLogs(prev => [...prev.slice(-9), `📊 #${callbackCallCount}: dB=${db.toFixed(1)}, amp=${averageAmplitude.toFixed(1)}, скачок=${jump.toFixed(1)}, порог_гром=${volThreshold.toFixed(1)}, порог_скачок=${peakThreshold.toFixed(1)}, выше_гром=${isAboveVol}, выше_скачок=${isAbovePeak}`]);
+              const status = await expoRecordingRef.current.getStatusAsync();
+              meteringCallCount++;
+              
+              // Логируем первые 20 вызовов
+              if (meteringCallCount <= 20) {
+                console.log(`📊 [iOS] Expo AV метринг #${meteringCallCount}:`, JSON.stringify({
+                  isRecording: status.isRecording,
+                  durationMillis: status.durationMillis,
+                  metering: status.metering,
+                  canRecord: status.canRecord,
+                }));
+              } else if (meteringCallCount % 50 === 0) {
+                console.log(`📊 [iOS] Expo AV метринг работает (#${meteringCallCount}), metering=${status.metering ?? 'N/A'}`);
+              }
+              
+              if (!status.isRecording) {
+                return;
+              }
+              
+              // Получаем метринг из статуса
+              let averageAmplitude = 0;
+              
+              if (status.metering !== undefined && status.metering !== null && status.metering > -160) {
+                // Expo AV возвращает метринг в децибелах (-160 до 0)
+                const db = status.metering;
+                const normalizedDb = Math.max(-80, Math.min(0, db));
+                averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
+              } else {
+                // Если метринг недоступен
+                if (meteringCallCount <= 10) {
+                  console.warn(`⚠️ [iOS] Метеринг недоступен (${status.metering})`);
+                }
+                return;
+              }
+              
+              // Обновляем предыдущую амплитуду
+              const previousAmp = previousAmplitudeRef.current;
+              previousAmplitudeRef.current = averageAmplitude;
+              
+              // Детекция звука
+              const volumeThreshold = volumeThresholdRef.current;
+              const peakDetectionThreshold = peakDetectionThresholdRef.current;
+              const amplitudeJump = averageAmplitude - previousAmp;
+              
+              const isAboveVolumeThreshold = averageAmplitude > volumeThreshold;
+              const isPeakDetection = amplitudeJump > peakDetectionThreshold;
+              
+              if (isAboveVolumeThreshold || isPeakDetection) {
+                const currentTime = Date.now();
+                const recordingStartTime = recordingStartTimeRef.current || currentTime;
+                const relativeTime = currentTime - recordingStartTime;
+                
+                console.log(`🔊 [iOS] Звук обнаружен! Время: ${relativeTime}мс, Амплитуда: ${averageAmplitude.toFixed(1)}, Скачок: ${amplitudeJump.toFixed(1)}`);
+                
+                handleSoundDetected(relativeTime, averageAmplitude);
+              }
+            } catch (meteringError) {
+              if (meteringCallCount <= 10) {
+                console.warn(`⚠️ [iOS] Ошибка получения метеринга: ${meteringError instanceof Error ? meteringError.message : String(meteringError)}`);
               }
             }
-          } else {
-            // Fallback: используем базовое значение
-            averageAmplitude = 0;
-            if (callbackCallCount <= 20) {
-              // setDebugLogs(prev => [...prev.slice(-9), `⚠️ #${callbackCallCount}: currentMetering отсутствует`]);
-            }
-          }
-
-          setCurrentAmplitude(averageAmplitude / 255);
-
-          const currentEvents = soundEventsRef.current;
+          }, 100); // Опрашиваем каждые 100ms
           
-          // ВАЖНО: Если событий уже 2, сбрасываем для следующего измерения
-          // (события должны были сброситься после расчета скорости, но на всякий случай)
-          if (currentEvents.length >= 2) {
-            console.log(`🔄 [iOS] Событий уже ${currentEvents.length}, сбрасываем для следующего измерения`);
-            soundEventsRef.current = [];
-            setSoundEvents([]);
-            previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду
-            lastSoundDetectionTimeRef.current = 0; // Сбрасываем время последней детекции
-          }
-
-          // Детекция пика: резкий скачок амплитуды
-          const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
-          
-          const isFirstSound = currentEvents.length === 0;
-          const isSecondSound = currentEvents.length === 1;
-          
-          // Используем ref для актуальных порогов (чтобы избежать ошибок при изменении чувствительности)
-          const currentVolumeThreshold = volumeThresholdRef.current;
-          const currentPeakThreshold = peakDetectionThresholdRef.current;
-          
-          // Для первого звука: 
-          // Требуем ОБЯЗАТЕЛЬНО резкий скачок И высокую амплитуду
-          // Это фильтрует фоновую музыку и обычные звуки (которые обычно более плавные)
-          const firstSoundDetected = isFirstSound && (
-            amplitudeJump > currentPeakThreshold && // ОБЯЗАТЕЛЬНО резкий скачок
-            averageAmplitude > currentVolumeThreshold && // И высокая амплитуда
-            amplitudeJump > 60 // Повышено (было 40) - скачок должен быть достаточно большим для реального удара
-          );
-          
-          // Для второго звука: также требуем резкий скачок
-          // Музыка и обычные звуки обычно не дают резких скачков, поэтому это поможет отфильтровать
-          const secondSoundDetected = isSecondSound && 
-            averageAmplitude > currentVolumeThreshold && 
-            amplitudeJump > currentPeakThreshold * 0.5 && // Повышено (было 40%) - требуем скачок минимум 50% от порога
-            amplitudeJump > 50; // Повышено (было 30) - скачок должен быть достаточно большим для реального удара
-          
-          const isPeak = firstSoundDetected || secondSoundDetected;
-          
-          // Детальное логирование для отладки (только когда есть звук)
-          if (callbackCallCount <= 50 && averageAmplitude > 50) {
-            console.log(`🔍 [iOS] Детекция: amp=${averageAmplitude.toFixed(1)}, jump=${amplitudeJump.toFixed(1)}, prev=${previousAmplitudeRef.current.toFixed(1)}, volThresh=${currentVolumeThreshold.toFixed(1)}, peakThresh=${currentPeakThreshold.toFixed(1)}, events=${currentEvents.length}, first=${firstSoundDetected}, second=${secondSoundDetected}, isPeak=${isPeak}`);
-          }
-
-          if (!isPeak) {
-            if (averageAmplitude < previousAmplitudeRef.current) {
-              previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmplitudeRef.current * 0.3;
-            } else {
-              previousAmplitudeRef.current = averageAmplitude;
-            }
-          } else {
-            previousAmplitudeRef.current = averageAmplitude * 0.8;
-          }
-
-          if (isPeak && currentEvents.length < 2) {
-            const nowMs = Date.now();
-            const lastEvent = currentEvents[currentEvents.length - 1];
-            const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
-            const timeSinceLastDetection = nowMs - lastSoundDetectionTimeRef.current;
-            const timeSinceLastSpeedCalculation = nowMs - lastSpeedCalculationTimeRef.current;
-            
-            // ВАЖНО: Проверяем период покоя после расчета скорости
-            // Это предотвращает немедленную детекцию нового звука после расчета
-            if (timeSinceLastSpeedCalculation < COOLDOWN_AFTER_SPEED_MS) {
-              // Игнорируем звуки в период покоя (первые 500мс после расчета скорости)
-              return;
-            }
-            
-            // ВАЖНО: Проверяем и время с последнего события, и время с последней детекции
-            // Это предотвращает множественную детекцию одного звука
-            if ((currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) && 
-                timeSinceLastDetection > DEBOUNCE_MS) {
-              console.log(`🔊 [iOS] Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
-              lastSoundDetectionTimeRef.current = nowMs; // Обновляем время последней детекции
-              handleSoundDetected(nowMs, averageAmplitude / 255);
-            } else {
-              console.log(`⏸️ [iOS] Звук игнорирован (слишком близко: событие=${timeSinceLastEvent.toFixed(0)}мс, детекция=${timeSinceLastDetection.toFixed(0)}мс)`);
-            }
-          }
-        });
-        
-        recordBackListenerRef.current = recordBackListener;
-        console.log('✅ [iOS] Listener добавлен и сохранен в ref');
-        
-        // Проверяем, что listener действительно добавлен
-        setTimeout(() => {
-          if (callbackCallCount === 0) {
-            console.error('❌ [iOS] КРИТИЧНО: Callback не вызывается! Метеринг не работает.');
-            console.error('❌ [iOS] Проверьте:');
-            console.error('  1. Правильно ли вызван startRecorder');
-            console.error('  2. Включен ли метеринг');
-            console.error('  3. Правильно ли настроена аудиосессия');
-          } else {
-            console.log(`✅ [iOS] Callback работает! Вызван ${callbackCallCount} раз за первые 2 секунды`);
-          }
-        }, 2000);
-        const listenerAddedMsg = '✅ [iOS] Слушатель добавлен, ожидаем данные...';
-        console.log(listenerAddedMsg);
-        // setDebugLogs(prev => [...prev.slice(-9), listenerAddedMsg]);
+          console.log('✅ [iOS] Цикл опроса метеринга запущен');
+        } catch (expoError) {
+          console.error(`❌ [iOS] Ошибка expo-av записи: ${expoError instanceof Error ? expoError.message : String(expoError)}`);
+          throw expoError;
+        }
       } catch (error) {
         const errorMsg = `❌ Ошибка записи: ${error instanceof Error ? error.message : String(error)}`;
         console.error('❌ Ошибка запуска записи на iOS:', error);
-        // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
         if (error instanceof Error && error.stack) {
           const stackTrace = error.stack.substring(0, 150);
-          // setDebugLogs(prev => [...prev.slice(-9), `Stack: ${stackTrace}`]);
+          console.error('Stack:', stackTrace);
         }
         Alert.alert(
           'Ошибка записи',
@@ -963,6 +806,18 @@ export default function PuckSpeedSoundScreen() {
 
     return () => {
       isAnalyzingRef.current = false;
+      
+      // Останавливаем expo-av запись
+      if (expoMeteringIntervalRef.current) {
+        clearInterval(expoMeteringIntervalRef.current);
+        expoMeteringIntervalRef.current = null;
+      }
+      if (expoRecordingRef.current) {
+        expoRecordingRef.current.stopAndUnloadAsync().catch(() => {});
+        expoRecordingRef.current = null;
+      }
+      
+      // Останавливаем AudioRecorderPlayer (fallback)
       if (recordBackListenerRef.current && audioRecorderPlayerRef.current) {
         try {
           (audioRecorderPlayerRef.current as any).removeRecordBackListener(recordBackListenerRef.current);
@@ -973,6 +828,7 @@ export default function PuckSpeedSoundScreen() {
       }
       if (audioRecorderPlayerRef.current) {
         audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+        audioRecorderPlayerRef.current = null;
       }
     };
   }, [isIOS, isMeasuring, handleSoundDetected, hasPermission]); // Убрали VOLUME_THRESHOLD и PEAK_DETECTION_THRESHOLD из зависимостей, используем ref
