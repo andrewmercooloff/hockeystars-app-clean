@@ -667,57 +667,70 @@ export default function PuckSpeedSoundScreen() {
         // Запускаем запись С ЯВНЫМ ВКЛЮЧЕНИЕМ МЕТЕРИНГА
         try {
           const startMsg = '📹 [iOS] Запускаем запись с метерингом...';
-          // setDebugLogs(prev => [...prev.slice(-9), startMsg]);
+          console.log(startMsg);
           
-          // ВАЖНО: Для iOS нужно использовать формат с тремя параметрами
-          // startRecorder(path, audioSet, meteringEnabled)
-          // meteringEnabled должен быть true для получения currentMetering
-          const uri = await audioRecorderPlayer.startRecorder(
-            undefined, // путь (undefined = автоматический)
-            {
-              sampleRate: 44100,
-              numberOfChannels: 1,
-              bitRate: 128000,
-              encoder: 'aac',
-            },
-            true // ВАЖНО: meteringEnabled = true для получения currentMetering
-          );
+          // Настраиваем частоту обновления метеринга ДО запуска записи
+          try {
+            audioRecorderPlayer.setSubscriptionDuration(0.1); // 100ms = 10 раз в секунду
+            console.log('⏱️ [iOS] Частота обновления метеринга установлена: 100ms');
+          } catch (subError) {
+            console.warn(`⚠️ [iOS] Ошибка setSubscriptionDuration: ${subError instanceof Error ? subError.message : String(subError)}`);
+          }
           
-          const pathMsg = `✅ [iOS] Запись начата с метерингом: ${uri || 'путь не получен'}`;
-          console.log('✅ [iOS] Запись начата с метерингом, путь:', uri);
-          // setDebugLogs(prev => [...prev.slice(-9), pathMsg]);
+          // Пробуем разные форматы вызова startRecorder для совместимости
+          let uri: string | null = null;
+          try {
+            // Сначала пробуем формат с тремя параметрами (meteringEnabled)
+            uri = await audioRecorderPlayer.startRecorder(
+              undefined, // путь (undefined = автоматический)
+              {
+                sampleRate: 44100,
+                numberOfChannels: 1,
+                bitRate: 128000,
+                encoder: 'aac',
+              },
+              true // ВАЖНО: meteringEnabled = true для получения currentMetering
+            );
+            console.log('✅ [iOS] Запись начата с метерингом (3 параметра), путь:', uri);
+          } catch (threeParamError) {
+            console.warn('⚠️ [iOS] Формат с 3 параметрами не сработал, пробуем 2 параметра:', threeParamError);
+            try {
+              // Fallback: формат с двумя параметрами
+              uri = await audioRecorderPlayer.startRecorder(
+                undefined,
+                {
+                  sampleRate: 44100,
+                  numberOfChannels: 1,
+                  bitRate: 128000,
+                  encoder: 'aac',
+                }
+              );
+              console.log('✅ [iOS] Запись начата (2 параметра), путь:', uri);
+            } catch (twoParamError) {
+              console.error('❌ [iOS] Оба формата не сработали:', twoParamError);
+              throw twoParamError;
+            }
+          }
           
           // Небольшая задержка для инициализации метеринга
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise(resolve => setTimeout(resolve, 500));
+          console.log('✅ [iOS] Задержка после запуска записи завершена');
         } catch (startError) {
           const errorMsg = `❌ [iOS] Ошибка startRecorder: ${startError instanceof Error ? startError.message : String(startError)}`;
           console.error(errorMsg);
-          // setDebugLogs(prev => [...prev.slice(-9), errorMsg]);
           throw startError;
-        }
-        
-        // Настраиваем частоту обновления метеринга ПОСЛЕ запуска записи
-        try {
-          audioRecorderPlayer.setSubscriptionDuration(0.1); // 100ms = 10 раз в секунду
-          const subMsg = '⏱️ [iOS] Частота обновления метеринга: 100ms';
-          // setDebugLogs(prev => [...prev.slice(-9), subMsg]);
-        } catch (subError) {
-          const subErrorMsg = `⚠️ [iOS] Ошибка setSubscriptionDuration: ${subError instanceof Error ? subError.message : String(subError)}`;
-          console.warn(subErrorMsg);
-          // setDebugLogs(prev => [...prev.slice(-9), subErrorMsg]);
         }
 
         // Добавляем слушатель для получения данных об амплитуде
         const listenerMsg = '👂 [iOS] Добавляем слушатель...';
         console.log(listenerMsg);
-        // setDebugLogs(prev => [...prev.slice(-9), listenerMsg]);
         
         let callbackCallCount = 0;
         const recordBackListener = audioRecorderPlayer.addRecordBackListener((e: any) => {
           callbackCallCount++;
           
-          // Логируем первые 10 вызовов для диагностики
-          if (callbackCallCount <= 10) {
+          // ВСЕГДА логируем первые 20 вызовов для диагностики в production
+          if (callbackCallCount <= 20) {
             const logData = {
               currentMetering: e?.currentMetering,
               currentPosition: e?.currentPosition,
@@ -727,11 +740,15 @@ export default function PuckSpeedSoundScreen() {
               isNull: e === null,
               isUndefined: e === undefined
             };
-            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, logData);
-            // setDebugLogs(prev => [...prev.slice(-9), `🎤 #${callbackCallCount}: metering=${e?.currentMetering ?? 'N/A'}, pos=${e?.currentPosition ?? 'N/A'}, keys=${logData.keys.join(',')}`]);
+            console.log(`🎤 [iOS] Callback #${callbackCallCount}, данные:`, JSON.stringify(logData));
           } else if (callbackCallCount % 50 === 0) {
             // Периодически логируем, что callback работает
-            // setDebugLogs(prev => [...prev.slice(-9), `🎤 Callback работает (#${callbackCallCount}), metering=${e?.currentMetering ?? 'N/A'}`]);
+            console.log(`🎤 [iOS] Callback работает (#${callbackCallCount}), metering=${e?.currentMetering ?? 'N/A'}`);
+          }
+          
+          // Если callback не вызывается, это будет видно в логах
+          if (callbackCallCount === 1) {
+            console.log('✅ [iOS] Callback вызван впервые - метеринг должен работать!');
           }
           
           if (!isAnalyzingRef.current || !isMeasuringRef.current) {
@@ -869,8 +886,22 @@ export default function PuckSpeedSoundScreen() {
             }
           }
         });
-
+        
         recordBackListenerRef.current = recordBackListener;
+        console.log('✅ [iOS] Listener добавлен и сохранен в ref');
+        
+        // Проверяем, что listener действительно добавлен
+        setTimeout(() => {
+          if (callbackCallCount === 0) {
+            console.error('❌ [iOS] КРИТИЧНО: Callback не вызывается! Метеринг не работает.');
+            console.error('❌ [iOS] Проверьте:');
+            console.error('  1. Правильно ли вызван startRecorder');
+            console.error('  2. Включен ли метеринг');
+            console.error('  3. Правильно ли настроена аудиосессия');
+          } else {
+            console.log(`✅ [iOS] Callback работает! Вызван ${callbackCallCount} раз за первые 2 секунды`);
+          }
+        }, 2000);
         const listenerAddedMsg = '✅ [iOS] Слушатель добавлен, ожидаем данные...';
         console.log(listenerAddedMsg);
         // setDebugLogs(prev => [...prev.slice(-9), listenerAddedMsg]);
