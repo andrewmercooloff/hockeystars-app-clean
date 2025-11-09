@@ -30,7 +30,7 @@
         ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSMicrophoneUsageDescription": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net",
-        "NSCameraUsageDescription": "This app uses camera for profile photos"
+        "NSCameraUsageDescription": "This app uses camera to measure puck speed by detecting motion through the camera frame"
       }
     },
     "android": {
@@ -53,7 +53,8 @@
         "android.permission.WAKE_LOCK",
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
       ],
       "notification": {
         "icon": "./assets/images/ic_notification.png",
@@ -122,6 +123,12 @@
         "expo-av",
         {
           "microphonePermission": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net"
+        }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "This app uses camera to measure puck speed by detecting motion through the camera frame"
         }
       ]
     ],

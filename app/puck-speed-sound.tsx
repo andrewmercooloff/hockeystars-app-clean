@@ -29,6 +29,7 @@ import {
   PanResponder,
   KeyboardAvoidingView,
   Dimensions,
+  AppState,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -103,7 +104,7 @@ export default function PuckSpeedSoundScreen() {
   const [currentAmplitude, setCurrentAmplitude] = useState(0);
   const [distanceCm, setDistanceCm] = useState<string>('500'); // Расстояние в см (по умолчанию 5м = 500см)
   const [showInstructions, setShowInstructions] = useState(false); // Показывать ли инструкцию
-  const [sensitivity, setSensitivity] = useState(50); // Чувствительность (0-100, по умолчанию 50)
+  const [sensitivity, setSensitivity] = useState(30); // Чувствительность (0-100, по умолчанию 30)
   const prevSpeedResultsLengthRef = useRef(0); // Для отслеживания появления новых результатов
   const blinkAnim = useRef(new Animated.Value(1)).current; // Анимация мигания для радара
   const sliderWidthRef = useRef<number>(300); // Ширина слайдера для вычислений
@@ -138,27 +139,31 @@ export default function PuckSpeedSoundScreen() {
   ).current;
   
   // Параметры
-  const MIN_TIME_BETWEEN_SOUNDS_MS = 100; // Минимальное время между звуками (100мс)
+  // Минимальное время между звуками: для расстояния 5м и максимальной скорости 130 км/ч (36.11 м/с)
+  // минимальное время = 5м / 36.11 м/с = 0.1386с = 138.6мс
+  // Добавляем запас для погрешности измерений: 150мс
+  const MIN_TIME_BETWEEN_SOUNDS_MS = 150; // Минимальное время между звуками (150мс) для валидации
+  const MAX_SPEED_KMH = 130; // Максимальная скорость 130 км/ч
   // Расстояние конвертируем из см в метры
   const distanceMeters = parseFloat(distanceCm) / 100 || 5; // По умолчанию 5м если не указано
-  const DEBOUNCE_MS = 200; // Debounce для предотвращения ложных срабатываний (увеличено до 200мс)
+  const DEBOUNCE_MS = 400; // Debounce для предотвращения ложных срабатываний (увеличено до 400мс для предотвращения двойной детекции)
   
   // Ref для отслеживания времени последней детекции звука
   const lastSoundDetectionTimeRef = useRef<number>(0);
   // Ref для отслеживания времени последнего расчета скорости (чтобы не детектировать сразу после расчета)
   const lastSpeedCalculationTimeRef = useRef<number>(0);
-  const COOLDOWN_AFTER_SPEED_MS = 500; // Период покоя после расчета скорости (500мс)
+  const COOLDOWN_AFTER_SPEED_MS = 1000; // Период покоя после расчета скорости (1000мс = 1сек) - увеличен для предотвращения ложных срабатываний
   
   // Вычисляем пороги на основе чувствительности (0 = менее чувствительный, 100 = более чувствительный)
-  // VOLUME_THRESHOLD: от 180 (нечувствительный) до 120 (очень чувствительный) - ПОВЫШЕНЫ для снижения чувствительности
+  // VOLUME_THRESHOLD: от 180 (нечувствительный) до 120 (очень чувствительный) - снижены для увеличения чувствительности
   // Чем больше чувствительность, тем меньше порог громкости
   const VOLUME_THRESHOLD = React.useMemo(() => {
-    return 180 - (sensitivity * 0.6); // 180 до 120 (было 150 до 80) - повышено для снижения чувствительности
+    return 180 - (sensitivity * 0.6); // 180 до 120 - снижены для увеличения чувствительности
   }, [sensitivity]);
   
-  // PEAK_DETECTION_THRESHOLD: от 100 (нечувствительный) до 50 (очень чувствительный) - ПОВЫШЕНЫ для снижения чувствительности
+  // PEAK_DETECTION_THRESHOLD: от 100 (нечувствительный) до 50 (очень чувствительный) - снижены для увеличения чувствительности
   const PEAK_DETECTION_THRESHOLD = React.useMemo(() => {
-    return 100 - (sensitivity * 0.5); // 100 до 50 (было 80 до 30) - повышено для снижения чувствительности
+    return 100 - (sensitivity * 0.5); // 100 до 50 - снижены для увеличения чувствительности
   }, [sensitivity]);
   
   // Ref для актуальных порогов (чтобы callback всегда использовал актуальные значения)
@@ -418,13 +423,19 @@ export default function PuckSpeedSoundScreen() {
 
   // Обработка обнаруженного звука (автоматически для веб, вручную для мобильного)
   const handleSoundDetected = useCallback((timestamp: number, amplitude: number) => {
+    // Используем ref для синхронного доступа к текущим событиям
+    const currentEvents = soundEventsRef.current;
+    
     setSoundEvents(prev => {
+      // Используем ref если состояние еще не обновилось (для быстрых последовательных звуков)
+      const baseEvents = prev.length > 0 ? prev : currentEvents;
+      
       const newEvent: SoundEvent = {
         timestamp: timestamp,
         amplitude: amplitude,
       };
 
-      const updatedEvents = [...prev, newEvent];
+      const updatedEvents = [...baseEvents, newEvent];
       
       console.log(`📊 События звука: ${updatedEvents.length}/2`);
       if (updatedEvents.length === 1) {
@@ -455,14 +466,68 @@ export default function PuckSpeedSoundScreen() {
 
         console.log(`⏱️ Время между звуками: ${timeDiffMs.toFixed(0)}мс (${timeDiffSeconds.toFixed(3)}с)`);
 
+        // ВАЖНО: Проверяем минимальное время для фильтрации двойной детекции
+        // Интервалы < 120мс обычно означают, что один звук детектируется дважды
+        // Реальные удары обычно имеют интервал > 120мс (для расстояния 5м и скорости до 130 км/ч)
+        const MIN_TIME_TO_FILTER_DOUBLE_DETECTION = 120; // Минимальный интервал для валидного измерения (120мс)
+        
+        // Дополнительная проверка: если интервал очень короткий (< 150мс) И амплитуды очень похожи - это двойная детекция
+        const firstSoundAmplitude = updatedEvents[0].amplitude * 255;
+        const secondSoundAmplitude = newEvent.amplitude * 255;
+        const amplitudeDifference = Math.abs(firstSoundAmplitude - secondSoundAmplitude);
+        const isSimilarAmplitude = amplitudeDifference < 30; // Разница менее 30 - очень похожие амплитуды
+        
+        if (timeDiffMs < MIN_TIME_TO_FILTER_DOUBLE_DETECTION || (timeDiffMs < 150 && isSimilarAmplitude)) {
+          console.log(`⚠️ Время между звуками слишком короткое (${timeDiffMs.toFixed(0)}мс < ${MIN_TIME_TO_FILTER_DOUBLE_DETECTION}мс) или похожие амплитуды (разница: ${amplitudeDifference.toFixed(1)}), вероятно один звук детектирован дважды - игнорируем`);
+          setCurrentStatus(t('puckSpeed.invalidMeasurement') || '⚠️ Слишком быстро, попробуйте еще раз');
+          
+          // Очищаем таймаут
+          if (soundTimeoutRef.current) {
+            clearTimeout(soundTimeoutRef.current);
+            soundTimeoutRef.current = null;
+          }
+          
+          // Сбрасываем события для следующего измерения
+          soundEventsRef.current = [];
+          previousAmplitudeRef.current = 0;
+          lastSoundDetectionTimeRef.current = 0;
+          return [];
+        }
+        
+        // Проверяем качество звуков для дополнительной фильтрации фоновых звуков
+        const MIN_AMPLITUDE_FOR_VALID_SOUND = 140; // Минимальная амплитуда для валидного звука (из 255) - снижена для увеличения чувствительности
+        // Амплитуды уже вычислены выше
+        
+        // Проверяем, что оба звука имеют достаточную амплитуду (признак реального удара)
+        const bothSoundsValid = firstSoundAmplitude >= MIN_AMPLITUDE_FOR_VALID_SOUND && 
+                                secondSoundAmplitude >= MIN_AMPLITUDE_FOR_VALID_SOUND;
+        
+        // Если звуки слишком тихие, это вероятно фоновый шум
+        if (!bothSoundsValid) {
+          console.log(`⚠️ Один или оба звука слишком тихие (${firstSoundAmplitude.toFixed(1)}, ${secondSoundAmplitude.toFixed(1)} < ${MIN_AMPLITUDE_FOR_VALID_SOUND}), игнорируем как фоновый шум`);
+          setCurrentStatus(t('puckSpeed.invalidMeasurement') || '⚠️ Слишком тихо, попробуйте еще раз');
+          
+          // Очищаем таймаут
+          if (soundTimeoutRef.current) {
+            clearTimeout(soundTimeoutRef.current);
+            soundTimeoutRef.current = null;
+          }
+          
+          // Сбрасываем события для следующего измерения
+          soundEventsRef.current = [];
+          previousAmplitudeRef.current = 0;
+          lastSoundDetectionTimeRef.current = 0;
+          return [];
+        }
+
         if (timeDiffSeconds > 0) {
           const speedMs = distanceMeters / timeDiffSeconds;
           const speedKmh = speedMs * 3.6;
           
-          // Проверка: если скорость больше 120 км/ч, не сохраняем результат
-          if (speedKmh > 120) {
-            console.log(`⚠️ Скорость ${speedKmh.toFixed(2)} км/ч превышает лимит 120 км/ч, результат не сохранен`);
-            setCurrentStatus(t('puckSpeed.speedExceedsLimit') || '⚠️ Скорость превышает 120 км/ч, измерение не засчитано');
+          // Проверка: если скорость больше 130 км/ч, не сохраняем результат
+          if (speedKmh > MAX_SPEED_KMH) {
+            console.log(`⚠️ Скорость ${speedKmh.toFixed(2)} км/ч превышает лимит ${MAX_SPEED_KMH} км/ч, результат не сохранен`);
+            setCurrentStatus(t('puckSpeed.speedExceedsLimit') || `⚠️ Скорость превышает ${MAX_SPEED_KMH} км/ч, измерение не засчитано`);
             
             // Очищаем таймаут
             if (soundTimeoutRef.current) {
@@ -471,6 +536,9 @@ export default function PuckSpeedSoundScreen() {
             }
             
             // Сбрасываем события для следующего измерения
+            soundEventsRef.current = [];
+            previousAmplitudeRef.current = 0;
+            lastSoundDetectionTimeRef.current = 0;
             return [];
           }
           
@@ -512,7 +580,7 @@ export default function PuckSpeedSoundScreen() {
 
       return updatedEvents;
     });
-  }, [distanceMeters]);
+  }, [distanceMeters, MIN_TIME_BETWEEN_SOUNDS_MS, MAX_SPEED_KMH, t, isWeb, isIOS]);
 
   // Цикл анализа для веб-версии (Web Audio API)
   useEffect(() => {
@@ -578,18 +646,23 @@ export default function PuckSpeedSoundScreen() {
       
       // Для первого звука: требуем ОБЯЗАТЕЛЬНО резкий скачок И высокую амплитуду
       // Это фильтрует фоновую музыку и обычные звуки (которые обычно более плавные)
+      const MIN_AMPLITUDE_JUMP_WEB = 50; // Минимальный скачок для первого звука - снижен с 60 для увеличения чувствительности
+      const MIN_AMPLITUDE_JUMP_SECOND_WEB = 30; // Сниженный порог для второго звука - снижен с 35
+      const MIN_AMPLITUDE_FOR_DETECTION_WEB = 140; // Минимальная амплитуда для детекции - снижена с 150
+      
       const firstSoundDetected = isFirstSound && (
+        averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION_WEB && // Высокая амплитуда
         amplitudeJump > PEAK_DETECTION_THRESHOLD && // ОБЯЗАТЕЛЬНО резкий скачок
         averageAmplitude > VOLUME_THRESHOLD && // И высокая амплитуда
-        amplitudeJump > 60 // Повышено (было 40) - скачок должен быть достаточно большим для реального удара
+        amplitudeJump > MIN_AMPLITUDE_JUMP_WEB
       );
       
-      // Для второго звука: также требуем резкий скачок
-      // Музыка и обычные звуки обычно не дают резких скачков, поэтому это поможет отфильтровать
+      // Для второго звука (гол): используем более мягкие условия для детекции быстрых звуков
+      // Если амплитуда высокая, то даже небольшой скачок может быть реальным ударом
       const secondSoundDetected = isSecondSound && 
+        averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION_WEB && // Высокая амплитуда
         averageAmplitude > VOLUME_THRESHOLD && 
-        amplitudeJump > PEAK_DETECTION_THRESHOLD * 0.5 && // Повышено (было 30%) - требуем скачок минимум 50% от порога
-        amplitudeJump > 50; // Повышено (было 30) - скачок должен быть достаточно большим для реального удара
+        (amplitudeJump > PEAK_DETECTION_THRESHOLD || amplitudeJump > MIN_AMPLITUDE_JUMP_SECOND_WEB); // ИЛИ для более чувствительной детекции
       
       const isPeak = firstSoundDetected || secondSoundDetected;
       
@@ -603,8 +676,14 @@ export default function PuckSpeedSoundScreen() {
           previousAmplitudeRef.current = averageAmplitude; // Обычное обновление
         }
       } else {
-        // Если звук обнаружен, обновляем только после небольшого затухания
-        previousAmplitudeRef.current = averageAmplitude * 0.8; // Сохраняем 80% для детекции второго звука
+        // Если звук обнаружен, обновляем предыдущую амплитуду
+        // Для первого звука сбрасываем еще сильнее (до 30%), чтобы второй звук легче детектировался даже если он быстрый
+        // Для второго звука сбрасываем почти полностью для следующего измерения
+        if (isFirstSound) {
+          previousAmplitudeRef.current = averageAmplitude * 0.3; // Снижено для лучшей детекции быстрого второго звука
+        } else {
+          previousAmplitudeRef.current = averageAmplitude * 0.3; // Почти сбрасываем после второго звука
+        }
       }
 
       // Если обнаружен пик, и ещё нет 2 пиков
@@ -612,18 +691,40 @@ export default function PuckSpeedSoundScreen() {
         // Используем Date.now() относительно времени начала записи для точности
         const nowMs = Date.now();
 
-        // Debounce: проверяем, не слишком близко ли к предыдущему пику
-        const lastEvent = currentEvents[currentEvents.length - 1];
-        const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
+        // Debounce: проверяем время последней детекции для предотвращения двойной детекции
+        const timeSinceLastDetection = nowMs - lastSoundDetectionTimeRef.current;
+        const isFirstSound = currentEvents.length === 0;
+        const isSecondSound = currentEvents.length === 1;
         
-            if (currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) {
-              const soundMsg = `🔊 [Web] Звук ${currentEvents.length + 1}: ампл=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}`;
-              console.log(`🔊 Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
-              // setDebugLogs(prev => [...prev.slice(-9), soundMsg]);
-              handleSoundDetected(nowMs, averageAmplitude / 255);
-            } else {
-              console.log(`⏸️ Звук игнорирован (слишком близко к предыдущему: ${timeSinceLastEvent.toFixed(0)}мс)`);
-            }
+        // Применяем debounce для обоих звуков
+        let shouldIgnore = false;
+        if (isFirstSound) {
+          if (timeSinceLastDetection < DEBOUNCE_MS) {
+            shouldIgnore = true;
+            console.log(`⏸️ [Web] Первый звук игнорирован (слишком близко к предыдущему: ${timeSinceLastDetection.toFixed(0)}мс)`);
+          }
+        } else if (isSecondSound) {
+          // Для второго звука используем более длинный debounce (120мс)
+          const SECOND_SOUND_DEBOUNCE_MS = 120;
+          if (timeSinceLastDetection < SECOND_SOUND_DEBOUNCE_MS) {
+            shouldIgnore = true;
+            console.log(`⏸️ [Web] Второй звук игнорирован (слишком близко к предыдущему: ${timeSinceLastDetection.toFixed(0)}мс)`);
+          }
+        }
+        
+        if (!shouldIgnore) {
+          // Обновляем время последней детекции
+          lastSoundDetectionTimeRef.current = nowMs;
+          
+          // Синхронно обновляем ref перед вызовом handleSoundDetected для второго звука
+          if (isSecondSound) {
+            soundEventsRef.current = [...currentEvents];
+          }
+          
+          const soundMsg = `🔊 [Web] Звук ${currentEvents.length + 1}: ампл=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}`;
+          console.log(`🔊 Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
+          handleSoundDetected(nowMs, averageAmplitude / 255);
+        }
       }
 
       // Продолжаем анализ
@@ -743,37 +844,148 @@ export default function PuckSpeedSoundScreen() {
               
               if (status.metering !== undefined && status.metering !== null && status.metering > -160) {
                 // Expo AV возвращает метринг в децибелах (-160 до 0)
+                // -120 и ниже обычно означает тишину, но мы все равно обрабатываем
                 const db = status.metering;
-                const normalizedDb = Math.max(-80, Math.min(0, db));
-                averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
-              } else {
-                // Если метринг недоступен
-                if (meteringCallCount <= 10) {
-                  console.warn(`⚠️ [iOS] Метеринг недоступен (${status.metering})`);
+                // Нормализуем от -120 (тишина) до 0 (максимум)
+                const normalizedDb = Math.max(-120, Math.min(0, db));
+                // Конвертируем в амплитуду 0-255, где -120 = 0, 0 = 255
+                averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 120) / 120) * 255));
+              } else if (status.metering === null || status.metering === undefined) {
+                // Если метринг недоступен, возможно запись остановилась
+                if (meteringCallCount <= 10 || meteringCallCount % 50 === 0) {
+                  console.warn(`⚠️ [iOS] Метеринг недоступен (${status.metering}), isRecording: ${status.isRecording}`);
                 }
-                return;
+                // Не возвращаемся, продолжаем обновлять UI с 0
+                averageAmplitude = 0;
+              } else {
+                // Метеринг <= -160, это очень тихо
+                averageAmplitude = 0;
               }
               
-              // Обновляем предыдущую амплитуду
+              // Обновляем UI с текущей амплитудой (нормализуем к 0-1 для отображения)
+              // Обновляем всегда, даже если амплитуда 0, чтобы индикатор работал
+              setCurrentAmplitude(averageAmplitude / 255);
+              
+              // Получаем предыдущую амплитуду ДО вычисления скачка
               const previousAmp = previousAmplitudeRef.current;
-              previousAmplitudeRef.current = averageAmplitude;
               
               // Детекция звука
               const volumeThreshold = volumeThresholdRef.current;
               const peakDetectionThreshold = peakDetectionThresholdRef.current;
               const amplitudeJump = averageAmplitude - previousAmp;
               
+              // Debounce: проверяем время последней детекции
+              const currentTime = Date.now();
+              const timeSinceLastDetection = currentTime - lastSoundDetectionTimeRef.current;
+              const timeSinceLastSpeedCalc = currentTime - lastSpeedCalculationTimeRef.current;
+              
+              // Получаем текущие события для определения, какой это звук
+              const currentEvents = soundEventsRef.current;
+              const isFirstSound = currentEvents.length === 0;
+              const isSecondSound = currentEvents.length === 1;
+              
+              // Проверяем период покоя после расчета скорости для обоих звуков
+              if (timeSinceLastSpeedCalc < COOLDOWN_AFTER_SPEED_MS) {
+                if (averageAmplitude < previousAmp) {
+                  previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                } else {
+                  previousAmplitudeRef.current = averageAmplitude;
+                }
+                return;
+              }
+              
+              // Применяем debounce для обоих звуков, чтобы предотвратить двойную детекцию одного звука
+              // Для первого звука - стандартный debounce
+              // Для второго звука - более короткий debounce, но все равно нужен для предотвращения двойной детекции
+              if (isFirstSound) {
+                if (timeSinceLastDetection < DEBOUNCE_MS) {
+                  if (averageAmplitude < previousAmp) {
+                    previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                  } else {
+                    previousAmplitudeRef.current = averageAmplitude;
+                  }
+                  return;
+                }
+              } else if (isSecondSound) {
+                // Для второго звука используем более длинный debounce (120мс)
+                // Это предотвращает двойную детекцию одного звука
+                // Реальные вторые звуки обычно происходят через > 120мс после первого
+                const SECOND_SOUND_DEBOUNCE_MS = 120; // Debounce для второго звука
+                if (timeSinceLastDetection < SECOND_SOUND_DEBOUNCE_MS) {
+                  if (averageAmplitude < previousAmp) {
+                    previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                  } else {
+                    previousAmplitudeRef.current = averageAmplitude;
+                  }
+                  return;
+                }
+              }
+              
+              // Используем ОБА условия (И, а не ИЛИ) для более строгой детекции
+              // Требуем и высокую амплитуду, И резкий скачок
               const isAboveVolumeThreshold = averageAmplitude > volumeThreshold;
               const isPeakDetection = amplitudeJump > peakDetectionThreshold;
               
-              if (isAboveVolumeThreshold || isPeakDetection) {
-                const currentTime = Date.now();
+              // Минимальный скачок для детекции - снижены для увеличения чувствительности
+              const MIN_AMPLITUDE_JUMP = 50; // Минимальный скачок для первого звука (бросок) - снижен с 60
+              // Для второго звука используем более низкий порог, так как предыдущая амплитуда может быть высокой
+              // и скачок может быть меньше из-за того, что первый звук еще "звучит"
+              const MIN_AMPLITUDE_JUMP_SECOND = 30; // Сниженный порог для второго звука (гол) - снижен с 35
+              
+              // Минимальная амплитуда для валидного звука (для фильтрации фоновых звуков) - снижена для увеличения чувствительности
+              const MIN_AMPLITUDE_FOR_DETECTION = 140; // Минимальная амплитуда из 255 для детекции - снижена с 150
+              
+              // Для первого звука: требуем высокую амплитуду И резкий скачок И минимальный скачок
+              // Это гарантирует, что детектируются только реальные удары, а не фоновые звуки
+              const firstSoundDetected = isFirstSound && 
+                averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION && // Высокая амплитуда
+                isAboveVolumeThreshold && 
+                isPeakDetection && 
+                amplitudeJump > MIN_AMPLITUDE_JUMP;
+              
+              // Для второго звука: используем более мягкие условия для детекции быстрых звуков
+              // Если амплитуда высокая, то даже небольшой скачок может быть реальным ударом
+              // (так как предыдущая амплитуда может быть высокой после первого звука)
+              const secondSoundDetected = isSecondSound && 
+                averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION && // Высокая амплитуда
+                isAboveVolumeThreshold && 
+                (isPeakDetection || amplitudeJump > MIN_AMPLITUDE_JUMP_SECOND); // ИЛИ для более чувствительной детекции
+              
+              if (firstSoundDetected || secondSoundDetected) {
                 const recordingStartTime = recordingStartTimeRef.current || currentTime;
                 const relativeTime = currentTime - recordingStartTime;
                 
+                // Обновляем время последней детекции
+                lastSoundDetectionTimeRef.current = currentTime;
+                
                 console.log(`🔊 [iOS] Звук обнаружен! Время: ${relativeTime}мс, Амплитуда: ${averageAmplitude.toFixed(1)}, Скачок: ${amplitudeJump.toFixed(1)}`);
                 
+                // Синхронно обновляем ref перед вызовом handleSoundDetected для второго звука
+                if (isSecondSound) {
+                  soundEventsRef.current = [...currentEvents];
+                }
+                
                 handleSoundDetected(relativeTime, averageAmplitude);
+                
+                // Обновляем предыдущую амплитуду после детекции
+                // Для первого звука сбрасываем еще сильнее (до 30%), чтобы второй звук легче детектировался даже если он быстрый
+                // Для второго звука сбрасываем почти полностью для следующего измерения
+                if (isFirstSound) {
+                  previousAmplitudeRef.current = averageAmplitude * 0.3; // Снижено с 0.4 для лучшей детекции быстрого второго звука
+                } else {
+                  previousAmplitudeRef.current = averageAmplitude * 0.3; // Почти сбрасываем после второго звука
+                }
+              } else {
+                // Обновляем предыдущую амплитуду плавно, если звук не обнаружен
+                // Если ждем второй звук и амплитуда падает - сбрасываем быстрее для детекции второго звука
+                if (isSecondSound && averageAmplitude < previousAmp) {
+                  // Быстрое затухание для второго звука, чтобы он мог детектироваться даже если происходит быстро
+                  previousAmplitudeRef.current = averageAmplitude * 0.5 + previousAmp * 0.5;
+                } else if (averageAmplitude < previousAmp) {
+                  previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                } else {
+                  previousAmplitudeRef.current = averageAmplitude;
+                }
               }
             } catch (meteringError) {
               if (meteringCallCount <= 10) {
@@ -832,6 +1044,209 @@ export default function PuckSpeedSoundScreen() {
       }
     };
   }, [isIOS, isMeasuring, handleSoundDetected, hasPermission]); // Убрали VOLUME_THRESHOLD и PEAK_DETECTION_THRESHOLD из зависимостей, используем ref
+
+  // Обработчик AppState для перезапуска записи при возврате из фона
+  useEffect(() => {
+    if (!isIOS || !hasPermission) return;
+
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      if (nextAppState === 'active' && isMeasuring) {
+        // Приложение вернулось в активное состояние и измерение активно
+        console.log('🔄 [AppState] Приложение вернулось из фона, проверяем запись...');
+        
+        // Небольшая задержка для стабилизации
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // ВСЕГДА перезапускаем запись и интервал при возврате из фона
+        // Это гарантирует работу даже после долгого неактивного состояния
+        console.log('🔄 [AppState] Перезапускаем запись и интервал...');
+        
+        // Останавливаем старый интервал если есть
+        if (expoMeteringIntervalRef.current) {
+          clearInterval(expoMeteringIntervalRef.current);
+          expoMeteringIntervalRef.current = null;
+        }
+        
+        // Останавливаем старую запись если есть
+        if (expoRecordingRef.current) {
+          try {
+            await expoRecordingRef.current.stopAndUnloadAsync();
+          } catch (e) {
+            // Игнорируем ошибки
+          }
+          expoRecordingRef.current = null;
+        }
+        
+        // Перезапускаем запись
+        try {
+          await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            staysActiveInBackground: false,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: false,
+            playThroughEarpieceAndroid: false,
+          });
+          
+          const recording = new Audio.Recording();
+          expoRecordingRef.current = recording;
+          
+          await recording.prepareToRecordAsync({
+            ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+            isMeteringEnabled: true,
+          });
+          await recording.startAsync();
+          
+          console.log('✅ [AppState] Запись перезапущена после возврата из фона');
+          
+          // Перезапускаем цикл опроса метеринга
+          isAnalyzingRef.current = true;
+          recordingStartTimeRef.current = Date.now();
+          previousAmplitudeRef.current = 0;
+          
+          // Запускаем цикл опроса метеринга вручную
+          let meteringCallCount = 0;
+          expoMeteringIntervalRef.current = setInterval(async () => {
+                  try {
+                    if (!expoRecordingRef.current || !isAnalyzingRef.current || !isMeasuringRef.current) {
+                      return;
+                    }
+                    
+                    const status = await expoRecordingRef.current.getStatusAsync();
+                    meteringCallCount++;
+                    
+                    if (!status.isRecording) {
+                      return;
+                    }
+                    
+                    // Получаем метринг из статуса
+                    let averageAmplitude = 0;
+                    
+                    if (status.metering !== undefined && status.metering !== null && status.metering > -160) {
+                      const db = status.metering;
+                      const normalizedDb = Math.max(-120, Math.min(0, db));
+                      averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 120) / 120) * 255));
+                    } else if (status.metering === null || status.metering === undefined) {
+                      averageAmplitude = 0;
+                    } else {
+                      averageAmplitude = 0;
+                    }
+                    
+                    setCurrentAmplitude(averageAmplitude / 255);
+                    
+                    const previousAmp = previousAmplitudeRef.current;
+                    const volumeThreshold = volumeThresholdRef.current;
+                    const peakDetectionThreshold = peakDetectionThresholdRef.current;
+                    const amplitudeJump = averageAmplitude - previousAmp;
+                    
+                    const currentTime = Date.now();
+                    const timeSinceLastDetection = currentTime - lastSoundDetectionTimeRef.current;
+                    const timeSinceLastSpeedCalc = currentTime - lastSpeedCalculationTimeRef.current;
+                    
+                    const currentEvents = soundEventsRef.current;
+                    const isFirstSound = currentEvents.length === 0;
+                    const isSecondSound = currentEvents.length === 1;
+                    
+                    // Проверяем период покоя после расчета скорости для обоих звуков
+                    if (timeSinceLastSpeedCalc < COOLDOWN_AFTER_SPEED_MS) {
+                      if (averageAmplitude < previousAmp) {
+                        previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                      } else {
+                        previousAmplitudeRef.current = averageAmplitude;
+                      }
+                      return;
+                    }
+                    
+                    // Применяем debounce для обоих звуков
+                    if (isFirstSound) {
+                      if (timeSinceLastDetection < DEBOUNCE_MS) {
+                        if (averageAmplitude < previousAmp) {
+                          previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                        } else {
+                          previousAmplitudeRef.current = averageAmplitude;
+                        }
+                        return;
+                      }
+                    } else if (isSecondSound) {
+                      // Для второго звука используем более длинный debounce (120мс)
+                      const SECOND_SOUND_DEBOUNCE_MS = 120;
+                      if (timeSinceLastDetection < SECOND_SOUND_DEBOUNCE_MS) {
+                        if (averageAmplitude < previousAmp) {
+                          previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                        } else {
+                          previousAmplitudeRef.current = averageAmplitude;
+                        }
+                        return;
+                      }
+                    }
+                    
+                    const isAboveVolumeThreshold = averageAmplitude > volumeThreshold;
+                    const isPeakDetection = amplitudeJump > peakDetectionThreshold;
+                    
+                    const MIN_AMPLITUDE_JUMP = 50; // Для первого звука - снижен с 60 для увеличения чувствительности
+                    const MIN_AMPLITUDE_JUMP_SECOND = 30; // Сниженный порог для второго звука - снижен с 35
+                    const MIN_AMPLITUDE_FOR_DETECTION = 140; // Минимальная амплитуда для детекции - снижена с 150
+                    
+                    const firstSoundDetected = isFirstSound && 
+                      averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION &&
+                      isAboveVolumeThreshold && 
+                      isPeakDetection && 
+                      amplitudeJump > MIN_AMPLITUDE_JUMP;
+                    
+                    // Для второго звука используем более мягкие условия
+                    const secondSoundDetected = isSecondSound && 
+                      averageAmplitude >= MIN_AMPLITUDE_FOR_DETECTION &&
+                      isAboveVolumeThreshold && 
+                      (isPeakDetection || amplitudeJump > MIN_AMPLITUDE_JUMP_SECOND); // ИЛИ для более чувствительной детекции
+                    
+                    if (firstSoundDetected || secondSoundDetected) {
+                      const recordingStartTime = recordingStartTimeRef.current || currentTime;
+                      const relativeTime = currentTime - recordingStartTime;
+                      
+                      lastSoundDetectionTimeRef.current = currentTime;
+                      
+                      console.log(`🔊 [iOS] Звук обнаружен! Время: ${relativeTime}мс, Амплитуда: ${averageAmplitude.toFixed(1)}, Скачок: ${amplitudeJump.toFixed(1)}`);
+                      
+                      // Синхронно обновляем ref перед вызовом handleSoundDetected для второго звука
+                      if (isSecondSound) {
+                        soundEventsRef.current = [...currentEvents];
+                      }
+                      
+                      handleSoundDetected(relativeTime, averageAmplitude);
+                      
+                      // Обновляем предыдущую амплитуду после детекции
+                      if (isFirstSound) {
+                        previousAmplitudeRef.current = averageAmplitude * 0.3; // Снижено для лучшей детекции быстрого второго звука
+                      } else {
+                        previousAmplitudeRef.current = averageAmplitude * 0.3; // Почти сбрасываем после второго звука
+                      }
+                    } else {
+                      // Если ждем второй звук и амплитуда падает - сбрасываем быстрее
+                      if (isSecondSound && averageAmplitude < previousAmp) {
+                        previousAmplitudeRef.current = averageAmplitude * 0.5 + previousAmp * 0.5;
+                      } else if (averageAmplitude < previousAmp) {
+                        previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmp * 0.3;
+                      } else {
+                        previousAmplitudeRef.current = averageAmplitude;
+                      }
+                    }
+                  } catch (meteringError) {
+                    if (meteringCallCount <= 10) {
+                      console.warn(`⚠️ [iOS] Ошибка получения метеринга: ${meteringError instanceof Error ? meteringError.message : String(meteringError)}`);
+                    }
+                  }
+                }, 100);
+                
+                console.log('✅ [AppState] Цикл опроса метеринга перезапущен');
+          } catch (restartError) {
+            console.error('❌ [AppState] Ошибка перезапуска записи:', restartError);
+          }
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [isIOS, hasPermission, isMeasuring]);
 
   // Останавливаем микрофон при уходе со страницы (используем useFocusEffect для отслеживания фокуса)
   useFocusEffect(
@@ -1110,7 +1525,7 @@ export default function PuckSpeedSoundScreen() {
                 <View 
                   style={[
                     styles.amplitudeBarFill, 
-                    { width: `${Math.max(currentAmplitude * 100, 1)}%` }
+                    { width: `${Math.max(currentAmplitude * 100, 0)}%` }
                   ]} 
                 />
               </View>
@@ -1145,7 +1560,7 @@ export default function PuckSpeedSoundScreen() {
               
               {/* Ползунок чувствительности (компактный, под радаром) */}
               <View style={styles.sensitivityContainerCompact}>
-                <Text style={styles.sensitivityLabelCompact}>{t('puckSpeed.sensitivity') || 'Чувствительность:'}{' '}{isNaN(sensitivity) ? 50 : Math.max(0, Math.min(100, sensitivity))}%</Text>
+                <Text style={styles.sensitivityLabelCompact}>{t('puckSpeed.sensitivity') || 'Чувствительность:'}{' '}{isNaN(sensitivity) ? 30 : Math.max(0, Math.min(100, sensitivity))}%</Text>
                 <View 
                   style={styles.sliderContainerCompact}
                   onLayout={(e) => {
@@ -1159,13 +1574,13 @@ export default function PuckSpeedSoundScreen() {
                     <View 
                       style={[
                         styles.sliderFillCompact, 
-                        { width: `${Math.max(0, Math.min(100, sensitivity ?? 50))}%` }
+                        { width: `${Math.max(0, Math.min(100, sensitivity ?? 30))}%` }
                       ]} 
                     />
                     <View 
                       style={[
                         styles.sliderThumbCompact,
-                        { left: `${Math.max(0, Math.min(100, sensitivity ?? 50))}%` }
+                        { left: `${Math.max(0, Math.min(100, sensitivity ?? 30))}%` }
                       ]}
                     />
                   </View>

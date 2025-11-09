@@ -3879,107 +3879,107 @@ export default function PlayerProfile() {
             {/* Нормативы - показываем только игрокам (не тренерам), видно всем */}
             {player && player.status === 'player' ? (
               // Всегда показываем нормативы всем (убрана проверка дружбы)
-              // Для собственного профиля показываем всегда, для других - только если есть данные
-              (currentUser && currentUser.id === player.id) ||
-              (player.pullUps && player.pullUps !== '0' && player.pullUps !== '' && player.pullUps !== 'null') ||
-              (player.pushUps && player.pushUps !== '0' && player.pushUps !== '' && player.pushUps !== 'null') ||
-              (player.plankTime && player.plankTime !== '0' && player.plankTime !== '' && player.plankTime !== 'null') ||
-              (player.sprint100m && player.sprint100m !== '0' && player.sprint100m !== '' && player.sprint100m !== 'null') ||
-              (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
-              (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null') ||
-              (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
-                isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                  // Редактируемая версия нормативов
-                  <View style={styles.section} ref={exercisesRef}>
-                    <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
-                    <View style={styles.infoGrid}>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.pullUps')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.pullUps !== undefined ? editData.pullUps : (player.pullUps || '')}
+                // Для собственного профиля показываем всегда, для других - только если есть данные
+                (currentUser && currentUser.id === player.id) ||
+                (player.pullUps && player.pullUps !== '0' && player.pullUps !== '' && player.pullUps !== 'null') ||
+                (player.pushUps && player.pushUps !== '0' && player.pushUps !== '' && player.pushUps !== 'null') ||
+                (player.plankTime && player.plankTime !== '0' && player.plankTime !== '' && player.plankTime !== 'null') ||
+                (player.sprint100m && player.sprint100m !== '0' && player.sprint100m !== '' && player.sprint100m !== 'null') ||
+                (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
+                (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null') ||
+                (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
+                  isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                    // Редактируемая версия нормативов
+                    <View style={styles.section} ref={exercisesRef}>
+                      <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
+                      <View style={styles.infoGrid}>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.pullUps')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.pullUps !== undefined ? editData.pullUps : (player.pullUps || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, pullUps: text})}
-                          placeholder={t('countPlaceholder')}
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.pushUps')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.pushUps !== undefined ? editData.pushUps : (player.pushUps || '')}
+                            onChangeText={(text) => setEditData({...editData, pullUps: text})}
+                            placeholder={t('countPlaceholder')}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.pushUps')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.pushUps !== undefined ? editData.pushUps : (player.pushUps || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, pushUps: text})}
-                          placeholder={t('countPlaceholder')}
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.plank')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.plankTime !== undefined ? editData.plankTime : (player.plankTime || '')}
+                            onChangeText={(text) => setEditData({...editData, pushUps: text})}
+                            placeholder={t('countPlaceholder')}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.plank')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.plankTime !== undefined ? editData.plankTime : (player.plankTime || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, plankTime: text})}
-                          placeholder={t('timePlaceholder')}
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.sprint')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.sprint100m !== undefined ? editData.sprint100m : (player.sprint100m || '')}
+                            onChangeText={(text) => setEditData({...editData, plankTime: text})}
+                            placeholder={t('timePlaceholder')}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.sprint')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.sprint100m !== undefined ? editData.sprint100m : (player.sprint100m || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, sprint100m: text})}
-                          placeholder={t('timePlaceholder')}
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.longJump')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.longJump !== undefined ? editData.longJump : (player.longJump || '')}
+                            onChangeText={(text) => setEditData({...editData, sprint100m: text})}
+                            placeholder={t('timePlaceholder')}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.longJump')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.longJump !== undefined ? editData.longJump : (player.longJump || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, longJump: text})}
-                          placeholder={t('profile.lengthInCm')}
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{t('profile.jumpRope')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.jumpRope !== undefined ? editData.jumpRope : (player.jumpRope || '')}
+                            onChangeText={(text) => setEditData({...editData, longJump: text})}
+                            placeholder={t('profile.lengthInCm')}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.infoItem}>
+                          <Text style={styles.infoLabel}>{t('profile.jumpRope')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.jumpRope !== undefined ? editData.jumpRope : (player.jumpRope || '')}
                           onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, jumpRope: text})}
-                          placeholder={t('countPlaceholder')}
-                          keyboardType="numeric"
-                        />
+                            onChangeText={(text) => setEditData({...editData, jumpRope: text})}
+                            placeholder={t('countPlaceholder')}
+                            keyboardType="numeric"
+                          />
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ) : (
-                  <NormativesSection
-                    pullUps={player.pullUps}
-                    pushUps={player.pushUps}
-                    plankTime={player.plankTime}
-                    sprint100m={player.sprint100m}
-                    longJump={player.longJump}
-                    jumpRope={player.jumpRope}
-                    changes={{
-                      pullUps: getChangeForField('pullUps'),
-                      pushUps: getChangeForField('pushUps'),
-                      plankTime: getChangeForField('plankTime'),
-                      sprint100m: getChangeForField('sprint100m'),
-                      longJump: getChangeForField('longJump'),
-                      jumpRope: getChangeForField('jumpRope'),
-                    }}
-                  />
-                )
-              ) : null // Не показываем секцию, если данных нет
+                  ) : (
+                    <NormativesSection
+                      pullUps={player.pullUps}
+                      pushUps={player.pushUps}
+                      plankTime={player.plankTime}
+                      sprint100m={player.sprint100m}
+                      longJump={player.longJump}
+                      jumpRope={player.jumpRope}
+                      changes={{
+                        pullUps: getChangeForField('pullUps'),
+                        pushUps: getChangeForField('pushUps'),
+                        plankTime: getChangeForField('plankTime'),
+                        sprint100m: getChangeForField('sprint100m'),
+                        longJump: getChangeForField('longJump'),
+                        jumpRope: getChangeForField('jumpRope'),
+                      }}
+                    />
+                  )
+                ) : null // Не показываем секцию, если данных нет
             ) : null}
 
             {/* Секция измерения скорости шайбы - только для игроков, видно всем */}
@@ -3988,17 +3988,17 @@ export default function PlayerProfile() {
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
-                <View style={styles.puckSpeedContainer}>
-                  {player.puckSpeed ? (
-                    <View style={styles.puckSpeedDisplay}>
-                      <View style={styles.puckSpeedValueContainer}>
-                        <Text style={styles.puckSpeedValue}>
+                  <View style={styles.puckSpeedContainer}>
+                    {player.puckSpeed ? (
+                      <View style={styles.puckSpeedDisplay}>
+                        <View style={styles.puckSpeedValueContainer}>
+                          <Text style={styles.puckSpeedValue}>
                           {Math.round(player.puckSpeed)}
-                        </Text>
-                        <Text style={styles.puckSpeedUnit}>
-                          {t('puckSpeed.kmh') || 'км/ч'}
-                        </Text>
-                      </View>
+                          </Text>
+                          <Text style={styles.puckSpeedUnit}>
+                            {t('puckSpeed.kmh') || 'км/ч'}
+                          </Text>
+                        </View>
                       {player.puckSpeedHistory && player.puckSpeedHistory.length > 0 && (() => {
                         // Сортируем по скорости (по убыванию) и берем топ-3
                         const topSpeeds = [...player.puckSpeedHistory]
@@ -4019,19 +4019,19 @@ export default function PlayerProfile() {
                         };
                         
                         return (
-                        <View style={styles.puckSpeedHistory}>
-                          <Text style={styles.puckSpeedHistoryLabel}>
+                          <View style={styles.puckSpeedHistory}>
+                            <Text style={styles.puckSpeedHistoryLabel}>
                               {t('puckSpeed.top3') || 'Топ 3 измерений'}
-                          </Text>
+                            </Text>
                             {topSpeeds.map((record, index) => (
                               <View key={index} style={styles.puckSpeedHistoryRow}>
-                            <Text style={styles.puckSpeedHistoryValue}>
+                              <Text style={styles.puckSpeedHistoryValue}>
                                   {Math.round(record.speed)}{' '}{t('puckSpeed.kmh') || 'км/ч'}
-                            </Text>
+                              </Text>
                                 <View style={styles.puckSpeedHistoryDateContainer}>
                                   <Text style={styles.puckSpeedHistoryDate}>
                                     {formatDate(record.date)}
-                                  </Text>
+                                      </Text>
                                   {isEditing && (currentUser?.id === player.id || currentUser?.status === 'admin') && (
                                     <TouchableOpacity
                                       style={styles.deleteSpeedRecordButton}
@@ -4053,8 +4053,8 @@ export default function PlayerProfile() {
                                       />
                                     </TouchableOpacity>
                                   )}
-                                </View>
-                              </View>
+                            </View>
+                          </View>
                             ))}
                                   </View>
                                 );
@@ -4070,13 +4070,13 @@ export default function PlayerProfile() {
                           </Text>
                         </TouchableOpacity>
                       )}
-                    </View>
-                  ) : (
-                    <View style={styles.puckSpeedEmpty}>
-                      <Ionicons name="speedometer-outline" size={48} color="#666" />
-                      <Text style={styles.puckSpeedEmptyText}>
-                        {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
-                      </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.puckSpeedEmpty}>
+                        <Ionicons name="speedometer-outline" size={48} color="#666" />
+                        <Text style={styles.puckSpeedEmptyText}>
+                          {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
+                        </Text>
                       {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
@@ -4088,9 +4088,9 @@ export default function PlayerProfile() {
                           </Text>
                         </TouchableOpacity>
                       )}
-                    </View>
-                  )}
-                </View>
+                      </View>
+                    )}
+                  </View>
               </View>
             )}
 

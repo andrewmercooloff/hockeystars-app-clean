@@ -29,9 +29,13 @@ const LogoHeader = React.memo(() => {
       backgroundColor: '#000'
     }}>
       {/* Логотип приложения слева */}
-      <View style={{ marginLeft: 61.5, marginBottom: -5 }}>
+      <TouchableOpacity 
+        style={{ marginLeft: 61.5, marginBottom: -5 }}
+        onPress={() => router.push('/')}
+        activeOpacity={0.7}
+      >
         <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
-      </View>
+      </TouchableOpacity>
       
       {/* Аватар справа */}
       <TouchableOpacity 

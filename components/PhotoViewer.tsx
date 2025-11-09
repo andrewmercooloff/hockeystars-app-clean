@@ -1,5 +1,5 @@
 import SafeIcon from './SafeIcon';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     Dimensions,
     ImageBackground,
@@ -28,19 +28,49 @@ interface PhotoViewerProps {
 
 export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0, playerId }: PhotoViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // Обновляем currentIndex при изменении initialIndex
   useEffect(() => {
     setCurrentIndex(initialIndex);
-  }, [initialIndex]);
+    // Прокручиваем к нужному фото при открытии
+    if (visible && scrollViewRef.current) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({
+          x: initialIndex * screenWidth,
+          animated: false,
+        });
+      }, 100);
+    }
+  }, [initialIndex, visible]);
+
+  // Обработчик прокрутки для обновления текущего индекса
+  const handleScroll = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(offsetX / screenWidth);
+    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < photos.length) {
+      setCurrentIndex(newIndex);
+    }
+  };
 
   const nextPhoto = () => {
-    setCurrentIndex((prev) => (prev + 1) % photos.length);
+    if (photos.length <= 1 || !scrollViewRef.current) return;
+    const newIndex = (currentIndex + 1) % photos.length;
+    scrollViewRef.current.scrollTo({
+      x: newIndex * screenWidth,
+      animated: true,
+    });
   };
 
   const prevPhoto = () => {
-    setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
+    if (photos.length <= 1 || !scrollViewRef.current) return;
+    const newIndex = (currentIndex - 1 + photos.length) % photos.length;
+    scrollViewRef.current.scrollTo({
+      x: newIndex * screenWidth,
+      animated: true,
+    });
   };
+
 
   if (photos.length === 0) return null;
 
@@ -68,14 +98,33 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
               </Text>
             </View>
 
-            {/* Основное изображение */}
+            {/* Основное изображение с поддержкой нативного прокручивания */}
             <View style={styles.imageContainer}>
-              <CachedImage
-                imageUrl={photos[currentIndex]}
-                style={styles.mainImage}
-                resizeMode="contain"
-              />
-              {playerId && (
+              <ScrollView
+                ref={scrollViewRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+                decelerationRate="fast"
+                snapToInterval={screenWidth}
+                snapToAlignment="center"
+                contentContainerStyle={styles.scrollContent}
+              >
+                {photos.map((photo, index) => (
+                  <View key={index} style={styles.imagePage}>
+                    <CachedImage
+                      imageUrl={photo}
+                      style={styles.mainImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                ))}
+              </ScrollView>
+              
+              {/* Кнопка лайка для текущего фото */}
+              {playerId && photos[currentIndex] && (
                 <View style={styles.photoLikeButton}>
                   <LikeButton
                     playerId={playerId}
@@ -92,12 +141,16 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
                 <TouchableOpacity
                   style={[styles.navButton, styles.prevButton]}
                   onPress={prevPhoto}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Ionicons name="chevron-back" size={30} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.navButton, styles.nextButton]}
                   onPress={nextPhoto}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Ionicons name="chevron-forward" size={30} color="#fff" />
                 </TouchableOpacity>
@@ -175,11 +228,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+  },
+  scrollContent: {
+    alignItems: 'center',
+  },
+  imagePage: {
+    width: screenWidth,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
   mainImage: {
-    width: '100%',
+    width: screenWidth,
     height: '100%',
   },
   navButton: {

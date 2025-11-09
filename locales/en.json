@@ -2919,6 +2919,20 @@
     "deleteError": "Error",
     "deleteErrorMessage": "Failed to delete record",
     "speedExceedsLimit": "Speed exceeds 120 km/h, measurement not counted",
-    "needMicrophone": "Microphone access required"
+    "needMicrophone": "Microphone access required",
+    "loading": "Loading...",
+    "cameraRadar": "Camera Radar",
+    "detectionZone": "DETECTION ZONE",
+    "motion": "Motion",
+    "threshold": "Threshold",
+    "puckInFrame": "🎯 Object in frame - waiting for exit...",
+    "waitingForPuck": "🎯 Waiting for object...",
+    "cameraInstructions": "HOW TO USE:\n\n1. Position the phone so that an object (puck, ball, etc.) flies through the frame\n2. Measure the distance (width of detection zone): 80 cm\n3. Press START\n4. Quickly throw the object through the frame (don't stop it in the frame!)\n\n💡 You can use any object: puck, ball, tennis ball, etc.",
+    "grantPermission": "Grant Permission",
+    "webCameraNotSupported": "Camera on web is not supported yet. Use the mobile app to measure speed via camera.",
+    "cameraNotAvailable": "Camera not available",
+    "lastSpeed": "Last Speed",
+    "invalidSpeed": "Speed out of range",
+    "invalidTime": "Object in frame too long. Throw faster!"
   }
 }

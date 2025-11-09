@@ -1220,12 +1220,12 @@ export default function HomeScreen() {
 
         {/* Фильтры - показываем только когда данные загружены */}
         {players.length > 0 && (
-          <View style={styles.filtersWrapper}>
-            <View style={styles.filtersContainer}>
-              <CountryFilter players={players} />
-              <YearFilter players={players} />
-            </View>
-          </View>
+        <View style={styles.filtersWrapper}>
+        <View style={styles.filtersContainer}>
+          <CountryFilter players={players} />
+          <YearFilter players={players} />
+        </View>
+        </View>
         )}
 
 
