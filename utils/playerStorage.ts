@@ -2661,13 +2661,29 @@ export const loadNotifications = async (userId?: string): Promise<any[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
+      // Тихая обработка сетевых ошибок (отсутствие интернета)
+      const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
+                             (error as any)?.message?.includes('network') ||
+                             (error as any)?.code === 'NETWORK_ERROR';
+      
+      if (!isNetworkError) {
+        // Логируем только не-сетевые ошибки
       console.error('❌ Ошибка загрузки уведомлений:', error);
+      }
       return [];
     }
 
     return data || [];
   } catch (error) {
+    // Тихая обработка сетевых ошибок (отсутствие интернета)
+    const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
+                           (error as any)?.message?.includes('network') ||
+                           (error as any)?.code === 'NETWORK_ERROR';
+    
+    if (!isNetworkError) {
+      // Логируем только не-сетевые ошибки
     console.error('❌ Ошибка загрузки уведомлений:', error);
+    }
     return [];
   }
 };

@@ -1,4 +1,4 @@
-package com.hockeystars.app
+package by.hockeystars.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

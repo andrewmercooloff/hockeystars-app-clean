@@ -5,7 +5,6 @@ import * as React from 'react';
 import { AppState, LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
-import LogViewer from '../components/LogViewer';
 import { UserProvider, useUser } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
@@ -240,7 +239,16 @@ export default function RootLayout() {
       
       console.log('✅ Счетчик уведомлений пересчитан и обновлен:', realCount);
     } catch (error) {
+      // Тихая обработка сетевых ошибок (отсутствие интернета)
+      const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
+                             (error as any)?.message?.includes('network') ||
+                             (error as any)?.code === 'NETWORK_ERROR';
+      
+      if (!isNetworkError) {
+        // Логируем только не-сетевые ошибки
       console.error('❌ Ошибка загрузки счетчика:', error);
+      }
+      // При сетевых ошибках просто пропускаем обновление счетчика
     }
   }, []);
 
@@ -369,7 +377,9 @@ export default function RootLayout() {
           } catch (error) {
             console.error('❌ Ошибка инициализации звуков:', error);
              }
+        
         // Загружаем уведомления, предназначенные для текущего пользователя (по user_id)
+        try {
         const { data: notificationsData, error } = await supabase
           .from('notifications')
           .select('*')
@@ -377,7 +387,16 @@ export default function RootLayout() {
           .order('created_at', { ascending: false });
         
         if (error) {
+            // Тихая обработка сетевых ошибок (отсутствие интернета)
+            const isNetworkError = error.message?.includes('Network request failed') || 
+                                   error.message?.includes('network') ||
+                                   error.code === 'NETWORK_ERROR';
+            
+            if (!isNetworkError) {
+              // Логируем только не-сетевые ошибки
           console.error('Ошибка загрузки уведомлений:', error);
+            }
+            // При сетевых ошибках просто пропускаем загрузку уведомлений
           return;
         }
         
@@ -390,7 +409,12 @@ export default function RootLayout() {
             try {
               await markNotificationAsRead(notification.id);
             } catch (error) {
+                // Тихая обработка сетевых ошибок
+                const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
+                                       (error as any)?.message?.includes('network');
+                if (!isNetworkError) {
               console.error('Ошибка отметки уведомления:', error);
+                }
             }
           }
         }
@@ -462,6 +486,18 @@ export default function RootLayout() {
         
         // Сразу пересчитываем счетчик уведомлений (без задержки)
         await loadNotificationCount(nextUser.id);
+        } catch (notificationError) {
+          // Тихая обработка сетевых ошибок при загрузке уведомлений (отсутствие интернета)
+          const isNetworkError = (notificationError as any)?.message?.includes('Network request failed') || 
+                                 (notificationError as any)?.message?.includes('network') ||
+                                 (notificationError as any)?.code === 'NETWORK_ERROR';
+          
+          if (!isNetworkError) {
+            // Логируем только не-сетевые ошибки
+            console.error('Ошибка загрузки уведомлений:', notificationError);
+          }
+          // При сетевых ошибках просто продолжаем работу без уведомлений
+        }
         
       } else {
         setUserLoaded(false);
@@ -729,6 +765,8 @@ export default function RootLayout() {
               tabBarActiveTintColor: '#fff',
               tabBarInactiveTintColor: '#888',
               tabBarShowLabel: false,
+              // Анимации отключены для лучшей производительности
+              animationEnabled: false,
             }}
           >
         <Tabs.Screen
@@ -968,7 +1006,6 @@ export default function RootLayout() {
             </Animated.View>
           )}
           </GestureHandlerRootView>
-          <LogViewer />
               </NotificationProvider>
             </UserProvider>
           </ScreenProvider>
@@ -977,3 +1014,4 @@ export default function RootLayout() {
     </LanguageProvider>
   );
 }
+

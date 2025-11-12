@@ -629,13 +629,34 @@ export default function PlayerProfile() {
     // Проверяем, изменился ли id
     const idChanged = normalizedId !== previousId && previousId !== undefined;
     
-    // Проверяем кеш для мгновенного отображения (работает даже при смене id, если профиль был в кеше)
+    // ВАЖНО: Если id изменился, сначала очищаем состояние синхронно
+    if (idChanged) {
+      console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
+      // Отменяем любые текущие загрузки для старого ID
+      currentLoadingIdRef.current = null;
+      // Полностью очищаем все состояние СРАЗУ
+      setPlayer(null);
+      setFriends([]);
+      setFriendshipStatus('none');
+      setIsEditing(false);
+      setEditData({});
+      setGalleryPhotos([]);
+      setAchievements([]);
+      setCoachYears([]);
+      setIndividualTraining([]);
+      setSkateServices([]);
+      setVideoFields([{ url: '', timeCode: '' }]);
+      setLoading(true); // Показываем loading для нового профиля
+      // Обновляем previousId сразу
+      previousIdRef.current = normalizedId;
+    }
+    
+    // Проверяем кеш для нового ID (после очистки состояния)
     const cachedPlayer = playersCache[normalizedId as string];
     
-    // Если профиль есть в кеше и соответствует id - показываем мгновенно
-    if (cachedPlayer && cachedPlayer.id === normalizedId && !idChanged) {
-      // Мгновенно показываем данные из кеша только если ID не изменился
-      // (если ID изменился, нужно загрузить заново, даже если есть в кеше)
+    // Если профиль есть в кеше для нового ID - показываем мгновенно
+    if (cachedPlayer && cachedPlayer.id === normalizedId) {
+      // Мгновенно показываем данные из кеша
       setPlayer(cachedPlayer);
       setLoading(false);
       
@@ -663,44 +684,31 @@ export default function PlayerProfile() {
       // Устанавливаем текущий загружаемый ID
       currentLoadingIdRef.current = normalizedId;
       
-      // Обновляем данные в фоне (без показа loading), если id не изменился
-      // Если id не изменился - тоже обновляем для актуальности данных
+      // Обновляем данные в фоне (без показа loading)
       loadPlayerData();
       
-      // Обновляем предыдущий id
+      // Обновляем предыдущий id (если еще не обновлен)
+      if (!idChanged) {
       previousIdRef.current = normalizedId;
+      }
     } else {
-      // Если id изменился, очищаем состояние, чтобы не показывать старые данные
-      if (idChanged) {
-        console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
-        // Отменяем любые текущие загрузки для старого ID
-        currentLoadingIdRef.current = null;
-        // Полностью очищаем все состояние
-        setPlayer(null);
-        setFriends([]);
-        setFriendshipStatus('none');
-        setIsEditing(false);
-        setEditData({});
-        setGalleryPhotos([]);
-        setAchievements([]);
-        setCoachYears([]);
-        setIndividualTraining([]);
-        setSkateServices([]);
-        setVideoFields([{ url: '', timeCode: '' }]);
-        previousIdRef.current = normalizedId;
-      } else if (previousId === undefined) {
+      // Нет в кеше - загружаем данные
+      if (!idChanged && previousId === undefined) {
         // Первая загрузка - устанавливаем previousId
         previousIdRef.current = normalizedId;
       }
       
-      // Нет в кеше или данные не соответствуют - показываем loading и загружаем данные
       // Устанавливаем текущий загружаемый ID
       currentLoadingIdRef.current = normalizedId;
+      
+      // Если состояние еще не очищено (не было смены id), показываем loading
+      if (!idChanged) {
       setLoading(true);
       setFriends([]);
       setFriendshipStatus('none');
       setIsEditing(false);
       setEditData({});
+      }
       
       // Загружаем данные игрока (используется кеш из getPlayerById на уровне БД)
       loadPlayerData();
@@ -2344,16 +2352,26 @@ export default function PlayerProfile() {
     );
   }
 
-  if (!player) {
+  // Нормализуем id для проверки
+  const normalizedId = Array.isArray(id) ? id[0] : id;
+  
+  // Если player не загружен или его ID не совпадает с текущим - показываем loading
+  if (!player || (normalizedId && player.id !== normalizedId)) {
     return (
       <View style={styles.container}>
         <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
+            {loading ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Загрузка...</Text>
+              </View>
+            ) : (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
                 {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Player not found' : t('profile.playerNotFound')}
               </Text>
             </View>
+            )}
           </View>
         </CachedBackground>
       </View>

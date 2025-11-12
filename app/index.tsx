@@ -4,9 +4,11 @@ import '../utils/logSilencer';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
+  AppState,
   Dimensions,
   ImageBackground,
   Modal,
+  PixelRatio,
   Platform,
   StyleSheet,
   Text,
@@ -36,6 +38,14 @@ const Puck = React.lazy(() => import('../components/Puck'));
 
 const { width, height } = Dimensions.get('window');
 
+// Диагностическое логирование размеров экрана (отключено для производительности)
+// Раскомментируйте при необходимости отладки
+// const windowDims = Dimensions.get('window');
+// const screenDims = Dimensions.get('screen');
+// const pixelRatio = PixelRatio.get();
+// const fontScale = PixelRatio.getFontScale();
+// console.log('📐 [PUCK PHYSICS] Screen dimensions initialized:', {...});
+
 interface PuckPosition {
   id: string;
   x: number;
@@ -47,13 +57,27 @@ interface PuckPosition {
 }
 
 const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string) => {
-  const puckSize = 70; // Размер шайбы
+  // ВАЖНО: Проверяем, не изменился ли scale factor, который может влиять на размеры
+  const currentPixelRatio = PixelRatio.get();
+  const currentScale = Dimensions.get('window').scale || 1;
+  
+  // Размер шайбы в логических единицах (points)
+  // Если scale factor изменился, реальный размер на экране может отличаться
+  const puckSize = 70; // Размер шайбы в points
+  
+  // Логирование размера шайбы отключено для производительности
+  // const puckSizeLoggedRef = useRef(false);
+  // if (__DEV__ && Platform.OS === 'ios' && !puckSizeLoggedRef.current) {
+  //   console.log('📐 [PUCK PHYSICS] Puck size calculation:', {...});
+  //   puckSizeLoggedRef.current = true;
+  // }
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousLengthRef = useRef<number>(0);
   const lastHapticTimeRef = useRef<number>(0);
   const collisionDetectedRef = useRef<boolean>(false);
+  const [animationRestartTrigger, setAnimationRestartTrigger] = useState<number>(0); // Триггер для принудительного перезапуска анимации
   
   // Определяем производительность устройства для Android
   const getAndroidPerformanceLevel = useCallback(() => {
@@ -105,17 +129,18 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
+    let boundaries;
     if (Platform.OS === 'ios') {
       // Для iPhone используем границы от самых краев экрана (льда)
-      return {
-        leftOffset: 5,
-        topOffset: 5,
+      boundaries = {
+        leftOffset: -5, // Уменьшено на 10px чтобы убрать лишний отступ слева
+        topOffset: -5, // Уменьшено на 10px чтобы убрать лишний отступ сверху
         rightOffset: 5,
         bottomOffset: 218 // Уменьшено на 7px чтобы шайбы долетали до нижней границы
       };
     } else if (Platform.OS === 'web') {
       // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
-      return {
+      boundaries = {
         leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
         topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
         rightOffset: 450,  // Значительно увеличено для предотвращения вылета справа (было 350)
@@ -123,14 +148,26 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       };
     } else {
       // Для Android используем фиксированные границы (сбалансированное пространство по горизонтали)
-      return {
+      boundaries = {
         leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
         topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
         rightOffset: 165,  // Уменьшено чтобы шайбы долетали до края
         bottomOffset: 415  // Уменьшено чтобы шайбы долетали до края
       };
     }
-  }, [width, height]);
+    
+    // Диагностическое логирование границ
+    // ВАЖНО: puckSize - диаметр шайбы (70px), радиус = puckSize/2
+    // Центр шайбы не должен заходить дальше чем screen - offset - radius
+    const wallMaxX = width - boundaries.rightOffset - puckSize / 2;
+    const wallMaxY = height - boundaries.bottomOffset - puckSize / 2;
+    // Логирование границ отключено для производительности
+    // if (__DEV__) {
+    //   console.log('📐 [PUCK PHYSICS] Boundaries calculated:', {...});
+    // }
+    
+    return boundaries;
+  }, [width, height, puckSize]);
 
   useEffect(() => {
     if (players.length === 0) return;
@@ -230,9 +267,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Запускаем анимацию только при первой инициализации или изменении количества
     // Используем строгое сравнение - запускаем только когда длина реально изменилась
     const hasLengthChanged = previousLengthRef.current !== puckPositions.length;
+    const shouldRestart = animationRestartTrigger > 0;
     
-    // Если анимация уже запущена и количество шайб не изменилось, не перезапускаем
-    if (animationIntervalRef.current && !hasLengthChanged) {
+    // Если анимация уже запущена и количество шайб не изменилось, и нет принудительного перезапуска, не перезапускаем
+    if (animationIntervalRef.current && !hasLengthChanged && !shouldRestart) {
       return;
     }
     
@@ -265,11 +303,24 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             return pos;
           }
           
-          // Более плавное движение
-          let newX = pos.x + pos.vx;
-          let newY = pos.y + pos.vy;
+          // КРИТИЧНО: Ограничиваем скорость ДО применения к позиции
+          // Это предотвращает вылет за границы из-за слишком большой скорости
+          const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
           let newVx = pos.vx;
           let newVy = pos.vy;
+          
+          // Определяем maxSpeed в зависимости от платформы (временно, будет переопределено позже)
+          let maxSpeed = 4.5;
+          
+          // Ограничиваем скорость ДО применения к позиции
+          if (currentSpeed > maxSpeed) {
+            newVx = (newVx / currentSpeed) * maxSpeed;
+            newVy = (newVy / currentSpeed) * maxSpeed;
+          }
+          
+          // Более плавное движение
+          let newX = pos.x + newVx;
+          let newY = pos.y + newVy;
           
           // Убираем трение для постоянного движения
           // const friction = 0.999; // Убираем трение
@@ -279,18 +330,69 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
           // Обработка коллизий со стенами (платформо-зависимые границы)
           // Оптимизация: кешируем вычисления границ
-          const wallMaxX = width - boundaries.rightOffset - puckSize;
-          const wallMaxY = height - boundaries.bottomOffset - puckSize;
+          // ВАЖНО: puckSize - диаметр шайбы (70px), радиус = puckSize/2
+          // Центр шайбы не должен заходить дальше чем screen - offset - radius
+          const puckRadius = puckSize / 2;
+          const wallMaxX = width - boundaries.rightOffset - puckRadius;
+          const wallMaxY = height - boundaries.bottomOffset - puckRadius;
           
-          // Физика отскока - оптимизирована для плавности
-          const bounceMultiplier = Platform.OS === 'ios' ? 1.05 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 1.1 : 1.05);
+          // Физика отскока - унифицирована для всех платформ
+          // Маленький отскок для реализма, но не слишком сильный чтобы не вылетать
+          const bounceMultiplier = 0.95; // Незначительное уменьшение скорости при отскоке
           
-          if (newX <= boundaries.leftOffset || newX >= wallMaxX) {
-            newVx = -newVx * bounceMultiplier; // Отскок от стен
-            newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
+          // СТРОГАЯ проверка границ ДО логирования - исправляем проблему с вылетом
+          // Проверяем и корректируем позицию ПЕРЕД применением физики отскока
+          // puckRadius уже объявлен выше
+          const wasOutOfBoundsBefore = newX < boundaries.leftOffset + puckRadius ||
+                                     newX > wallMaxX - puckRadius ||
+                                     newY < boundaries.topOffset + puckRadius ||
+                                     newY > wallMaxY - puckRadius;
+          
+          // Логирование выхода за границы отключено для производительности
+          // if (Platform.OS === 'ios' && __DEV__ && wasOutOfBoundsBefore) {
+          //   console.warn('🚨 [PUCK PHYSICS] iOS Puck out of bounds BEFORE correction:', {...});
+          // }
+          
+          // СТРОГАЯ коррекция позиции - сначала ограничиваем, потом отскок
+          // ВАЖНО: Проверяем ДО коррекции, была ли шайба за границами
+          const wasOutOfBounds = newX < boundaries.leftOffset || newX > wallMaxX || newY < boundaries.topOffset || newY > wallMaxY;
+          
+          // ВАЖНО: Исправляем направление скорости правильно
+          if (newX < boundaries.leftOffset) {
+            newX = boundaries.leftOffset;
+            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо (положительная скорость)
+          } else if (newX > wallMaxX) {
+            newX = wallMaxX;
+            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево (отрицательная скорость)
           }
-          if (newY <= boundaries.topOffset || newY >= wallMaxY) {
-            newVy = -newVy * bounceMultiplier; // Отскок от стен
+          
+          if (newY < boundaries.topOffset) {
+            newY = boundaries.topOffset;
+            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз (положительная скорость)
+          } else if (newY > wallMaxY) {
+            newY = wallMaxY;
+            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх (отрицательная скорость)
+          }
+          
+          // КРИТИЧНО: Уменьшаем скорость на 30% при выходе за границы для большей стабильности
+          // Это предотвращает вылет в следующем кадре
+          if (wasOutOfBounds) {
+            newVx *= 0.7; // Уменьшаем скорость на 30%
+            newVy *= 0.7;
+          }
+          
+          const speedAfterWallBounce = Math.sqrt(newVx * newVx + newVy * newVy);
+          if (speedAfterWallBounce > maxSpeed) {
+            newVx = (newVx / speedAfterWallBounce) * maxSpeed;
+            newVy = (newVy / speedAfterWallBounce) * maxSpeed;
+          }
+          
+          // Дополнительная проверка после коррекции (на случай если что-то пошло не так)
+          // Логирование отключено для производительности, но коррекция остается
+          const stillOutOfBounds = newX < boundaries.leftOffset || newX > wallMaxX || newY < boundaries.topOffset || newY > wallMaxY;
+          if (stillOutOfBounds) {
+            // Принудительная коррекция без логирования
+            newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
             newY = Math.max(boundaries.topOffset, Math.min(wallMaxY, newY));
           }
 
@@ -301,16 +403,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const maxY = height - boundaries.bottomOffset - puckSize;
             
             // Проверяем, если шайба вылетает за границы (с учетом размера)
+            // Логирование отключено для производительности
             if (newX < boundaries.leftOffset || newX > maxX || newY < boundaries.topOffset || newY > maxY) {
-              console.warn('🚨 Puck out of bounds BEFORE correction:', { 
-                id: pos.id, 
-                position: { x: newX, y: newY },
-                limits: { maxX, maxY },
-                boundaries,
-                velocity: { vx: newVx, vy: newVy },
-                screenSize: { width, height },
-                puckSize
-              });
+              // console.warn('🚨 Puck out of bounds BEFORE correction:', {...});
               
               // Если шайба вылетает, сбрасываем скорость в противоположную сторону
               if (newX < boundaries.leftOffset || newX > maxX) {
@@ -339,8 +434,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
           // Жесткая система коллизий - шайбы не могут накладываться
           // Оптимизация: проверяем только близкие шайбы (квадрат расстояния быстрее чем sqrt)
-          const minDistance = (Platform.OS === 'android' || Platform.OS === 'web') ? puckSize * 0.5 : puckSize;
+          // ВАЖНО: Исправляем расчет минимального расстояния для столкновений
+          // puckSize = 70 - это диаметр шайбы
+          // Для столкновения двух шайб минимальное расстояние между центрами = диаметр = puckSize
+          // НО: если они накладываются друг на друга, увеличиваем расстояние столкновения
+          // Возвращаем полное расстояние столкновения, чтобы шайбы не накладывались
+          const minDistance = puckSize; // Используем полный диаметр для столкновений
           const minDistanceSq = minDistance ** 2;
+          
+          // Логирование настроек столкновений отключено для производительности
+          // if (Platform.OS === 'ios' && __DEV__ && !collisionSettingsLoggedRef.current) {
+          //   console.log('📐 [PUCK PHYSICS] Collision settings:', {...});
+          //   collisionSettingsLoggedRef.current = true;
+          // }
           
           currentPositions.forEach((otherPos, otherIndex) => {
             if (otherPos.id === pos.id || otherPos.isDragging) return;
@@ -353,6 +459,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             if (distanceSq < minDistanceSq && distanceSq > 0) {
               const distance = Math.sqrt(distanceSq); // Вычисляем sqrt только при коллизии
               const angle = Math.atan2(dy, dx);
+              
+              // Логирование столкновений отключено для производительности (вызывается очень часто!)
+              // if (Platform.OS === 'ios' && __DEV__) {
+              //   console.log('💥 [PUCK PHYSICS] Collision detected:', {...});
+              // }
               
               // Агрессивная коррекция позиции: отталкиваем сразу на безопасное расстояние
               const correctionDistance = (minDistance - distance) * 1.15; // Немного снижено для производительности
@@ -411,7 +522,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           
               // Адаптивные ограничения скорости в зависимости от производительности устройства
           // Оптимизировано для плавности и производительности
-          let maxSpeed, minSpeed;
+          // ВАЖНО: maxSpeed уже объявлен выше, только переопределяем значение
+          let minSpeed;
           if (Platform.OS === 'ios') {
             // Оптимизированные скорости для iOS - баланс между плавностью и производительностью
             maxSpeed = 4.5; // Восстановлено для более плавного движения
@@ -440,10 +552,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             maxSpeed = 4.5;
             minSpeed = 0.7;
           }
-          const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
-          if (currentSpeed > maxSpeed) {
-            newVx = (newVx / currentSpeed) * maxSpeed;
-            newVy = (newVy / currentSpeed) * maxSpeed;
+
+          // Ограничиваем скорость ПОСЛЕ применения всех изменений
+          const speedAfterCollisions = Math.sqrt(newVx * newVx + newVy * newVy);
+          if (speedAfterCollisions > maxSpeed) {
+            newVx = (newVx / speedAfterCollisions) * maxSpeed;
+            newVy = (newVy / speedAfterCollisions) * maxSpeed;
           }
           
           // Минимальная скорость для предотвращения остановки - применяем всегда
@@ -451,6 +565,91 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const angle = Math.random() * 2 * Math.PI;
             newVx = Math.cos(angle) * minSpeed;
             newVy = Math.sin(angle) * minSpeed;
+          }
+          
+          // КРИТИЧЕСКИ ВАЖНО: Проверка границ ПОСЛЕ всех столкновений между шайбами
+          // Столкновения могут сдвинуть шайбу за границы, поэтому проверяем еще раз
+          if (newX < boundaries.leftOffset + puckRadius) {
+            newX = boundaries.leftOffset + puckRadius;
+            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо (положительная скорость)
+          } else if (newX > wallMaxX) {
+            newX = wallMaxX;
+            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево (отрицательная скорость)
+          }
+
+          if (newY < boundaries.topOffset + puckRadius) {
+            newY = boundaries.topOffset + puckRadius;
+            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз (положительная скорость)
+          } else if (newY > wallMaxY) {
+            newY = wallMaxY;
+            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх (отрицательная скорость)
+          }
+          
+          // Финальная проверка на всякий случай - ГАРАНТИРУЕМ что позиция в пределах границ
+          const beforeFinalCheck = { x: newX, y: newY };
+          
+          // КРИТИЧНО: Если позиция все еще за границами, принудительно корректируем
+          // и исправляем направление скорости с учетом радиуса шайбы
+
+          if (newX < boundaries.leftOffset + puckRadius) {
+            newX = boundaries.leftOffset + puckRadius;
+            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо
+          } else if (newX > wallMaxX - puckRadius) {
+            newX = wallMaxX - puckRadius;
+            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево
+          }
+
+          if (newY < boundaries.topOffset + puckRadius) {
+            newY = boundaries.topOffset + puckRadius;
+            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз
+          } else if (newY > wallMaxY - puckRadius) {
+            newY = wallMaxY - puckRadius;
+            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх
+          }
+          
+          // Дополнительная гарантия - принудительное ограничение с учетом радиуса
+          newX = Math.max(boundaries.leftOffset + puckRadius, Math.min(wallMaxX, newX));
+          newY = Math.max(boundaries.topOffset + puckRadius, Math.min(wallMaxY, newY));
+          
+          // КРИТИЧНО: Ограничиваем скорость ПОСЛЕ отскока от стен
+          // Это предотвращает превышение maxSpeed после bounceMultiplier
+          const speedAfterBounce = Math.sqrt(newVx * newVx + newVy * newVy);
+          if (speedAfterBounce > maxSpeed) {
+            newVx = (newVx / speedAfterBounce) * maxSpeed;
+            newVy = (newVy / speedAfterBounce) * maxSpeed;
+          }
+          
+          // СТРОГАЯ проверка после финальной коррекции - если все еще за границами, это критическая ошибка
+          const stillOutOfBoundsFinal = newX < boundaries.leftOffset + puckRadius ||
+                                 newX > wallMaxX - puckRadius ||
+                                 newY < boundaries.topOffset + puckRadius ||
+                                 newY > wallMaxY - puckRadius;
+          if (stillOutOfBoundsFinal) {
+            // Принудительная коррекция - это последняя линия защиты (без логирования для производительности)
+            newX = Math.max(boundaries.leftOffset + puckRadius, Math.min(wallMaxX - puckRadius, newX));
+            newY = Math.max(boundaries.topOffset + puckRadius, Math.min(wallMaxY - puckRadius, newY));
+          }
+          
+          // Логирование финальной проверки отключено для производительности
+          // if (Platform.OS === 'ios' && __DEV__ && !stillOutOfBounds) {
+          //   const afterFinalCheck = { x: newX, y: newY };
+          //   if (beforeFinalCheck.x !== afterFinalCheck.x || beforeFinalCheck.y !== afterFinalCheck.y) {
+          //     console.log('✅ [PUCK PHYSICS] Final check corrected position:', {...});
+          //   }
+          // }
+          
+          // АБСОЛЮТНАЯ ЗАЩИТА: Финальная принудительная коррекция перед возвратом
+          // Гарантируем что шайба НИКОГДА не выйдет за границы экрана
+          if (newX < boundaries.leftOffset + puckRadius) {
+            newX = boundaries.leftOffset + puckRadius;
+          } else if (newX > wallMaxX) {
+            newX = wallMaxX;
+          }
+
+          if (newY < boundaries.topOffset + puckRadius) {
+            newY = boundaries.topOffset + puckRadius;
+          } else if (newY > wallMaxY) {
+            newY = wallMaxY;
           }
           
           return {
@@ -507,50 +706,95 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         clearTimeout(startDelayRef.current);
       }
     };
-  }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize, currentScreen]);
+  }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize, currentScreen, animationRestartTrigger]);
+
+  // Обработчик AppState для перезапуска анимации при возврате из фона
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active' && currentScreen === 'index' && puckPositions.length > 0) {
+        // Приложение вернулось из фона - перезапускаем анимацию немедленно
+        // Очищаем старый интервал, если он есть
+        if (animationIntervalRef.current) {
+          clearInterval(animationIntervalRef.current);
+          animationIntervalRef.current = null;
+        }
+        
+        // Устанавливаем флаг принудительного перезапуска
+        // Это заставит основной useEffect перезапустить анимацию
+        setAnimationRestartTrigger(Date.now());
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [puckPositions.length, currentScreen]);
 
   // Функция для обновления позиции и скорости конкретной шайбы (для drag)
   const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging: boolean = true) => {
-    let hasCollision = false;
-    
     setPuckPositions(currentPositions => {
-      // Проверяем коллизии с другими шайбами при перетаскивании
+      // Оптимизация: проверяем коллизии только с близкими шайбами
       let adjustedX = x;
       let adjustedY = y;
       const updatedPositions = [...currentPositions];
       
+      // Предварительно вычисляем значения для оптимизации
+      const minDistance = puckSize;
+      const minDistanceSq = minDistance * minDistance;
+      const dragSpeedSq = vx * vx + vy * vy;
+      const dragSpeed = dragSpeedSq > 0 ? Math.sqrt(dragSpeedSq) : 0;
+      
+      // Базовые коэффициенты (вычисляем один раз)
+      const basePushStrength = Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.5 : 0.65);
+      const speedFactor = dragSpeed > 0 ? Math.min(dragSpeed / 2.0, 2.0) : 0;
+      const dynamicPushStrength = basePushStrength * (0.5 + speedFactor * 0.5);
+      
       currentPositions.forEach((otherPos, index) => {
-        if (otherPos.id === id) return;
+        if (otherPos.id === id || otherPos.isDragging) return; // Пропускаем перетаскиваемые шайбы
         
         const dx = adjustedX - otherPos.x;
         const dy = adjustedY - otherPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSq = dx * dx + dy * dy; // Используем квадрат расстояния - быстрее
         
-        // Минимальное расстояние между центрами шайб
-        const minDistance = puckSize;
+        // Быстрая проверка: если шайба слишком далеко, пропускаем
+        const maxCheckDistanceSq = isDragging ? minDistanceSq : (minDistance * 1.5) ** 2;
+        if (distanceSq > maxCheckDistanceSq || distanceSq === 0) return;
         
-        if (distance < minDistance && distance > 0) {
-          hasCollision = true; // Обнаружено столкновение
+        // Только теперь вычисляем sqrt для точного расчета
+        const distance = Math.sqrt(distanceSq);
+        
+        if (distance < minDistance) {
+          // Столкновение обнаружено
           const angle = Math.atan2(dy, dx);
           
           // Агрессивная коррекция: отталкиваем перетаскиваемую шайбу
-          const correctionDistance = (minDistance - distance) * 1.2; // Добавляем 20% запаса
+          const correctionDistance = (minDistance - distance) * 1.2;
           adjustedX += Math.cos(angle) * correctionDistance;
           adjustedY += Math.sin(angle) * correctionDistance;
           
-          // Улучшенная передача импульса при перетаскивании
-          const pushStrength = Platform.OS === 'ios' ? 0.35 : (Platform.OS === 'android' ? 0.3 : 0.4);
+          // Передаем импульс при столкновении
+          if (dragSpeed > 0.3) {
+            const pushAngle = angle + Math.PI; // Инвертируем направление
+            const pushVx = Math.cos(pushAngle) * dragSpeed * dynamicPushStrength;
+            const pushVy = Math.sin(pushAngle) * dragSpeed * dynamicPushStrength;
+            
+            updatedPositions[index] = {
+              ...otherPos,
+              vx: otherPos.vx + pushVx,
+              vy: otherPos.vy + pushVy
+            };
+          }
+        } else if (!isDragging && dragSpeed > 0.5) {
+          // При отпускании: передаем небольшой импульс близким шайбам
+          const proximityFactor = 1.0 - (distance - minDistance) / (minDistance * 0.5);
           
-          // Вычисляем общую скорость перетаскивания
-          const dragSpeed = Math.sqrt(vx * vx + vy * vy);
-          
-          // Толкаем только если есть реальная скорость (не при каждом движении пальца)
-          if (dragSpeed > 0.5) { // Понижаем порог для более отзывчивого толчка
-            // angle - это угол ОТ другой шайбы К перетаскиваемой
-            // Нужно инвертировать, чтобы толкать ДРУГУЮ шайбу ОТ перетаскиваемой
-            const pushAngle = angle + Math.PI; // Инвертируем направление на 180°
-            const pushVx = Math.cos(pushAngle) * dragSpeed * pushStrength;
-            const pushVy = Math.sin(pushAngle) * dragSpeed * pushStrength;
+          if (proximityFactor > 0) {
+            const basePushStrengthProx = Platform.OS === 'ios' ? 0.4 : (Platform.OS === 'android' ? 0.35 : 0.45);
+            const dynamicPushStrengthProx = basePushStrengthProx * (0.5 + speedFactor * 0.5) * proximityFactor;
+            
+            const pushAngle = Math.atan2(dy, dx) + Math.PI;
+            const pushVx = Math.cos(pushAngle) * dragSpeed * dynamicPushStrengthProx;
+            const pushVy = Math.sin(pushAngle) * dragSpeed * dynamicPushStrengthProx;
             
             updatedPositions[index] = {
               ...otherPos,
@@ -565,9 +809,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         pos.id === id ? { ...pos, x: adjustedX, y: adjustedY, vx, vy, isDragging } : pos
       );
     });
-    
-    // Вибрация при перетаскивании отключена - только при столкновениях
-    // Вибрация при drag отключена по запросу пользователя
   }, [puckSize, currentUserId]);
 
   return { puckPositions, puckSize, updatePuckPosition, getAndroidPerformanceLevel };
@@ -586,6 +827,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
   const hasDraggedRef = useRef(false);
   const lastUpdateTimeRef = useRef(0);
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
+  const lastVelocityRef = useRef({ vx: 0, vy: 0 }); // Последняя скорость для использования при отпускании
   const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -609,6 +851,7 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     lastPositionRef.current = { x: position.x, y: position.y };
     hasDraggedRef.current = false;
     dragVelocityRef.current = { vx: 0, vy: 0 };
+    lastVelocityRef.current = { vx: 0, vy: 0 }; // Сбрасываем последнюю скорость
     dragHistoryRef.current = []; // Очищаем историю
     setIsDragging(true);
     
@@ -622,9 +865,11 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     const now = Date.now();
     
     // Адаптивный throttling в зависимости от производительности устройства
+    // Увеличиваем интервал для лучшей производительности при перетаскивании
     const throttleInterval = Platform.OS === 'android' ? 
-      (getAndroidPerformanceLevel() === 'high' ? 16 : 
-       getAndroidPerformanceLevel() === 'medium' ? 20 : 33) : 16;
+      (getAndroidPerformanceLevel() === 'high' ? 20 : 
+       getAndroidPerformanceLevel() === 'medium' ? 25 : 40) : 20;
+    
     if (now - lastUpdateTimeRef.current < throttleInterval) {
       return;
     }
@@ -667,7 +912,10 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     const vx = (newX - lastPositionRef.current.x) * speedMultiplier;
     const vy = (newY - lastPositionRef.current.y) * speedMultiplier;
     
-    // Накапливаем скорость для финального импульса
+    // Сохраняем последнюю скорость для использования при отпускании
+    lastVelocityRef.current = { vx, vy };
+    
+    // Накапливаем скорость для финального импульса (для совместимости, но не используем)
     dragVelocityRef.current.vx += vx;
     dragVelocityRef.current.vy += vy;
     
@@ -684,41 +932,39 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
   const handleTouchEnd = () => {
     setIsDragging(false);
     
-    // Рассчитываем финальную скорость на основе направления движения пальца
+    // Используем последнюю скорость движения для финального импульса
     if (onDrag) {
-      const now = Date.now();
-      const timeDiff = now - dragStartRef.current.time;
-      
-      // Простое решение: используем накопленную скорость, но с правильным направлением
-      // Восстановлены коэффициенты для более отзывчивого толчка
+      // Применяем множитель импульса к последней скорости
       let impulseMultiplier;
       if (Platform.OS === 'android') {
         const performanceLevel = getAndroidPerformanceLevel();
         switch (performanceLevel) {
           case 'high':
-            impulseMultiplier = 0.7; // Восстановлено для сильного импульса
+            impulseMultiplier = 0.7;
             break;
           case 'medium':
-            impulseMultiplier = 0.6; // Восстановлено
+            impulseMultiplier = 0.6;
             break;
           case 'low':
           default:
-            impulseMultiplier = 0.5; // Восстановлено
+            impulseMultiplier = 0.5;
             break;
         }
       } else {
-        impulseMultiplier = 0.7; // Восстановлено для iOS - более сильный импульс
+        impulseMultiplier = 0.7; // iOS - более сильный импульс
       }
-      const finalVx = dragVelocityRef.current.vx * impulseMultiplier;
-      const finalVy = dragVelocityRef.current.vy * impulseMultiplier;
       
-      // Убираем логи направления для чистоты консоли
+      // Используем последнюю сохраненную скорость (правильное направление)
+      const finalVx = lastVelocityRef.current.vx * impulseMultiplier;
+      const finalVy = lastVelocityRef.current.vy * impulseMultiplier;
       
       onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
     }
     
-    // Сбрасываем накопленную скорость
+    // Сбрасываем накопленную скорость и историю
     dragVelocityRef.current = { vx: 0, vy: 0 };
+    lastVelocityRef.current = { vx: 0, vy: 0 };
+    dragHistoryRef.current = [];
   };
 
   return (

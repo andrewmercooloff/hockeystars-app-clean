@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: '#800000',
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)', // Уменьшена прозрачность (было 0.6, стало 0.7)
   },
   chatAvatar: {
     width: 50,

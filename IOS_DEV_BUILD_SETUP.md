@@ -185,3 +185,5 @@ npx expo start --dev-client --tunnel
 eas build:list
 ```
 
+
+
