@@ -132,12 +132,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     let boundaries;
     if (Platform.OS === 'ios') {
       // Для iPhone используем границы от самых краев экрана (льда)
-      // В TestFlight сборке нужны большие отступы справа и снизу
+      // Используем те же значения, что работают в Expo Go
       boundaries = {
         leftOffset: -25, // Установлено -25px для отступа слева
         topOffset: -25, // Установлено -25px для отступа сверху
-        rightOffset: 50, // Увеличено для TestFlight (было 7) - предотвращает вылет справа
-        bottomOffset: 250 // Увеличено для TestFlight (было 218) - предотвращает вылет снизу
+        rightOffset: 7, // Значение из Expo Go
+        bottomOffset: 218 // Значение из Expo Go
       };
     } else if (Platform.OS === 'web') {
       // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
@@ -447,11 +447,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Жесткая система коллизий - шайбы не могут накладываться
           // Оптимизация: проверяем только близкие шайбы (квадрат расстояния быстрее чем sqrt)
           // ВАЖНО: Исправляем расчет минимального расстояния для столкновений
-          // puckSize = 70 - это диаметр шайбы
-          // Для столкновения двух шайб минимальное расстояние между центрами = диаметр = puckSize
-          // НО: если они накладываются друг на друга, увеличиваем расстояние столкновения
-          // Возвращаем полное расстояние столкновения, чтобы шайбы не накладывались
-          const minDistance = puckSize; // Используем полный диаметр для столкновений
+          // puckSize = 70 - это диаметр шайбы, радиус = 35
+          // В Expo Go используется радиус для расчета столкновений, чтобы шайбы не отталкивались слишком далеко
+          // Для соответствия Expo Go используем радиус вместо диаметра
+          const puckRadius = puckSize / 2; // Радиус шайбы = 35
+          // Используем радиус * 1.5 вместо диаметра для более мягких столкновений (как в Expo Go)
+          const minDistance = puckRadius * 1.5; // 35 * 1.5 = 52.5 (вместо 70)
           const minDistanceSq = minDistance ** 2;
           
           // Логирование настроек столкновений отключено для производительности
@@ -477,15 +478,16 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               //   console.log('💥 [PUCK PHYSICS] Collision detected:', {...});
               // }
               
-              // Агрессивная коррекция позиции: отталкиваем сразу на безопасное расстояние
-              const correctionDistance = (minDistance - distance) * 1.15; // Немного снижено для производительности
+              // Коррекция позиции: отталкиваем на безопасное расстояние (как в Expo Go)
+              // Уменьшаем коэффициент коррекции для соответствия Expo Go
+              const correctionDistance = (minDistance - distance) * 0.5; // Уменьшено с 1.15 до 0.5 для соответствия Expo Go
               newX += Math.cos(angle) * correctionDistance;
               newY += Math.sin(angle) * correctionDistance;
               
-              // Оптимизированная физика отталкивания - баланс между плавностью и производительностью
+              // Физика отталкивания - настройки для соответствия Expo Go
               const overlap = minDistance - distance;
-              // Сбалансированные коэффициенты для плавного движения
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.65 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 0.4 : 0.5));
+              // Уменьшаем силу отталкивания для соответствия Expo Go
+              const pushForce = overlap * (Platform.OS === 'ios' ? 0.3 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 0.2 : 0.25));
               
               // Оптимизированная передача импульса - баланс между реализмом и производительностью
               const currentSpeedSq = pos.vx * pos.vx + pos.vy * pos.vy;
