@@ -13,17 +13,17 @@ import {
     Animated
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import CachedAvatar from '../components/CachedAvatar';
+import CachedAvatar from '../../components/CachedAvatar';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam } from '../utils/playerStorage';
-import { supabase } from '../utils/supabase';
-import { useLanguage } from '../contexts/LanguageContext';
-import OptimizedBackground from '../components/OptimizedBackground';
-import { useScreenContext } from '../contexts/ScreenContext';
-import { useUser } from '../contexts/UserContext';
-import { forceGilroyFont } from '../utils/forceGilroyFont';
-import CachedBackground from '../components/CachedBackground';
+import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam } from '../../utils/playerStorage';
+import { supabase } from '../../utils/supabase';
+import { useLanguage } from '../../contexts/LanguageContext';
+import OptimizedBackground from '../../components/OptimizedBackground';
+import { useScreenContext } from '../../contexts/ScreenContext';
+import { useUser } from '../../contexts/UserContext';
+import { forceGilroyFont } from '../../utils/forceGilroyFont';
+import CachedBackground from '../../components/CachedBackground';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -734,7 +734,7 @@ export default function SearchScreen() {
       return (
         <View style={styles.container}>
           <CachedBackground
-            source={require('../assets/images/led.jpg')}
+            source={require('../../assets/images/led.jpg')}
             style={styles.backgroundImage}
             resizeMode="cover"
           >

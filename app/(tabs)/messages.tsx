@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
-import { useScreenContext } from '../contexts/ScreenContext';
+import { useScreenContext } from '../../contexts/ScreenContext';
 import {
     Alert,
     Image,
@@ -15,21 +15,21 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import CachedAvatar from '../components/CachedAvatar';
+import CachedAvatar from '../../components/CachedAvatar';
 // Убираем все анимации переходов
 import {
     getPlayerById,
     getUserConversations,
     Message,
     Player
-} from '../utils/playerStorage';
-import { useLanguage } from '../contexts/LanguageContext';
-import { supabase } from '../utils/supabase';
-import { useUser } from '../contexts/UserContext';
-import OptimizedBackground from '../components/OptimizedBackground';
-import CachedBackground from '../components/CachedBackground';
+} from '../../utils/playerStorage';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { supabase } from '../../utils/supabase';
+import { useUser } from '../../contexts/UserContext';
+import OptimizedBackground from '../../components/OptimizedBackground';
+import CachedBackground from '../../components/CachedBackground';
 
-const iceBg = require('../assets/images/led.jpg');
+const iceBg = require('../../assets/images/led.jpg');
 
 interface ChatPreview {
   player: Player;
