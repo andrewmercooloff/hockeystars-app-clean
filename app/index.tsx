@@ -132,11 +132,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     let boundaries;
     if (Platform.OS === 'ios') {
       // Для iPhone используем границы от самых краев экрана (льда)
+      // В TestFlight сборке нужны большие отступы справа и снизу
       boundaries = {
-        leftOffset: -5, // Уменьшено на 10px чтобы убрать лишний отступ слева
-        topOffset: -5, // Уменьшено на 10px чтобы убрать лишний отступ сверху
-        rightOffset: 5,
-        bottomOffset: 218 // Уменьшено на 7px чтобы шайбы долетали до нижней границы
+        leftOffset: -25, // Установлено -25px для отступа слева
+        topOffset: -25, // Установлено -25px для отступа сверху
+        rightOffset: 50, // Увеличено для TestFlight (было 7) - предотвращает вылет справа
+        bottomOffset: 250 // Увеличено для TestFlight (было 218) - предотвращает вылет снизу
       };
     } else if (Platform.OS === 'web') {
       // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
@@ -161,10 +162,21 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Центр шайбы не должен заходить дальше чем screen - offset - radius
     const wallMaxX = width - boundaries.rightOffset - puckSize / 2;
     const wallMaxY = height - boundaries.bottomOffset - puckSize / 2;
-    // Логирование границ отключено для производительности
-    // if (__DEV__) {
-    //   console.log('📐 [PUCK PHYSICS] Boundaries calculated:', {...});
-    // }
+    // Логирование границ для диагностики в production (если включены логи)
+    const enableLogsInProduction = typeof process !== 'undefined' &&
+      process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
+    if (enableLogsInProduction && Platform.OS === 'ios') {
+      console.log('📐 [PUCK PHYSICS] iOS Boundaries calculated:', {
+        width,
+        height,
+        puckSize,
+        boundaries,
+        wallMaxX,
+        wallMaxY,
+        rightOffset: boundaries.rightOffset,
+        bottomOffset: boundaries.bottomOffset
+      });
+    }
     
     return boundaries;
   }, [width, height, puckSize]);
