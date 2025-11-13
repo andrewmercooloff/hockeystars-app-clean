@@ -450,7 +450,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // puckSize = 70 - это диаметр шайбы, радиус = 35
           // В Expo Go используется радиус для расчета столкновений, чтобы шайбы не отталкивались слишком далеко
           // Для соответствия Expo Go используем радиус вместо диаметра
-          const puckRadius = puckSize / 2; // Радиус шайбы = 35
+          // puckRadius уже объявлен выше (строка 347), используем его
           // Используем радиус * 1.5 вместо диаметра для более мягких столкновений (как в Expo Go)
           const minDistance = puckRadius * 1.5; // 35 * 1.5 = 52.5 (вместо 70)
           const minDistanceSq = minDistance ** 2;
