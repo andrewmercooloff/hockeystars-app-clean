@@ -21,20 +21,20 @@ import { Vibration } from 'react-native';
 import Animated, {
   useAnimatedStyle
 } from 'react-native-reanimated';
-import CountryFilter from '../../components/CountryFilter';
-import YearFilter from '../../components/YearFilter';
-import { useCountryFilter } from '../../utils/CountryFilterContext';
-import { useYearFilter } from '../../utils/YearFilterContext';
-import { countryCodeToCountryName, detectCountryFromIP } from '../../utils/countryUtils';
-import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection, clearAllPlayersCache } from '../../utils/playerStorage';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useScreenContext } from '../../contexts/ScreenContext';
-import { useUser } from '../../contexts/UserContext';
+import CountryFilter from '../components/CountryFilter';
+import YearFilter from '../components/YearFilter';
+import { useCountryFilter } from '../utils/CountryFilterContext';
+import { useYearFilter } from '../utils/YearFilterContext';
+import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryUtils';
+import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection, clearAllPlayersCache } from '../utils/playerStorage';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
+import { useUser } from '../contexts/UserContext';
 import NetInfo from '@react-native-community/netinfo';
-import { forceGilroyFont } from '../../utils/forceGilroyFont';
-import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
+import { forceGilroyFont } from '../utils/forceGilroyFont';
+import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 // Lazy load Puck component to improve initial render performance
-const Puck = React.lazy(() => import('../../components/Puck'));
+const Puck = React.lazy(() => import('../components/Puck'));
 
 const { width, height } = Dimensions.get('window');
 
@@ -130,15 +130,15 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   // Мемоизируем границы, чтобы они не пересчитывались постоянно
   const boundaries = useMemo(() => {
     let boundaries;
-      if (Platform.OS === 'ios') {
-        // Для iPhone используем границы от самых краев экрана (льда)
+    if (Platform.OS === 'ios') {
+      // Для iPhone используем границы от самых краев экрана (льда)
         // Используем те же значения, что работают в Expo Go
         boundaries = {
           leftOffset: -25, // Установлено -25px для отступа слева
           topOffset: -25, // Установлено -25px для отступа сверху
           rightOffset: 7, // Значение из Expo Go
           bottomOffset: 218 // Значение из Expo Go
-        };
+      };
     } else if (Platform.OS === 'web') {
       // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
       boundaries = {

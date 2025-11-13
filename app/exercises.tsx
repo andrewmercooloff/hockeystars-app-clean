@@ -12,13 +12,13 @@ import {
     ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { loadCurrentUser } from '../../utils/playerStorage';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useScreenContext } from '../../contexts/ScreenContext';
-import { useExercises } from '../../hooks/useExercises';
-import { LocalizedExercise, Language } from '../../types/exercise';
+import { loadCurrentUser } from '../utils/playerStorage';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useScreenContext } from '../contexts/ScreenContext';
+import { useExercises } from '../hooks/useExercises';
+import { LocalizedExercise, Language } from '../types/exercise';
 
-const iceBg = require('../../assets/images/led.jpg');
+const iceBg = require('../assets/images/led.jpg');
 
 const { width } = Dimensions.get('window');
 

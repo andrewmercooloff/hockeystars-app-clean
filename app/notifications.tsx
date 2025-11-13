@@ -13,40 +13,40 @@ import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import StatsChangeNotification from '../../components/StatsChangeNotification';
-import PhotoAddedNotification from '../../components/PhotoAddedNotification';
-import FriendshipNotification from '../../components/FriendshipNotification';
-import ExerciseNotification from '../../components/ExerciseNotification';
-import GiftReceivedNotification from '../../components/GiftReceivedNotification';
-import FriendRequestNotification from '../../components/FriendRequestNotification';
-import GiftRequestNotification from '../../components/GiftRequestNotification';
-import GiftAcceptedNotification from '../../components/GiftAcceptedNotification';
-import VideoAddedNotification from '../../components/VideoAddedNotification';
-import AvatarChangedNotification from '../../components/AvatarChangedNotification';
-import AchievementAddedNotification from '../../components/AchievementAddedNotification';
-import PuckSpeedChangedNotification from '../../components/PuckSpeedChangedNotification';
-import PhysicalDataChangedNotification from '../../components/PhysicalDataChangedNotification';
-import FriendAcceptedNotification from '../../components/FriendAcceptedNotification';
-import FriendGiftReceivedNotification from '../../components/FriendGiftReceivedNotification';
-import LikeNotification from '../../components/LikeNotification';
-import CachedAvatar from '../../components/CachedAvatar';
+import StatsChangeNotification from '../components/StatsChangeNotification';
+import PhotoAddedNotification from '../components/PhotoAddedNotification';
+import FriendshipNotification from '../components/FriendshipNotification';
+import ExerciseNotification from '../components/ExerciseNotification';
+import GiftReceivedNotification from '../components/GiftReceivedNotification';
+import FriendRequestNotification from '../components/FriendRequestNotification';
+import GiftRequestNotification from '../components/GiftRequestNotification';
+import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
+import VideoAddedNotification from '../components/VideoAddedNotification';
+import AvatarChangedNotification from '../components/AvatarChangedNotification';
+import AchievementAddedNotification from '../components/AchievementAddedNotification';
+import PuckSpeedChangedNotification from '../components/PuckSpeedChangedNotification';
+import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
+import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
+import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
+import LikeNotification from '../components/LikeNotification';
+import CachedAvatar from '../components/CachedAvatar';
 import {
     acceptFriendRequest,
     declineFriendRequest,
     getReceivedFriendRequests,
     loadNotifications,
     markNotificationAsRead
-} from '../../utils/playerStorage';
-import { supabase } from '../../utils/supabase';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useNotificationContext } from '../../contexts/NotificationContext';
-import { useScreenContext } from '../../contexts/ScreenContext';
-import { useUser } from '../../contexts/UserContext';
-import OptimizedBackground from '../../components/OptimizedBackground';
-import { preloadPlayerAvatars } from '../../utils/AvatarCache';
-import CachedBackground from '../../components/CachedBackground';
+} from '../utils/playerStorage';
+import { supabase } from '../utils/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useNotificationContext } from '../contexts/NotificationContext';
+import { useScreenContext } from '../contexts/ScreenContext';
+import { useUser } from '../contexts/UserContext';
+import OptimizedBackground from '../components/OptimizedBackground';
+import { preloadPlayerAvatars } from '../utils/AvatarCache';
+import CachedBackground from '../components/CachedBackground';
 
-const iceBg = require('../../assets/images/led.jpg');
+const iceBg = require('../assets/images/led.jpg');
 
 // Мемоизированный компонент для элемента уведомления
 const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete, currentUserId }: {
