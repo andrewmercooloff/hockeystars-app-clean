@@ -57,8 +57,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const isFilterChange = isInitializedRef.current && previousPlayerIds !== currentPlayerIds;
     
     // При смене фильтра используем меньшую скорость и сбрасываем скорости для плавного перехода
-    // Снижаем скорость на 30%: обычная скорость 0.7, при смене фильтра 0.49 (0.7 * 0.7)
-    const speedMultiplier = isFilterChange ? 0.49 : 0.7;
+    // Снижаем скорость на 50%: обычная скорость 0.7, при смене фильтра 0.35 (0.7 * 0.5)
+    const speedMultiplier = isFilterChange ? 0.35 : 0.7;
 
            const positions: PuckPosition[] = players.map(player => ({
             id: player.id,
@@ -198,6 +198,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 const separationForce = overlap * 0.9;
                 vx += Math.cos(angle) * separationForce;
                 vy += Math.sin(angle) * separationForce;
+
+                // Уменьшаем скорость на 30% после столкновения
+                vx *= 0.7;
+                vy *= 0.7;
 
                 if (currentUserId && pos.id === currentUserId) {
                   collisionDetectedRef.current = true;
@@ -599,20 +603,20 @@ const OriginalPuckAnimator = React.memo(({
         const pixelsPerMsY = totalDy / totalTime;
         const frameTime = 16; // миллисекунды на кадр
         // Увеличиваем скорость при отпускании для более энергичного движения
-        const speedMultiplier = 1.5; // Увеличиваем скорость в 1.5 раза
+        const speedMultiplier = 2.5; // Увеличиваем скорость в 2.5 раза для более энергичного движения
         finalVx = pixelsPerMsX * frameTime * speedMultiplier;
         finalVy = pixelsPerMsY * frameTime * speedMultiplier;
       } else {
         // Если истории недостаточно, используем последнюю сохраненную скорость
         // Компенсируем коэффициент 0.4, который был применен при вычислении
         // Увеличиваем скорость при отпускании для более энергичного движения
-        const speedMultiplier = 1.5; // Увеличиваем скорость в 1.5 раза
+        const speedMultiplier = 2.5; // Увеличиваем скорость в 2.5 раза для более энергичного движения
         finalVx = (lastDragVelocityRef.current.vx / 0.4) * speedMultiplier;
         finalVy = (lastDragVelocityRef.current.vy / 0.4) * speedMultiplier;
       }
 
       // Увеличиваем максимальную скорость при отпускании для более энергичного движения
-      const maxReleaseSpeed = 4.5; // Увеличено с 3.0 для более быстрого движения при отпускании
+      const maxReleaseSpeed = 8.0; // Увеличено для более быстрого и естественного движения при отпускании
       const releaseSpeed = Math.sqrt(finalVx * finalVx + finalVy * finalVy);
       if (releaseSpeed > maxReleaseSpeed) {
         const speedRatio = maxReleaseSpeed / releaseSpeed;
