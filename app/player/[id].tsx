@@ -1,3 +1,6 @@
+// КРИТИЧЕСКИЙ ЛОГ - должен появиться ДО всех импортов
+(console as any).log('🔍 [ROUTES DEBUG] app/player/[id].tsx - ФАЙЛ НАЧИНАЕТ ЗАГРУЗКУ');
+
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';

@@ -1,3 +1,6 @@
+// КРИТИЧЕСКИЙ ЛОГ - должен появиться ДО всех импортов
+(console as any).log('🔍 [ROUTES DEBUG] app/puck-speed-sound.tsx - ФАЙЛ НАЧИНАЕТ ЗАГРУЗКУ');
+
 /**
  * ИЗМЕРЕНИЕ СКОРОСТИ ШАЙБЫ ПО ЗВУКУ
  * 
@@ -33,8 +36,8 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
-// Пробуем разные способы импорта для совместимости с production
-import AudioRecorderPlayerModule from 'react-native-audio-recorder-player';
+// Динамический импорт для react-native-audio-recorder-player (только для нативных платформ)
+// Не импортируем на web, чтобы избежать ошибок
 import CachedBackground from '../components/CachedBackground';
 import { savePuckSpeedResult, getPlayerById } from '../utils/playerStorage';
 import { useUser } from '../contexts/UserContext';
@@ -85,6 +88,7 @@ export default function PuckSpeedSoundScreen() {
   const expoAVRecordingRef = useRef<Audio.Recording | null>(null); // Fallback на expo-av
   const useExpoAVRef = useRef<boolean>(false); // Флаг использования expo-av вместо AudioRecorderPlayer
   const expoAVMeteringIntervalRef = useRef<NodeJS.Timeout | null>(null); // Интервал для опроса метеринга expo-av
+  const callbackCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Timeout для проверки callback AudioRecorderPlayer
   
   const isAnalyzingRef = useRef(false);
   const soundEventsRef = useRef<SoundEvent[]>([]); // Ref для синхронного доступа
@@ -355,15 +359,18 @@ export default function PuckSpeedSoundScreen() {
 
   // Инициализация AudioRecorderPlayer для iOS
   useEffect(() => {
-    if (!isIOS || !hasPermission) return;
+    if (!isIOS || !hasPermission || isWeb) return;
 
     const initializeIOSAudio = async () => {
       try {
         const logMsg = '🔧 [iOS] Инициализируем AudioRecorderPlayer...';
         console.log(logMsg);
         
+        // Динамический импорт только для нативных платформ (не web)
+        const AudioRecorderPlayerModule = await import('react-native-audio-recorder-player');
+        
         // Проверяем, как экспортируется модуль в production
-        const AudioRecorderPlayer = AudioRecorderPlayerModule;
+        const AudioRecorderPlayer = AudioRecorderPlayerModule.default || AudioRecorderPlayerModule;
         console.log('📦 [iOS] Тип AudioRecorderPlayerModule:', typeof AudioRecorderPlayerModule);
         console.log('📦 [iOS] AudioRecorderPlayerModule:', AudioRecorderPlayerModule);
         console.log('📦 [iOS] AudioRecorderPlayerModule.default:', AudioRecorderPlayerModule.default);
@@ -372,26 +379,26 @@ export default function PuckSpeedSoundScreen() {
         let audioRecorderPlayer: any = null;
         
         // Пробуем разные способы создания экземпляра
-        if (typeof AudioRecorderPlayerModule === 'function') {
+        if (typeof AudioRecorderPlayer === 'function') {
           // Если это функция/класс, создаем через new
           console.log('✅ [iOS] AudioRecorderPlayerModule - это функция, создаем через new');
-          audioRecorderPlayer = new AudioRecorderPlayerModule();
-        } else if (AudioRecorderPlayerModule && typeof AudioRecorderPlayerModule === 'object') {
+          audioRecorderPlayer = new AudioRecorderPlayer();
+        } else if (AudioRecorderPlayer && typeof AudioRecorderPlayer === 'object') {
           // Если это объект, проверяем default
-          if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'function') {
+          if (AudioRecorderPlayer.default && typeof AudioRecorderPlayer.default === 'function') {
             console.log('✅ [iOS] Используем AudioRecorderPlayerModule.default как функцию');
-            audioRecorderPlayer = new AudioRecorderPlayerModule.default();
-          } else if (AudioRecorderPlayerModule.default && typeof AudioRecorderPlayerModule.default === 'object') {
+            audioRecorderPlayer = new AudioRecorderPlayer.default();
+          } else if (AudioRecorderPlayer.default && typeof AudioRecorderPlayer.default === 'object') {
             // Возможно, default уже является экземпляром
             console.log('✅ [iOS] AudioRecorderPlayerModule.default - это объект, используем напрямую');
-            audioRecorderPlayer = AudioRecorderPlayerModule.default;
+            audioRecorderPlayer = AudioRecorderPlayer.default;
           } else {
             // Возможно, сам модуль уже является экземпляром
             console.log('✅ [iOS] AudioRecorderPlayerModule - это объект, используем напрямую');
-            audioRecorderPlayer = AudioRecorderPlayerModule;
+            audioRecorderPlayer = AudioRecorderPlayer;
           }
         } else {
-          throw new Error(`Неожиданный тип AudioRecorderPlayerModule: ${typeof AudioRecorderPlayerModule}`);
+          throw new Error(`Неожиданный тип AudioRecorderPlayerModule: ${typeof AudioRecorderPlayer}`);
         }
         
         // Проверяем, что у объекта есть нужные методы
@@ -435,7 +442,7 @@ export default function PuckSpeedSoundScreen() {
         soundTimeoutRef.current = null;
       }
     };
-  }, [isIOS, hasPermission]);
+  }, [isIOS, hasPermission, isWeb]);
 
   // Обновляем ref при изменении soundEvents
   useEffect(() => {
@@ -896,7 +903,9 @@ export default function PuckSpeedSoundScreen() {
           const errorMsg = '❌ [iOS] AudioRecorderPlayer не инициализирован, переключаемся на expo-av';
           console.error(errorMsg);
           useExpoAVRef.current = true;
-          startExpoAVRecording();
+          startExpoAVRecording().catch((error) => {
+            console.error('❌ [iOS] Ошибка при переключении на expo-av:', error);
+          });
           return;
         }
 
@@ -988,7 +997,6 @@ export default function PuckSpeedSoundScreen() {
         console.log(listenerMsg);
         
         let callbackCallCount = 0;
-        let callbackCheckTimeoutRef: NodeJS.Timeout | null = null;
         
         const recordBackListener = audioRecorderPlayer.addRecordBackListener((e: any) => {
           callbackCallCount++;
@@ -1156,7 +1164,12 @@ export default function PuckSpeedSoundScreen() {
         
         // Проверяем, что listener действительно добавлен
         // Если callback не вызывается в течение 3 секунд, переключаемся на expo-av
-        callbackCheckTimeoutRef = setTimeout(() => {
+        // В production сборке callback часто не работает, но в development может быть небольшая задержка
+        if (callbackCheckTimeoutRef.current) {
+          clearTimeout(callbackCheckTimeoutRef.current);
+        }
+        callbackCheckTimeoutRef.current = setTimeout(() => {
+          callbackCheckTimeoutRef.current = null;
           if (callbackCallCount === 0) {
             console.error('❌ [iOS] КРИТИЧНО: Callback не вызывается! Метеринг не работает.');
             console.error('❌ [iOS] Переключаемся на expo-av как fallback...');
@@ -1168,6 +1181,7 @@ export default function PuckSpeedSoundScreen() {
               }
               if (recordBackListenerRef.current) {
                 audioRecorderPlayerRef.current?.removeRecordBackListener?.(recordBackListenerRef.current);
+                recordBackListenerRef.current = null;
               }
             } catch (e) {
               console.warn('⚠️ [iOS] Ошибка при остановке AudioRecorderPlayer:', e);
@@ -1175,11 +1189,13 @@ export default function PuckSpeedSoundScreen() {
             
             // Переключаемся на expo-av
             useExpoAVRef.current = true;
-            startExpoAVRecording();
+            startExpoAVRecording().catch((error) => {
+              console.error('❌ [iOS] Ошибка при переключении на expo-av:', error);
+            });
           } else {
-            console.log(`✅ [iOS] Callback работает! Вызван ${callbackCallCount} раз за первые 2 секунды`);
+            console.log(`✅ [iOS] Callback работает! Вызван ${callbackCallCount} раз за первые 3 секунды`);
           }
-        }, 3000);
+        }, 3000); // 3 секунды - достаточно для development, но быстро для production fallback
         const listenerAddedMsg = '✅ [iOS] Слушатель добавлен, ожидаем данные...';
         console.log(listenerAddedMsg);
         // setDebugLogs(prev => [...prev.slice(-9), listenerAddedMsg]);
@@ -1194,16 +1210,14 @@ export default function PuckSpeedSoundScreen() {
         // Если AudioRecorderPlayer не работает, пробуем expo-av
         console.error('❌ [iOS] AudioRecorderPlayer не работает, переключаемся на expo-av...');
         useExpoAVRef.current = true;
-        try {
-          startExpoAVRecording();
-        } catch (expoAVError) {
+        startExpoAVRecording().catch((expoAVError) => {
           console.error('❌ [iOS] И expo-av не работает:', expoAVError);
           Alert.alert(
             'Ошибка записи',
             `Не удалось запустить запись звука: ${error instanceof Error ? error.message : String(error)}. Проверьте разрешения на микрофон в настройках.`
           );
           isAnalyzingRef.current = false;
-        }
+        });
       }
     };
 
@@ -1211,6 +1225,12 @@ export default function PuckSpeedSoundScreen() {
 
     return () => {
       isAnalyzingRef.current = false;
+      
+      // Очищаем timeout проверки callback
+      if (callbackCheckTimeoutRef.current) {
+        clearTimeout(callbackCheckTimeoutRef.current);
+        callbackCheckTimeoutRef.current = null;
+      }
       
       // Останавливаем expo-av, если используется
       if (useExpoAVRef.current && expoAVMeteringIntervalRef.current) {
@@ -1257,14 +1277,26 @@ export default function PuckSpeedSoundScreen() {
           animationFrameRef.current = null;
         }
         
-        // Для веб-версии: закрываем аудио контекст
-        if (audioContextRef.current) {
-          audioContextRef.current.close().catch(() => {});
-          audioContextRef.current = null;
+        // Для веб-версии: останавливаем поток микрофона и закрываем аудио контекст
+        if (isWeb) {
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+          }
+          if (audioContextRef.current) {
+            audioContextRef.current.close().catch(() => {});
+            audioContextRef.current = null;
+          }
         }
         
         // Для iOS: останавливаем запись и удаляем слушатель
         if (isIOS) {
+          // Очищаем timeout проверки callback
+          if (callbackCheckTimeoutRef.current) {
+            clearTimeout(callbackCheckTimeoutRef.current);
+            callbackCheckTimeoutRef.current = null;
+          }
+          
           // Останавливаем expo-av, если используется
           if (useExpoAVRef.current) {
             if (expoAVMeteringIntervalRef.current) {
@@ -1300,7 +1332,7 @@ export default function PuckSpeedSoundScreen() {
         lastSoundDetectionTimeRef.current = 0;
         lastSpeedCalculationTimeRef.current = 0;
       };
-    }, [isIOS])
+    }, [isIOS, isWeb])
   );
 
   // Cleanup: останавливаем микрофон и анализ при размонтировании компонента
@@ -1318,26 +1350,51 @@ export default function PuckSpeedSoundScreen() {
         animationFrameRef.current = null;
       }
       
-      // Для веб-версии: закрываем аудио контекст
-      if (audioContextRef.current) {
-        audioContextRef.current.close().catch(() => {});
-        audioContextRef.current = null;
+      // Для веб-версии: останавливаем поток микрофона и закрываем аудио контекст
+      if (isWeb) {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        if (audioContextRef.current) {
+          audioContextRef.current.close().catch(() => {});
+          audioContextRef.current = null;
+        }
       }
       
       // Для iOS: останавливаем запись и удаляем слушатель
-      if (isIOS && audioRecorderPlayerRef.current) {
-        // Удаляем слушатель
-        if (recordBackListenerRef.current) {
-          try {
-            (audioRecorderPlayerRef.current as any).removeRecordBackListener(recordBackListenerRef.current);
-          } catch (e) {
-            // Игнорируем ошибки
-          }
-          recordBackListenerRef.current = null;
+      if (isIOS) {
+        // Очищаем timeout проверки callback
+        if (callbackCheckTimeoutRef.current) {
+          clearTimeout(callbackCheckTimeoutRef.current);
+          callbackCheckTimeoutRef.current = null;
         }
         
-        // Останавливаем запись
-        audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+        // Останавливаем expo-av, если используется
+        if (useExpoAVRef.current) {
+          if (expoAVMeteringIntervalRef.current) {
+            clearInterval(expoAVMeteringIntervalRef.current);
+            expoAVMeteringIntervalRef.current = null;
+          }
+          if (expoAVRecordingRef.current) {
+            expoAVRecordingRef.current.stopAndUnloadAsync().catch(() => {});
+            expoAVRecordingRef.current = null;
+          }
+          useExpoAVRef.current = false;
+        } else if (audioRecorderPlayerRef.current) {
+          // Удаляем слушатель
+          if (recordBackListenerRef.current) {
+            try {
+              (audioRecorderPlayerRef.current as any).removeRecordBackListener(recordBackListenerRef.current);
+            } catch (e) {
+              // Игнорируем ошибки
+            }
+            recordBackListenerRef.current = null;
+          }
+          
+          // Останавливаем запись
+          audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+        }
       }
       
       // Сбрасываем состояние

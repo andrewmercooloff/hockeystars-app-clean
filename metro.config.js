@@ -14,6 +14,11 @@ module.exports = (() => {
     ...resolver,
     assetExts: resolver.assetExts.filter(ext => ext !== 'svg'),
     sourceExts: [...resolver.sourceExts, 'svg'],
+    // Игнорируем нативные модули на web
+    blockList: [
+      // Игнорируем react-native-audio-recorder-player на web
+      /react-native-audio-recorder-player\/.*\.(native|ios|android)\.(js|ts|tsx)$/,
+    ],
   };
 
   // Добавляем настройки для корректной работы с Expo

@@ -1,51 +1,450 @@
-
-import '../utils/logSilencer';
-
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import {
-  AppState,
-  Dimensions,
-  ImageBackground,
-  Modal,
-  PixelRatio,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
+import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { Vibration } from 'react-native';
-import Animated, {
-  useAnimatedStyle
-} from 'react-native-reanimated';
+import Puck from '../components/Puck';
+import { useUser } from '../contexts/UserContext';
+import { useScreenContext } from '../contexts/ScreenContext';
+import { Player, loadPlayers, getSmartPlayerSelection } from '../utils/playerStorage';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
-import { countryCodeToCountryName, detectCountryFromIP } from '../utils/countryUtils';
-import { Player, checkDatabaseStatus, fixCorruptedData, initializeStorage, loadCurrentUser, loadPlayers, getSmartPlayerSelection, clearAllPlayersCache } from '../utils/playerStorage';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useScreenContext } from '../contexts/ScreenContext';
-import { useUser } from '../contexts/UserContext';
-import NetInfo from '@react-native-community/netinfo';
-import { forceGilroyFont } from '../utils/forceGilroyFont';
-import { dataCache, CACHE_KEYS } from '../utils/DataCache';
-// Lazy load Puck component to improve initial render performance
-const Puck = React.lazy(() => import('../components/Puck'));
 
-const { width, height } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-// Диагностическое логирование размеров экрана (отключено для производительности)
-// Раскомментируйте при необходимости отладки
-// const windowDims = Dimensions.get('window');
-// const screenDims = Dimensions.get('screen');
-// const pixelRatio = PixelRatio.get();
-// const fontScale = PixelRatio.getFontScale();
-// console.log('📐 [PUCK PHYSICS] Screen dimensions initialized:', {...});
+// Размер шайбы
+const PUCK_SIZE = 70;
 
+// Упрощенная версия usePuckCollisionSystem для тестового экрана
+const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string, screenWidth?: number, screenHeight?: number) => {
+  const puckSize = 70;
+  const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
+  const animationRef = useRef<any>(null);
+  const collisionDetectedRef = useRef(false);
+  const lastHapticTimeRef = useRef(0);
+  const isInitializedRef = useRef(false);
+  const previousPlayersRef = useRef<Player[]>([]);
+  const wasInBackgroundRef = useRef(false);
+  const backgroundReturnFramesRef = useRef(0);
+  const cachedPositionsRef = useRef<PuckPosition[]>([]);
+
+  const windowDimensions = Dimensions.get('window');
+  const width = screenWidth ?? windowDimensions.width;
+  const height = screenHeight ?? windowDimensions.height;
+
+  const boundaries = useMemo(() => ({
+    left: 10, // Отступ 10 пикселей слева
+    top: 10, // Отступ 10 пикселей сверху
+    right: width - puckSize - 10, // Отступ 10 пикселей справа
+    bottom: height - 200 - puckSize - 15, // Вычитаем место для таб-бара и отступ 15 пикселей снизу
+  }), [width, height, puckSize]);
+
+  // Инициализация позиций
+  useEffect(() => {
+    if (players.length === 0) {
+      setPuckPositions([]);
+      return;
+    }
+
+    // Определяем, это первая инициализация или смена фильтра
+    const isFirstInit = !isInitializedRef.current;
+    // Проверяем, изменился ли список игроков (сравниваем по ID)
+    const previousPlayerIds = previousPlayersRef.current.map(p => p.id).sort().join(',');
+    const currentPlayerIds = players.map(p => p.id).sort().join(',');
+    const isFilterChange = isInitializedRef.current && previousPlayerIds !== currentPlayerIds;
+    
+    // При смене фильтра используем меньшую скорость и сбрасываем скорости для плавного перехода
+    // Снижаем скорость на 30%: обычная скорость 0.7, при смене фильтра 0.49 (0.7 * 0.7)
+    const speedMultiplier = isFilterChange ? 0.49 : 0.7;
+
+           const positions: PuckPosition[] = players.map(player => ({
+            id: player.id,
+             x: Math.random() * (boundaries.right - boundaries.left - 100) + boundaries.left + 50,
+             y: Math.random() * (boundaries.bottom - boundaries.top - 100) + boundaries.top + 50,
+      vx: (Math.random() - 0.5) * speedMultiplier,
+      vy: (Math.random() - 0.5) * speedMultiplier,
+            size: puckSize,
+             isDragging: false,
+           }));
+
+    setPuckPositions(positions);
+    // Кэшируем начальные позиции
+    cachedPositionsRef.current = positions;
+    isInitializedRef.current = true; // Отмечаем, что инициализация произошла
+    previousPlayersRef.current = players; // Сохраняем текущий список игроков
+  }, [players, boundaries]);
+
+  // Анимационный цикл - отключен при большом количестве шайб для производительности
+  useEffect(() => {
+    if (puckPositions.length === 0) return;
+
+    // Для большого количества шайб используем упрощенную анимацию
+    const isHighLoad = puckPositions.length > 20;
+
+    // Адаптивный интервал: реже обновляем при большом количестве шайб
+    const interval = isHighLoad ? 20 : 12;
+
+    // Очищаем предыдущий интервал, если он существует
+    if (animationRef.current) {
+      clearInterval(animationRef.current);
+    }
+
+    animationRef.current = setInterval(() => {
+      setPuckPositions(currentPositions => {
+        // Проверяем, есть ли шайбы для обновления (не все в drag)
+        const hasNonDraggingPucks = currentPositions.some(p => !p.isDragging);
+        if (!hasNonDraggingPucks) {
+          return currentPositions; // Если все в drag, просто возвращаем текущие позиции
+        }
+
+        const updatedPositions = currentPositions.map(pos => {
+          // Пропускаем шайбы, которые перетаскиваются (они обновляются через updatePuckPosition)
+          if (pos.isDragging) {
+            return pos;
+          }
+
+          let { x, y, vx, vy } = pos;
+
+          // Оптимизация возврата из фона - пропускаем коллизии на 3 кадра для быстрого восстановления
+          const skipCollisions = backgroundReturnFramesRef.current > 0;
+          if (skipCollisions) {
+            backgroundReturnFramesRef.current--;
+          }
+
+          // Для большого количества шайб упрощаем физику
+          const simplifiedPhysics = isHighLoad;
+
+          // Шайбы никогда не останавливаются полностью - поддерживаем минимальную скорость
+          if (!simplifiedPhysics) {
+            const minSpeed = 0.8;
+            const currentSpeed = Math.sqrt(vx * vx + vy * vy);
+
+            if (currentSpeed < minSpeed) {
+              if (currentSpeed > 0.001) {
+                const speedRatio = minSpeed / currentSpeed;
+                vx *= speedRatio;
+                vy *= speedRatio;
+              } else {
+                const randomAngle = Math.random() * Math.PI * 2;
+                vx = Math.cos(randomAngle) * minSpeed;
+                vy = Math.sin(randomAngle) * minSpeed;
+              }
+            }
+          }
+
+          x += vx;
+          y += vy;
+
+          // Проверяем границы
+          if (x <= boundaries.left) {
+            x = boundaries.left;
+            vx = Math.abs(vx) * (simplifiedPhysics ? 1.0 : 1.02);
+          } else if (x >= boundaries.right) {
+            x = boundaries.right;
+            vx = -Math.abs(vx) * (simplifiedPhysics ? 1.0 : 1.02);
+          }
+
+          if (y <= boundaries.top) {
+            y = boundaries.top;
+            vy = Math.abs(vy) * (simplifiedPhysics ? 1.0 : 1.02);
+          } else if (y >= boundaries.bottom) {
+            y = boundaries.bottom;
+            vy = -Math.abs(vy) * (simplifiedPhysics ? 1.0 : 1.02);
+          }
+
+          // Коллизии включены для небольшого количества шайб
+          if (!skipCollisions) {
+            const maxCollisionsToCheck = 8;
+            const minDistanceSquared = puckSize * puckSize;
+
+            let collisionsChecked = 0;
+            currentPositions.forEach(otherPos => {
+              if (otherPos.id === pos.id || pos.isDragging || otherPos.isDragging) return;
+              if (collisionsChecked >= maxCollisionsToCheck) return;
+
+              const dx = x - otherPos.x;
+              const dy = y - otherPos.y;
+              const distanceSquared = dx * dx + dy * dy;
+
+              if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
+                collisionsChecked++;
+                const distance = Math.sqrt(distanceSquared);
+                const angle = Math.atan2(dy, dx);
+                const minDistance = puckSize;
+                const overlap = minDistance - distance;
+
+                const pushDistance = overlap * 0.5;
+                x += Math.cos(angle) * pushDistance;
+                y += Math.sin(angle) * pushDistance;
+
+                const relativeVx = vx - otherPos.vx;
+                const relativeVy = vy - otherPos.vy;
+                const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+
+                if (dotProduct < 0) {
+                  const restitution = 0.8;
+                  const impulse = dotProduct * restitution;
+                  vx -= impulse * Math.cos(angle);
+                  vy -= impulse * Math.sin(angle);
+
+                  const collisionBoost = 0.6;
+                  vx += Math.cos(angle) * collisionBoost;
+                  vy += Math.sin(angle) * collisionBoost;
+                }
+
+                const separationForce = overlap * 0.9;
+                vx += Math.cos(angle) * separationForce;
+                vy += Math.sin(angle) * separationForce;
+
+                if (currentUserId && pos.id === currentUserId) {
+                  collisionDetectedRef.current = true;
+                }
+              }
+            });
+          }
+          
+          // Финальная проверка границ
+          x = Math.max(boundaries.left, Math.min(boundaries.right, x));
+          y = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
+
+          // При упрощенной физике пропускаем трение и ограничение скорости
+          if (!simplifiedPhysics) {
+            const friction = 0.999;
+            vx *= friction;
+            vy *= friction;
+
+            const maxSpeed = 3.0;
+            const currentSpeedLimit = Math.sqrt(vx * vx + vy * vy);
+            if (currentSpeedLimit > maxSpeed) {
+              const speedRatio = maxSpeed / currentSpeedLimit;
+              vx *= speedRatio;
+              vy *= speedRatio;
+            }
+          }
+
+          return { ...pos, x, y, vx, vy };
+        });
+
+        // Всегда обновляем кэш для надежности
+        cachedPositionsRef.current = updatedPositions;
+
+        return updatedPositions;
+      });
+    }, interval);
+
+    // Отслеживаем переход в фон для кэширования состояния (только для мобильных платформ)
+    // На веб AppState не используется, так как нет концепции фонового режима
+    let appStateSubscription: { remove: () => void } | null = null;
+    
+    // Используем только на мобильных платформах, полностью исключаем на веб
+    // Ранний return для веб-платформы, чтобы Metro bundler не пытался разрешить require('react-native')
+    if (Platform.OS === 'web') {
+      // На веб не используем AppState, просто пропускаем этот блок
+    } else {
+      // Только для iOS и Android
+      try {
+        // Используем проверку доступности модуля через typeof для избежания проблем на веб
+        let AppStateModule: any = null;
+        try {
+          // Пытаемся получить AppState только если мы не на веб-платформе
+          if (typeof require !== 'undefined') {
+            const ReactNative = require('react-native');
+            AppStateModule = ReactNative?.AppState;
+          }
+        } catch (e) {
+          // Игнорируем ошибки при загрузке модуля
+        }
+        
+        if (AppStateModule) {
+          appStateSubscription = AppStateModule.addEventListener('change', (nextAppState: string) => {
+            if (nextAppState.match(/inactive|background/)) {
+              // Сохраняем текущее состояние при уходе в фон
+              wasInBackgroundRef.current = true;
+              cachedPositionsRef.current = [...puckPositions];
+            } else if (nextAppState === 'active' && wasInBackgroundRef.current) {
+              // Возвращаемся из фона - сразу восстанавливаем позиции из кэша для мгновенного отображения
+              if (cachedPositionsRef.current.length > 0) {
+                setPuckPositions(cachedPositionsRef.current);
+              }
+              // Пропускаем коллизии на несколько кадров для быстрого восстановления
+              backgroundReturnFramesRef.current = 3; // Уменьшено с 5 до 3 для более быстрого восстановления
+              wasInBackgroundRef.current = false;
+            }
+          });
+        }
+      } catch (e) {
+        // AppState недоступен, игнорируем
+      }
+    }
+
+    return () => {
+      if (animationRef.current) {
+        clearInterval(animationRef.current);
+        animationRef.current = null;
+      }
+      appStateSubscription?.remove();
+    };
+  }, [puckPositions.length, boundaries, currentUserId]); // Добавили currentUserId для вибрации
+
+  // Обработка вибрации при столкновениях (отдельный эффект)
+  // Вибрация работает только на главном экране и только для текущего пользователя
+  useEffect(() => {
+    if (collisionDetectedRef.current && currentScreen === 'home' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+      const now = Date.now();
+      const timeDiff = now - lastHapticTimeRef.current;
+      if (timeDiff > 100) {
+        lastHapticTimeRef.current = now;
+        
+        // Легкая вибрация для столкновений шайб
+        if (Platform.OS === 'ios') {
+          try {
+            // Используем легкую вибрацию для iOS
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          } catch (error) {
+            // Если не сработало, пробуем Vibration
+            try {
+              Vibration.vibrate(30); // Короткая легкая вибрация
+            } catch (vibError) {
+              // Игнорируем ошибки
+            }
+          }
+        } else {
+          // Для Android используем короткую легкую вибрацию
+          try {
+            Vibration.vibrate(30);
+          } catch (vibError) {
+            // Игнорируем ошибки
+          }
+        }
+      }
+      // Сбрасываем флаг после проверки
+      collisionDetectedRef.current = false;
+    } else if (collisionDetectedRef.current) {
+      // Сбрасываем флаг, если не на главном экране
+      collisionDetectedRef.current = false;
+    }
+  }, [puckPositions, currentScreen]);
+
+  // Функция для обновления позиции при drag
+  const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => {
+    setPuckPositions(current => {
+      let finalX = Math.max(boundaries.left, Math.min(boundaries.right, x));
+      let finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
+
+      // Если шайба в drag, проверяем коллизии и корректируем позицию
+      let dragVx = vx;
+      let dragVy = vy;
+
+      // Проверка коллизий для перетаскиваемой шайбы (чтобы не проходила сквозь другие)
+      if (isDragging) {
+        // Проверяем только ближайшие шайбы
+        const maxCollisionsToCheck = current.length;
+        let collisionsChecked = 0;
+
+        current.forEach(otherPos => {
+        if (otherPos.id === id) return;
+          if (collisionsChecked >= maxCollisionsToCheck) return;
+
+          const dx = finalX - otherPos.x;
+          const dy = finalY - otherPos.y;
+          const distanceSquared = dx * dx + dy * dy;
+          const minDistance = 70;
+          const minDistanceSquared = minDistance * minDistance;
+
+          if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
+            const distance = Math.sqrt(distanceSquared);
+            collisionsChecked++;
+            const angle = Math.atan2(dy, dx);
+
+            const overlap = minDistance - distance;
+            finalX += Math.cos(angle) * overlap;
+            finalY += Math.sin(angle) * overlap;
+
+            if (currentUserId && id === currentUserId) {
+              collisionDetectedRef.current = true;
+            }
+          }
+        });
+      }
+
+      // Ограничиваем финальную позицию границами
+      finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
+      finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
+
+      return current.map(pos => {
+        if (pos.id === id) {
+          // Обновляем позицию перетаскиваемой шайбы
+          return {
+            ...pos,
+            x: finalX,
+            y: finalY,
+            vx: dragVx ?? pos.vx,
+            vy: dragVy ?? pos.vy,
+            isDragging: isDragging ?? false,
+          };
+        }
+
+        // ВРЕМЕННО ОТКЛЮЧЕНО: проверка коллизий с перетаскиваемой шайбой для тестирования производительности
+        // Проверяем коллизии с перетаскиваемой шайбой и отталкиваем другую шайбу
+        // Оптимизация: проверяем только если шайба близко (быстрая проверка без sqrt)
+        // if (isDragging && pushChecksCount < maxPushChecks) {
+        //   const dx = finalX - pos.x;
+        //   const dy = finalY - pos.y;
+        //   const distanceSquared = dx * dx + dy * dy;
+        //   const minDistance = 70; // puckSize
+        //   const minDistanceSquared = minDistance * minDistance;
+
+        //   if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
+        //     pushChecksCount++;
+        //     const distance = Math.sqrt(distanceSquared); // Вычисляем только если нужно
+        //     // Отталкиваем другую шайбу - угол должен быть от перетаскиваемой к неподвижной
+        //     const angle = Math.atan2(dy, dx); // dy = finalY - pos.y, dx = finalX - pos.x
+
+        //     // Вычисляем скорость отталкивания на основе скорости перетаскиваемой шайбы (уменьшено)
+        //   const dragSpeed = Math.sqrt(vx * vx + vy * vy);
+        //     const pushForce = Math.min(dragSpeed * 0.5, 4.0); // Уменьшаем силу отталкивания
+
+        //     // Также добавляем силу отталкивания для предотвращения прилипания (уменьшено)
+        //     const separationForce = 0.8; // Уменьшаем
+
+        //     // Добавляем ускорение при столкновении (уменьшено)
+        //     const collisionBoost = 0.3; // Уменьшаем для мягкого отталкивания
+
+        //     // Вторая шайба должна отталкиваться в направлении от перетаскиваемой
+        //     return {
+        //       ...pos,
+        //       vx: pos.vx + Math.cos(angle) * (pushForce + separationForce + collisionBoost),
+        //       vy: pos.vy + Math.sin(angle) * (pushForce + separationForce + collisionBoost),
+        //     };
+        //   }
+        // }
+
+        return pos;
+      });
+    });
+  }, [boundaries, currentUserId]);
+
+  return {
+    puckPositions,
+    updatePuckPosition,
+    boundaries,
+    isInitialized: puckPositions.length > 0,
+  };
+};
+
+interface TestPuck {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  player: Player;
+}
+
+// Типы для совместимости
 interface PuckPosition {
   id: string;
   x: number;
@@ -53,823 +452,58 @@ interface PuckPosition {
   vx: number;
   vy: number;
   size: number;
-  isDragging?: boolean; // Флаг для перетаскиваемой шайбы
+  isDragging: boolean;
 }
 
-const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string) => {
-  // ВАЖНО: Проверяем, не изменился ли scale factor, который может влиять на размеры
-  const currentPixelRatio = PixelRatio.get();
-  const currentScale = Dimensions.get('window').scale || 1;
-  
-  // Размер шайбы в логических единицах (points)
-  // Если scale factor изменился, реальный размер на экране может отличаться
-  const puckSize = 70; // Размер шайбы в points
-  
-  // Логирование размера шайбы отключено для производительности
-  // const puckSizeLoggedRef = useRef(false);
-  // if (__DEV__ && Platform.OS === 'ios' && !puckSizeLoggedRef.current) {
-  //   console.log('📐 [PUCK PHYSICS] Puck size calculation:', {...});
-  //   puckSizeLoggedRef.current = true;
-  // }
-  const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
-  const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const startDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previousLengthRef = useRef<number>(0);
-  const lastHapticTimeRef = useRef<number>(0);
-  const collisionDetectedRef = useRef<boolean>(false);
-  const [animationRestartTrigger, setAnimationRestartTrigger] = useState<number>(0); // Триггер для принудительного перезапуска анимации
-  
-  // Определяем производительность устройства для Android
-  const getAndroidPerformanceLevel = useCallback(() => {
-    if (Platform.OS !== 'android') return 'high';
-    
-    // Простая эвристика на основе количества ядер и памяти
-    // В реальном приложении можно использовать react-native-device-info
-    const deviceInfo = {
-      // Примерные значения для разных типов устройств
-      cores: navigator.hardwareConcurrency || 4,
-      memory: (navigator as any).deviceMemory || 4
-    };
-    
-    // Определяем уровень производительности
-    if (deviceInfo.cores >= 8 && deviceInfo.memory >= 6) {
-      return 'high'; // Флагманы и мощные устройства
-    } else if (deviceInfo.cores >= 4 && deviceInfo.memory >= 4) {
-      return 'medium'; // Средние устройства
-    } else {
-      return 'low'; // Старые/слабые устройства
-    }
-  }, []);
-  
-  // Получаем оптимальную частоту обновления
-  // Восстановлено оригинальное значение для iOS
-  const getOptimalFrameRate = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      // Вернули оригинальные 60 FPS для iOS - максимальная плавность
-      return 16; // 60 FPS для iOS (оригинальное значение)
-    } else if (Platform.OS === 'web') {
-      return 16; // 60 FPS для Web (обычно мощные устройства)
-    } else if (Platform.OS === 'android') {
-      const performanceLevel = getAndroidPerformanceLevel();
-      switch (performanceLevel) {
-        case 'high':
-          return 16; // 60 FPS для мощных Android
-        case 'medium':
-          return 20; // 50 FPS для средних Android
-        case 'low':
-        default:
-          return 33; // 30 FPS для слабых Android
-      }
-    }
-    return 16; // По умолчанию 60 FPS
-  }, [getAndroidPerformanceLevel]);
-  
-  // Отладочная информация (только при изменении currentUserId)
-  // console.log('🎯 ВИБРАЦИЯ: usePuckCollisionSystem инициализирован с currentUserId =', currentUserId);
-
-  // Мемоизируем границы, чтобы они не пересчитывались постоянно
-  const boundaries = useMemo(() => {
-    let boundaries;
-    if (Platform.OS === 'ios') {
-      // Для iPhone используем границы от самых краев экрана (льда)
-        // Используем те же значения, что работают в Expo Go
-        boundaries = {
-          leftOffset: -25, // Установлено -25px для отступа слева
-          topOffset: -25, // Установлено -25px для отступа сверху
-          rightOffset: 7, // Значение из Expo Go
-          bottomOffset: 218 // Значение из Expo Go
-      };
-    } else if (Platform.OS === 'web') {
-      // Для Web используем более строгие границы (дополнительные отступы справа и снизу)
-      boundaries = {
-        leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
-        topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
-        rightOffset: 450,  // Значительно увеличено для предотвращения вылета справа (было 350)
-        bottomOffset: 650  // Значительно увеличено для предотвращения вылета снизу (было 550)
-      };
-    } else {
-      // Для Android используем фиксированные границы (сбалансированное пространство по горизонтали)
-      boundaries = {
-        leftOffset: 5,   // Уменьшено на 5 для увеличения пространства слева
-        topOffset: 5,    // Уменьшено на 5 для увеличения пространства сверху
-        rightOffset: 165,  // Уменьшено чтобы шайбы долетали до края
-        bottomOffset: 415  // Уменьшено чтобы шайбы долетали до края
-      };
-    }
-    
-    // Диагностическое логирование границ
-    // ВАЖНО: puckSize - диаметр шайбы (70px), радиус = puckSize/2
-    // Центр шайбы не должен заходить дальше чем screen - offset - radius
-    const wallMaxX = width - boundaries.rightOffset - puckSize / 2;
-    const wallMaxY = height - boundaries.bottomOffset - puckSize / 2;
-    // Логирование границ для диагностики в production (если включены логи)
-    const enableLogsInProduction = typeof process !== 'undefined' &&
-      process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
-    if (enableLogsInProduction && Platform.OS === 'ios') {
-      console.log('📐 [PUCK PHYSICS] iOS Boundaries calculated:', {
-        width,
-        height,
-        puckSize,
-        boundaries,
-        wallMaxX,
-        wallMaxY,
-        rightOffset: boundaries.rightOffset,
-        bottomOffset: boundaries.bottomOffset
-      });
-    }
-    
-    return boundaries;
-  }, [width, height, puckSize]);
-
-  useEffect(() => {
-    if (players.length === 0) return;
-
-    setPuckPositions(currentPositions => {
-      const positionsMap = new Map(currentPositions.map(p => [p.id, p]));
-      const nextPositions: PuckPosition[] = [];
-
-      players.forEach(player => {
-        if (positionsMap.has(player.id)) {
-          nextPositions.push(positionsMap.get(player.id)!);
-        } else {
-          // Генерация позиции с проверкой на наложение с существующими шайбами
-          let attempts = 0;
-          let newX: number, newY: number;
-          const maxAttempts = 50;
-          const minDistance = puckSize * 1.05; // Минимальное расстояние при инициализации
-          
-          do {
-            newX = boundaries.leftOffset + Math.random() * (width - boundaries.rightOffset - puckSize);
-            newY = boundaries.topOffset + Math.random() * (height - boundaries.bottomOffset - puckSize);
-            attempts++;
-            
-            // Проверяем расстояние до всех существующих шайб
-            let tooClose = false;
-            nextPositions.forEach(existingPos => {
-              const dx = newX - existingPos.x;
-              const dy = newY - existingPos.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance < minDistance) {
-                tooClose = true;
-              }
-            });
-            
-            if (!tooClose) break;
-          } while (attempts < maxAttempts);
-          
-          // Если не удалось найти подходящую позицию, используем случайную
-          if (attempts >= maxAttempts) {
-            newX = boundaries.leftOffset + Math.random() * (width - boundaries.rightOffset - boundaries.leftOffset - puckSize);
-            newY = boundaries.topOffset + Math.random() * (height - boundaries.bottomOffset - boundaries.topOffset - puckSize);
-          }
-          
-          // Логирование для веб-платформы
-          
-          // Адаптивная скорость в зависимости от производительности устройства
-          let speedMultiplier;
-          if (Platform.OS === 'ios') {
-            speedMultiplier = 1.0; // Оптимизировано для лучшей производительности
-          } else if (Platform.OS === 'web') {
-            speedMultiplier = 1.0; // Снижено с 1.2 для более стабильной работы границ
-          } else if (Platform.OS === 'android') {
-            const performanceLevel = getAndroidPerformanceLevel();
-            switch (performanceLevel) {
-              case 'high':
-                speedMultiplier = 1.0; // Высокая скорость для мощных Android
-                break;
-              case 'medium':
-                speedMultiplier = 0.7; // Средняя скорость для средних Android
-                break;
-              case 'low':
-              default:
-                speedMultiplier = 0.5; // Низкая скорость для слабых Android
-                break;
-            }
-          } else {
-            speedMultiplier = 1.2;
-          }
-          nextPositions.push({
-            id: player.id,
-            x: newX,
-            y: newY,
-            vx: (Math.random() - 0.5) * speedMultiplier,
-            vy: (Math.random() - 0.5) * speedMultiplier,
-            size: puckSize,
-          });
-        }
-      });
-
-      return nextPositions;
-    });
-  }, [players, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize]);
-
-  useEffect(() => {
-    if (puckPositions.length === 0) return;
-
-    // Проверяем, что мы на главном экране перед запуском анимации
-    if (currentScreen !== 'index') {
-      // Очищаем интервал при уходе с главного экрана
-      if (animationIntervalRef.current) {
-        clearInterval(animationIntervalRef.current);
-        animationIntervalRef.current = null;
-      }
-      return;
-    }
-
-    // Запускаем анимацию только при первой инициализации или изменении количества
-    // Используем строгое сравнение - запускаем только когда длина реально изменилась
-    const hasLengthChanged = previousLengthRef.current !== puckPositions.length;
-    const shouldRestart = animationRestartTrigger > 0;
-    
-    // Если анимация уже запущена и количество шайб не изменилось, и нет принудительного перезапуска, не перезапускаем
-    if (animationIntervalRef.current && !hasLengthChanged && !shouldRestart) {
-      return;
-    }
-    
-    previousLengthRef.current = puckPositions.length;
-
-    // Очищаем предыдущие интервалы, если они есть
-    if (animationIntervalRef.current) {
-      clearInterval(animationIntervalRef.current);
-      animationIntervalRef.current = null;
-    }
-    if (startDelayRef.current) {
-      clearTimeout(startDelayRef.current);
-      startDelayRef.current = null;
-    }
-
-    // Запускаем анимацию сразу без задержки
-    animationIntervalRef.current = setInterval(() => {
-        // Проверяем, что мы на главном экране перед обработкой физики
-        if (currentScreen !== 'index') {
-          return; // Не обрабатываем физику, если не на главном экране
-        }
-        
-      setPuckPositions(currentPositions => {
-          // Создаем массив обновлений для хранения изменений скоростей от коллизий
-          const velocityChanges = currentPositions.map(() => ({ dvx: 0, dvy: 0 }));
-          
-          return currentPositions.map((pos, posIndex) => {
-          // Пропускаем физику для перетаскиваемых шайб
-          if (pos.isDragging) {
-            return pos;
-          }
-          
-          // КРИТИЧНО: Ограничиваем скорость ДО применения к позиции
-          // Это предотвращает вылет за границы из-за слишком большой скорости
-          const currentSpeed = Math.sqrt(pos.vx * pos.vx + pos.vy * pos.vy);
-          let newVx = pos.vx;
-          let newVy = pos.vy;
-          
-          // Определяем maxSpeed в зависимости от платформы (временно, будет переопределено позже)
-          let maxSpeed = 4.5;
-          
-          // Ограничиваем скорость ДО применения к позиции
-          if (currentSpeed > maxSpeed) {
-            newVx = (newVx / currentSpeed) * maxSpeed;
-            newVy = (newVy / currentSpeed) * maxSpeed;
-          }
-          
-          // Более плавное движение
-          let newX = pos.x + newVx;
-          let newY = pos.y + newVy;
-          
-          // Убираем трение для постоянного движения
-          // const friction = 0.999; // Убираем трение
-          // newVx *= friction;
-          // newVy *= friction;
-
-
-          // Обработка коллизий со стенами (платформо-зависимые границы)
-          // Оптимизация: кешируем вычисления границ
-          // ВАЖНО: puckSize - диаметр шайбы (70px), радиус = puckSize/2
-          // Центр шайбы не должен заходить дальше чем screen - offset - radius
-          const puckRadius = puckSize / 2;
-          const wallMaxX = width - boundaries.rightOffset - puckRadius;
-          const wallMaxY = height - boundaries.bottomOffset - puckRadius;
-          
-          // Физика отскока - унифицирована для всех платформ
-          // Маленький отскок для реализма, но не слишком сильный чтобы не вылетать
-          const bounceMultiplier = 0.95; // Незначительное уменьшение скорости при отскоке
-          
-          // СТРОГАЯ проверка границ ДО логирования - исправляем проблему с вылетом
-          // Проверяем и корректируем позицию ПЕРЕД применением физики отскока
-          // puckRadius уже объявлен выше
-          const wasOutOfBoundsBefore = newX < boundaries.leftOffset + puckRadius ||
-                                     newX > wallMaxX - puckRadius ||
-                                     newY < boundaries.topOffset + puckRadius ||
-                                     newY > wallMaxY - puckRadius;
-          
-          // Логирование выхода за границы отключено для производительности
-          // if (Platform.OS === 'ios' && __DEV__ && wasOutOfBoundsBefore) {
-          //   console.warn('🚨 [PUCK PHYSICS] iOS Puck out of bounds BEFORE correction:', {...});
-          // }
-          
-          // СТРОГАЯ коррекция позиции - сначала ограничиваем, потом отскок
-          // ВАЖНО: Проверяем ДО коррекции, была ли шайба за границами
-          const wasOutOfBounds = newX < boundaries.leftOffset || newX > wallMaxX || newY < boundaries.topOffset || newY > wallMaxY;
-          
-          // ВАЖНО: Исправляем направление скорости правильно
-          if (newX < boundaries.leftOffset) {
-            newX = boundaries.leftOffset;
-            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо (положительная скорость)
-          } else if (newX > wallMaxX) {
-            newX = wallMaxX;
-            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево (отрицательная скорость)
-          }
-          
-          if (newY < boundaries.topOffset) {
-            newY = boundaries.topOffset;
-            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз (положительная скорость)
-          } else if (newY > wallMaxY) {
-            newY = wallMaxY;
-            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх (отрицательная скорость)
-          }
-          
-          // КРИТИЧНО: Уменьшаем скорость на 30% при выходе за границы для большей стабильности
-          // Это предотвращает вылет в следующем кадре
-          if (wasOutOfBounds) {
-            newVx *= 0.7; // Уменьшаем скорость на 30%
-            newVy *= 0.7;
-          }
-          
-          const speedAfterWallBounce = Math.sqrt(newVx * newVx + newVy * newVy);
-          if (speedAfterWallBounce > maxSpeed) {
-            newVx = (newVx / speedAfterWallBounce) * maxSpeed;
-            newVy = (newVy / speedAfterWallBounce) * maxSpeed;
-          }
-          
-          // Дополнительная проверка после коррекции (на случай если что-то пошло не так)
-          // Логирование отключено для производительности, но коррекция остается
-          const stillOutOfBounds = newX < boundaries.leftOffset || newX > wallMaxX || newY < boundaries.topOffset || newY > wallMaxY;
-          if (stillOutOfBounds) {
-            // Принудительная коррекция без логирования
-            newX = Math.max(boundaries.leftOffset, Math.min(wallMaxX, newX));
-            newY = Math.max(boundaries.topOffset, Math.min(wallMaxY, newY));
-          }
-
-          // Дополнительная защита для веб-платформы - принудительное ограничение позиции
-          if (Platform.OS === 'web') {
-            // Исправляем расчет максимальных координат с учетом размера шайбы
-            const maxX = width - boundaries.rightOffset - puckSize;
-            const maxY = height - boundaries.bottomOffset - puckSize;
-            
-            // Проверяем, если шайба вылетает за границы (с учетом размера)
-            // Логирование отключено для производительности
-            if (newX < boundaries.leftOffset || newX > maxX || newY < boundaries.topOffset || newY > maxY) {
-              // console.warn('🚨 Puck out of bounds BEFORE correction:', {...});
-              
-              // Если шайба вылетает, сбрасываем скорость в противоположную сторону
-              if (newX < boundaries.leftOffset || newX > maxX) {
-                newVx = -newVx * 0.5; // Сбрасываем скорость
-              }
-              if (newY < boundaries.topOffset || newY > maxY) {
-                newVy = -newVy * 0.5; // Сбрасываем скорость
-              }
-            }
-            
-            // Строгая коррекция с учетом размера шайбы
-            const correctedX = Math.max(boundaries.leftOffset, Math.min(maxX, newX));
-            const correctedY = Math.max(boundaries.topOffset, Math.min(maxY, newY));
-            
-            newX = correctedX;
-            newY = correctedY;
-            
-            // Если шайба прижалась к границе, отражаем скорость
-            if (newX <= boundaries.leftOffset || newX >= maxX - puckSize) {
-              newVx = -newVx * 0.85; // Web - улучшенный коэффициент
-            }
-            if (newY <= boundaries.topOffset || newY >= maxY - puckSize) {
-              newVy = -newVy * 0.85; // Web - улучшенный коэффициент
-            }
-          }
-
-          // Жесткая система коллизий - шайбы не могут накладываться
-          // Оптимизация: проверяем только близкие шайбы (квадрат расстояния быстрее чем sqrt)
-          // ВАЖНО: Исправляем расчет минимального расстояния для столкновений
-           // puckSize = 70 - это диаметр шайбы, радиус = 35
-           // В Expo Go используется радиус для расчета столкновений, чтобы шайбы не отталкивались слишком далеко
-           // Для соответствия Expo Go используем радиус вместо диаметра
-           // puckRadius уже объявлен выше (строка 347), используем его
-           // Используем радиус * 1.5 вместо диаметра для более мягких столкновений (как в Expo Go)
-           const minDistance = puckRadius * 1.5; // 35 * 1.5 = 52.5 (вместо 70)
-          const minDistanceSq = minDistance ** 2;
-          
-          // Логирование настроек столкновений отключено для производительности
-          // if (Platform.OS === 'ios' && __DEV__ && !collisionSettingsLoggedRef.current) {
-          //   console.log('📐 [PUCK PHYSICS] Collision settings:', {...});
-          //   collisionSettingsLoggedRef.current = true;
-          // }
-          
-          currentPositions.forEach((otherPos, otherIndex) => {
-            if (otherPos.id === pos.id || otherPos.isDragging) return;
-            
-            const dx = newX - otherPos.x;
-            const dy = newY - otherPos.y;
-            const distanceSq = dx * dx + dy * dy; // Используем квадрат расстояния - быстрее
-            
-            // Минимальное расстояние между центрами шайб (диаметр шайбы)
-            if (distanceSq < minDistanceSq && distanceSq > 0) {
-              const distance = Math.sqrt(distanceSq); // Вычисляем sqrt только при коллизии
-              const angle = Math.atan2(dy, dx);
-              
-              // Логирование столкновений отключено для производительности (вызывается очень часто!)
-              // if (Platform.OS === 'ios' && __DEV__) {
-              //   console.log('💥 [PUCK PHYSICS] Collision detected:', {...});
-              // }
-              
-               // Коррекция позиции: отталкиваем на безопасное расстояние (как в Expo Go)
-               // Уменьшаем коэффициент коррекции для соответствия Expo Go
-               const correctionDistance = (minDistance - distance) * 0.5; // Уменьшено с 1.15 до 0.5 для соответствия Expo Go
-              newX += Math.cos(angle) * correctionDistance;
-              newY += Math.sin(angle) * correctionDistance;
-              
-              // Физика отталкивания - настройки для соответствия Expo Go
-              const overlap = minDistance - distance;
-              // Уменьшаем силу отталкивания для соответствия Expo Go
-              const pushForce = overlap * (Platform.OS === 'ios' ? 0.3 : ((Platform.OS === 'android' || Platform.OS === 'web') ? 0.2 : 0.25));
-              
-              // Оптимизированная передача импульса - баланс между реализмом и производительностью
-              const currentSpeedSq = pos.vx * pos.vx + pos.vy * pos.vy;
-              const otherSpeedSq = otherPos.vx * otherPos.vx + otherPos.vy * otherPos.vy;
-              
-              // Передаем импульс только если скорости достаточно высокие (быстрая проверка)
-              if (currentSpeedSq > 0.09 || otherSpeedSq > 0.09) { // 0.3^2 = 0.09
-                const currentSpeed = Math.sqrt(currentSpeedSq);
-                const otherSpeed = Math.sqrt(otherSpeedSq);
-                const combinedSpeed = (currentSpeed + otherSpeed) * 0.5;
-                const impulseTransfer = Math.min(combinedSpeed * 0.55, 3.5); // Восстановлено для более плавной физики
-                const impulseX = Math.cos(angle) * impulseTransfer;
-                const impulseY = Math.sin(angle) * impulseTransfer;
-                
-                // Сбалансированная передача импульса
-                const speedFactor = currentSpeed > otherSpeed ? 1.15 : 0.85;
-                velocityChanges[otherIndex].dvx += impulseX * speedFactor;
-                velocityChanges[otherIndex].dvy += impulseY * speedFactor;
-              }
-              
-              // Текущая шайба отталкивается от другой с усилением при столкновении
-              newVx += Math.cos(angle) * pushForce;
-              newVy += Math.sin(angle) * pushForce;
-              
-              // Другая шайба отталкивается от текущей с той же силой
-              velocityChanges[otherIndex].dvx -= Math.cos(angle) * pushForce;
-              velocityChanges[otherIndex].dvy -= Math.sin(angle) * pushForce;
-              
-              // Отмечаем столкновение для вибрации только если это шайба пользователя
-              if (currentUserId && pos.id === currentUserId) {
-                collisionDetectedRef.current = true;
-              }
-            }
-          });
-          
-          // Применяем изменения скорости от коллизий ПЕРЕД ограничениями
-          // Упрощенная обработка коллизий для лучшей производительности
-          const hasCollision = velocityChanges[posIndex].dvx !== 0 || velocityChanges[posIndex].dvy !== 0;
-          if (hasCollision) {
-            // Убрано дополнительное ускорение - экономит вычисления и улучшает стабильность
-            // newVx и newVy уже имеют изменения от velocityChanges
-          }
-          
-          newVx += velocityChanges[posIndex].dvx;
-          newVy += velocityChanges[posIndex].dvy;
-          
-              // Адаптивные ограничения скорости в зависимости от производительности устройства
-          // Оптимизировано для плавности и производительности
-          // ВАЖНО: maxSpeed уже объявлен выше, только переопределяем значение
-          let minSpeed;
-          if (Platform.OS === 'ios') {
-            // Оптимизированные скорости для iOS - баланс между плавностью и производительностью
-            maxSpeed = 4.5; // Восстановлено для более плавного движения
-            minSpeed = 0.7; // Восстановлено
-          } else if (Platform.OS === 'web') {
-            maxSpeed = 5.5;
-            minSpeed = 0.8;
-          } else if (Platform.OS === 'android') {
-            const performanceLevel = getAndroidPerformanceLevel();
-            switch (performanceLevel) {
-              case 'high':
-                maxSpeed = 4.0; // Восстановлено для плавности
-                minSpeed = 0.6;
-                break;
-              case 'medium':
-                maxSpeed = 2.5; // Восстановлено
-                minSpeed = 0.4;
-                break;
-              case 'low':
-              default:
-                maxSpeed = 1.5; // Восстановлено
-                minSpeed = 0.3;
-                break;
-            }
-          } else {
-            maxSpeed = 4.5;
-            minSpeed = 0.7;
-          }
-
-          // Ограничиваем скорость ПОСЛЕ применения всех изменений
-          const speedAfterCollisions = Math.sqrt(newVx * newVx + newVy * newVy);
-          if (speedAfterCollisions > maxSpeed) {
-            newVx = (newVx / speedAfterCollisions) * maxSpeed;
-            newVy = (newVy / speedAfterCollisions) * maxSpeed;
-          }
-          
-          // Минимальная скорость для предотвращения остановки - применяем всегда
-          if (currentSpeed < minSpeed) {
-            const angle = Math.random() * 2 * Math.PI;
-            newVx = Math.cos(angle) * minSpeed;
-            newVy = Math.sin(angle) * minSpeed;
-          }
-          
-          // КРИТИЧЕСКИ ВАЖНО: Проверка границ ПОСЛЕ всех столкновений между шайбами
-          // Столкновения могут сдвинуть шайбу за границы, поэтому проверяем еще раз
-          if (newX < boundaries.leftOffset + puckRadius) {
-            newX = boundaries.leftOffset + puckRadius;
-            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо (положительная скорость)
-          } else if (newX > wallMaxX) {
-            newX = wallMaxX;
-            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево (отрицательная скорость)
-          }
-
-          if (newY < boundaries.topOffset + puckRadius) {
-            newY = boundaries.topOffset + puckRadius;
-            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз (положительная скорость)
-          } else if (newY > wallMaxY) {
-            newY = wallMaxY;
-            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх (отрицательная скорость)
-          }
-          
-          // Финальная проверка на всякий случай - ГАРАНТИРУЕМ что позиция в пределах границ
-          const beforeFinalCheck = { x: newX, y: newY };
-          
-          // КРИТИЧНО: Если позиция все еще за границами, принудительно корректируем
-          // и исправляем направление скорости с учетом радиуса шайбы
-
-          if (newX < boundaries.leftOffset + puckRadius) {
-            newX = boundaries.leftOffset + puckRadius;
-            newVx = Math.abs(newVx) * bounceMultiplier; // Отскок вправо
-          } else if (newX > wallMaxX - puckRadius) {
-            newX = wallMaxX - puckRadius;
-            newVx = -Math.abs(newVx) * bounceMultiplier; // Отскок влево
-          }
-
-          if (newY < boundaries.topOffset + puckRadius) {
-            newY = boundaries.topOffset + puckRadius;
-            newVy = Math.abs(newVy) * bounceMultiplier; // Отскок вниз
-          } else if (newY > wallMaxY - puckRadius) {
-            newY = wallMaxY - puckRadius;
-            newVy = -Math.abs(newVy) * bounceMultiplier; // Отскок вверх
-          }
-          
-          // Дополнительная гарантия - принудительное ограничение с учетом радиуса
-          newX = Math.max(boundaries.leftOffset + puckRadius, Math.min(wallMaxX, newX));
-          newY = Math.max(boundaries.topOffset + puckRadius, Math.min(wallMaxY, newY));
-          
-          // КРИТИЧНО: Ограничиваем скорость ПОСЛЕ отскока от стен
-          // Это предотвращает превышение maxSpeed после bounceMultiplier
-          const speedAfterBounce = Math.sqrt(newVx * newVx + newVy * newVy);
-          if (speedAfterBounce > maxSpeed) {
-            newVx = (newVx / speedAfterBounce) * maxSpeed;
-            newVy = (newVy / speedAfterBounce) * maxSpeed;
-          }
-          
-          // СТРОГАЯ проверка после финальной коррекции - если все еще за границами, это критическая ошибка
-          const stillOutOfBoundsFinal = newX < boundaries.leftOffset + puckRadius ||
-                                 newX > wallMaxX - puckRadius ||
-                                 newY < boundaries.topOffset + puckRadius ||
-                                 newY > wallMaxY - puckRadius;
-          if (stillOutOfBoundsFinal) {
-            // Принудительная коррекция - это последняя линия защиты (без логирования для производительности)
-            newX = Math.max(boundaries.leftOffset + puckRadius, Math.min(wallMaxX - puckRadius, newX));
-            newY = Math.max(boundaries.topOffset + puckRadius, Math.min(wallMaxY - puckRadius, newY));
-          }
-          
-          // Логирование финальной проверки отключено для производительности
-          // if (Platform.OS === 'ios' && __DEV__ && !stillOutOfBounds) {
-          //   const afterFinalCheck = { x: newX, y: newY };
-          //   if (beforeFinalCheck.x !== afterFinalCheck.x || beforeFinalCheck.y !== afterFinalCheck.y) {
-          //     console.log('✅ [PUCK PHYSICS] Final check corrected position:', {...});
-          //   }
-          // }
-          
-          // АБСОЛЮТНАЯ ЗАЩИТА: Финальная принудительная коррекция перед возвратом
-          // Гарантируем что шайба НИКОГДА не выйдет за границы экрана
-          if (newX < boundaries.leftOffset + puckRadius) {
-            newX = boundaries.leftOffset + puckRadius;
-          } else if (newX > wallMaxX) {
-            newX = wallMaxX;
-          }
-
-          if (newY < boundaries.topOffset + puckRadius) {
-            newY = boundaries.topOffset + puckRadius;
-          } else if (newY > wallMaxY) {
-            newY = wallMaxY;
-          }
-          
-          return {
-            ...pos,
-            x: newX,
-            y: newY,
-            vx: newVx,
-            vy: newVy
-          };
-        });
-      });
-        
-        // Вызываем вибрацию если было столкновение (с дебаунсом) и мы на главном экране
-        if (collisionDetectedRef.current && currentScreen === 'index' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
-          const now = Date.now();
-          const timeDiff = now - lastHapticTimeRef.current;
-          if (timeDiff > 100) {
-            lastHapticTimeRef.current = now;
-            
-            // Легкая вибрация для столкновений шайб
-            if (Platform.OS === 'ios') {
-              try {
-                // Используем легкую вибрацию для iOS
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              } catch (error) {
-                // Если не сработало, пробуем Vibration
-                try {
-                  Vibration.vibrate(30); // Короткая легкая вибрация
-                } catch (vibError) {
-                  // Игнорируем ошибки
-                }
-              }
-            } else {
-              // Для Android используем короткую легкую вибрацию
-              try {
-                Vibration.vibrate(30);
-              } catch (vibError) {
-                // Игнорируем ошибки
-              }
-            }
-          }
-          // Сбрасываем флаг после проверки
-          collisionDetectedRef.current = false;
-        } else if (collisionDetectedRef.current) {
-          collisionDetectedRef.current = false;
-        }
-    }, getOptimalFrameRate()); // Адаптивная частота обновления в зависимости от производительности устройства
-
-    return () => {
-      if (animationIntervalRef.current) {
-        clearInterval(animationIntervalRef.current);
-      }
-      if (startDelayRef.current) {
-        clearTimeout(startDelayRef.current);
-      }
-    };
-  }, [puckPositions.length, boundaries.leftOffset, boundaries.rightOffset, boundaries.topOffset, boundaries.bottomOffset, width, height, puckSize, currentScreen, animationRestartTrigger]);
-
-  // Обработчик AppState для перезапуска анимации при возврате из фона
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active' && currentScreen === 'index' && puckPositions.length > 0) {
-        // Приложение вернулось из фона - перезапускаем анимацию немедленно
-        // Очищаем старый интервал, если он есть
-        if (animationIntervalRef.current) {
-          clearInterval(animationIntervalRef.current);
-          animationIntervalRef.current = null;
-        }
-        
-        // Устанавливаем флаг принудительного перезапуска
-        // Это заставит основной useEffect перезапустить анимацию
-        setAnimationRestartTrigger(Date.now());
-      }
-    });
-
-    return () => {
-      subscription?.remove();
-    };
-  }, [puckPositions.length, currentScreen]);
-
-  // Функция для обновления позиции и скорости конкретной шайбы (для drag)
-  const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging: boolean = true) => {
-    setPuckPositions(currentPositions => {
-      // Оптимизация: проверяем коллизии только с близкими шайбами
-      let adjustedX = x;
-      let adjustedY = y;
-      const updatedPositions = [...currentPositions];
-      
-      // Предварительно вычисляем значения для оптимизации
-      const minDistance = puckSize;
-      const minDistanceSq = minDistance * minDistance;
-      const dragSpeedSq = vx * vx + vy * vy;
-      const dragSpeed = dragSpeedSq > 0 ? Math.sqrt(dragSpeedSq) : 0;
-      
-      // Базовые коэффициенты (вычисляем один раз)
-      const basePushStrength = Platform.OS === 'ios' ? 0.6 : (Platform.OS === 'android' ? 0.5 : 0.65);
-      const speedFactor = dragSpeed > 0 ? Math.min(dragSpeed / 2.0, 2.0) : 0;
-      const dynamicPushStrength = basePushStrength * (0.5 + speedFactor * 0.5);
-      
-      currentPositions.forEach((otherPos, index) => {
-        if (otherPos.id === id || otherPos.isDragging) return; // Пропускаем перетаскиваемые шайбы
-        
-        const dx = adjustedX - otherPos.x;
-        const dy = adjustedY - otherPos.y;
-        const distanceSq = dx * dx + dy * dy; // Используем квадрат расстояния - быстрее
-        
-        // Быстрая проверка: если шайба слишком далеко, пропускаем
-        const maxCheckDistanceSq = isDragging ? minDistanceSq : (minDistance * 1.5) ** 2;
-        if (distanceSq > maxCheckDistanceSq || distanceSq === 0) return;
-        
-        // Только теперь вычисляем sqrt для точного расчета
-        const distance = Math.sqrt(distanceSq);
-        
-        if (distance < minDistance) {
-          // Столкновение обнаружено
-          const angle = Math.atan2(dy, dx);
-          
-          // Агрессивная коррекция: отталкиваем перетаскиваемую шайбу
-          const correctionDistance = (minDistance - distance) * 1.2;
-          adjustedX += Math.cos(angle) * correctionDistance;
-          adjustedY += Math.sin(angle) * correctionDistance;
-          
-          // Передаем импульс при столкновении
-          if (dragSpeed > 0.3) {
-            const pushAngle = angle + Math.PI; // Инвертируем направление
-            const pushVx = Math.cos(pushAngle) * dragSpeed * dynamicPushStrength;
-            const pushVy = Math.sin(pushAngle) * dragSpeed * dynamicPushStrength;
-            
-            updatedPositions[index] = {
-              ...otherPos,
-              vx: otherPos.vx + pushVx,
-              vy: otherPos.vy + pushVy
-            };
-          }
-        } else if (!isDragging && dragSpeed > 0.5) {
-          // При отпускании: передаем небольшой импульс близким шайбам
-          const proximityFactor = 1.0 - (distance - minDistance) / (minDistance * 0.5);
-          
-          if (proximityFactor > 0) {
-            const basePushStrengthProx = Platform.OS === 'ios' ? 0.4 : (Platform.OS === 'android' ? 0.35 : 0.45);
-            const dynamicPushStrengthProx = basePushStrengthProx * (0.5 + speedFactor * 0.5) * proximityFactor;
-            
-            const pushAngle = Math.atan2(dy, dx) + Math.PI;
-            const pushVx = Math.cos(pushAngle) * dragSpeed * dynamicPushStrengthProx;
-            const pushVy = Math.sin(pushAngle) * dragSpeed * dynamicPushStrengthProx;
-            
-            updatedPositions[index] = {
-              ...otherPos,
-              vx: otherPos.vx + pushVx,
-              vy: otherPos.vy + pushVy
-            };
-          }
-        }
-      });
-      
-      return updatedPositions.map(pos => 
-        pos.id === id ? { ...pos, x: adjustedX, y: adjustedY, vx, vy, isDragging } : pos
-      );
-    });
-  }, [puckSize, currentUserId]);
-
-  return { puckPositions, puckSize, updatePuckPosition, getAndroidPerformanceLevel };
-};
-
-const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLevel }: { 
+// Импортируем оригинальный PuckAnimator из основного экрана
+// Для этого нужно создать временную копию компонента
+// Мемоизированный компонент шайбы для оптимизации производительности
+const OriginalPuckAnimator = React.memo(({
+  player,
+  position,
+  onNav,
+  onDrag,
+  getAndroidPerformanceLevel
+}: {
   player: Player; 
   position: PuckPosition; 
   onNav: () => void; 
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
-  getAndroidPerformanceLevel: () => 'high' | 'medium' | 'low';
+  getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0, startX: 0, startY: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
   const lastUpdateTimeRef = useRef(0);
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
-  const lastVelocityRef = useRef({ vx: 0, vy: 0 }); // Последняя скорость для использования при отпускании
+  const lastDragVelocityRef = useRef({ vx: 0, vy: 0 }); // Последняя скорость движения при drag
   const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: position.x },
-        { translateY: position.y }
-      ]
-    };
-  }, [position.x, position.y]);
+  const animatedStyle = useAnimatedStyle(() => ({
+    left: position.x,
+    top: position.y,
+  }), [position.x, position.y]);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
+    // Сохраняем начальную позицию шайбы и смещение касания
     dragStartRef.current = {
-      x: touch.pageX - position.x,
-      y: touch.pageY - position.y,
+      x: touch.locationX, // Смещение от левого края компонента в момент начала drag
+      y: touch.locationY, // Смещение от верхнего края компонента в момент начала drag
       pageX: touch.pageX,
       pageY: touch.pageY,
-      time: Date.now()
+      time: Date.now(),
+      startX: position.x, // Начальная позиция шайбы
+      startY: position.y,
     };
     lastPositionRef.current = { x: position.x, y: position.y };
     hasDraggedRef.current = false;
+    setHasDragged(false);
     dragVelocityRef.current = { vx: 0, vy: 0 };
-    lastVelocityRef.current = { vx: 0, vy: 0 }; // Сбрасываем последнюю скорость
-    dragHistoryRef.current = []; // Очищаем историю
+    dragHistoryRef.current = [];
     setIsDragging(true);
-    
-    // Таймаут отключен - можно держать шайбу сколько угодно
   };
 
   const handleTouchMove = (e: any) => {
@@ -878,15 +512,10 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     const touch = e.nativeEvent;
     const now = Date.now();
     
-    // Адаптивный throttling в зависимости от производительности устройства
-    // Увеличиваем интервал для лучшей производительности при перетаскивании
-    const throttleInterval = Platform.OS === 'android' ? 
-      (getAndroidPerformanceLevel() === 'high' ? 20 : 
-       getAndroidPerformanceLevel() === 'medium' ? 25 : 40) : 20;
-    
-    if (now - lastUpdateTimeRef.current < throttleInterval) {
-      return;
-    }
+    // Увеличиваем throttle для оптимизации при большом количестве шайб
+    const throttleInterval = Platform.OS === 'android' ? 20 : 20; // Оптимизированная частота обновлений
+
+    if (now - lastUpdateTimeRef.current < throttleInterval) return;
     lastUpdateTimeRef.current = now;
     
     // Проверяем, что палец сдвинулся достаточно для drag (минимум 5 пикселей)
@@ -899,44 +528,39 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
     }
     
     hasDraggedRef.current = true;
-    
-    const newX = touch.pageX - dragStartRef.current.x;
-    const newY = touch.pageY - dragStartRef.current.y;
-    
-    // Вычисляем скорость на основе изменения позиции для толчка других шайб
-    // Восстановлены коэффициенты для более отзывчивого движения
-    let speedMultiplier;
-    if (Platform.OS === 'android') {
-      const performanceLevel = getAndroidPerformanceLevel();
-      switch (performanceLevel) {
-        case 'high':
-          speedMultiplier = 1.0; // Восстановлено для отзывчивости
-          break;
-        case 'medium':
-          speedMultiplier = 0.9; // Восстановлено
-          break;
-        case 'low':
-        default:
-          speedMultiplier = 0.8; // Восстановлено
-          break;
-      }
-    } else {
-      speedMultiplier = 1.0; // Восстановлено для iOS - полная отзывчивость
+    setHasDragged(true);
+
+    // Вычисляем новую позицию: используем pageX/pageY для абсолютных координат
+    // Разница между текущим и начальным pageX/pageY дает смещение в пикселях экрана
+    const deltaX = touch.pageX - dragStartRef.current.pageX;
+    const deltaY = touch.pageY - dragStartRef.current.pageY;
+    // Используем начальную позицию + смещение для плавного движения (без дергания)
+    const newX = dragStartRef.current.startX + deltaX;
+    const newY = dragStartRef.current.startY + deltaY;
+
+    // Шайба следует за пальцем напрямую, но с ограничением скорости для натурального движения
+    // Вычисляем скорость на основе изменения позиции (для толчка других шайб)
+    // Используем lastPositionRef для расчета скорости, чтобы избежать дергания
+    let vx = (newX - lastPositionRef.current.x) * 0.4;
+    let vy = (newY - lastPositionRef.current.y) * 0.4;
+
+    // Ограничиваем максимальную скорость для натурального движения
+    const maxSpeed = 8.0; // Максимальная скорость при drag (увеличена)
+    const speed = Math.sqrt(vx * vx + vy * vy);
+    if (speed > maxSpeed) {
+      vx = (vx / speed) * maxSpeed;
+      vy = (vy / speed) * maxSpeed;
     }
-    const vx = (newX - lastPositionRef.current.x) * speedMultiplier;
-    const vy = (newY - lastPositionRef.current.y) * speedMultiplier;
-    
-    // Сохраняем последнюю скорость для использования при отпускании
-    lastVelocityRef.current = { vx, vy };
-    
-    // Накапливаем скорость для финального импульса (для совместимости, но не используем)
+
     dragVelocityRef.current.vx += vx;
     dragVelocityRef.current.vy += vy;
     
-    // Записываем историю движения (последние 5 точек)
+    // Сохраняем последнюю скорость движения для использования при отпускании
+    lastDragVelocityRef.current = { vx, vy };
+    
     dragHistoryRef.current.push({ x: newX, y: newY, time: now });
-    if (dragHistoryRef.current.length > 5) {
-      dragHistoryRef.current.shift(); // Удаляем старые точки
+    if (dragHistoryRef.current.length > 10) {
+      dragHistoryRef.current.shift();
     }
     
     lastPositionRef.current = { x: newX, y: newY };
@@ -946,39 +570,76 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
   const handleTouchEnd = () => {
     setIsDragging(false);
     
-    // Используем последнюю скорость движения для финального импульса
-    if (onDrag) {
-      // Применяем множитель импульса к последней скорости
-      let impulseMultiplier;
-      if (Platform.OS === 'android') {
-        const performanceLevel = getAndroidPerformanceLevel();
-        switch (performanceLevel) {
-          case 'high':
-            impulseMultiplier = 0.7;
-            break;
-          case 'medium':
-            impulseMultiplier = 0.6;
-            break;
-          case 'low':
-          default:
-            impulseMultiplier = 0.5;
-            break;
+    if (onDrag && hasDraggedRef.current) {
+      // Это был drag - применяем скорость движения, с которой двигали шайбу
+      // Вычисляем реальную скорость на основе последних позиций из истории
+      let finalVx = 0;
+      let finalVy = 0;
+      
+      if (dragHistoryRef.current.length >= 2) {
+        // Используем последние позиции для более точного расчета скорости
+        const history = dragHistoryRef.current;
+        const last = history[history.length - 1];
+        
+        // Используем среднее значение из последних 3-4 позиций для более плавной скорости
+        const samplesToUse = Math.min(4, history.length - 1);
+        let totalDx = 0;
+        let totalDy = 0;
+        let totalTime = 0;
+        
+        for (let i = history.length - 1; i > history.length - samplesToUse - 1; i--) {
+          const current = history[i];
+          const previous = history[i - 1];
+          totalDx += current.x - previous.x;
+          totalDy += current.y - previous.y;
+          totalTime += Math.max(1, current.time - previous.time);
         }
+        
+        const pixelsPerMsX = totalDx / totalTime;
+        const pixelsPerMsY = totalDy / totalTime;
+        const frameTime = 16; // миллисекунды на кадр
+        // Увеличиваем скорость при отпускании для более энергичного движения
+        const speedMultiplier = 1.5; // Увеличиваем скорость в 1.5 раза
+        finalVx = pixelsPerMsX * frameTime * speedMultiplier;
+        finalVy = pixelsPerMsY * frameTime * speedMultiplier;
       } else {
-        impulseMultiplier = 0.7; // iOS - более сильный импульс
+        // Если истории недостаточно, используем последнюю сохраненную скорость
+        // Компенсируем коэффициент 0.4, который был применен при вычислении
+        // Увеличиваем скорость при отпускании для более энергичного движения
+        const speedMultiplier = 1.5; // Увеличиваем скорость в 1.5 раза
+        finalVx = (lastDragVelocityRef.current.vx / 0.4) * speedMultiplier;
+        finalVy = (lastDragVelocityRef.current.vy / 0.4) * speedMultiplier;
       }
-      
-      // Используем последнюю сохраненную скорость (правильное направление)
-      const finalVx = lastVelocityRef.current.vx * impulseMultiplier;
-      const finalVy = lastVelocityRef.current.vy * impulseMultiplier;
-      
+
+      // Увеличиваем максимальную скорость при отпускании для более энергичного движения
+      const maxReleaseSpeed = 4.5; // Увеличено с 3.0 для более быстрого движения при отпускании
+      const releaseSpeed = Math.sqrt(finalVx * finalVx + finalVy * finalVy);
+      if (releaseSpeed > maxReleaseSpeed) {
+        const speedRatio = maxReleaseSpeed / releaseSpeed;
+        finalVx *= speedRatio;
+        finalVy *= speedRatio;
+      }
+
+      // Если скорость слишком мала, устанавливаем минимальную скорость
+      const minSpeed = 0.2;
+      if (releaseSpeed < minSpeed && releaseSpeed > 0) {
+        const angle = Math.atan2(finalVy, finalVx);
+        finalVx = Math.cos(angle) * minSpeed;
+        finalVy = Math.sin(angle) * minSpeed;
+      }
+
       onDrag(position.id, position.x, position.y, finalVx, finalVy, false);
     }
     
-    // Сбрасываем накопленную скорость и историю
+    // Сбрасываем накопленную скорость
     dragVelocityRef.current = { vx: 0, vy: 0 };
-    lastVelocityRef.current = { vx: 0, vy: 0 };
-    dragHistoryRef.current = [];
+    lastDragVelocityRef.current = { vx: 0, vy: 0 };
+
+    // Сбрасываем флаг drag с задержкой, чтобы onPress мог проверить
+    setTimeout(() => {
+      hasDraggedRef.current = false;
+      setHasDragged(false);
+    }, 100);
   };
 
   return (
@@ -992,8 +653,11 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
         <Puck
           avatar={player.avatar}
           playerId={player.id}
-          onPress={hasDraggedRef.current ? () => {} : onNav}
-          animatedStyle={animatedStyle}
+          onPress={() => {
+            if (!hasDragged) {
+              onNav();
+            }
+          }}
           size={position.size}
         points={player.goals && player.assists ? 
           (() => {
@@ -1008,30 +672,84 @@ const PuckAnimator = ({ player, position, onNav, onDrag, getAndroidPerformanceLe
           })() : undefined}
         isStar={player.status === 'star'}
         status={player.status}
-        isOnline={player.isOnline}
+          isOnline={player.isOnline} // Реальный статус онлайн из базы данных
         />
       </Suspense>
     </Animated.View>
   );
-};
-
-const iceBg = require('../assets/images/led.jpg');
+}, (prevProps, nextProps) => {
+  // Кастомная функция сравнения для оптимизации: перерисовываем только при изменении позиции или данных игрока
+  return (
+    prevProps.position.x === nextProps.position.x &&
+    prevProps.position.y === nextProps.position.y &&
+    prevProps.position.vx === nextProps.position.vx &&
+    prevProps.position.vy === nextProps.position.vy &&
+    prevProps.position.isDragging === nextProps.position.isDragging &&
+    prevProps.player.id === nextProps.player.id &&
+    prevProps.player.avatar === nextProps.player.avatar &&
+    prevProps.player.status === nextProps.player.status &&
+    prevProps.player.isOnline === nextProps.player.isOnline
+  );
+});
 
 export default function HomeScreen() {
+  const { currentUser } = useUser();
   const router = useRouter();
-  const { t } = useLanguage();
-  const { setCurrentScreen } = useScreenContext();
-  const { currentUser, setCurrentUser, refreshUser } = useUser();
-  const params = useLocalSearchParams();
+  const { setCurrentScreen, currentScreen } = useScreenContext();
+
+  // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isConnected, setIsConnected] = useState(true);
-  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+
+  // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
   const { selectedYear, setSelectedYear, showYearFilter, setShowYearFilter } = useYearFilter();
+
+  // Устанавливаем начальные значения фильтров при первом запуске
+  useEffect(() => {
+    if (players.length > 0 && selectedCountry === null && selectedYear === null) {
+      // Устанавливаем фильтр по стране текущего пользователя или "Беларусь" по умолчанию
+      const defaultCountry = currentUser?.country || 'Беларусь';
+      setSelectedCountry(defaultCountry);
+
+      // Устанавливаем фильтр по году рождения текущего пользователя
+      // Если год не указан - находим год с максимальным количеством игроков в выбранной стране
+      let defaultYear: number;
+
+      if (currentUser?.birthDate) {
+        // Используем год рождения текущего пользователя
+        defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
+      } else {
+        // Находим год с максимальным количеством игроков в выбранной стране
+        const playersInCountry = players.filter(player =>
+          player.country === defaultCountry &&
+          player.birthDate &&
+          player.status === 'player' // Только игроки, не админы/тренеры
+        );
+
+        if (playersInCountry.length > 0) {
+          // Группируем игроков по году рождения
+          const yearCounts: { [year: string]: number } = {};
+          playersInCountry.forEach(player => {
+            const year = player.birthDate!.split('-')[0];
+            yearCounts[year] = (yearCounts[year] || 0) + 1;
+          });
+
+          // Находим год с максимальным количеством игроков
+          const mostPopularYear = Object.keys(yearCounts).reduce((a, b) =>
+            yearCounts[a] > yearCounts[b] ? a : b
+          );
+
+          defaultYear = parseInt(mostPopularYear);
+        } else {
+          // Если нет игроков в этой стране, используем 2012 как запасной вариант
+          defaultYear = 2012;
+        }
+      }
+
+      setSelectedYear(defaultYear);
+    }
+  }, [players.length, currentUser, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear]);
 
   // Состояние для управления годами рождения
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
@@ -1043,537 +761,112 @@ export default function HomeScreen() {
     return years;
   }, []);
 
-  // Группировка игроков по годам рождения
-  const playersByYear = useMemo(() => {
-    const grouped: Record<number, Player[]> = {};
-    
-    // Инициализируем все годы
-    birthYears.forEach((year: number) => {
-      grouped[year] = [];
-    });
-    
-    // Группируем игроков по годам рождения
-    players.forEach(player => {
-      if (player.birthDate) {
-        try {
-          // Парсим дату рождения (формат: YYYY-MM-DD из базы данных)
-          if (/^\d{4}-\d{2}-\d{2}$/.test(player.birthDate)) {
-            const birthYear = parseInt(player.birthDate.split('-')[0]);
-            if (birthYear >= 2008 && birthYear <= 2019) {
-              if (!grouped[birthYear]) {
-                grouped[birthYear] = [];
-              }
-              grouped[birthYear].push(player);
-            }
-          }
-          // Также поддерживаем старый формат DD.MM.YYYY для обратной совместимости
-          else if (player.birthDate.includes('.')) {
-            const parts = player.birthDate.split('.');
-            if (parts.length === 3) {
-              const birthYear = parseInt(parts[2]);
-              if (birthYear >= 2008 && birthYear <= 2019) {
-                if (!grouped[birthYear]) {
-                  grouped[birthYear] = [];
-                }
-                grouped[birthYear].push(player);
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Ошибка парсинга даты рождения:', error);
-        }
-      } else {
-      }
-    });
-    
-    // Выводим статистику по группам
-    Object.keys(grouped).forEach(year => {
-      const yearNum = parseInt(year);
-      if (grouped[yearNum].length > 0) {
-      }
-    });
-    
-    return grouped;
-  }, [players, birthYears]);
-
-
-
   // Ключ для перегенерации случайной части выборки
   const [shuffleKey, setShuffleKey] = useState(0);
 
+  // Загрузка игроков
+  useEffect(() => {
+    const loadAllPlayers = async () => {
+      try {
+        setLoading(true);
+        const loadedPlayers = await loadPlayers();
+        setPlayers(loadedPlayers);
+        console.log(`✅ Загружено ${loadedPlayers.length} игроков для главной страницы`);
+        } catch (error) {
+        console.error('❌ Ошибка загрузки игроков:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAllPlayers();
+  }, []);
+
   // Умный отбор игроков с ограничением количества
   const allVisiblePlayers = useMemo(() => {
+    if (players.length === 0) return [];
+
     const selected = getSmartPlayerSelection(
       players, 
       currentUser?.id,
       selectedCountry || undefined,
       selectedYear || undefined,
-      shuffleKey // Передаем shuffleKey как seed для детерминированного рандома
+      shuffleKey
     );
     return selected;
   }, [players, currentUser?.id, selectedCountry, selectedYear, shuffleKey]);
 
-  // Автоматическое обновление рандомных участников каждый час
-  useEffect(() => {
-    const ONE_HOUR_MS = 60 * 60 * 1000; // 1 час в миллисекундах
-    
-    // Устанавливаем интервал для автоматического обновления
-    const autoUpdateInterval = setInterval(() => {
-      console.log('🔄 Автоматическое обновление рандомных участников (каждый час)');
-      setShuffleKey(prev => prev + 1);
-    }, ONE_HOUR_MS);
-    
-    return () => {
-      clearInterval(autoUpdateInterval);
-    };
-  }, []);
+  // Используем полную логику коллизий из основного экрана
+  const { puckPositions, updatePuckPosition, boundaries } = usePuckCollisionSystem(
+    allVisiblePlayers, // передаем всех видимых игроков
+    currentUser?.id,
+    currentScreen || undefined, // передаем currentScreen из контекста
+    screenWidth,
+    screenHeight
+  );
 
-  // Детектор тряски: «потряси, чтобы обновить рандомных игроков»
-  useEffect(() => {
-    let lastShakeTs = 0;
-    let subscription: any;
-
-    const SHAKE_THRESHOLD = 2.2; // сила тряски
-    const SHAKE_DEBOUNCE_MS = 1200; // защита от повторов
-
-    (async () => {
-      try {
-        // @ts-ignore: optional dependency at runtime, types may be missing in dev env
-        const sensors: any = await import('expo-sensors');
-        const Accelerometer = sensors?.Accelerometer;
-        if (!Accelerometer) return;
-        Accelerometer.setUpdateInterval(100);
-        subscription = Accelerometer.addListener(({ x, y, z }: any) => {
-          const magnitude = Math.abs(x) + Math.abs(y) + Math.abs(z);
-          const now = Date.now();
-          if (magnitude > SHAKE_THRESHOLD && now - lastShakeTs > SHAKE_DEBOUNCE_MS) {
-            lastShakeTs = now;
-            try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
-            setShuffleKey(prev => prev + 1);
-          }
-        });
-      } catch {}
-    })();
-
-    return () => {
-      try { subscription && subscription.remove && subscription.remove(); } catch {}
-    };
-  }, []);
-
-  // Автоматически сбрасываем фильтр по годам, если в выбранной стране нет игроков указанного года
-  useEffect(() => {
-    if (selectedCountry && selectedYear && players.length > 0) {
-      const hasPlayersInYear = players.some(player => {
-        if (player.country === selectedCountry && player.birthDate) {
-          try {
-            // Парсим дату рождения (формат: YYYY-MM-DD из базы данных)
-            if (/^\d{4}-\d{2}-\d{2}$/.test(player.birthDate)) {
-              const birthYear = parseInt(player.birthDate.split('-')[0]);
-              return birthYear === selectedYear;
-            }
-            // Также поддерживаем старый формат DD.MM.YYYY для обратной совместимости
-            else if (player.birthDate.includes('.')) {
-              const parts = player.birthDate.split('.');
-              if (parts.length === 3) {
-                const birthYear = parseInt(parts[2]);
-                return birthYear === selectedYear;
-              }
-            }
-          } catch (error) {
-            console.error('Ошибка парсинга даты рождения:', error);
-          }
-        }
-        return false;
-      });
-      
-      if (!hasPlayersInYear) {
-        setSelectedYear(null);
-      }
-    }
-  }, [selectedCountry, selectedYear, players.length]); // Зависим только от длины массива игроков, а не от самого массива
-
-  // Auto-detect country on first load if not already selected
-  React.useEffect(() => {
-    let mounted = true;
-    const run = async () => {
-      try {
-        if (selectedCountry) return;
-        const code = await detectCountryFromIP();
-        if (code && mounted) {
-          const countryName = countryCodeToCountryName(code) ?? code;
-          if (countryName) {
-            setSelectedCountry(countryName);
-          }
-        }
-      } catch {
-        // ignore
-      }
-    };
-    run();
-    return () => {
-      mounted = false;
-    };
-  }, [selectedCountry, setSelectedCountry]);
-
-
-
-  const { isMainScreen, currentScreen } = useScreenContext();
-  const { puckPositions = [], puckSize, updatePuckPosition, getAndroidPerformanceLevel } = usePuckCollisionSystem(allVisiblePlayers, currentUser?.id, currentScreen || undefined);
-  
-  // Отладочная функция для проверки состояния экрана
-  // Функция отладки отключена
-
-
-
-
-  const refreshPlayers = useCallback(async (forceRefresh = false) => {
-    try {
-      let loadedPlayers: Player[];
-      
-      if (forceRefresh) {
-        // Принудительная загрузка без кэша
-        loadedPlayers = await loadPlayers();
-        // Обновляем кэш с новыми данными
-        dataCache.set(CACHE_KEYS.PLAYERS, loadedPlayers, 5 * 60 * 1000);
-      } else {
-        // Используем кеширование для загрузки игроков
-        loadedPlayers = await dataCache.getOrLoad(
-          CACHE_KEYS.PLAYERS,
-          () => loadPlayers(),
-          5 * 60 * 1000 // 5 минут
-        );
-      }
-      
-      setPlayers(loadedPlayers);
-      
-    } catch (error) {
-      console.error('❌ Ошибка обновления игроков:', error);
-    }
-  }, []);
-
-  const checkForNewUser = useCallback(async () => {
-    try {
-      const user = await loadCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('❌ Ошибка загрузки пользователя:', error);
-    }
-  }, []);
-
-  // Функция инициализации приложения
-  const initializeApp = useCallback(async () => {
-    try {
-      // Принудительно применяем шрифт Gilroy
-      forceGilroyFont();
-      
-      setLoading(true);
-      setImageLoaded(false); // Сбрасываем флаг загрузки изображения
-      
-      // Используем кеширование для быстрой загрузки
-      const [loadedPlayers, user] = await Promise.all([
-        dataCache.getOrLoad(
-          CACHE_KEYS.PLAYERS,
-          () => loadPlayers(),
-          5 * 60 * 1000 // 5 минут
-        ),
-        dataCache.getOrLoad(
-          CACHE_KEYS.USER_PROFILE,
-          () => loadCurrentUser(),
-          2 * 60 * 1000 // 2 минуты
-        )
-      ]);
-      
-      // Предзагружаем дополнительные данные пользователя в фоне
-      if (user?.id) {
-        import('../utils/playerStorage').then(({ preloadUserData }) => 
-          preloadUserData(user.id).catch(err => 
-            console.warn('⚠️ Предзагрузка данных пользователя не удалась:', err)
-          )
-        );
-      }
-      
-      setPlayers(loadedPlayers);
-      setCurrentUser(user);
-      
-      // Предзагружаем аватары всех игроков для мгновенного отображения в профилях
-      import('../utils/AvatarCache').then(({ avatarCache }) => {
-        avatarCache.preloadPlayerAvatars(loadedPlayers).catch(err => 
-          console.warn('⚠️ Предзагрузка аватаров не удалась:', err)
-        );
-      });
-      
-      // Устанавливаем значения по умолчанию только если они не установлены
-      if (!selectedCountry) {
-        if (user?.country) {
-          setSelectedCountry(user.country);
-        } else {
-          setSelectedCountry('Беларусь');
-        }
-      }
-      
-      if (!selectedYear) {
-        if (user?.birthDate) {
-          try {
-            if (/^\d{4}-\d{2}-\d{2}$/.test(user.birthDate)) {
-              const birthYear = parseInt(user.birthDate.split('-')[0]);
-              if (birthYear >= 2008 && birthYear <= 2019) {
-                setSelectedYear(birthYear);
-              } else {
-                setSelectedYear(2012);
-              }
-            } else if (user.birthDate.includes('.')) {
-              const parts = user.birthDate.split('.');
-              if (parts.length === 3) {
-                const birthYear = parseInt(parts[2]);
-                if (birthYear >= 2008 && birthYear <= 2019) {
-                  setSelectedYear(birthYear);
-                } else {
-                  setSelectedYear(2012);
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Ошибка парсинга даты рождения пользователя:', error);
-            setSelectedYear(2012);
-          }
-        } else {
-          setSelectedYear(2012);
-        }
-      }
-      
-      setImageLoaded(true);
-      setLoading(false);
-    } catch (error) {
-      console.error('❌ Ошибка инициализации приложения:', error);
-      setLoading(false);
-    }
-  }, []); // Убираем зависимости, чтобы избежать циклов
-
-  // Отслеживание подключения к интернету
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
-      const connected = state.isConnected && state.isInternetReachable !== false;
-      setIsConnected(connected ?? false);
-      setIsCheckingConnection(false);
-      
-      // Если подключение восстановлено и были загружены игроки - перезагружаем данные
-      if (connected && !loading && players.length === 0) {
-        setLoading(true);
-        initializeApp();
-      }
-    });
-
-    return () => unsubscribe();
-  }, [players.length, loading]);
-
-  useEffect(() => {
-    initializeApp();
-  }, []); // Запускаем только один раз при монтировании
-
-  // Функция для принудительного обновления игроков
-  const forceRefreshPlayers = useCallback(async () => {
-    // Принудительно инвалидируем кэш перед обновлением
-    dataCache.invalidate(CACHE_KEYS.PLAYERS);
-    // Очищаем AsyncStorage кэш всех игроков
-    await clearAllPlayersCache();
-    // Принудительно обновляем данные без использования кэша
-    const loadedPlayers = await loadPlayers(true); // forceRefresh = true
-    setPlayers(loadedPlayers);
-    checkForNewUser();
-  }, []);
-
-  const lastRefreshTimeRef = useRef<number>(0);
-
+  // Перезапускаем анимацию при возвращении на экран
   useFocusEffect(
     useCallback(() => {
-      // Устанавливаем, что мы на главном экране
-      setCurrentScreen('index');
-      
-      // Если есть параметр refresh или прошло больше 2 секунд с последнего обновления - обновляем
-      const now = Date.now();
-      const shouldRefresh = params.refresh || (now - lastRefreshTimeRef.current > 2000);
-      
-      if (shouldRefresh) {
-        lastRefreshTimeRef.current = now;
-        forceRefreshPlayers().then(() => {
-          // Очищаем параметр refresh после использования
-          if (params.refresh) {
-            setTimeout(() => {
-              router.setParams({ refresh: undefined });
-            }, 100);
-          }
-        });
-      }
-      
-      // Возвращаем функцию очистки
+      setCurrentScreen('home');
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, params.refresh, forceRefreshPlayers, router])
+    }, [setCurrentScreen])
   );
 
-  // Отдельный useEffect для обработки параметра refresh (работает даже если мы уже на главном экране)
-  useEffect(() => {
-    if (params.refresh) {
-      forceRefreshPlayers().then(() => {
-        // Очищаем параметр refresh после использования
-        setTimeout(() => {
-          router.setParams({ refresh: undefined });
-        }, 100);
-      });
-    }
-  }, [params.refresh, forceRefreshPlayers, router]);
+  // Обработчик drag - мемоизирован для оптимизации
+  const handleDrag = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => {
+    updatePuckPosition(id, x, y, vx, vy, isDragging);
+  }, [updatePuckPosition]);
 
-  // Убираем частую проверку обновлений данных - только при необходимости
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     refreshPlayers();
-  //   }, 10000);
-  //   return () => clearInterval(interval);
-  // }, [refreshPlayers]);
+  // Обработчик нажатия на шайбу (навигация в профиль) - мемоизирован для оптимизации
+  const handlePuckPress = useCallback((playerId: string) => {
+    router.push({ pathname: '/player/[id]', params: { id: playerId } });
+  }, [router]);
 
-  // Проверяем пользователя реже
-  useEffect(() => {
-    const interval = setInterval(() => {
-      checkForNewUser();
-    }, 300000); // 5 минут
+  // Мемоизированный список шайб для оптимизации рендеринга
+  const renderedPucks = useMemo(() => {
+    return puckPositions.map((position) => {
+      const player = allVisiblePlayers.find(p => p.id === position.id);
+      if (!player) return null;
+      
+      return (
+        <OriginalPuckAnimator
+          key={player.id}
+          player={player}
+          position={position}
+          onNav={() => handlePuckPress(player.id)}
+          onDrag={handleDrag}
+          getAndroidPerformanceLevel={() => 'high'}
+        />
+      );
+    }).filter(Boolean);
+  }, [puckPositions, allVisiblePlayers, handlePuckPress, handleDrag]);
 
-    return () => clearInterval(interval);
-  }, [checkForNewUser]);
+  // Анимация запущена если есть шайбы
+  const isRunning = puckPositions.length > 0;
 
-  // Сбрасываем состояние dropdown фильтров при загрузке или когда игроков нет
-  useEffect(() => {
-    if (loading || players.length === 0) {
-      setShowCountryFilter(false);
-      setShowYearFilter(false);
-    }
-  }, [loading, players.length, setShowCountryFilter, setShowYearFilter]);
-
-  if (loading) {
     return (
       <View style={styles.container}>
         <ImageBackground 
-          source={iceBg} 
-          style={styles.hockeyRink} 
+        source={require('../assets/images/led.jpg')}
+        style={styles.background}
           resizeMode="cover"
-          onLoad={() => setImageLoaded(true)}
-        >
-          {imageLoaded && <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />}
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>{t('home.loadingPlayers')}</Text>
-          </View>
-        </ImageBackground>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <ImageBackground 
-        source={iceBg} 
-        style={styles.hockeyRink} 
-        resizeMode="cover"
-        onLoad={() => setImageLoaded(true)}
       >
-        {/* Внутренняя граница */}
-        <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
+        {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
+        {renderedPucks}
 
-        {/* Фильтры - показываем только когда данные загружены */}
-        {players.length > 0 && (
+        {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
+        <View style={styles.innerBorder} pointerEvents="box-none"></View>
+
+        {/* Фильтры - как в основном экране */}
         <View style={styles.filtersWrapper}>
-        <View style={styles.filtersContainer}>
-          <CountryFilter players={players} />
-          <YearFilter players={players} />
-        </View>
-        </View>
-        )}
-
-
-        {/* Показываем сообщение, если нет подключения к интернету */}
-        {!isConnected && !isCheckingConnection && (
-          <View style={styles.noPlayersContainer}>
-            <Ionicons name="cloud-offline-outline" size={48} color="#fa2f40" style={{ marginBottom: 10 }} />
-            <Text style={styles.noPlayersText}>
-              {t('home.waitingForConnection') || 'Ожидание подключения'}
-            </Text>
-            <Text style={styles.noPlayersSubtext}>
-              {t('home.checkInternetConnection') || 'Проверьте подключение к интернету'}
-            </Text>
-          </View>
-        )}
-
-        {/* Показываем сообщение, если нет игроков по выбранным фильтрам */}
-        {isConnected && allVisiblePlayers.length === 0 && (selectedCountry || selectedYear) && (
-          <View style={styles.noPlayersContainer}>
-            <Text style={styles.noPlayersText}>
-              {selectedCountry && selectedYear 
-                ? t('home.noPlayersCountryYear', { country: selectedCountry, year: selectedYear })
-                : selectedCountry 
-                  ? t('home.noPlayersCountry', { country: selectedCountry })
-                  : t('home.noPlayersYear', { year: selectedYear })
-              }
-            </Text>
-            <Text style={styles.noPlayersSubtext}>
-              {t('home.iceEmpty')}
-            </Text>
-          </View>
-        )}
-
-        {puckPositions.map((position) => {
-          const player = allVisiblePlayers.find(p => p.id === position.id);
-          if (!player) return null;
-          
-          return (
-            <PuckAnimator
-              key={player.id}
-              player={player}
-              position={position}
-              onNav={() => {
-                if (currentUser) {
-                  router.push({ pathname: '/player/[id]', params: { id: player.id } });
-                } else {
-                  setShowAuthModal(true);
-                }
-              }}
-              onDrag={updatePuckPosition}
-              getAndroidPerformanceLevel={getAndroidPerformanceLevel}
-            />
-          );
-        })}
-
-        <Modal
-          visible={showAuthModal}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowAuthModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t('auth.required')}</Text>
-              <Text style={styles.modalMessage}>
-                {t('auth.loginRequired')}
-              </Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity 
-                  style={styles.modalButton} 
-                  onPress={() => {
-                    setShowAuthModal(false);
-                    router.push('/login');
-                  }}
-                >
-                  <Ionicons name="log-in" size={20} color="#fff" />
-                  <Text style={styles.modalButtonText}>{t('auth.login')}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton, styles.modalButtonSecondary]} 
-                  onPress={() => setShowAuthModal(false)}
-                >
-                  <Text style={styles.modalButtonTextSecondary}>{t('common.cancel')}</Text>
-                </TouchableOpacity>
+          <View style={styles.filtersContainer}>
+            <CountryFilter players={players} />
+            <YearFilter players={players} />
               </View>
             </View>
-          </View>
-        </Modal>
       </ImageBackground>
     </View>
   );
@@ -1582,18 +875,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(1,0,0)',
-    overflow: 'hidden', // Добавляем overflow: hidden
+    backgroundColor: '#000',
   },
-  hockeyRink: {
+  background: {
     flex: 1,
     width: '100%',
     height: '100%',
-    borderRadius: 50,
-    overflow: 'hidden',
-    // Убираем border
-    // borderWidth: 6,
-    // borderColor: 'rgba(102, 102, 102, 0.5)',
+    borderRadius: 50, // Скругленные углы как у хоккейной коробки
+    overflow: 'hidden', // Обрезаем содержимое по скругленным углам
   },
   innerBorder: {
     position: 'absolute',
@@ -1601,190 +890,48 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     bottom: 8,
-    borderRadius: 42,
-    borderWidth: 1, // Толщина 1 пиксель
-    borderColor: 'rgba(255, 255, 255, 1)', // Полностью белый, без прозрачности
-  },
-  logoPuckContainer: {
-    position: 'absolute',
-    top: 0,
-    left: width / 2 - 100,
-    zIndex: 1000,
-  },
-  logoPuck: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgb(1,0,0)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#fa2f40',
-    boxShadow: '0 8px 8px rgba(1, 0, 0, 0.4)',
-    elevation: 12,
-  },
-  logoImage: {
-    width: 160,
-    height: 160,
-  },
-  logoImageContainer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  adminPuckContainer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
-  },
-  
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
-    borderRadius: 20,
-    padding: 30,
-    margin: 20,
-    alignItems: 'center',
+    borderRadius: 50, // Увеличиваем радиус для более скругленных углов хоккейной коробки
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 1)',
   },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  modalMessage: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  modalButton: {
-    backgroundColor: '#fa2f40',
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  modalButtonSecondary: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
-    borderColor: '#fa2f40',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    marginLeft: 8,
-  },
-  modalButtonTextSecondary: {
-    color: '#fa2f40',
-  },
-
-
-  noPlayersContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: -150,
-    marginTop: -50,
-    backgroundColor: 'rgba(1, 0, 0, 0.85)',
-    borderRadius: 20,
-    paddingHorizontal: 25,
-    paddingVertical: 20,
-    alignItems: 'center',
-    zIndex: 10,
-    maxWidth: 300,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 4px 6px rgba(1, 0, 0, 0.3)',
-    elevation: 6,
-  },
-  noPlayersText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-    marginBottom: 8,
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  noPlayersSubtext: {
-    color: '#ccc',
-    fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
-    textAlign: 'center',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 1,
-    elevation: 1,
-  },
-
   puckContainer: {
     position: 'absolute',
+    zIndex: 10,
   },
-
   filtersWrapper: {
     position: 'absolute',
-    top: 20,
+    top: 20, // В левом верхнем углу как на главной
     left: 20,
     right: 20,
-    zIndex: 10,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+    alignItems: 'flex-start', // Выравнивание влево
   },
   filtersContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8, // Уменьшаем отступ между фильтрами
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    gap: 15,
   },
-  // Стили кнопки отладки удалены
-  filterButton: {
-    // Удалено
+  controlPanel: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  filterButtonText: {
-    // Удалено
+  info: {
+    flex: 1,
+    marginLeft: 16,
   },
-  filterButtonIcon: {
-    // Удалено
+  infoText: {
+    color: '#fff',
+    fontSize: 12,
+    marginBottom: 2,
   },
-  filtersHint: {
-    // Удалено
-  },
-  filtersHintText: {
-    // Удалено
-  },
-  filtersHintSubtext: {
-    // Удалено
-  },
-
-
-
 });

@@ -1683,6 +1683,11 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     // Очищаем кеш игрока при обновлении (только если не пропускаем)
     if (!skipCacheClear) {
       await clearPlayerCache(playerId);
+
+      // Очищаем AsyncStorage кэш всех игроков для главной страницы (чтобы изменения отображались)
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.removeItem('all_players');
+
       // НЕ очищаем кеш всех игроков при каждом обновлении
       // await clearAllPlayersCache(); // Закомментировано для лучшей производительности
     }
@@ -2600,7 +2605,11 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
       
       // Очищаем DataCache для списка игроков
       dataCache.invalidate(CACHE_KEYS.PLAYERS);
-      
+
+      // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.removeItem('all_players');
+
       // Очищаем кэш всех игроков для гарантии
       await clearAllPlayersCache();
       
@@ -3632,7 +3641,12 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     // Очищаем кеш всех игроков и инвалидация dataCache, чтобы главный экран увидел нового игрока
     await clearAllPlayersCache();
-    try { 
+
+    // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    await AsyncStorage.removeItem('all_players');
+
+    try {
       dataCache.invalidate(CACHE_KEYS.PLAYERS);
     } catch (e) {
       console.error('❌ Ошибка dataCache.invalidate:', e);
@@ -3783,7 +3797,12 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
     
     // Очищаем кеш всех игроков и инвалидация dataCache, чтобы главный экран увидел нового игрока
     await clearAllPlayersCache();
-    try { 
+
+    // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    await AsyncStorage.removeItem('all_players');
+
+    try {
       dataCache.invalidate(CACHE_KEYS.PLAYERS);
     } catch (e) {
       console.error('❌ Ошибка dataCache.invalidate:', e);
@@ -6296,16 +6315,35 @@ export const getSmartPlayerSelection = (
     const admins = players.filter(player => player.status === 'admin');
     
     // Звезды и скауты - показываем рандомно (обрабатываются отдельно)
-    const starsAndScouts = players.filter(player => {
-      const isStarOrScout = player.status === 'star' || player.status === 'scout';
-      if (!isStarOrScout) return false;
+    // Скауты показываются во всех странах независимо от фильтра, но с вероятностью 25% (1 к 4)
+    // Звезды показываются всегда (если проходят фильтр по стране)
+    
+    // Если randomSeed не передан или равен 0, используем текущее время для разнообразия
+    const effectiveSeed = randomSeed !== undefined && randomSeed !== 0
+      ? randomSeed 
+      : Date.now() % 1000000; // Используем миллисекунды для разнообразия
+    
+    // Отдельно обрабатываем звезд
+    const stars = players.filter(player => {
+      if (player.status !== 'star') return false;
       
-      // Если выбран фильтр по стране, фильтруем по стране
+      // Звезды фильтруются по стране, если выбран фильтр
       if (selectedCountry) {
         return player.country === selectedCountry;
       }
-      
       return true;
+    });
+    
+    // Отдельно обрабатываем скаутов с вероятностью 25% (1 к 4)
+    // Скауты показываются во всех странах независимо от фильтра
+    const allScouts = players.filter(player => player.status === 'scout');
+    const selectedScouts = allScouts.filter(scout => {
+      // Создаем уникальный seed для каждого скаута на основе его ID и общего seed
+      const scoutSeed = `${scout.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      // Используем синус для получения значения от -1 до 1, затем преобразуем в вероятность
+      const randomValue = Math.sin(scoutSeed * 1.5) * 0.5 + 0.5; // От 0 до 1
+      // 25% вероятность показать скаута (1 к 4)
+      return randomValue <= 0.25;
     });
     
     // Остальные не-игроки (тренеры, магазины, заточка коньков)
@@ -6324,26 +6362,33 @@ export const getSmartPlayerSelection = (
       return true;
     });
     
-    // Звезды и скауты показываем рандомно
-    // Каждая звезда/скаут случайно решает, показываться ей или нет (50% вероятность)
-    // Используем детерминированный рандом на основе seed для стабильности
-    const effectiveSeed = randomSeed !== undefined 
-      ? randomSeed 
-      : `${selectedCountry || 'all'}_${selectedYear || 'all'}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    // Перемешиваем звезд отдельно и берем до 5
+    const starsShuffled = [...stars].sort((a, b) => {
+      const seedA = `${a.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seedB = `${b.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const randomA = Math.sin(seedA * 1.5);
+      const randomB = Math.sin(seedB * 1.5);
+      return randomA - randomB;
+    });
+    const limitedStars = starsShuffled.slice(0, 5);
     
-    // Для каждой звезды/скаута определяем случайно, показывать её или нет
-    // Используем хеш от playerId + seed для детерминированного, но случайного решения
-    const starsAndScoutsRandom = starsAndScouts.filter((player, index) => {
-      // Создаем уникальный seed для каждого игрока на основе его ID и общего seed
-      const playerSeed = `${player.id}_${effectiveSeed}_${index}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      // Используем синус для получения значения от -1 до 1, затем преобразуем в вероятность
-      const randomValue = Math.sin(playerSeed * 1.5) * 0.5 + 0.5; // От 0 до 1
-      // 50% вероятность показать звезду/скаута
-      return randomValue > 0.5;
+    // Перемешиваем скаутов отдельно
+    const scoutsShuffled = [...selectedScouts].sort((a, b) => {
+      const seedA = `${a.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seedB = `${b.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const randomA = Math.sin(seedA * 1.5);
+      const randomB = Math.sin(seedB * 1.5);
+      return randomA - randomB;
     });
     
-    // Ограничиваем максимум 10 звезд/скаутов (на случай если случайно выбралось больше)
-    const limitedStarsAndScouts = starsAndScoutsRandom.slice(0, 10);
+    // Сначала берем звезд (до 5), затем добавляем скаутов отдельно (если есть место)
+    const maxTotal = 5;
+    const starsCount = limitedStars.length;
+    const remainingSlotsForScouts = Math.max(0, maxTotal - starsCount);
+    const limitedScouts = scoutsShuffled.slice(0, remainingSlotsForScouts);
+    
+    // Объединяем звезд и скаутов (не перемешивая их между собой)
+    const limitedStarsAndScouts = [...limitedStars, ...limitedScouts];
 
     // 2. Фильтруем игроков по стране и году
     const filteredPlayers = players.filter(player => {
@@ -6434,7 +6479,7 @@ export const getSmartPlayerSelection = (
     // otherNonPlayers уже объявлен выше, просто используем его
     permanentPlayers.push(...otherNonPlayers);
     
-    // 9.6. Рандомные звезды и скауты (до 10 человек, выбираются случайно)
+    // 9.6. Рандомные звезды и скауты (до 5 человек, выбираются случайно)
     permanentPlayers.push(...limitedStarsAndScouts);
 
     // 10. Если постоянных игроков больше максимума, обрезаем до максимума
@@ -6463,7 +6508,9 @@ export const getSmartPlayerSelection = (
     const finalPlayers = uniquePlayers.slice(0, MAX_PLAYERS);
 
     console.log(`🎯 Умный отбор игроков: ${finalPlayers.length} из ${players.length} (фильтр: ${selectedCountry || 'все страны'}, ${selectedYear || 'все годы'})`);
-    console.log(`📊 Разбивка: админы: ${admins.length}, звезды/скауты (рандом ${starsAndScouts.length > 0 ? `${limitedStarsAndScouts.length}/${starsAndScouts.length}` : '0'}, показывается случайно): ${limitedStarsAndScouts.length}, другие не-игроки: ${otherNonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayersLimited.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
+    const showingStars = limitedStars.length;
+    const showingScouts = limitedScouts.length;
+    console.log(`📊 Разбивка: админы: ${admins.length}, звезды: ${showingStars}/${stars.length}, скауты: ${showingScouts}/${allScouts.length} (вероятность 25%), другие не-игроки: ${otherNonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayersLimited.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
     console.log(`🔢 Лимит: ${MAX_PLAYERS} (постоянные: ${permanentCount}, доступно для случайных: ${remainingSlots}, итого: ${finalPlayers.length})`);
 
     return finalPlayers;

@@ -139,8 +139,8 @@ const Puck: React.FC<PuckProps> = ({
               overflow: 'hidden'
             }
           ]}>
-            <Image 
-              source={require('../assets/images/scout.png')} 
+            <Image
+              source={require('../assets/images/scout.png')}
               style={{
                 width: dimensions.avatarSize - 4,
                 height: dimensions.avatarSize - 4,
@@ -160,10 +160,10 @@ const Puck: React.FC<PuckProps> = ({
               backgroundColor: '#2C3E50'
             }
           ]}>
-            <Ionicons 
-              name={status === 'shop' ? 'storefront' : 'person'} 
-              size={dimensions.iconSize} 
-              color="#FFFFFF" 
+            <Ionicons
+              name={status === 'shop' ? 'storefront' : 'person'}
+              size={dimensions.iconSize}
+              color="#FFFFFF"
             />
           </View>
         )}
@@ -179,9 +179,9 @@ const Puck: React.FC<PuckProps> = ({
           <View style={[
             styles.onlineIndicator,
             {
-              width: size * 0.12,
-              height: size * 0.12,
-              borderRadius: (size * 0.12) / 2,
+              width: size * 0.08, // Уменьшен размер для минимализма
+              height: size * 0.08,
+              borderRadius: (size * 0.08) / 2,
               top: (size * 0.05) + 3, // Сдвигаем вниз: увеличиваем top
               right: (size * 0.05) + 5, // Сдвигаем влево: увеличиваем right
             }
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   onlineIndicator: {
     position: 'absolute',
     backgroundColor: '#4CAF50',
-    borderWidth: 2,
+    borderWidth: 1, // Более тонкая граница для минимализма
     borderColor: '#000',
     zIndex: 10,
   },

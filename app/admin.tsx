@@ -1,3 +1,6 @@
+// КРИТИЧЕСКИЙ ЛОГ - должен появиться ДО всех импортов
+(console as any).log('🔍 [ROUTES DEBUG] app/admin.tsx - ФАЙЛ НАЧИНАЕТ ЗАГРУЗКУ');
+
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useEffect, useState, useCallback } from 'react';
 import {

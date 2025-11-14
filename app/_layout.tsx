@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { Tabs, useRouter, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
-import { AppState, LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
+import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
 import { UserProvider, useUser } from '../contexts/UserContext';
@@ -66,16 +66,52 @@ if (false && (typeof __DEV__ === 'undefined' || !__DEV__)) {
 export default function RootLayout() {
   const lastUserLoadTime = React.useRef<number>(0);
   const loginTracked = React.useRef<boolean>(false); // Флаг для отслеживания логина в сессии
-  const [appState, setAppState] = React.useState<string>(AppState.currentState);
+  // Условный импорт AppState только для мобильных платформ
+  const getAppState = () => {
+    if (Platform.OS === 'web') {
+      return 'active'; // На веб всегда активен
+    }
+    try {
+      // Безопасная проверка доступности модуля
+      if (typeof require !== 'undefined') {
+        const ReactNative = require('react-native');
+        const AppStateModule = ReactNative?.AppState;
+        return AppStateModule?.currentState || 'active';
+      }
+    } catch {
+      // Игнорируем ошибки
+    }
+    return 'active';
+  };
+
+  const [appState, setAppState] = React.useState<string>(getAppState());
   const [showSplash, setShowSplash] = React.useState<boolean>(true);
   const [appReady, setAppReady] = React.useState<boolean>(false);
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   
   React.useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      setAppState(nextAppState);
-    });
+    // AppState только для мобильных платформ
+    if (Platform.OS === 'web') {
+      return; // На веб не используем AppState
+    }
+    
+    let subscription: { remove: () => void } | null = null;
+    try {
+      // Безопасная проверка доступности модуля
+      if (typeof require !== 'undefined') {
+        const ReactNative = require('react-native');
+        const AppStateModule = ReactNative?.AppState;
+        if (AppStateModule) {
+          subscription = AppStateModule.addEventListener('change', (nextAppState: string) => {
+            setAppState(nextAppState);
+          });
+        }
+      }
+    } catch (e) {
+      // AppState недоступен
+    }
+    
     return () => subscription?.remove();
   }, []);
   const router = useRouter();
@@ -623,11 +659,26 @@ export default function RootLayout() {
     };
 
     // Добавляем слушатель для обновления при фокусе на приложении
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active') {
-        handleFocus();
+    // AppState только для мобильных платформ
+    let subscription: { remove: () => void } | null = null;
+    if (Platform.OS !== 'web') {
+      try {
+        // Безопасная проверка доступности модуля
+        if (typeof require !== 'undefined') {
+          const ReactNative = require('react-native');
+          const AppStateModule = ReactNative?.AppState;
+          if (AppStateModule) {
+            subscription = AppStateModule.addEventListener('change', (nextAppState: string) => {
+              if (nextAppState === 'active') {
+                handleFocus();
+              }
+            });
+          }
+        }
+      } catch (e) {
+        // AppState недоступен
       }
-    });
+    }
 
     return () => subscription?.remove();
   }, []);
@@ -731,7 +782,21 @@ export default function RootLayout() {
     // Это уже реализовано в основном useEffect выше
   }, []);
 
-  const Image = require('react-native').Image;
+  // Условный импорт Image только для мобильных платформ
+  const Image = Platform.OS === 'web' 
+    ? require('react-native-web').Image 
+    : (() => {
+        try {
+          if (typeof require !== 'undefined') {
+            const ReactNative = require('react-native');
+            return ReactNative?.Image;
+          }
+        } catch {
+          // Игнорируем ошибки
+        }
+        // Fallback на react-native-web если react-native недоступен
+        return require('react-native-web').Image;
+      })();
   
   return (
     <LanguageProvider>
@@ -973,6 +1038,12 @@ export default function RootLayout() {
         />
         <Tabs.Screen
           name="puck-speed-sound"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="puck-test"
           options={{
             href: null,
           }}
