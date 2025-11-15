@@ -2183,7 +2183,9 @@
   },
   "filters": {
     "year": "rok",
-    "yearDefault": "2012"
+    "yearDefault": "2012",
+    "allCountries": "Wszystkie",
+    "allYears": "Wszystkie"
   },
   "chat": {
     "loading": "Ładowanie czatu...",

@@ -2369,7 +2369,9 @@
   },
   "filters": {
     "year": "vuosi",
-    "yearDefault": "2012"
+    "yearDefault": "2012",
+    "allCountries": "Kaikki",
+    "allYears": "Kaikki"
   },
   "chat": {
     "loading": "Ladataan chattia...",

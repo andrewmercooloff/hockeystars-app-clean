@@ -2399,7 +2399,9 @@
   },
   "filters": {
     "year": "metų",
-    "yearDefault": "2012 m"
+    "yearDefault": "2012 m",
+    "allCountries": "Visi",
+    "allYears": "Visi"
   },
   "chat": {
     "loading": "Įkeliamas pokalbis...",

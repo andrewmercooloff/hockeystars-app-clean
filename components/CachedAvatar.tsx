@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from 'expo-image';
-import { View } from 'react-native';
+import { View, Image as RNImage } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
 
@@ -14,6 +14,7 @@ interface CachedAvatarProps {
   style?: any;
   onError?: () => void;
   onLoad?: () => void;
+  status?: string; // Добавляем статус для проверки скаута
 }
 
 const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
@@ -26,6 +27,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   style,
   onError,
   onLoad,
+  status,
 }) => {
   // Используем useAvatarCache который подписывается на изменения через Realtime
   // ВАЖНО: Кеш имеет приоритет над fallbackAvatarUrl, даже если fallbackAvatarUrl изменился
@@ -108,6 +110,19 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     ...style
   }), [size, style]);
 
+  // Для скаутов всегда показываем scout.png
+  if (status === 'scout') {
+    return (
+      <View style={[imageStyle, { backgroundColor: 'transparent' }]}>
+        <RNImage
+          source={require('../assets/images/scout.png')}
+          style={imageStyle}
+          resizeMode="cover"
+        />
+      </View>
+    );
+  }
+
   // Если нет URL или ошибка загрузки, показываем fallback
   if (!effectiveAvatarUrl || imageError) {
     return (
@@ -151,7 +166,8 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     prevProps.size === nextProps.size &&
     prevProps.fallbackIcon === nextProps.fallbackIcon &&
     prevProps.fallbackSize === nextProps.fallbackSize &&
-    prevProps.fallbackColor === nextProps.fallbackColor
+    prevProps.fallbackColor === nextProps.fallbackColor &&
+    prevProps.status === nextProps.status
   );
 });
 

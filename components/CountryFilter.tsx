@@ -31,7 +31,15 @@ export default function CountryFilter({ players }: { players: Player[] }) {
     ).sort() as string[];
   }, [players]);
 
-  const handleCountrySelect = useCallback((country: string) => {
+  // Мемоизируем текст кнопки с учетом "Все"
+  const filterButtonText = useMemo(() => {
+    if (!selectedCountry) {
+      return t('filters.allCountries') || 'Все';
+    }
+    return t(`profile.countries.${selectedCountry}`);
+  }, [selectedCountry, t]);
+
+  const handleCountrySelect = useCallback((country: string | null) => {
     setSelectedCountry(country);
     // Плавно закрываем dropdown перед вызовом setShowCountryFilter
     Animated.parallel([
@@ -85,10 +93,6 @@ export default function CountryFilter({ players }: { players: Player[] }) {
     }
   }, [showCountryFilter, dropdownOpacity, dropdownTranslateY]);
 
-  // Мемоизируем текст кнопки
-  const filterButtonText = useMemo(() => {
-    return selectedCountry ? t(`profile.countries.${selectedCountry}`) : t('profile.countries.Беларусь');
-  }, [selectedCountry, t]);
 
   return (
     <View style={styles.container}>
@@ -112,6 +116,22 @@ export default function CountryFilter({ players }: { players: Player[] }) {
             transform: [{ translateY: dropdownTranslateY }],
           }
         ]}>
+          {/* Опция "Все" */}
+          <TouchableOpacity
+            style={[
+              styles.countryItem,
+              !selectedCountry && styles.selectedCountryItem
+            ]}
+            onPress={() => handleCountrySelect(null)}
+          >
+            <Text style={[
+              styles.countryText,
+              !selectedCountry && styles.selectedCountryText
+            ]}>
+              {t('filters.allCountries') || 'Все'}
+            </Text>
+          </TouchableOpacity>
+          
           {countries.map((country, index) => {
             const isSelected = selectedCountry === country;
             const isFirst = index === 0;

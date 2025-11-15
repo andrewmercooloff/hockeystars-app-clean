@@ -2250,7 +2250,9 @@
   },
   "filters": {
     "year": "год",
-    "yearDefault": "2012 год"
+    "yearDefault": "2012 год",
+    "allCountries": "Все",
+    "allYears": "Все"
   },
   "chat": {
     "loading": "Загрузка чата...",

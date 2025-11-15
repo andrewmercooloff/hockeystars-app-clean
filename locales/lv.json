@@ -2395,7 +2395,9 @@
   },
   "filters": {
     "year": "gadā",
-    "yearDefault": "2012. gads"
+    "yearDefault": "2012. gads",
+    "allCountries": "Visi",
+    "allYears": "Visi"
   },
   "chat": {
     "loading": "Notiek tērzēšanas ielāde...",

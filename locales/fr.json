@@ -2375,7 +2375,9 @@
   },
   "filters": {
     "year": "année",
-    "yearDefault": "2012"
+    "yearDefault": "2012",
+    "allCountries": "Tous",
+    "allYears": "Tous"
   },
   "chat": {
     "loading": "Chargement du chat...",

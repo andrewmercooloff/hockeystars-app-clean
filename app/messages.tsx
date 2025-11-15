@@ -396,6 +396,7 @@ export default function MessagesScreen() {
                     fallbackAvatarUrl={chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
                     size={50}
                     style={styles.chatAvatar}
+                    status={chat.player.status}
                     onError={() => {
                       // Fallback для аватарки при ошибке загрузки
                       console.log('Ошибка загрузки аватарки для:', chat.player.name);
@@ -404,11 +405,11 @@ export default function MessagesScreen() {
                   
                   <View style={styles.chatInfo}>
                     <View style={styles.chatHeader}>
-                      {chat.player.status !== 'scout' && (
-                        <Text style={styles.chatName}>
-                          {chat.player.name?.toUpperCase()}
-                        </Text>
-                      )}
+                      <Text style={styles.chatName}>
+                        {chat.player.status === 'scout' 
+                          ? t('profile.scout')?.toUpperCase() || 'SCOUT'
+                          : chat.player.name?.toUpperCase()}
+                      </Text>
                       {chat.lastMessage && (
                         <Text style={styles.chatTime}>
                           {formatTime(chat.lastMessage.timestamp)}

@@ -2367,7 +2367,9 @@
   },
   "filters": {
     "year": "rok",
-    "yearDefault": "2012"
+    "yearDefault": "2012",
+    "allCountries": "Vše",
+    "allYears": "Vše"
   },
   "chat": {
     "loading": "Načítání chatu...",

@@ -71,24 +71,6 @@ export default function YearFilter({ players }: { players: any[] }) {
     return years;
   }, [players, selectedCountry]);
 
-  const handleYearSelect = useCallback((year: number) => {
-    setSelectedYear(year);
-    // Плавно закрываем dropdown перед вызовом setShowYearFilter
-    Animated.parallel([
-      Animated.timing(dropdownOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(dropdownTranslateY, {
-        toValue: -20,
-        duration: 200,
-        useNativeDriver: true,
-      })
-    ]).start(() => {
-      setShowYearFilter(false); // Закрываем фильтр после завершения анимации
-    });
-  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownTranslateY]);
 
   const handleFilterToggle = useCallback(() => {
     setShowYearFilter(!showYearFilter);
@@ -125,6 +107,25 @@ export default function YearFilter({ players }: { players: any[] }) {
     }
   }, [showYearFilter, dropdownOpacity, dropdownTranslateY]);
 
+  const handleYearSelect = useCallback((year: number | null) => {
+    setSelectedYear(year);
+    // Плавно закрываем dropdown перед вызовом setShowYearFilter
+    Animated.parallel([
+      Animated.timing(dropdownOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(dropdownTranslateY, {
+        toValue: -20,
+        duration: 200,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      setShowYearFilter(false); // Закрываем фильтр после завершения анимации
+    });
+  }, [setSelectedYear, setShowYearFilter, dropdownOpacity, dropdownTranslateY]);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -132,7 +133,7 @@ export default function YearFilter({ players }: { players: any[] }) {
         onPress={handleFilterToggle}
       >
         <Text style={styles.filterButtonText}>
-          {selectedYear ? `${selectedYear}` : t('filters.yearDefault')}
+          {selectedYear ? `${selectedYear}` : (t('filters.allYears') || 'Все')}
         </Text>
         <Text style={styles.filterButtonIcon}>
           {showYearFilter ? '▲' : '▼'}
@@ -147,6 +148,22 @@ export default function YearFilter({ players }: { players: any[] }) {
             transform: [{ translateY: dropdownTranslateY }],
           }
         ]}>
+          {/* Опция "Все" */}
+          <TouchableOpacity
+            style={[
+              styles.yearItem,
+              !selectedYear && styles.selectedYearItem
+            ]}
+            onPress={() => handleYearSelect(null)}
+          >
+            <Text style={[
+              styles.yearText,
+              !selectedYear && styles.selectedYearText
+            ]}>
+              {t('filters.allYears') || 'Все'}
+            </Text>
+          </TouchableOpacity>
+          
           {availableYears.map(({ year }, index) => {
             const isSelected = selectedYear === year;
             const isFirst = index === 0;

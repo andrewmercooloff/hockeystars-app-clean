@@ -2485,6 +2485,7 @@ export default function PlayerProfile() {
                             fallbackAvatarUrl={imageSource}
                             size={100}
                             style={styles.avatarImage}
+                            status={player.status}
                           />
                         </View>
                       </View>

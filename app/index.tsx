@@ -679,6 +679,7 @@ export default function HomeScreen() {
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
+  const filtersInitializedRef = useRef(false); // Флаг, что фильтры были инициализированы
 
   // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
@@ -686,47 +687,78 @@ export default function HomeScreen() {
 
   // Устанавливаем начальные значения фильтров при первом запуске
   useEffect(() => {
-    if (players.length > 0 && selectedCountry === null && selectedYear === null) {
-      // Устанавливаем фильтр по стране текущего пользователя или "Беларусь" по умолчанию
-      const defaultCountry = currentUser?.country || 'Беларусь';
-      setSelectedCountry(defaultCountry);
+    // Инициализируем фильтры только один раз при первой загрузке
+    if (players.length > 0 && !filtersInitializedRef.current && selectedCountry === null && selectedYear === null) {
+      // Для неавторизованных пользователей показываем "Все"
+      if (!currentUser) {
+        setSelectedCountry(null);
+        setSelectedYear(null);
+        return;
+      }
 
-      // Устанавливаем фильтр по году рождения текущего пользователя
-      // Если год не указан - находим год с максимальным количеством игроков в выбранной стране
-      let defaultYear: number;
-
-      if (currentUser?.birthDate) {
-        // Используем год рождения текущего пользователя
-        defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
-      } else {
-        // Находим год с максимальным количеством игроков в выбранной стране
+      // Устанавливаем фильтр по стране текущего пользователя
+      const defaultCountry = currentUser?.country;
+      
+      // Проверяем, есть ли игроки в стране пользователя
+      if (defaultCountry) {
         const playersInCountry = players.filter(player =>
           player.country === defaultCountry &&
           player.birthDate &&
-          player.status === 'player' // Только игроки, не админы/тренеры
+          player.status === 'player'
         );
 
-        if (playersInCountry.length > 0) {
-          // Группируем игроков по году рождения
+        // Если нет игроков в стране пользователя, показываем "Все"
+        if (playersInCountry.length === 0) {
+          setSelectedCountry(null);
+          setSelectedYear(null);
+          return;
+        }
+
+        setSelectedCountry(defaultCountry);
+
+        // Устанавливаем фильтр по году рождения текущего пользователя
+        let defaultYear: number | null = null;
+
+        if (currentUser?.birthDate) {
+          // Используем год рождения текущего пользователя
+          defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
+          
+          // Проверяем, есть ли игроки в этом году в стране пользователя
+          const playersInYear = playersInCountry.filter(player => {
+            const year = player.birthDate!.split('-')[0];
+            return parseInt(year) === defaultYear;
+          });
+
+          // Если нет игроков в этом году, показываем "Все" для года
+          if (playersInYear.length === 0) {
+            defaultYear = null;
+          }
+        } else {
+          // Находим год с максимальным количеством игроков в выбранной стране
           const yearCounts: { [year: string]: number } = {};
           playersInCountry.forEach(player => {
             const year = player.birthDate!.split('-')[0];
             yearCounts[year] = (yearCounts[year] || 0) + 1;
           });
 
-          // Находим год с максимальным количеством игроков
-          const mostPopularYear = Object.keys(yearCounts).reduce((a, b) =>
-            yearCounts[a] > yearCounts[b] ? a : b
-          );
-
-          defaultYear = parseInt(mostPopularYear);
-        } else {
-          // Если нет игроков в этой стране, используем 2012 как запасной вариант
-          defaultYear = 2012;
+          if (Object.keys(yearCounts).length > 0) {
+            // Находим год с максимальным количеством игроков
+            const mostPopularYear = Object.keys(yearCounts).reduce((a, b) =>
+              yearCounts[a] > yearCounts[b] ? a : b
+            );
+            defaultYear = parseInt(mostPopularYear);
+          }
         }
-      }
 
-      setSelectedYear(defaultYear);
+        setSelectedYear(defaultYear);
+      } else {
+        // Если у пользователя нет страны, показываем "Все"
+        setSelectedCountry(null);
+        setSelectedYear(null);
+      }
+      
+      // Помечаем, что фильтры были инициализированы
+      filtersInitializedRef.current = true;
     }
   }, [players.length, currentUser, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear]);
 

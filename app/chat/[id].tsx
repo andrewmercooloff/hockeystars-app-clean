@@ -31,6 +31,7 @@ import { Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../utils/supabase';
 import CachedBackground from '../../components/CachedBackground';
+import CachedAvatar from '../../components/CachedAvatar';
 import { addActivityPoints } from '../../services/activityService';
 
 const iceBg = require('../../assets/images/led.jpg');
@@ -609,19 +610,18 @@ export default function ChatScreen() {
                 style={styles.avatarButton}
                 activeOpacity={0.7}
               >
-                <Image 
-                  source={{ 
-                    uri: otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player',
-                    cache: 'force-cache',
-                    headers: {
-                      'Cache-Control': 'max-age=3600'
-                    }
-                  }} 
+                <CachedAvatar
+                  playerId={otherPlayer.id}
+                  fallbackAvatarUrl={otherPlayer.avatar || 'https://via.placeholder.com/40/333/fff?text=Player'}
+                  size={40}
                   style={styles.headerAvatar}
+                  status={otherPlayer.status}
                 />
               </TouchableOpacity>
               <View style={styles.headerText}>
-                <Text style={styles.headerName}>{otherPlayer.name?.toUpperCase()}</Text>
+                <Text style={styles.headerName}>
+                  {otherPlayer.status === 'scout' ? t('profile.scout')?.toUpperCase() || 'SCOUT' : otherPlayer.name?.toUpperCase()}
+                </Text>
                 <Text style={[
                   styles.headerStatus,
                   otherPlayer.isOnline ? styles.headerStatusOnline : styles.headerStatusOffline
@@ -654,7 +654,13 @@ export default function ChatScreen() {
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Ionicons name="chatbubble-outline" size={48} color="#fff" />
-                  <Text style={styles.emptyText}>{t('chat.startConversation', { name: otherPlayer.name?.toUpperCase() })}</Text>
+                  <Text style={styles.emptyText}>
+                    {t('chat.startConversation', { 
+                      name: otherPlayer.status === 'scout' 
+                        ? t('profile.scout')?.toUpperCase() || 'SCOUT' 
+                        : otherPlayer.name?.toUpperCase() 
+                    })}
+                  </Text>
                 </View>
               ) : !loading ? (
                 (() => {
