@@ -46,6 +46,7 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isNearBottom, setIsNearBottom] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastLoadTimeRef = useRef<number>(0);
   const lastMessageCountRef = useRef<number>(0);
@@ -65,11 +66,34 @@ export default function ChatScreen() {
   useEffect(() => {
     if (scrollToBottom === 'true' && messages.length > 0 && !loading) {
       console.log('🔗 Автоматическая прокрутка в чат через deep link');
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, Platform.OS === 'android' ? 300 : 200);
+      // Делаем несколько попыток прокрутки для надежности
+      const scrollAttempts = [200, 400, 600];
+      scrollAttempts.forEach((delay, index) => {
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({ animated: index === 0 });
+            setIsNearBottom(true);
+          }
+        }, Platform.OS === 'android' ? delay + 100 : delay);
+      });
     }
   }, [scrollToBottom, messages.length, loading]);
+
+  // Улучшенная автоматическая прокрутка при загрузке сообщений
+  useEffect(() => {
+    if (messages.length > 0 && !loading && scrollViewRef.current) {
+      // Делаем несколько попыток прокрутки для надежности
+      const scrollAttempts = [100, 300, 500];
+      scrollAttempts.forEach((delay, index) => {
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({ animated: index === 0 });
+            setIsNearBottom(true);
+          }
+        }, Platform.OS === 'android' ? delay + 100 : delay);
+      });
+    }
+  }, [messages.length, loading]);
 
   useEffect(() => {
     if (!currentUser || !otherPlayer || otherPlayer.id !== id) {
@@ -122,12 +146,34 @@ export default function ChatScreen() {
               // Проверяем, что сообщение еще не добавлено
               const exists = prevMessages.some(msg => msg.id === newMessage.id);
               if (exists) {
-              console.log('⚠️ Сообщение уже существует в списке, пропускаем');
-                return prevMessages;
+                // Если сообщение уже существует, обновляем его (например, статус прочтения)
+                console.log('⚠️ Сообщение уже существует в списке, обновляем его');
+                return prevMessages.map(msg => {
+                  if (msg.id === newMessage.id) {
+                    return {
+                      ...msg,
+                      read: rawMessage.read || false,
+                      text: rawMessage.text || msg.text
+                    };
+                  }
+                  return msg;
+                });
               }
               
             // Удаляем временное сообщение, если оно есть (заменяем на реальное из базы)
-            const filteredMessages = prevMessages.filter(msg => !msg.id.startsWith('temp-'));
+            // Ищем временное сообщение с таким же текстом и отправителем
+            const filteredMessages = prevMessages.filter(msg => {
+              if (msg.id.startsWith('temp-')) {
+                // Если это временное сообщение от текущего пользователя с таким же текстом
+                // и временем отправки близким к текущему, заменяем его
+                if (msg.senderId === newMessage.senderId && 
+                    msg.text === newMessage.text &&
+                    Math.abs(msg.timestamp.getTime() - newMessage.timestamp.getTime()) < 5000) {
+                  return false; // Удаляем временное сообщение
+                }
+              }
+              return true;
+            });
             
             console.log('➕ Добавляем новое сообщение в список. Всего сообщений:', filteredMessages.length + 1);
             return [...filteredMessages, newMessage];
@@ -136,6 +182,16 @@ export default function ChatScreen() {
             // Помечаем сообщение как прочитанное, так как чат открыт
             // Это предотвратит обновление счетчика непрочитанных сообщений
           if (newMessage.receiverId === currentUser.id && !newMessage.read) {
+              // Сразу обновляем локальное состояние для мгновенного отображения
+              setMessages(prevMessages => {
+                return prevMessages.map(msg => {
+                  if (msg.id === newMessage.id) {
+                    return { ...msg, read: true };
+                  }
+                  return msg;
+                });
+              });
+              
               setTimeout(async () => {
                 try {
                   await supabase
@@ -157,6 +213,15 @@ export default function ChatScreen() {
                     .eq('id', currentUser.id);
                 } catch (error) {
                   console.error('❌ Ошибка отметки сообщения как прочитанного в открытом чате:', error);
+                  // Откатываем изменение в случае ошибки
+                  setMessages(prevMessages => {
+                    return prevMessages.map(msg => {
+                      if (msg.id === newMessage.id) {
+                        return { ...msg, read: false };
+                      }
+                      return msg;
+                    });
+                  });
                 }
               }, 100);
             }
@@ -164,8 +229,45 @@ export default function ChatScreen() {
             // Прокручиваем вниз после получения нового сообщения
             setTimeout(() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
+              setIsNearBottom(true);
             }, Platform.OS === 'android' ? 200 : 100);
           }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          console.log('📨 Realtime: Получено событие UPDATE для сообщения:', payload.new);
+          
+          const rawMessage = payload.new;
+          
+          // Проверяем, что сообщение для этого чата
+          const isForThisChat = (
+            (rawMessage.sender_id === currentUser.id && rawMessage.receiver_id === otherPlayer.id) ||
+            (rawMessage.sender_id === otherPlayer.id && rawMessage.receiver_id === currentUser.id)
+          );
+          
+          if (!isForThisChat) {
+            return;
+          }
+          
+          // Обновляем статус прочтения сообщения в локальном состоянии
+          setMessages(prevMessages => {
+            return prevMessages.map(msg => {
+              if (msg.id === rawMessage.id) {
+                return {
+                  ...msg,
+                  read: rawMessage.read || false
+                };
+              }
+              return msg;
+            });
+          });
+        }
       )
       .on(
         'postgres_changes',
@@ -208,7 +310,7 @@ export default function ChatScreen() {
     };
   }, [currentUser?.id, otherPlayer?.id, id]);
 
-  // Обработка системной кнопки "назад"
+  // Обработка системной кнопки "назад" и автоскролл при возврате в чат
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -218,8 +320,16 @@ export default function ChatScreen() {
 
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
+      // Автоскролл вниз при возврате в чат (если есть сообщения)
+      if (messages.length > 0 && !loading) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+          setIsNearBottom(true);
+        }, Platform.OS === 'android' ? 300 : 200);
+      }
+
       return () => backHandler.remove();
-    }, [])
+    }, [messages.length, loading])
   );
 
   // Синхронизируем счетчик с глобальным контекстом после загрузки
@@ -271,13 +381,35 @@ export default function ChatScreen() {
           }
           
           // Сразу загружаем сообщения
-          const conversation = await getConversation(userData.id, otherPlayerData.id);
-          setMessages(conversation);
+          console.log(`📨 Загружаем диалог между ${userData.id} и ${otherPlayerData.id}...`);
+          try {
+            const conversation = await getConversation(userData.id, otherPlayerData.id);
+            console.log(`✅ Загружено ${conversation.length} сообщений в диалоге`);
+            if (conversation.length > 0) {
+              console.log(`📨 Примеры сообщений:`, conversation.slice(0, 3).map(m => ({ id: m.id, text: m.text.substring(0, 30) })));
+            } else {
+              console.warn(`⚠️ Диалог пустой - нет сообщений между ${userData.id} и ${otherPlayerData.id}`);
+            }
+            setMessages(conversation);
+            // Устанавливаем isNearBottom в true после загрузки
+            setIsNearBottom(true);
+          } catch (convError) {
+            console.error('❌ Ошибка загрузки диалога:', convError);
+            console.error('❌ Детали ошибки:', JSON.stringify(convError, null, 2));
+            setMessages([]);
+          }
           
-          // Прокручиваем вниз после загрузки сообщений
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, Platform.OS === 'android' ? 300 : 100); // Больше времени для Android
+          // Прокручиваем вниз после загрузки сообщений (несколько попыток для надежности)
+          // useEffect выше также будет пытаться прокрутить, но здесь делаем дополнительную попытку
+          const scrollAttempts = [200, 400, 600];
+          scrollAttempts.forEach((delay, index) => {
+            setTimeout(() => {
+              if (scrollViewRef.current) {
+                scrollViewRef.current.scrollToEnd({ animated: index === 0 });
+                setIsNearBottom(true);
+              }
+            }, Platform.OS === 'android' ? delay + 100 : delay);
+          });
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
@@ -292,8 +424,11 @@ export default function ChatScreen() {
         }
       }
     } catch (error) {
-      console.error('Ошибка загрузки данных чата:', error);
+      console.error('❌ Ошибка загрузки данных чата:', error);
+      console.error('❌ Детали ошибки:', error instanceof Error ? error.message : String(error));
+      console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'No stack');
       Alert.alert(t('chat.error'), t('chat.errorLoadingChat'));
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -344,6 +479,7 @@ export default function ChatScreen() {
           // Прокручиваем вниз при получении новых сообщений
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
+            setIsNearBottom(true);
           }, Platform.OS === 'android' ? 200 : 100);
         }
 
@@ -376,6 +512,7 @@ export default function ChatScreen() {
     // Прокручиваем вниз сразу
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
+      setIsNearBottom(true);
     }, 50);
     
         // Устанавливаем флаг, что только что отправили сообщение
@@ -408,6 +545,7 @@ export default function ChatScreen() {
         await loadMessages();
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
+          setIsNearBottom(true);
           }, 100);
         }, 500);
       } else {
@@ -480,6 +618,7 @@ export default function ChatScreen() {
       // Прокручиваем к полю ввода
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
+        setIsNearBottom(true);
         console.log('Ответ на сообщение:', message.text);
       }, 100);
     } catch (error) {
@@ -650,6 +789,13 @@ export default function ChatScreen() {
               style={styles.messagesContainer}
               contentContainerStyle={styles.messagesContent}
               showsVerticalScrollIndicator={false}
+              onScroll={(event) => {
+                const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+                const paddingToBottom = 100; // Порог для определения "внизу"
+                const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+                setIsNearBottom(isAtBottom);
+              }}
+              scrollEventThrottle={400}
             >
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
@@ -713,14 +859,23 @@ export default function ChatScreen() {
                                   isMyMessage ? styles.myMessageText : styles.otherMessageText
                                 ]}>
                                   {message.text}
-                                  {'  '}
+                                </Text>
+                                <View style={styles.messageFooter}>
                                   <Text style={[
                                     styles.messageTime,
                                     isMyMessage ? styles.myMessageTime : styles.otherMessageTime
                                   ]}>
                                     {formatTime(message.timestamp)}
                                   </Text>
-                                </Text>
+                                  {isMyMessage && (
+                                    <Ionicons
+                                      name={message.read ? "checkmark-done" : "checkmark"}
+                                      size={14}
+                                      color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
+                                      style={styles.readIndicator}
+                                    />
+                                  )}
+                                </View>
                               </View>
                             </View>
                           </Swipeable>
@@ -745,6 +900,7 @@ export default function ChatScreen() {
                 onFocus={() => {
                   setTimeout(() => {
                     scrollViewRef.current?.scrollToEnd({ animated: true });
+                    setIsNearBottom(true);
                   }, Platform.OS === 'android' ? 300 : 100);
                 }}
               />
@@ -764,6 +920,20 @@ export default function ChatScreen() {
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
+
+          {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
+          {!isNearBottom && messages.length > 0 && (
+            <TouchableOpacity
+              style={styles.scrollToBottomButton}
+              onPress={() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+                setTimeout(() => setIsNearBottom(true), 300);
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-down" size={24} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
       </CachedBackground>
     </View>
@@ -938,6 +1108,12 @@ const styles = StyleSheet.create({
   otherMessageText: {
     color: '#fff',
   },
+  messageFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    alignSelf: 'flex-end',
+  },
   messageTime: {
     fontSize: 10,
     fontFamily: 'Gilroy-Regular',
@@ -947,6 +1123,9 @@ const styles = StyleSheet.create({
   },
   otherMessageTime: {
     color: 'rgba(255, 255, 255, 0.4)',
+  },
+  readIndicator: {
+    marginLeft: 4,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -992,6 +1171,26 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     backgroundColor: '#fa2f40',
     opacity: 0.7,
+  },
+  scrollToBottomButton: {
+    position: 'absolute',
+    bottom: 80,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: 'rgb(1,0,0)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 8,
+    zIndex: 1000,
   },
   replyButton: {
     backgroundColor: 'transparent',

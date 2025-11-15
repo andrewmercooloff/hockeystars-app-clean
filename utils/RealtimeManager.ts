@@ -11,6 +11,8 @@ class RealtimeManager {
   private currentUserId: string | null = null;
   private notificationCountCallback: ((count: number) => void) | null = null;
   private messagesCountCallback: ((count: number) => void) | null = null;
+  private lastNotificationCount: number | null = null;
+  private lastMessagesCount: number | null = null;
 
   static getInstance(): RealtimeManager {
     if (!RealtimeManager.instance) {
@@ -31,6 +33,15 @@ class RealtimeManager {
    */
   setMessagesCountCallback(callback: (count: number) => void): void {
     this.messagesCountCallback = callback;
+  }
+
+  /**
+   * Инициализирует последние значения счетчиков
+   * Используется для синхронизации при настройке подписок
+   */
+  initializeCounts(notificationCount: number, messagesCount: number): void {
+    this.lastNotificationCount = notificationCount;
+    this.lastMessagesCount = messagesCount;
   }
 
   /**
@@ -115,8 +126,15 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          // Эмитируем событие для обновления UI
-          this.emitNotificationCountUpdate(payload.new.unread_notifications_count || 0);
+          const newCount = payload.new.unread_notifications_count || 0;
+          const oldCount = payload.old?.unread_notifications_count || 0;
+          
+          // Вызываем callback только если счетчик уведомлений действительно изменился
+          // и значение отличается от последнего известного
+          if (newCount !== oldCount && newCount !== this.lastNotificationCount) {
+            this.lastNotificationCount = newCount;
+            this.emitNotificationCountUpdate(newCount);
+          }
         }
       )
       .subscribe();
@@ -142,8 +160,15 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          // Эмитируем событие для обновления UI
-          this.emitMessagesCountUpdate(payload.new.unread_messages_count || 0);
+          const newCount = payload.new.unread_messages_count || 0;
+          const oldCount = payload.old?.unread_messages_count || 0;
+          
+          // Вызываем callback только если счетчик сообщений действительно изменился
+          // и значение отличается от последнего известного
+          if (newCount !== oldCount && newCount !== this.lastMessagesCount) {
+            this.lastMessagesCount = newCount;
+            this.emitMessagesCountUpdate(newCount);
+          }
         }
       )
       .subscribe();
@@ -168,9 +193,20 @@ class RealtimeManager {
           table: 'messages'
         },
         async (payload) => {
-          // Проверяем, является ли текущий пользователь получателем
+          // ВАЖНО: Проверяем, является ли текущий пользователь получателем
+          // Это критично - уведомления должны приходить ТОЛЬКО получателю
           const receiverId = payload.new.receiver_id;
+          const senderId = payload.new.sender_id;
+          
+          // Если получатель не текущий пользователь - не отправляем уведомление
           if (receiverId !== userId) {
+            console.log(`🔔 Пропускаем уведомление: получатель ${receiverId} не совпадает с текущим пользователем ${userId}`);
+            return;
+          }
+          
+          // Дополнительная проверка: если отправитель и получатель одинаковые - не отправляем
+          if (senderId === receiverId) {
+            console.log('🔔 Пропускаем уведомление: отправитель и получатель одинаковые');
             return;
           }
           
@@ -179,24 +215,27 @@ class RealtimeManager {
             const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
             const { getPlayerById } = await import('./playerStorage');
             
-            const senderId = payload.new.sender_id;
             const messageText = payload.new.text;
             
             // Получаем данные отправителя
             const senderPlayer = await getPlayerById(senderId);
             if (!senderPlayer) {
+              console.log('🔔 Пропускаем уведомление: не удалось получить данные отправителя');
               return;
             }
             
             // Получаем токены получателя
             const receiverTokens = await getUserPushTokens(userId);
             if (receiverTokens.length > 0) {
+              console.log(`🔔 Отправляем push-уведомление получателю ${userId} от ${senderId}`);
               await sendMessageNotification(
                 receiverTokens,
                 senderPlayer.name || 'Пользователь',
                 messageText,
                 senderId
               );
+            } else {
+              console.log(`🔔 Пропускаем уведомление: у получателя ${userId} нет push токенов`);
             }
             
           } catch (error) {
@@ -368,6 +407,9 @@ class RealtimeManager {
     
     this.subscriptions.clear();
     this.currentUserId = null;
+    // Сбрасываем последние значения счетчиков при отключении
+    this.lastNotificationCount = null;
+    this.lastMessagesCount = null;
   }
 
   /**

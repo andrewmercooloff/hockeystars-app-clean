@@ -2639,6 +2639,154 @@ export default function PlayerProfile() {
               </View>
             )}
 
+            {/* Кнопки действий - перемещены вверх перед статистикой */}
+            {currentUser && currentUser.id !== player.id && (
+              <View style={styles.actionsSectionTop}>
+                {/* Кнопка управления дружбой - для звезд */}
+                {player.status === 'star' && (
+                  <>
+                    {friendshipStatus === 'received_request' ? (
+                      <View style={{ gap: 10, marginBottom: 10 }}>
+                        <TouchableOpacity 
+                          style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
+                          onPress={handleAddFriend}
+                          disabled={friendLoading}
+                        >
+                          <Ionicons name="checkmark-outline" size={20} color="#fff" />
+                          <Text style={styles.actionButtonText}>
+                            {friendLoading ? t('common.loading') : t('notifications.accept')}
+                          </Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                          style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                          onPress={handleDeclineFriend}
+                          disabled={friendLoading}
+                        >
+                          <Ionicons name="close-outline" size={20} color="#fff" />
+                          <Text style={styles.actionButtonText}>
+                            {friendLoading ? t('common.loading') : t('notifications.decline')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : friendshipStatus === 'friends' ? (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="person-remove-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="close-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="person-add-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.addFriend')}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+
+                {/* Кнопка управления дружбой - для не-звезд и не-скаутов */}
+                {player.status !== 'star' && player.status !== 'scout' && (
+                  <>
+                    {friendshipStatus === 'received_request' ? (
+                      <View style={{ gap: 10, marginBottom: 10 }}>
+                        <TouchableOpacity 
+                          style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
+                          onPress={handleAddFriend}
+                          disabled={friendLoading}
+                        >
+                          <Ionicons name="checkmark-outline" size={20} color="#fff" />
+                          <Text style={styles.actionButtonText}>
+                            {friendLoading ? t('common.loading') : t('notifications.accept')}
+                          </Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                          style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                          onPress={handleDeclineFriend}
+                          disabled={friendLoading}
+                        >
+                          <Ionicons name="close-outline" size={20} color="#fff" />
+                          <Text style={styles.actionButtonText}>
+                            {friendLoading ? t('common.loading') : t('notifications.decline')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : friendshipStatus === 'friends' ? (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="person-remove-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="close-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity 
+                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        onPress={handleAddFriend}
+                        disabled={friendLoading}
+                      >
+                        <Ionicons name="person-add-outline" size={20} color="#fff" />
+                        <Text style={styles.actionButtonText}>
+                          {friendLoading ? t('common.loading') : t('profile.addFriend')}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+
+                {/* Кнопка написать сообщение */}
+                <TouchableOpacity 
+                  style={[styles.actionButton, { backgroundColor: '#fff', marginBottom: 10 }]} 
+                  onPress={() => {
+                    router.push({ 
+                      pathname: '/chat/[id]', 
+                      params: { id: player.id } 
+                    });
+                  }}
+                >
+                  <Ionicons name="chatbubble-outline" size={20} color="rgb(1,0,0)" />
+                  <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>
+                    {t('profile.sendMessage')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) */}
             {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && 
@@ -4023,8 +4171,8 @@ export default function PlayerProfile() {
                 ) : null // Не показываем секцию, если данных нет
             ) : null}
 
-            {/* Секция измерения скорости шайбы - только для игроков, видно всем */}
-            {player && player.status === 'player' && (
+            {/* Секция измерения скорости шайбы - только для игроков, видно всем, скрыта если скорость не измерена */}
+            {player && player.status === 'player' && player.puckSpeed && player.puckSpeed > 0 && (
               <View ref={puckSpeedRef} style={styles.section}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
@@ -4135,8 +4283,8 @@ export default function PlayerProfile() {
               </View>
             )}
 
-            {/* Секция упражнений */}
-            {player && (
+            {/* Секция упражнений - скрыта если упражнения не выполнены */}
+            {player && player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0 && (
               <PlayerExercisesSection 
                 player={player} 
                 isOwnProfile={currentUser?.id === player.id}
@@ -4294,79 +4442,7 @@ export default function PlayerProfile() {
             </View>
             )}
 
-            {/* Кнопка управления дружбой - для не-звезд и не-скаутов показываем здесь */}
-            {player.status !== 'star' && player.status !== 'scout' && currentUser && currentUser.id !== player.id && (
-              <View ref={friendsRef}>
-                {friendshipStatus === 'received_request' ? (
-                  // Запрос дружбы получен
-                  <View style={{ gap: 10, marginTop: 10, marginBottom: 20 }}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="checkmark-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('notifications.accept')}
-                      </Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleDeclineFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('notifications.decline')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : friendshipStatus === 'friends' ? (
-                  // Уже друзья
-                  <View style={{ marginTop: 10, marginBottom: 20 }}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="person-remove-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
-                  // Запрос дружбы отправлен
-                  <View style={{ marginTop: 10, marginBottom: 20 }}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#FF9800' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  // Нет дружбы - можно добавить
-                  <View style={{ marginTop: 10, marginBottom: 20 }}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="person-add-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('profile.addFriend')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            )}
+            {/* Кнопка управления дружбой - для не-звезд и не-скаутов - удалена отсюда, перенесена вверх */}
 
             {/* Кнопки действий для взаимодействия с профилем */}
             <View style={styles.actionsSection}>
@@ -4639,25 +4715,7 @@ export default function PlayerProfile() {
             )}
 
 
-            {/* Кнопка написать сообщение - под кнопками дружбы */}
-            {currentUser && currentUser.id !== player.id && (
-              <View style={{ marginTop: 20, marginBottom: 20 }}>
-                <TouchableOpacity 
-                  style={[styles.actionButton, { backgroundColor: '#fff' }]} 
-                  onPress={() => {
-                    router.push({ 
-                      pathname: '/chat/[id]', 
-                      params: { id: player.id } 
-                    });
-                  }}
-                >
-                  <Ionicons name="chatbubble-outline" size={20} color="rgb(1,0,0)" />
-                  <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>
-                    {t('profile.sendMessage')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            {/* Кнопка написать сообщение - удалена отсюда, перенесена вверх */}
 
             {/* QR-код профиля */}
             {player && (
@@ -5444,6 +5502,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fa2f40',
     marginTop: 4,
+  },
+  actionsSectionTop: {
+    marginTop: 10,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    gap: 10,
   },
   actionsSection: {
     gap: 15,

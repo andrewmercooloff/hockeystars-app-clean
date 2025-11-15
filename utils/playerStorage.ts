@@ -2059,10 +2059,14 @@ export const getMessages = async (userId1: string, userId2: string): Promise<Mes
 // Получение диалога между двумя пользователями
 export const getConversation = async (userId1: string, userId2: string): Promise<Message[]> => {
   try {
+    console.log(`📨 getConversation: загружаем диалог между ${userId1} и ${userId2}`);
     const messages = await getMessages(userId1, userId2);
-    return messages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const sorted = messages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    console.log(`✅ getConversation: получено ${sorted.length} сообщений`);
+    return sorted;
   } catch (error) {
     console.error('❌ Ошибка загрузки диалога:', error);
+    console.error('❌ Детали ошибки:', error instanceof Error ? error.stack : String(error));
     return [];
   }
 };
@@ -2086,23 +2090,36 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     await sendMessage(message);
     
     // Отправляем push-уведомление напрямую (альтернатива Realtime)
+    // ВАЖНО: Уведомление отправляется ТОЛЬКО получателю (receiverId)
+    // Это гарантирует, что админы не получат уведомления о чужих сообщениях
     try {
       const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
       
+      // Дополнительная проверка: отправитель и получатель не должны быть одинаковыми
+      if (senderId === receiverId) {
+        console.log('🔔 Пропускаем уведомление: отправитель и получатель одинаковые');
+        return true;
+      }
+      
       // Получаем данные отправителя
       const senderPlayer = await getPlayerById(senderId);
-      if (senderPlayer) {
+      if (!senderPlayer) {
+        console.log('🔔 Пропускаем уведомление: не удалось получить данные отправителя');
+        return true;
+      }
+      
       // Получаем токены получателя
       const receiverTokens = await getUserPushTokens(receiverId);
-      
       if (receiverTokens.length > 0) {
+        console.log(`🔔 Отправляем push-уведомление получателю ${receiverId} от ${senderId}`);
         await sendMessageNotification(
           receiverTokens,
           senderPlayer.name || 'Пользователь',
           text,
           senderId
         );
-      }
+      } else {
+        console.log(`🔔 Пропускаем уведомление: у получателя ${receiverId} нет push токенов`);
       }
     } catch (pushError) {
       console.error('❌ Ошибка отправки push-уведомления:', pushError);
@@ -2180,22 +2197,75 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
 // Получение всех диалогов пользователя
 export const getUserConversations = async (userId: string): Promise<Record<string, Message[]>> => {
   try {
-    // Получаем все сообщения пользователя
-    const { data, error } = await supabase
+    console.log(`📨 getUserConversations: загружаем диалоги для пользователя ${userId}...`);
+    
+    // Пробуем два подхода: сначала с .or(), если не работает - два отдельных запроса
+    let data: any[] = [];
+    let error: any = null;
+    
+    // Подход 1: Используем .or() запрос
+    const { data: orData, error: orError } = await supabase
       .from('messages')
       .select('*')
       .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
       .order('created_at', { ascending: true });
     
+    if (orError) {
+      console.error('❌ Ошибка с .or() запросом:', orError);
+      console.error('❌ Детали ошибки:', JSON.stringify(orError, null, 2));
+      console.warn('⚠️ Пробуем два отдельных запроса...');
+      
+      // Подход 2: Два отдельных запроса
+      const [sentResult, receivedResult] = await Promise.all([
+        supabase
+          .from('messages')
+          .select('*')
+          .eq('sender_id', userId)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('messages')
+          .select('*')
+          .eq('receiver_id', userId)
+          .order('created_at', { ascending: true })
+      ]);
+      
+      if (sentResult.error) {
+        console.error('❌ Ошибка получения отправленных сообщений:', sentResult.error);
+      }
+      if (receivedResult.error) {
+        console.error('❌ Ошибка получения полученных сообщений:', receivedResult.error);
+      }
+      
+      // Объединяем результаты и убираем дубликаты по id
+      const sentMessages = sentResult.data || [];
+      const receivedMessages = receivedResult.data || [];
+      const messageMap = new Map();
+      
+      [...sentMessages, ...receivedMessages].forEach(msg => {
+        if (!messageMap.has(msg.id)) {
+          messageMap.set(msg.id, msg);
+        }
+      });
+      
+      data = Array.from(messageMap.values());
+      error = sentResult.error || receivedResult.error;
+    } else {
+      data = orData || [];
+      error = orError;
+    }
+    
     if (error) {
       console.error('❌ Ошибка получения диалогов:', error);
+      console.error('❌ Детали ошибки:', JSON.stringify(error, null, 2));
       return {};
     }
+    
+    console.log(`✅ getUserConversations: получено ${data.length} сообщений из БД`);
     
     // Группируем сообщения по собеседникам
     const conversations: Record<string, Message[]> = {};
     
-    (data || []).forEach(msg => {
+    data.forEach(msg => {
       const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
       
       if (!conversations[otherUserId]) {
@@ -2212,9 +2282,26 @@ export const getUserConversations = async (userId: string): Promise<Record<strin
       });
     });
     
+    // Сортируем сообщения в каждом диалоге по времени
+    Object.keys(conversations).forEach(key => {
+      conversations[key].sort((a, b) => {
+        const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+        const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
+        return aTime - bTime;
+      });
+    });
+    
+    const conversationCount = Object.keys(conversations).length;
+    console.log(`✅ getUserConversations: сформировано ${conversationCount} диалогов`);
+    
+    if (conversationCount === 0 && data.length > 0) {
+      console.warn(`⚠️ getUserConversations: есть сообщения (${data.length}), но диалоги не сформированы`);
+    }
+    
     return conversations;
   } catch (error) {
     console.error('❌ Ошибка получения диалогов пользователя:', error);
+    console.error('❌ Детали ошибки:', error instanceof Error ? error.stack : String(error));
     return {};
   }
 };
