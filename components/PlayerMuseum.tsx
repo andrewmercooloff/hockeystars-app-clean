@@ -106,6 +106,35 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     return itemName; // Возвращаем оригинальное название, если не смогли определить
   };
 
+  // Функция для парсинга custom_name и извлечения названия подарка
+  // Возвращает только название подарка без предлога и имени дарителя
+  const parseGiftName = (customName: string): string => {
+    if (!customName) return '';
+    
+    let giftName = customName;
+    
+    // Убираем "от Админ" или "от Admin" в конце
+    giftName = giftName.replace(/\s*от\s+Админ\s*$/i, '');
+    giftName = giftName.replace(/\s*от\s+Admin\s*$/i, '');
+    
+    // Убираем "from Админ" или "from Admin" в конце
+    giftName = giftName.replace(/\s*from\s+Админ\s*$/i, '');
+    giftName = giftName.replace(/\s*from\s+Admin\s*$/i, '');
+    
+    // Убираем просто "Админ" или "Admin" в конце (без предлога)
+    giftName = giftName.replace(/\s+Админ\s*$/i, '');
+    giftName = giftName.replace(/\s+Admin\s*$/i, '');
+    
+    // Убираем "от [любое имя]" в конце (может быть несколько слов в имени)
+    // Используем более точное регулярное выражение для захвата всего имени
+    giftName = giftName.replace(/\s+от\s+.+$/i, '');
+    
+    // Убираем "from [любое имя]" в конце (может быть несколько слов в имени)
+    giftName = giftName.replace(/\s+from\s+.+$/i, '');
+    
+    return giftName.trim();
+  };
+
   // Функция для навигации к профилю звезды
   const navigateToStarProfile = (starId: string) => {
     router.push(`/player/${starId}`);
@@ -468,37 +497,38 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
               )}
               
               <Text style={styles.itemSource} numberOfLines={2}>
-                {/* Если есть custom_name - используем его (новая система) */}
-                {item.custom_name ? (
-                  <Text 
-                    style={styles.starNameLink}
-                    onPress={() => navigateToStarProfile(item.received_from.id)}
-                  >
-                    {item.custom_name}
-                  </Text>
-                ) : item.item.name.includes('от Админ') ? (
-                  // Для старых административных подарков убираем "от Админ" из названия и показываем отдельно
-                  <>
-                    {item.item.name.replace(' от Админ', '')} {t('gifts.from')}{' '}
-                    <Text 
-                      style={styles.starNameLink}
-                      onPress={() => navigateToStarProfile(item.received_from.id)}
-                    >
-                      {item.received_from.name}
-                    </Text>
-                  </>
-                ) : (
-                  // Для старых обычных подарков показываем название + от кого
-                  <>
-                    {translateItemName(item.item.name, item.item.item_type)} {t('gifts.from')}{' '}
-                    <Text 
-                      style={styles.starNameLink}
-                      onPress={() => navigateToStarProfile(item.received_from.id)}
-                    >
-                      {item.received_from.name}
-                    </Text>
-                  </>
-                )}
+                {/* Унифицированный формат: "Название подарка" от "Имя дарителя" */}
+                {(() => {
+                  let giftName = '';
+                  
+                  if (item.custom_name) {
+                    // Если есть custom_name - парсим его, убирая предлоги и имена
+                    giftName = parseGiftName(item.custom_name);
+                  } else if (item.item.name.includes('от Админ')) {
+                    // Для старых административных подарков убираем "от Админ" из названия
+                    giftName = item.item.name.replace(' от Админ', '').trim();
+                  } else {
+                    // Для старых обычных подарков используем переведенное название
+                    giftName = translateItemName(item.item.name, item.item.item_type);
+                  }
+                  
+                  // Если после парсинга название пустое, используем название из item
+                  if (!giftName) {
+                    giftName = translateItemName(item.item.name, item.item.item_type);
+                  }
+                  
+                  return (
+                    <>
+                      {giftName} {t('gifts.from')}{' '}
+                      <Text 
+                        style={styles.starNameLink}
+                        onPress={() => navigateToStarProfile(item.received_from.id)}
+                      >
+                        {item.received_from.name}
+                      </Text>
+                    </>
+                  );
+                })()}
               </Text>
               
               {!item.item.image_url && (

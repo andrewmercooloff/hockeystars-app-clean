@@ -2415,9 +2415,6 @@ export default function PlayerProfile() {
             contentContainerStyle={styles.scrollContainer}
             keyboardShouldPersistTaps="handled"
           >
-            
-
-
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               <View style={styles.avatarContainer}>
@@ -2640,7 +2637,7 @@ export default function PlayerProfile() {
             )}
 
             {/* Кнопки действий - перемещены вверх перед статистикой */}
-            {currentUser && currentUser.id !== player.id && (
+            {currentUser && player && currentUser.id !== player.id && (
               <View style={styles.actionsSectionTop}>
                 {/* Кнопка управления дружбой - для звезд */}
                 {player.status === 'star' && (
