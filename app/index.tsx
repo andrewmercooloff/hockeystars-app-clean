@@ -22,14 +22,24 @@ const PUCK_SIZE = 70;
 const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string, screenWidth?: number, screenHeight?: number) => {
   const puckSize = 70;
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
-  const animationRef = useRef<any>(null);
   const collisionDetectedRef = useRef(false);
   const lastHapticTimeRef = useRef(0);
   const isInitializedRef = useRef(false);
   const previousPlayersRef = useRef<Player[]>([]);
-  const wasInBackgroundRef = useRef(false);
-  const backgroundReturnFramesRef = useRef(0);
-  const cachedPositionsRef = useRef<PuckPosition[]>([]);
+  
+  // Для максимальной плавности используем useFrameCallback
+  const lastTimeRef = useRef<number>(0);
+  const accumulatorRef = useRef(0);
+  
+  // Для интерполяции между кадрами
+  const renderPositionsRef = useRef<PuckPosition[]>([]);
+  const physicsPositionsRef = useRef<PuckPosition[]>([]);
+  const alphaRef = useRef(1); // Интерполяционный коэффициент
+  
+  // Константы для плавной физики
+  const STEP_MS = 1000 / 120; // 120 FPS для максимальной плавности
+  const FIXED_DT = 1 / 120; // Фиксированный timestep в секундах
+  const MAX_STEPS = 2; // Максимум шагов за кадр
 
   const windowDimensions = Dimensions.get('window');
   const width = screenWidth ?? windowDimensions.width;
@@ -71,365 +81,281 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
            }));
 
     setPuckPositions(positions);
-    // Кэшируем начальные позиции
-    cachedPositionsRef.current = positions;
-    isInitializedRef.current = true; // Отмечаем, что инициализация произошла
-    previousPlayersRef.current = players; // Сохраняем текущий список игроков
+    physicsPositionsRef.current = positions;
+    renderPositionsRef.current = positions;
+    previousPlayersRef.current = players;
+    isInitializedRef.current = true;
   }, [players, boundaries]);
 
-  // Анимационный цикл - отключен при большом количестве шайб для производительности
+  // Физический шаг с оптимизированными константами
+  const stepPhysics = useCallback(() => {
+    const currentPositions = physicsPositionsRef.current;
+    if (currentPositions.length === 0) return;
+    
+    const minSpeed = 0.8;
+    const friction = 0.999;
+    const maxSpeed = 15.0; // Ограничение максимальной скорости шайб
+
+    const hasNonDraggingPucks = currentPositions.some((p) => !p.isDragging);
+    if (!hasNonDraggingPucks) return;
+
+    const updatedPositions = currentPositions.map((pos) => {
+      if (pos.isDragging) return pos;
+
+      let { x, y, vx, vy } = pos;
+
+      // Минимальная скорость
+      const currentSpeed = Math.sqrt(vx * vx + vy * vy);
+      if (currentSpeed < minSpeed) {
+        if (currentSpeed > 0.001) {
+          const ratio = minSpeed / currentSpeed;
+          vx *= ratio;
+          vy *= ratio;
+        } else {
+          const angle = Math.random() * Math.PI * 2;
+          vx = Math.cos(angle) * minSpeed;
+          vy = Math.sin(angle) * minSpeed;
+        }
+      }
+
+      // Интеграция с фиксированным timestep для плавности
+      x += vx * FIXED_DT * 60;
+      y += vy * FIXED_DT * 60;
+
+      // Границы
+      if (x <= boundaries.left) {
+        x = boundaries.left;
+        vx = Math.abs(vx);
+      } else if (x >= boundaries.right) {
+        x = boundaries.right;
+        vx = -Math.abs(vx);
+      }
+
+      if (y <= boundaries.top) {
+        y = boundaries.top;
+        vy = Math.abs(vy);
+      } else if (y >= boundaries.bottom) {
+        y = boundaries.bottom;
+        vy = -Math.abs(vy);
+      }
+
+      // Упрощенные коллизии для плавности
+      const minDistance = puckSize;
+      const minDistSq = minDistance * minDistance;
+
+      for (const other of currentPositions) {
+        if (other.id === pos.id || pos.isDragging || other.isDragging) continue;
+
+        const dx = x - other.x;
+        const dy = y - other.y;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < minDistSq && distSq > 0) {
+          const dist = Math.sqrt(distSq);
+          const angle = Math.atan2(dy, dx);
+          const overlap = minDistance - dist;
+
+          const push = overlap * 0.5;
+          x += Math.cos(angle) * push;
+          y += Math.sin(angle) * push;
+
+          const relativeVx = vx - other.vx;
+          const relativeVy = vy - other.vy;
+          const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+
+          if (dot < 0) {
+            const restitution = 0.8;
+            const impulse = dot * restitution;
+            vx -= impulse * Math.cos(angle);
+            vy -= impulse * Math.sin(angle);
+          }
+
+          // Более мягкое сглаживание для плавности
+          vx *= 0.95;
+          vy *= 0.95;
+
+          if (currentUserId && pos.id === currentUserId) {
+            collisionDetectedRef.current = true;
+          }
+        }
+      }
+
+      // Трение и ограничение скорости
+      vx *= friction;
+      vy *= friction;
+
+      const speed = Math.sqrt(vx * vx + vy * vy);
+      if (speed > maxSpeed) {
+        const ratio = maxSpeed / speed;
+        vx *= ratio;
+        vy *= ratio;
+      }
+
+      // Финальная проверка границ
+      x = Math.max(boundaries.left, Math.min(boundaries.right, x));
+      y = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
+
+      return { ...pos, x, y, vx, vy };
+    });
+
+    // Обновляем референсы для интерполяции
+    physicsPositionsRef.current = updatedPositions;
+  }, [boundaries, currentUserId, puckSize]);
+
+  // Используем requestAnimationFrame с интерполяцией для максимальной плавности
   useEffect(() => {
     if (puckPositions.length === 0) return;
 
-    // Для большого количества шайб используем упрощенную анимацию
-    const isHighLoad = puckPositions.length > 20;
+    let animationFrameId: number | null = null;
 
-    // Адаптивный интервал: реже обновляем при большом количестве шайб
-    const interval = isHighLoad ? 20 : 12;
+    const tick = (now: number) => {
+      if (lastTimeRef.current === 0) {
+        lastTimeRef.current = now;
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
 
-    // Очищаем предыдущий интервал, если он существует
-    if (animationRef.current) {
-      clearInterval(animationRef.current);
-    }
+      const dtMs = now - lastTimeRef.current;
+      lastTimeRef.current = now;
 
-    animationRef.current = setInterval(() => {
-      setPuckPositions(currentPositions => {
-        // Проверяем, есть ли шайбы для обновления (не все в drag)
-        const hasNonDraggingPucks = currentPositions.some(p => !p.isDragging);
-        if (!hasNonDraggingPucks) {
-          return currentPositions; // Если все в drag, просто возвращаем текущие позиции
-        }
+      // Ограничиваем максимальный шаг времени
+      const MAX_DT_MS = 100;
+      const clampedDtMs = Math.min(dtMs, MAX_DT_MS);
 
-        const updatedPositions = currentPositions.map(pos => {
-          // Пропускаем шайбы, которые перетаскиваются (они обновляются через updatePuckPosition)
-          if (pos.isDragging) {
-            return pos;
-          }
+      accumulatorRef.current += clampedDtMs;
 
-          let { x, y, vx, vy } = pos;
+      // Выполняем шаги физики
+      let steps = 0;
+      while (accumulatorRef.current >= STEP_MS && steps < MAX_STEPS) {
+        stepPhysics();
+        accumulatorRef.current -= STEP_MS;
+        steps++;
+      }
 
-          // Оптимизация возврата из фона - пропускаем коллизии на 3 кадра для быстрого восстановления
-          const skipCollisions = backgroundReturnFramesRef.current > 0;
-          if (skipCollisions) {
-            backgroundReturnFramesRef.current--;
-          }
+      // Интерполяция между кадрами для сверх-плавности
+      const alpha = Math.min(accumulatorRef.current / STEP_MS, 1);
+      alphaRef.current = alpha;
 
-          // Для большого количества шайб упрощаем физику
-          const simplifiedPhysics = isHighLoad;
+      // Обновляем позиции с интерполяцией
+      setPuckPositions((current) => {
+        const physics = physicsPositionsRef.current;
+        if (physics.length === 0 || physics.length !== current.length) return current;
 
-          // Шайбы никогда не останавливаются полностью - поддерживаем минимальную скорость
-          if (!simplifiedPhysics) {
-            const minSpeed = 0.8;
-            const currentSpeed = Math.sqrt(vx * vx + vy * vy);
+        // Линейная интерполяция между текущими и физическими позициями
+        const interpolated = physics.map((physicsPos, i) => {
+          const currentPos = current[i];
+          if (!currentPos) return physicsPos;
 
-            if (currentSpeed < minSpeed) {
-              if (currentSpeed > 0.001) {
-                const speedRatio = minSpeed / currentSpeed;
-                vx *= speedRatio;
-                vy *= speedRatio;
-              } else {
-                const randomAngle = Math.random() * Math.PI * 2;
-                vx = Math.cos(randomAngle) * minSpeed;
-                vy = Math.sin(randomAngle) * minSpeed;
-              }
-            }
-          }
-
-          x += vx;
-          y += vy;
-
-          // Проверяем границы
-          if (x <= boundaries.left) {
-            x = boundaries.left;
-            vx = Math.abs(vx) * (simplifiedPhysics ? 1.0 : 1.02);
-          } else if (x >= boundaries.right) {
-            x = boundaries.right;
-            vx = -Math.abs(vx) * (simplifiedPhysics ? 1.0 : 1.02);
-          }
-
-          if (y <= boundaries.top) {
-            y = boundaries.top;
-            vy = Math.abs(vy) * (simplifiedPhysics ? 1.0 : 1.02);
-          } else if (y >= boundaries.bottom) {
-            y = boundaries.bottom;
-            vy = -Math.abs(vy) * (simplifiedPhysics ? 1.0 : 1.02);
-          }
-
-          // Коллизии включены для небольшого количества шайб
-          if (!skipCollisions) {
-            const maxCollisionsToCheck = 8;
-            const minDistanceSquared = puckSize * puckSize;
-
-            let collisionsChecked = 0;
-            currentPositions.forEach(otherPos => {
-              if (otherPos.id === pos.id || pos.isDragging || otherPos.isDragging) return;
-              if (collisionsChecked >= maxCollisionsToCheck) return;
-
-              const dx = x - otherPos.x;
-              const dy = y - otherPos.y;
-              const distanceSquared = dx * dx + dy * dy;
-
-              if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
-                collisionsChecked++;
-                const distance = Math.sqrt(distanceSquared);
-                const angle = Math.atan2(dy, dx);
-                const minDistance = puckSize;
-                const overlap = minDistance - distance;
-
-                const pushDistance = overlap * 0.5;
-                x += Math.cos(angle) * pushDistance;
-                y += Math.sin(angle) * pushDistance;
-
-                const relativeVx = vx - otherPos.vx;
-                const relativeVy = vy - otherPos.vy;
-                const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
-
-                if (dotProduct < 0) {
-                  const restitution = 0.8;
-                  const impulse = dotProduct * restitution;
-                  vx -= impulse * Math.cos(angle);
-                  vy -= impulse * Math.sin(angle);
-
-                  const collisionBoost = 0.6;
-                  vx += Math.cos(angle) * collisionBoost;
-                  vy += Math.sin(angle) * collisionBoost;
-                }
-
-                const separationForce = overlap * 0.9;
-                vx += Math.cos(angle) * separationForce;
-                vy += Math.sin(angle) * separationForce;
-
-                // Уменьшаем скорость на 30% после столкновения
-                vx *= 0.7;
-                vy *= 0.7;
-
-                if (currentUserId && pos.id === currentUserId) {
-                  collisionDetectedRef.current = true;
-                }
-              }
-            });
-          }
-          
-          // Финальная проверка границ
-          x = Math.max(boundaries.left, Math.min(boundaries.right, x));
-          y = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
-
-          // При упрощенной физике пропускаем трение и ограничение скорости
-          if (!simplifiedPhysics) {
-            const friction = 0.999;
-            vx *= friction;
-            vy *= friction;
-
-            const maxSpeed = 3.0;
-            const currentSpeedLimit = Math.sqrt(vx * vx + vy * vy);
-            if (currentSpeedLimit > maxSpeed) {
-              const speedRatio = maxSpeed / currentSpeedLimit;
-              vx *= speedRatio;
-              vy *= speedRatio;
-            }
-          }
-
-          return { ...pos, x, y, vx, vy };
+          return {
+            ...physicsPos,
+            x: currentPos.x + (physicsPos.x - currentPos.x) * alpha,
+            y: currentPos.y + (physicsPos.y - currentPos.y) * alpha,
+          };
         });
 
-        // Всегда обновляем кэш для надежности
-        cachedPositionsRef.current = updatedPositions;
-
-        return updatedPositions;
+        return interpolated;
       });
-    }, interval);
 
-    // Отслеживаем переход в фон для кэширования состояния (только для мобильных платформ)
-    // На веб AppState не используется, так как нет концепции фонового режима
-    let appStateSubscription: { remove: () => void } | null = null;
-    
-    // Используем только на мобильных платформах, полностью исключаем на веб
-    // Ранний return для веб-платформы, чтобы Metro bundler не пытался разрешить require('react-native')
-    if (Platform.OS === 'web') {
-      // На веб не используем AppState, просто пропускаем этот блок
-    } else {
-      // Только для iOS и Android
-      try {
-        // Используем проверку доступности модуля через typeof для избежания проблем на веб
-        let AppStateModule: any = null;
-        try {
-          // Пытаемся получить AppState только если мы не на веб-платформе
-          if (typeof require !== 'undefined') {
-            const ReactNative = require('react-native');
-            AppStateModule = ReactNative?.AppState;
-          }
-        } catch (e) {
-          // Игнорируем ошибки при загрузке модуля
-        }
-        
-        if (AppStateModule) {
-          appStateSubscription = AppStateModule.addEventListener('change', (nextAppState: string) => {
-            if (nextAppState.match(/inactive|background/)) {
-              // Сохраняем текущее состояние при уходе в фон
-              wasInBackgroundRef.current = true;
-              cachedPositionsRef.current = [...puckPositions];
-            } else if (nextAppState === 'active' && wasInBackgroundRef.current) {
-              // Возвращаемся из фона - сразу восстанавливаем позиции из кэша для мгновенного отображения
-              if (cachedPositionsRef.current.length > 0) {
-                setPuckPositions(cachedPositionsRef.current);
-              }
-              // Пропускаем коллизии на несколько кадров для быстрого восстановления
-              backgroundReturnFramesRef.current = 3; // Уменьшено с 5 до 3 для более быстрого восстановления
-              wasInBackgroundRef.current = false;
-            }
-          });
-        }
-      } catch (e) {
-        // AppState недоступен, игнорируем
-      }
-    }
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    lastTimeRef.current = 0;
+    accumulatorRef.current = 0;
+    animationFrameId = requestAnimationFrame(tick);
 
     return () => {
-      if (animationRef.current) {
-        clearInterval(animationRef.current);
-        animationRef.current = null;
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
       }
-      appStateSubscription?.remove();
+      lastTimeRef.current = 0;
+      accumulatorRef.current = 0;
     };
-  }, [puckPositions.length, boundaries, currentUserId]); // Добавили currentUserId для вибрации
+  }, [puckPositions.length, stepPhysics]);
 
-  // Обработка вибрации при столкновениях (отдельный эффект)
-  // Вибрация работает только на главном экране и только для текущего пользователя
+  // Вибрация при столкновениях (без изменений)
   useEffect(() => {
     if (collisionDetectedRef.current && currentScreen === 'home' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
       const now = Date.now();
       const timeDiff = now - lastHapticTimeRef.current;
       if (timeDiff > 100) {
         lastHapticTimeRef.current = now;
-        
-        // Легкая вибрация для столкновений шайб
         if (Platform.OS === 'ios') {
           try {
-            // Используем легкую вибрацию для iOS
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          } catch (error) {
-            // Если не сработало, пробуем Vibration
+          } catch {
             try {
-              Vibration.vibrate(30); // Короткая легкая вибрация
-            } catch (vibError) {
-              // Игнорируем ошибки
-            }
+              Vibration.vibrate(30);
+            } catch {}
           }
         } else {
-          // Для Android используем короткую легкую вибрацию
           try {
             Vibration.vibrate(30);
-          } catch (vibError) {
-            // Игнорируем ошибки
-          }
+          } catch {}
         }
       }
-      // Сбрасываем флаг после проверки
       collisionDetectedRef.current = false;
     } else if (collisionDetectedRef.current) {
-      // Сбрасываем флаг, если не на главном экране
       collisionDetectedRef.current = false;
     }
   }, [puckPositions, currentScreen]);
 
   // Функция для обновления позиции при drag
-  const updatePuckPosition = useCallback((id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => {
-    setPuckPositions(current => {
-      let finalX = Math.max(boundaries.left, Math.min(boundaries.right, x));
-      let finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
-
-      // Если шайба в drag, проверяем коллизии и корректируем позицию
-      let dragVx = vx;
-      let dragVy = vy;
+  const updatePuckPosition = useCallback(
+    (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => {
+      setPuckPositions((current) => {
+        let finalX = Math.max(boundaries.left, Math.min(boundaries.right, x));
+        let finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
 
       // Проверка коллизий для перетаскиваемой шайбы (чтобы не проходила сквозь другие)
       if (isDragging) {
-        // Проверяем только ближайшие шайбы
-        const maxCollisionsToCheck = current.length;
-        let collisionsChecked = 0;
+        // Простая проверка коллизий при drag (без сложной оптимизации)
+        const minDistance = puckSize;
+        const minDistSq = minDistance * minDistance;
 
-        current.forEach(otherPos => {
-        if (otherPos.id === id) return;
-          if (collisionsChecked >= maxCollisionsToCheck) return;
-
-          const dx = finalX - otherPos.x;
-          const dy = finalY - otherPos.y;
-          const distanceSquared = dx * dx + dy * dy;
-          const minDistance = 70;
-          const minDistanceSquared = minDistance * minDistance;
-
-          if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
-            const distance = Math.sqrt(distanceSquared);
-            collisionsChecked++;
+        for (const other of current) {
+          if (other.id === id) continue;
+          const dx = finalX - other.x;
+          const dy = finalY - other.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < minDistSq && distSq > 0) {
+            const dist = Math.sqrt(distSq);
             const angle = Math.atan2(dy, dx);
-
-            const overlap = minDistance - distance;
+            const overlap = minDistance - dist;
             finalX += Math.cos(angle) * overlap;
             finalY += Math.sin(angle) * overlap;
-
             if (currentUserId && id === currentUserId) {
               collisionDetectedRef.current = true;
             }
           }
-        });
+        }
       }
 
       // Ограничиваем финальную позицию границами
-      finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
-      finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
+        finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
+        finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
 
-      return current.map(pos => {
-        if (pos.id === id) {
-          // Обновляем позицию перетаскиваемой шайбы
-          return {
-            ...pos,
-            x: finalX,
-            y: finalY,
-            vx: dragVx ?? pos.vx,
-            vy: dragVy ?? pos.vy,
-            isDragging: isDragging ?? false,
-          };
-        }
+        const newPositions = current.map((pos) =>
+          pos.id === id
+            ? {
+                ...pos,
+                x: finalX,
+                y: finalY,
+                vx: vx ?? pos.vx,
+                vy: vy ?? pos.vy,
+                isDragging: isDragging ?? false,
+              }
+            : pos
+        );
 
-        // ВРЕМЕННО ОТКЛЮЧЕНО: проверка коллизий с перетаскиваемой шайбой для тестирования производительности
-        // Проверяем коллизии с перетаскиваемой шайбой и отталкиваем другую шайбу
-        // Оптимизация: проверяем только если шайба близко (быстрая проверка без sqrt)
-        // if (isDragging && pushChecksCount < maxPushChecks) {
-        //   const dx = finalX - pos.x;
-        //   const dy = finalY - pos.y;
-        //   const distanceSquared = dx * dx + dy * dy;
-        //   const minDistance = 70; // puckSize
-        //   const minDistanceSquared = minDistance * minDistance;
+        // Обновляем референсы для интерполяции
+        physicsPositionsRef.current = newPositions;
+        renderPositionsRef.current = newPositions;
 
-        //   if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
-        //     pushChecksCount++;
-        //     const distance = Math.sqrt(distanceSquared); // Вычисляем только если нужно
-        //     // Отталкиваем другую шайбу - угол должен быть от перетаскиваемой к неподвижной
-        //     const angle = Math.atan2(dy, dx); // dy = finalY - pos.y, dx = finalX - pos.x
-
-        //     // Вычисляем скорость отталкивания на основе скорости перетаскиваемой шайбы (уменьшено)
-        //   const dragSpeed = Math.sqrt(vx * vx + vy * vy);
-        //     const pushForce = Math.min(dragSpeed * 0.5, 4.0); // Уменьшаем силу отталкивания
-
-        //     // Также добавляем силу отталкивания для предотвращения прилипания (уменьшено)
-        //     const separationForce = 0.8; // Уменьшаем
-
-        //     // Добавляем ускорение при столкновении (уменьшено)
-        //     const collisionBoost = 0.3; // Уменьшаем для мягкого отталкивания
-
-        //     // Вторая шайба должна отталкиваться в направлении от перетаскиваемой
-        //     return {
-        //       ...pos,
-        //       vx: pos.vx + Math.cos(angle) * (pushForce + separationForce + collisionBoost),
-        //       vy: pos.vy + Math.sin(angle) * (pushForce + separationForce + collisionBoost),
-        //     };
-        //   }
-        // }
-
-        return pos;
+        return newPositions;
       });
-    });
-  }, [boundaries, currentUserId]);
+    },
+    [boundaries, currentUserId, puckSize]
+  );
 
   return {
     puckPositions,
@@ -484,11 +410,23 @@ const OriginalPuckAnimator = React.memo(({
   const dragVelocityRef = useRef({ vx: 0, vy: 0 });
   const lastDragVelocityRef = useRef({ vx: 0, vy: 0 }); // Последняя скорость движения при drag
   const dragHistoryRef = useRef<{x: number, y: number, time: number}[]>([]);
+  
+  // Используем useSharedValue для максимальной плавности на 120 Гц
+  const animatedX = useSharedValue(position.x);
+  const animatedY = useSharedValue(position.y);
+  
+  // Синхронизируем shared values с position при изменении (когда не drag)
+  useEffect(() => {
+    if (!isDragging) {
+      animatedX.value = position.x;
+      animatedY.value = position.y;
+    }
+  }, [position.x, position.y, isDragging]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    left: position.x,
-    top: position.y,
-  }), [position.x, position.y]);
+    left: animatedX.value,
+    top: animatedY.value,
+  }), []);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -507,6 +445,11 @@ const OriginalPuckAnimator = React.memo(({
     setHasDragged(false);
     dragVelocityRef.current = { vx: 0, vy: 0 };
     dragHistoryRef.current = [];
+    
+    // Синхронизируем shared values с текущей позицией перед началом drag
+    animatedX.value = position.x;
+    animatedY.value = position.y;
+    
     setIsDragging(true);
   };
 
@@ -516,11 +459,8 @@ const OriginalPuckAnimator = React.memo(({
     const touch = e.nativeEvent;
     const now = Date.now();
     
-    // Увеличиваем throttle для оптимизации при большом количестве шайб
-    const throttleInterval = Platform.OS === 'android' ? 20 : 20; // Оптимизированная частота обновлений
-
-    if (now - lastUpdateTimeRef.current < throttleInterval) return;
-    lastUpdateTimeRef.current = now;
+    // Убираем throttle для максимальной плавности на 120 Гц
+    // Обновления будут ограничены только частотой событий touch
     
     // Проверяем, что палец сдвинулся достаточно для drag (минимум 5 пикселей)
     const dx = touch.pageX - dragStartRef.current.pageX;
@@ -545,11 +485,13 @@ const OriginalPuckAnimator = React.memo(({
     // Шайба следует за пальцем напрямую, но с ограничением скорости для натурального движения
     // Вычисляем скорость на основе изменения позиции (для толчка других шайб)
     // Используем lastPositionRef для расчета скорости, чтобы избежать дергания
-    let vx = (newX - lastPositionRef.current.x) * 0.4;
-    let vy = (newY - lastPositionRef.current.y) * 0.4;
+    // Увеличиваем коэффициент для лучшего отслеживания быстрого движения
+    const dt = Math.max(1, now - lastUpdateTimeRef.current); // время в миллисекундах
+    let vx = ((newX - lastPositionRef.current.x) / dt) * 60; // пиксели в секунду (60 FPS)
+    let vy = ((newY - lastPositionRef.current.y) / dt) * 60; // пиксели в секунду (60 FPS)
 
     // Ограничиваем максимальную скорость для натурального движения
-    const maxSpeed = 8.0; // Максимальная скорость при drag (увеличена)
+    const maxSpeed = 20.0; // Максимальная скорость при drag (увеличена для более быстрого движения)
     const speed = Math.sqrt(vx * vx + vy * vy);
     if (speed > maxSpeed) {
       vx = (vx / speed) * maxSpeed;
@@ -561,6 +503,7 @@ const OriginalPuckAnimator = React.memo(({
     
     // Сохраняем последнюю скорость движения для использования при отпускании
     lastDragVelocityRef.current = { vx, vy };
+    lastUpdateTimeRef.current = now;
     
     dragHistoryRef.current.push({ x: newX, y: newY, time: now });
     if (dragHistoryRef.current.length > 10) {
@@ -568,11 +511,21 @@ const OriginalPuckAnimator = React.memo(({
     }
     
     lastPositionRef.current = { x: newX, y: newY };
+    
+    // Обновляем shared values напрямую для максимальной плавности на 120 Гц
+    animatedX.value = newX;
+    animatedY.value = newY;
+    
+    // Обновляем state для физики (с небольшой задержкой для оптимизации)
     onDrag(position.id, newX, newY, vx, vy, true);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    
+    // Синхронизируем shared values с финальной позицией после drag
+    animatedX.value = position.x;
+    animatedY.value = position.y;
     
     if (onDrag && hasDraggedRef.current) {
       // Это был drag - применяем скорость движения, с которой двигали шайбу
@@ -584,9 +537,10 @@ const OriginalPuckAnimator = React.memo(({
         // Используем последние позиции для более точного расчета скорости
         const history = dragHistoryRef.current;
         const last = history[history.length - 1];
+        const secondLast = history[history.length - 2];
         
-        // Используем среднее значение из последних 3-4 позиций для более плавной скорости
-        const samplesToUse = Math.min(4, history.length - 1);
+        // Используем последние 2-3 позиции для более точного расчета скорости быстрого движения
+        const samplesToUse = Math.min(3, history.length - 1);
         let totalDx = 0;
         let totalDy = 0;
         let totalTime = 0;
@@ -594,29 +548,50 @@ const OriginalPuckAnimator = React.memo(({
         for (let i = history.length - 1; i > history.length - samplesToUse - 1; i--) {
           const current = history[i];
           const previous = history[i - 1];
+          const dt = Math.max(1, current.time - previous.time);
           totalDx += current.x - previous.x;
           totalDy += current.y - previous.y;
-          totalTime += Math.max(1, current.time - previous.time);
+          totalTime += dt;
         }
         
+        // Вычисляем скорость в пикселях на миллисекунду
         const pixelsPerMsX = totalDx / totalTime;
         const pixelsPerMsY = totalDy / totalTime;
-        const frameTime = 16; // миллисекунды на кадр
-        // Увеличиваем скорость при отпускании для более энергичного движения
-        const speedMultiplier = 2.5; // Увеличиваем скорость в 2.5 раза для более энергичного движения
-        finalVx = pixelsPerMsX * frameTime * speedMultiplier;
-        finalVy = pixelsPerMsY * frameTime * speedMultiplier;
+        
+        // Вычисляем реальную скорость движения пальца (пиксели в секунду)
+        const fingerSpeedPxPerSec = Math.sqrt(pixelsPerMsX * pixelsPerMsX + pixelsPerMsY * pixelsPerMsY) * 1000;
+        
+        // Применяем множитель, который зависит от скорости движения
+        // Для медленных движений - меньший множитель, для быстрых - больший
+        let speedMultiplier = 0.5; // Базовый множитель для медленных движений (уменьшен в 2 раза: было 1.0)
+        if (fingerSpeedPxPerSec > 500) {
+          // Для быстрых движений увеличиваем множитель пропорционально скорости
+          speedMultiplier = 0.5 + (fingerSpeedPxPerSec - 500) / 1000; // От 0.5 до ~1.0+ для очень быстрых движений (уменьшено в 2 раза: было 1.0 + .../500)
+        }
+        
+        // Конвертируем в единицы физики (делим на 60 для конвертации)
+        finalVx = pixelsPerMsX * 1000 * speedMultiplier / 60;
+        finalVy = pixelsPerMsY * 1000 * speedMultiplier / 60;
       } else {
         // Если истории недостаточно, используем последнюю сохраненную скорость
-        // Компенсируем коэффициент 0.4, который был применен при вычислении
-        // Увеличиваем скорость при отпускании для более энергичного движения
-        const speedMultiplier = 2.5; // Увеличиваем скорость в 2.5 раза для более энергичного движения
-        finalVx = (lastDragVelocityRef.current.vx / 0.4) * speedMultiplier;
-        finalVy = (lastDragVelocityRef.current.vy / 0.4) * speedMultiplier;
+        // Скорость уже в пикселях в секунду
+        const fingerSpeedPxPerSec = Math.sqrt(
+          lastDragVelocityRef.current.vx * lastDragVelocityRef.current.vx + 
+          lastDragVelocityRef.current.vy * lastDragVelocityRef.current.vy
+        );
+        
+        let speedMultiplier = 0.5; // Базовый множитель (уменьшен в 2 раза: было 1.0)
+        if (fingerSpeedPxPerSec > 500) {
+          speedMultiplier = 0.5 + (fingerSpeedPxPerSec - 500) / 1000; // От 0.5 до ~1.0+ (уменьшено в 2 раза: было 1.0 + .../500)
+        }
+        
+        finalVx = lastDragVelocityRef.current.vx * speedMultiplier / 60;
+        finalVy = lastDragVelocityRef.current.vy * speedMultiplier / 60;
       }
 
-      // Увеличиваем максимальную скорость при отпускании для более энергичного движения
-      const maxReleaseSpeed = 8.0; // Увеличено для более быстрого и естественного движения при отпускании
+      // Убираем жесткое ограничение скорости - скорость должна зависеть от скорости движения пальца
+      // Оставляем только очень высокий лимит для защиты от ошибок
+      const maxReleaseSpeed = 25.0; // Очень высокий лимит (уменьшен в 2 раза: было 50.0)
       const releaseSpeed = Math.sqrt(finalVx * finalVx + finalVy * finalVy);
       if (releaseSpeed > maxReleaseSpeed) {
         const speedRatio = maxReleaseSpeed / releaseSpeed;

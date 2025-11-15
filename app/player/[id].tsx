@@ -1,6 +1,3 @@
-// КРИТИЧЕСКИЙ ЛОГ - должен появиться ДО всех импортов
-(console as any).log('🔍 [ROUTES DEBUG] app/player/[id].tsx - ФАЙЛ НАЧИНАЕТ ЗАГРУЗКУ');
-
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -473,6 +470,28 @@ export default function PlayerProfile() {
         return;
       }
       
+      // Оптимизация: сначала показываем кешированные данные из состояния, если они есть
+      const cachedPlayer = playersCache[normalizedId as string];
+      
+      if (cachedPlayer) {
+        console.log('⚡ Используем кешированные данные профиля из состояния');
+        setPlayer(cachedPlayer);
+        setLoading(false); // Убираем индикатор загрузки для кешированных данных
+        
+        // Загружаем текущего пользователя параллельно
+        const userData = await loadCurrentUser();
+        setCurrentUser(userData);
+        
+        // Загружаем дополнительные данные в фоне
+        loadAdditionalData(cachedPlayer, userData);
+        
+        // Продолжаем загрузку свежих данных в фоне для обновления (не блокируем UI)
+        // Realtime обновления работают независимо через подписки
+      } else {
+        // Если кешированных данных нет, показываем индикатор загрузки
+        setLoading(true);
+      }
+      
       // Проверяем, что id не изменился во время загрузки
       const currentId = Array.isArray(id) ? id[0] : id;
       if (currentId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
@@ -491,7 +510,7 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные параллельно
+      // Загружаем основные данные параллельно (getPlayerById уже использует кеш)
       const [playerData, userData] = await Promise.all([
         getPlayerById(normalizedId as string),
         loadCurrentUser()

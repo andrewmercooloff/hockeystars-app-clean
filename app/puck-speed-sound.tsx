@@ -1,6 +1,3 @@
-// КРИТИЧЕСКИЙ ЛОГ - должен появиться ДО всех импортов
-(console as any).log('🔍 [ROUTES DEBUG] app/puck-speed-sound.tsx - ФАЙЛ НАЧИНАЕТ ЗАГРУЗКУ');
-
 /**
  * ИЗМЕРЕНИЕ СКОРОСТИ ШАЙБЫ ПО ЗВУКУ
  * 
@@ -430,11 +427,23 @@ export default function PuckSpeedSoundScreen() {
     // Очистка при размонтировании
     return () => {
       if (audioRecorderPlayerRef.current && recordBackListenerRef.current) {
-        audioRecorderPlayerRef.current.removeRecordBackListener();
+        try {
+          if (typeof audioRecorderPlayerRef.current.removeRecordBackListener === 'function') {
+            audioRecorderPlayerRef.current.removeRecordBackListener();
+          }
+        } catch (e) {
+          // Игнорируем ошибки при очистке
+        }
         recordBackListenerRef.current = null;
       }
       if (audioRecorderPlayerRef.current) {
-        audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+        try {
+          if (typeof audioRecorderPlayerRef.current.stopRecorder === 'function') {
+            audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+          }
+        } catch (e) {
+          // Игнорируем ошибки при очистке
+        }
         audioRecorderPlayerRef.current = null;
       }
       if (soundTimeoutRef.current) {
@@ -714,7 +723,13 @@ export default function PuckSpeedSoundScreen() {
           recordBackListenerRef.current = null;
         }
         if (audioRecorderPlayerRef.current) {
-          audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+          try {
+            if (typeof audioRecorderPlayerRef.current.stopRecorder === 'function') {
+              audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+            }
+          } catch (e) {
+            // Игнорируем ошибки при остановке
+          }
         }
       }
       return;
@@ -944,7 +959,13 @@ export default function PuckSpeedSoundScreen() {
           recordBackListenerRef.current = null;
         }
         if (audioRecorderPlayerRef.current) {
-          audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+          try {
+            if (typeof audioRecorderPlayerRef.current.stopRecorder === 'function') {
+              audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+            }
+          } catch (e) {
+            // Игнорируем ошибки при остановке
+          }
         }
       }
     };
@@ -1011,7 +1032,13 @@ export default function PuckSpeedSoundScreen() {
             }
             
             // Останавливаем запись
-            audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+            try {
+              if (typeof audioRecorderPlayerRef.current.stopRecorder === 'function') {
+                audioRecorderPlayerRef.current.stopRecorder().catch(() => {});
+              }
+            } catch (e) {
+              // Игнорируем ошибки при остановке
+            }
           }
         }
         

@@ -324,6 +324,25 @@ export default function SearchScreen() {
           return;
         }
 
+        // Оптимизация: сначала показываем кешированные данные, потом обновляем
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const cacheKey = 'all_players';
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        
+        if (cachedData) {
+          const { players: cachedPlayers } = JSON.parse(cachedData);
+          if (cachedPlayers && cachedPlayers.length > 0) {
+            // Показываем кешированные данные сразу
+            const filteredCachedPlayers = currentUser.status === 'admin' 
+              ? cachedPlayers
+              : cachedPlayers.filter((player: Player) => 
+                  player.status === 'player' || 
+                  player.status === 'admin'
+                );
+            setPlayers(filteredCachedPlayers);
+            setLoading(false); // Убираем индикатор загрузки для кешированных данных
+          }
+        }
 
         // Загрузка игроков (без принудительной очистки кеша, чтобы избежать перезагрузки)
         const allPlayers = await loadPlayers();

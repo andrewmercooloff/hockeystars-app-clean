@@ -37,10 +37,21 @@ export function useExercises(
   // Загружаем упражнения с кешированием
   const loadExercises = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
 
-      // Используем кеширование для всех данных
+      // Оптимизация: сначала пытаемся получить кешированные данные синхронно
+      const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
+      const cachedExercises = await dataCache.get(cacheKey);
+      
+      if (cachedExercises && cachedExercises.length > 0) {
+        // Показываем кешированные данные сразу
+        setExercises(cachedExercises);
+        setLoading(false); // Убираем индикатор загрузки для кешированных данных
+      } else {
+        setLoading(true);
+      }
+
+      // Используем кеширование для всех данных (обновляем в фоне)
       const [exercisesData, categoriesData, difficultiesData, rankingsData] = await Promise.all([
         dataCache.getOrLoad(
           `${CACHE_KEYS.EXERCISES}_${language}`,

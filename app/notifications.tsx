@@ -772,17 +772,18 @@ export default function NotificationsScreen() {
     }
   }, [currentUser, t]);
 
-  // Запускаем загрузку только когда пользователь авторизован
+  // Запускаем загрузку когда пользователь авторизован (не ждем isUserLoading)
   useEffect(() => {
-    if (currentUser && !isUserLoading) {
+    if (currentUser) {
+      // Начинаем загрузку сразу, не дожидаясь полной загрузки пользователя
       loadNotificationsData(true).then(() => {
         setLoading(false); // Убираем индикатор загрузки после завершения загрузки данных
       });
-    } else if (!isUserLoading && currentUser === null) {
-      // Если загрузка завершена и пользователь не авторизован
+    } else if (currentUser === null) {
+      // Если пользователь не авторизован
       setLoading(false);
     }
-  }, [currentUser, isUserLoading, loadNotificationsData]);
+  }, [currentUser, loadNotificationsData]);
 
   // Обновляем уведомления при фокусе на экран
   useFocusEffect(

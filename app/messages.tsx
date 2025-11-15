@@ -64,9 +64,23 @@ export default function MessagesScreen() {
       
       const chatPreviews: ChatPreview[] = [];
       
+      // Оптимизация: загружаем всех игроков параллельно вместо последовательной загрузки
+      const userIds = Object.keys(conversations).filter(userId => conversations[userId].length > 0);
+      const playerPromises = userIds.map(userId => getPlayerById(userId));
+      const players = await Promise.all(playerPromises);
+      
+      // Создаем Map для быстрого доступа к игрокам
+      const playersMap = new Map<string, Player>();
+      players.forEach((player, index) => {
+        if (player) {
+          playersMap.set(userIds[index], player);
+        }
+      });
+      
+      // Формируем превью чатов
       for (const [otherUserId, messages] of Object.entries(conversations)) {
         if (messages.length > 0) {
-          const otherPlayer = await getPlayerById(otherUserId);
+          const otherPlayer = playersMap.get(otherUserId);
           if (otherPlayer) {
             const lastMessage = messages[messages.length - 1];
             

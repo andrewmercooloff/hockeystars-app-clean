@@ -36,11 +36,11 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   document.documentElement.style.backgroundColor = '#050008';
 }
 
-// ВРЕМЕННО: Включаем логи в production для отладки проблемы с записью звука
-// После исправления можно вернуть отключение логов
 // В режиме разработки показываем предупреждения для отладки
-// Отключаем только в продакшене (ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ОТЛАДКИ)
-if (false && (typeof __DEV__ === 'undefined' || !__DEV__)) {
+// В production отключаем логи, но можно включить через EXPO_PUBLIC_ENABLE_LOGS=true для TestFlight
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : false;
+const enableLogsInProd = typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
+if (!isDev && !enableLogsInProd) {
   LogBox.ignoreAllLogs();
   // In production, silence runtime logs to avoid noisy output
   // @ts-ignore
@@ -175,6 +175,7 @@ export default function RootLayout() {
   const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
+  const lastNotificationCountRef = React.useRef<number>(0);
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
@@ -246,7 +247,7 @@ export default function RootLayout() {
   };
   
   // Функция для загрузки счетчика уведомлений из БД
-  const loadNotificationCount = React.useCallback(async (userId: string) => {
+  const loadNotificationCount = React.useCallback(async (userId: string, skipUpdateIfSame: boolean = false) => {
     try {
       // Пересчитываем реальное количество непрочитанных уведомлений
       const { count } = await supabase
@@ -258,22 +259,36 @@ export default function RootLayout() {
       
       const realCount = count || 0;
       
-      // Обновляем счетчик в БД
-      await supabase
-        .from('players')
-        .update({ 
-          unread_notifications_count: realCount,
-          notifications: JSON.stringify({
-            unread_count: realCount,
-            last_updated: new Date().toISOString()
+      // Если счетчик не изменился и мы не хотим обновлять UI, пропускаем
+      if (skipUpdateIfSame && realCount === unreadNotificationsCount) {
+        return;
+      }
+      
+      // Обновляем счетчик в БД только если он изменился
+      if (realCount !== lastNotificationCountRef.current) {
+        await supabase
+          .from('players')
+          .update({ 
+            unread_notifications_count: realCount,
+            notifications: JSON.stringify({
+              unread_count: realCount,
+              last_updated: new Date().toISOString()
+            })
           })
-        })
-        .eq('id', userId);
+          .eq('id', userId);
+        
+        lastNotificationCountRef.current = realCount;
+      }
       
-      // Устанавливаем правильный счетчик
-      setUnreadNotificationsCount(realCount);
-      
-      console.log('✅ Счетчик уведомлений пересчитан и обновлен:', realCount);
+      // Обновляем UI только если значение действительно изменилось
+      if (realCount !== unreadNotificationsCount) {
+        setUnreadNotificationsCount(realCount);
+        lastNotificationCountRef.current = realCount;
+        console.log('✅ Счетчик уведомлений пересчитан и обновлен:', realCount);
+      } else {
+        // Обновляем ref даже если значение не изменилось, чтобы избежать повторных обновлений
+        lastNotificationCountRef.current = realCount;
+      }
     } catch (error) {
       // Тихая обработка сетевых ошибок (отсутствие интернета)
       const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
@@ -286,7 +301,7 @@ export default function RootLayout() {
       }
       // При сетевых ошибках просто пропускаем обновление счетчика
     }
-  }, []);
+  }, [unreadNotificationsCount]);
 
   // Убираем useEffect, который перезаписывает счетчик
   // Счетчик обновляется только через updateNotificationCount
@@ -643,19 +658,36 @@ export default function RootLayout() {
   // Принудительно обновляем пользователя при переходе на главную страницу
   // Это нужно для корректного выхода из профиля
   const lastAppStateLoadRef = React.useRef<number>(0);
+  const isUpdatingRef = React.useRef<boolean>(false);
+  
   React.useEffect(() => {
     const handleFocus = () => {
-      // Добавляем throttling - максимум один раз в 5 секунд
+      // Добавляем throttling - максимум один раз в 30 секунд
+      // Увеличиваем интервал, чтобы избежать мигания индикатора
       const now = Date.now();
-      if (now - lastAppStateLoadRef.current < 5000) {
-        return; // Пропускаем вызов, если прошло меньше 5 секунд
+      if (now - lastAppStateLoadRef.current < 30000) {
+        return; // Пропускаем вызов, если прошло меньше 30 секунд
       }
+      
+      // Предотвращаем множественные одновременные обновления
+      if (isUpdatingRef.current) {
+        return;
+      }
+      
+      // Сохраняем текущее значение счетчика перед обновлением
+      lastNotificationCountRef.current = unreadNotificationsCount;
+      
       lastAppStateLoadRef.current = now;
+      isUpdatingRef.current = true;
 
-      // Небольшая задержка для того, чтобы навигация завершилась
+      // Увеличиваем задержку для более плавного обновления
+      // НЕ обновляем счетчик уведомлений при возврате из фона, чтобы избежать мигания
+      // Счетчик обновляется через Realtime подписку автоматически
       setTimeout(() => {
-        loadUser();
-      }, 100);
+        loadUser().finally(() => {
+          isUpdatingRef.current = false;
+        });
+      }, 1000); // Увеличено до 1 секунды для более плавного обновления
     };
 
     // Добавляем слушатель для обновления при фокусе на приложении
@@ -716,9 +748,20 @@ export default function RootLayout() {
   // }, [appState, appReady]);
 
   // Загружаем счетчик уведомлений при смене пользователя
+  // НО не обновляем при возврате из фона, чтобы избежать мигания
+  const lastUserIdRef = React.useRef<string | null>(null);
   React.useEffect(() => {
     if (currentUser?.id) {
-      loadNotificationCount(currentUser.id);
+      // Обновляем счетчик только если пользователь действительно изменился
+      // (не при возврате из фона, когда currentUser остается тем же)
+      if (lastUserIdRef.current !== currentUser.id) {
+        lastUserIdRef.current = currentUser.id;
+        loadNotificationCount(currentUser.id);
+      } else {
+        // Если пользователь не изменился, обновляем счетчик только если он изменился
+        // Используем skipUpdateIfSame, чтобы не мигать индикатором
+        loadNotificationCount(currentUser.id, true);
+      }
     }
   }, [currentUser?.id, loadNotificationCount]);
 

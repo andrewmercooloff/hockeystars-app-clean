@@ -5,6 +5,10 @@ import { Platform } from 'react-native';
  * Сервис для управления звуками сообщений и push-уведомлений
  * Воспроизводит звуки клюшки при отправке и получении сообщений
  * Воспроизводит звук уведомления при push-уведомлениях
+ * 
+ * ВАЖНО: Пока используем expo-av для воспроизведения звуков, так как expo-audio имеет другой API
+ * и требует использования hooks, что не подходит для модульного кода.
+ * Миграция на expo-audio будет выполнена позже, когда будет доступен подходящий API.
  */
 
 // Объекты для хранения загруженных звуков
@@ -30,6 +34,7 @@ export async function initializeSounds(): Promise<void> {
   try {
     // Небольшая задержка для полной загрузки приложения
     await new Promise(resolve => setTimeout(resolve, 1000));
+    
     // Настраиваем аудио режим для TestFlight и продакшена
     try {
       await Audio.setAudioModeAsync({
@@ -38,7 +43,6 @@ export async function initializeSounds(): Promise<void> {
         playsInSilentModeIOS: true, // Воспроизводим даже в беззвучном режиме
         shouldDuckAndroid: false, // Не приглушаем другие звуки
         playThroughEarpieceAndroid: false,
-        // Убираем проблемные параметры interruptionMode
       });
     } catch (audioModeError) {
       console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError.message);
@@ -67,10 +71,10 @@ export async function initializeSounds(): Promise<void> {
     notificationSound = notSound;
 
     isInitialized = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка инициализации звуков:', error);
-    console.error('❌ Error details:', error.message);
-    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error details:', error?.message);
+    console.error('❌ Error stack:', error?.stack);
   }
 }
 
