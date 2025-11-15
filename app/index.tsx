@@ -70,15 +70,55 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Снижаем скорость на 50%: обычная скорость 0.7, при смене фильтра 0.35 (0.7 * 0.5)
     const speedMultiplier = isFilterChange ? 0.35 : 0.7;
 
-           const positions: PuckPosition[] = players.map(player => ({
-            id: player.id,
-             x: Math.random() * (boundaries.right - boundaries.left - 100) + boundaries.left + 50,
-             y: Math.random() * (boundaries.bottom - boundaries.top - 100) + boundaries.top + 50,
-      vx: (Math.random() - 0.5) * speedMultiplier,
-      vy: (Math.random() - 0.5) * speedMultiplier,
-            size: puckSize,
-             isDragging: false,
-           }));
+    // Генерируем позиции с проверкой коллизий, чтобы шайбы не накладывались друг на друга
+    const positions: PuckPosition[] = [];
+    const minDistance = puckSize;
+    const minDistSq = minDistance * minDistance;
+    const maxAttempts = 100; // Максимальное количество попыток для размещения каждой шайбы
+
+    for (const player of players) {
+      let x: number, y: number;
+      let attempts = 0;
+      let validPosition = false;
+
+      // Пытаемся найти валидную позицию без коллизий
+      while (!validPosition && attempts < maxAttempts) {
+        x = Math.random() * (boundaries.right - boundaries.left - 100) + boundaries.left + 50;
+        y = Math.random() * (boundaries.bottom - boundaries.top - 100) + boundaries.top + 50;
+        
+        // Проверяем коллизии с уже размещенными шайбами
+        validPosition = true;
+        for (const existingPos of positions) {
+          const dx = x - existingPos.x;
+          const dy = y - existingPos.y;
+          const distSq = dx * dx + dy * dy;
+          
+          if (distSq < minDistSq) {
+            validPosition = false;
+            break;
+          }
+        }
+        
+        attempts++;
+      }
+
+      // Если не удалось найти позицию без коллизий, используем последнюю попытку
+      // (в этом случае коллизии будут разрешены физикой на следующем кадре)
+      if (!validPosition) {
+        x = Math.random() * (boundaries.right - boundaries.left - 100) + boundaries.left + 50;
+        y = Math.random() * (boundaries.bottom - boundaries.top - 100) + boundaries.top + 50;
+      }
+
+      positions.push({
+        id: player.id,
+        x: x!,
+        y: y!,
+        vx: (Math.random() - 0.5) * speedMultiplier,
+        vy: (Math.random() - 0.5) * speedMultiplier,
+        size: puckSize,
+        isDragging: false,
+      });
+    }
 
     setPuckPositions(positions);
     physicsPositionsRef.current = positions;

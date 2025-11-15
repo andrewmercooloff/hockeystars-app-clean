@@ -779,14 +779,27 @@ export default function RootLayout() {
     }
 
     // Устанавливаем callback для обновления счетчика уведомлений
+    // Добавляем проверку, чтобы избежать мигания индикатора
     realtimeManager.setNotificationCountCallback((count: number) => {
-      setUnreadNotificationsCount(count);
+      // Обновляем UI только если значение действительно изменилось
+      // Используем ref для проверки, чтобы не зависеть от состояния в зависимостях
+      if (count !== lastNotificationCountRef.current) {
+        lastNotificationCountRef.current = count;
+        setUnreadNotificationsCount(count);
+      }
     });
 
     // Обновляем ТОЛЬКО отдельный счетчик, НЕ трогаем currentUser
     realtimeManager.setMessagesCountCallback((count: number) => {
       setUnreadMessagesCount(count);
     });
+
+    // Инициализируем последние значения счетчиков в RealtimeManager
+    // для предотвращения ложных срабатываний при первой настройке подписок
+    realtimeManager.initializeCounts(
+      lastNotificationCountRef.current,
+      unreadMessagesCount
+    );
 
     // Используем централизованный менеджер подписок
     realtimeManager.setupSubscriptions(currentUser.id);
@@ -795,7 +808,7 @@ export default function RootLayout() {
       // Отключаем подписки при размонтировании
       realtimeManager.disconnect();
     };
-  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?.id, unreadMessagesCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Обновляем счетчики при фокусе на экране сообщений
   React.useEffect(() => {

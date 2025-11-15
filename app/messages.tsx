@@ -60,7 +60,9 @@ export default function MessagesScreen() {
       }
 
       // Загружаем чаты для пользователя
+      console.log(`📨 loadChatsData: загружаем чаты для пользователя ${currentUser.id}...`);
       const conversations = await getUserConversations(currentUser.id);
+      console.log(`✅ loadChatsData: получено ${Object.keys(conversations).length} диалогов`);
       
       const chatPreviews: ChatPreview[] = [];
       
