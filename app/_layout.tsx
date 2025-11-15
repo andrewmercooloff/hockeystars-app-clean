@@ -89,6 +89,7 @@ export default function RootLayout() {
   const [appReady, setAppReady] = React.useState<boolean>(false);
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
+  const splashStartTime = React.useRef<number>(Date.now());
   
   React.useEffect(() => {
     // AppState только для мобильных платформ
@@ -214,28 +215,39 @@ export default function RootLayout() {
     
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
-      // Принудительное скрытие splash screen через 5 секунд, если что-то пошло не так
+      // Принудительное скрытие splash screen через 2 секунды максимум
+      const maxSplashTime = 2000; // 2 секунды максимум
       const forceHideSplashTimeout = setTimeout(() => {
         Animated.timing(splashOpacity, {
           toValue: 0,
-          duration: 500,
+          duration: 300,
           useNativeDriver: true,
         }).start(() => {
           setShowSplash(false);
         });
-      }, 5000);
+      }, maxSplashTime);
 
       if (appReady && !isUserLoading && userLoaded) {
         // Плавно скрываем наш кастомный splash screen когда все загружено
         clearTimeout(forceHideSplashTimeout);
         
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowSplash(false);
-        });
+        // Вычисляем оставшееся время до максимума (2 секунды)
+        const elapsed = Date.now() - splashStartTime.current;
+        const remainingTime = Math.max(0, maxSplashTime - elapsed);
+        
+        // Если уже прошло достаточно времени, скрываем сразу
+        // Если нет, ждем минимальное время для плавности
+        const hideDelay = remainingTime > 100 ? 100 : 0;
+        
+        setTimeout(() => {
+          Animated.timing(splashOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            setShowSplash(false);
+          });
+        }, hideDelay);
       }
 
       return () => {
@@ -628,17 +640,22 @@ export default function RootLayout() {
         // Помечаем приложение как готовое
         setAppReady(true);
         
-        // При ошибке тоже добавляем задержку для консистентности
+        // При ошибке тоже добавляем минимальную задержку, но не больше 2 секунд
+        const elapsed = Date.now() - splashStartTime.current;
+        const maxSplashTime = 2000;
+        const remainingTime = Math.max(0, maxSplashTime - elapsed);
+        const hideDelay = remainingTime > 300 ? 300 : Math.max(0, remainingTime);
+        
         setTimeout(() => {
           // При ошибке тоже плавно скрываем splash screen
           Animated.timing(splashOpacity, {
             toValue: 0,
-            duration: 500,
+            duration: 300,
             useNativeDriver: true,
           }).start(() => {
             setShowSplash(false);
           });
-        }, 500);
+        }, hideDelay);
       }
     };
 
