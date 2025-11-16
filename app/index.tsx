@@ -139,7 +139,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const hasNonDraggingPucks = currentPositions.some((p) => !p.isDragging);
     if (!hasNonDraggingPucks) return;
 
-    const updatedPositions = currentPositions.map((pos) => {
+    let updatedPositions = currentPositions.map((pos) => {
       if (pos.isDragging) return pos;
 
       let { x, y, vx, vy } = pos;
@@ -179,43 +179,43 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         vy = -Math.abs(vy);
       }
 
-      // Упрощенные коллизии для плавности
+      // Упрощенная проверка коллизий - только физика столкновений
+      // Геометрические коллизии решаются после обновления всех позиций
       const minDistance = puckSize;
       const minDistSq = minDistance * minDistance;
 
-      for (const other of currentPositions) {
-        if (other.id === pos.id || pos.isDragging || other.isDragging) continue;
+      // Только физика столкновений для автоматических шайб
+      if (!pos.isDragging) {
+        for (const other of currentPositions) {
+          if (other.id === pos.id || other.isDragging) continue;
 
-        const dx = x - other.x;
-        const dy = y - other.y;
-        const distSq = dx * dx + dy * dy;
+          const dx = x - other.x;
+          const dy = y - other.y;
+          const distSq = dx * dx + dy * dy;
 
-        if (distSq < minDistSq && distSq > 0) {
-          const dist = Math.sqrt(distSq);
-          const angle = Math.atan2(dy, dx);
-          const overlap = minDistance - dist;
+          if (distSq < minDistSq && distSq > 0) {
+            const dist = Math.sqrt(distSq);
+            const angle = Math.atan2(dy, dx);
+            
+            // Физика столкновения
+            const relativeVx = vx - other.vx;
+            const relativeVy = vy - other.vy;
+            const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
 
-          const push = overlap * 0.5;
-          x += Math.cos(angle) * push;
-          y += Math.sin(angle) * push;
+            if (dot < 0) {
+              const restitution = 0.8;
+              const impulse = dot * restitution;
+              vx -= impulse * Math.cos(angle);
+              vy -= impulse * Math.sin(angle);
+            }
 
-          const relativeVx = vx - other.vx;
-          const relativeVy = vy - other.vy;
-          const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+            // Более мягкое сглаживание для плавности
+            vx *= 0.95;
+            vy *= 0.95;
 
-          if (dot < 0) {
-            const restitution = 0.8;
-            const impulse = dot * restitution;
-            vx -= impulse * Math.cos(angle);
-            vy -= impulse * Math.sin(angle);
-          }
-
-          // Более мягкое сглаживание для плавности
-          vx *= 0.95;
-          vy *= 0.95;
-
-          if (currentUserId && pos.id === currentUserId) {
-            collisionDetectedRef.current = true;
+            if (currentUserId && pos.id === currentUserId) {
+              collisionDetectedRef.current = true;
+            }
           }
         }
       }
@@ -237,6 +237,68 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
       return { ...pos, x, y, vx, vy };
     });
+
+    // Оптимизированное решение коллизий - один проход с накоплением смещений
+    const minDistance = puckSize;
+    const minDistSq = minDistance * minDistance;
+    
+    // Массив для накопления смещений
+    const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
+    
+    // Один проход: вычисляем все необходимые смещения
+    for (let i = 0; i < updatedPositions.length; i++) {
+      const pos1 = updatedPositions[i];
+      
+      for (let j = i + 1; j < updatedPositions.length; j++) {
+        const pos2 = updatedPositions[j];
+        
+        // Пропускаем если обе перетаскиваются
+        if (pos1.isDragging && pos2.isDragging) continue;
+        
+        const dx = pos1.x - pos2.x;
+        const dy = pos1.y - pos2.y;
+        const distSq = dx * dx + dy * dy;
+        
+        if (distSq < minDistSq && distSq > 0) {
+          const dist = Math.sqrt(distSq);
+          const angle = Math.atan2(dy, dx);
+          const overlap = minDistance - dist;
+          
+          // Накопление смещений
+          if (pos1.isDragging) {
+            // pos1 перетаскивается, двигаем только pos2
+            offsets[j].x -= Math.cos(angle) * overlap;
+            offsets[j].y -= Math.sin(angle) * overlap;
+          } else if (pos2.isDragging) {
+            // pos2 перетаскивается, двигаем только pos1
+            offsets[i].x += Math.cos(angle) * overlap;
+            offsets[i].y += Math.sin(angle) * overlap;
+          } else {
+            // Обе автоматические - двигаем обе
+            const halfOverlap = overlap * 0.5;
+            offsets[i].x += Math.cos(angle) * halfOverlap;
+            offsets[i].y += Math.sin(angle) * halfOverlap;
+            offsets[j].x -= Math.cos(angle) * halfOverlap;
+            offsets[j].y -= Math.sin(angle) * halfOverlap;
+          }
+          
+          if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
+            collisionDetectedRef.current = true;
+          }
+        }
+      }
+    }
+    
+    // Применяем накопленные смещения за один проход
+    for (let i = 0; i < updatedPositions.length; i++) {
+      if (offsets[i].x !== 0 || offsets[i].y !== 0) {
+        updatedPositions[i] = {
+          ...updatedPositions[i],
+          x: Math.max(boundaries.left, Math.min(boundaries.right, updatedPositions[i].x + offsets[i].x)),
+          y: Math.max(boundaries.top, Math.min(boundaries.bottom, updatedPositions[i].y + offsets[i].y)),
+        };
+      }
+    }
 
     // Обновляем референсы для интерполяции
     physicsPositionsRef.current = updatedPositions;
@@ -340,52 +402,133 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   }, [puckPositions, currentScreen]);
 
   // Функция для обновления позиции при drag
+  // Используем прямые формулы вместо итераций для производительности
   const updatePuckPosition = useCallback(
     (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => {
       setPuckPositions((current) => {
+        // Находим текущую позицию шайбы
+        const currentPuck = current.find(p => p.id === id);
+        const prevX = currentPuck?.x ?? x;
+        const prevY = currentPuck?.y ?? y;
+        
         let finalX = Math.max(boundaries.left, Math.min(boundaries.right, x));
         let finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, y));
 
-      // Проверка коллизий для перетаскиваемой шайбы (чтобы не проходила сквозь другие)
-      if (isDragging) {
-        // Простая проверка коллизий при drag (без сложной оптимизации)
         const minDistance = puckSize;
         const minDistSq = minDistance * minDistance;
 
-        for (const other of current) {
-          if (other.id === id) continue;
-          const dx = finalX - other.x;
-          const dy = finalY - other.y;
-          const distSq = dx * dx + dy * dy;
-          if (distSq < minDistSq && distSq > 0) {
-            const dist = Math.sqrt(distSq);
-            const angle = Math.atan2(dy, dx);
-            const overlap = minDistance - dist;
-            finalX += Math.cos(angle) * overlap;
-            finalY += Math.sin(angle) * overlap;
-            if (currentUserId && id === currentUserId) {
-              collisionDetectedRef.current = true;
+        // Создаем новый массив позиций
+        const newPositions = current.map((pos) => ({ ...pos }));
+
+        if (isDragging) {
+          // Находим индекс перетаскиваемой шайбы
+          const draggedIndex = newPositions.findIndex(p => p.id === id);
+          if (draggedIndex === -1) return current;
+
+          // Обновляем позицию перетаскиваемой шайбы
+          newPositions[draggedIndex] = {
+            ...newPositions[draggedIndex],
+            x: finalX,
+            y: finalY,
+            vx: vx ?? newPositions[draggedIndex].vx,
+            vy: vy ?? newPositions[draggedIndex].vy,
+            isDragging: true,
+          };
+
+          // Прямая формула для решения всех коллизий за один проход
+          // Для каждой другой шайбы вычисляем коллизию с перетаскиваемой
+          for (let i = 0; i < newPositions.length; i++) {
+            if (i === draggedIndex) continue;
+            
+            const other = newPositions[i];
+            const dx = finalX - other.x;
+            const dy = finalY - other.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < minDistSq && distSq > 0) {
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
+              const overlap = minDistance - dist;
+              
+              // Перетаскиваемая шайба остается на месте (или двигается минимально)
+              // Другая шайба отталкивается полностью
+              const pushX = -Math.cos(angle) * overlap;
+              const pushY = -Math.sin(angle) * overlap;
+              
+              // Применяем отталкивание к другой шайбе
+              let newOtherX = other.x + pushX;
+              let newOtherY = other.y + pushY;
+              
+              // Проверяем границы для отталкиваемой шайбы
+              newOtherX = Math.max(boundaries.left, Math.min(boundaries.right, newOtherX));
+              newOtherY = Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY));
+              
+              newPositions[i] = {
+                ...other,
+                x: newOtherX,
+                y: newOtherY,
+              };
+
+              if (currentUserId && (id === currentUserId || other.id === currentUserId)) {
+                collisionDetectedRef.current = true;
+              }
             }
           }
+
+          // Дополнительная проверка: если перетаскиваемая шайба все еще пересекается,
+          // немного отодвигаем её назад (используем уже обновленные позиции других шайб)
+          for (let i = 0; i < newPositions.length; i++) {
+            if (i === draggedIndex) continue;
+            
+            const other = newPositions[i];
+            const dx = finalX - other.x;
+            const dy = finalY - other.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < minDistSq && distSq > 0) {
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
+              const overlap = minDistance - dist;
+              
+              // Немного отодвигаем перетаскиваемую шайбу назад
+              finalX -= Math.cos(angle) * overlap * 0.3;
+              finalY -= Math.sin(angle) * overlap * 0.3;
+              
+              // Дополнительно отталкиваем другую шайбу, если она все еще слишком близко
+              const additionalPush = overlap * 0.2;
+              const newOtherX = other.x - Math.cos(angle) * additionalPush;
+              const newOtherY = other.y - Math.sin(angle) * additionalPush;
+              
+              newPositions[i] = {
+                ...other,
+                x: Math.max(boundaries.left, Math.min(boundaries.right, newOtherX)),
+                y: Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY)),
+              };
+            }
+          }
+
+          // Обновляем финальную позицию перетаскиваемой шайбы
+          finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
+          finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
+          newPositions[draggedIndex] = {
+            ...newPositions[draggedIndex],
+            x: finalX,
+            y: finalY,
+          };
+        } else {
+          // Если не перетаскиваем, просто обновляем позицию
+          const index = newPositions.findIndex(p => p.id === id);
+          if (index !== -1) {
+            newPositions[index] = {
+              ...newPositions[index],
+              x: finalX,
+              y: finalY,
+              vx: vx ?? newPositions[index].vx,
+              vy: vy ?? newPositions[index].vy,
+              isDragging: false,
+            };
+          }
         }
-      }
-
-      // Ограничиваем финальную позицию границами
-        finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
-        finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
-
-        const newPositions = current.map((pos) =>
-          pos.id === id
-            ? {
-                ...pos,
-                x: finalX,
-                y: finalY,
-                vx: vx ?? pos.vx,
-                vy: vy ?? pos.vy,
-                isDragging: isDragging ?? false,
-              }
-            : pos
-        );
 
         // Обновляем референсы для интерполяции
         physicsPositionsRef.current = newPositions;
