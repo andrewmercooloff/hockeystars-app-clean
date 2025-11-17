@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Tabs, useRouter, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
+import { Asset } from 'expo-asset';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
 import { UserProvider, useUser } from '../contexts/UserContext';
@@ -35,6 +36,10 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   document.body.style.backgroundColor = '#050008';
   document.documentElement.style.backgroundColor = '#050008';
 }
+
+const GLOBAL_PRELOAD_ASSETS = [
+  require('../assets/images/led.jpg'),
+];
 
 // В режиме разработки показываем предупреждения для отладки
 // В production отключаем логи, но можно включить через EXPO_PUBLIC_ENABLE_LOGS=true для TestFlight
@@ -177,6 +182,11 @@ export default function RootLayout() {
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
   const lastNotificationCountRef = React.useRef<number>(0);
+  const lastMessagesCountRef = React.useRef<number>(0);
+  const unreadNotificationsStateRef = React.useRef<number>(unreadNotificationsCount);
+  React.useEffect(() => {
+    unreadNotificationsStateRef.current = unreadNotificationsCount;
+  }, [unreadNotificationsCount]);
 
   // Внутренний компонент для синхронизации с UserContext
   const UserSync = () => {
@@ -572,10 +582,26 @@ export default function RootLayout() {
     }
   };
 
+  const loadUserRef = React.useRef(loadUser);
+  React.useEffect(() => {
+    loadUserRef.current = loadUser;
+  });
+
   // Функция для принудительного обновления счетчиков
   const refreshCounters = async () => {
     if (currentUser) {
       await loadUser();
+      // Дополнительно обновляем счетчик сообщений
+      try {
+        const { getUnreadMessageCount } = await import('../utils/playerStorage');
+        const count = await getUnreadMessageCount(currentUser.id);
+        if (count !== lastMessagesCountRef.current) {
+          lastMessagesCountRef.current = count;
+          setUnreadMessagesCount(count);
+        }
+      } catch (error) {
+        console.error('❌ Ошибка обновления счетчика сообщений:', error);
+      }
     }
   };
 
@@ -585,6 +611,34 @@ export default function RootLayout() {
       await loadUser();
     }
   };
+
+  const refreshBadgeCounts = React.useCallback(async () => {
+    if (!currentUser?.id) {
+      return;
+    }
+
+    try {
+      const { getUnreadMessageCount } = await import('../utils/playerStorage');
+      const messageCount = await getUnreadMessageCount(currentUser.id);
+      if (messageCount !== lastMessagesCountRef.current) {
+        lastMessagesCountRef.current = messageCount;
+        setUnreadMessagesCount(messageCount);
+      }
+    } catch (error) {
+      console.error('❌ Ошибка обновления счетчика сообщений при возврате из фона:', error);
+    }
+
+    try {
+      await loadNotificationCount(currentUser.id);
+    } catch (error) {
+      console.error('❌ Ошибка обновления счетчика уведомлений при возврате из фона:', error);
+    }
+  }, [currentUser?.id, loadNotificationCount]);
+
+  const refreshBadgeCountsRef = React.useRef(refreshBadgeCounts);
+  React.useEffect(() => {
+    refreshBadgeCountsRef.current = refreshBadgeCounts;
+  }, [refreshBadgeCounts]);
 
   React.useEffect(() => {
     const initializeApp = async () => {
@@ -605,6 +659,9 @@ export default function RootLayout() {
         // Инициализируем только критически важные ресурсы параллельно
         const initPromises = [
           initializeStorage(),
+          Asset.loadAsync(GLOBAL_PRELOAD_ASSETS).catch(err => {
+            console.warn('⚠️ Не удалось предзагрузить фон led:', err);
+          }),
           // Предзагружаем данные пользователя в фоне, если он есть
           currentUser ? import('../utils/playerStorage').then(({ preloadUserData }) => 
             preloadUserData(currentUser.id).catch(err => 
@@ -669,8 +726,33 @@ export default function RootLayout() {
     if (!loaded) return;
     // Загружаем пользователя сразу после загрузки шрифтов, не ждем appReady
     loadUser();
-    // УБРАЛИ setInterval - теперь счетчик обновляется только через Realtime!
-  }, [loaded]);
+    
+    // Периодическое обновление счетчика сообщений (каждые 5 секунд)
+    // Это нужно для надежности, так как Realtime может не сработать
+    const messagesInterval = setInterval(async () => {
+      if (currentUser) {
+        try {
+          const { getUnreadMessageCount } = await import('../utils/playerStorage');
+          const count = await getUnreadMessageCount(currentUser.id);
+          if (count !== lastMessagesCountRef.current) {
+            lastMessagesCountRef.current = count;
+            setUnreadMessagesCount(count);
+            // Также обновляем счетчик в БД для синхронизации
+            await supabase
+              .from('players')
+              .update({ unread_messages_count: count })
+              .eq('id', currentUser.id);
+          }
+        } catch (error) {
+          console.error('❌ Ошибка периодического обновления счетчика сообщений:', error);
+        }
+      }
+    }, 5000); // Каждые 5 секунд
+    
+    return () => {
+      clearInterval(messagesInterval);
+    };
+  }, [loaded, currentUser?.id]);
 
   // Принудительно обновляем пользователя при переходе на главную страницу
   // Это нужно для корректного выхода из профиля
@@ -692,16 +774,18 @@ export default function RootLayout() {
       }
       
       // Сохраняем текущее значение счетчика перед обновлением
-      lastNotificationCountRef.current = unreadNotificationsCount;
+      lastNotificationCountRef.current = unreadNotificationsStateRef.current;
       
       lastAppStateLoadRef.current = now;
       isUpdatingRef.current = true;
+
+      refreshBadgeCountsRef.current?.();
 
       // Увеличиваем задержку для более плавного обновления
       // НЕ обновляем счетчик уведомлений при возврате из фона, чтобы избежать мигания
       // Счетчик обновляется через Realtime подписку автоматически
       setTimeout(() => {
-        loadUser().finally(() => {
+        loadUserRef.current?.().finally(() => {
           isUpdatingRef.current = false;
         });
       }, 1000); // Увеличено до 1 секунды для более плавного обновления
@@ -784,8 +868,23 @@ export default function RootLayout() {
 
   // Инициализация счетчика при загрузке пользователя
   React.useEffect(() => {
-    if (currentUser && currentUser.unreadMessagesCount !== undefined) {
+    if (currentUser) {
+      if (currentUser.unreadMessagesCount !== undefined) {
+        lastMessagesCountRef.current = currentUser.unreadMessagesCount;
       setUnreadMessagesCount(currentUser.unreadMessagesCount);
+      } else {
+        // Если счетчик не загружен, загружаем его
+        (async () => {
+          try {
+            const { getUnreadMessageCount } = await import('../utils/playerStorage');
+            const count = await getUnreadMessageCount(currentUser.id);
+            lastMessagesCountRef.current = count;
+            setUnreadMessagesCount(count);
+          } catch (error) {
+            console.error('❌ Ошибка загрузки счетчика сообщений:', error);
+          }
+        })();
+      }
     }
   }, [currentUser?.id]);
 
@@ -808,11 +907,15 @@ export default function RootLayout() {
 
     // Обновляем ТОЛЬКО отдельный счетчик, НЕ трогаем currentUser
     realtimeManager.setMessagesCountCallback((count: number) => {
+      if (count !== lastMessagesCountRef.current) {
+        lastMessagesCountRef.current = count;
       setUnreadMessagesCount(count);
+      }
     });
 
     // Инициализируем последние значения счетчиков в RealtimeManager
     // для предотвращения ложных срабатываний при первой настройке подписок
+    lastMessagesCountRef.current = unreadMessagesCount;
     realtimeManager.initializeCounts(
       lastNotificationCountRef.current,
       unreadMessagesCount
@@ -931,18 +1034,14 @@ export default function RootLayout() {
           name="messages"
           listeners={{
             tabPress: (e: any) => {
-              // Проверяем только если точно известно, что пользователь не зарегистрирован
-              // (не проверяем во время загрузки, чтобы избежать редиректов)
-              if (!currentUser && userLoaded) {
+              if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
-              } else if (!currentUser && !userLoaded) {
-                // Во время загрузки просто предотвращаем переход
-                e.preventDefault();
               }
             },
           }}
           options={{
+            lazy: false,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return (
@@ -984,15 +1083,14 @@ export default function RootLayout() {
           name="notifications"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser && userLoaded) {
+              if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
-              } else if (!currentUser && !userLoaded) {
-                e.preventDefault();
               }
             },
           }}
           options={{
+            lazy: false,
             tabBarIcon: NotificationsTabIcon,
           }}
         />
@@ -1001,15 +1099,14 @@ export default function RootLayout() {
           name="search"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser && userLoaded) {
+              if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
-              } else if (!currentUser && !userLoaded) {
-                e.preventDefault();
               }
             },
           }}
           options={{
+            lazy: false,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="search-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
@@ -1021,15 +1118,14 @@ export default function RootLayout() {
           name="exercises"
           listeners={{
             tabPress: (e: any) => {
-              if (!currentUser && userLoaded) {
+              if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
-              } else if (!currentUser && !userLoaded) {
-                e.preventDefault();
               }
             },
           }}
           options={{
+            lazy: false,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="barbell-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;

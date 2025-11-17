@@ -6,13 +6,15 @@ import {
     Image,
     ImageBackground,
     KeyboardAvoidingView,
+    Modal,
     Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -46,12 +48,21 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [isReportingChat, setIsReportingChat] = useState(false);
+  const messageRefs = useRef<Map<string, View>>(new Map());
   const scrollViewRef = useRef<ScrollView>(null);
   const lastLoadTimeRef = useRef<number>(0);
   const lastMessageCountRef = useRef<number>(0);
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
   const justSentMessageRef = useRef<boolean>(false);
+  const isInitialLoadRef = useRef<boolean>(true); // Флаг первой загрузки чата
+  const savedScrollPositionRef = useRef<number | null>(null); // Сохраненная позиция прокрутки
+  const wasNearBottomRef = useRef<boolean>(true); // Был ли пользователь внизу перед уходом
 
 
   useEffect(() => {
@@ -59,39 +70,36 @@ export default function ChatScreen() {
     setMessages([]);
     setNewMessage('');
     setLoading(true);
+    setReplyingToMessage(null); // Очищаем сообщение для ответа при смене чата
+    setContextMenuVisible(false); // Закрываем меню при смене чата
+    setContextMenuMessage(null);
+    messageRefs.current.clear(); // Очищаем refs сообщений
+    isInitialLoadRef.current = true; // Сбрасываем флаг при смене чата
+    savedScrollPositionRef.current = null; // Сбрасываем сохраненную позицию при смене чата
+    wasNearBottomRef.current = true; // Сбрасываем флаг при смене чата
     loadChatData();
   }, [id]);
 
   // Обработка автоматической прокрутки при переходе через deep link
   useEffect(() => {
-    if (scrollToBottom === 'true' && messages.length > 0 && !loading) {
+    if (scrollToBottom === 'true' && messages.length > 0 && !loading && scrollViewRef.current) {
       console.log('🔗 Автоматическая прокрутка в чат через deep link');
-      // Делаем несколько попыток прокрутки для надежности
-      const scrollAttempts = [200, 400, 600];
-      scrollAttempts.forEach((delay, index) => {
-        setTimeout(() => {
-          if (scrollViewRef.current) {
-            scrollViewRef.current.scrollToEnd({ animated: index === 0 });
-            setIsNearBottom(true);
-          }
-        }, Platform.OS === 'android' ? delay + 100 : delay);
-      });
+      // При первой загрузке - без анимации, сразу вниз
+      if (isInitialLoadRef.current) {
+        scrollViewRef.current.scrollToEnd({ animated: false });
+        setIsNearBottom(true);
+        isInitialLoadRef.current = false;
+      }
     }
   }, [scrollToBottom, messages.length, loading]);
 
-  // Улучшенная автоматическая прокрутка при загрузке сообщений
+  // Автоматическая прокрутка при первой загрузке сообщений (без анимации)
   useEffect(() => {
-    if (messages.length > 0 && !loading && scrollViewRef.current) {
-      // Делаем несколько попыток прокрутки для надежности
-      const scrollAttempts = [100, 300, 500];
-      scrollAttempts.forEach((delay, index) => {
-        setTimeout(() => {
-          if (scrollViewRef.current) {
-            scrollViewRef.current.scrollToEnd({ animated: index === 0 });
-            setIsNearBottom(true);
-          }
-        }, Platform.OS === 'android' ? delay + 100 : delay);
-      });
+    if (messages.length > 0 && !loading && scrollViewRef.current && isInitialLoadRef.current) {
+      // При первой загрузке - без анимации, сразу вниз
+      scrollViewRef.current.scrollToEnd({ animated: false });
+      setIsNearBottom(true);
+      isInitialLoadRef.current = false;
     }
   }, [messages.length, loading]);
 
@@ -131,14 +139,38 @@ export default function ChatScreen() {
           
           console.log('✅ Сообщение для этого чата, обрабатываем');
           
+          // Парсим информацию об ответе из текста сообщения
+          let text = rawMessage.text;
+          let replyToId: string | undefined;
+          let replyToText: string | undefined;
+          let replyToSenderId: string | undefined;
+          
+          const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+          if (replyDataMatch) {
+            try {
+              const replyData = JSON.parse(replyDataMatch[1]);
+              if (replyData.replyTo) {
+                replyToId = replyData.replyTo.id;
+                replyToText = replyData.replyTo.text;
+                replyToSenderId = replyData.replyTo.senderId;
+                text = replyDataMatch[2];
+              }
+            } catch (e) {
+              console.error('Ошибка парсинга replyTo данных:', e);
+            }
+          }
+          
           // Преобразуем данные из Supabase формата (snake_case) в формат Message (camelCase)
           const newMessage: Message = {
             id: rawMessage.id,
             senderId: rawMessage.sender_id,
             receiverId: rawMessage.receiver_id,
-            text: rawMessage.text,
+            text: text,
             timestamp: new Date(rawMessage.created_at),
-            read: rawMessage.read
+            read: rawMessage.read,
+            replyToId,
+            replyToText,
+            replyToSenderId
           };
           
             // Добавляем новое сообщение в состояние
@@ -230,6 +262,7 @@ export default function ChatScreen() {
             setTimeout(() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
               setIsNearBottom(true);
+              wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
             }, Platform.OS === 'android' ? 200 : 100);
           }
       )
@@ -310,7 +343,7 @@ export default function ChatScreen() {
     };
   }, [currentUser?.id, otherPlayer?.id, id]);
 
-  // Обработка системной кнопки "назад" и автоскролл при возврате в чат
+  // Обработка системной кнопки "назад" и восстановление позиции при возврате в чат
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -320,15 +353,36 @@ export default function ChatScreen() {
 
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      // Автоскролл вниз при возврате в чат (если есть сообщения)
-      if (messages.length > 0 && !loading) {
+      // При возврате в чат восстанавливаем позицию или прокручиваем вниз
+      if (messages.length > 0 && !loading && scrollViewRef.current) {
+        // Небольшая задержка для рендеринга контента
         setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
-          setIsNearBottom(true);
-        }, Platform.OS === 'android' ? 300 : 200);
+          if (isInitialLoadRef.current) {
+            // При первой загрузке прокручиваем вниз
+            scrollViewRef.current?.scrollToEnd({ animated: false });
+            setIsNearBottom(true);
+            wasNearBottomRef.current = true;
+            isInitialLoadRef.current = false;
+          } else if (savedScrollPositionRef.current !== null && !wasNearBottomRef.current) {
+            // Восстанавливаем сохраненную позицию, если не был внизу
+            scrollViewRef.current.scrollTo({
+              y: savedScrollPositionRef.current,
+              animated: false
+            });
+            setIsNearBottom(false);
+          } else if (wasNearBottomRef.current) {
+            // Если был внизу, прокручиваем вниз
+            scrollViewRef.current?.scrollToEnd({ animated: false });
+            setIsNearBottom(true);
+          }
+        }, Platform.OS === 'android' ? 100 : 50);
       }
 
-      return () => backHandler.remove();
+      // При уходе из чата сохраняем текущую позицию
+      return () => {
+        backHandler.remove();
+        // Позиция уже сохранена в onScroll
+      };
     }, [messages.length, loading])
   );
 
@@ -393,23 +447,12 @@ export default function ChatScreen() {
             setMessages(conversation);
             // Устанавливаем isNearBottom в true после загрузки
             setIsNearBottom(true);
+            // Прокрутка вниз будет выполнена в useEffect выше без анимации
           } catch (convError) {
             console.error('❌ Ошибка загрузки диалога:', convError);
             console.error('❌ Детали ошибки:', JSON.stringify(convError, null, 2));
             setMessages([]);
           }
-          
-          // Прокручиваем вниз после загрузки сообщений (несколько попыток для надежности)
-          // useEffect выше также будет пытаться прокрутить, но здесь делаем дополнительную попытку
-          const scrollAttempts = [200, 400, 600];
-          scrollAttempts.forEach((delay, index) => {
-            setTimeout(() => {
-              if (scrollViewRef.current) {
-                scrollViewRef.current.scrollToEnd({ animated: index === 0 });
-                setIsNearBottom(true);
-              }
-            }, Platform.OS === 'android' ? delay + 100 : delay);
-          });
           
           // Отмечаем сообщения как прочитанные
           await markMessagesAsRead(userData.id, otherPlayerData.id);
@@ -434,6 +477,142 @@ export default function ChatScreen() {
     }
   };
 
+  // Жалоба на чат
+  const reportChat = React.useCallback(async () => {
+    if (!currentUser || !otherPlayer || isReportingChat) {
+      return;
+    }
+
+    setIsReportingChat(true);
+
+    try {
+      const { data: admins, error: adminsError } = await supabase
+        .from('players')
+        .select('id, name')
+        .eq('status', 'admin');
+
+      if (adminsError || !admins || admins.length === 0) {
+        console.error('❌ Ошибка получения списка админов для жалобы на чат:', adminsError);
+        Alert.alert(t('common.error') || 'Ошибка', t('admin.error') || 'Ошибка');
+        return;
+      }
+
+      const adminIds = admins.map(admin => admin.id);
+      const { data: pushTokens, error: tokensError } = await supabase
+        .from('push_tokens')
+        .select('user_id, token')
+        .in('user_id', adminIds);
+
+      if (tokensError) {
+        console.error('❌ Ошибка получения push токенов админов:', tokensError);
+      }
+
+      const tokensMap = new Map<string, string[]>();
+      if (pushTokens) {
+        pushTokens.forEach(pt => {
+          if (!tokensMap.has(pt.user_id)) {
+            tokensMap.set(pt.user_id, []);
+          }
+          tokensMap.get(pt.user_id)!.push(pt.token);
+        });
+      }
+
+      const generateUUID = (): string => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+
+      const timestamp = new Date().toISOString();
+      const notificationMessage =
+        t('admin.reportChatNotification', {
+          reporterName: currentUser.name,
+          reportedName: otherPlayer.name,
+        }) || `${currentUser.name} пожаловался на чат с ${otherPlayer.name}`;
+
+      const notifications = admins.map(admin => ({
+        id: generateUUID(),
+        user_id: admin.id,
+        type: 'user_report',
+        title: notificationMessage,
+        message: notificationMessage,
+        data: {
+          reporterId: currentUser.id,
+          reporterName: currentUser.name,
+          reporterAvatar: currentUser.avatar,
+          reportedId: otherPlayer.id,
+          reportedName: otherPlayer.name,
+          reportedAvatar: otherPlayer.avatar,
+          context: 'chat',
+          timestamp,
+        },
+        created_at: timestamp,
+        is_read: false,
+      }));
+
+      if (notifications.length > 0) {
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+
+        if (notificationError) {
+          console.error('❌ Ошибка создания уведомлений о жалобе на чат:', notificationError);
+          Alert.alert(t('common.error') || 'Ошибка', t('admin.error') || 'Ошибка');
+          return;
+        }
+
+        for (const admin of admins) {
+          const adminTokens = tokensMap.get(admin.id);
+          if (adminTokens && adminTokens.length > 0) {
+            try {
+              const { sendNotificationToUser } = await import('../../utils/notificationService');
+              await sendNotificationToUser(
+                admin.id,
+                notificationMessage,
+                '',
+                {
+                  type: 'user_report',
+                  reporterId: currentUser.id,
+                  reportedId: otherPlayer.id,
+                  context: 'chat',
+                }
+              );
+            } catch (error) {
+              console.warn(`Не удалось отправить push-уведомление админу ${admin.name}:`, error);
+            }
+          }
+        }
+      }
+
+      Alert.alert(
+        t('admin.reportUserTitle') || 'Жалоба отправлена',
+        t('admin.reportUserMessage') || 'Жалоба отправлена администратору. Мы свяжемся с Вами, если нужны будут подробности.'
+      );
+    } catch (error) {
+      console.error('❌ Ошибка отправки жалобы на чат:', error);
+      Alert.alert(t('common.error') || 'Ошибка', t('admin.error') || 'Ошибка');
+    } finally {
+      setIsReportingChat(false);
+    }
+  }, [currentUser, otherPlayer, isReportingChat, t]);
+
+  const handleReportChat = React.useCallback(() => {
+    if (!currentUser || !otherPlayer) {
+      return;
+    }
+
+    Alert.alert(
+      t('chat.reportChat') || t('admin.reportUser') || 'Пожаловаться',
+      t('chat.reportChatConfirm') || 'Вы уверены, что хотите пожаловаться на этот чат?',
+      [
+        { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+        { text: t('common.confirm') || 'OK', onPress: () => reportChat() }
+      ]
+    );
+  }, [currentUser, otherPlayer, reportChat, t]);
+
   const loadMessages = async () => {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
       try {
@@ -444,8 +623,42 @@ export default function ChatScreen() {
         const currentMessageIds = new Set(conversation.map(m => m.id));
         const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
         
+        // Парсим информацию об ответе для всех сообщений
+        const parsedConversation = conversation.map(msg => {
+          let text = msg.text;
+          let replyToId: string | undefined = msg.replyToId;
+          let replyToText: string | undefined = msg.replyToText;
+          let replyToSenderId: string | undefined = msg.replyToSenderId;
+          
+          // Если replyTo данные не были распарсены при загрузке, парсим из текста
+          if (!replyToId) {
+            const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+            if (replyDataMatch) {
+              try {
+                const replyData = JSON.parse(replyDataMatch[1]);
+                if (replyData.replyTo) {
+                  replyToId = replyData.replyTo.id;
+                  replyToText = replyData.replyTo.text;
+                  replyToSenderId = replyData.replyTo.senderId;
+                  text = replyDataMatch[2];
+                }
+              } catch (e) {
+                console.error('Ошибка парсинга replyTo данных:', e);
+              }
+            }
+          }
+          
+          return {
+            ...msg,
+            text,
+            replyToId,
+            replyToText,
+            replyToSenderId
+          };
+        });
+        
         // Обновляем состояние сообщений
-        setMessages(conversation);
+        setMessages(parsedConversation);
         
         // Обновляем отслеживаемые ID сообщений
         lastMessageIdsRef.current = currentMessageIds;
@@ -480,6 +693,7 @@ export default function ChatScreen() {
           setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
             setIsNearBottom(true);
+            wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
           }, Platform.OS === 'android' ? 200 : 100);
         }
 
@@ -495,7 +709,9 @@ export default function ChatScreen() {
     }
 
     const messageText = newMessage.trim();
+    const replyingTo = replyingToMessage;
     setNewMessage(''); // Очищаем поле сразу для лучшего UX
+    setReplyingToMessage(null); // Очищаем сообщение для ответа
     
     // Оптимистичное обновление - добавляем сообщение сразу в UI
     const tempMessage: Message = {
@@ -504,7 +720,10 @@ export default function ChatScreen() {
       receiverId: otherPlayer.id,
       text: messageText,
       timestamp: new Date(),
-      read: false
+      read: false,
+      replyToId: replyingTo?.id,
+      replyToText: replyingTo?.text,
+      replyToSenderId: replyingTo?.senderId
     };
     
     setMessages(prev => [...prev, tempMessage]);
@@ -513,13 +732,23 @@ export default function ChatScreen() {
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
       setIsNearBottom(true);
+      wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
     }, 50);
     
         // Устанавливаем флаг, что только что отправили сообщение
         justSentMessageRef.current = true;
         
     try {
-      const success = await sendMessageSimple(currentUser.id, otherPlayer.id, messageText);
+      const success = await sendMessageSimple(
+        currentUser.id, 
+        otherPlayer.id, 
+        messageText,
+        replyingTo ? {
+          id: replyingTo.id,
+          text: replyingTo.text,
+          senderId: replyingTo.senderId
+        } : undefined
+      );
       if (success) {
         // Начисляем 1 звездочку за отправку сообщения
         try {
@@ -546,6 +775,7 @@ export default function ChatScreen() {
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
           setIsNearBottom(true);
+          wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
           }, 100);
         }, 500);
       } else {
@@ -611,18 +841,90 @@ export default function ChatScreen() {
   // Ответ на сообщение
   const handleReplyToMessage = (message: Message) => {
     try {
-      // Устанавливаем текст ответа в поле ввода
-      const replyText = `> ${message.text}\n\n`;
-      setNewMessage(replyText);
+      // Сохраняем сообщение для ответа
+      setReplyingToMessage(message);
       
       // Прокручиваем к полю ввода
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
         setIsNearBottom(true);
+        wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
         console.log('Ответ на сообщение:', message.text);
       }, 100);
     } catch (error) {
       console.error('Ошибка ответа на сообщение:', error);
+    }
+  };
+
+  // Обработка долгого нажатия на сообщение
+  const handleLongPressMessage = (message: Message) => {
+    const messageRef = messageRefs.current.get(message.id);
+    if (!messageRef) {
+      console.warn('Message ref not found for message:', message.id);
+      return;
+    }
+    
+    // Получаем позицию сообщения на экране
+    messageRef.measure((x, y, width, height, pageX, pageY) => {
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+      
+      // Позиционируем меню прямо под сообщением
+      const isMyMessage = message.senderId === currentUser?.id;
+      const menuWidth = 160;
+      const menuHeight = 120; // 3 пункта меню
+      
+      // Вычисляем позицию меню
+      let menuX: number;
+      let menuY: number;
+      
+      // Для моих сообщений (справа) - меню справа от сообщения
+      // Для чужих сообщений (слева) - меню слева от сообщения
+      if (isMyMessage) {
+        // Мое сообщение - меню справа от него, выровнено по правому краю
+        menuX = Math.max(10, pageX + width - menuWidth);
+      } else {
+        // Чужое сообщение - меню слева от него, выровнено по левому краю
+        menuX = Math.min(screenWidth - menuWidth - 10, pageX);
+      }
+      
+      // Вертикальная позиция - прямо под сообщением
+      menuY = Math.min(screenHeight - menuHeight - 10, pageY + height + 5);
+      
+      setContextMenuPosition({ x: menuX, y: menuY });
+      setContextMenuMessage(message);
+      setContextMenuVisible(true);
+      
+      // Вибрация при открытии меню
+      try {
+        if (Platform.OS === 'ios') {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } else {
+          Vibration.vibrate(50);
+        }
+      } catch (e) {
+        // Игнорируем ошибки вибрации
+      }
+    });
+  };
+  
+  const handleCloseContextMenu = () => {
+    setContextMenuVisible(false);
+    setContextMenuMessage(null);
+  };
+  
+  const handleContextMenuAction = (action: 'reply' | 'forward' | 'delete') => {
+    if (!contextMenuMessage) return;
+    
+    handleCloseContextMenu();
+    
+    if (action === 'reply') {
+      handleReplyToMessage(contextMenuMessage);
+    } else if (action === 'forward') {
+      // TODO: Реализовать пересылку сообщения
+      console.log('Переслать сообщение:', contextMenuMessage);
+    } else if (action === 'delete') {
+      handleDeleteMessage(contextMenuMessage.id);
     }
   };
 
@@ -701,14 +1003,6 @@ export default function ChatScreen() {
     );
   };
 
-  // Рендер правой кнопки удаления при свайпе
-  const renderRightActions = () => {
-    return (
-      <View style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={24} color="#fa2f40" />
-      </View>
-    );
-  };
 
 
 
@@ -770,12 +1064,41 @@ export default function ChatScreen() {
               </View>
             </View>
             
-            {/* Кнопка очистки чата */}
-            {messages.length > 0 && (
-              <TouchableOpacity onPress={handleClearChat} style={styles.clearChatButton}>
-                <Ionicons name="trash-outline" size={24} color="#fa2f40" />
+            {/* Кнопки действий */}
+            <View style={styles.headerActions}>
+              {messages.length > 0 && (
+                <TouchableOpacity
+                  onPress={handleClearChat}
+                  style={styles.headerActionButton}
+                  hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  accessibilityLabel={t('chat.clearChat')}
+                >
+                  <Ionicons
+                    name="trash-outline"
+                    size={12}
+                    color="#fff"
+                    style={styles.headerActionIcon}
+                  />
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={handleReportChat}
+                style={[styles.headerActionButton, isReportingChat && styles.headerActionButtonDisabled]}
+                hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                accessibilityLabel={t('chat.reportChat') || 'Report chat'}
+                disabled={isReportingChat}
+              >
+                <Ionicons
+                  name="flag-outline"
+                  size={12}
+                  color="#fff"
+                  style={[
+                    styles.headerActionIcon,
+                    isReportingChat ? styles.headerActionIconDisabled : undefined
+                  ]}
+                />
               </TouchableOpacity>
-            )}
+            </View>
           </View>
 
           {/* Сообщения */}
@@ -794,8 +1117,29 @@ export default function ChatScreen() {
                 const paddingToBottom = 100; // Порог для определения "внизу"
                 const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
                 setIsNearBottom(isAtBottom);
+                // Сохраняем текущую позицию прокрутки
+                savedScrollPositionRef.current = contentOffset.y;
+                wasNearBottomRef.current = isAtBottom;
               }}
               scrollEventThrottle={400}
+              onContentSizeChange={(contentWidth, contentHeight) => {
+                if (messages.length > 0 && !loading && scrollViewRef.current) {
+                  if (isInitialLoadRef.current) {
+                    // При первой загрузке сразу прокручиваем вниз без анимации
+                    scrollViewRef.current.scrollToEnd({ animated: false });
+                    setIsNearBottom(true);
+                    wasNearBottomRef.current = true;
+                    isInitialLoadRef.current = false;
+                  } else if (savedScrollPositionRef.current !== null && !wasNearBottomRef.current) {
+                    // Восстанавливаем сохраненную позицию, если не был внизу
+                    scrollViewRef.current.scrollTo({
+                      y: savedScrollPositionRef.current,
+                      animated: false
+                    });
+                    setIsNearBottom(false);
+                  }
+                }
+              }}
             >
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
@@ -835,49 +1179,93 @@ export default function ChatScreen() {
                           <Swipeable
                             key={message.id}
                             renderLeftActions={() => renderLeftActions(message)}
-                            renderRightActions={renderRightActions}
                             onSwipeableLeftOpen={() => handleReplyToMessage(message)}
-                            onSwipeableRightOpen={() => handleDeleteMessage(message.id)}
-                            overshootRight={false}
                             overshootLeft={false}
                             friction={2}
-                            rightThreshold={40}
                             leftThreshold={40}
                           >
-                            <View 
-                              style={[
-                                styles.messageContainer,
-                                isMyMessage ? styles.myMessage : styles.otherMessage
-                              ]}
+                            <TouchableOpacity
+                              activeOpacity={1}
+                              onLongPress={() => handleLongPressMessage(message)}
+                              delayLongPress={500}
                             >
+                              <View 
+                                ref={(ref) => {
+                                  if (ref) {
+                                    messageRefs.current.set(message.id, ref);
+                                  } else {
+                                    messageRefs.current.delete(message.id);
+                                  }
+                                }}
+                                style={[
+                                  styles.messageContainer,
+                                  isMyMessage ? styles.myMessage : styles.otherMessage
+                                ]}
+                              >
                               <View style={[
                                 styles.messageBubble,
                                 isMyMessage ? styles.myBubble : styles.otherBubble
                               ]}>
-                                <Text style={[
-                                  styles.messageText,
-                                  isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                ]}>
-                                  {message.text}
-                                </Text>
-                                <View style={styles.messageFooter}>
+                                {/* Превью сообщения, на которое отвечаем */}
+                                {message.replyToId && message.replyToText && (
+                                  <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={() => {
+                                      // Прокручиваем к сообщению, на которое отвечаем
+                                      const replyToMessage = messages.find(m => m.id === message.replyToId);
+                                      if (replyToMessage) {
+                                        // Можно добавить подсветку сообщения
+                                        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                                      }
+                                    }}
+                                    style={styles.replyPreviewInMessage}
+                                  >
+                                    <View style={[
+                                      styles.replyPreviewLineInMessage,
+                                      isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
+                                    ]} />
+                                    <View style={styles.replyPreviewContentInMessage}>
+                                      <Text style={[
+                                        styles.replyPreviewNameInMessage,
+                                        isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
+                                      ]}>
+                                        {message.replyToSenderId === currentUser.id
+                                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
+                                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
+                                      </Text>
+                                      <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
+                                        {message.replyToText}
+                                      </Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                )}
+                                <View style={styles.messageTextRow}>
                                   <Text style={[
-                                    styles.messageTime,
-                                    isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                                    styles.messageText,
+                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
                                   ]}>
-                                    {formatTime(message.timestamp)}
+                                    {message.text}
                                   </Text>
-                                  {isMyMessage && (
-                                    <Ionicons
-                                      name={message.read ? "checkmark-done" : "checkmark"}
-                                      size={14}
-                                      color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
-                                      style={styles.readIndicator}
-                                    />
-                                  )}
+                                  <View style={styles.messageTimeContainer}>
+                                    <Text style={[
+                                      styles.messageTime,
+                                      isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                                    ]}>
+                                      {formatTime(message.timestamp)}
+                                    </Text>
+                                    {isMyMessage && (
+                                      <Ionicons
+                                        name={message.read ? "checkmark-done" : "checkmark"}
+                                        size={12}
+                                        color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
+                                        style={styles.readIndicator}
+                                      />
+                                    )}
+                                  </View>
                                 </View>
                               </View>
                             </View>
+                            </TouchableOpacity>
                           </Swipeable>
                         );
                       })}
@@ -889,37 +1277,117 @@ export default function ChatScreen() {
 
             {/* Поле ввода */}
             <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.textInput}
-                value={newMessage}
-                onChangeText={setNewMessage}
-                placeholder={t('chat.enterMessage')}
-                placeholderTextColor="#fff"
-                multiline
-                maxLength={500}
-                onFocus={() => {
-                  setTimeout(() => {
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                    setIsNearBottom(true);
-                  }, Platform.OS === 'android' ? 300 : 100);
-                }}
-              />
-              <TouchableOpacity 
+              {/* Отображение ответа на сообщение */}
+              {replyingToMessage && (
+                <View style={styles.replyPreviewContainer}>
+                  <View style={styles.replyPreviewContent}>
+                    <View style={styles.replyPreviewLine} />
+                    <View style={styles.replyPreviewTextContainer}>
+                      <Text style={styles.replyPreviewName}>
+                        {replyingToMessage.senderId === currentUser?.id
+                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
+                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
+                      </Text>
+                      <Text style={styles.replyPreviewText} numberOfLines={1}>
+                        {replyingToMessage.text}
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setReplyingToMessage(null)}
+                    style={styles.replyPreviewClose}
+                  >
+                    <Ionicons name="close" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              )}
+              <View style={styles.textInputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={newMessage}
+                  onChangeText={setNewMessage}
+                  placeholder={t('chat.enterMessage')}
+                  placeholderTextColor="#fff"
+                  multiline
+                  maxLength={500}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                      setIsNearBottom(true);
+                      wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
+                    }, Platform.OS === 'android' ? 300 : 100);
+                  }}
+                />
+                <TouchableOpacity 
                 style={[
                   styles.sendButton, 
                   !newMessage.trim() && styles.sendButtonDisabled
                 ]} 
                 onPress={handleSendMessage}
-                disabled={!newMessage.trim()}
-              >
-                <Ionicons 
-                  name="send" 
-                  size={20} 
-                  color="#fff" 
-                />
-              </TouchableOpacity>
+                  disabled={!newMessage.trim()}
+                >
+                  <Ionicons 
+                    name="send" 
+                    size={20} 
+                    color="#fff" 
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </KeyboardAvoidingView>
+
+          {/* Кастомное меню в стиле Telegram */}
+          <Modal
+            visible={contextMenuVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={handleCloseContextMenu}
+          >
+            <TouchableOpacity
+              style={styles.contextMenuOverlay}
+              activeOpacity={1}
+              onPress={handleCloseContextMenu}
+            >
+              <View
+                style={[
+                  styles.contextMenu,
+                  {
+                    left: contextMenuPosition.x,
+                    top: contextMenuPosition.y,
+                  }
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.contextMenuItem}
+                  onPress={() => handleContextMenuAction('reply')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="arrow-undo-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                  <Text style={styles.contextMenuText}>{t('chat.reply') || 'Ответить'}</Text>
+                </TouchableOpacity>
+                <View style={styles.contextMenuDivider} />
+                <TouchableOpacity
+                  style={styles.contextMenuItem}
+                  onPress={() => handleContextMenuAction('forward')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="arrow-forward-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                  <Text style={styles.contextMenuText}>{t('chat.forward') || 'Переслать'}</Text>
+                </TouchableOpacity>
+                <View style={styles.contextMenuDivider} />
+                <TouchableOpacity
+                  style={styles.contextMenuItem}
+                  onPress={() => handleContextMenuAction('delete')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="trash-outline" size={18} color="#fa2f40" style={styles.contextMenuIcon} />
+                  <Text style={[styles.contextMenuText, styles.contextMenuDeleteText]}>
+                    {t('common.delete') || 'Удалить'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
 
           {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
           {!isNearBottom && messages.length > 0 && (
@@ -927,7 +1395,10 @@ export default function ChatScreen() {
               style={styles.scrollToBottomButton}
               onPress={() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true });
-                setTimeout(() => setIsNearBottom(true), 300);
+                setTimeout(() => {
+                  setIsNearBottom(true);
+                  wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
+                }, 300);
               }}
               activeOpacity={0.7}
             >
@@ -1019,8 +1490,29 @@ const styles = StyleSheet.create({
   headerStatusOffline: {
     color: '#888',
   },
-  clearChatButton: {
-    // Убираем фон и отступы для компактности
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  headerActionButton: {
+    marginLeft: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(250, 47, 64, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0,
+  },
+  headerActionButtonDisabled: {
+    opacity: 0.5,
+  },
+  headerActionIcon: {
+    opacity: 0.6,
+  },
+  headerActionIconDisabled: {
+    opacity: 0.4,
   },
   chatContainer: {
     flex: 1,
@@ -1066,7 +1558,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   messageContainer: {
-    marginVertical: 6,
+    marginVertical: 4,
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   myMessage: {
@@ -1077,8 +1569,8 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
@@ -1097,10 +1589,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(1,0,0)',
     borderBottomLeftRadius: 4,
   },
+  messageTextRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    flexWrap: 'wrap',
+  },
   messageText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    lineHeight: 24,
+    lineHeight: 20,
+    flexShrink: 1,
+    marginRight: 6,
   },
   myMessageText: {
     color: '#fff',
@@ -1108,11 +1607,11 @@ const styles = StyleSheet.create({
   otherMessageText: {
     color: '#fff',
   },
-  messageFooter: {
+  messageTimeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-    alignSelf: 'flex-end',
+    paddingBottom: 2,
+    flexShrink: 0,
   },
   messageTime: {
     fontSize: 10,
@@ -1125,15 +1624,141 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.4)',
   },
   readIndicator: {
-    marginLeft: 4,
+    marginLeft: 3,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: 'column',
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
     backgroundColor: 'transparent',
+  },
+  replyPreviewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#fa2f40',
+  },
+  replyPreviewContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  replyPreviewLine: {
+    width: 3,
+    height: 40,
+    backgroundColor: '#fa2f40',
+    borderRadius: 2,
+    marginRight: 10,
+  },
+  replyPreviewTextContainer: {
+    flex: 1,
+  },
+  replyPreviewName: {
+    color: '#fa2f40',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    marginBottom: 2,
+  },
+  replyPreviewText: {
+    color: '#fff',
+    fontSize: 13,
+    fontFamily: 'Gilroy-Regular',
+    opacity: 0.8,
+  },
+  replyPreviewClose: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  replyPreviewInMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  replyPreviewLineInMessage: {
+    width: 3,
+    height: 35,
+    borderRadius: 2,
+    marginRight: 8,
+  },
+  replyPreviewLineInMyMessage: {
+    backgroundColor: '#fff',
+  },
+  replyPreviewLineInOtherMessage: {
+    backgroundColor: '#fa2f40',
+  },
+  replyPreviewContentInMessage: {
+    flex: 1,
+  },
+  replyPreviewNameInMessage: {
+    fontSize: 11,
+    fontFamily: 'Gilroy-Bold',
+    marginBottom: 2,
+  },
+  replyPreviewNameInMyMessage: {
+    color: '#fff',
+  },
+  replyPreviewNameInOtherMessage: {
+    color: '#fa2f40',
+  },
+  replyPreviewTextInMessage: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+  },
+  contextMenuOverlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  contextMenu: {
+    position: 'absolute',
+    backgroundColor: 'rgba(30, 30, 30, 0.95)',
+    borderRadius: 10,
+    paddingVertical: 2,
+    minWidth: 160,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  contextMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  contextMenuIcon: {
+    marginRight: 10,
+  },
+  contextMenuText: {
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'Gilroy-Regular',
+    flex: 1,
+  },
+  contextMenuDeleteText: {
+    color: '#fa2f40',
+  },
+  contextMenuDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 2,
+  },
+  textInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   textInput: {
     flex: 1,

@@ -953,6 +953,9 @@ export default function PlayerProfile() {
 
   // Ref для активного поля ввода
   const activeInputRef = useRef<TextInput | null>(null);
+  // Refs для полей роста и веса
+  const heightInputRef = useRef<TextInput | null>(null);
+  const weightInputRef = useRef<TextInput | null>(null);
 
   // Глобальный слушатель клавиатуры для прокрутки к активному полю
   useEffect(() => {
@@ -1016,6 +1019,19 @@ export default function PlayerProfile() {
     const target = e?.target as any;
     if (target && target.measure) {
       activeInputRef.current = target;
+    }
+  };
+
+  // Обработчик фокуса для полей роста и веса
+  const handleHeightFocus = () => {
+    if (heightInputRef.current) {
+      activeInputRef.current = heightInputRef.current;
+    }
+  };
+
+  const handleWeightFocus = () => {
+    if (weightInputRef.current) {
+      activeInputRef.current = weightInputRef.current;
     }
   };
 
@@ -1260,6 +1276,226 @@ export default function PlayerProfile() {
     
     // Открываем чат с игроком
     router.push({ pathname: '/chat/[id]', params: { id: player!.id } });
+  };
+
+  const reportUser = React.useCallback(async () => {
+    if (!currentUser || !player || currentUser.id === player.id) {
+      return;
+    }
+
+    try {
+      const { data: admins, error: adminsError } = await supabase
+        .from('players')
+        .select('id, name')
+        .eq('status', 'admin');
+
+      if (adminsError) {
+        console.error('❌ Ошибка получения списка админов:', adminsError);
+        showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+        return;
+      }
+
+      if (!admins || admins.length === 0) {
+        console.log('ℹ️ Админы не найдены');
+      }
+
+      const adminIds = admins.map(admin => admin.id);
+      const { data: pushTokens, error: tokensError } = await supabase
+        .from('push_tokens')
+        .select('user_id, token')
+        .in('user_id', adminIds);
+
+      if (tokensError) {
+        console.error('❌ Ошибка получения push токенов:', tokensError);
+      }
+
+      const tokensMap = new Map<string, string[]>();
+      if (pushTokens) {
+        pushTokens.forEach(pt => {
+          if (!tokensMap.has(pt.user_id)) {
+            tokensMap.set(pt.user_id, []);
+          }
+          tokensMap.get(pt.user_id)!.push(pt.token);
+        });
+      }
+
+      const generateUUID = (): string => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+
+      const notifications = admins.map(admin => ({
+        id: generateUUID(),
+        user_id: admin.id,
+        type: 'user_report',
+        title: t('admin.reportNotification', { 
+          reporterName: currentUser.name, 
+          reportedName: player.name 
+        }) || `${currentUser.name} пожаловался на ${player.name}`,
+        message: t('admin.reportNotification', { 
+          reporterName: currentUser.name, 
+          reportedName: player.name 
+        }) || `${currentUser.name} пожаловался на ${player.name}`,
+        data: {
+          reporterId: currentUser.id,
+          reporterName: currentUser.name,
+          reporterAvatar: currentUser.avatar,
+          reportedId: player.id,
+          reportedName: player.name,
+          reportedAvatar: player.avatar,
+          timestamp: new Date().toISOString()
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
+      }));
+
+      if (notifications.length > 0) {
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+
+        if (notificationError) {
+          console.error('❌ Ошибка создания уведомлений о жалобе:', notificationError);
+        } else {
+          for (const admin of admins) {
+            const adminTokens = tokensMap.get(admin.id);
+            if (adminTokens && adminTokens.length > 0) {
+              try {
+                const { sendNotificationToUser } = await import('../../utils/notificationService');
+                await sendNotificationToUser(
+                  admin.id,
+                  t('admin.reportNotification', { 
+                    reporterName: currentUser.name, 
+                    reportedName: player.name 
+                  }) || `${currentUser.name} пожаловался на ${player.name}`,
+                  '',
+                  {
+                    type: 'user_report',
+                    reporterId: currentUser.id,
+                    reportedId: player.id
+                  }
+                );
+              } catch (error) {
+                console.warn(`Не удалось отправить push-уведомление админу ${admin.name}:`, error);
+              }
+            }
+          }
+        }
+      }
+
+      showCustomAlert(
+        t('admin.reportUserTitle') || 'Жалоба отправлена',
+        t('admin.reportUserMessage') || 'Жалоба отправлена администратору. Мы свяжемся с Вами, если нужны будут подробности.',
+        'success'
+      );
+    } catch (error) {
+      console.error('❌ Ошибка отправки жалобы:', error);
+      showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+    }
+  }, [currentUser, player, showCustomAlert, t]);
+
+  const handleReportUser = React.useCallback(() => {
+    if (!currentUser || !player || currentUser.id === player.id) {
+      return;
+    }
+
+    Alert.alert(
+      t('admin.reportUser') || t('profile.reportUser') || 'Пожаловаться',
+      t('admin.reportUserConfirm', { name: player.name }) || `Вы уверены, что хотите пожаловаться на ${player.name}?`,
+      [
+        { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+        { text: t('common.confirm') || 'OK', onPress: () => reportUser() }
+      ]
+    );
+  }, [currentUser, player, reportUser, t]);
+
+  const handleHideProfile = async () => {
+    if (!currentUser || currentUser.status !== 'admin' || !player) {
+      return;
+    }
+
+    try {
+      // Проверяем, существует ли колонка is_hidden
+      // Если нет - показываем сообщение о необходимости добавить колонку
+      const { error } = await supabase
+        .from('players')
+        .update({ is_hidden: true })
+        .eq('id', player.id);
+
+      if (error) {
+        console.error('❌ Ошибка скрытия профиля:', error);
+        // Если колонка не существует, показываем специальное сообщение
+        if (error.code === 'PGRST204' || error.message?.includes('is_hidden')) {
+          showCustomAlert(
+            t('common.error') || 'Ошибка',
+            'Колонка is_hidden не найдена в базе данных. Пожалуйста, выполните SQL скрипт database/add_is_hidden_column.sql',
+            'error'
+          );
+        } else {
+          showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+        }
+      } else {
+        // Очищаем кеш для этого игрока
+        await clearPlayerCache(player.id);
+        
+        // Сразу обновляем состояние с новым значением is_hidden
+        setPlayer({ ...player, is_hidden: true });
+        
+        showCustomAlert(
+          t('common.success') || 'Успешно',
+          t('admin.hideProfileSuccess', { name: player.name }) || `Профиль ${player.name} скрыт`,
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('❌ Ошибка скрытия профиля:', error);
+      showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+    }
+  };
+
+  const handleUnhideProfile = async () => {
+    if (!currentUser || currentUser.status !== 'admin' || !player) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('players')
+        .update({ is_hidden: false })
+        .eq('id', player.id);
+
+      if (error) {
+        console.error('❌ Ошибка показа профиля:', error);
+        // Если колонка не существует, показываем специальное сообщение
+        if (error.code === 'PGRST204' || error.message?.includes('is_hidden')) {
+          showCustomAlert(
+            t('common.error') || 'Ошибка',
+            'Колонка is_hidden не найдена в базе данных. Пожалуйста, выполните SQL скрипт database/add_is_hidden_column.sql',
+            'error'
+          );
+        } else {
+          showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+        }
+      } else {
+        // Очищаем кеш для этого игрока
+        await clearPlayerCache(player.id);
+        
+        // Сразу обновляем состояние с новым значением is_hidden
+        setPlayer({ ...player, is_hidden: false });
+        
+        showCustomAlert(
+          t('common.success') || 'Успешно',
+          t('admin.unhideProfileSuccess', { name: player.name }) || `Профиль ${player.name} показан`,
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('❌ Ошибка показа профиля:', error);
+      showCustomAlert(t('common.error'), t('admin.error') || 'Ошибка', 'error');
+    }
   };
 
   const handleAddFriend = async () => {
@@ -2400,6 +2636,25 @@ export default function PlayerProfile() {
     );
   }
 
+  // Проверка доступа к скрытому профилю
+  // Скрытый профиль доступен только владельцу и администраторам
+  if (player.is_hidden && currentUser && currentUser.id !== player.id && currentUser.status !== 'admin') {
+    return (
+      <View style={styles.container}>
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlay}>
+            <View style={styles.errorContainer}>
+              <Ionicons name="eye-off-outline" size={64} color="#fa2f40" style={{ marginBottom: 20 }} />
+              <Text style={styles.errorText}>
+                {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Player not found' : t('profile.playerNotFound')}
+              </Text>
+            </View>
+          </View>
+        </CachedBackground>
+      </View>
+    );
+  }
+
 
 
   return (
@@ -2418,104 +2673,111 @@ export default function PlayerProfile() {
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               <View style={styles.avatarContainer}>
-              {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                <TouchableOpacity 
-                  style={styles.profileImage}
-                  onPress={pickImage}
-                >
-              {(() => {
-                // Используем editData.avatar если есть, иначе player.avatar
-                const imageSource = editData.avatar || player.avatar;
-                const hasValidImage = imageSource && typeof imageSource === 'string' && (
-                  imageSource.startsWith('data:image/') || 
-                  imageSource.startsWith('http') || 
-                  imageSource.startsWith('file://') || 
-                  imageSource.startsWith('content://')
-                );
+                <View style={styles.avatarWrapper}>
+                  {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                    <TouchableOpacity 
+                      style={styles.profileImage}
+                      onPress={pickImage}
+                    >
+                      {(() => {
+                        // Используем editData.avatar если есть, иначе player.avatar
+                        const imageSource = editData.avatar || player.avatar;
+                        const hasValidImage = imageSource && typeof imageSource === 'string' && (
+                          imageSource.startsWith('data:image/') || 
+                          imageSource.startsWith('http') || 
+                          imageSource.startsWith('file://') || 
+                          imageSource.startsWith('content://')
+                        );
 
-                if (hasValidImage) {
-                  return (
-                    <View style={[styles.profileImage]}>
-                        <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                    <CachedAvatar
-                      key={imageSource} // Добавляем key для принудительного перерендеринга при изменении аватара
-                      playerId={player.id}
-                      fallbackAvatarUrl={imageSource}
-                      size={100}
-                      style={styles.avatarImage}
-                    />
+                        if (hasValidImage) {
+                          return (
+                            <View style={[styles.profileImage]}>
+                              <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                                <CachedAvatar
+                                  key={imageSource} // Добавляем key для принудительного перерендеринга при изменении аватара
+                                  playerId={player.id}
+                                  fallbackAvatarUrl={imageSource}
+                                  size={100}
+                                  style={styles.avatarImage}
+                                />
+                              </View>
+                            </View>
+                          );
+                        } else {
+                          return (
+                            <View style={[styles.profileImage]}>
+                              <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
+                              </View>
+                            </View>
+                          );
+                        }
+                      })()}
+                      <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
+                        <Ionicons name="camera" size={24} color="#fff" />
                       </View>
-                    </View>
+                    </TouchableOpacity>
+                  ) : (
+                    (() => {
+                      // Отладочный лог отключен
+                      const imageSource = player.avatar;
+                      const hasValidImage = imageSource && typeof imageSource === 'string' && (
+                        imageSource.startsWith('data:image/') || 
+                        imageSource.startsWith('http') || 
+                        imageSource.startsWith('file://') || 
+                        imageSource.startsWith('content://')
                       );
-                    } else {
-                      return (
-                        <View style={[styles.profileImage]}>
-                          <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                            <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
+                      // Отладочный лог отключен
+
+                      if (hasValidImage) {
+                        return (
+                          <View style={[styles.profileImage]}>
+                            <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                              <CachedAvatar
+                                playerId={player.id}
+                                fallbackAvatarUrl={imageSource}
+                                size={100}
+                                style={styles.avatarImage}
+                                status={player.status}
+                              />
+                            </View>
                           </View>
-                        </View>
-                      );
-                    }
-                  })()}
-                  <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
-                    <Ionicons name="camera" size={24} color="#fff" />
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                (() => {
-                  // Отладочный лог отключен
-                  const imageSource = player.avatar;
-                  const hasValidImage = imageSource && typeof imageSource === 'string' && (
-                    imageSource.startsWith('data:image/') || 
-                    imageSource.startsWith('http') || 
-                    imageSource.startsWith('file://') || 
-                    imageSource.startsWith('content://')
-                  );
-                  // Отладочный лог отключен
-
-                  if (hasValidImage) {
-                    return (
-                      <View style={[styles.profileImage]}>
-                        <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                          <CachedAvatar
-                            playerId={player.id}
-                            fallbackAvatarUrl={imageSource}
-                            size={100}
-                            style={styles.avatarImage}
-                            status={player.status}
-                          />
-                        </View>
-                      </View>
-                    );
-                  } else {
-                    return (
-                      <View style={[styles.profileImage]}>
-                        <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                          {player.status === 'scout' ? (
-                            <>
-                              {/* Отладочный лог отключен */}
-                            <Image 
-                              source={require('../../assets/images/scout.png')} 
-                              style={styles.avatarImage}
-                            />
-                            </>
-                          ) : (
-                            <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
-                          )}
-                        </View>
-                      </View>
-                    );
-                  }
-                })()
-              )}
+                        );
+                      } else {
+                        return (
+                          <View style={[styles.profileImage]}>
+                            <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                              {player.status === 'scout' ? (
+                                <>
+                                  {/* Отладочный лог отключен */}
+                                  <Image 
+                                    source={require('../../assets/images/scout.png')} 
+                                    style={styles.avatarImage}
+                                  />
+                                </>
+                              ) : (
+                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
+                              )}
+                            </View>
+                          </View>
+                        );
+                      }
+                    })()
+                  )}
+                  {player.is_hidden && (
+                    <View style={styles.hiddenBadge}>
+                      <Ionicons name="eye-off-outline" size={18} color="#fa2f40" />
+                    </View>
+                  )}
+                </View>
               
-           {/* Activity Rating - показывается только владельцу и администратору */}
-           <ActivityRating 
-             userId={player.id}
-             currentUserId={currentUser?.id}
-             isAdmin={currentUser?.status === 'admin'}
-             refreshKey={activityRefreshKey}
-           />
+                {/* Activity Rating - показывается только владельцу и администратору */}
+                <ActivityRating 
+                  userId={player.id}
+                  currentUserId={currentUser?.id}
+                  isAdmin={currentUser?.status === 'admin'}
+                  refreshKey={activityRefreshKey}
+                />
               </View>
               
               <View style={styles.nameRow}>
@@ -3731,7 +3993,7 @@ export default function PlayerProfile() {
                           return team.teamName;
                         }
                         return translated;
-                      })()} ({team.startYear} - {t('profile.настоящее время')})
+                      })()} ({String(team.startYear || '')} - {t('profile.настоящее время')})
                               </Text>
                             </View>
                           ))}
@@ -3758,7 +4020,7 @@ export default function PlayerProfile() {
                           return team.teamName;
                         }
                         return translated;
-                      })()} ({team.startYear}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
+                      })()} ({String(team.startYear || '')}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
                               </Text>
                             </View>
                           ))}
@@ -3846,9 +4108,11 @@ export default function PlayerProfile() {
                     <Text style={styles.infoLabel}>{t('profile.height')}</Text>
                         {isEditingMode ? (
                       <TextInput
+                        ref={heightInputRef}
                         style={styles.editInput}
                         value={editData.height !== undefined ? editData.height : (player.height || '')}
                         onChangeText={(text) => setEditData({...editData, height: text})}
+                        onFocus={handleHeightFocus}
                         placeholder={`${t('profile.height')} (${t('profile.cm')})`}
                         placeholderTextColor="#888"
                         keyboardType="numeric"
@@ -3864,9 +4128,11 @@ export default function PlayerProfile() {
                     <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
                         {isEditingMode ? (
                       <TextInput
+                        ref={weightInputRef}
                         style={styles.editInput}
                         value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
                         onChangeText={(text) => setEditData({...editData, weight: text})}
+                        onFocus={handleWeightFocus}
                         placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
                         placeholderTextColor="#888"
                         keyboardType="numeric"
@@ -4501,73 +4767,6 @@ export default function PlayerProfile() {
               </TouchableOpacity>
             )}
 
-            {/* Кнопка управления дружбой для звезд - в самом низу профиля */}
-            {player.status === 'star' && currentUser && currentUser.id !== player.id && (
-              <>
-                {friendshipStatus === 'received_request' ? (
-                  // Запрос дружбы получен
-                  <View style={{ gap: 10 }}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="checkmark-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('notifications.accept')}
-                      </Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleDeclineFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('notifications.decline')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : friendshipStatus === 'friends' ? (
-                  // Уже друзья
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="person-remove-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
-                      </Text>
-                    </TouchableOpacity>
-                ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
-                  // Запрос дружбы отправлен
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#FF9800' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="close-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                        {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
-                      </Text>
-                    </TouchableOpacity>
-                ) : (
-                  // Нет дружбы - можно добавить
-                    <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                      onPress={handleAddFriend}
-                      disabled={friendLoading}
-                    >
-                      <Ionicons name="person-add-outline" size={20} color="#fff" />
-                      <Text style={styles.actionButtonText}>
-                      {friendLoading ? t('common.loading') : t('profile.addFriend')}
-                      </Text>
-                    </TouchableOpacity>
-                )}
-              </>
-            )}
 
             {/* Основные кнопки управления профилем */}
             {currentUser && currentUser.id === player.id && (
@@ -4633,7 +4832,7 @@ export default function PlayerProfile() {
             {/* Кнопка входа в аккаунт для администратора */}
             {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
               <TouchableOpacity 
-                style={styles.loginAsUserButton}
+                style={[styles.loginAsUserButton, { backgroundColor: '#8B0000' }]}
                 onPress={async () => {
                   Alert.alert(
                     t('admin.loginAsUser') || 'Войти в аккаунт',
@@ -4688,10 +4887,11 @@ export default function PlayerProfile() {
             )}
 
             {/* Кнопки редактирования и удаления для администратора */}
-            {currentUser?.status === 'admin' && player && (
-              <View style={styles.adminButtonsContainer}>
+            {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
+              <View>
+                {/* Кнопка редактирования - на отдельной строке */}
                 <TouchableOpacity 
-                  style={[styles.adminButton, styles.editButton]} 
+                  style={[styles.adminButton, styles.editButton, { marginBottom: 10, alignSelf: 'stretch' }]} 
                   onPress={() => {
                     setEditData(player);
                     setIsEditing(true);
@@ -4701,13 +4901,79 @@ export default function PlayerProfile() {
                   <Text style={[styles.adminButtonText, styles.editButtonText]}>{t('profile.edit')}</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity 
-                  style={[styles.adminButton, styles.deleteButton]} 
-                  onPress={handleDeletePlayer}
-                >
-                  <Ionicons name="trash-outline" size={20} color="#fff" />
-                  <Text style={styles.adminButtonText}>{t('profile.deleteUser')}</Text>
-                </TouchableOpacity>
+                {/* Кнопки удаления и скрытия - на одной строке */}
+                <View style={styles.adminButtonsContainer}>
+                  <TouchableOpacity 
+                    style={[styles.adminButton, styles.deleteButton]} 
+                    onPress={handleDeletePlayer}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#fff" />
+                    <Text style={styles.adminButtonText}>{t('profile.deleteUser')}</Text>
+                  </TouchableOpacity>
+
+                  {/* Кнопка скрыть/показать профиль */}
+                  {player.is_hidden ? (
+                    <TouchableOpacity 
+                      style={[styles.adminButton, { backgroundColor: '#4CAF50' }]} 
+                      onPress={() => {
+                        Alert.alert(
+                          t('admin.unhideProfile') || 'Показать профиль',
+                          t('admin.unhideProfileConfirm', { name: player.name }) || `Вы уверены, что хотите показать профиль ${player.name}?`,
+                          [
+                            {
+                              text: t('common.cancel') || 'Отмена',
+                              style: 'cancel'
+                            },
+                            {
+                              text: t('common.confirm') || 'Подтвердить',
+                              onPress: handleUnhideProfile
+                            }
+                          ]
+                        );
+                      }}
+                    >
+                      <Ionicons name="eye-outline" size={20} color="#fff" />
+                      <Text style={styles.adminButtonText}>{t('admin.unhideProfile') || 'Показать профиль'}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity 
+                      style={[styles.adminButton, { backgroundColor: '#000000' }]} 
+                      onPress={() => {
+                        Alert.alert(
+                          t('admin.hideProfile') || 'Скрыть профиль',
+                          t('admin.hideProfileConfirm', { name: player.name }) || `Вы уверены, что хотите скрыть профиль ${player.name}? Профиль станет невидимым для всех пользователей.`,
+                          [
+                            {
+                              text: t('common.cancel') || 'Отмена',
+                              style: 'cancel'
+                            },
+                            {
+                              text: t('common.confirm') || 'Подтвердить',
+                              onPress: handleHideProfile
+                            }
+                          ]
+                        );
+                      }}
+                    >
+                      <Ionicons name="eye-off-outline" size={20} color="#fff" />
+                      <Text style={styles.adminButtonText}>{t('admin.hideProfile') || 'Скрыть профиль'}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            )}
+
+
+            {/* Сообщение о скрытом профиле для владельца */}
+            {currentUser && player && currentUser.id === player.id && player.is_hidden && (
+              <View style={[styles.section, { marginTop: 20, marginBottom: 20, backgroundColor: 'rgba(250, 47, 64, 0.2)', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#fa2f40' }]}>
+                <Ionicons name="eye-off-outline" size={24} color="#fa2f40" style={{ marginBottom: 10, alignSelf: 'center' }} />
+                <Text style={[styles.sectionTitle, { color: '#fa2f40', textAlign: 'center', marginBottom: 8 }]}>
+                  {t('admin.profileHidden') || 'Профиль скрыт'}
+                </Text>
+                <Text style={[styles.sectionText, { color: '#fff', textAlign: 'center' }]}>
+                  {t('admin.profileHiddenMessage') || 'Ваш профиль скрыт администратором. Обратитесь к администратору для восстановления доступа.'}
+                </Text>
               </View>
             )}
 
@@ -4743,6 +5009,25 @@ export default function PlayerProfile() {
                   <Ionicons name="share-outline" size={20} color="#fff" />
                   <Text style={styles.shareButtonText}>
                     {t('profile.shareProfileSocial') || 'Поделиться профилем в соц. сетях'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Кнопка пожаловаться - в самом низу профиля */}
+            {currentUser && player && currentUser.id !== player.id && (
+              <View style={{ marginTop: 10, marginBottom: 30, paddingHorizontal: 20 }}>
+                <TouchableOpacity 
+                  style={[styles.shareButton, { 
+                    backgroundColor: 'transparent', 
+                    borderWidth: 1, 
+                    borderColor: 'rgba(255, 255, 255, 0.5)'
+                  }]} 
+                  onPress={handleReportUser}
+                >
+                  <Ionicons name="flag-outline" size={20} color="rgba(255, 255, 255, 0.5)" />
+                  <Text style={[styles.shareButtonText, { color: 'rgba(255, 255, 255, 0.5)' }]}>
+                    {t('profile.reportUser') || t('admin.reportUser') || 'Пожаловаться'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -4800,13 +5085,17 @@ export default function PlayerProfile() {
                         <Ionicons name="ribbon" size={14} color="#fa2f40" /> {translatePosition(player.position)}
                       </>
                     )}
-                    {player.position && player.country && ' | '}
+                    {player.position && player.country && (
+                      <Text style={styles.shareCardSeparator}> | </Text>
+                    )}
                     {player.country && (
                       <>
                         <Ionicons name="flag" size={14} color="#fa2f40" /> {t(`profile.countries.${player.country}`)}
                       </>
                     )}
-                    {(player.position || player.country) && player.grip && ' | '}
+                    {(player.position || player.country) && player.grip && (
+                      <Text style={styles.shareCardSeparator}> | </Text>
+                    )}
                     {player.grip && (
                       <>
                         <Ionicons name="hand-left" size={14} color="#fa2f40" /> {translateGrip(player.grip)}
@@ -5351,7 +5640,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
   },
@@ -5387,6 +5675,21 @@ const styles = StyleSheet.create({
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
+  },
+  avatarWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hiddenBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -32,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 16,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
   },
   profileImage: {
     width: 120,
@@ -6572,7 +6875,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   loginAsUserButton: {
-    backgroundColor: '#FF1493',
     borderRadius: 8,
     padding: 16,
     flexDirection: 'row',
@@ -6593,6 +6895,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     paddingHorizontal: 0,
+    alignItems: 'stretch',
   },
   adminButton: {
     flex: 1,
@@ -6603,6 +6906,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 44,
+    height: 44,
+    width: '100%',
   },
   adminButtonText: {
     fontSize: 14,
@@ -6776,6 +7081,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     textAlign: 'center',
+  },
+  shareCardSeparator: {
+    color: '#fff',
   },
   shareCardExperience: {
     fontFamily: 'Gilroy-Bold',

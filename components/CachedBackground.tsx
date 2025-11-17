@@ -23,6 +23,7 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
         contentFit={resizeMode}
         priority="high"
         cachePolicy="memory-disk"
+        transition={0}
       />
       {children}
     </View>

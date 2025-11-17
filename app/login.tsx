@@ -2,6 +2,7 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+    ImageBackground,
     Keyboard,
     Platform,
     StyleSheet,
@@ -14,7 +15,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import WebTextInput from '../components/WebTextInput';
-import CachedBackground from '../components/CachedBackground';
 import { findPlayerByCredentials, saveCurrentUser, getPlayerByPhone, createPlayer } from '../utils/playerStorage';
 import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -402,9 +402,10 @@ export default function LoginScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.hockeyRinkContainer}>
-          <CachedBackground 
-            source={iceBg} 
+          <ImageBackground 
+            source={iceBg}
             style={styles.hockeyRink}
+            resizeMode="cover"
           >
             {/* Внутренняя граница хоккейной коробки */}
             <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
@@ -569,7 +570,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </CachedBackground>
+          </ImageBackground>
         </View>
 
         {/* Кастомный алерт */}
@@ -597,12 +598,8 @@ const styles = StyleSheet.create({
   },
   hockeyRink: {
     flex: 1,
-    borderRadius: 50, // Увеличили радиус для более округлых краев
-    borderWidth: 4, // Увеличили толщину границы
-    borderColor: 'rgba(255, 255, 255, 0.8)', // Сделали границу более заметной
-    overflow: 'hidden', // Обрезаем содержимое по границам
-    boxShadow: '0 8px 8px rgba(5, 0, 8, 0.4)',
-    elevation: 12,
+    borderRadius: 50,
+    overflow: 'hidden',
   },
   innerBorder: {
     position: 'absolute',
@@ -612,7 +609,7 @@ const styles = StyleSheet.create({
     bottom: 8,
     borderRadius: 42,
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 1)',
   },
   modalOverlay: {
     flex: 1,
