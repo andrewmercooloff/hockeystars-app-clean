@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   infoSection: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     paddingTop: 16,
     paddingBottom: 8,
     paddingHorizontal: 16,
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sectionContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   completionStatsCard: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     borderRadius: 20,
     padding: 12,
     borderWidth: 1,

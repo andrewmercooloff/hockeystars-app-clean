@@ -1467,17 +1467,17 @@ const styles = StyleSheet.create({
     overflow: 'visible', // Разрешаем фильтрам выходить за пределы
   },
   searchSection: {
-    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+    backgroundColor: 'rgba(1, 0, 0, 0.53)',
   },
   searchSectionOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+    backgroundColor: 'rgba(1, 0, 0, 0.53)',
     paddingHorizontal: 20,
     paddingVertical: 8,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -1561,7 +1561,7 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0,0,0,0.95)',
+    backgroundColor: 'rgba(1, 0, 0, 0.95)',
     borderRadius: 10,
     marginTop: 4,
     zIndex: 10000,
@@ -1622,7 +1622,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     zIndex: 1,
     elevation: 1,
-    marginTop: 270, // Отступ для поиска и фильтров (включая третью строку и кнопку сброса)
+    marginTop: 260, // Отступ для поиска и фильтров (включая третью строку и кнопку сброса, уменьшено на 10px)
   },
   playerItemBlur: {
     borderRadius: 20,
@@ -1631,25 +1631,24 @@ const styles = StyleSheet.create({
   playerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
     borderRadius: 20,
     padding: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   playerGradientShadow: {
-    marginBottom: 5,
     marginHorizontal: 16,
+    marginVertical: 6,
     borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 3,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
   },
   playerPhotoContainer: {
     width: 60,

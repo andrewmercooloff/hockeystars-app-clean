@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck from '../components/Puck';
 import { useUser } from '../contexts/UserContext';
 import { useScreenContext } from '../contexts/ScreenContext';
-import { Player, loadPlayers, getSmartPlayerSelection } from '../utils/playerStorage';
+import { Player, loadPlayers, getSmartPlayerSelection, getBlockedUsers } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -187,9 +187,44 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Определяем, это первая инициализация или смена фильтра
     const isFirstInit = !isInitializedRef.current;
     // Проверяем, изменился ли список игроков (сравниваем по ID)
-    const previousPlayerIds = previousPlayersRef.current.map(p => p.id).sort().join(',');
-    const currentPlayerIds = players.map(p => p.id).sort().join(',');
-    const isFilterChange = isInitializedRef.current && previousPlayerIds !== currentPlayerIds;
+    const previousPlayerIds = new Set(previousPlayersRef.current.map(p => p.id));
+    const currentPlayerIds = new Set(players.map(p => p.id));
+    
+    // Проверяем, является ли текущий список подмножеством предыдущего
+    // (это означает, что только заблокированные пользователи были удалены)
+    const isSubset = Array.from(currentPlayerIds).every(id => previousPlayerIds.has(id));
+    const isSameSize = currentPlayerIds.size === previousPlayerIds.size;
+    
+    // Если текущий список является подмножеством предыдущего и размер не изменился,
+    // значит список не изменился - не пересоздаем позиции
+    // Если размер изменился, но это подмножество - значит только удалили игроков, тоже не пересоздаем
+    const isFilterChange = isInitializedRef.current && !isSubset && !isSameSize;
+    
+    // Если список не изменился, не пересоздаем позиции
+    if (isInitializedRef.current && isSameSize && isSubset) {
+      // Обновляем только список игроков, но не позиции
+      previousPlayersRef.current = players;
+      return;
+    }
+    
+    // Если список уменьшился (удалили заблокированных), удаляем только позиции удаленных игроков
+    if (isInitializedRef.current && isSubset && currentPlayerIds.size < previousPlayerIds.size) {
+      // Удаляем позиции для удаленных игроков
+      setPuckPositions(prev => {
+        const filtered = prev.filter(pos => currentPlayerIds.has(pos.id));
+        // Обновляем refs
+        physicsPositionsRef.current = filtered;
+        renderPositionsRef.current = filtered;
+        // Удаляем shared values для удаленных игроков
+        const removedIds = Array.from(previousPlayerIds).filter(id => !currentPlayerIds.has(id));
+        removedIds.forEach(id => {
+          sharedPositionsRef.current.delete(id);
+        });
+        return filtered;
+      });
+      previousPlayersRef.current = players;
+      return;
+    }
     
     // Адаптивная скорость в зависимости от производительности устройства
     const baseSpeedMultiplier = (() => {
@@ -1257,7 +1292,9 @@ export default function HomeScreen() {
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const filtersInitializedRef = useRef(false); // Флаг, что фильтры были инициализированы
+  const previousVisiblePlayersRef = useRef<Set<string>>(new Set()); // Сохраняем ID видимых игроков для сравнения
 
   // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
@@ -1371,6 +1408,21 @@ export default function HomeScreen() {
     loadAllPlayers();
   }, [loadAllPlayers]);
 
+  // Загружаем список заблокированных пользователей
+  useEffect(() => {
+    const loadBlockedUsers = async () => {
+      if (currentUser?.id) {
+        try {
+          const blocked = await getBlockedUsers(currentUser.id);
+          setBlockedUsers(blocked);
+        } catch (error) {
+          console.error('❌ Ошибка загрузки заблокированных пользователей:', error);
+        }
+      }
+    };
+    loadBlockedUsers();
+  }, [currentUser?.id]);
+
 
   // Умный отбор игроков с ограничением количества
   const allVisiblePlayers = useMemo(() => {
@@ -1384,8 +1436,28 @@ export default function HomeScreen() {
       selectedYear || undefined,
       shuffleKey
     );
-    return selected;
-  }, [players, currentUser?.id, selectedCountry, selectedYear, shuffleKey]);
+    
+    // Фильтруем заблокированных пользователей (не показываем их на льду)
+    let filtered = selected;
+    if (blockedUsers.length > 0) {
+      const blockedSet = new Set(blockedUsers);
+      filtered = selected.filter(player => !blockedSet.has(player.id));
+    }
+    
+    // Сохраняем текущий набор ID игроков для сравнения
+    const currentPlayerIds = new Set(filtered.map(p => p.id));
+    const previousPlayerIds = previousVisiblePlayersRef.current;
+    
+    // Если список игроков не изменился (только заблокированные были удалены), 
+    // не обновляем ref, чтобы позиции шайб сохранились
+    const isSubset = Array.from(currentPlayerIds).every(id => previousPlayerIds.has(id));
+    if (!isSubset || currentPlayerIds.size !== previousPlayerIds.size) {
+      // Список изменился - обновляем ref
+      previousVisiblePlayersRef.current = currentPlayerIds;
+    }
+    
+    return filtered;
+  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, shuffleKey, blockedUsers]);
 
   // Используем полную логику коллизий из основного экрана
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition } = usePuckCollisionSystem(
@@ -1400,10 +1472,34 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('home');
+      // Обновляем список заблокированных пользователей при возвращении на экран
+      // Но делаем это асинхронно с небольшой задержкой, чтобы не блокировать рендеринг
+      const loadBlockedUsers = async () => {
+        if (currentUser?.id) {
+          try {
+            const blocked = await getBlockedUsers(currentUser.id);
+            // Обновляем только если список действительно изменился
+            setBlockedUsers(prev => {
+              const prevSet = new Set(prev);
+              const newSet = new Set(blocked);
+              if (prevSet.size !== newSet.size || 
+                  !Array.from(prevSet).every(id => newSet.has(id))) {
+                return blocked;
+              }
+              return prev; // Не обновляем, если список не изменился
+            });
+          } catch (error) {
+            console.error('❌ Ошибка загрузки заблокированных пользователей:', error);
+          }
+        }
+      };
+      // Загружаем с небольшой задержкой, чтобы не блокировать рендеринг
+      const timeoutId = setTimeout(loadBlockedUsers, 200);
       return () => {
+        clearTimeout(timeoutId);
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen])
+    }, [setCurrentScreen, currentUser?.id])
   );
 
   // Realtime подписка на изменения is_hidden для обновления видимости профилей
@@ -1577,7 +1673,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',

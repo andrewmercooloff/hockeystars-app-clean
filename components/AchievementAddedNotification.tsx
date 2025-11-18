@@ -100,14 +100,22 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
 export default AchievementAddedNotification;
 
 const styles = StyleSheet.create({
-  containerBlur: {
+    containerBlur: {
     borderRadius: 20,
-    marginHorizontal: 20,
-    marginVertical: 8,
+    marginHorizontal: 16,
+    marginVertical: 6,
     overflow: 'hidden',
+    shadowColor: 'rgb(1,0,0)',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
   },
   container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     borderRadius: 20,
     padding: 16,
     flexDirection: 'row',

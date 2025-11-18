@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 12,
     padding: 6,
     borderWidth: 1,

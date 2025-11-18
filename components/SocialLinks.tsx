@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         elevation: 3,
       },
       web: {
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)',
+        boxShadow: '0 1px 2px rgba(1, 0, 0, 0.15)',
       },
     }),
   },

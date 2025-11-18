@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',

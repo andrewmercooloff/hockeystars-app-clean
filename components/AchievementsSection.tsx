@@ -3,11 +3,13 @@ import {
     Alert,
     Modal,
     ScrollView,
+    StyleProp,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
+    ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Achievement } from '../utils/playerStorage';
@@ -17,12 +19,14 @@ interface AchievementsSectionProps {
   achievements?: Achievement[];
   isEditing?: boolean;
   onAchievementsChange?: (achievements: Achievement[]) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function AchievementsSection({ 
   achievements = [], 
   isEditing = false,
-  onAchievementsChange 
+  onAchievementsChange,
+  style,
 }: AchievementsSectionProps) {
   const { t } = useLanguage();
   const [modalVisible, setModalVisible] = useState(false);
@@ -161,9 +165,10 @@ export default function AchievementsSection({
   if (achievements.length === 0 && !isEditing) {
     return null;
   }
+  const containerStyle = [styles.section, style];
 
   return (
-    <View style={styles.section}>
+    <View style={containerStyle}>
       <Text style={styles.sectionTitle}>{t('profile.achievements') || 'Достижения'}</Text>
       
       {achievements.length === 0 ? (
@@ -339,7 +344,7 @@ export default function AchievementsSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
     borderWidth: 3,
     justifyContent: 'center',
     alignItems: 'center',
@@ -452,12 +457,12 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    backgroundColor: 'rgba(1, 0, 0, 0.95)',
     borderRadius: 20,
     padding: 25,
     width: '90%',

@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Черный полупрозрачный фон
+    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Черный полупрозрачный фон
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 10,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     width: 100,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     borderRadius: 12,
     marginTop: 4,
     zIndex: 20,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
       web: {
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 4px 8px rgba(1, 0, 0, 0.3)',
       },
     }),
   },

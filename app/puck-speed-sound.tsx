@@ -1659,7 +1659,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
   },
   pageHeader: {
     position: 'absolute',
@@ -1900,7 +1900,7 @@ const styles = StyleSheet.create({
   },
   speedBox: {
     width: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderWidth: 4,
     borderColor: '#fa2f40',
     borderRadius: 20,
@@ -1938,7 +1938,7 @@ const styles = StyleSheet.create({
     marginBottom: -5, // Уменьшен отступ снизу
   },
   resultDetails: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
@@ -1957,7 +1957,7 @@ const styles = StyleSheet.create({
     flex: 1,
     maxHeight: '65%', // Увеличено (было 60%) - больше места для таблицы
     zIndex: 50,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     borderRadius: 15,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
@@ -2111,7 +2111,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     borderWidth: 1,
     borderColor: '#fa2f40',
     borderRadius: 8,
@@ -2203,7 +2203,7 @@ const styles = StyleSheet.create({
     bottom: 120,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 15,
     padding: 15,
     borderWidth: 2,
@@ -2256,7 +2256,7 @@ const styles = StyleSheet.create({
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderWidth: 1.5, // Уменьшено (было 2)
     borderColor: '#fa2f40',
     paddingHorizontal: 15, // Уменьшено (было 20)
@@ -2276,7 +2276,7 @@ const styles = StyleSheet.create({
     right: 20,
     paddingHorizontal: 15,
     paddingVertical: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#fa2f40',

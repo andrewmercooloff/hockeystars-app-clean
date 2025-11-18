@@ -755,7 +755,7 @@ const styles = {
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(0,0,0,0.8)', // Более темный фон
+    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Более темный фон
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,
@@ -893,13 +893,13 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   datePickerModal: {
-    backgroundColor: 'rgba(0,0,0,0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -950,13 +950,13 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   countryPickerModal: {
-    backgroundColor: 'rgba(0,0,0,0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     borderRadius: 15,
     padding: 20,
     width: '90%',

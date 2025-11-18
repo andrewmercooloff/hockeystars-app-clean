@@ -6,10 +6,12 @@ import {
     Image,
     Platform,
     ScrollView,
+    StyleProp,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
+    ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -30,6 +32,7 @@ interface EditablePhotosSectionProps {
   onPhotosChange?: (photos: string[]) => void;
   isShopProfile?: boolean;
   playerId?: string; // ID игрока, владельца фото
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function EditablePhotosSection({ 
@@ -37,7 +40,8 @@ export default function EditablePhotosSection({
   isEditing = false,
   onPhotosChange,
   isShopProfile,
-  playerId
+  playerId,
+  style,
 }: EditablePhotosSectionProps) {
   const { t } = useLanguage();
 
@@ -381,7 +385,7 @@ export default function EditablePhotosSection({
   }
 
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, style]}>
       <Text style={styles.sectionTitle}>
         {isShopProfile ? t('profile.photos') : t('profile.hockeyPhotos')}
       </Text>
@@ -547,7 +551,7 @@ export default function EditablePhotosSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -644,7 +648,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 4,
     padding: 2,
   },
@@ -666,7 +670,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
   },
   removePhotoButton: {
     position: 'absolute',
@@ -711,7 +715,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 6,
     right: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 6,
     padding: 4,
   },
@@ -735,7 +739,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -6,
     right: -6,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 12,
     padding: 2,
   },

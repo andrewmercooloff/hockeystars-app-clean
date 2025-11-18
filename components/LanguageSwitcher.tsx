@@ -122,7 +122,7 @@ const LanguageSwitcher: React.FC = () => {
 
 const styles = StyleSheet.create({
   languageButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },

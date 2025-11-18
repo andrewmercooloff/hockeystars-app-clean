@@ -77,15 +77,66 @@ type SectionCardProps = {
   wrapperStyle?: StyleProp<ViewStyle>;
 };
 
-const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurStyle, wrapperStyle }, ref) => (
-  <View style={[styles.sectionWrapper, wrapperStyle]}>
-    <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
-      <View ref={ref} style={[styles.section, style]}>
-        {children}
+const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurStyle, wrapperStyle }, ref) => {
+  // Не показываем секцию, если children пустой, null, false или 0
+  if (children === null || children === undefined || children === false || children === 0) {
+    return null;
+  }
+  
+  // Проверяем, если children это массив
+  if (Array.isArray(children)) {
+    // Фильтруем пустые элементы (null, false, 0, undefined, пустые строки, строки, числа)
+    const filteredChildren = children.filter(child => {
+      // Отфильтровываем примитивные значения, которые не могут быть отображены напрямую
+      if (child === null || child === undefined || child === false || child === 0) {
+        return false;
+      }
+      // Отфильтровываем строки и числа (они должны быть обернуты в <Text>)
+      if (typeof child === 'string' || typeof child === 'number') {
+        return false;
+      }
+      // Проверяем, если это React элемент, который может быть null
+      if (typeof child === 'object' && 'type' in child && child.type === null) {
+        return false;
+      }
+      return true;
+    });
+    // Если после фильтрации массив пустой, не показываем секцию
+    if (filteredChildren.length === 0) {
+      return null;
+    }
+    // Используем отфильтрованные children
+    return (
+      <View style={[styles.sectionWrapper, wrapperStyle]}>
+        <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
+          <View ref={ref} style={[styles.section, style]}>
+            {filteredChildren}
+          </View>
+        </BlurView>
       </View>
-    </BlurView>
-  </View>
-));
+    );
+  }
+  
+  // Проверяем, если children это строка или число - не показываем (должны быть обернуты в <Text>)
+  if (typeof children === 'string' || typeof children === 'number') {
+    return null;
+  }
+  
+  // Проверяем, если children это React элемент, который может быть null
+  if (typeof children === 'object' && children !== null && 'type' in children && children.type === null) {
+    return null;
+  }
+  
+  return (
+    <View style={[styles.sectionWrapper, wrapperStyle]}>
+      <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
+        <View ref={ref} style={[styles.section, style]}>
+          {children}
+        </View>
+      </BlurView>
+    </View>
+  );
+});
 
 SectionCard.displayName = 'SectionCard';
 
@@ -1549,7 +1600,7 @@ export default function PlayerProfile() {
                 setIsUserBlockedState(true);
                 showCustomAlert(
                   t('profile.blockUserTitle') || 'Пользователь заблокирован',
-                  t('profile.blockUserMessage') || 'Пользователь был заблокирован. Вы больше не будете видеть его сообщения и профиль.',
+                  t('profile.blockUserMessage', { name: player.name }) || `${player.name} был заблокирован. Он не увидит Ваш профиль, не сможет написать Вам и не получит уведомления о том, что был заблокирован Вами.`,
                   'success'
                 );
               } else {
@@ -3089,6 +3140,16 @@ export default function PlayerProfile() {
                 />
               )}
               
+              {/* Индикатор заблокированного пользователя */}
+              {isUserBlockedState && currentUser && currentUser.id !== player.id && (
+                <View style={styles.blockedIndicator}>
+                  <Ionicons name="ban" size={20} color="#fa2f40" />
+                  <Text style={styles.blockedIndicatorText}>
+                    {t('profile.profileBlocked') || 'Профиль заблокирован'}
+                  </Text>
+                </View>
+              )}
+              
               <View style={styles.statusContainer}>
                 <Text style={styles.playerStatus}>
                   {player.status === 'player' ? t('profile.player') : 
@@ -3133,6 +3194,21 @@ export default function PlayerProfile() {
 
 
 
+            {/* Если пользователь заблокирован - показываем только основную информацию и сообщение */}
+            {isUserBlockedState && currentUser && currentUser.id !== player.id ? (
+              <SectionCard>
+                <View style={styles.blockedProfileMessage}>
+                  <Ionicons name="ban" size={48} color="#fa2f40" style={{ marginBottom: 16 }} />
+                  <Text style={styles.blockedProfileTitle}>
+                    {t('profile.profileBlocked') || 'Профиль заблокирован'}
+                  </Text>
+                  <Text style={styles.blockedProfileText}>
+                    {t('profile.profileBlockedMessage') || 'Вы заблокировали этого пользователя. Большая часть информации скрыта.'}
+                  </Text>
+                </View>
+              </SectionCard>
+            ) : (
+              <>
             {/* Кнопка добавления пользователя для администратора */}
             {currentUser && currentUser.status === 'admin' && currentUser.id === player?.id && (
               <SectionCard>
@@ -4560,175 +4636,166 @@ export default function PlayerProfile() {
             })()}
 
             {/* Видео моментов - только для игроков (не тренеры) */}
-            {player.status === 'player' && ((currentUser && currentUser.id === player.id && isEditing) || (player.favoriteGoals && player.favoriteGoals.trim() !== '' && player.favoriteGoals.trim() !== 'null') || (isEditing && currentUser?.status === 'admin')) && (
-             <SectionCard ref={videosRef}>
-               <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
-                {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+            {player.status === 'player' && (() => {
+              const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              const hasVideos = player.favoriteGoals && 
+                                player.favoriteGoals.trim() !== '' && 
+                                player.favoriteGoals.trim() !== 'null' &&
+                                player.favoriteGoals.split('\n').filter(goal => goal.trim()).length > 0;
+              
+              // Показываем секцию только если:
+              // 1. Режим редактирования (для владельца или админа)
+              // 2. Есть реальные видео
+              if (!isEditingMode && !hasVideos) {
+                return null;
+              }
+              
+              // Проверяем, есть ли контент для отображения
+              const videoContent = isEditingMode ? (
+                <View>
+                  <Text style={styles.sectionSubtitle}>
+                    {t('addVideoLink')}{'\n'}
+                    {t('supportedPlatforms')}
+                  </Text>
                   <View>
-                    <Text style={styles.sectionSubtitle}>
-                      {t('addVideoLink')}{'\n'}
-                      {t('supportedPlatforms')}
-                    </Text>
-                    <View>
-                      {videoFields.map((video, index) => (
-                        <View key={index} style={styles.videoFieldContainer}>
-                          <TextInput
-                            style={styles.videoUrlInput}
-                            value={video.url}
-                            onChangeText={(text) => {
+                    {videoFields.map((video, index) => (
+                      <View key={index} style={styles.videoFieldContainer}>
+                        <TextInput
+                          style={styles.videoUrlInput}
+                          value={video.url}
+                          onChangeText={(text) => {
+                            const newVideoFields = [...videoFields];
+                            newVideoFields[index] = { ...newVideoFields[index], url: text };
+                            setVideoFields(newVideoFields);
+                          }}
+                          placeholder={t('videoUrlPlaceholder')}
+                          placeholderTextColor="#888"
+                        />
+                        <View style={styles.timeInputContainer}>
+                        <TextInput
+                            style={styles.timeInputField}
+                            value={video.hours}
+                          onChangeText={(text) => {
+                              // Разрешаем только цифры и ограничиваем до 99
+                              const numericText = text.replace(/[^0-9]/g, '');
+                              const value = numericText === '' ? '0' : Math.min(99, parseInt(numericText)).toString();
                               const newVideoFields = [...videoFields];
-                              newVideoFields[index] = { ...newVideoFields[index], url: text };
+                              newVideoFields[index] = { ...newVideoFields[index], hours: value };
                               setVideoFields(newVideoFields);
                             }}
-                            placeholder={t('videoUrlPlaceholder')}
+                            placeholder="0"
                             placeholderTextColor="#888"
+                            keyboardType="numeric"
+                            maxLength={2}
                           />
-                          <View style={styles.timeInputContainer}>
+                          <Text style={styles.timeSeparator}>:</Text>
                           <TextInput
-                              style={styles.timeInputField}
-                              value={video.hours}
-                            onChangeText={(text) => {
-                                // Разрешаем только цифры и ограничиваем до 99
-                                const numericText = text.replace(/[^0-9]/g, '');
-                                const value = numericText === '' ? '0' : Math.min(99, parseInt(numericText)).toString();
-                                const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], hours: value };
-                                setVideoFields(newVideoFields);
-                              }}
-                              placeholder="0"
-                              placeholderTextColor="#888"
-                              keyboardType="numeric"
-                              maxLength={2}
-                            />
-                            <Text style={styles.timeSeparator}>:</Text>
-                            <TextInput
-                              style={styles.timeInputField}
-                              value={video.minutes}
-                              onChangeText={(text) => {
-                                // Разрешаем только цифры и ограничиваем до 59
-                                const numericText = text.replace(/[^0-9]/g, '');
-                                const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
-                                const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], minutes: value };
-                                setVideoFields(newVideoFields);
-                            }}
-                              placeholder="0"
-                            placeholderTextColor="#888"
-                              keyboardType="numeric"
-                              maxLength={2}
-                            />
-                            <Text style={styles.timeSeparator}>:</Text>
-                            <TextInput
-                              style={styles.timeInputField}
-                              value={video.seconds}
-                              onChangeText={(text) => {
-                                // Разрешаем только цифры и ограничиваем до 59
-                                const numericText = text.replace(/[^0-9]/g, '');
-                                const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
-                                const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], seconds: value };
-                                setVideoFields(newVideoFields);
-                              }}
-                              placeholder="0"
-                              placeholderTextColor="#888"
-                              keyboardType="numeric"
-                              maxLength={2}
+                            style={styles.timeInputField}
+                            value={video.minutes}
+                          onChangeText={(text) => {
+                              // Разрешаем только цифры и ограничиваем до 59
+                              const numericText = text.replace(/[^0-9]/g, '');
+                              const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
+                              const newVideoFields = [...videoFields];
+                              newVideoFields[index] = { ...newVideoFields[index], minutes: value };
+                              setVideoFields(newVideoFields);
+                          }}
+                            placeholder="0"
+                          placeholderTextColor="#888"
+                            keyboardType="numeric"
+                            maxLength={2}
                           />
-                          </View>
-                          {videoFields.length > 1 && (
-                            <TouchableOpacity
-                              style={styles.removeVideoButton}
-                              onPress={() => {
-                                const newVideoFields = videoFields.filter((_, i) => i !== index);
-                                setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
-                              }}
-                            >
-                              <Ionicons name="close-circle" size={20} color="#fa2f40" />
-                            </TouchableOpacity>
-                          )}
+                          <Text style={styles.timeSeparator}>:</Text>
+                          <TextInput
+                            style={styles.timeInputField}
+                            value={video.seconds}
+                          onChangeText={(text) => {
+                              // Разрешаем только цифры и ограничиваем до 59
+                              const numericText = text.replace(/[^0-9]/g, '');
+                              const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
+                              const newVideoFields = [...videoFields];
+                              newVideoFields[index] = { ...newVideoFields[index], seconds: value };
+                              setVideoFields(newVideoFields);
+                            }}
+                            placeholder="0"
+                          placeholderTextColor="#888"
+                            keyboardType="numeric"
+                            maxLength={2}
+                        />
                         </View>
-                      ))}
-                      <TouchableOpacity
-                        style={styles.addMoreButton}
-                        onPress={() => {
-                          setVideoFields([...videoFields, { url: '', hours: '0', minutes: '0', seconds: '0' }]);
-                        }}
-                      >
-                        <Ionicons name="add-circle" size={24} color="#fff" />
-                        <Text style={styles.addMoreButtonText}>{t('addMoreVideo')}</Text>
-                      </TouchableOpacity>
-                    </View>
+                        {videoFields.length > 1 && (
+                          <TouchableOpacity
+                            style={styles.removeVideoButton}
+                            onPress={() => {
+                              const newVideoFields = videoFields.filter((_, i) => i !== index);
+                              setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+                            }}
+                          >
+                            <Ionicons name="close-circle" size={20} color="#fa2f40" />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                    <TouchableOpacity
+                      style={styles.addMoreButton}
+                      onPress={() => {
+                        setVideoFields([...videoFields, { url: '', hours: '0', minutes: '0', seconds: '0' }]);
+                      }}
+                    >
+                      <Ionicons name="add-circle" size={24} color="#fff" />
+                      <Text style={styles.addMoreButtonText}>{t('addMoreVideo')}</Text>
+                    </TouchableOpacity>
                   </View>
-                ) : player.favoriteGoals ? (
-                  (() => {
-                    const videoUrls = player.favoriteGoals.split('\n').filter(goal => goal.trim());
-                    const parsedVideos = videoUrls.map(goal => parseVideoUrl(goal.trim()));
-                    
-                    return (
-                  <VideoCarousel
-                        videos={parsedVideos}
-                    onVideoPress={(video) => setSelectedVideo(video)}
-                    playerId={player.id}
-                    externalRefreshTrigger={videoLikeRefreshTrigger}
-                  />
-                    );
-                  })()
-                ) : null}
-             </SectionCard>
-            )}
+                </View>
+              ) : hasVideos ? (
+                (() => {
+                  const videoUrls = player.favoriteGoals.split('\n').filter(goal => goal.trim());
+                  const parsedVideos = videoUrls.map(goal => parseVideoUrl(goal.trim())).filter(v => v !== null);
+                  
+                  // Если после парсинга не осталось валидных видео, не показываем секцию
+                  if (parsedVideos.length === 0) {
+                    return null;
+                  }
+                  
+                  return (
+                    <VideoCarousel
+                      videos={parsedVideos}
+                      onVideoPress={(video) => setSelectedVideo(video)}
+                      playerId={player.id}
+                      externalRefreshTrigger={videoLikeRefreshTrigger}
+                    />
+                  );
+                })()
+              ) : null;
+              
+              // Если нет контента, не показываем секцию
+              if (!videoContent) {
+                return null;
+              }
+              
+              return (
+                <SectionCard ref={videosRef}>
+                  <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
+                  {videoContent}
+                </SectionCard>
+              );
+            })()}
 
             {/* Фотографии - не показываем для звезд, для магазинов и заточки коньков доступны всем */}
-            {player.status !== 'star' && (
-              (player.status === 'shop' || player.status === 'skateSharpening') ? (
-                // Для магазинов и заточки коньков фото доступны всем
-                <SectionCard ref={photosRef}>
-                  <EditablePhotosSection
-                    playerId={player.id}
-                    photos={galleryPhotos}
-                    isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-                    onPhotosChange={async (newPhotos) => {
-                      setGalleryPhotos(newPhotos);
-                      // Обновляем фото в базе данных
-                      try {
-                        const updatedPlayer = { ...player, photos: newPhotos };
-                        await updatePlayer(player.id, updatedPlayer);
-                        setPlayer(updatedPlayer);
-                      } catch (error) {
-                        console.error('Ошибка обновления фото:', error);
-                      }
-                    }}
-                    isShopProfile={true}
-                    style={styles.embeddedSectionContent}
-                  />
-                </SectionCard>
-              ) : (
-                // Для остальных - только друзьям
-                (currentUser && currentUser.id === player.id) || 
-                (currentUser?.status === 'admin') ||
-                friendshipStatus === 'friends' ? (
-                <SectionCard ref={photosRef}>
-                  <EditablePhotosSection
-                    playerId={player.id}
-                    photos={galleryPhotos}
-                    isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-                    onPhotosChange={async (newPhotos) => {
-                      setGalleryPhotos(newPhotos);
-                      // Обновляем фото в базе данных
-                      try {
-                        const updatedPlayer = { ...player, photos: newPhotos };
-                        await updatePlayer(player.id, updatedPlayer);
-                        setPlayer(updatedPlayer);
-                      } catch (error) {
-                        console.error('Ошибка обновления фото:', error);
-                      }
-                    }}
-                    style={styles.embeddedSectionContent}
-                  />
-                </SectionCard>
-                ) : (
+            {player.status !== 'star' && (() => {
+              const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
+              const canSeePhotos = (currentUser && currentUser.id === player.id) || 
+                                   (currentUser?.status === 'admin') ||
+                                   friendshipStatus === 'friends' ||
+                                   isShopOrSkateSharpening;
+              const isEditingPhotos = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              
+              // Если нет доступа и не магазин/заточка - показываем заблокированную секцию
+              if (!canSeePhotos && !isShopOrSkateSharpening) {
+                return (
                   <SectionCard ref={photosRef}>
                     <Text style={styles.sectionTitle}>
-                      {(player.status === 'shop' || player.status === 'skateSharpening') ? t('profile.photos') : t('profile.hockeyPhotos')}
+                      {t('profile.hockeyPhotos')}
                     </Text>
                     <View style={styles.lockedSectionContainer}>
                       <Ionicons name="lock-closed" size={48} color="#fa2f40" />
@@ -4738,9 +4805,37 @@ export default function PlayerProfile() {
                       </Text>
                     </View>
                   </SectionCard>
-                )
-              )
-            )}
+                );
+              }
+              
+              // Если нет фото и не режим редактирования - не показываем секцию
+              if (galleryPhotos.length === 0 && !isEditingPhotos) {
+                return null;
+              }
+              
+              return (
+                <SectionCard ref={photosRef}>
+                  <EditablePhotosSection
+                    playerId={player.id}
+                    photos={galleryPhotos}
+                    isEditing={isEditingPhotos}
+                    onPhotosChange={async (newPhotos) => {
+                      setGalleryPhotos(newPhotos);
+                      // Обновляем фото в базе данных
+                      try {
+                        const updatedPlayer = { ...player, photos: newPhotos };
+                        await updatePlayer(player.id, updatedPlayer);
+                        setPlayer(updatedPlayer);
+                      } catch (error) {
+                        console.error('Ошибка обновления фото:', error);
+                      }
+                    }}
+                    isShopProfile={isShopOrSkateSharpening}
+                    style={styles.embeddedSectionContent}
+                  />
+                </SectionCard>
+              );
+            })()}
 
             {/* Нормативы - показываем только игрокам (не тренерам), видно всем */}
             {player && player.status === 'player' ? (
@@ -5010,14 +5105,20 @@ export default function PlayerProfile() {
               (currentUser?.status === 'star') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
-                // 1. Есть подарки (для всех друзей) ИЛИ данные еще не загрузились (undefined) - даем время загрузиться
-                // 2. Это админ или звезда (для кнопки "Отправить подарок")
-                // 3. Это владелец профиля (даже если нет подарков - чтобы видеть пустой музей)
-                // Скрываем музей только если явно известно, что он пустой (count === 0)
-                (museumItemsCount[player.id] === undefined || museumItemsCount[player.id] > 0) || 
-                (currentUser?.status === 'admin') ||
-                (currentUser?.status === 'star') ||
-                (currentUser?.id === player.id) ? (
+                // 1. Это владелец профиля, админ или звезда - всегда показываем
+                // 2. Для друзей - только если есть подарки или данные еще не загрузились (undefined)
+                // Скрываем музей для друзей, если явно известно, что он пустой (count === 0)
+                (() => {
+                  const hasGiftButton = (currentUser?.status === 'admin' || currentUser?.status === 'star');
+                  const hasMuseumItems = museumItemsCount[player.id] === undefined || museumItemsCount[player.id] > 0;
+                  const isOwner = currentUser?.id === player.id;
+                  
+                  // Если нет подарков, нет кнопки и это не владелец - не показываем секцию
+                  if (!hasMuseumItems && !hasGiftButton && !isOwner) {
+                    return false;
+                  }
+                  return true;
+                })() ? (
                   <SectionCard ref={museumRef}>
                   {/* Заголовок музея - показываем всегда */}
                     <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
@@ -5451,6 +5552,9 @@ export default function PlayerProfile() {
               </View>
             )}
 
+              </>
+            )}
+
           </ScrollView>
         </View>
       </CachedBackground>
@@ -5476,7 +5580,21 @@ export default function PlayerProfile() {
               }
             ]}
           >
-            {!isUserBlockedState && (
+            {isUserBlockedState ? (
+              <>
+                <TouchableOpacity
+                  style={styles.profileMenuItem}
+                  onPress={handleUnblockUser}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="checkmark-circle-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                  <Text style={styles.profileMenuText}>
+                    {t('profile.unblock') || 'Разблокировать'}
+                  </Text>
+                </TouchableOpacity>
+                <View style={styles.profileMenuDivider} />
+              </>
+            ) : (
               <>
                 <TouchableOpacity
                   style={styles.profileMenuItem}
@@ -7724,6 +7842,45 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginVertical: 2,
+  },
+  blockedIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+  },
+  blockedIndicatorText: {
+    color: '#fa2f40',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    marginLeft: 8,
+  },
+  blockedProfileMessage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  blockedProfileTitle: {
+    color: '#fa2f40',
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  blockedProfileText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    lineHeight: 24,
   },
 
 

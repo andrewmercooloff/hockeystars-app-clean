@@ -1641,7 +1641,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   notificationsContent: {
-    paddingTop: 68, // Отступ для фиксированного заголовка
+    paddingTop: 48, // Отступ для фиксированного заголовка (уменьшено на 20px)
     paddingBottom: 8,
   },
   pageHeader: {
@@ -1722,19 +1722,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     minHeight: 80,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
   },
   notificationGradientShadow: {
     marginHorizontal: 16,
     marginVertical: 6,
-    borderRadius: 12,
+    borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 3,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
     elevation: 8,
   },
   notificationIcon: {
@@ -1847,7 +1847,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
@@ -1856,11 +1856,11 @@ const styles = StyleSheet.create({
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
   },
   friendRequestActions: {
     flexDirection: 'row',

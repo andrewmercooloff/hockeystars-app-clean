@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
   },
   small: {
     paddingHorizontal: 6,

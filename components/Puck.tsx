@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
       },
       web: {
-        boxShadow: '0 3px 4px rgba(0, 0, 0, 0.8)',
+        boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
       },
     }),
     borderWidth: 2,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
       },
       web: {
-        boxShadow: '0 3px 4px rgba(0, 0, 0, 0.8)',
+        boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
       },
     }),
     borderWidth: 2,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
       },
       web: {
-        boxShadow: '0 1px 1px rgba(0, 0, 0, 0.6)',
+        boxShadow: '0 1px 1px rgba(1, 0, 0, 0.6)',
       },
     }),
   },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
       },
       web: {
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.7)',
+        boxShadow: '0 1px 2px rgba(1, 0, 0, 0.7)',
       },
     }),
   },

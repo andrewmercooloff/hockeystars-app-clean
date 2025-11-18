@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
   },
   playButton: {
     width: 80,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     marginTop: 12,
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowColor: 'rgba(1, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },

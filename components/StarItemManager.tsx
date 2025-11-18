@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     borderRadius: 12,
     marginVertical: 10,
     borderWidth: 1,
