@@ -22,7 +22,9 @@ import {
     getPlayerById,
     getUserConversations,
     Message,
-    Player
+    Player,
+    getBlockedUsers,
+    isUserBlocked
 } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
@@ -65,6 +67,10 @@ export default function MessagesScreen() {
       const conversations = await getUserConversations(currentUser.id);
       console.log(`✅ loadChatsData: получено ${Object.keys(conversations).length} диалогов`);
       
+      // Загружаем список заблокированных пользователей
+      const blockedUsers = await getBlockedUsers(currentUser.id);
+      const blockedSet = new Set(blockedUsers);
+      
       const chatPreviews: ChatPreview[] = [];
       
       // Оптимизация: загружаем всех игроков параллельно вместо последовательной загрузки
@@ -83,6 +89,17 @@ export default function MessagesScreen() {
       // Формируем превью чатов
       for (const [otherUserId, messages] of Object.entries(conversations)) {
         if (messages.length > 0) {
+          // Проверяем, не заблокирован ли этот пользователь
+          // Если текущий пользователь заблокировал другого - показываем (с индикатором)
+          // Если другой пользователь заблокировал текущего - скрываем
+          const isBlockedByMe = blockedSet.has(otherUserId);
+          const isBlockedByThem = await isUserBlocked(otherUserId, currentUser.id);
+          
+          // Скрываем, если нас заблокировали
+          if (isBlockedByThem) {
+            continue;
+          }
+          
           const otherPlayer = playersMap.get(otherUserId);
           if (otherPlayer) {
             const lastMessage = messages[messages.length - 1];
@@ -599,7 +616,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     borderRadius: 20,
     borderWidth: 2,
     borderColor: 'rgba(250, 47, 64, 0.2)',

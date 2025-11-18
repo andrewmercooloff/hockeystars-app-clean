@@ -127,7 +127,7 @@ export default function ExercisesScreen() {
       const bId = parseInt(b.exerciseId);
       return aId - bId;
     });
-  }, [allExercises, selectedCategory, searchQuery, exerciseRankings, loading]);
+  }, [allExercises, selectedCategory, searchQuery, exerciseRankings, loading, language]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -511,10 +511,10 @@ const styles = StyleSheet.create({
     overflow: 'visible', // Разрешаем фильтрам выходить за пределы
   },
   searchAndFiltersContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+    backgroundColor: 'rgba(1, 0, 0, 0.53)',
   },
   searchAndFiltersOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+    backgroundColor: 'rgba(1, 0, 0, 0.53)',
     paddingVertical: 0,
   },
   searchInputWrapper: {
@@ -562,23 +562,22 @@ const styles = StyleSheet.create({
   exerciseCard: {
     borderRadius: 20,
     padding: 16,
-    marginBottom: 6,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
   },
   exerciseGradientShadow: {
-    marginBottom: 6,
+    marginVertical: 6,
     marginHorizontal: 16,
     borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 3,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
   },
   exerciseHeader: {
     flexDirection: 'row',
@@ -706,7 +705,7 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,

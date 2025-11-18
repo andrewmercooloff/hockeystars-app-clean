@@ -6912,3 +6912,139 @@ export const deletePuckSpeedRecord = async (playerId: string, recordDate: string
     return null;
   }
 };
+
+/**
+ * Блокирует пользователя
+ * @param blockerId ID пользователя, который блокирует
+ * @param blockedId ID пользователя, которого блокируют
+ * @returns true если блокировка успешна, false в противном случае
+ */
+export const blockUser = async (blockerId: string, blockedId: string): Promise<boolean> => {
+  try {
+    if (blockerId === blockedId) {
+      console.error('❌ Нельзя заблокировать самого себя');
+      return false;
+    }
+
+    const { error } = await supabase
+      .from('blocked_users')
+      .insert({
+        blocker_id: blockerId,
+        blocked_id: blockedId,
+      });
+
+    if (error) {
+      // Если таблица не существует
+      if (error.code === '42P01') {
+        console.error('❌ Таблица blocked_users не существует. Выполните SQL скрипт database/create_blocked_users_table.sql');
+        return false;
+      }
+      // Если пользователь уже заблокирован, это не ошибка
+      if (error.code === '23505') { // Unique violation
+        console.log('ℹ️ Пользователь уже заблокирован');
+        return true;
+      }
+      console.error('❌ Ошибка блокировки пользователя:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error: any) {
+    if (error?.code === '42P01') {
+      console.error('❌ Таблица blocked_users не существует. Выполните SQL скрипт database/create_blocked_users_table.sql');
+      return false;
+    }
+    console.error('❌ Ошибка блокировки пользователя:', error);
+    return false;
+  }
+};
+
+/**
+ * Разблокирует пользователя
+ * @param blockerId ID пользователя, который разблокирует
+ * @param blockedId ID пользователя, которого разблокируют
+ * @returns true если разблокировка успешна, false в противном случае
+ */
+export const unblockUser = async (blockerId: string, blockedId: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('blocked_users')
+      .delete()
+      .eq('blocker_id', blockerId)
+      .eq('blocked_id', blockedId);
+
+    if (error) {
+      console.error('❌ Ошибка разблокировки пользователя:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('❌ Ошибка разблокировки пользователя:', error);
+    return false;
+  }
+};
+
+/**
+ * Проверяет, заблокирован ли пользователь
+ * @param blockerId ID пользователя, который проверяет
+ * @param blockedId ID пользователя, которого проверяют
+ * @returns true если пользователь заблокирован, false в противном случае
+ */
+export const isUserBlocked = async (blockerId: string, blockedId: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('blocked_users')
+      .select('id')
+      .eq('blocker_id', blockerId)
+      .eq('blocked_id', blockedId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') { // No rows returned
+        return false;
+      }
+      // Если таблица не существует, просто возвращаем false
+      if (error.code === '42P01') { // relation does not exist
+        console.log('ℹ️ Таблица blocked_users еще не создана. Выполните SQL скрипт database/create_blocked_users_table.sql');
+        return false;
+      }
+      console.error('❌ Ошибка проверки блокировки пользователя:', error);
+      return false;
+    }
+
+    return data !== null;
+  } catch (error: any) {
+    // Если таблица не существует, просто возвращаем false
+    if (error?.code === '42P01') {
+      console.log('ℹ️ Таблица blocked_users еще не создана. Выполните SQL скрипт database/create_blocked_users_table.sql');
+      return false;
+    }
+    console.error('❌ Ошибка проверки блокировки пользователя:', error);
+    return false;
+  }
+};
+
+/**
+ * Получает список заблокированных пользователей
+ * @param blockerId ID пользователя
+ * @returns Массив ID заблокированных пользователей
+ */
+export const getBlockedUsers = async (blockerId: string): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('blocked_users')
+      .select('blocked_id')
+      .eq('blocker_id', blockerId);
+
+    if (error) {
+      console.error('❌ Ошибка получения списка заблокированных пользователей:', error);
+      return [];
+    }
+
+    return data?.map(item => item.blocked_id) || [];
+  } catch (error) {
+    console.error('❌ Ошибка получения списка заблокированных пользователей:', error);
+    return [];
+  }
+};

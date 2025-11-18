@@ -26,7 +26,10 @@ import {
     markMessagesAsRead,
     Message,
     Player,
-    sendMessageSimple
+    sendMessageSimple,
+    blockUser,
+    unblockUser,
+    isUserBlocked
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
@@ -55,6 +58,10 @@ export default function ChatScreen() {
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [isReportingChat, setIsReportingChat] = useState(false);
+  const [chatMenuVisible, setChatMenuVisible] = useState(false);
+  const [chatMenuPosition, setChatMenuPosition] = useState({ x: 0, y: 0 });
+  const [isBlockingUser, setIsBlockingUser] = useState(false);
+  const [isUserBlockedState, setIsUserBlockedState] = useState(false);
   const messageRefs = useRef<Map<string, View>>(new Map());
   const scrollViewRef = useRef<ScrollView>(null);
   const lastLoadTimeRef = useRef<number>(0);
@@ -64,6 +71,7 @@ export default function ChatScreen() {
   const isInitialLoadRef = useRef<boolean>(true); // Флаг первой загрузки чата
   const savedScrollPositionRef = useRef<number | null>(null); // Сохраненная позиция прокрутки
   const wasNearBottomRef = useRef<boolean>(true); // Был ли пользователь внизу перед уходом
+  const chatMenuButtonRef = useRef<View>(null);
 
 
   useEffect(() => {
@@ -614,9 +622,138 @@ export default function ChatScreen() {
     );
   }, [currentUser, otherPlayer, reportChat, t]);
 
+  // Проверка блокировки пользователя
+  useEffect(() => {
+    const checkBlockedStatus = async () => {
+      if (!currentUser || !otherPlayer) {
+        return;
+      }
+      const blocked = await isUserBlocked(currentUser.id, otherPlayer.id);
+      setIsUserBlockedState(blocked);
+    };
+    checkBlockedStatus();
+  }, [currentUser, otherPlayer]);
+
+  // Обработчик открытия меню чата
+  const handleOpenChatMenu = () => {
+    if (!chatMenuButtonRef.current) {
+      return;
+    }
+    chatMenuButtonRef.current.measure((x, y, width, height, pageX, pageY) => {
+      setChatMenuPosition({ x: pageX + width, y: pageY + height });
+      setChatMenuVisible(true);
+    });
+  };
+
+  // Обработчик закрытия меню чата
+  const handleCloseChatMenu = () => {
+    setChatMenuVisible(false);
+  };
+
+  // Обработчик блокировки пользователя из чата
+  const handleBlockUserFromChat = React.useCallback(async () => {
+    if (!currentUser || !otherPlayer || isBlockingUser) {
+      return;
+    }
+
+    handleCloseChatMenu();
+
+    Alert.alert(
+      t('profile.blockUser') || 'Заблокировать пользователя',
+      t('profile.blockUserConfirm', { name: otherPlayer.name }) || `Вы уверены, что хотите заблокировать ${otherPlayer.name}?`,
+      [
+        { text: t('common.cancel') || 'Отмена', style: 'cancel' },
+        { 
+          text: t('profile.block') || 'Заблокировать', 
+          style: 'destructive',
+          onPress: async () => {
+            setIsBlockingUser(true);
+            try {
+              const success = await blockUser(currentUser.id, otherPlayer.id);
+              if (success) {
+                setIsUserBlockedState(true);
+                Alert.alert(
+                  t('profile.blockUserTitle') || 'Пользователь заблокирован',
+                  t('profile.blockUserMessage') || 'Пользователь был заблокирован. Вы больше не будете видеть его сообщения и профиль.'
+                );
+                router.push('/messages');
+              } else {
+                Alert.alert(t('common.error') || 'Ошибка', t('profile.blockUserError') || 'Не удалось заблокировать пользователя');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка блокировки пользователя:', error);
+              Alert.alert(t('common.error') || 'Ошибка', t('profile.blockUserError') || 'Не удалось заблокировать пользователя');
+            } finally {
+              setIsBlockingUser(false);
+            }
+          }
+        }
+      ]
+    );
+  }, [currentUser, otherPlayer, isBlockingUser, t, router]);
+
+  // Обработчик разблокировки пользователя из чата
+  const handleUnblockUserFromChat = React.useCallback(async () => {
+    if (!currentUser || !otherPlayer || isBlockingUser) {
+      return;
+    }
+
+    handleCloseChatMenu();
+
+    Alert.alert(
+      t('profile.unblockUser') || 'Разблокировать пользователя',
+      t('profile.unblockUserConfirm', { name: otherPlayer.name }) || `Вы уверены, что хотите разблокировать ${otherPlayer.name}?`,
+      [
+        { text: t('common.cancel') || 'Отмена', style: 'cancel' },
+        { 
+          text: t('profile.unblock') || 'Разблокировать', 
+          style: 'default',
+          onPress: async () => {
+            setIsBlockingUser(true);
+            try {
+              const success = await unblockUser(currentUser.id, otherPlayer.id);
+              if (success) {
+                setIsUserBlockedState(false);
+                Alert.alert(
+                  t('profile.unblockUserTitle') || 'Пользователь разблокирован',
+                  t('profile.unblockUserMessage') || 'Пользователь был разблокирован.'
+                );
+              } else {
+                Alert.alert(t('common.error') || 'Ошибка', t('profile.unblockUserError') || 'Не удалось разблокировать пользователя');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка разблокировки пользователя:', error);
+              Alert.alert(t('common.error') || 'Ошибка', t('profile.unblockUserError') || 'Не удалось разблокировать пользователя');
+            } finally {
+              setIsBlockingUser(false);
+            }
+          }
+        }
+      ]
+    );
+  }, [currentUser, otherPlayer, isBlockingUser, t]);
+
+  // Обработчик жалобы из меню чата
+  const handleReportFromChatMenu = React.useCallback(() => {
+    handleCloseChatMenu();
+    handleReportChat();
+  }, [handleReportChat]);
+
   const loadMessages = async () => {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
       try {
+        // Проверяем, не заблокировал ли нас другой пользователь
+        const isBlockedByThem = await isUserBlocked(otherPlayer.id, currentUser.id);
+        if (isBlockedByThem) {
+          // Если нас заблокировали, не показываем сообщения и редиректим
+          Alert.alert(
+            t('common.error') || 'Ошибка',
+            'Вы не можете видеть сообщения этого пользователя.'
+          );
+          router.push('/messages');
+          return;
+        }
+        
         const conversation = await getConversation(currentUser.id, otherPlayer.id);
         const now = Date.now();
         
@@ -1070,38 +1207,20 @@ export default function ChatScreen() {
               </View>
             </View>
             
-            {/* Кнопки действий */}
+            {/* Кнопка с 3 точками */}
             <View style={styles.headerActions}>
-              {messages.length > 0 && (
-                <TouchableOpacity
-                  onPress={handleClearChat}
-                  style={styles.headerActionButton}
-                  hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                  accessibilityLabel={t('chat.clearChat')}
-                >
-                  <Ionicons
-                    name="trash-outline"
-                    size={12}
-                    color="#fff"
-                    style={styles.headerActionIcon}
-                  />
-                </TouchableOpacity>
-              )}
               <TouchableOpacity
-                onPress={handleReportChat}
-                style={[styles.headerActionButton, isReportingChat && styles.headerActionButtonDisabled]}
+                ref={chatMenuButtonRef}
+                onPress={handleOpenChatMenu}
+                style={styles.headerActionButton}
                 hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                accessibilityLabel={t('chat.reportChat') || 'Report chat'}
-                disabled={isReportingChat}
+                accessibilityLabel="Menu"
               >
                 <Ionicons
-                  name="flag-outline"
-                  size={12}
+                  name="ellipsis-horizontal"
+                  size={16}
                   color="#fff"
-                  style={[
-                    styles.headerActionIcon,
-                    isReportingChat ? styles.headerActionIconDisabled : undefined
-                  ]}
+                  style={styles.headerActionIcon}
                 />
               </TouchableOpacity>
             </View>
@@ -1398,6 +1517,88 @@ export default function ChatScreen() {
             </TouchableOpacity>
           </Modal>
 
+          {/* Меню чата */}
+          <Modal
+            visible={chatMenuVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={handleCloseChatMenu}
+          >
+            <TouchableOpacity
+              style={styles.contextMenuOverlay}
+              activeOpacity={1}
+              onPress={handleCloseChatMenu}
+            >
+              <View
+                style={[
+                  styles.contextMenu,
+                  {
+                    left: chatMenuPosition.x - 150,
+                    top: chatMenuPosition.y + 5,
+                  }
+                ]}
+              >
+                {isUserBlockedState ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.contextMenuItem}
+                      onPress={handleUnblockUserFromChat}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="checkmark-circle-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                      <Text style={styles.contextMenuText}>
+                        {t('profile.unblock') || 'Разблокировать'}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.contextMenuDivider} />
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={styles.contextMenuItem}
+                      onPress={handleBlockUserFromChat}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="ban-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                      <Text style={styles.contextMenuText}>
+                        {t('profile.block') || 'Заблокировать'}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.contextMenuDivider} />
+                  </>
+                )}
+                <TouchableOpacity
+                  style={styles.contextMenuItem}
+                  onPress={handleReportFromChatMenu}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="flag-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                  <Text style={styles.contextMenuText}>
+                    {t('admin.reportUser') || 'Пожаловаться'}
+                  </Text>
+                </TouchableOpacity>
+                {messages.length > 0 && (
+                  <>
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity
+                      style={styles.contextMenuItem}
+                      onPress={() => {
+                        handleCloseChatMenu();
+                        handleClearChat();
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="trash-outline" size={18} color="#fa2f40" style={styles.contextMenuIcon} />
+                      <Text style={[styles.contextMenuText, styles.contextMenuDeleteText]}>
+                        {t('chat.clearChat') || 'Очистить чат'}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
+          </Modal>
+
           {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
           {!isNearBottom && messages.length > 0 && (
             <TouchableOpacity
@@ -1509,13 +1710,9 @@ const styles = StyleSheet.create({
   },
   headerActionButton: {
     marginLeft: 12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(250, 47, 64, 0.8)',
+    padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 0,
   },
   headerActionButtonDisabled: {
     opacity: 0.5,
@@ -1740,6 +1937,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(30, 30, 30, 0.95)',
     borderRadius: 10,
     paddingVertical: 2,
+    paddingBottom: 4,
     minWidth: 160,
     shadowColor: '#000',
     shadowOffset: {
@@ -1754,7 +1952,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   contextMenuIcon: {
     marginRight: 10,
@@ -1821,7 +2019,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'rgb(1,0,0)',

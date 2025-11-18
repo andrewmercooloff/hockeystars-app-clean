@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ExerciseCompletion, getPlayerExerciseStats, Player, PlayerExerciseStats } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -9,9 +9,10 @@ import { Language, localizeExercise } from '../types/exercise';
 interface PlayerExercisesSectionProps {
   player: Player;
   isOwnProfile: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerExercisesSectionProps) {
+export default function PlayerExercisesSection({ player, isOwnProfile, style }: PlayerExercisesSectionProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const [exerciseStats, setExerciseStats] = useState<PlayerExerciseStats | null>(null);
@@ -21,10 +22,12 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   useEffect(() => {
     loadExerciseStats();
-  }, [player.id, player.exerciseStats]); // Добавляем зависимость от exerciseStats для обновления
+  }, [player.id, player.exerciseStats, language]); // Добавляем language в зависимости для перезагрузки при смене языка
 
   const loadExerciseStats = async () => {
     try {
+      setLoading(true);
+      setExerciseTitles({}); // Очищаем названия при перезагрузке
       const stats = await getPlayerExerciseStats(player.id);
       setExerciseStats(stats);
       
@@ -33,7 +36,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
         const titles: { [key: string]: string } = {};
         const uncachedTitles: string[] = [];
         
-        // Проверяем, какие названия уже есть в кеше
+        // Проверяем, какие названия уже есть в кеше для текущего языка
         for (const completion of stats.completions) {
           const cacheKey = `exercise_title_${completion.exerciseId}_${language}`;
           try {
@@ -51,7 +54,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
         
         // Устанавливаем кешированные названия сразу
         if (Object.keys(titles).length > 0) {
-          setExerciseTitles(prev => ({ ...prev, ...titles }));
+          setExerciseTitles(titles);
         }
         
         // Загружаем только некешированные названия
@@ -64,7 +67,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
                 const localizedExercise = localizeExercise(exercise, language as Language);
                 titles[exerciseId] = localizedExercise.title;
                 
-                // Кешируем название
+                // Кешируем название для текущего языка
                 const cacheKey = `exercise_title_${exerciseId}_${language}`;
                 const AsyncStorage = require('@react-native-async-storage/async-storage').default;
                 await AsyncStorage.setItem(cacheKey, localizedExercise.title);
@@ -97,9 +100,11 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
     return null;
   }
 
+  const containerStyle = [styles.section, style];
+
   if (loading || titlesLoading) {
     return (
-      <View style={styles.section}>
+      <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <Text style={styles.loadingText}>{t('exercisesSection.loading')}</Text>
       </View>
@@ -108,7 +113,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   if (!exerciseStats || exerciseStats.totalCompletions === 0) {
     return (
-      <View style={styles.section}>
+      <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <View style={styles.emptyStateContent}>
           <Text style={styles.emptyStateText}>
@@ -139,7 +144,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
 
   if (sortedCompletions.length === 0) {
     return (
-      <View style={styles.section}>
+      <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <Text style={styles.emptyText}>{t('exercisesSection.noExercises')}</Text>
       </View>
@@ -149,7 +154,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
   // Если не все названия загружены, показываем загрузку
   if (!allTitlesLoaded) {
     return (
-      <View style={styles.section}>
+      <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <Text style={styles.loadingText}>{t('exercisesSection.loading')}</Text>
       </View>
@@ -157,7 +162,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile }: PlayerE
   }
 
   return (
-    <View style={styles.section}>
+    <View style={containerStyle}>
       <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
       
       <View style={styles.exercisesGrid}>
@@ -192,7 +197,7 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 10,
     marginBottom: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 15,
     padding: 16,
     borderWidth: 1,

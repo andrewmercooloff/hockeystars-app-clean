@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,15 +23,18 @@ import {
     PanResponder,
     Platform,
     ScrollView,
+    StyleProp,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    View
+    View,
+    ViewStyle
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import QRCode from 'react-native-qrcode-svg';
@@ -57,7 +60,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -66,6 +69,25 @@ import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useUser } from '../../contexts/UserContext';
 
 const iceBg = require('../../assets/images/led.jpg');
+
+type SectionCardProps = {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  blurStyle?: StyleProp<ViewStyle>;
+  wrapperStyle?: StyleProp<ViewStyle>;
+};
+
+const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurStyle, wrapperStyle }, ref) => (
+  <View style={[styles.sectionWrapper, wrapperStyle]}>
+    <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
+      <View ref={ref} style={[styles.section, style]}>
+        {children}
+      </View>
+    </BlurView>
+  </View>
+));
+
+SectionCard.displayName = 'SectionCard';
 
 
 export default function PlayerProfile() {
@@ -86,6 +108,7 @@ export default function PlayerProfile() {
   const friendsRef = useRef<View>(null);
   const giftButtonRef = useRef<View>(null);
   const puckSpeedRef = useRef<View>(null);
+  const profileMenuButtonRef = useRef<View>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -177,6 +200,7 @@ export default function PlayerProfile() {
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const canShowAchievements = achievements.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id));
   const [pastTeams, setPastTeams] = useState<PastTeam[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
   const [individualTraining, setIndividualTraining] = useState<string[]>([]);
@@ -186,6 +210,10 @@ export default function PlayerProfile() {
   const [showRequestGiftModal, setShowRequestGiftModal] = useState(false);
   const [requestGiftMessage, setRequestGiftMessage] = useState('');
   const [requestGiftLoading, setRequestGiftLoading] = useState(false);
+  const [profileMenuVisible, setProfileMenuVisible] = useState(false);
+  const [profileMenuPosition, setProfileMenuPosition] = useState({ x: 0, y: 0 });
+  const [isBlockingUser, setIsBlockingUser] = useState(false);
+  const [isUserBlockedState, setIsUserBlockedState] = useState(false);
   
   // Используем английские ключи для позиций (стандарт в базе данных)
   const positions = ['center', 'winger', 'defender', 'goalie'];
@@ -1453,6 +1481,139 @@ export default function PlayerProfile() {
       ]
     );
   }, [currentUser, player, reportUser, t]);
+
+  // Проверка блокировки пользователя
+  useEffect(() => {
+    const checkBlockedStatus = async () => {
+      if (!currentUser || !player || currentUser.id === player.id) {
+        return;
+      }
+      const blocked = await isUserBlocked(currentUser.id, player.id);
+      setIsUserBlockedState(blocked);
+    };
+    checkBlockedStatus();
+  }, [currentUser, player]);
+
+  // Обработчик открытия меню профиля
+  const handleOpenProfileMenu = (event: any) => {
+    if (!currentUser || !player || currentUser.id === player.id) {
+      return;
+    }
+    // Используем координаты из события, если доступны
+    if (event?.nativeEvent) {
+      const { pageX, pageY } = event.nativeEvent;
+      if (profileMenuButtonRef.current) {
+        profileMenuButtonRef.current.measure((x, y, width, height, measuredPageX, measuredPageY) => {
+          setProfileMenuPosition({ x: measuredPageX + width, y: measuredPageY + height });
+          setProfileMenuVisible(true);
+        });
+      } else {
+        // Fallback: используем координаты из события
+        setProfileMenuPosition({ x: pageX || 0, y: (pageY || 0) + 30 });
+        setProfileMenuVisible(true);
+      }
+    } else if (profileMenuButtonRef.current) {
+      profileMenuButtonRef.current.measure((x, y, width, height, pageX, pageY) => {
+        setProfileMenuPosition({ x: pageX + width, y: pageY + height });
+        setProfileMenuVisible(true);
+      });
+    }
+  };
+
+  // Обработчик закрытия меню профиля
+  const handleCloseProfileMenu = () => {
+    setProfileMenuVisible(false);
+  };
+
+  // Обработчик блокировки пользователя
+  const handleBlockUser = React.useCallback(async () => {
+    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser) {
+      return;
+    }
+
+    handleCloseProfileMenu();
+
+    Alert.alert(
+      t('profile.blockUser') || 'Заблокировать пользователя',
+      t('profile.blockUserConfirm', { name: player.name }) || `Вы уверены, что хотите заблокировать ${player.name}?`,
+      [
+        { text: t('common.cancel') || 'Отмена', style: 'cancel' },
+        { 
+          text: t('profile.block') || 'Заблокировать', 
+          style: 'destructive',
+          onPress: async () => {
+            setIsBlockingUser(true);
+            try {
+              const success = await blockUser(currentUser.id, player.id);
+              if (success) {
+                setIsUserBlockedState(true);
+                showCustomAlert(
+                  t('profile.blockUserTitle') || 'Пользователь заблокирован',
+                  t('profile.blockUserMessage') || 'Пользователь был заблокирован. Вы больше не будете видеть его сообщения и профиль.',
+                  'success'
+                );
+              } else {
+                showCustomAlert(t('common.error') || 'Ошибка', t('profile.blockUserError') || 'Не удалось заблокировать пользователя', 'error');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка блокировки пользователя:', error);
+              showCustomAlert(t('common.error') || 'Ошибка', t('profile.blockUserError') || 'Не удалось заблокировать пользователя', 'error');
+            } finally {
+              setIsBlockingUser(false);
+            }
+          }
+        }
+      ]
+    );
+  }, [currentUser, player, isBlockingUser, t]);
+
+  // Обработчик разблокировки пользователя
+  const handleUnblockUser = React.useCallback(async () => {
+    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser) {
+      return;
+    }
+
+    handleCloseProfileMenu();
+
+    Alert.alert(
+      t('profile.unblockUser') || 'Разблокировать пользователя',
+      t('profile.unblockUserConfirm', { name: player.name }) || `Вы уверены, что хотите разблокировать ${player.name}?`,
+      [
+        { text: t('common.cancel') || 'Отмена', style: 'cancel' },
+        { 
+          text: t('profile.unblock') || 'Разблокировать', 
+          style: 'default',
+          onPress: async () => {
+            setIsBlockingUser(true);
+            try {
+              const success = await unblockUser(currentUser.id, player.id);
+              if (success) {
+                setIsUserBlockedState(false);
+                showCustomAlert(
+                  t('profile.unblockUserTitle') || 'Пользователь разблокирован',
+                  t('profile.unblockUserMessage') || 'Пользователь был разблокирован.',
+                  'success'
+                );
+              } else {
+                showCustomAlert(t('common.error') || 'Ошибка', t('profile.unblockUserError') || 'Не удалось разблокировать пользователя', 'error');
+              }
+            } catch (error) {
+              console.error('❌ Ошибка разблокировки пользователя:', error);
+              showCustomAlert(t('common.error') || 'Ошибка', t('profile.unblockUserError') || 'Не удалось разблокировать пользователя', 'error');
+            } finally {
+              setIsBlockingUser(false);
+            }
+          }
+        }
+      ]
+    );
+  }, [currentUser, player, isBlockingUser, t]);
+
+  // Обработчик жалобы из меню
+  const handleReportFromMenu = React.useCallback(() => {
+    handleCloseProfileMenu();
+    handleReportUser();
+  }, [handleReportUser]);
 
   const handleHideProfile = async () => {
     if (!currentUser || currentUser.status !== 'admin' || !player) {
@@ -2750,6 +2911,17 @@ export default function PlayerProfile() {
           >
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
+              {/* Кнопка с 3 точками в правом верхнем углу профиля - показывается только для чужих профилей */}
+              {currentUser && player && currentUser.id !== player.id && (
+                <TouchableOpacity
+                  ref={profileMenuButtonRef}
+                  onPress={handleOpenProfileMenu}
+                  style={styles.profileMenuButton}
+                  hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                >
+                  <Ionicons name="ellipsis-vertical" size={24} color="rgba(255, 255, 255, 0.6)" />
+                </TouchableOpacity>
+              )}
               <View style={styles.avatarContainer}>
                 <View style={styles.avatarWrapper}>
                   {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -2791,7 +2963,7 @@ export default function PlayerProfile() {
                           );
                         }
                       })()}
-                      <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
+                      <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(1, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
                         <Ionicons name="camera" size={24} color="#fff" />
                       </View>
                     </TouchableOpacity>
@@ -2963,7 +3135,7 @@ export default function PlayerProfile() {
 
             {/* Кнопка добавления пользователя для администратора */}
             {currentUser && currentUser.status === 'admin' && currentUser.id === player?.id && (
-              <View style={styles.section}>
+              <SectionCard>
                 <TouchableOpacity 
                   style={[styles.friendRequestButton, styles.adminAddUserButton]} 
                   onPress={() => router.push('/admin/create-user')}
@@ -2973,7 +3145,7 @@ export default function PlayerProfile() {
                     {t('admin.addUser')}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </SectionCard>
             )}
 
             {/* Кнопки действий - перемещены вверх перед статистикой */}
@@ -3152,7 +3324,7 @@ export default function PlayerProfile() {
                 const hasStats = gamesNum > 0 || minutesNum > 0 || shotsNum > 0 || savesNum > 0;
                 
                 return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
-                  <View style={styles.section} ref={statsRef}>
+                  <SectionCard ref={statsRef}>
                     <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                     {isEditing ? (
                       <View style={styles.statsGrid}>
@@ -3297,7 +3469,7 @@ export default function PlayerProfile() {
                         )}
                       </View>
                     )}
-                  </View>
+                  </SectionCard>
                 ) : null;
               } else {
                 // Статистика для полевых игроков
@@ -3311,7 +3483,7 @@ export default function PlayerProfile() {
                 const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
                 
                 return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
-                  <View style={styles.section} ref={statsRef}>
+                  <SectionCard ref={statsRef}>
                     <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                     {isEditing ? (
                       <View style={styles.statsGrid}>
@@ -3428,14 +3600,14 @@ export default function PlayerProfile() {
                         )}
                       </View>
                     )}
-                  </View>
+                  </SectionCard>
                 ) : null;
               }
             })()}
 
             {/* Основная информация - скрыта для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <View style={styles.section}>
+            <SectionCard>
               <Text style={styles.sectionTitle}>{t('profile.basicInfo')}</Text>
               <View style={styles.infoGrid}>
                 <View style={styles.infoItem}>
@@ -3755,14 +3927,14 @@ export default function PlayerProfile() {
                   </View>
                 )}
               </View>
-            </View>
+            </SectionCard>
             )}
 
             {/* Карта - только для магазинов */}
-            {player.status === 'shop' && player.address && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
-                <View style={styles.mapContainer}>
+              {player.status === 'shop' && player.address && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
+                 <View style={styles.mapContainer}>
                   {Platform.OS === 'web' ? (
                     <iframe
                       srcDoc={`
@@ -3872,15 +4044,15 @@ export default function PlayerProfile() {
                       }}
                     />
                 )}
-              </View>
-            </View>
+                 </View>
+               </SectionCard>
             )}
 
             {/* Скидка для друзей - только для магазинов */}
-            {player.status === 'shop' && (player.discountForFriends || isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
-                <Text style={styles.discountExplanation}>
+              {player.status === 'shop' && (player.discountForFriends || isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
+                 <Text style={styles.discountExplanation}>
                   {t('profile.discountForFriendsHint')}
                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3919,14 +4091,14 @@ export default function PlayerProfile() {
                       }
                     </Text>
                   </ImageBackground>
-                    )}
-                  </View>
                 )}
+               </SectionCard>
+              )}
 
             {/* Услуги заточки коньков - только для заточки коньков */}
-            {player.status === 'skateSharpening' && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
+              {player.status === 'skateSharpening' && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>
                   {t('profile.skateServices') || 'Услуги'}
                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3974,14 +4146,14 @@ export default function PlayerProfile() {
                     )}
                   </View>
                 )}
-              </View>
-            )}
+               </SectionCard>
+              )}
 
             {/* Карта - для заточки коньков */}
-            {player.status === 'skateSharpening' && player.address && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
-                <View style={styles.mapContainer}>
+              {player.status === 'skateSharpening' && player.address && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
+                 <View style={styles.mapContainer}>
                   {Platform.OS === 'web' ? (
                     <iframe
                       srcDoc={`
@@ -4085,15 +4257,15 @@ export default function PlayerProfile() {
                       }}
                     />
                 )}
-              </View>
-            </View>
+                </View>
+               </SectionCard>
             )}
 
             {/* Скидка для друзей - для заточки коньков */}
-            {player.status === 'skateSharpening' && (player.discountForFriends || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
-                <Text style={styles.discountExplanation}>
+              {player.status === 'skateSharpening' && (player.discountForFriends || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>{t('profile.discountForFriends')}</Text>
+                 <Text style={styles.discountExplanation}>
                   {t('profile.discountForFriendsHint')}
                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -4132,15 +4304,15 @@ export default function PlayerProfile() {
                       }
                     </Text>
                   </ImageBackground>
-                    )}
-                  </View>
                 )}
+               </SectionCard>
+              )}
 
             {/* Социальные сети */}
-            {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('editProfile.socialLinks')}</Text>
-                <View style={styles.infoGrid}>
+              {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>{t('editProfile.socialLinks')}</Text>
+                 <View style={styles.infoGrid}>
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('socialLinks.instagram')}</Text>
                     <TextInput
@@ -4171,13 +4343,13 @@ export default function PlayerProfile() {
                       placeholderTextColor="#888"
                     />
                   </View>
-                </View>
-              </View>
+                 </View>
+               </SectionCard>
             )}
 
             {/* Секция команд - не показываем для магазинов и заточки коньков */}
             {player.status !== 'shop' && player.status !== 'skateSharpening' && (playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
-              <View style={styles.teamsSection}>
+              <SectionCard>
                 <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
                 
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -4269,15 +4441,15 @@ export default function PlayerProfile() {
                     )}
                   </>
                 )}
-              </View>
+              </SectionCard>
             )}
 
             {/* Индивидуальные тренировки - только для тренеров */}
-            {player.status === 'coach' && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
-                  {t('profile.individualTraining') || 'Индивидуальные тренировки'}
-                </Text>
+              {player.status === 'coach' && (
+               <SectionCard>
+                 <Text style={styles.sectionTitle}>
+                   {t('profile.individualTraining') || 'Индивидуальные тренировки'}
+                 </Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     {availableTrainingTypes.map(trainingType => {
@@ -4323,7 +4495,7 @@ export default function PlayerProfile() {
                     )}
                   </View>
                 )}
-              </View>
+               </SectionCard>
             )}
 
             {/* Физические данные - только для игроков (не тренеры) */}
@@ -4339,7 +4511,7 @@ export default function PlayerProfile() {
               }
               
               return (
-              <View style={styles.section}>
+              <SectionCard>
                 <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
                 <View style={styles.infoGrid}>
                     {/* Рост - показываем только если указан или в режиме редактирования */}
@@ -4383,14 +4555,14 @@ export default function PlayerProfile() {
                   </View>
                     )}
                 </View>
-              </View>
+              </SectionCard>
               );
             })()}
 
             {/* Видео моментов - только для игроков (не тренеры) */}
             {player.status === 'player' && ((currentUser && currentUser.id === player.id && isEditing) || (player.favoriteGoals && player.favoriteGoals.trim() !== '' && player.favoriteGoals.trim() !== 'null') || (isEditing && currentUser?.status === 'admin')) && (
-              <View style={styles.section} ref={videosRef}>
-                <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
+             <SectionCard ref={videosRef}>
+               <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
                 {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                   <View>
                     <Text style={styles.sectionSubtitle}>
@@ -4502,14 +4674,14 @@ export default function PlayerProfile() {
                     );
                   })()
                 ) : null}
-              </View>
+             </SectionCard>
             )}
 
-            {/* Фотографии - не показываем для звезд, для магазинов доступны всем */}
+            {/* Фотографии - не показываем для звезд, для магазинов и заточки коньков доступны всем */}
             {player.status !== 'star' && (
-              player.status === 'shop' ? (
-                // Для магазинов фото доступны всем
-                <View ref={photosRef}>
+              (player.status === 'shop' || player.status === 'skateSharpening') ? (
+                // Для магазинов и заточки коньков фото доступны всем
+                <SectionCard ref={photosRef}>
                   <EditablePhotosSection
                     playerId={player.id}
                     photos={galleryPhotos}
@@ -4526,14 +4698,15 @@ export default function PlayerProfile() {
                       }
                     }}
                     isShopProfile={true}
+                    style={styles.embeddedSectionContent}
                   />
-                </View>
+                </SectionCard>
               ) : (
                 // Для остальных - только друзьям
                 (currentUser && currentUser.id === player.id) || 
                 (currentUser?.status === 'admin') ||
                 friendshipStatus === 'friends' ? (
-                <View ref={photosRef}>
+                <SectionCard ref={photosRef}>
                   <EditablePhotosSection
                     playerId={player.id}
                     photos={galleryPhotos}
@@ -4549,10 +4722,11 @@ export default function PlayerProfile() {
                         console.error('Ошибка обновления фото:', error);
                       }
                     }}
+                    style={styles.embeddedSectionContent}
                   />
-                </View>
+                </SectionCard>
                 ) : (
-                  <View style={styles.section} ref={photosRef}>
+                  <SectionCard ref={photosRef}>
                     <Text style={styles.sectionTitle}>
                       {(player.status === 'shop' || player.status === 'skateSharpening') ? t('profile.photos') : t('profile.hockeyPhotos')}
                     </Text>
@@ -4563,7 +4737,7 @@ export default function PlayerProfile() {
                         {t('profile.addToFriendsToSeePhotos', { name: player.name })}
                       </Text>
                     </View>
-                  </View>
+                  </SectionCard>
                 )
               )
             )}
@@ -4582,7 +4756,7 @@ export default function PlayerProfile() {
                 (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
                   isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                     // Редактируемая версия нормативов
-                    <View style={styles.section} ref={exercisesRef}>
+                    <SectionCard ref={exercisesRef}>
                       <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                       <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
@@ -4652,31 +4826,50 @@ export default function PlayerProfile() {
                           />
                         </View>
                       </View>
-                    </View>
-                  ) : (
-                    <NormativesSection
-                      pullUps={player.pullUps}
-                      pushUps={player.pushUps}
-                      plankTime={player.plankTime}
-                      sprint100m={player.sprint100m}
-                      longJump={player.longJump}
-                      jumpRope={player.jumpRope}
-                      changes={{
-                        pullUps: getChangeForField('pullUps'),
-                        pushUps: getChangeForField('pushUps'),
-                        plankTime: getChangeForField('plankTime'),
-                        sprint100m: getChangeForField('sprint100m'),
-                        longJump: getChangeForField('longJump'),
-                        jumpRope: getChangeForField('jumpRope'),
-                      }}
-                    />
-                  )
+                    </SectionCard>
+                  ) : (() => {
+                    // Проверяем, есть ли хотя бы один норматив
+                    const hasAnyNormative = 
+                      (player.pullUps && player.pullUps !== '0' && player.pullUps !== '' && player.pullUps !== 'null') ||
+                      (player.pushUps && player.pushUps !== '0' && player.pushUps !== '' && player.pushUps !== 'null') ||
+                      (player.plankTime && player.plankTime !== '0' && player.plankTime !== '' && player.plankTime !== 'null') ||
+                      (player.sprint100m && player.sprint100m !== '0' && player.sprint100m !== '' && player.sprint100m !== 'null') ||
+                      (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
+                      (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null');
+                    
+                    // Не показываем секцию, если нет нормативов
+                    if (!hasAnyNormative) {
+                      return null;
+                    }
+                    
+                    return (
+                      <SectionCard ref={exercisesRef}>
+                        <NormativesSection
+                          pullUps={player.pullUps}
+                          pushUps={player.pushUps}
+                          plankTime={player.plankTime}
+                          sprint100m={player.sprint100m}
+                          longJump={player.longJump}
+                          jumpRope={player.jumpRope}
+                          changes={{
+                            pullUps: getChangeForField('pullUps'),
+                            pushUps: getChangeForField('pushUps'),
+                            plankTime: getChangeForField('plankTime'),
+                            sprint100m: getChangeForField('sprint100m'),
+                            longJump: getChangeForField('longJump'),
+                            jumpRope: getChangeForField('jumpRope'),
+                          }}
+                          style={styles.embeddedSectionContent}
+                        />
+                      </SectionCard>
+                    );
+                  })()
                 ) : null // Не показываем секцию, если данных нет
             ) : null}
 
             {/* Секция измерения скорости шайбы - только для игроков, видно всем, скрыта если скорость не измерена */}
-            {player && player.status === 'player' && player.puckSpeed && player.puckSpeed > 0 && (
-              <View ref={puckSpeedRef} style={styles.section}>
+{player && player.status === 'player' && player.puckSpeed && player.puckSpeed > 0 && (
+              <SectionCard ref={puckSpeedRef}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
@@ -4782,27 +4975,31 @@ export default function PlayerProfile() {
                       )}
                       </View>
                     )}
-                  </View>
-              </View>
+                 </View>
+               </SectionCard>
             )}
 
             {/* Секция упражнений - скрыта если упражнения не выполнены */}
             {player && player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0 && (
-              <PlayerExercisesSection 
-                player={player} 
-                isOwnProfile={currentUser?.id === player.id}
-              />
+              <SectionCard>
+                <PlayerExercisesSection 
+                  player={player} 
+                  isOwnProfile={currentUser?.id === player.id}
+                  style={styles.embeddedSectionContent}
+                />
+              </SectionCard>
             )}
 
             {/* Достижения - не показываем для магазинов и заточки коньков */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && (
-            <View ref={achievementsRef}>
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && canShowAchievements && (
+            <SectionCard ref={achievementsRef}>
               <AchievementsSection 
                 achievements={achievements}
                 isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
                 onAchievementsChange={setAchievements}
+                style={styles.embeddedSectionContent}
               />
-            </View>
+            </SectionCard>
             )}
 
             {/* Музей игрока - полученные предметы */}
@@ -4821,7 +5018,7 @@ export default function PlayerProfile() {
                 (currentUser?.status === 'admin') ||
                 (currentUser?.status === 'star') ||
                 (currentUser?.id === player.id) ? (
-                  <View style={styles.section} ref={museumRef}>
+                  <SectionCard ref={museumRef}>
                   {/* Заголовок музея - показываем всегда */}
                     <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   
@@ -4892,10 +5089,10 @@ export default function PlayerProfile() {
                       </TouchableOpacity>
                     </View>
                   )}
-                </View>
+                </SectionCard>
                 ) : null
               ) : (
-                <View style={styles.section}>
+                <SectionCard>
                   <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   <View style={styles.lockedSectionContainer}>
                     <Ionicons name="lock-closed" size={48} color="#fa2f40" />
@@ -4904,13 +5101,13 @@ export default function PlayerProfile() {
                       {t('profile.addToFriendsToSeeMuseum', { name: player.name })}
                     </Text>
                   </View>
-                </View>
+                </SectionCard>
               )
             )}
 
             {/* Друзья - скрыты для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <View style={styles.section}>
+            <SectionCard>
               <Text style={styles.sectionTitle}>
                 {t('profile.friends')} ({friends.length})
               </Text>
@@ -4939,10 +5136,10 @@ export default function PlayerProfile() {
                   <Text style={styles.noDataText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
                   <Text style={styles.noDataSubtext}>
                     {t('profile.beFirstToAdd', {name: player.name})}
-                  </Text>
+                 </Text>
                 </View>
               )}
-            </View>
+            </SectionCard>
             )}
 
             {/* Кнопка управления дружбой - для не-звезд и не-скаутов - удалена отсюда, перенесена вверх */}
@@ -5038,10 +5235,10 @@ export default function PlayerProfile() {
                   <View style={{ gap: 15, marginTop: 20, marginBottom: 20 }}>
                     {/* Переключатель языка - только для собственного профиля */}
                     {currentUser && currentUser.id === player?.id && (
-                      <View style={styles.section}>
+                      <SectionCard>
                         <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
                         <LanguageSwitcher />
-                      </View>
+                      </SectionCard>
                     )}
                     
                     <TouchableOpacity 
@@ -5128,7 +5325,7 @@ export default function PlayerProfile() {
 
             {/* Кнопки редактирования и удаления для администратора */}
             {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
-              <View>
+             <SectionCard>
                 {/* Кнопка редактирования - на отдельной строке */}
                 <TouchableOpacity 
                   style={[styles.adminButton, styles.editButton, { marginBottom: 10, alignSelf: 'stretch' }]} 
@@ -5200,21 +5397,21 @@ export default function PlayerProfile() {
                     </TouchableOpacity>
                   )}
                 </View>
-              </View>
+             </SectionCard>
             )}
 
 
             {/* Сообщение о скрытом профиле для владельца */}
             {currentUser && player && currentUser.id === player.id && player.is_hidden && (
-              <View style={[styles.section, { marginTop: 20, marginBottom: 20, backgroundColor: 'rgba(250, 47, 64, 0.2)', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#fa2f40' }]}>
+             <View style={[styles.section, { marginTop: 20, marginBottom: 20, backgroundColor: 'rgba(250, 47, 64, 0.2)', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#fa2f40' }]}>
                 <Ionicons name="eye-off-outline" size={24} color="#fa2f40" style={{ marginBottom: 10, alignSelf: 'center' }} />
                 <Text style={[styles.sectionTitle, { color: '#fa2f40', textAlign: 'center', marginBottom: 8 }]}>
                   {t('admin.profileHidden') || 'Профиль скрыт'}
                 </Text>
                 <Text style={[styles.sectionText, { color: '#fff', textAlign: 'center' }]}>
                   {t('admin.profileHiddenMessage') || 'Ваш профиль скрыт администратором. Обратитесь к администратору для восстановления доступа.'}
-                </Text>
-              </View>
+                 </Text>
+             </View>
             )}
 
 
@@ -5254,28 +5451,59 @@ export default function PlayerProfile() {
               </View>
             )}
 
-            {/* Кнопка пожаловаться - в самом низу профиля */}
-            {currentUser && player && currentUser.id !== player.id && (
-              <View style={{ marginTop: 10, marginBottom: 30, paddingHorizontal: 20 }}>
-                <TouchableOpacity 
-                  style={[styles.shareButton, { 
-                    backgroundColor: 'transparent', 
-                    borderWidth: 1, 
-                    borderColor: 'rgba(255, 255, 255, 0.5)'
-                  }]} 
-                  onPress={handleReportUser}
-                >
-                  <Ionicons name="flag-outline" size={20} color="rgba(255, 255, 255, 0.5)" />
-                  <Text style={[styles.shareButtonText, { color: 'rgba(255, 255, 255, 0.5)' }]}>
-                    {t('profile.reportUser') || t('admin.reportUser') || 'Пожаловаться'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
           </ScrollView>
         </View>
       </CachedBackground>
+      
+      {/* Меню профиля */}
+      <Modal
+        visible={profileMenuVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCloseProfileMenu}
+      >
+        <TouchableOpacity
+          style={styles.profileMenuOverlay}
+          activeOpacity={1}
+          onPress={handleCloseProfileMenu}
+        >
+          <View
+            style={[
+              styles.profileMenu,
+              {
+                left: profileMenuPosition.x - 150,
+                top: profileMenuPosition.y + 5,
+              }
+            ]}
+          >
+            {!isUserBlockedState && (
+              <>
+                <TouchableOpacity
+                  style={styles.profileMenuItem}
+                  onPress={handleBlockUser}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="ban-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                  <Text style={styles.profileMenuText}>
+                    {t('profile.block') || 'Заблокировать'}
+                  </Text>
+                </TouchableOpacity>
+                <View style={styles.profileMenuDivider} />
+              </>
+            )}
+            <TouchableOpacity
+              style={styles.profileMenuItem}
+              onPress={handleReportFromMenu}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="flag-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+              <Text style={styles.profileMenuText}>
+                {t('profile.reportUser') || t('admin.reportUser') || 'Пожаловаться'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
       <View style={{ position: 'absolute', left: -10000, top: 0 }}>
         <View 
           ref={shareCardRef} 
@@ -5869,7 +6097,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -5921,10 +6149,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
     marginTop: 20,
+    position: 'relative',
   },
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
+  },
+  profileMenuButton: {
+    position: 'absolute',
+    top: 0,
+    right: 20,
+    padding: 8,
+    zIndex: 10,
   },
   avatarWrapper: {
     position: 'relative',
@@ -5935,7 +6171,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     right: -32,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 16,
     padding: 6,
     borderWidth: 1,
@@ -6105,27 +6341,43 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  section: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', 
-    borderRadius: 15,
-    padding: 20,
+  sectionWrapper: {
+    marginHorizontal: 0,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)', 
+  },
+  sectionBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  section: {
+    backgroundColor: 'rgba(1, 0, 0, 0.4)',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(250, 47, 64, 0.2)',
     ...Platform.select({
       ios: {
-    shadowColor: 'rgb(1,0,0)',
+        shadowColor: 'rgb(1,0,0)',
         shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
       },
       android: {
-    elevation: 5,
+        elevation: 5,
       },
       web: {
         boxShadow: '0 2px 4px rgba(1, 0, 0, 0.25)',
       },
     }),
+  },
+  embeddedSectionContent: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderColor: 'transparent',
+    padding: 0,
+    marginBottom: 0,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
 
   sectionTitle: {
@@ -6139,7 +6391,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 40,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(1, 0, 0, 0.4)',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
@@ -6493,7 +6745,7 @@ const styles = StyleSheet.create({
 
   videoModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -6528,7 +6780,7 @@ const styles = StyleSheet.create({
     top: 30,
     right: 20,
     zIndex: 1001,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 20,
     padding: 8,
   },
@@ -6952,28 +7204,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-  teamsSection: {
-    backgroundColor: 'rgba(1, 0, 0, 0.7)', 
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)', 
-    ...Platform.select({
-      ios: {
-    shadowColor: 'rgb(1,0,0)',
-        shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-      },
-      android: {
-    elevation: 5,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(1, 0, 0, 0.25)',
-      },
-    }),
-  },
   modalCancelButton: {
     marginTop: 12,
     paddingVertical: 15,
@@ -7027,7 +7257,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(1, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 60,
@@ -7453,6 +7683,47 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
     marginLeft: 4,
+  },
+  profileMenuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  profileMenu: {
+    position: 'absolute',
+    backgroundColor: 'rgba(1, 0, 0, 0.95)',
+    borderRadius: 12,
+    paddingVertical: 4,
+    minWidth: 180,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.3)',
+  },
+  profileMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  profileMenuIcon: {
+    marginRight: 12,
+  },
+  profileMenuText: {
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'Gilroy-Regular',
+    flex: 1,
+  },
+  profileMenuDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 2,
   },
 
 
