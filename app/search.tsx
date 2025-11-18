@@ -13,10 +13,11 @@ import {
     Animated
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CachedAvatar from '../components/CachedAvatar';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam } from '../utils/playerStorage';
+import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam, isGoalkeeperPosition } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -40,7 +41,8 @@ const FilterButton = React.memo(({
   onToggle,
   positions,
   countries,
-  teams
+  teams,
+  disabled = false
 }: { 
   title: string, 
   options: any[], 
@@ -52,7 +54,8 @@ const FilterButton = React.memo(({
   onToggle: (filterName: string) => void,
   positions?: any[],
   countries?: any[],
-  teams?: any[]
+  teams?: any[],
+  disabled?: boolean
 }) => {
   const { t, language } = useLanguage();
   const [dropdownOpacity] = useState(new Animated.Value(0));
@@ -115,10 +118,15 @@ const FilterButton = React.memo(({
   return (
     <View style={[styles.filterContainer, isActive && styles.filterContainerActive]}>
       <TouchableOpacity 
-        style={[styles.filterButton, (isActive || selectedValue) && styles.filterButtonActive]} 
-        onPress={toggleDropdown}
+        style={[
+          styles.filterButton, 
+          (isActive || selectedValue) && styles.filterButtonActive,
+          disabled && styles.filterButtonDisabled
+        ]} 
+        onPress={disabled ? undefined : toggleDropdown}
+        disabled={disabled}
       >
-        <Text style={styles.filterButtonText}>
+        <Text style={[styles.filterButtonText, disabled && styles.filterButtonTextDisabled]}>
           {(() => {
             if (selectedValue) {
               // Для команд нужно найти название по ID
@@ -158,6 +166,11 @@ const FilterButton = React.memo(({
                 return `> ${selectedValue}`;
               }
               
+              // Для PPG, SV%, GAA показываем значение как есть
+              if (title === 'PPG' || title === 'SV%' || title === 'GAA') {
+                return selectedValue;
+              }
+              
               return selectedValue;
             }
             return title;
@@ -182,12 +195,18 @@ const FilterButton = React.memo(({
             showsVerticalScrollIndicator={false}
             nestedScrollEnabled={true}
           >
-          <TouchableOpacity 
-            style={styles.filterDropdownItem} 
-            onPress={() => handleSelect(null)}
-          >
-            <Text style={styles.filterDropdownItemText}>{t('search.all')}</Text>
-          </TouchableOpacity>
+          {/* Добавляем "Все" только если его нет в опциях (для старых фильтров) */}
+          {!options.some(opt => {
+            const optValue = typeof opt === 'string' ? opt : opt.original;
+            return optValue === null;
+          }) && (
+            <TouchableOpacity 
+              style={styles.filterDropdownItem} 
+              onPress={() => handleSelect(null)}
+            >
+              <Text style={styles.filterDropdownItemText}>{language === 'ru' ? 'Все' : 'All'}</Text>
+            </TouchableOpacity>
+          )}
             {options.map((option) => {
               const displayText = typeof option === 'string' ? option : option.translated;
               const optionValue = typeof option === 'string' ? option : option.original;
@@ -272,6 +291,9 @@ export default function SearchScreen() {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMinHeight, setSelectedMinHeight] = useState<string | null>(null);
   const [selectedMinWeight, setSelectedMinWeight] = useState<string | null>(null);
+  const [selectedPPG, setSelectedPPG] = useState<string | null>(null);
+  const [selectedSV, setSelectedSV] = useState<string | null>(null);
+  const [selectedGAA, setSelectedGAA] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   
   // Состояние для отслеживания открытых фильтров
@@ -324,36 +346,23 @@ export default function SearchScreen() {
           return;
         }
 
-        // Оптимизация: сначала показываем кешированные данные, потом обновляем
-        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-        const cacheKey = 'all_players';
-        const cachedData = await AsyncStorage.getItem(cacheKey);
+        // Загрузка игроков (включая скрытые профили)
+        // Принудительно обновляем данные, чтобы получить актуальную информацию о скрытых профилях
+        const allPlayers = await loadPlayers(true); // forceRefresh = true для администраторов
         
-        if (cachedData) {
-          const { players: cachedPlayers } = JSON.parse(cachedData);
-          if (cachedPlayers && cachedPlayers.length > 0) {
-            // Показываем кешированные данные сразу
-            const filteredCachedPlayers = currentUser.status === 'admin' 
-              ? cachedPlayers
-              : cachedPlayers.filter((player: Player) => 
-                  player.status === 'player' || 
-                  player.status === 'admin'
-                );
-            setPlayers(filteredCachedPlayers);
-            setLoading(false); // Убираем индикатор загрузки для кешированных данных
-          }
+        // Для администраторов показываем всех игроков (включая скрытые профили)
+        // Для обычных пользователей фильтруем по статусу
+        let filteredPlayers: Player[];
+        if (currentUser.status === 'admin') {
+          // Администратор видит всех (включая скрытые профили)
+          filteredPlayers = allPlayers;
+          console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
+        } else {
+          filteredPlayers = allPlayers.filter(player => 
+            player.status === 'player' || 
+            player.status === 'admin'
+          );
         }
-
-        // Загрузка игроков (без принудительной очистки кеша, чтобы избежать перезагрузки)
-        const allPlayers = await loadPlayers();
-        
-        // Администратор видит всех пользователей, обычные пользователи - только игроков и администраторов
-        const filteredPlayers = currentUser.status === 'admin' 
-          ? allPlayers // Администратор видит всех
-          : allPlayers.filter(player => 
-              player.status === 'player' || 
-              player.status === 'admin'
-            );
         
         setPlayers(filteredPlayers);
         
@@ -390,8 +399,14 @@ export default function SearchScreen() {
   // Загрузка списка команд
   const [teams, setTeams] = useState<Array<{id: string, name: string, name_ru?: string}>>([]);
   
+  // Загружаем команды из базы данных только для администраторов
   useEffect(() => {
     const loadTeamsFromDatabase = async () => {
+      // Для обычных пользователей команды будут извлекаться из массива players
+      if (currentUser?.status !== 'admin') {
+        return;
+      }
+      
       try {
         const { supabase } = await import('../utils/supabase');
         
@@ -420,7 +435,8 @@ export default function SearchScreen() {
           if (team && !uniqueTeams.has(team.id)) {
             uniqueTeams.set(team.id, {
               id: team.id,
-              name: language === 'ru' ? team.name_ru || team.name : team.name
+              name: language === 'ru' ? team.name_ru || team.name : team.name,
+              name_ru: team.name_ru
             });
           }
         });
@@ -433,7 +449,34 @@ export default function SearchScreen() {
     };
     
     loadTeamsFromDatabase();
-  }, [language]);
+  }, [language, currentUser?.status]);
+  
+  // Для обычных пользователей извлекаем команды из массива players
+  const teamsFromPlayers = useMemo(() => {
+    // Для администраторов используем команды из базы данных
+    if (currentUser?.status === 'admin') {
+      return teams;
+    }
+    
+    // Для обычных пользователей извлекаем команды из массива players
+    const uniqueTeams = new Map<string, {id: string, name: string, name_ru?: string}>();
+    
+    players.forEach(player => {
+      if (player.teams && player.teams.length > 0) {
+        player.teams.forEach(team => {
+          if (team.teamId && !uniqueTeams.has(team.teamId)) {
+            uniqueTeams.set(team.teamId, {
+              id: team.teamId,
+              name: language === 'ru' ? (team.teamNameRu || team.teamName) : team.teamName,
+              name_ru: team.teamNameRu
+            });
+          }
+        });
+      }
+    });
+    
+    return Array.from(uniqueTeams.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [players, teams, currentUser?.status, language]);
   
   // Мемоизированные фильтры
   const countries = useMemo(() => {
@@ -590,9 +633,116 @@ export default function SearchScreen() {
     [players, language]
   );
 
+  // Определяем, является ли выбранная позиция вратарем
+  const isSelectedPositionGoalkeeper = useMemo(() => {
+    if (!selectedPosition) return false;
+    return isGoalkeeperPosition(selectedPosition);
+  }, [selectedPosition]);
+
+  // Определяем, активны ли фильтры
+  const isPPGDisabled = useMemo(() => {
+    // PPG неактивен, если выбрана позиция вратаря или выбран GAA/SV%
+    return isSelectedPositionGoalkeeper || selectedGAA !== null || selectedSV !== null;
+  }, [isSelectedPositionGoalkeeper, selectedGAA, selectedSV]);
+
+  const isSVDisabled = useMemo(() => {
+    // SV% неактивен, если выбран PPG или выбрана позиция не вратаря
+    return selectedPPG !== null || (!isSelectedPositionGoalkeeper && selectedPosition !== null);
+  }, [selectedPPG, isSelectedPositionGoalkeeper, selectedPosition]);
+
+  const isGAADisabled = useMemo(() => {
+    // GAA неактивен, если выбран PPG или выбрана позиция не вратаря
+    return selectedPPG !== null || (!isSelectedPositionGoalkeeper && selectedPosition !== null);
+  }, [selectedPPG, isSelectedPositionGoalkeeper, selectedPosition]);
+
+  // Опции для фильтра PPG (показываем только если есть полевые игроки с PPG)
+  const ppgOptions = useMemo(() => {
+    const hasFieldPlayersWithPPG = players.some(p => {
+      if (isGoalkeeperPosition(p.position)) return false;
+      if (!p.goals || !p.assists || !p.games) return false;
+      const gamesNum = parseInt(p.games) || 0;
+      return gamesNum > 0;
+    });
+    
+    if (!hasFieldPlayersWithPPG) return [];
+    
+    return [
+      { translated: language === 'ru' ? 'Все' : 'All', original: null },
+      { translated: '< 0.3', original: '< 0.3' },
+      { translated: '> 0.3', original: '> 0.3' },
+      { translated: '> 0.5', original: '> 0.5' },
+      { translated: '> 0.8', original: '> 0.8' },
+      { translated: '> 1', original: '> 1' },
+      { translated: '> 1.3', original: '> 1.3' },
+      { translated: '> 1.5', original: '> 1.5' },
+      { translated: '> 2', original: '> 2' },
+    ];
+  }, [players, language]);
+
+  // Опции для фильтра SV% (показываем только если есть вратари с SV%)
+  const svOptions = useMemo(() => {
+    const hasGoalkeepersWithSV = players.some(p => {
+      if (!isGoalkeeperPosition(p.position)) return false;
+      if (!p.shots || !p.saves) return false;
+      const shotsNum = parseInt(p.shots) || 0;
+      return shotsNum > 0;
+    });
+    
+    if (!hasGoalkeepersWithSV) return [];
+    
+    return [
+      { translated: language === 'ru' ? 'Все' : 'All', original: null },
+      { translated: '< 0.800', original: '< 0.800' },
+      { translated: '> 0.800', original: '> 0.800' },
+      { translated: '> 0.850', original: '> 0.850' },
+      { translated: '> 0.900', original: '> 0.900' },
+      { translated: '> 0.920', original: '> 0.920' },
+      { translated: '> 0.930', original: '> 0.930' },
+      { translated: '> 0.935', original: '> 0.935' },
+    ];
+  }, [players, t]);
+
+  // Опции для фильтра GAA (показываем только если есть вратари с GAA)
+  const gaaOptions = useMemo(() => {
+    const hasGoalkeepersWithGAA = players.some(p => {
+      if (!isGoalkeeperPosition(p.position)) return false;
+      if (!p.minutes || !p.shots || !p.saves) return false;
+      const minutesNum = parseInt(p.minutes) || 0;
+      return minutesNum > 0;
+    });
+    
+    if (!hasGoalkeepersWithGAA) return [];
+    
+    return [
+      { translated: language === 'ru' ? 'Все' : 'All', original: null },
+      { translated: '> 4.0', original: '> 4.0' },
+      { translated: '< 4.0', original: '< 4.0' },
+      { translated: '< 3.5', original: '< 3.5' },
+      { translated: '< 3.0', original: '< 3.0' },
+      { translated: '< 2.5', original: '< 2.5' },
+      { translated: '< 2.0', original: '< 2.0' },
+    ];
+  }, [players, language]);
+
   // Фильтрация и сортировка игроков
   const filteredPlayers = useMemo(() => {
     const filtered = players.filter(player => {
+      // Исключаем скрытые профили (кроме текущего пользователя, если он скрыт, и администраторов)
+      // Администраторы видят все скрытые профили
+      if (player.is_hidden) {
+        // Если это скрытый профиль
+        if (currentUser?.status === 'admin') {
+          // Администраторы видят все скрытые профили
+          // Продолжаем фильтрацию дальше
+        } else if (currentUser && player.id === currentUser.id) {
+          // Владелец видит свой скрытый профиль
+          // Продолжаем фильтрацию дальше
+        } else {
+          // Остальные пользователи не видят скрытые профили
+          return false;
+        }
+      }
+      
       // Фильтр по поиску
       const matchesSearch = !searchQuery || 
         player.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -648,6 +798,79 @@ export default function SearchScreen() {
       const matchesWeight = !selectedMinWeight || 
         (player.weight && parseInt(player.weight) >= parseInt(selectedMinWeight));
       
+      // Определяем, является ли игрок вратарем
+      const isGoalkeeper = isGoalkeeperPosition(player.position);
+      
+      // Если выбран PPG, исключаем вратарей из результатов
+      if (selectedPPG && isGoalkeeper) {
+        return false;
+      }
+      
+      // Если выбран GAA или SV%, исключаем полевых игроков из результатов
+      if ((selectedGAA || selectedSV) && !isGoalkeeper) {
+        return false;
+      }
+      
+      // Фильтр по PPG (для полевых игроков)
+      const matchesPPG = !selectedPPG || (() => {
+        // Вратари уже исключены выше
+        if (!player.goals || !player.assists || !player.games) return false;
+        const goalsNum = parseInt(player.goals) || 0;
+        const assistsNum = parseInt(player.assists) || 0;
+        const gamesNum = parseInt(player.games) || 0;
+        if (gamesNum === 0) return false;
+        const ppg = (goalsNum + assistsNum) / gamesNum;
+        
+        if (selectedPPG === '< 0.3') return ppg < 0.3;
+        if (selectedPPG === '> 0.3') return ppg > 0.3;
+        if (selectedPPG === '> 0.5') return ppg > 0.5;
+        if (selectedPPG === '> 0.8') return ppg > 0.8;
+        if (selectedPPG === '> 1') return ppg > 1;
+        if (selectedPPG === '> 1.3') return ppg > 1.3;
+        if (selectedPPG === '> 1.5') return ppg > 1.5;
+        if (selectedPPG === '> 2') return ppg > 2;
+        return true;
+      })();
+      
+      // Фильтр по SV% (для вратарей)
+      const matchesSV = !selectedSV || (() => {
+        // Полевые игроки уже исключены выше
+        if (!player.shots || !player.saves) return false;
+        const shotsNum = parseInt(player.shots) || 0;
+        const savesNum = parseInt(player.saves) || 0;
+        if (shotsNum === 0) return false;
+        const sv = savesNum / shotsNum;
+        
+        if (selectedSV === '< 0.800') return sv < 0.800;
+        if (selectedSV === '> 0.800') return sv > 0.800;
+        if (selectedSV === '> 0.850') return sv > 0.850;
+        if (selectedSV === '> 0.900') return sv > 0.900;
+        if (selectedSV === '> 0.920') return sv > 0.920;
+        if (selectedSV === '> 0.930') return sv > 0.930;
+        if (selectedSV === '> 0.935') return sv > 0.935;
+        return true;
+      })();
+      
+      // Фильтр по GAA (для вратарей)
+      const matchesGAA = !selectedGAA || (() => {
+        if (!isGoalkeeperPosition(player.position)) return false; // Полевые игроки не имеют GAA
+        if (!player.minutes || !player.shots || !player.saves) return false;
+        const minutesNum = parseInt(player.minutes) || 0;
+        const shotsNum = parseInt(player.shots) || 0;
+        const savesNum = parseInt(player.saves) || 0;
+        if (minutesNum === 0) return false;
+        const goalsAgainst = shotsNum - savesNum;
+        const gaa = (goalsAgainst * 60) / minutesNum;
+        
+        if (selectedGAA === '> 4.0') return gaa > 4.0;
+        if (selectedGAA === '< 4.0') return gaa < 4.0;
+        if (selectedGAA === '< 3.5') return gaa < 3.5;
+        if (selectedGAA === '< 3.0') return gaa < 3.0;
+        if (selectedGAA === '< 2.5') return gaa < 2.5;
+        if (selectedGAA === '< 2.0') return gaa < 2.0;
+        return true;
+      })();
+      
       const matches = matchesSearch && 
              matchesCountry &&
              matchesTeam &&
@@ -655,7 +878,10 @@ export default function SearchScreen() {
              matchesPosition && 
              matchesYear &&
              matchesHeight &&
-             matchesWeight;
+             matchesWeight &&
+             matchesPPG &&
+             matchesSV &&
+             matchesGAA;
       
       
       return matches;
@@ -670,7 +896,7 @@ export default function SearchScreen() {
     
     
     return sorted;
-  }, [players, searchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, currentUser]);
+  }, [players, searchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
 
   // Key extractor для FlatList
   const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
@@ -699,48 +925,149 @@ export default function SearchScreen() {
     return (
       <TouchableOpacity 
         onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
+        activeOpacity={0.7}
       >
         <View style={styles.playerGradientShadow}>
-          <View style={styles.playerItem}>
-        <View style={photoContainerStyle}>
-          <CachedAvatar 
-            playerId={item.id}
-            fallbackAvatarUrl={playerPhoto || ''}
-            size={60}
-            style={styles.playerPhoto}
-            onError={() => {
-              console.warn(`Ошибка загрузки фото для игрока ${item.name}`);
-            }}
-          />
-        </View>
-        <View style={styles.playerDetails}>
-          <View style={styles.playerNameRow}>
-            <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
-              {item.name}
-            </Text>
-            {item.activityRating !== undefined && item.activityRating > 0 && (
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={12} color="#AA3333" />
-                <Text style={styles.ratingText}>{item.activityRating}</Text>
+          <BlurView
+            intensity={20}
+            tint="dark"
+            style={styles.playerItemBlur}
+          >
+            <View style={styles.playerItem}>
+            <View style={photoContainerStyle}>
+              <CachedAvatar 
+                playerId={item.id}
+                fallbackAvatarUrl={playerPhoto}
+                size={60}
+                style={styles.playerPhoto}
+                status={item.status}
+              />
+            </View>
+            <View style={styles.playerDetails}>
+              <View style={styles.playerNameRow}>
+                <Text style={styles.playerName} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                {item.is_hidden && currentUser?.status === 'admin' && (
+                  <Ionicons 
+                    name="eye-off-outline" 
+                    size={18} 
+                    color="#fa2f40" 
+                    style={{ marginLeft: 8 }}
+                  />
+                )}
+                {item.activityRating !== undefined && item.activityRating > 0 && (
+                  <View style={styles.ratingContainer}>
+                    <Ionicons name="star" size={11} color="#AA3333" />
+                    <Text style={styles.ratingText}>{Math.round(item.activityRating)}</Text>
+                  </View>
+                )}
               </View>
-            )}
+              <Text style={styles.playerInfo}>
+                {(() => {
+                  // Для администратора показываем только "Администратор"
+                  if (item.status === 'admin') {
+                    return language === 'en' ? 'Administrator' : 'Администратор';
+                  }
+                  
+                  const parts: string[] = [];
+                  
+                  // Позиция
+                  if (item.position) {
+                    parts.push(t(`profile.positions.${item.position}`) || item.position);
+                  }
+                  
+                  // Страна
+                  if (item.country) {
+                    const countryTranslation = t(`profile.countries.${item.country}`);
+                    const countryDisplay = countryTranslation !== `profile.countries.${item.country}` 
+                      ? countryTranslation 
+                      : item.country;
+                    parts.push(countryDisplay);
+                  }
+                  
+                  // Год рождения
+                  if (item.birthDate) {
+                    const birthYear = new Date(item.birthDate).getFullYear();
+                    if (!isNaN(birthYear)) {
+                      parts.push(birthYear.toString());
+                    }
+                  } else if (item.age) {
+                    const currentYear = new Date().getFullYear();
+                    const birthYear = currentYear - item.age;
+                    parts.push(birthYear.toString());
+                  }
+                  
+                  // Хват
+                  if (item.grip) {
+                    let gripDisplay = item.grip;
+                    if (item.grip === 'Левый' || item.grip === 'Left') {
+                      gripDisplay = t('search.left');
+                    } else if (item.grip === 'Правый' || item.grip === 'Right') {
+                      gripDisplay = t('search.right');
+                    }
+                    parts.push(gripDisplay);
+                  }
+                  
+                  // Рост
+                  if (item.height && item.height.trim() !== '' && item.height !== '0') {
+                    parts.push(`${item.height} ${t('cm')}`);
+                  }
+                  
+                  // Вес
+                  if (item.weight && item.weight.trim() !== '' && item.weight !== '0') {
+                    parts.push(`${item.weight} ${t('kg')}`);
+                  }
+                  
+                  // Определяем, является ли игрок вратарем
+                  const isGoalkeeper = isGoalkeeperPosition(item.position);
+                  
+                  // Для вратарей показываем SV% и GAA (если измерены)
+                  if (isGoalkeeper) {
+                    // SV%
+                    if (item.shots && item.saves) {
+                      const shotsNum = parseInt(item.shots) || 0;
+                      const savesNum = parseInt(item.saves) || 0;
+                      if (shotsNum > 0) {
+                        const sv = (savesNum / shotsNum).toFixed(3);
+                        parts.push(`SV%: ${sv}`);
+                      }
+                    }
+                    
+                    // GAA
+                    if (item.minutes && item.shots && item.saves) {
+                      const minutesNum = parseInt(item.minutes) || 0;
+                      const shotsNum = parseInt(item.shots) || 0;
+                      const savesNum = parseInt(item.saves) || 0;
+                      if (minutesNum > 0) {
+                        const goalsAgainst = shotsNum - savesNum;
+                        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
+                        parts.push(`GAA: ${gaa}`);
+                      }
+                    }
+                  } else {
+                    // Для полевых игроков показываем PPG (если измерен)
+                    if (item.goals && item.assists && item.games) {
+                      const goalsNum = parseInt(item.goals) || 0;
+                      const assistsNum = parseInt(item.assists) || 0;
+                      const gamesNum = parseInt(item.games) || 0;
+                      if (gamesNum > 0) {
+                        const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
+                        parts.push(`PPG: ${ppg}`);
+                      }
+                    }
+                  }
+                  
+                  return parts.join(' • ');
+                })()}
+              </Text>
+            </View>
           </View>
-          {item.status !== 'admin' && (
-            <Text style={styles.playerInfo} numberOfLines={2} ellipsizeMode="tail">
-              {item.country ? t(`profile.countries.${item.country}`) : item.country} | {item.position ? (t(`profile.${item.position}`) || item.position) : ''} | {formatBirthDate(item.birthDate || '')} | {item.height} {t('profile.cm')} | {item.weight} {t('profile.kg')} | {(() => {
-                const grip = item.grip?.toLowerCase();
-                if (grip === 'левый' || grip === 'left') return t('profile.left');
-                if (grip === 'правый' || grip === 'right') return t('profile.right');
-                return grip ? (t(`profile.${grip}`) || item.grip) : '';
-              })()}
-            </Text>
-          )}
-        </View>
-          </View>
+          </BlurView>
         </View>
       </TouchableOpacity>
     );
-  }, [router, t]);
+  }, [router, t, currentUser]);
 
   // Показываем загрузку пока проверяем авторизацию
   // Если пользователь не авторизован, показываем загрузку или перенаправляем
@@ -801,9 +1128,14 @@ export default function SearchScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <View style={styles.searchSection}>
-            {/* Полупрозрачный оверлей */}
-            <View style={styles.searchSectionOverlay}>
+          <BlurView
+            intensity={20}
+            tint="dark"
+            style={styles.searchSectionBlur}
+          >
+            <View style={styles.searchSection}>
+              {/* Полупрозрачный оверлей */}
+              <View style={styles.searchSectionOverlay}>
               {/* Поле поиска */}
               <View style={styles.searchContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -836,7 +1168,7 @@ export default function SearchScreen() {
                 />
                 <FilterButton 
                   title={t('search.team')} 
-                  options={teams.map(team => ({
+                  options={teamsFromPlayers.map(team => ({
                     translated: language === 'ru' ? (team.name_ru || team.name) : team.name,
                     original: team.id
                   }))} 
@@ -849,7 +1181,7 @@ export default function SearchScreen() {
                   filterName="team"
                   isOpen={isFilterOpen('team')}
                   onToggle={toggleFilter}
-                  teams={teams}
+                  teams={teamsFromPlayers}
                 />
                 <FilterButton 
                   title={t('search.position')} 
@@ -858,6 +1190,15 @@ export default function SearchScreen() {
                   onSelect={(value) => {
                     setSelectedPosition(value);
                     setActiveFilter(value ? 'position' : null);
+                    // Если выбрана позиция вратаря - сбрасываем PPG
+                    if (value && isGoalkeeperPosition(value)) {
+                      setSelectedPPG(null);
+                    }
+                    // Если выбрана позиция не вратаря - сбрасываем GAA и SV%
+                    if (value && !isGoalkeeperPosition(value)) {
+                      setSelectedGAA(null);
+                      setSelectedSV(null);
+                    }
                   }}
                   isActive={activeFilter === 'position'}
                   filterName="position"
@@ -922,9 +1263,110 @@ export default function SearchScreen() {
                   onToggle={toggleFilter}
                 />
               </View>
+
+              {/* Третья строка: PPG, SV%, GAA */}
+              {(ppgOptions.length > 0 || svOptions.length > 0 || gaaOptions.length > 0) && (
+                <View style={styles.filterRow}>
+                  {ppgOptions.length > 0 && (
+                    <FilterButton 
+                      title="PPG" 
+                      options={ppgOptions} 
+                      selectedValue={selectedPPG}
+                      onSelect={(value) => {
+                        if (isPPGDisabled) return;
+                        setSelectedPPG(value);
+                        setActiveFilter(value ? 'ppg' : null);
+                        // Сбрасываем GAA и SV% при выборе PPG
+                        if (value) {
+                          setSelectedGAA(null);
+                          setSelectedSV(null);
+                        }
+                      }}
+                      isActive={activeFilter === 'ppg'}
+                      filterName="ppg"
+                      isOpen={isFilterOpen('ppg')}
+                      onToggle={toggleFilter}
+                      disabled={isPPGDisabled}
+                    />
+                  )}
+                  {svOptions.length > 0 && (
+                    <FilterButton 
+                      title="SV%" 
+                      options={svOptions} 
+                      selectedValue={selectedSV}
+                      onSelect={(value) => {
+                        if (isSVDisabled) return;
+                        setSelectedSV(value);
+                        setActiveFilter(value ? 'sv' : null);
+                        // Сбрасываем PPG при выборе SV%
+                        if (value) {
+                          setSelectedPPG(null);
+                        }
+                      }}
+                      isActive={activeFilter === 'sv'}
+                      filterName="sv"
+                      isOpen={isFilterOpen('sv')}
+                      onToggle={toggleFilter}
+                      disabled={isSVDisabled}
+                    />
+                  )}
+                  {gaaOptions.length > 0 && (
+                    <FilterButton 
+                      title="GAA" 
+                      options={gaaOptions} 
+                      selectedValue={selectedGAA}
+                      onSelect={(value) => {
+                        if (isGAADisabled) return;
+                        setSelectedGAA(value);
+                        setActiveFilter(value ? 'gaa' : null);
+                        // Сбрасываем PPG при выборе GAA
+                        if (value) {
+                          setSelectedPPG(null);
+                        }
+                      }}
+                      isActive={activeFilter === 'gaa'}
+                      filterName="gaa"
+                      isOpen={isFilterOpen('gaa')}
+                      onToggle={toggleFilter}
+                      disabled={isGAADisabled}
+                    />
+                  )}
+                </View>
+              )}
+
+              {/* Кнопка сброса всех фильтров */}
+              <TouchableOpacity
+                style={[
+                  styles.resetFiltersButton,
+                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA) && styles.resetFiltersButtonInactive
+                ]}
+                onPress={() => {
+                  setSelectedCountry(null);
+                  setSelectedTeam(null);
+                  setSelectedHand(null);
+                  setSelectedPosition(null);
+                  setSelectedYear(null);
+                  setSelectedMinHeight(null);
+                  setSelectedMinWeight(null);
+                  setSelectedPPG(null);
+                  setSelectedSV(null);
+                  setSelectedGAA(null);
+                  setActiveFilter(null);
+                  setOpenFilters(new Set());
+                }}
+                disabled={!(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA)}
+              >
+                <Text style={[
+                  styles.resetFiltersButtonText,
+                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA) && styles.resetFiltersButtonTextInactive
+                ]}>
+                  {t('search.resetFilters')}
+                </Text>
+              </TouchableOpacity>
             </View>
             </View>
-          </View>
+            </View>
+          </BlurView>
 
           {/* Список игроков */}
           <FlatList
@@ -1016,24 +1458,26 @@ const styles = StyleSheet.create({
     color: '#fff',
     flex: 1,
   },
-  searchSection: {
+  searchSectionBlur: {
     position: 'absolute',
     top: 41, // Под заголовком
     left: 0,
     right: 0,
     zIndex: 1001,
     overflow: 'visible', // Разрешаем фильтрам выходить за пределы
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+  },
+  searchSection: {
+    backgroundColor: 'rgba(0, 0, 0, 0.53)',
   },
   searchSectionOverlay: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.53)',
     paddingHorizontal: 20,
     paddingVertical: 8,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -1066,7 +1510,7 @@ const styles = StyleSheet.create({
   filterRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   filterContainer: {
     flex: 1,
@@ -1082,7 +1526,7 @@ const styles = StyleSheet.create({
   filterButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 8,
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1094,10 +1538,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderColor: '#fa2f40',
   },
+  filterButtonDisabled: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    opacity: 0.5,
+  },
   filterButtonText: {
     color: '#fff',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
+  },
+  filterButtonTextDisabled: {
+    color: 'rgba(255, 255, 255, 0.4)',
   },
   filterButtonIcon: {
     color: '#fff',
@@ -1145,26 +1597,51 @@ const styles = StyleSheet.create({
   selectedFilterItem: {
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
+  resetFiltersButton: {
+    backgroundColor: '#fa2f40',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 5,
+    marginBottom: 5,
+  },
+  resetFiltersButtonInactive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  resetFiltersButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+  },
+  resetFiltersButtonTextInactive: {
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
   playersList: {
-    paddingHorizontal: 20,
     paddingBottom: 20,
     zIndex: 1,
     elevation: 1,
-    marginTop: 210, // Отступ для поиска и фильтров + 10px
+    marginTop: 270, // Отступ для поиска и фильтров (включая третью строку и кнопку сброса)
+  },
+  playerItemBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   playerItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,
-    borderRadius: 10,
+    borderRadius: 20,
     padding: 10,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   playerGradientShadow: {
     marginBottom: 5,
-    borderRadius: 10,
+    marginHorizontal: 16,
+    borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,

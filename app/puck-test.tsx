@@ -559,6 +559,7 @@ export default function PuckTestScreen() {
     const selected = getSmartPlayerSelection(
       players,
       currentUser?.id,
+      currentUser?.status,
       selectedCountry || undefined,
       selectedYear || undefined,
       shuffleKey

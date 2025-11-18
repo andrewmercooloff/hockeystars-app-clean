@@ -1689,7 +1689,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     flex: 1,
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     textAlign: 'left',
@@ -1925,7 +1925,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   speedValue: {
-    fontSize: 230,
+    fontSize: 180,
     fontFamily: 'DigifaceRegular',
     color: '#fa2f40',
     marginBottom: 0, // Убрано для приближения "км/ч" к числу (было 5)

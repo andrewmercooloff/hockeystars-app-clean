@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -65,8 +66,13 @@ const LikeNotification = React.memo(function LikeNotification({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.avatarContainer}>
+    <BlurView
+      intensity={20}
+      tint="dark"
+      style={styles.containerBlur}
+    >
+      <View style={styles.container}>
+        <View style={styles.avatarContainer}>
         {likedById ? (
           <CachedAvatar
             playerId={likedById}
@@ -100,18 +106,23 @@ const LikeNotification = React.memo(function LikeNotification({
           </View>
         </View>
       </View>
-    </View>
+      </View>
+    </BlurView>
   );
 });
 
 export default LikeNotification;
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  containerBlur: {
+    borderRadius: 20,
     marginHorizontal: 20,
     marginVertical: 8,
-    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',

@@ -12,6 +12,7 @@ import {
     ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -83,8 +84,9 @@ export default function ExercisesScreen() {
 
   // Фильтруем и сортируем упражнения с мемоизацией (клиентская фильтрация)
   const sortedExercises = useMemo(() => {
-    // Если данные еще загружаются, возвращаем пустой массив
-    if (loading || allExercises.length === 0) {
+    // Если данные еще загружаются или язык не установлен, возвращаем пустой массив
+    // Это предотвращает показ данных на неправильном языке при первом запуске
+    if (loading || allExercises.length === 0 || !language) {
       return [];
     }
 
@@ -204,7 +206,12 @@ export default function ExercisesScreen() {
                         activeOpacity={0.8}
                       >
                         <View style={styles.exerciseGradientShadow}>
-                          <View style={styles.exerciseCard}>
+                          <BlurView
+                            intensity={20}
+                            tint="dark"
+                            style={styles.exerciseCardBlur}
+                          >
+                            <View style={styles.exerciseCard}>
                             <View style={styles.exerciseHeader}>
                               <Text style={styles.exerciseTitle}>{exercise.title}</Text>
                               <View style={styles.exerciseMeta}>
@@ -241,6 +248,7 @@ export default function ExercisesScreen() {
                               )}
                             </View>
                           </View>
+                            </BlurView>
                         </View>
                       </TouchableOpacity>
                     ))}
@@ -274,7 +282,14 @@ export default function ExercisesScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <View style={styles.searchAndFiltersContainer}>
+          <BlurView
+            intensity={20}
+            tint="dark"
+            style={styles.searchAndFiltersContainerBlur}
+          >
+            <View style={styles.searchAndFiltersContainer}>
+              {/* Полупрозрачный оверлей */}
+              <View style={styles.searchAndFiltersOverlay}>
             {/* Строка поиска */}
             <View style={styles.searchInputWrapper}>
               <View style={styles.searchInputContainer}>
@@ -333,7 +348,9 @@ export default function ExercisesScreen() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
+              </View>
+            </View>
+          </BlurView>
 
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
@@ -357,7 +374,12 @@ export default function ExercisesScreen() {
                 }}
               >
                 <View style={styles.exerciseGradientShadow}>
-                  <View style={styles.exerciseCard}>
+                  <BlurView
+                    intensity={20}
+                    tint="dark"
+                    style={styles.exerciseCardBlur}
+                  >
+                    <View style={styles.exerciseCard}>
                 <View style={styles.exerciseHeader}>
                   <View style={styles.exerciseInfo}>
                     <View style={styles.exerciseTitleRow}>
@@ -417,6 +439,7 @@ export default function ExercisesScreen() {
                   </View>
                 </View>
                   </View>
+                    </BlurView>
                 </View>
               </TouchableOpacity>
             ))}
@@ -479,19 +502,30 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'left',
   },
-  searchAndFiltersContainer: {
+  searchAndFiltersContainerBlur: {
     position: 'absolute',
     top: 41, // Под заголовком
     left: 0,
     right: 0,
-    zIndex: 999,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    zIndex: 1001,
     overflow: 'visible', // Разрешаем фильтрам выходить за пределы
+  },
+  searchAndFiltersContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+  },
+  searchAndFiltersOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.53)',
+    paddingVertical: 0,
+  },
+  searchInputWrapper: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 4,
   },
   categoriesScroll: {
     flexDirection: 'row',
-    paddingTop: 8, // Отступ сверху после поля поиска
-    paddingBottom: 10, // Отступ снизу для фильтров
+    paddingTop: 4, // Отступ сверху после поля поиска
+    paddingBottom: 8, // Отступ снизу для фильтров
     paddingHorizontal: 20, // Отступы по краям для кнопок фильтров
   },
   categoryButton: {
@@ -519,20 +553,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   exercisesContainer: {
-    paddingHorizontal: 20,
     paddingBottom: 20,
   },
+  exerciseCardBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   exerciseCard: {
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 6,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
   exerciseGradientShadow: {
     marginBottom: 6,
-    borderRadius: 12,
+    marginHorizontal: 16,
+    borderRadius: 20,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
@@ -665,21 +703,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   // Стили для поиска (как в search.tsx)
-  searchInputWrapper: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 8,
-  },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 8, // Уменьшили отступы
+    paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: '#fa2f40',
-    height: 40, // Фиксированная высота вместо minHeight
+    height: 40,
     width: '100%',
   },
   searchIcon: {

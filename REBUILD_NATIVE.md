@@ -67,3 +67,7 @@ npm install react-native-reanimated@latest
 
 
 
+
+
+
+

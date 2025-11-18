@@ -57,7 +57,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -187,8 +187,16 @@ export default function PlayerProfile() {
   const [requestGiftMessage, setRequestGiftMessage] = useState('');
   const [requestGiftLoading, setRequestGiftLoading] = useState(false);
   
-  // Массивы для селекторов
-  const positions = [t('profile.center'), t('profile.winger'), t('profile.defender'), t('profile.goalie')];
+  // Используем английские ключи для позиций (стандарт в базе данных)
+  const positions = ['center', 'winger', 'defender', 'goalie'];
+  
+  // Маппинг ключей на переведенные названия для отображения
+  const positionLabels: { [key: string]: string } = {
+    'center': t('profile.positions.center'),
+    'winger': t('profile.positions.winger'),
+    'defender': t('profile.positions.defender'),
+    'goalie': t('profile.positions.goalie'),
+  };
   const grips = ['Левый', 'Правый'];
   const availableYears = Array.from({ length: 15 }, (_, i) => 2021 - i); // 2021 до 2007
   const availableTrainingTypes = [
@@ -236,18 +244,52 @@ export default function PlayerProfile() {
   };
 
   // Функция для перевода позиций
-  const translatePosition = (position: string) => {
-    const positionMap: { [key: string]: string } = {
-      'Центральный нападающий': t('profile.positions.center'),
-      'Крайний нападающий': t('profile.positions.winger'),
-      'Защитник': t('profile.positions.defender'),
-      'Вратарь': t('profile.positions.goalie'),
-      'Center': t('profile.positions.center'),
-      'Winger': t('profile.positions.winger'),
-      'Defender': t('profile.positions.defender'),
-      'Goalie': t('profile.positions.goalie')
+  const translatePosition = (position: string | undefined | null) => {
+    if (!position) return '';
+    
+    // Убираем пробелы и приводим к нижнему регистру для сравнения
+    const normalizedPos = position.trim().toLowerCase();
+    
+    // Получаем переводы с fallback на хардкод, если перевод не найден
+    const getTranslation = (key1: string, key2: string, fallbackRu: string, fallbackEn: string) => {
+      // Пробуем оба варианта ключей (на верхнем уровне и в profile.positions)
+      let translation = t(key1);
+      if (translation === key1 || translation.includes('Translation missing')) {
+        translation = t(key2);
+      }
+      // Если перевод не найден (вернулся ключ), используем fallback
+      if (translation === key1 || translation === key2 || translation.includes('Translation missing')) {
+        return language === 'ru' ? fallbackRu : fallbackEn;
+      }
+      return translation;
     };
-    return positionMap[position] || position;
+    
+    // Позиции теперь хранятся как английские ключи, переводим их для отображения
+    const positionMap: { [key: string]: string } = {
+      'center': getTranslation('profile.positions.center', 'center', 'Центральный нападающий', 'Center'),
+      'winger': getTranslation('profile.positions.winger', 'winger', 'Крайний нападающий', 'Winger'),
+      'defender': getTranslation('profile.positions.defender', 'defender', 'Защитник', 'Defender'),
+      'goalie': getTranslation('profile.positions.goalie', 'goalie', 'Вратарь', 'Goalie'),
+      // Поддержка старых значений для обратной совместимости
+      'центральный нападающий': getTranslation('profile.positions.center', 'center', 'Центральный нападающий', 'Center'),
+      'крайний нападающий': getTranslation('profile.positions.winger', 'winger', 'Крайний нападающий', 'Winger'),
+      'защитник': getTranslation('profile.positions.defender', 'defender', 'Защитник', 'Defender'),
+      'вратарь': getTranslation('profile.positions.goalie', 'goalie', 'Вратарь', 'Goalie'),
+      'goalkeeper': getTranslation('profile.positions.goalie', 'goalie', 'Вратарь', 'Goalie'),
+    };
+    
+    // Сначала проверяем нормализованное значение
+    if (positionMap[normalizedPos]) {
+      return positionMap[normalizedPos];
+    }
+    
+    // Если не найдено, проверяем исходное значение (с учетом регистра)
+    if (positionMap[position]) {
+      return positionMap[position];
+    }
+    
+    // Если ничего не найдено, возвращаем исходное значение
+    return position;
   };
 
   // Функция для перевода хвата
@@ -2212,22 +2254,58 @@ export default function PlayerProfile() {
           );
         }
         
-        // 5. Проверяем изменение статистики (голы/передачи)
+        // 5. Проверяем изменение статистики (голы/передачи для полевых игроков, минуты/броски/сэйвы для вратарей)
         const statsChanges: { field: string, oldValue: number, newValue: number }[] = [];
         
-        // Отладочный лог отключен
+        // Определяем, является ли игрок вратарем (используем функцию нормализации)
+        const currentPosition = editData.position || player.position;
+        const isGoalkeeper = isGoalkeeperPosition(currentPosition);
         
-        const oldGoals = parseInt(player.goals) || 0;
-        const newGoals = parseInt(editData.goals || player.goals) || 0;
-        console.log(`⚽ Голы: ${oldGoals} → ${newGoals}`);
-        if (oldGoals !== newGoals) {
-          statsChanges.push({ field: 'goals', oldValue: oldGoals, newValue: newGoals });
-        }
-        
-        const oldAssists = parseInt(player.assists) || 0;
-        const newAssists = parseInt(editData.assists || player.assists) || 0;
-        if (oldAssists !== newAssists) {
-          statsChanges.push({ field: 'assists', oldValue: oldAssists, newValue: newAssists });
+        if (isGoalkeeper) {
+          // Отслеживаем изменения статистики для вратарей
+          const oldGames = parseInt(player.games || '0') || 0;
+          const newGames = parseInt(editData.games !== undefined ? editData.games : (player.games || '0')) || 0;
+          if (oldGames !== newGames) {
+            statsChanges.push({ field: 'games', oldValue: oldGames, newValue: newGames });
+          }
+          
+          const oldMinutes = parseInt(player.minutes || '0') || 0;
+          const newMinutes = parseInt(editData.minutes !== undefined ? editData.minutes : (player.minutes || '0')) || 0;
+          if (oldMinutes !== newMinutes) {
+            statsChanges.push({ field: 'minutes', oldValue: oldMinutes, newValue: newMinutes });
+          }
+          
+          const oldShots = parseInt(player.shots || '0') || 0;
+          const newShots = parseInt(editData.shots !== undefined ? editData.shots : (player.shots || '0')) || 0;
+          if (oldShots !== newShots) {
+            statsChanges.push({ field: 'shots', oldValue: oldShots, newValue: newShots });
+          }
+          
+          const oldSaves = parseInt(player.saves || '0') || 0;
+          const newSaves = parseInt(editData.saves !== undefined ? editData.saves : (player.saves || '0')) || 0;
+          if (oldSaves !== newSaves) {
+            statsChanges.push({ field: 'saves', oldValue: oldSaves, newValue: newSaves });
+          }
+        } else {
+          // Отслеживаем изменения статистики для полевых игроков
+          const oldGoals = parseInt(player.goals || '0') || 0;
+          const newGoals = parseInt(editData.goals !== undefined ? editData.goals : (player.goals || '0')) || 0;
+          console.log(`⚽ Голы: ${oldGoals} → ${newGoals}`);
+          if (oldGoals !== newGoals) {
+            statsChanges.push({ field: 'goals', oldValue: oldGoals, newValue: newGoals });
+          }
+          
+          const oldAssists = parseInt(player.assists || '0') || 0;
+          const newAssists = parseInt(editData.assists !== undefined ? editData.assists : (player.assists || '0')) || 0;
+          if (oldAssists !== newAssists) {
+            statsChanges.push({ field: 'assists', oldValue: oldAssists, newValue: newAssists });
+          }
+          
+          const oldGames = parseInt(player.games || '0') || 0;
+          const newGames = parseInt(editData.games !== undefined ? editData.games : (player.games || '0')) || 0;
+          if (oldGames !== newGames) {
+            statsChanges.push({ field: 'games', oldValue: oldGames, newValue: newGames });
+          }
         }
         
         if (statsChanges.length > 0) {
@@ -3050,138 +3128,310 @@ export default function PlayerProfile() {
             {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) */}
             {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && 
              !(player.status === 'scout' && currentUser?.status !== 'admin') && (() => {
-              const goalsNum = parseInt(player.goals || '0') || 0;
-              const assistsNum = parseInt(player.assists || '0') || 0;
-              const gamesNum = parseInt(player.games || '0') || 0;
-              const pointsNum = goalsNum + assistsNum;
-              const effectiveness = gamesNum > 0 ? (pointsNum / gamesNum).toFixed(1) : '0.0';
+              // Определяем, является ли игрок вратарем (используем функцию нормализации)
+              const currentPosition = editData.position || player.position;
+              const isGoalkeeper = isGoalkeeperPosition(currentPosition);
               
-
-              
-              // Показываем статистику только если есть хотя бы одно ненулевое значение
-              const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
-              
-              return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
-                <View style={styles.section} ref={statsRef}>
-                  <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
-                  {isEditing ? (
-                    <View style={styles.statsGrid}>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>{t('profile.gamesCount')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.games !== undefined ? editData.games : (player.games || '')}
-                          onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, games: text})}
-                          placeholder="0"
-                          placeholderTextColor="#888"
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>{t('profile.goalsCount')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.goals !== undefined ? editData.goals : (player.goals || '')}
-                          onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, goals: text})}
-                          placeholder="0"
-                          placeholderTextColor="#888"
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>{t('profile.assists')}</Text>
-                        <TextInput
-                          style={styles.editInput}
-                          value={editData.assists !== undefined ? editData.assists : (player.assists || '')}
-                          onFocus={handleInputFocus}
-                          onChangeText={(text) => setEditData({...editData, assists: text})}
-                          placeholder="0"
-                          placeholderTextColor="#888"
-                          keyboardType="numeric"
-                        />
-                      </View>
-                    </View>
-                  ) : (
-                  <View style={styles.statsGrid}>
-                    {pointsNum > 0 && (
-                      <View style={styles.statItem}>
-                        <View style={styles.statCircle}>
-                        <Text style={styles.statValue}>{pointsNum.toString()}</Text>
-                        </View>
-                        <View style={styles.statLabelContainer}>
-                          <Text style={styles.statLabel}>
-                            {t('profile.points') === 'profile.points' ? 'очки' : t('profile.points')}
-                          </Text>
-                        </View>
-                      </View>
-                    )}
-                    {assistsNum > 0 && (
-                    <View style={styles.statItem}>
-                        <View style={styles.statCircle}>
-                          <Text style={styles.statValue}>{assistsNum.toString()}</Text>
-                          <ChangeIndicator 
-                            change={getChangeForField('assists')} 
-                            size="small" 
+              if (isGoalkeeper) {
+                // Статистика для вратарей
+                const gamesNum = parseInt(player.games || '0') || 0;
+                const minutesNum = parseInt(player.minutes || '0') || 0;
+                const shotsNum = parseInt(player.shots || '0') || 0;
+                const savesNum = parseInt(player.saves || '0') || 0;
+                
+                // Расчет SV (save percentage в десятичном формате, например 0.922)
+                const savePercentage = shotsNum > 0 ? (savesNum / shotsNum).toFixed(3) : '0.000';
+                
+                // Расчет GAA (среднее количество пропущенных голов за игру)
+                // GAA = (пропущенные голы * 60) / проведенные минуты
+                // Пропущенные голы = броски - сэйвы
+                const goalsAgainst = shotsNum - savesNum;
+                const gaa = minutesNum > 0 ? ((goalsAgainst * 60) / minutesNum).toFixed(2) : '0.00';
+                
+                // Показываем статистику только если есть хотя бы одно ненулевое значение
+                const hasStats = gamesNum > 0 || minutesNum > 0 || shotsNum > 0 || savesNum > 0;
+                
+                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
+                  <View style={styles.section} ref={statsRef}>
+                    <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
+                    {isEditing ? (
+                      <View style={styles.statsGrid}>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.gamesCount')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.games !== undefined ? editData.games : (player.games || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, games: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
                           />
                         </View>
-                        <View style={styles.statLabelContainer}>
-                          <Text style={styles.statLabel}>
-                            {t('profile.assists') === 'profile.assists' ? 'передачи' : t('profile.assists')}
-                          </Text>
-                        </View>
-                    </View>
-                    )}
-                    {goalsNum > 0 && (
-                      <View style={styles.statItem}>
-                        <View style={styles.statCircle}>
-                        <Text style={styles.statValue}>{goalsNum.toString()}</Text>
-                          <ChangeIndicator 
-                            change={getChangeForField('goals')} 
-                            size="small" 
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.minutes')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.minutes !== undefined ? editData.minutes : (player.minutes || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, minutes: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
                           />
                         </View>
-                        <View style={styles.statLabelContainer}>
-                          <Text style={styles.statLabel}>
-                            {t('profile.goalsCount') === 'profile.goalsCount' ? 'голы' : t('profile.goalsCount')}
-                          </Text>
-                        </View>
-                      </View>
-                    )}
-                    {gamesNum > 0 && (
-                      <View style={styles.statItem}>
-                        <View style={styles.statCircle}>
-                        <Text style={styles.statValue}>{gamesNum.toString()}</Text>
-                          <ChangeIndicator 
-                            change={getChangeForField('games')} 
-                            size="small" 
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.shots')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.shots !== undefined ? editData.shots : (player.shots || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, shots: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
                           />
                         </View>
-                        <View style={styles.statLabelContainer}>
-                          <Text style={styles.statLabel}>
-                            {t('profile.gamesCount') === 'profile.gamesCount' ? 'игры' : t('profile.gamesCount')}
-                          </Text>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.saves')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.saves !== undefined ? editData.saves : (player.saves || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, saves: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
                         </View>
                       </View>
-                    )}
-                    {pointsNum > 0 && gamesNum > 0 && (
-                      <View style={styles.statItem}>
-                        <View style={styles.statCircle}>
-                          <Text style={styles.statValue}>{effectiveness}</Text>
-                        </View>
-                        <View style={styles.statLabelContainer}>
-                          <Text style={[styles.statLabel, styles.statLabelSmall]}>
-                            {t('profile.effectiveness') === 'profile.effectiveness' ? 'результативность' : t('profile.effectiveness')}
-                          </Text>
-                        </View>
+                    ) : (
+                      <View style={styles.statsGrid}>
+                        {gamesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{gamesNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('games')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.gamesCount') === 'profile.gamesCount' ? 'игры' : t('profile.gamesCount')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {minutesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{minutesNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('minutes')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.minutes') === 'profile.minutes' ? 'минуты' : t('profile.minutes')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {shotsNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{shotsNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('shots')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.shots') === 'profile.shots' ? 'броски' : t('profile.shots')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {savesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{savesNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('saves')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.saves') === 'profile.saves' ? 'сэйвы' : t('profile.saves')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {shotsNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValueSmall}>{savePercentage}</Text>
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={[styles.statLabel, styles.statLabelSmall]}>
+                                {t('profile.savePercentage') === 'profile.savePercentage' ? 'SV%' : t('profile.savePercentage')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {minutesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{gaa}</Text>
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={[styles.statLabel, styles.statLabelSmall]}>
+                                {t('profile.goalsAgainstAverage') === 'profile.goalsAgainstAverage' ? 'GAA' : t('profile.goalsAgainstAverage')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
                       </View>
                     )}
                   </View>
-                  )}
-                </View>
-              ) : null;
-            })(            )}
+                ) : null;
+              } else {
+                // Статистика для полевых игроков
+                const goalsNum = parseInt(player.goals || '0') || 0;
+                const assistsNum = parseInt(player.assists || '0') || 0;
+                const gamesNum = parseInt(player.games || '0') || 0;
+                const pointsNum = goalsNum + assistsNum;
+                const effectiveness = gamesNum > 0 ? (pointsNum / gamesNum).toFixed(1) : '0.0';
+                
+                // Показываем статистику только если есть хотя бы одно ненулевое значение
+                const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
+                
+                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
+                  <View style={styles.section} ref={statsRef}>
+                    <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
+                    {isEditing ? (
+                      <View style={styles.statsGrid}>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.gamesCount')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.games !== undefined ? editData.games : (player.games || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, games: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.goalsCount')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.goals !== undefined ? editData.goals : (player.goals || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, goals: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>{t('profile.assists')}</Text>
+                          <TextInput
+                            style={styles.editInput}
+                            value={editData.assists !== undefined ? editData.assists : (player.assists || '')}
+                            onFocus={handleInputFocus}
+                            onChangeText={(text) => setEditData({...editData, assists: text})}
+                            placeholder="0"
+                            placeholderTextColor="#888"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                      </View>
+                    ) : (
+                      <View style={styles.statsGrid}>
+                        {pointsNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{pointsNum.toString()}</Text>
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.points') === 'profile.points' ? 'очки' : t('profile.points')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {assistsNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{assistsNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('assists')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.assists') === 'profile.assists' ? 'передачи' : t('profile.assists')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {goalsNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{goalsNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('goals')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.goalsCount') === 'profile.goalsCount' ? 'голы' : t('profile.goalsCount')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {gamesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{gamesNum.toString()}</Text>
+                              <ChangeIndicator 
+                                change={getChangeForField('games')} 
+                                size="small" 
+                              />
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={styles.statLabel}>
+                                {t('profile.gamesCount') === 'profile.gamesCount' ? 'игры' : t('profile.gamesCount')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                        {pointsNum > 0 && gamesNum > 0 && (
+                          <View style={styles.statItem}>
+                            <View style={styles.statCircle}>
+                              <Text style={styles.statValue}>{effectiveness}</Text>
+                            </View>
+                            <View style={styles.statLabelContainer}>
+                              <Text style={[styles.statLabel, styles.statLabelSmall]}>
+                                {t('profile.effectiveness') === 'profile.effectiveness' ? 'результативность' : t('profile.effectiveness')}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </View>
+                ) : null;
+              }
+            })()}
 
             {/* Основная информация - скрыта для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
@@ -3911,16 +4161,6 @@ export default function PlayerProfile() {
                       placeholderTextColor="#888"
                     />
             </View>
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('socialLinks.vk')}</Text>
-                    <TextInput
-                      style={styles.editInput}
-                      value={editData.vk !== undefined ? editData.vk : (player.vk || '')}
-                      onChangeText={(text) => setEditData({...editData, vk: text})}
-                      placeholder={t('socialLinks.vkPlaceholder')}
-                      placeholderTextColor="#888"
-                    />
-                  </View>
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('socialLinks.website')}</Text>
                     <TextInput
@@ -5079,10 +5319,11 @@ export default function PlayerProfile() {
 
                 {/* Основная информация - в одну строку */}
                 <View style={styles.shareCardMainInfo}>
-                  <Text style={styles.shareCardInfoLine}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
                     {player.position && (
                       <>
-                        <Ionicons name="ribbon" size={14} color="#fa2f40" /> {translatePosition(player.position)}
+                        <Ionicons name="ribbon" size={14} color="#fa2f40" />
+                        <Text style={styles.shareCardInfoLine}> {translatePosition(player.position)}</Text>
                       </>
                     )}
                     {player.position && player.country && (
@@ -5090,7 +5331,8 @@ export default function PlayerProfile() {
                     )}
                     {player.country && (
                       <>
-                        <Ionicons name="flag" size={14} color="#fa2f40" /> {t(`profile.countries.${player.country}`)}
+                        <Ionicons name="flag" size={14} color="#fa2f40" />
+                        <Text style={styles.shareCardInfoLine}> {t(`profile.countries.${player.country}`)}</Text>
                       </>
                     )}
                     {(player.position || player.country) && player.grip && (
@@ -5098,10 +5340,11 @@ export default function PlayerProfile() {
                     )}
                     {player.grip && (
                       <>
-                        <Ionicons name="hand-left" size={14} color="#fa2f40" /> {translateGrip(player.grip)}
+                        <Ionicons name="hand-left" size={14} color="#fa2f40" />
+                        <Text style={styles.shareCardInfoLine}> {translateGrip(player.grip)}</Text>
                       </>
                     )}
-                  </Text>
+                  </View>
                 </View>
 
                 {/* Опыт в хоккее - красным цветом без контейнера */}
@@ -5302,7 +5545,9 @@ export default function PlayerProfile() {
       {showCountryPicker && (
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t('selectCountry')}</Text>
+            <View style={styles.modalHeaderContainer}>
+              <Text style={styles.modalTitle}>{t('selectCountry')}</Text>
+            </View>
             <ScrollView style={styles.modalScroll}>
               {COUNTRIES.map((country) => (
                 <TouchableOpacity
@@ -5331,18 +5576,21 @@ export default function PlayerProfile() {
       {showPositionPicker && (
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t('selectPosition')}</Text>
+            <View style={styles.modalHeaderContainer}>
+              <Text style={styles.modalTitle}>{t('selectPosition')}</Text>
+            </View>
             <ScrollView style={styles.modalScroll}>
               {positions.map((position) => (
                 <TouchableOpacity
                   key={position}
                   style={styles.modalOption}
                   onPress={() => {
+                    // Сохраняем английский ключ позиции (стандарт в базе данных)
                     setEditData({...editData, position: position});
                     setShowPositionPicker(false);
                   }}
                 >
-                  <Text style={styles.modalOptionText}>{position}</Text>
+                  <Text style={styles.modalOptionText}>{positionLabels[position] || position}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -5360,7 +5608,9 @@ export default function PlayerProfile() {
       {showGripPicker && (
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t('profile.selectGrip')}</Text>
+            <View style={styles.modalHeaderContainer}>
+              <Text style={styles.modalTitle}>{t('profile.selectGrip')}</Text>
+            </View>
             <ScrollView style={styles.modalScroll}>
               {grips.map((grip) => (
                 <TouchableOpacity
@@ -5931,27 +6181,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 5,
+    paddingHorizontal: 2,
   },
   statValue: {
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+    textAlign: 'center',
+    letterSpacing: -0.5,
+  },
+  statValueSmall: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    textAlign: 'center',
+    letterSpacing: -0.3,
   },
   statLabel: {
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     marginTop: 2,
+    textAlign: 'center',
   },
   statLabelSmall: {
     fontSize: 10,
     fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
   },
   statLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 2,
     position: 'relative',
+    minHeight: 16,
+  },
+  statLabelContainerOffset: {
+    marginTop: 4,
   },
   infoGrid: {
     flexDirection: 'row',
@@ -6568,8 +6834,19 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   modalContainer: {
-    flex: 1,
+    width: '90%',
+    maxHeight: Dimensions.get('window').height * 0.7,
     backgroundColor: '#000',
+    borderRadius: 12,
+    overflow: 'hidden',
+    padding: 16,
+    flexDirection: 'column',
+  },
+  modalHeaderContainer: {
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 12,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -6584,7 +6861,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    flex: 1,
+    textAlign: 'center',
   },
   closeButton: {
     padding: 4,
@@ -6661,7 +6938,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   modalScroll: {
-    maxHeight: 300,
+    flex: 1,
   },
   modalOption: {
     paddingVertical: 15,
@@ -6698,7 +6975,7 @@ const styles = StyleSheet.create({
     }),
   },
   modalCancelButton: {
-    marginTop: 20,
+    marginTop: 12,
     paddingVertical: 15,
     backgroundColor: '#fa2f40',
     borderRadius: 8,

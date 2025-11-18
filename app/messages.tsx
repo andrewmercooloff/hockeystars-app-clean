@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CachedAvatar from '../components/CachedAvatar';
 // Убираем все анимации переходов
 import {
@@ -268,9 +269,19 @@ export default function MessagesScreen() {
   const formatLastMessage = (message: Message, currentUserId: string) => {
     const isMyMessage = message.senderId === currentUserId;
     const prefix = isMyMessage ? t('messages.you') : '';
-    const text = message.text.length > 30 
-      ? message.text.substring(0, 30) + '...' 
-      : message.text;
+    
+    // Удаляем метаданные ответа [REPLY_DATA:...] из текста
+    let text = message.text;
+    const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+    if (replyDataMatch) {
+      text = replyDataMatch[2]; // Берем только текст после метаданных
+    }
+    
+    // Обрезаем текст если слишком длинный
+    text = text.length > 30 
+      ? text.substring(0, 30) + '...' 
+      : text;
+    
     return prefix + text;
   };
 
@@ -337,26 +348,32 @@ export default function MessagesScreen() {
           
           {/* Строка поиска */}
           <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
-              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('messages.searchPlaceholder')}
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity
-                  onPress={() => setSearchQuery('')}
-                  style={styles.clearSearchButton}
-                >
-                  <Ionicons name="close-circle" size={20} color="#888" />
-                </TouchableOpacity>
-              )}
-            </View>
+            <BlurView
+              intensity={20}
+              tint="dark"
+              style={styles.searchInputBlur}
+            >
+              <View style={styles.searchInputContainer}>
+                <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder={t('messages.searchPlaceholder')}
+                  placeholderTextColor="#888"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setSearchQuery('')}
+                    style={styles.clearSearchButton}
+                  >
+                    <Ionicons name="close-circle" size={20} color="#888" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </BlurView>
           </View>
           
           {/* Список чатов */}
@@ -392,7 +409,12 @@ export default function MessagesScreen() {
                   activeOpacity={0.8}
                 >
                   <View style={styles.chatGradientShadow}>
-                    <View style={styles.chatItem}>
+                    <BlurView
+                      intensity={20}
+                      tint="dark"
+                      style={styles.chatItemBlur}
+                    >
+                      <View style={styles.chatItemOverlay}>
                   <CachedAvatar 
                     playerId={chat.player.id}
                     fallbackAvatarUrl={chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
@@ -443,7 +465,8 @@ export default function MessagesScreen() {
                        chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
                     </Text>
                   </View>
-                  </View>
+                      </View>
+                  </BlurView>
                   </View>
                 </TouchableOpacity>
               ))
@@ -567,6 +590,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20, // Уменьшили с 40 до 20 (в 2 раза)
   },
+  chatItemBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  chatItemOverlay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(250, 47, 64, 0.2)',
+  },
   chatItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -575,7 +612,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: '#800000',
-    backgroundColor: 'rgba(1, 0, 0, 0.7)', // Уменьшена прозрачность (было 0.6, стало 0.7)
+    backgroundColor: 'rgba(1, 0, 0, 0.7)',
   },
   chatAvatar: {
     width: 50,
@@ -644,6 +681,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 8,
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
+  },
+  searchInputBlur: {
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   searchInputContainer: {
     flexDirection: 'row',

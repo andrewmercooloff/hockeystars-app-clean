@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CachedAvatar from './CachedAvatar';
 
 interface GiftAcceptedNotificationProps {
@@ -26,8 +27,13 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
 }) => {
 
   return (
-    <View style={styles.container}>
-      <View style={styles.avatarContainer}>
+    <BlurView
+      intensity={20}
+      tint="dark"
+      style={styles.containerBlur}
+    >
+      <View style={styles.container}>
+        <View style={styles.avatarContainer}>
         {starAvatar ? (
           <CachedAvatar
             playerId={starId}
@@ -74,16 +80,21 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
           </View>
         </View>
       </View>
-    </View>
+      </View>
+    </BlurView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  containerBlur: {
+    borderRadius: 20,
     marginHorizontal: 20,
     marginVertical: 8,
-    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',

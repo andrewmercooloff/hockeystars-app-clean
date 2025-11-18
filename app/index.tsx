@@ -170,9 +170,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const bottomOffset = tabBarHeight + insets.bottom + puckSize + adjustedBottomPadding;
     
     return {
-      left: 10, // Отступ 10 пикселей слева
-      top: 10, // Отступ 10 пикселей сверху
-      right: width - puckSize - 10, // Отступ 10 пикселей справа
+    left: 10, // Отступ 10 пикселей слева
+    top: 10, // Отступ 10 пикселей сверху
+    right: width - puckSize - 10, // Отступ 10 пикселей справа
       bottom: height - bottomOffset, // Динамическая нижняя граница
     };
   }, [width, height, puckSize, tabBarHeight, insets.bottom]);
@@ -207,7 +207,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // При смене фильтра используем меньшую скорость и сбрасываем скорости для плавного перехода
     // Снижаем скорость на 50%
     const speedMultiplier = isFilterChange ? baseSpeedMultiplier * 0.5 : baseSpeedMultiplier;
-    
+
     // Генерируем позиции с проверкой коллизий, чтобы шайбы не накладывались друг на друга
     const positions: PuckPosition[] = [];
     const minDistance = puckSize;
@@ -326,7 +326,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           };
       }
     })();
-    
+
     const hasNonDraggingPucks = currentPositions.some((p) => !p.isDragging);
     if (!hasNonDraggingPucks) return;
 
@@ -379,14 +379,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
       // Только физика столкновений для автоматических шайб
       if (!pos.isDragging) {
-        for (const other of currentPositions) {
+      for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
 
-          const dx = x - other.x;
-          const dy = y - other.y;
-          const distSq = dx * dx + dy * dy;
+        const dx = x - other.x;
+        const dy = y - other.y;
+        const distSq = dx * dx + dy * dy;
 
-          if (distSq < minDistSq && distSq > 0) {
+        if (distSq < minDistSq && distSq > 0) {
             if (useSimplifiedPhysics) {
               // Упрощенная физика для слабых устройств - просто отталкивание
               const angle = Math.atan2(dy, dx);
@@ -401,21 +401,21 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 vy *= ratio;
               }
             } else {
-              const dist = Math.sqrt(distSq);
-              const angle = Math.atan2(dy, dx);
-              
-              // Физика столкновения
-              const relativeVx = vx - other.vx;
-              const relativeVy = vy - other.vy;
-              const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+          const dist = Math.sqrt(distSq);
+          const angle = Math.atan2(dy, dx);
 
-              if (dot < 0) {
+              // Физика столкновения
+          const relativeVx = vx - other.vx;
+          const relativeVy = vy - other.vy;
+          const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+
+          if (dot < 0) {
                 // Увеличиваем restitution для лучшего отталкивания и предотвращения кучкования
                 // Для iOS: 0.5 (было 0.4), для других: 0.9 (было 0.8)
                 const restitution = performanceLevel === 'high' ? 0.5 : 0.9;
-                const impulse = dot * restitution;
-                vx -= impulse * Math.cos(angle);
-                vy -= impulse * Math.sin(angle);
+            const impulse = dot * restitution;
+            vx -= impulse * Math.cos(angle);
+            vy -= impulse * Math.sin(angle);
                 
                 // Добавляем дополнительный импульс отталкивания для предотвращения кучкования
                 const additionalPush = 0.2;
@@ -429,19 +429,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                   vx *= ratio;
                   vy *= ratio;
                 }
-              }
+          }
 
-              // Более мягкое сглаживание для плавности
-              vx *= 0.95;
-              vy *= 0.95;
+          // Более мягкое сглаживание для плавности
+          vx *= 0.95;
+          vy *= 0.95;
             }
 
             // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
-            if (currentUserId && pos.id === currentUserId) {
+          if (currentUserId && pos.id === currentUserId) {
               const collisionKey = [pos.id, other.id].sort().join('-');
               if (!activeCollisionsRef.current.has(collisionKey)) {
                 activeCollisionsRef.current.add(collisionKey);
-                collisionDetectedRef.current = true;
+            collisionDetectedRef.current = true;
               }
             }
           }
@@ -613,7 +613,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       alphaRef.current = alpha;
 
       // ОБНОВЛЯЕМ SHARED VALUES КАЖДЫЙ КАДР для максимальной плавности
-      const physics = physicsPositionsRef.current;
+        const physics = physicsPositionsRef.current;
       physics.forEach(physicsPos => {
         const shared = sharedPositionsRef.current.get(physicsPos.id);
         if (shared && shared.x && shared.y) {
@@ -752,7 +752,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
         const minDistance = puckSize;
         const minDistSq = minDistance * minDistance;
-
+        
         // Создаем новый массив позиций
         const newPositions = current.map((pos) => ({ ...pos }));
 
@@ -760,7 +760,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Находим индекс перетаскиваемой шайбы
           const draggedIndex = newPositions.findIndex(p => p.id === id);
           if (draggedIndex === -1) return current;
-
+          
           // Обновляем позицию перетаскиваемой шайбы
           newPositions[draggedIndex] = {
             ...newPositions[draggedIndex],
@@ -770,7 +770,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             vy: vy ?? newPositions[draggedIndex].vy,
             isDragging: true,
           };
-
+            
           // Прямая формула для решения всех коллизий за один проход
           // Для каждой другой шайбы вычисляем коллизию с перетаскиваемой
           const useSimplifiedDragCollisions = performanceLevel === 'low';
@@ -797,8 +797,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 const dist = Math.sqrt(distSq);
                 angle = Math.atan2(dy, dx);
                 overlap = minDistance - dist;
-              }
-              
+          }
+          
               // Перетаскиваемая шайба остается на месте (или двигается минимально)
               // Другая шайба отталкивается полностью
               // Увеличиваем силу отталкивания для предотвращения кучкования
@@ -806,7 +806,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               const adjustedOverlap = overlap * pushStrength;
               const pushX = -Math.cos(angle) * adjustedOverlap;
               const pushY = -Math.sin(angle) * adjustedOverlap;
-              
+            
               // Применяем отталкивание к другой шайбе
               let newOtherX = other.x + pushX;
               let newOtherY = other.y + pushY;
@@ -826,8 +826,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 const collisionKey = [id, other.id].sort().join('-');
                 if (!activeCollisionsRef.current.has(collisionKey)) {
                   activeCollisionsRef.current.add(collisionKey);
-                  collisionDetectedRef.current = true;
-                }
+              collisionDetectedRef.current = true;
+            }
               }
             }
           }
@@ -840,14 +840,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               if (i === draggedIndex) continue;
               
               const other = newPositions[i];
-              const dx = finalX - other.x;
-              const dy = finalY - other.y;
-              const distSq = dx * dx + dy * dy;
+            const dx = finalX - other.x;
+            const dy = finalY - other.y;
+            const distSq = dx * dx + dy * dy;
 
-              if (distSq < minDistSq && distSq > 0) {
-                const dist = Math.sqrt(distSq);
-                const angle = Math.atan2(dy, dx);
-                const overlap = minDistance - dist;
+            if (distSq < minDistSq && distSq > 0) {
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
+              const overlap = minDistance - dist;
                 
                 // Немного отодвигаем перетаскиваемую шайбу назад
                 finalX -= Math.cos(angle) * overlap * 0.3;
@@ -863,17 +863,17 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                   x: Math.max(boundaries.left, Math.min(boundaries.right, newOtherX)),
                   y: Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY)),
                 };
-              }
-            }
           }
+        }
+      }
 
           // Обновляем финальную позицию перетаскиваемой шайбы
-          finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
-          finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
+        finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
+        finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
           newPositions[draggedIndex] = {
             ...newPositions[draggedIndex],
-            x: finalX,
-            y: finalY,
+                x: finalX,
+                y: finalY,
           };
         } else {
           // Если не перетаскиваем, просто обновляем позицию
@@ -1355,15 +1355,15 @@ export default function HomeScreen() {
 
   // Загрузка игроков (только при монтировании, без принудительного обновления)
   const loadAllPlayers = useCallback(async () => {
-    try {
-      setLoading(true);
+      try {
+        setLoading(true);
       const loadedPlayers = await loadPlayers(false); // Используем кеш для избежания лишних перезагрузок
-      setPlayers(loadedPlayers);
-    } catch (error) {
-      console.error('❌ Ошибка загрузки игроков:', error);
-    } finally {
-      setLoading(false);
-    }
+        setPlayers(loadedPlayers);
+        } catch (error) {
+        console.error('❌ Ошибка загрузки игроков:', error);
+      } finally {
+        setLoading(false);
+      }
   }, []);
 
   // Загружаем игроков при монтировании

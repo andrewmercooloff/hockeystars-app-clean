@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useGlobalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, getLastExerciseCompletion } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useExercises } from '../hooks/useExercises';
@@ -46,11 +47,14 @@ export default function ExerciseDetailsScreen() {
   
   useEffect(() => {
     loadUserData();
+  }, []);
+
+  useEffect(() => {
     loadExercise();
-  }, [exerciseId]);
+  }, [exerciseId, language]);
   
   const loadExercise = async () => {
-    if (exerciseId) {
+    if (exerciseId && language) {
       try {
         setExerciseLoading(true);
         const exerciseData = await getExerciseById(exerciseId as string);
@@ -292,97 +296,153 @@ export default function ExerciseDetailsScreen() {
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
             {/* Основная информация */}
-            <View style={styles.infoSection}>
-              <View style={styles.infoRow}>
-            <Ionicons name="checkmark" size={20} color="#fff" />
-            <Text style={styles.infoLabel}>{t('exercises.details.category')}:</Text>
-            <Text style={styles.infoValue}>{translateCategory(exercise?.category || '')}</Text>
-                </View>
-                
-          <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={20} color="#fff" />
-            <Text style={styles.infoLabel}>{t('exercises.details.duration')}:</Text>
-            <Text style={styles.infoValue}>{exercise?.duration || ''}</Text>
-                </View>
-                
-          <View style={styles.infoRow}>
-            <Ionicons name="trending-up-outline" size={20} color="#fff" />
-            <Text style={styles.infoLabel}>{t('exercises.details.difficulty')}:</Text>
-                  <View style={[
-                    styles.difficultyBadge,
-              { backgroundColor: getDifficultyColor(exercise?.difficulty || '') }
-                  ]}>
-              <Text style={styles.difficultyText}>{translateDifficulty(exercise?.difficulty || '')}</Text>
+            <BlurView
+              intensity={20}
+              tint="dark"
+              style={styles.infoSectionBlur}
+            >
+              <View style={styles.infoSection}>
+                <View style={styles.infoSectionContent}>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="checkmark" size={20} color="#fff" />
+                    <Text style={styles.infoLabel}>{t('exercises.details.category')}:</Text>
+                    <Text style={styles.infoValue}>{translateCategory(exercise?.category || '')}</Text>
+                  </View>
+                  
+                  <View style={styles.infoRow}>
+                    <Ionicons name="time-outline" size={20} color="#fff" />
+                    <Text style={styles.infoLabel}>{t('exercises.details.duration')}:</Text>
+                    <Text style={styles.infoValue}>{exercise?.duration || ''}</Text>
+                  </View>
+                  
+                  <View style={styles.infoRow}>
+                    <Ionicons name="trending-up-outline" size={20} color="#fff" />
+                    <Text style={styles.infoLabel}>{t('exercises.details.difficulty')}:</Text>
+                    <View style={[
+                      styles.difficultyBadge,
+                      { backgroundColor: getDifficultyColor(exercise?.difficulty || '') }
+                    ]}>
+                      <Text style={styles.difficultyText}>{translateDifficulty(exercise?.difficulty || '')}</Text>
+                    </View>
+                  </View>
                 </View>
               </View>
-            </View>
+            </BlurView>
 
             {/* Описание */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('exercises.details.description')}</Text>
-              <Text style={styles.description}>{exercise?.description || ''}</Text>
+            <View style={styles.sectionWrapper}>
+              <BlurView
+                intensity={20}
+                tint="dark"
+                style={styles.sectionContainerBlur}
+              >
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>{t('exercises.details.description')}</Text>
+                  <Text style={styles.description}>{exercise?.description || ''}</Text>
+                </View>
+              </BlurView>
             </View>
 
             {/* Польза */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('exercises.details.benefits')}</Text>
-              {exercise?.benefits?.map((benefit: string, index: number) => (
-                <View key={index} style={styles.benefitItem}>
-                  <Ionicons name="checkmark-circle" size={20} color="#fa2f40" />
-                  <Text style={styles.benefitText}>{benefit}</Text>
+            <View style={styles.sectionWrapper}>
+              <BlurView
+                intensity={20}
+                tint="dark"
+                style={styles.sectionContainerBlur}
+              >
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>{t('exercises.details.benefits')}</Text>
+                  {exercise?.benefits?.map((benefit: string, index: number) => (
+                    <View key={index} style={styles.benefitItem}>
+                      <Ionicons name="checkmark-circle" size={20} color="#fa2f40" />
+                      <Text style={styles.benefitText}>{benefit}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              </BlurView>
             </View>
 
             {/* Инструкции */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('exercises.details.instructions')}</Text>
-              {exercise?.instructions?.map((instruction: string, index: number) => (
-                <View key={index} style={styles.instructionItem}>
-                  <View style={styles.instructionNumber}>
-                    <Text style={styles.instructionNumberText}>{index + 1}</Text>
-                  </View>
-                  <Text style={styles.instructionText}>{instruction}</Text>
+            <View style={styles.sectionWrapper}>
+              <BlurView
+                intensity={20}
+                tint="dark"
+                style={styles.sectionContainerBlur}
+              >
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>{t('exercises.details.instructions')}</Text>
+                  {exercise?.instructions?.map((instruction: string, index: number) => (
+                    <View key={index} style={styles.instructionItem}>
+                      <View style={styles.instructionNumber}>
+                        <Text style={styles.instructionNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={styles.instructionText}>{instruction}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              </BlurView>
             </View>
 
             {/* Советы */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('exercises.details.tips')}</Text>
-              {exercise?.tips?.map((tip: string, index: number) => (
-                <View key={index} style={styles.tipItem}>
-                  <Ionicons name="bulb-outline" size={20} color="#fa2f40" />
-                  <Text style={styles.tipText}>{tip}</Text>
+            <View style={styles.sectionWrapper}>
+              <BlurView
+                intensity={20}
+                tint="dark"
+                style={styles.sectionContainerBlur}
+              >
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>{t('exercises.details.tips')}</Text>
+                  {exercise?.tips?.map((tip: string, index: number) => (
+                    <View key={index} style={styles.tipItem}>
+                      <Ionicons name="bulb-outline" size={20} color="#fa2f40" />
+                      <Text style={styles.tipText}>{tip}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              </BlurView>
             </View>
 
         {/* Дополнительная информация */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('exercises.details.additionalInfo')}</Text>
-              <View style={styles.bottomInfoRow}>
-                <Ionicons name="barbell-outline" size={20} color="#fa2f40" />
-                <Text style={styles.bottomInfoLabel}>{t('exercises.details.equipment')}:</Text>
-                <Text style={styles.bottomInfoValue}>{exercise?.equipment || ''}</Text>
-              </View>
-              
-              <View style={styles.bottomInfoRow}>
-                <Ionicons name="flame-outline" size={20} color="#fa2f40" />
-                <Text style={styles.bottomInfoLabel}>{t('exercises.details.calories')}:</Text>
-                <Text style={styles.bottomInfoValue}>{exercise?.calories || ''}</Text>
-              </View>
+            <View style={styles.sectionWrapper}>
+              <BlurView
+                intensity={20}
+                tint="dark"
+                style={styles.sectionContainerBlur}
+              >
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>{t('exercises.details.additionalInfo')}</Text>
+                  <View style={styles.bottomInfoRow}>
+                    <Ionicons name="barbell-outline" size={20} color="#fa2f40" />
+                    <Text style={styles.bottomInfoLabel}>{t('exercises.details.equipment')}:</Text>
+                    <Text style={styles.bottomInfoValue}>{exercise?.equipment || ''}</Text>
+                  </View>
+                  
+                  <View style={styles.bottomInfoRow}>
+                    <Ionicons name="flame-outline" size={20} color="#fa2f40" />
+                    <Text style={styles.bottomInfoLabel}>{t('exercises.details.calories')}:</Text>
+                    <Text style={styles.bottomInfoValue}>{exercise?.calories || ''}</Text>
+                  </View>
+                </View>
+              </BlurView>
             </View>
 
         {/* Статистика выполнения */}
         {currentUser && (
-          <View style={styles.completionStatsCard}>
-            <View style={styles.completionStatsContent}>
-              <Ionicons name="checkmark-circle" size={20} color="rgb(1,0,0)" />
-              <Text style={styles.completionStatsText}>
-                {t('exercises.details.completed')} {completionCount}
-              </Text>
-            </View>
+          <View style={styles.completionStatsWrapper}>
+            <BlurView
+              intensity={20}
+              tint="dark"
+              style={styles.sectionContainerBlur}
+            >
+              <View style={styles.completionStatsCard}>
+                <View style={styles.completionStatsContent}>
+                  <Ionicons name="checkmark-circle" size={20} color="#fa2f40" />
+                  <Text style={styles.completionStatsText}>
+                    {t('exercises.details.completed')} {completionCount}
+                  </Text>
+                </View>
+              </View>
+            </BlurView>
           </View>
         )}
 
@@ -481,11 +541,19 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'left',
   },
+  infoSectionBlur: {
+    marginTop: -1,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
   infoSection: {
-    backgroundColor: '#2a2a2a',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingTop: 16,
+    paddingBottom: 8,
+    paddingHorizontal: 16,
+  },
+  infoSectionContent: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
   },
   infoRow: {
     flexDirection: 'row',
@@ -521,15 +589,21 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
-  sectionContainer: {
+  sectionWrapper: {
     marginTop: 10,
     marginBottom: 20,
-    marginHorizontal: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
-    borderRadius: 15,
+    marginHorizontal: 16,
+  },
+  sectionContainerBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  sectionContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#fa2f40',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   sectionTitle: {
     fontSize: 18,
@@ -631,14 +705,16 @@ const styles = StyleSheet.create({
     color: '#fa2f40',
     textAlign: 'center',
   },
-  completionStatsCard: {
-    marginHorizontal: 20,
+  completionStatsWrapper: {
+    marginHorizontal: 16,
     marginVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+  },
+  completionStatsCard: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 20,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: 'rgba(255, 68, 68, 0.3)',
   },
   completionStatsContent: {
     flexDirection: 'row',
@@ -648,7 +724,7 @@ const styles = StyleSheet.create({
   completionStatsText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    color: 'rgb(1,0,0)',
+    color: '#fff',
     marginLeft: 8,
   },
   completeButton: {

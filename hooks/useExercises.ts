@@ -36,44 +36,35 @@ export function useExercises(
 
   // Загружаем упражнения с кешированием
   const loadExercises = useCallback(async () => {
+    // Не загружаем, если язык не установлен
+    if (!language) {
+      console.log('⏳ Ожидание загрузки языка...');
+      return;
+    }
+
     try {
       setError(null);
+      setLoading(true);
 
-      // Оптимизация: сначала пытаемся получить кешированные данные синхронно
-      const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
-      const cachedExercises = await dataCache.get(cacheKey);
-      
-      if (cachedExercises && cachedExercises.length > 0) {
-        // Показываем кешированные данные сразу
-        setExercises(cachedExercises);
-        setLoading(false); // Убираем индикатор загрузки для кешированных данных
-      } else {
-        setLoading(true);
-      }
-
-      // Используем кеширование для всех данных (обновляем в фоне)
+      // ВАЖНО: Всегда загружаем данные для текущего языка напрямую, без кеша
+      // Это гарантирует, что при смене языка данные будут правильными
+      console.log(`🔄 Загрузка упражнений для языка: ${language}`);
       const [exercisesData, categoriesData, difficultiesData, rankingsData] = await Promise.all([
-        dataCache.getOrLoad(
-          `${CACHE_KEYS.EXERCISES}_${language}`,
-          () => ExerciseService.getLocalizedExercises(language, filters),
-          10 * 60 * 1000 // 10 минут
-        ),
-        dataCache.getOrLoad(
-          `${CACHE_KEYS.EXERCISE_CATEGORIES}_${language}`,
-          () => ExerciseService.getExerciseCategories(language),
-          30 * 60 * 1000 // 30 минут
-        ),
-        dataCache.getOrLoad(
-          `${CACHE_KEYS.EXERCISE_DIFFICULTIES}_${language}`,
-          () => ExerciseService.getExerciseDifficulties(language),
-          30 * 60 * 1000 // 30 минут
-        ),
+        ExerciseService.getLocalizedExercises(language, filters),
+        ExerciseService.getExerciseCategories(language),
+        ExerciseService.getExerciseDifficulties(language),
         dataCache.getOrLoad(
           CACHE_KEYS.EXERCISE_RANKINGS,
           () => ExerciseService.getExerciseRankings(),
           5 * 60 * 1000 // 5 минут
         )
       ]);
+
+      // Сохраняем в кеш для будущего использования
+      const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
+      await dataCache.set(cacheKey, exercisesData);
+      await dataCache.set(`${CACHE_KEYS.EXERCISE_CATEGORIES}_${language}`, categoriesData);
+      await dataCache.set(`${CACHE_KEYS.EXERCISE_DIFFICULTIES}_${language}`, difficultiesData);
 
       setExercises(exercisesData);
       setCategories(categoriesData);

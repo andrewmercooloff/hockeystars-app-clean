@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform, AppState } from 'react-native';
+import Constants from 'expo-constants';
 import { supabase } from './supabase';
 import { playNotificationSound } from './soundService';
 
@@ -74,8 +75,13 @@ export interface PushTokenData {
 export async function registerForPushNotificationsAsync(): Promise<string | null> {
   let token: string | null = null;
 
+  console.log('🔔 Начало регистрации push-уведомлений');
+  console.log('🔔 Platform.OS:', Platform.OS);
+  console.log('🔔 Device.isDevice:', Device.isDevice);
+
   if (Platform.OS === 'android') {
     // На Android нужно создать канал уведомлений
+    try {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'HockeyStars Notifications',
       description: 'Notifications for HockeyStars app',
@@ -86,38 +92,81 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
       enableVibrate: true,
       enableLights: true,
     });
+      console.log('🔔 Android канал уведомлений создан');
+    } catch (error) {
+      console.error('❌ Ошибка создания Android канала:', error);
+    }
   }
 
   if (Device.isDevice) {
     // Проверяем разрешения
+    try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      console.log('🔔 Текущий статус разрешений:', existingStatus);
     let finalStatus = existingStatus;
     
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
+        console.log('🔔 Запрашиваем разрешения...');
+        const { status } = await Notifications.requestPermissionsAsync({
+          ios: {
+            allowAlert: true,
+            allowBadge: true,
+            allowSound: true,
+            allowAnnouncements: false,
+          },
+        });
       finalStatus = status;
+        console.log('🔔 Результат запроса разрешений:', status);
     }
     
     if (finalStatus !== 'granted') {
-      // console.log('❌ Push notifications permission denied. Status:', finalStatus);
+        console.error('❌ Push notifications permission denied. Status:', finalStatus);
       return null;
     }
     
+      console.log('🔔 Разрешения получены, запрашиваем токен...');
     
     try {
       // Получаем Expo push token
+        // Для production сборок важно использовать правильный projectId
+        // Пытаемся получить projectId из конфигурации, иначе используем хардкод
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId || 'ccb608ca-e849-4a98-b337-d38863d3ebff';
+        console.log('🔔 Используемый projectId:', projectId);
+        
       const expoPushToken = await Notifications.getExpoPushTokenAsync({
-        projectId: 'ccb608ca-e849-4a98-b337-d38863d3ebff', // Ваш EAS project ID
+          projectId: projectId,
       });
       
       token = expoPushToken.data;
-    } catch (error) {
+        
+        if (token) {
+          console.log('✅ Push token получен успешно:', token.substring(0, 30) + '...');
+          console.log('🔔 Длина токена:', token.length);
+        } else {
+          console.error('❌ Push token пустой');
+        }
+      } catch (error: any) {
       console.error('❌ Ошибка получения push token:', error);
-      console.error('❌ Error details:', error.message);
-      console.error('❌ Error stack:', error.stack);
+        console.error('❌ Error details:', error?.message || 'No message');
+        console.error('❌ Error code:', error?.code || 'No code');
+        console.error('❌ Error stack:', error?.stack || 'No stack');
+        
+        // Дополнительная диагностика для production сборок
+        if (error?.message?.includes('credentials') || error?.code === 'E_PUSH_NOTIFICATIONS_CREDENTIALS') {
+          console.error('⚠️ ВНИМАНИЕ: Проблема с credentials для push-уведомлений!');
+          console.error('⚠️ Для production сборок (TestFlight) убедитесь, что:');
+          console.error('⚠️ 1. APNs credentials настроены в EAS: eas credentials');
+          console.error('⚠️ 2. Production APNs ключ загружен в EAS');
+          console.error('⚠️ 3. Bundle identifier совпадает: by.hockeystars.app');
+        }
+      }
+    } catch (error: any) {
+      console.error('❌ Ошибка при проверке разрешений:', error);
+      console.error('❌ Error details:', error?.message || 'No message');
     }
   } else {
-    // console.log('❌ Push notifications работают только на физических устройствах');
+    console.warn('⚠️ Push notifications работают только на физических устройствах');
+    console.warn('⚠️ Текущее устройство:', Device.isDevice ? 'физическое' : 'эмулятор/симулятор');
   }
 
   return token;
@@ -128,8 +177,11 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
  */
 export async function savePushToken(token: string, userId: string): Promise<boolean> {
   try {
+    console.log('🔔 Сохранение push token для пользователя:', userId);
+    
     // Используем deviceId из Device или генерируем уникальный ID
     const deviceId = Device.osInternalBuildId || `${Platform.OS}-${Date.now()}`;
+    console.log('🔔 Device ID:', deviceId);
     
     const tokenData: PushTokenData = {
       token,
@@ -147,10 +199,13 @@ export async function savePushToken(token: string, userId: string): Promise<bool
 
     if (selectError) {
       console.error('❌ Ошибка проверки существующего токена:', selectError);
+      console.error('❌ Error details:', selectError.message);
+      console.error('❌ Error code:', selectError.code);
       return false;
     }
 
     if (existingTokens && existingTokens.length > 0) {
+      console.log('🔔 Токен уже существует, обновляем...');
       // Обновляем существующий токен
       const { error: updateError } = await supabase
         .from('push_tokens')
@@ -164,9 +219,13 @@ export async function savePushToken(token: string, userId: string): Promise<bool
 
       if (updateError) {
         console.error('❌ Ошибка обновления push token:', updateError);
+        console.error('❌ Error details:', updateError.message);
+        console.error('❌ Error code:', updateError.code);
         return false;
       }
+      console.log('✅ Push token обновлен');
     } else {
+      console.log('🔔 Создаем новый токен...');
       // Вставляем новый токен
       const { error: insertError } = await supabase
         .from('push_tokens')
@@ -174,13 +233,25 @@ export async function savePushToken(token: string, userId: string): Promise<bool
 
       if (insertError) {
         console.error('❌ Ошибка вставки push token:', insertError);
+        console.error('❌ Error details:', insertError.message);
+        console.error('❌ Error code:', insertError.code);
+        console.error('❌ Error hint:', insertError.hint);
+        
+        // Проверяем, не проблема ли это с RLS политиками
+        if (insertError.code === '42501' || insertError.message?.includes('permission') || insertError.message?.includes('policy')) {
+          console.error('⚠️ ВНИМАНИЕ: Проблема с RLS политиками!');
+          console.error('⚠️ Проверьте, что политики для push_tokens разрешают INSERT');
+        }
         return false;
       }
+      console.log('✅ Push token создан');
     }
 
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка сохранения push token:', error);
+    console.error('❌ Error details:', error?.message || 'No message');
+    console.error('❌ Error stack:', error?.stack || 'No stack');
     return false;
   }
 }
@@ -497,14 +568,22 @@ export async function sendAchievementNotification(
 }
 
 // Кеш для предотвращения повторной инициализации
-const initializedUsers = new Set<string>();
+// Используем Map для хранения времени последней инициализации
+const initializedUsers = new Map<string, number>();
+const INITIALIZATION_COOLDOWN = 5 * 60 * 1000; // 5 минут между попытками инициализации
 
 /**
  * Инициализация push-уведомлений для пользователя
  */
-export async function initializePushNotifications(userId: string): Promise<boolean> {
+export async function initializePushNotifications(userId: string, forceReinit: boolean = false): Promise<boolean> {
+  console.log('🔔 Инициализация push-уведомлений для пользователя:', userId);
+  
   // Проверяем, не инициализированы ли уже уведомления для этого пользователя
-  if (initializedUsers.has(userId)) {
+  const lastInitTime = initializedUsers.get(userId);
+  const now = Date.now();
+  
+  if (!forceReinit && lastInitTime && (now - lastInitTime < INITIALIZATION_COOLDOWN)) {
+    console.log('🔔 Push-уведомления уже инициализированы недавно, пропускаем');
     return true;
   }
 
@@ -513,25 +592,46 @@ export async function initializePushNotifications(userId: string): Promise<boole
     const token = await registerForPushNotificationsAsync();
     
     if (!token) {
-      // console.log('❌ Не удалось получить push token');
+      console.error('❌ Не удалось получить push token для пользователя:', userId);
+      console.error('❌ Проверьте:');
+      console.error('❌ 1. Разрешения на уведомления в настройках устройства');
+      console.error('❌ 2. Для production сборок: APNs credentials в EAS');
+      console.error('❌ 3. Интернет-соединение');
       return false;
     }
+
+    console.log('🔔 Сохранение push token в базу данных...');
 
     // Сохраняем token в базе данных
     const saved = await savePushToken(token, userId);
     if (saved) {
       // Помечаем пользователя как инициализированного
-      initializedUsers.add(userId);
+      initializedUsers.set(userId, now);
+      console.log('✅ Push-уведомления успешно инициализированы для пользователя:', userId);
       return true;
     } else {
-      // console.log('❌ Не удалось сохранить push token');
+      console.error('❌ Не удалось сохранить push token в базу данных');
+      console.error('❌ Проверьте RLS политики для таблицы push_tokens');
       return false;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка инициализации push-уведомлений:', error);
-    console.error('❌ Error details:', error.message);
-    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error details:', error?.message || 'No message');
+    console.error('❌ Error stack:', error?.stack || 'No stack');
     return false;
+  }
+}
+
+/**
+ * Сброс кеша инициализации для пользователя (для принудительной переинициализации)
+ */
+export function resetPushNotificationCache(userId?: string): void {
+  if (userId) {
+    initializedUsers.delete(userId);
+    console.log('🔔 Кеш инициализации сброшен для пользователя:', userId);
+  } else {
+    initializedUsers.clear();
+    console.log('🔔 Кеш инициализации полностью сброшен');
   }
 }
 

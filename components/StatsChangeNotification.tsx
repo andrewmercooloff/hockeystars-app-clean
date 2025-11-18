@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -33,6 +34,9 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
     'goals': t('goals'),
     'assists': t('assists'), 
     'games': t('games'),
+    'minutes': t('profile.minutes'),
+    'shots': t('profile.shots'),
+    'saves': t('profile.saves'),
     'pullUps': t('pullUps'),
     'pushUps': t('pushUps'),
     'plankTime': t('plankTime'),
@@ -74,9 +78,14 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
   }, [t]);
 
   return (
-    <View style={styles.container}>
-      {/* Аватар слева */}
-      <View style={styles.avatarContainer}>
+    <BlurView
+      intensity={20}
+      tint="dark"
+      style={styles.containerBlur}
+    >
+      <View style={styles.container}>
+        {/* Аватар слева */}
+        <View style={styles.avatarContainer}>
         {playerAvatar ? (
           <CachedAvatar
             playerId={playerId}
@@ -123,17 +132,22 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           ))}
           </View>
       </View>
-    </View>
+      </View>
+    </BlurView>
   );
 });
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: 12,
-    padding: 16,
+  containerBlur: {
+    borderRadius: 20,
     marginHorizontal: 20,
     marginVertical: 8,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
+    padding: 16,
     borderLeftWidth: 4,
     borderLeftColor: '#FF4444',
     flexDirection: 'row',
@@ -171,13 +185,13 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   changesContainer: {
-    gap: 8,
+    gap: 4,
   },
   changeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   fieldName: {
     fontSize: 14,

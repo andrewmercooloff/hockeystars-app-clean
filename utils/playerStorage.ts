@@ -6,6 +6,43 @@ import { addActivityPoints } from '../services/activityService';
 // Глобальный кеш для пользователя
 let globalUserCache: Player | null = null;
 
+// Функция для нормализации позиции игрока (приводит все варианты к стандартным английским ключам)
+export const normalizePosition = (position: string | undefined | null): string | undefined => {
+  if (!position) return undefined;
+  
+  const pos = position.trim();
+  const posLower = pos.toLowerCase();
+  
+  // Нормализуем позицию вратаря к стандартному ключу 'goalie'
+  if (posLower === 'goalkeeper' || posLower === 'goalie' || pos === 'Вратарь' || pos === 'Goalkeeper' || pos === 'Goalie' || pos === 'goalie' || pos === 'GOALIE') {
+    return 'goalie';
+  }
+  
+  // Нормализуем позицию центрального нападающего к 'center'
+  if (pos === 'Центральный нападающий' || posLower === 'center' || pos === 'Center') {
+    return 'center';
+  }
+  
+  // Нормализуем позицию крайнего нападающего к 'winger'
+  if (pos === 'Крайний нападающий' || posLower === 'winger' || pos === 'Winger') {
+    return 'winger';
+  }
+  
+  // Нормализуем позицию защитника к 'defender'
+  if (pos === 'Защитник' || posLower === 'defender' || pos === 'Defender') {
+    return 'defender';
+  }
+  
+  // Возвращаем позицию как есть, если это не известная позиция
+  return pos;
+};
+
+// Функция для проверки, является ли игрок вратарем
+export const isGoalkeeperPosition = (position: string | undefined | null): boolean => {
+  if (!position) return false;
+  return normalizePosition(position) === 'goalie';
+};
+
 // Интерфейс для данных из Supabase (snake_case)
 export interface SupabasePlayer {
   id: string;
@@ -31,6 +68,10 @@ export interface SupabasePlayer {
   country?: string;
   grip?: string;
   games?: number;
+  // Поля для вратарей
+  minutes?: number; // количество проведенных минут
+  shots?: number; // количество бросков
+  saves?: number; // отраженные броски (сэйвы)
   pull_ups?: number;
   push_ups?: number;
   plank_time?: number;
@@ -60,6 +101,7 @@ export interface SupabasePlayer {
   puck_speed_data?: string; // JSON: { maxSpeed: number, history: Array<{speed: number, date: string}> }
   is_online?: boolean; // статус онлайн пользователя
   last_seen?: string; // время последней активности (ISO string)
+  is_hidden?: boolean; // флаг скрытия профиля администратором
 }
 
 // Интерфейс для приложения (camelCase) - совместимый со старым кодом
@@ -175,6 +217,10 @@ export interface Player {
   country?: string;
   grip?: string;
   games?: string;
+  // Поля для вратарей
+  minutes?: string; // количество проведенных минут
+  shots?: string; // количество бросков
+  saves?: string; // отраженные броски (сэйвы)
   pullUps?: string;
   pushUps?: string;
   plankTime?: string;
@@ -212,6 +258,8 @@ export interface Player {
   // Онлайн статус
   isOnline?: boolean; // статус онлайн пользователя
   lastSeen?: string; // последний раз когда пользователь был онлайн
+  // Скрытие профиля
+  is_hidden?: boolean; // флаг скрытия профиля администратором
 }
 
 // Интерфейс для записи скорости шайбы
@@ -227,6 +275,9 @@ export interface Message {
   text: string;
   timestamp: Date;
   read: boolean;
+  replyToId?: string; // ID сообщения, на которое отвечаем
+  replyToText?: string; // Текст сообщения, на которое отвечаем (для превью)
+  replyToSenderId?: string; // ID отправителя сообщения, на которое отвечаем
 }
 
 export interface FriendRequest {
@@ -255,7 +306,7 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
   const result = {
     id: supabasePlayer.id,
     name: supabasePlayer.name,
-    position: supabasePlayer.position,
+    position: normalizePosition(supabasePlayer.position) || supabasePlayer.position || '',
     team: supabasePlayer.team,
     age: supabasePlayer.age,
     height: supabasePlayer.height ? supabasePlayer.height.toString() : '',
@@ -299,6 +350,10 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     country: supabasePlayer.country,
     grip: supabasePlayer.grip,
     games: supabasePlayer.games ? supabasePlayer.games.toString() : '0',
+    // Поля для вратарей
+    minutes: supabasePlayer.minutes ? supabasePlayer.minutes.toString() : '0',
+    shots: supabasePlayer.shots ? supabasePlayer.shots.toString() : '0',
+    saves: supabasePlayer.saves ? supabasePlayer.saves.toString() : '0',
     pullUps: supabasePlayer.pull_ups && String(supabasePlayer.pull_ups) !== '0' && String(supabasePlayer.pull_ups) !== 'null' ? supabasePlayer.pull_ups.toString() : '',
     pushUps: supabasePlayer.push_ups && String(supabasePlayer.push_ups) !== '0' && String(supabasePlayer.push_ups) !== 'null' ? supabasePlayer.push_ups.toString() : '',
     plankTime: supabasePlayer.plank_time && String(supabasePlayer.plank_time) !== '0' && String(supabasePlayer.plank_time) !== 'null' ? supabasePlayer.plank_time.toString() : '',
@@ -402,6 +457,8 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     // Онлайн статус
     isOnline: supabasePlayer.is_online ?? false,
     lastSeen: supabasePlayer.last_seen || undefined,
+    // Скрытие профиля
+    is_hidden: supabasePlayer.is_hidden ?? false,
   };
   
   
@@ -1025,7 +1082,7 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
 
   return {
     name: player.name,
-    position: player.position,
+    position: normalizePosition(player.position) || player.position || '',
     team: player.team,
     age: player.age,
     height: parseInt(player.height) || 0,
@@ -1046,6 +1103,10 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     country: player.country,
     grip: player.grip,
     games: player.games ? parseInt(player.games) : 0,
+    // Поля для вратарей
+    minutes: player.minutes ? parseInt(player.minutes) : 0,
+    shots: player.shots ? parseInt(player.shots) : 0,
+    saves: player.saves ? parseInt(player.saves) : 0,
     pull_ups: player.pullUps ? parseInt(player.pullUps) : 0,
     push_ups: player.pushUps ? parseInt(player.pushUps) : 0,
     plank_time: player.plankTime ? parseInt(player.plankTime) : 0,
@@ -1137,6 +1198,8 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     
     if (data) {
       // Преобразуем данные из Supabase в формат приложения
+      // НЕ фильтруем скрытые профили здесь - они будут отфильтрованы в компонентах
+      // Это нужно, чтобы администраторы могли видеть скрытые профили в поиске
       const players = data.map(convertSupabaseToPlayer);
       
       // Обновляем кеш аватаров для всех игроков
@@ -2014,13 +2077,37 @@ export const sendMessage = async (message: Omit<Message, 'id' | 'timestamp'>): P
       throw error;
     }
     
+    // Парсим информацию об ответе из текста сообщения
+    let text = data.text;
+    let replyToId: string | undefined;
+    let replyToText: string | undefined;
+    let replyToSenderId: string | undefined;
+    
+    const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+    if (replyDataMatch) {
+      try {
+        const replyData = JSON.parse(replyDataMatch[1]);
+        if (replyData.replyTo) {
+          replyToId = replyData.replyTo.id;
+          replyToText = replyData.replyTo.text;
+          replyToSenderId = replyData.replyTo.senderId;
+          text = replyDataMatch[2];
+        }
+      } catch (e) {
+        console.error('Ошибка парсинга replyTo данных:', e);
+      }
+    }
+    
     return {
       id: data.id,
       senderId: data.sender_id,
       receiverId: data.receiver_id,
-      text: data.text,
+      text: text,
       timestamp: new Date(data.created_at),
-      read: data.read
+      read: data.read,
+      replyToId,
+      replyToText,
+      replyToSenderId
     };
   } catch (error) {
     console.error('❌ Ошибка отправки сообщения:', error);
@@ -2042,14 +2129,41 @@ export const getMessages = async (userId1: string, userId2: string): Promise<Mes
       return [];
     }
     
-    return (data || []).map(msg => ({
-      id: msg.id,
-      senderId: msg.sender_id,
-      receiverId: msg.receiver_id,
-      text: msg.text,
-      timestamp: new Date(msg.created_at),
-      read: msg.read
-    }));
+    return (data || []).map(msg => {
+      // Парсим информацию об ответе из текста сообщения
+      let text = msg.text;
+      let replyToId: string | undefined;
+      let replyToText: string | undefined;
+      let replyToSenderId: string | undefined;
+      
+      // Проверяем, есть ли в начале текста метаданные об ответе
+      const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+      if (replyDataMatch) {
+        try {
+          const replyData = JSON.parse(replyDataMatch[1]);
+          if (replyData.replyTo) {
+            replyToId = replyData.replyTo.id;
+            replyToText = replyData.replyTo.text;
+            replyToSenderId = replyData.replyTo.senderId;
+            text = replyDataMatch[2]; // Убираем метаданные из текста
+          }
+        } catch (e) {
+          console.error('Ошибка парсинга replyTo данных:', e);
+        }
+      }
+      
+      return {
+        id: msg.id,
+        senderId: msg.sender_id,
+        receiverId: msg.receiver_id,
+        text: text,
+        timestamp: new Date(msg.created_at),
+        read: msg.read,
+        replyToId,
+        replyToText,
+        replyToSenderId
+      };
+    });
   } catch (error) {
     console.error('❌ Ошибка получения сообщений:', error);
     return [];
@@ -2072,7 +2186,12 @@ export const getConversation = async (userId1: string, userId2: string): Promise
 };
 
 // Упрощенная отправка сообщения
-export const sendMessageSimple = async (senderId: string, receiverId: string, text: string): Promise<boolean> => {
+export const sendMessageSimple = async (
+  senderId: string, 
+  receiverId: string, 
+  text: string,
+  replyTo?: { id: string; text: string; senderId: string }
+): Promise<boolean> => {
   try {
     // console.log('📨 ОТПРАВКА СООБЩЕНИЯ:', {
     //   senderId,
@@ -2080,11 +2199,27 @@ export const sendMessageSimple = async (senderId: string, receiverId: string, te
     //   text: text.substring(0, 30) + '...'
     // });
     
+    // Формируем текст сообщения с информацией об ответе в JSON формате в начале
+    let messageText = text;
+    if (replyTo) {
+      const replyData = JSON.stringify({
+        replyTo: {
+          id: replyTo.id,
+          text: replyTo.text.substring(0, 100), // Ограничиваем длину для превью
+          senderId: replyTo.senderId
+        }
+      });
+      messageText = `[REPLY_DATA:${replyData}]${text}`;
+    }
+    
     const message = {
       senderId,
       receiverId,
-      text,
-      read: false
+      text: messageText,
+      read: false,
+      replyToId: replyTo?.id,
+      replyToText: replyTo?.text,
+      replyToSenderId: replyTo?.senderId
     };
     
     await sendMessage(message);
@@ -3911,23 +4046,46 @@ export const trackStatsChanges = (oldPlayer: Player, newPlayer: Player): StatCha
   const changes: StatChange[] = [];
   const timestamp = new Date().toISOString();
   
-  // Поля статистики для отслеживания
-  const statsFields = ['goals', 'assists', 'games'];
+  // Определяем, является ли игрок вратарем (используем функцию нормализации)
+  const isGoalkeeper = isGoalkeeperPosition(newPlayer.position);
   
-  statsFields.forEach(field => {
-    const oldValue = parseInt(oldPlayer[field as keyof Player] as string || '0') || 0;
-    const newValue = parseInt(newPlayer[field as keyof Player] as string || '0') || 0;
+  if (isGoalkeeper) {
+    // Поля статистики для вратарей
+    const goalkeeperStatsFields = ['games', 'minutes', 'shots', 'saves'];
     
-    if (oldValue !== newValue) {
-      changes.push({
-        field,
-        oldValue,
-        newValue,
-        change: newValue - oldValue,
-        timestamp
-      });
-    }
-  });
+    goalkeeperStatsFields.forEach(field => {
+      const oldValue = parseInt(oldPlayer[field as keyof Player] as string || '0') || 0;
+      const newValue = parseInt(newPlayer[field as keyof Player] as string || '0') || 0;
+      
+      if (oldValue !== newValue) {
+        changes.push({
+          field,
+          oldValue,
+          newValue,
+          change: newValue - oldValue,
+          timestamp
+        });
+      }
+    });
+  } else {
+    // Поля статистики для полевых игроков
+    const statsFields = ['goals', 'assists', 'games'];
+    
+    statsFields.forEach(field => {
+      const oldValue = parseInt(oldPlayer[field as keyof Player] as string || '0') || 0;
+      const newValue = parseInt(newPlayer[field as keyof Player] as string || '0') || 0;
+      
+      if (oldValue !== newValue) {
+        changes.push({
+          field,
+          oldValue,
+          newValue,
+          change: newValue - oldValue,
+          timestamp
+        });
+      }
+    });
+  }
   
   return changes;
 };
@@ -5081,17 +5239,28 @@ export const notifyFriendsAboutChanges = async (
         const friendLang = friendLanguages.get(friend.id) || 'en';
         const friendTranslations = loadTranslations(friendLang);
         
-        const fieldNamesRu: { [key: string]: string } = {
-            'goals': 'голов',
-            'assists': 'передач', 
-            'games': 'игр'
-          };
-        const fieldNamesEn: { [key: string]: string } = {
-          'goals': 'goals',
-          'assists': 'assists', 
-          'games': 'games'
+        // Используем переводы из файлов локализации
+        // Для русского языка используем родительный падеж для правильной грамматики в уведомлениях
+        const fieldNames: { [key: string]: string } = {
+          'goals': friendLang === 'ru' 
+            ? (friendTranslations?.goals === 'Голы' ? 'голов' : friendTranslations?.goals || 'голов')
+            : (friendTranslations?.goals || 'goals'),
+          'assists': friendLang === 'ru'
+            ? (friendTranslations?.assists === 'Передачи' ? 'передач' : friendTranslations?.assists || 'передач')
+            : (friendTranslations?.assists || 'assists'),
+          'games': friendLang === 'ru'
+            ? (friendTranslations?.games === 'Игры' ? 'игр' : friendTranslations?.games || 'игр')
+            : (friendTranslations?.games || 'games'),
+          'minutes': friendLang === 'ru'
+            ? (friendTranslations?.profile?.minutes === 'минуты' ? 'минут' : friendTranslations?.profile?.minutes || 'минут')
+            : (friendTranslations?.profile?.minutes || 'minutes'),
+          'shots': friendLang === 'ru'
+            ? (friendTranslations?.profile?.shots === 'броски' ? 'бросков' : friendTranslations?.profile?.shots || 'бросков')
+            : (friendTranslations?.profile?.shots || 'shots'),
+          'saves': friendLang === 'ru'
+            ? (friendTranslations?.profile?.saves === 'сэйвы' ? 'сэйвов' : friendTranslations?.profile?.saves || 'сэйвов')
+            : (friendTranslations?.profile?.saves || 'saves')
         };
-        const fieldNames = friendLang === 'ru' ? fieldNamesRu : fieldNamesEn;
         
         const statChangesText = statChanges
           .map(change => {
@@ -5378,19 +5547,28 @@ export const notifyFriendsAboutNewFriendship = async (
     }
 
     // Получаем друзей обоих игроков (исключая их самих)
+    // ВАЖНО: получаем друзей ПОСЛЕ того, как дружба была добавлена, поэтому нужно явно исключить userId1 и userId2
     const [friends1, friends2] = await Promise.all([
       getFriends(userId1),
       getFriends(userId2)
     ]);
 
     // Объединяем списки друзей и исключаем дубликаты и самих игроков
+    // Явно исключаем userId1 и userId2, чтобы они не получили уведомление "стали друзьями"
     const allFriends = [...friends1, ...friends2].filter((friend, index, arr) => {
-      return friend.id !== userId1 && 
-             friend.id !== userId2 && 
-             arr.findIndex(f => f.id === friend.id) === index;
+      // Исключаем обоих участников новой дружбы - они не должны получать уведомление "стали друзьями"
+      // Отправитель запроса уже получил уведомление "запрос принят", а принимающий не должен получать ничего
+      if (friend.id === userId1 || friend.id === userId2) {
+        console.log(`🚫 Исключаем ${friend.id} из списка получателей уведомления о дружбе (это участник новой дружбы)`);
+        return false;
+      }
+      // Исключаем дубликаты
+      return arr.findIndex(f => f.id === friend.id) === index;
     });
 
     console.log('👥 Друзья для уведомлений о дружбе:', allFriends.length);
+    console.log('👥 ID друзей для уведомлений:', allFriends.map(f => f.id));
+    console.log('👥 userId1:', userId1, 'userId2:', userId2);
 
     if (allFriends.length === 0) {
       console.log('👥 Нет друзей для отправки уведомлений о дружбе');
@@ -6390,16 +6568,31 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
  * @returns отобранные игроки для отображения на главном экране
  */
 export const getSmartPlayerSelection = (
-  players: Player[], 
+  players: Player[],
   currentUserId?: string,
+  currentUserStatus?: string,
   selectedCountry?: string,
   selectedYear?: number,
   randomSeed?: number // Добавляем seed для детерминированного рандома
 ): Player[] => {
   try {
+    // 0. Фильтруем скрытые профили (кроме текущего пользователя, если он скрыт)
+    const visiblePlayers = players.filter(player => {
+      if (player.is_hidden) {
+        // Скрытый профиль показываем:
+        // 1. Всегда администраторам
+        if (currentUserStatus === 'admin') {
+          return true;
+        }
+        // 2. Самому владельцу профиля
+        return currentUserId && player.id === currentUserId;
+      }
+      return true;
+    });
+    
     // 1. Разделяем не-игроков на категории
     // Администраторы всегда показываются везде
-    const admins = players.filter(player => player.status === 'admin');
+    const admins = visiblePlayers.filter(player => player.status === 'admin');
     
     // Звезды и скауты - показываем рандомно (обрабатываются отдельно)
     // Скауты показываются во всех странах независимо от фильтра, но с вероятностью 25% (1 к 4)
@@ -6411,7 +6604,7 @@ export const getSmartPlayerSelection = (
       : Date.now() % 1000000; // Используем миллисекунды для разнообразия
     
     // Отдельно обрабатываем звезд
-    const stars = players.filter(player => {
+    const stars = visiblePlayers.filter(player => {
       if (player.status !== 'star') return false;
       
       // Звезды фильтруются по стране, если выбран фильтр
@@ -6423,7 +6616,7 @@ export const getSmartPlayerSelection = (
     
     // Отдельно обрабатываем скаутов с вероятностью 25% (1 к 4)
     // Скауты показываются во всех странах независимо от фильтра
-    const allScouts = players.filter(player => player.status === 'scout');
+    const allScouts = visiblePlayers.filter(player => player.status === 'scout');
     const selectedScouts = allScouts.filter(scout => {
       // Создаем уникальный seed для каждого скаута на основе его ID и общего seed
       const scoutSeed = `${scout.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -6434,7 +6627,7 @@ export const getSmartPlayerSelection = (
     });
     
     // Остальные не-игроки (тренеры, магазины, заточка коньков)
-    const otherNonPlayers = players.filter(player => {
+    const otherNonPlayers = visiblePlayers.filter(player => {
       const isOtherNonPlayer = player.status === 'coach' || 
         player.status === 'shop' || 
         player.status === 'skateSharpening';
@@ -6478,7 +6671,7 @@ export const getSmartPlayerSelection = (
     const limitedStarsAndScouts = [...limitedStars, ...limitedScouts];
 
     // 2. Фильтруем игроков по стране и году
-    const filteredPlayers = players.filter(player => {
+    const filteredPlayers = visiblePlayers.filter(player => {
       if (player.status !== 'player') return false;
       
       // Фильтр по стране
@@ -6593,12 +6786,6 @@ export const getSmartPlayerSelection = (
     
     // 15. Финальное ограничение на 30 (на всякий случай, если после удаления дубликатов стало больше)
     const finalPlayers = uniquePlayers.slice(0, MAX_PLAYERS);
-
-    console.log(`🎯 Умный отбор игроков: ${finalPlayers.length} из ${players.length} (фильтр: ${selectedCountry || 'все страны'}, ${selectedYear || 'все годы'})`);
-    const showingStars = limitedStars.length;
-    const showingScouts = limitedScouts.length;
-    console.log(`📊 Разбивка: админы: ${admins.length}, звезды: ${showingStars}/${stars.length}, скауты: ${showingScouts}/${allScouts.length} (вероятность 25%), другие не-игроки: ${otherNonPlayers.length}, новички: ${newcomers.length}, топ: ${topPlayers.length}, случайные: ${randomPlayersLimited.length}${currentUser ? ', текущий пользователь: 1' : ''}`);
-    console.log(`🔢 Лимит: ${MAX_PLAYERS} (постоянные: ${permanentCount}, доступно для случайных: ${remainingSlots}, итого: ${finalPlayers.length})`);
 
     return finalPlayers;
 

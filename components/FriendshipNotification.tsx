@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface FriendshipNotificationProps {
@@ -49,13 +50,18 @@ export default function FriendshipNotification({
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container}
-      onPress={handlePress}
-      activeOpacity={0.7}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    <BlurView
+      intensity={20}
+      tint="dark"
+      style={styles.containerBlur}
     >
-      <View style={styles.avatarsContainer}>
+      <TouchableOpacity 
+        style={styles.container}
+        onPress={handlePress}
+        activeOpacity={0.7}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <View style={styles.avatarsContainer}>
         <View style={[styles.avatarWrapper, styles.firstAvatar]}>
           {friend1Avatar ? (
             <Image
@@ -99,16 +105,21 @@ export default function FriendshipNotification({
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </BlurView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  containerBlur: {
+    borderRadius: 20,
     marginHorizontal: 20,
     marginVertical: 8,
-    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -40,8 +41,13 @@ export default function FriendRequestNotification({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.avatarContainer}>
+    <BlurView
+      intensity={20}
+      tint="dark"
+      style={styles.containerBlur}
+    >
+      <View style={styles.container}>
+        <View style={styles.avatarContainer}>
         {playerId ? (
           <CachedAvatar
             playerId={playerId}
@@ -81,16 +87,21 @@ export default function FriendRequestNotification({
           </View>
         </View>
       </View>
-    </View>
+      </View>
+    </BlurView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  containerBlur: {
+    borderRadius: 20,
     marginHorizontal: 20,
     marginVertical: 8,
-    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -136,6 +147,7 @@ const styles = StyleSheet.create({
   timeText: {
     color: '#aaa',
     fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
   },
   requestItem: {
@@ -147,6 +159,7 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#ddd',
     fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
     flex: 1,
   },
   friendshipBadge: {

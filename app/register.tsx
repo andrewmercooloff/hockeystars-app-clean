@@ -491,7 +491,16 @@ export default function RegisterScreen() {
     }
   };
 
-  const positions = ['Центральный нападающий', 'Крайний нападающий', 'Защитник', 'Вратарь'];
+  // Используем английские ключи для позиций (стандарт в базе данных)
+  const positions = ['center', 'winger', 'defender', 'goalie'];
+  
+  // Маппинг ключей на переведенные названия для отображения
+  const positionLabels: { [key: string]: string } = {
+    'center': t('profile.positions.center'),
+    'winger': t('profile.positions.winger'),
+    'defender': t('profile.positions.defender'),
+    'goalie': t('profile.positions.goalie'),
+  };
 
   return (
     <ImageBackground source={iceBg} style={styles.container} resizeMode="cover">
@@ -735,7 +744,7 @@ export default function RegisterScreen() {
                       styles.pickerOptionText,
                       formData.position === pos && styles.pickerOptionTextSelected
                     ]}>
-                      {pos}
+                      {positionLabels[pos] || pos}
                     </Text>
                   </TouchableOpacity>
                 ))}

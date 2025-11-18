@@ -17,6 +17,7 @@ import {
     Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
     getConversation,
@@ -1033,11 +1034,16 @@ export default function ChatScreen() {
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок чата */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
-            <View style={styles.headerInfo}>
+          <BlurView
+            intensity={20}
+            tint="dark"
+            style={styles.headerBlur}
+          >
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <View style={styles.headerInfo}>
               <TouchableOpacity 
                 onPress={() => router.push(`/player/${otherPlayer.id}`)}
                 style={styles.avatarButton}
@@ -1099,7 +1105,8 @@ export default function ChatScreen() {
                 />
               </TouchableOpacity>
             </View>
-          </View>
+            </View>
+          </BlurView>
 
           {/* Сообщения */}
           <KeyboardAvoidingView 
@@ -1143,14 +1150,16 @@ export default function ChatScreen() {
             >
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                  <Ionicons name="chatbubble-outline" size={48} color="#fff" />
-                  <Text style={styles.emptyText}>
-                    {t('chat.startConversation', { 
-                      name: otherPlayer.status === 'scout' 
-                        ? t('profile.scout')?.toUpperCase() || 'SCOUT' 
-                        : otherPlayer.name?.toUpperCase() 
-                    })}
-                  </Text>
+                  <View style={styles.emptyContent}>
+                    <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
+                    <Text style={styles.emptyTitle}>
+                      {t('chat.startConversation', { 
+                        name: otherPlayer.status === 'scout' 
+                          ? t('profile.scout')?.toUpperCase() || 'SCOUT' 
+                          : otherPlayer.name?.toUpperCase() 
+                      })}
+                    </Text>
+                  </View>
                 </View>
               ) : !loading ? (
                 (() => {
@@ -1319,11 +1328,11 @@ export default function ChatScreen() {
                   }}
                 />
                 <TouchableOpacity 
-                style={[
-                  styles.sendButton, 
-                  !newMessage.trim() && styles.sendButtonDisabled
-                ]} 
-                onPress={handleSendMessage}
+                  style={[
+                    styles.sendButton, 
+                    !newMessage.trim() && styles.sendButtonDisabled
+                  ]} 
+                  onPress={handleSendMessage}
                   disabled={!newMessage.trim()}
                 >
                   <Ionicons 
@@ -1443,12 +1452,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
   },
-  header: {
+  headerBlur: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 1000,
+    overflow: 'hidden',
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -1529,18 +1541,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
+    flexGrow: 1, // Позволяет контенту растягиваться
   },
   emptyContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    paddingVertical: 60,
+  },
+  emptyContent: {
+    backgroundColor: 'rgba(1, 0, 0, 0.8)',
     borderRadius: 15,
-    marginHorizontal: 60,
-    marginVertical: 10,
-    padding: 15,
+    padding: 20,
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(250, 47, 64, 0.3)',
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
@@ -1549,12 +1564,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginHorizontal: 16,
   },
-  emptyText: {
-    color: '#fff',
-    fontSize: 16,
+  emptyTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
     fontFamily: 'Gilroy-Regular',
-    marginTop: 12,
+    marginTop: 16,
+    marginBottom: 8,
     textAlign: 'center',
   },
   messageContainer: {

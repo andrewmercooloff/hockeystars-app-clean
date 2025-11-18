@@ -10,6 +10,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -29,6 +30,7 @@ import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNo
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
 import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
 import LikeNotification from '../components/LikeNotification';
+import UserReportNotification from '../components/UserReportNotification';
 import CachedAvatar from '../components/CachedAvatar';
 import {
     acceptFriendRequest,
@@ -356,6 +358,22 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={notification.timestamp || notification.created_at || Date.now()}
             />
           </TouchableOpacity>
+        ) : notification.type === 'user_report' ? (
+          <TouchableOpacity
+            onPress={() => onPress(notification)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <UserReportNotification
+              reporterName={notification.data?.reporterName || notification.playerName || 'Игрок'}
+              reporterId={notification.data?.reporterId}
+              reporterAvatar={notification.data?.reporterAvatar || notification.playerAvatar}
+              reportedName={notification.data?.reportedName || 'Игрок'}
+              reportedId={notification.data?.reportedId}
+              reportedAvatar={notification.data?.reportedAvatar}
+              timestamp={notification.timestamp}
+            />
+          </TouchableOpacity>
         ) : notification.type === 'gift_request' ? (
           <TouchableOpacity
             onPress={() => onPress(notification)}
@@ -378,7 +396,12 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <View style={styles.notificationGradientShadow}>
-            <View style={styles.notificationItem}>
+            <BlurView
+              intensity={20}
+              tint="dark"
+              style={styles.notificationItemBlur}
+            >
+              <View style={styles.notificationItem}>
             <View style={styles.notificationIcon}>
               <Ionicons 
                 name={getNotificationIcon(notification.type) as any} 
@@ -432,6 +455,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             )}
             </View>
             </View>
+            </BlurView>
           </View>
         </TouchableOpacity>
         )}
@@ -570,7 +594,8 @@ export default function NotificationsScreen() {
             notification.type === 'physical_data_changed' ||
             notification.type === 'puck_speed_changed' ||
             notification.type === 'video_liked' ||
-            notification.type === 'photo_liked') {
+            notification.type === 'photo_liked' ||
+            notification.type === 'user_report') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
         }
         
@@ -1227,6 +1252,11 @@ export default function NotificationsScreen() {
           // Fallback на текущего пользователя, если playerId не найден
           router.push(`/player/${currentUser.id}?scrollToPhotos=true`);
         }
+      } else if (notification.type === 'user_report') {
+        // Для уведомлений о жалобах переходим на профиль пользователя, на которого пожаловались
+        if (notification.data && notification.data.reportedId) {
+          router.push(`/player/${notification.data.reportedId}`);
+        }
       } else if (notification.type === 'gift_request') {
         // Для уведомлений о запросе подарка переходим на профиль игрока для отправки подарка
         if (notification.data && notification.data.requesterId) {
@@ -1679,18 +1709,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20, // Точно такой же paddingHorizontal как в сообщениях
   },
+  notificationItemBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    borderRadius: 12,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
     minHeight: 80,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   notificationGradientShadow: {
     marginHorizontal: 16,
