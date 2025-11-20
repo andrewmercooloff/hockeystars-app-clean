@@ -6630,6 +6630,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: 'transparent',
     padding: 0,
+    paddingHorizontal: 0,
     marginTop: 0,
     marginBottom: 0,
     shadowColor: 'transparent',
