@@ -324,7 +324,7 @@ export default function CurrentTeamsSection({
     <View style={styles.container}>
       {currentTeams.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="people-outline" size={48} color="#666" />
+          <Ionicons name="shirt-outline" size={48} color="#666" />
           <Text style={styles.emptyText}>{t('noCurrentTeams')}</Text>
         </View>
       ) : (
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 12,
   },
   emptyText: {
     fontSize: 16,
@@ -537,6 +537,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     marginTop: 15,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },

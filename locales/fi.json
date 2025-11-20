@@ -2033,6 +2033,12 @@
     "phone": "Puhelin",
     "sendMessage": "Lähetä viesti",
     "shareProfile": "Jaa profiili",
+    "noTeamsYet": "Joukkueet eivät vielä ole lisätty",
+    "noVideosYet": "Videomomentit eivät vielä ole lisätty",
+    "noPhotosYet": "Valokuvat eivät vielä ole lisätty",
+    "noExercisesYet": "Harjoitukset eivät vielä ole valmiit",
+    "noAchievementsYet": "Saavutukset eivät vielä ole lisätty",
+    "noStandardsYet": "Normit eivät vielä ole täytetty",
     "shareProfileSocial": "Jaa profiili sosiaalisessa mediassa",
     "currentSeasonStats": "Nykyisen kauden tilastot"
   },

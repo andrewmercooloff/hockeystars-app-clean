@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Связаться с командой HockeyStars">
+    <title>HockeyStars — Связаться с нами</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="pucks-container">
+        <div class="puck puck-1"><div class="puck-avatar"></div></div>
+        <div class="puck puck-2"><div class="puck-avatar"></div></div>
+        <div class="puck puck-3"><div class="puck-avatar"></div></div>
+        <div class="puck puck-4"><div class="puck-avatar"></div></div>
+        <div class="puck puck-5"><div class="puck-avatar"></div></div>
+        <div class="puck puck-6"><div class="puck-avatar"></div></div>
+        <div class="puck puck-7"><div class="puck-avatar"></div></div>
+        <div class="puck puck-8"><div class="puck-avatar"></div></div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html">
+                    <img src="logo.png" alt="HockeyStars" class="logo">
+                </a>
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+                    <button class="lang-btn active" data-lang="ru" aria-label="Русский">RU</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="contact-card">
+                <h1 data-i18n="contact.title">Связаться с нами</h1>
+                <p class="contact-subtitle" data-i18n="contact.subtitle">
+                    Есть вопрос или предложение? Напишите нам – мы отвечаем лично и обычно в течение одного рабочего дня.
+                </p>
+
+                <form class="contact-form" method="POST" action="contact-send.php" data-endpoint="contact-send.php">
+                    <div class="contact-form-row">
+                        <label for="contact-name" data-i18n="contact.form.name">Ваше имя</label>
+                        <input type="text" id="contact-name" name="name" placeholder="Connor Bedard">
+                    </div>
+                    <div class="contact-form-row">
+                        <label for="contact-email" data-i18n="contact.form.email">Email</label>
+                        <input type="email" id="contact-email" name="email" placeholder="you@email.com">
+                    </div>
+                    <div class="contact-form-row">
+                        <label for="contact-message" data-i18n="contact.form.message">Сообщение</label>
+                        <textarea id="contact-message" name="message" rows="5" placeholder="Расскажите, как мы можем помочь"></textarea>
+                    </div>
+                    <input type="hidden" name="lang" value="ru">
+                    <button type="submit" class="contact-submit" data-i18n="contact.form.submit">
+                        Отправить сообщение
+                    </button>
+                    <p class="contact-status" aria-live="polite"></p>
+                </form>
+
+                <a href="index.html" class="back-link" data-i18n="contact.back">← Вернуться на главную</a>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text" data-i18n="footer.copyright">© 2025 HockeyStars. Все права защищены.</p>
+                <a href="rules.html" class="footer-link footer-privacy-ru" data-i18n="footer.privacy">Политика конфиденциальности</a>
+                <a href="privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
+                <a href="contact.html" class="footer-link" data-i18n="footer.contact">Обратная связь</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

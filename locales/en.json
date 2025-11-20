@@ -2111,7 +2111,13 @@
     "currentSeasonStats": "Current Season Stats",
     "phone": "Phone",
     "sendMessage": "Send Message",
-    "shareProfile": "Share Profile"
+    "shareProfile": "Share Profile",
+    "noTeamsYet": "Teams not added yet",
+    "noVideosYet": "Video moments not added yet",
+    "noPhotosYet": "Photos not added yet",
+    "noExercisesYet": "Exercises not completed yet",
+    "noAchievementsYet": "Achievements not added yet",
+    "noStandardsYet": "Standards not filled yet"
   },
   "register": {
     "title": "Registration",

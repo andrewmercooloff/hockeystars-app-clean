@@ -23,6 +23,8 @@ import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import { addPlayer, saveCurrentUser, Team, createPlayer } from '../utils/playerStorage';
 import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
+import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
+import { uploadImageToStorage } from '../utils/uploadImage';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -58,7 +60,9 @@ export default function RegisterScreen() {
     email: '',
     discountForFriends: '',
     // Поля для заточки коньков
-    skate_services: [] as string[]
+    skate_services: [] as string[],
+    // Поле для родительского согласия (для детей < 13 лет)
+    parentEmail: ''
   });
   const [step, setStep] = useState<'form' | 'verification'>('form');
   const [verificationCode, setVerificationCode] = useState('');
@@ -76,6 +80,14 @@ export default function RegisterScreen() {
   const filteredCountries = COUNTRIES.filter(country =>
     country.toLowerCase().includes(countrySearchText.toLowerCase())
   );
+
+  // Функция для валидации имени (минимум 2 слова, каждое слово минимум 2 буквы)
+  const validateName = (name: string): boolean => {
+    if (!name || name.trim().length === 0) return false;
+    const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+    if (words.length < 2) return false;
+    return words.every(word => word.length >= 2);
+  };
 
   // Функция для нормализации названий стран для поиска переводов
   const normalizeCountryName = (country: string) => {
@@ -294,6 +306,14 @@ export default function RegisterScreen() {
       return;
     }
 
+    // Валидация имени для игроков, звезд, тренеров и скаутов
+    if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
+      if (!validateName(formData.name)) {
+        showAlert('Ошибка', t('register.nameError') || 'Введите имя и фамилию на английском (минимум 2 слова, каждое слово минимум 2 буквы)', 'error');
+        return;
+      }
+    }
+
     // Проверка формата телефона - обязательный знак +
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
     const isBypassNumber = formData.phone.endsWith('######');
@@ -312,6 +332,27 @@ export default function RegisterScreen() {
     if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
       showAlert('Ошибка', 'Пожалуйста, заполните все поля', 'error');
       return;
+    }
+
+    // Проверка возраста и родительского согласия для детей < 13 лет
+    if (formData.birthDate && formData.status === 'player') {
+      const age = calculateAge(formData.birthDate);
+      if (age < 13) {
+        if (!formData.parentEmail || !formData.parentEmail.trim()) {
+          showAlert(
+            'Требуется согласие родителя',
+            'Для регистрации детей младше 13 лет необходимо указать email одного из родителей. Родитель получит письмо с запросом на подтверждение согласия.',
+            'warning'
+          );
+          return;
+        }
+        // Проверяем формат email родителя
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.parentEmail.trim())) {
+          showAlert('Ошибка', 'Пожалуйста, введите корректный email родителя', 'error');
+          return;
+        }
+      }
     }
 
     setLoading(true);
@@ -423,7 +464,59 @@ export default function RegisterScreen() {
         console.log('🔓 Bypass номер - верификация пропущена');
       }
       
-      // Создаем игрока в базе данных
+      // Проверяем возраст для определения необходимости родительского согласия
+      const needsParentalConsent = formData.birthDate && formData.status === 'player' && requiresParentalConsent(formData.birthDate);
+      
+      if (needsParentalConsent && formData.parentEmail) {
+        // Регистрация ребенка < 13 лет - требуется родительское согласие
+        console.log('👶 Регистрация ребенка < 13 лет, запрашиваем согласие родителя');
+        
+        const consentResult = await registerChildWithParentalConsent(
+          formData.phone,
+          formData.name,
+          formData.birthDate,
+          formData.parentEmail.trim(),
+          formData.country,
+          formData.position,
+          formData.team,
+          formData.status // Передаем исходный статус пользователя
+        );
+        
+        if (!consentResult.success) {
+          showAlert('Ошибка', consentResult.error || 'Не удалось отправить запрос родительского согласия', 'error');
+          return;
+        }
+        
+        // Показываем экран ожидания подтверждения
+        showAlert(
+          'Запрос отправлен родителю',
+          `Мы отправили письмо на адрес ${formData.parentEmail.trim()} с запросом на подтверждение согласия. После того как родитель подтвердит согласие, вы сможете войти в приложение.`,
+          'info',
+          () => {
+            setAlert(prev => ({ ...prev, visible: false }));
+            setTimeout(() => {
+              router.push('/login');
+            }, 100);
+          }
+        );
+        
+        return;
+      }
+      
+      // Обычная регистрация для пользователей >= 13 лет
+      // Загружаем аватар в Supabase Storage, если он есть
+      let avatarUrl = formData.avatar || '';
+      if (formData.avatar && (formData.avatar.startsWith('file://') || formData.avatar.startsWith('content://'))) {
+        console.log('📤 Загружаем аватар в Supabase Storage...');
+        const uploadedUrl = await uploadImageToStorage(formData.avatar);
+        if (uploadedUrl) {
+          avatarUrl = uploadedUrl;
+          console.log('✅ Аватар загружен:', uploadedUrl);
+        } else {
+          console.warn('⚠️ Не удалось загрузить аватар, продолжаем без него');
+        }
+      }
+      
       const playerData = {
         id: Date.now().toString(),
         phone: formData.phone,
@@ -437,7 +530,7 @@ export default function RegisterScreen() {
         height: formData.height || '',
         weight: formData.weight || '',
         number: formData.number || '',
-        avatar: formData.avatar || '',
+        avatar: avatarUrl,
         age: 0,
         city: '',
         goals: '',
@@ -516,7 +609,10 @@ export default function RegisterScreen() {
           
           {/* Статус */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('register.status')}</Text>
+            <Text style={styles.label}>
+              {t('register.status')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
+            </Text>
             <View style={styles.pickerContainer}>
               <TouchableOpacity
                 style={[
@@ -607,7 +703,10 @@ export default function RegisterScreen() {
           
           {/* Телефон */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('register.phone')}</Text>
+            <Text style={styles.label}>
+              {t('register.phone')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
+            </Text>
             <TextInput
               style={styles.input}
               value={formData.phone}
@@ -628,7 +727,10 @@ export default function RegisterScreen() {
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
-              {(formData.status === 'shop' || formData.status === 'skateSharpening') ? t('profile.organizationName') : t('register.name')}
+              {(formData.status === 'shop' || formData.status === 'skateSharpening') 
+                ? t('profile.organizationName')
+                : t('register.name')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
             </Text>
             <TextInput
               style={styles.input}
@@ -648,18 +750,13 @@ export default function RegisterScreen() {
               placeholder={
                 (formData.status === 'shop' || formData.status === 'skateSharpening')
                   ? t('profile.organizationNamePlaceholder')
-                  : t('register.name').toUpperCase()
+                  : (t('register.namePlaceholder') || 'SIDNEY CROSBY').toUpperCase()
               }
               placeholderTextColor="#888"
               autoCapitalize={(formData.status === 'shop' || formData.status === 'skateSharpening') ? 'words' : 'characters'}
               selectTextOnFocus={true}
               autoFocus={false}
             />
-            {(formData.status !== 'shop' && formData.status !== 'skateSharpening') && (
-              <Text style={styles.hintText}>
-                {t('profile.nameHint')}
-              </Text>
-            )}
           </View>
 
           {/* Фото/Логотип */}
@@ -700,7 +797,10 @@ export default function RegisterScreen() {
           {/* Дата рождения - для игроков и звезд */}
           {(formData.status === 'player' || formData.status === 'star') && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.birthDate')}</Text>
+              <Text style={styles.label}>
+                {t('register.birthDate')}
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
               <TouchableOpacity style={styles.dateInput} onPress={showDatePickerModal}>
                 <Text style={styles.dateInputText}>
                   {formData.birthDate || t('register.selectDate')}
@@ -710,9 +810,34 @@ export default function RegisterScreen() {
             </View>
           )}
 
+          {/* Email родителя - только для детей < 13 лет */}
+          {formData.status === 'player' && formData.birthDate && requiresParentalConsent(formData.birthDate) && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                Email родителя <Text style={{color: '#fa2f40'}}>*</Text>
+              </Text>
+              <Text style={[styles.label, {fontSize: 12, color: '#aaa', marginBottom: 8}]}>
+                Для регистрации детей младше 13 лет требуется согласие родителя. Родитель получит письмо с запросом на подтверждение.
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="email@example.com"
+                placeholderTextColor="#666"
+                value={formData.parentEmail}
+                onChangeText={(text) => setFormData({...formData, parentEmail: text})}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+          )}
+
           {/* Страна */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('register.country')}</Text>
+            <Text style={styles.label}>
+              {t('register.country')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
+            </Text>
             <TouchableOpacity
               style={styles.countryButton}
               onPress={() => setShowCountryPicker(true)}
@@ -729,7 +854,10 @@ export default function RegisterScreen() {
           {/* Позиция - для игроков и звезд */}
           {(formData.status === 'player' || formData.status === 'star') && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.position')}</Text>
+              <Text style={styles.label}>
+                {t('register.position')}
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
               <View style={styles.pickerContainer}>
                 {positions.map((pos) => (
                   <TouchableOpacity

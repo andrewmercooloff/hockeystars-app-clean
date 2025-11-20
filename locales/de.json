@@ -2041,6 +2041,12 @@
     "phone": "Telefon",
     "sendMessage": "Nachricht senden",
     "shareProfile": "Profil teilen",
+    "noTeamsYet": "Teams noch nicht hinzugefügt",
+    "noVideosYet": "Videomomente noch nicht hinzugefügt",
+    "noPhotosYet": "Fotos noch nicht hinzugefügt",
+    "noExercisesYet": "Übungen noch nicht abgeschlossen",
+    "noAchievementsYet": "Erfolge noch nicht hinzugefügt",
+    "noStandardsYet": "Normen noch nicht ausgefüllt",
     "shareProfileSocial": "Profil in sozialen Netzwerken teilen",
     "currentSeasonStats": "Aktuelle Saisonstatistiken"
   },

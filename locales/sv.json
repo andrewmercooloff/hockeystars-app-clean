@@ -2041,6 +2041,12 @@
     "phone": "Telefon",
     "sendMessage": "Skicka meddelande",
     "shareProfile": "Dela profil",
+    "noTeamsYet": "Lag har inte lagts till ännu",
+    "noVideosYet": "Videomoment har inte lagts till ännu",
+    "noPhotosYet": "Foton har inte lagts till ännu",
+    "noExercisesYet": "Övningar har inte slutförts ännu",
+    "noAchievementsYet": "Prestationer har inte lagts till ännu",
+    "noStandardsYet": "Standarder har inte fyllts i ännu",
     "shareProfileSocial": "Dela profil på sociala nätverk",
     "currentSeasonStats": "Nuvarande säsongsstatistik"
   },

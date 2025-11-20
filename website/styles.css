@@ -279,7 +279,7 @@ body {
 }
 
 .hero-logo {
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     height: auto;
     object-fit: contain;
@@ -602,6 +602,101 @@ body {
     transform: translateX(3px);
 }
 
+/* Contact form */
+.contact-card {
+    max-width: 720px;
+    margin: 60px auto;
+    padding: 40px 30px;
+    background: rgba(5, 0, 8, 0.85);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+.contact-card h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.contact-subtitle {
+    color: var(--color-text-gray);
+    margin-bottom: 30px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.contact-form label {
+    font-weight: 600;
+    color: var(--color-text-white);
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-white);
+    font-size: 16px;
+    transition: border 0.2s ease, background 0.2s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.contact-submit {
+    background: var(--color-primary);
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--color-text-white);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.contact-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.contact-status {
+    min-height: 24px;
+    color: var(--color-text-gray);
+    font-size: 14px;
+    margin-top: -10px;
+}
+
+.contact-status.success {
+    color: #4caf50;
+}
+
+.contact-status.error {
+    color: #ff7373;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-logo {
@@ -632,6 +727,11 @@ body {
     .download-btn {
         width: 100%;
         max-width: 300px;
+    }
+
+    .contact-card {
+        margin: 40px auto;
+        padding: 30px 20px;
     }
 
     .footer-content {
@@ -688,7 +788,7 @@ body {
     }
 
     .hero-logo {
-        max-width: 340px;
+        max-width: 640px;
     }
 
     .hero-subtitle {

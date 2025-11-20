@@ -52,6 +52,9 @@ const DraggableTeamItem = ({ team, onRemove, onEdit, drag, isActive, readOnly = 
         </TouchableOpacity>
       )}
       
+      <View style={styles.teamIconWrapper}>
+        <Ionicons name="shirt-outline" size={20} color="#fa2f40" />
+      </View>
       <View style={styles.teamInfo}>
         <Text style={styles.teamName}>{getTeamDisplayName(team.teamNameRu || team.teamName, language)}</Text>
         <Text style={styles.teamPeriod}>{getPeriodText(team)}</Text>
@@ -95,8 +98,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 6,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.2)',
   },
@@ -108,6 +112,12 @@ const styles = StyleSheet.create({
   },
   dragHandle: {
     padding: 4,
+    marginRight: 8,
+  },
+  teamIconWrapper: {
+    width: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 8,
   },
   teamInfo: {

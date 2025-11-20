@@ -2033,6 +2033,12 @@
     "phone": "Telefon",
     "sendMessage": "Odeslat zprávu",
     "shareProfile": "Sdílet profil",
+    "noTeamsYet": "Týmy ještě nebyly přidány",
+    "noVideosYet": "Video momenty ještě nebyly přidány",
+    "noPhotosYet": "Fotky ještě nebyly přidány",
+    "noExercisesYet": "Cvičení ještě nebyla dokončena",
+    "noAchievementsYet": "Úspěchy ještě nebyly přidány",
+    "noStandardsYet": "Normy ještě nebyly vyplněny",
     "shareProfileSocial": "Sdílet profil na sociálních sítích",
     "currentSeasonStats": "Statistiky aktuální sezóny"
   },

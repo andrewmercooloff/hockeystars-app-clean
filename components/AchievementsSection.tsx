@@ -37,6 +37,9 @@ export default function AchievementsSection({
     place: 1 as 1 | 2 | 3,
     description: ''
   });
+  
+  // Нормализуем achievements - убеждаемся, что это массив
+  const normalizedAchievements = Array.isArray(achievements) ? achievements : [];
 
   const getMedalIcon = (place: number) => {
     switch (place) {
@@ -130,7 +133,7 @@ export default function AchievementsSection({
       return;
     }
 
-    const updatedAchievements = achievements.map(achievement =>
+    const updatedAchievements = normalizedAchievements.map(achievement =>
       achievement.id === editingAchievement.id ? editingAchievement : achievement
     );
     
@@ -149,7 +152,7 @@ export default function AchievementsSection({
           text: t('common.delete'),
           style: 'destructive',
           onPress: () => {
-            const updatedAchievements = achievements.filter(achievement => achievement.id !== id);
+            const updatedAchievements = normalizedAchievements.filter(achievement => achievement.id !== id);
             onAchievementsChange?.(updatedAchievements);
           }
         }
@@ -162,16 +165,11 @@ export default function AchievementsSection({
     setModalVisible(true);
   };
 
-  if (achievements.length === 0 && !isEditing) {
-    return null;
-  }
   const containerStyle = [styles.section, style];
 
   return (
     <View style={containerStyle}>
-      <Text style={styles.sectionTitle}>{t('profile.achievements') || 'Достижения'}</Text>
-      
-      {achievements.length === 0 ? (
+      {normalizedAchievements.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="trophy-outline" size={48} color="#666" />
           <Text style={styles.emptyText}>{t('profile.noAchievements') || 'Нет достижений'}</Text>
@@ -183,7 +181,7 @@ export default function AchievementsSection({
           style={styles.achievementsScroll}
           contentContainerStyle={styles.achievementsContainer}
         >
-          {achievements.map((achievement) => {
+          {normalizedAchievements.map((achievement) => {
             const medal = getMedalIcon(achievement.place);
             return (
               <View key={achievement.id} style={styles.achievementMedal}>
@@ -367,13 +365,17 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 30,
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    minHeight: 100,
   },
   emptyText: {
-    color: '#fff',
+    color: '#888',
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    marginTop: 10,
+    textAlign: 'center',
+    marginTop: 16,
   },
   achievementsScroll: {
     marginHorizontal: -5,

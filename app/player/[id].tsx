@@ -251,7 +251,8 @@ export default function PlayerProfile() {
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const canShowAchievements = achievements.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id));
+  const isOwner = currentUser && player && currentUser.id === player.id;
+  const canShowAchievements = achievements.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player?.id)) || isOwner;
   const [pastTeams, setPastTeams] = useState<PastTeam[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
   const [individualTraining, setIndividualTraining] = useState<string[]>([]);
@@ -3123,9 +3124,9 @@ export default function PlayerProfile() {
                     keyboardType="numeric"
                     maxLength={2}
                   />
-                ) : player.number ? (
+                ) : (player.number || (currentUser && currentUser.id === player.id)) ? (
                   <View style={styles.numberBadge}>
-                    <Text style={styles.numberText}>#{player.number}</Text>
+                    <Text style={styles.numberText}>#{player.number || '?'}</Text>
                   </View>
                   ) : null
                 )}
@@ -3398,8 +3399,9 @@ export default function PlayerProfile() {
                 
                 // Показываем статистику только если есть хотя бы одно ненулевое значение
                 const hasStats = gamesNum > 0 || minutesNum > 0 || shotsNum > 0 || savesNum > 0;
+                const isOwner = currentUser && currentUser.id === player.id;
                 
-                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
+                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
                   <SectionCard ref={statsRef}>
                     <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                     {isEditing ? (
@@ -3455,7 +3457,7 @@ export default function PlayerProfile() {
                       </View>
                     ) : (
                       <View style={styles.statsGrid}>
-                        {gamesNum > 0 && (
+                        {(gamesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{gamesNum.toString()}</Text>
@@ -3471,7 +3473,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {minutesNum > 0 && (
+                        {(minutesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{minutesNum.toString()}</Text>
@@ -3487,7 +3489,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {shotsNum > 0 && (
+                        {(shotsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{shotsNum.toString()}</Text>
@@ -3503,7 +3505,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {savesNum > 0 && (
+                        {(savesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{savesNum.toString()}</Text>
@@ -3519,7 +3521,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {shotsNum > 0 && (
+                        {(shotsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValueSmall}>{savePercentage}</Text>
@@ -3531,7 +3533,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {minutesNum > 0 && (
+                        {(minutesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{gaa}</Text>
@@ -3557,8 +3559,9 @@ export default function PlayerProfile() {
                 
                 // Показываем статистику только если есть хотя бы одно ненулевое значение
                 const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
+                const isOwner = currentUser && currentUser.id === player.id;
                 
-                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) ? (
+                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
                   <SectionCard ref={statsRef}>
                     <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
                     {isEditing ? (
@@ -3602,7 +3605,7 @@ export default function PlayerProfile() {
                       </View>
                     ) : (
                       <View style={styles.statsGrid}>
-                        {pointsNum > 0 && (
+                        {(pointsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{pointsNum.toString()}</Text>
@@ -3614,7 +3617,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {assistsNum > 0 && (
+                        {(assistsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{assistsNum.toString()}</Text>
@@ -3630,7 +3633,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {goalsNum > 0 && (
+                        {(goalsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{goalsNum.toString()}</Text>
@@ -3646,7 +3649,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {gamesNum > 0 && (
+                        {(gamesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{gamesNum.toString()}</Text>
@@ -3662,7 +3665,7 @@ export default function PlayerProfile() {
                             </View>
                           </View>
                         )}
-                        {pointsNum > 0 && gamesNum > 0 && (
+                        {((pointsNum > 0 && gamesNum > 0) || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
                               <Text style={styles.statValue}>{effectiveness}</Text>
@@ -3683,7 +3686,7 @@ export default function PlayerProfile() {
 
             {/* Основная информация - скрыта для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <SectionCard>
+            <SectionCard wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>{t('profile.basicInfo')}</Text>
               <View style={styles.infoGrid}>
                 <View style={styles.infoItem}>
@@ -3738,7 +3741,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Адрес - только для магазинов */}
-                {player.status === 'shop' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'shop' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.address')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3757,7 +3760,7 @@ export default function PlayerProfile() {
 
 
                 {/* Часы работы - только для магазинов */}
-                {player.status === 'shop' && (player.workingHours || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'shop' && (player.workingHours || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.workingHours')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3775,7 +3778,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Email - только для магазинов */}
-                {player.status === 'shop' && (player.email || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'shop' && (player.email || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Email</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3794,7 +3797,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Поля для заточки коньков */}
-                {player.status === 'skateSharpening' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'skateSharpening' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.address')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3812,7 +3815,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Часы работы - для заточки коньков */}
-                {player.status === 'skateSharpening' && (player.workingHours || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'skateSharpening' && (player.workingHours || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.workingHours')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -3830,7 +3833,7 @@ export default function PlayerProfile() {
                 )}
 
                 {/* Email - для заточки коньков */}
-                {player.status === 'skateSharpening' && (player.email || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+                {player.status === 'skateSharpening' && (player.email || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Email</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -4424,7 +4427,10 @@ export default function PlayerProfile() {
             )}
 
             {/* Секция команд - не показываем для магазинов и заточки коньков */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && (playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && (() => {
+              const isOwner = currentUser && currentUser.id === player.id;
+              return playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner;
+            })() && (
               <SectionCard>
                 <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
                 
@@ -4463,14 +4469,14 @@ export default function PlayerProfile() {
                 ) : (
                   <>
                     {/* Текущие команды */}
-                    {playerTeams.length > 0 && (
+                    {playerTeams.length > 0 ? (
                       <>
                         <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
                         <View style={styles.teamsListContainer}>
                           {playerTeams.map((team, index) => (
                             <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
                               <Animated.View style={styles.rotatedStar}>
-                                <Ionicons name="star" size={16} color="#fa2f40" />
+                                <Ionicons name="shirt-outline" size={18} color="#fa2f40" />
                               </Animated.View>
                               <Text style={styles.teamsListText}>
                                 {(() => {
@@ -4487,17 +4493,22 @@ export default function PlayerProfile() {
                           ))}
                         </View>
                       </>
+                    ) : isOwner && (
+                      <View style={styles.emptySectionContainer}>
+                        <Ionicons name="shirt-outline" size={48} color="#666" />
+                        <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
+                      </View>
                     )}
                     
                     {/* Прошлые команды */}
-                    {pastTeams.length > 0 && (
+                    {pastTeams.length > 0 ? (
                       <>
                         <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
                         <View style={styles.teamsListContainer}>
                           {pastTeams.map((team, index) => (
                             <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
                               <Animated.View style={styles.rotatedStar}>
-                                <Ionicons name="star" size={16} color="#888" />
+                                <Ionicons name="shirt-outline" size={18} color="#888" />
                               </Animated.View>
                               <Text style={styles.teamsListText}>
                                 {(() => {
@@ -4514,7 +4525,7 @@ export default function PlayerProfile() {
                           ))}
                         </View>
                       </>
-                    )}
+                    ) : null}
                   </>
                 )}
               </SectionCard>
@@ -4580,9 +4591,13 @@ export default function PlayerProfile() {
               const hasHeight = player.height && parseInt(player.height) > 0;
               const hasWeight = player.weight && parseInt(player.weight) > 0;
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              const isOwner = currentUser && currentUser.id === player.id;
               
-              // Показываем раздел только если есть хотя бы один параметр или мы в режиме редактирования
-              if (!isEditingMode && !hasHeight && !hasWeight) {
+              // Показываем раздел если:
+              // - есть хотя бы один параметр ИЛИ
+              // - мы в режиме редактирования ИЛИ
+              // - это владелец профиля (чтобы стимулировать заполнение)
+              if (!isEditingMode && !hasHeight && !hasWeight && !isOwner) {
                 return null;
               }
               
@@ -4590,8 +4605,8 @@ export default function PlayerProfile() {
               <SectionCard>
                 <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
                 <View style={styles.infoGrid}>
-                    {/* Рост - показываем только если указан или в режиме редактирования */}
-                    {(hasHeight || isEditingMode) && (
+                    {/* Рост - показываем если указан, в режиме редактирования или это владелец профиля */}
+                    {(hasHeight || isEditingMode || isOwner) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.height')}</Text>
                         {isEditingMode ? (
@@ -4610,8 +4625,8 @@ export default function PlayerProfile() {
                     )}
                   </View>
                     )}
-                    {/* Вес - показываем только если указан или в режиме редактирования */}
-                    {(hasWeight || isEditingMode) && (
+                    {/* Вес - показываем если указан, в режиме редактирования или это владелец профиля */}
+                    {(hasWeight || isEditingMode || isOwner) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
                         {isEditingMode ? (
@@ -4646,7 +4661,9 @@ export default function PlayerProfile() {
               // Показываем секцию только если:
               // 1. Режим редактирования (для владельца или админа)
               // 2. Есть реальные видео
-              if (!isEditingMode && !hasVideos) {
+              // 3. Это владелец профиля (чтобы стимулировать заполнение)
+              const isOwner = currentUser && currentUser.id === player.id;
+              if (!isEditingMode && !hasVideos && !isOwner) {
                 return null;
               }
               
@@ -4749,11 +4766,19 @@ export default function PlayerProfile() {
                 </View>
               ) : hasVideos ? (
                 (() => {
-                  const videoUrls = player.favoriteGoals.split('\n').filter(goal => goal.trim());
+                  const videoUrls = (player.favoriteGoals || '').split('\n').filter(goal => goal.trim());
                   const parsedVideos = videoUrls.map(goal => parseVideoUrl(goal.trim())).filter(v => v !== null);
                   
-                  // Если после парсинга не осталось валидных видео, не показываем секцию
+                  // Если после парсинга не осталось валидных видео, показываем пустое состояние для владельца
                   if (parsedVideos.length === 0) {
+                    if (isOwner) {
+                      return (
+                        <View style={styles.emptySectionContainer}>
+                          <Ionicons name="videocam-outline" size={48} color="#666" />
+                          <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
+                        </View>
+                      );
+                    }
                     return null;
                   }
                   
@@ -4766,6 +4791,11 @@ export default function PlayerProfile() {
                     />
                   );
                 })()
+              ) : isOwner ? (
+                <View style={styles.emptySectionContainer}>
+                  <Ionicons name="videocam-outline" size={48} color="#666" />
+                  <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
+                </View>
               ) : null;
               
               // Если нет контента, не показываем секцию
@@ -4793,7 +4823,7 @@ export default function PlayerProfile() {
               // Если нет доступа и не магазин/заточка - показываем заблокированную секцию
               if (!canSeePhotos && !isShopOrSkateSharpening) {
                 return (
-                  <SectionCard ref={photosRef}>
+            <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
                     <Text style={styles.sectionTitle}>
                       {t('profile.hockeyPhotos')}
                     </Text>
@@ -4808,13 +4838,23 @@ export default function PlayerProfile() {
                 );
               }
               
-              // Если нет фото и не режим редактирования - не показываем секцию
-              if (galleryPhotos.length === 0 && !isEditingPhotos) {
+              // Если нет фото и не режим редактирования - не показываем секцию (кроме владельца)
+              const isOwner = currentUser && currentUser.id === player.id;
+              if (galleryPhotos.length === 0 && !isEditingPhotos && !isOwner) {
                 return null;
               }
               
               return (
-                <SectionCard ref={photosRef}>
+                <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
+                  <Text style={styles.sectionTitle}>
+                    {t('profile.hockeyPhotos')}
+                  </Text>
+                  {galleryPhotos.length === 0 && !isEditingPhotos && isOwner ? (
+                    <View style={styles.emptySectionContainer}>
+                      <Ionicons name="images-outline" size={48} color="#666" />
+                      <Text style={styles.emptySectionText}>{t('profile.noPhotosYet')}</Text>
+                    </View>
+                  ) : (
                   <EditablePhotosSection
                     playerId={player.id}
                     photos={galleryPhotos}
@@ -4832,7 +4872,9 @@ export default function PlayerProfile() {
                     }}
                     isShopProfile={isShopOrSkateSharpening}
                     style={styles.embeddedSectionContent}
+                      showTitle={false}
                   />
+                  )}
                 </SectionCard>
               );
             })()}
@@ -4932,9 +4974,24 @@ export default function PlayerProfile() {
                       (player.longJump && player.longJump !== '0' && player.longJump !== '' && player.longJump !== 'null') ||
                       (player.jumpRope && player.jumpRope !== '0' && player.jumpRope !== '' && player.jumpRope !== 'null');
                     
-                    // Не показываем секцию, если нет нормативов
-                    if (!hasAnyNormative) {
+                    const isOwner = currentUser && currentUser.id === player.id;
+                    
+                    // Не показываем секцию, если нет нормативов (кроме владельца)
+                    if (!hasAnyNormative && !isOwner) {
                       return null;
+                    }
+                    
+                    // Если нет нормативов, но это владелец - показываем пустое состояние
+                    if (!hasAnyNormative && isOwner) {
+                      return (
+                        <SectionCard ref={exercisesRef}>
+                          <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
+                          <View style={styles.emptySectionContainer}>
+                            <Ionicons name="fitness-outline" size={48} color="#666" />
+                            <Text style={styles.emptySectionText}>{t('profile.noStandardsYet')}</Text>
+                          </View>
+                        </SectionCard>
+                      );
                     }
                     
                     return (
@@ -4962,9 +5019,13 @@ export default function PlayerProfile() {
                 ) : null // Не показываем секцию, если данных нет
             ) : null}
 
-            {/* Секция измерения скорости шайбы - только для игроков, видно всем, скрыта если скорость не измерена */}
-{player && player.status === 'player' && player.puckSpeed && player.puckSpeed > 0 && (
-              <SectionCard ref={puckSpeedRef}>
+            {/* Секция измерения скорости шайбы - только для игроков, видно всем, скрыта если скорость не измерена (кроме владельца профиля) */}
+{player && player.status === 'player' && (() => {
+              const hasSpeed = player.puckSpeed && player.puckSpeed > 0;
+              const isOwner = currentUser && currentUser.id === player.id;
+              return hasSpeed || isOwner;
+            })() && (
+            <SectionCard ref={puckSpeedRef} wrapperStyle={styles.compactSectionWrapper}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
@@ -5074,9 +5135,13 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция упражнений - скрыта если упражнения не выполнены */}
-            {player && player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0 && (
-              <SectionCard>
+            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца) */}
+            {player && (() => {
+              const hasExercises = player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0;
+              const isOwner = currentUser && currentUser.id === player.id;
+              return hasExercises || isOwner;
+            })() && (
+              <SectionCard wrapperStyle={styles.compactSectionWrapper}>
                 <PlayerExercisesSection 
                   player={player} 
                   isOwnProfile={currentUser?.id === player.id}
@@ -5087,7 +5152,8 @@ export default function PlayerProfile() {
 
             {/* Достижения - не показываем для магазинов и заточки коньков */}
             {player.status !== 'shop' && player.status !== 'skateSharpening' && canShowAchievements && (
-            <SectionCard ref={achievementsRef}>
+            <SectionCard ref={achievementsRef} wrapperStyle={styles.compactSectionWrapper}>
+              <Text style={styles.sectionTitle}>{t('profile.achievements')}</Text>
               <AchievementsSection 
                 achievements={achievements}
                 isEditing={isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
@@ -5119,7 +5185,7 @@ export default function PlayerProfile() {
                   }
                   return true;
                 })() ? (
-                  <SectionCard ref={museumRef}>
+                  <SectionCard ref={museumRef} wrapperStyle={styles.compactSectionWrapper}>
                   {/* Заголовок музея - показываем всегда */}
                     <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   
@@ -5193,7 +5259,7 @@ export default function PlayerProfile() {
                 </SectionCard>
                 ) : null
               ) : (
-                <SectionCard>
+                <SectionCard wrapperStyle={styles.compactSectionWrapper}>
                   <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   <View style={styles.lockedSectionContainer}>
                     <Ionicons name="lock-closed" size={48} color="#fa2f40" />
@@ -5208,7 +5274,7 @@ export default function PlayerProfile() {
 
             {/* Друзья - скрыты для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <SectionCard>
+            <SectionCard wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>
                 {t('profile.friends')} ({friends.length})
               </Text>
@@ -5233,11 +5299,14 @@ export default function PlayerProfile() {
                   ))}
                 </View>
               ) : (
-                <View style={styles.friendsContainer}>
-                  <Text style={styles.noDataText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
+                <View style={styles.emptySectionContainer}>
+                  <Ionicons name="people-outline" size={48} color="#666" />
+                  <Text style={styles.emptySectionText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
+                  {!(currentUser && currentUser.id === player.id) && (
                   <Text style={styles.noDataSubtext}>
                     {t('profile.beFirstToAdd', {name: player.name})}
                  </Text>
+                  )}
                 </View>
               )}
             </SectionCard>
@@ -5807,6 +5876,17 @@ export default function PlayerProfile() {
         </View>
       </View>
 
+      {/* Плавающая кнопка редактирования (когда НЕ в режиме редактирования) */}
+      {!isEditing && currentUser && currentUser.id === player?.id && (
+        <TouchableOpacity
+          style={styles.floatingEditButton}
+          onPress={() => setIsEditing(true)}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="create-outline" size={28} color="#fa2f40" />
+        </TouchableOpacity>
+      )}
+
       {/* Плавающая кнопка сохранения в режиме редактирования */}
       {isEditing && currentUser && currentUser.id === player?.id && (
         <TouchableOpacity
@@ -5890,30 +5970,47 @@ export default function PlayerProfile() {
       {/* Модальное окно выбора страны */}
       {showCountryPicker && (
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={() => setShowCountryPicker(false)}>
+            <View style={styles.modalOverlayTouchable} />
+          </TouchableWithoutFeedback>
+          <View style={[styles.pickerModalContainer, styles.countryModalContainer]}>
             <View style={styles.modalHeaderContainer}>
-              <Text style={styles.modalTitle}>{t('selectCountry')}</Text>
+              <View style={styles.modalTitleWrapper}>
+                <Text style={styles.modalTitle}>{t('profile.selectCountry') || t('selectCountry')}</Text>
             </View>
-            <ScrollView style={styles.modalScroll}>
-              {COUNTRIES.map((country) => (
+              <TouchableOpacity
+                style={styles.pickerModalCloseButton}
+                onPress={() => setShowCountryPicker(false)}
+              >
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.pickerModalContentLarge}>
+              <ScrollView 
+                style={styles.pickerModalScroll}
+                contentContainerStyle={styles.pickerModalScrollContent}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+              >
+                {COUNTRIES && COUNTRIES.length > 0 ? COUNTRIES.map((country) => (
                 <TouchableOpacity
                   key={country}
-                  style={styles.modalOption}
+                    style={styles.pickerModalOptionCompact}
                   onPress={() => {
                     setEditData({...editData, country: country});
                     setShowCountryPicker(false);
                   }}
                 >
-                  <Text style={styles.modalOptionText}>{t(`profile.countries.${country}`)}</Text>
+                    <Text style={styles.pickerModalOptionText}>{t(`profile.countries.${country}`) || country}</Text>
                 </TouchableOpacity>
-              ))}
+                )) : (
+                  <View style={styles.pickerModalOptionCompact}>
+                    <Text style={styles.pickerModalOptionText}>Список стран недоступен</Text>
+                  </View>
+                )}
             </ScrollView>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setShowCountryPicker(false)}
-            >
-              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       )}
@@ -5921,31 +6018,43 @@ export default function PlayerProfile() {
       {/* Модальное окно выбора позиции */}
       {showPositionPicker && (
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={() => setShowPositionPicker(false)}>
+            <View style={styles.modalOverlayTouchable} />
+          </TouchableWithoutFeedback>
+          <View style={styles.pickerModalContainer}>
             <View style={styles.modalHeaderContainer}>
-              <Text style={styles.modalTitle}>{t('selectPosition')}</Text>
+              <View style={styles.modalTitleWrapper}>
+                <Text style={styles.modalTitle}>{t('profile.selectPosition') || t('selectPosition')}</Text>
             </View>
-            <ScrollView style={styles.modalScroll}>
+              <TouchableOpacity
+                style={styles.pickerModalCloseButton}
+                onPress={() => setShowPositionPicker(false)}
+              >
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.pickerModalContent}>
+              <ScrollView 
+                style={styles.pickerModalScroll}
+                contentContainerStyle={styles.pickerModalScrollContent}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+              >
               {positions.map((position) => (
                 <TouchableOpacity
                   key={position}
-                  style={styles.modalOption}
+                    style={styles.pickerModalOption}
                   onPress={() => {
-                    // Сохраняем английский ключ позиции (стандарт в базе данных)
                     setEditData({...editData, position: position});
                     setShowPositionPicker(false);
                   }}
                 >
-                  <Text style={styles.modalOptionText}>{positionLabels[position] || position}</Text>
+                    <Text style={styles.pickerModalOptionText}>{positionLabels[position] || position}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setShowPositionPicker(false)}
-            >
-              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       )}
@@ -5953,30 +6062,47 @@ export default function PlayerProfile() {
       {/* Модальное окно выбора хвата */}
       {showGripPicker && (
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={() => setShowGripPicker(false)}>
+            <View style={styles.modalOverlayTouchable} />
+          </TouchableWithoutFeedback>
+          <View style={styles.pickerModalContainer}>
             <View style={styles.modalHeaderContainer}>
+              <View style={styles.modalTitleWrapper}>
               <Text style={styles.modalTitle}>{t('profile.selectGrip')}</Text>
             </View>
-            <ScrollView style={styles.modalScroll}>
-              {grips.map((grip) => (
+              <TouchableOpacity
+                style={styles.pickerModalCloseButton}
+                onPress={() => setShowGripPicker(false)}
+              >
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.pickerModalContent}>
+              <ScrollView 
+                style={styles.pickerModalScroll}
+                contentContainerStyle={styles.pickerModalScrollContent}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+              >
+                {grips && grips.length > 0 ? grips.map((grip) => (
                 <TouchableOpacity
                   key={grip}
-                  style={styles.modalOption}
+                    style={styles.pickerModalOption}
                   onPress={() => {
                     setEditData({...editData, grip: grip});
                     setShowGripPicker(false);
                   }}
                 >
-                  <Text style={styles.modalOptionText}>{t(`profile.grips.${grip}`)}</Text>
+                    <Text style={styles.pickerModalOptionText}>{t(`profile.grips.${grip}`) || grip}</Text>
                 </TouchableOpacity>
-              ))}
+                )) : (
+                  <View style={styles.pickerModalOption}>
+                    <Text style={styles.pickerModalOptionText}>Список хватов недоступен</Text>
+                  </View>
+                )}
             </ScrollView>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setShowGripPicker(false)}
-            >
-              <Text style={styles.modalCancelButtonText}>{t('profile.cancel')}</Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       )}
@@ -6273,6 +6399,13 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
   },
+  profileBackButton: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    padding: 8,
+    zIndex: 10,
+  },
   profileMenuButton: {
     position: 'absolute',
     top: 0,
@@ -6462,6 +6595,10 @@ const styles = StyleSheet.create({
   sectionWrapper: {
     marginHorizontal: 0,
     marginBottom: 20,
+  },
+  compactSectionWrapper: {
+    marginTop: 12,
+    marginBottom: 12,
   },
   sectionBlur: {
     borderRadius: 20,
@@ -6754,9 +6891,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
   },
+  emptySectionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    minHeight: 80,
+  },
+  emptySectionText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 12,
+  },
   puckSpeedContainer: {
-    padding: 20,
-    paddingBottom: 0,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
   },
   puckSpeedDisplay: {
     alignItems: 'center',
@@ -6778,7 +6930,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   puckSpeedHistory: {
-    marginBottom: 20,
+    marginBottom: 12,
     padding: 15,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
@@ -6901,6 +7053,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 20,
     padding: 8,
+  },
+  floatingEditButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   floatingSaveButton: {
     position: 'absolute',
@@ -7198,25 +7370,72 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(1, 0, 0, 0.85)',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.select({
+      ios: 70,
+      android: 40,
+      default: 50,
+    }),
     zIndex: 1000,
+  },
+  modalOverlayTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   modalContainer: {
     width: '90%',
-    maxHeight: Dimensions.get('window').height * 0.7,
-    backgroundColor: '#000',
-    borderRadius: 12,
+    maxWidth: 420,
+    maxHeight: Dimensions.get('window').height * 0.75,
+    backgroundColor: '#08010d',
+    borderRadius: 20,
     overflow: 'hidden',
-    padding: 16,
+    padding: 0,
     flexDirection: 'column',
+    justifyContent: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+  },
+  pickerModalContainer: {
+    width: '100%',
+    maxWidth: 420,
+    maxHeight: Dimensions.get('window').height * 0.9,
+    backgroundColor: '#050008',
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+    padding: 0,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+  },
+  countryModalContainer: {
+    minHeight: Dimensions.get('window').height * 0.6,
   },
   modalHeaderContainer: {
-    paddingBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-    marginBottom: 12,
+    borderBottomColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: '#fa2f40',
+  },
+  modalTitleWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  pickerModalCloseButton: {
+    padding: 6,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -7239,6 +7458,47 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 16,
+  },
+  pickerModalContent: {
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  pickerModalContentLarge: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: Dimensions.get('window').height * 0.6,
+  },
+  pickerModalScroll: {
+    width: '100%',
+    maxHeight: Dimensions.get('window').height * 0.65,
+  },
+  pickerModalScrollContent: {
+    paddingBottom: 20,
+    flexGrow: 0,
+  },
+  pickerModalOption: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    minHeight: 50,
+    justifyContent: 'center',
+  },
+  pickerModalOptionCompact: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  pickerModalOptionText: {
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    textAlign: 'left',
   },
   formGroup: {
     marginBottom: 20,
@@ -7306,33 +7566,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     lineHeight: 16,
     fontFamily: 'Gilroy-Regular',
-  },
-  modalScroll: {
-    flex: 1,
-  },
-  modalOption: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  modalOptionText: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Regular',
-    color: '#fff',
-    textAlign: 'center',
-  },
-  modalCancelButton: {
-    marginTop: 12,
-    paddingVertical: 15,
-    backgroundColor: '#fa2f40',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  modalCancelButtonText: {
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
   },
   subsectionTitle: {
     fontSize: 14,
@@ -7428,15 +7661,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-  },
-  modalCloseButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 1,
-  },
-  modalContent: {
-    padding: 20,
   },
   modalSectionTitle: {
     fontSize: 18,

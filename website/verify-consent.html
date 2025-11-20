@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение согласия - HockeyStars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        @font-face {
+            font-family: 'Gilroy';
+            src: url('gilroy-regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Gilroy';
+            src: url('gilroy-bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('led.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            z-index: 0;
+            opacity: 0.3;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(80deg, #054c76d4, #0c192ad9, #471c3ade);
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            background: rgba(5, 0, 8, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .loading {
+            color: #cccccc;
+        }
+        
+        .error {
+            color: #fa2f40;
+        }
+        
+        .success {
+            color: #ffffff;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #fa2f40;
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        p {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .info-box p {
+            color: #ffffff;
+            margin: 0;
+        }
+        
+        .info-box p:first-child {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        a {
+            color: #fa2f40;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="success-icon">⏳</div>
+            <h1>Обработка запроса...</h1>
+            <p>Пожалуйста, подождите, мы подтверждаем ваше согласие.</p>
+        </div>
+        <div id="error" style="display: none;" class="error">
+            <div class="success-icon">❌</div>
+            <h1>Ошибка</h1>
+            <p id="error-message"></p>
+        </div>
+        <div id="success" style="display: none;" class="success">
+            <div class="success-icon">✅</div>
+            <h1>Согласие подтверждено!</h1>
+            <p id="success-message"></p>
+            <div class="info-box">
+                <p style="margin: 0;"><strong>Аккаунт активирован</strong></p>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">Теперь ваш ребенок может войти в приложение HockeyStars.</p>
+            </div>
+            <p style="font-size: 14px; color: #999;">
+                Если у вас есть вопросы, свяжитесь с нами: <a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Получаем токен из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        console.log('🔍 Полный URL:', window.location.href);
+        console.log('🔍 Токен из URL:', token);
+        console.log('🔍 Декодированный токен:', decodeURIComponent(token || ''));
+
+        if (!token) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = 'Токен не предоставлен. Пожалуйста, используйте ссылку из письма.';
+        } else {
+            // Вызываем Edge Function через fetch
+            const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+            const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+            
+            // Правильно кодируем токен для URL
+            const encodedToken = encodeURIComponent(token);
+            const verifyUrl = `${supabaseUrl}/functions/v1/verify-parental-consent?token=${encodedToken}`;
+            console.log('🔍 URL для запроса:', verifyUrl);
+            
+            fetch(verifyUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${anonKey}`,
+                    'apikey': anonKey,
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.json().then(err => {
+                        throw new Error(err.error || err.message || 'Ошибка подтверждения');
+                    });
+                }
+            })
+            .then(html => {
+                // Если ответ - HTML, показываем его
+                if (html.includes('<!DOCTYPE') || html.includes('<html')) {
+                    document.body.innerHTML = html;
+                } else {
+                    // Если JSON, парсим
+                    try {
+                        const data = JSON.parse(html);
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                    } catch (e) {
+                        // Не JSON, показываем как есть
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message || 'Произошла ошибка при подтверждении согласия. Пожалуйста, попробуйте позже или свяжитесь с поддержкой.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
+

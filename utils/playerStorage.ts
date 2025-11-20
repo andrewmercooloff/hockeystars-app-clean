@@ -56,6 +56,7 @@ export interface SupabasePlayer {
   email?: string;
   password?: string;
   status?: string;
+  parent_email?: string; // Email родителя для детей < 13 лет
   birth_date?: string;
   hockey_start_date?: string;
   experience?: number;
@@ -205,6 +206,7 @@ export interface Player {
   email?: string;
   password?: string;
   status?: string;
+  parentEmail?: string; // Email родителя для детей < 13 лет
   birthDate?: string;
   hockeyStartDate?: string;
   experience?: string;
@@ -315,6 +317,7 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     email: supabasePlayer.email,
     password: supabasePlayer.password,
     status: supabasePlayer.status,
+    parentEmail: supabasePlayer.parent_email,
     birthDate: supabasePlayer.birth_date,
     hockeyStartDate: (() => {
       if (!supabasePlayer.hockey_start_date || supabasePlayer.hockey_start_date === '' || supabasePlayer.hockey_start_date === 'null') {
@@ -3781,12 +3784,15 @@ export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = f
   try {
     
     // Если это доступ администратора, ищем любого пользователя с этим номером
+    // Если есть несколько пользователей с одним телефоном, берем самого нового
     if (isAdminAccess) {
       const { data, error } = await supabase
         .from('players')
         .select('*')
         .eq('phone', phone)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
       if (error) {
         console.error('❌ Ошибка поиска игрока (admin access):', error);
@@ -3801,23 +3807,29 @@ export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = f
     }
     
     // Обычный поиск - сначала администратор, потом обычный пользователь
+    // Если есть несколько администраторов с одним телефоном, берем самого нового
     const { data: adminData, error: adminError } = await supabase
       .from('players')
       .select('*')
       .eq('phone', phone)
       .eq('status', 'admin')
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     
     if (adminData) {
       return convertSupabaseToPlayer(adminData);
     }
     
     // Если администратор не найден, ищем обычного пользователя
+    // Если есть несколько пользователей с одним телефоном, берем самого нового
     const { data, error } = await supabase
       .from('players')
       .select('*')
       .eq('phone', phone)
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     
     if (error) {
       console.error('❌ Ошибка поиска игрока:', error);
@@ -3840,6 +3852,16 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
   try {
     console.log('👤 Создаем нового игрока:', playerData.name);
     
+    // Проверяем, нет ли уже пользователя с таким телефоном
+    if (playerData.phone) {
+      const existingPlayer = await getPlayerByPhone(playerData.phone, true); // Используем admin access для поиска всех
+      if (existingPlayer) {
+        console.error('❌ Пользователь с таким телефоном уже существует:', existingPlayer.id, existingPlayer.name, existingPlayer.status);
+        // Возвращаем существующего пользователя вместо создания нового
+        return existingPlayer;
+      }
+    }
+    
     // Конвертируем данные игрока в формат Supabase
     const supabaseData = convertPlayerToSupabase(playerData);
     
@@ -3851,6 +3873,15 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     if (error) {
       console.error('❌ Ошибка создания игрока:', error);
+      // Если ошибка из-за дубликата телефона, пытаемся найти существующего пользователя
+      if (error.code === '23505' && playerData.phone) { // 23505 = unique violation
+        console.log('⚠️ Обнаружен дубликат телефона, ищем существующего пользователя...');
+        const existingPlayer = await getPlayerByPhone(playerData.phone, true);
+        if (existingPlayer) {
+          console.log('✅ Найден существующий пользователь:', existingPlayer.id, existingPlayer.name);
+          return existingPlayer;
+        }
+      }
       return null;
     }
     

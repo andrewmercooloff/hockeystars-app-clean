@@ -467,9 +467,12 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   // Если нет подарков, показываем сообщение
   if (museumItems.length === 0) {
     return (
-      <Text style={styles.emptyText}>
-        {t('profile.museumEmpty', { playerName: playerName || t('profile.player') })}
-      </Text>
+      <View style={styles.emptyContainer}>
+        <Ionicons name="gift-outline" size={48} color="#666" />
+        <Text style={styles.emptyText}>
+          {t('profile.museumEmpty', { playerName: playerName || t('profile.player') })}
+        </Text>
+      </View>
     );
   }
 
@@ -641,10 +644,19 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    minHeight: 100,
+  },
   emptyText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#888',
+    fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
+    marginTop: 16,
   },
   deleteButton: {
     position: 'absolute',

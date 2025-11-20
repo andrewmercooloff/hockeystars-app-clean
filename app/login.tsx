@@ -363,6 +363,17 @@ export default function LoginScreen() {
         return;
       }
       
+      // Проверяем статус аккаунта - если ожидается подтверждение родителя, не пускаем
+      if (user.status === 'pending_verification') {
+        setAlert({
+          visible: true,
+          title: 'Ожидание подтверждения родителя',
+          message: `Ваш аккаунт ожидает подтверждения от родителя. Мы отправили письмо на адрес ${user.parentEmail || 'указанный при регистрации'}. После того как родитель подтвердит согласие, вы сможете войти в приложение.`,
+          type: 'warning'
+        });
+        return;
+      }
+      
       // Пользователь найден - входим в систему
       await saveCurrentUser(user);
       

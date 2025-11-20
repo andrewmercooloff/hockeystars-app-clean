@@ -27,6 +27,7 @@ import { realtimeManager } from '../utils/RealtimeManager';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
+import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -133,9 +134,7 @@ export default function RootLayout() {
   React.useEffect(() => {
     if (Platform.OS === 'ios') {
       // Скрываем нативный splash screen немедленно, чтобы показывался только наш кастомный
-      SplashScreen.hideAsync().catch(() => {
-        // Игнорируем ошибки, если splash screen уже скрыт
-      });
+      safeHideSplashScreen();
     }
   }, []); // Выполняется один раз при монтировании
 
@@ -648,12 +647,7 @@ export default function RootLayout() {
         // Нативный splash screen уже скрыт в начале файла для iOS
         // Здесь дополнительно скрываем для других платформ
         if (Platform.OS !== 'ios') {
-          try {
-            await SplashScreen.hideAsync();
-            console.log('✅ Нативный splash screen скрыт');
-          } catch (splashError) {
-            console.log('ℹ️ Splash screen already hidden or not registered:', splashError.message);
-          }
+          await safeHideSplashScreen();
         }
         
         // Инициализируем только критически важные ресурсы параллельно
@@ -685,11 +679,7 @@ export default function RootLayout() {
         
         // При ошибке быстро скрываем Metro splash и показываем нашу заставку
         if (Platform.OS !== 'ios') {
-          try {
-            await SplashScreen.hideAsync();
-          } catch (finalError) {
-            // Ignore
-          }
+          await safeHideSplashScreen();
         }
         
         // При ошибке сразу переходим к скрытию заставки

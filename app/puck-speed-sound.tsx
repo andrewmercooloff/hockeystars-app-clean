@@ -36,6 +36,7 @@ import { Audio } from 'expo-av';
 // Динамический импорт для react-native-audio-recorder-player (только для нативных платформ)
 // Не импортируем на web, чтобы избежать ошибок
 import CachedBackground from '../components/CachedBackground';
+import CustomAlert from '../components/CustomAlert';
 import { savePuckSpeedResult, getPlayerById } from '../utils/playerStorage';
 import { useUser } from '../contexts/UserContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -104,6 +105,13 @@ export default function PuckSpeedSoundScreen() {
   const [distanceCm, setDistanceCm] = useState<string>('500'); // Расстояние в см (по умолчанию 5м = 500см)
   const [showInstructions, setShowInstructions] = useState(false); // Показывать ли инструкцию
   const [sensitivity, setSensitivity] = useState(50); // Чувствительность (0-100, по умолчанию 50)
+  const [alert, setAlert] = useState({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    onConfirm: () => {},
+  });
   const prevSpeedResultsLengthRef = useRef(0); // Для отслеживания появления новых результатов
   const blinkAnim = useRef(new Animated.Value(1)).current; // Анимация мигания для радара
   const sliderWidthRef = useRef<number>(300); // Ширина слайдера для вычислений
@@ -328,7 +336,13 @@ export default function PuckSpeedSoundScreen() {
         // setDebugLogs(prev => [...prev.slice(-9), successMsg]);
       } catch (error) {
         console.error('❌ Ошибка инициализации Web Audio:', error);
-        Alert.alert('Ошибка', 'Не удалось инициализировать микрофон. Проверьте разрешения.');
+        setAlert({
+          visible: true,
+          title: 'Ошибка',
+          message: 'Не удалось инициализировать микрофон. Проверьте разрешения.',
+          type: 'error',
+          onConfirm: () => setAlert({ ...alert, visible: false }),
+        });
       }
     };
 
@@ -917,10 +931,13 @@ export default function PuckSpeedSoundScreen() {
         await startExpoAVRecording();
       } catch (error) {
         console.error('❌ [iOS] Ошибка запуска expo-av:', error);
-        Alert.alert(
-          'Ошибка записи',
-          `Не удалось запустить запись звука: ${error instanceof Error ? error.message : String(error)}. Проверьте разрешения на микрофон в настройках.`
-        );
+        setAlert({
+          visible: true,
+          title: 'Ошибка записи',
+          message: `Не удалось запустить запись звука: ${error instanceof Error ? error.message : String(error)}. Проверьте разрешения на микрофон в настройках.`,
+          type: 'error',
+          onConfirm: () => setAlert({ ...alert, visible: false }),
+        });
         isAnalyzingRef.current = false;
       }
       
@@ -1175,7 +1192,13 @@ export default function PuckSpeedSoundScreen() {
   // Начало измерения
   const startMeasuring = () => {
     if (!hasPermission) {
-      Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.needMicrophone') || 'Необходим доступ к микрофону');
+      setAlert({
+        visible: true,
+        title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+        message: t('puckSpeed.needMicrophone') || 'Необходим доступ к микрофону',
+        type: 'error',
+        onConfirm: () => setAlert({ ...alert, visible: false }),
+      });
       return;
     }
 
@@ -1268,12 +1291,17 @@ export default function PuckSpeedSoundScreen() {
           <View style={styles.pageHeader}>
             <TouchableOpacity 
               onPress={() => {
-                // Если идет измерение, останавливаем его и возвращаемся на начальную страницу
+                // Если идет измерение, останавливаем его
                 if (isMeasuring) {
                   stopMeasuring();
-                } else {
-                  // Если не измеряем, просто возвращаемся назад
+                  return;
+                }
+                // Возвращаемся на предыдущую страницу
+                if (router.canGoBack()) {
                   router.back();
+                } else {
+                  // Если нет истории, возвращаемся на главную
+                  router.replace('/');
                 }
               }} 
               style={styles.backButton}
@@ -1418,7 +1446,13 @@ export default function PuckSpeedSoundScreen() {
                           style={styles.addToProfileButton}
                           onPress={async () => {
                             if (!currentUser?.id) {
-                              Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата');
+                              setAlert({
+                                visible: true,
+                                title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+                                message: t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата',
+                                type: 'error',
+                                onConfirm: () => setAlert({ ...alert, visible: false }),
+                              });
                               return;
                             }
                             
@@ -1429,16 +1463,40 @@ export default function PuckSpeedSoundScreen() {
                                 await refreshUser(true);
                                 const isNewMaxSpeed = maxSpeedKmh > previousMaxSpeed;
                                 if (isNewMaxSpeed) {
-                                  Alert.alert(t('puckSpeed.successAdded') || 'Успешно!', `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}\n\n${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                  setAlert({
+                                    visible: true,
+                                    title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
+                                    message: `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
+                                    type: 'success',
+                                    onConfirm: () => setAlert({ ...alert, visible: false }),
+                                  });
                                 } else {
-                                  Alert.alert(t('puckSpeed.successAdded') || 'Успешно', `${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'} ${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                  setAlert({
+                                    visible: true,
+                                    title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
+                                    message: `${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
+                                    type: 'success',
+                                    onConfirm: () => setAlert({ ...alert, visible: false }),
+                                  });
                                 }
                               } else {
-                                Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат');
+                                setAlert({
+                                  visible: true,
+                                  title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+                                  message: t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат',
+                                  type: 'error',
+                                  onConfirm: () => setAlert({ ...alert, visible: false }),
+                                });
                               }
                             } catch (error) {
                               console.error('Ошибка сохранения:', error);
-                              Alert.alert('Ошибка', 'Не удалось сохранить результат');
+                              setAlert({
+                                visible: true,
+                                title: 'Ошибка',
+                                message: 'Не удалось сохранить результат',
+                                type: 'error',
+                                onConfirm: () => setAlert({ ...alert, visible: false }),
+                              });
                             }
                           }}
                         >
@@ -1464,7 +1522,13 @@ export default function PuckSpeedSoundScreen() {
                             style={styles.addToProfileButton}
                             onPress={async () => {
                               if (!currentUser?.id) {
-                                Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата');
+                                setAlert({
+                                  visible: true,
+                                  title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+                                  message: t('puckSpeed.errorNoProfile') || 'Необходимо войти в профиль для сохранения результата',
+                                  type: 'error',
+                                  onConfirm: () => setAlert({ ...alert, visible: false }),
+                                });
                                 return;
                               }
                               
@@ -1475,16 +1539,40 @@ export default function PuckSpeedSoundScreen() {
                                   await refreshUser(true);
                                   const isNewMaxSpeed = speedKmh > previousMaxSpeed;
                                   if (isNewMaxSpeed) {
-                                    Alert.alert(t('puckSpeed.successAdded') || 'Успешно!', `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'}\n\n${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                    setAlert({
+                                      visible: true,
+                                      title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
+                                      message: `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
+                                      type: 'success',
+                                      onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    });
                                   } else {
-                                    Alert.alert(t('puckSpeed.successAdded') || 'Успешно', `${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'} ${t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль'}`);
+                                    setAlert({
+                                      visible: true,
+                                      title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
+                                      message: `${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
+                                      type: 'success',
+                                      onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    });
                                   }
                                 } else {
-                                  Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат');
+                                  setAlert({
+                                    visible: true,
+                                    title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+                                    message: t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат',
+                                    type: 'error',
+                                    onConfirm: () => setAlert({ ...alert, visible: false }),
+                                  });
                                 }
                               } catch (error) {
                                 console.error('Ошибка сохранения:', error);
-                                Alert.alert(t('puckSpeed.errorSaveFailed') || 'Ошибка', t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат');
+                                setAlert({
+                                  visible: true,
+                                  title: t('puckSpeed.errorSaveFailed') || 'Ошибка',
+                                  message: t('puckSpeed.errorSaveFailed') || 'Не удалось сохранить результат',
+                                  type: 'error',
+                                  onConfirm: () => setAlert({ ...alert, visible: false }),
+                                });
                               }
                             }}
                           >
@@ -1643,6 +1731,16 @@ export default function PuckSpeedSoundScreen() {
           )}
         </View>
       </CachedBackground>
+      <CustomAlert
+        visible={alert.visible}
+        title={alert.title}
+        message={alert.message}
+        type={alert.type}
+        onConfirm={() => {
+          setAlert({ ...alert, visible: false });
+          if (alert.onConfirm) alert.onConfirm();
+        }}
+      />
     </KeyboardAvoidingView>
   );
 }

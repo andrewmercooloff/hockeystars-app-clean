@@ -1,8 +1,8 @@
 // Translations
 const translations = {
     ru: {
-        'hero.subtitle': 'Мир хоккейных звезд в одном приложении',
-        'hero.description': 'Заявите о себе на весь мир, станьте хоккейной звездой!',
+        'hero.subtitle': 'Весь хоккейный мир в одном приложении',
+        'hero.description': 'Заяви о себе, стань хоккейной звездой!',
         'forWhom.title': 'Для кого?',
         'forWhom.players.title': 'Для хоккеистов:',
         'forWhom.players.text': 'Заявите о себе, станьте заметными для скаутов, просите подарки у звезд, находите друзей во всем хоккейном мире!',
@@ -31,9 +31,21 @@ const translations = {
         'download.playstore.label': 'Скачать в',
         'footer.copyright': '© 2025 HockeyStars. Все права защищены.',
         'footer.privacy': 'Политика конфиденциальности',
+        'footer.contact': 'Обратная связь',
+        'contact.title': 'Связаться с нами',
+        'contact.subtitle': 'Есть вопрос или предложение? Напишите нам – мы отвечаем лично и обычно в течение одного рабочего дня.',
+        'contact.form.name': 'Ваше имя',
+        'contact.form.email': 'Email',
+        'contact.form.message': 'Сообщение',
+        'contact.form.submit': 'Отправить сообщение',
+        'contact.form.validation': 'Пожалуйста, заполните все поля.',
+        'contact.form.sending': 'Отправляем сообщение…',
+        'contact.form.success': 'Сообщение отправлено! Мы свяжемся с вами в течение одного рабочего дня.',
+        'contact.form.error': 'Не удалось отправить сообщение. Попробуйте еще раз или напишите на support@hockeystars.app.',
+        'contact.back': '← Вернуться на главную',
         'rules.title': 'Политика конфиденциальности',
-        'rules.lastUpdated': 'Последнее обновление: 17 ноября 2025 г.',
-        'rules.intro': 'Настоящая Политика конфиденциальности описывает, как HockeyStars ("мы", "наш" или "приложение") собирает, использует и защищает вашу личную информацию при использовании нашего мобильного приложения.',
+        'rules.lastUpdated': 'Последнее обновление: 19 ноября 2025 г.',
+        'rules.intro': 'Настоящая Политика конфиденциальности описывает, как Andrey Merkulov, владелец приложения HockeyStars («Приложение»), («мы», «нас», «наш») собирает, использует и защищает вашу личную информацию.',
         'rules.dataCollection.title': '1. Сбор информации',
         'rules.dataCollection.personal.title': '1.1. Персональные данные',
         'rules.dataCollection.personal.text': 'При регистрации и использовании приложения мы собираем следующую информацию:',
@@ -58,14 +70,13 @@ const translations = {
         'rules.dataUsage.item5': 'Обеспечение безопасности и предотвращение мошенничества',
         'rules.dataUsage.item6': 'Анализ использования приложения для улучшения сервиса',
         'rules.dataSharing.title': '3. Передача данных третьим лицам',
-        'rules.dataSharing.text': 'Мы используем следующие сторонние сервисы, которые могут иметь доступ к вашим данным:',
-        'rules.dataSharing.item1': '<strong>Supabase</strong> - для хранения данных и аутентификации пользователей. Supabase обрабатывает ваши данные в соответствии со своей политикой конфиденциальности.',
-        'rules.dataSharing.item2': '<strong>Expo</strong> - для разработки и распространения приложения. Expo может собирать анонимные данные об использовании.',
-        'rules.dataSharing.item3': '<strong>Apple App Store / Google Play</strong> - для распространения приложения. Эти платформы могут собирать данные в соответствии со своими политиками.',
-        'rules.dataSharing.noSale': 'Мы не продаем и не передаем ваши персональные данные третьим лицам для маркетинговых целей.',
+        'rules.dataSharing.text': 'Мы не продаем и не передаем ваши персональные данные третьим лицам для маркетинговых целей. Для обеспечения работы Приложения мы используем следующие сторонние сервисы, которые выступают в качестве обработчиков ваших данных:',
+        'rules.dataSharing.item1': '<strong>Supabase</strong> - используется для облачной базы данных и аутентификации пользователей. Данные хранятся на защищенных серверах. Ознакомиться с политикой конфиденциальности Supabase можно <a href="https://supabase.com/privacy" target="_blank">здесь</a>.',
+        'rules.dataSharing.item2': '<strong>Expo</strong> - используется как платформа для разработки и развертывания Приложения. Expo может собирать анонимные технические данные для анализа стабильности.',
+        'rules.dataSharing.item3': '<strong>Apple App Store / Google Play</strong> - эти платформы обрабатывают данные, связанные с покупкой и загрузкой Приложения, в соответствии со своими собственными политиками конфиденциальности.',
         'rules.dataSecurity.title': '4. Безопасность данных',
-        'rules.dataSecurity.text': 'Мы принимаем разумные меры для защиты вашей информации:',
-        'rules.dataSecurity.item1': 'Использование шифрования для передачи данных',
+        'rules.dataSecurity.text': 'Мы принимаем разумные технические и организационные меры для защиты вашей информации. К ним относятся шифрование данных при передаче (протокол SSL/TLS), безопасное хранение данных на защищенных серверах и строгий контроль доступа к персональным данным.',
+        'rules.dataSecurity.item1': 'Шифрование данных при передаче (протокол SSL/TLS)',
         'rules.dataSecurity.item2': 'Безопасное хранение данных на защищенных серверах',
         'rules.dataSecurity.item3': 'Регулярное обновление систем безопасности',
         'rules.dataSecurity.item4': 'Ограничение доступа к персональным данным только авторизованному персоналу',
@@ -78,21 +89,52 @@ const translations = {
         'rules.userRights.item4': 'Право на отзыв согласия на обработку данных',
         'rules.userRights.item5': 'Право на ограничение обработки данных',
         'rules.userRights.contact': 'Для осуществления этих прав свяжитесь с нами через приложение или по электронной почте.',
-        'rules.children.title': '6. Защита детей',
-        'rules.children.text': 'Наше приложение предназначено для пользователей всех возрастов, включая несовершеннолетних. Мы принимаем дополнительные меры для защиты конфиденциальности детей:',
-        'rules.children.item1': 'Родители или опекуны могут контролировать использование приложения детьми',
-        'rules.children.item2': 'Мы не собираем намеренно персональные данные от детей без согласия родителей',
-        'rules.children.item3': 'Если мы узнаем, что собрали данные от ребенка без согласия, мы удалим эту информацию',
-        'rules.changes.title': '7. Изменения в Политике конфиденциальности',
+        'rules.children.title': '6. Защита детей (Политика в отношении несовершеннолетних)',
+        'rules.children.text': 'Наше Приложение предназначено для пользователей всех возрастов, включая детей. Мы уделяем первостепенное внимание защите их конфиденциальности.',
+        'rules.children.item1': 'Родители или законные представители несут ответственность за контроль использования Приложения их детьми',
+        'rules.children.item2': 'Мы не собираем намеренно персональные данные от детей без требуемого по закону согласия родителей',
+        'rules.children.item3': 'Если мы узнаем, что собрали данные от ребенка без согласия, мы немедленно удалим эту информацию',
+        'rules.children.item4': 'Родители имеют право запросить доступ к данным своего ребенка, потребовать их исправления или полного удаления',
+        'rules.children.item5': 'Мы не продаем и не передаем данные детей третьим лицам для маркетинговых целей',
+        'rules.children.contact': 'Для реализации этих прав родители могут связаться с нашей службой поддержки по email support@hockeystars.app с адреса электронной почты, который использовался для предоставления согласия.',
+        'rules.children.parentalConsent.title': '6.1. Родительское согласие для детей младше 13 лет',
+        'rules.children.parentalConsent.text': 'Для регистрации детей младше 13 лет требуется верифицированное согласие родителей:',
+        'rules.children.parentalConsent.item1': 'Родительское согласие получается только по электронной почте (не через простую галочку)',
+        'rules.children.parentalConsent.item2': 'Мы отправляем подробную информацию о собираемых данных и наших правилах конфиденциальности',
+        'rules.children.parentalConsent.item3': 'Родитель должен подтвердить согласие через специальную ссылку в письме',
+        'rules.children.parentalConsent.item4': 'Без подтвержденного согласия родителей регистрация ребенка невозможна',
+        'rules.children.parentalConsent.item5': 'Родители могут отозвать согласие в любое время',
+        'rules.moderation.title': '7. Модерация контента и безопасность пользователей',
+        'rules.moderation.text': 'Мы стремимся обеспечить безопасную и комфортную среду для всех пользователей нашего приложения. Для этого мы реализуем систему модерации и предоставляем пользователям инструменты для защиты:',
+        'rules.moderation.manualReview.title': '7.1. Модерация контента',
+        'rules.moderation.manualReview.text': 'Мы применяем систему модерации контента, которая включает в себя как автоматические фильтры, так и ручную проверку:',
+        'rules.moderation.manualReview.item1': 'Публикуемый контент (профили, фото, видео) может проходить проверку на соответствие правилам нашего сообщества',
+        'rules.moderation.manualReview.item2': 'Аккаунты, нарушающие правила, в том числе занимающиеся буллингом, распространением запрещенного контента или иными деструктивными действиями, могут быть заблокированы',
+        'rules.moderation.manualReview.item3': 'Мы стремимся оперативно реагировать на жалобы пользователей и нарушения',
+        'rules.moderation.reporting.title': '7.2. Система жалоб',
+        'rules.moderation.reporting.text': 'Пользователи могут сообщать о нарушениях через встроенную систему жалоб:',
+        'rules.moderation.reporting.item1': 'Возможность пожаловаться на любого пользователя из его профиля',
+        'rules.moderation.reporting.item2': 'Все жалобы отправляются непосредственно администратору приложения',
+        'rules.moderation.reporting.item3': 'Жалобы обрабатываются в кратчайшие сроки',
+        'rules.moderation.reporting.item4': 'Анонимность жалобщика гарантируется',
+        'rules.moderation.reporting.item5': 'О результатах рассмотрения жалобы информируется заявитель',
+        'rules.moderation.blocking.title': '7.3. Функции блокировки пользователей',
+        'rules.moderation.blocking.text': 'Пользователи имеют возможность самостоятельно блокировать других пользователей:',
+        'rules.moderation.blocking.item1': 'Заблокированный пользователь не сможет просматривать ваш профиль',
+        'rules.moderation.blocking.item2': 'Заблокированный пользователь не сможет отправлять вам сообщения',
+        'rules.moderation.blocking.item3': 'Заблокированный пользователь не получит уведомления о блокировке',
+        'rules.moderation.blocking.item4': 'Вы можете разблокировать пользователя в любое время',
+        'rules.moderation.blocking.item5': 'Блокировка не влияет на возможность отправки жалоб администратору',
+        'rules.changes.title': '8. Изменения в Политике конфиденциальности',
         'rules.changes.text': 'Мы можем периодически обновлять настоящую Политику конфиденциальности. О существенных изменениях мы уведомим вас через приложение или по электронной почте. Продолжение использования приложения после внесения изменений означает ваше согласие с обновленной политикой.',
-        'rules.contact.title': '8. Контакты',
+        'rules.contact.title': '9. Контакты',
         'rules.contact.text': 'Если у вас есть вопросы или предложения относительно настоящей Политики конфиденциальности, пожалуйста, свяжитесь с нами:',
         'rules.contact.email': 'Email: support@hockeystars.app',
         'rules.contact.app': 'Через приложение: раздел "Настройки" → "Поддержка"',
         'rules.back': '← Вернуться на главную'
     },
     en: {
-        'hero.subtitle': 'The world of hockey stars in one app',
+        'hero.subtitle': 'The entire hockey world in one app',
         'hero.description': 'Make yourself known to the world, become a hockey star!',
         'forWhom.title': 'For whom?',
         'forWhom.players.title': 'For players:',
@@ -122,9 +164,21 @@ const translations = {
         'download.playstore.label': 'Get it on',
         'footer.copyright': '© 2025 HockeyStars. All rights reserved.',
         'footer.privacy': 'Privacy Policy',
+        'footer.contact': 'Contact Us',
+        'contact.title': 'Contact Us',
+        'contact.subtitle': 'Have a question or suggestion? Send us a note — we personally reply within one business day.',
+        'contact.form.name': 'Your name',
+        'contact.form.email': 'Email',
+        'contact.form.message': 'Message',
+        'contact.form.submit': 'Send message',
+        'contact.form.validation': 'Please fill in all fields.',
+        'contact.form.sending': 'Sending your message…',
+        'contact.form.success': 'Message sent! We will get back to you within one business day.',
+        'contact.form.error': 'Message could not be sent. Please try again or email us at support@hockeystars.app.',
+        'contact.back': '← Back to main page',
         'rules.title': 'Privacy Policy',
-        'rules.lastUpdated': 'Last updated: November 17, 2025',
-        'rules.intro': 'This Privacy Policy describes how HockeyStars ("we", "our" or "the app") collects, uses and protects your personal information when you use our mobile application.',
+        'rules.lastUpdated': 'Last updated: November 19, 2025',
+        'rules.intro': 'This Privacy Policy describes how Andrey Merkulov, the owner of the HockeyStars mobile application ("App"), ("we", "us", "our") collects, uses, and protects your personal information.',
         'rules.dataCollection.title': '1. Information Collection',
         'rules.dataCollection.personal.title': '1.1. Personal Data',
         'rules.dataCollection.personal.text': 'When registering and using the app, we collect the following information:',
@@ -148,15 +202,14 @@ const translations = {
         'rules.dataUsage.item4': 'Sending push notifications about important events',
         'rules.dataUsage.item5': 'Ensuring security and preventing fraud',
         'rules.dataUsage.item6': 'Analyzing app usage to improve service',
-        'rules.dataSharing.title': '3. Sharing Data with Third Parties',
-        'rules.dataSharing.text': 'We use the following third-party services that may have access to your data:',
-        'rules.dataSharing.item1': '<strong>Supabase</strong> - for data storage and user authentication. Supabase processes your data in accordance with its privacy policy.',
-        'rules.dataSharing.item2': '<strong>Expo</strong> - for app development and distribution. Expo may collect anonymous usage data.',
-        'rules.dataSharing.item3': '<strong>Apple App Store / Google Play</strong> - for app distribution. These platforms may collect data in accordance with their policies.',
-        'rules.dataSharing.noSale': 'We do not sell or transfer your personal data to third parties for marketing purposes.',
+        'rules.dataSharing.title': '3. Data Sharing with Third Parties',
+        'rules.dataSharing.text': 'We do not sell or transfer your personal data to third parties for marketing purposes. To ensure the App’s operation, we use the following third-party services that act as processors of your data:',
+        'rules.dataSharing.item1': '<strong>Supabase</strong> – used for the cloud database and user authentication. Data is stored on secure servers. You can review Supabase’s privacy policy <a href="https://supabase.com/privacy" target="_blank">here</a>.',
+        'rules.dataSharing.item2': '<strong>Expo</strong> – used as a platform for app development and deployment. Expo may collect anonymous technical data for stability analysis.',
+        'rules.dataSharing.item3': '<strong>Apple App Store / Google Play</strong> – these platforms process data related to purchasing and downloading the App in accordance with their own privacy policies.',
         'rules.dataSecurity.title': '4. Data Security',
-        'rules.dataSecurity.text': 'We take reasonable measures to protect your information:',
-        'rules.dataSecurity.item1': 'Using encryption for data transmission',
+        'rules.dataSecurity.text': 'We take reasonable technical and organizational measures to protect your information. These include data encryption during transmission (SSL/TLS protocol), secure storage on protected servers, and strict access control to personal data.',
+        'rules.dataSecurity.item1': 'Data encryption during transmission (SSL/TLS protocol)',
         'rules.dataSecurity.item2': 'Secure data storage on protected servers',
         'rules.dataSecurity.item3': 'Regular security system updates',
         'rules.dataSecurity.item4': 'Limiting access to personal data to authorized personnel only',
@@ -169,20 +222,54 @@ const translations = {
         'rules.userRights.item4': 'Right to withdraw consent to data processing',
         'rules.userRights.item5': 'Right to restrict data processing',
         'rules.userRights.contact': 'To exercise these rights, contact us through the app or by email.',
-        'rules.children.title': '6. Children Protection',
-        'rules.children.text': 'Our app is intended for users of all ages, including minors. We take additional measures to protect children\'s privacy:',
-        'rules.children.item1': 'Parents or guardians can control children\'s use of the app',
-        'rules.children.item2': 'We do not intentionally collect personal data from children without parental consent',
-        'rules.children.item3': 'If we learn that we have collected data from a child without consent, we will delete that information',
-        'rules.changes.title': '7. Changes to Privacy Policy',
-        'rules.changes.text': 'We may periodically update this Privacy Policy. We will notify you of significant changes through the app or by email. Continued use of the app after changes are made means you agree to the updated policy.',
-        'rules.contact.title': '8. Contact',
+        'rules.children.title': '6. Children’s Protection (Policy Regarding Minors)',
+        'rules.children.text': 'Our App is intended for users of all ages, including children. We give top priority to protecting their privacy.',
+        'rules.children.item1': 'Parents or legal representatives are responsible for controlling their children’s use of the App',
+        'rules.children.item2': 'We do not intentionally collect personal data from children without the legally required parental consent',
+        'rules.children.item3': 'If we learn that we collected data from a child without consent, we will promptly delete this information',
+        'rules.children.item4': 'Parents have the right to request access to their child’s data, demand corrections, or complete deletion',
+        'rules.children.item5': 'We do not sell or transfer children’s data to third parties for marketing purposes',
+        'rules.children.contact': 'To exercise these rights, parents can contact our support team at support@hockeystars.app from the email address used to provide consent.',
+        'rules.children.parentalConsent.title': '6.1. Parental Consent for Children Under 13',
+        'rules.children.parentalConsent.text': 'For users under 13 years of age, we require verifiable parental consent:',
+        'rules.children.parentalConsent.item1': 'Parental consent is obtained only via email (not through a simple checkbox)',
+        'rules.children.parentalConsent.item2': 'We send detailed information about the collected data and our privacy rules',
+        'rules.children.parentalConsent.item3': 'The parent must confirm consent through a special link in the email',
+        'rules.children.parentalConsent.item4': 'Without verified parental consent, the child’s registration cannot be completed',
+        'rules.children.parentalConsent.item5': 'Parents can revoke consent at any time',
+        'rules.moderation.title': '7. Content Moderation and User Safety',
+        'rules.moderation.text': 'We strive to ensure a safe and comfortable environment for all users. To achieve this, we implement moderation systems and provide users with protection tools:',
+        'rules.moderation.manualReview.title': '7.1. Content Moderation',
+        'rules.moderation.manualReview.text': 'We apply a content moderation system that includes both automatic filters and manual review:',
+        'rules.moderation.manualReview.item1': 'Published content (profiles, photos, videos) may be checked for compliance with our community rules',
+        'rules.moderation.manualReview.item2': 'Accounts that violate rules, including bullying or distributing prohibited content, may be blocked',
+        'rules.moderation.manualReview.item3': 'We strive to respond promptly to user complaints and violations',
+        'rules.moderation.reporting.title': '7.2. Reporting System',
+        'rules.moderation.reporting.text': 'Users can report violations through the built-in reporting system:',
+        'rules.moderation.reporting.item1': 'Ability to report any user from their profile',
+        'rules.moderation.reporting.item2': 'All reports are sent directly to the app administrator',
+        'rules.moderation.reporting.item3': 'Reports are processed as quickly as possible',
+        'rules.moderation.reporting.item4': 'The complainant’s anonymity is guaranteed',
+        'rules.moderation.reporting.item5': 'The complainant is informed about the review results',
+        'rules.moderation.blocking.title': '7.3. User Blocking Features',
+        'rules.moderation.blocking.text': 'Users can block other users on their own:',
+        'rules.moderation.blocking.item1': 'The blocked user cannot view your profile',
+        'rules.moderation.blocking.item2': 'The blocked user cannot send you messages',
+        'rules.moderation.blocking.item3': 'The blocked user does not receive a blocking notification',
+        'rules.moderation.blocking.item4': 'You can unblock a user at any time',
+        'rules.moderation.blocking.item5': 'Blocking does not affect the ability to send complaints to the administrator',
+        'rules.changes.title': '8. Changes to the Privacy Policy',
+        'rules.changes.text': 'We may periodically update this Privacy Policy. We will notify you of material changes through the App or by email. Continued use of the App after changes means your acceptance of the updated policy.',
+        'rules.contact.title': '9. Contacts',
         'rules.contact.text': 'If you have questions or suggestions regarding this Privacy Policy, please contact us:',
         'rules.contact.email': 'Email: support@hockeystars.app',
         'rules.contact.app': 'Through the app: Settings → Support',
         'rules.back': '← Back to home'
     }
 };
+
+let currentLanguage = 'en';
+const CONTACT_FORM_ENDPOINT_DEFAULT = 'contact-send.php';
 
 // Russian-speaking countries
 const russianSpeakingCountries = [
@@ -223,6 +310,7 @@ function setLanguage(lang) {
     
     localStorage.setItem('hockeystars-lang', lang);
     document.documentElement.lang = lang;
+    currentLanguage = lang;
     
     // Update all translatable elements
     const elements = document.querySelectorAll('[data-i18n]');
@@ -247,6 +335,30 @@ function setLanguage(lang) {
             btn.classList.remove('active');
         }
     });
+
+    // Update privacy policy links
+    const privacyRu = document.querySelector('.footer-privacy-ru');
+    const privacyEn = document.querySelector('.footer-privacy-en');
+    if (privacyRu && privacyEn) {
+        if (lang === 'en') {
+            privacyRu.style.display = 'none';
+            privacyEn.style.display = 'inline-block';
+        } else {
+            privacyRu.style.display = 'inline-block';
+            privacyEn.style.display = 'none';
+        }
+    }
+
+    document.querySelectorAll('input[name="lang"]').forEach(input => {
+        input.value = lang;
+    });
+}
+
+function getTranslationValue(key, fallback) {
+    if (translations[currentLanguage] && translations[currentLanguage][key]) {
+        return translations[currentLanguage][key];
+    }
+    return fallback;
 }
 
 // Load avatars for pucks
@@ -361,6 +473,79 @@ function updatePuckAvatars(avatarUrls) {
             const cachedAvatars = JSON.parse(localStorage.getItem('hockeystars-puck-avatars') || '[]');
             cachedAvatars[index] = urls[index];
             localStorage.setItem('hockeystars-puck-avatars', JSON.stringify(cachedAvatars));
+        }
+    });
+}
+
+function initContactForm() {
+    const form = document.querySelector('.contact-form');
+    if (!form) {
+        return;
+    }
+
+    const nameInput = form.querySelector('input[name="name"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const messageInput = form.querySelector('textarea[name="message"]');
+    const statusEl = form.querySelector('.contact-status');
+    const endpoint = form.dataset.endpoint || CONTACT_FORM_ENDPOINT_DEFAULT;
+
+    const setStatus = (message, isError = false) => {
+        if (!statusEl) {
+            return;
+        }
+        statusEl.textContent = message;
+        statusEl.classList.remove('success', 'error');
+        statusEl.classList.add(isError ? 'error' : 'success');
+    };
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const name = nameInput?.value.trim();
+        const email = emailInput?.value.trim();
+        const message = messageInput?.value.trim();
+
+        if (!name || !email || !message) {
+            setStatus(getTranslationValue('contact.form.validation', 'Please fill in all fields.'), true);
+            return;
+        }
+
+        try {
+            setStatus(getTranslationValue('contact.form.sending', 'Sending your message…'), false);
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('message', message);
+            formData.append('lang', currentLanguage);
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Request failed');
+            }
+
+            setStatus(
+                getTranslationValue(
+                    'contact.form.success',
+                    'Message sent! We will get back to you within one business day.'
+                ),
+                false
+            );
+            form.reset();
+        } catch (error) {
+            console.error('Failed to submit contact form', error);
+            setStatus(
+                getTranslationValue(
+                    'contact.form.error',
+                    'Message could not be sent. Please try again or email us at support@hockeystars.app.'
+                ),
+                true
+            );
         }
     });
 }
@@ -606,5 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //     .then(response => response.json())
     //     .then(data => updatePuckAvatars(data.avatarUrls))
     //     .catch(error => console.error('Error loading avatars:', error));
+
+    initContactForm();
 });
 

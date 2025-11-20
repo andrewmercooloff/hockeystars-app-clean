@@ -319,7 +319,7 @@ export default function PastTeamsSection({
       
              {!hasPastTeams ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="people-outline" size={48} color="#666" />
+          <Ionicons name="shirt-outline" size={48} color="#666" />
           <Text style={styles.emptyText}>{t('noPastTeams')}</Text>
         </View>
              ) : (
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: 12,
   },
   emptyText: {
     color: '#666',
@@ -576,6 +576,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     marginTop: 15,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },

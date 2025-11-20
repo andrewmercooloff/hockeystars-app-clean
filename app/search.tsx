@@ -25,6 +25,7 @@ import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import CachedBackground from '../components/CachedBackground';
+import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -371,11 +372,7 @@ export default function SearchScreen() {
         // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
         // Вместо этого просто логируем ошибку
       } finally {
-        try {
-          await SplashScreen.hideAsync();
-        } catch (splashError) {
-          // Игнорируем ошибку splash screen
-        }
+        await safeHideSplashScreen();
         setLoading(false);
       }
     };

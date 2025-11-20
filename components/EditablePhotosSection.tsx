@@ -33,6 +33,7 @@ interface EditablePhotosSectionProps {
   isShopProfile?: boolean;
   playerId?: string; // ID игрока, владельца фото
   style?: StyleProp<ViewStyle>;
+  showTitle?: boolean;
 }
 
 export default function EditablePhotosSection({ 
@@ -42,6 +43,7 @@ export default function EditablePhotosSection({
   isShopProfile,
   playerId,
   style,
+  showTitle = true,
 }: EditablePhotosSectionProps) {
   const { t } = useLanguage();
 
@@ -386,9 +388,11 @@ export default function EditablePhotosSection({
 
   return (
     <View style={[styles.section, style]}>
-      <Text style={styles.sectionTitle}>
-        {isShopProfile ? t('profile.photos') : t('profile.hockeyPhotos')}
-      </Text>
+      {showTitle && (
+        <Text style={styles.sectionTitle}>
+          {isShopProfile ? t('profile.photos') : t('profile.hockeyPhotos')}
+        </Text>
+      )}
       
              {isEditing && (
          <>
@@ -554,6 +558,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1, 0, 0, 0.6)',
     borderRadius: 15,
     padding: 20,
+    paddingBottom: 12,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { Ionicons } from '@expo/vector-icons';
 import { processAvatarThumbnails } from '../utils/ThumbnailGenerator';
 
@@ -101,8 +102,24 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 
   const uploadOriginalImage = async (imageUri: string, playerId: string): Promise<string> => {
     try {
+      // Сжимаем изображение до 250px перед загрузкой
+      let processedImageUri = imageUri;
+      if (imageUri.startsWith('file://') || imageUri.startsWith('content://')) {
+        try {
+          const result = await ImageManipulator.manipulateAsync(
+            imageUri,
+            [{ resize: { width: 250 } }], // Уменьшенный размер для аватаров (250px)
+            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } // JPEG для аватаров с сжатием 0.8
+          );
+          processedImageUri = result.uri;
+        } catch (manipulatorError) {
+          console.error('❌ Ошибка обработки изображения:', manipulatorError);
+          processedImageUri = imageUri;
+        }
+      }
+      
       // Конвертируем в blob
-      const response = await fetch(imageUri);
+      const response = await fetch(processedImageUri);
       const blob = await response.blob();
       
       // Создаем FormData

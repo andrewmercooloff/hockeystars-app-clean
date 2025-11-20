@@ -8,6 +8,7 @@ import {
     Animated
 } from 'react-native';
 import { useCountryFilter } from '../utils/CountryFilterContext';
+import { useYearFilter } from '../utils/YearFilterContext';
 import { Player } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -19,6 +20,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
     showCountryFilter, 
     setShowCountryFilter 
   } = useCountryFilter();
+  const { selectedYear, setSelectedYear } = useYearFilter();
 
   // Анимированные значения для dropdown
   const [dropdownOpacity] = useState(new Animated.Value(0));
@@ -41,6 +43,41 @@ export default function CountryFilter({ players }: { players: Player[] }) {
 
   const handleCountrySelect = useCallback((country: string | null) => {
     setSelectedCountry(country);
+    
+    // Проверяем, есть ли игроки с выбранным годом в новой стране
+    if (selectedYear !== null && country !== null) {
+      const playersInCountry = players.filter(player =>
+        player.country === country &&
+        player.birthDate &&
+        player.status === 'player'
+      );
+      
+      // Проверяем, есть ли игроки в этом году в новой стране
+      const playersInYear = playersInCountry.filter(player => {
+        if (!player.birthDate) return false;
+        let birthYear: number | null = null;
+        
+        // YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(player.birthDate)) {
+          birthYear = parseInt(player.birthDate.split('-')[0]);
+        }
+        // DD.MM.YYYY (обратная совместимость)
+        else if (player.birthDate.includes('.')) {
+          const parts = player.birthDate.split('.');
+          if (parts.length === 3) {
+            birthYear = parseInt(parts[2]);
+          }
+        }
+        
+        return birthYear === selectedYear;
+      });
+      
+      // Если нет игроков в этом году в новой стране, сбрасываем год на "все"
+      if (playersInYear.length === 0) {
+        setSelectedYear(null);
+      }
+    }
+    
     // Плавно закрываем dropdown перед вызовом setShowCountryFilter
     Animated.parallel([
       Animated.timing(dropdownOpacity, {
@@ -56,7 +93,7 @@ export default function CountryFilter({ players }: { players: Player[] }) {
     ]).start(() => {
       setShowCountryFilter(false); // Закрываем фильтр после завершения анимации
     });
-  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownTranslateY]);
+  }, [setSelectedCountry, setShowCountryFilter, dropdownOpacity, dropdownTranslateY, selectedYear, setSelectedYear, players]);
 
   const handleFilterToggle = useCallback(() => {
     setShowCountryFilter(!showCountryFilter);

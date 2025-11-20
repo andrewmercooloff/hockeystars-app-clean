@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ExerciseCompletion, getPlayerExerciseStats, Player, PlayerExerciseStats } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -116,6 +117,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
       <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <View style={styles.emptyStateContent}>
+          <Ionicons name="barbell-outline" size={48} color="#666" />
           <Text style={styles.emptyStateText}>
             {isOwnProfile ? t('exercisesSection.noExercisesOwn') : t('exercisesSection.noExercisesOther')}
           </Text>
@@ -146,7 +148,10 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
     return (
       <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
-        <Text style={styles.emptyText}>{t('exercisesSection.noExercises')}</Text>
+        <View style={styles.emptyStateContent}>
+          <Ionicons name="barbell-outline" size={48} color="#666" />
+          <Text style={styles.emptyText}>{t('exercisesSection.noExercises')}</Text>
+        </View>
       </View>
     );
   }
@@ -199,7 +204,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: 'rgba(1, 0, 0, 0.7)',
     borderRadius: 15,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
   },
@@ -217,14 +224,17 @@ const styles = StyleSheet.create({
   },
   emptyStateContent: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 20,
+    minHeight: 100,
   },
   emptyStateText: {
     color: '#888',
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 16,
     maxWidth: 250,
   },
   exercisesGrid: {
