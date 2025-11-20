@@ -6932,7 +6932,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   puckSpeedHistory: {
-    marginBottom: 12,
+    marginBottom: 0,
     padding: 15,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
