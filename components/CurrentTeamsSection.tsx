@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 6,
   },
   emptyText: {
     fontSize: 16,

@@ -6894,7 +6894,7 @@ const styles = StyleSheet.create({
   emptySectionContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
+    paddingVertical: 7,
     paddingHorizontal: 20,
     minHeight: 80,
   },
@@ -6908,7 +6908,7 @@ const styles = StyleSheet.create({
   puckSpeedContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 12,
+    paddingBottom: 6,
   },
   puckSpeedDisplay: {
     alignItems: 'center',

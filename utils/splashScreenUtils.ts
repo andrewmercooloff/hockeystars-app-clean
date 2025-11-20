@@ -46,3 +46,4 @@ export function resetSplashScreenFlag(): void {
   splashScreenHidden = false;
 }
 
+

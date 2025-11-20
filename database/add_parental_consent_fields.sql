@@ -170,3 +170,4 @@ BEGIN
   RAISE NOTICE '📊 Проверьте таблицу players: SELECT id, name, status, parent_email FROM players LIMIT 5;';
 END $$;
 
+

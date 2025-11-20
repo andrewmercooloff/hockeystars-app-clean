@@ -27,3 +27,4 @@ FROM public.players
 WHERE phone = '+375297730000'
 ORDER BY created_at DESC;
 
+

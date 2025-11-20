@@ -170,3 +170,4 @@ async function checkMerky() {
 // Запускаем проверку
 checkMerky().catch(console.error);
 
+

@@ -169,3 +169,4 @@ WHERE status = 'pending_verification';
 - [COPPA Compliance Guide](https://www.ftc.gov/business-guidance/resources/childrens-online-privacy-protection-rule-six-step-compliance-plan-your-business)
 - [App Store Review Guidelines - Kids Category](https://developer.apple.com/app-store/review/guidelines/#kids-category)
 
+

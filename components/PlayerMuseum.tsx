@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 6,
     minHeight: 100,
   },
   emptyText: {
