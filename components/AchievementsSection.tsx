@@ -37,7 +37,7 @@ export default function AchievementsSection({
     place: 1 as 1 | 2 | 3,
     description: ''
   });
-
+  
   // Нормализуем achievements - убеждаемся, что это массив
   const normalizedAchievements = Array.isArray(achievements) ? achievements : [];
 

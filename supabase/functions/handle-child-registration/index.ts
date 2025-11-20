@@ -17,6 +17,9 @@ interface ChildRegistrationRequest {
   position?: string
   team?: string
   userStatus?: string // Исходный статус пользователя (player/star) - будет восстановлен при активации
+  // Поля для повторной отправки
+  resend?: boolean
+  token?: string
 }
 
 // Генерация уникального токена
@@ -24,12 +27,22 @@ function generateConsentToken(): string {
   return crypto.randomUUID() + '-' + Date.now().toString(36)
 }
 
+// Определение языка на основе страны
+function determineLanguage(country?: string): string {
+  // Для России и Беларуси - русский, для остальных - английский
+  const russianSpeakingCountries = ['Россия', 'Беларусь', 'Russia', 'Belarus', 'RU', 'BY'];
+  if (country && russianSpeakingCountries.includes(country)) {
+    return 'ru';
+  }
+  return 'en';
+}
+
 // Отправка письма родителю через Resend
 async function sendParentalConsentEmail(
   parentEmail: string,
   childName: string,
   consentToken: string,
-  lang: string = 'ru'
+  lang: string = 'en'
 ): Promise<{ success: boolean; error?: string }> {
   if (!RESEND_API_KEY) {
     console.warn('⚠️ RESEND_API_KEY не настроен, используем fallback')
@@ -196,9 +209,61 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player' }: ChildRegistrationRequest = await req.json()
+    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player', resend, token }: ChildRegistrationRequest = await req.json()
 
-    // Валидация
+    // Обработка повторной отправки письма
+    if (resend && token) {
+      // Находим игрока по токену или по email родителя и имени
+      const { data: player, error: findError } = await supabase
+        .from('players')
+        .select('id, name, parent_email, country, status')
+        .eq('parent_email', parentEmail)
+        .eq('name', name)
+        .eq('status', 'pending_verification')
+        .maybeSingle()
+
+      if (findError || !player) {
+        return new Response(
+          JSON.stringify({ error: 'Игрок не найден или уже активирован' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Обновляем токен
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({
+          consent_token: token,
+          consent_token_expires_at: expiresAt
+        })
+        .eq('id', player.id)
+
+      if (updateError) {
+        return new Response(
+          JSON.stringify({ error: 'Ошибка обновления токена' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Определяем язык и отправляем письмо
+      const emailLang = determineLanguage(player.country || country)
+      const emailResult = await sendParentalConsentEmail(parentEmail, player.name, token, emailLang)
+
+      if (!emailResult.success) {
+        return new Response(
+          JSON.stringify({ error: 'Не удалось отправить письмо', details: emailResult.error }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Письмо успешно отправлено' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Валидация для новой регистрации
     if (!phone || !name || !birthDate || !parentEmail) {
       return new Response(
         JSON.stringify({ error: 'Все обязательные поля должны быть заполнены' }),
@@ -316,22 +381,9 @@ serve(async (req) => {
     console.log('🔍 Проверка сохраненного токена:', verifyToken)
 
     // Определяем язык письма на основе страны
-    let emailLanguage = 'en'; // По умолчанию английский
-
-    // Русскоязычные страны
-    const russianSpeakingCountries = [
-      'Россия', 'Беларусь', 'Украина', 'Казахстан', 'Киргизия', 'Таджикистан',
-      'Узбекистан', 'Армения', 'Азербайджан', 'Молдова', 'Грузия',
-      'Russia', 'Belarus', 'Ukraine', 'Kazakhstan', 'Kyrgyzstan', 'Tajikistan',
-      'Uzbekistan', 'Armenia', 'Azerbaijan', 'Moldova', 'Georgia'
-    ];
-
-    if (country && russianSpeakingCountries.some(rc => country.toLowerCase().includes(rc.toLowerCase()))) {
-      emailLanguage = 'ru';
-    }
-
-    console.log(`📧 Отправляем письмо родителю на ${parentEmail} для ребенка ${name} на языке: ${emailLanguage} (страна: ${country})`)
-    const emailResult = await sendParentalConsentEmail(parentEmail, name, consentToken, emailLanguage)
+    const emailLang = determineLanguage(country)
+    console.log(`📧 Отправляем письмо родителю на ${parentEmail} для ребенка ${name}, язык: ${emailLang}`)
+    const emailResult = await sendParentalConsentEmail(parentEmail, name, consentToken, emailLang)
 
     if (!emailResult.success) {
       console.error('❌ Email не отправлен:', emailResult.error)

@@ -277,7 +277,7 @@ serve(async (req) => {
     console.log('🔍 Ищем токен в таблице players:', token)
     const { data: playerData, error: playerError } = await supabase
       .from('players')
-      .select('id, name, parent_email, consent_token, consent_token_expires_at, status, country')
+      .select('id, name, parent_email, consent_token, consent_token_expires_at, status')
       .eq('consent_token', token)
       .single()
 
@@ -384,29 +384,12 @@ serve(async (req) => {
 
     console.log('✅ Аккаунт успешно активирован:', updatedPlayer)
 
-    // Определяем язык письма подтверждения на основе страны
-    let emailLanguage = 'en'; // По умолчанию английский
-
-    // Русскоязычные страны
-    const russianSpeakingCountries = [
-      'Россия', 'Беларусь', 'Украина', 'Казахстан', 'Киргизия', 'Таджикистан',
-      'Узбекистан', 'Армения', 'Азербайджан', 'Молдова', 'Грузия',
-      'Russia', 'Belarus', 'Ukraine', 'Kazakhstan', 'Kyrgyzstan', 'Tajikistan',
-      'Uzbekistan', 'Armenia', 'Azerbaijan', 'Moldova', 'Georgia'
-    ];
-
-    if (playerData.country && russianSpeakingCountries.some(rc => playerData.country!.toLowerCase().includes(rc.toLowerCase()))) {
-      emailLanguage = 'ru';
-    }
-
-    console.log(`📧 Отправляем письмо подтверждения на языке: ${emailLanguage} (страна: ${playerData.country})`)
-
     // Отправляем второе письмо (Email-Plus) - не критично, если не отправится
     try {
       const emailResult = await sendActivationConfirmationEmail(
         playerData.parent_email || updatedPlayer.parent_email,
         playerData.name || updatedPlayer.name,
-        emailLanguage
+        'ru'
       )
 
       if (!emailResult.success) {

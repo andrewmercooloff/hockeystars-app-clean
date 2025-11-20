@@ -98,10 +98,10 @@ export async function resendParentalConsentEmail(
   playerId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Получаем данные игрока
+    // Получаем данные игрока (включая страну для определения языка письма)
     const { data: player, error: fetchError } = await supabase
       .from('players')
-      .select('name, parent_email, birth_date')
+      .select('name, parent_email, birth_date, country')
       .eq('id', playerId)
       .single();
 
@@ -144,6 +144,7 @@ export async function resendParentalConsentEmail(
         name: player.name,
         birthDate: player.birth_date,
         parentEmail: player.parent_email,
+        country: player.country, // Передаем страну для определения языка письма
         resend: true,
         token: newToken
       }

@@ -6540,31 +6540,25 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
   try {
     console.log('🔔 Отправляем уведомление админам о новой регистрации:', newPlayer.name);
     
-    // Получаем всех админов (сначала без фильтра по push_token)
-    const { data: allAdmins, error: adminsError } = await supabase
+    // Получаем всех админов
+    const { data: admins, error: adminsError } = await supabase
       .from('players')
       .select('id, name, push_token')
-      .eq('status', 'admin');
+      .eq('status', 'admin')
+      .not('push_token', 'is', null);
     
     if (adminsError) {
       console.error('❌ Ошибка получения списка админов:', adminsError);
       return;
     }
     
-    if (!allAdmins || allAdmins.length === 0) {
-      console.log('ℹ️ Админы не найдены в базе данных');
+    if (!admins || admins.length === 0) {
+      console.log('ℹ️ Админы не найдены или у них нет push токенов');
       return;
     }
     
-    // Фильтруем админов с push токенами для push уведомлений
-    const adminsWithPushTokens = allAdmins.filter(admin => admin.push_token);
-
-    if (adminsWithPushTokens.length === 0) {
-      console.log('ℹ️ Админы найдены, но у них нет push токенов');
-    }
-
-    // Отправляем уведомление каждому админу (в БД)
-    for (const admin of allAdmins) {
+    // Отправляем уведомление каждому админу
+    for (const admin of admins) {
       try {
         const { error: notificationError } = await supabase
           .from('notifications')
@@ -6584,31 +6578,7 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
         if (notificationError) {
           console.error(`❌ Ошибка создания уведомления для админа ${admin.name}:`, notificationError);
         } else {
-          // Отправляем push уведомление только если у админа есть push токен
-          if (admin.push_token) {
-            try {
-              const { sendNotificationToUser } = await import('./notificationService');
-              await sendNotificationToUser(
-                admin.id,
-                'Новая регистрация',
-                `Зарегистрировался новый пользователь: ${newPlayer.name}`,
-                {
-                  type: 'new_registration',
-                  player_id: newPlayer.id,
-                  player_name: newPlayer.name,
-                  player_phone: newPlayer.phone,
-                  player_status: newPlayer.status,
-                  action: 'open_admin_panel'
-                }
-              );
-            } catch (pushError) {
-              console.error(`❌ Ошибка отправки push уведомления админу ${admin.name}:`, pushError);
-            }
-          } else {
-            console.log(`ℹ️ Админ ${admin.name} найден, но у него нет push токена`);
-          }
-
-          // console.log(`✅ Уведомление в БД отправлено админу: ${admin.name}`);
+          // console.log(`✅ Уведомление отправлено админу: ${admin.name}`);
         }
       } catch (error) {
         console.error(`❌ Ошибка отправки уведомления админу ${admin.name}:`, error);
