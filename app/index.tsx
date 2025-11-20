@@ -240,18 +240,59 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return;
     }
     
-    // Адаптивная скорость в зависимости от производительности устройства
-    const baseSpeedMultiplier = (() => {
-      switch (performanceLevel) {
-        case 'high':
-          return 0.49; // Уменьшено на 30% для iOS (было 0.7, теперь 0.7 * 0.7 = 0.49)
-        case 'medium':
-          return 0.5; // Средняя скорость для средних устройств
-        case 'low':
-        default:
-          return 0.4; // Низкая скорость для слабых устройств
-      }
-    })();
+    // Для первого запуска используем упрощенную инициализацию
+    if (isFirstInit) {
+      console.log('🚀 Первый запуск - упрощенная инициализация шайб');
+
+      // Создаем позиции только для первых 10 игроков для быстрого старта
+      const initialPlayers = players.slice(0, Math.min(10, players.length));
+
+      // Простое размещение без сложных коллизий
+      const positions: PuckPosition[] = initialPlayers.map((player, index) => {
+        const x = (index % 3) * 120 + 60; // Простая сетка 3xN
+        const y = Math.floor(index / 3) * 120 + 100;
+        return {
+          id: player.id,
+          x,
+          y,
+          vx: 0,
+          vy: 0,
+          player
+        };
+      });
+
+      setPuckPositions(positions);
+      physicsPositionsRef.current = positions;
+      renderPositionsRef.current = positions;
+      previousPlayersRef.current = players;
+      isInitializedRef.current = true;
+
+      // Через 2 секунды добавляем остальных игроков
+      setTimeout(() => {
+        if (players.length > 10) {
+          console.log('➕ Добавляем остальных игроков');
+          initializeFullPositions();
+        }
+      }, 2000);
+
+      return;
+    }
+
+    initializeFullPositions();
+
+    function initializeFullPositions() {
+      // Полная инициализация для всех игроков
+      const baseSpeedMultiplier = (() => {
+        switch (performanceLevel) {
+          case 'high':
+            return 0.49;
+          case 'medium':
+            return 0.5;
+          case 'low':
+          default:
+            return 0.4;
+        }
+      })();
     
     // При смене фильтра используем меньшую скорость и сбрасываем скорости для плавного перехода
     // Снижаем скорость на 50%
