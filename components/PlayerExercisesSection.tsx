@@ -211,9 +211,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.3)',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
+    marginBottom: 15,
   },
   loadingText: {
     color: '#888',
