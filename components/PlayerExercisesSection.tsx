@@ -22,7 +22,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   const [titlesLoading, setTitlesLoading] = useState(false);
 
   useEffect(() => {
-    if (isLanguageLoaded) {
+    if (isLanguageLoaded && language !== 'en') { // Не загружаем, пока язык не загрузился И не является английским по умолчанию
       loadExerciseStats();
     }
   }, [player.id, player.exerciseStats, language, isLanguageLoaded]); // Добавляем isLanguageLoaded в зависимости
@@ -31,6 +31,15 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
     try {
       setLoading(true);
       setExerciseTitles({}); // Очищаем названия при перезагрузке
+
+      // Очищаем кеш названий упражнений при смене языка
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const keys = await AsyncStorage.getAllKeys();
+      const exerciseTitleKeys = keys.filter(key => key.startsWith('exercise_title_'));
+      if (exerciseTitleKeys.length > 0) {
+        await AsyncStorage.multiRemove(exerciseTitleKeys);
+        console.log('🗑️ Очищен кеш названий упражнений при смене языка');
+      }
       const stats = await getPlayerExerciseStats(player.id);
       setExerciseStats(stats);
       
