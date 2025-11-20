@@ -6574,10 +6574,30 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
               player_status: newPlayer.status
             }
           });
-        
+
         if (notificationError) {
           console.error(`❌ Ошибка создания уведомления для админа ${admin.name}:`, notificationError);
         } else {
+          // Отправляем push уведомление
+          try {
+            const { sendNotificationToUser } = await import('./notificationService');
+            await sendNotificationToUser(
+              admin.id,
+              'Новая регистрация',
+              `Зарегистрировался новый пользователь: ${newPlayer.name}`,
+              {
+                type: 'new_registration',
+                player_id: newPlayer.id,
+                player_name: newPlayer.name,
+                player_phone: newPlayer.phone,
+                player_status: newPlayer.status,
+                action: 'open_admin_panel'
+              }
+            );
+          } catch (pushError) {
+            console.error(`❌ Ошибка отправки push уведомления админу ${admin.name}:`, pushError);
+          }
+
           // console.log(`✅ Уведомление отправлено админу: ${admin.name}`);
         }
       } catch (error) {
