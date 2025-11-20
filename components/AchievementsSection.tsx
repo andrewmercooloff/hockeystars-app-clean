@@ -366,9 +366,9 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: 7,
     paddingHorizontal: 20,
-    minHeight: 100,
+    minHeight: 80,
   },
   emptyText: {
     color: '#888',
