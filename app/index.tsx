@@ -334,7 +334,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     renderPositionsRef.current = positions;
     previousPlayersRef.current = players;
     isInitializedRef.current = true;
-    }
   }, [players, boundaries, performanceLevel]);
 
   // Физический шаг с адаптивными константами в зависимости от производительности
