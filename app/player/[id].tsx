@@ -6910,7 +6910,7 @@ const styles = StyleSheet.create({
   puckSpeedContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 3,
+    paddingBottom: 0,
   },
   puckSpeedDisplay: {
     alignItems: 'center',
