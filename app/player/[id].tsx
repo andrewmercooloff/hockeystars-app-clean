@@ -6909,7 +6909,7 @@ const styles = StyleSheet.create({
   },
   puckSpeedContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 0,
   },
   puckSpeedDisplay: {
