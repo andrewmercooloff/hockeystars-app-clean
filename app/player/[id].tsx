@@ -5025,7 +5025,7 @@ export default function PlayerProfile() {
               const isOwner = currentUser && currentUser.id === player.id;
               return hasSpeed || isOwner;
             })() && (
-            <SectionCard ref={puckSpeedRef} wrapperStyle={styles.compactSectionWrapper}>
+            <SectionCard ref={puckSpeedRef} wrapperStyle={[styles.compactSectionWrapper, { marginBottom: 0 }]}>
                 <Text style={styles.sectionTitle}>
                   {t('puckSpeed.title') || 'Скорость шайбы'}
                 </Text>
