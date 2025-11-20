@@ -184,22 +184,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return;
     }
 
-    // Небольшая задержка при первой инициализации для лучшей производительности
-    const isFirstInit = !isInitializedRef.current;
-    if (isFirstInit) {
-      const timer = setTimeout(() => {
-        initializePositions();
-      }, 500); // 500ms задержка при первом запуске
-
-      return () => clearTimeout(timer);
-    }
-
     initializePositions();
 
     function initializePositions() {
-
     // Определяем, это первая инициализация или смена фильтра
-    const isFirstInit = !isInitializedRef.current;
     // Проверяем, изменился ли список игроков (сравниваем по ID)
     const previousPlayerIds = new Set(previousPlayersRef.current.map(p => p.id));
     const currentPlayerIds = new Set(players.map(p => p.id));
@@ -239,45 +227,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       previousPlayersRef.current = players;
       return;
     }
-    
-    // Для первого запуска используем упрощенную инициализацию
-    if (isFirstInit) {
-      console.log('🚀 Первый запуск - упрощенная инициализация шайб');
-
-      // Создаем позиции только для первых 10 игроков для быстрого старта
-      const initialPlayers = players.slice(0, Math.min(10, players.length));
-
-      // Простое размещение без сложных коллизий
-      const positions: PuckPosition[] = initialPlayers.map((player, index) => {
-        const x = (index % 3) * 120 + 60; // Простая сетка 3xN
-        const y = Math.floor(index / 3) * 120 + 100;
-        return {
-          id: player.id,
-          x,
-          y,
-          vx: 0,
-          vy: 0,
-          player
-        };
-      });
-
-      setPuckPositions(positions);
-      physicsPositionsRef.current = positions;
-      renderPositionsRef.current = positions;
-      previousPlayersRef.current = players;
-      isInitializedRef.current = true;
-
-      // Через 2 секунды добавляем остальных игроков
-      setTimeout(() => {
-        if (players.length > 10) {
-          console.log('➕ Добавляем остальных игроков');
-          initializeFullPositions();
-        }
-      }, 2000);
-
-      return;
-    }
-
     initializeFullPositions();
 
     function initializeFullPositions() {
@@ -1358,21 +1307,12 @@ export default function HomeScreen() {
 
   // Устанавливаем начальные значения фильтров при первом запуске
   useEffect(() => {
-    // Инициализируем фильтры только один раз при первой загрузке с задержкой
     if (players.length > 0 && !filtersInitializedRef.current && selectedCountry === null && selectedYear === null) {
-      // Задержка для предотвращения торможения анимации
-      const timer = setTimeout(() => {
-        initializeFilters();
-      }, 800); // 800ms задержка после загрузки игроков
-
-      return () => clearTimeout(timer);
-    }
-
-    function initializeFilters() {
       // Для неавторизованных пользователей показываем "Все"
       if (!currentUser) {
         setSelectedCountry(null);
         setSelectedYear(null);
+        filtersInitializedRef.current = true;
         return;
       }
 
@@ -1468,14 +1408,9 @@ export default function HomeScreen() {
       }
   }, []);
 
-  // Загружаем игроков при монтировании с небольшой задержкой для лучшей производительности
+  // Загружаем игроков при монтировании
   useEffect(() => {
-    // Небольшая задержка чтобы дать время на инициализацию UI перед загрузкой данных
-    const timer = setTimeout(() => {
-      loadAllPlayers();
-    }, 100); // 100ms задержка
-
-    return () => clearTimeout(timer);
+    loadAllPlayers();
   }, [loadAllPlayers]);
 
   // Загружаем список заблокированных пользователей
@@ -1543,7 +1478,6 @@ export default function HomeScreen() {
     useCallback(() => {
       setCurrentScreen('home');
       // Обновляем список заблокированных пользователей при возвращении на экран
-      // Но делаем это асинхронно с небольшой задержкой, чтобы не блокировать рендеринг
       const loadBlockedUsers = async () => {
         if (currentUser?.id) {
           try {
@@ -1563,10 +1497,8 @@ export default function HomeScreen() {
           }
         }
       };
-      // Загружаем с небольшой задержкой, чтобы не блокировать рендеринг
-      const timeoutId = setTimeout(loadBlockedUsers, 200);
+      loadBlockedUsers();
       return () => {
-        clearTimeout(timeoutId);
         setCurrentScreen(null);
       };
     }, [setCurrentScreen, currentUser?.id])
@@ -1576,13 +1508,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!currentUser) return;
 
-    // Небольшая задержка перед инициализацией подписки для лучшей производительности
-    const timer = setTimeout(() => {
-      initializeRealtimeSubscription();
-    }, 1000); // 1 секунда задержка
-
-    function initializeRealtimeSubscription() {
-      const channel = supabase
+    const channel = supabase
       .channel('players-visibility-updates')
       .on(
         'postgres_changes',
@@ -1635,7 +1561,6 @@ export default function HomeScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
-    }
   }, [currentUser]);
 
   // Обработчик drag - мемоизирован для оптимизации
