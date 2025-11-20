@@ -184,6 +184,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return;
     }
 
+    // Небольшая задержка при первой инициализации для лучшей производительности
+    const isFirstInit = !isInitializedRef.current;
+    if (isFirstInit) {
+      const timer = setTimeout(() => {
+        initializePositions();
+      }, 500); // 500ms задержка при первом запуске
+
+      return () => clearTimeout(timer);
+    }
+
+    initializePositions();
+
+    function initializePositions() {
+
     // Определяем, это первая инициализация или смена фильтра
     const isFirstInit = !isInitializedRef.current;
     // Проверяем, изменился ли список игроков (сравниваем по ID)
@@ -330,6 +344,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     renderPositionsRef.current = positions;
     previousPlayersRef.current = players;
     isInitializedRef.current = true;
+    }
   }, [players, boundaries, performanceLevel]);
 
   // Физический шаг с адаптивными константами в зависимости от производительности
@@ -1403,9 +1418,14 @@ export default function HomeScreen() {
       }
   }, []);
 
-  // Загружаем игроков при монтировании
+  // Загружаем игроков при монтировании с небольшой задержкой для лучшей производительности
   useEffect(() => {
-    loadAllPlayers();
+    // Небольшая задержка чтобы дать время на инициализацию UI перед загрузкой данных
+    const timer = setTimeout(() => {
+      loadAllPlayers();
+    }, 100); // 100ms задержка
+
+    return () => clearTimeout(timer);
   }, [loadAllPlayers]);
 
   // Загружаем список заблокированных пользователей
