@@ -14,7 +14,7 @@ interface PlayerExercisesSectionProps {
 }
 
 export default function PlayerExercisesSection({ player, isOwnProfile, style }: PlayerExercisesSectionProps) {
-  const { t, language } = useLanguage();
+  const { t, language, isLanguageLoaded } = useLanguage();
   const router = useRouter();
   const [exerciseStats, setExerciseStats] = useState<PlayerExerciseStats | null>(null);
   const [exerciseTitles, setExerciseTitles] = useState<{ [key: string]: string }>({});
@@ -22,8 +22,10 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   const [titlesLoading, setTitlesLoading] = useState(false);
 
   useEffect(() => {
-    loadExerciseStats();
-  }, [player.id, player.exerciseStats, language]); // Добавляем language в зависимости для перезагрузки при смене языка
+    if (isLanguageLoaded) {
+      loadExerciseStats();
+    }
+  }, [player.id, player.exerciseStats, language, isLanguageLoaded]); // Добавляем isLanguageLoaded в зависимости
 
   const loadExerciseStats = async () => {
     try {

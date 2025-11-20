@@ -20,6 +20,7 @@ export type Language = 'ru' | 'lt' | 'lv' | 'pl' | 'sv' | 'cs' | 'sk' | 'fi' | '
 
 interface LanguageContextType {
   language: Language;
+  isLanguageLoaded: boolean;
   setLanguage: (lang: Language) => void;
   resetToDeviceLanguage: () => Promise<void>;
   t: (key: string, params?: Record<string, any>) => string;
@@ -91,6 +92,7 @@ interface LanguageProviderProps {
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en'); // Начинаем с английского как fallback
+  const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
 
   // Загружаем язык при запуске
   useEffect(() => {
@@ -101,7 +103,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     try {
       // Сначала проверяем, есть ли сохраненный язык
       const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
-      
+
       if (savedLanguage && supportedLanguages.includes(savedLanguage as Language)) {
         // Если есть сохраненный язык, используем его
         setLanguageState(savedLanguage as Language);
@@ -109,7 +111,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
         // Если нет сохраненного языка, определяем язык устройства
         const deviceLanguage = getDeviceLanguage();
         setLanguageState(deviceLanguage);
-        
+
         // Сохраняем определенный язык для будущих запусков
         await AsyncStorage.setItem('selectedLanguage', deviceLanguage);
       }
@@ -117,12 +119,16 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       console.warn('❌ Ошибка загрузки языка:', error);
       // В случае ошибки используем английский
       setLanguageState('en');
+    } finally {
+      // Важно: устанавливаем флаг загрузки в конце, независимо от результата
+      setIsLanguageLoaded(true);
     }
   };
 
   const setLanguage = async (lang: Language) => {
     try {
       setLanguageState(lang);
+      setIsLanguageLoaded(true); // Язык уже загружен при ручной смене
       await AsyncStorage.setItem('selectedLanguage', lang);
       
       // ВАЖНО: Сохраняем язык в БД для правильной локализации уведомлений
@@ -193,7 +199,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, resetToDeviceLanguage, t }}>
+    <LanguageContext.Provider value={{ language, isLanguageLoaded, setLanguage, resetToDeviceLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
