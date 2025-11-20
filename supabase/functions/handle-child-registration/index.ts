@@ -315,9 +315,23 @@ serve(async (req) => {
       .single()
     console.log('🔍 Проверка сохраненного токена:', verifyToken)
 
-    // Отправляем письмо родителю
-    console.log(`📧 Отправляем письмо родителю на ${parentEmail} для ребенка ${name}`)
-    const emailResult = await sendParentalConsentEmail(parentEmail, name, consentToken, 'ru')
+    // Определяем язык письма на основе страны
+    let emailLanguage = 'en'; // По умолчанию английский
+
+    // Русскоязычные страны
+    const russianSpeakingCountries = [
+      'Россия', 'Беларусь', 'Украина', 'Казахстан', 'Киргизия', 'Таджикистан',
+      'Узбекистан', 'Армения', 'Азербайджан', 'Молдова', 'Грузия',
+      'Russia', 'Belarus', 'Ukraine', 'Kazakhstan', 'Kyrgyzstan', 'Tajikistan',
+      'Uzbekistan', 'Armenia', 'Azerbaijan', 'Moldova', 'Georgia'
+    ];
+
+    if (country && russianSpeakingCountries.some(rc => country.toLowerCase().includes(rc.toLowerCase()))) {
+      emailLanguage = 'ru';
+    }
+
+    console.log(`📧 Отправляем письмо родителю на ${parentEmail} для ребенка ${name} на языке: ${emailLanguage} (страна: ${country})`)
+    const emailResult = await sendParentalConsentEmail(parentEmail, name, consentToken, emailLanguage)
 
     if (!emailResult.success) {
       console.error('❌ Email не отправлен:', emailResult.error)

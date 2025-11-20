@@ -184,10 +184,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       return;
     }
 
-    initializePositions();
-
-    function initializePositions() {
     // Определяем, это первая инициализация или смена фильтра
+    const isFirstInit = !isInitializedRef.current;
     // Проверяем, изменился ли список игроков (сравниваем по ID)
     const previousPlayerIds = new Set(previousPlayersRef.current.map(p => p.id));
     const currentPlayerIds = new Set(players.map(p => p.id));
@@ -227,21 +225,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       previousPlayersRef.current = players;
       return;
     }
-    initializeFullPositions();
-
-    function initializeFullPositions() {
-      // Полная инициализация для всех игроков
-      const baseSpeedMultiplier = (() => {
-        switch (performanceLevel) {
-          case 'high':
-            return 0.49;
-          case 'medium':
-            return 0.5;
-          case 'low':
-          default:
-            return 0.4;
-        }
-      })();
+    
+    // Адаптивная скорость в зависимости от производительности устройства
+    const baseSpeedMultiplier = (() => {
+      switch (performanceLevel) {
+        case 'high':
+          return 0.49; // Уменьшено на 30% для iOS (было 0.7, теперь 0.7 * 0.7 = 0.49)
+        case 'medium':
+          return 0.5; // Средняя скорость для средних устройств
+        case 'low':
+        default:
+          return 0.4; // Низкая скорость для слабых устройств
+      }
+    })();
     
     // При смене фильтра используем меньшую скорость и сбрасываем скорости для плавного перехода
     // Снижаем скорость на 50%
@@ -334,8 +330,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     renderPositionsRef.current = positions;
     previousPlayersRef.current = players;
     isInitializedRef.current = true;
-    }
-    }
   }, [players, boundaries, performanceLevel]);
 
   // Физический шаг с адаптивными константами в зависимости от производительности
@@ -1308,12 +1302,12 @@ export default function HomeScreen() {
 
   // Устанавливаем начальные значения фильтров при первом запуске
   useEffect(() => {
+    // Инициализируем фильтры только один раз при первой загрузке
     if (players.length > 0 && !filtersInitializedRef.current && selectedCountry === null && selectedYear === null) {
       // Для неавторизованных пользователей показываем "Все"
       if (!currentUser) {
         setSelectedCountry(null);
         setSelectedYear(null);
-        filtersInitializedRef.current = true;
         return;
       }
 
@@ -1479,6 +1473,7 @@ export default function HomeScreen() {
     useCallback(() => {
       setCurrentScreen('home');
       // Обновляем список заблокированных пользователей при возвращении на экран
+      // Но делаем это асинхронно с небольшой задержкой, чтобы не блокировать рендеринг
       const loadBlockedUsers = async () => {
         if (currentUser?.id) {
           try {
@@ -1498,8 +1493,10 @@ export default function HomeScreen() {
           }
         }
       };
-      loadBlockedUsers();
+      // Загружаем с небольшой задержкой, чтобы не блокировать рендеринг
+      const timeoutId = setTimeout(loadBlockedUsers, 200);
       return () => {
+        clearTimeout(timeoutId);
         setCurrentScreen(null);
       };
     }, [setCurrentScreen, currentUser?.id])

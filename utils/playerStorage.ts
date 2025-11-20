@@ -6550,12 +6550,12 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
       console.error('❌ Ошибка получения списка админов:', adminsError);
       return;
     }
-
+    
     if (!allAdmins || allAdmins.length === 0) {
       console.log('ℹ️ Админы не найдены в базе данных');
       return;
     }
-
+    
     // Фильтруем админов с push токенами для push уведомлений
     const adminsWithPushTokens = allAdmins.filter(admin => admin.push_token);
 
@@ -6580,7 +6580,7 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
               player_status: newPlayer.status
             }
           });
-
+        
         if (notificationError) {
           console.error(`❌ Ошибка создания уведомления для админа ${admin.name}:`, notificationError);
         } else {
