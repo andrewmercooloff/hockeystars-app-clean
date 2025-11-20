@@ -1317,8 +1317,17 @@ export default function HomeScreen() {
 
   // Устанавливаем начальные значения фильтров при первом запуске
   useEffect(() => {
-    // Инициализируем фильтры только один раз при первой загрузке
+    // Инициализируем фильтры только один раз при первой загрузке с задержкой
     if (players.length > 0 && !filtersInitializedRef.current && selectedCountry === null && selectedYear === null) {
+      // Задержка для предотвращения торможения анимации
+      const timer = setTimeout(() => {
+        initializeFilters();
+      }, 800); // 800ms задержка после загрузки игроков
+
+      return () => clearTimeout(timer);
+    }
+
+    function initializeFilters() {
       // Для неавторизованных пользователей показываем "Все"
       if (!currentUser) {
         setSelectedCountry(null);
@@ -1389,7 +1398,7 @@ export default function HomeScreen() {
       
       // Помечаем, что фильтры были инициализированы
       filtersInitializedRef.current = true;
-    }
+    }}
   }, [players.length, currentUser, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear]);
 
   // Состояние для управления годами рождения
@@ -1526,7 +1535,13 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!currentUser) return;
 
-    const channel = supabase
+    // Небольшая задержка перед инициализацией подписки для лучшей производительности
+    const timer = setTimeout(() => {
+      initializeRealtimeSubscription();
+    }, 1000); // 1 секунда задержка
+
+    function initializeRealtimeSubscription() {
+      const channel = supabase
       .channel('players-visibility-updates')
       .on(
         'postgres_changes',
@@ -1579,6 +1594,7 @@ export default function HomeScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
+    }
   }, [currentUser]);
 
   // Обработчик drag - мемоизирован для оптимизации
