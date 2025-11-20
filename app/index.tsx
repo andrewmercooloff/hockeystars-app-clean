@@ -1398,7 +1398,7 @@ export default function HomeScreen() {
       
       // Помечаем, что фильтры были инициализированы
       filtersInitializedRef.current = true;
-    }}
+    }
   }, [players.length, currentUser, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear]);
 
   // Состояние для управления годами рождения
