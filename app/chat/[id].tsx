@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
@@ -54,6 +54,7 @@ export default function ChatScreen() {
   const [loading, setLoading] = useState(true);
   const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false); // Флаг для скрытия контента до прокрутки
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -86,6 +87,7 @@ export default function ChatScreen() {
     isInitialLoadRef.current = true; // Сбрасываем флаг при смене чата
     savedScrollPositionRef.current = null; // Сбрасываем сохраненную позицию при смене чата
     wasNearBottomRef.current = true; // Сбрасываем флаг при смене чата
+    setIsScrolledToBottom(false); // Сбрасываем флаг прокрутки
     loadChatData();
   }, [id]);
 
@@ -102,12 +104,25 @@ export default function ChatScreen() {
     }
   }, [scrollToBottom, messages.length, loading]);
 
-  // Автоматическая прокрутка при первой загрузке сообщений (без анимации)
-  useEffect(() => {
+  // Синхронная прокрутка при первой загрузке сообщений (до рендеринга)
+  useLayoutEffect(() => {
     if (messages.length > 0 && !loading && scrollViewRef.current && isInitialLoadRef.current) {
-      // При первой загрузке - без анимации, сразу вниз
-      scrollViewRef.current.scrollToEnd({ animated: false });
+      // При первой загрузке - без анимации, сразу вниз (синхронно до рендеринга)
+      // Используем несколько попыток для надежности
+      const scrollToBottom = () => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: false });
+        }
+      };
+      
+      // Прокручиваем сразу
+      scrollToBottom();
+      
+      // И еще раз через небольшую задержку для надежности
+      setTimeout(scrollToBottom, 0);
+      
       setIsNearBottom(true);
+      setIsScrolledToBottom(true);
       isInitialLoadRef.current = false;
     }
   }, [messages.length, loading]);
@@ -458,6 +473,7 @@ export default function ChatScreen() {
           }
           setMessages(conversation);
           setIsNearBottom(true);
+          // useLayoutEffect обработает прокрутку синхронно
           
           // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
           markMessagesAsRead(userData.id, otherPlayerData.id).catch(err => {
@@ -1257,10 +1273,11 @@ export default function ChatScreen() {
               scrollEventThrottle={400}
               onContentSizeChange={(contentWidth, contentHeight) => {
                 if (messages.length > 0 && !loading && scrollViewRef.current) {
-                  if (isInitialLoadRef.current) {
+                  if (isInitialLoadRef.current && !isScrolledToBottom) {
                     // При первой загрузке сразу прокручиваем вниз без анимации
                     scrollViewRef.current.scrollToEnd({ animated: false });
                     setIsNearBottom(true);
+                    setIsScrolledToBottom(true);
                     wasNearBottomRef.current = true;
                     isInitialLoadRef.current = false;
                   } else if (savedScrollPositionRef.current !== null && !wasNearBottomRef.current) {
@@ -1271,6 +1288,15 @@ export default function ChatScreen() {
                     });
                     setIsNearBottom(false);
                   }
+                }
+              }}
+              onLayout={() => {
+                // Прокручиваем вниз при первом layout (до того как контент станет видимым)
+                if (messages.length > 0 && !loading && scrollViewRef.current && isInitialLoadRef.current) {
+                  scrollViewRef.current.scrollToEnd({ animated: false });
+                  setIsScrolledToBottom(true);
+                  setIsNearBottom(true);
+                  isInitialLoadRef.current = false;
                 }
               }}
             >
