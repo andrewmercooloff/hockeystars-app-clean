@@ -3056,63 +3056,64 @@ export default function PlayerProfile() {
       
       // Запрашиваем подтверждение (используем те же переводы, что и для админа)
       showCustomAlert(
-      t('profile.deleteUser') || t('deleteUser'),
-      t('profile.deleteUserConfirm', { name: player.name }),
-      'warning',
-      async () => {
-        try {
-          setLoading(true);
-          console.log('🗑️ Начинаем удаление собственного аккаунта:', player.id);
-          
-          const success = await deletePlayer(player.id, true); // true = это удаление собственного аккаунта
-          
-          if (success) {
-            console.log('✅ Аккаунт успешно удален, выходим из системы');
+        t('profile.deleteUser') || t('deleteUser'),
+        t('profile.deleteUserConfirm', { name: player.name }),
+        'warning',
+        async () => {
+          try {
+            setLoading(true);
+            console.log('🗑️ Начинаем удаление собственного аккаунта:', player.id);
             
-            // Выходим из аккаунта после удаления
-            try {
-              await logoutUser();
-              console.log('✅ Выход из аккаунта выполнен');
-            } catch (logoutError) {
-              console.warn('⚠️ Ошибка при выходе из аккаунта (не критично):', logoutError);
-            }
+            const success = await deletePlayer(player.id, true); // true = это удаление собственного аккаунта
             
-            // НЕ вызываем refreshUser(), так как пользователь уже удален
-            // Это может вызвать зависание
-            
-            setLoading(false);
-            
-            showCustomAlert(
-              t('common.success') || t('success'), 
-              t('profile.userDeleted', { name: player.name }),
-              'success',
-              () => {
-                // Перенаправляем на страницу входа
-                router.replace('/login');
+            if (success) {
+              console.log('✅ Аккаунт успешно удален, выходим из системы');
+              
+              // Выходим из аккаунта после удаления
+              try {
+                await logoutUser();
+                console.log('✅ Выход из аккаунта выполнен');
+              } catch (logoutError) {
+                console.warn('⚠️ Ошибка при выходе из аккаунта (не критично):', logoutError);
               }
-            );
-          } else {
+              
+              // НЕ вызываем refreshUser(), так как пользователь уже удален
+              // Это может вызвать зависание
+              
+              setLoading(false);
+              
+              showCustomAlert(
+                t('common.success') || t('success'), 
+                t('profile.userDeleted', { name: player.name }),
+                'success',
+                () => {
+                  // Перенаправляем на страницу входа
+                  router.replace('/login');
+                }
+              );
+            } else {
+              setLoading(false);
+              console.error('❌ Не удалось удалить аккаунт');
+              showCustomAlert(
+                t('common.error') || 'Ошибка', 
+                t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
+                'error'
+              );
+            }
+          } catch (error) {
             setLoading(false);
-            console.error('❌ Не удалось удалить аккаунт');
+            console.error('❌ Ошибка при удалении аккаунта:', error);
             showCustomAlert(
               t('common.error') || 'Ошибка', 
               t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
               'error'
             );
           }
-        } catch (error) {
-          setLoading(false);
-          console.error('❌ Ошибка при удалении аккаунта:', error);
-          showCustomAlert(
-            t('common.error') || 'Ошибка', 
-            t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
-            'error'
-          );
-        }
-      },
-      true, // showCancel
-      () => {} // onCancel - просто закрывает диалог
-    );
+        },
+        true, // showCancel
+        () => {} // onCancel - просто закрывает диалог
+      );
+    }, 300); // Задержка 300мс для закрытия меню
   };
 
   const handleLogout = async () => {
