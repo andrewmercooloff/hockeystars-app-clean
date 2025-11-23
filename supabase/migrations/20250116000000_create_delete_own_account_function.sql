@@ -3,7 +3,8 @@
 -- Проверяет, что пользователь удаляет именно свой аккаунт
 
 CREATE OR REPLACE FUNCTION delete_own_account(
-  player_id_param UUID
+  player_id_param UUID,
+  requesting_user_id UUID
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -12,15 +13,15 @@ AS $$
 DECLARE
   current_user_id UUID;
 BEGIN
-  -- Получаем ID текущего пользователя
-  current_user_id := auth.uid();
+  -- Получаем ID текущего пользователя из auth или из параметра
+  current_user_id := COALESCE(auth.uid(), requesting_user_id);
   
   -- Проверяем, что пользователь удаляет именно свой аккаунт
   IF current_user_id IS NULL THEN
     RAISE EXCEPTION 'User not authenticated';
   END IF;
   
-  IF current_user_id != player_id_param THEN
+  IF current_user_id != player_id_param OR requesting_user_id != player_id_param THEN
     RAISE EXCEPTION 'Permission denied: you can only delete your own account';
   END IF;
   
@@ -74,5 +75,5 @@ END;
 $$;
 
 -- Даем права на выполнение функции аутентифицированным пользователям
-GRANT EXECUTE ON FUNCTION delete_own_account(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION delete_own_account(UUID, UUID) TO authenticated;
 

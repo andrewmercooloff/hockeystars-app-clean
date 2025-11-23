@@ -2857,8 +2857,16 @@ export const deletePlayer = async (playerId: string, isOwnAccount: boolean = fal
       console.log('🗑️ Используем RPC функцию для удаления собственного аккаунта');
       console.log('🗑️ playerId:', playerId);
       
+      // Получаем текущего пользователя для проверки
+      const currentUser = await loadCurrentUser();
+      if (!currentUser || currentUser.id !== playerId) {
+        console.error('❌ Пользователь может удалить только свой аккаунт');
+        return false;
+      }
+      
       const { data, error } = await supabase.rpc('delete_own_account', {
-        player_id_param: playerId
+        player_id_param: playerId,
+        requesting_user_id: playerId
       });
       
       console.log('🗑️ RPC результат - data:', data, 'error:', error);
