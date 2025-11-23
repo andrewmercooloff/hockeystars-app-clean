@@ -2014,6 +2014,15 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       user.unreadMessagesCount = 0;
     }
     
+    // ВАЖНО: Обновляем данные пользователя в AsyncStorage, если они были изменены из базы данных
+    // Это гарантирует, что при следующей загрузке будут использоваться актуальные данные
+    if (user.country !== JSON.parse(userData).country || 
+        user.birthDate !== JSON.parse(userData).birthDate || 
+        user.status !== JSON.parse(userData).status) {
+      console.log('🔄 [USER] Обновляем данные пользователя в AsyncStorage с актуальными данными из БД');
+      await AsyncStorage.setItem('hockeystars_current_user', JSON.stringify(user));
+    }
+    
     // Кэшируем результат
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
       user,
