@@ -1975,22 +1975,42 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     const user = JSON.parse(userData);
     
-    // Сразу загружаем счетчик сообщений из базы для мгновенного отображения правильного значения
+    // ВАЖНО: Загружаем актуальные данные пользователя из базы данных, чтобы убедиться, что страна и другие поля актуальны
     try {
       const { data: playerData, error: playerError } = await supabase
         .from('players')
-        .select('unread_messages_count')
+        .select('id, name, country, birth_date, status, unread_messages_count')
         .eq('id', user.id)
         .single();
       
       if (!playerError && playerData) {
+        // Обновляем критически важные поля из базы данных
+        if (playerData.country && playerData.country !== user.country) {
+          console.log('⚠️ [USER] Обнаружено несоответствие страны пользователя:', {
+            cachedCountry: user.country,
+            dbCountry: playerData.country,
+            userId: user.id,
+            userName: user.name
+          });
+          user.country = playerData.country;
+        }
+        
+        // Обновляем другие важные поля
+        if (playerData.birth_date && playerData.birth_date !== user.birthDate) {
+          user.birthDate = playerData.birth_date;
+        }
+        
+        if (playerData.status && playerData.status !== user.status) {
+          user.status = playerData.status;
+        }
+        
         user.unreadMessagesCount = playerData.unread_messages_count || 0;
       } else {
         // Fallback на 0 если не удалось загрузить
         user.unreadMessagesCount = 0;
       }
     } catch (error) {
-      console.error('❌ Ошибка загрузки счетчика сообщений:', error);
+      console.error('❌ Ошибка загрузки данных пользователя из БД:', error);
       user.unreadMessagesCount = 0;
     }
     
