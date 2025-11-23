@@ -1607,7 +1607,7 @@ export default function PlayerProfile() {
 
   // Обработчик открытия меню профиля
   const handleOpenProfileMenu = (event: any) => {
-    if (!currentUser || !player || currentUser.id === player.id) {
+    if (!currentUser || !player) {
       return;
     }
     // Используем координаты из события, если доступны
@@ -3035,6 +3035,44 @@ export default function PlayerProfile() {
     );
   };
 
+  // Удаление собственного аккаунта
+  const handleDeleteOwnAccount = async () => {
+    if (!currentUser || !player || currentUser.id !== player.id) {
+      return;
+    }
+
+    // Запрашиваем подтверждение (используем те же переводы, что и для админа)
+    showCustomAlert(
+      t('profile.deleteUser') || t('deleteUser'),
+      t('profile.deleteUserConfirm', { name: player.name }),
+      'warning',
+      async () => {
+        const success = await deletePlayer(player.id);
+        if (success) {
+          // Выходим из аккаунта после удаления
+          const { logoutUser } = await import('../../utils/playerStorage');
+          await logoutUser();
+          await refreshUser();
+          
+          showCustomAlert(
+            t('common.success') || t('success'), 
+            t('profile.userDeleted', { name: player.name }),
+            'success',
+            () => router.replace('/login')
+          );
+        } else {
+          showCustomAlert(
+            t('common.error') || 'Ошибка', 
+            t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
+            'error'
+          );
+        }
+      },
+      true, // showCancel
+      () => {} // onCancel - просто закрывает диалог
+    );
+  };
+
   const handleLogout = async () => {
     setAlert({
       visible: true,
@@ -3298,12 +3336,13 @@ export default function PlayerProfile() {
               <View>
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
-              {/* Кнопка с 3 точками в правом верхнем углу профиля - показывается только для чужих профилей */}
-              {/* НЕ показывается для админов: ни если просматриваемый пользователь - админ, ни если текущий пользователь - админ */}
+              {/* Кнопка с 3 точками в правом верхнем углу профиля */}
+              {/* Показывается для чужих профилей (кроме админов) и для своего профиля */}
               {currentUser && player && 
-               currentUser.id !== player.id && 
-               player.status !== 'admin' && 
-               currentUser.status !== 'admin' && (
+               ((currentUser.id !== player.id && 
+                 player.status !== 'admin' && 
+                 currentUser.status !== 'admin') ||
+                (currentUser.id === player.id && currentUser.status !== 'admin')) && (
                 <TouchableOpacity
                   ref={profileMenuButtonRef}
                   onPress={handleOpenProfileMenu}
@@ -6110,45 +6149,62 @@ export default function PlayerProfile() {
               }
             ]}
           >
-            {isUserBlockedState ? (
-              <>
-                <TouchableOpacity
-                  style={styles.profileMenuItem}
-                  onPress={handleUnblockUser}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="checkmark-circle-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
-                  <Text style={styles.profileMenuText}>
-                    {t('profile.unblock') || 'Разблокировать'}
-                  </Text>
-                </TouchableOpacity>
-                <View style={styles.profileMenuDivider} />
-              </>
+            {/* Меню для своего профиля */}
+            {currentUser && player && currentUser.id === player.id ? (
+              <TouchableOpacity
+                style={styles.profileMenuItem}
+                onPress={handleDeleteOwnAccount}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash-outline" size={18} color="#fa2f40" style={styles.profileMenuIcon} />
+                <Text style={[styles.profileMenuText, { color: '#fa2f40' }]}>
+                  {t('profile.deleteUser') || t('deleteUser') || 'Удалить аккаунт'}
+                </Text>
+              </TouchableOpacity>
             ) : (
+              /* Меню для чужого профиля */
               <>
+                {isUserBlockedState ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.profileMenuItem}
+                      onPress={handleUnblockUser}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="checkmark-circle-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                      <Text style={styles.profileMenuText}>
+                        {t('profile.unblock') || 'Разблокировать'}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.profileMenuDivider} />
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={styles.profileMenuItem}
+                      onPress={handleBlockUser}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="ban-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                      <Text style={styles.profileMenuText}>
+                        {t('profile.block') || 'Заблокировать'}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.profileMenuDivider} />
+                  </>
+                )}
                 <TouchableOpacity
                   style={styles.profileMenuItem}
-                  onPress={handleBlockUser}
+                  onPress={handleReportFromMenu}
                   activeOpacity={0.7}
                 >
-                  <Ionicons name="ban-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                  <Ionicons name="flag-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
                   <Text style={styles.profileMenuText}>
-                    {t('profile.block') || 'Заблокировать'}
+                    {t('profile.reportUser') || t('admin.reportUser') || 'Пожаловаться'}
                   </Text>
                 </TouchableOpacity>
-                <View style={styles.profileMenuDivider} />
               </>
             )}
-            <TouchableOpacity
-              style={styles.profileMenuItem}
-              onPress={handleReportFromMenu}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="flag-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
-              <Text style={styles.profileMenuText}>
-                {t('profile.reportUser') || t('admin.reportUser') || 'Пожаловаться'}
-              </Text>
-            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>
