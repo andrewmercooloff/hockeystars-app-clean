@@ -1368,13 +1368,8 @@ export default function HomeScreen() {
   // Вычисляем начальные значения фильтров СИНХРОННО при первом рендере
   // Это гарантирует, что фильтры будут установлены до вычисления allVisiblePlayers
   const initialFilters = useMemo(() => {
-    // Если фильтры уже инициализированы или игроки еще не загружены, возвращаем текущие значения
-    if (filtersInitializedRef.current || players.length === 0) {
-      return { country: selectedCountry, year: selectedYear };
-    }
-
     // Ждем загрузки пользователя перед инициализацией фильтров
-    if (isUserLoading) {
+    if (isUserLoading || players.length === 0) {
       return { country: null, year: null };
     }
 
@@ -1390,8 +1385,26 @@ export default function HomeScreen() {
       userName: currentUser?.name,
       userCountry: defaultCountry,
       playersCount: players.length,
-      isUserLoading
+      isUserLoading,
+      filtersInitialized: filtersInitializedRef.current,
+      currentSelectedCountry: selectedCountry
     });
+    
+    // ВАЖНО: Если фильтры уже инициализированы, но страна в контексте не совпадает со страной пользователя,
+    // это означает, что что-то пошло не так. В этом случае переинициализируем фильтры.
+    if (filtersInitializedRef.current && selectedCountry !== null && selectedCountry !== defaultCountry) {
+      console.log('⚠️ [FILTERS] Обнаружено несоответствие: страна в контексте не совпадает со страной пользователя!', {
+        contextCountry: selectedCountry,
+        userCountry: defaultCountry
+      });
+      // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
+      filtersInitializedRef.current = false;
+    }
+    
+    // Если фильтры уже инициализированы и страна совпадает, возвращаем текущие значения
+    if (filtersInitializedRef.current && selectedCountry === defaultCountry) {
+      return { country: selectedCountry, year: selectedYear };
+    }
     
     if (!defaultCountry) {
       console.log('⚠️ [FILTERS] У пользователя не указана страна, показываем "Все"');
