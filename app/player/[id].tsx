@@ -246,6 +246,7 @@ export default function PlayerProfile() {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showPositionPicker, setShowPositionPicker] = useState(false);
   const [showGripPicker, setShowGripPicker] = useState(false);
+  const [countrySearchText, setCountrySearchText] = useState('');
   const [showBirthDatePicker, setShowBirthDatePicker] = useState(false);
   const [selectedBirthDate, setSelectedBirthDate] = useState(new Date());
   const [videoFields, setVideoFields] = useState<Array<{url: string, hours: string, minutes: string, seconds: string}>>([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
@@ -6389,140 +6390,148 @@ export default function PlayerProfile() {
 
       {/* Модальное окно выбора страны */}
       {showCountryPicker && (
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={() => setShowCountryPicker(false)}>
-            <View style={styles.modalOverlayTouchable} />
-          </TouchableWithoutFeedback>
-          <View style={[styles.pickerModalContainer, styles.countryModalContainer]}>
-            <View style={styles.modalHeaderContainer}>
-              <View style={styles.modalTitleWrapper}>
-                <Text style={styles.modalTitle}>{t('profile.selectCountry') || t('selectCountry')}</Text>
-            </View>
-              <TouchableOpacity
-                style={styles.pickerModalCloseButton}
-                onPress={() => setShowCountryPicker(false)}
-              >
-                <Ionicons name="close" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.pickerModalContentLarge}>
-              <ScrollView 
-                style={styles.pickerModalScroll}
-                contentContainerStyle={styles.pickerModalScrollContent}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-              >
-                {COUNTRIES && COUNTRIES.length > 0 ? COUNTRIES.map((country) => (
-                <TouchableOpacity
-                  key={country}
-                    style={styles.pickerModalOptionCompact}
-                  onPress={() => {
-                    setEditData({...editData, country: country});
-                    setShowCountryPicker(false);
-                  }}
-                >
-                    <Text style={styles.pickerModalOptionText}>{t(`profile.countries.${country}`) || country}</Text>
-                </TouchableOpacity>
-                )) : (
-                  <View style={styles.pickerModalOptionCompact}>
-                    <Text style={styles.pickerModalOptionText}>Список стран недоступен</Text>
-                  </View>
-                )}
+        <View style={styles.countryPickerOverlay}>
+          <View style={styles.countryPickerModal}>
+            <Text style={styles.countryPickerTitle}>{t('profile.selectCountry')}</Text>
+            
+            <TextInput
+              style={styles.countrySearchInput}
+              value={countrySearchText}
+              onChangeText={setCountrySearchText}
+              placeholder={t('profile.searchCountry') || 'Поиск страны...'}
+              placeholderTextColor="#888"
+            />
+            
+            <ScrollView style={styles.countryList} showsVerticalScrollIndicator={false}>
+              {(countrySearchText 
+                ? COUNTRIES.filter(country => 
+                    t(`profile.countries.${country}`)?.toLowerCase().includes(countrySearchText.toLowerCase()) ||
+                    country.toLowerCase().includes(countrySearchText.toLowerCase())
+                  )
+                : COUNTRIES
+              ).map((country) => {
+                const isSelected = (editData.country || player?.country) === country;
+                return (
+                  <TouchableOpacity
+                    key={country}
+                    style={[
+                      styles.countryOption,
+                      isSelected && styles.countryOptionSelected
+                    ]}
+                    onPress={() => {
+                      setEditData({...editData, country: country});
+                      setShowCountryPicker(false);
+                      setCountrySearchText('');
+                    }}
+                  >
+                    <Text style={[
+                      styles.countryOptionText,
+                      isSelected && styles.countryOptionTextSelected
+                    ]}>
+                      {t(`profile.countries.${country}`) || country}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
-            </View>
+            
+            <TouchableOpacity
+              style={styles.countryPickerCloseButton}
+              onPress={() => {
+                setShowCountryPicker(false);
+                setCountrySearchText('');
+              }}
+            >
+              <Text style={styles.countryPickerCloseText}>{t('common.close')}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
 
       {/* Модальное окно выбора позиции */}
       {showPositionPicker && (
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={() => setShowPositionPicker(false)}>
-            <View style={styles.modalOverlayTouchable} />
-          </TouchableWithoutFeedback>
-          <View style={styles.pickerModalContainer}>
-            <View style={styles.modalHeaderContainer}>
-              <View style={styles.modalTitleWrapper}>
-                <Text style={styles.modalTitle}>{t('profile.selectPosition') || t('selectPosition')}</Text>
+        <View style={styles.countryPickerOverlay}>
+          <View style={styles.countryPickerModal}>
+            <Text style={styles.countryPickerTitle}>{t('profile.selectPosition') || t('selectPosition')}</Text>
+            
+            <View style={styles.pickerContainer}>
+              {positions.map((position) => {
+                const isSelected = (editData.position || player?.position) === position;
+                return (
+                  <TouchableOpacity
+                    key={position}
+                    style={[
+                      styles.pickerOption,
+                      isSelected && styles.pickerOptionSelected
+                    ]}
+                    onPress={() => {
+                      setEditData({...editData, position: position});
+                      setShowPositionPicker(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.pickerOptionText,
+                      isSelected && styles.pickerOptionTextSelected
+                    ]}>
+                      {positionLabels[position] || position}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-              <TouchableOpacity
-                style={styles.pickerModalCloseButton}
-                onPress={() => setShowPositionPicker(false)}
-              >
-                <Ionicons name="close" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.pickerModalContent}>
-              <ScrollView 
-                style={styles.pickerModalScroll}
-                contentContainerStyle={styles.pickerModalScrollContent}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-              >
-              {positions.map((position) => (
-                <TouchableOpacity
-                  key={position}
-                    style={styles.pickerModalOption}
-                  onPress={() => {
-                    setEditData({...editData, position: position});
-                    setShowPositionPicker(false);
-                  }}
-                >
-                    <Text style={styles.pickerModalOptionText}>{positionLabels[position] || position}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            </View>
+            
+            <TouchableOpacity
+              style={styles.countryPickerCloseButton}
+              onPress={() => setShowPositionPicker(false)}
+            >
+              <Text style={styles.countryPickerCloseText}>{t('common.close')}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
 
       {/* Модальное окно выбора хвата */}
       {showGripPicker && (
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={() => setShowGripPicker(false)}>
-            <View style={styles.modalOverlayTouchable} />
-          </TouchableWithoutFeedback>
-          <View style={styles.pickerModalContainer}>
-            <View style={styles.modalHeaderContainer}>
-              <View style={styles.modalTitleWrapper}>
-              <Text style={styles.modalTitle}>{t('profile.selectGrip')}</Text>
+        <View style={styles.countryPickerOverlay}>
+          <View style={styles.countryPickerModal}>
+            <Text style={styles.countryPickerTitle}>{t('profile.selectGrip')}</Text>
+            
+            <View style={styles.pickerContainer}>
+              {grips && grips.length > 0 ? grips.map((grip) => {
+                const isSelected = (editData.grip || player?.grip) === grip;
+                return (
+                  <TouchableOpacity
+                    key={grip}
+                    style={[
+                      styles.pickerOption,
+                      isSelected && styles.pickerOptionSelected
+                    ]}
+                    onPress={() => {
+                      setEditData({...editData, grip: grip});
+                      setShowGripPicker(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.pickerOptionText,
+                      isSelected && styles.pickerOptionTextSelected
+                    ]}>
+                      {t(`profile.grips.${grip}`) || grip}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }) : (
+                <View style={styles.pickerOption}>
+                  <Text style={styles.pickerOptionText}>Список хватов недоступен</Text>
+                </View>
+              )}
             </View>
-              <TouchableOpacity
-                style={styles.pickerModalCloseButton}
-                onPress={() => setShowGripPicker(false)}
-              >
-                <Ionicons name="close" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.pickerModalContent}>
-              <ScrollView 
-                style={styles.pickerModalScroll}
-                contentContainerStyle={styles.pickerModalScrollContent}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-              >
-                {grips && grips.length > 0 ? grips.map((grip) => (
-                <TouchableOpacity
-                  key={grip}
-                    style={styles.pickerModalOption}
-                  onPress={() => {
-                    setEditData({...editData, grip: grip});
-                    setShowGripPicker(false);
-                  }}
-                >
-                    <Text style={styles.pickerModalOptionText}>{t(`profile.grips.${grip}`) || grip}</Text>
-                </TouchableOpacity>
-                )) : (
-                  <View style={styles.pickerModalOption}>
-                    <Text style={styles.pickerModalOptionText}>Список хватов недоступен</Text>
-                  </View>
-                )}
-            </ScrollView>
-            </View>
+            
+            <TouchableOpacity
+              style={styles.countryPickerCloseButton}
+              onPress={() => setShowGripPicker(false)}
+            >
+              <Text style={styles.countryPickerCloseText}>{t('common.close')}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -7820,6 +7829,106 @@ const styles = StyleSheet.create({
       default: 50,
     }),
     zIndex: 1000,
+  },
+  countryPickerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(5, 0, 8, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  countryPickerModal: {
+    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    borderRadius: 15,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+    alignItems: 'center',
+  },
+  countryPickerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    marginBottom: 15,
+  },
+  countrySearchInput: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+    borderWidth: 1,
+    borderColor: 'rgba(255,68,68,0.3)',
+    width: '100%',
+    marginBottom: 15,
+  },
+  countryList: {
+    maxHeight: 300,
+    width: '100%',
+  },
+  countryOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  countryOptionSelected: {
+    backgroundColor: 'rgba(255,68,68,0.2)',
+  },
+  countryOptionText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Regular',
+  },
+  countryOptionTextSelected: {
+    color: '#FF4444',
+    fontFamily: 'Gilroy-Bold',
+  },
+  countryPickerCloseButton: {
+    backgroundColor: '#FF4444',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    marginTop: 15,
+  },
+  countryPickerCloseText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  pickerOption: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  pickerOptionSelected: {
+    backgroundColor: '#FF4444',
+    borderColor: '#FF4444',
+  },
+  pickerOptionText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+  },
+  pickerOptionTextSelected: {
+    color: '#fff',
+    fontFamily: 'Gilroy-Bold',
   },
   modalOverlayTouchable: {
     position: 'absolute',
