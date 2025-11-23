@@ -2824,6 +2824,12 @@ export default function PlayerProfile() {
         AsyncStorage.removeItem(cacheKey).catch(error => {
           console.warn('⚠️ Не удалось очистить кеш игрока:', error);
         });
+
+        // Очищаем кеш всех игроков, чтобы изменения отобразились на главной странице
+        const allPlayersCacheKey = 'all_players';
+        AsyncStorage.removeItem(allPlayersCacheKey).catch(error => {
+          console.warn('⚠️ Не удалось очистить кеш всех игроков:', error);
+        });
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
         setTimeout(async () => {
@@ -2853,6 +2859,26 @@ export default function PlayerProfile() {
             try {
               // Обновляем локальное состояние для немедленного отображения
               setCurrentUser(refreshedPlayer);
+
+              // Также обновляем список игроков на главной странице, если он есть
+              // Это нужно для отображения измененной страны на главной странице
+              const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+              try {
+                const cachedPlayers = await AsyncStorage.getItem('all_players');
+                if (cachedPlayers) {
+                  const { players: cachedPlayersList } = JSON.parse(cachedPlayers);
+                  const updatedPlayersList = cachedPlayersList.map((p: Player) =>
+                    p.id === player.id ? refreshedPlayer : p
+                  );
+                  await AsyncStorage.setItem('all_players', JSON.stringify({
+                    players: updatedPlayersList,
+                    timestamp: Date.now()
+                  }));
+                  console.log('✅ Обновили кеш всех игроков с новой страной пользователя');
+                }
+              } catch (error) {
+                console.warn('⚠️ Не удалось обновить кеш всех игроков:', error);
+              }
             } catch (error) {
               console.error('❌ Ошибка обновления глобального состояния:', error);
             }

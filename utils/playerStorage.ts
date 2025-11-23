@@ -1075,14 +1075,17 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     // Если forceRefresh = true, пропускаем проверку кэша
     if (!forceRefresh) {
       const cachedData = await AsyncStorage.getItem(cacheKey);
-      
+
       if (cachedData) {
         const { players, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < cacheTime) {
+          console.log('💾 Загрузили игроков из кеша all_players');
           return players;
         }
       }
     }
+
+    console.log('🌐 Загружаем игроков из базы данных' + (forceRefresh ? ' (принудительно)' : ''));
     
     const { data, error } = await supabase
       .from('players')

@@ -1360,6 +1360,7 @@ export default function HomeScreen() {
   const filtersInitializedRef = useRef(false); // Флаг, что фильтры были инициализированы
   const previousVisiblePlayersRef = useRef<Set<string>>(new Set()); // Сохраняем ID видимых игроков для сравнения
   const filterInitTimeRef = useRef<number>(0); // Время инициализации фильтров для защиты от пересчета
+  const lastUserCountryRef = useRef<string | null>(null); // Отслеживаем изменения страны пользователя
 
   // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
@@ -1397,37 +1398,12 @@ export default function HomeScreen() {
       currentSelectedCountry: selectedCountry
     });
     
-    // ВАЖНО: Если фильтры уже инициализированы, но страна пользователя изменилась,
-    // переинициализируем фильтры независимо от текущего выбора в интерфейсе
-    if (filtersInitializedRef.current && currentUser && currentUser.country) {
-      const currentUserCountry = currentUser.country;
-      if (currentUserCountry !== defaultCountry) {
-        console.log('⚠️ [FILTERS] Страна пользователя изменилась!', {
-          dbCountry: currentUserCountry,
-          calculatedDefault: defaultCountry,
-          selectedCountry,
-          filtersInitialized: filtersInitializedRef.current
-        });
-        // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
-        filtersInitializedRef.current = false;
-      }
-    }
-
-    // Также проверяем несоответствие между выбранной страной и страной пользователя
-    if (filtersInitializedRef.current && selectedCountry !== null && defaultCountry && selectedCountry !== defaultCountry) {
-      console.log('⚠️ [FILTERS] Обнаружено несоответствие: выбранная страна не совпадает с новой страной пользователя!', {
-        contextCountry: selectedCountry,
-        userCountry: defaultCountry
-      });
-      // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
-      filtersInitializedRef.current = false;
-    }
+    // ВАЖНО: Переинициализация фильтров происходит только при первом запуске или
+    // когда пользователь сохранил изменения в своем профиле (currentUser.country изменилась)
+    // НЕ переинициализируем фильтры когда пользователь просто выбирает другую страну в интерфейсе!
     
-    // Если фильтры уже инициализированы и страна совпадает, возвращаем текущие значения
-    if (filtersInitializedRef.current && selectedCountry !== null && defaultCountry && selectedCountry === defaultCountry) {
-      console.log('🔍 [FILTERS] Фильтры уже инициализированы и страна совпадает, возвращаем текущие значения');
-      return { country: selectedCountry, year: selectedYear };
-    }
+    // initialFilters всегда рассчитывает значения на основе данных пользователя
+    // НЕ возвращаем текущие значения из контекста
     
     if (!defaultCountry) {
       console.log('⚠️ [FILTERS] У пользователя не указана страна, показываем "Все"');
@@ -1491,7 +1467,23 @@ export default function HomeScreen() {
     }
 
     return { country: defaultCountry, year: defaultYear };
-  }, [players.length, currentUser?.country, currentUser?.birthDate, currentUser?.status, isUserLoading]);
+  }, [players.length, currentUser, isUserLoading]);
+
+  // Отслеживаем изменения страны пользователя и переинициализируем фильтры
+  useEffect(() => {
+    if (currentUser?.country && lastUserCountryRef.current && currentUser.country !== lastUserCountryRef.current) {
+      console.log('🌍 [FILTERS] Страна пользователя изменилась в базе данных:', {
+        oldCountry: lastUserCountryRef.current,
+        newCountry: currentUser.country
+      });
+      // Сбрасываем флаг инициализации, чтобы фильтры переинициализировались
+      filtersInitializedRef.current = false;
+    }
+    // Обновляем сохраненную страну пользователя
+    if (currentUser?.country !== lastUserCountryRef.current) {
+      lastUserCountryRef.current = currentUser?.country || null;
+    }
+  }, [currentUser?.country]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
@@ -1508,24 +1500,11 @@ export default function HomeScreen() {
       filtersInitializedRef.current = false;
     }
 
-    // ВАЖНО: Переинициализируем фильтры, если страна пользователя изменилась
-    // Это должно происходить независимо от текущего состояния фильтров
-    if (currentUser && filtersInitializedRef.current && initialFilters.country && selectedCountry !== initialFilters.country) {
-      console.log('🔄 [FILTERS] Страна пользователя изменилась, переинициализируем фильтры', {
-        oldCountry: selectedCountry,
-        newCountry: initialFilters.country
-      });
-      filtersInitializedRef.current = false;
-    }
-
     // Инициализируем фильтры только один раз при первой загрузке
-    // Или переинициализируем только если страна пользователя изменилась И фильтры были инициализированы
-    // НЕ переинициализируем, если пользователь вручную выбрал "Все"
+    // Переинициализация при изменении страны пользователя обрабатывается в отдельном useEffect выше
     const shouldInitialize = players.length > 0 &&
       !filtersInitializedRef.current &&
-      (selectedCountry === null && selectedYear === null ||
-       filtersInitializedRef.current === false // Флаг был сброшен из-за изменения страны пользователя
-      );
+      (selectedCountry === null && selectedYear === null);
     
     if (shouldInitialize) {
       console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', {
@@ -1535,7 +1514,8 @@ export default function HomeScreen() {
         currentUserBirthDate: currentUser?.birthDate,
         isUserLoading,
         playersCount: players.length,
-        filtersInitializedFlag: filtersInitializedRef.current
+        filtersInitializedFlag: filtersInitializedRef.current,
+        reason: filtersInitializedRef.current === false ? 'flag_reset' : 'first_time'
       });
 
       setSelectedCountry(initialFilters.country);
@@ -1550,7 +1530,7 @@ export default function HomeScreen() {
       // Помечаем, что фильтры были инициализированы
       filtersInitializedRef.current = true;
     }
-  }, [players.length, currentUser, isUserLoading, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear, initialFilters]);
+  }, [players.length, currentUser, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
 
   // Состояние для управления годами рождения
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
@@ -1573,9 +1553,16 @@ export default function HomeScreen() {
   const loadAllPlayers = useCallback(async (forceRefresh = false) => {
       try {
         setLoading(true);
+        console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
       const loadedPlayers = await loadPlayers(forceRefresh); // Принудительное обновление при необходимости
         setPlayers(loadedPlayers);
         console.log(`✅ Игроки загружены${forceRefresh ? ' (принудительно)' : ''}:`, loadedPlayers.length);
+
+        // Логируем страну текущего пользователя в загруженных данных
+        if (currentUser) {
+          const currentUserInList = loadedPlayers.find(p => p.id === currentUser.id);
+          console.log('👤 Страна текущего пользователя в списке:', currentUserInList?.country);
+        }
         } catch (error) {
         console.error('❌ Ошибка загрузки игроков:', error);
       } finally {
@@ -1930,9 +1917,13 @@ export default function HomeScreen() {
   // Перезапускаем анимацию при возвращении на экран
   useFocusEffect(
     useCallback(() => {
+      console.log('🏠 Возвращение на главный экран, перезагрузка игроков');
       setCurrentScreen('home');
-      // Перезагружаем игроков при возвращении на главный экран (например, после регистрации)
-      loadAllPlayers();
+      // Перезагружаем игроков при возвращении на главный экран (например, после регистрации или изменения профиля)
+      // Используем небольшую задержку, чтобы изменения в профиле успели сохраниться
+      setTimeout(() => {
+        loadAllPlayers();
+      }, 500);
       // Убрали задержку, чтобы избежать остановки анимации
       // blockedUsers уже загружаются при монтировании компонента
       if (unblockLoadRef.current && !hasLoadedBlockedInitiallyRef.current) {
