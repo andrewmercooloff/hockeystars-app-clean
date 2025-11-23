@@ -1386,19 +1386,37 @@ export default function HomeScreen() {
     // Для авторизованных пользователей вычисляем фильтры синхронно
     const defaultCountry = currentUser?.country;
     
+    console.log('🔍 [FILTERS] Проверка инициализации фильтров:', {
+      userName: currentUser?.name,
+      userCountry: defaultCountry,
+      playersCount: players.length,
+      isUserLoading
+    });
+    
     if (!defaultCountry) {
+      console.log('⚠️ [FILTERS] У пользователя не указана страна, показываем "Все"');
       return { country: null, year: null };
     }
 
     // Проверяем, есть ли игроки в стране пользователя
+    // ВАЖНО: учитываем всех пользователей со статусом 'player', 'star', 'coach', 'scout'
+    // чтобы фильтр работал правильно для всех типов пользователей
     const playersInCountry = players.filter(player =>
       player.country === defaultCountry &&
       player.birthDate &&
-      player.status === 'player'
+      (player.status === 'player' || player.status === 'star' || player.status === 'coach' || player.status === 'scout')
     );
+
+    console.log('🔍 [FILTERS] Игроки в стране пользователя:', {
+      country: defaultCountry,
+      playersInCountry: playersInCountry.length,
+      allPlayersInCountry: players.filter(p => p.country === defaultCountry).length,
+      allPlayersWithStatus: players.filter(p => p.status === 'player').length
+    });
 
     // Если нет игроков в стране пользователя, показываем "Все"
     if (playersInCountry.length === 0) {
+      console.log('⚠️ [FILTERS] Нет игроков в стране пользователя, показываем "Все"');
       return { country: null, year: null };
     }
 
@@ -1462,7 +1480,14 @@ export default function HomeScreen() {
       !filtersInitializedRef.current;
     
     if (shouldInitialize) {
-      console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', initialFilters, 'currentUser:', currentUser?.name, 'isUserLoading:', isUserLoading);
+      console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', {
+        initialFilters,
+        currentUserName: currentUser?.name,
+        currentUserCountry: currentUser?.country,
+        currentUserBirthDate: currentUser?.birthDate,
+        isUserLoading,
+        playersCount: players.length
+      });
       
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
@@ -1470,7 +1495,7 @@ export default function HomeScreen() {
       if (initialFilters.country) {
         console.log(`✅ [FILTERS] Фильтры инициализированы: страна=${initialFilters.country}, год=${initialFilters.year}`);
       } else {
-        console.log('✅ [FILTERS] Фильтры инициализированы: "Все"');
+        console.log('✅ [FILTERS] Фильтры инициализированы: "Все" (страна=null, год=null)');
       }
       
       // Помечаем, что фильтры были инициализированы
