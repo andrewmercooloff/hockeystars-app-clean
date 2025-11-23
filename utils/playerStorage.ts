@@ -983,8 +983,8 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     position: normalizePosition(player.position) || player.position || '',
     team: player.team,
     age: player.age,
-    height: parseInt(player.height) || 0,
-    weight: parseInt(player.weight) || 0,
+    height: player.height ? (typeof player.height === 'string' ? parseInt(player.height) : player.height) : 0,
+    weight: player.weight ? (typeof player.weight === 'string' ? parseInt(player.weight) : player.weight) : 0,
     avatar: player.avatar,
     email: player.email || undefined, // undefined вместо null для TypeScript
     password: player.password,
