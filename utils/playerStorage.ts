@@ -1960,8 +1960,39 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       if (cachedData) {
         const { user, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < cacheTime) {
-          // Быстро возвращаем кешированного пользователя
-          return user;
+          // ВАЖНО: Даже при загрузке из кэша проверяем страну из БД,
+          // чтобы убедиться, что данные актуальны
+          // Это критично для правильной работы фильтров
+          try {
+            const { data: playerData, error: playerError } = await supabase
+              .from('players')
+              .select('id, country, birth_date, status')
+              .eq('id', user.id)
+              .single();
+            
+            if (!playerError && playerData) {
+              // Если страна не совпадает, обновляем и не используем кэш
+              if (playerData.country && playerData.country !== user.country) {
+                console.log('⚠️ [USER] Обнаружено несоответствие страны в кэше:', {
+                  cachedCountry: user.country,
+                  dbCountry: playerData.country,
+                  userId: user.id,
+                  userName: user.name
+                });
+                // Продолжаем загрузку без использования кэша, чтобы обновить данные
+              } else {
+                // Страна совпадает, можно использовать кэш
+                return user;
+              }
+            } else {
+              // Если не удалось загрузить из БД, используем кэш
+              return user;
+            }
+          } catch (error) {
+            console.error('❌ Ошибка проверки страны из БД при загрузке из кэша:', error);
+            // При ошибке используем кэш
+            return user;
+          }
         }
       }
     }
