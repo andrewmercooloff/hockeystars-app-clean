@@ -408,11 +408,15 @@ export default function ChatScreen() {
   const loadChatData = async () => {
     try {
       if (id) {
-        const otherPlayerData = await getPlayerById(id as string);
-        const userData = await loadCurrentUser();
+        // Загружаем данные параллельно для ускорения
+        const [otherPlayerData, userData] = await Promise.all([
+          getPlayerById(id as string),
+          loadCurrentUser()
+        ]);
         
         // Редирект убран - проверка авторизации происходит в _layout.tsx
         if (!userData) {
+          setLoading(false);
           return;
         }
 
@@ -420,59 +424,45 @@ export default function ChatScreen() {
         setCurrentUser(userData);
         
         if (otherPlayerData) {
-          // Принудительно обновляем статус онлайн при загрузке чата
-          // Получаем актуальные данные из базы напрямую
-          try {
-            const { data: freshPlayerData, error } = await supabase
+          // Загружаем сообщения и статус онлайн параллельно
+          const [conversation, statusResult] = await Promise.all([
+            getConversation(userData.id, otherPlayerData.id).catch(err => {
+              console.error('❌ Ошибка загрузки диалога:', err);
+              return [];
+            }),
+            supabase
               .from('players')
               .select('is_online, last_seen')
               .eq('id', otherPlayerData.id)
-              .single();
-            
-            if (!error && freshPlayerData) {
-              setOtherPlayer(prev => {
-                if (!prev) return prev;
-                return {
-                  ...prev,
-                  isOnline: freshPlayerData.is_online ?? prev.isOnline,
-                  lastSeen: freshPlayerData.last_seen ?? prev.lastSeen
-                };
-              });
-            }
-          } catch (statusError) {
-            console.warn('⚠️ Не удалось обновить статус при загрузке чата:', statusError);
+              .single()
+              .then(({ data, error }) => ({ data, error }))
+              .catch(err => ({ data: null, error: err }))
+          ]);
+          
+          // Обновляем статус онлайн если получен
+          if (statusResult.data && !statusResult.error) {
+            setOtherPlayer(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                isOnline: statusResult.data.is_online ?? prev.isOnline,
+                lastSeen: statusResult.data.last_seen ?? prev.lastSeen
+              };
+            });
           }
           
-          // Сразу загружаем сообщения
-          console.log(`📨 Загружаем диалог между ${userData.id} и ${otherPlayerData.id}...`);
-          try {
-            const conversation = await getConversation(userData.id, otherPlayerData.id);
-            console.log(`✅ Загружено ${conversation.length} сообщений в диалоге`);
-            if (conversation.length > 0) {
-              console.log(`📨 Примеры сообщений:`, conversation.slice(0, 3).map(m => ({ id: m.id, text: m.text.substring(0, 30) })));
-            } else {
-              console.warn(`⚠️ Диалог пустой - нет сообщений между ${userData.id} и ${otherPlayerData.id}`);
-            }
-            setMessages(conversation);
-            // Устанавливаем isNearBottom в true после загрузки
-            setIsNearBottom(true);
-            // Прокрутка вниз будет выполнена в useEffect выше без анимации
-          } catch (convError) {
-            console.error('❌ Ошибка загрузки диалога:', convError);
-            console.error('❌ Детали ошибки:', JSON.stringify(convError, null, 2));
-            setMessages([]);
+          // Устанавливаем сообщения
+          console.log(`✅ Загружено ${conversation.length} сообщений в диалоге`);
+          if (conversation.length > 0) {
+            console.log(`📨 Примеры сообщений:`, conversation.slice(0, 3).map(m => ({ id: m.id, text: m.text.substring(0, 30) })));
           }
+          setMessages(conversation);
+          setIsNearBottom(true);
           
-          // Отмечаем сообщения как прочитанные
-          await markMessagesAsRead(userData.id, otherPlayerData.id);
-          
-          // Обновляем локальное состояние
-          setCurrentUser(userData);
-          
-          // setTimeout(async () => {
-          //   console.log('🔄 Автоматическое скрытие индикатора через 2 секунды после захода в чат');
-          //   await refreshUser(true);
-          // }, 2000);
+          // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
+          markMessagesAsRead(userData.id, otherPlayerData.id).catch(err => {
+            console.error('⚠️ Ошибка отметки сообщений как прочитанных (не критично):', err);
+          });
         }
       }
     } catch (error) {

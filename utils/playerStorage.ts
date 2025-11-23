@@ -5576,15 +5576,26 @@ export const notifyFriendsAboutChanges = async (
         sentPushNotifications.add(pushCacheKey);
         pushNotificationCache.set(pushCacheKey, now);
         
-        let title = '📊 Обновление статистики';
-        let body = `${playerName} обновил свою статистику`;
+        // Получаем язык получателя для локализации
+        const userLang = friendLanguages.get(userId) || 'en';
+        const userTranslations = loadTranslations(userLang);
+        
+        let title = userLang === 'ru' ? '📊 Обновление статистики' : '📊 Stats Update';
+        let body = userLang === 'ru' 
+          ? `${playerName} обновил статистику`
+          : `${playerName} updated stats`;
         
         if (notificationType === 'stats_change') {
-          title = '📊 Обновление статистики';
-          body = `${playerName} обновил статистику`;
+          const userNotification = deduplicatedNotifications.find(n => n.user_id === userId);
+          if (userNotification) {
+            title = userNotification.title || title;
+            body = userNotification.message || body;
+          }
         } else if (notificationType === 'physical_data_changed') {
-          title = '💪 Обновление нормативов';
-          body = `${playerName} обновил свои нормативы`;
+          title = userLang === 'ru' ? '💪 Изменение физических данных' : '💪 Physical Data Changed';
+          body = userLang === 'ru'
+            ? `${playerName} обновил физические данные`
+            : `${playerName} updated physical data`;
         }
         
         await sendNotificationToUser(

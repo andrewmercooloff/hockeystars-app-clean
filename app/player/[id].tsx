@@ -1958,22 +1958,20 @@ export default function PlayerProfile() {
             return updated;
           });
           
-          showCustomAlert(t('common.success'), t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 'success');
-          
           // Очищаем кеш игрока и аватара асинхронно (не блокируем UI)
           setTimeout(async () => {
             try {
-          await clearPlayerCache(player.id);
-          // Также очищаем кеш аватара для этого игрока
-          try {
-            const { avatarCache } = await import('../../utils/AvatarCache');
-            avatarCache.clearAvatar(player.id);
-            console.log('🗑️ Кеш аватара игрока очищен после принятия запроса дружбы');
-          } catch (error) {
-            console.error('⚠️ Ошибка очистки кеша аватара (не критично):', error);
-          }
-          console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
-          
+              await clearPlayerCache(player.id);
+              // Также очищаем кеш аватара для этого игрока
+              try {
+                const { avatarCache } = await import('../../utils/AvatarCache');
+                avatarCache.clearAvatar(player.id);
+                console.log('🗑️ Кеш аватара игрока очищен после принятия запроса дружбы');
+              } catch (error) {
+                console.error('⚠️ Ошибка очистки кеша аватара (не критично):', error);
+              }
+              console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
+              
               // Обновляем статус из базы данных
               const newStatus = await getFriendshipStatus(currentUser.id, player.id);
               setFriendshipStatus(newStatus);
@@ -1981,6 +1979,15 @@ export default function PlayerProfile() {
               console.error('⚠️ Ошибка обновления данных после принятия запроса (не критично):', error);
             }
           }, 300);
+          
+          // Показываем алерт после очистки кеша, чтобы не блокировать UI
+          showCustomAlert(
+            t('common.success'), 
+            t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 
+            'success',
+            undefined, // Не закрываем автоматически
+            false // Не показываем кнопку отмены
+          );
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
