@@ -155,8 +155,8 @@
     <div class="container">
         <div id="loading" class="loading">
             <div class="success-icon">⏳</div>
-            <h1 id="loading-title">Processing request...</h1>
-            <p id="loading-message">Please wait, we are confirming your consent.</p>
+            <h1 id="loading-title"></h1>
+            <p id="loading-message"></p>
         </div>
         <div id="error" style="display: none;" class="error">
             <div class="success-icon">❌</div>
@@ -178,11 +178,12 @@
     </div>
 
     <script>
-        // Определяем язык пользователя
+        // Определяем язык пользователя СРАЗУ при загрузке страницы
         const urlParams = new URLSearchParams(window.location.search);
         const langParam = urlParams.get('lang');
         const browserLang = navigator.language || navigator.userLanguage || 'en';
-        const isRussian = langParam === 'ru' || (!langParam && (browserLang.startsWith('ru') || browserLang.startsWith('be')));
+        // По умолчанию используем английский, если lang не указан явно
+        const isRussian = langParam === 'ru';
         const lang = isRussian ? 'ru' : 'en';
         
         // Локализованные тексты
@@ -215,11 +216,22 @@
         
         const t = texts[lang];
         
-        // Устанавливаем язык страницы
-        document.getElementById('html-root').setAttribute('lang', lang);
-        document.getElementById('page-title').textContent = t.title;
-        document.getElementById('loading-title').textContent = t.loadingTitle;
-        document.getElementById('loading-message').textContent = t.loadingMessage;
+        // Устанавливаем язык страницы СРАЗУ, до загрузки контента
+        if (document.getElementById('html-root')) {
+            document.getElementById('html-root').setAttribute('lang', lang);
+        }
+        if (document.getElementById('page-title')) {
+            document.getElementById('page-title').textContent = t.title;
+        }
+        // Устанавливаем текст загрузки СРАЗУ
+        const loadingTitleEl = document.getElementById('loading-title');
+        const loadingMessageEl = document.getElementById('loading-message');
+        if (loadingTitleEl) {
+            loadingTitleEl.textContent = t.loadingTitle;
+        }
+        if (loadingMessageEl) {
+            loadingMessageEl.textContent = t.loadingMessage;
+        }
         document.getElementById('error-title').textContent = t.errorTitle;
         document.getElementById('success-title').textContent = t.successTitle;
         document.getElementById('account-activated').textContent = t.accountActivated;
