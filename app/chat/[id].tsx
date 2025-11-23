@@ -1384,7 +1384,7 @@ export default function ChatScreen() {
                                     </View>
                                   </TouchableOpacity>
                                 )}
-                                <View style={styles.messageTextRow}>
+                                <View style={styles.messageContentContainer}>
                                   <Text style={[
                                     styles.messageText,
                                     isMyMessage ? styles.myMessageText : styles.otherMessageText
@@ -1820,10 +1820,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(1,0,0)',
     borderBottomLeftRadius: 4,
   },
-  messageTextRow: {
+  messageContentContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    flexWrap: 'nowrap',
   },
   messageText: {
     fontSize: 16,

@@ -48,13 +48,13 @@ export async function registerChildWithParentalConsent(
   try {
     console.log(`🌐 registerChildWithParentalConsent: передаем язык=${language}, avatar=${avatar ? 'есть' : 'нет'}`);
     const requestBody = {
-      phone,
-      name,
-      birthDate,
-      parentEmail,
-      country,
-      position,
-      team,
+        phone,
+        name,
+        birthDate,
+        parentEmail,
+        country,
+        position,
+        team,
       userStatus, // Передаем исходный статус
       language, // Передаем язык приложения
       avatar // Передаем аватар

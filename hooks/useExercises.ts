@@ -112,7 +112,7 @@ export function useExercises(
         setUserStats({});
       } else {
         console.warn('⚠️ Ошибка загрузки статистики упражнений (не критично):', err?.message || 'Unknown error');
-        setUserStats({});
+      setUserStats({});
       }
     }
   }, []);

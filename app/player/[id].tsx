@@ -60,7 +60,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -2670,21 +2670,8 @@ export default function PlayerProfile() {
           }
         }
         
-        if (statsChanges.length > 0) {
-          console.log('📊 Обнаружены изменения статистики:', statsChanges);
-          console.log('ℹ️ Уведомления будут отправлены автоматически через updatePlayer');
-          // Начисляем 1 звездочку за изменение статистики
-          try {
-            await addActivityPoints(player.id, 'STATS_UPDATE');
-          } catch (error) {
-            console.error('❌ Ошибка начисления очков активности за изменение статистики (не критично):', error);
-          }
-        } else {
-          console.log('ℹ️ Статистика НЕ изменилась, уведомления НЕ отправляются');
-        }
-
         // Проверяем изменения нормативов
-        const normativeChanges = [];
+        const normativeChanges: { field: string, oldValue: number, newValue: number, change: number }[] = [];
         
         // Проверяем pullUps
         const oldPullUps = parseInt(player.pullUps || '0');
@@ -2727,6 +2714,39 @@ export default function PlayerProfile() {
         const newJumpRope = parseInt(editData.jumpRope || player.jumpRope || '0');
         if (oldJumpRope !== newJumpRope) {
           normativeChanges.push({ field: 'jumpRope', oldValue: oldJumpRope, newValue: newJumpRope, change: newJumpRope - oldJumpRope });
+        }
+        
+        // Конвертируем statsChanges в формат для notifyFriendsAboutChanges
+        const statChangesForNotify = statsChanges.map(change => ({
+          field: change.field,
+          oldValue: change.oldValue,
+          newValue: change.newValue,
+          change: change.newValue - change.oldValue
+        }));
+        
+        // Отправляем уведомления о статистике и нормативах
+        if (statChangesForNotify.length > 0 || normativeChanges.length > 0) {
+          console.log('📊 Отправляем уведомления о статистике и нормативах:', {
+            stats: statChangesForNotify.length,
+            normatives: normativeChanges.length
+          });
+          notificationPromises.push(
+            notifyFriendsAboutChanges(
+              player.id,
+              player.name,
+              statChangesForNotify,
+              normativeChanges
+            )
+          );
+          
+          // Начисляем 1 звездочку за изменение статистики
+          try {
+            await addActivityPoints(player.id, 'STATS_UPDATE');
+          } catch (error) {
+            console.error('❌ Ошибка начисления очков активности за изменение статистики (не критично):', error);
+          }
+        } else {
+          console.log('ℹ️ Статистика и нормативы НЕ изменились, уведомления НЕ отправляются');
         }
         
       } catch (notifyError) {

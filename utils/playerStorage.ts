@@ -868,18 +868,18 @@ export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[]
         pastTeams
       }
     });
-
+    
     if (error) {
       console.error('❌ Ошибка синхронизации команд через Edge Function:', error);
       return false;
     }
-
+    
     if (data && data.success) {
       console.log('✅ Команды успешно синхронизированы через Edge Function');
       // Очищаем кеш команд при успешной синхронизации
       await clearTeamsCache(playerId);
       return true;
-    } else {
+      } else {
       console.error('❌ Edge Function вернул ошибку:', data?.error);
       return false;
     }
@@ -1414,7 +1414,7 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
           
           if (retryError) {
             console.error('❌ Ошибка повторной отправки запроса дружбы:', retryError);
-            return false;
+      return false;
           }
           
           console.log('✅ Запрос дружбы успешно создан после удаления конфликтующего запроса');
@@ -1503,26 +1503,26 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
       }
         
       // Отправляем push уведомление (даже если in-app уведомление уже существует)
-      try {
-        const { sendNotificationToUser } = await import('./notificationService');
-        const pushResult = await sendNotificationToUser(
-          toId,
-          pushTitle,
-          pushBody,
-          {
-            type: 'friend_request',
-            sender_id: fromId,
-            playerId: fromId,
-            action: 'open_notifications'
+        try {
+          const { sendNotificationToUser } = await import('./notificationService');
+          const pushResult = await sendNotificationToUser(
+            toId,
+            pushTitle,
+            pushBody,
+            {
+              type: 'friend_request',
+              sender_id: fromId,
+              playerId: fromId,
+              action: 'open_notifications'
+            }
+          );
+          if (pushResult) {
+            console.log('✅ Push-уведомление о запросе дружбы отправлено');
+          } else {
+            console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
           }
-        );
-        if (pushResult) {
-          console.log('✅ Push-уведомление о запросе дружбы отправлено');
-        } else {
-          console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
-        }
-      } catch (pushError) {
-        console.error('⚠️ Ошибка отправки push уведомления:', pushError);
+        } catch (pushError) {
+          console.error('⚠️ Ошибка отправки push уведомления:', pushError);
       }
     }
     
@@ -5134,23 +5134,29 @@ export const notifyFriendsAboutPhysicalData = async (
       // Отправляем push уведомления и обновляем счетчик для каждого получателя
       const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
       for (const userId of uniqueUserIds) {
-        // Отправляем push уведомление
+        // Отправляем push уведомление с локализацией для получателя
         try {
           const { sendNotificationToUser } = await import('./notificationService');
+          const friendLang = friendLanguages.get(userId) || 'en';
+          const friendTranslations = loadTranslations(friendLang);
+          
           const changesText = changes.map(change => {
             const fieldName = change.field === 'height' 
-              ? (translations?.height || 'рост')
-              : (translations?.weight || 'вес');
+              ? (friendTranslations?.height || 'рост')
+              : (friendTranslations?.weight || 'вес');
             const unit = change.field === 'height' 
-              ? (translations?.cm || 'см')
-              : (translations?.kg || 'кг');
+              ? (friendTranslations?.cm || 'см')
+              : (friendTranslations?.kg || 'кг');
             return `${fieldName}: ${change.oldValue}${unit} → ${change.newValue}${unit}`;
           }).join(', ');
-          const updatedText = translations?.statsNotification?.updated || 'обновил';
-          const physicalDataText = translations?.statsNotification?.physicalData || 'физические данные';
+          
+          const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
+          const physicalDataText = friendTranslations?.statsNotification?.physicalData || (friendLang === 'ru' ? 'физические данные' : 'physical data');
+          const title = friendLang === 'ru' ? '💪 Изменение физических данных' : '💪 Physical Data Changed';
+          
           await sendNotificationToUser(
             userId,
-            '💪 Изменение физических данных',
+            title,
             `${playerName} ${updatedText} ${physicalDataText}: ${changesText}`,
             {
               type: 'physical_data_changed',

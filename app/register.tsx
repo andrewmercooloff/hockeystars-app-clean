@@ -696,7 +696,7 @@ export default function RegisterScreen() {
           (error.code === '23505' && formData.phone)) {
         showAlert('Ошибка', 'Этот номер уже зарегистрирован. Попробуйте войти', 'error');
       } else {
-        showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
+      showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
       }
     } finally {
       setLoading(false);

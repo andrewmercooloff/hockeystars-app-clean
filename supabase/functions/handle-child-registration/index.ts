@@ -108,9 +108,9 @@ async function sendParentalConsentEmail(
       <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
           <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
-            <div style="text-align: center; margin-bottom: 30px;">
+          <div style="text-align: center; margin-bottom: 30px;">
               <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
-            </div>
+          </div>
           
           <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Здравствуйте!</h2>
           
@@ -166,9 +166,9 @@ async function sendParentalConsentEmail(
       <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
           <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
-            <div style="text-align: center; margin-bottom: 30px;">
+          <div style="text-align: center; margin-bottom: 30px;">
               <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
-            </div>
+          </div>
           
           <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Hello!</h2>
           
