@@ -2848,10 +2848,42 @@ export const getFriends = async (userId: string): Promise<Player[]> => {
 };
 
 // Удаление игрока
-export const deletePlayer = async (playerId: string): Promise<boolean> => {
+export const deletePlayer = async (playerId: string, isOwnAccount: boolean = false): Promise<boolean> => {
   try {
-    console.log(`🗑️ Удаляем игрока с ID: ${playerId}`);
+    console.log(`🗑️ Удаляем игрока с ID: ${playerId}, isOwnAccount: ${isOwnAccount}`);
     
+    // Если пользователь удаляет свой аккаунт, используем RPC функцию
+    if (isOwnAccount) {
+      console.log('🗑️ Используем RPC функцию для удаления собственного аккаунта');
+      const { data, error } = await supabase.rpc('delete_own_account', {
+        player_id_param: playerId
+      });
+      
+      if (error) {
+        console.error('❌ Ошибка удаления собственного аккаунта через RPC:', error);
+        return false;
+      }
+      
+      if (data) {
+        console.log('✅ Аккаунт успешно удален через RPC функцию');
+        // Очищаем кеши после успешного удаления
+        try {
+          avatarCache.clearAvatar(playerId);
+          await clearPlayerCache(playerId);
+          dataCache.invalidate(CACHE_KEYS.PLAYERS);
+          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          await AsyncStorage.removeItem('all_players');
+          await clearAllPlayersCache();
+          console.log(`✅ Кеши очищены для удаленного игрока`);
+        } catch (cacheError) {
+          console.warn('⚠️ Ошибка очистки кешей:', cacheError);
+        }
+        return true;
+      }
+      return false;
+    }
+    
+    // Для админов используем обычный способ удаления
     // Проверяем, существует ли игрок перед удалением
     const { data: existingBefore, error: existErr } = await supabase
       .from('players')

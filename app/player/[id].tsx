@@ -3051,7 +3051,7 @@ export default function PlayerProfile() {
           setLoading(true);
           console.log('🗑️ Начинаем удаление собственного аккаунта:', player.id);
           
-          const success = await deletePlayer(player.id);
+          const success = await deletePlayer(player.id, true); // true = это удаление собственного аккаунта
           
           if (success) {
             console.log('✅ Аккаунт успешно удален, выходим из системы');
