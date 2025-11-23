@@ -308,7 +308,7 @@ serve(async (req) => {
     console.log('🔍 Ищем токен в таблице players:', token)
     const { data: playerData, error: playerError } = await supabase
       .from('players')
-      .select('id, name, parent_email, consent_token, consent_token_expires_at, status, language')
+      .select('id, name, parent_email, consent_token, consent_token_expires_at, status, language, team')
       .eq('consent_token', token)
       .single()
 
