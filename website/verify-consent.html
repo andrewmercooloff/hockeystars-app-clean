@@ -150,6 +150,22 @@
             }
         }
     </style>
+    <script>
+        // Определяем язык СРАЗУ при загрузке страницы, до отображения контента
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            // Логика: если lang=ru в URL - русский, иначе - английский
+            // Это соответствует логике Edge Function, которая передает lang в URL
+            const lang = langParam === 'ru' ? 'ru' : 'en';
+            
+            // Устанавливаем язык для HTML элемента сразу
+            document.documentElement.setAttribute('lang', lang);
+            
+            // Сохраняем язык в глобальной переменной для использования в основном скрипте
+            window.__PAGE_LANG__ = lang;
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -178,13 +194,16 @@
     </div>
 
     <script>
-        // Определяем язык пользователя СРАЗУ при загрузке страницы
-        const urlParams = new URLSearchParams(window.location.search);
-        const langParam = urlParams.get('lang');
-        const browserLang = navigator.language || navigator.userLanguage || 'en';
-        // По умолчанию используем английский, если lang не указан явно
-        const isRussian = langParam === 'ru';
-        const lang = isRussian ? 'ru' : 'en';
+        // Используем язык, определенный в head скрипте
+        // Логика: если lang=ru в URL - русский, иначе - английский
+        // Это соответствует логике Edge Function:
+        // - Если язык приложения русский ИЛИ страна Россия/Беларусь - lang=ru
+        // - Иначе - lang=en
+        const lang = window.__PAGE_LANG__ || (() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            return langParam === 'ru' ? 'ru' : 'en';
+        })();
         
         // Локализованные тексты
         const texts = {
