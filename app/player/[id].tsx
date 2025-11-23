@@ -3069,6 +3069,9 @@ export default function PlayerProfile() {
             if (success) {
               console.log('✅ Аккаунт успешно удален, выходим из системы');
               
+              // Очищаем контекст пользователя ПЕРЕД выходом
+              setCurrentUser(null);
+              
               // Выходим из аккаунта после удаления
               try {
                 await logoutUser();
@@ -3077,20 +3080,22 @@ export default function PlayerProfile() {
                 console.warn('⚠️ Ошибка при выходе из аккаунта (не критично):', logoutError);
               }
               
-              // НЕ вызываем refreshUser(), так как пользователь уже удален
-              // Это может вызвать зависание
+              // Очищаем все кеши
+              try {
+                const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+                await AsyncStorage.removeItem('all_players');
+                await AsyncStorage.removeItem('hockeystars_current_user');
+                await AsyncStorage.removeItem('hockeystars_user_cache');
+                console.log('✅ Все кеши очищены');
+              } catch (cacheError) {
+                console.warn('⚠️ Ошибка очистки кешей:', cacheError);
+              }
               
               setLoading(false);
               
-              showCustomAlert(
-                t('common.success') || t('success'), 
-                t('profile.userDeleted', { name: player.name }),
-                'success',
-                () => {
-                  // Перенаправляем на страницу входа
-                  router.replace('/login');
-                }
-              );
+              // Сразу перенаправляем на страницу входа без показа диалога успеха
+              // так как пользователь уже удален и диалог может не показаться
+              router.replace('/login');
             } else {
               setLoading(false);
               console.error('❌ Не удалось удалить аккаунт');
