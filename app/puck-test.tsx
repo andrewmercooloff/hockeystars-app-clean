@@ -525,7 +525,7 @@ export default function PuckTestScreen() {
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
   const birthYears = useMemo(() => {
     const years: number[] = [];
-    for (let year = 2019; year >= 2008; year--) {
+    for (let year = 2025; year >= 2008; year--) {
       years.push(year);
     }
     return years;

@@ -1347,7 +1347,7 @@ const OriginalPuckAnimator = React.memo(({
 });
 
 export default function HomeScreen() {
-  const { currentUser } = useUser();
+  const { currentUser, isUserLoading } = useUser();
   const router = useRouter();
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
@@ -1371,6 +1371,11 @@ export default function HomeScreen() {
     // Если фильтры уже инициализированы или игроки еще не загружены, возвращаем текущие значения
     if (filtersInitializedRef.current || players.length === 0) {
       return { country: selectedCountry, year: selectedYear };
+    }
+
+    // Ждем загрузки пользователя перед инициализацией фильтров
+    if (isUserLoading) {
+      return { country: null, year: null };
     }
 
     // Для неавторизованных пользователей показываем "Все"
@@ -1432,14 +1437,32 @@ export default function HomeScreen() {
     }
 
     return { country: defaultCountry, year: defaultYear };
-  }, [players.length, currentUser, selectedCountry, selectedYear]);
+  }, [players.length, currentUser, isUserLoading, selectedCountry, selectedYear]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
   useLayoutEffect(() => {
+    // Ждем завершения загрузки пользователя перед инициализацией фильтров
+    if (isUserLoading) {
+      return;
+    }
+
+    // Если пользователь загрузился, но фильтры еще не инициализированы, сбрасываем флаг
+    // Это позволяет переинициализировать фильтры, если они были установлены как null до загрузки пользователя
+    if (currentUser && filtersInitializedRef.current && selectedCountry === null && selectedYear === null && initialFilters.country !== null) {
+      console.log('🔄 [FILTERS] Пользователь загрузился, переинициализируем фильтры');
+      filtersInitializedRef.current = false;
+    }
+
     // Инициализируем фильтры только один раз при первой загрузке
-    if (players.length > 0 && !filtersInitializedRef.current && selectedCountry === null && selectedYear === null) {
-      console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', initialFilters);
+    // Или переинициализируем, если пользователь загрузился после того, как фильтры уже были установлены как null
+    const shouldInitialize = players.length > 0 && 
+      selectedCountry === null && 
+      selectedYear === null &&
+      !filtersInitializedRef.current;
+    
+    if (shouldInitialize) {
+      console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', initialFilters, 'currentUser:', currentUser?.name, 'isUserLoading:', isUserLoading);
       
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
@@ -1453,13 +1476,13 @@ export default function HomeScreen() {
       // Помечаем, что фильтры были инициализированы
       filtersInitializedRef.current = true;
     }
-  }, [players.length, currentUser, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear, initialFilters]);
+  }, [players.length, currentUser, isUserLoading, selectedCountry, selectedYear, setSelectedCountry, setSelectedYear, initialFilters]);
 
   // Состояние для управления годами рождения
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
   const birthYears = useMemo(() => {
     const years: number[] = [];
-    for (let year = 2019; year >= 2008; year--) {
+    for (let year = 2025; year >= 2008; year--) {
       years.push(year);
     }
     return years;

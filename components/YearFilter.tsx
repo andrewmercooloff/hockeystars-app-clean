@@ -53,8 +53,8 @@ export default function YearFilter({ players }: { players: any[] }) {
           }
         }
 
-        // Проверяем диапазон лет
-        if (birthYear && birthYear >= 2008 && birthYear <= 2019) {
+        // Добавляем все годы без ограничений (только проверяем, что год валидный)
+        if (birthYear && !isNaN(birthYear) && birthYear > 1900 && birthYear <= new Date().getFullYear() + 1) {
           yearCounts[birthYear] = (yearCounts[birthYear] || 0) + 1;
         }
       } catch (_) {

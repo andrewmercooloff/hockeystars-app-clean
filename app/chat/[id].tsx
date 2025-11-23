@@ -488,7 +488,9 @@ export default function ChatScreen() {
 
   // Жалоба на чат
   const reportChat = React.useCallback(async () => {
-    if (!currentUser || !otherPlayer || isReportingChat) {
+    // Нельзя пожаловаться на чат с админом или быть админом и жаловаться на чат
+    if (!currentUser || !otherPlayer || isReportingChat || 
+        otherPlayer.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -608,7 +610,9 @@ export default function ChatScreen() {
   }, [currentUser, otherPlayer, isReportingChat, t]);
 
   const handleReportChat = React.useCallback(() => {
-    if (!currentUser || !otherPlayer) {
+    // Нельзя пожаловаться на чат с админом или быть админом и жаловаться на чат
+    if (!currentUser || !otherPlayer || 
+        otherPlayer.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -694,7 +698,9 @@ export default function ChatScreen() {
 
   // Обработчик разблокировки пользователя из чата
   const handleUnblockUserFromChat = React.useCallback(async () => {
-    if (!currentUser || !otherPlayer || isBlockingUser) {
+    // Нельзя разблокировать админа или быть админом и разблокировать кого-то
+    if (!currentUser || !otherPlayer || isBlockingUser || 
+        otherPlayer.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -1093,6 +1099,12 @@ export default function ChatScreen() {
 
   // Очистка всего чата
   const handleClearChat = async () => {
+    // Нельзя очистить чат с админом или быть админом и очищать чат
+    if (!currentUser || !otherPlayer || 
+        otherPlayer.status === 'admin' || currentUser.status === 'admin') {
+      return;
+    }
+    
     Alert.alert(
       t('chat.clearChat'),
       t('chat.clearChatConfirm'),
@@ -1207,23 +1219,28 @@ export default function ChatScreen() {
               </View>
             </View>
             
-            {/* Кнопка с 3 точками */}
-            <View style={styles.headerActions}>
-              <TouchableOpacity
-                ref={chatMenuButtonRef}
-                onPress={handleOpenChatMenu}
-                style={styles.headerActionButton}
-                hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                accessibilityLabel="Menu"
-              >
-                <Ionicons
-                  name="ellipsis-horizontal"
-                  size={16}
-                  color="#fff"
-                  style={styles.headerActionIcon}
-                />
-              </TouchableOpacity>
-            </View>
+            {/* Кнопка с 3 точками - НЕ показывается для админов */}
+            {/* НЕ показывается если другой пользователь - админ или текущий пользователь - админ */}
+            {otherPlayer && currentUser && 
+             otherPlayer.status !== 'admin' && 
+             currentUser.status !== 'admin' && (
+              <View style={styles.headerActions}>
+                <TouchableOpacity
+                  ref={chatMenuButtonRef}
+                  onPress={handleOpenChatMenu}
+                  style={styles.headerActionButton}
+                  hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  accessibilityLabel="Menu"
+                >
+                  <Ionicons
+                    name="ellipsis-horizontal"
+                    size={16}
+                    color="#fff"
+                    style={styles.headerActionIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
             </View>
           </BlurView>
 

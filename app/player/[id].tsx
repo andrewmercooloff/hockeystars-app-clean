@@ -1572,7 +1572,9 @@ export default function PlayerProfile() {
   }, [currentUser, player, showCustomAlert, t]);
 
   const handleReportUser = React.useCallback(() => {
-    if (!currentUser || !player || currentUser.id === player.id) {
+    // Нельзя пожаловаться на админа или быть админом и жаловаться на кого-то
+    if (!currentUser || !player || currentUser.id === player.id || 
+        player.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -1631,7 +1633,9 @@ export default function PlayerProfile() {
 
   // Обработчик блокировки пользователя
   const handleBlockUser = React.useCallback(async () => {
-    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser) {
+    // Нельзя блокировать админа или быть админом и блокировать кого-то
+    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser || 
+        player.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -1673,7 +1677,9 @@ export default function PlayerProfile() {
 
   // Обработчик разблокировки пользователя
   const handleUnblockUser = React.useCallback(async () => {
-    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser) {
+    // Нельзя разблокировать админа или быть админом и разблокировать кого-то
+    if (!currentUser || !player || currentUser.id === player.id || isBlockingUser || 
+        player.status === 'admin' || currentUser.status === 'admin') {
       return;
     }
 
@@ -3195,7 +3201,11 @@ export default function PlayerProfile() {
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               {/* Кнопка с 3 точками в правом верхнем углу профиля - показывается только для чужих профилей */}
-              {currentUser && player && currentUser.id !== player.id && (
+              {/* НЕ показывается для админов: ни если просматриваемый пользователь - админ, ни если текущий пользователь - админ */}
+              {currentUser && player && 
+               currentUser.id !== player.id && 
+               player.status !== 'admin' && 
+               currentUser.status !== 'admin' && (
                 <TouchableOpacity
                   ref={profileMenuButtonRef}
                   onPress={handleOpenProfileMenu}
