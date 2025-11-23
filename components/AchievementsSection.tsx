@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import {
     Alert,
+    Keyboard,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     ScrollView,
     StyleProp,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
     ViewStyle,
 } from 'react-native';
@@ -229,13 +233,25 @@ export default function AchievementsSection({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingAchievement ? t('profile.editAchievement') : t('profile.addAchievement')}
-            </Text>
-            
-            <TextInput
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.modalContentWrapper}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 150 : 20}
+            >
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.modalContent}>
+                  <ScrollView 
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.modalScrollContent}
+                  >
+                    <Text style={styles.modalTitle}>
+                      {editingAchievement ? t('profile.editAchievement') : t('profile.addAchievement')}
+                    </Text>
+                    
+                    <TextInput
               style={styles.input}
               placeholder={t('profile.competitionName')}
               placeholderTextColor="#888"
@@ -307,34 +323,40 @@ export default function AchievementsSection({
                 }
               }}
             />
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  setEditingAchievement(null);
-                  setNewAchievement({
-                    competition: '',
-                    year: new Date().getFullYear(),
-                    place: 1,
-                    description: ''
-                  });
-                }}
-              >
-                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={editingAchievement ? handleEditAchievement : handleAddAchievement}
-              >
-                <Text style={styles.saveButtonText}>
-                  {editingAchievement ? t('common.save') : t('common.add')}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  </ScrollView>
+                  
+                  {/* Кнопки вынесены за пределы ScrollView для фиксации над клавиатурой */}
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={styles.cancelButton}
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        setModalVisible(false);
+                        setEditingAchievement(null);
+                        setNewAchievement({
+                          competition: '',
+                          year: new Date().getFullYear(),
+                          place: 1,
+                          description: ''
+                        });
+                      }}
+                    >
+                      <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.saveButton}
+                      onPress={editingAchievement ? handleEditAchievement : handleAddAchievement}
+                    >
+                      <Text style={styles.saveButtonText}>
+                        {editingAchievement ? t('common.save') : t('common.add')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
@@ -471,6 +493,13 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
+    flex: 1,
+    flexDirection: 'column',
+    maxHeight: '90%',
+  },
+  modalScrollContent: {
+    paddingBottom: 20,
+    flexGrow: 1,
   },
   modalTitle: {
     fontSize: 20,
@@ -531,6 +560,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 15,
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    zIndex: 1000,
   },
   cancelButton: {
     flex: 1,

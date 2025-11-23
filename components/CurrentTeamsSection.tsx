@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
+    Keyboard,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -357,13 +361,25 @@ export default function CurrentTeamsSection({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingTeam ? t('editTeam') : t('addTeam')}
-            </Text>
-            
-            <View style={styles.searchContainer}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.modalContentWrapper}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 150 : 20}
+            >
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.modalContent}>
+                  <ScrollView 
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.modalScrollContent}
+                  >
+                    <Text style={styles.modalTitle}>
+                      {editingTeam ? t('editTeam') : t('addTeam')}
+                    </Text>
+                    
+                    <View style={styles.searchContainer}>
               <TextInput
                 style={styles.searchInput}
                 placeholder={t('searchTeams')}
@@ -473,39 +489,43 @@ export default function CurrentTeamsSection({
                 }
               }}
             />
-
-
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => {
-                  setModalVisible(false);
-                  setEditingTeam(null);
-                  setNewTeam({
-                    teamName: '',
-                    teamCountry: '',
-                    teamCity: '',
-                    startYear: '',
-                    endYear: '',
-                    isCurrent: true
-                  });
-                }}
-              >
-                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.button, styles.saveButton]}
-                onPress={editingTeam ? handleEditTeam : handleAddTeam}
-              >
-                <Text style={styles.saveButtonText}>
-                  {editingTeam ? t('save') : t('add')}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  </ScrollView>
+                  
+                  {/* Кнопки вынесены за пределы ScrollView для фиксации над клавиатурой */}
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.button, styles.cancelButton]}
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        setModalVisible(false);
+                        setEditingTeam(null);
+                        setNewTeam({
+                          teamName: '',
+                          teamCountry: '',
+                          teamCity: '',
+                          startYear: '',
+                          endYear: '',
+                          isCurrent: true
+                        });
+                      }}
+                    >
+                      <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={[styles.button, styles.saveButton]}
+                      onPress={editingTeam ? handleEditTeam : handleAddTeam}
+                    >
+                      <Text style={styles.saveButtonText}>
+                        {editingTeam ? t('save') : t('add')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
@@ -553,14 +573,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  modalContentWrapper: {
+    width: '100%',
+    maxHeight: '90%',
+  },
   modalContent: {
     backgroundColor: '#1a1a1a',
     borderRadius: 15,
     padding: 20,
     width: '90%',
-    maxHeight: '80%',
+    maxHeight: '90%',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    alignSelf: 'center',
+    flex: 1,
+    flexDirection: 'column',
+  },
+  modalScrollContent: {
+    paddingBottom: 20,
+    flexGrow: 1,
   },
   modalTitle: {
     fontSize: 18,
@@ -645,6 +676,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    zIndex: 1000,
   },
   button: {
     flex: 1,

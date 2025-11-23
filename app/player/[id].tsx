@@ -2357,9 +2357,39 @@ export default function PlayerProfile() {
       }
 
       // Объединяем текущие данные игрока с изменениями
+      // ВАЖНО: Сначала берем все поля из player, затем перезаписываем editData
       const updatedPlayer = {
         ...player, 
         ...editData,
+        // Явно сохраняем все важные поля, чтобы они не потерялись
+        name: editData.name !== undefined ? editData.name : player.name,
+        position: editData.position !== undefined ? editData.position : player.position,
+        team: editData.team !== undefined ? editData.team : player.team,
+        city: editData.city !== undefined ? editData.city : player.city,
+        birthDate: editData.birthDate !== undefined ? editData.birthDate : player.birthDate,
+        country: editData.country !== undefined ? editData.country : player.country,
+        grip: editData.grip !== undefined ? editData.grip : player.grip,
+        height: editData.height !== undefined ? editData.height : player.height,
+        weight: editData.weight !== undefined ? editData.weight : player.weight,
+        number: editData.number !== undefined ? editData.number : player.number,
+        instagram: editData.instagram !== undefined ? editData.instagram : player.instagram,
+        tiktok: editData.tiktok !== undefined ? editData.tiktok : player.tiktok,
+        vk: editData.vk !== undefined ? editData.vk : player.vk,
+        website: editData.website !== undefined ? editData.website : player.website,
+        experience: editData.experience !== undefined ? editData.experience : player.experience,
+        hockeyStartDate: editData.hockeyStartDate !== undefined ? editData.hockeyStartDate : player.hockeyStartDate,
+        goals: editData.goals !== undefined ? editData.goals : player.goals,
+        assists: editData.assists !== undefined ? editData.assists : player.assists,
+        games: editData.games !== undefined ? editData.games : player.games,
+        minutes: editData.minutes !== undefined ? editData.minutes : player.minutes,
+        shots: editData.shots !== undefined ? editData.shots : player.shots,
+        saves: editData.saves !== undefined ? editData.saves : player.saves,
+        pullUps: editData.pullUps !== undefined ? editData.pullUps : player.pullUps,
+        pushUps: editData.pushUps !== undefined ? editData.pushUps : player.pushUps,
+        plankTime: editData.plankTime !== undefined ? editData.plankTime : player.plankTime,
+        sprint100m: editData.sprint100m !== undefined ? editData.sprint100m : player.sprint100m,
+        longJump: editData.longJump !== undefined ? editData.longJump : player.longJump,
+        jumpRope: editData.jumpRope !== undefined ? editData.jumpRope : player.jumpRope,
         avatar: avatarUrl, // Используем URL из Storage
         favoriteGoals: goalsText,
         photos: galleryPhotos,
