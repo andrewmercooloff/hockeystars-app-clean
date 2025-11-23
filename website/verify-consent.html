@@ -194,19 +194,21 @@
     </div>
 
     <script>
-        // Используем язык, определенный в head скрипте
-        // Логика: если lang=ru в URL - русский, иначе - английский
-        // Это соответствует логике Edge Function:
-        // - Если язык приложения русский ИЛИ страна Россия/Беларусь - lang=ru
-        // - Иначе - lang=en
-        const lang = window.__PAGE_LANG__ || (() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const langParam = urlParams.get('lang');
-            return langParam === 'ru' ? 'ru' : 'en';
-        })();
-        
-        // Локализованные тексты
-        const texts = {
+        // Убеждаемся, что DOM загружен
+        (function() {
+            // Используем язык, определенный в head скрипте
+            // Логика: если lang=ru в URL - русский, иначе - английский
+            // Это соответствует логике Edge Function:
+            // - Если язык приложения русский ИЛИ страна Россия/Беларусь - lang=ru
+            // - Иначе - lang=en
+            const lang = window.__PAGE_LANG__ || (() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const langParam = urlParams.get('lang');
+                return langParam === 'ru' ? 'ru' : 'en';
+            })();
+            
+            // Локализованные тексты
+            const texts = {
             ru: {
                 title: 'Подтверждение согласия - HockeyStars',
                 loadingTitle: 'Обработка запроса...',
@@ -257,35 +259,45 @@
         document.getElementById('account-message').textContent = t.accountMessage;
         document.getElementById('support-message').innerHTML = t.supportMessage + '<a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>';
         
-        // Получаем токен из URL
-        const token = urlParams.get('token');
-        
-        console.log('🔍 Полный URL:', window.location.href);
-        console.log('🔍 Токен из URL:', token);
-        console.log('🔍 Декодированный токен:', decodeURIComponent(token || ''));
-        console.log('🌐 Определенный язык:', lang);
+            // Получаем токен из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            console.log('🔍 Полный URL:', window.location.href);
+            console.log('🔍 Токен из URL:', token);
+            console.log('🔍 Декодированный токен:', decodeURIComponent(token || ''));
+            console.log('🌐 Определенный язык:', lang);
 
-        if (!token) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error-message').textContent = t.errorNoToken;
-        } else {
-            // Вызываем Edge Function через fetch
-            const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
-            const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+            if (!token) {
+                const loadingEl = document.getElementById('loading');
+                const errorEl = document.getElementById('error');
+                const errorMessageEl = document.getElementById('error-message');
+                
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'block';
+                if (errorMessageEl) errorMessageEl.textContent = t.errorNoToken;
+            } else {
+                // Вызываем Edge Function через fetch
+                const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+                const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+                
+                // Правильно кодируем токен для URL
+                const encodedToken = encodeURIComponent(token);
+                const verifyUrl = `${supabaseUrl}/functions/v1/verify-parental-consent?token=${encodedToken}`;
+                console.log('🔍 URL для запроса:', verifyUrl);
+                
+                // Добавляем таймаут для запроса (30 секунд)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
             
-            // Правильно кодируем токен для URL
-            const encodedToken = encodeURIComponent(token);
-            const verifyUrl = `${supabaseUrl}/functions/v1/verify-parental-consent?token=${encodedToken}`;
-            console.log('🔍 URL для запроса:', verifyUrl);
-            
-            fetch(verifyUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${anonKey}`,
-                    'apikey': anonKey,
-                }
-            })
+                fetch(verifyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${anonKey}`,
+                        'apikey': anonKey,
+                    },
+                    signal: controller.signal
+                })
             .then(response => {
                 console.log('📡 Response status:', response.status);
                 console.log('📡 Response ok:', response.ok);
@@ -332,43 +344,62 @@
                     });
                 }
             })
-            .then(result => {
-                console.log('✅ Response received:', result.type);
-                
-                if (result.type === 'html') {
-                    // Edge Function вернул HTML страницу - заменяем весь body
-                    console.log('📄 Replacing body with HTML response');
-                    document.body.innerHTML = result.content;
-                } else if (result.type === 'json') {
-                    // JSON ответ - проверяем на ошибки
-                    if (result.content.error) {
-                        throw new Error(result.content.error);
+                .then(result => {
+                    clearTimeout(timeoutId);
+                    console.log('✅ Response received:', result.type);
+                    
+                    if (result.type === 'html') {
+                        // Edge Function вернул HTML страницу - заменяем весь body
+                        console.log('📄 Replacing body with HTML response');
+                        document.body.innerHTML = result.content;
+                    } else if (result.type === 'json') {
+                        // JSON ответ - проверяем на ошибки
+                        if (result.content.error) {
+                            throw new Error(result.content.error);
+                        }
+                        // Если успех, показываем страницу успеха
+                        const loadingEl = document.getElementById('loading');
+                        const successEl = document.getElementById('success');
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        if (successEl) successEl.style.display = 'block';
+                    } else {
+                        // Текстовый ответ
+                        console.log('📝 Text response:', result.content);
+                        const loadingEl = document.getElementById('loading');
+                        const successEl = document.getElementById('success');
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        if (successEl) successEl.style.display = 'block';
                     }
-                    // Если успех, показываем страницу успеха
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('success').style.display = 'block';
-                } else {
-                    // Текстовый ответ
-                    console.log('📝 Text response:', result.content);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('success').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('❌ Fetch error:', error);
-                console.error('❌ Error stack:', error.stack);
-                
-                const loadingEl = document.getElementById('loading');
-                const errorEl = document.getElementById('error');
-                const errorMessageEl = document.getElementById('error-message');
-                
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (errorEl) errorEl.style.display = 'block';
-                if (errorMessageEl) {
-                    errorMessageEl.textContent = error.message || t.errorGeneric;
-                }
-            });
-        }
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    console.error('❌ Fetch error:', error);
+                    console.error('❌ Error name:', error.name);
+                    console.error('❌ Error message:', error.message);
+                    if (error.stack) {
+                        console.error('❌ Error stack:', error.stack);
+                    }
+                    
+                    const loadingEl = document.getElementById('loading');
+                    const errorEl = document.getElementById('error');
+                    const errorMessageEl = document.getElementById('error-message');
+                    
+                    let errorText = t.errorGeneric;
+                    if (error.name === 'AbortError') {
+                        errorText = lang === 'ru' 
+                            ? 'Запрос занял слишком много времени. Пожалуйста, попробуйте еще раз.'
+                            : 'Request took too long. Please try again.';
+                    } else if (error.message) {
+                        errorText = error.message;
+                    }
+                    
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    if (errorEl) errorEl.style.display = 'block';
+                    if (errorMessageEl) {
+                        errorMessageEl.textContent = errorText;
+                    }
+                });
+            }
     </script>
 </body>
 </html>
