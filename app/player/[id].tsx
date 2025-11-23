@@ -1061,22 +1061,26 @@ export default function PlayerProfile() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
-      
+
       // Обновляем данные игрока при возвращении на экран
-      // Это нужно чтобы увидеть актуальную статистику упражнений
+      // Это нужно чтобы увидеть актуальную статистику упражнений и изменения профиля
       const now = Date.now();
-      if (player && player.id && globalCurrentUser?.id === player.id && !loading) {
-        // Это собственный профиль - обновляем данные, но не слишком часто (раз в 2 секунды)
+      const normalizedId = Array.isArray(id) ? id[0] : id;
+
+      if (player && player.id && normalizedId && !loading) {
+        // Обновляем данные профиля при возвращении, но не слишком часто (раз в 2 секунды)
+        // Важно: всегда обновляем данные после редактирования профиля
         if (now - lastRefreshTime.current > 2000) {
           lastRefreshTime.current = now;
+          console.log('🔄 Обновляем данные профиля при возвращении на экран');
           loadPlayerData();
         }
       }
-      
+
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, player?.id, globalCurrentUser?.id])
+    }, [setCurrentScreen, player?.id, id])
   );
 
   // Обработка прокрутки к разным разделам
@@ -2807,12 +2811,19 @@ export default function PlayerProfile() {
       // Обновляем состояние игрока
       if (refreshedPlayer) {
         setPlayer(refreshedPlayer);
-        
+
         // ВАЖНО: Обновляем кэш состояния для немедленного отображения при возвращении в профиль
         setPlayersCache(prev => ({
           ...prev,
           [player.id]: refreshedPlayer
         }));
+
+        // Также очищаем кеш getPlayerById, чтобы при следующем заходе загрузились свежие данные
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const cacheKey = `player_${player.id}`;
+        AsyncStorage.removeItem(cacheKey).catch(error => {
+          console.warn('⚠️ Не удалось очистить кеш игрока:', error);
+        });
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
         setTimeout(async () => {
@@ -2836,14 +2847,11 @@ export default function PlayerProfile() {
           }, 0);
         }
         
-        // Принудительно обновляем все экраны, которые могут показывать данные пользователя (асинхронно)
+        // Обновляем глобальное состояние пользователя асинхронно (не блокируем основной поток)
         if (currentUser.id === player.id) {
           setTimeout(async () => {
             try {
-              // Обновляем глобальное состояние пользователя
-              await refreshUser(true);
-              
-              // Дополнительно обновляем локальное состояние для немедленного отображения
+              // Обновляем локальное состояние для немедленного отображения
               setCurrentUser(refreshedPlayer);
             } catch (error) {
               console.error('❌ Ошибка обновления глобального состояния:', error);

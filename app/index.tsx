@@ -1368,6 +1368,13 @@ export default function HomeScreen() {
   // Вычисляем начальные значения фильтров СИНХРОННО при первом рендере
   // Это гарантирует, что фильтры будут установлены до вычисления allVisiblePlayers
   const initialFilters = useMemo(() => {
+    console.log('🔍 [FILTERS] Пересчет initialFilters:', {
+      isUserLoading,
+      playersCount: players.length,
+      currentUserCountry: currentUser?.country,
+      currentUserName: currentUser?.name
+    });
+
     // Ждем загрузки пользователя перед инициализацией фильтров
     if (isUserLoading || players.length === 0) {
       return { country: null, year: null };
@@ -1390,16 +1397,30 @@ export default function HomeScreen() {
       currentSelectedCountry: selectedCountry
     });
     
-    // ВАЖНО: Если фильтры уже инициализированы, но страна в контексте не совпадает со страной пользователя,
-    // это означает, что страна пользователя была изменена. В этом случае переинициализируем фильтры.
+    // ВАЖНО: Если фильтры уже инициализированы, но страна пользователя изменилась,
+    // переинициализируем фильтры независимо от текущего выбора в интерфейсе
+    if (filtersInitializedRef.current && currentUser && currentUser.country) {
+      const currentUserCountry = currentUser.country;
+      if (currentUserCountry !== defaultCountry) {
+        console.log('⚠️ [FILTERS] Страна пользователя изменилась!', {
+          dbCountry: currentUserCountry,
+          calculatedDefault: defaultCountry,
+          selectedCountry,
+          filtersInitialized: filtersInitializedRef.current
+        });
+        // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
+        filtersInitializedRef.current = false;
+      }
+    }
+
+    // Также проверяем несоответствие между выбранной страной и страной пользователя
     if (filtersInitializedRef.current && selectedCountry !== null && defaultCountry && selectedCountry !== defaultCountry) {
-      console.log('⚠️ [FILTERS] Обнаружено несоответствие: страна пользователя изменилась!', {
+      console.log('⚠️ [FILTERS] Обнаружено несоответствие: выбранная страна не совпадает с новой страной пользователя!', {
         contextCountry: selectedCountry,
         userCountry: defaultCountry
       });
       // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
       filtersInitializedRef.current = false;
-      // Продолжаем выполнение ниже, чтобы вычислить правильные значения
     }
     
     // Если фильтры уже инициализированы и страна совпадает, возвращаем текущие значения
@@ -1470,7 +1491,7 @@ export default function HomeScreen() {
     }
 
     return { country: defaultCountry, year: defaultYear };
-  }, [players.length, currentUser, isUserLoading, selectedCountry, selectedYear]);
+  }, [players.length, currentUser?.country, currentUser?.birthDate, currentUser?.status, isUserLoading]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
@@ -1488,7 +1509,8 @@ export default function HomeScreen() {
     }
 
     // ВАЖНО: Переинициализируем фильтры, если страна пользователя изменилась
-    if (currentUser && filtersInitializedRef.current && initialFilters.country && selectedCountry !== null && selectedCountry !== initialFilters.country) {
+    // Это должно происходить независимо от текущего состояния фильтров
+    if (currentUser && filtersInitializedRef.current && initialFilters.country && selectedCountry !== initialFilters.country) {
       console.log('🔄 [FILTERS] Страна пользователя изменилась, переинициализируем фильтры', {
         oldCountry: selectedCountry,
         newCountry: initialFilters.country
@@ -1497,12 +1519,13 @@ export default function HomeScreen() {
     }
 
     // Инициализируем фильтры только один раз при первой загрузке
-    // Или переинициализируем, если пользователь загрузился после того, как фильтры уже были установлены как null
-    // Или если страна пользователя изменилась
-    const shouldInitialize = players.length > 0 && 
-      ((selectedCountry === null && selectedYear === null) || 
-       (filtersInitializedRef.current && initialFilters.country && selectedCountry !== null && selectedCountry !== initialFilters.country)) &&
-      !filtersInitializedRef.current;
+    // Или переинициализируем только если страна пользователя изменилась И фильтры были инициализированы
+    // НЕ переинициализируем, если пользователь вручную выбрал "Все"
+    const shouldInitialize = players.length > 0 &&
+      !filtersInitializedRef.current &&
+      (selectedCountry === null && selectedYear === null ||
+       filtersInitializedRef.current === false // Флаг был сброшен из-за изменения страны пользователя
+      );
     
     if (shouldInitialize) {
       console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', {
@@ -1511,9 +1534,10 @@ export default function HomeScreen() {
         currentUserCountry: currentUser?.country,
         currentUserBirthDate: currentUser?.birthDate,
         isUserLoading,
-        playersCount: players.length
+        playersCount: players.length,
+        filtersInitializedFlag: filtersInitializedRef.current
       });
-      
+
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
       
@@ -1844,7 +1868,8 @@ export default function HomeScreen() {
       selectedYear: effectiveYear,
       hiddenCount: hiddenPlayerIds.size,
       fromContext: { country: selectedCountry, year: selectedYear },
-      fromInitial: { country: initialFilters.country, year: initialFilters.year }
+      fromInitial: { country: initialFilters.country, year: initialFilters.year },
+      effectiveValues: { country: effectiveCountry, year: effectiveYear }
     });
 
     // Фильтруем скрытые профили ДО вызова getSmartPlayerSelection для главного экрана

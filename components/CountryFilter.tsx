@@ -42,8 +42,16 @@ export default function CountryFilter({ players }: { players: Player[] }) {
   }, [selectedCountry, t]);
 
   const handleCountrySelect = useCallback((country: string | null) => {
+    console.log('🌍 [CountryFilter] Выбор страны:', country);
     setSelectedCountry(country);
-    
+
+    // Если выбрана опция "Все", сбрасываем год (показываем всех игроков)
+    if (country === null) {
+      console.log('🌍 [CountryFilter] Выбрана опция "Все", сбрасываем год');
+      setSelectedYear(null);
+      // НЕ делаем return, продолжаем для закрытия dropdown
+    }
+
     // Проверяем, есть ли игроки с выбранным годом в новой стране
     if (selectedYear !== null && country !== null) {
       const playersInCountry = players.filter(player =>

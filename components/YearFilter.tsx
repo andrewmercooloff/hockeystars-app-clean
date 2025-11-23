@@ -13,11 +13,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 export default function YearFilter({ players }: { players: any[] }) {
   const { t } = useLanguage();
-  const { 
-    selectedYear, 
-    setSelectedYear, 
-    showYearFilter, 
-    setShowYearFilter 
+  const { setSelectedCountry } = useCountryFilter();
+  const {
+    selectedYear,
+    setSelectedYear,
+    showYearFilter,
+    setShowYearFilter
   } = useYearFilter();
   const { selectedCountry } = useCountryFilter();
 
@@ -108,7 +109,15 @@ export default function YearFilter({ players }: { players: any[] }) {
   }, [showYearFilter, dropdownOpacity, dropdownTranslateY]);
 
   const handleYearSelect = useCallback((year: number | null) => {
+    console.log('📅 [YearFilter] Выбор года:', year);
     setSelectedYear(year);
+
+    // Если выбран "Все" по годам, сбрасываем страну (показываем всех игроков)
+    if (year === null) {
+      console.log('📅 [YearFilter] Выбран "Все" по годам, сбрасываем страну');
+      setSelectedCountry(null);
+    }
+
     // Плавно закрываем dropdown перед вызовом setShowYearFilter
     Animated.parallel([
       Animated.timing(dropdownOpacity, {
