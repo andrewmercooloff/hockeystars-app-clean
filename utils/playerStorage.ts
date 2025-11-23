@@ -2078,16 +2078,16 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
 };
 
 // Выход пользователя
-export const logoutUser = async (): Promise<void> => {
+export const logoutUser = async (skipStatusUpdate: boolean = false): Promise<void> => {
   try {
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     
     // Проверим, есть ли данные пользователя перед удалением
     const userData = await AsyncStorage.getItem('hockeystars_current_user');
-    if (userData) {
+    if (userData && !skipStatusUpdate) {
       const user = JSON.parse(userData);
       
-      // Обновляем онлайн-статус в базе данных при выходе
+      // Обновляем онлайн-статус в базе данных при выходе (только если пользователь не удален)
       try {
         await supabase
           .from('players')
@@ -2097,7 +2097,7 @@ export const logoutUser = async (): Promise<void> => {
           })
           .eq('id', user.id);
       } catch (statusError) {
-        // Не критично, если не удалось обновить статус
+        // Не критично, если не удалось обновить статус (возможно, пользователь уже удален)
         console.warn('⚠️ Не удалось обновить офлайн-статус:', statusError);
       }
     }
@@ -2106,10 +2106,11 @@ export const logoutUser = async (): Promise<void> => {
     await AsyncStorage.removeItem('hockeystars_current_user');
     await AsyncStorage.removeItem('hockeystars_user_cache');
     await AsyncStorage.removeItem('hockeystars_last_user_id');
+    await AsyncStorage.removeItem('all_players');
     
     // Обновляем глобальный кеш и контекст пользователя
     try {
-      const { updateGlobalUserCache, globalUserCache } = await import('../contexts/UserContext');
+      const { updateGlobalUserCache } = await import('../contexts/UserContext');
       updateGlobalUserCache(null);
     } catch (contextError) {
       console.error('❌ Ошибка обновления контекста пользователя:', contextError);
