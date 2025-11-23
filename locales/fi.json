@@ -1952,6 +1952,8 @@
     "logo": "Logo",
     "selectLogo": "Valitse logo",
     "selectCountry": "Valitse maa",
+    "selectPosition": "Valitse sijainti",
+    "selectGrip": "Valitse ote",
     "searchCountry": "Etsi maa",
     "errorEnterCompetition": "Kirjoita kilpailun nimi",
     "errorEnterYear": "Anna kelvollinen vuosi.",

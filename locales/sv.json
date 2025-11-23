@@ -1945,6 +1945,8 @@
     "logo": "Logotyp",
     "selectLogo": "Välj en logotyp",
     "selectCountry": "Välj ett land",
+    "selectPosition": "Välj en position",
+    "selectGrip": "Välj grepp",
     "searchCountry": "Sök efter ett land",
     "errorEnterCompetition": "Ange namnet på tävlingen",
     "errorEnterYear": "Ange ett giltigt år.",

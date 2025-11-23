@@ -1966,6 +1966,8 @@
     "logo": "Logotips",
     "selectLogo": "Izvēlieties logotipu",
     "selectCountry": "Izvēlieties valsti",
+    "selectPosition": "Izvēlieties pozīciju",
+    "selectGrip": "Izvēlieties tvērienu",
     "searchCountry": "Meklējiet valsti",
     "errorEnterCompetition": "Ievadiet konkursa nosaukumu",
     "errorEnterYear": "Lūdzu, ievadiet derīgu gadu.",

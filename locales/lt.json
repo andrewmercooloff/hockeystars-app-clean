@@ -1966,6 +1966,8 @@
     "logo": "Logotipas",
     "selectLogo": "Pasirinkite logotipą",
     "selectCountry": "Pasirinkite šalį",
+    "selectPosition": "Pasirinkite poziciją",
+    "selectGrip": "Pasirinkite griebimą",
     "searchCountry": "Ieškokite šalies",
     "errorEnterCompetition": "Įveskite konkurso pavadinimą",
     "errorEnterYear": "Įveskite galiojančius metus.",

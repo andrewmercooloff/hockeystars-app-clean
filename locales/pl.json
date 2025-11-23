@@ -1731,6 +1731,8 @@
     "logo": "Logo",
     "selectLogo": "Wybierz logo",
     "selectCountry": "Wybierz kraj",
+    "selectPosition": "Wybierz pozycję",
+    "selectGrip": "Wybierz chwyt",
     "searchCountry": "Wyszukaj kraj",
     "errorEnterCompetition": "Wprowadź nazwę konkursu",
     "errorEnterYear": "Proszę podać prawidłowy rok.",

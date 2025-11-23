@@ -1952,6 +1952,8 @@
     "logo": "Logo",
     "selectLogo": "Vyberte logo",
     "selectCountry": "Vyberte zemi",
+    "selectPosition": "Vyberte pozici",
+    "selectGrip": "Vyberte úchop",
     "searchCountry": "Vyhledejte zemi",
     "errorEnterCompetition": "Zadejte název soutěže",
     "errorEnterYear": "Zadejte prosím platný rok.",
