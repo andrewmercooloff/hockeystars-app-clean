@@ -147,7 +147,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser: globalCurrentUser, refreshUser, setCurrentUser } = useUser();
+  const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
@@ -3070,7 +3070,7 @@ export default function PlayerProfile() {
               console.log('✅ Аккаунт успешно удален, выходим из системы');
               
               // Очищаем контекст пользователя ПЕРЕД выходом
-              setCurrentUser(null);
+              setGlobalCurrentUser(null);
               
               // Выходим из аккаунта после удаления
               try {
