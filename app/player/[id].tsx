@@ -147,7 +147,7 @@ export default function PlayerProfile() {
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser: globalCurrentUser, refreshUser } = useUser();
+  const { currentUser: globalCurrentUser, refreshUser, setCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
