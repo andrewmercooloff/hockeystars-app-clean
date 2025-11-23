@@ -930,12 +930,13 @@ export default function NotificationsScreen() {
       if (currentUser) {
         try {
           // Подсчитываем количество непрочитанных уведомлений (exclude actionable)
+          // Исключаем типы уведомлений, которые не должны учитываться в счетчике
           const { count } = await supabase
             .from('notifications')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', currentUser.id)
             .eq('is_read', false)
-            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
+            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite,new_friendship)');
           
           const newCount = count || 0;
           

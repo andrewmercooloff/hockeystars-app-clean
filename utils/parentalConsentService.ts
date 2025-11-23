@@ -1,6 +1,14 @@
 // Сервис для работы с родительским согласием (COPPA)
 import { supabase } from './supabase';
 
+// Получаем URL и ключ из конфигурации Supabase
+const getSupabaseConfig = () => {
+  // Пытаемся получить из переменных окружения или используем значения по умолчанию
+  const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+  return { supabaseUrl, supabaseAnonKey };
+};
+
 // Вычисление возраста из даты рождения
 export function calculateAge(birthDate: string): number {
   // Формат: DD.MM.YYYY
@@ -33,28 +41,117 @@ export async function registerChildWithParentalConsent(
   country?: string,
   position?: string,
   team?: string,
-  userStatus: string = 'player' // Исходный статус пользователя (player/star)
+  userStatus: string = 'player', // Исходный статус пользователя (player/star)
+  language?: string, // Язык приложения пользователя
+  avatar?: string // URL аватара (если загружен)
 ): Promise<{ success: boolean; error?: string; playerId?: string }> {
   try {
-    // Вызываем Edge Function
+    console.log(`🌐 registerChildWithParentalConsent: передаем язык=${language}, avatar=${avatar ? 'есть' : 'нет'}`);
+    const requestBody = {
+      phone,
+      name,
+      birthDate,
+      parentEmail,
+      country,
+      position,
+      team,
+      userStatus, // Передаем исходный статус
+      language, // Передаем язык приложения
+      avatar // Передаем аватар
+    };
+    console.log(`🌐 Полный body запроса:`, JSON.stringify({ ...requestBody, phone: '[phone]', avatar: avatar ? (avatar.substring(0, 50) + '...') : 'нет' }));
+    // Вызываем Edge Function через SDK
     const { data, error } = await supabase.functions.invoke('handle-child-registration', {
-      body: {
-        phone,
-        name,
-        birthDate,
-        parentEmail,
-        country,
-        position,
-        team,
-        userStatus // Передаем исходный статус
-      }
+      body: requestBody
     });
 
-    if (error) {
-      console.error('❌ Error calling handle-child-registration:', error);
-      return { success: false, error: error.message || 'Ошибка запроса родительского согласия' };
+    // Сначала проверяем, есть ли ошибка в data (даже при не-2xx статусе SDK может вернуть data)
+    if (data) {
+      if (data.error) {
+        const errorMessage = data.error;
+        // Проверяем, является ли это ошибкой о существующем пользователе
+        if (errorMessage.includes('уже зарегистрирован') || 
+            errorMessage.includes('уже существует') || 
+            errorMessage.includes('already exists') ||
+            errorMessage.includes('already registered')) {
+          return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+        }
+        return { success: false, error: errorMessage };
+      }
+      if (data.success) {
+        return { success: true, playerId: data.playerId };
+      }
     }
 
+    // Если есть error, используем прямой fetch для получения полного ответа
+    if (error) {
+      console.error('❌ Error calling handle-child-registration:', error);
+      
+      // Пытаемся извлечь сообщение из data, если оно есть
+      if (data && data.error) {
+        const errorMessage = data.error;
+        if (errorMessage.includes('уже зарегистрирован') || 
+            errorMessage.includes('уже существует') || 
+            errorMessage.includes('already exists') ||
+            errorMessage.includes('already registered')) {
+          return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+        }
+        return { success: false, error: errorMessage };
+      }
+      
+      // Используем прямой fetch для получения полного ответа с телом ошибки
+      try {
+        const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+        
+        const response = await fetch(`${supabaseUrl}/functions/v1/handle-child-registration`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`
+          },
+          body: JSON.stringify({
+            phone,
+            name,
+            birthDate,
+            parentEmail,
+            country,
+            position,
+            team,
+            userStatus
+          })
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok && responseData.error) {
+          const errorMessage = responseData.error;
+          if (errorMessage.includes('уже зарегистрирован') || 
+              errorMessage.includes('уже существует') || 
+              errorMessage.includes('already exists') ||
+              errorMessage.includes('already registered')) {
+            return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+          }
+          return { success: false, error: errorMessage };
+        }
+      } catch (fetchError) {
+        console.error('❌ Error fetching full response:', fetchError);
+      }
+      
+      // Если не удалось получить сообщение из fetch, используем стандартное сообщение
+      const errorMessage = (error as any).context?.error || error.message;
+      if (errorMessage && (
+        errorMessage.includes('уже зарегистрирован') || 
+        errorMessage.includes('уже существует') || 
+        errorMessage.includes('already exists') ||
+        errorMessage.includes('already registered')
+      )) {
+        return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+      }
+      
+      return { success: false, error: errorMessage || 'Ошибка запроса родительского согласия' };
+    }
+
+    // Если нет ни data, ни error, но и нет success
     if (!data || !data.success) {
       return { success: false, error: data?.error || 'Не удалось отправить запрос согласия' };
     }
@@ -62,7 +159,14 @@ export async function registerChildWithParentalConsent(
     return { success: true, playerId: data.playerId };
   } catch (error: any) {
     console.error('❌ Error in registerChildWithParentalConsent:', error);
-    return { success: false, error: error.message || 'Неизвестная ошибка' };
+    const errorMessage = error.message || 'Неизвестная ошибка';
+    if (errorMessage.includes('уже зарегистрирован') || 
+        errorMessage.includes('уже существует') || 
+        errorMessage.includes('already exists') ||
+        errorMessage.includes('already registered')) {
+      return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+    }
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -98,10 +202,10 @@ export async function resendParentalConsentEmail(
   playerId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Получаем данные игрока (включая страну для определения языка письма)
+    // Получаем данные игрока (включая страну и язык для определения языка письма)
     const { data: player, error: fetchError } = await supabase
       .from('players')
-      .select('name, parent_email, birth_date, country')
+      .select('name, parent_email, birth_date, country, language')
       .eq('id', playerId)
       .single();
 
@@ -145,6 +249,7 @@ export async function resendParentalConsentEmail(
         birthDate: player.birth_date,
         parentEmail: player.parent_email,
         country: player.country, // Передаем страну для определения языка письма
+        language: player.language, // Передаем язык из БД, если он сохранен
         resend: true,
         token: newToken
       }

@@ -107,7 +107,7 @@ export interface LocalizedExercise {
 }
 
 // Тип для языка
-export type Language = 'ru | lt | lv | pl | sv | cs | sk | fi | it | de | fr | en';
+export type Language = 'ru' | 'lt' | 'lv' | 'pl' | 'sv' | 'cs' | 'sk' | 'fi' | 'it' | 'de' | 'fr' | 'en';
 
 // Интерфейс для фильтров упражнений
 export interface ExerciseFilters {

@@ -128,25 +128,7 @@ export default function AdminScreen() {
     avatar: null
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  // Устанавливаем currentScreen при фокусе на экране админки
-  useFocusEffect(
-    useCallback(() => {
-      setCurrentScreen('admin');
-      console.log('👑 АДМИНКА: Устанавливаем currentScreen = admin');
-      return () => {
-        setCurrentScreen(null);
-        console.log('👑 АДМИНКА: Устанавливаем currentScreen = null');
-      };
-    }, [setCurrentScreen])
-  );
-
-
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [loadedPlayers, user] = await Promise.all([
         loadPlayers(),
@@ -165,7 +147,25 @@ export default function AdminScreen() {
     } catch (error) {
       console.error('❌ Ошибка загрузки данных:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Устанавливаем currentScreen при фокусе на экране админки и обновляем список игроков
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentScreen('admin');
+      console.log('👑 АДМИНКА: Устанавливаем currentScreen = admin');
+      // Обновляем список игроков при возврате на экран админки
+      loadData();
+      return () => {
+        setCurrentScreen(null);
+        console.log('👑 АДМИНКА: Устанавливаем currentScreen = null');
+      };
+    }, [setCurrentScreen, loadData])
+  );
 
   const filteredPlayers = players.filter(player => 
     player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -228,6 +228,19 @@ export default function LoginScreen() {
         return;
       }
       
+      // ПРОВЕРЯЕМ существование пользователя ПЕРЕД отправкой SMS
+      const existingPlayer = await getPlayerByPhone(phone);
+      if (!existingPlayer) {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          title: t('auth.userNotFound') || 'Пользователь не найден',
+          message: t('auth.userNotFoundMessage') || 'Аккаунт с таким номером телефона не зарегистрирован. Пожалуйста, зарегистрируйтесь.',
+          type: 'error'
+        });
+        return;
+      }
+      
       // Генерируем код для обычных номеров
       const code = generateVerificationCode();
       

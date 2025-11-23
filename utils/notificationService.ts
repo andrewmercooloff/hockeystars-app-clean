@@ -198,9 +198,12 @@ export async function savePushToken(token: string, userId: string): Promise<bool
       .eq('user_id', userId);
 
     if (selectError) {
-      console.error('❌ Ошибка проверки существующего токена:', selectError);
-      console.error('❌ Error details:', selectError.message);
-      console.error('❌ Error code:', selectError.code);
+      // Если пользователь не найден (foreign key constraint), это нормально
+      if (selectError.code === '23503') {
+        console.warn('⚠️ Пользователь не найден в базе данных, пропускаем сохранение push token');
+        return false;
+      }
+      console.warn('⚠️ Ошибка проверки существующего токена (не критично):', selectError.message);
       return false;
     }
 
@@ -218,9 +221,12 @@ export async function savePushToken(token: string, userId: string): Promise<bool
         .eq('user_id', userId);
 
       if (updateError) {
-        console.error('❌ Ошибка обновления push token:', updateError);
-        console.error('❌ Error details:', updateError.message);
-        console.error('❌ Error code:', updateError.code);
+        // Если пользователь не найден (foreign key constraint), это нормально
+        if (updateError.code === '23503') {
+          console.warn('⚠️ Пользователь не найден в базе данных, пропускаем обновление push token');
+          return false;
+        }
+        console.warn('⚠️ Ошибка обновления push token (не критично):', updateError.message);
         return false;
       }
       console.log('✅ Push token обновлен');
@@ -232,16 +238,22 @@ export async function savePushToken(token: string, userId: string): Promise<bool
         .insert(tokenData);
 
       if (insertError) {
-        console.error('❌ Ошибка вставки push token:', insertError);
-        console.error('❌ Error details:', insertError.message);
-        console.error('❌ Error code:', insertError.code);
-        console.error('❌ Error hint:', insertError.hint);
+        // Ошибка foreign key constraint означает, что пользователь не существует в таблице players
+        if (insertError.code === '23503') {
+          console.warn('⚠️ Пользователь не найден в базе данных, пропускаем сохранение push token');
+          console.warn('⚠️ Это может произойти, если пользователь еще не синхронизирован с Supabase');
+          return false;
+        }
         
         // Проверяем, не проблема ли это с RLS политиками
         if (insertError.code === '42501' || insertError.message?.includes('permission') || insertError.message?.includes('policy')) {
-          console.error('⚠️ ВНИМАНИЕ: Проблема с RLS политиками!');
-          console.error('⚠️ Проверьте, что политики для push_tokens разрешают INSERT');
+          console.warn('⚠️ Проблема с RLS политиками для push_tokens');
+          console.warn('⚠️ Проверьте политики в Supabase Dashboard');
+          return false;
         }
+        
+        // Для остальных ошибок логируем как предупреждение
+        console.warn('⚠️ Ошибка вставки push token (не критично):', insertError.message);
         return false;
       }
       console.log('✅ Push token создан');
@@ -249,9 +261,8 @@ export async function savePushToken(token: string, userId: string): Promise<bool
 
     return true;
   } catch (error: any) {
-    console.error('❌ Ошибка сохранения push token:', error);
-    console.error('❌ Error details:', error?.message || 'No message');
-    console.error('❌ Error stack:', error?.stack || 'No stack');
+    // Не критичная ошибка - приложение продолжит работать без push-уведомлений
+    console.warn('⚠️ Ошибка сохранения push token (не критично):', error?.message || 'Unknown error');
     return false;
   }
 }
@@ -610,14 +621,18 @@ export async function initializePushNotifications(userId: string, forceReinit: b
       console.log('✅ Push-уведомления успешно инициализированы для пользователя:', userId);
       return true;
     } else {
-      console.error('❌ Не удалось сохранить push token в базу данных');
-      console.error('❌ Проверьте RLS политики для таблицы push_tokens');
+      // Не критичная ошибка - приложение продолжит работать без push-уведомлений
+      console.warn('⚠️ Не удалось сохранить push token в базу данных');
+      console.warn('⚠️ Push-уведомления могут быть недоступны');
+      console.warn('⚠️ Проверьте RLS политики для таблицы push_tokens в Supabase Dashboard');
+      // Не возвращаем false, чтобы не блокировать работу приложения
+      // Просто логируем предупреждение
       return false;
     }
   } catch (error: any) {
-    console.error('❌ Ошибка инициализации push-уведомлений:', error);
-    console.error('❌ Error details:', error?.message || 'No message');
-    console.error('❌ Error stack:', error?.stack || 'No stack');
+    // Не критичная ошибка - приложение продолжит работать без push-уведомлений
+    console.warn('⚠️ Ошибка инициализации push-уведомлений:', error?.message || 'Unknown error');
+    // Не логируем полный stack trace, чтобы не засорять консоль
     return false;
   }
 }

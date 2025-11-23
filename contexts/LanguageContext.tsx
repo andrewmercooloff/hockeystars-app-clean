@@ -188,9 +188,14 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       return key;
     }
     
-    // Интерполяция переменных
+    // Интерполяция переменных (поддерживаем оба формата: {name} и {{name}})
     if (params) {
-      return value.replace(/\{(\w+)\}/g, (match, paramKey) => {
+      // Сначала обрабатываем двойные скобки {{name}}
+      value = value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
+        return params[paramKey] !== undefined ? params[paramKey] : match;
+      });
+      // Затем обрабатываем одинарные скобки {name}
+      value = value.replace(/\{(\w+)\}/g, (match, paramKey) => {
         return params[paramKey] !== undefined ? params[paramKey] : match;
       });
     }

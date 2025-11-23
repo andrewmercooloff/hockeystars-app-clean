@@ -22,9 +22,14 @@ export interface UseExercisesReturn {
   exerciseRankings: { [exerciseId: string]: number };
 }
 
+interface UseExercisesOptions {
+  enabled?: boolean;
+}
+
 export function useExercises(
   language: Language = 'ru',
-  filters?: ExerciseFilters
+  filters?: ExerciseFilters,
+  options: UseExercisesOptions = {}
 ): UseExercisesReturn {
   const [exercises, setExercises] = useState<LocalizedExercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,12 +38,17 @@ export function useExercises(
   const [difficulties, setDifficulties] = useState<string[]>([]);
   const [userStats, setUserStats] = useState<{ [exerciseId: string]: number }>({});
   const [exerciseRankings, setExerciseRankings] = useState<{ [exerciseId: string]: number }>({});
+  const isEnabled = options.enabled ?? true;
 
   // Загружаем упражнения с кешированием
   const loadExercises = useCallback(async () => {
-    // Не загружаем, если язык не установлен
-    if (!language) {
+    // Не загружаем, если язык не установлен или загрузка отключена
+    if (!language || !isEnabled) {
+      if (!isEnabled) {
+        console.log('⏸ Загрузка упражнений приостановлена до готовности языка');
+      } else {
       console.log('⏳ Ожидание загрузки языка...');
+      }
       return;
     }
 
@@ -76,7 +86,7 @@ export function useExercises(
     } finally {
       setLoading(false);
     }
-  }, [language, filters]);
+  }, [language, filters, isEnabled]);
 
   // Загружаем статистику пользователя с кешированием
   const loadUserStats = useCallback(async () => {
@@ -95,9 +105,15 @@ export function useExercises(
       } else {
         setUserStats({});
       }
-    } catch (err) {
-      console.error('Error loading user stats:', err);
-      setUserStats({});
+    } catch (err: any) {
+      // PGRST116 означает, что у пользователя еще нет статистики - это нормально
+      if (err?.code === 'PGRST116') {
+        console.log('💪 У пользователя еще нет статистики упражнений');
+        setUserStats({});
+      } else {
+        console.warn('⚠️ Ошибка загрузки статистики упражнений (не критично):', err?.message || 'Unknown error');
+        setUserStats({});
+      }
     }
   }, []);
 
@@ -180,14 +196,20 @@ export function useExercises(
 
   // Обновляем упражнения
   const refreshExercises = useCallback(async () => {
+    if (!isEnabled) {
+      return;
+    }
     await loadExercises();
-  }, [loadExercises]);
+  }, [loadExercises, isEnabled]);
 
   // Загружаем данные при монтировании и изменении языка
   useEffect(() => {
+    if (!isEnabled) {
+      return;
+    }
     loadExercises();
     loadUserStats();
-  }, [language]); // Убираем фильтры из зависимостей
+  }, [language, isEnabled, loadExercises, loadUserStats]); // Убираем фильтры из зависимостей
 
   return {
     exercises,

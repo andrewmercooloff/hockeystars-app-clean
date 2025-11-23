@@ -67,10 +67,46 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
     const responseData = await response.json();
 
     if (response.ok) {
-      // console.log('✅ SMS отправлено успешно:', responseData);
+      // Проверяем статус сообщения в ответе
+      const messageStatus = responseData.status;
+      const errorCode = responseData.error_code;
+      const errorMessage = responseData.error_message;
+      
+      // Если есть ошибка доставки (например, 30453 - Message delivery blocked)
+      if (errorCode) {
+        console.error('❌ Twilio ошибка доставки:', {
+          errorCode,
+          errorMessage,
+          status: messageStatus,
+          sid: responseData.sid
+        });
+        console.error('❌ Сообщение заблокировано Twilio. Проверьте настройки аккаунта и номера.');
+        return false;
+      }
+      
+      // Проверяем, что статус не "failed" или "undelivered"
+      if (messageStatus === 'failed' || messageStatus === 'undelivered') {
+        console.error('❌ Twilio сообщение не доставлено:', {
+          status: messageStatus,
+          errorCode: responseData.error_code,
+          errorMessage: responseData.error_message,
+          sid: responseData.sid
+        });
+        return false;
+      }
+      
+      console.log('✅ SMS отправлено успешно:', {
+        sid: responseData.sid,
+        status: messageStatus,
+        to: formattedPhone
+      });
       return true;
     } else {
-      console.error('❌ Ошибка Twilio API:', responseData);
+      console.error('❌ Ошибка Twilio API:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: responseData
+      });
       return false;
     }
   } catch (error) {

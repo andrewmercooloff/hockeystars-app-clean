@@ -14,13 +14,17 @@ const { width } = Dimensions.get('window');
 
 export default function ExerciseDetailsScreen() {
   const router = useRouter();
-  const { t, language } = useLanguage();
+  const { t, language, isLanguageLoaded } = useLanguage();
   const localParams = useLocalSearchParams();
   const globalParams = useGlobalSearchParams();
   const exerciseId = localParams.id || globalParams.id;
   
   // Используем хук для загрузки упражнений из базы данных
-  const { getExerciseById, loading, error, markAsCompleted } = useExercises(language as Language);
+  const { getExerciseById, loading, error, markAsCompleted } = useExercises(
+    language as Language,
+    undefined,
+    { enabled: isLanguageLoaded }
+  );
   const [exercise, setExercise] = useState<any>(null);
   const [exerciseLoading, setExerciseLoading] = useState(true);
   

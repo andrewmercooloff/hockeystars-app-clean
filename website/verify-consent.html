@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html id="html-root" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подтверждение согласия - HockeyStars</title>
+    <title id="page-title">Consent Verification - HockeyStars</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
@@ -155,41 +155,89 @@
     <div class="container">
         <div id="loading" class="loading">
             <div class="success-icon">⏳</div>
-            <h1>Обработка запроса...</h1>
-            <p>Пожалуйста, подождите, мы подтверждаем ваше согласие.</p>
+            <h1 id="loading-title">Processing request...</h1>
+            <p id="loading-message">Please wait, we are confirming your consent.</p>
         </div>
         <div id="error" style="display: none;" class="error">
             <div class="success-icon">❌</div>
-            <h1>Ошибка</h1>
+            <h1 id="error-title">Error</h1>
             <p id="error-message"></p>
         </div>
         <div id="success" style="display: none;" class="success">
             <div class="success-icon">✅</div>
-            <h1>Согласие подтверждено!</h1>
+            <h1 id="success-title">Consent Confirmed!</h1>
             <p id="success-message"></p>
             <div class="info-box">
-                <p style="margin: 0;"><strong>Аккаунт активирован</strong></p>
-                <p style="margin: 10px 0 0 0; font-size: 14px;">Теперь ваш ребенок может войти в приложение HockeyStars.</p>
+                <p style="margin: 0;"><strong id="account-activated">Account Activated</strong></p>
+                <p id="account-message" style="margin: 10px 0 0 0; font-size: 14px;">Your child can now log in to the HockeyStars app.</p>
             </div>
-            <p style="font-size: 14px; color: #999;">
-                Если у вас есть вопросы, свяжитесь с нами: <a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>
+            <p id="support-message" style="font-size: 14px; color: #999;">
+                If you have any questions, please contact us: <a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>
             </p>
         </div>
     </div>
 
     <script>
-        // Получаем токен из URL
+        // Определяем язык пользователя
         const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        const browserLang = navigator.language || navigator.userLanguage || 'en';
+        const isRussian = langParam === 'ru' || (!langParam && (browserLang.startsWith('ru') || browserLang.startsWith('be')));
+        const lang = isRussian ? 'ru' : 'en';
+        
+        // Локализованные тексты
+        const texts = {
+            ru: {
+                title: 'Подтверждение согласия - HockeyStars',
+                loadingTitle: 'Обработка запроса...',
+                loadingMessage: 'Пожалуйста, подождите, мы подтверждаем ваше согласие.',
+                errorTitle: 'Ошибка',
+                errorNoToken: 'Токен не предоставлен. Пожалуйста, используйте ссылку из письма.',
+                errorGeneric: 'Произошла ошибка при подтверждении согласия. Пожалуйста, попробуйте позже или свяжитесь с поддержкой.',
+                successTitle: 'Согласие подтверждено!',
+                accountActivated: 'Аккаунт активирован',
+                accountMessage: 'Теперь ваш ребенок может войти в приложение HockeyStars.',
+                supportMessage: 'Если у вас есть вопросы, свяжитесь с нами: '
+            },
+            en: {
+                title: 'Consent Verification - HockeyStars',
+                loadingTitle: 'Processing request...',
+                loadingMessage: 'Please wait, we are confirming your consent.',
+                errorTitle: 'Error',
+                errorNoToken: 'Token not provided. Please use the link from the email.',
+                errorGeneric: 'An error occurred while confirming consent. Please try again later or contact support.',
+                successTitle: 'Consent Confirmed!',
+                accountActivated: 'Account Activated',
+                accountMessage: 'Your child can now log in to the HockeyStars app.',
+                supportMessage: 'If you have any questions, please contact us: '
+            }
+        };
+        
+        const t = texts[lang];
+        
+        // Устанавливаем язык страницы
+        document.getElementById('html-root').setAttribute('lang', lang);
+        document.getElementById('page-title').textContent = t.title;
+        document.getElementById('loading-title').textContent = t.loadingTitle;
+        document.getElementById('loading-message').textContent = t.loadingMessage;
+        document.getElementById('error-title').textContent = t.errorTitle;
+        document.getElementById('success-title').textContent = t.successTitle;
+        document.getElementById('account-activated').textContent = t.accountActivated;
+        document.getElementById('account-message').textContent = t.accountMessage;
+        document.getElementById('support-message').innerHTML = t.supportMessage + '<a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>';
+        
+        // Получаем токен из URL
         const token = urlParams.get('token');
         
         console.log('🔍 Полный URL:', window.location.href);
         console.log('🔍 Токен из URL:', token);
         console.log('🔍 Декодированный токен:', decodeURIComponent(token || ''));
+        console.log('🌐 Определенный язык:', lang);
 
         if (!token) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'block';
-            document.getElementById('error-message').textContent = 'Токен не предоставлен. Пожалуйста, используйте ссылку из письма.';
+            document.getElementById('error-message').textContent = t.errorNoToken;
         } else {
             // Вызываем Edge Function через fetch
             const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
@@ -235,7 +283,7 @@
             .catch(error => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error-message').textContent = error.message || 'Произошла ошибка при подтверждении согласия. Пожалуйста, попробуйте позже или свяжитесь с поддержкой.';
+                document.getElementById('error-message').textContent = error.message || t.errorGeneric;
                 console.error('Error:', error);
             });
         }

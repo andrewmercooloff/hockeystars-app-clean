@@ -387,10 +387,32 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
+      // Обновляем список игроков при возврате на экран поиска
+      if (currentUser) {
+        const refreshData = async () => {
+          try {
+            const allPlayers = await loadPlayers(true); // forceRefresh = true
+            let filteredPlayers: Player[];
+            if (currentUser.status === 'admin') {
+              filteredPlayers = allPlayers;
+              console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
+            } else {
+              filteredPlayers = allPlayers.filter(player => 
+                player.status === 'player' || 
+                player.status === 'admin'
+              );
+            }
+            setPlayers(filteredPlayers);
+          } catch (error) {
+            console.error('❌ Ошибка обновления списка игроков:', error);
+          }
+        };
+        refreshData();
+      }
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen])
+    }, [setCurrentScreen, currentUser])
   );
 
   // Загрузка списка команд

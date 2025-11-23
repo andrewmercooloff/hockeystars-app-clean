@@ -851,11 +851,8 @@ export const getPlayerTeamsAsPastTeams = async (playerId: string): Promise<PastT
   }
 };
 
-// Синхронизация команд игрока с базой данных (оптимизированная версия)
+// Синхронизация команд игрока с базой данных через Edge Function (обходит RLS)
 export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[], pastTeams: PastTeam[]): Promise<boolean> => {
-  // Объявляем переменную для бэкапа вне try/catch для доступа в catch
-  let oldTeamsData: any = null;
-  
   try {
     // Проверяем, что playerId валидный
     if (!playerId) {
@@ -863,133 +860,31 @@ export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[]
       return false;
     }
     
-    // 1. Создаем бэкап существующих команд для отката при ошибке
-    const { data, error: backupError } = await supabase
-      .from('player_teams')
-      .select('*')
-      .eq('player_id', playerId);
-    
-    oldTeamsData = data;
-    
-    if (backupError) {
-      console.error('❌ Ошибка создания бэкапа команд:', backupError);
-      return false;
-    }
-    
-    // 2. Подготавливаем все команды для добавления
-    const allTeams = [
-      ...currentTeams.map(team => ({ ...team, isCurrent: true })),
-      ...pastTeams.filter(team => !team.isCurrent).map(team => ({ ...team, isCurrent: false }))
-    ];
-    
-    // 3. Проверяем валидность всех ID команд ПЕРЕД удалением
-    console.log('📋 Проверка команд для сохранения:', { 
-      total: allTeams.length, 
-      teams: allTeams.map(t => ({ id: t.id, name: t.teamName, isCurrent: t.isCurrent }))
-    });
-    
-    const invalidTeams = allTeams.filter(team => !team.id || team.id === 'undefined' || team.id === 'null');
-    if (invalidTeams.length > 0) {
-      console.error('❌ Найдены невалидные ID команд:', invalidTeams.map(t => ({ name: t.teamName, id: t.id })));
-      return false;
-    }
-    
-    // 4. Очищаем поле pastTeams в таблице players
-    const { error: clearPastTeamsError } = await supabase
-      .from('players')
-      .update({ past_teams: '[]' })
-      .eq('id', playerId);
-    
-    if (clearPastTeamsError) {
-      console.error('❌ Ошибка очистки поля pastTeams:', clearPastTeamsError);
-      return false;
-    }
-    
-    // 5. Удаляем все существующие команды игрока
-    const { error: deleteTeamsError } = await supabase
-      .from('player_teams')
-      .delete()
-      .eq('player_id', playerId);
-    
-    if (deleteTeamsError) {
-      console.error('❌ Ошибка удаления существующих команд:', deleteTeamsError);
-      return false;
-    }
-    
-    // 6. Добавляем новые команды
-    if (allTeams.length === 0) {
-      // Если команд нет, операция успешна
-      return true;
-    }
-    
-    const addPromises = allTeams.map((team, index) => 
-      addPlayerTeam(playerId, team.id, team.isCurrent, team.startYear, team.endYear, index)
-    );
-    
-    const results = await Promise.all(addPromises);
-    const failedTeams = results.filter((success) => !success);
-    
-    console.log('📊 Результаты добавления команд:', { 
-      total: results.length, 
-      successful: results.filter(r => r).length, 
-      failed: failedTeams.length 
-    });
-    
-    // 7. Если при добавлении произошла ошибка - восстанавливаем старые команды
-    if (failedTeams.length > 0) {
-      console.error(`❌ Ошибка добавления ${failedTeams.length} команд, восстанавливаем старые данные...`);
-      console.error('📋 Детали ошибок:', failedTeams);
-      
-      // Восстанавливаем старые команды из бэкапа
-      if (oldTeamsData && oldTeamsData.length > 0) {
-        console.log('🔄 Восстановление команд из бэкапа...', { count: oldTeamsData.length });
-        
-        const restorePromises = oldTeamsData.map(team => {
-          return addPlayerTeam(
-            team.player_id, 
-            team.team_id, 
-            team.is_primary, 
-            team.start_year, 
-            team.end_year, 
-            team.team_order
-          );
-        });
-        
-        await Promise.all(restorePromises);
-        console.log('✅ Старые команды восстановлены');
-      } else {
-        console.warn('⚠️ Нет данных для восстановления');
+    // Используем Edge Function для синхронизации команд (обходит RLS)
+    const { data, error } = await supabase.functions.invoke('sync-player-teams', {
+      body: {
+        playerId,
+        currentTeams,
+        pastTeams
       }
-      
+    });
+
+    if (error) {
+      console.error('❌ Ошибка синхронизации команд через Edge Function:', error);
       return false;
     }
-    
-    console.log('✅ Все команды успешно сохранены');
-    
-    // 8. Очищаем кеш команд при успешной синхронизации
-    await clearTeamsCache(playerId);
-    
-    return true;
+
+    if (data && data.success) {
+      console.log('✅ Команды успешно синхронизированы через Edge Function');
+      // Очищаем кеш команд при успешной синхронизации
+      await clearTeamsCache(playerId);
+      return true;
+    } else {
+      console.error('❌ Edge Function вернул ошибку:', data?.error);
+      return false;
+    }
   } catch (error) {
     console.error('❌ Ошибка синхронизации команд:', error);
-    
-    // Пытаемся восстановить команды из старого бэкапа
-    if (oldTeamsData && oldTeamsData.length > 0) {
-      console.log('🔄 Пытаемся восстановить команды из бэкапа...');
-      const restorePromises = oldTeamsData.map(team => {
-        return addPlayerTeam(
-          team.player_id, 
-          team.team_id, 
-          team.is_primary, 
-          team.start_year, 
-          team.end_year, 
-          team.team_order
-        );
-      });
-      
-      await Promise.all(restorePromises);
-    }
-    
     return false;
   }
 };
@@ -1431,6 +1326,59 @@ export const clearAllExerciseStatsCache = async (): Promise<void> => {
 // Отправка запроса дружбы с очисткой кеша
 export const sendFriendRequest = async (fromId: string, toId: string): Promise<boolean> => {
   try {
+    console.log('📤 sendFriendRequest вызван:', { fromId, toId });
+    
+    // Сначала проверяем, есть ли отклоненный запрос между этими пользователями
+    // Если есть, удаляем его перед созданием нового
+    const { data: existingRequest, error: checkError } = await supabase
+      .from('friend_requests')
+      .select('id, status')
+      .or(`and(from_id.eq.${fromId},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${fromId})`)
+      .eq('status', 'rejected')
+      .maybeSingle();
+    
+    console.log('📤 Проверка отклоненных запросов:', { existingRequest, checkError });
+    
+    if (existingRequest) {
+      // Удаляем отклоненный запрос перед созданием нового
+      const { error: deleteError } = await supabase
+        .from('friend_requests')
+        .delete()
+        .eq('id', existingRequest.id);
+      
+      if (deleteError) {
+        console.error('❌ Ошибка удаления отклоненного запроса:', deleteError);
+      } else {
+        console.log('🗑️ Удален отклоненный запрос перед созданием нового');
+      }
+    }
+    
+    // Также проверяем и удаляем любые другие запросы (pending) между этими пользователями
+    // чтобы избежать конфликтов
+    const { data: allRequests } = await supabase
+      .from('friend_requests')
+      .select('id, status')
+      .or(`and(from_id.eq.${fromId},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${fromId})`);
+    
+    if (allRequests && allRequests.length > 0) {
+      console.log('📤 Найдены существующие запросы:', allRequests);
+      // Удаляем все существующие запросы, кроме accepted (друзья)
+      const nonAcceptedRequests = allRequests.filter(req => req.status !== 'accepted');
+      if (nonAcceptedRequests.length > 0) {
+        const idsToDelete = nonAcceptedRequests.map(req => req.id);
+        const { error: deleteAllError } = await supabase
+          .from('friend_requests')
+          .delete()
+          .in('id', idsToDelete);
+        
+        if (deleteAllError) {
+          console.error('❌ Ошибка удаления существующих запросов:', deleteAllError);
+        } else {
+          console.log('🗑️ Удалены существующие запросы перед созданием нового:', idsToDelete);
+        }
+      }
+    }
+    
     const { data, error } = await supabase
       .from('friend_requests')
       .insert([{
@@ -1443,7 +1391,39 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
 
     if (error) {
       console.error('❌ Ошибка отправки запроса дружбы:', error);
-      return false;
+      // Если ошибка связана с уникальным ограничением, возможно есть отклоненный запрос
+      // Попробуем удалить его и создать новый
+      if (error.code === '23505' || error.message?.includes('unique') || error.message?.includes('duplicate')) {
+        console.log('🔄 Обнаружен конфликт уникальности, пытаемся удалить старый запрос и создать новый');
+        const { error: deleteError } = await supabase
+          .from('friend_requests')
+          .delete()
+          .or(`and(from_id.eq.${fromId},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${fromId})`);
+        
+        if (!deleteError) {
+          // Пытаемся создать запрос снова
+          const { data: retryData, error: retryError } = await supabase
+            .from('friend_requests')
+            .insert([{
+              from_id: fromId,
+              to_id: toId,
+              status: 'pending'
+            }])
+            .select()
+            .single();
+          
+          if (retryError) {
+            console.error('❌ Ошибка повторной отправки запроса дружбы:', retryError);
+            return false;
+          }
+          
+          console.log('✅ Запрос дружбы успешно создан после удаления конфликтующего запроса');
+          // Продолжаем выполнение с retryData вместо data
+          // Но так как мы уже вставили данные, просто продолжаем
+        }
+      } else {
+        return false;
+      }
     }
 
     // Очищаем кеш статуса дружбы при отправке запроса
@@ -1470,7 +1450,21 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
       const pushBody = translations?.notifications?.wantsToAddYou?.replace('{name}', senderData.name)
         || `${senderData.name} wants to add you as a friend`;
       
-      // Создаем уведомление для получателя
+      // Проверяем, нет ли уже уведомления о запросе дружбы от этого пользователя
+      const { data: existingNotifications } = await supabase
+        .from('notifications')
+        .select('id, data')
+        .eq('user_id', toId)
+        .eq('type', 'friend_request')
+        .eq('is_read', false);
+      
+      // Проверяем в памяти, есть ли уведомление от этого отправителя
+      const existingNotification = existingNotifications?.find(
+        (notif: any) => notif.data?.sender_id === fromId || notif.data?.playerId === fromId
+      );
+      
+      // Создаем уведомление только если его еще нет
+      if (!existingNotification) {
       try {
         const { error: notificationError } = await supabase
           .from('notifications')
@@ -1494,38 +1488,41 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
           console.error('❌ Ошибка создания in-app уведомления о запросе:', notificationError);
         } else {
           console.log('✅ In-app уведомление о запросе дружбы создано для:', toId);
-        }
         
         // Увеличиваем счетчик уведомлений для получателя
         const { error: counterError } = await supabase.rpc('increment_unread_notifications', { user_id: toId });
         if (counterError) {
           console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
         }
-        
-        // Отправляем push уведомление
-        try {
-          const { sendNotificationToUser } = await import('./notificationService');
-          const pushResult = await sendNotificationToUser(
-            toId,
-            pushTitle,
-            pushBody,
-            {
-              type: 'friend_request',
-              sender_id: fromId,
-              playerId: fromId,
-              action: 'open_notifications'
-            }
-          );
-          if (pushResult) {
-            console.log('✅ Push-уведомление о запросе дружбы отправлено');
-          } else {
-            console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
           }
-        } catch (pushError) {
-          console.error('⚠️ Ошибка отправки push уведомления:', pushError);
+        } catch (notificationError) {
+          console.error('❌ Ошибка создания уведомления о запросе:', notificationError);
         }
-      } catch (notificationError) {
-        console.error('❌ Ошибка создания уведомления о запросе:', notificationError);
+      } else {
+        console.log('ℹ️ Уведомление о запросе дружбы уже существует, пропускаем создание');
+      }
+        
+      // Отправляем push уведомление (даже если in-app уведомление уже существует)
+      try {
+        const { sendNotificationToUser } = await import('./notificationService');
+        const pushResult = await sendNotificationToUser(
+          toId,
+          pushTitle,
+          pushBody,
+          {
+            type: 'friend_request',
+            sender_id: fromId,
+            playerId: fromId,
+            action: 'open_notifications'
+          }
+        );
+        if (pushResult) {
+          console.log('✅ Push-уведомление о запросе дружбы отправлено');
+        } else {
+          console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
+        }
+      } catch (pushError) {
+        console.error('⚠️ Ошибка отправки push уведомления:', pushError);
       }
     }
     
@@ -1583,8 +1580,11 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       } else {
         status = 'received_request';
       }
+    } else if (data.status === 'rejected') {
+      // Отклоненные запросы считаются как 'none', чтобы можно было отправить запрос снова
+      status = 'none';
     } else {
-      status = data.status as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending';
+      status = 'none';
     }
     
     // Кешируем результат
@@ -2523,7 +2523,13 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     // Создаем уведомление для ОТПРАВИТЕЛЯ запроса о том, что его запрос принят
     if (acceptorData && senderId) {
       try {
-        await supabase
+        console.log('📝 Создаем уведомление friend_accepted для отправителя запроса:', {
+          senderId,
+          acceptorId: userId1,
+          acceptorName: acceptorData.name
+        });
+        
+        const { data: notificationData, error: insertError } = await supabase
           .from('notifications')
           .insert([{
             user_id: senderId,
@@ -2536,15 +2542,29 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
               acceptor_name: acceptorData.name,
               acceptor_avatar: acceptorData.avatar
             }
-          }]);
+          }])
+          .select()
+          .single();
+        
+        if (insertError) {
+          console.error('❌ Ошибка создания уведомления friend_accepted:', insertError);
+        } else {
+          console.log('✅ Уведомление friend_accepted создано:', notificationData?.id);
+        }
         
         // Увеличиваем счетчик уведомлений для отправителя
-        await supabase.rpc('increment_unread_notifications', { user_id: senderId });
+        const { error: counterError } = await supabase.rpc('increment_unread_notifications', { user_id: senderId });
         
+        if (counterError) {
+          console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
+        } else {
+          console.log('✅ Счетчик уведомлений увеличен для отправителя запроса:', senderId);
+        }
         
         // Отправляем push уведомление
         try {
           const { getUserPushTokens, sendNotificationToUser } = await import('./notificationService');
+          console.log('📤 Отправляем push уведомление friend_accepted отправителю:', senderId);
           await sendNotificationToUser(
             senderId,
             '🤝 Запрос принят',
@@ -2555,12 +2575,18 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
               action: 'open_notifications'
             }
           );
+          console.log('✅ Push уведомление friend_accepted отправлено');
         } catch (pushError) {
           console.error('⚠️ Ошибка отправки push уведомления:', pushError);
         }
       } catch (notificationError) {
         console.error('❌ Ошибка создания уведомления о принятии:', notificationError);
       }
+    } else {
+      console.warn('⚠️ Не удалось создать уведомление friend_accepted: отсутствуют данные', {
+        hasAcceptorData: !!acceptorData,
+        senderId
+      });
     }
     
     // Уведомляем друзей о новой дружбе
@@ -3851,19 +3877,31 @@ export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = f
 export const createPlayer = async (playerData: Player): Promise<Player | null> => {
   try {
     console.log('👤 Создаем нового игрока:', playerData.name);
+    console.log('📋 Данные игрока перед созданием:', {
+      name: playerData.name,
+      status: playerData.status,
+      avatar: playerData.avatar ? (playerData.avatar.substring(0, 50) + '...') : 'нет',
+      phone: playerData.phone
+    });
     
     // Проверяем, нет ли уже пользователя с таким телефоном
     if (playerData.phone) {
       const existingPlayer = await getPlayerByPhone(playerData.phone, true); // Используем admin access для поиска всех
       if (existingPlayer) {
         console.error('❌ Пользователь с таким телефоном уже существует:', existingPlayer.id, existingPlayer.name, existingPlayer.status);
-        // Возвращаем существующего пользователя вместо создания нового
-        return existingPlayer;
+        // Выбрасываем ошибку вместо возврата существующего пользователя
+        throw new Error('PHONE_ALREADY_EXISTS');
       }
     }
     
     // Конвертируем данные игрока в формат Supabase
     const supabaseData = convertPlayerToSupabase(playerData);
+    console.log('📋 Данные для Supabase:', {
+      name: supabaseData.name,
+      status: supabaseData.status,
+      avatar: supabaseData.avatar ? (supabaseData.avatar.substring(0, 50) + '...') : 'нет',
+      phone: supabaseData.phone
+    });
     
     const { data, error } = await supabase
       .from('players')
@@ -3873,14 +3911,10 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     if (error) {
       console.error('❌ Ошибка создания игрока:', error);
-      // Если ошибка из-за дубликата телефона, пытаемся найти существующего пользователя
+      // Если ошибка из-за дубликата телефона, выбрасываем специальную ошибку
       if (error.code === '23505' && playerData.phone) { // 23505 = unique violation
-        console.log('⚠️ Обнаружен дубликат телефона, ищем существующего пользователя...');
-        const existingPlayer = await getPlayerByPhone(playerData.phone, true);
-        if (existingPlayer) {
-          console.log('✅ Найден существующий пользователь:', existingPlayer.id, existingPlayer.name);
-          return existingPlayer;
-        }
+        console.log('⚠️ Обнаружен дубликат телефона');
+        throw new Error('PHONE_ALREADY_EXISTS');
       }
       return null;
     }
@@ -3890,7 +3924,31 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
       return null;
     }
     
+    console.log('✅ Игрок создан в БД:', {
+      id: data.id,
+      name: data.name,
+      status: data.status,
+      avatar: data.avatar ? (data.avatar.substring(0, 50) + '...') : 'нет',
+      avatarFull: data.avatar || null
+    });
+    
     const createdPlayer = convertSupabaseToPlayer(data);
+    
+    console.log('✅ Игрок конвертирован:', {
+      id: createdPlayer.id,
+      name: createdPlayer.name,
+      status: createdPlayer.status,
+      avatar: createdPlayer.avatar ? (createdPlayer.avatar.substring(0, 50) + '...') : 'нет',
+      avatarFull: createdPlayer.avatar || null
+    });
+    
+    // Обновляем кеш аватаров для нового игрока
+    if (createdPlayer.avatar) {
+      avatarCache.setAvatar(createdPlayer.id, createdPlayer.avatar);
+      console.log('✅ Аватар добавлен в кеш для игрока:', createdPlayer.id, 'URL:', createdPlayer.avatar.substring(0, 80) + '...');
+    } else {
+      console.warn('⚠️ У созданного игрока нет аватара!');
+    }
     
     // Очищаем кеш всех игроков и инвалидация dataCache, чтобы главный экран увидел нового игрока
     await clearAllPlayersCache();
@@ -5649,8 +5707,20 @@ export const notifyFriendsAboutNewFriendship = async (
         // console.log('✅ Уведомления о дружбе сохранены в базу данных');
         
         // Отправляем push уведомления и обновляем счетчик для каждого друга
-        const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
+        // ВАЖНО: еще раз проверяем, что участники дружбы не получают уведомления
+        const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))].filter(
+          userId => userId !== userId1 && userId !== userId2
+        );
+        
+        console.log('👥 Отправка push уведомлений для пользователей (исключая участников дружбы):', uniqueUserIds);
+        
         for (const userId of uniqueUserIds) {
+          // Дополнительная проверка на всякий случай
+          if (userId === userId1 || userId === userId2) {
+            console.log(`🚫 Пропускаем отправку уведомления участнику дружбы: ${userId}`);
+            continue;
+          }
+          
           // Отправляем push уведомление
           try {
             const { sendNotificationToUser } = await import('./notificationService');
@@ -6540,12 +6610,11 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
   try {
     console.log('🔔 Отправляем уведомление админам о новой регистрации:', newPlayer.name);
     
-    // Получаем всех админов
+    // Получаем всех админов (без push_token, так как он в отдельной таблице)
     const { data: admins, error: adminsError } = await supabase
       .from('players')
-      .select('id, name, push_token')
-      .eq('status', 'admin')
-      .not('push_token', 'is', null);
+      .select('id, name')
+      .eq('status', 'admin');
     
     if (adminsError) {
       console.error('❌ Ошибка получения списка админов:', adminsError);
@@ -6553,13 +6622,14 @@ export const notifyAdminsAboutNewRegistration = async (newPlayer: Player): Promi
     }
     
     if (!admins || admins.length === 0) {
-      console.log('ℹ️ Админы не найдены или у них нет push токенов');
+      console.log('ℹ️ Админы не найдены');
       return;
     }
     
     // Отправляем уведомление каждому админу
     for (const admin of admins) {
       try {
+        // Создаем уведомление в базе данных
         const { error: notificationError } = await supabase
           .from('notifications')
           .insert({
@@ -6664,6 +6734,22 @@ export const getSmartPlayerSelection = (
         player.status === 'skateSharpening';
       
       if (!isOtherNonPlayer) return false;
+      
+      // Специальная логика для тренеров: фильтрация по годам тренировки
+      if (player.status === 'coach') {
+        // Если у тренера указаны годы тренировки
+        if (player.coach_years && player.coach_years.length > 0) {
+          // Если год не выбран - тренеры с указанными годами НЕ показываются
+          if (!selectedYear) {
+            return false;
+          }
+          // Показываем только если выбранный год есть в списке годов тренера
+          if (!player.coach_years.includes(selectedYear)) {
+            return false;
+          }
+        }
+        // Если годы не указаны - показываем везде (обратная совместимость)
+      }
       
       // Если выбран фильтр по стране, фильтруем остальных не-игроков
       if (selectedCountry) {

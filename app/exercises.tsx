@@ -24,7 +24,7 @@ const iceBg = require('../assets/images/led.jpg');
 const { width } = Dimensions.get('window');
 
 export default function ExercisesScreen() {
-  const { t, language } = useLanguage();
+  const { t, language, isLanguageLoaded } = useLanguage();
   const router = useRouter();
   const { setCurrentScreen } = useScreenContext();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export default function ExercisesScreen() {
     refreshExercises,
     userStats,
     exerciseRankings
-  } = useExercises(language as Language); // Убираем фильтры - загружаем все упражнения
+  } = useExercises(language as Language, undefined, { enabled: isLanguageLoaded }); // Убираем фильтры - загружаем все упражнения, ждем загрузки языка
 
   // Загружаем данные пользователя
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function ExercisesScreen() {
   const sortedExercises = useMemo(() => {
     // Если данные еще загружаются или язык не установлен, возвращаем пустой массив
     // Это предотвращает показ данных на неправильном языке при первом запуске
-    if (loading || allExercises.length === 0 || !language) {
+    if (!isLanguageLoaded || loading || allExercises.length === 0 || !language) {
       return [];
     }
 
@@ -164,7 +164,7 @@ export default function ExercisesScreen() {
   };
 
 
-  if (loading) {
+  if (!isLanguageLoaded || loading) {
     return (
       <View style={styles.container}>
         <ImageBackground

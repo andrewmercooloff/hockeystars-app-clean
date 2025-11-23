@@ -95,6 +95,17 @@ export default function PuckSpeedSoundScreen() {
   const isMeasuringRef = useRef<boolean>(false); // Ref для синхронной проверки isMeasuring
   const soundTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Таймаут ожидания второго звука
   
+  // НОВАЯ ЛОГИКА: Отслеживание полных циклов звука (подъем -> падение)
+  type SoundState = 'idle' | 'firstSoundRising' | 'firstSoundFalling' | 'firstSoundComplete' | 'secondSoundRising' | 'secondSoundFalling' | 'secondSoundComplete';
+  const soundStateRef = useRef<SoundState>('idle');
+  const firstSoundStartTimeRef = useRef<number>(0); // Время начала первого звука
+  const firstSoundPeakAmplitudeRef = useRef<number>(0); // Пиковая амплитуда первого звука
+  const firstSoundFallingStartTimeRef = useRef<number>(0); // Время начала затухания первого звука
+  const secondSoundStartTimeRef = useRef<number>(0); // Время начала второго звука
+  const secondSoundPeakAmplitudeRef = useRef<number>(0); // Пиковая амплитуда второго звука
+  const secondSoundFallingStartTimeRef = useRef<number>(0); // Время начала затухания второго звука
+  const lastAmplitudeRef = useRef<number>(0); // Последняя амплитуда для определения направления
+  
   // State
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [soundEvents, setSoundEvents] = useState<SoundEvent[]>([]);
@@ -477,6 +488,299 @@ export default function PuckSpeedSoundScreen() {
     isMeasuringRef.current = isMeasuring;
   }, [isMeasuring]);
 
+  // НОВАЯ ФУНКЦИЯ: Обработка амплитуды с отслеживанием полных циклов звука (подъем -> падение)
+  const processAmplitudeWithCycleDetection = useCallback((averageAmplitude: number, nowMs: number) => {
+    const currentState = soundStateRef.current;
+    const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
+    const currentVolumeThreshold = volumeThresholdRef.current;
+    const currentPeakThreshold = peakDetectionThresholdRef.current;
+    
+    // Определяем направление изменения амплитуды
+    const isRising = averageAmplitude > lastAmplitudeRef.current;
+    const isFalling = averageAmplitude < lastAmplitudeRef.current;
+    lastAmplitudeRef.current = averageAmplitude;
+    
+    // Обновляем previousAmplitudeRef для следующего расчета
+    if (averageAmplitude < previousAmplitudeRef.current) {
+      previousAmplitudeRef.current = averageAmplitude * 0.9 + previousAmplitudeRef.current * 0.1;
+    } else {
+      previousAmplitudeRef.current = averageAmplitude;
+    }
+    
+    switch (currentState) {
+      case 'idle':
+        // Ждем начала первого звука: резкий подъем амплитуды выше порога
+        if (isRising && 
+            amplitudeJump > currentPeakThreshold * 1.1 && 
+            averageAmplitude > currentVolumeThreshold &&
+            amplitudeJump > 70) {
+          soundStateRef.current = 'firstSoundRising';
+          firstSoundStartTimeRef.current = nowMs;
+          firstSoundPeakAmplitudeRef.current = averageAmplitude;
+          console.log(`🔊 [Cycle] Первый звук начался: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
+          handleSoundDetected(nowMs, averageAmplitude / 255);
+        }
+        break;
+        
+      case 'firstSoundRising':
+        // Первый звук растет - отслеживаем пик
+        if (averageAmplitude > firstSoundPeakAmplitudeRef.current) {
+          firstSoundPeakAmplitudeRef.current = averageAmplitude;
+        }
+        
+        // КРИТИЧНО: Для быстрых скоростей второй звук может начаться ДО затухания первого
+        // Проверяем, прошло ли достаточно времени с начала первого звука (минимум 30мс)
+        const timeSinceFirstStartRising = nowMs - firstSoundStartTimeRef.current;
+        const canStartSecondSoundRising = timeSinceFirstStartRising > 20; // Минимум 20мс для очень быстрых скоростей (до ~900 км/ч)
+        
+        // Если прошло достаточно времени И амплитуда снова поднялась (второй звук), начинаем второй звук
+        // Это позволяет фиксировать очень быстрые скорости, когда второй звук начинается сразу после пика первого
+        // Для очень быстрых скоростей значительно снижаем пороги
+        const isVeryFastSpeedRising = timeSinceFirstStartRising < 300; // Если время < 300мс, это очень быстрая скорость (> 60 км/ч)
+        const isExtremelyFastSpeedRising = timeSinceFirstStartRising < 150; // Если время < 150мс, это экстремально быстрая скорость (> 120 км/ч)
+        const isUltraFastSpeedRising = timeSinceFirstStartRising < 80; // Если время < 80мс, это ультра быстрая скорость (> 225 км/ч)
+        const secondSoundPeakThresholdRising = isUltraFastSpeedRising 
+          ? currentPeakThreshold * 0.1   // 10% для ультра быстрых скоростей
+          : isExtremelyFastSpeedRising 
+            ? currentPeakThreshold * 0.12  // 12% для экстремально быстрых скоростей
+            : isVeryFastSpeedRising 
+              ? currentPeakThreshold * 0.18  // 18% для очень быстрых скоростей
+              : currentPeakThreshold * 0.3; // 30% для обычных скоростей
+        const secondSoundJumpThresholdRising = isUltraFastSpeedRising 
+          ? 8   // 8 для ультра быстрых скоростей
+          : isExtremelyFastSpeedRising 
+            ? 9   // 9 для экстремально быстрых скоростей
+            : isVeryFastSpeedRising 
+              ? 11  // 11 для очень быстрых скоростей
+              : 15; // 15 для обычных скоростей
+        const secondSoundVolumeThresholdRising = isUltraFastSpeedRising 
+          ? currentVolumeThreshold * 0.45  // 45% для ультра быстрых скоростей
+          : isExtremelyFastSpeedRising 
+            ? currentVolumeThreshold * 0.48  // 48% для экстремально быстрых скоростей
+            : isVeryFastSpeedRising 
+              ? currentVolumeThreshold * 0.52  // 52% для очень быстрых скоростей
+              : currentVolumeThreshold * 0.6; // 60% для обычных скоростей
+        
+        // Для очень быстрых скоростей проверяем резкий скачок амплитуды
+        // Это позволяет зафиксировать второй звук даже если он начинается во время пика первого
+        // Для очень быстрых скоростей (< 200мс) проверяем только скачок и громкость, без проверки на рост
+        const isSecondSoundDetected = canStartSecondSoundRising && 
+            amplitudeJump > secondSoundJumpThresholdRising && 
+            averageAmplitude > secondSoundVolumeThresholdRising &&
+            // Для очень быстрых скоростей проверяем, что это не продолжение первого звука
+            // Но для экстремально быстрых скоростей (< 100мс) разрешаем даже если амплитуда близка к пику первого
+            (isExtremelyFastSpeedRising || 
+             (isVeryFastSpeedRising && (isRising || averageAmplitude < firstSoundPeakAmplitudeRef.current * 0.98)) ||
+             (!isVeryFastSpeedRising && isRising && averageAmplitude < firstSoundPeakAmplitudeRef.current * 0.95 && amplitudeJump > secondSoundPeakThresholdRising));
+        
+        if (isSecondSoundDetected) {
+          // Второй звук начался ДО затухания первого - это нормально для очень быстрых скоростей
+          soundStateRef.current = 'secondSoundRising';
+          secondSoundStartTimeRef.current = nowMs;
+          secondSoundPeakAmplitudeRef.current = averageAmplitude;
+          const timeBetweenSounds = secondSoundStartTimeRef.current - firstSoundStartTimeRef.current;
+          console.log(`🔊 [Cycle] Второй звук начался (во время роста первого, очень быстрая скорость): амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время между звуками=${timeBetweenSounds}мс, ультра быстрая=${isUltraFastSpeedRising}, экстремально быстрая=${isExtremelyFastSpeedRising}, очень быстрая=${isVeryFastSpeedRising}`);
+          handleSoundDetected(nowMs, averageAmplitude / 255);
+        }
+        // Переходим к затуханию, если амплитуда упала на 10% от пика (более чувствительно для быстрых звуков)
+        // Для быстрых скоростей важно быстро переходить к затуханию, чтобы второй звук мог начаться раньше
+        else if (isFalling && averageAmplitude < firstSoundPeakAmplitudeRef.current * 0.9) {
+          // Амплитуда упала на 10% от пика - звук начал затухать
+          soundStateRef.current = 'firstSoundFalling';
+          firstSoundFallingStartTimeRef.current = nowMs; // Фиксируем время начала затухания
+          console.log(`🔊 [Cycle] Первый звук начал затухать: пик=${firstSoundPeakAmplitudeRef.current.toFixed(1)}, текущая=${averageAmplitude.toFixed(1)}`);
+        }
+        break;
+        
+      case 'firstSoundFalling':
+        // Первый звук затухает - но для быстрых скоростей второй звук может начаться ДО завершения первого
+        // Проверяем, прошло ли достаточно времени с начала первого звука (минимум 50мс для очень быстрых скоростей)
+        const timeSinceFirstStart = nowMs - firstSoundStartTimeRef.current;
+        const canStartSecondSound = timeSinceFirstStart > 20; // Минимум 20мс для очень быстрых скоростей (до ~900 км/ч)
+        
+        // Если прошло достаточно времени И амплитуда снова поднялась (второй звук), начинаем второй звук
+        // Для быстрых скоростей второй звук может начаться во время затухания первого
+        // Для быстрых скоростей значительно снижаем пороги второго звука, так как он может быть тише
+        const isVeryFastSpeed = timeSinceFirstStart < 300; // Если время < 300мс, это очень быстрая скорость (> 60 км/ч)
+        const isExtremelyFastSpeed = timeSinceFirstStart < 150; // Если время < 150мс, это экстремально быстрая скорость (> 120 км/ч)
+        const isUltraFastSpeed = timeSinceFirstStart < 80; // Если время < 80мс, это ультра быстрая скорость (> 225 км/ч)
+        const secondSoundPeakThreshold = isUltraFastSpeed 
+          ? currentPeakThreshold * 0.1   // 10% для ультра быстрых скоростей
+          : isExtremelyFastSpeed 
+            ? currentPeakThreshold * 0.12  // 12% для экстремально быстрых скоростей
+            : isVeryFastSpeed 
+              ? currentPeakThreshold * 0.18  // 18% для очень быстрых скоростей
+              : currentPeakThreshold * 0.4; // 40% для обычных скоростей
+        const secondSoundJumpThreshold = isUltraFastSpeed 
+          ? 8   // 8 для ультра быстрых скоростей
+          : isExtremelyFastSpeed 
+            ? 9   // 9 для экстремально быстрых скоростей
+            : isVeryFastSpeed 
+              ? 11  // 11 для очень быстрых скоростей
+              : 20; // 20 для обычных скоростей
+        const secondSoundVolumeThreshold = isUltraFastSpeed 
+          ? currentVolumeThreshold * 0.45  // 45% для ультра быстрых скоростей
+          : isExtremelyFastSpeed 
+            ? currentVolumeThreshold * 0.48  // 48% для экстремально быстрых скоростей
+            : isVeryFastSpeed 
+              ? currentVolumeThreshold * 0.52  // 52% для очень быстрых скоростей
+              : currentVolumeThreshold * 0.7; // 70% для обычных скоростей
+        
+        if (canStartSecondSound && isRising && 
+            amplitudeJump > secondSoundPeakThreshold && 
+            averageAmplitude > secondSoundVolumeThreshold &&
+            amplitudeJump > secondSoundJumpThreshold) {
+          // Второй звук начался ДО завершения первого - это нормально для быстрых скоростей
+          soundStateRef.current = 'secondSoundRising';
+          secondSoundStartTimeRef.current = nowMs;
+          secondSoundPeakAmplitudeRef.current = averageAmplitude;
+          const timeBetweenSounds = secondSoundStartTimeRef.current - firstSoundStartTimeRef.current;
+          console.log(`🔊 [Cycle] Второй звук начался (во время затухания первого, быстрая скорость): амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время между звуками=${timeBetweenSounds}мс, ультра быстрая=${isUltraFastSpeed}, экстремально быстрая=${isExtremelyFastSpeed}, очень быстрая=${isVeryFastSpeed}`);
+          handleSoundDetected(nowMs, averageAmplitude / 255);
+        } else {
+          // Продолжаем отслеживать затухание первого звука
+          const firstSoundEndThreshold = Math.min(
+            firstSoundPeakAmplitudeRef.current * 0.5, // 50% от пика
+            currentVolumeThreshold * 0.8 // ИЛИ 80% от порога громкости (что меньше)
+          );
+          
+          if (averageAmplitude < firstSoundEndThreshold) {
+            // Амплитуда упала достаточно низко - звук завершен (частичное затухание)
+            soundStateRef.current = 'firstSoundComplete';
+            console.log(`✅ [Cycle] Первый звук завершен (частичное затухание): начало=${firstSoundStartTimeRef.current}, конец=${nowMs}, длительность=${nowMs - firstSoundStartTimeRef.current}мс, пик=${firstSoundPeakAmplitudeRef.current.toFixed(1)}, порог=${firstSoundEndThreshold.toFixed(1)}, текущая=${averageAmplitude.toFixed(1)}`);
+          } else if (isRising && amplitudeJump > currentPeakThreshold * 0.7 && averageAmplitude > firstSoundPeakAmplitudeRef.current * 0.9) {
+            // Амплитуда снова поднялась очень близко к пику (90%+) - возможно, это продолжение первого звука
+            soundStateRef.current = 'firstSoundRising';
+            if (averageAmplitude > firstSoundPeakAmplitudeRef.current) {
+              firstSoundPeakAmplitudeRef.current = averageAmplitude;
+            }
+          }
+        }
+        break;
+        
+      case 'firstSoundComplete':
+        // Первый звук завершен - ждем начала второго звука
+        // Второй звук начинается: резкий подъем амплитуды выше порога
+        // Для быстрых скоростей снижаем пороги второго звука
+        const timeSinceFirstStartComplete = nowMs - firstSoundStartTimeRef.current;
+        const isVeryFastSpeedComplete = timeSinceFirstStartComplete < 300; // Если время < 300мс, это очень быстрая скорость (> 60 км/ч)
+        const isExtremelyFastSpeedComplete = timeSinceFirstStartComplete < 150; // Если время < 150мс, это экстремально быстрая скорость (> 120 км/ч)
+        const isUltraFastSpeedComplete = timeSinceFirstStartComplete < 80; // Если время < 80мс, это ультра быстрая скорость (> 225 км/ч)
+        const secondSoundPeakThresholdComplete = isUltraFastSpeedComplete 
+          ? currentPeakThreshold * 0.1   // 10% для ультра быстрых скоростей
+          : isExtremelyFastSpeedComplete 
+            ? currentPeakThreshold * 0.12  // 12% для экстремально быстрых скоростей
+            : isVeryFastSpeedComplete 
+              ? currentPeakThreshold * 0.18  // 18% для очень быстрых скоростей
+              : currentPeakThreshold * 0.4; // 40% для обычных скоростей
+        const secondSoundJumpThresholdComplete = isUltraFastSpeedComplete 
+          ? 8   // 8 для ультра быстрых скоростей
+          : isExtremelyFastSpeedComplete 
+            ? 9   // 9 для экстремально быстрых скоростей
+            : isVeryFastSpeedComplete 
+              ? 11  // 11 для очень быстрых скоростей
+              : 20; // 20 для обычных скоростей
+        const secondSoundVolumeThresholdComplete = isUltraFastSpeedComplete 
+          ? currentVolumeThreshold * 0.45  // 45% для ультра быстрых скоростей
+          : isExtremelyFastSpeedComplete 
+            ? currentVolumeThreshold * 0.48  // 48% для экстремально быстрых скоростей
+            : isVeryFastSpeedComplete 
+              ? currentVolumeThreshold * 0.52  // 52% для очень быстрых скоростей
+              : currentVolumeThreshold * 0.7; // 70% для обычных скоростей
+        
+        if (isRising && 
+            amplitudeJump > secondSoundPeakThresholdComplete && 
+            averageAmplitude > secondSoundVolumeThresholdComplete &&
+            amplitudeJump > secondSoundJumpThresholdComplete) {
+          soundStateRef.current = 'secondSoundRising';
+          secondSoundStartTimeRef.current = nowMs;
+          secondSoundPeakAmplitudeRef.current = averageAmplitude; // Инициализируем пик второго звука
+          const timeBetweenSounds = secondSoundStartTimeRef.current - firstSoundStartTimeRef.current;
+          console.log(`🔊 [Cycle] Второй звук начался: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время между звуками=${timeBetweenSounds}мс, ультра быстрая=${isUltraFastSpeedComplete}, экстремально быстрая=${isExtremelyFastSpeedComplete}, очень быстрая=${isVeryFastSpeedComplete}`);
+          handleSoundDetected(nowMs, averageAmplitude / 255);
+        }
+        break;
+        
+      case 'secondSoundRising':
+        // Второй звук растет - отслеживаем пик
+        if (averageAmplitude > secondSoundPeakAmplitudeRef.current) {
+          secondSoundPeakAmplitudeRef.current = averageAmplitude;
+        }
+        // Переходим к затуханию, если амплитуда упала на 10% от пика (более чувствительно для быстрых звуков)
+        // Для быстрых скоростей важно быстро переходить к затуханию
+        if (isFalling && averageAmplitude < secondSoundPeakAmplitudeRef.current * 0.9) {
+          // Амплитуда начала падать - звук начал затухать
+          soundStateRef.current = 'secondSoundFalling';
+          secondSoundFallingStartTimeRef.current = nowMs; // Фиксируем время начала затухания
+          console.log(`🔊 [Cycle] Второй звук начал затухать: пик=${secondSoundPeakAmplitudeRef.current.toFixed(1)}, текущая=${averageAmplitude.toFixed(1)}`);
+        }
+        break;
+        
+      case 'secondSoundFalling':
+        // Второй звук затухает - завершаем при частичном затухании (60% от пика) для повышения чувствительности
+        // Звук считается завершенным, если амплитуда упала ниже 60% от пика ИЛИ ниже порога громкости
+        // Используем более высокий порог (60% вместо 50%), чтобы звук завершался быстрее
+        const secondSoundEndThreshold = Math.min(
+          secondSoundPeakAmplitudeRef.current * 0.6, // 60% от пика (повышено для более быстрого завершения)
+          currentVolumeThreshold * 0.9 // ИЛИ 90% от порога громкости (что меньше)
+        );
+        
+        // Также проверяем время с начала затухания - если прошло достаточно времени (> 200мс), завершаем звук
+        const timeSinceFallingStart = nowMs - secondSoundFallingStartTimeRef.current;
+        const hasEnoughTimePassed = timeSinceFallingStart > 200; // Прошло более 200мс с начала затухания
+        
+        if (averageAmplitude < secondSoundEndThreshold || (hasEnoughTimePassed && isFalling && averageAmplitude < secondSoundPeakAmplitudeRef.current * 0.7)) {
+          // Амплитуда упала достаточно низко ИЛИ прошло достаточно времени - звук завершен (частичное затухание)
+          soundStateRef.current = 'secondSoundComplete';
+          console.log(`✅ [Cycle] Второй звук завершен (частичное затухание): начало=${secondSoundStartTimeRef.current}, конец=${nowMs}, пик=${secondSoundPeakAmplitudeRef.current.toFixed(1)}, порог=${secondSoundEndThreshold.toFixed(1)}, текущая=${averageAmplitude.toFixed(1)}, время затухания=${timeSinceFallingStart}мс`);
+          
+          // Рассчитываем скорость на основе времени между началами звуков
+          const timeBetweenStarts = secondSoundStartTimeRef.current - firstSoundStartTimeRef.current;
+          if (timeBetweenStarts > 0) {
+            const speedMs = distanceMeters / (timeBetweenStarts / 1000);
+            const speedKmh = speedMs * 3.6;
+            console.log(`⏱️ Время между началами звуков: ${timeBetweenStarts}мс (${(timeBetweenStarts / 1000).toFixed(3)}с)`);
+            console.log(`⚡ Скорость рассчитана: ${speedKmh.toFixed(2)} км/ч`);
+            
+            // Проверка: если скорость больше 120 км/ч, не сохраняем результат
+            if (speedKmh > 120) {
+              console.log(`⚠️ Скорость ${speedKmh.toFixed(2)} км/ч превышает лимит 120 км/ч, результат не сохранен`);
+            } else {
+              // Сохраняем результат
+              const speedMph = speedKmh / 1.60934;
+              const result: SpeedResult = {
+                speedMs,
+                speedKmh,
+                speedMph,
+                timeMs: timeBetweenStarts,
+                timestamp: Date.now(),
+                distance: distanceMeters
+              };
+              setSpeedResults(prev => [...prev, result]);
+              setCurrentStatus(`${t('puckSpeed.speedCalculated') || '⚡ Скорость:'} ${speedKmh.toFixed(1)} ${t('puckSpeed.kmh') || 'км/ч'}`);
+              lastSpeedCalculationTimeRef.current = Date.now();
+            }
+          }
+          
+          // Сбрасываем состояние
+          soundStateRef.current = 'idle';
+          soundEventsRef.current = [];
+          setSoundEvents([]);
+          previousAmplitudeRef.current = 0;
+          lastSoundDetectionTimeRef.current = 0;
+        } else if (isRising && amplitudeJump > currentPeakThreshold * 0.4 && averageAmplitude > currentVolumeThreshold * 0.8) {
+          // Амплитуда снова поднялась высоко - возможно, это продолжение второго звука
+          soundStateRef.current = 'secondSoundRising';
+        }
+        break;
+        
+      case 'secondSoundComplete':
+        // Второй звук завершен - сбрасываем состояние (должно было произойти выше)
+        soundStateRef.current = 'idle';
+        break;
+    }
+  }, [distanceMeters, handleSoundDetected, t]);
+
   // Обработка обнаруженного звука (автоматически для веб, вручную для мобильного)
   const handleSoundDetected = useCallback((timestamp: number, amplitude: number) => {
     setSoundEvents(prev => {
@@ -603,6 +907,8 @@ export default function PuckSpeedSoundScreen() {
     isAnalyzingRef.current = true;
     recordingStartTimeRef.current = Date.now(); // Фиксируем время начала записи
     previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду
+    soundStateRef.current = 'idle'; // Сбрасываем состояние звука
+    lastAmplitudeRef.current = 0; // Сбрасываем последнюю амплитуду
 
     const analyzeAudio = () => {
       // Проверяем состояние измерения через ref для синхронного доступа
@@ -627,65 +933,12 @@ export default function PuckSpeedSoundScreen() {
       const frameCount = Math.floor(Date.now() / 1000) % 5; // Логируем каждые 5 секунд
       if (frameCount === 0 && Math.random() < 0.1) {
         console.log(`📊 Чувствительность: ${sensitivity}%, Порог громкости: ${VOLUME_THRESHOLD.toFixed(1)}, Порог скачка: ${PEAK_DETECTION_THRESHOLD.toFixed(1)}`);
-        console.log(`📊 Амплитуда: ${averageAmplitude.toFixed(1)}/${VOLUME_THRESHOLD.toFixed(1)}, событий: ${currentEvents.length}/2, громкость: ${(averageAmplitude / 255 * 100).toFixed(1)}%`);
+        console.log(`📊 Амплитуда: ${averageAmplitude.toFixed(1)}/${VOLUME_THRESHOLD.toFixed(1)}, событий: ${currentEvents.length}/2, состояние: ${soundStateRef.current}, громкость: ${(averageAmplitude / 255 * 100).toFixed(1)}%`);
       }
 
-      // Детекция пика: резкий скачок амплитуды (более точная детекция)
-      const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
-      
-      // Для первого звука нужен резкий скачок, для второго - более мягкое условие
-      const isFirstSound = currentEvents.length === 0;
-      const isSecondSound = currentEvents.length === 1;
-      
-      // Для первого звука: требуем ОБЯЗАТЕЛЬНО резкий скачок И высокую амплитуду
-      // Это фильтрует фоновую музыку и обычные звуки (которые обычно более плавные)
-      const firstSoundDetected = isFirstSound && (
-        amplitudeJump > PEAK_DETECTION_THRESHOLD && // ОБЯЗАТЕЛЬНО резкий скачок
-        averageAmplitude > VOLUME_THRESHOLD && // И высокая амплитуда
-        amplitudeJump > 60 // Повышено (было 40) - скачок должен быть достаточно большим для реального удара
-      );
-      
-      // Для второго звука: также требуем резкий скачок
-      // Музыка и обычные звуки обычно не дают резких скачков, поэтому это поможет отфильтровать
-      const secondSoundDetected = isSecondSound && 
-        averageAmplitude > VOLUME_THRESHOLD && 
-        amplitudeJump > PEAK_DETECTION_THRESHOLD * 0.5 && // Повышено (было 30%) - требуем скачок минимум 50% от порога
-        amplitudeJump > 50; // Повышено (было 30) - скачок должен быть достаточно большим для реального удара
-      
-      const isPeak = firstSoundDetected || secondSoundDetected;
-      
-      // Обновляем предыдущую амплитуду плавно (с затуханием), чтобы не пропустить второй звук
-      // Если звук обнаружен, не обновляем сразу - это поможет зафиксировать второй звук
-      if (!isPeak) {
-        // Плавное обновление с затуханием (если амплитуда падает, обновляем быстрее)
-        if (averageAmplitude < previousAmplitudeRef.current) {
-          previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmplitudeRef.current * 0.3; // Быстрое затухание
-        } else {
-          previousAmplitudeRef.current = averageAmplitude; // Обычное обновление
-        }
-      } else {
-        // Если звук обнаружен, обновляем только после небольшого затухания
-        previousAmplitudeRef.current = averageAmplitude * 0.8; // Сохраняем 80% для детекции второго звука
-      }
-
-      // Если обнаружен пик, и ещё нет 2 пиков
-      if (isPeak && currentEvents.length < 2) {
-        // Используем Date.now() относительно времени начала записи для точности
-        const nowMs = Date.now();
-
-        // Debounce: проверяем, не слишком близко ли к предыдущему пику
-        const lastEvent = currentEvents[currentEvents.length - 1];
-        const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
-        
-            if (currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) {
-          const soundMsg = `🔊 [Web] Звук ${currentEvents.length + 1}: ампл=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}`;
-          console.log(`🔊 Обнаружен звук ${currentEvents.length + 1}: амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}, время=${nowMs}`);
-              // setDebugLogs(prev => [...prev.slice(-9), soundMsg]);
-          handleSoundDetected(nowMs, averageAmplitude / 255);
-            } else {
-              console.log(`⏸️ Звук игнорирован (слишком близко к предыдущему: ${timeSinceLastEvent.toFixed(0)}мс)`);
-        }
-      }
+      // НОВАЯ ЛОГИКА: Используем отслеживание полных циклов звука вместо детекции пиков
+      const nowMs = Date.now();
+      processAmplitudeWithCycleDetection(averageAmplitude, nowMs);
 
       // Продолжаем анализ
       if (isAnalyzingRef.current) {
@@ -701,7 +954,7 @@ export default function PuckSpeedSoundScreen() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isWeb, isMeasuring, handleSoundDetected, VOLUME_THRESHOLD, PEAK_DETECTION_THRESHOLD]);
+  }, [isWeb, isMeasuring, processAmplitudeWithCycleDetection]);
 
   // Цикл анализа для iOS (AudioRecorderPlayer)
   useEffect(() => {
@@ -753,6 +1006,8 @@ export default function PuckSpeedSoundScreen() {
       isAnalyzingRef.current = true;
       recordingStartTimeRef.current = Date.now();
       previousAmplitudeRef.current = 0; // ВАЖНО: сбрасываем предыдущую амплитуду при старте
+      soundStateRef.current = 'idle'; // Сбрасываем состояние звука
+      lastAmplitudeRef.current = 0; // Сбрасываем последнюю амплитуду
 
     // Fallback функция для использования expo-av вместо AudioRecorderPlayer
     const startExpoAVRecording = async () => {
@@ -811,11 +1066,11 @@ export default function PuckSpeedSoundScreen() {
               const db = status.metering;
               
               // Преобразуем децибелы в амплитуду (как в AudioRecorderPlayer)
+              const normalizedDb = db <= -160 ? -160 : Math.max(-80, Math.min(0, db));
               let averageAmplitude = 0;
               if (db <= -160) {
                 averageAmplitude = 0;
               } else {
-                const normalizedDb = Math.max(-80, Math.min(0, db));
                 averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
               }
               
@@ -840,63 +1095,9 @@ export default function PuckSpeedSoundScreen() {
                 }
               }
               
-              // Используем ту же логику детекции звука, что и для AudioRecorderPlayer
-              const currentEvents = soundEventsRef.current;
-              if (currentEvents.length >= 2) {
-                soundEventsRef.current = [];
-                setSoundEvents([]);
-                previousAmplitudeRef.current = 0;
-                lastSoundDetectionTimeRef.current = 0;
-              }
-              
-              const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
-              const isFirstSound = currentEvents.length === 0;
-              const isSecondSound = currentEvents.length === 1;
-              
-              const currentVolumeThreshold = volumeThresholdRef.current;
-              const currentPeakThreshold = peakDetectionThresholdRef.current;
-              
-              const firstSoundDetected = isFirstSound && (
-                amplitudeJump > currentPeakThreshold &&
-                averageAmplitude > currentVolumeThreshold &&
-                amplitudeJump > 60
-              );
-              
-              const secondSoundDetected = isSecondSound && 
-                averageAmplitude > currentVolumeThreshold && 
-                amplitudeJump > currentPeakThreshold * 0.5 &&
-                amplitudeJump > 50;
-              
-              const isPeak = firstSoundDetected || secondSoundDetected;
-              
-              if (!isPeak) {
-                if (averageAmplitude < previousAmplitudeRef.current) {
-                  previousAmplitudeRef.current = averageAmplitude * 0.7 + previousAmplitudeRef.current * 0.3;
-                } else {
-                  previousAmplitudeRef.current = averageAmplitude;
-                }
-              } else {
-                previousAmplitudeRef.current = averageAmplitude * 0.8;
-              }
-              
-              if (isPeak && currentEvents.length < 2) {
-                const nowMs = Date.now();
-                const lastEvent = currentEvents[currentEvents.length - 1];
-                const timeSinceLastEvent = lastEvent ? nowMs - lastEvent.timestamp : Infinity;
-                const timeSinceLastDetection = nowMs - lastSoundDetectionTimeRef.current;
-                const timeSinceLastSpeedCalculation = nowMs - lastSpeedCalculationTimeRef.current;
-                
-                if (timeSinceLastSpeedCalculation < COOLDOWN_AFTER_SPEED_MS) {
-                  return;
-                }
-                
-                if ((currentEvents.length === 0 || timeSinceLastEvent > DEBOUNCE_MS) && 
-                    timeSinceLastDetection > DEBOUNCE_MS) {
-                  console.log(`🔊 [iOS] Expo AV: Звук ${currentEvents.length + 1} обнаружен, амплитуда=${averageAmplitude.toFixed(1)}, скачок=${amplitudeJump.toFixed(1)}`);
-                  lastSoundDetectionTimeRef.current = nowMs;
-                  handleSoundDetected(nowMs, averageAmplitude / 255);
-                }
-              }
+              // НОВАЯ ЛОГИКА: Используем отслеживание полных циклов звука вместо детекции пиков
+              const nowMs = Date.now();
+              processAmplitudeWithCycleDetection(averageAmplitude, nowMs);
             } else {
               const enableLogs = typeof process !== 'undefined' &&
                 process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
@@ -999,6 +1200,7 @@ export default function PuckSpeedSoundScreen() {
         // Останавливаем анализ
         isAnalyzingRef.current = false;
         isMeasuringRef.current = false;
+        soundStateRef.current = 'idle'; // Сбрасываем состояние звука
         
         // Для веб-версии: останавливаем анализ
         if (animationFrameRef.current) {
@@ -1225,6 +1427,8 @@ export default function PuckSpeedSoundScreen() {
 
   // Остановка измерения
   const stopMeasuring = () => {
+    // Сбрасываем состояние звука
+    soundStateRef.current = 'idle';
     // Очищаем таймаут
     if (soundTimeoutRef.current) {
       clearTimeout(soundTimeoutRef.current);

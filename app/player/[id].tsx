@@ -195,6 +195,7 @@ export default function PlayerProfile() {
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
+  const [playerNotFoundTimeout, setPlayerNotFoundTimeout] = useState<NodeJS.Timeout | null>(null);
   const [activityRefreshKey, setActivityRefreshKey] = useState<number>(0);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
 
@@ -385,10 +386,45 @@ export default function PlayerProfile() {
 
   // Функция для начала редактирования и отслеживания изменений
   const handleStartEditing = () => {
-    setIsEditing(true);
+    if (!player) return;
+    
+    // Инициализируем все поля редактирования актуальными данными игрока
     setEditData({
       ...player
     });
+    
+    // Инициализируем видео поля из favoriteGoals
+    if (player.favoriteGoals) {
+      const goals = player.favoriteGoals.split('\n').filter(goal => goal.trim());
+      const videoData = goals.map(goal => {
+        const { url, hours, minutes, seconds } = parseVideoUrl(goal);
+        return { url, hours: hours || '0', minutes: minutes || '0', seconds: seconds || '0' };
+      });
+      setVideoFields(videoData.length > 0 ? videoData : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+    } else {
+      setVideoFields([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+    }
+    
+    // Инициализируем галерею фото
+    if (player.photos && Array.isArray(player.photos)) {
+      setGalleryPhotos(player.photos);
+    } else {
+      setGalleryPhotos([]);
+    }
+    
+    // Инициализируем достижения
+    if (player.achievements && Array.isArray(player.achievements)) {
+      setAchievements(player.achievements);
+    } else {
+      setAchievements([]);
+    }
+    
+    // Инициализируем команды (текущие и прошлые)
+    // playerTeams уже загружены через loadAdditionalData
+    // Прошлые команды уже установлены в pastTeams через loadAdditionalData
+    // Текущие команды управляются через CurrentTeamsSection и уже установлены в playerTeams
+    
+    setIsEditing(true);
   };
 
   // Используем ref для отслеживания предыдущего id, чтобы избежать показа неправильного профиля
@@ -663,7 +699,16 @@ export default function PlayerProfile() {
         const retryPlayerData = await getPlayerById(normalizedId as string);
         
         if (!retryPlayerData) {
-          console.log('❌ Игрок не найден после повторной попытки, редиректим на главную');
+          console.log('❌ Игрок не найден после повторной попытки');
+          // Проверяем, является ли это профилем текущего пользователя
+          const { loadCurrentUser } = await import('../../utils/playerStorage');
+          const currentUserData = await loadCurrentUser();
+          if (currentUserData && currentUserData.id === normalizedId) {
+            console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
+            const { logoutUser } = await import('../../utils/playerStorage');
+            await logoutUser();
+            await refreshUser();
+          }
           router.replace('/');
           return;
         } else {
@@ -1157,20 +1202,27 @@ export default function PlayerProfile() {
     }
   };
 
-  const showCustomAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', onConfirm?: () => void) => {
+  const showCustomAlert = (
+    title: string, 
+    message: string, 
+    type: 'success' | 'error' | 'warning' | 'info' = 'info', 
+    onConfirm?: () => void,
+    showCancel?: boolean,
+    onCancel?: () => void
+  ) => {
     setAlert({
       visible: true,
       title,
       message,
       type,
-      onConfirm: onConfirm || (() => setAlert({ ...alert, visible: false })),
-      onCancel: () => {},
+      onConfirm: onConfirm || (() => setAlert(prev => ({ ...prev, visible: false }))),
+      onCancel: onCancel || (() => setAlert(prev => ({ ...prev, visible: false }))),
       onSecondary: () => {},
-      showCancel: false,
+      showCancel: showCancel || false,
       showSecondary: false,
       confirmText: t('common.ok'),
-      cancelText: t('cancel'),
-      secondaryText: t('additional')
+      cancelText: t('profile.cancel') || t('common.cancel'),
+      secondaryText: t('profile.additional')
     });
   };
 
@@ -1696,6 +1748,10 @@ export default function PlayerProfile() {
         // Очищаем кеш для этого игрока
         await clearPlayerCache(player.id);
         
+        // Очищаем кеш всех игроков для главного экрана, чтобы изменения отображались сразу
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        await AsyncStorage.removeItem('all_players');
+        
         // Сразу обновляем состояние с новым значением is_hidden
         setPlayer({ ...player, is_hidden: true });
         
@@ -1738,6 +1794,10 @@ export default function PlayerProfile() {
         // Очищаем кеш для этого игрока
         await clearPlayerCache(player.id);
         
+        // Очищаем кеш всех игроков для главного экрана, чтобы изменения отображались сразу
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        await AsyncStorage.removeItem('all_players');
+        
         // Сразу обновляем состояние с новым значением is_hidden
         setPlayer({ ...player, is_hidden: false });
         
@@ -1754,8 +1814,22 @@ export default function PlayerProfile() {
   };
 
   const handleAddFriend = async () => {
+    console.log('🔘 handleAddFriend вызван:', { 
+      friendLoading, 
+      friendshipStatus, 
+      currentUserId: currentUser?.id, 
+      playerId: player?.id,
+      playerName: player?.name 
+    });
+    
+    // Защита от повторных вызовов
+    if (friendLoading) {
+      console.log('⚠️ handleAddFriend: friendLoading=true, пропускаем');
+      return;
+    }
     
     if (!currentUser || !player) {
+      console.log('⚠️ handleAddFriend: нет currentUser или player');
       showCustomAlert('Ошибка', 'Необходимо войти в профиль для добавления в друзья', 'error', () => router.push('/login'));
       return;
     }
@@ -1766,11 +1840,9 @@ export default function PlayerProfile() {
         // Удаляем из друзей
         const success = await removeFriend(currentUser.id, player.id);
         if (success) {
-          // Небольшая задержка для обновления базы данных
-          await new Promise(resolve => setTimeout(resolve, 100));
-          // Обновляем статус дружбы из базы данных
-          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(newStatus);
+          // Сразу обновляем статус на 'none' для мгновенной обратной связи
+          setFriendshipStatus('none');
+          
           // Очищаем кеш статуса дружбы для этого игрока
           const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
           setFriendshipStatusCache(prev => {
@@ -1778,21 +1850,31 @@ export default function PlayerProfile() {
             delete updated[cacheKey];
             return updated;
           });
+          
           showCustomAlert(t('common.success'), t('profile.removedFromFriends', { name: player?.name || 'Player' }), 'success');
+          
+          // Обновляем статус из базы данных асинхронно (не блокируем UI)
+          setTimeout(async () => {
+            try {
+              const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+              setFriendshipStatus(newStatus);
+            } catch (error) {
+              console.error('⚠️ Ошибка обновления статуса дружбы (не критично):', error);
+            }
+          }, 300);
         } else {
           showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
         }
       } else if (friendshipStatus === 'none') {
-    
         // Отправляем запрос дружбы
+        console.log('📤 Отправка запроса дружбы:', { fromId: currentUser.id, toId: player.id });
         const success = await sendFriendRequest(currentUser.id, player.id);
+        console.log('📤 Результат отправки запроса дружбы:', success);
 
         if (success) {
-          // Небольшая задержка для обновления базы данных
-          await new Promise(resolve => setTimeout(resolve, 100));
-          // Обновляем статус дружбы из базы данных
-          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(newStatus);
+          // Сразу обновляем статус на 'sent_request' для мгновенной обратной связи
+          setFriendshipStatus('sent_request');
+          
           // Очищаем кеш статуса дружбы для этого игрока
           const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
           setFriendshipStatusCache(prev => {
@@ -1809,19 +1891,30 @@ export default function PlayerProfile() {
             // Не показываем ошибку пользователю, так как это не критично
           }
           
+          // Показываем уведомление после обновления UI
           showCustomAlert(t('common.success'), t('profile.friendRequestSent'), 'success');
+          
+          // Обновляем статус из базы данных асинхронно (не блокируем UI)
+          setTimeout(async () => {
+            try {
+              const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+              console.log('📤 Обновленный статус дружбы после отправки:', newStatus);
+              setFriendshipStatus(newStatus);
+            } catch (error) {
+              console.error('⚠️ Ошибка обновления статуса дружбы (не критично):', error);
+            }
+          }, 300);
         } else {
-          showCustomAlert(t('common.error'), t('profile.friendRequestError'), 'error');
+          console.error('❌ Не удалось отправить запрос дружбы');
+          showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
         }
       } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
         // Отменяем запрос
         const success = await cancelFriendRequest(currentUser.id, player.id);
         if (success) {
-          // Небольшая задержка для обновления базы данных
-          await new Promise(resolve => setTimeout(resolve, 100));
-          // Обновляем статус дружбы из базы данных
-          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(newStatus);
+          // Сразу обновляем статус на 'none' для мгновенной обратной связи
+          setFriendshipStatus('none');
+          
           // Очищаем кеш статуса дружбы для этого игрока
           const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
           setFriendshipStatusCache(prev => {
@@ -1829,7 +1922,18 @@ export default function PlayerProfile() {
             delete updated[cacheKey];
             return updated;
           });
+          
           showCustomAlert(t('common.success'), t('profile.friendRequestCancelled'), 'info');
+          
+          // Обновляем статус из базы данных асинхронно (не блокируем UI)
+          setTimeout(async () => {
+            try {
+              const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+              setFriendshipStatus(newStatus);
+            } catch (error) {
+              console.error('⚠️ Ошибка обновления статуса дружбы (не критично):', error);
+            }
+          }, 300);
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
         }
@@ -1837,11 +1941,9 @@ export default function PlayerProfile() {
         // Принимаем запрос
         const success = await acceptFriendRequest(currentUser.id, player.id);
         if (success) {
-          // Небольшая задержка для обновления базы данных
-          await new Promise(resolve => setTimeout(resolve, 100));
-          // Обновляем статус дружбы из базы данных
-          const newStatus = await getFriendshipStatus(currentUser.id, player.id);
-          setFriendshipStatus(newStatus);
+          // Сразу обновляем статус на 'friends' для мгновенной обратной связи
+          setFriendshipStatus('friends');
+          
           // Очищаем кеш статуса дружбы для этого игрока
           const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
           setFriendshipStatusCache(prev => {
@@ -1849,7 +1951,12 @@ export default function PlayerProfile() {
             delete updated[cacheKey];
             return updated;
           });
-          // Очищаем кеш игрока и аватара перед обновлением данных, чтобы получить свежие данные с актуальным аватаром
+          
+          showCustomAlert(t('common.success'), t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 'success');
+          
+          // Очищаем кеш игрока и аватара асинхронно (не блокируем UI)
+          setTimeout(async () => {
+            try {
           await clearPlayerCache(player.id);
           // Также очищаем кеш аватара для этого игрока
           try {
@@ -1861,17 +1968,29 @@ export default function PlayerProfile() {
           }
           console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
           
-          showCustomAlert(t('common.success'), t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 'success');
+              // Обновляем статус из базы данных
+              const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+              setFriendshipStatus(newStatus);
+            } catch (error) {
+              console.error('⚠️ Ошибка обновления данных после принятия запроса (не критично):', error);
+            }
+          }, 300);
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
       }
       
-      // Обновляем данные игрока после изменения друзей (с задержкой, чтобы дать время БД синхронизироваться)
-      // Не обновляем статус дружбы здесь, так как он уже обновлен выше
+      // Обновляем данные игрока после изменения друзей (только для принятия запроса, где нужно обновить список друзей)
+      // Для других операций не нужно перезагружать все данные игрока
+      if (friendshipStatus === 'received_request') {
       setTimeout(async () => {
+          try {
         await loadPlayerData();
-      }, 200);
+          } catch (error) {
+            console.error('⚠️ Ошибка обновления данных игрока (не критично):', error);
+          }
+        }, 300);
+      }
     } catch (error) {
       console.error('❌ Ошибка управления друзьями:', error);
       showCustomAlert('Ошибка', 'Произошла ошибка при управлении друзьями', 'error');
@@ -2013,14 +2132,31 @@ export default function PlayerProfile() {
     try {
       const success = await declineFriendRequest(currentUser.id, player.id);
       if (success) {
+        // Сразу обновляем статус на 'none' для мгновенной обратной связи
         setFriendshipStatus('none');
+        
+        // Очищаем кеш статуса дружбы для этого игрока
+        const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+        setFriendshipStatusCache(prev => {
+          const updated = { ...prev };
+          delete updated[cacheKey];
+          return updated;
+        });
+        
         showCustomAlert('Запрос отклонен', 'Запрос дружбы отклонен', 'info');
+        
+        // Обновляем статус из базы данных асинхронно (не блокируем UI)
+        setTimeout(async () => {
+          try {
+            const newStatus = await getFriendshipStatus(currentUser.id, player.id);
+            setFriendshipStatus(newStatus);
+          } catch (error) {
+            console.error('⚠️ Ошибка обновления статуса дружбы (не критично):', error);
+          }
+        }, 300);
       } else {
         showCustomAlert('Ошибка', 'Не удалось отклонить запрос', 'error');
       }
-      
-      // Обновляем данные игрока после изменения друзей
-      await loadPlayerData();
     } catch (error) {
       console.error('Ошибка отклонения запроса дружбы:', error);
       showCustomAlert('Ошибка', 'Произошла ошибка при отклонении запроса', 'error');
@@ -2362,9 +2498,16 @@ export default function PlayerProfile() {
       // Отладочный лог отключен
       
       // Проверяем результат синхронизации команд
+      // ВАЖНО: Не прерываем сохранение остальных данных при ошибке команд
       if (!teamsSyncResult.success) {
-        showCustomAlert('Ошибка', teamsSyncResult.error || 'Неизвестная ошибка', 'error');
-        return;
+        console.error('❌ Ошибка синхронизации команд:', teamsSyncResult.error);
+        // Показываем предупреждение, но продолжаем сохранение остальных данных
+        showCustomAlert(
+          'Предупреждение', 
+          'Команды не удалось сохранить: ' + (teamsSyncResult.error || 'Неизвестная ошибка') + '. Остальные данные сохранены.',
+          'warning'
+        );
+        // НЕ возвращаемся - продолжаем сохранение остальных данных
       }
       
       
@@ -2763,22 +2906,28 @@ export default function PlayerProfile() {
 
     // Запрашиваем подтверждение
     showCustomAlert(
-      t('deleteUser'),
+      t('profile.deleteUser') || t('deleteUser'),
       t('profile.deleteUserConfirm', { name: player.name }),
       'warning',
       async () => {
         const success = await deletePlayer(player.id);
         if (success) {
             showCustomAlert(
-              t('success'), 
+              t('common.success') || t('success'), 
               t('profile.userDeleted', { name: player.name }),
               'success',
               () => router.push({ pathname: '/', params: { refresh: String(Date.now()) } })
             );
         } else {
-          showCustomAlert('Ошибка', 'Не удалось удалить пользователя', 'error');
+          showCustomAlert(
+            t('common.error') || 'Ошибка', 
+            t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
+            'error'
+          );
         }
-      }
+      },
+      true, // showCancel
+      () => {} // onCancel - просто закрывает диалог
     );
   };
 
@@ -2885,6 +3034,45 @@ export default function PlayerProfile() {
     }
   };
 
+  // Нормализуем id для проверки
+  const normalizedId = Array.isArray(id) ? id[0] : id;
+  
+  // Проверяем, является ли это профилем текущего пользователя
+  const isCurrentUserProfile = currentUser && normalizedId && currentUser.id === normalizedId;
+  
+  // Устанавливаем таймаут для автоматического редиректа, если игрок не найден
+  useEffect(() => {
+    if (!player && !loading && normalizedId) {
+      // Если игрок не найден и загрузка завершена, устанавливаем таймаут на 5 секунд
+      const timeout = setTimeout(async () => {
+        console.log('⏰ Таймаут: игрок не найден, выполняем редирект');
+        if (isCurrentUserProfile) {
+          try {
+            const { logoutUser } = await import('../../utils/playerStorage');
+            await logoutUser();
+            await refreshUser();
+          } catch (error) {
+            console.error('❌ Ошибка при выходе:', error);
+          }
+        }
+        router.replace('/');
+      }, 5000);
+      
+      setPlayerNotFoundTimeout(timeout);
+      
+      return () => {
+        clearTimeout(timeout);
+      };
+    } else {
+      // Если игрок найден или идет загрузка, очищаем таймаут
+      if (playerNotFoundTimeout) {
+        clearTimeout(playerNotFoundTimeout);
+        setPlayerNotFoundTimeout(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player, loading, normalizedId, isCurrentUserProfile]);
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -2900,9 +3088,6 @@ export default function PlayerProfile() {
       </View>
     );
   }
-
-  // Нормализуем id для проверки
-  const normalizedId = Array.isArray(id) ? id[0] : id;
   
   // Если player не загружен или его ID не совпадает с текущим - показываем loading
   if (!player || (normalizedId && player.id !== normalizedId)) {
@@ -2912,13 +3097,55 @@ export default function PlayerProfile() {
           <View style={styles.overlay}>
             {loading ? (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Загрузка...</Text>
+                <Text style={styles.errorText}>Загрузка профиля...</Text>
+                {isCurrentUserProfile && (
+                  <TouchableOpacity
+                    style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
+                    onPress={async () => {
+                      try {
+                        const { logoutUser } = await import('../../utils/playerStorage');
+                        await logoutUser();
+                        await refreshUser();
+                        router.replace('/');
+                      } catch (error) {
+                        console.error('❌ Ошибка при выходе:', error);
+                        router.replace('/');
+                      }
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Выйти из аккаунта</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             ) : (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
-                {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Player not found' : t('profile.playerNotFound')}
+                {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Игрок не найден' : t('profile.playerNotFound')}
               </Text>
+              {isCurrentUserProfile && (
+                <TouchableOpacity
+                  style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
+                  onPress={async () => {
+                    try {
+                      const { logoutUser } = await import('../../utils/playerStorage');
+                      await logoutUser();
+                      await refreshUser();
+                      router.replace('/');
+                    } catch (error) {
+                      console.error('❌ Ошибка при выходе:', error);
+                      router.replace('/');
+                    }
+                  }}
+                >
+                  <Text style={styles.buttonText}>Выйти из аккаунта</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[styles.button, { marginTop: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
+                onPress={() => router.replace('/')}
+              >
+                <Text style={styles.buttonText}>На главную</Text>
+              </TouchableOpacity>
             </View>
             )}
           </View>
@@ -2951,16 +3178,20 @@ export default function PlayerProfile() {
   return (
     <KeyboardAvoidingView 
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-          <ScrollView 
-            ref={scrollViewRef} 
-            contentContainerStyle={styles.scrollContainer}
-            keyboardShouldPersistTaps="handled"
-          >
+            <ScrollView 
+              ref={scrollViewRef} 
+              contentContainerStyle={styles.scrollContainer}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              onScrollBeginDrag={Keyboard.dismiss}
+            >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <View>
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               {/* Кнопка с 3 точками в правом верхнем углу профиля - показывается только для чужих профилей */}
@@ -3374,8 +3605,8 @@ export default function PlayerProfile() {
               </View>
             )}
 
-            {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) */}
-            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && 
+            {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) и администраторов */}
+            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' &&
              !(player.status === 'scout' && currentUser?.status !== 'admin') && (() => {
               // Определяем, является ли игрок вратарем (используем функцию нормализации)
               const currentPosition = editData.position || player.position;
@@ -4426,8 +4657,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция команд - не показываем для магазинов и заточки коньков */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && (() => {
+            {/* Секция команд - не показываем для магазинов, заточки коньков и администраторов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && (() => {
               const isOwner = currentUser && currentUser.id === player.id;
               return playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner;
             })() && (
@@ -4650,7 +4881,7 @@ export default function PlayerProfile() {
               );
             })()}
 
-            {/* Видео моментов - только для игроков (не тренеры) */}
+            {/* Видео моментов - только для игроков (не тренеры и не администраторы) */}
             {player.status === 'player' && (() => {
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
               const hasVideos = player.favoriteGoals && 
@@ -4685,6 +4916,49 @@ export default function PlayerProfile() {
                             newVideoFields[index] = { ...newVideoFields[index], url: text };
                             setVideoFields(newVideoFields);
                           }}
+                          onFocus={(e) => {
+                            activeInputRef.current = e.target as any;
+                            // Прокручиваем к полю при фокусе
+                            setTimeout(() => {
+                              if (scrollViewRef.current && e.target) {
+                                (e.target as any).measureLayout(
+                                  scrollViewRef.current as any,
+                                  (x: number, y: number, width: number, height: number) => {
+                                    const screenHeight = Dimensions.get('window').height;
+                                    const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                    const visibleArea = screenHeight - keyboardHeight;
+                                    const inputBottom = y + height;
+                                    const targetY = inputBottom - visibleArea + 200;
+                                    if (targetY > 0) {
+                                      scrollViewRef.current?.scrollTo({ 
+                                        y: targetY, 
+                                        animated: true 
+                                      });
+                                    }
+                                  },
+                                  () => {
+                                    // Fallback если measureLayout не работает
+                                    (e.target as any).measure((fx: number, fy: number, fw: number, fh: number, px: number, py: number) => {
+                                      const screenHeight = Dimensions.get('window').height;
+                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                      const visibleArea = screenHeight - keyboardHeight;
+                                      const inputBottom = py + fh;
+                                      const scrollOffset = inputBottom - visibleArea + 200;
+                                      if (scrollOffset > 0) {
+                                        scrollViewRef.current?.scrollTo({ 
+                                          y: scrollOffset, 
+                                          animated: true 
+                                        });
+                                      }
+                                    });
+                                  }
+                                );
+                              }
+                            }, 300);
+                          }}
+                          onBlur={() => {
+                            activeInputRef.current = null;
+                          }}
                           placeholder={t('videoUrlPlaceholder')}
                           placeholderTextColor="#888"
                         />
@@ -4699,6 +4973,33 @@ export default function PlayerProfile() {
                               const newVideoFields = [...videoFields];
                               newVideoFields[index] = { ...newVideoFields[index], hours: value };
                               setVideoFields(newVideoFields);
+                            }}
+                            onFocus={(e) => {
+                              activeInputRef.current = e.target as any;
+                              setTimeout(() => {
+                                if (scrollViewRef.current && e.target) {
+                                  (e.target as any).measureLayout(
+                                    scrollViewRef.current as any,
+                                    (x: number, y: number, width: number, height: number) => {
+                                      const screenHeight = Dimensions.get('window').height;
+                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                      const visibleArea = screenHeight - keyboardHeight;
+                                      const inputBottom = y + height;
+                                      const targetY = inputBottom - visibleArea + 200;
+                                      if (targetY > 0) {
+                                        scrollViewRef.current?.scrollTo({ 
+                                          y: targetY, 
+                                          animated: true 
+                                        });
+                                      }
+                                    },
+                                    () => {}
+                                  );
+                                }
+                              }, 300);
+                            }}
+                            onBlur={() => {
+                              activeInputRef.current = null;
                             }}
                             placeholder="0"
                             placeholderTextColor="#888"
@@ -4717,6 +5018,33 @@ export default function PlayerProfile() {
                               newVideoFields[index] = { ...newVideoFields[index], minutes: value };
                               setVideoFields(newVideoFields);
                           }}
+                            onFocus={(e) => {
+                              activeInputRef.current = e.target as any;
+                              setTimeout(() => {
+                                if (scrollViewRef.current && e.target) {
+                                  (e.target as any).measureLayout(
+                                    scrollViewRef.current as any,
+                                    (x: number, y: number, width: number, height: number) => {
+                                      const screenHeight = Dimensions.get('window').height;
+                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                      const visibleArea = screenHeight - keyboardHeight;
+                                      const inputBottom = y + height;
+                                      const targetY = inputBottom - visibleArea + 200;
+                                      if (targetY > 0) {
+                                        scrollViewRef.current?.scrollTo({ 
+                                          y: targetY, 
+                                          animated: true 
+                                        });
+                                      }
+                                    },
+                                    () => {}
+                                  );
+                                }
+                              }, 300);
+                            }}
+                            onBlur={() => {
+                              activeInputRef.current = null;
+                            }}
                             placeholder="0"
                           placeholderTextColor="#888"
                             keyboardType="numeric"
@@ -4733,6 +5061,33 @@ export default function PlayerProfile() {
                               const newVideoFields = [...videoFields];
                               newVideoFields[index] = { ...newVideoFields[index], seconds: value };
                               setVideoFields(newVideoFields);
+                            }}
+                            onFocus={(e) => {
+                              activeInputRef.current = e.target as any;
+                              setTimeout(() => {
+                                if (scrollViewRef.current && e.target) {
+                                  (e.target as any).measureLayout(
+                                    scrollViewRef.current as any,
+                                    (x: number, y: number, width: number, height: number) => {
+                                      const screenHeight = Dimensions.get('window').height;
+                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                      const visibleArea = screenHeight - keyboardHeight;
+                                      const inputBottom = y + height;
+                                      const targetY = inputBottom - visibleArea + 200;
+                                      if (targetY > 0) {
+                                        scrollViewRef.current?.scrollTo({ 
+                                          y: targetY, 
+                                          animated: true 
+                                        });
+                                      }
+                                    },
+                                    () => {}
+                                  );
+                                }
+                              }, 300);
+                            }}
+                            onBlur={() => {
+                              activeInputRef.current = null;
                             }}
                             placeholder="0"
                           placeholderTextColor="#888"
@@ -4811,8 +5166,8 @@ export default function PlayerProfile() {
               );
             })()}
 
-            {/* Фотографии - не показываем для звезд, для магазинов и заточки коньков доступны всем */}
-            {player.status !== 'star' && (() => {
+            {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
+            {player.status !== 'star' && player.status !== 'admin' && (() => {
               const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
               const canSeePhotos = (currentUser && currentUser.id === player.id) || 
                                    (currentUser?.status === 'admin') ||
@@ -4879,8 +5234,8 @@ export default function PlayerProfile() {
               );
             })()}
 
-            {/* Нормативы - показываем только игрокам (не тренерам), видно всем */}
-            {player && player.status === 'player' ? (
+            {/* Нормативы - показываем только игрокам (не тренерам и не администраторам), видно всем */}
+            {player && player.status === 'player' && player.status !== 'admin' ? (
               // Всегда показываем нормативы всем (убрана проверка дружбы)
                 // Для собственного профиля показываем всегда, для других - только если есть данные
                 (currentUser && currentUser.id === player.id) ||
@@ -5100,7 +5455,7 @@ export default function PlayerProfile() {
                                   </View>
                                 );
                             })()}
-                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && (
+                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && !isEditing && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
                           onPress={() => router.push('/puck-speed-sound')}
@@ -5118,7 +5473,7 @@ export default function PlayerProfile() {
                         <Text style={styles.puckSpeedEmptyText}>
                           {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
                         </Text>
-                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && (
+                      {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && !isEditing && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
                           onPress={() => router.push('/puck-speed-sound')}
@@ -5135,8 +5490,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца) */}
-            {player && (() => {
+            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца) и для администраторов */}
+            {player && player.status !== 'admin' && (() => {
               const hasExercises = player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0;
               const isOwner = currentUser && currentUser.id === player.id;
               return hasExercises || isOwner;
@@ -5150,8 +5505,8 @@ export default function PlayerProfile() {
               </SectionCard>
             )}
 
-            {/* Достижения - не показываем для магазинов и заточки коньков */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && canShowAchievements && (
+            {/* Достижения - не показываем для магазинов, заточки коньков и администраторов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && canShowAchievements && (
             <SectionCard ref={achievementsRef} wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>{t('profile.achievements')}</Text>
               <AchievementsSection 
@@ -5164,8 +5519,8 @@ export default function PlayerProfile() {
             )}
 
             {/* Музей игрока - полученные предметы */}
-            {/* Показываем музей только для обычных игроков, у звезд, тренеров, скаутов его быть не должно */}
-            {player && player.status === 'player' && (
+            {/* Показываем музей только для обычных игроков, у звезд, тренеров, скаутов и администраторов его быть не должно */}
+            {player && player.status === 'player' && player.status !== 'admin' && (
               (currentUser && currentUser.id === player.id) || 
               (currentUser?.status === 'admin') ||
               (currentUser?.status === 'star') ||
@@ -5373,6 +5728,8 @@ export default function PlayerProfile() {
                 </Text>
               </TouchableOpacity>
             )}
+              </>
+            )}
 
 
             {/* Основные кнопки управления профилем */}
@@ -5499,10 +5856,7 @@ export default function PlayerProfile() {
                 {/* Кнопка редактирования - на отдельной строке */}
                 <TouchableOpacity 
                   style={[styles.adminButton, styles.editButton, { marginBottom: 10, alignSelf: 'stretch' }]} 
-                  onPress={() => {
-                    setEditData(player);
-                    setIsEditing(true);
-                  }}
+                  onPress={handleStartEditing}
                 >
                   <Ionicons name="create-outline" size={20} color="rgb(1,0,0)" />
                   <Text style={[styles.adminButtonText, styles.editButtonText]}>{t('profile.edit')}</Text>
@@ -5621,11 +5975,10 @@ export default function PlayerProfile() {
               </View>
             )}
 
-              </>
-            )}
-
-          </ScrollView>
-        </View>
+              </View>
+            </TouchableWithoutFeedback>
+            </ScrollView>
+          </View>
       </CachedBackground>
       
       {/* Меню профиля */}
@@ -5880,7 +6233,7 @@ export default function PlayerProfile() {
       {!isEditing && currentUser && currentUser.id === player?.id && (
         <TouchableOpacity
           style={styles.floatingEditButton}
-          onPress={() => setIsEditing(true)}
+          onPress={handleStartEditing}
           activeOpacity={0.8}
         >
           <Ionicons name="create-outline" size={28} color="#fa2f40" />
@@ -6325,7 +6678,6 @@ export default function PlayerProfile() {
           </View>
         </Modal>
       )}
-
     </KeyboardAvoidingView>
   );
 }
@@ -6383,11 +6735,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   errorText: {
     color: '#fff',
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#fa2f40',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 200,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Gilroy-Bold',
   },
   profileSection: {
     alignItems: 'center',
@@ -7008,6 +7377,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 25,
     gap: 10,
+    marginTop: 15,
   },
   measureSpeedButtonText: {
     fontSize: 16,
@@ -7084,6 +7454,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: '#fa2f40',
+    zIndex: 1000,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,

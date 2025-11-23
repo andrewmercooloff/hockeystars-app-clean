@@ -22,7 +22,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   const [titlesLoading, setTitlesLoading] = useState(false);
 
   useEffect(() => {
-    if (isLanguageLoaded && language !== 'en') { // Не загружаем, пока язык не загрузился И не является английским по умолчанию
+    if (isLanguageLoaded) { // Загружаем упражнения, когда язык загружен (для всех языков, включая английский)
       loadExerciseStats();
     }
   }, [player.id, player.exerciseStats, language, isLanguageLoaded]); // Добавляем isLanguageLoaded в зависимости

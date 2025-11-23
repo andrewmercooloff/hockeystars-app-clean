@@ -118,92 +118,116 @@ async function sendActivationConfirmationEmail(
   }
 
   const supportEmail = 'support@hockey-stars.com'
+  const baseUrl = Deno.env.get('SITE_URL') || 'https://hockey-stars.com'
+  const logoUrl = `${baseUrl}/logo.png`
+  const privacyPolicyUrl = lang === 'ru' 
+    ? `${baseUrl}/rules.html`
+    : `${baseUrl}/privacy-en.html`
+  
   const emailContent = lang === 'ru' ? {
     subject: 'Аккаунт вашего ребенка в HockeyStars активирован',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-        <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fa2f40; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">HOCKEYSTARS</h1>
-          </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
+          <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
+            </div>
           
-          <h2 style="color: #333; margin-bottom: 20px;">Здравствуйте!</h2>
+          <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Здравствуйте!</h2>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Вы успешно дали согласие на создание аккаунта для вашего ребенка <strong>${childName}</strong>.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            Вы успешно дали согласие на создание аккаунта для вашего ребенка <strong style="color: #fff;">${childName}</strong>.
           </p>
           
-          <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <p style="color: #155724; margin: 0; font-weight: bold;">
+          <div style="background-color: rgba(212, 237, 218, 0.2); border: 1px solid rgba(195, 230, 203, 0.3); padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <p style="color: #4ade80; margin: 0; font-weight: bold; font-family: Arial, sans-serif;">
               ✅ Аккаунт активирован
             </p>
-            <p style="color: #155724; margin: 10px 0 0 0;">
+            <p style="color: #4ade80; margin: 10px 0 0 0; font-family: Arial, sans-serif;">
               Теперь ваш ребенок может войти в приложение и начать пользоваться HockeyStars.
             </p>
           </div>
           
-          <p style="color: #666; line-height: 1.6; margin-top: 30px;">
-            <strong>Важно:</strong> Если вы считаете, что это произошло по ошибке, или хотите отозвать согласие и удалить аккаунт ребенка, 
-            пожалуйста, свяжитесь с нами по адресу <a href="mailto:${supportEmail}" style="color: #fa2f40;">${supportEmail}</a>.
+          <p style="color: #999; line-height: 1.6; margin-top: 30px; font-family: Arial, sans-serif;">
+            <strong style="color: #ccc;">Важно:</strong> Если вы считаете, что это произошло по ошибке, или хотите отозвать согласие и удалить аккаунт ребенка, 
+            пожалуйста, свяжитесь с нами по адресу <a href="mailto:${supportEmail}" style="color: #fa2f40; text-decoration: underline;">${supportEmail}</a>.
           </p>
           
-          <p style="color: #666; line-height: 1.6;">
-            Вы также можете просмотреть нашу <a href="https://hockey-stars.com/rules.html" style="color: #fa2f40;">Политику конфиденциальности</a> 
+          <p style="color: #999; line-height: 1.6; font-family: Arial, sans-serif;">
+            Вы также можете просмотреть нашу <a href="${privacyPolicyUrl}" style="color: #fa2f40; text-decoration: underline;">Политику конфиденциальности</a> 
             в любое время.
           </p>
           
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px; margin: 0;">
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #999; font-size: 12px; margin: 0; font-family: Arial, sans-serif;">
               С уважением,<br>
               Команда HockeyStars<br>
-              <a href="mailto:${supportEmail}" style="color: #fa2f40;">${supportEmail}</a>
+              <a href="mailto:${supportEmail}" style="color: #fa2f40; text-decoration: underline;">${supportEmail}</a>
             </p>
           </div>
         </div>
       </div>
+      </body>
+      </html>
     `
   } : {
     subject: 'Your child\'s HockeyStars account has been activated',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-        <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fa2f40; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">HOCKEYSTARS</h1>
-          </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
+          <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
+            </div>
           
-          <h2 style="color: #333; margin-bottom: 20px;">Hello!</h2>
+          <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Hello!</h2>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            You have successfully given consent for your child <strong>${childName}</strong> to create an account.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            You have successfully given consent for your child <strong style="color: #fff;">${childName}</strong> to create an account.
           </p>
           
-          <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <p style="color: #155724; margin: 0; font-weight: bold;">
+          <div style="background-color: rgba(212, 237, 218, 0.2); border: 1px solid rgba(195, 230, 203, 0.3); padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <p style="color: #4ade80; margin: 0; font-weight: bold; font-family: Arial, sans-serif;">
               ✅ Account Activated
             </p>
-            <p style="color: #155724; margin: 10px 0 0 0;">
+            <p style="color: #4ade80; margin: 10px 0 0 0; font-family: Arial, sans-serif;">
               Your child can now log in to the app and start using HockeyStars.
             </p>
           </div>
           
-          <p style="color: #666; line-height: 1.6; margin-top: 30px;">
-            <strong>Important:</strong> If you believe this happened by mistake, or want to revoke consent and delete your child's account, 
-            please contact us at <a href="mailto:${supportEmail}" style="color: #fa2f40;">${supportEmail}</a>.
+          <p style="color: #999; line-height: 1.6; margin-top: 30px; font-family: Arial, sans-serif;">
+            <strong style="color: #ccc;">Important:</strong> If you believe this happened by mistake, or want to revoke consent and delete your child's account, 
+            please contact us at <a href="mailto:${supportEmail}" style="color: #fa2f40; text-decoration: underline;">${supportEmail}</a>.
           </p>
           
-          <p style="color: #666; line-height: 1.6;">
-            You can also review our <a href="https://hockey-stars.com/privacy-en.html" style="color: #fa2f40;">Privacy Policy</a> at any time.
+          <p style="color: #999; line-height: 1.6; font-family: Arial, sans-serif;">
+            You can also review our <a href="${privacyPolicyUrl}" style="color: #fa2f40; text-decoration: underline;">Privacy Policy</a> at any time.
           </p>
           
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px; margin: 0;">
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #999; font-size: 12px; margin: 0; font-family: Arial, sans-serif;">
               Best regards,<br>
               HockeyStars Team<br>
-              <a href="mailto:${supportEmail}" style="color: #fa2f40;">${supportEmail}</a>
+              <a href="mailto:${supportEmail}" style="color: #fa2f40; text-decoration: underline;">${supportEmail}</a>
             </p>
           </div>
         </div>
       </div>
+      </body>
+      </html>
     `
   }
 
@@ -277,7 +301,7 @@ serve(async (req) => {
     console.log('🔍 Ищем токен в таблице players:', token)
     const { data: playerData, error: playerError } = await supabase
       .from('players')
-      .select('id, name, parent_email, consent_token, consent_token_expires_at, status')
+      .select('id, name, parent_email, consent_token, consent_token_expires_at, status, language')
       .eq('consent_token', token)
       .single()
 
@@ -320,24 +344,43 @@ serve(async (req) => {
       console.log('✅ Аккаунт уже активирован')
       // Возвращаем страницу успеха, но без повторной активации
       const playerNameSafe = (playerData.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      const alreadyActivePage = `
-        <!DOCTYPE html>
-        <html lang="ru">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Аккаунт уже активирован - HockeyStars</title>
-          ${HTML_STYLES}
-        </head>
-        <body>
-          <div class="container">
-            <div class="success-icon">✅</div>
-            <h1>Аккаунт уже активирован</h1>
-            <p>Аккаунт вашего ребенка <strong>${playerNameSafe}</strong> уже был активирован ранее.</p>
-            <p>Ваш ребенок может войти в приложение HockeyStars.</p>
-          </div>
-        </body>
-        </html>
+      const playerLang = playerData.language || 'en'
+      const alreadyActivePage = playerLang === 'ru' ? `
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Аккаунт уже активирован - HockeyStars</title>
+        ${HTML_STYLES}
+      </head>
+      <body>
+        <div class="container">
+          <div class="success-icon">✅</div>
+          <h1>Аккаунт уже активирован</h1>
+          <p>Аккаунт вашего ребенка <strong>${playerNameSafe}</strong> уже был активирован ранее.</p>
+          <p>Ваш ребенок может войти в приложение HockeyStars.</p>
+        </div>
+      </body>
+      </html>
+      ` : `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Already Activated - HockeyStars</title>
+        ${HTML_STYLES}
+      </head>
+      <body>
+        <div class="container">
+          <div class="success-icon">✅</div>
+          <h1>Account Already Activated</h1>
+          <p>Your child's account <strong>${playerNameSafe}</strong> has already been activated previously.</p>
+          <p>Your child can now log in to the HockeyStars app.</p>
+        </div>
+      </body>
+      </html>
       `
       return new Response(alreadyActivePage, {
         status: 200,
@@ -371,7 +414,7 @@ serve(async (req) => {
         // parent_email оставляем для истории (можно удалить, если нужно)
       })
       .eq('id', playerData.id)
-      .select('id, name, parent_email, status')
+      .select('id, name, parent_email, status, language')
       .single()
 
     if (updateError || !updatedPlayer) {
@@ -386,10 +429,14 @@ serve(async (req) => {
 
     // Отправляем второе письмо (Email-Plus) - не критично, если не отправится
     try {
+      // Получаем язык игрока из БД
+      const playerLang = updatedPlayer.language || playerData.language || 'en'
+      console.log(`📧 Отправляем confirmation email на языке: ${playerLang}`)
+      
       const emailResult = await sendActivationConfirmationEmail(
         playerData.parent_email || updatedPlayer.parent_email,
         playerData.name || updatedPlayer.name,
-        'ru'
+        playerLang
       )
 
       if (!emailResult.success) {
@@ -421,7 +468,8 @@ serve(async (req) => {
 
     // Возвращаем HTML страницу успеха
     const playerName = (updatedPlayer.name || playerData.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    const successPage = `
+    const playerLang = updatedPlayer.language || playerData.language || 'en'
+    const successPage = playerLang === 'ru' ? `
       <!DOCTYPE html>
       <html lang="ru">
       <head>
@@ -445,6 +493,30 @@ serve(async (req) => {
         </div>
       </body>
       </html>
+    ` : `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Consent Confirmed - HockeyStars</title>
+        ${HTML_STYLES}
+      </head>
+      <body>
+        <div class="container">
+          <div class="success-icon">✅</div>
+          <h1>Consent Confirmed!</h1>
+          <p>Thank you! You have successfully confirmed consent to create an account for your child <strong>${playerName}</strong>.</p>
+          <div class="info-box">
+            <p style="margin: 0;"><strong>Account Activated</strong></p>
+            <p style="margin: 10px 0 0 0; font-size: 14px;">Your child can now log in to the HockeyStars app.</p>
+          </div>
+          <p style="font-size: 14px; color: #aaaaaa;">
+            If you have any questions, please contact us: <a href="mailto:support@hockey-stars.com">support@hockey-stars.com</a>
+          </p>
+        </div>
+      </body>
+      </html>
     `
 
     return new Response(successPage, {
@@ -463,7 +535,7 @@ serve(async (req) => {
       try {
         const { data: checkPlayer } = await supabase
           .from('players')
-          .select('id, name, status')
+          .select('id, name, status, language')
           .eq('consent_token', token)
           .or('status.eq.active,status.eq.pending_verification')
           .single()
@@ -471,7 +543,9 @@ serve(async (req) => {
         // Если аккаунт активен, возвращаем страницу успеха
         if (checkPlayer && checkPlayer.status === 'active') {
           const playerName = (checkPlayer.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-          const successPage = `
+          const playerLang = checkPlayer.language || 'en'
+          
+          const successPage = playerLang === 'ru' ? `
             <!DOCTYPE html>
             <html lang="ru">
             <head>
@@ -486,6 +560,24 @@ serve(async (req) => {
                 <h1>Согласие подтверждено!</h1>
                 <p>Аккаунт вашего ребенка <strong>${playerName}</strong> активирован.</p>
                 <p>Теперь ваш ребенок может войти в приложение HockeyStars.</p>
+              </div>
+            </body>
+            </html>
+          ` : `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Consent Confirmed - HockeyStars</title>
+              ${HTML_STYLES}
+            </head>
+            <body>
+              <div class="container">
+                <div class="success-icon">✅</div>
+                <h1>Consent Confirmed!</h1>
+                <p>Your child's account <strong>${playerName}</strong> has been activated.</p>
+                <p>Your child can now log in to the HockeyStars app.</p>
               </div>
             </body>
             </html>

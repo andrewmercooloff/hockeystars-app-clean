@@ -273,6 +273,11 @@ export class ExerciseService {
         .single();
 
       if (error) {
+        // PGRST116 означает, что пользователь не найден или нет данных - это нормально
+        if (error.code === 'PGRST116') {
+          console.log('💪 Пользователь не найден или нет статистики упражнений, возвращаем пустой объект');
+          return {};
+        }
         console.error('❌ Error fetching user exercise stats:', error);
         throw error;
       }

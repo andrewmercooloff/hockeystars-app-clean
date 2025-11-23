@@ -271,12 +271,13 @@ export default function RootLayout() {
   const loadNotificationCount = React.useCallback(async (userId: string, skipUpdateIfSame: boolean = false) => {
     try {
       // Пересчитываем реальное количество непрочитанных уведомлений
+      // Исключаем типы уведомлений, которые не должны учитываться в счетчике
       const { count } = await supabase
         .from('notifications')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('is_read', false)
-        .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
+        .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite,new_friendship)');
       
       const realCount = count || 0;
       

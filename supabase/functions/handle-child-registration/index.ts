@@ -17,6 +17,8 @@ interface ChildRegistrationRequest {
   position?: string
   team?: string
   userStatus?: string // Исходный статус пользователя (player/star) - будет восстановлен при активации
+  language?: string // Язык приложения пользователя (ru, en, и т.д.)
+  avatar?: string // URL аватара (если загружен)
   // Поля для повторной отправки
   resend?: boolean
   token?: string
@@ -27,13 +29,35 @@ function generateConsentToken(): string {
   return crypto.randomUUID() + '-' + Date.now().toString(36)
 }
 
-// Определение языка на основе страны
-function determineLanguage(country?: string): string {
-  // Для России и Беларуси - русский, для остальных - английский
+// Определение языка на основе языка приложения или страны
+function determineLanguage(appLanguage?: string, country?: string): string {
+  console.log(`📧 determineLanguage called:`);
+  console.log(`📧   - appLanguage: ${appLanguage}`);
+  console.log(`📧   - appLanguage type: ${typeof appLanguage}`);
+  console.log(`📧   - appLanguage === 'en': ${appLanguage === 'en'}`);
+  console.log(`📧   - appLanguage === 'ru': ${appLanguage === 'ru'}`);
+  console.log(`📧   - appLanguage truthy?: ${!!appLanguage}`);
+  console.log(`📧   - country: ${country}`);
+  
+  // Если передан язык приложения, используем его (но только ru или en для писем)
+  if (appLanguage) {
+    // Если язык русский - используем русский
+    if (appLanguage === 'ru') {
+      console.log('📧 Determined language: ru (from appLanguage)');
+      return 'ru';
+    }
+    // Для всех остальных языков (en, de, fr, и т.д.) используем английский
+    console.log(`📧 Determined language: en (from appLanguage, was: ${appLanguage})`);
+    return 'en';
+  }
+  
+  // Fallback: определяем по стране, если язык не передан
   const russianSpeakingCountries = ['Россия', 'Беларусь', 'Russia', 'Belarus', 'RU', 'BY'];
   if (country && russianSpeakingCountries.includes(country)) {
+    console.log(`📧 Determined language: ru (from country fallback: ${country})`);
     return 'ru';
   }
+  console.log(`📧 Determined language: en (default fallback, country: ${country || 'не указана'})`);
   return 'en';
 }
 
@@ -51,109 +75,142 @@ async function sendParentalConsentEmail(
 
   const baseUrl = Deno.env.get('SITE_URL') || 'https://hockey-stars.com'
   // URL для подтверждения через публичную страницу на сайте
-  const consentUrl = `${baseUrl}/verify-consent.html?token=${consentToken}`
+  // Добавляем параметр lang для правильной локализации страницы
+  const consentUrl = `${baseUrl}/verify-consent.html?token=${consentToken}&lang=${lang}`
+  // URL логотипа - используем абсолютный URL
+  // ВАЖНО: Используем полный URL с протоколом для корректной загрузки в почтовых клиентах
+  const logoUrl = `${baseUrl}/logo.png`
+  
+  console.log(`📧 sendParentalConsentEmail called:`)
+  console.log(`📧   - lang: ${lang}`)
+  console.log(`📧   - logoUrl: ${logoUrl}`)
+  console.log(`📧   - baseUrl: ${baseUrl}`)
+  console.log(`📧   - parentEmail: ${parentEmail}`)
+  console.log(`📧   - childName: ${childName}`)
 
+  // Определяем URL политики конфиденциальности в зависимости от языка
   const privacyPolicyUrl = lang === 'ru' 
     ? `${baseUrl}/rules.html`
     : `${baseUrl}/privacy-en.html`
 
+  console.log(`📧 Определение содержимого письма: lang=${lang}, lang === 'ru': ${lang === 'ru'}`)
+  
+  // Используем двуязычный формат писем
   const emailContent = lang === 'ru' ? {
     subject: 'Требуется ваше согласие для регистрации ребенка в HockeyStars',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-        <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fa2f40; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">HOCKEYSTARS</h1>
-          </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
+          <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
+            </div>
           
-          <h2 style="color: #333; margin-bottom: 20px;">Здравствуйте!</h2>
+          <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Здравствуйте!</h2>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Ваш ребенок <strong>${childName}</strong> хочет создать аккаунт в приложении HockeyStars — социальной сети для юных хоккеистов.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            Ваш ребенок <strong style="color: #fff;">${childName}</strong> хочет создать аккаунт в приложении HockeyStars — социальной сети для юных хоккеистов.
           </p>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            В соответствии с законом COPPA, для пользователей младше 13 лет требуется верифицированное согласие родителей. 
-            Мы собираем следующие данные: имя, возраст, игровая статистика, фото и видео.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            В соответствии с законом COPPA, для пользователей младше 13 лет требуется подтвержденное согласие родителей. 
+            Мы собираем следующие данные: имя, возраст, игровая статистика, фотографии и видео.
           </p>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Пожалуйста, ознакомьтесь с нашей полной <a href="${privacyPolicyUrl}" style="color: #fa2f40;">Политикой конфиденциальности</a>.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            Пожалуйста, ознакомьтесь с нашей <a href="${privacyPolicyUrl}" style="color: #fa2f40; text-decoration: underline;">Политикой конфиденциальности</a>.
           </p>
           
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0;">
-            <p style="color: #333; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+          <div style="background-color: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <p style="color: #fff; margin: 0 0 15px 0; font-size: 16px; font-weight: bold; font-family: Arial, sans-serif;">
               Чтобы дать согласие на создание аккаунта, пожалуйста, перейдите по ссылке ниже:
             </p>
             <a href="${consentUrl}" 
-               style="display: inline-block; background-color: #fa2f40; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0;">
+               style="display: inline-block; background-color: #fa2f40; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; font-family: Arial, sans-serif;">
               Подтвердить согласие
             </a>
           </div>
           
-          <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px;">
-            <strong>Важно:</strong> Ссылка действительна в течение <strong>24 часов</strong>.<br>
+          <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px; font-family: Arial, sans-serif;">
+            <strong style="color: #ccc;">Важно:</strong> Ссылка действительна в течение <strong style="color: #fff;">24 часов</strong>.<br>
             Если вы не давали разрешения, просто проигнорируйте это письмо. Аккаунт не будет создан без вашего подтверждения.
           </p>
           
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px; margin: 0;">
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #999; font-size: 12px; margin: 0; font-family: Arial, sans-serif;">
               С уважением,<br>
               Команда HockeyStars<br>
-              <a href="mailto:support@hockey-stars.com" style="color: #fa2f40;">support@hockey-stars.com</a>
+              <a href="mailto:support@hockey-stars.com" style="color: #fa2f40; text-decoration: underline;">support@hockey-stars.com</a>
             </p>
           </div>
         </div>
       </div>
+      </body>
+      </html>
     `
   } : {
     subject: 'Parental Consent Required for HockeyStars Registration',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-        <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fa2f40; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">HOCKEYSTARS</h1>
-          </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
+          <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
+            </div>
           
-          <h2 style="color: #333; margin-bottom: 20px;">Hello!</h2>
+          <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif;">Hello!</h2>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Your child <strong>${childName}</strong> wants to create an account in the HockeyStars app — a social network for young hockey players.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            Your child <strong style="color: #fff;">${childName}</strong> wants to create an account in the HockeyStars app — a social network for young hockey players.
           </p>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
             In accordance with COPPA law, verified parental consent is required for users under 13 years of age. 
             We collect the following data: name, age, game statistics, photos and videos.
           </p>
           
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Please review our full <a href="${privacyPolicyUrl}" style="color: #fa2f40;">Privacy Policy</a>.
+          <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif;">
+            Please review our full <a href="${privacyPolicyUrl}" style="color: #fa2f40; text-decoration: underline;">Privacy Policy</a>.
           </p>
           
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0;">
-            <p style="color: #333; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+          <div style="background-color: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <p style="color: #fff; margin: 0 0 15px 0; font-size: 16px; font-weight: bold; font-family: Arial, sans-serif;">
               To give consent for account creation, please click the link below:
             </p>
             <a href="${consentUrl}" 
-               style="display: inline-block; background-color: #fa2f40; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0;">
+               style="display: inline-block; background-color: #fa2f40; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; font-family: Arial, sans-serif;">
               Confirm Consent
             </a>
           </div>
           
-          <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px;">
-            <strong>Important:</strong> The link is valid for <strong>24 hours</strong>.<br>
+          <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px; font-family: Arial, sans-serif;">
+            <strong style="color: #ccc;">Important:</strong> The link is valid for <strong style="color: #fff;">24 hours</strong>.<br>
             If you did not give permission, simply ignore this email. The account will not be created without your confirmation.
           </p>
           
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px; margin: 0;">
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #999; font-size: 12px; margin: 0; font-family: Arial, sans-serif;">
               Best regards,<br>
               HockeyStars Team<br>
-              <a href="mailto:support@hockey-stars.com" style="color: #fa2f40;">support@hockey-stars.com</a>
+              <a href="mailto:support@hockey-stars.com" style="color: #fa2f40; text-decoration: underline;">support@hockey-stars.com</a>
             </p>
           </div>
         </div>
       </div>
+      </body>
+      </html>
     `
   }
 
@@ -168,7 +225,12 @@ async function sendParentalConsentEmail(
       html: emailContent.html
     }
     
-    console.log(`📧 Email payload:`, JSON.stringify({ ...emailPayload, html: '[HTML content]' }))
+    console.log(`📧 Email payload (без HTML):`, JSON.stringify({ ...emailPayload, html: '[HTML content]' }))
+    console.log(`📧 Email HTML содержит logoUrl: ${emailContent.html.includes(logoUrl)}`)
+    console.log(`📧 Email HTML содержит русский текст: ${emailContent.html.includes('Здравствуйте')}`)
+    console.log(`📧 Email HTML содержит английский текст: ${emailContent.html.includes('Hello')}`)
+    console.log(`📧 Email subject: ${emailContent.subject}`)
+    console.log(`📧 КРИТИЧЕСКАЯ ПРОВЕРКА: lang=${lang}, subject содержит 'Требуется' (ru): ${emailContent.subject.includes('Требуется')}, subject содержит 'Required' (en): ${emailContent.subject.includes('Required')}`)
     
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -209,18 +271,27 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player', resend, token }: ChildRegistrationRequest = await req.json()
+    const requestBody = await req.json()
+    console.log(`📧 Получен запрос:`, JSON.stringify({ ...requestBody, phone: requestBody.phone ? '[phone]' : undefined }))
+    console.log(`📧 ПРОВЕРКА language в запросе: requestBody.language = ${requestBody.language}, type = ${typeof requestBody.language}`)
+    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player', language, avatar, resend, token }: ChildRegistrationRequest = requestBody
+    console.log(`📧 Распарсенные параметры: language=${language}, country=${country}, userStatus=${userStatus}, avatar=${avatar ? 'есть' : 'нет'}`)
+    console.log(`📧 ПРОВЕРКА после деструктуризации: language = ${language}, type = ${typeof language}, undefined? ${language === undefined}, null? ${language === null}`)
+    console.log(`📧 ПРОВЕРКА аватара: avatar = ${avatar}, type = ${typeof avatar}, undefined? ${avatar === undefined}, null? ${avatar === null}, empty? ${avatar === ''}`)
 
     // Обработка повторной отправки письма
     if (resend && token) {
+      console.log(`📧 Повторная отправка письма: language=${language}, country=${country}`)
       // Находим игрока по токену или по email родителя и имени
       const { data: player, error: findError } = await supabase
         .from('players')
-        .select('id, name, parent_email, country, status')
+        .select('id, name, parent_email, country, status, language')
         .eq('parent_email', parentEmail)
         .eq('name', name)
         .eq('status', 'pending_verification')
         .maybeSingle()
+      
+      console.log(`📧 Найденный игрок:`, player ? { id: player.id, name: player.name, country: player.country, language: player.language } : 'не найден')
 
       if (findError || !player) {
         return new Response(
@@ -247,7 +318,11 @@ serve(async (req) => {
       }
 
       // Определяем язык и отправляем письмо
-      const emailLang = determineLanguage(player.country || country)
+      // Используем язык из запроса, если он есть, иначе из БД, иначе определяем по стране
+      const playerLanguage = language || player.language
+      console.log(`📧 Язык для повторной отправки: language из запроса=${language}, language из БД=${player.language}, итоговый=${playerLanguage}`)
+      const emailLang = determineLanguage(playerLanguage, player.country || country)
+      console.log(`📧 Определенный язык письма: ${emailLang}`)
       const emailResult = await sendParentalConsentEmail(parentEmail, player.name, token, emailLang)
 
       if (!emailResult.success) {
@@ -298,7 +373,7 @@ serve(async (req) => {
 
     if (existingPlayer) {
       return new Response(
-        JSON.stringify({ error: 'Пользователь с таким телефоном уже существует' }),
+        JSON.stringify({ error: 'Этот номер уже зарегистрирован. Попробуйте войти', code: 'PHONE_ALREADY_EXISTS' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -339,6 +414,9 @@ serve(async (req) => {
     // Это временное решение, пока не добавим отдельное поле user_type в схему БД
     const teamWithStatus = team ? `${team}|${userStatus}` : `|${userStatus}`
     
+    // Определяем язык для сохранения в БД (если передан, иначе определяем по стране)
+    const playerLanguage = language || determineLanguage(undefined, country)
+    
     const { data: playerData, error: insertError } = await supabase
       .from('players')
       .insert({
@@ -353,7 +431,9 @@ serve(async (req) => {
         status: 'pending_verification',
         parent_email: parentEmail,
         consent_token: consentToken,
-        consent_token_expires_at: expiresAt
+        consent_token_expires_at: expiresAt,
+        language: playerLanguage, // Сохраняем язык в БД
+        avatar: avatar || null // Сохраняем аватар, если он был загружен
       })
       .select()
       .single()
@@ -380,9 +460,26 @@ serve(async (req) => {
       .single()
     console.log('🔍 Проверка сохраненного токена:', verifyToken)
 
-    // Определяем язык письма на основе страны
-    const emailLang = determineLanguage(country)
-    console.log(`📧 Отправляем письмо родителю на ${parentEmail} для ребенка ${name}, язык: ${emailLang}`)
+    // Определяем язык письма на основе языка приложения или страны
+    console.log(`📧 ПЕРЕД определением языка:`)
+    console.log(`📧   - language parameter: ${language}`)
+    console.log(`📧   - country parameter: ${country}`)
+    console.log(`📧   - language type: ${typeof language}`)
+    console.log(`📧   - language value: ${JSON.stringify(language)}`)
+    console.log(`📧   - language === 'en': ${language === 'en'}`)
+    console.log(`📧   - language === 'ru': ${language === 'ru'}`)
+    console.log(`📧   - language truthy?: ${!!language}`)
+    
+    const emailLang = determineLanguage(language, country)
+    
+    console.log(`📧 ПОСЛЕ определения языка:`)
+    console.log(`📧   - emailLang: ${emailLang}`)
+    console.log(`📧   - emailLang === 'ru': ${emailLang === 'ru'}`)
+    console.log(`📧   - emailLang === 'en': ${emailLang === 'en'}`)
+    console.log(`📧   - Отправляем письмо родителю на ${parentEmail} для ребенка ${name}`)
+    console.log(`📧   - Язык приложения: ${language || 'не указан'}`)
+    console.log(`📧   - Язык письма: ${emailLang}`)
+    
     const emailResult = await sendParentalConsentEmail(parentEmail, name, consentToken, emailLang)
 
     if (!emailResult.success) {

@@ -2,10 +2,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { COUNTRIES } from '../utils/constants';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUser } from '../contexts/UserContext';
 import {
     Alert,
+    Dimensions,
     Image,
     ImageBackground,
     Keyboard,
@@ -40,7 +42,8 @@ const availableSkateServices = [
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { refreshUser } = useUser();
   const [formData, setFormData] = useState({
     phone: '',
     name: '',
@@ -76,6 +79,63 @@ export default function RegisterScreen() {
   const [countrySearchText, setCountrySearchText] = useState('');
   const [skateServices, setSkateServices] = useState<string[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  
+  // Refs для обработки клавиатуры
+  const scrollViewRef = useRef<ScrollView>(null);
+  const codeInputRef = useRef<TextInput>(null);
+  
+  // Глобальный слушатель клавиатуры для прокрутки к полю ввода кода
+  useEffect(() => {
+    if (step !== 'verification') return;
+    
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        const keyboardHeight = e.endCoordinates?.height || 0;
+        setTimeout(() => {
+          if (codeInputRef.current && scrollViewRef.current) {
+            // Используем measureLayout для получения позиции относительно ScrollView
+            codeInputRef.current.measureLayout(
+              scrollViewRef.current as any,
+              (x, y, width, height) => {
+                const screenHeight = Dimensions.get('window').height;
+                const visibleArea = screenHeight - keyboardHeight;
+                const inputBottom = y + height;
+                const targetY = inputBottom - visibleArea + 130;
+                
+                if (targetY > 0) {
+                  scrollViewRef.current?.scrollTo({ 
+                    y: targetY, 
+                    animated: true 
+                  });
+                }
+              },
+              () => {
+                // Fallback: используем measure если measureLayout не работает
+                codeInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                  const screenHeight = Dimensions.get('window').height;
+                  const visibleArea = screenHeight - keyboardHeight;
+                  const inputBottom = pageY + height;
+                  const scrollOffset = inputBottom - visibleArea + 130;
+                  
+                  if (scrollOffset > 0) {
+                    scrollViewRef.current?.scrollTo({ 
+                      y: scrollOffset, 
+                      animated: true 
+                    });
+                  }
+                });
+              }
+            );
+          }
+        }, Platform.OS === 'ios' ? 100 : 300);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+    };
+  }, [step]);
   
   const filteredCountries = COUNTRIES.filter(country =>
     country.toLowerCase().includes(countrySearchText.toLowerCase())
@@ -340,8 +400,8 @@ export default function RegisterScreen() {
       if (age < 13) {
         if (!formData.parentEmail || !formData.parentEmail.trim()) {
           showAlert(
-            'Требуется согласие родителя',
-            'Для регистрации детей младше 13 лет необходимо указать email одного из родителей. Родитель получит письмо с запросом на подтверждение согласия.',
+            t('register.parentalConsentRequired') || 'Требуется согласие родителя',
+            t('register.parentalConsentMessage') || 'Для регистрации детей младше 13 лет необходимо указать email одного из родителей. Родитель получит письмо с запросом на подтверждение согласия.',
             'warning'
           );
           return;
@@ -470,6 +530,20 @@ export default function RegisterScreen() {
       if (needsParentalConsent && formData.parentEmail) {
         // Регистрация ребенка < 13 лет - требуется родительское согласие
         console.log('👶 Регистрация ребенка < 13 лет, запрашиваем согласие родителя');
+        console.log(`🌐 Текущий язык приложения: ${language}`);
+        
+        // Загружаем аватар в Supabase Storage, если он есть (ТАКЖЕ для детей младше 13 лет!)
+        let avatarUrl = formData.avatar || '';
+        if (formData.avatar && (formData.avatar.startsWith('file://') || formData.avatar.startsWith('content://'))) {
+          console.log('📤 Загружаем аватар в Supabase Storage для ребенка < 13 лет...');
+          const uploadedUrl = await uploadImageToStorage(formData.avatar);
+          if (uploadedUrl) {
+            avatarUrl = uploadedUrl;
+            console.log('✅ Аватар загружен для ребенка:', uploadedUrl);
+          } else {
+            console.warn('⚠️ Не удалось загрузить аватар, продолжаем без него');
+          }
+        }
         
         const consentResult = await registerChildWithParentalConsent(
           formData.phone,
@@ -479,18 +553,24 @@ export default function RegisterScreen() {
           formData.country,
           formData.position,
           formData.team,
-          formData.status // Передаем исходный статус пользователя
+          formData.status, // Передаем исходный статус пользователя
+          language, // Передаем язык приложения
+          avatarUrl // Передаем загруженный аватар
         );
         
         if (!consentResult.success) {
-          showAlert('Ошибка', consentResult.error || 'Не удалось отправить запрос родительского согласия', 'error');
+          showAlert(
+            t('common.error') || 'Ошибка', 
+            consentResult.error || (t('register.parentalConsentError') || 'Не удалось отправить запрос родительского согласия'), 
+            'error'
+          );
           return;
         }
         
         // Показываем экран ожидания подтверждения
         showAlert(
-          'Запрос отправлен родителю',
-          `Мы отправили письмо на адрес ${formData.parentEmail.trim()} с запросом на подтверждение согласия. После того как родитель подтвердит согласие, вы сможете войти в приложение.`,
+          t('register.parentalConsentSent') || 'Запрос отправлен родителю',
+          (t('register.parentalConsentSentMessage') || `Мы отправили письмо на адрес ${formData.parentEmail.trim()} с запросом на подтверждение согласия. После того как родитель подтвердит согласие, вы сможете войти в приложение.`).replace('{{email}}', formData.parentEmail.trim()),
           'info',
           () => {
             setAlert(prev => ({ ...prev, visible: false }));
@@ -517,11 +597,17 @@ export default function RegisterScreen() {
         }
       }
       
+      console.log('📋 Формируем данные игрока:', {
+        status: formData.status,
+        avatar: avatarUrl ? (avatarUrl.substring(0, 50) + '...') : 'нет',
+        team: formData.team
+      });
+      
       const playerData = {
         id: Date.now().toString(),
         phone: formData.phone,
         name: formData.name,
-        status: formData.status,
+        status: formData.status || 'player', // Убеждаемся, что статус есть
         birthDate: formData.birthDate || '',
         country: formData.country,
         team: formData.team || '',
@@ -555,13 +641,35 @@ export default function RegisterScreen() {
         } : {})
       };
       
+      console.log('📋 Данные игрока перед созданием:', {
+        name: playerData.name,
+        status: playerData.status,
+        avatar: playerData.avatar ? (playerData.avatar.substring(0, 50) + '...') : 'нет'
+      });
+      
       const newPlayer = await createPlayer(playerData);
       
       if (newPlayer) {
-        await saveCurrentUser(newPlayer);
-      } else {
-        // Fallback - сохраняем локально
-        await saveCurrentUser(playerData);
+        console.log('✅ Игрок создан, полученные данные:', {
+          id: newPlayer.id,
+          name: newPlayer.name,
+          status: newPlayer.status,
+          avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
+        });
+      }
+      
+      const playerToSave = newPlayer || playerData;
+      
+      if (playerToSave) {
+        await saveCurrentUser(playerToSave);
+        
+        // Обновляем контекст пользователя для немедленного обновления интерфейса
+        try {
+          await refreshUser(true); // forceRefresh = true
+          console.log('✅ Контекст пользователя обновлен после регистрации');
+        } catch (contextError) {
+          console.warn('⚠️ Не удалось обновить контекст пользователя:', contextError);
+        }
       }
       
       showAlert(
@@ -571,14 +679,25 @@ export default function RegisterScreen() {
         () => {
           setAlert(prev => ({ ...prev, visible: false }));
           setTimeout(() => {
-            router.push('/');
+            // Переходим на главную с параметром refresh для обновления списка игроков
+            router.replace({ pathname: '/', params: { refresh: String(Date.now()) } });
           }, 100);
         }
       );
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Ошибка регистрации:', error);
-      showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
+      // Проверяем, является ли это ошибкой о существующем номере телефона
+      if (error.message === 'PHONE_ALREADY_EXISTS' || 
+          error.message?.includes('уже зарегистрирован') || 
+          error.message?.includes('уже существует') ||
+          error.message?.includes('already exists') ||
+          error.message?.includes('already registered') ||
+          (error.code === '23505' && formData.phone)) {
+        showAlert('Ошибка', 'Этот номер уже зарегистрирован. Попробуйте войти', 'error');
+      } else {
+        showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -598,6 +717,7 @@ export default function RegisterScreen() {
   return (
     <ImageBackground source={iceBg} style={styles.container} resizeMode="cover">
       <ScrollView 
+        ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
@@ -695,7 +815,7 @@ export default function RegisterScreen() {
                   styles.pickerOptionText,
                   formData.status === 'skateSharpening' && styles.pickerOptionTextSelected
                 ]}>
-                  Заточка коньков
+                  {t('register.skateSharpening')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -814,10 +934,10 @@ export default function RegisterScreen() {
           {formData.status === 'player' && formData.birthDate && requiresParentalConsent(formData.birthDate) && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
-                Email родителя <Text style={{color: '#fa2f40'}}>*</Text>
+                {t('register.parentEmail') || 'Email родителя'} <Text style={{color: '#fa2f40'}}>*</Text>
               </Text>
               <Text style={[styles.label, {fontSize: 12, color: '#aaa', marginBottom: 8}]}>
-                Для регистрации детей младше 13 лет требуется согласие родителя. Родитель получит письмо с запросом на подтверждение.
+                {t('register.parentalConsentHint') || 'Для регистрации детей младше 13 лет требуется согласие родителя. Родитель получит письмо с запросом на подтверждение.'}
               </Text>
               <TextInput
                 style={styles.input}
@@ -901,20 +1021,23 @@ export default function RegisterScreen() {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>{t('register.grip')}</Text>
               <View style={styles.pickerContainer}>
-                {['Левый', 'Правый'].map((grip) => (
+                {[
+                  { key: 'Левый', translation: t('common.left') },
+                  { key: 'Правый', translation: t('common.right') }
+                ].map((grip) => (
                   <TouchableOpacity
-                    key={grip}
+                    key={grip.key}
                     style={[
                       styles.pickerOption,
-                      formData.grip === grip && styles.pickerOptionSelected
+                      formData.grip === grip.key && styles.pickerOptionSelected
                     ]}
-                    onPress={() => setFormData({...formData, grip: grip})}
+                    onPress={() => setFormData({...formData, grip: grip.key})}
                   >
                     <Text style={[
                       styles.pickerOptionText,
-                      formData.grip === grip && styles.pickerOptionTextSelected
+                      formData.grip === grip.key && styles.pickerOptionTextSelected
                     ]}>
-                      {grip}
+                      {grip.translation}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -1132,6 +1255,7 @@ export default function RegisterScreen() {
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>{t('auth.code')}</Text>
                 <TextInput
+                  ref={codeInputRef}
                   style={[styles.input, styles.codeInput]}
                   value={verificationCode}
                   onChangeText={(text) => setVerificationCode(text.replace(/[^0-9]/g, '').slice(0, 6))}
@@ -1143,6 +1267,31 @@ export default function RegisterScreen() {
                   textContentType="oneTimeCode"
                   selectTextOnFocus={true}
                   autoFocus={false}
+                  onFocus={() => {
+                    // Дополнительная прокрутка при фокусе
+                    setTimeout(() => {
+                      if (codeInputRef.current && scrollViewRef.current) {
+                        codeInputRef.current.measureLayout(
+                          scrollViewRef.current as any,
+                          (x, y, width, height) => {
+                            const screenHeight = Dimensions.get('window').height;
+                            const keyboardHeight = 300; // Примерная высота клавиатуры
+                            const visibleArea = screenHeight - keyboardHeight;
+                            const inputBottom = y + height;
+                            const targetY = inputBottom - visibleArea + 130;
+                            
+                            if (targetY > 0) {
+                              scrollViewRef.current?.scrollTo({ 
+                                y: targetY, 
+                                animated: true 
+                              });
+                            }
+                          },
+                          () => {}
+                        );
+                      }
+                    }, 300);
+                  }}
                 />
                 <Text style={styles.emailHint}>
                   {t('auth.codeSent')}: {formData.phone}
