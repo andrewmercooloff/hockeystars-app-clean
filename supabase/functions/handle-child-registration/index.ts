@@ -19,6 +19,10 @@ interface ChildRegistrationRequest {
   userStatus?: string // Исходный статус пользователя (player/star) - будет восстановлен при активации
   language?: string // Язык приложения пользователя (ru, en, и т.д.)
   avatar?: string // URL аватара (если загружен)
+  grip?: string // Хват игрока
+  height?: string | number // Рост игрока
+  weight?: string | number // Вес игрока
+  number?: string | number // Номер игрока
   // Поля для повторной отправки
   resend?: boolean
   token?: string
@@ -274,7 +278,7 @@ serve(async (req) => {
     const requestBody = await req.json()
     console.log(`📧 Получен запрос:`, JSON.stringify({ ...requestBody, phone: requestBody.phone ? '[phone]' : undefined }))
     console.log(`📧 ПРОВЕРКА language в запросе: requestBody.language = ${requestBody.language}, type = ${typeof requestBody.language}`)
-    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player', language, avatar, resend, token }: ChildRegistrationRequest = requestBody
+    const { phone, name, birthDate, parentEmail, country, position, team, userStatus = 'player', language, avatar, grip, height, weight, number, resend, token }: ChildRegistrationRequest = requestBody
     console.log(`📧 Распарсенные параметры: language=${language}, country=${country}, userStatus=${userStatus}, avatar=${avatar ? 'есть' : 'нет'}`)
     console.log(`📧 ПРОВЕРКА после деструктуризации: language = ${language}, type = ${typeof language}, undefined? ${language === undefined}, null? ${language === null}`)
     console.log(`📧 ПРОВЕРКА аватара: avatar = ${avatar}, type = ${typeof avatar}, undefined? ${avatar === undefined}, null? ${avatar === null}, empty? ${avatar === ''}`)
@@ -433,7 +437,11 @@ serve(async (req) => {
         consent_token: consentToken,
         consent_token_expires_at: expiresAt,
         language: playerLanguage, // Сохраняем язык в БД
-        avatar: avatar || null // Сохраняем аватар, если он был загружен
+        avatar: avatar || null, // Сохраняем аватар, если он был загружен
+        grip: grip || '', // Хват игрока
+        height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
+        weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
+        number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '' // Номер игрока
       })
       .select()
       .single()

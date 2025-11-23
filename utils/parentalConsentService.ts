@@ -43,7 +43,11 @@ export async function registerChildWithParentalConsent(
   team?: string,
   userStatus: string = 'player', // Исходный статус пользователя (player/star)
   language?: string, // Язык приложения пользователя
-  avatar?: string // URL аватара (если загружен)
+  avatar?: string, // URL аватара (если загружен)
+  grip?: string, // Хват игрока
+  height?: string, // Рост игрока
+  weight?: string, // Вес игрока
+  number?: string // Номер игрока
 ): Promise<{ success: boolean; error?: string; playerId?: string }> {
   try {
     console.log(`🌐 registerChildWithParentalConsent: передаем язык=${language}, avatar=${avatar ? 'есть' : 'нет'}`);
@@ -57,7 +61,11 @@ export async function registerChildWithParentalConsent(
         team,
       userStatus, // Передаем исходный статус
       language, // Передаем язык приложения
-      avatar // Передаем аватар
+      avatar, // Передаем аватар
+      grip, // Хват игрока
+      height, // Рост игрока
+      weight, // Вес игрока
+      number // Номер игрока
     };
     console.log(`🌐 Полный body запроса:`, JSON.stringify({ ...requestBody, phone: '[phone]', avatar: avatar ? (avatar.substring(0, 50) + '...') : 'нет' }));
     // Вызываем Edge Function через SDK
@@ -117,7 +125,13 @@ export async function registerChildWithParentalConsent(
             country,
             position,
             team,
-            userStatus
+            userStatus,
+            language,
+            avatar,
+            grip,
+            height,
+            weight,
+            number
           })
         });
 

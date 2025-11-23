@@ -983,8 +983,8 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     position: normalizePosition(player.position) || player.position || '',
     team: player.team,
     age: player.age,
-    height: player.height ? (typeof player.height === 'string' ? parseInt(player.height) : player.height) : 0,
-    weight: player.weight ? (typeof player.weight === 'string' ? parseInt(player.weight) : player.weight) : 0,
+    height: player.height && player.height !== '' ? (typeof player.height === 'string' ? parseInt(player.height) || 0 : player.height) : 0,
+    weight: player.weight && player.weight !== '' ? (typeof player.weight === 'string' ? parseInt(player.weight) || 0 : player.weight) : 0,
     avatar: player.avatar,
     email: player.email || undefined, // undefined вместо null для TypeScript
     password: player.password,
@@ -999,7 +999,7 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     goals: player.goals ? parseInt(player.goals) : 0,
     assists: player.assists ? parseInt(player.assists) : 0,
     country: player.country,
-    grip: player.grip,
+    grip: player.grip || '',
     games: player.games ? parseInt(player.games) : 0,
     // Поля для вратарей
     minutes: player.minutes ? parseInt(player.minutes) : 0,
@@ -1013,7 +1013,7 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     jump_rope: player.jumpRope ? parseInt(player.jumpRope) : 0,
     favorite_goals: player.favoriteGoals || '',
     photos: player.photos && player.photos.length > 0 ? JSON.stringify(player.photos) : '[]',
-    number: player.number || '',
+    number: player.number && player.number !== '' ? (typeof player.number === 'string' ? player.number : String(player.number)) : '',
     exercise_stats: player.exerciseStats ? JSON.stringify(player.exerciseStats) : '{"completions":[],"totalCompletions":0}',
     instagram: player.instagram || '',
     tiktok: player.tiktok || '',

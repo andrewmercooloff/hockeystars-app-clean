@@ -555,7 +555,11 @@ export default function RegisterScreen() {
           formData.team,
           formData.status, // Передаем исходный статус пользователя
           language, // Передаем язык приложения
-          avatarUrl // Передаем загруженный аватар
+          avatarUrl, // Передаем загруженный аватар
+          formData.grip, // Хват игрока
+          formData.height, // Рост игрока
+          formData.weight, // Вес игрока
+          formData.number // Номер игрока
         );
         
         if (!consentResult.success) {

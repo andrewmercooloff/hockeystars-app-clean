@@ -291,8 +291,15 @@ serve(async (req) => {
 
     if (!token) {
       console.error('❌ Токен не предоставлен в URL')
+      // Определяем язык из параметра URL или используем английский по умолчанию
+      const url = new URL(req.url)
+      const langParam = url.searchParams.get('lang')
+      const isRussian = langParam === 'ru'
+      const errorMessage = isRussian 
+        ? 'Токен не предоставлен' 
+        : 'Token not provided'
       return new Response(
-        JSON.stringify({ error: 'Токен не предоставлен' }),
+        JSON.stringify({ error: errorMessage }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -309,32 +316,57 @@ serve(async (req) => {
 
     if (playerError) {
       console.error('❌ Ошибка при поиске игрока:', playerError)
+      // Определяем язык из параметра URL или используем английский по умолчанию
+      const url = new URL(req.url)
+      const langParam = url.searchParams.get('lang')
+      const isRussian = langParam === 'ru'
+      
       // Если это ошибка "не найдено", проверяем, может токен просто не существует
       if (playerError.code === 'PGRST116') {
+        const errorMessage = isRussian
+          ? 'Токен не найден. Возможно, ссылка уже была использована или истекла.'
+          : 'Token not found. The link may have already been used or expired.'
         return new Response(
-          JSON.stringify({ error: 'Токен не найден. Возможно, ссылка уже была использована или истекла.' }),
+          JSON.stringify({ error: errorMessage }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
+      const errorMessage = isRussian
+        ? 'Ошибка проверки токена'
+        : 'Token verification error'
       return new Response(
-        JSON.stringify({ error: 'Ошибка проверки токена', details: playerError.message }),
+        JSON.stringify({ error: errorMessage, details: playerError.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     if (!playerData) {
       console.error('❌ Игрок с таким токеном не найден')
+      // Определяем язык из параметра URL или используем английский по умолчанию
+      const url = new URL(req.url)
+      const langParam = url.searchParams.get('lang')
+      const isRussian = langParam === 'ru'
+      const errorMessage = isRussian
+        ? 'Токен не найден или недействителен'
+        : 'Token not found or invalid'
       return new Response(
-        JSON.stringify({ error: 'Токен не найден или недействителен' }),
+        JSON.stringify({ error: errorMessage }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    // Получаем язык пользователя для локализации сообщений
+    const playerLang = playerData.language || 'en'
+    const isRussian = playerLang === 'ru'
+
     // Проверяем, не истек ли токен
     if (playerData.consent_token_expires_at && new Date(playerData.consent_token_expires_at) < new Date()) {
       console.error('❌ Токен истек:', playerData.consent_token_expires_at)
+      const errorMessage = isRussian
+        ? 'Срок действия ссылки истек. Пожалуйста, запросите новую ссылку.'
+        : 'The link has expired. Please request a new link.'
       return new Response(
-        JSON.stringify({ error: 'Срок действия ссылки истек. Пожалуйста, запросите новую ссылку.' }),
+        JSON.stringify({ error: errorMessage }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
