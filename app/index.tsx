@@ -1478,12 +1478,14 @@ export default function HomeScreen() {
       });
       // Сбрасываем флаг инициализации, чтобы фильтры переинициализировались
       filtersInitializedRef.current = false;
+      // Обновляем список игроков, чтобы отображалась новая страна пользователя
+      loadAllPlayers(true); // Принудительное обновление
     }
     // Обновляем сохраненную страну пользователя
     if (currentUser?.country !== lastUserCountryRef.current) {
       lastUserCountryRef.current = currentUser?.country || null;
     }
-  }, [currentUser?.country]);
+  }, [currentUser?.country, loadAllPlayers]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
@@ -1698,14 +1700,15 @@ export default function HomeScreen() {
       return [];
     }
 
-    // Используем вычисленные начальные фильтры, если фильтры еще не установлены в контексте
-    // Это гарантирует, что фильтры применяются с первого рендера
+    // Используем выбранные фильтры напрямую
+    // Если пользователь явно выбрал "Все" (null), используем null, а не initialFilters
+    // initialFilters используются только при первой инициализации в useLayoutEffect
     const effectiveCountry = selectedCountry !== null && selectedCountry !== undefined 
       ? selectedCountry 
-      : (initialFilters.country !== undefined ? initialFilters.country : null);
+      : null; // Если выбрано "Все", используем null, а не страну пользователя
     const effectiveYear = selectedYear !== null && selectedYear !== undefined 
       ? selectedYear 
-      : (initialFilters.year !== undefined ? initialFilters.year : null);
+      : null; // Если выбрано "Все", используем null, а не год пользователя
 
     // Проверяем, изменились ли параметры фильтрации
     // Также отслеживаем изменения is_hidden для скрытых игроков
