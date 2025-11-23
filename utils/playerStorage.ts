@@ -1601,22 +1601,29 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
 };
 
 // Получение игрока по ID с кешированием
-export const getPlayerById = async (id: string): Promise<Player | null> => {
+export const getPlayerById = async (id: string, forceRefresh: boolean = false): Promise<Player | null> => {
   try {
     // Кешируем результат на 10 минут для улучшения производительности
     const cacheKey = `player_${id}`;
     const cacheTime = 10 * 60 * 1000; // 10 минут
     
-    // Проверяем кэш
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-    
-    if (cachedData) {
-      const { player, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < cacheTime) {
-        // // // // console.log('💪 getPlayerById: используем кешированные данные для игрока:', id);
-        return player;
+    // Проверяем кэш (только если не принудительное обновление)
+    if (!forceRefresh) {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const cachedData = await AsyncStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        const { player, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < cacheTime) {
+          // // // // console.log('💪 getPlayerById: используем кешированные данные для игрока:', id);
+          return player;
+        }
       }
+    } else {
+      // При принудительном обновлении очищаем кэш
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.removeItem(cacheKey);
+      console.log('🔄 [CACHE] Кэш игрока очищен для принудительного обновления:', id);
     }
     
     // // // // // console.log('💪 getPlayerById: загружаем данные игрока из базы:', id);

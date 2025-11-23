@@ -630,10 +630,11 @@ export default function PlayerProfile() {
       }
       
       // Оптимизация: сначала показываем кешированные данные из состояния, если они есть
+      // НО: всегда загружаем свежие данные из БД, чтобы убедиться, что они актуальны
       const cachedPlayer = playersCache[normalizedId as string];
       
       if (cachedPlayer) {
-        console.log('⚡ Используем кешированные данные профиля из состояния');
+        console.log('⚡ Используем кешированные данные профиля из состояния для быстрого отображения');
         setPlayer(cachedPlayer);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
         
@@ -644,8 +645,8 @@ export default function PlayerProfile() {
         // Загружаем дополнительные данные в фоне
         loadAdditionalData(cachedPlayer, userData);
         
-        // Продолжаем загрузку свежих данных в фоне для обновления (не блокируем UI)
-        // Realtime обновления работают независимо через подписки
+        // ВАЖНО: Всегда загружаем свежие данные из БД в фоне для обновления кэша
+        // Это гарантирует, что при следующем открытии профиля будут актуальные данные
       } else {
         // Если кешированных данных нет, показываем индикатор загрузки
         setLoading(true);
@@ -669,9 +670,13 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные параллельно (getPlayerById уже использует кеш)
+      // Загружаем основные данные параллельно
+      // ВАЖНО: Если это профиль текущего пользователя, принудительно обновляем из БД
+      const isCurrentUserProfile = currentUser?.id === normalizedId;
       const [playerData, userData] = await Promise.all([
-        getPlayerById(normalizedId as string),
+        isCurrentUserProfile 
+          ? getPlayerById(normalizedId as string, true) // Принудительное обновление для текущего пользователя
+          : getPlayerById(normalizedId as string),
         loadCurrentUser()
       ]);
       
@@ -2806,7 +2811,19 @@ export default function PlayerProfile() {
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
+        console.log('✅ [SAVE] Обновляем состояние игрока после сохранения:', {
+          playerId: refreshedPlayer.id,
+          country: refreshedPlayer.country,
+          oldCountry: player.country
+        });
+        
         setPlayer(refreshedPlayer);
+        
+        // ВАЖНО: Обновляем кэш игрока, чтобы при следующей загрузке использовались актуальные данные
+        setPlayersCache(prev => ({
+          ...prev,
+          [refreshedPlayer.id]: refreshedPlayer
+        }));
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
         setTimeout(async () => {
@@ -2819,11 +2836,13 @@ export default function PlayerProfile() {
         
         // Если редактируем свой собственный профиль, обновляем также currentUser в AsyncStorage
         if (currentUser.id === player.id) {
+          console.log('✅ [SAVE] Обновляем currentUser после сохранения собственного профиля');
           setCurrentUser(refreshedPlayer);
           // Сохраняем обновленные данные в AsyncStorage асинхронно (не блокируем основной поток)
           setTimeout(async () => {
             try {
               await saveCurrentUser(refreshedPlayer);
+              console.log('✅ [SAVE] currentUser сохранен в AsyncStorage');
             } catch (error) {
               console.error('❌ Ошибка обновления currentUser в AsyncStorage:', error);
             }
@@ -2834,20 +2853,56 @@ export default function PlayerProfile() {
         if (currentUser.id === player.id) {
           setTimeout(async () => {
             try {
-              // Обновляем глобальное состояние пользователя
+              // Обновляем глобальное состояние пользователя с принудительным обновлением
               await refreshUser(true);
               
               // Дополнительно обновляем локальное состояние для немедленного отображения
               setCurrentUser(refreshedPlayer);
+              console.log('✅ [SAVE] Глобальное состояние пользователя обновлено');
             } catch (error) {
               console.error('❌ Ошибка обновления глобального состояния:', error);
             }
           }, 0);
         }
+      } else {
+        console.error('❌ [SAVE] refreshedPlayer не получен после сохранения!');
       }
       
       setIsEditing(false);
       showCustomAlert(t('common.success'), t('playerUpdated'), 'success');
+      
+      // ВАЖНО: Принудительно очищаем кэш игрока и перезагружаем данные из БД
+      // Это гарантирует, что при следующем открытии профиля будут актуальные данные
+      setTimeout(async () => {
+        try {
+          console.log('🔄 [SAVE] Очищаем кэш и перезагружаем профиль из БД');
+          // Очищаем кэш конкретного игрока
+          await clearPlayerCache(player.id);
+          
+          // Удаляем из локального кэша состояния
+          setPlayersCache(prev => {
+            const newCache = { ...prev };
+            delete newCache[player.id];
+            return newCache;
+          });
+          
+          // Перезагружаем данные из БД с принудительным обновлением
+          const freshPlayerData = await getPlayerById(player.id, true);
+          if (freshPlayerData) {
+            console.log('✅ [SAVE] Профиль перезагружен из БД:', {
+              country: freshPlayerData.country,
+              oldCountry: player.country
+            });
+            setPlayer(freshPlayerData);
+            setPlayersCache(prev => ({
+              ...prev,
+              [freshPlayerData.id]: freshPlayerData
+            }));
+          }
+        } catch (error) {
+          console.error('⚠️ Ошибка перезагрузки профиля после сохранения (не критично):', error);
+        }
+      }, 500);
       
       // Дополнительное обновление команд через небольшую задержку для надежности (только если команды изменились)
       if (teamsChanged) {
