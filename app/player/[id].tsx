@@ -3037,10 +3037,18 @@ export default function PlayerProfile() {
 
   // Удаление собственного аккаунта
   const handleDeleteOwnAccount = async () => {
+    console.log('🗑️ handleDeleteOwnAccount вызвана');
+    console.log('🗑️ currentUser:', currentUser?.id, currentUser?.name);
+    console.log('🗑️ player:', player?.id, player?.name);
+    console.log('🗑️ currentUser.id === player.id:', currentUser?.id === player?.id);
+    
     if (!currentUser || !player || currentUser.id !== player.id) {
+      console.log('❌ Условие не выполнено, выходим из функции');
       return;
     }
 
+    console.log('✅ Условие выполнено, показываем диалог подтверждения');
+    
     // Запрашиваем подтверждение (используем те же переводы, что и для админа)
     showCustomAlert(
       t('profile.deleteUser') || t('deleteUser'),
