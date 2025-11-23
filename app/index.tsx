@@ -1391,18 +1391,20 @@ export default function HomeScreen() {
     });
     
     // ВАЖНО: Если фильтры уже инициализированы, но страна в контексте не совпадает со страной пользователя,
-    // это означает, что что-то пошло не так. В этом случае переинициализируем фильтры.
-    if (filtersInitializedRef.current && selectedCountry !== null && selectedCountry !== defaultCountry) {
-      console.log('⚠️ [FILTERS] Обнаружено несоответствие: страна в контексте не совпадает со страной пользователя!', {
+    // это означает, что страна пользователя была изменена. В этом случае переинициализируем фильтры.
+    if (filtersInitializedRef.current && selectedCountry !== null && defaultCountry && selectedCountry !== defaultCountry) {
+      console.log('⚠️ [FILTERS] Обнаружено несоответствие: страна пользователя изменилась!', {
         contextCountry: selectedCountry,
         userCountry: defaultCountry
       });
       // Сбрасываем флаг инициализации, чтобы переинициализировать фильтры
       filtersInitializedRef.current = false;
+      // Продолжаем выполнение ниже, чтобы вычислить правильные значения
     }
     
     // Если фильтры уже инициализированы и страна совпадает, возвращаем текущие значения
-    if (filtersInitializedRef.current && selectedCountry === defaultCountry) {
+    if (filtersInitializedRef.current && selectedCountry !== null && defaultCountry && selectedCountry === defaultCountry) {
+      console.log('🔍 [FILTERS] Фильтры уже инициализированы и страна совпадает, возвращаем текущие значения');
       return { country: selectedCountry, year: selectedYear };
     }
     
@@ -1485,11 +1487,21 @@ export default function HomeScreen() {
       filtersInitializedRef.current = false;
     }
 
+    // ВАЖНО: Переинициализируем фильтры, если страна пользователя изменилась
+    if (currentUser && filtersInitializedRef.current && initialFilters.country && selectedCountry !== null && selectedCountry !== initialFilters.country) {
+      console.log('🔄 [FILTERS] Страна пользователя изменилась, переинициализируем фильтры', {
+        oldCountry: selectedCountry,
+        newCountry: initialFilters.country
+      });
+      filtersInitializedRef.current = false;
+    }
+
     // Инициализируем фильтры только один раз при первой загрузке
     // Или переинициализируем, если пользователь загрузился после того, как фильтры уже были установлены как null
+    // Или если страна пользователя изменилась
     const shouldInitialize = players.length > 0 && 
-      selectedCountry === null && 
-      selectedYear === null &&
+      ((selectedCountry === null && selectedYear === null) || 
+       (filtersInitializedRef.current && initialFilters.country && selectedCountry !== null && selectedCountry !== initialFilters.country)) &&
       !filtersInitializedRef.current;
     
     if (shouldInitialize) {

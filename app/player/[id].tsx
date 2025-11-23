@@ -630,11 +630,10 @@ export default function PlayerProfile() {
       }
       
       // Оптимизация: сначала показываем кешированные данные из состояния, если они есть
-      // НО: всегда загружаем свежие данные из БД, чтобы убедиться, что они актуальны
       const cachedPlayer = playersCache[normalizedId as string];
       
       if (cachedPlayer) {
-        console.log('⚡ Используем кешированные данные профиля из состояния для быстрого отображения');
+        console.log('⚡ Используем кешированные данные профиля из состояния');
         setPlayer(cachedPlayer);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
         
@@ -645,8 +644,8 @@ export default function PlayerProfile() {
         // Загружаем дополнительные данные в фоне
         loadAdditionalData(cachedPlayer, userData);
         
-        // ВАЖНО: Всегда загружаем свежие данные из БД в фоне для обновления кэша
-        // Это гарантирует, что при следующем открытии профиля будут актуальные данные
+        // Продолжаем загрузку свежих данных в фоне для обновления (не блокируем UI)
+        // Realtime обновления работают независимо через подписки
       } else {
         // Если кешированных данных нет, показываем индикатор загрузки
         setLoading(true);
@@ -670,13 +669,9 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные параллельно
-      // ВАЖНО: Если это профиль текущего пользователя, принудительно обновляем из БД
-      const isCurrentUserProfile = currentUser?.id === normalizedId;
+      // Загружаем основные данные параллельно (getPlayerById уже использует кеш)
       const [playerData, userData] = await Promise.all([
-        isCurrentUserProfile 
-          ? getPlayerById(normalizedId as string, true) // Принудительное обновление для текущего пользователя
-          : getPlayerById(normalizedId as string),
+        getPlayerById(normalizedId as string),
         loadCurrentUser()
       ]);
       
@@ -1967,17 +1962,17 @@ export default function PlayerProfile() {
           // Очищаем кеш игрока и аватара асинхронно (не блокируем UI)
           setTimeout(async () => {
             try {
-              await clearPlayerCache(player.id);
-              // Также очищаем кеш аватара для этого игрока
-              try {
-                const { avatarCache } = await import('../../utils/AvatarCache');
-                avatarCache.clearAvatar(player.id);
-                console.log('🗑️ Кеш аватара игрока очищен после принятия запроса дружбы');
-              } catch (error) {
-                console.error('⚠️ Ошибка очистки кеша аватара (не критично):', error);
-              }
-              console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
-              
+          await clearPlayerCache(player.id);
+          // Также очищаем кеш аватара для этого игрока
+          try {
+            const { avatarCache } = await import('../../utils/AvatarCache');
+            avatarCache.clearAvatar(player.id);
+            console.log('🗑️ Кеш аватара игрока очищен после принятия запроса дружбы');
+          } catch (error) {
+            console.error('⚠️ Ошибка очистки кеша аватара (не критично):', error);
+          }
+          console.log('🗑️ Кеш игрока очищен после принятия запроса дружбы для получения свежих данных');
+          
               // Обновляем статус из базы данных
               const newStatus = await getFriendshipStatus(currentUser.id, player.id);
               setFriendshipStatus(newStatus);
@@ -2712,7 +2707,7 @@ export default function PlayerProfile() {
             statsChanges.push({ field: 'games', oldValue: oldGames, newValue: newGames });
           }
         }
-        
+
         // Проверяем изменения нормативов
         const normativeChanges: { field: string, oldValue: number, newValue: number, change: number }[] = [];
         
@@ -2811,18 +2806,12 @@ export default function PlayerProfile() {
       
       // Обновляем состояние игрока
       if (refreshedPlayer) {
-        console.log('✅ [SAVE] Обновляем состояние игрока после сохранения:', {
-          playerId: refreshedPlayer.id,
-          country: refreshedPlayer.country,
-          oldCountry: player.country
-        });
-        
         setPlayer(refreshedPlayer);
         
-        // ВАЖНО: Обновляем кэш игрока, чтобы при следующей загрузке использовались актуальные данные
+        // ВАЖНО: Обновляем кэш состояния для немедленного отображения при возвращении в профиль
         setPlayersCache(prev => ({
           ...prev,
-          [refreshedPlayer.id]: refreshedPlayer
+          [player.id]: refreshedPlayer
         }));
         
         // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
@@ -2836,13 +2825,11 @@ export default function PlayerProfile() {
         
         // Если редактируем свой собственный профиль, обновляем также currentUser в AsyncStorage
         if (currentUser.id === player.id) {
-          console.log('✅ [SAVE] Обновляем currentUser после сохранения собственного профиля');
           setCurrentUser(refreshedPlayer);
           // Сохраняем обновленные данные в AsyncStorage асинхронно (не блокируем основной поток)
           setTimeout(async () => {
             try {
               await saveCurrentUser(refreshedPlayer);
-              console.log('✅ [SAVE] currentUser сохранен в AsyncStorage');
             } catch (error) {
               console.error('❌ Ошибка обновления currentUser в AsyncStorage:', error);
             }
@@ -2853,56 +2840,20 @@ export default function PlayerProfile() {
         if (currentUser.id === player.id) {
           setTimeout(async () => {
             try {
-              // Обновляем глобальное состояние пользователя с принудительным обновлением
+              // Обновляем глобальное состояние пользователя
               await refreshUser(true);
               
               // Дополнительно обновляем локальное состояние для немедленного отображения
               setCurrentUser(refreshedPlayer);
-              console.log('✅ [SAVE] Глобальное состояние пользователя обновлено');
             } catch (error) {
               console.error('❌ Ошибка обновления глобального состояния:', error);
             }
           }, 0);
         }
-      } else {
-        console.error('❌ [SAVE] refreshedPlayer не получен после сохранения!');
       }
       
       setIsEditing(false);
       showCustomAlert(t('common.success'), t('playerUpdated'), 'success');
-      
-      // ВАЖНО: Принудительно очищаем кэш игрока и перезагружаем данные из БД
-      // Это гарантирует, что при следующем открытии профиля будут актуальные данные
-      setTimeout(async () => {
-        try {
-          console.log('🔄 [SAVE] Очищаем кэш и перезагружаем профиль из БД');
-          // Очищаем кэш конкретного игрока
-          await clearPlayerCache(player.id);
-          
-          // Удаляем из локального кэша состояния
-          setPlayersCache(prev => {
-            const newCache = { ...prev };
-            delete newCache[player.id];
-            return newCache;
-          });
-          
-          // Перезагружаем данные из БД с принудительным обновлением
-          const freshPlayerData = await getPlayerById(player.id, true);
-          if (freshPlayerData) {
-            console.log('✅ [SAVE] Профиль перезагружен из БД:', {
-              country: freshPlayerData.country,
-              oldCountry: player.country
-            });
-            setPlayer(freshPlayerData);
-            setPlayersCache(prev => ({
-              ...prev,
-              [freshPlayerData.id]: freshPlayerData
-            }));
-          }
-        } catch (error) {
-          console.error('⚠️ Ошибка перезагрузки профиля после сохранения (не критично):', error);
-        }
-      }, 500);
       
       // Дополнительное обновление команд через небольшую задержку для надежности (только если команды изменились)
       if (teamsChanged) {
@@ -3302,13 +3253,13 @@ export default function PlayerProfile() {
     >
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-            <ScrollView 
-              ref={scrollViewRef} 
-              contentContainerStyle={styles.scrollContainer}
-              keyboardShouldPersistTaps="handled"
+          <ScrollView 
+            ref={scrollViewRef} 
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
               onScrollBeginDrag={Keyboard.dismiss}
-            >
+          >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <View>
             {/* Фото и основная информация */}
@@ -5167,7 +5118,7 @@ export default function PlayerProfile() {
                             }}
                             onBlur={() => {
                               activeInputRef.current = null;
-                            }}
+                          }}
                             placeholder="0"
                           placeholderTextColor="#888"
                             keyboardType="numeric"
@@ -6100,8 +6051,8 @@ export default function PlayerProfile() {
 
               </View>
             </TouchableWithoutFeedback>
-            </ScrollView>
-          </View>
+          </ScrollView>
+        </View>
       </CachedBackground>
       
       {/* Меню профиля */}
@@ -6467,7 +6418,7 @@ export default function PlayerProfile() {
               ).map((country) => {
                 const isSelected = (editData.country || player?.country) === country;
                 return (
-                  <TouchableOpacity
+              <TouchableOpacity
                     key={country}
                     style={[
                       styles.countryOption,
@@ -6478,27 +6429,27 @@ export default function PlayerProfile() {
                       setShowCountryPicker(false);
                       setCountrySearchText('');
                     }}
-                  >
+              >
                     <Text style={[
                       styles.countryOptionText,
                       isSelected && styles.countryOptionTextSelected
                     ]}>
                       {t(`profile.countries.${country}`) || country}
                     </Text>
-                  </TouchableOpacity>
+              </TouchableOpacity>
                 );
               })}
             </ScrollView>
             
-            <TouchableOpacity
+                <TouchableOpacity
               style={styles.countryPickerCloseButton}
-              onPress={() => {
-                setShowCountryPicker(false);
+                  onPress={() => {
+                    setShowCountryPicker(false);
                 setCountrySearchText('');
-              }}
-            >
+                  }}
+                >
               <Text style={styles.countryPickerCloseText}>{t('common.close')}</Text>
-            </TouchableOpacity>
+                </TouchableOpacity>
           </View>
         </View>
       )}
@@ -6513,24 +6464,24 @@ export default function PlayerProfile() {
               {positions.map((position) => {
                 const isSelected = (editData.position || player?.position) === position;
                 return (
-                  <TouchableOpacity
-                    key={position}
+                <TouchableOpacity
+                  key={position}
                     style={[
                       styles.pickerOption,
                       isSelected && styles.pickerOptionSelected
                     ]}
-                    onPress={() => {
-                      setEditData({...editData, position: position});
-                      setShowPositionPicker(false);
-                    }}
-                  >
+                  onPress={() => {
+                    setEditData({...editData, position: position});
+                    setShowPositionPicker(false);
+                  }}
+                >
                     <Text style={[
                       styles.pickerOptionText,
                       isSelected && styles.pickerOptionTextSelected
                     ]}>
                       {positionLabels[position] || position}
                     </Text>
-                  </TouchableOpacity>
+                </TouchableOpacity>
                 );
               })}
             </View>
@@ -6555,30 +6506,30 @@ export default function PlayerProfile() {
               {grips && grips.length > 0 ? grips.map((grip) => {
                 const isSelected = (editData.grip || player?.grip) === grip;
                 return (
-                  <TouchableOpacity
-                    key={grip}
+                <TouchableOpacity
+                  key={grip}
                     style={[
                       styles.pickerOption,
                       isSelected && styles.pickerOptionSelected
                     ]}
-                    onPress={() => {
-                      setEditData({...editData, grip: grip});
-                      setShowGripPicker(false);
-                    }}
-                  >
+                  onPress={() => {
+                    setEditData({...editData, grip: grip});
+                    setShowGripPicker(false);
+                  }}
+                >
                     <Text style={[
                       styles.pickerOptionText,
                       isSelected && styles.pickerOptionTextSelected
                     ]}>
                       {t(`profile.grips.${grip}`) || grip}
                     </Text>
-                  </TouchableOpacity>
+                </TouchableOpacity>
                 );
               }) : (
                 <View style={styles.pickerOption}>
                   <Text style={styles.pickerOptionText}>Список хватов недоступен</Text>
-                </View>
-              )}
+                  </View>
+                )}
             </View>
             
             <TouchableOpacity
