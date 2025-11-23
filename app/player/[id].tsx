@@ -6494,7 +6494,7 @@ export default function PlayerProfile() {
       {showGripPicker && (
         <View style={styles.countryPickerOverlay}>
           <View style={styles.countryPickerModal}>
-            <Text style={styles.countryPickerTitle}>{t('profile.selectGrip')}</Text>
+              <Text style={styles.countryPickerTitle}>{t('profile.selectGrip') || t('selectGrip')}</Text>
             
             <View style={styles.pickerContainer}>
               {grips && grips.length > 0 ? grips.map((grip) => {

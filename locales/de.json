@@ -1945,6 +1945,8 @@
     "logo": "Logo",
     "selectLogo": "Wählen Sie ein Logo",
     "selectCountry": "Wählen Sie ein Land",
+    "selectPosition": "Wählen Sie eine Position",
+    "selectGrip": "Wählen Sie einen Griff",
     "searchCountry": "Suche nach einem Land",
     "errorEnterCompetition": "Geben Sie den Namen des Wettbewerbs ein",
     "errorEnterYear": "Bitte geben Sie ein gültiges Jahr ein.",
