@@ -104,28 +104,7 @@ export default function ChatScreen() {
     }
   }, [scrollToBottom, messages.length, loading]);
 
-  // Синхронная прокрутка при первой загрузке сообщений (до рендеринга)
-  useLayoutEffect(() => {
-    if (messages.length > 0 && !loading && scrollViewRef.current && isInitialLoadRef.current) {
-      // При первой загрузке - без анимации, сразу вниз (синхронно до рендеринга)
-      // Используем несколько попыток для надежности
-      const scrollToBottom = () => {
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToEnd({ animated: false });
-        }
-      };
-      
-      // Прокручиваем сразу
-      scrollToBottom();
-      
-      // И еще раз через небольшую задержку для надежности
-      setTimeout(scrollToBottom, 0);
-      
-      setIsNearBottom(true);
-      setIsScrolledToBottom(true);
-      isInitialLoadRef.current = false;
-    }
-  }, [messages.length, loading]);
+  // Убираем прокрутку - контент сразу будет внизу через contentContainerStyle
 
   useEffect(() => {
     if (!currentUser || !otherPlayer || otherPlayer.id !== id) {
@@ -1273,9 +1252,9 @@ export default function ChatScreen() {
               scrollEventThrottle={400}
               onContentSizeChange={(contentWidth, contentHeight) => {
                 if (messages.length > 0 && !loading && scrollViewRef.current) {
-                  if (isInitialLoadRef.current && !isScrolledToBottom) {
-                    // При первой загрузке сразу прокручиваем вниз без анимации
-                    scrollViewRef.current.scrollToEnd({ animated: false });
+                  if (isInitialLoadRef.current) {
+                    // При первой загрузке просто отмечаем, что контент загружен
+                    // Прокрутка не нужна - контент уже внизу через justifyContent: 'flex-end'
                     setIsNearBottom(true);
                     setIsScrolledToBottom(true);
                     wasNearBottomRef.current = true;
@@ -1288,15 +1267,6 @@ export default function ChatScreen() {
                     });
                     setIsNearBottom(false);
                   }
-                }
-              }}
-              onLayout={() => {
-                // Прокручиваем вниз при первом layout (до того как контент станет видимым)
-                if (messages.length > 0 && !loading && scrollViewRef.current && isInitialLoadRef.current) {
-                  scrollViewRef.current.scrollToEnd({ animated: false });
-                  setIsScrolledToBottom(true);
-                  setIsNearBottom(true);
-                  isInitialLoadRef.current = false;
                 }
               }}
             >
@@ -1772,6 +1742,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
     flexGrow: 1, // Позволяет контенту растягиваться
+    justifyContent: 'flex-end', // Контент сразу прижат к низу, без прокрутки
   },
   emptyContainer: {
     flex: 1,
