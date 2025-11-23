@@ -3047,10 +3047,15 @@ export default function PlayerProfile() {
       return;
     }
 
-    console.log('✅ Условие выполнено, показываем диалог подтверждения');
+    // Закрываем меню перед показом диалога
+    handleCloseProfileMenu();
     
-    // Запрашиваем подтверждение (используем те же переводы, что и для админа)
-    showCustomAlert(
+    // Небольшая задержка, чтобы меню успело закрыться
+    setTimeout(() => {
+      console.log('✅ Условие выполнено, показываем диалог подтверждения');
+      
+      // Запрашиваем подтверждение (используем те же переводы, что и для админа)
+      showCustomAlert(
       t('profile.deleteUser') || t('deleteUser'),
       t('profile.deleteUserConfirm', { name: player.name }),
       'warning',
