@@ -3047,19 +3047,49 @@ export default function PlayerProfile() {
       t('profile.deleteUserConfirm', { name: player.name }),
       'warning',
       async () => {
-        const success = await deletePlayer(player.id);
-        if (success) {
-          // Выходим из аккаунта после удаления
-          await logoutUser();
-          await refreshUser();
+        try {
+          setLoading(true);
+          console.log('🗑️ Начинаем удаление собственного аккаунта:', player.id);
           
-          showCustomAlert(
-            t('common.success') || t('success'), 
-            t('profile.userDeleted', { name: player.name }),
-            'success',
-            () => router.replace('/login')
-          );
-        } else {
+          const success = await deletePlayer(player.id);
+          
+          if (success) {
+            console.log('✅ Аккаунт успешно удален, выходим из системы');
+            
+            // Выходим из аккаунта после удаления
+            try {
+              await logoutUser();
+              console.log('✅ Выход из аккаунта выполнен');
+            } catch (logoutError) {
+              console.warn('⚠️ Ошибка при выходе из аккаунта (не критично):', logoutError);
+            }
+            
+            // НЕ вызываем refreshUser(), так как пользователь уже удален
+            // Это может вызвать зависание
+            
+            setLoading(false);
+            
+            showCustomAlert(
+              t('common.success') || t('success'), 
+              t('profile.userDeleted', { name: player.name }),
+              'success',
+              () => {
+                // Перенаправляем на страницу входа
+                router.replace('/login');
+              }
+            );
+          } else {
+            setLoading(false);
+            console.error('❌ Не удалось удалить аккаунт');
+            showCustomAlert(
+              t('common.error') || 'Ошибка', 
+              t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
+              'error'
+            );
+          }
+        } catch (error) {
+          setLoading(false);
+          console.error('❌ Ошибка при удалении аккаунта:', error);
           showCustomAlert(
             t('common.error') || 'Ошибка', 
             t('profile.deleteUserError') || 'Не удалось удалить пользователя', 
