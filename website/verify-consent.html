@@ -287,35 +287,86 @@
                 }
             })
             .then(response => {
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response ok:', response.ok);
+                console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const contentType = response.headers.get('content-type') || '';
+                console.log('📡 Content-Type:', contentType);
+                
                 if (response.ok) {
-                    return response.text();
+                    // Если это HTML, возвращаем как текст
+                    if (contentType.includes('text/html')) {
+                        return response.text().then(html => ({ type: 'html', content: html }));
+                    }
+                    // Если это JSON, парсим
+                    if (contentType.includes('application/json')) {
+                        return response.json().then(data => ({ type: 'json', content: data }));
+                    }
+                    // Иначе пробуем как текст
+                    return response.text().then(text => {
+                        // Проверяем, это HTML или JSON
+                        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+                            return { type: 'html', content: text };
+                        }
+                        try {
+                            const data = JSON.parse(text);
+                            return { type: 'json', content: data };
+                        } catch (e) {
+                            return { type: 'text', content: text };
+                        }
+                    });
                 } else {
-                    return response.json().then(err => {
-                        throw new Error(err.error || err.message || 'Ошибка подтверждения');
+                    // Ошибка - пробуем парсить как JSON
+                    return response.text().then(text => {
+                        console.error('❌ Error response:', text);
+                        try {
+                            const errorData = JSON.parse(text);
+                            throw new Error(errorData.error || errorData.message || 'Ошибка подтверждения');
+                        } catch (parseError) {
+                            if (parseError instanceof Error && parseError.message !== 'Ошибка подтверждения') {
+                                throw parseError;
+                            }
+                            throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
+                        }
                     });
                 }
             })
-            .then(html => {
-                // Если ответ - HTML, показываем его
-                if (html.includes('<!DOCTYPE') || html.includes('<html')) {
-                    document.body.innerHTML = html;
-                } else {
-                    // Если JSON, парсим
-                    try {
-                        const data = JSON.parse(html);
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
-                    } catch (e) {
-                        // Не JSON, показываем как есть
+            .then(result => {
+                console.log('✅ Response received:', result.type);
+                
+                if (result.type === 'html') {
+                    // Edge Function вернул HTML страницу - заменяем весь body
+                    console.log('📄 Replacing body with HTML response');
+                    document.body.innerHTML = result.content;
+                } else if (result.type === 'json') {
+                    // JSON ответ - проверяем на ошибки
+                    if (result.content.error) {
+                        throw new Error(result.content.error);
                     }
+                    // Если успех, показываем страницу успеха
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                } else {
+                    // Текстовый ответ
+                    console.log('📝 Text response:', result.content);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
                 }
             })
             .catch(error => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error-message').textContent = error.message || t.errorGeneric;
-                console.error('Error:', error);
+                console.error('❌ Fetch error:', error);
+                console.error('❌ Error stack:', error.stack);
+                
+                const loadingEl = document.getElementById('loading');
+                const errorEl = document.getElementById('error');
+                const errorMessageEl = document.getElementById('error-message');
+                
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'block';
+                if (errorMessageEl) {
+                    errorMessageEl.textContent = error.message || t.errorGeneric;
+                }
             });
         }
     </script>
