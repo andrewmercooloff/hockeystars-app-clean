@@ -422,19 +422,43 @@ serve(async (req) => {
 
     // Активируем аккаунт напрямую
     console.log('✅ Активируем аккаунт для игрока:', playerData.id)
+    console.log('📋 Текущее значение team:', playerData.team)
     
-    // Извлекаем исходный статус из поля team (формат: "team|originalStatus")
+    // Извлекаем исходный статус из поля team (формат: "team|originalStatus" или "|originalStatus" если команда пустая)
     let originalStatus = 'player' // По умолчанию
-    let teamWithoutStatus = playerData.team || ''
+    let teamWithoutStatus = ''
     
-    if (playerData.team && playerData.team.includes('|')) {
-      const parts = playerData.team.split('|')
-      if (parts.length >= 2) {
-        teamWithoutStatus = parts[0] // Команда без статуса
-        originalStatus = parts[1] || 'player' // Исходный статус
-        console.log('📋 Восстанавливаем исходный статус:', originalStatus, 'из команды:', teamWithoutStatus)
+    if (playerData.team) {
+      // Проверяем, содержит ли team разделитель |
+      if (playerData.team.includes('|')) {
+        const parts = playerData.team.split('|')
+        console.log('📋 Разделили team на части:', parts, 'количество частей:', parts.length)
+        
+        // Если есть хотя бы 2 части (даже если первая пустая), извлекаем статус
+        if (parts.length >= 2) {
+          teamWithoutStatus = parts[0] || '' // Команда без статуса (может быть пустой)
+          originalStatus = parts[parts.length - 1] || 'player' // Берем последнюю часть как статус (на случай если в команде есть |)
+          console.log('📋 Восстанавливаем исходный статус:', originalStatus, 'из команды:', teamWithoutStatus || '(пусто)')
+        } else {
+          // Если только одна часть, значит это просто команда без статуса
+          teamWithoutStatus = playerData.team
+          originalStatus = 'player' // Используем значение по умолчанию
+          console.log('📋 Команда без статуса, используем значение по умолчанию:', originalStatus)
+        }
+      } else {
+        // Если нет разделителя, значит это просто команда без статуса
+        teamWithoutStatus = playerData.team
+        originalStatus = 'player' // Используем значение по умолчанию
+        console.log('📋 Команда без разделителя, используем значение по умолчанию:', originalStatus)
       }
+    } else {
+      // Если team пустое, статус по умолчанию
+      teamWithoutStatus = ''
+      originalStatus = 'player'
+      console.log('📋 Команда пустая, используем значение по умолчанию:', originalStatus)
     }
+    
+    console.log('📋 Итоговые значения - статус:', originalStatus, 'команда:', teamWithoutStatus || '(пусто)')
     
     const { data: updatedPlayer, error: updateError } = await supabase
       .from('players')
