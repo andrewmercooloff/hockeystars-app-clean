@@ -1314,8 +1314,11 @@ export default function NotificationsScreen() {
             router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'friend_request') {
-          if (notification.playerId) {
-            router.push(`/player/${notification.playerId}`);
+          // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
+          const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
+          if (senderId) {
+            console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
+            router.push(`/player/${senderId}?scrollToFriends=true`);
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
@@ -1383,8 +1386,11 @@ export default function NotificationsScreen() {
             router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'friend_request') {
-          if (notification.playerId) {
-            router.push(`/player/${notification.playerId}`);
+          // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
+          const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
+          if (senderId) {
+            console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
+            router.push(`/player/${senderId}?scrollToFriends=true`);
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
