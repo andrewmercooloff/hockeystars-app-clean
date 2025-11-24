@@ -355,9 +355,43 @@
                     console.log('✅ Response received:', result.type);
                     
                     if (result.type === 'html') {
-                        // Edge Function вернул HTML страницу - заменяем весь body
-                        console.log('📄 Replacing body with HTML response');
-                        document.body.innerHTML = result.content;
+                        // Edge Function вернул HTML страницу - заменяем весь документ
+                        console.log('📄 Replacing document with HTML response');
+                        console.log('📄 HTML content length:', result.content.length);
+                        console.log('📄 HTML content preview:', result.content.substring(0, 500));
+                        try {
+                            // Используем document.write для полной замены страницы
+                            // Это правильный способ для замены всего HTML документа
+                            document.open();
+                            document.write(result.content);
+                            document.close();
+                            console.log('✅ Document replaced successfully');
+                        } catch (htmlError) {
+                            console.error('❌ Error replacing document:', htmlError);
+                            // Если не удалось заменить документ, извлекаем содержимое body из HTML
+                            try {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(result.content, 'text/html');
+                                const bodyContent = doc.body.innerHTML;
+                                if (bodyContent) {
+                                    document.body.innerHTML = bodyContent;
+                                    console.log('✅ Body content extracted and replaced');
+                                } else {
+                                    // Показываем страницу успеха вместо замены body
+                                    const loadingEl = document.getElementById('loading');
+                                    const successEl = document.getElementById('success');
+                                    if (loadingEl) loadingEl.style.display = 'none';
+                                    if (successEl) successEl.style.display = 'block';
+                                }
+                            } catch (parseError) {
+                                console.error('❌ Error parsing HTML:', parseError);
+                                // Показываем страницу успеха вместо замены body
+                                const loadingEl = document.getElementById('loading');
+                                const successEl = document.getElementById('success');
+                                if (loadingEl) loadingEl.style.display = 'none';
+                                if (successEl) successEl.style.display = 'block';
+                            }
+                        }
                     } else if (result.type === 'json') {
                         // JSON ответ - проверяем на ошибки
                         if (result.content.error) {
