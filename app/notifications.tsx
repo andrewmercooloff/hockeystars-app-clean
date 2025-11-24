@@ -828,14 +828,14 @@ export default function NotificationsScreen() {
     }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
   );
 
-  // Автоматически отмечаем все уведомления как прочитанные через 7 секунд ТОЛЬКО когда экран в фокусе
+  // Автоматически отмечаем все уведомления как прочитанные через 3 секунды ТОЛЬКО когда экран в фокусе
   useEffect(() => {
     if (isScreenFocused && currentUser && notifications.length > 0) {
       const timer = setTimeout(async () => {
         await markAllNotificationsAsRead();
         // Обновляем счетчик уведомлений через контекст
         await updateNotificationCount(currentUser);
-      }, 7000);
+      }, 3000);
       
       return () => {
         clearTimeout(timer);
