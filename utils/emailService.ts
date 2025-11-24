@@ -126,7 +126,7 @@ export const verifyAdminSecretCode = (phone: string, inputCode: string): { succe
 };
 
 // Проверка кода подтверждения
-export const verifyCode = async (email: string, inputCode: string): Promise<{ success: boolean; message: string }> => {
+export const verifyCode = async (email: string, inputCode: string): Promise<{ success: boolean; message: string; translationKey?: string }> => {
   try {
     
     // Сначала проверяем, не является ли это секретным кодом администратора
@@ -146,11 +146,11 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
     
     if (error) {
       console.error('❌ Ошибка поиска кода:', error);
-      return { success: false, message: 'Ошибка проверки кода' };
+      return { success: false, message: 'auth.codeVerificationError', translationKey: 'auth.codeVerificationError' };
     }
     
     if (!codes || codes.length === 0) {
-      return { success: false, message: 'Код не найден или истек. Запросите новый код.' };
+      return { success: false, message: 'auth.codeNotFoundOrExpired', translationKey: 'auth.codeNotFoundOrExpired' };
     }
     
     const verificationRecord = codes[0];
@@ -159,7 +159,8 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
     if (verificationRecord.code !== inputCode) {
       return { 
         success: false, 
-        message: 'Неверный код. Попробуйте еще раз.' 
+        message: 'auth.codeInvalid',
+        translationKey: 'auth.codeInvalid'
       };
     }
     
@@ -170,11 +171,11 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
       .eq('id', verificationRecord.id);
     
     // console.log('✅ Код подтвержден успешно');
-    return { success: true, message: 'Код подтвержден успешно' };
+    return { success: true, message: 'auth.codeVerified', translationKey: 'auth.codeVerified' };
     
   } catch (error) {
     console.error('❌ Ошибка проверки кода:', error);
-    return { success: false, message: 'Ошибка проверки кода' };
+    return { success: false, message: 'auth.codeVerificationError', translationKey: 'auth.codeVerificationError' };
   }
 };
 

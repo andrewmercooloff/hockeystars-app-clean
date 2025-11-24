@@ -348,9 +348,13 @@ export default function LoginScreen() {
       const verification = await verifyCode(phone, code);
       
       if (!verification.success) {
+        // Используем ключ перевода, если он есть, иначе используем сообщение напрямую
+        const errorMessage = verification.translationKey 
+          ? t(verification.translationKey) || verification.message
+          : verification.message;
         setAlert({
           visible: true,
-          title: t('common.error'),
+          title: t('auth.errorVerifyingCode') || t('common.error'),
           message: verification.message,
           type: 'error'
         });

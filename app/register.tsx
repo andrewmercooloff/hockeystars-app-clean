@@ -516,7 +516,11 @@ export default function RegisterScreen() {
         const verification = await verifyCode(formData.phone, verificationCode);
         
         if (!verification.success) {
-          showAlert('Ошибка', verification.message, 'error');
+          // Используем ключ перевода, если он есть, иначе используем сообщение напрямую
+          const errorMessage = verification.translationKey 
+            ? t(verification.translationKey) || verification.message
+            : verification.message;
+          showAlert(t('auth.errorVerifyingCode') || 'Ошибка', errorMessage, 'error');
           return;
         }
       } else {
