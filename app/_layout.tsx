@@ -191,6 +191,87 @@ export default function RootLayout() {
   const UserSync = () => {
     const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
     const params = useLocalSearchParams();
+    const globalUserRef = React.useRef<Player | null>(globalUser);
+    
+    React.useEffect(() => {
+      globalUserRef.current = globalUser;
+    }, [globalUser]);
+    
+    const adjustFriendRequestsCount = React.useCallback((delta: number) => {
+      const current = globalUserRef.current;
+      if (!current) return;
+      
+      const nextCount = Math.max(0, (current.friendRequestsCount ?? 0) + delta);
+      if (nextCount === (current.friendRequestsCount ?? 0)) {
+        return;
+      }
+      
+      const updatedUser = { ...current, friendRequestsCount: nextCount };
+      setGlobalUser(updatedUser);
+    }, [setGlobalUser]);
+    
+    React.useEffect(() => {
+      if (!globalUser?.id) {
+        return;
+      }
+      
+      const channel = supabase
+        .channel(`friend-requests-indicator-${globalUser.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'friend_requests',
+            filter: `to_id=eq.${globalUser.id}`,
+          },
+          (payload) => {
+            const newRequest = payload.new as { status?: string } | null;
+            if (newRequest?.status === 'pending') {
+              adjustFriendRequestsCount(1);
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'friend_requests',
+            filter: `to_id=eq.${globalUser.id}`,
+          },
+          (payload) => {
+            const oldStatus = (payload.old as { status?: string } | null)?.status;
+            const newStatus = (payload.new as { status?: string } | null)?.status;
+            
+            if (oldStatus !== 'pending' && newStatus === 'pending') {
+              adjustFriendRequestsCount(1);
+            } else if (oldStatus === 'pending' && newStatus !== 'pending') {
+              adjustFriendRequestsCount(-1);
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'friend_requests',
+            filter: `to_id=eq.${globalUser.id}`,
+          },
+          (payload) => {
+            const oldStatus = (payload.old as { status?: string } | null)?.status;
+            if (oldStatus === 'pending') {
+              adjustFriendRequestsCount(-1);
+            }
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, [globalUser?.id, adjustFriendRequestsCount]);
     
     // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
     React.useEffect(() => {
@@ -521,6 +602,8 @@ export default function RootLayout() {
         const unreadMessagesCount = await getUnreadMessageCount(user.id);
         
         // Загружаем запросы в друзья для отдельного счетчика
+        // НО: если realtime подписка активна, не перезаписываем счетчик, чтобы избежать мигания
+        // Счетчик будет обновляться через realtime подписку в UserSync
         const { getReceivedFriendRequests } = await import('../utils/playerStorage');
         const receivedFriendRequests = await getReceivedFriendRequests(user.id);
         const friendRequestsCount = receivedFriendRequests.length;
@@ -543,10 +626,18 @@ export default function RootLayout() {
           }
         }
         
+        // Сохраняем текущий friendRequestsCount из globalUser, если он есть
+        // Это предотвращает мигание индикатора при обновлении через loadUser
+        const preservedFriendRequestsCount = currentUser?.friendRequestsCount ?? friendRequestsCount;
+        
         const nextUser: Player = {
           ...user,
           unreadMessagesCount,
-          friendRequestsCount,
+          // Используем сохраненное значение, если оно отличается от загруженного не более чем на 1
+          // Это позволяет realtime подписке обновлять счетчик без конфликтов
+          friendRequestsCount: Math.abs(preservedFriendRequestsCount - friendRequestsCount) <= 1 
+            ? preservedFriendRequestsCount 
+            : friendRequestsCount,
           giftRequestsCount,
         };
 
