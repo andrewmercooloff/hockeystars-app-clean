@@ -361,8 +361,8 @@ serve(async (req) => {
     }
 
     // Получаем язык пользователя для локализации сообщений
-    const playerLang = playerData.language || 'en'
-    const isRussian = playerLang === 'ru'
+    const basePlayerLang = playerData.language || 'en'
+    const isRussian = basePlayerLang === 'ru'
 
     // Проверяем, не истек ли токен
     if (playerData.consent_token_expires_at && new Date(playerData.consent_token_expires_at) < new Date()) {
@@ -381,8 +381,8 @@ serve(async (req) => {
       console.log('✅ Аккаунт уже активирован')
       // Возвращаем страницу успеха, но без повторной активации
       const playerNameSafe = (playerData.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      const playerLang = playerData.language || 'en'
-      const alreadyActivePage = playerLang === 'ru' ? `
+      const alreadyActiveLang = playerData.language || 'en'
+      const alreadyActivePage = alreadyActiveLang === 'ru' ? `
       <!DOCTYPE html>
       <html lang="ru">
       <head>
@@ -491,13 +491,13 @@ serve(async (req) => {
     // Отправляем второе письмо (Email-Plus) - не критично, если не отправится
     try {
       // Получаем язык игрока из БД
-      const playerLang = updatedPlayer.language || playerData.language || 'en'
-      console.log(`📧 Отправляем confirmation email на языке: ${playerLang}`)
+      const confirmationEmailLang = updatedPlayer.language || playerData.language || 'en'
+      console.log(`📧 Отправляем confirmation email на языке: ${confirmationEmailLang}`)
       
       const emailResult = await sendActivationConfirmationEmail(
         playerData.parent_email || updatedPlayer.parent_email,
         playerData.name || updatedPlayer.name,
-        playerLang
+        confirmationEmailLang
       )
 
       if (!emailResult.success) {
@@ -529,8 +529,8 @@ serve(async (req) => {
 
     // Возвращаем HTML страницу успеха
     const playerName = (updatedPlayer.name || playerData.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    const playerLang = updatedPlayer.language || playerData.language || 'en'
-    const successPage = playerLang === 'ru' ? `
+    const successPageLang = updatedPlayer.language || playerData.language || 'en'
+    const successPage = successPageLang === 'ru' ? `
       <!DOCTYPE html>
       <html lang="ru">
       <head>
@@ -612,9 +612,9 @@ serve(async (req) => {
         // Если аккаунт активен, возвращаем страницу успеха
         if (checkPlayer && checkPlayer.status === 'active') {
           const playerName = (checkPlayer.name || 'вашего ребенка').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-          const playerLang = checkPlayer.language || 'en'
+          const alreadyActivatedLang = checkPlayer.language || 'en'
           
-          const successPage = playerLang === 'ru' ? `
+          const successPage = alreadyActivatedLang === 'ru' ? `
             <!DOCTYPE html>
             <html lang="ru">
             <head>
