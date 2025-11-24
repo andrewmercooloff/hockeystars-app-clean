@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Impossibile inviare nuovamente il codice",
     "errorInvalidCode": "Inserisci il codice di 6 cifre",
     "errorRegistration": "Impossibile completare la registrazione",
+    "phoneAlreadyRegistered": "Questo numero di telefono è già registrato. Prova ad accedere",
     "errorLoginRequired": "Devi effettuare l'accesso al tuo profilo",
     "errorLoginRequiredMessage": "Devi aver effettuato l'accesso per inviare messaggi.",
     "errorLoginRequiredFriends": "Devi effettuare l'accesso per aggiungere qualcuno come amico.",

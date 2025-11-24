@@ -567,9 +567,13 @@ export default function RegisterScreen() {
         );
         
         if (!consentResult.success) {
+          // Проверяем, является ли это ошибкой о существующем номере телефона
+          const errorMessage = consentResult.error === 'PHONE_ALREADY_EXISTS' 
+            ? t('auth.phoneAlreadyRegistered') || 'Этот номер уже зарегистрирован. Попробуйте войти'
+            : (consentResult.error || (t('register.parentalConsentError') || 'Не удалось отправить запрос родительского согласия'));
           showAlert(
             t('common.error') || 'Ошибка', 
-            consentResult.error || (t('register.parentalConsentError') || 'Не удалось отправить запрос родительского согласия'), 
+            errorMessage, 
             'error'
           );
           return;
@@ -702,9 +706,9 @@ export default function RegisterScreen() {
           error.message?.includes('already exists') ||
           error.message?.includes('already registered') ||
           (error.code === '23505' && formData.phone)) {
-        showAlert('Ошибка', 'Этот номер уже зарегистрирован. Попробуйте войти', 'error');
+        showAlert(t('common.error') || 'Ошибка', t('auth.phoneAlreadyRegistered') || 'Этот номер уже зарегистрирован. Попробуйте войти', 'error');
       } else {
-      showAlert('Ошибка', 'Не удалось завершить регистрацию', 'error');
+      showAlert(t('common.error') || 'Ошибка', t('auth.errorRegistration') || 'Не удалось завершить регистрацию', 'error');
       }
     } finally {
       setLoading(false);

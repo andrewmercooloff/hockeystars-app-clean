@@ -1751,6 +1751,7 @@
     "errorSendingCodeResend": "Nepavyko pakartotinai išsiųsti kodo",
     "errorInvalidCode": "Įveskite 6 skaitmenų kodą",
     "errorRegistration": "Nepavyko užbaigti registracijos",
+    "phoneAlreadyRegistered": "Šis telefono numeris jau užregistruotas. Bandykite prisijungti",
     "errorLoginRequired": "Turite prisijungti prie savo profilio",
     "errorLoginRequiredMessage": "Norėdami siųsti pranešimus, turite būti prisijungę.",
     "errorLoginRequiredFriends": "Turite prisijungti, kad ką nors pridėtumėte prie draugų.",

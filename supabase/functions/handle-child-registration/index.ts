@@ -377,7 +377,7 @@ serve(async (req) => {
 
     if (existingPlayer) {
       return new Response(
-        JSON.stringify({ error: 'Этот номер уже зарегистрирован. Попробуйте войти', code: 'PHONE_ALREADY_EXISTS' }),
+        JSON.stringify({ error: 'PHONE_ALREADY_EXISTS', code: 'PHONE_ALREADY_EXISTS' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }

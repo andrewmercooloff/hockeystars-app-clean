@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Code konnte nicht erneut gesendet werden",
     "errorInvalidCode": "Bitte geben Sie den 6-stelligen Code ein",
     "errorRegistration": "Registrierung konnte nicht abgeschlossen werden",
+    "phoneAlreadyRegistered": "Diese Telefonnummer ist bereits registriert. Bitte versuchen Sie sich anzumelden",
     "errorLoginRequired": "Sie müssen sich bei Ihrem Profil anmelden",
     "errorLoginRequiredMessage": "Sie müssen angemeldet sein, um Nachrichten senden zu können.",
     "errorLoginRequiredFriends": "Sie müssen sich anmelden, um jemanden als Freund hinzuzufügen.",

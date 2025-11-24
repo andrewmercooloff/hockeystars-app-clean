@@ -1552,6 +1552,7 @@
     "errorSendingCodeResend": "Не удалось отправить код повторно",
     "errorInvalidCode": "Пожалуйста, введите 6-значный код",
     "errorRegistration": "Не удалось завершить регистрацию",
+    "phoneAlreadyRegistered": "Этот номер уже зарегистрирован. Попробуйте войти",
     "errorLoginRequired": "Необходимо войти в профиль",
     "errorLoginRequiredMessage": "Необходимо войти в профиль для отправки сообщений",
     "errorLoginRequiredFriends": "Необходимо войти в профиль для добавления в друзья",

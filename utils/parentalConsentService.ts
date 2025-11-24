@@ -102,7 +102,7 @@ export async function registerChildWithParentalConsent(
             errorMessage.includes('уже существует') || 
             errorMessage.includes('already exists') ||
             errorMessage.includes('already registered')) {
-          return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+          return { success: false, error: 'PHONE_ALREADY_EXISTS' };
         }
         return { success: false, error: errorMessage };
       }
@@ -159,7 +159,7 @@ export async function registerChildWithParentalConsent(
         errorMessage.includes('already exists') ||
         errorMessage.includes('already registered')
       )) {
-        return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+        return { success: false, error: 'PHONE_ALREADY_EXISTS' };
       }
       
       return { success: false, error: errorMessage || 'Ошибка запроса родительского согласия' };
@@ -178,7 +178,7 @@ export async function registerChildWithParentalConsent(
         errorMessage.includes('уже существует') || 
         errorMessage.includes('already exists') ||
         errorMessage.includes('already registered')) {
-      return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+      return { success: false, error: 'PHONE_ALREADY_EXISTS' };
     }
     return { success: false, error: errorMessage };
   }

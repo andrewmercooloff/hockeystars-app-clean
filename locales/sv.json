@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Det gick inte att skicka koden igen",
     "errorInvalidCode": "Ange den 6-siffriga koden",
     "errorRegistration": "Det gick inte att slutföra registreringen",
+    "phoneAlreadyRegistered": "Detta telefonnummer är redan registrerat. Försök logga in",
     "errorLoginRequired": "Du måste logga in på din profil",
     "errorLoginRequiredMessage": "Du måste vara inloggad för att skicka meddelanden.",
     "errorLoginRequiredFriends": "Du måste logga in för att lägga till någon som vän.",

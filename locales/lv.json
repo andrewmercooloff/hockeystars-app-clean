@@ -1751,6 +1751,7 @@
     "errorSendingCodeResend": "Neizdevās atkārtoti nosūtīt kodu",
     "errorInvalidCode": "Lūdzu, ievadiet 6 ciparu kodu",
     "errorRegistration": "Neizdevās pabeigt reģistrāciju",
+    "phoneAlreadyRegistered": "Šis tālruņa numurs jau ir reģistrēts. Lūdzu, mēģiniet piesakās",
     "errorLoginRequired": "Jums ir jāpiesakās savā profilā",
     "errorLoginRequiredMessage": "Lai nosūtītu ziņas, jums ir jāpiesakās.",
     "errorLoginRequiredFriends": "Lai kādu pievienotu kā draugu, jums ir jāpiesakās.",

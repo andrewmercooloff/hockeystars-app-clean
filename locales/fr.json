@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Échec du renvoi du code",
     "errorInvalidCode": "Veuillez saisir le code à 6 chiffres",
     "errorRegistration": "Échec de l'inscription",
+    "phoneAlreadyRegistered": "Ce numéro de téléphone est déjà enregistré. Veuillez essayer de vous connecter",
     "errorLoginRequired": "Vous devez vous connecter à votre profil",
     "errorLoginRequiredMessage": "Vous devez être connecté pour envoyer des messages.",
     "errorLoginRequiredFriends": "Vous devez vous connecter pour ajouter quelqu'un comme ami.",

@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Koodin uudelleenlähetys epäonnistui",
     "errorInvalidCode": "Anna 6-numeroinen koodi",
     "errorRegistration": "Rekisteröinnin viimeistely epäonnistui",
+    "phoneAlreadyRegistered": "Tämä puhelinnumero on jo rekisteröity. Yritä kirjautua sisään",
     "errorLoginRequired": "Sinun täytyy kirjautua sisään profiiliisi",
     "errorLoginRequiredMessage": "Sinun tulee olla kirjautuneena sisään lähettääksesi viestejä.",
     "errorLoginRequiredFriends": "Sinun on kirjauduttava sisään, jotta voit lisätä jonkun ystäväksi.",

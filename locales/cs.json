@@ -1738,6 +1738,7 @@
     "errorSendingCodeResend": "Nepodařilo se znovu odeslat kód",
     "errorInvalidCode": "Zadejte 6místný kód",
     "errorRegistration": "Registraci se nepodařilo dokončit",
+    "phoneAlreadyRegistered": "Toto telefonní číslo je již registrováno. Zkuste se přihlásit",
     "errorLoginRequired": "Musíte se přihlásit do svého profilu",
     "errorLoginRequiredMessage": "Pro odesílání zpráv musíte být přihlášeni.",
     "errorLoginRequiredFriends": "Chcete-li přidat někoho jako přítele, musíte se přihlásit.",

@@ -1523,6 +1523,7 @@
     "errorSendingCodeResend": "Nie udało się ponownie wysłać kodu",
     "errorInvalidCode": "Proszę wpisać 6-cyfrowy kod",
     "errorRegistration": "Nie udało się ukończyć rejestracji",
+    "phoneAlreadyRegistered": "Ten numer telefonu jest już zarejestrowany. Spróbuj się zalogować",
     "errorLoginRequired": "Musisz zalogować się do swojego profilu",
     "errorLoginRequiredMessage": "Musisz się zalogować, aby wysyłać wiadomości.",
     "errorLoginRequiredFriends": "Musisz się zalogować, aby dodać kogoś jako znajomego.",

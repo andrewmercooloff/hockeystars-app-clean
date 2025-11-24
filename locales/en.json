@@ -1781,6 +1781,7 @@
     "errorSendingCodeResend": "Failed to resend code",
     "errorInvalidCode": "Please enter a 6-digit code",
     "errorRegistration": "Failed to complete registration",
+    "phoneAlreadyRegistered": "This phone number is already registered. Please try logging in",
     "errorLoginRequired": "Login required",
     "errorLoginRequiredMessage": "You need to log in to send messages",
     "errorLoginRequiredFriends": "You need to log in to add friends",
