@@ -176,7 +176,7 @@
         </div>
         <div id="error" style="display: none;" class="error">
             <div class="success-icon">❌</div>
-            <h1 id="error-title">Error</h1>
+            <h1 id="error-title"></h1>
             <p id="error-message"></p>
         </div>
         <div id="success" style="display: none;" class="success">
@@ -317,6 +317,7 @@
                     }
                     // Иначе пробуем как текст
                     return response.text().then(text => {
+                        console.log('📝 Raw response text:', text.substring(0, 200));
                         // Проверяем, это HTML или JSON
                         if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
                             return { type: 'html', content: text };
@@ -325,21 +326,26 @@
                             const data = JSON.parse(text);
                             return { type: 'json', content: data };
                         } catch (e) {
+                            console.warn('⚠️ Failed to parse as JSON, treating as text');
                             return { type: 'text', content: text };
                         }
                     });
                 } else {
                     // Ошибка - пробуем парсить как JSON
                     return response.text().then(text => {
-                        console.error('❌ Error response:', text);
+                        console.error('❌ Error response status:', response.status);
+                        console.error('❌ Error response text:', text);
                         try {
                             const errorData = JSON.parse(text);
-                            throw new Error(errorData.error || errorData.message || 'Ошибка подтверждения');
+                            const errorMessage = errorData.error || errorData.message || errorData.details || t.errorGeneric;
+                            throw new Error(errorMessage);
                         } catch (parseError) {
-                            if (parseError instanceof Error && parseError.message !== 'Ошибка подтверждения') {
+                            if (parseError instanceof Error && parseError.message !== t.errorGeneric) {
                                 throw parseError;
                             }
-                            throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
+                            // Если не удалось распарсить, используем текст ответа или стандартное сообщение
+                            const errorMessage = text && text.trim() ? text : `${t.errorGeneric} (HTTP ${response.status})`;
+                            throw new Error(errorMessage);
                         }
                     });
                 }
@@ -382,6 +388,7 @@
                     
                     const loadingEl = document.getElementById('loading');
                     const errorEl = document.getElementById('error');
+                    const errorTitleEl = document.getElementById('error-title');
                     const errorMessageEl = document.getElementById('error-message');
                     
                     let errorText = t.errorGeneric;
@@ -389,12 +396,19 @@
                         errorText = lang === 'ru' 
                             ? 'Запрос занял слишком много времени. Пожалуйста, попробуйте еще раз.'
                             : 'Request took too long. Please try again.';
+                    } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                        errorText = lang === 'ru'
+                            ? 'Не удалось подключиться к серверу. Проверьте подключение к интернету и попробуйте еще раз.'
+                            : 'Failed to connect to server. Please check your internet connection and try again.';
                     } else if (error.message) {
                         errorText = error.message;
                     }
                     
                     if (loadingEl) loadingEl.style.display = 'none';
                     if (errorEl) errorEl.style.display = 'block';
+                    if (errorTitleEl) {
+                        errorTitleEl.textContent = t.errorTitle;
+                    }
                     if (errorMessageEl) {
                         errorMessageEl.textContent = errorText;
                     }
