@@ -582,19 +582,27 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('❌ Error in verify-parental-consent:', error)
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace')
     
-    // Если ошибка произошла, но токен был передан, проверяем, может аккаунт уже активирован
+    // Определяем язык из параметра URL или используем английский по умолчанию
     const url = new URL(req.url)
+    const langParam = url.searchParams.get('lang')
+    const isRussian = langParam === 'ru'
     const token = url.searchParams.get('token')
     
+    // Если ошибка произошла, но токен был передан, проверяем, может аккаунт уже активирован
     if (token) {
       try {
-        const { data: checkPlayer } = await supabase
+        const { data: checkPlayer, error: checkError } = await supabase
           .from('players')
           .select('id, name, status, language')
           .eq('consent_token', token)
           .or('status.eq.active,status.eq.pending_verification')
           .single()
+        
+        if (checkError) {
+          console.error('❌ Ошибка при проверке статуса аккаунта:', checkError)
+        }
         
         // Если аккаунт активен, возвращаем страницу успеха
         if (checkPlayer && checkPlayer.status === 'active') {
@@ -649,8 +657,17 @@ serve(async (req) => {
     }
     
     // Если не удалось проверить или аккаунт не активирован, возвращаем ошибку
+    const errorMessage = isRussian
+      ? 'Внутренняя ошибка сервера'
+      : 'Internal server error'
+    const errorDetails = error instanceof Error ? error.message : String(error)
+    
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message || 'Unknown error' }),
+      JSON.stringify({ 
+        error: errorMessage, 
+        message: errorDetails || 'Unknown error',
+        details: error instanceof Error && error.stack ? error.stack.substring(0, 200) : undefined
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
