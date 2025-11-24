@@ -201,13 +201,20 @@ export default function RootLayout() {
       const current = globalUserRef.current;
       if (!current) return;
       
-      const nextCount = Math.max(0, (current.friendRequestsCount ?? 0) + delta);
-      if (nextCount === (current.friendRequestsCount ?? 0)) {
+      const currentCount = current.friendRequestsCount ?? 0;
+      const nextCount = Math.max(0, currentCount + delta);
+      
+      // Предотвращаем обновление, если значение не изменилось
+      if (nextCount === currentCount) {
         return;
       }
       
+      // Обновляем пользователя с новым счетчиком
       const updatedUser = { ...current, friendRequestsCount: nextCount };
       setGlobalUser(updatedUser);
+      
+      // Также обновляем локальный currentUser для немедленного отображения
+      setCurrentUser(updatedUser);
     }, [setGlobalUser]);
     
     React.useEffect(() => {
