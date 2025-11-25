@@ -1905,13 +1905,13 @@ export default function PuckSpeedSoundScreen() {
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>1</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction1') || 'Измерьте расстояние от шайбы до сетки ворот и установите ползунком сверху'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction1') || 'Поставьте телефон равноудаленно от места удара по шайбе и от ворот или разместите одну петличку возле места удара, а вторую закрепите в безопасном месте на сетке'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>2</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction2') || 'Поставьте телефон возле ворот, или используйте 2 петлички. Одну петличку разместите ближе к удару, вторую ближе к воротам.'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction2') || 'Ударьте по шайбе - радар считает время удара и попадания в ворота и рассчитает скорость'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
