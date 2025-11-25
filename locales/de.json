@@ -2796,10 +2796,6 @@
   "logout": "Ausfahrt",
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",
   "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?",
-  "puckSpeed": {
-    "instruction2": "Schießen Sie den Puck - das Radar zählt die Zeit des Aufpralls und des Toreintritts und berechnet die Geschwindigkeit",
-    "instruction3": "Machen Sie mehrere Versuche - wählen Sie die richtige Geschwindigkeit und fügen Sie sie Ihrem Profil hinzu"
-  },
   "puckSpeedNotification": {
     "title": "Neuer Geschwindigkeitsrekord",
     "message": "{playerName} hat einen neuen Geschwindigkeitsrekord aufgestellt: {speed} km/h"
