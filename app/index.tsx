@@ -1724,10 +1724,16 @@ export default function HomeScreen() {
         return selectedCountry;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      if (initialFilters.country !== null && initialFilters.country !== undefined) {
-        return initialFilters.country;
+      // ВАЖНО: Используем initialFilters только если игроки загружены и пользователь загружен
+      if (players.length > 0 && !isUserLoading && currentUser) {
+        if (initialFilters.country !== null && initialFilters.country !== undefined) {
+          return initialFilters.country;
+        }
+        // Если initialFilters.country === null, это означает "Все" - возвращаем undefined
+        return undefined;
       }
-      // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
+      // Пока данные загружаются - возвращаем undefined, чтобы не показывать всех
+      // Это предотвратит показ всех игроков до инициализации фильтров
       return undefined;
     })();
     const effectiveYear = (() => {
@@ -1742,10 +1748,16 @@ export default function HomeScreen() {
         return selectedYear;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      if (initialFilters.year !== null && initialFilters.year !== undefined) {
-        return initialFilters.year;
+      // ВАЖНО: Используем initialFilters только если игроки загружены и пользователь загружен
+      if (players.length > 0 && !isUserLoading && currentUser) {
+        if (initialFilters.year !== null && initialFilters.year !== undefined) {
+          return initialFilters.year;
+        }
+        // Если initialFilters.year === null, это означает "Все" - возвращаем undefined
+        return undefined;
       }
-      // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
+      // Пока данные загружаются - возвращаем undefined, чтобы не показывать всех
+      // Это предотвратит показ всех игроков до инициализации фильтров
       return undefined;
     })();
 
