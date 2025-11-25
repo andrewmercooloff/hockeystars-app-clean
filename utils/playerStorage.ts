@@ -5771,17 +5771,28 @@ export const notifyFriendsAboutChanges = async (
         const userLang = friendLanguages.get(userId) || 'en';
         const userTranslations = loadTranslations(userLang);
         
-        let title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
-        let body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
+        // Определяем, есть ли изменения нормативов в уведомлениях
+        const userNotification = deduplicatedNotifications.find(n => n.user_id === userId);
+        const hasNormativeChanges = userNotification?.data?.changes?.some((c: any) => 
+          ['pullUps', 'pushUps', 'plankTime', 'sprint100m', 'longJump', 'jumpRope'].includes(c.field)
+        );
         
-        if (notificationType === 'stats_change') {
-          const userNotification = deduplicatedNotifications.find(n => n.user_id === userId);
-          if (userNotification) {
-            title = userNotification.title || title;
-            body = userNotification.message || body;
-          }
+        let title: string;
+        let body: string;
+        
+        if (hasNormativeChanges) {
+          // Для нормативов используем специальный заголовок
+          title = userNotification?.title || ('💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update'));
+          body = userNotification?.message || `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
+        } else if (notificationType === 'stats_change') {
+          // Для статистики используем стандартный заголовок
+          title = userNotification?.title || ('📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update'));
+          body = userNotification?.message || `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
         } else if (notificationType === 'physical_data_changed') {
           title = '💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update');
+          body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
+        } else {
+          title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
           body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
         }
         
@@ -5800,19 +5811,38 @@ export const notifyFriendsAboutChanges = async (
         console.error('⚠️ Ошибка отправки push уведомления об изменениях:', pushError);
       }
       
-      // Обновляем счетчик
+      // Обновляем счетчик напрямую (гарантирует Realtime событие)
       try {
-        // Просто увеличиваем счетчик на 1 используя SQL функцию
-        const { error: updateError } = await supabase
-          .rpc('increment_unread_notifications', { user_id: userId });
+        // Получаем текущий счетчик
+        const { data: playerData, error: fetchError } = await supabase
+          .from('players')
+          .select('unread_notifications_count')
+          .eq('id', userId)
+          .single();
 
-        if (updateError) {
-          console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
+        if (fetchError) {
+          console.error('❌ Ошибка получения счетчика уведомлений:', fetchError);
         } else {
-          console.log(`✅ Счетчик уведомлений увеличен для пользователя ${userId}`);
+          const currentCount = playerData?.unread_notifications_count || 0;
+          const newCount = currentCount + 1;
+
+          // Обновляем счетчик напрямую (гарантирует Realtime событие)
+          const { error: updateError } = await supabase
+            .from('players')
+            .update({ 
+              unread_notifications_count: newCount,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+
+          if (updateError) {
+            console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
+          } else {
+            console.log(`✅ Счетчик уведомлений обновлен для пользователя ${userId}: ${currentCount} → ${newCount}`);
+          }
         }
-      } catch (updateError) {
-        console.error('❌ Ошибка обновления счетчика:', updateError);
+      } catch (counterError) {
+        console.error('⚠️ Ошибка обновления счетчика уведомлений:', counterError);
       }
     }
   } catch (error) {
