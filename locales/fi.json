@@ -33,8 +33,8 @@
   "defender": "Puolustaja",
   "goalie": "Maalivahti",
   "goals": "Maalit",
-  "assists": "Vaihteistot",
-  "games": "Pelit",
+  "assists": "Syötöt",
+  "games": "Ottelut",
   "pullUps": "Vedot",
   "pushUps": "Push-ups",
   "plankTime": "Lankku (s)",
@@ -1861,7 +1861,7 @@
     "unblockUserMessage": "Käyttäjän esto on poistettu.",
     "blockUserError": "Käyttäjän esto epäonnistui",
     "unblockUserError": "Käyttäjän eston poisto epäonnistui",
-    "points": "pisteitä",
+    "points": "Pisteet",
     "friendsCount": "ystäviä",
     "friendsCountStats": "Ystävät",
     "seconds": "sek",
@@ -1872,9 +1872,9 @@
     "Защитник": "Puolustaja",
     "Вратарь": "Maalivahti",
     "настоящее время": "nykyaikaa",
-    "goals": "maalit",
-    "assists": "vaihteet",
-    "games": "pelejä",
+    "goals": "Maalit",
+    "assists": "Syötöt",
+    "games": "Ottelut",
     "pullUps": "Vedot",
     "pushUps": "Push-ups",
     "plankTime": "lankku (sek)",
@@ -2451,7 +2451,12 @@
     "reportChat": "Ilmoita chatista",
     "reportChatConfirm": "Haluatko varmasti ilmoittaa tästä chatista?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Välitä kenelle",
+    "noFriendsToForward": "Ei kavereita välitettäväksi",
+    "messageForwarded": "Viesti välitetty",
+    "forwardedTo": "Välitetty",
+    "forwardError": "Välitys epäonnistui"
   },
   "createUser": {
     "title": "Käyttäjän luominen",
@@ -2768,5 +2773,15 @@
   "puckSpeedNotification": {
     "title": "Uusi nopeusennätys",
     "message": "{playerName} asetti uuden nopeusennätyksen: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Uudet saavutukset",
+    "newPhotos": "Uudet kuvat",
+    "newVideos": "Uudet videohetket",
+    "statsUpdate": "Tilastopäivitys",
+    "standardsUpdate": "Normipäivitys",
+    "friendRequest": "Kaveripyyntö",
+    "newFriendship": "Uusi ystävyys",
+    "speedRecord": "Uusi nopeusennätys"
   }
 }

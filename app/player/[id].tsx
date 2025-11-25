@@ -3648,7 +3648,7 @@ export default function PlayerProfile() {
               </SectionCard>
             ) : (
               <>
-            {/* Кнопка добавления пользователя для администратора */}
+            {/* Кнопки администратора */}
             {currentUser && currentUser.status === 'admin' && currentUser.id === player?.id && (
               <SectionCard>
                 <TouchableOpacity 
@@ -3658,6 +3658,16 @@ export default function PlayerProfile() {
                   <Ionicons name="person-add-outline" size={20} color="#fff" />
                   <Text style={styles.friendRequestButtonText}>
                     {t('admin.addUser')}
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.friendRequestButton, styles.adminUsersButton]} 
+                  onPress={() => router.push('/admin/users')}
+                >
+                  <Ionicons name="people-outline" size={20} color="#fff" />
+                  <Text style={styles.friendRequestButtonText}>
+                    Управление пользователями
                   </Text>
                 </TouchableOpacity>
               </SectionCard>
@@ -7480,6 +7490,13 @@ const styles = StyleSheet.create({
     borderColor: '#fa2f40',
     borderWidth: 2,
     borderRadius: 8,
+  },
+  adminUsersButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#8A2BE2',
+    borderWidth: 2,
+    borderRadius: 8,
+    marginTop: 10,
   },
   noDataText: {
     fontSize: 16,

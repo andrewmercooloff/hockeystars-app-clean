@@ -183,8 +183,14 @@ class RealtimeManager {
    * Настраивает подписку на новые сообщения для отправки push уведомлений
    */
   private async setupMessagesSubscription(userId: string): Promise<void> {
+    // Push-уведомления для сообщений теперь отправляются только из sendMessageSimple
+    // Это устраняет дублирование уведомлений, которое происходило когда:
+    // 1. sendMessageSimple отправляла push при отправке сообщения
+    // 2. RealtimeManager на устройстве получателя также пытался отправить push
+    // Подписка на сообщения оставлена для возможных будущих нужд (обновление UI и т.д.)
+    
     const channel = supabase
-      .channel('messages-push-notifications-global')
+      .channel('messages-realtime-updates')
       .on(
         'postgres_changes',
         {
@@ -193,64 +199,23 @@ class RealtimeManager {
           table: 'messages'
         },
         async (payload) => {
-          // ВАЖНО: Проверяем, является ли текущий пользователь получателем
-          // Это критично - уведомления должны приходить ТОЛЬКО получателю
+          // Просто логируем для отладки, push НЕ отправляем
+          // Push уведомления отправляются централизованно из sendMessageSimple
           const receiverId = payload.new.receiver_id;
           const senderId = payload.new.sender_id;
           
-          // Если получатель не текущий пользователь - не отправляем уведомление
-          if (receiverId !== userId) {
-            console.log(`🔔 Пропускаем уведомление: получатель ${receiverId} не совпадает с текущим пользователем ${userId}`);
-            return;
-          }
-          
-          // Дополнительная проверка: если отправитель и получатель одинаковые - не отправляем
-          if (senderId === receiverId) {
-            console.log('🔔 Пропускаем уведомление: отправитель и получатель одинаковые');
-            return;
-          }
-          
-          // Отправляем push уведомление
-          try {
-            const { sendMessageNotification, getUserPushTokens } = await import('./notificationService');
-            const { getPlayerById } = await import('./playerStorage');
-            
-            const messageText = payload.new.text;
-            
-            // Получаем данные отправителя
-            const senderPlayer = await getPlayerById(senderId);
-            if (!senderPlayer) {
-              console.log('🔔 Пропускаем уведомление: не удалось получить данные отправителя');
-              return;
-            }
-            
-            // Получаем токены получателя
-            const receiverTokens = await getUserPushTokens(userId);
-            if (receiverTokens.length > 0) {
-              console.log(`🔔 Отправляем push-уведомление получателю ${userId} от ${senderId}`);
-              await sendMessageNotification(
-                receiverTokens,
-                senderPlayer.name || 'Пользователь',
-                messageText,
-                senderId
-              );
-            } else {
-              console.log(`🔔 Пропускаем уведомление: у получателя ${userId} нет push токенов`);
-            }
-            
-          } catch (error) {
-            console.error('❌ Ошибка отправки push через Realtime:', error);
+          if (receiverId === userId) {
+            console.log(`📨 Realtime: получено новое сообщение от ${senderId} для ${userId}`);
+            // Push НЕ отправляем здесь - это делает sendMessageSimple
           }
         }
       )
       .subscribe();
 
-    this.subscriptions.set('messages-push-notifications-global', {
+    this.subscriptions.set('messages-realtime-updates', {
       channel,
-      name: 'messages-push-notifications-global'
+      name: 'messages-realtime-updates'
     });
-    
-    // console.log('✅ Подписка на сообщения создана для пользователя:', userId);
   }
 
   /**

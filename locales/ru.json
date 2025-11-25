@@ -10,6 +10,7 @@
     "next": "Далее",
     "done": "Готово",
     "reorder": "Порядок",
+    "and": "и",
     "loading": "Загрузка...",
     "error": "Ошибка",
     "success": "Успех",
@@ -76,11 +77,22 @@
     "message": "Поздравляем! Вы получили достижение: {achievementName}"
   },
   "avatarNotification": {
+    "title": "Новый аватар",
     "changed": "изменил свой аватар"
   },
   "puckSpeedNotification": {
     "title": "Новый рекорд скорости",
     "message": "{playerName} установил новый рекорд скорости: {speed} км/ч"
+  },
+  "pushTitles": {
+    "newAchievements": "Новые достижения",
+    "newPhotos": "Новые фото",
+    "newVideos": "Новые видео моменты",
+    "statsUpdate": "Изменения в статистике",
+    "standardsUpdate": "Изменения в нормативах",
+    "friendRequest": "Запрос в друзья",
+    "newFriendship": "Новая дружба",
+    "speedRecord": "Новый рекорд скорости"
   },
   "statsNotification": {
     "updated": "обновил",
@@ -2250,6 +2262,8 @@
     "wantsToAddYou": "{name} хочет добавить вас в друзья",
     "wantsToAddAsFriend": "хочет добавить вас в друзья",
     "friendRequestAccepted": "Запрос в друзья принят!",
+    "friendAccepted": "Запрос принят",
+    "acceptedYourRequest": "принял ваш запрос в друзья",
     "friendRequestDeclined": "Запрос в друзья отклонен",
     "giftRequest": "Запрос подарка",
     "giftRequestMessage": "{playerName} просит подарок",
@@ -2341,7 +2355,12 @@
     "reportChat": "Пожаловаться на чат",
     "reportChatConfirm": "Вы уверены, что хотите пожаловаться на этот чат?",
     "online": "Онлайн",
-    "offline": "Офлайн"
+    "offline": "Офлайн",
+    "forwardTo": "Переслать",
+    "noFriendsToForward": "Нет друзей для пересылки",
+    "messageForwarded": "Сообщение переслано",
+    "forwardedTo": "Переслано",
+    "forwardError": "Не удалось переслать сообщение"
   },
   "createUser": {
     "title": "Создание пользователя",

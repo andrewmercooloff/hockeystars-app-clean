@@ -421,6 +421,7 @@ serve(async (req) => {
     // Определяем язык для сохранения в БД (если передан, иначе определяем по стране)
     const playerLanguage = language || determineLanguage(undefined, country)
     
+    const now = new Date().toISOString()
     const { data: playerData, error: insertError } = await supabase
       .from('players')
       .insert({
@@ -441,7 +442,9 @@ serve(async (req) => {
         grip: grip || '', // Хват игрока
         height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
         weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
-        number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '' // Номер игрока
+        number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '', // Номер игрока
+        created_at: now, // Дата регистрации
+        updated_at: now  // Дата обновления
       })
       .select()
       .single()

@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
+    Keyboard,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -349,159 +353,177 @@ export default function PastTeamsSection({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingTeam ? t('editTeam') : t('addTeam')}
-            </Text>
-            
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('searchTeams')}
-                placeholderTextColor="#888"
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-              />
-              {showSuggestions && (
-                <View style={styles.suggestionsContainer}>
-                  {isSearching ? (
-                    <Text style={styles.suggestionText}>{t('searching')}</Text>
-                  ) : searchResults.length > 0 ? (
-                    <ScrollView style={styles.suggestionsList}>
-                      {searchResults.map((team) => (
-                        <TouchableOpacity
-                          key={team.id}
-                          style={styles.suggestionItem}
-                          onPress={() => selectTeam(team)}
-                        >
-                          <Text style={styles.suggestionText}>{getTeamDisplayName(team.name)}</Text>
-                          {(team.city || team.country) && (
-                            <Text style={styles.suggestionSubtext}>
-                              {[
-                                team.city ? getCityDisplayName(team.city, language) : null,
-                                team.country ? getCountryDisplayName(team.country, language) : null
-                              ].filter(Boolean).join(', ')}
-                            </Text>
-                          )}
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  ) : searchTerm.trim().length >= 2 ? (
-                    <Text style={styles.suggestionText}>{t('noTeamsFound')}</Text>
-                  ) : null}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.modalContentWrapper}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 20}
+            >
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.modalContent}>
+                  <ScrollView 
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.modalScrollContent}
+                  >
+                    <Text style={styles.modalTitle}>
+                      {editingTeam ? t('editTeam') : t('addTeam')}
+                    </Text>
+                    
+                    <View style={styles.searchContainer}>
+                      <TextInput
+                        style={styles.searchInput}
+                        placeholder={t('searchTeams')}
+                        placeholderTextColor="#888"
+                        value={searchTerm}
+                        onChangeText={setSearchTerm}
+                      />
+                      {showSuggestions && (
+                        <View style={styles.suggestionsContainer}>
+                          {isSearching ? (
+                            <Text style={styles.suggestionText}>{t('searching')}</Text>
+                          ) : searchResults.length > 0 ? (
+                            <ScrollView style={styles.suggestionsList}>
+                              {searchResults.map((team) => (
+                                <TouchableOpacity
+                                  key={team.id}
+                                  style={styles.suggestionItem}
+                                  onPress={() => selectTeam(team)}
+                                >
+                                  <Text style={styles.suggestionText}>{getTeamDisplayName(team.name)}</Text>
+                                  {(team.city || team.country) && (
+                                    <Text style={styles.suggestionSubtext}>
+                                      {[
+                                        team.city ? getCityDisplayName(team.city, language) : null,
+                                        team.country ? getCountryDisplayName(team.country, language) : null
+                                      ].filter(Boolean).join(', ')}
+                                    </Text>
+                                  )}
+                                </TouchableOpacity>
+                              ))}
+                            </ScrollView>
+                          ) : searchTerm.trim().length >= 2 ? (
+                            <Text style={styles.suggestionText}>{t('noTeamsFound')}</Text>
+                          ) : null}
+                        </View>
+                      )}
+                    </View>
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder={t('teamName')}
+                      placeholderTextColor="#888"
+                      value={editingTeam?.teamName || newTeam.teamName}
+                      onChangeText={(text) => {
+                        if (editingTeam) {
+                          setEditingTeam({ ...editingTeam, teamName: text });
+                        } else {
+                          setNewTeam({ ...newTeam, teamName: text });
+                        }
+                      }}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder={t('teamCountry')}
+                      placeholderTextColor="#888"
+                      value={editingTeam?.teamCountry || newTeam.teamCountry}
+                      onChangeText={(text) => {
+                        if (editingTeam) {
+                          setEditingTeam({ ...editingTeam, teamCountry: text });
+                        } else {
+                          setNewTeam({ ...newTeam, teamCountry: text });
+                        }
+                      }}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder={t('teamCity')}
+                      placeholderTextColor="#888"
+                      value={editingTeam?.teamCity || newTeam.teamCity}
+                      onChangeText={(text) => {
+                        if (editingTeam) {
+                          setEditingTeam({ ...editingTeam, teamCity: text });
+                        } else {
+                          setNewTeam({ ...newTeam, teamCity: text });
+                        }
+                      }}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder={t('startYear')}
+                      placeholderTextColor="#888"
+                      keyboardType="numeric"
+                      value={editingTeam ? String(editingTeam.startYear) : newTeam.startYear}
+                      onChangeText={(text) => {
+                        if (editingTeam) {
+                          const year = parseInt(text) || 0;
+                          setEditingTeam({ ...editingTeam, startYear: year });
+                        } else {
+                          setNewTeam({ ...newTeam, startYear: text });
+                        }
+                      }}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder={t('endYear')}
+                      placeholderTextColor="#888"
+                      keyboardType="numeric"
+                      returnKeyType="done"
+                      value={editingTeam ? (editingTeam.endYear ? String(editingTeam.endYear) : '') : newTeam.endYear}
+                      onChangeText={(text) => {
+                        if (editingTeam) {
+                          const year = text ? parseInt(text) : undefined;
+                          setEditingTeam({ ...editingTeam, endYear: year });
+                        } else {
+                          setNewTeam({ ...newTeam, endYear: text });
+                        }
+                      }}
+                      onSubmitEditing={Keyboard.dismiss}
+                    />
+                  </ScrollView>
+                  
+                  {/* Кнопки вынесены за ScrollView для фиксации над клавиатурой */}
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.button, styles.cancelButton]}
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        setModalVisible(false);
+                        setEditingTeam(null);
+                        setNewTeam({
+                          teamName: '',
+                          teamCountry: '',
+                          teamCity: '',
+                          startYear: '',
+                          endYear: '',
+                          isCurrent: false
+                        });
+                        setSearchTerm('');
+                        setSearchResults([]);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, styles.saveButton]}
+                      onPress={editingTeam ? handleEditTeam : handleAddTeam}
+                    >
+                      <Text style={styles.saveButtonText}>
+                        {editingTeam ? t('save') : t('add')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              )}
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('teamName')}
-              placeholderTextColor="#888"
-              value={editingTeam?.teamName || newTeam.teamName}
-              onChangeText={(text) => {
-                if (editingTeam) {
-                  setEditingTeam({ ...editingTeam, teamName: text });
-                } else {
-                  setNewTeam({ ...newTeam, teamName: text });
-                }
-              }}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('teamCountry')}
-              placeholderTextColor="#888"
-              value={editingTeam?.teamCountry || newTeam.teamCountry}
-              onChangeText={(text) => {
-                if (editingTeam) {
-                  setEditingTeam({ ...editingTeam, teamCountry: text });
-                } else {
-                  setNewTeam({ ...newTeam, teamCountry: text });
-                }
-              }}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('teamCity')}
-              placeholderTextColor="#888"
-              value={editingTeam?.teamCity || newTeam.teamCity}
-              onChangeText={(text) => {
-                if (editingTeam) {
-                  setEditingTeam({ ...editingTeam, teamCity: text });
-                } else {
-                  setNewTeam({ ...newTeam, teamCity: text });
-                }
-              }}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('startYear')}
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-              value={editingTeam ? String(editingTeam.startYear) : newTeam.startYear}
-              onChangeText={(text) => {
-                if (editingTeam) {
-                  const year = parseInt(text) || 0;
-                  setEditingTeam({ ...editingTeam, startYear: year });
-                } else {
-                  setNewTeam({ ...newTeam, startYear: text });
-                }
-              }}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('endYear')}
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-              value={editingTeam ? (editingTeam.endYear ? String(editingTeam.endYear) : '') : newTeam.endYear}
-              onChangeText={(text) => {
-                if (editingTeam) {
-                  const year = text ? parseInt(text) : undefined;
-                  setEditingTeam({ ...editingTeam, endYear: year });
-                } else {
-                  setNewTeam({ ...newTeam, endYear: text });
-                }
-              }}
-            />
-
-
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  setEditingTeam(null);
-                  setNewTeam({
-                    teamName: '',
-                    teamCountry: '',
-                    teamCity: '',
-                    startYear: '',
-                    endYear: '',
-                    isCurrent: false
-                  });
-                  setSearchTerm('');
-                  setSearchResults([]);
-                  setShowSuggestions(false);
-                }}
-              >
-                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={editingTeam ? handleEditTeam : handleAddTeam}
-              >
-                <Text style={styles.saveButtonText}>
-                  {editingTeam ? t('save') : t('add')}
-                </Text>
-              </TouchableOpacity>
-            </View>
+              </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
@@ -592,19 +614,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'rgba(1, 0, 0, 0.95)',
-    borderRadius: 20,
-    padding: 25,
-    width: '90%',
+  modalContentWrapper: {
+    width: '100%',
     maxWidth: 400,
+    alignSelf: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 15,
+    padding: 20,
+    maxHeight: 580,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },
+  modalScrollContent: {
+    paddingBottom: 10,
+  },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fff',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -673,17 +702,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 10,
   },
-  modalButtons: {
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 15,
+    gap: 10,
+    marginTop: 15,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   cancelButton: {
-    flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 15,
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
@@ -693,11 +725,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   saveButton: {
-    flex: 1,
     backgroundColor: '#FF4444',
-    borderRadius: 12,
-    padding: 15,
-    alignItems: 'center',
   },
   saveButtonText: {
     fontSize: 16,

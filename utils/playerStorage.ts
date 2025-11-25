@@ -1492,12 +1492,37 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
         } else {
           console.log('✅ In-app уведомление о запросе дружбы создано для:', toId);
         
-        // Увеличиваем счетчик уведомлений для получателя
-        const { error: counterError } = await supabase.rpc('increment_unread_notifications', { user_id: toId });
-        if (counterError) {
-          console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
-        }
+          // Увеличиваем счетчик уведомлений для получателя
+          // Используем прямое обновление вместо RPC для гарантированного срабатывания Realtime
+          try {
+            // Получаем текущий счетчик
+            const { data: playerData } = await supabase
+              .from('players')
+              .select('unread_notifications_count')
+              .eq('id', toId)
+              .single();
+            
+            const currentCount = playerData?.unread_notifications_count || 0;
+            const newCount = currentCount + 1;
+            
+            // Обновляем счетчик с updated_at для срабатывания Realtime подписки
+            const { error: updateError } = await supabase
+              .from('players')
+              .update({ 
+                unread_notifications_count: newCount,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', toId);
+            
+            if (updateError) {
+              console.error('❌ Ошибка увеличения счетчика уведомлений:', updateError);
+            } else {
+              console.log('✅ Счетчик уведомлений увеличен для:', toId, 'новое значение:', newCount);
+            }
+          } catch (counterError) {
+            console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
           }
+        }
         } catch (notificationError) {
           console.error('❌ Ошибка создания уведомления о запросе:', notificationError);
         }
@@ -1667,12 +1692,18 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
 export const addPlayer = async (player: Omit<Player, 'id' | 'unread_notifications_count' | 'unreadMessagesCount'>): Promise<Player> => {
   try {
     // Добавляем игрока
-    
     const supabasePlayer = convertPlayerToSupabase(player);
+    
+    // Добавляем created_at и updated_at при создании
+    const dataWithTimestamp = {
+      ...supabasePlayer,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
     
     const { data, error } = await supabase
       .from('players')
-      .insert([supabasePlayer])
+      .insert([dataWithTimestamp])
       .select()
       .single();
     
@@ -2600,13 +2631,22 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
           acceptorName: acceptorData.name
         });
         
+        // Получаем язык получателя (отправителя запроса)
+        const { getUserLanguage, loadTranslations } = await import('./languageHelper');
+        const senderLang = await getUserLanguage(senderId);
+        const senderTranslations = loadTranslations(senderLang);
+        
+        const title = senderTranslations?.notifications?.friendAccepted || 'Friend Request Accepted';
+        const acceptedText = senderTranslations?.notifications?.acceptedYourRequest || 'accepted your friend request';
+        const message = `${acceptorData.name} ${acceptedText}`;
+        
         const { data: notificationData, error: insertError } = await supabase
           .from('notifications')
           .insert([{
             user_id: senderId,
             type: 'friend_accepted',
-            title: 'Friend Request Accepted',
-            message: `${acceptorData.name} accepted your friend request`,
+            title: title,
+            message: message,
             is_read: false,
             data: { 
               acceptor_id: userId1,
@@ -2632,14 +2672,16 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
           console.log('✅ Счетчик уведомлений увеличен для отправителя запроса:', senderId);
         }
         
-        // Отправляем push уведомление
+        // Отправляем push уведомление с локализацией
         try {
-          const { getUserPushTokens, sendNotificationToUser } = await import('./notificationService');
+          const { sendNotificationToUser } = await import('./notificationService');
           console.log('📤 Отправляем push уведомление friend_accepted отправителю:', senderId);
+          const pushTitle = '🤝 ' + title;
+          
           await sendNotificationToUser(
             senderId,
-            '🤝 Запрос принят',
-            `${acceptorData.name} принял ваш запрос в друзья`,
+            pushTitle,
+            message,
             {
               type: 'friend_accepted',
               acceptor_id: userId1,
@@ -3173,7 +3215,9 @@ export const createAdmin = async (): Promise<Player | null> => {
       push_ups: 0,
       plank_time: 0,
       sprint_100m: 0,
-      long_jump: 0
+      long_jump: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
     
     const { data, error } = await supabase
@@ -4016,16 +4060,25 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
     // Конвертируем данные игрока в формат Supabase
     const supabaseData = convertPlayerToSupabase(playerData);
+    
+    // Добавляем created_at при создании
+    const dataWithTimestamp = {
+      ...supabaseData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
     console.log('📋 Данные для Supabase:', {
-      name: supabaseData.name,
-      status: supabaseData.status,
-      avatar: supabaseData.avatar ? (supabaseData.avatar.substring(0, 50) + '...') : 'нет',
-      phone: supabaseData.phone
+      name: dataWithTimestamp.name,
+      status: dataWithTimestamp.status,
+      avatar: dataWithTimestamp.avatar ? (dataWithTimestamp.avatar.substring(0, 50) + '...') : 'нет',
+      phone: dataWithTimestamp.phone,
+      created_at: dataWithTimestamp.created_at
     });
     
     const { data, error } = await supabase
       .from('players')
-      .insert([supabaseData])
+      .insert([dataWithTimestamp])
       .select('*')
       .single();
     
@@ -4192,15 +4245,19 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
       status: playerData.status || 'player'
     };
 
-    // Проставляем createdAt для корректной логики «новички на льду»
-    try { (completePlayerData as any).createdAt = (completePlayerData as any).createdAt || new Date().toISOString(); } catch {}
-
     // Конвертируем данные игрока в формат Supabase
     const supabaseData = convertPlayerToSupabase(completePlayerData);
     
+    // Добавляем created_at при создании
+    const dataWithTimestamp = {
+      ...supabaseData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
     const { data, error } = await supabase
       .from('players')
-      .insert([supabaseData])
+      .insert([dataWithTimestamp])
       .select('*')
       .single();
     
@@ -4382,8 +4439,8 @@ export const notifyFriendsAboutPhotos = async (
         ? (friendTranslations?.photoNotification?.onePhoto || translations?.photoNotification?.onePhoto || 'новое фото')
         : ((friendTranslations?.photoNotification?.multiplePhotos || translations?.photoNotification?.multiplePhotos)?.replace('{count}', photosCount.toString()) || `${photosCount} новых фото`);
       
-      const addedText = friendTranslations?.photoNotification?.added || translations?.photoNotification?.added || 'добавил';
-      const title = friendLang === 'ru' ? 'Новые фото' : 'New Photos';
+      const addedText = friendTranslations?.photoNotification?.added || translations?.photoNotification?.added || 'added';
+      const title = friendTranslations?.pushTitles?.newPhotos || 'New photos';
       
       return {
         id: generateUUID(),
@@ -4423,13 +4480,17 @@ export const notifyFriendsAboutPhotos = async (
           // Отправляем push уведомление
           try {
             const { sendNotificationToUser } = await import('./notificationService');
+            // Получаем локализацию для каждого получателя
+            const userLang = friendLanguages.get(userId) || 'en';
+            const userTranslations = loadTranslations(userLang);
             const photoText = photosCount === 1 
-              ? (translations?.photoNotification?.onePhoto || 'новое фото')
-              : (translations?.photoNotification?.multiplePhotos?.replace('{count}', photosCount.toString()) || `${photosCount} новых фото`);
-            const addedText = translations?.photoNotification?.added || 'добавил';
+              ? (userTranslations?.photoNotification?.onePhoto || 'new photo')
+              : ((userTranslations?.photoNotification?.multiplePhotos || '{count} new photos')?.replace('{count}', photosCount.toString()));
+            const addedText = userTranslations?.photoNotification?.added || 'added';
+            const pushTitle = '📸 ' + (userTranslations?.pushTitles?.newPhotos || 'New photos');
             await sendNotificationToUser(
               userId,
-              '📸 Новые фото',
+              pushTitle,
               `${playerName} ${addedText} ${photoText}`,
               {
                 type: 'photo_added',
@@ -4521,8 +4582,8 @@ export const notifyFriendsAboutVideos = async (
         ? (friendTranslations?.videoNotification?.oneVideo || translations?.videoNotification?.oneVideo || 'новое видео')
         : ((friendTranslations?.videoNotification?.multipleVideos || translations?.videoNotification?.multipleVideos)?.replace('{count}', videosCount.toString()) || `${videosCount} новых видео`);
       
-      const addedText = friendTranslations?.videoNotification?.added || translations?.videoNotification?.added || 'добавил';
-      const title = friendLang === 'ru' ? 'Новые видео моменты' : 'New Videos';
+      const addedText = friendTranslations?.videoNotification?.added || translations?.videoNotification?.added || 'added';
+      const title = friendTranslations?.pushTitles?.newVideos || 'New video moments';
       
       return {
         id: generateUUID(),
@@ -4563,13 +4624,17 @@ export const notifyFriendsAboutVideos = async (
         // Отправляем push уведомление
         try {
           const { sendNotificationToUser } = await import('./notificationService');
+          // Получаем локализацию для каждого получателя
+          const userLang = friendLanguages.get(userId) || 'en';
+          const userTranslations = loadTranslations(userLang);
           const videoText = videosCount === 1 
-            ? (translations?.videoNotification?.oneVideo || 'новое видео')
-            : (translations?.videoNotification?.multipleVideos?.replace('{count}', videosCount.toString()) || `${videosCount} новых видео`);
-          const addedText = translations?.videoNotification?.added || 'добавил';
+            ? (userTranslations?.videoNotification?.oneVideo || 'new video')
+            : ((userTranslations?.videoNotification?.multipleVideos || '{count} new videos')?.replace('{count}', videosCount.toString()));
+          const addedText = userTranslations?.videoNotification?.added || 'added';
+          const pushTitle = '🎬 ' + (userTranslations?.pushTitles?.newVideos || 'New video moments');
           await sendNotificationToUser(
             userId,
-            '🎬 Новые видео моменты',
+            pushTitle,
             `${playerName} ${addedText} ${videoText}`,
             {
               type: 'video_added',
@@ -4700,8 +4765,8 @@ export const notifyFriendsAboutAvatarChange = async (
       const friendLang = friendLanguages.get(friend.id) || 'en';
       const friendTranslations = loadTranslations(friendLang);
       
-      const changedText = friendTranslations?.avatarNotification?.changed || translations?.avatarNotification?.changed || 'изменил свой аватар';
-      const title = friendLang === 'ru' ? 'Новый аватар' : 'New Avatar';
+      const changedText = friendTranslations?.avatarNotification?.changed || translations?.avatarNotification?.changed || 'changed avatar';
+      const title = friendTranslations?.avatarNotification?.title || 'New Avatar';
       
       return {
         id: generateUUID(),
@@ -4918,9 +4983,9 @@ export const notifyFriendsAboutPuckSpeed = async (
             const friendLang = friendLanguages.get(notification.user_id) || 'en';
             const friendTranslations = loadTranslations(friendLang);
             
-            const pushTitle = friendTranslations?.puckSpeedNotification?.title || '⚡ Новый рекорд скорости';
+            const pushTitle = '⚡ ' + (friendTranslations?.pushTitles?.speedRecord || friendTranslations?.puckSpeedNotification?.title || 'New speed record');
             const pushMessage = friendTranslations?.puckSpeedNotification?.message?.replace('{playerName}', playerName).replace('{speed}', Math.round(newMaxSpeed).toString())
-              || `${playerName} установил новый рекорд: ${Math.round(newMaxSpeed)} км/ч`;
+              || `${playerName}: ${Math.round(newMaxSpeed)} km/h`;
             
             await sendNotificationToUser(
               notification.user_id,
@@ -5015,7 +5080,7 @@ export const notifyFriendsAboutAchievements = async (
         : ((friendTranslations?.achievementNotification?.multipleAchievements || translations?.achievementNotification?.multipleAchievements)?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
       
       const addedText = friendTranslations?.achievementNotification?.added || translations?.achievementNotification?.added || 'добавил';
-      const title = friendLang === 'ru' ? 'Новые достижения' : 'New Achievements';
+        const title = friendTranslations?.pushTitles?.newAchievements || 'New Achievements';
       
       return {
         id: generateUUID(),
@@ -5065,7 +5130,7 @@ export const notifyFriendsAboutAchievements = async (
               ? (friendTranslations?.achievementNotification?.oneAchievement || translations?.achievementNotification?.oneAchievement || 'новое достижение')
               : ((friendTranslations?.achievementNotification?.multipleAchievements || translations?.achievementNotification?.multipleAchievements)?.replace('{count}', achievementsCount.toString()) || `${achievementsCount} новых достижения`);
             const receivedText = friendTranslations?.achievementNotification?.received || translations?.achievementNotification?.received || 'получил';
-            const pushTitle = friendLang === 'ru' ? '🏆 Новые достижения' : '🏆 New Achievements';
+            const pushTitle = '🏆 ' + (friendTranslations?.pushTitles?.newAchievements || 'New Achievements');
             
             await sendNotificationToUser(
               notification.user_id,
@@ -5214,9 +5279,9 @@ export const notifyFriendsAboutPhysicalData = async (
         return `${fieldName}: ${change.oldValue}${unit} → ${change.newValue}${unit}`;
       }).join(', ');
       
-      const updatedText = friendTranslations?.statsNotification?.updated || 'обновил';
-      const physicalDataText = friendTranslations?.statsNotification?.physicalData || 'физические данные';
-      const title = friendLang === 'ru' ? 'Изменение физических данных' : 'Physical Data Changed';
+      const updatedText = friendTranslations?.statsNotification?.updated || 'updated';
+      const physicalDataText = friendTranslations?.statsNotification?.physicalData || 'physical data';
+      const title = friendTranslations?.pushTitles?.standardsUpdate || 'Physical Data Changed';
       
       return {
         id: generateUUID(),
@@ -5270,9 +5335,9 @@ export const notifyFriendsAboutPhysicalData = async (
             return `${fieldName}: ${change.oldValue}${unit} → ${change.newValue}${unit}`;
           }).join(', ');
           
-          const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
-          const physicalDataText = friendTranslations?.statsNotification?.physicalData || (friendLang === 'ru' ? 'физические данные' : 'physical data');
-          const title = friendLang === 'ru' ? '💪 Изменение физических данных' : '💪 Physical Data Changed';
+          const updatedText = friendTranslations?.statsNotification?.updated || 'updated';
+          const physicalDataText = friendTranslations?.statsNotification?.physicalData || 'physical data';
+          const title = '💪 ' + (friendTranslations?.pushTitles?.standardsUpdate || 'Physical Data Changed');
           
           await sendNotificationToUser(
             userId,
@@ -5485,8 +5550,8 @@ export const notifyFriendsAboutChanges = async (
         })
         .join(', ');
 
-        const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
-        const title = friendLang === 'ru' ? 'Изменения в статистике' : 'Stats Update';
+        const updatedText = friendTranslations?.statsNotification?.updated || 'updated';
+        const title = friendTranslations?.pushTitles?.statsUpdate || 'Stats Update';
         
         return {
         id: generateUUID(),
@@ -5531,7 +5596,8 @@ export const notifyFriendsAboutChanges = async (
           'longJump': 'long jump',
           'jumpRope': 'jump rope'
         };
-        const fieldNames = friendLang === 'ru' ? fieldNamesRu : fieldNamesEn;
+        // Используем переводы из файла локализации или fallback на английский
+        const fieldNames = friendTranslations?.normativeFields || fieldNamesEn;
         
         const normativeChangesText = normativeChanges
           .map(change => {
@@ -5541,8 +5607,8 @@ export const notifyFriendsAboutChanges = async (
         })
         .join(', ');
 
-        const updatedText = friendTranslations?.statsNotification?.updated || (friendLang === 'ru' ? 'обновил' : 'updated');
-        const title = friendLang === 'ru' ? 'Изменения в нормативах' : 'Standards Update';
+        const updatedText = friendTranslations?.statsNotification?.updated || 'updated';
+        const title = friendTranslations?.pushTitles?.standardsUpdate || 'Standards Update';
         
         return {
         id: generateUUID(),
@@ -5700,10 +5766,8 @@ export const notifyFriendsAboutChanges = async (
         const userLang = friendLanguages.get(userId) || 'en';
         const userTranslations = loadTranslations(userLang);
         
-        let title = userLang === 'ru' ? '📊 Обновление статистики' : '📊 Stats Update';
-        let body = userLang === 'ru' 
-          ? `${playerName} обновил статистику`
-          : `${playerName} updated stats`;
+        let title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
+        let body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
         
         if (notificationType === 'stats_change') {
           const userNotification = deduplicatedNotifications.find(n => n.user_id === userId);
@@ -5712,10 +5776,8 @@ export const notifyFriendsAboutChanges = async (
             body = userNotification.message || body;
           }
         } else if (notificationType === 'physical_data_changed') {
-          title = userLang === 'ru' ? '💪 Изменение физических данных' : '💪 Physical Data Changed';
-          body = userLang === 'ru'
-            ? `${playerName} обновил физические данные`
-            : `${playerName} updated physical data`;
+          title = '💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update');
+          body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
         }
         
         await sendNotificationToUser(
@@ -5816,26 +5878,37 @@ export const notifyFriendsAboutNewFriendship = async (
       });
     };
 
-    // Создаем уведомления для всех друзей
-    const notifications = allFriends.map(friend => ({
-      id: generateUUID(),
-      user_id: friend.id,
-      type: 'new_friendship',
-      title: 'Новая дружба',
-      message: `${player1.name} и ${player2.name} стали друзьями`,
-      data: {
-        friend1Id: userId1,
-        friend1Name: player1.name,
-        friend1Avatar: player1.avatar,
-        friend2Id: userId2,
-        friend2Name: player2.name,
-        friend2Avatar: player2.avatar,
-        confirmedBy: userId1, // userId1 - тот, кто подтвердил дружбу
-        timestamp: new Date().toISOString()
-      },
-      created_at: new Date().toISOString(),
-      is_read: false
-    }));
+    // Получаем языки всех друзей для локализации
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(allFriends.map(f => f.id));
+    
+    // Создаем уведомления для всех друзей с локализацией
+    const notifications = allFriends.map(friend => {
+      const friendLang = friendLanguages.get(friend.id) || 'en';
+      const friendTranslations = loadTranslations(friendLang);
+      const title = friendTranslations?.pushTitles?.newFriendship || 'New friendship';
+      const becameText = friendTranslations?.friendshipNotification?.became || 'became friends';
+      
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'new_friendship',
+        title: title,
+        message: `${player1.name} ${friendTranslations?.common?.and || 'and'} ${player2.name} ${becameText}`,
+        data: {
+          friend1Id: userId1,
+          friend1Name: player1.name,
+          friend1Avatar: player1.avatar,
+          friend2Id: userId2,
+          friend2Name: player2.name,
+          friend2Avatar: player2.avatar,
+          confirmedBy: userId1, // userId1 - тот, кто подтвердил дружбу
+          timestamp: new Date().toISOString()
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
+    });
 
     // Сохраняем уведомления в базу данных
     if (notifications.length > 0) {
@@ -5864,13 +5937,19 @@ export const notifyFriendsAboutNewFriendship = async (
             continue;
           }
           
-          // Отправляем push уведомление
+          // Отправляем push уведомление с локализацией получателя
           try {
             const { sendNotificationToUser } = await import('./notificationService');
+            const userLang = friendLanguages.get(userId) || 'en';
+            const userTranslations = loadTranslations(userLang);
+            const pushTitle = '👥 ' + (userTranslations?.pushTitles?.newFriendship || 'New friendship');
+            const becameText = userTranslations?.friendshipNotification?.became || 'became friends';
+            const andText = userTranslations?.common?.and || 'and';
+            
             await sendNotificationToUser(
               userId,
-              '👥 Новая дружба',
-              `${player1.name} и ${player2.name} стали друзьями`,
+              pushTitle,
+              `${player1.name} ${andText} ${player2.name} ${becameText}`,
               {
                 type: 'new_friendship',
                 friend1Id: userId1,
@@ -7283,5 +7362,59 @@ export const getBlockedUsers = async (blockerId: string): Promise<string[]> => {
   } catch (error) {
     console.error('❌ Ошибка получения списка заблокированных пользователей:', error);
     return [];
+  }
+};
+
+/**
+ * Исправляет отсутствующие даты регистрации (created_at) для всех пользователей
+ * @returns Количество исправленных записей
+ */
+export const fixMissingCreatedAt = async (): Promise<number> => {
+  try {
+    console.log('🔧 Начинаем исправление отсутствующих дат регистрации...');
+    
+    // Получаем всех пользователей без created_at
+    const { data: playersWithoutDate, error: fetchError } = await supabase
+      .from('players')
+      .select('id, name, created_at')
+      .is('created_at', null);
+    
+    if (fetchError) {
+      console.error('❌ Ошибка получения пользователей:', fetchError);
+      return 0;
+    }
+    
+    if (!playersWithoutDate || playersWithoutDate.length === 0) {
+      console.log('✅ Все пользователи уже имеют дату регистрации');
+      return 0;
+    }
+    
+    console.log(`📋 Найдено ${playersWithoutDate.length} пользователей без даты регистрации`);
+    
+    let fixedCount = 0;
+    const now = new Date().toISOString();
+    
+    for (const player of playersWithoutDate) {
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({ 
+          created_at: now,
+          updated_at: now
+        })
+        .eq('id', player.id);
+      
+      if (updateError) {
+        console.error(`❌ Ошибка обновления игрока ${player.name}:`, updateError);
+      } else {
+        console.log(`✅ Исправлен: ${player.name}`);
+        fixedCount++;
+      }
+    }
+    
+    console.log(`🔧 Исправлено ${fixedCount} из ${playersWithoutDate.length} записей`);
+    return fixedCount;
+  } catch (error) {
+    console.error('❌ Ошибка исправления дат регистрации:', error);
+    return 0;
   }
 };

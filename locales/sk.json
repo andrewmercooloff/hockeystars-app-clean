@@ -32,9 +32,9 @@
   "center": "Stred dopredu",
   "defender": "Obranca",
   "goalie": "Brankár",
-  "goals": "Ciele",
-  "assists": "Prevodovky",
-  "games": "Hry",
+  "goals": "Góly",
+  "assists": "Prihrávky",
+  "games": "Zápasy",
   "pullUps": "Príťahy",
   "pushUps": "Kliky",
   "plankTime": "Plank (s)",
@@ -1861,7 +1861,7 @@
     "unblockUserMessage": "Používateľ bol odblokovaný.",
     "blockUserError": "Nepodarilo sa zablokovať používateľa",
     "unblockUserError": "Nepodarilo sa odblokovať používateľa",
-    "points": "bodov",
+    "points": "Body",
     "friendsCount": "priatelia",
     "friendsCountStats": "Priatelia",
     "seconds": "sek",
@@ -1872,9 +1872,9 @@
     "Защитник": "Obranca",
     "Вратарь": "Brankár",
     "настоящее время": "súčasnej dobe",
-    "goals": "ciele",
-    "assists": "ozubené kolesá",
-    "games": "hry",
+    "goals": "Góly",
+    "assists": "Prihrávky",
+    "games": "Zápasy",
     "pullUps": "Príťahy",
     "pushUps": "Kliky",
     "plankTime": "doska (s)",
@@ -2451,7 +2451,12 @@
     "reportChat": "Nahlásiť chat",
     "reportChatConfirm": "Naozaj chcete nahlásiť tento chat?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Preposlať komu",
+    "noFriendsToForward": "Žiadni priatelia na preposlanie",
+    "messageForwarded": "Správa preposlaná",
+    "forwardedTo": "Preposlané",
+    "forwardError": "Preposlanie zlyhalo"
   },
   "createUser": {
     "title": "Vytvorenie používateľa",
@@ -2768,5 +2773,15 @@
   "puckSpeedNotification": {
     "title": "Nový rekord rýchlosti",
     "message": "{playerName} stanovil nový rekord rýchlosti: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nové úspechy",
+    "newPhotos": "Nové fotky",
+    "newVideos": "Nové video momenty",
+    "statsUpdate": "Aktualizácia štatistík",
+    "standardsUpdate": "Aktualizácia noriem",
+    "friendRequest": "Žiadosť o priateľstvo",
+    "newFriendship": "Nové priateľstvo",
+    "speedRecord": "Nový rekord rýchlosti"
   }
 }

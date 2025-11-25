@@ -33,8 +33,8 @@
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
   "defender": "Aizstāvis",
-  "goals": "Mērķi",
-  "assists": "Transmisijas",
+  "goals": "Vārti",
+  "assists": "Piespēles",
   "games": "Spēles",
   "pullUps": "Pievilkšanās",
   "pushUps": "Atspiešanās",
@@ -2477,7 +2477,12 @@
     "reportChat": "Ziņot par tērzēšanu",
     "reportChatConfirm": "Vai tiešām vēlaties ziņot par šo tērzēšanu?",
     "online": "Tiešsaistē",
-    "offline": "Bezsaistē"
+    "offline": "Bezsaistē",
+    "forwardTo": "Pārsūtīt kam",
+    "noFriendsToForward": "Nav draugu, kam pārsūtīt",
+    "messageForwarded": "Ziņa pārsūtīta",
+    "forwardedTo": "Pārsūtīts",
+    "forwardError": "Pārsūtīšana neizdevās"
   },
   "createUser": {
     "title": "Lietotāja izveide",
@@ -2826,6 +2831,16 @@
   "puckSpeedNotification": {
     "title": "Jauns ātruma rekords",
     "message": "{playerName} noteica jaunu ātruma rekordu: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Jauni sasniegumi",
+    "newPhotos": "Jaunas fotogrāfijas",
+    "newVideos": "Jauni video momenti",
+    "statsUpdate": "Statistikas atjauninājums",
+    "standardsUpdate": "Normatīvu atjauninājums",
+    "friendRequest": "Draudzības pieprasījums",
+    "newFriendship": "Jauna draudzība",
+    "speedRecord": "Jauns ātruma rekords"
   },
   "statsNotification": {
     "updated": "atjaunoja",

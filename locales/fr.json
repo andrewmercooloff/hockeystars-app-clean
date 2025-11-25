@@ -32,9 +32,9 @@
   "center": "Avant-centre",
   "defender": "Défenseur",
   "goalie": "Gardien de but",
-  "goals": "Objectifs",
-  "assists": "Transmissions",
-  "games": "Jeux",
+  "goals": "Buts",
+  "assists": "Passes",
+  "games": "Matchs",
   "pullUps": "Tractions",
   "pushUps": "Des pompes",
   "plankTime": "Planche (sec)",
@@ -1854,7 +1854,7 @@
     "unblockUserMessage": "L'utilisateur a été débloqué.",
     "blockUserError": "Impossible de bloquer l'utilisateur",
     "unblockUserError": "Impossible de débloquer l'utilisateur",
-    "points": "points",
+    "points": "Points",
     "friendsCount": "amis",
     "friendsCountStats": "Amis",
     "seconds": "seconde",
@@ -1865,9 +1865,9 @@
     "Защитник": "Défenseur",
     "Вратарь": "Gardien de but",
     "настоящее время": "temps présent",
-    "goals": "objectifs",
-    "assists": "engrenages",
-    "games": "jeux",
+    "goals": "Buts",
+    "assists": "Passes",
+    "games": "Matchs",
     "pullUps": "Tractions",
     "pushUps": "Des pompes",
     "plankTime": "planche (sec)",
@@ -2457,7 +2457,12 @@
     "reportChat": "Signaler la discussion",
     "reportChatConfirm": "Êtes-vous sûr de vouloir signaler cette discussion ?",
     "online": "En ligne",
-    "offline": "Hors ligne"
+    "offline": "Hors ligne",
+    "forwardTo": "Transférer à",
+    "noFriendsToForward": "Pas d'amis à qui transférer",
+    "messageForwarded": "Message transféré",
+    "forwardedTo": "Transféré",
+    "forwardError": "Échec du transfert"
   },
   "createUser": {
     "title": "Créer un utilisateur",
@@ -2774,5 +2779,15 @@
   "puckSpeedNotification": {
     "title": "Nouveau record de vitesse",
     "message": "{playerName} a établi un nouveau record de vitesse: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nouveaux succès",
+    "newPhotos": "Nouvelles photos",
+    "newVideos": "Nouveaux moments vidéo",
+    "statsUpdate": "Mise à jour des statistiques",
+    "standardsUpdate": "Mise à jour des normes",
+    "friendRequest": "Demande d'ami",
+    "newFriendship": "Nouvelle amitié",
+    "speedRecord": "Nouveau record de vitesse"
   }
 }

@@ -110,41 +110,9 @@ export const teamTranslations: { [key: string]: string } = {
 
 // Словарь переводов городов
 export const cityTranslations: { [key: string]: string } = {
+  // Беларусь
   'Минск': 'Minsk',
   'Молодечно': 'Molodechno',
-  'Москва': 'Moscow',
-  'Рига': 'Riga',
-  'Торонто': 'Toronto',
-  'Монреаль': 'Montreal',
-  'Ванкувер': 'Vancouver',
-  'Эдмонтон': 'Edmonton',
-  'Калгари': 'Calgary',
-  'Виннипег': 'Winnipeg',
-  'Оттава': 'Ottawa',
-  'Нью-Йорк': 'New York',
-  'Бостон': 'Boston',
-  'Чикаго': 'Chicago',
-  'Детройт': 'Detroit',
-  'Питтсбург': 'Pittsburgh',
-  'Вашингтон': 'Washington',
-  'Тампа': 'Tampa',
-  'Денвер': 'Denver',
-  'Хельсинки': 'Helsinki',
-  'Тампере': 'Tampere',
-  'Оулу': 'Oulu',
-  'Турку': 'Turku',
-  'Карлстад': 'Karlstad',
-  'Йёнчёпинг': 'Jönköping',
-  'Гётеборг': 'Gothenburg',
-  'Стокгольм': 'Stockholm',
-  'Каунас': 'Kaunas',
-  'Вильнюс': 'Vilnius',
-  'Клайпеда': 'Klaipeda',
-  'Даугавпилс': 'Daugavpils',
-  'Лиепая': 'Liepaja',
-  'Краков': 'Krakow',
-  'Тыхы': 'Tychy',
-  'Новы-Тарг': 'Nowy Targ',
   'Барановичи': 'Baranovichi',
   'Лида': 'Lida',
   'Пинск': 'Pinsk',
@@ -156,6 +124,112 @@ export const cityTranslations: { [key: string]: string } = {
   'Лунинец': 'Luninets',
   'Витебск': 'Vitebsk',
   'Брест': 'Brest',
+  'Гомель': 'Gomel',
+  'Гродно': 'Grodno',
+  'Могилев': 'Mogilev',
+  'Орша': 'Orsha',
+  'Полоцк': 'Polotsk',
+  'Новополоцк': 'Novopolotsk',
+  'Солигорск': 'Soligorsk',
+  'Борисов': 'Borisov',
+  'Светлогорск': 'Svetlogorsk',
+  'Мозырь': 'Mozyr',
+  'Речица': 'Rechitsa',
+  'Слуцк': 'Slutsk',
+  
+  // Россия
+  'Москва': 'Moscow',
+  'Санкт-Петербург': 'Saint Petersburg',
+  'Ярославль': 'Yaroslavl',
+  'Казань': 'Kazan',
+  'Челябинск': 'Chelyabinsk',
+  'Уфа': 'Ufa',
+  'Магнитогорск': 'Magnitogorsk',
+  'Череповец': 'Cherepovets',
+  'Нижний Новгород': 'Nizhny Novgorod',
+  'Омск': 'Omsk',
+  'Новосибирск': 'Novosibirsk',
+  'Хабаровск': 'Khabarovsk',
+  'Екатеринбург': 'Yekaterinburg',
+  'Тольятти': 'Togliatti',
+  'Сочи': 'Sochi',
+  
+  // Латвия
+  'Рига': 'Riga',
+  'Даугавпилс': 'Daugavpils',
+  'Лиепая': 'Liepaja',
+  
+  // Литва
+  'Каунас': 'Kaunas',
+  'Вильнюс': 'Vilnius',
+  'Клайпеда': 'Klaipeda',
+  
+  // Канада
+  'Торонто': 'Toronto',
+  'Монреаль': 'Montreal',
+  'Ванкувер': 'Vancouver',
+  'Эдмонтон': 'Edmonton',
+  'Калгари': 'Calgary',
+  'Виннипег': 'Winnipeg',
+  'Оттава': 'Ottawa',
+  
+  // США
+  'Нью-Йорк': 'New York',
+  'Бостон': 'Boston',
+  'Чикаго': 'Chicago',
+  'Детройт': 'Detroit',
+  'Питтсбург': 'Pittsburgh',
+  'Вашингтон': 'Washington',
+  'Тампа': 'Tampa',
+  'Денвер': 'Denver',
+  'Лос-Анджелес': 'Los Angeles',
+  'Сан-Хосе': 'San Jose',
+  'Анахайм': 'Anaheim',
+  'Даллас': 'Dallas',
+  'Майами': 'Miami',
+  'Филадельфия': 'Philadelphia',
+  'Буффало': 'Buffalo',
+  'Сиэтл': 'Seattle',
+  'Миннеаполис': 'Minneapolis',
+  'Сент-Луис': 'St. Louis',
+  'Нэшвилл': 'Nashville',
+  'Феникс': 'Phoenix',
+  'Колумбус': 'Columbus',
+  'Роли': 'Raleigh',
+  
+  // Финляндия
+  'Хельсинки': 'Helsinki',
+  'Тампере': 'Tampere',
+  'Оулу': 'Oulu',
+  'Турку': 'Turku',
+  
+  // Швеция
+  'Карлстад': 'Karlstad',
+  'Йёнчёпинг': 'Jönköping',
+  'Гётеборг': 'Gothenburg',
+  'Стокгольм': 'Stockholm',
+  'Мальмё': 'Malmö',
+  
+  // Польша
+  'Краков': 'Krakow',
+  'Тыхы': 'Tychy',
+  'Новы-Тарг': 'Nowy Targ',
+  'Варшава': 'Warsaw',
+  
+  // Чехия
+  'Прага': 'Prague',
+  'Брно': 'Brno',
+  
+  // Германия
+  'Берлин': 'Berlin',
+  'Мюнхен': 'Munich',
+  'Кёльн': 'Cologne',
+  'Мангейм': 'Mannheim',
+  
+  // Швейцария
+  'Цюрих': 'Zurich',
+  'Берн': 'Bern',
+  'Женева': 'Geneva',
 };
 
 // Словарь переводов стран
@@ -188,6 +262,30 @@ export const countryTranslations: { [key: string]: string } = {
   'Бельгия': 'Belgium',
   'Великобритания': 'United Kingdom',
   'Исландия': 'Iceland',
+  'Казахстан': 'Kazakhstan',
+  'Китай': 'China',
+  'Япония': 'Japan',
+  'Южная Корея': 'South Korea',
+  'Австралия': 'Australia',
+  'Новая Зеландия': 'New Zealand',
+  'Израиль': 'Israel',
+  'ОАЭ': 'UAE',
+  'Турция': 'Turkey',
+  'Грузия': 'Georgia',
+  'Армения': 'Armenia',
+  'Азербайджан': 'Azerbaijan',
+  'Молдова': 'Moldova',
+  'Румыния': 'Romania',
+  'Болгария': 'Bulgaria',
+  'Сербия': 'Serbia',
+  'Черногория': 'Montenegro',
+  'Босния и Герцеговина': 'Bosnia and Herzegovina',
+  'Северная Македония': 'North Macedonia',
+  'Греция': 'Greece',
+  'Кипр': 'Cyprus',
+  'Мексика': 'Mexico',
+  'Бразилия': 'Brazil',
+  'Аргентина': 'Argentina',
 };
 
 // Функция для поиска переводов команды
@@ -210,7 +308,8 @@ export const findTeamTranslation = (teamName: string, searchTerm: string): boole
 
 // Функция для получения отображаемого названия команды
 export const getTeamDisplayName = (teamName: string, language: string = 'ru'): string => {
-  if (language === 'en') {
+  // Для всех языков кроме русского используем английский перевод
+  if (language !== 'ru') {
     const translation = teamTranslations[teamName];
     if (translation) {
       // Делаем первую букву каждого слова заглавной для лучшего отображения
@@ -225,7 +324,8 @@ export const getTeamDisplayName = (teamName: string, language: string = 'ru'): s
 
 // Функция для получения переведенного названия города
 export const getCityDisplayName = (cityName: string, language: string = 'ru'): string => {
-  if (language === 'en' && cityName) {
+  // Для всех языков кроме русского используем английский перевод
+  if (language !== 'ru' && cityName) {
     const translation = cityTranslations[cityName];
     return translation || cityName;
   }
@@ -234,7 +334,8 @@ export const getCityDisplayName = (cityName: string, language: string = 'ru'): s
 
 // Функция для получения переведенного названия страны
 export const getCountryDisplayName = (countryName: string, language: string = 'ru'): string => {
-  if (language === 'en' && countryName) {
+  // Для всех языков кроме русского используем английский перевод
+  if (language !== 'ru' && countryName) {
     const translation = countryTranslations[countryName];
     return translation || countryName;
   }

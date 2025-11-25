@@ -32,8 +32,8 @@
   "center": "Mittelstürmer",
   "defender": "Verteidiger",
   "goalie": "Torwart",
-  "goals": "Ziele",
-  "assists": "Getriebe",
+  "goals": "Tore",
+  "assists": "Vorlagen",
   "games": "Spiele",
   "pullUps": "Klimmzüge",
   "pushUps": "Liegestütze",
@@ -1865,8 +1865,8 @@
     "Защитник": "Verteidiger",
     "Вратарь": "Torwart",
     "настоящее время": "Gegenwart",
-    "goals": "Ziele",
-    "assists": "Getriebe",
+    "goals": "Tore",
+    "assists": "Vorlagen",
     "games": "Spiele",
     "pullUps": "Klimmzüge",
     "pushUps": "Liegestütze",
@@ -2476,7 +2476,12 @@
     "reportChat": "Chat melden",
     "reportChatConfirm": "Sind Sie sicher, dass Sie diesen Chat melden möchten?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Weiterleiten an",
+    "noFriendsToForward": "Keine Freunde zum Weiterleiten",
+    "messageForwarded": "Nachricht weitergeleitet",
+    "forwardedTo": "Weitergeleitet",
+    "forwardError": "Weiterleitung fehlgeschlagen"
   },
   "createUser": {
     "title": "Erstellen eines Benutzers",
@@ -2793,5 +2798,15 @@
   "puckSpeedNotification": {
     "title": "Neuer Geschwindigkeitsrekord",
     "message": "{playerName} hat einen neuen Geschwindigkeitsrekord aufgestellt: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Neue Erfolge",
+    "newPhotos": "Neue Fotos",
+    "newVideos": "Neue Video-Momente",
+    "statsUpdate": "Statistik aktualisiert",
+    "standardsUpdate": "Normen aktualisiert",
+    "friendRequest": "Freundschaftsanfrage",
+    "newFriendship": "Neue Freundschaft",
+    "speedRecord": "Neuer Geschwindigkeitsrekord"
   }
 }

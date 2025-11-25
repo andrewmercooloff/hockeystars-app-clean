@@ -32,9 +32,9 @@
   "center": "Centravanti",
   "defender": "Difensore",
   "goalie": "Portiere",
-  "goals": "Obiettivi",
-  "assists": "Trasmissioni",
-  "games": "Giochi",
+  "goals": "Gol",
+  "assists": "Assist",
+  "games": "Partite",
   "pullUps": "Trazioni alla sbarra",
   "pushUps": "Sollevamento",
   "plankTime": "Plank (sec)",
@@ -1854,7 +1854,7 @@
     "unblockUserMessage": "L'utente è stato sbloccato.",
     "blockUserError": "Impossibile bloccare l'utente",
     "unblockUserError": "Impossibile sbloccare l'utente",
-    "points": "punti",
+    "points": "Punti",
     "friendsCount": "amici",
     "friendsCountStats": "Amici",
     "seconds": "secondo",
@@ -1865,9 +1865,9 @@
     "Защитник": "Difensore",
     "Вратарь": "Portiere",
     "настоящее время": "tempo presente",
-    "goals": "obiettivi",
-    "assists": "ingranaggi",
-    "games": "giochi",
+    "goals": "Gol",
+    "assists": "Assist",
+    "games": "Partite",
     "pullUps": "Trazioni alla sbarra",
     "pushUps": "Sollevamento",
     "plankTime": "tavola (sec)",
@@ -2457,7 +2457,12 @@
     "reportChat": "Segnala chat",
     "reportChatConfirm": "Sei sicuro di voler segnalare questa chat?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Inoltra a",
+    "noFriendsToForward": "Nessun amico a cui inoltrare",
+    "messageForwarded": "Messaggio inoltrato",
+    "forwardedTo": "Inoltrato",
+    "forwardError": "Inoltro fallito"
   },
   "createUser": {
     "title": "Creazione di un utente",
@@ -2774,5 +2779,15 @@
   "puckSpeedNotification": {
     "title": "Nuovo record di velocità",
     "message": "{playerName} ha stabilito un nuovo record di velocità: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nuovi traguardi",
+    "newPhotos": "Nuove foto",
+    "newVideos": "Nuovi momenti video",
+    "statsUpdate": "Aggiornamento statistiche",
+    "standardsUpdate": "Aggiornamento standard",
+    "friendRequest": "Richiesta di amicizia",
+    "newFriendship": "Nuova amicizia",
+    "speedRecord": "Nuovo record di velocità"
   }
 }

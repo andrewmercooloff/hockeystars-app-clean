@@ -34,9 +34,9 @@
   "center": "Środkowy napastnik",
   "defender": "Obrońca",
   "goalie": "Bramkarz",
-  "goals": "Cele",
-  "assists": "Przekładnie",
-  "games": "Zawody sportowe",
+  "goals": "Gole",
+  "assists": "Asysty",
+  "games": "Mecze",
   "pullUps": "Podciąganie",
   "pushUps": "Pompki",
   "plankTime": "Deska (sek)",
@@ -2265,7 +2265,12 @@
     "reportChat": "Zgłoś czat",
     "reportChatConfirm": "Czy na pewno chcesz zgłosić ten czat?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Prześlij do",
+    "noFriendsToForward": "Brak znajomych do przesłania",
+    "messageForwarded": "Wiadomość przesłana",
+    "forwardedTo": "Przesłano",
+    "forwardError": "Nie udało się przesłać"
   },
   "createUser": {
     "title": "Tworzenie użytkownika",
@@ -2614,6 +2619,16 @@
   "puckSpeedNotification": {
     "title": "Nowy rekord prędkości",
     "message": "{playerName} ustanowił nowy rekord prędkości: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nowe osiągnięcia",
+    "newPhotos": "Nowe zdjęcia",
+    "newVideos": "Nowe momenty wideo",
+    "statsUpdate": "Aktualizacja statystyk",
+    "standardsUpdate": "Aktualizacja norm",
+    "friendRequest": "Zaproszenie do znajomych",
+    "newFriendship": "Nowa przyjaźń",
+    "speedRecord": "Nowy rekord prędkości"
   },
   "statsNotification": {
     "updated": "zaktualizował",

@@ -33,8 +33,8 @@
   "defender": "Försvarare",
   "goalie": "Målvakt",
   "goals": "Mål",
-  "assists": "Transmissioner",
-  "games": "Spel",
+  "assists": "Assist",
+  "games": "Matcher",
   "pullUps": "Pull-ups",
   "pushUps": "Armhävningar",
   "plankTime": "Planka (sek)",
@@ -1854,7 +1854,7 @@
     "unblockUserMessage": "Användaren har avblockerats.",
     "blockUserError": "Kunde inte blockera användare",
     "unblockUserError": "Kunde inte avblockera användare",
-    "points": "poäng",
+    "points": "Poäng",
     "friendsCount": "vänner",
     "friendsCountStats": "Vänner",
     "seconds": "sek",
@@ -1865,9 +1865,9 @@
     "Защитник": "Försvarare",
     "Вратарь": "Målvakt",
     "настоящее время": "nutid",
-    "goals": "mål",
-    "assists": "växlar",
-    "games": "spel",
+    "goals": "Mål",
+    "assists": "Assist",
+    "games": "Matcher",
     "pullUps": "Pull-ups",
     "pushUps": "Armhävningar",
     "plankTime": "planka (sek)",
@@ -2459,7 +2459,12 @@
     "reportChat": "Rapportera chatt",
     "reportChatConfirm": "Är du säker på att du vill rapportera den här chatten?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Vidarebefordra till",
+    "noFriendsToForward": "Inga vänner att vidarebefordra till",
+    "messageForwarded": "Meddelande vidarebefordrat",
+    "forwardedTo": "Vidarebefordrat",
+    "forwardError": "Vidarebefordran misslyckades"
   },
   "createUser": {
     "title": "Skapa en användare",
@@ -2776,5 +2781,15 @@
   "puckSpeedNotification": {
     "title": "Nytt hastighetsrekord",
     "message": "{playerName} satte ett nytt hastighetsrekord: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nya prestationer",
+    "newPhotos": "Nya foton",
+    "newVideos": "Nya videomoment",
+    "statsUpdate": "Statistikuppdatering",
+    "standardsUpdate": "Normuppdatering",
+    "friendRequest": "Vänförfrågan",
+    "newFriendship": "Ny vänskap",
+    "speedRecord": "Nytt hastighetsrekord"
   }
 }

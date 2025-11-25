@@ -29,7 +29,8 @@ import {
     sendMessageSimple,
     blockUser,
     unblockUser,
-    isUserBlocked
+    isUserBlocked,
+    getFriends
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
@@ -63,6 +64,10 @@ export default function ChatScreen() {
   const [chatMenuPosition, setChatMenuPosition] = useState({ x: 0, y: 0 });
   const [isBlockingUser, setIsBlockingUser] = useState(false);
   const [isUserBlockedState, setIsUserBlockedState] = useState(false);
+  const [forwardModalVisible, setForwardModalVisible] = useState(false);
+  const [forwardMessage, setForwardMessage] = useState<Message | null>(null);
+  const [friendsList, setFriendsList] = useState<Player[]>([]);
+  const [loadingFriends, setLoadingFriends] = useState(false);
   const messageRefs = useRef<Map<string, View>>(new Map());
   const scrollViewRef = useRef<ScrollView>(null);
   const lastLoadTimeRef = useRef<number>(0);
@@ -1050,8 +1055,7 @@ export default function ChatScreen() {
     if (action === 'reply') {
       handleReplyToMessage(contextMenuMessage);
     } else if (action === 'forward') {
-      // TODO: Реализовать пересылку сообщения
-      console.log('Переслать сообщение:', contextMenuMessage);
+      handleForwardMessage(contextMenuMessage);
     } else if (action === 'delete') {
       handleDeleteMessage(contextMenuMessage.id);
     }
@@ -1079,6 +1083,57 @@ export default function ChatScreen() {
       }, 100);
     } catch (error) {
       console.error('❌ Ошибка удаления сообщения:', error);
+    }
+  };
+
+  // Пересылка сообщения
+  const handleForwardMessage = async (message: Message) => {
+    if (!currentUser) return;
+    
+    setForwardMessage(message);
+    setLoadingFriends(true);
+    setForwardModalVisible(true);
+    
+    try {
+      const friends = await getFriends(currentUser.id);
+      // Исключаем текущего собеседника из списка
+      const filteredFriends = friends.filter(f => f.id !== otherPlayer?.id);
+      setFriendsList(filteredFriends);
+    } catch (error) {
+      console.error('❌ Ошибка загрузки друзей:', error);
+      setFriendsList([]);
+    } finally {
+      setLoadingFriends(false);
+    }
+  };
+
+  // Отправка пересланного сообщения
+  const handleSendForwardedMessage = async (recipient: Player) => {
+    if (!currentUser || !forwardMessage) return;
+    
+    try {
+      // Формируем текст пересланного сообщения
+      const senderName = forwardMessage.senderId === currentUser.id 
+        ? currentUser.name 
+        : otherPlayer?.name || 'Unknown';
+      const forwardedText = `[FWD]${senderName}:\n${forwardMessage.text}`;
+      
+      await sendMessageSimple(currentUser.id, recipient.id, forwardedText);
+      
+      setForwardModalVisible(false);
+      setForwardMessage(null);
+      
+      Alert.alert(
+        t('chat.messageForwarded') || 'Сообщение переслано',
+        `${t('chat.forwardedTo') || 'Переслано'}: ${recipient.name}`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('❌ Ошибка пересылки сообщения:', error);
+      Alert.alert(
+        t('common.error') || 'Ошибка',
+        t('chat.forwardError') || 'Не удалось переслать сообщение'
+      );
     }
   };
 
@@ -1371,12 +1426,32 @@ export default function ChatScreen() {
                                   </TouchableOpacity>
                                 )}
                                 <View style={styles.messageContentContainer}>
-                                  <Text style={[
-                                    styles.messageText,
-                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                  ]}>
-                                    {message.text}
-                                  </Text>
+                                  {message.text.startsWith('[FWD]') ? (
+                                    <View style={styles.forwardedMessageContent}>
+                                      <View style={styles.forwardedHeader}>
+                                        <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
+                                        <Text style={[
+                                          styles.forwardedSenderName,
+                                          isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                        ]}>
+                                          {message.text.substring(5).split(':\n')[0]}:
+                                        </Text>
+                                      </View>
+                                      <Text style={[
+                                        styles.messageText,
+                                        isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                      ]}>
+                                        {message.text.substring(5).split(':\n').slice(1).join(':\n')}
+                                      </Text>
+                                    </View>
+                                  ) : (
+                                    <Text style={[
+                                      styles.messageText,
+                                      isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                    ]}>
+                                      {message.text}
+                                    </Text>
+                                  )}
                                   <View style={styles.messageTimeContainer}>
                                     <Text style={[
                                       styles.messageTime,
@@ -1602,6 +1677,83 @@ export default function ChatScreen() {
             </TouchableOpacity>
           </Modal>
 
+          {/* Модальное окно пересылки сообщения */}
+          <Modal
+            visible={forwardModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setForwardModalVisible(false);
+              setForwardMessage(null);
+            }}
+          >
+            <View style={styles.forwardModalOverlay}>
+              <View style={styles.forwardModalContainer}>
+                <View style={styles.forwardModalHeader}>
+                  <Text style={styles.forwardModalTitle}>
+                    {t('chat.forwardTo') || 'Переслать кому'}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setForwardModalVisible(false);
+                      setForwardMessage(null);
+                    }}
+                    style={styles.forwardModalCloseButton}
+                  >
+                    <Ionicons name="close" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+                
+                {loadingFriends ? (
+                  <View style={styles.forwardModalLoading}>
+                    <Text style={styles.forwardModalLoadingText}>
+                      {t('common.loading') || 'Загрузка...'}
+                    </Text>
+                  </View>
+                ) : friendsList.length === 0 ? (
+                  <View style={styles.forwardModalEmpty}>
+                    <Ionicons name="people-outline" size={48} color="#666" />
+                    <Text style={styles.forwardModalEmptyText}>
+                      {t('chat.noFriendsToForward') || 'Нет друзей для пересылки'}
+                    </Text>
+                  </View>
+                ) : (
+                  <ScrollView style={styles.forwardModalList}>
+                    {friendsList.map((friend) => (
+                      <TouchableOpacity
+                        key={friend.id}
+                        style={styles.forwardModalItem}
+                        onPress={() => handleSendForwardedMessage(friend)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.forwardModalItemAvatarContainer}>
+                          {friend.avatar ? (
+                            <Image
+                              source={{ uri: friend.avatar }}
+                              style={styles.forwardModalItemAvatar}
+                            />
+                          ) : (
+                            <View style={[styles.forwardModalItemAvatar, styles.forwardModalItemAvatarPlaceholder]}>
+                              <Ionicons name="person" size={18} color="#fff" />
+                            </View>
+                          )}
+                        </View>
+                        <Text style={styles.forwardModalItemName} numberOfLines={1}>{friend.name}</Text>
+                        <Text style={styles.forwardModalItemStatus}>
+                          {friend.status === 'star' ? t('chat.star') || 'Звезда' : 
+                           friend.status === 'coach' ? t('chat.coach') || 'Тренер' :
+                           friend.status === 'scout' ? t('chat.scout') || 'Скаут' :
+                           t('chat.player') || 'Игрок'}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={16} color="#666" />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+            </View>
+          </Modal>
+
           {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
           {!isNearBottom && messages.length > 0 && (
             <TouchableOpacity
@@ -1813,6 +1965,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexWrap: 'nowrap',
   },
+  forwardedMessageContent: {
+    flexDirection: 'column',
+  },
+  forwardedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+    gap: 4,
+  },
+  forwardedSenderName: {
+    fontSize: 13,
+    fontFamily: 'Gilroy-Bold',
+    opacity: 0.8,
+  },
   messageText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
@@ -1975,6 +2141,96 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginVertical: 2,
+  },
+  // Стили для модального окна пересылки
+  forwardModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
+  },
+  forwardModalContainer: {
+    backgroundColor: '#1a1a1a',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+  },
+  forwardModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  forwardModalTitle: {
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  forwardModalCloseButton: {
+    padding: 4,
+  },
+  forwardModalLoading: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  forwardModalLoadingText: {
+    color: '#888',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+  },
+  forwardModalEmpty: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  forwardModalEmptyText: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 12,
+    textAlign: 'center',
+    fontFamily: 'Gilroy-Regular',
+  },
+  forwardModalList: {
+    maxHeight: 400,
+  },
+  forwardModalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  forwardModalItemAvatarContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  forwardModalItemAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  forwardModalItemAvatarPlaceholder: {
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  forwardModalItemName: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    marginLeft: 10,
+  },
+  forwardModalItemStatus: {
+    fontSize: 12,
+    color: '#888',
+    fontFamily: 'Gilroy-Regular',
+    marginRight: 6,
   },
   textInputContainer: {
     flexDirection: 'row',

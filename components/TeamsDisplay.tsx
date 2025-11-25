@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PlayerTeam } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
+import { getCityDisplayName, getTeamDisplayName } from '../utils/teamTranslations';
 
 interface TeamsDisplayProps {
   teams: PlayerTeam[];
@@ -11,7 +12,7 @@ interface TeamsDisplayProps {
 }
 
 const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, compact = false }: TeamsDisplayProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Мемоизируем пустое состояние
   const emptyState = useMemo(() => (
@@ -21,17 +22,25 @@ const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, comp
     </View>
   ), [t]);
 
+  // Функция для получения отображаемого названия команды
+  const getDisplayTeamName = (team: PlayerTeam) => {
+    if (language === 'ru') {
+      return team.teamNameRu || team.teamName;
+    }
+    return getTeamDisplayName(team.teamNameRu || team.teamName, language) || team.teamName;
+  };
+
   // Мемоизируем компактный режим
   const compactView = useMemo(() => (
     <View style={styles.compactContainer}>
       {teams.map((team, index) => (
         <View key={team.teamId} style={styles.compactTeam}>
-          <Text style={styles.compactTeamName}>{team.teamNameRu || team.teamName}</Text>
+          <Text style={styles.compactTeamName}>{getDisplayTeamName(team)}</Text>
           {index < teams.length - 1 && <Text style={styles.compactSeparator}>, </Text>}
         </View>
       ))}
     </View>
-  ), [teams]);
+  ), [teams, language]);
 
   if (!teams || teams.length === 0) {
     return emptyState;
@@ -59,12 +68,12 @@ const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, comp
                   color="#FF4444" 
                 />
                 <Text style={styles.teamName}>
-                  {team.teamNameRu || team.teamName}
+                  {getDisplayTeamName(team)}
                 </Text>
               </View>
               
               {team.teamCity && (
-                <Text style={styles.teamCity}>{team.teamCity}</Text>
+                <Text style={styles.teamCity}>{getCityDisplayName(team.teamCity, language)}</Text>
               )}
             </View>
             

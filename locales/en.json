@@ -10,6 +10,7 @@
     "next": "Next",
     "done": "Done",
     "reorder": "Reorder",
+    "and": "and",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -76,11 +77,22 @@
     "message": "Congratulations! You received achievement: {achievementName}"
   },
   "avatarNotification": {
+    "title": "New Avatar",
     "changed": "changed avatar"
   },
   "puckSpeedNotification": {
     "title": "New speed record",
     "message": "{playerName} set a new speed record: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "New Achievements",
+    "newPhotos": "New photos",
+    "newVideos": "New video moments",
+    "statsUpdate": "Stats Update",
+    "standardsUpdate": "Standards Update",
+    "friendRequest": "Friend Request",
+    "newFriendship": "New friendship",
+    "speedRecord": "New speed record"
   },
   "statsNotification": {
     "updated": "updated",
@@ -2491,6 +2503,8 @@
     "wantsToAddYou": "{name} wants to add you as a friend",
     "wantsToAddAsFriend": "wants to add you as a friend",
     "friendRequestAccepted": "Friend request accepted!",
+    "friendAccepted": "Request Accepted",
+    "acceptedYourRequest": "accepted your friend request",
     "friendRequestDeclined": "Friend request declined",
     "giftRequest": "Gift Request",
     "giftRequestMessage": "{playerName} is requesting a gift",
@@ -2671,7 +2685,12 @@
     "reportChat": "Report chat",
     "reportChatConfirm": "Are you sure you want to report this chat?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Forward to",
+    "noFriendsToForward": "No friends to forward",
+    "messageForwarded": "Message forwarded",
+    "forwardedTo": "Forwarded to",
+    "forwardError": "Failed to forward message"
   },
   "createUser": {
     "title": "Create User",

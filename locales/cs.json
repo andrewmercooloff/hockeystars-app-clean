@@ -32,9 +32,9 @@
   "center": "Střed dopředu",
   "defender": "Obránce",
   "goalie": "Brankář",
-  "goals": "Cíle",
-  "assists": "Převody",
-  "games": "Hry",
+  "goals": "Góly",
+  "assists": "Přihrávky",
+  "games": "Zápasy",
   "pullUps": "Přítahy",
   "pushUps": "Shyby",
   "plankTime": "Plank (s)",
@@ -1861,7 +1861,7 @@
     "unblockUserMessage": "Uživatel byl odblokován.",
     "blockUserError": "Nepodařilo se zablokovat uživatele",
     "unblockUserError": "Nepodařilo se odblokovat uživatele",
-    "points": "body",
+    "points": "Body",
     "friendsCount": "přátelé",
     "friendsCountStats": "Přátelé",
     "seconds": "sek",
@@ -1872,9 +1872,9 @@
     "Защитник": "Obránce",
     "Вратарь": "Brankář",
     "настоящее время": "současné době",
-    "goals": "cíle",
-    "assists": "ozubená kola",
-    "games": "hry",
+    "goals": "Góly",
+    "assists": "Přihrávky",
+    "games": "Zápasy",
     "pullUps": "Přítahy",
     "pushUps": "Shyby",
     "plankTime": "prkno (s)",
@@ -2449,7 +2449,12 @@
     "reportChat": "Nahlásit chat",
     "reportChatConfirm": "Opravdu chcete nahlásit tento chat?",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "forwardTo": "Přeposlat komu",
+    "noFriendsToForward": "Žádní přátelé k přeposlání",
+    "messageForwarded": "Zpráva přeposlána",
+    "forwardedTo": "Přeposláno",
+    "forwardError": "Přeposlání se nezdařilo"
   },
   "createUser": {
     "title": "Vytvoření uživatele",
@@ -2766,5 +2771,15 @@
   "puckSpeedNotification": {
     "title": "Nový rychlostní rekord",
     "message": "{playerName} stanovil nový rychlostní rekord: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nové úspěchy",
+    "newPhotos": "Nové fotky",
+    "newVideos": "Nové video momenty",
+    "statsUpdate": "Aktualizace statistik",
+    "standardsUpdate": "Aktualizace norem",
+    "friendRequest": "Žádost o přátelství",
+    "newFriendship": "Nové přátelství",
+    "speedRecord": "Nový rychlostní rekord"
   }
 }

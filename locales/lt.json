@@ -33,9 +33,9 @@
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
   "defender": "Gynėjas",
-  "goals": "Tikslai",
-  "assists": "Transmisijos",
-  "games": "Žaidimai",
+  "goals": "Įvarčiai",
+  "assists": "Perdavimai",
+  "games": "Rungtynės",
   "pullUps": "Prisitraukimai",
   "pushUps": "Atsispaudimai",
   "plankTime": "Lenta (sek.)",
@@ -1888,7 +1888,7 @@
     "настоящее время": "dabartinis laikas",
     "goals": "Įvarčiai",
     "assists": "Perdavimai",
-    "games": "Žaidimai",
+    "games": "Rungtynės",
     "pullUps": "Prisitraukimai",
     "pushUps": "Atsispaudimai",
     "plankTime": "lenta (sek.)",
@@ -2481,7 +2481,12 @@
     "reportChat": "Pranešti apie pokalbį",
     "reportChatConfirm": "Ar tikrai norite pranešti apie šį pokalbį?",
     "online": "Prisijungęs",
-    "offline": "Atsijungęs"
+    "offline": "Atsijungęs",
+    "forwardTo": "Persiųsti kam",
+    "noFriendsToForward": "Nėra draugų persiųsti",
+    "messageForwarded": "Žinutė persiųsta",
+    "forwardedTo": "Persiųsta",
+    "forwardError": "Nepavyko persiųsti"
   },
   "createUser": {
     "title": "Vartotojo kūrimas",
@@ -2628,6 +2633,16 @@
   "puckSpeedNotification": {
     "title": "Naujas greičio rekordas",
     "message": "{playerName} nustatė naują greičio rekordą: {speed} km/h"
+  },
+  "pushTitles": {
+    "newAchievements": "Nauji pasiekimai",
+    "newPhotos": "Naujos nuotraukos",
+    "newVideos": "Nauji video akimirkos",
+    "statsUpdate": "Statistikos atnaujinimas",
+    "standardsUpdate": "Normatyvų atnaujinimas",
+    "friendRequest": "Draugystės prašymas",
+    "newFriendship": "Nauja draugystė",
+    "speedRecord": "Naujas greičio rekordas"
   },
   "statsNotification": {
     "updated": "atnaujino",
