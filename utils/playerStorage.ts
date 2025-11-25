@@ -5840,12 +5840,15 @@ export const notifyFriendsAboutNewFriendship = async (
     }
 
     // Получаем друзей обоих игроков
-    // ВАЖНО: получаем друзей ПОСЛЕ того, как дружба была добавлена (статус 'accepted')
-    // Это означает, что новый друг может быть в списке друзей, поэтому нужно явно исключить userId1 и userId2
-    const [friends1, friends2] = await Promise.all([
+    // ВАЖНО: Исключаем userId1 и userId2 из списков друзей, т.к. они участники новой дружбы
+    const [friends1Raw, friends2Raw] = await Promise.all([
       getFriends(userId1),
       getFriends(userId2)
     ]);
+    
+    // Явно исключаем участников новой дружбы из списков друзей
+    const friends1 = friends1Raw.filter(f => f.id !== userId2 && f.id !== userId1);
+    const friends2 = friends2Raw.filter(f => f.id !== userId1 && f.id !== userId2);
 
     // Объединяем списки друзей обоих пользователей
     // Исключаем:

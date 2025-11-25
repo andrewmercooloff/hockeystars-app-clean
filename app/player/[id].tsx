@@ -1148,6 +1148,13 @@ export default function PlayerProfile() {
           lastRefreshTime.current = now;
           console.log('🔄 Обновляем данные профиля при возвращении на экран');
           loadPlayerData();
+          
+          // Принудительно обновляем статус дружбы
+          if (currentUser && currentUser.id !== player.id) {
+            getFriendshipStatus(currentUser.id, player.id).then(status => {
+              setFriendshipStatus(status);
+            });
+          }
         }
       }
 
