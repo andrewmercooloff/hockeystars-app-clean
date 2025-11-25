@@ -2797,7 +2797,6 @@
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",
   "logoutConfirmMessage": "Möchten Sie sich wirklich von Ihrem Profil abmelden?",
   "puckSpeed": {
-    "instruction1": "Stellen Sie das Telefon in gleicher Entfernung vom Schussort und vom Tor auf oder platzieren Sie ein Ansteckmikrofon in der Nähe des Schussortes und befestigen Sie das zweite an einem sicheren Ort am Netz",
     "instruction2": "Schießen Sie den Puck - das Radar zählt die Zeit des Aufpralls und des Toreintritts und berechnet die Geschwindigkeit",
     "instruction3": "Machen Sie mehrere Versuche - wählen Sie die richtige Geschwindigkeit und fügen Sie sie Ihrem Profil hinzu"
   },
