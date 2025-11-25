@@ -1710,18 +1710,18 @@ export default function HomeScreen() {
 
     // ВАЖНО: Не показываем игроков до инициализации фильтров, если они должны быть применены
     // Это предотвращает показ всех игроков при первой загрузке
-    // Если фильтры еще не инициализированы, но initialFilters готовы - используем их
+    // Если фильтры уже инициализированы - используем их
+    // Если фильтры еще не инициализированы, но initialFilters готовы (игроки и пользователь загружены) - используем их
     // Если initialFilters еще не готовы (пользователь загружается) - не показываем игроков
     const filtersReady = filtersInitializedRef.current || 
-      (!isUserLoading && currentUser && (initialFilters.country !== null || initialFilters.country === null)); // null означает "Все", это тоже валидное значение
+      (!isUserLoading && currentUser && players.length > 0); // Данные готовы для вычисления initialFilters
     
-    if (!filtersReady && !isUserLoading && currentUser) {
-      // Данные загружены, но фильтры еще не инициализированы - ждем инициализации
-      // Возвращаем предыдущий список, если он есть, или пустой массив
+    if (!filtersReady) {
+      // Данные еще не готовы - возвращаем предыдущий список, если он есть, или пустой массив
       if (allVisiblePlayersRef.current.length > 0) {
         return allVisiblePlayersRef.current;
       }
-      // Если список пустой, возвращаем пустой массив до инициализации фильтров
+      // Если список пустой, возвращаем пустой массив до готовности данных
       return [];
     }
 
