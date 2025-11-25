@@ -2702,6 +2702,14 @@
     "normativeUpdated": "Standardi \"{{name}}\" on päivitetty",
     "errorUpdatingNormative": "Standardin päivittäminen epäonnistui"
   },
+  "normativeFields": {
+    "pullUps": "vetoja",
+    "pushUps": "punnerruksia",
+    "plankTime": "lankkua",
+    "sprint100m": "100m sprinttiä",
+    "longJump": "pituushyppyä",
+    "jumpRope": "hyppynarua"
+  },
   "socialLinks": {
     "website": "Verkkosivusto tai linkki",
     "error": "Virhe",

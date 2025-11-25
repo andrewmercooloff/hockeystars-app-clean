@@ -2727,6 +2727,14 @@
     "normativeUpdated": "Der \"{{name}}\"-Standard wurde aktualisiert",
     "errorUpdatingNormative": "Fehler beim Aktualisieren des Standards"
   },
+  "normativeFields": {
+    "pullUps": "Klimmzüge",
+    "pushUps": "Liegestütze",
+    "plankTime": "Planke",
+    "sprint100m": "100m Sprint",
+    "longJump": "Weitsprung",
+    "jumpRope": "Seilspringen"
+  },
   "socialLinks": {
     "website": "Webseite oder Link",
     "error": "Fehler",

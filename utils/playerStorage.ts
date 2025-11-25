@@ -5585,24 +5585,16 @@ export const notifyFriendsAboutChanges = async (
         const friendLang = friendLanguages.get(friend.id) || 'en';
         const friendTranslations = loadTranslations(friendLang);
         
-        const fieldNamesRu: { [key: string]: string } = {
-            'pullUps': 'подтягиваний',
-            'pushUps': 'отжиманий',
-            'plankTime': 'планки',
-            'sprint100m': 'стометровки',
-            'longJump': 'прыжка в длину',
-            'jumpRope': 'скакалки'
-          };
-        const fieldNamesEn: { [key: string]: string } = {
-          'pullUps': 'pull-ups',
-          'pushUps': 'push-ups',
-          'plankTime': 'plank',
-          'sprint100m': '100m sprint',
-          'longJump': 'long jump',
-          'jumpRope': 'jump rope'
+        // Используем переводы из файла локализации
+        // Если есть секция normativeFields - используем её, иначе используем прямые ключи из корня
+        const fieldNames = friendTranslations?.normativeFields || {
+          'pullUps': friendTranslations?.pullUps || 'pull-ups',
+          'pushUps': friendTranslations?.pushUps || 'push-ups',
+          'plankTime': friendTranslations?.plankTime || 'plank',
+          'sprint100m': friendTranslations?.sprint100m || '100m sprint',
+          'longJump': friendTranslations?.longJump || 'long jump',
+          'jumpRope': friendTranslations?.jumpRope || 'jump rope'
         };
-        // Используем переводы из файла локализации или fallback на английский
-        const fieldNames = friendTranslations?.normativeFields || fieldNamesEn;
         
         const normativeChangesText = normativeChanges
           .map(change => {

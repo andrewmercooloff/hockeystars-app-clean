@@ -2651,6 +2651,14 @@
     "normatives": "normatyvus",
     "physicalData": "fizinius duomenis"
   },
+  "normativeFields": {
+    "pullUps": "atsispaudimų",
+    "pushUps": "atsispaudimų",
+    "plankTime": "plankos",
+    "sprint100m": "100m bėgimo",
+    "longJump": "šuolio į tolį",
+    "jumpRope": "šokdarties"
+  },
   "height": "ūgis",
   "weight": "svoris",
   "cm": "cm",

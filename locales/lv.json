@@ -2745,6 +2745,14 @@
     "normativeUpdated": "Standarts \"{{name}}\" ir atjaunināts",
     "errorUpdatingNormative": "Neizdevās atjaunināt standartu"
   },
+  "normativeFields": {
+    "pullUps": "pievilkšanās",
+    "pushUps": "piezemēšanās",
+    "plankTime": "plankas",
+    "sprint100m": "100m sprinta",
+    "longJump": "tāllēkšanas",
+    "jumpRope": "lecamaukla"
+  },
   "socialLinks": {
     "website": "Tīmekļa vietne vai saite",
     "error": "Kļūda",

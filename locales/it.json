@@ -2708,6 +2708,14 @@
     "normativeUpdated": "Lo standard \"{{name}}\" è stato aggiornato",
     "errorUpdatingNormative": "Impossibile aggiornare lo standard"
   },
+  "normativeFields": {
+    "pullUps": "trazioni",
+    "pushUps": "flessioni",
+    "plankTime": "plank",
+    "sprint100m": "sprint 100m",
+    "longJump": "salto in lungo",
+    "jumpRope": "corda"
+  },
   "socialLinks": {
     "website": "Sito web o collegamento",
     "error": "Errore",

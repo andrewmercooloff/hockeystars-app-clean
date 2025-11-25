@@ -2633,6 +2633,14 @@
     "normativeUpdated": "Норматив \"{{name}}\" обновлен",
     "errorUpdatingNormative": "Не удалось обновить норматив"
   },
+  "normativeFields": {
+    "pullUps": "подтягиваний",
+    "pushUps": "отжиманий",
+    "plankTime": "планки",
+    "sprint100m": "стометровки",
+    "longJump": "прыжка в длину",
+    "jumpRope": "скакалки"
+  },
   "socialLinks": {
     "website": "Сайт или ссылка",
     "error": "Ошибка",

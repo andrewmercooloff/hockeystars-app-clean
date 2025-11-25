@@ -2710,6 +2710,14 @@
     "normativeUpdated": "Standarden \"{{name}}\" har uppdaterats",
     "errorUpdatingNormative": "Det gick inte att uppdatera standarden"
   },
+  "normativeFields": {
+    "pullUps": "armhävningar",
+    "pushUps": "armhävningar",
+    "plankTime": "plankan",
+    "sprint100m": "100m sprint",
+    "longJump": "längdhopp",
+    "jumpRope": "hopprep"
+  },
   "socialLinks": {
     "website": "Webbplats eller länk",
     "error": "Fel",

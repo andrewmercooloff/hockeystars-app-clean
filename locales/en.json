@@ -2900,6 +2900,14 @@
     "normativeUpdated": "Standard \"{name}\" updated",
     "errorUpdatingNormative": "Failed to update standard"
   },
+  "normativeFields": {
+    "pullUps": "pull-ups",
+    "pushUps": "push-ups",
+    "plankTime": "plank",
+    "sprint100m": "100m sprint",
+    "longJump": "long jump",
+    "jumpRope": "jump rope"
+  },
   "logout": "Logout",
   "logoutConfirm": "Logout from profile",
   "logoutConfirmMessage": "Are you sure you want to logout from your profile?",

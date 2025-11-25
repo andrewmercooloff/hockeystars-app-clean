@@ -2700,6 +2700,14 @@
     "normativeUpdated": "Standard \"{{name}}\" byl aktualizován",
     "errorUpdatingNormative": "Aktualizace standardu se nezdařila"
   },
+  "normativeFields": {
+    "pullUps": "přítahů",
+    "pushUps": "kliků",
+    "plankTime": "prkna",
+    "sprint100m": "sprintu 100m",
+    "longJump": "skoku do dálky",
+    "jumpRope": "švihadla"
+  },
   "socialLinks": {
     "website": "webové stránky nebo odkaz",
     "error": "Chyba",
