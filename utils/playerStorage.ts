@@ -2601,6 +2601,11 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     await clearFriendshipCache(userId1, userId2);
     console.log('✅ Кеш статуса дружбы очищен после принятия запроса');
     
+    // Очищаем кеш друзей для обоих пользователей
+    await clearFriendsCache(userId1);
+    await clearFriendsCache(userId2);
+    console.log('✅ Кеш друзей очищен для обоих пользователей');
+    
     // Получаем имя и аватар того, кто принял запрос (userId1 - тот кто принимает)
     const { data: acceptorData } = await supabase
       .from('players')
