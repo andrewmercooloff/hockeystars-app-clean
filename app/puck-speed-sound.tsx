@@ -2463,6 +2463,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 20,
     elevation: 15,
+    marginTop: 10,
   },
   startButton: {
     alignItems: 'center',
