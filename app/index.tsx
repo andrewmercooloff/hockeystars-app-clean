@@ -1708,6 +1708,23 @@ export default function HomeScreen() {
       return [];
     }
 
+    // ВАЖНО: Не показываем игроков до инициализации фильтров, если они должны быть применены
+    // Это предотвращает показ всех игроков при первой загрузке
+    // Если фильтры еще не инициализированы, но initialFilters готовы - используем их
+    // Если initialFilters еще не готовы (пользователь загружается) - не показываем игроков
+    const filtersReady = filtersInitializedRef.current || 
+      (!isUserLoading && currentUser && (initialFilters.country !== null || initialFilters.country === null)); // null означает "Все", это тоже валидное значение
+    
+    if (!filtersReady && !isUserLoading && currentUser) {
+      // Данные загружены, но фильтры еще не инициализированы - ждем инициализации
+      // Возвращаем предыдущий список, если он есть, или пустой массив
+      if (allVisiblePlayersRef.current.length > 0) {
+        return allVisiblePlayersRef.current;
+      }
+      // Если список пустой, возвращаем пустой массив до инициализации фильтров
+      return [];
+    }
+
     // Определяем эффективные фильтры
     // Приоритет: 1) selectedCountry/Year из контекста (если установлены)
     //            2) initialFilters (если вычислены и фильтры не инициализированы)
