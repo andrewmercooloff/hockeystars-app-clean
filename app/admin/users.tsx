@@ -107,6 +107,7 @@ export default function AdminUsersScreen() {
       case 'scout': return '#888888';
       case 'admin': return '#8A2BE2';
       case 'shop': return '#00FF00';
+      case 'skateSharpening': return '#00BCD4';
       default: return '#FFFFFF';
     }
   };
@@ -118,6 +119,7 @@ export default function AdminUsersScreen() {
       case 'scout': return 'Скаут';
       case 'admin': return 'Админ';
       case 'shop': return 'Магазин';
+      case 'skateSharpening': return 'Заточка';
       case 'player': return 'Игрок';
       default: return 'Игрок';
     }

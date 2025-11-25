@@ -1715,12 +1715,16 @@ export default function HomeScreen() {
     const effectiveCountry = (() => {
       // Если фильтры уже установлены пользователем - используем их
       if (filtersInitializedRef.current) {
-        return selectedCountry !== null && selectedCountry !== undefined 
-      ? selectedCountry 
-          : undefined;
+        // Если selectedCountry === null - пользователь выбрал "Все", возвращаем undefined
+        // Если selectedCountry === undefined - еще не установлено, возвращаем undefined
+        // Если selectedCountry - строка - возвращаем её
+        if (selectedCountry === null || selectedCountry === undefined) {
+          return undefined;
+        }
+        return selectedCountry;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      if (initialFilters.country !== null) {
+      if (initialFilters.country !== null && initialFilters.country !== undefined) {
         return initialFilters.country;
       }
       // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
@@ -1729,12 +1733,16 @@ export default function HomeScreen() {
     const effectiveYear = (() => {
       // Если фильтры уже установлены пользователем - используем их
       if (filtersInitializedRef.current) {
-        return selectedYear !== null && selectedYear !== undefined 
-      ? selectedYear 
-          : undefined;
+        // Если selectedYear === null - пользователь выбрал "Все", возвращаем undefined
+        // Если selectedYear === undefined - еще не установлено, возвращаем undefined
+        // Если selectedYear - число - возвращаем его
+        if (selectedYear === null || selectedYear === undefined) {
+          return undefined;
+        }
+        return selectedYear;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      if (initialFilters.year !== null) {
+      if (initialFilters.year !== null && initialFilters.year !== undefined) {
         return initialFilters.year;
       }
       // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
