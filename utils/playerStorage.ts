@@ -1075,7 +1075,7 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     // Если forceRefresh = true, пропускаем проверку кэша
     if (!forceRefresh) {
       const cachedData = await AsyncStorage.getItem(cacheKey);
-
+      
       if (cachedData) {
         const { players, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < cacheTime) {
@@ -1992,8 +1992,8 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
                 // Продолжаем загрузку без использования кэша, чтобы обновить данные
               } else {
                 // Страна совпадает, можно использовать кэш
-                return user;
-              }
+          return user;
+        }
             } else {
               // Если не удалось загрузить из БД, используем кэш
               return user;
@@ -3682,23 +3682,8 @@ export const completeExercise = async (playerId: string, exerciseId: string): Pr
       // Очищаем кеш статистики упражнений при изменении
       await clearExerciseStatsCache(playerId);
       
-      // Получаем данные упражнения для уведомления
-      try {
-        const { ExerciseService } = await import('../services/exerciseService');
-        const exerciseData = await ExerciseService.getExerciseById(exerciseId);
-        
-        if (player.name) {
-          // Отправляем уведомления друзьям
-          await notifyFriendsAboutExercise(
-            playerId,
-            player.name,
-            exerciseId
-          );
-        }
-      } catch (notificationError) {
-        console.error('❌ Ошибка отправки уведомлений об упражнении:', notificationError);
-        // Не прерываем выполнение, если уведомления не отправились
-      }
+      // ВАЖНО: Уведомления друзьям отправляются в ExerciseService.markExerciseAsCompleted
+      // Здесь НЕ отправляем уведомления, чтобы избежать дублирования
       
       return true;
     } else {
@@ -3820,38 +3805,57 @@ export const getExerciseCompletionCount = async (playerId: string, exerciseId: s
 };
 
 // Получить время последнего выполнения конкретного упражнения
+// ВАЖНО: Получаем данные напрямую из БД, минуя кеш, для актуальности
 export const getLastExerciseCompletion = async (playerId: string, exerciseId: string): Promise<ExerciseCompletion | null> => {
   try {
-    // console.log('💪 getLastExerciseCompletion вызван для:', { playerId, exerciseId });
+    // Получаем данные напрямую из базы данных, минуя кеш
+    const { data, error } = await supabase
+      .from('players')
+      .select('exercise_stats')
+      .eq('id', playerId)
+      .single();
     
-    // Получаем данные игрока напрямую из базы
-    const player = await getPlayerById(playerId);
-    if (!player || !player.exerciseStats) {
-      // // console.log('💪 У игрока нет данных о статистике упражнений');
+    if (error || !data) {
       return null;
     }
     
-    // // console.log('💪 Данные exerciseStats игрока:', player.exerciseStats);
+    // Парсим exercise_stats
+    let exerciseStats: PlayerExerciseStats | null = null;
     
-    // Проверяем старый формат (массив)
-    if (Array.isArray(player.exerciseStats.completions)) {
-      // // console.log('💪 Используем старый формат данных (массив)');
-      const completion = player.exerciseStats.completions.find(c => c.exerciseId === exerciseId);
+    if (data.exercise_stats) {
+      if (typeof data.exercise_stats === 'string') {
+        try {
+          exerciseStats = JSON.parse(data.exercise_stats);
+        } catch (e) {
+          console.error('❌ Ошибка парсинга exercise_stats:', e);
+          return null;
+        }
+      } else {
+        exerciseStats = data.exercise_stats as PlayerExerciseStats;
+      }
+    }
+    
+    if (!exerciseStats || !exerciseStats.completions) {
+      return null;
+    }
+    
+    // Проверяем формат (массив)
+    if (Array.isArray(exerciseStats.completions)) {
+      const completion = exerciseStats.completions.find(c => c.exerciseId === exerciseId);
       if (completion) {
-        // console.log('💪 Найдена запись в старом формате:', completion);
         return completion;
       }
     }
     
-    // Проверяем новый формат (объект) - если есть
-    if (player.exerciseStats.completions && typeof player.exerciseStats.completions === 'object' && !Array.isArray(player.exerciseStats.completions)) {
-      // // console.log('💪 Используем новый формат данных (объект)');
-      // В новом формате нет информации о времени, возвращаем null
-      console.log('⚠️ В новом формате нет информации о времени выполнения');
-      return null;
+    // Проверяем формат (объект) - конвертируем в ExerciseCompletion
+    if (typeof exerciseStats.completions === 'object' && !Array.isArray(exerciseStats.completions)) {
+      const count = (exerciseStats.completions as any)[exerciseId];
+      if (count !== undefined) {
+        // В объектном формате нет даты - возвращаем null (упражнение можно выполнить)
+        return null;
+      }
     }
     
-    // // console.log('💪 Упражнение не найдено в статистике');
     return null;
   } catch (error) {
     console.error('❌ Ошибка получения времени последнего выполнения:', error);
@@ -5768,29 +5772,35 @@ export const notifyFriendsAboutNewFriendship = async (
       return;
     }
 
-    // Получаем друзей обоих игроков (исключая их самих)
-    // ВАЖНО: получаем друзей ПОСЛЕ того, как дружба была добавлена, поэтому нужно явно исключить userId1 и userId2
+    // Получаем друзей обоих игроков
+    // ВАЖНО: получаем друзей ПОСЛЕ того, как дружба была добавлена (статус 'accepted')
+    // Это означает, что новый друг может быть в списке друзей, поэтому нужно явно исключить userId1 и userId2
     const [friends1, friends2] = await Promise.all([
       getFriends(userId1),
       getFriends(userId2)
     ]);
 
-    // Объединяем списки друзей и исключаем дубликаты и самих игроков
-    // Явно исключаем userId1 и userId2, чтобы они не получили уведомление "стали друзьями"
+    // Объединяем списки друзей обоих пользователей
+    // Исключаем:
+    // 1. Самих участников новой дружбы (userId1 и userId2) - они не должны получать уведомление "стали друзьями"
+    //    - Отправитель запроса уже получил уведомление "запрос принят" (friend_accepted)
+    //    - Принимающий не должен получать уведомление о новой дружбе
+    // 2. Дубликаты (если у обоих пользователей есть общие друзья)
     const allFriends = [...friends1, ...friends2].filter((friend, index, arr) => {
-      // Исключаем обоих участников новой дружбы - они не должны получать уведомление "стали друзьями"
-      // Отправитель запроса уже получил уведомление "запрос принят", а принимающий не должен получать ничего
+      // Исключаем обоих участников новой дружбы
       if (friend.id === userId1 || friend.id === userId2) {
         console.log(`🚫 Исключаем ${friend.id} из списка получателей уведомления о дружбе (это участник новой дружбы)`);
         return false;
       }
-      // Исключаем дубликаты
+      // Исключаем дубликаты (если друг есть в списке друзей обоих пользователей)
       return arr.findIndex(f => f.id === friend.id) === index;
     });
 
     console.log('👥 Друзья для уведомлений о дружбе:', allFriends.length);
     console.log('👥 ID друзей для уведомлений:', allFriends.map(f => f.id));
-    console.log('👥 userId1:', userId1, 'userId2:', userId2);
+    console.log('👥 userId1 (принимающий):', userId1, 'userId2 (отправитель):', userId2);
+    console.log('👥 Друзья userId1:', friends1.length, friends1.map(f => f.id));
+    console.log('👥 Друзья userId2:', friends2.length, friends2.map(f => f.id));
 
     if (allFriends.length === 0) {
       console.log('👥 Нет друзей для отправки уведомлений о дружбе');
@@ -5901,11 +5911,8 @@ export const notifyFriendsAboutExercise = async (
   playerName: string,
   exerciseId: string
 ): Promise<void> => {
-  console.error('🚨🚨🚨 notifyFriendsAboutExercise ВЫЗВАНА 🚨🚨🚨');
-  console.error('🚨 Параметры:', { playerId, playerName, exerciseId });
   try {
-    console.warn('💪 NOTIFY EXERCISE: Начало отправки уведомлений о выполнении упражнения:', { playerId, playerName, exerciseId });
-    console.error('💪 NOTIFY EXERCISE: Начало отправки уведомлений о выполнении упражнения:', { playerId, playerName, exerciseId });
+    console.log('💪 NOTIFY EXERCISE: Начало отправки уведомлений о выполнении упражнения:', { playerId, playerName, exerciseId });
 
     // Получаем данные игрока для аватара
     const { data: playerData, error: playerError } = await supabase
@@ -5919,7 +5926,7 @@ export const notifyFriendsAboutExercise = async (
     // Получаем друзей игрока
     const friends = await getFriends(playerId);
 
-    console.error('👥 Друзья для уведомлений об упражнении:', friends.length);
+    console.log('👥 Друзья для уведомлений об упражнении:', friends.length);
 
     if (friends.length === 0) {
       console.log('👥 У игрока нет друзей для отправки уведомлений об упражнении');
@@ -5935,27 +5942,59 @@ export const notifyFriendsAboutExercise = async (
       });
     };
 
-    // Создаем уведомления для друзей
-    const notifications = friends.map(friend => ({
-      id: generateUUID(),
-      user_id: friend.id,
-      type: 'exercise_completed',
-      title: 'Exercise completed',
-      message: `${playerName} completed an exercise`,
-      data: {
-        playerId,
-        playerName,
-        playerAvatar,
-        exerciseId,
-        timestamp: new Date().toISOString()
-      },
-      created_at: new Date().toISOString(),
-      is_read: false
-    }));
+    // Получаем языки всех друзей для локализации уведомлений
+    const { getUserLanguages } = await import('./languageHelper');
+    const friendIds = friends.map(f => f.id);
+    const friendLanguages = await getUserLanguages(friendIds);
+    
+    // Загружаем переводы
+    const translations: any = {
+      ru: require('../locales/ru.json'),
+      en: require('../locales/en.json'),
+      lt: require('../locales/lt.json'),
+      lv: require('../locales/lv.json'),
+      pl: require('../locales/pl.json'),
+      sv: require('../locales/sv.json'),
+      cs: require('../locales/cs.json'),
+      sk: require('../locales/sk.json'),
+      fi: require('../locales/fi.json'),
+      it: require('../locales/it.json'),
+      de: require('../locales/de.json'),
+      fr: require('../locales/fr.json'),
+    };
+
+    // Создаем уведомления для друзей с локализацией
+    const notifications = friends.map(friend => {
+      const userLanguage = friendLanguages.get(friend.id) || 'en';
+      const userTranslations = translations[userLanguage] || translations.en;
+      const exerciseNotification = userTranslations?.exerciseNotification;
+      
+      // Формируем локализованные тексты
+      const title = exerciseNotification?.title || 'Exercise completed';
+      const completedText = exerciseNotification?.completed || 'completed an exercise';
+      const message = `${playerName} ${completedText}`;
+      
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'exercise_completed',
+        title: title,
+        message: message,
+        data: {
+          playerId,
+          playerName,
+          playerAvatar,
+          exerciseId,
+          timestamp: new Date().toISOString()
+        },
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
+    });
 
     // Сохраняем уведомления в базу данных
     if (notifications.length > 0) {
-      console.warn('💾 Сохраняем уведомления об упражнении в БД:', notifications.length);
+      console.log('💾 Сохраняем уведомления об упражнении в БД:', notifications.length);
       const { error } = await supabase
         .from('notifications')
         .insert(notifications);
@@ -5967,27 +6006,27 @@ export const notifyFriendsAboutExercise = async (
         
         // Обновляем счетчик уведомлений для каждого друга и отправляем push-уведомления
         const uniqueUserIds = [...new Set(notifications.map(n => n.user_id))];
-        console.error(`👥 Уникальных друзей для отправки push-уведомлений: ${uniqueUserIds.length}`);
+        console.log(`👥 Уникальных друзей для отправки push-уведомлений: ${uniqueUserIds.length}`);
         
         // Импортируем функцию отправки push-уведомлений один раз для всех друзей
         let sendNotificationToUser: any = null;
         try {
-          console.error('📦 Импортируем sendNotificationToUser...');
           const notificationModule = await import('./notificationService');
           sendNotificationToUser = notificationModule.sendNotificationToUser;
           if (!sendNotificationToUser) {
             console.error('❌ sendNotificationToUser не найдена в модуле notificationService');
             throw new Error('sendNotificationToUser не экспортирована');
           }
-          console.error('✅ sendNotificationToUser успешно импортирована');
         } catch (importError) {
-          console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось импортировать sendNotificationToUser:', importError);
-          console.error('❌ Детали ошибки импорта:', importError instanceof Error ? importError.stack : JSON.stringify(importError, null, 2));
+          console.error('❌ Не удалось импортировать sendNotificationToUser:', importError);
           // Продолжаем выполнение, но без push-уведомлений
         }
         
+        // Создаем Map для быстрого доступа к уведомлениям по userId
+        const notificationsByUser = new Map<string, typeof notifications[0]>();
+        notifications.forEach(n => notificationsByUser.set(n.user_id, n));
+        
         for (const userId of uniqueUserIds) {
-          console.error(`🔄 Обрабатываем пользователя ${userId}...`);
           
           // ОБНОВЛЕНИЕ СЧЕТЧИКА - независимый блок
           try {
@@ -6006,61 +6045,14 @@ export const notifyFriendsAboutExercise = async (
           
           // ОТПРАВКА PUSH-УВЕДОМЛЕНИЯ - независимый блок (всегда выполняется, если функция импортирована)
           if (!sendNotificationToUser) {
-            console.error(`⚠️ [${userId}] Пропускаем отправку push-уведомления: функция не импортирована`);
             continue;
           }
           
           try {
-            // ВАЖНО: Получаем язык пользователя из БД
-            const { getUserLanguage } = await import('./languageHelper');
-            const userLanguage = await getUserLanguage(userId);
-            
-            // Загружаем переводы для нужного языка
-            let pushTitle = '💪 Exercise completed';
-            let pushBody = `${playerName} completed an exercise`;
-            
-            try {
-              const translations: any = {
-                ru: require('../locales/ru.json'),
-                en: require('../locales/en.json'),
-                lt: require('../locales/lt.json'),
-                lv: require('../locales/lv.json'),
-                pl: require('../locales/pl.json'),
-                sv: require('../locales/sv.json'),
-                cs: require('../locales/cs.json'),
-                sk: require('../locales/sk.json'),
-                fi: require('../locales/fi.json'),
-                it: require('../locales/it.json'),
-                de: require('../locales/de.json'),
-                fr: require('../locales/fr.json'),
-              };
-              
-              const userTranslations = translations[userLanguage] || translations.en;
-              const exerciseNotification = userTranslations?.exerciseNotification;
-              
-              if (exerciseNotification) {
-                // Используем локализованный текст
-                pushTitle = `💪 ${exerciseNotification.title || 'Exercise completed'}`;
-                // Для body используем шаблон с именем игрока
-                const completedText = exerciseNotification.completed || 'completed an exercise';
-                pushBody = `${playerName} ${completedText}`;
-              }
-            } catch (translationError) {
-              console.error(`⚠️ [${userId}] Ошибка загрузки переводов, используем английский:`, translationError);
-            }
-            
-            console.error(`📤 [${userId}] Начинаем отправку push-уведомления об упражнении...`);
-            console.error(`📤 [${userId}] Язык: ${userLanguage}, Данные для отправки:`, {
-              userId,
-              title: pushTitle,
-              body: pushBody,
-              data: {
-                type: 'exercise_completed',
-                player_id: playerId,
-                exercise_id: exerciseId,
-                action: 'open_exercise'
-              }
-            });
+            // Используем уже подготовленные локализованные данные из уведомления
+            const notification = notificationsByUser.get(userId);
+            const pushTitle = `💪 ${notification?.title || 'Exercise completed'}`;
+            const pushBody = notification?.message || `${playerName} completed an exercise`;
             
             const pushResult = await sendNotificationToUser(
               userId,
@@ -6074,16 +6066,11 @@ export const notifyFriendsAboutExercise = async (
               }
             );
             
-            console.error(`📤 [${userId}] Результат отправки push-уведомления:`, pushResult);
-            
             if (pushResult) {
-              console.error(`✅ [${userId}] Push-уведомление об упражнении успешно отправлено`);
-            } else {
-              console.error(`⚠️ [${userId}] Push-уведомление об упражнении НЕ отправлено (вернулось false)`);
+              console.log(`✅ Push-уведомление об упражнении отправлено для ${userId}`);
             }
           } catch (pushError) {
-            console.error(`❌ [${userId}] Ошибка отправки push-уведомления об упражнении:`, pushError);
-            console.error(`❌ [${userId}] Детали ошибки:`, pushError instanceof Error ? pushError.stack : JSON.stringify(pushError, null, 2));
+            console.error(`❌ Ошибка отправки push-уведомления для ${userId}:`, pushError);
             // Продолжаем выполнение для других пользователей
           }
         }

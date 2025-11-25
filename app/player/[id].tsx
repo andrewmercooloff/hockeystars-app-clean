@@ -198,6 +198,17 @@ export default function PlayerProfile() {
   const [playerNotFoundTimeout, setPlayerNotFoundTimeout] = useState<NodeJS.Timeout | null>(null);
   const [activityRefreshKey, setActivityRefreshKey] = useState<number>(0);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
+  
+  // Ref для отслеживания времени последнего ручного изменения статуса
+  const lastManualStatusChangeRef = useRef<number>(0);
+  
+  // Ref для хранения текущего кеша статуса дружбы
+  const friendshipStatusCacheRef = useRef<Record<string, 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>>({});
+  
+  // Синхронизируем ref с состоянием
+  useEffect(() => {
+    friendshipStatusCacheRef.current = friendshipStatusCache;
+  }, [friendshipStatusCache]);
 
   // Синхронизируем локальное состояние с глобальным
   useEffect(() => {
@@ -906,56 +917,100 @@ export default function PlayerProfile() {
     // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
   }, [id, loadPlayerData]);
 
-  // Восстанавливаем статус дружбы из кеша после загрузки currentUser
+
+  // Инициализация статуса дружбы при загрузке профиля
   useEffect(() => {
-    if (currentUser && player && currentUser.id !== player.id) {
-      const cacheKey = `${currentUser.id}_${player.id}`;
+    if (!currentUser || !player || currentUser.id === player.id) return;
+
+    const initializeFriendshipStatus = async () => {
+      // Не инициализируем статус, если он был изменен вручную менее 3 секунд назад
+      const timeSinceLastManualChange = Date.now() - lastManualStatusChangeRef.current;
+      if (timeSinceLastManualChange < 3000) {
+        console.log('⏭️ Пропускаем инициализацию статуса (недавнее ручное изменение)');
+        return;
+      }
+
+      const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+
+      // Сначала проверяем локальный кеш
       if (friendshipStatusCache[cacheKey]) {
         setFriendshipStatus(friendshipStatusCache[cacheKey]);
+        return;
       }
-    }
-  }, [currentUser, player, friendshipStatusCache]);
 
-  // Realtime подписка на изменения friend_requests для обновления кнопки
-  // Используем debounce чтобы избежать множественных обновлений
+      // Если нет в кеше, загружаем из БД
+      try {
+        const status = await getFriendshipStatus(currentUser.id, player.id);
+        setFriendshipStatus(status);
+
+        // Сохраняем в кеш
+        setFriendshipStatusCache(prev => ({
+          ...prev,
+          [cacheKey]: status
+        }));
+      } catch (error) {
+        console.error('⚠️ Ошибка инициализации статуса дружбы (не критично):', error);
+        setFriendshipStatus('none');
+      }
+    };
+
+    initializeFriendshipStatus();
+  }, [currentUser?.id, player?.id]);
+
+  // Realtime подписка для синхронизации статуса дружбы
   useEffect(() => {
     if (!currentUser || !player) return;
 
     let debounceTimer: NodeJS.Timeout | null = null;
-    let isUpdating = false;
 
-    const updateFriendshipStatus = async () => {
-      if (isUpdating) return;
-      isUpdating = true;
-      
+    const syncFriendshipStatus = async () => {
+      // Не синхронизируем статус через realtime в течение 3 секунд после ручного изменения
+      const timeSinceLastManualChange = Date.now() - lastManualStatusChangeRef.current;
+      if (timeSinceLastManualChange < 3000) {
+        console.log('⏭️ Пропускаем realtime синхронизацию (недавнее ручное изменение)');
+        return;
+      }
+
       try {
-        const status = await getFriendshipStatus(currentUser.id, player.id);
-        setFriendshipStatus(status);
+        const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+        const currentStatus = await getFriendshipStatus(currentUser.id, player.id);
+
+        // Обновляем только если статус действительно изменился
+        setFriendshipStatusCache(prev => {
+          const cachedStatus = prev[cacheKey];
+          if (cachedStatus !== currentStatus) {
+            console.log('🔄 Realtime обновление статуса дружбы:', cachedStatus, '→', currentStatus);
+            setFriendshipStatus(currentStatus);
+            return {
+              ...prev,
+              [cacheKey]: currentStatus
+            };
+          }
+          return prev;
+        });
       } catch (error) {
-        console.error('⚠️ Ошибка обновления статуса дружбы через realtime (не критично):', error);
-      } finally {
-        isUpdating = false;
+        console.error('⚠️ Ошибка синхронизации статуса дружбы через realtime (не критично):', error);
       }
     };
 
-    const debouncedUpdate = () => {
+    const debouncedSync = () => {
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }
-      debounceTimer = setTimeout(updateFriendshipStatus, 200);
+      debounceTimer = setTimeout(syncFriendshipStatus, 500);
     };
 
     const friendRequestsChannel = supabase
-      .channel(`friend-requests-${player.id}`)
+      .channel(`friend-requests-sync-${currentUser.id}-${player.id}`)
       .on(
         'postgres_changes',
         {
-          event: '*', // Слушаем все события (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'friend_requests',
-          filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}` // Запросы ОТ текущего пользователя К просматриваемому
+          filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}`
         },
-        debouncedUpdate
+        debouncedSync
       )
       .on(
         'postgres_changes',
@@ -963,9 +1018,9 @@ export default function PlayerProfile() {
           event: '*',
           schema: 'public',
           table: 'friend_requests',
-          filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}` // Запросы ОТ просматриваемого К текущему пользователю
+          filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}`
         },
-        debouncedUpdate
+        debouncedSync
       )
       .subscribe();
 
@@ -1133,7 +1188,11 @@ export default function PlayerProfile() {
     } else if (scrollToExercises === 'true') {
       scrollToSection(exercisesRef);
     } else if (scrollToFriends === 'true') {
-      scrollToSection(friendsRef);
+      // При переходе по уведомлению о запросе в друзья прокручиваем к началу профиля,
+      // чтобы сразу были видны кнопки "принять" и "отклонить"
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      }, 300);
     } else if (scrollToGift === 'true') {
       scrollToSection(giftButtonRef);
     } else if (scrollToSpeed === 'true') {
@@ -1844,46 +1903,45 @@ export default function PlayerProfile() {
   };
 
   const handleAddFriend = async () => {
-    console.log('🔘 handleAddFriend вызван:', { 
-      friendLoading, 
-      friendshipStatus, 
-      currentUserId: currentUser?.id, 
+    console.log('🔘 handleAddFriend вызван:', {
+      friendLoading,
+      friendshipStatus,
+      currentUserId: currentUser?.id,
       playerId: player?.id,
-      playerName: player?.name 
+      playerName: player?.name
     });
-    
+
     // Защита от повторных вызовов
     if (friendLoading) {
       console.log('⚠️ handleAddFriend: friendLoading=true, пропускаем');
       return;
     }
-    
+
     if (!currentUser || !player) {
       console.log('⚠️ handleAddFriend: нет currentUser или player');
       showCustomAlert('Ошибка', 'Необходимо войти в профиль для добавления в друзья', 'error', () => router.push('/login'));
       return;
     }
-    
+
     setFriendLoading(true);
     try {
+      const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+
       if (friendshipStatus === 'friends') {
         // Удаляем из друзей
         const success = await removeFriend(currentUser.id, player.id);
         if (success) {
-          // Сразу обновляем статус на 'none' для мгновенной обратной связи
+          // Отмечаем время ручного изменения статуса
+          lastManualStatusChangeRef.current = Date.now();
+          
+          // Обновляем статус и кеш
+          setFriendshipStatusCache(prev => ({
+            ...prev,
+            [cacheKey]: 'none'
+          }));
           setFriendshipStatus('none');
-          
-          // Очищаем кеш статуса дружбы для этого игрока
-          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-          setFriendshipStatusCache(prev => {
-            const updated = { ...prev };
-            delete updated[cacheKey];
-            return updated;
-          });
-          
+
           showCustomAlert(t('common.success'), t('profile.removedFromFriends', { name: player?.name || 'Player' }), 'success');
-          
-          // Realtime подписка обновит статус автоматически, не нужно делать это вручную
         } else {
           showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
         }
@@ -1894,51 +1952,42 @@ export default function PlayerProfile() {
         console.log('📤 Результат отправки запроса дружбы:', success);
 
         if (success) {
-          // Сразу обновляем статус на 'sent_request' для мгновенной обратной связи
+          // Отмечаем время ручного изменения статуса
+          lastManualStatusChangeRef.current = Date.now();
+          
+          // Обновляем статус и кеш
+          setFriendshipStatusCache(prev => ({
+            ...prev,
+            [cacheKey]: 'sent_request'
+          }));
           setFriendshipStatus('sent_request');
-          
-          // Очищаем кеш статуса дружбы для этого игрока
-          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-          setFriendshipStatusCache(prev => {
-            const updated = { ...prev };
-            delete updated[cacheKey];
-            return updated;
-          });
-          
+
           // Трекаем добавление в друзья (не критично, если упадет - не должно влиять на работу)
           try {
             await addActivityPoints(currentUser.id, 'FRIEND_ADD');
           } catch (error) {
             console.error('⚠️ Failed to track friend add (не критично):', error);
-            // Не показываем ошибку пользователю, так как это не критично
           }
-          
-          // Показываем уведомление
+
           showCustomAlert(t('common.success'), t('profile.friendRequestSent'), 'success');
-          
-          // Realtime подписка обновит статус автоматически, не нужно делать это вручную
         } else {
-          console.error('❌ Не удалось отправить запрос дружбы');
           showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
         }
       } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
         // Отменяем запрос
         const success = await cancelFriendRequest(currentUser.id, player.id);
         if (success) {
-          // Сразу обновляем статус на 'none' для мгновенной обратной связи
+          // Отмечаем время ручного изменения статуса
+          lastManualStatusChangeRef.current = Date.now();
+          
+          // Обновляем статус и кеш
+          setFriendshipStatusCache(prev => ({
+            ...prev,
+            [cacheKey]: 'none'
+          }));
           setFriendshipStatus('none');
-          
-          // Очищаем кеш статуса дружбы для этого игрока
-          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-          setFriendshipStatusCache(prev => {
-            const updated = { ...prev };
-            delete updated[cacheKey];
-            return updated;
-          });
-          
+
           showCustomAlert(t('common.success'), t('profile.friendRequestCancelled'), 'info');
-          
-          // Realtime подписка обновит статус автоматически, не нужно делать это вручную
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
         }
@@ -1946,31 +1995,19 @@ export default function PlayerProfile() {
         // Принимаем запрос
         const success = await acceptFriendRequest(currentUser.id, player.id);
         if (success) {
-          // Сразу обновляем статус на 'friends' для мгновенной обратной связи
+          // Отмечаем время ручного изменения статуса
+          lastManualStatusChangeRef.current = Date.now();
+          
+          // Обновляем статус и кеш
+          setFriendshipStatusCache(prev => ({
+            ...prev,
+            [cacheKey]: 'friends'
+          }));
           setFriendshipStatus('friends');
-          
-          // Очищаем кеш статуса дружбы для этого игрока
-          const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-          setFriendshipStatusCache(prev => {
-            const updated = { ...prev };
-            delete updated[cacheKey];
-            return updated;
-          });
-          
-          // Показываем алерт сразу
-          showCustomAlert(
-            t('common.success'), 
-            t('profile.friendshipAccepted', { name: player?.name || 'Player' }), 
-            'success',
-            undefined, // Не закрываем автоматически
-            false // Не показываем кнопку отмены
-          );
-          
-          // Очищаем кеш и обновляем данные один раз асинхронно (не блокируем UI)
-          // Realtime подписка обновит статус автоматически, поэтому не нужно делать это вручную
+
+          // Очищаем кеш игрока и аватара асинхронно
           setTimeout(async () => {
             try {
-              // Очищаем кеш игрока и аватара
               await clearPlayerCache(player.id);
               try {
                 const { avatarCache } = await import('../../utils/AvatarCache');
@@ -1978,13 +2015,16 @@ export default function PlayerProfile() {
               } catch (error) {
                 // Игнорируем ошибки очистки кеша аватара
               }
-              
-              // Обновляем данные игрока для обновления списка друзей
-              await loadPlayerData();
             } catch (error) {
-              console.error('⚠️ Ошибка обновления данных после принятия запроса (не критично):', error);
+              console.error('⚠️ Ошибка очистки кеша после принятия запроса (не критично):', error);
             }
-          }, 500);
+          }, 100);
+
+          showCustomAlert(
+            t('common.success'),
+            t('profile.friendshipAccepted', { name: player?.name || 'Player' }),
+            'success'
+          );
         } else {
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
@@ -3356,12 +3396,13 @@ export default function PlayerProfile() {
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
-              {/* Показывается для чужих профилей (кроме админов) и для своего профиля */}
+              {/* Для чужих профилей: показывается всегда (кроме админов) */}
+              {/* Для своего профиля: показывается только в режиме редактирования */}
               {currentUser && player && 
                ((currentUser.id !== player.id && 
                  player.status !== 'admin' && 
                  currentUser.status !== 'admin') ||
-                (currentUser.id === player.id && currentUser.status !== 'admin')) && (
+                (currentUser.id === player.id && currentUser.status !== 'admin' && isEditing)) && (
                 <TouchableOpacity
                   ref={profileMenuButtonRef}
                   onPress={handleOpenProfileMenu}

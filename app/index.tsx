@@ -79,7 +79,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   const activeCollisionsRef = useRef<Set<string>>(new Set());
   // Защита от переинициализации в первые секунды после загрузки
   const initializationTimeRef = useRef<number>(0);
-  const INITIALIZATION_PROTECTION_MS = 3000; // 3 секунды защиты
+  const INITIALIZATION_PROTECTION_MS = 6000; // 6 секунд защиты - покрывает загрузку пользователя и инициализацию фильтров
   
   // Определяем уровень производительности
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
@@ -197,46 +197,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const timeSinceInit = initializationTimeRef.current > 0 ? now - initializationTimeRef.current : Infinity;
     const isInProtectionPeriod = timeSinceInit < INITIALIZATION_PROTECTION_MS;
 
-    if (isInitializedRef.current) {
-      const previousIds = new Set(previousPlayersRef.current.map(p => p.id));
-      const currentIds = new Set(players.map(p => p.id));
-      const sameSize = previousIds.size === currentIds.size;
-      let samePlayers = sameSize;
-
-      if (sameSize) {
-        for (const id of currentIds) {
-          if (!previousIds.has(id)) {
-            samePlayers = false;
-            break;
-          }
-        }
-      }
-
-      if (samePlayers) {
-        // Если список игроков по ID не изменился, просто обновляем ref без переинициализации
-        // Это предотвращает остановку анимации при обновлении blockedUsers или других фильтров
-        // Также проверяем, не изменился ли статус игроков (может влиять на отображение)
-        const statusChanged = previousPlayersRef.current.some(prevPlayer => {
-          const currentPlayer = players.find(p => p.id === prevPlayer.id);
-          return !currentPlayer || currentPlayer.status !== prevPlayer.status;
-        });
-        
-        // В период защиты (первые 3 секунды) игнорируем изменения статуса, чтобы не переинициализировать
-        if (!statusChanged || isInProtectionPeriod) {
-          // Ничего не изменилось или мы в периоде защиты - просто обновляем ref
-          if (statusChanged && isInProtectionPeriod) {
-            console.log(`✅ [ANIMATION] usePuckCollisionSystem: статус изменился, но в периоде защиты - игнорируем`);
-          }
-          previousPlayersRef.current = players;
-          return;
-        }
-        // Если статус изменился и период защиты прошел, продолжаем обновление позиций ниже
-        console.log(`⚠️ [ANIMATION] usePuckCollisionSystem: статус изменился, будет переинициализация позиций`);
-      } else {
-        console.log(`⚠️ [ANIMATION] usePuckCollisionSystem: список игроков изменился (${previousIds.size} -> ${currentIds.size}), будет переинициализация`);
-      }
-    }
-    
+    // Определяем функцию генерации позиции здесь, чтобы она была доступна ниже
     const baseSpeedMultiplier = (() => {
       switch (performanceLevel) {
         case 'high':
@@ -287,7 +248,64 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       };
     };
 
+    // Проверка изменений списка игроков с защитой от переинициализации
     if (isInitializedRef.current) {
+      const previousIds = new Set(previousPlayersRef.current.map(p => p.id));
+      const currentIds = new Set(players.map(p => p.id));
+      
+      // Проверяем, все ли текущие игроки были в предыдущем списке
+      const allCurrentInPrevious = Array.from(currentIds).every(id => previousIds.has(id));
+      
+      // Если все текущие игроки уже есть - это фильтрация (уменьшение списка)
+      // В этом случае просто удаляем лишние шайбы, не переинициализируя позиции
+      if (allCurrentInPrevious && currentIds.size > 0 && previousIds.size !== currentIds.size) {
+        // Фильтрация - удаляем шайбы, которых больше нет в списке
+        setPuckPositions(prev => {
+          const filtered = prev.filter(pos => currentIds.has(pos.id));
+          physicsPositionsRef.current = filtered;
+          renderPositionsRef.current = filtered;
+          return filtered;
+        });
+        previousPlayersRef.current = players;
+        return;
+      }
+      
+      // Проверяем, одинаковые ли игроки
+      const sameSize = previousIds.size === currentIds.size;
+      const samePlayers = sameSize && allCurrentInPrevious;
+
+      if (samePlayers) {
+        // Список не изменился - просто обновляем ref
+        previousPlayersRef.current = players;
+        return;
+      }
+      
+      // В период защиты игнорируем изменения и только добавляем новые шайбы
+      if (isInProtectionPeriod && currentIds.size > 0) {
+        const newPlayerIds = Array.from(currentIds).filter(id => !previousIds.has(id));
+        if (newPlayerIds.length > 0) {
+          setPuckPositions(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const newPositions = [...prev];
+            
+            newPlayerIds.forEach(playerId => {
+              if (!existingIds.has(playerId)) {
+                const pos = generatePosition(newPositions);
+                pos.id = playerId;
+                newPositions.push(pos);
+              }
+            });
+            
+            physicsPositionsRef.current = newPositions;
+            renderPositionsRef.current = newPositions;
+            return newPositions;
+          });
+        }
+        previousPlayersRef.current = players;
+        return;
+      }
+
+      // Вне периода защиты - обновляем позиции с сохранением существующих
       const prevPlayers = previousPlayersRef.current;
       setPuckPositions(prevPositions => {
         const existingMap = new Map(prevPositions.map(pos => [pos.id, pos]));
@@ -1381,13 +1399,13 @@ export default function HomeScreen() {
       return { country: null, year: null };
     }
 
-    // Для неавторизованных пользователей показываем "Все"
-    if (!currentUser) {
+      // Для неавторизованных пользователей показываем "Все"
+      if (!currentUser) {
       return { country: null, year: null };
-    }
+      }
 
     // Для авторизованных пользователей вычисляем фильтры синхронно
-    const defaultCountry = currentUser?.country;
+      const defaultCountry = currentUser?.country;
     
     console.log('🔍 [FILTERS] Проверка инициализации фильтров:', {
       userName: currentUser?.name,
@@ -1409,13 +1427,13 @@ export default function HomeScreen() {
       console.log('⚠️ [FILTERS] У пользователя не указана страна, показываем "Все"');
       return { country: null, year: null };
     }
-
-    // Проверяем, есть ли игроки в стране пользователя
+      
+      // Проверяем, есть ли игроки в стране пользователя
     // ВАЖНО: учитываем всех пользователей со статусом 'player', 'star', 'coach', 'scout'
     // чтобы фильтр работал правильно для всех типов пользователей
-    const playersInCountry = players.filter(player =>
-      player.country === defaultCountry &&
-      player.birthDate &&
+        const playersInCountry = players.filter(player =>
+          player.country === defaultCountry &&
+          player.birthDate &&
       (player.status === 'player' || player.status === 'star' || player.status === 'coach' || player.status === 'scout')
     );
 
@@ -1426,48 +1444,76 @@ export default function HomeScreen() {
       allPlayersWithStatus: players.filter(p => p.status === 'player').length
     });
 
-    // Если нет игроков в стране пользователя, показываем "Все"
-    if (playersInCountry.length === 0) {
+        // Если нет игроков в стране пользователя, показываем "Все"
+        if (playersInCountry.length === 0) {
       console.log('⚠️ [FILTERS] Нет игроков в стране пользователя, показываем "Все"');
       return { country: null, year: null };
-    }
+        }
 
-    // Устанавливаем фильтр по году рождения текущего пользователя
-    let defaultYear: number | null = null;
+        // Устанавливаем фильтр по году рождения текущего пользователя
+        let defaultYear: number | null = null;
 
-    if (currentUser?.birthDate) {
-      // Используем год рождения текущего пользователя
-      defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
-      
-      // Проверяем, есть ли игроки в этом году в стране пользователя
-      const playersInYear = playersInCountry.filter(player => {
-        const year = player.birthDate!.split('-')[0];
-        return parseInt(year) === defaultYear;
-      });
+        if (currentUser?.birthDate) {
+          // Используем год рождения текущего пользователя
+          defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
+          
+          // Проверяем, есть ли игроки в этом году в стране пользователя
+          const playersInYear = playersInCountry.filter(player => {
+            const year = player.birthDate!.split('-')[0];
+            return parseInt(year) === defaultYear;
+          });
 
-      // Если нет игроков в этом году, показываем "Все" для года
-      if (playersInYear.length === 0) {
-        defaultYear = null;
-      }
-    } else {
-      // Находим год с максимальным количеством игроков в выбранной стране
-      const yearCounts: { [year: string]: number } = {};
-      playersInCountry.forEach(player => {
-        const year = player.birthDate!.split('-')[0];
-        yearCounts[year] = (yearCounts[year] || 0) + 1;
-      });
-
-      if (Object.keys(yearCounts).length > 0) {
-        // Находим год с максимальным количеством игроков
-        const mostPopularYear = Object.keys(yearCounts).reduce((a, b) =>
-          yearCounts[a] > yearCounts[b] ? a : b
-        );
-        defaultYear = parseInt(mostPopularYear);
-      }
-    }
+          // Если нет игроков в этом году, показываем "Все" для года
+          if (playersInYear.length === 0) {
+            defaultYear = null;
+          }
+        } else {
+          // Если у пользователя нет года рождения (например, админ),
+          // устанавливаем фильтр "все года" (null) - показываем всех игроков в стране пользователя
+          defaultYear = null;
+        }
 
     return { country: defaultCountry, year: defaultYear };
   }, [players.length, currentUser, isUserLoading]);
+
+  // Состояние для управления годами рождения
+  const [currentYearIndex, setCurrentYearIndex] = useState(0);
+  const birthYears = useMemo(() => {
+    const years: number[] = [];
+    for (let year = 2025; year >= 2008; year--) {
+      years.push(year);
+    }
+    return years;
+  }, []);
+
+  const getCurrentHourSeed = () => Math.floor(Date.now() / (60 * 60 * 1000));
+  const [randomSeed, setRandomSeed] = useState(() => getCurrentHourSeed());
+  const seedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const unblockLoadRef = useRef(false);
+
+  // Загрузка игроков (с поддержкой принудительного обновления)
+  // ВАЖНО: определяется ДО useEffect, которые его используют
+  const loadAllPlayers = useCallback(async (forceRefresh = false) => {
+      try {
+        setLoading(true);
+        console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
+      const loadedPlayers = await loadPlayers(forceRefresh); // Принудительное обновление при необходимости
+        setPlayers(loadedPlayers);
+        console.log(`✅ Игроки загружены${forceRefresh ? ' (принудительно)' : ''}:`, loadedPlayers.length);
+
+        // Логируем страну текущего пользователя в загруженных данных
+        if (currentUser) {
+          const currentUserInList = loadedPlayers.find(p => p.id === currentUser.id);
+          console.log('👤 Страна текущего пользователя в списке:', currentUserInList?.country);
+        }
+        } catch (error) {
+        console.error('❌ Ошибка загрузки игроков:', error);
+      } finally {
+        setLoading(false);
+      }
+  }, []);
 
   // Отслеживаем изменения страны пользователя и переинициализируем фильтры
   useEffect(() => {
@@ -1533,44 +1579,6 @@ export default function HomeScreen() {
       filtersInitializedRef.current = true;
     }
   }, [players.length, currentUser, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
-
-  // Состояние для управления годами рождения
-  const [currentYearIndex, setCurrentYearIndex] = useState(0);
-  const birthYears = useMemo(() => {
-    const years: number[] = [];
-    for (let year = 2025; year >= 2008; year--) {
-      years.push(year);
-    }
-    return years;
-  }, []);
-
-  const getCurrentHourSeed = () => Math.floor(Date.now() / (60 * 60 * 1000));
-  const [randomSeed, setRandomSeed] = useState(() => getCurrentHourSeed());
-  const seedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const seedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const unblockLoadRef = useRef(false);
-
-  // Загрузка игроков (с поддержкой принудительного обновления)
-  const loadAllPlayers = useCallback(async (forceRefresh = false) => {
-      try {
-        setLoading(true);
-        console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
-      const loadedPlayers = await loadPlayers(forceRefresh); // Принудительное обновление при необходимости
-        setPlayers(loadedPlayers);
-        console.log(`✅ Игроки загружены${forceRefresh ? ' (принудительно)' : ''}:`, loadedPlayers.length);
-
-        // Логируем страну текущего пользователя в загруженных данных
-        if (currentUser) {
-          const currentUserInList = loadedPlayers.find(p => p.id === currentUser.id);
-          console.log('👤 Страна текущего пользователя в списке:', currentUserInList?.country);
-        }
-        } catch (error) {
-        console.error('❌ Ошибка загрузки игроков:', error);
-      } finally {
-        setLoading(false);
-      }
-  }, []);
 
   // Загружаем игроков при монтировании
   useEffect(() => {
@@ -1652,15 +1660,15 @@ export default function HomeScreen() {
     let unblockTimeout: ReturnType<typeof setTimeout> | null = null;
     if (currentUser?.id) {
       unblockTimeout = setTimeout(() => {
-        unblockLoadRef.current = true;
-        loadBlockedUsers(true);
+      unblockLoadRef.current = true;
+      loadBlockedUsers(true);
       }, 1000); // Небольшая задержка для авторизованных пользователей
     }
-    
+
     return () => {
       clearTimers();
       if (unblockTimeout) {
-        clearTimeout(unblockTimeout);
+      clearTimeout(unblockTimeout);
       }
     };
   }, [loadBlockedUsers, currentUser?.id]);
@@ -1700,15 +1708,38 @@ export default function HomeScreen() {
       return [];
     }
 
-    // Используем выбранные фильтры напрямую
-    // Если пользователь явно выбрал "Все" (null), используем null, а не initialFilters
-    // initialFilters используются только при первой инициализации в useLayoutEffect
-    const effectiveCountry = selectedCountry !== null && selectedCountry !== undefined 
-      ? selectedCountry 
-      : null; // Если выбрано "Все", используем null, а не страну пользователя
-    const effectiveYear = selectedYear !== null && selectedYear !== undefined 
-      ? selectedYear 
-      : null; // Если выбрано "Все", используем null, а не год пользователя
+    // Определяем эффективные фильтры
+    // Приоритет: 1) selectedCountry/Year из контекста (если установлены)
+    //            2) initialFilters (если вычислены и фильтры не инициализированы)
+    //            3) undefined (показать всех)
+    const effectiveCountry = (() => {
+      // Если фильтры уже установлены пользователем - используем их
+      if (filtersInitializedRef.current) {
+        return selectedCountry !== null && selectedCountry !== undefined 
+          ? selectedCountry 
+          : undefined;
+      }
+      // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
+      if (initialFilters.country !== null) {
+        return initialFilters.country;
+      }
+      // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
+      return undefined;
+    })();
+    const effectiveYear = (() => {
+      // Если фильтры уже установлены пользователем - используем их
+      if (filtersInitializedRef.current) {
+        return selectedYear !== null && selectedYear !== undefined 
+          ? selectedYear 
+          : undefined;
+      }
+      // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
+      if (initialFilters.year !== null) {
+        return initialFilters.year;
+      }
+      // Пока пользователь загружается - показываем всех (фильтры применятся после загрузки)
+      return undefined;
+    })();
 
     // Проверяем, изменились ли параметры фильтрации
     // Также отслеживаем изменения is_hidden для скрытых игроков
@@ -1792,7 +1823,7 @@ export default function HomeScreen() {
       
       // Быстро проверяем, изменился ли список видимых игроков
       const visiblePlayersForHome = players.filter(player => !player.is_hidden);
-      const selected = getSmartPlayerSelection(
+    const selected = getSmartPlayerSelection(
         visiblePlayersForHome,
         checkUserId, // Используем предыдущий ID пользователя для проверки
         checkUserStatus,
@@ -1868,11 +1899,11 @@ export default function HomeScreen() {
     const visiblePlayersForHome = players.filter(player => !player.is_hidden);
 
     const selected = getSmartPlayerSelection(
-      visiblePlayersForHome, // Передаем уже отфильтрованный список без скрытых игроков
+      visiblePlayersForHome, // Передаем уже отфильтрованный список без скрытыx игроков
       currentUser?.id,
       currentUser?.status,
-      effectiveCountry || undefined, // Используем эффективные значения фильтров
-      effectiveYear || undefined,
+      effectiveCountry, // Используем эффективные значения фильтров (уже undefined если "Все")
+      effectiveYear, // Используем эффективные значения фильтров (уже undefined если "Все")
       randomSeed
     );
     
@@ -1906,7 +1937,7 @@ export default function HomeScreen() {
     console.log(`✅ [ANIMATION] Список видимых игроков обновлен: ${filtered.length} игроков`);
     allVisiblePlayersRef.current = filtered;
     return filtered;
-  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers]);
+  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, initialFilters]);
 
   // Используем полную логику коллизий из основного экрана
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition } = usePuckCollisionSystem(
@@ -1924,15 +1955,15 @@ export default function HomeScreen() {
       setCurrentScreen('home');
       // Перезагружаем игроков при возвращении на главный экран (например, после регистрации или изменения профиля)
       // Используем небольшую задержку, чтобы изменения в профиле успели сохраниться
-      setTimeout(() => {
+        setTimeout(() => {
         loadAllPlayers();
       }, 500);
       // Убрали задержку, чтобы избежать остановки анимации
       // blockedUsers уже загружаются при монтировании компонента
       if (unblockLoadRef.current && !hasLoadedBlockedInitiallyRef.current) {
         loadBlockedUsers(true);
-        hasLoadedBlockedInitiallyRef.current = true;
-      }
+            hasLoadedBlockedInitiallyRef.current = true;
+          }
       return () => {
         setCurrentScreen(null);
       };
@@ -1976,10 +2007,10 @@ export default function HomeScreen() {
               // Если игрок скрыт, просто обновляем его is_hidden (он будет отфильтрован в useMemo)
               if (playerExists) {
                 return currentPlayers.map((player) => 
-                  player.id === playerId 
-                    ? { ...player, is_hidden: newIsHidden }
-                    : player
-                );
+                player.id === playerId 
+                  ? { ...player, is_hidden: newIsHidden }
+                  : player
+              );
               }
               
               // Если игрок показан и его нет в текущем списке, загружаем его

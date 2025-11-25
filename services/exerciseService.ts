@@ -449,39 +449,23 @@ export class ExerciseService {
       }
       
       // Отправляем уведомления друзьям о выполнении упражнения
-      console.error('🚨🚨🚨 [EXERCISE] БЛОК ОТПРАВКИ УВЕДОМЛЕНИЙ НАЧАЛСЯ 🚨🚨🚨');
-      console.error('🚨 [EXERCISE] userId:', userId, 'exerciseId:', exerciseId);
-      console.error('🚨 [EXERCISE] player:', player ? { id: player.id, name: player.name } : 'null');
-      
       try {
-        console.warn('📤 [EXERCISE] Начинаем отправку уведомлений друзьям об упражнении...');
-        console.error('📤 [EXERCISE] Начинаем отправку уведомлений друзьям об упражнении...');
         const { loadCurrentUser, notifyFriendsAboutExercise } = await import('../utils/playerStorage');
-        console.error('📤 [EXERCISE] Импортировали функции, загружаем currentUser...');
         const currentUser = await loadCurrentUser();
-        console.error('📤 [EXERCISE] currentUser загружен:', currentUser ? { id: currentUser.id, name: currentUser.name } : 'null');
-        console.error('📤 [EXERCISE] userId:', userId);
         
         // Используем имя из player, если currentUser не загружен
         const playerName = currentUser?.name || player.name;
-        console.error('📤 [EXERCISE] playerName:', playerName);
         
         if (playerName) {
-          console.warn('📤 [EXERCISE] Вызываем notifyFriendsAboutExercise с:', { userId, playerName, exerciseId });
-          console.error('📤 [EXERCISE] Вызываем notifyFriendsAboutExercise с:', { userId, playerName, exerciseId });
           await notifyFriendsAboutExercise(
             userId,
             playerName,
             exerciseId
           );
-          console.warn('✅ [EXERCISE] notifyFriendsAboutExercise завершена');
-          console.error('✅ [EXERCISE] notifyFriendsAboutExercise завершена');
-        } else {
-          console.error('⚠️ [EXERCISE] Не можем отправить уведомления: нет имени пользователя');
+          console.log('✅ Уведомления друзьям об упражнении отправлены');
         }
       } catch (notificationError) {
-        console.error('❌ [EXERCISE] Ошибка отправки уведомлений об упражнении:', notificationError);
-        console.error('❌ [EXERCISE] Детали ошибки:', notificationError instanceof Error ? notificationError.stack : JSON.stringify(notificationError, null, 2));
+        console.error('❌ Ошибка отправки уведомлений об упражнении:', notificationError);
         // Не прерываем выполнение, если уведомления не отправились
       }
       

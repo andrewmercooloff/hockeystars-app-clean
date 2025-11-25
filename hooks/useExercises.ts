@@ -130,17 +130,13 @@ export function useExercises(
   // Отмечаем упражнение как выполненное
   const markAsCompleted = useCallback(async (exerciseId: string) => {
     try {
-      console.warn('💪 [USE-EXERCISES] markAsCompleted вызван для exerciseId:', exerciseId);
       // Импортируем функцию загрузки текущего пользователя
       const { loadCurrentUser } = await import('../utils/playerStorage');
-      console.warn('💪 [USE-EXERCISES] Загружаем текущего пользователя...');
       const user = await loadCurrentUser();
-      console.error('💪 [USE-EXERCISES] Пользователь загружен:', user ? { id: user.id, name: user.name } : 'null');
       
       if (user && user.id) {
-        console.warn('💪 [USE-EXERCISES] Вызываем ExerciseService.markExerciseAsCompleted...');
         await ExerciseService.markExerciseAsCompleted(user.id, exerciseId);
-        console.warn('✅ [USE-EXERCISES] ExerciseService.markExerciseAsCompleted завершен');
+        console.log('✅ Упражнение отмечено как выполненное');
         
         // КРИТИЧНО: Инвалидируем кеш профиля пользователя!
         // Это обновит раздел "выполненные упражнения" в профиле
@@ -152,15 +148,16 @@ export function useExercises(
         // Инвалидируем кеш рейтинга упражнений
         await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
         
-        // Очищаем глобальный кеш пользователя
+        // Очищаем глобальный кеш пользователя и кеш игрока
         try {
           const playerStorage = await import('../utils/playerStorage');
           if (playerStorage.globalUserCache) {
-            console.log('🔍 Очищаем глобальный кеш пользователя');
             playerStorage.globalUserCache = null;
           }
+          // Очищаем кеш игрока для актуальности данных при следующей проверке
+          await playerStorage.clearPlayerCache(user.id);
         } catch (cacheError) {
-          console.warn('⚠️ Не удалось очистить глобальный кеш:', cacheError);
+          console.warn('⚠️ Не удалось очистить кеш:', cacheError);
         }
         
         // Обновляем локальную статистику

@@ -49,9 +49,17 @@ export default function ExerciseDetailsScreen() {
     router.push('/exercises');
   };
   
+  // Загружаем данные пользователя при изменении exerciseId
   useEffect(() => {
-    loadUserData();
-  }, []);
+    // Сбрасываем состояние при смене упражнения
+    setCanComplete(true);
+    setLastCompletionTime(null);
+    setCompletionCount(0);
+    
+    if (exerciseId) {
+      loadUserData();
+    }
+  }, [exerciseId]);
 
   useEffect(() => {
     loadExercise();
