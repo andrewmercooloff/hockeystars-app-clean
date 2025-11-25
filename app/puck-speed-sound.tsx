@@ -1917,7 +1917,7 @@ export default function PuckSpeedSoundScreen() {
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>3</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction3') || 'Нажмите "Старт" и начинайте бросать.'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction3') || 'Совершите несколько попыток - выберите корректную скорость и добавьте ее в профиль'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
@@ -2431,7 +2431,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 0,
     textAlign: 'center',
   },
   instructionHintContainer: {
@@ -2463,7 +2463,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 20,
     elevation: 15,
-    marginTop: 10,
+    marginTop: 0,
   },
   startButton: {
     alignItems: 'center',
