@@ -1905,31 +1905,37 @@ export default function PuckSpeedSoundScreen() {
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>1</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction1') || 'Поставьте телефон равноудаленно от места удара по шайбе и от ворот или разместите одну петличку возле места удара, а вторую закрепите в безопасном месте на сетке'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction1') || 'Измерьте расстояние от сетки до места удара и выставьте ее в поле расстояния'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>2</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction2') || 'Ударьте по шайбе - радар считает время удара и попадания в ворота и рассчитает скорость'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction2') || 'Поставьте телефон равноудаленно от места удара по шайбе и от ворот или разместите одну петличку возле места удара, а вторую закрепите в безопасном месте на сетке'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>3</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction3') || 'Совершите несколько попыток - выберите корректную скорость и добавьте ее в профиль'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction3') || 'Ударьте по шайбе - радар считает время удара и попадания в ворота и рассчитает скорость'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>4</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction4') || 'Отрегулируйте чувствительность, если скорость рассчитана неверно.'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction4') || 'Совершите несколько попыток - выберите корректную скорость и добавьте ее в профиль'}</Text>
               </View>
               <View style={styles.instructionItem}>
                 <View style={styles.numberCircle}>
                   <Text style={styles.numberText}>5</Text>
                 </View>
-                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction5') || 'Выберите корректную и лучшую скорость для внесения в профиль'}</Text>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction5') || 'Отрегулируйте чувствительность, если скорость рассчитана неверно.'}</Text>
+              </View>
+              <View style={styles.instructionItem}>
+                <View style={styles.numberCircle}>
+                  <Text style={styles.numberText}>6</Text>
+                </View>
+                <Text style={styles.instructionItemText}>{t('puckSpeed.instruction6') || 'Выберите корректную и лучшую скорость для внесения в профиль'}</Text>
               </View>
             </View>
           )}
