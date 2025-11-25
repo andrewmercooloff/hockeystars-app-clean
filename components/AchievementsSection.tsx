@@ -491,7 +491,6 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '90%',
     maxWidth: 400,
-    maxHeight: 500,
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
   },

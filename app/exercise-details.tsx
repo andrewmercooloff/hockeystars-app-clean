@@ -57,7 +57,7 @@ export default function ExerciseDetailsScreen() {
     setCompletionCount(0);
     
     if (exerciseId) {
-      loadUserData();
+    loadUserData();
     }
   }, [exerciseId]);
 

@@ -4355,7 +4355,19 @@ export default function PlayerProfile() {
                   <Text style={styles.infoLabel}>
                     {t('profile.birthDate') || 'Дата рождения'}
                   </Text>
-                  <Text style={styles.infoValue}>{formatBirthDate(player.birthDate || '', language)}</Text>
+                  {isEditing && currentUser?.status === 'admin' ? (
+                    <TouchableOpacity
+                      style={styles.pickerButton}
+                      onPress={showBirthDatePickerModal}
+                    >
+                      <Text style={styles.pickerButtonText}>
+                        {editData.birthDate || player.birthDate || t('register.selectDate')}
+                      </Text>
+                      <Ionicons name="calendar-outline" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Text style={styles.infoValue}>{formatBirthDate(player.birthDate || '', language)}</Text>
+                  )}
                 </View>
                 )}
 

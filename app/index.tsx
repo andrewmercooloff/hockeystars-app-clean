@@ -1716,7 +1716,7 @@ export default function HomeScreen() {
       // Если фильтры уже установлены пользователем - используем их
       if (filtersInitializedRef.current) {
         return selectedCountry !== null && selectedCountry !== undefined 
-          ? selectedCountry 
+      ? selectedCountry 
           : undefined;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
@@ -1730,7 +1730,7 @@ export default function HomeScreen() {
       // Если фильтры уже установлены пользователем - используем их
       if (filtersInitializedRef.current) {
         return selectedYear !== null && selectedYear !== undefined 
-          ? selectedYear 
+      ? selectedYear 
           : undefined;
       }
       // Если фильтры еще не инициализированы, используем initialFilters (если готовы)

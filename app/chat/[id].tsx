@@ -1445,12 +1445,12 @@ export default function ChatScreen() {
                                       </Text>
                                     </View>
                                   ) : (
-                                    <Text style={[
-                                      styles.messageText,
-                                      isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                    ]}>
-                                      {message.text}
-                                    </Text>
+                                  <Text style={[
+                                    styles.messageText,
+                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                  ]}>
+                                    {message.text}
+                                  </Text>
                                   )}
                                   <View style={styles.messageTimeContainer}>
                                     <Text style={[
