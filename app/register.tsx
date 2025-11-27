@@ -1238,7 +1238,10 @@ export default function RegisterScreen() {
           {step === 'form' && (
             <TouchableOpacity 
               style={styles.termsLink}
-              onPress={() => Linking.openURL('https://hockey-stars.com/rules.pdf')}
+              onPress={() => {
+                const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
+                Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
+              }}
             >
               <Ionicons name="document-text-outline" size={16} color="#FF4444" />
               <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>

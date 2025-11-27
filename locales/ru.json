@@ -2634,12 +2634,12 @@
     "errorUpdatingNormative": "Не удалось обновить норматив"
   },
   "normativeFields": {
-    "pullUps": "подтягиваний",
-    "pushUps": "отжиманий",
-    "plankTime": "планки",
-    "sprint100m": "стометровки",
-    "longJump": "прыжка в длину",
-    "jumpRope": "скакалки"
+    "pullUps": "подтягивания",
+    "pushUps": "отжимания",
+    "plankTime": "планка",
+    "sprint100m": "стометровка",
+    "longJump": "прыжок в длину",
+    "jumpRope": "скакалка"
   },
   "socialLinks": {
     "website": "Сайт или ссылка",

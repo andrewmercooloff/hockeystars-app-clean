@@ -2534,12 +2534,12 @@
     "errorUpdatingNormative": "Nie udało się zaktualizować standardu"
   },
   "normativeFields": {
-    "pullUps": "pompek na drążku",
-    "pushUps": "pompek",
-    "plankTime": "deski",
-    "sprint100m": "sprintu 100m",
-    "longJump": "skoku w dal",
-    "jumpRope": "skakanki"
+    "pullUps": "pompki na drążku",
+    "pushUps": "pompki",
+    "plankTime": "deska",
+    "sprint100m": "sprint 100m",
+    "longJump": "skok w dal",
+    "jumpRope": "skakanka"
   },
   "socialLinks": {
     "website": "Strona internetowa lub link",

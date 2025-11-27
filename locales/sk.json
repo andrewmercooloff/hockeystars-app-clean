@@ -2703,12 +2703,12 @@
     "errorUpdatingNormative": "Aktualizácia štandardu zlyhala"
   },
   "normativeFields": {
-    "pullUps": "prítahov",
-    "pushUps": "kľukov",
-    "plankTime": "prkna",
-    "sprint100m": "šprintu 100m",
-    "longJump": "skoku do diaľky",
-    "jumpRope": "švihadla"
+    "pullUps": "prítahy",
+    "pushUps": "kľuky",
+    "plankTime": "prkno",
+    "sprint100m": "šprint 100m",
+    "longJump": "skok do diaľky",
+    "jumpRope": "švihadlo"
   },
   "socialLinks": {
     "website": "webové stránky alebo odkaz",

@@ -355,7 +355,7 @@ export default function LoginScreen() {
         setAlert({
           visible: true,
           title: t('auth.errorVerifyingCode') || t('common.error'),
-          message: verification.message,
+          message: errorMessage,
           type: 'error'
         });
         return;

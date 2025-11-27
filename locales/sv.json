@@ -1909,7 +1909,6 @@
     "writeMessage": "Skriv ett meddelande",
     "edit": "Redigera",
     "deleteUser": "Ta bort användare",
-    "noExercisesYet": "Spelaren har inte slutfört några övningar än.",
     "noGiftsYet": "Inga gåvor mottagna ännu",
     "editProfile": "Redigera profil",
     "writeToSupport": "Skriv till teknisk support",
@@ -2711,9 +2710,9 @@
     "errorUpdatingNormative": "Det gick inte att uppdatera standarden"
   },
   "normativeFields": {
-    "pullUps": "armhävningar",
+    "pullUps": "pull-ups",
     "pushUps": "armhävningar",
-    "plankTime": "plankan",
+    "plankTime": "planka",
     "sprint100m": "100m sprint",
     "longJump": "längdhopp",
     "jumpRope": "hopprep"
@@ -2760,7 +2759,6 @@
     "instruction4": "Gör flera försök - välj rätt hastighet och lägg till den i din profil",
     "instruction5": "Justera känsligheten om hastigheten beräknas felaktigt.",
     "instruction6": "Välj rätt och bästa hastigheten att lägga till i profilen",
-    "instruction5": "Välj rätt och bästa hastigheten att lägga till i profilen",
     "readInstructions": "Läs instruktionerna innan användning",
     "cm": "cm",
     "distanceLabel": "Avstånd från puck till nät",

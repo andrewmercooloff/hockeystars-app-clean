@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
-import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration } from 'react-native';
+import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus } from 'react-native';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -71,10 +71,27 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
 const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string, screenWidth?: number, screenHeight?: number) => {
   const puckSize = 70;
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
+  const [appIsActive, setAppIsActive] = useState(true);
   const collisionDetectedRef = useRef(false);
   const lastHapticTimeRef = useRef(0);
   const isInitializedRef = useRef(false);
   const previousPlayersRef = useRef<Player[]>([]);
+  
+  // Отслеживаем состояние приложения для остановки анимации в фоне
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      const isActive = nextAppState === 'active';
+      setAppIsActive(isActive);
+      if (!isActive) {
+        console.log('📱 Приложение ушло в фон - приостанавливаем анимацию шайб');
+      } else {
+        console.log('📱 Приложение активно - возобновляем анимацию шайб');
+      }
+    };
+    
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription?.remove();
+  }, []);
   // Отслеживаем активные столкновения для предотвращения повторной вибрации
   const activeCollisionsRef = useRef<Set<string>>(new Set());
   // Защита от переинициализации в первые секунды после загрузки
@@ -121,10 +138,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       case 'low':
       default:
         config = {
-          STEP_MS: 1000 / 30, // 30 FPS для слабых устройств (было 60, но слишком тяжело)
-          FIXED_DT: 1 / 30,
+          STEP_MS: 1000 / 20, // 20 FPS для слабых устройств (снижено с 30 для лучшей производительности)
+          FIXED_DT: 1 / 20,
           MAX_STEPS: 1, // Меньше шагов для слабых устройств
-          TARGET_FPS: 30, // 30 FPS для слабых устройств
+          TARGET_FPS: 20, // 20 FPS для слабых устройств
         };
         break;
     }
@@ -140,7 +157,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         return 2;
       case 'low':
       default:
-        return 4;
+        return 8; // Увеличено с 4 до 8 для слабых устройств - обновляем React state реже
     }
   }, [performanceLevel]);
 
@@ -421,9 +438,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         case 'low':
         default:
           return {
-            minSpeed: 0.5,
-            maxSpeed: 5.0, // Снижено для предотвращения разгона (было 8.0)
-            friction: 0.997,
+            minSpeed: 0.4, // Снижено для слабых устройств
+            maxSpeed: 4.0, // Снижено для слабых устройств (было 5.0)
+            friction: 0.996, // Увеличено трение для слабых устройств
           };
       }
     })();
@@ -480,43 +497,45 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
       // Только физика столкновений для автоматических шайб
       if (!pos.isDragging) {
-      for (const other of currentPositions) {
+        // Проверяем все коллизии (убрали ограничения для правильной работы)
+        for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
 
-        const dx = x - other.x;
-        const dy = y - other.y;
-        const distSq = dx * dx + dy * dy;
+          const dx = x - other.x;
+          const dy = y - other.y;
+          const distSq = dx * dx + dy * dy;
 
-        if (distSq < minDistSq && distSq > 0) {
+          if (distSq < minDistSq && distSq > 0) {
             if (useSimplifiedPhysics) {
-              // Упрощенная физика для слабых устройств - просто отталкивание
+              // Упрощенная физика для слабых устройств - просто отталкивание без Math.sqrt
               const angle = Math.atan2(dy, dx);
               // Увеличиваем силу отталкивания для предотвращения кучкования
-              vx += Math.cos(angle) * 0.2;
-              vy += Math.sin(angle) * 0.2;
-              // Ограничиваем скорость
-              const speed = Math.sqrt(vx * vx + vy * vy);
-              if (speed > maxSpeed) {
-                const ratio = maxSpeed / speed;
+              vx += Math.cos(angle) * 0.25;
+              vy += Math.sin(angle) * 0.25;
+              // Ограничиваем скорость без Math.sqrt (используем приближение)
+              const speedSq = vx * vx + vy * vy;
+              const maxSpeedSq = maxSpeed * maxSpeed;
+              if (speedSq > maxSpeedSq) {
+                const ratio = maxSpeed / Math.sqrt(speedSq);
                 vx *= ratio;
                 vy *= ratio;
               }
             } else {
-          const dist = Math.sqrt(distSq);
-          const angle = Math.atan2(dy, dx);
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
 
               // Физика столкновения
-          const relativeVx = vx - other.vx;
-          const relativeVy = vy - other.vy;
-          const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+              const relativeVx = vx - other.vx;
+              const relativeVy = vy - other.vy;
+              const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
 
-          if (dot < 0) {
+              if (dot < 0) {
                 // Увеличиваем restitution для лучшего отталкивания и предотвращения кучкования
                 // Для iOS: 0.5 (было 0.4), для других: 0.9 (было 0.8)
                 const restitution = performanceLevel === 'high' ? 0.5 : 0.9;
-            const impulse = dot * restitution;
-            vx -= impulse * Math.cos(angle);
-            vy -= impulse * Math.sin(angle);
+                const impulse = dot * restitution;
+                vx -= impulse * Math.cos(angle);
+                vy -= impulse * Math.sin(angle);
                 
                 // Добавляем дополнительный импульс отталкивания для предотвращения кучкования
                 const additionalPush = 0.2;
@@ -530,19 +549,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                   vx *= ratio;
                   vy *= ratio;
                 }
-          }
+              }
 
-          // Более мягкое сглаживание для плавности
-          vx *= 0.95;
-          vy *= 0.95;
+              // Более мягкое сглаживание для плавности
+              vx *= 0.95;
+              vy *= 0.95;
             }
 
             // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
-          if (currentUserId && pos.id === currentUserId) {
+            if (currentUserId && pos.id === currentUserId) {
               const collisionKey = [pos.id, other.id].sort().join('-');
               if (!activeCollisionsRef.current.has(collisionKey)) {
                 activeCollisionsRef.current.add(collisionKey);
-            collisionDetectedRef.current = true;
+                collisionDetectedRef.current = true;
               }
             }
           }
@@ -577,6 +596,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     // Массив для накопления смещений
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
     
+    // Проверяем все коллизии (убрали ограничения для правильной работы)
     // Один проход: вычисляем все необходимые смещения
     for (let i = 0; i < updatedPositions.length; i++) {
       const pos1 = updatedPositions[i];
@@ -592,71 +612,71 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         const distSq = dx * dx + dy * dy;
         
         if (distSq < minDistSq && distSq > 0) {
-          let angle: number;
-          let overlap: number;
-          
-          if (useSimplifiedCollisions) {
-            // Упрощенная версия для слабых устройств - избегаем Math.sqrt
-            // Используем приближение: dist ≈ distSq / minDistance для малых перекрытий
-            const distApprox = distSq / minDistance;
-            angle = Math.atan2(dy, dx);
-            overlap = minDistance - distApprox;
-            // Ограничиваем overlap, чтобы избежать слишком больших смещений
-            if (overlap > minDistance) overlap = minDistance * 0.5;
-          } else {
-            const dist = Math.sqrt(distSq);
-            angle = Math.atan2(dy, dx);
-            overlap = minDistance - dist;
-          }
-          
-          // Увеличиваем силу отталкивания для предотвращения кучкования
-          // Используем коэффициент 1.2 для более сильного отталкивания
-          const pushStrength = 1.2;
-          const adjustedOverlap = overlap * pushStrength;
-          
-          // Накопление смещений
-          if (pos1.isDragging) {
-            // pos1 перетаскивается, двигаем только pos2
-            offsets[j].x -= Math.cos(angle) * adjustedOverlap;
-            offsets[j].y -= Math.sin(angle) * adjustedOverlap;
-          } else if (pos2.isDragging) {
-            // pos2 перетаскивается, двигаем только pos1
-            offsets[i].x += Math.cos(angle) * adjustedOverlap;
-            offsets[i].y += Math.sin(angle) * adjustedOverlap;
-          } else {
-            // Обе автоматические - двигаем обе
-            const halfOverlap = adjustedOverlap * 0.5;
-            offsets[i].x += Math.cos(angle) * halfOverlap;
-            offsets[i].y += Math.sin(angle) * halfOverlap;
-            offsets[j].x -= Math.cos(angle) * halfOverlap;
-            offsets[j].y -= Math.sin(angle) * halfOverlap;
-          }
-          
-          // Добавляем импульс скорости для лучшего разлета при столкновении
-          // Это помогает предотвратить кучкование, придавая шайбам дополнительную скорость
-          if (!pos1.isDragging && !pos2.isDragging) {
-            const impulseStrength = 0.3; // Сила импульса
-            const cosAngle = Math.cos(angle);
-            const sinAngle = Math.sin(angle);
+            let angle: number;
+            let overlap: number;
             
-            // Придаем скорость в направлении отталкивания
-            updatedPositions[i].vx += cosAngle * impulseStrength;
-            updatedPositions[i].vy += sinAngle * impulseStrength;
-            updatedPositions[j].vx -= cosAngle * impulseStrength;
-            updatedPositions[j].vy -= sinAngle * impulseStrength;
-          }
-          
-          // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
-          if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
-            // Создаем уникальный ключ для пары шайб (сортируем ID для консистентности)
-            const collisionKey = [pos1.id, pos2.id].sort().join('-');
-            
-            // Если это новое столкновение (еще не было вибрации), отмечаем его
-            if (!activeCollisionsRef.current.has(collisionKey)) {
-              activeCollisionsRef.current.add(collisionKey);
-              collisionDetectedRef.current = true;
+            if (useSimplifiedCollisions) {
+              // Упрощенная версия для слабых устройств - избегаем Math.sqrt
+              // Используем приближение: dist ≈ distSq / minDistance для малых перекрытий
+              const distApprox = distSq / minDistance;
+              angle = Math.atan2(dy, dx);
+              overlap = minDistance - distApprox;
+              // Ограничиваем overlap, чтобы избежать слишком больших смещений
+              if (overlap > minDistance) overlap = minDistance * 0.5;
+            } else {
+              const dist = Math.sqrt(distSq);
+              angle = Math.atan2(dy, dx);
+              overlap = minDistance - dist;
             }
-          }
+            
+            // Увеличиваем силу отталкивания для предотвращения кучкования
+            // Используем коэффициент 1.2 для более сильного отталкивания
+            const pushStrength = 1.2;
+            const adjustedOverlap = overlap * pushStrength;
+            
+            // Накопление смещений
+            if (pos1.isDragging) {
+              // pos1 перетаскивается, двигаем только pos2
+              offsets[j].x -= Math.cos(angle) * adjustedOverlap;
+              offsets[j].y -= Math.sin(angle) * adjustedOverlap;
+            } else if (pos2.isDragging) {
+              // pos2 перетаскивается, двигаем только pos1
+              offsets[i].x += Math.cos(angle) * adjustedOverlap;
+              offsets[i].y += Math.sin(angle) * adjustedOverlap;
+            } else {
+              // Обе автоматические - двигаем обе
+              const halfOverlap = adjustedOverlap * 0.5;
+              offsets[i].x += Math.cos(angle) * halfOverlap;
+              offsets[i].y += Math.sin(angle) * halfOverlap;
+              offsets[j].x -= Math.cos(angle) * halfOverlap;
+              offsets[j].y -= Math.sin(angle) * halfOverlap;
+            }
+            
+            // Добавляем импульс скорости для лучшего разлета при столкновении
+            // Это помогает предотвратить кучкование, придавая шайбам дополнительную скорость
+            if (!pos1.isDragging && !pos2.isDragging) {
+              const impulseStrength = 0.3; // Сила импульса
+              const cosAngle = Math.cos(angle);
+              const sinAngle = Math.sin(angle);
+              
+              // Придаем скорость в направлении отталкивания
+              updatedPositions[i].vx += cosAngle * impulseStrength;
+              updatedPositions[i].vy += sinAngle * impulseStrength;
+              updatedPositions[j].vx -= cosAngle * impulseStrength;
+              updatedPositions[j].vy -= sinAngle * impulseStrength;
+            }
+            
+            // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
+            if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
+              // Создаем уникальный ключ для пары шайб (сортируем ID для консистентности)
+              const collisionKey = [pos1.id, pos2.id].sort().join('-');
+              
+              // Если это новое столкновение (еще не было вибрации), отмечаем его
+              if (!activeCollisionsRef.current.has(collisionKey)) {
+                activeCollisionsRef.current.add(collisionKey);
+                collisionDetectedRef.current = true;
+              }
+            }
         }
       }
     }
@@ -678,8 +698,28 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
   // Используем requestAnimationFrame с интерполяцией для максимальной плавности
   const animationRunningRef = useRef(false);
+  const appIsActiveRef = useRef(appIsActive);
+  
+  
+  // Обновляем ref при изменении состояния и сбрасываем время при уходе в фон
   useEffect(() => {
-    if (puckPositions.length === 0) {
+    appIsActiveRef.current = appIsActive;
+    if (!appIsActive) {
+      // Сбрасываем время при уходе в фон, чтобы при возврате анимация сразу продолжилась
+      lastTimeRef.current = 0;
+      accumulatorRef.current = 0;
+    }
+  }, [appIsActive]);
+  
+  // Отслеживаем наличие шайб для запуска анимации (без перезапуска при изменении количества)
+  const hasPucksRef = useRef(puckPositions.length > 0);
+  useEffect(() => {
+    hasPucksRef.current = puckPositions.length > 0;
+  }, [puckPositions.length]);
+  
+  useEffect(() => {
+    // Не запускаем анимацию если приложение в фоне
+    if (!appIsActive) {
       animationRunningRef.current = false;
       return;
     }
@@ -695,6 +735,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     let frameCount = 0;
 
     const tick = (now: number) => {
+      // Останавливаем анимацию если приложение ушло в фон
+      if (!appIsActiveRef.current) {
+        animationRunningRef.current = false;
+        lastTimeRef.current = 0; // Сбрасываем для моментального продолжения
+        return;
+      }
+      
+      // Пропускаем кадр если нет шайб, но продолжаем анимацию
+      if (!hasPucksRef.current || physicsPositionsRef.current.length === 0) {
+        lastTimeRef.current = 0; // Сбрасываем время для плавного старта когда шайбы появятся
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+      
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = now;
         animationFrameId = requestAnimationFrame(tick);
@@ -776,7 +830,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       // lastTimeRef.current = 0;
       // accumulatorRef.current = 0;
     };
-  }, [puckPositions.length, stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval]); // Вернули зависимость от длины, но с защитой от перезапуска
+  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, appIsActive]); // Убрали puckPositions.length - проверяем через hasPucksRef
 
   // Вибрация при столкновениях (только один раз при начале столкновения)
   useEffect(() => {
@@ -890,8 +944,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           // Для каждой другой шайбы вычисляем коллизию с перетаскиваемой
           const useSimplifiedDragCollisions = performanceLevel === 'low';
           
+          // Для слабых устройств ограничиваем количество проверяемых коллизий
+          const maxDragCollisionChecks = useSimplifiedDragCollisions ? 10 : newPositions.length;
+          let dragCheckedCount = 0;
+          
           for (let i = 0; i < newPositions.length; i++) {
             if (i === draggedIndex) continue;
+            if (useSimplifiedDragCollisions && dragCheckedCount >= maxDragCollisionChecks) break;
+            dragCheckedCount++;
             
             const other = newPositions[i];
             const dx = finalX - other.x;

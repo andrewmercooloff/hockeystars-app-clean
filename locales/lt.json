@@ -2652,12 +2652,12 @@
     "physicalData": "fizinius duomenis"
   },
   "normativeFields": {
-    "pullUps": "atsispaudimų",
-    "pushUps": "atsispaudimų",
-    "plankTime": "plankos",
-    "sprint100m": "100m bėgimo",
-    "longJump": "šuolio į tolį",
-    "jumpRope": "šokdarties"
+    "pullUps": "atsispaudimai",
+    "pushUps": "atsispaudimai",
+    "plankTime": "planka",
+    "sprint100m": "100m bėgimas",
+    "longJump": "šuolis į tolį",
+    "jumpRope": "šokdartis"
   },
   "height": "ūgis",
   "weight": "svoris",

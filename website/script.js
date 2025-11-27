@@ -278,6 +278,15 @@ const russianSpeakingCountries = [
 
 // Detect language based on browser locale
 function detectLanguage() {
+    // First, check URL parameter (highest priority)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang && (urlLang === 'ru' || urlLang === 'en')) {
+        // Save to localStorage for future visits
+        localStorage.setItem('hockeystars-lang', urlLang);
+        return urlLang;
+    }
+
     // Check if language is stored in localStorage
     const storedLang = localStorage.getItem('hockeystars-lang');
     if (storedLang && (storedLang === 'ru' || storedLang === 'en')) {

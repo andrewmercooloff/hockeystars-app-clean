@@ -1134,16 +1134,11 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
         });
       }
       
-      // Загружаем команды для каждого игрока
-      console.warn('🏒 Начинаем загрузку команд для всех игроков...');
+      // Загружаем команды для каждого игрока (без тяжёлых логов для производительности)
       try {
         const teamPromises = players.map(async (player) => {
           try {
             const teams = await getPlayerTeamsAsPastTeams(player.id);
-            console.warn(`📊 Игрок ${player.name} (${player.id}) имеет ${teams.length} команд`);
-            if (teams.length > 0) {
-              console.warn(`  - Команды:`, teams.map(t => `${t.teamName} (ID: ${t.id})`).join(', '));
-            }
             // Преобразуем PastTeam[] в PlayerTeam[] для совместимости
             player.teams = teams.map(team => ({
               teamId: team.id,
@@ -1165,7 +1160,6 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
         });
         
         await Promise.all(teamPromises);
-        console.warn('✅ Загрузка команд завершена');
       } catch (teamsError) {
         console.error('❌ Ошибка загрузки команд:', teamsError);
         // Устанавливаем пустые команды если не удалось загрузить
@@ -1276,9 +1270,11 @@ export const clearAllTeamsCache = async (): Promise<void> => {
 export const clearFriendshipCache = async (userId1: string, userId2: string): Promise<void> => {
   try {
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const cacheKey = `friendship_${userId1}_${userId2}`;
+    // ВАЖНО: Используем отсортированный ключ для симметричности
+    const sortedIds = [userId1, userId2].sort();
+    const cacheKey = `friendship_${sortedIds[0]}_${sortedIds[1]}`;
     await AsyncStorage.removeItem(cacheKey);
-    console.log(`🗑️ Кеш статуса дружбы ${userId1} <-> ${userId2} очищен`);
+    console.log(`🗑️ Кеш статуса дружбы ${userId1} <-> ${userId2} очищен (ключ: ${cacheKey})`);
   } catch (error) {
     console.error('❌ Ошибка очистки кеша статуса дружбы:', error);
   }
@@ -1329,55 +1325,70 @@ export const clearAllExerciseStatsCache = async (): Promise<void> => {
 // Отправка запроса дружбы с очисткой кеша
 export const sendFriendRequest = async (fromId: string, toId: string): Promise<boolean> => {
   try {
-    console.log('📤 sendFriendRequest вызван:', { fromId, toId });
-    
-    // Сначала проверяем, есть ли отклоненный запрос между этими пользователями
-    // Если есть, удаляем его перед созданием нового
-    const { data: existingRequest, error: checkError } = await supabase
-      .from('friend_requests')
-      .select('id, status')
-      .or(`and(from_id.eq.${fromId},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${fromId})`)
-      .eq('status', 'rejected')
-      .maybeSingle();
-    
-    console.log('📤 Проверка отклоненных запросов:', { existingRequest, checkError });
-    
-    if (existingRequest) {
-      // Удаляем отклоненный запрос перед созданием нового
-      const { error: deleteError } = await supabase
-        .from('friend_requests')
-        .delete()
-        .eq('id', existingRequest.id);
-      
-      if (deleteError) {
-        console.error('❌ Ошибка удаления отклоненного запроса:', deleteError);
-      } else {
-        console.log('🗑️ Удален отклоненный запрос перед созданием нового');
-      }
+    // КРИТИЧЕСКАЯ ПРОВЕРКА параметров
+    if (!fromId || !toId) {
+      console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: fromId или toId пустые!', { fromId, toId });
+      return false;
     }
     
-    // Также проверяем и удаляем любые другие запросы (pending) между этими пользователями
-    // чтобы избежать конфликтов
+    if (fromId === toId) {
+      console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: fromId равен toId!', { fromId, toId });
+      return false;
+    }
+    
+    console.log('📤 [FRIEND_REQUEST] sendFriendRequest вызван:', { fromId, toId });
+    
+    // Проверяем все существующие запросы между пользователями
     const { data: allRequests } = await supabase
       .from('friend_requests')
-      .select('id, status')
+      .select('id, status, from_id, to_id')
       .or(`and(from_id.eq.${fromId},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${fromId})`);
     
     if (allRequests && allRequests.length > 0) {
       console.log('📤 Найдены существующие запросы:', allRequests);
-      // Удаляем все существующие запросы, кроме accepted (друзья)
-      const nonAcceptedRequests = allRequests.filter(req => req.status !== 'accepted');
-      if (nonAcceptedRequests.length > 0) {
-        const idsToDelete = nonAcceptedRequests.map(req => req.id);
-        const { error: deleteAllError } = await supabase
+      
+      // Проверяем, есть ли входящий pending запрос от toId к fromId
+      // Если есть - это означает, что оба пользователя хотят дружить, просто принимаем запрос
+      const incomingPendingRequest = allRequests.find(
+        req => req.from_id === toId && req.to_id === fromId && req.status === 'pending'
+      );
+      
+      if (incomingPendingRequest) {
+        console.log('📤 Найден входящий pending запрос, принимаем его вместо создания нового');
+        // Принимаем входящий запрос вместо создания нового
+        return await acceptFriendRequest(fromId, toId);
+      }
+      
+      // Проверяем, есть ли уже исходящий pending запрос
+      const outgoingPendingRequest = allRequests.find(
+        req => req.from_id === fromId && req.to_id === toId && req.status === 'pending'
+      );
+      
+      if (outgoingPendingRequest) {
+        console.log('📤 Уже есть исходящий pending запрос, пропускаем');
+        return true; // Запрос уже отправлен
+      }
+      
+      // Проверяем, если уже друзья
+      const acceptedRequest = allRequests.find(req => req.status === 'accepted');
+      if (acceptedRequest) {
+        console.log('📤 Уже друзья, пропускаем');
+        return true;
+      }
+      
+      // Удаляем только отклоненные запросы (rejected)
+      const rejectedRequests = allRequests.filter(req => req.status === 'rejected');
+      if (rejectedRequests.length > 0) {
+        const idsToDelete = rejectedRequests.map(req => req.id);
+        const { error: deleteError } = await supabase
           .from('friend_requests')
           .delete()
           .in('id', idsToDelete);
         
-        if (deleteAllError) {
-          console.error('❌ Ошибка удаления существующих запросов:', deleteAllError);
+        if (deleteError) {
+          console.error('❌ Ошибка удаления отклоненных запросов:', deleteError);
         } else {
-          console.log('🗑️ Удалены существующие запросы перед созданием нового:', idsToDelete);
+          console.log('🗑️ Удалены отклоненные запросы перед созданием нового:', idsToDelete);
         }
       }
     }
@@ -1433,13 +1444,33 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
     await clearFriendshipCache(fromId, toId);
     
     // Получаем данные отправителя для уведомления
-    const { data: senderData } = await supabase
+    console.log('📤 [FRIEND_REQUEST] Получение данных отправителя для fromId:', fromId);
+    const { data: senderData, error: senderDataError } = await supabase
       .from('players')
-      .select('name, avatar')
+      .select('id, name, avatar')
       .eq('id', fromId)
       .single();
     
+    if (senderDataError) {
+      console.error('❌ [FRIEND_REQUEST] Ошибка получения данных отправителя:', senderDataError);
+    }
+    
     if (senderData) {
+      console.log('📤 [FRIEND_REQUEST] Данные отправителя получены:', {
+        fromId,
+        fromName: senderData.name,
+        toId,
+        senderDataId: senderData.id
+      });
+      
+      // КРИТИЧЕСКАЯ ПРОВЕРКА: убеждаемся что senderData.id совпадает с fromId
+      if (senderData.id !== fromId) {
+        console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: senderData.id не совпадает с fromId!', {
+          fromId,
+          senderDataId: senderData.id
+        });
+      }
+      
       // Получаем язык получателя из БД
       const { getUserLanguage, loadTranslations } = await import('./languageHelper');
       const receiverLanguage = await getUserLanguage(toId);
@@ -1453,44 +1484,133 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
       const pushBody = translations?.notifications?.wantsToAddYou?.replace('{name}', senderData.name)
         || `${senderData.name} wants to add you as a friend`;
       
-      // Проверяем, нет ли уже уведомления о запросе дружбы от этого пользователя
-      const { data: existingNotifications } = await supabase
-        .from('notifications')
-        .select('id, data')
-        .eq('user_id', toId)
-        .eq('type', 'friend_request')
-        .eq('is_read', false);
-      
-      // Проверяем в памяти, есть ли уведомление от этого отправителя
-      const existingNotification = existingNotifications?.find(
-        (notif: any) => notif.data?.sender_id === fromId || notif.data?.playerId === fromId
-      );
-      
-      // Создаем уведомление только если его еще нет
-      if (!existingNotification) {
+      // Удаляем старые уведомления о запросе дружбы от этого отправителя
+      // Это нужно, чтобы при повторной отправке запроса создавалось новое уведомление
+      console.log('🔍 [FRIEND_REQUEST] Проверка старых уведомлений для получателя:', toId, 'от отправителя:', fromId);
       try {
-        const { error: notificationError } = await supabase
+        // Сначала получаем старые уведомления, чтобы проверить, сколько из них непрочитанных
+        const { data: oldNotifications, error: selectOldError } = await supabase
           .from('notifications')
-          .insert([{
-            user_id: toId,
-            type: 'friend_request',
-            title: title,
-            message: message,
-            is_read: false,
-            data: {
-              sender_id: fromId,
-              sender_name: senderData.name,
-              sender_avatar: senderData.avatar,
-              playerId: fromId,
-              playerName: senderData.name,
-              playerAvatar: senderData.avatar
+          .select('id, is_read, data')
+          .eq('user_id', toId)
+          .eq('type', 'friend_request');
+        
+        if (selectOldError) {
+          console.error('❌ [FRIEND_REQUEST] Ошибка получения старых уведомлений:', selectOldError);
+        } else {
+          console.log(`🔍 [FRIEND_REQUEST] Найдено ${oldNotifications?.length || 0} старых уведомлений о запросах дружбы`);
+        }
+        
+        // Фильтруем в памяти, так как Supabase не поддерживает сложные запросы к JSON полям
+        const notificationsFromSender = oldNotifications?.filter((notif: any) => {
+          // Проверяем через прямой запрос к data
+          const notifData = notif.data || {};
+          const matches = notifData.sender_id === fromId || notifData.playerId === fromId;
+          if (matches) {
+            console.log('🔍 [FRIEND_REQUEST] Найдено старое уведомление от этого отправителя:', notif.id, 'is_read:', notif.is_read);
+          }
+          return matches;
+        }) || [];
+        
+        console.log(`🔍 [FRIEND_REQUEST] Найдено ${notificationsFromSender.length} уведомлений от отправителя ${fromId}`);
+        
+        if (notificationsFromSender.length > 0) {
+          // Подсчитываем непрочитанные уведомления
+          const unreadCount = notificationsFromSender.filter((n: any) => !n.is_read).length;
+          console.log(`🔍 [FRIEND_REQUEST] Из них непрочитанных: ${unreadCount}`);
+          
+          // Удаляем старые уведомления
+          const notificationIds = notificationsFromSender.map((n: any) => n.id);
+          const { error: deleteError } = await supabase
+            .from('notifications')
+            .delete()
+            .in('id', notificationIds);
+          
+          if (deleteError) {
+            console.error('❌ [FRIEND_REQUEST] Ошибка удаления старых уведомлений:', deleteError);
+          } else {
+            console.log(`🗑️ [FRIEND_REQUEST] Удалено ${notificationsFromSender.length} старых уведомлений (${unreadCount} непрочитанных)`);
+            
+            // Если были удалены непрочитанные уведомления, уменьшаем счетчик
+            if (unreadCount > 0) {
+              const { data: playerData } = await supabase
+                .from('players')
+                .select('unread_notifications_count')
+                .eq('id', toId)
+                .single();
+              
+              const currentCount = playerData?.unread_notifications_count || 0;
+              const newCount = Math.max(0, currentCount - unreadCount);
+              
+              console.log(`🔢 [FRIEND_REQUEST] Уменьшаем счетчик уведомлений: ${currentCount} → ${newCount}`);
+              
+              await supabase
+                .from('players')
+                .update({ 
+                  unread_notifications_count: newCount,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', toId);
             }
-          }]);
+          }
+        } else {
+          console.log('ℹ️ [FRIEND_REQUEST] Старых уведомлений от этого отправителя не найдено');
+        }
+      } catch (deleteOldError) {
+        console.error('❌ [FRIEND_REQUEST] Ошибка удаления старых уведомлений:', deleteOldError);
+      }
+      
+      // Всегда создаем новое уведомление при отправке запроса
+      console.log('📤 [FRIEND_REQUEST] Начинаем создание in-app уведомления для получателя:', toId);
+      try {
+        // КРИТИЧЕСКАЯ ПРОВЕРКА перед созданием уведомления
+        if (!toId || toId === fromId) {
+          console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: некорректный toId перед созданием уведомления!', { fromId, toId });
+          return true; // Возвращаем true чтобы не сломать основной flow
+        }
+        
+        console.log('📤 [FRIEND_REQUEST] Создание in-app уведомления для получателя:', toId, {
+          title,
+          message,
+          sender_id: fromId,
+          sender_name: senderData.name
+        });
+        
+        const notificationData = {
+          user_id: toId, // ВАЖНО: создаем уведомление ТОЛЬКО для получателя
+          type: 'friend_request',
+          title: title,
+          message: message,
+          is_read: false,
+          data: {
+            sender_id: fromId,
+            sender_name: senderData.name,
+            sender_avatar: senderData.avatar,
+            playerId: fromId,
+            playerName: senderData.name,
+            playerAvatar: senderData.avatar
+          }
+        };
+        
+        console.log('📤 [FRIEND_REQUEST] Данные для вставки уведомления:', JSON.stringify(notificationData, null, 2));
+        
+        const { data: insertedNotification, error: notificationError } = await supabase
+          .from('notifications')
+          .insert([notificationData])
+          .select()
+          .single();
         
         if (notificationError) {
-          console.error('❌ Ошибка создания in-app уведомления о запросе:', notificationError);
+          console.error('❌ [FRIEND_REQUEST] Ошибка создания in-app уведомления о запросе:', notificationError);
+          console.error('❌ [FRIEND_REQUEST] Детали ошибки:', {
+            code: notificationError.code,
+            message: notificationError.message,
+            details: notificationError.details,
+            hint: notificationError.hint
+          });
         } else {
-          console.log('✅ In-app уведомление о запросе дружбы создано для:', toId);
+          console.log('✅ [FRIEND_REQUEST] In-app уведомление о запросе дружбы создано для:', toId);
+          console.log('✅ [FRIEND_REQUEST] Созданное уведомление:', insertedNotification?.id);
         
           // Увеличиваем счетчик уведомлений для получателя
           // Используем прямое обновление вместо RPC для гарантированного срабатывания Realtime
@@ -1523,18 +1643,29 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
             console.error('❌ Ошибка увеличения счетчика уведомлений:', counterError);
           }
         }
-        } catch (notificationError) {
-          console.error('❌ Ошибка создания уведомления о запросе:', notificationError);
-        }
-      } else {
-        console.log('ℹ️ Уведомление о запросе дружбы уже существует, пропускаем создание');
+      } catch (notificationError) {
+        console.error('❌ Ошибка создания уведомления о запросе:', notificationError);
       }
         
       // Отправляем push уведомление (даже если in-app уведомление уже существует)
         try {
+          // КРИТИЧЕСКАЯ ПРОВЕРКА: убеждаемся что отправляем ТОЛЬКО получателю
+          if (!toId || toId === fromId) {
+            console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: toId некорректный или равен fromId!', { fromId, toId });
+            return true; // Возвращаем true чтобы не сломать основной flow
+          }
+          
+          console.log('📤 [PUSH] Отправка push-уведомления о запросе дружбы:', {
+            fromId,
+            fromName: senderData.name,
+            toId,
+            pushTitle,
+            pushBody
+          });
+          
           const { sendNotificationToUser } = await import('./notificationService');
           const pushResult = await sendNotificationToUser(
-            toId,
+            toId, // ВАЖНО: отправляем ТОЛЬКО получателю (toId)
             pushTitle,
             pushBody,
             {
@@ -1545,13 +1676,16 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
             }
           );
           if (pushResult) {
-            console.log('✅ Push-уведомление о запросе дружбы отправлено');
+            console.log('✅ [PUSH] Push-уведомление о запросе дружбы отправлено получателю:', toId);
           } else {
-            console.warn('⚠️ Push-уведомление о запросе дружбы не отправлено');
+            console.warn('⚠️ [PUSH] Push-уведомление о запросе дружбы не отправлено получателю:', toId);
           }
         } catch (pushError) {
-          console.error('⚠️ Ошибка отправки push уведомления:', pushError);
+          console.error('❌ [PUSH] Ошибка отправки push уведомления:', pushError, { fromId, toId });
       }
+    } else {
+      console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: senderData не определен! Не удалось получить данные отправителя для fromId:', fromId);
+      console.error('❌ [FRIEND_REQUEST] Это означает, что уведомление не будет создано!');
     }
     
     return true;
@@ -1562,21 +1696,24 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
 };
 
 // Проверка статуса дружбы с кешированием
-export const getFriendshipStatus = async (userId1: string, userId2: string): Promise<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'> => {
+export const getFriendshipStatus = async (userId1: string, userId2: string, skipCache: boolean = false): Promise<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'> => {
   try {
-    // Кешируем результат на 5 минут для улучшения производительности
-    const cacheKey = `friendship_${userId1}_${userId2}`;
+    // ВАЖНО: Используем отсортированный ключ для симметричности
+    const sortedIds = [userId1, userId2].sort();
+    const cacheKey = `friendship_${sortedIds[0]}_${sortedIds[1]}`;
     const cacheTime = 5 * 60 * 1000; // 5 минут
     
-    // Проверяем кэш (временно отключено для отладки)
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
     
-    // Проверяем кеш
-    if (cachedData) {
-      const { status, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < cacheTime) {
-        return status;
+    // Проверяем кеш только если не указан skipCache
+    if (!skipCache) {
+      const cachedData = await AsyncStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        const { status, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < cacheTime) {
+          return status;
+        }
       }
     }
     
@@ -1587,7 +1724,7 @@ export const getFriendshipStatus = async (userId1: string, userId2: string): Pro
       .single();
     
     if (error) {
-      // Кешируем результат "none" при ошибке
+      // Кешируем результат "none" при ошибке (нет записи = не друзья)
       await AsyncStorage.setItem(cacheKey, JSON.stringify({
         status: 'none',
         timestamp: Date.now()
@@ -1733,6 +1870,9 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     // Конвертируем данные в формат Supabase
     const supabaseData = convertPlayerToSupabase(updateData as Player);
     
+    // Явно обновляем updated_at для срабатывания Realtime подписок
+    supabaseData.updated_at = new Date().toISOString();
+    
     const { data, error } = await supabase
       .from('players')
       .update(supabaseData)
@@ -1793,28 +1933,20 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     }
     
     // Отслеживаем изменения статистики и нормативов
+    // ВАЖНО: Уведомления отправляются из handleSave в app/player/[id].tsx,
+    // чтобы избежать дублирования и проблем с кешированием.
+    // Здесь только сохраняем изменения в базу данных для истории.
     if (oldPlayer) {
       const statChanges = trackStatsChanges(oldPlayer, updatedPlayer);
       const normativeChanges = trackNormativeChanges(oldPlayer, updatedPlayer);
       
-      // Если есть изменения, сохраняем их в базу данных и отправляем уведомления друзьям
+      // Если есть изменения, сохраняем их в базу данных (действуют 7 дней)
       if (statChanges.length > 0 || normativeChanges.length > 0) {
         // Сохраняем изменения статистики и нормативов в базу данных (действуют 7 дней)
         await saveStatsChanges(playerId, [...statChanges, ...normativeChanges]);
         
-        // Отправляем уведомления друзьям асинхронно (не блокируем основной поток)
-        setTimeout(async () => {
-          try {
-            await notifyFriendsAboutChanges(
-              playerId, 
-              updatedPlayer.name, 
-              statChanges, 
-              normativeChanges
-            );
-          } catch (error) {
-            console.error('❌ Ошибка отправки уведомлений (не критично):', error);
-          }
-        }, 0);
+        // Уведомления отправляются из handleSave, чтобы избежать дублирования
+        // и проблем с кешированием при одновременном изменении статистики и нормативов
       }
     }
     
@@ -2115,8 +2247,11 @@ export const logoutUser = async (skipStatusUpdate: boolean = false): Promise<voi
     
     // Проверим, есть ли данные пользователя перед удалением
     const userData = await AsyncStorage.getItem('hockeystars_current_user');
+    let userId: string | null = null;
+    
     if (userData && !skipStatusUpdate) {
       const user = JSON.parse(userData);
+      userId = user.id;
       
       // Обновляем онлайн-статус в базе данных при выходе (только если пользователь не удален)
       try {
@@ -2130,6 +2265,16 @@ export const logoutUser = async (skipStatusUpdate: boolean = false): Promise<voi
       } catch (statusError) {
         // Не критично, если не удалось обновить статус (возможно, пользователь уже удален)
         console.warn('⚠️ Не удалось обновить офлайн-статус:', statusError);
+      }
+      
+      // Удаляем все push токены пользователя при выходе из аккаунта
+      try {
+        const { deleteUserPushTokens } = await import('./notificationService');
+        await deleteUserPushTokens(user.id);
+        console.log('✅ Push токены удалены при выходе из аккаунта');
+      } catch (tokenError) {
+        // Не критично, если не удалось удалить токены
+        console.warn('⚠️ Не удалось удалить push токены при выходе (не критично):', tokenError);
       }
     }
     
@@ -2606,6 +2751,44 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     await clearFriendsCache(userId2);
     console.log('✅ Кеш друзей очищен для обоих пользователей');
     
+    // ВАЖНО: Удаляем уведомление о запросе дружбы у принимающего (userId1)
+    // Это нужно чтобы индикатор "1" исчез после принятия запроса
+    try {
+      const senderId = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
+      if (senderId) {
+        const { data: deletedNotifications } = await supabase
+          .from('notifications')
+          .delete()
+          .eq('user_id', userId1)
+          .eq('type', 'friend_request')
+          .or(`data->sender_id.eq.${senderId},data->from_id.eq.${senderId},data->playerId.eq.${senderId}`)
+          .select();
+        
+        if (deletedNotifications && deletedNotifications.length > 0) {
+          console.log('✅ Удалено уведомление о запросе дружбы после принятия:', deletedNotifications.length);
+          
+          // Уменьшаем счётчик непрочитанных уведомлений
+          const { data: playerData } = await supabase
+            .from('players')
+            .select('unread_notifications_count')
+            .eq('id', userId1)
+            .single();
+          
+          const currentCount = playerData?.unread_notifications_count || 0;
+          const newCount = Math.max(currentCount - deletedNotifications.length, 0);
+          
+          await supabase
+            .from('players')
+            .update({ unread_notifications_count: newCount })
+            .eq('id', userId1);
+          
+          console.log('✅ Счётчик уведомлений уменьшен после принятия запроса:', newCount);
+        }
+      }
+    } catch (notifError) {
+      console.error('⚠️ Ошибка удаления уведомления о запросе (не критично):', notifError);
+    }
+    
     // Получаем имя и аватар того, кто принял запрос (userId1 - тот кто принимает)
     const { data: acceptorData } = await supabase
       .from('players')
@@ -2720,6 +2903,14 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
 // Отклонение запроса дружбы
 export const declineFriendRequest = async (userId1: string, userId2: string): Promise<boolean> => {
   try {
+    // Получаем информацию о запросе, чтобы узнать кто отправитель
+    const { data: requestData } = await supabase
+      .from('friend_requests')
+      .select('from_id, to_id')
+      .or(`and(from_id.eq.${userId1},to_id.eq.${userId2}),and(from_id.eq.${userId2},to_id.eq.${userId1})`)
+      .eq('status', 'pending')
+      .single();
+    
     const { error } = await supabase
       .from('friend_requests')
       .update({ status: 'rejected' })
@@ -2734,6 +2925,44 @@ export const declineFriendRequest = async (userId1: string, userId2: string): Pr
     // Очищаем кеш статуса дружбы после отклонения запроса
     await clearFriendshipCache(userId1, userId2);
     console.log('✅ Кеш статуса дружбы очищен после отклонения запроса');
+    
+    // ВАЖНО: Удаляем уведомление о запросе дружбы у отклоняющего (userId1)
+    // Это нужно чтобы индикатор "1" исчез после отклонения запроса
+    try {
+      const senderId = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
+      if (senderId) {
+        const { data: deletedNotifications } = await supabase
+          .from('notifications')
+          .delete()
+          .eq('user_id', userId1)
+          .eq('type', 'friend_request')
+          .or(`data->sender_id.eq.${senderId},data->from_id.eq.${senderId},data->playerId.eq.${senderId}`)
+          .select();
+        
+        if (deletedNotifications && deletedNotifications.length > 0) {
+          console.log('✅ Удалено уведомление о запросе дружбы после отклонения:', deletedNotifications.length);
+          
+          // Уменьшаем счётчик непрочитанных уведомлений
+          const { data: playerData } = await supabase
+            .from('players')
+            .select('unread_notifications_count')
+            .eq('id', userId1)
+            .single();
+          
+          const currentCount = playerData?.unread_notifications_count || 0;
+          const newCount = Math.max(currentCount - deletedNotifications.length, 0);
+          
+          await supabase
+            .from('players')
+            .update({ unread_notifications_count: newCount })
+            .eq('id', userId1);
+          
+          console.log('✅ Счётчик уведомлений уменьшен после отклонения запроса:', newCount);
+        }
+      }
+    } catch (notifError) {
+      console.error('⚠️ Ошибка удаления уведомления о запросе (не критично):', notifError);
+    }
     
     return true;
   } catch (error) {
@@ -4369,11 +4598,20 @@ export const trackNormativeChanges = (oldPlayer: Player, newPlayer: Player): Nor
   // Поля нормативов для отслеживания
   const normativeFields = ['pullUps', 'pushUps', 'plankTime', 'sprint100m', 'longJump', 'jumpRope'];
   
+  // Вспомогательная функция для безопасного парсинга нормативов
+  const parseNormative = (value: string | null | undefined, defaultValue: number = 0): number => {
+    if (value === null || value === undefined || value === '') return defaultValue;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  };
+  
   normativeFields.forEach(field => {
-    const oldValue = parseFloat(oldPlayer[field as keyof Player] as string || '0') || 0;
-    const newValue = parseFloat(newPlayer[field as keyof Player] as string || '0') || 0;
+    const oldValue = parseNormative(oldPlayer[field as keyof Player] as string);
+    const newValue = parseNormative(newPlayer[field as keyof Player] as string);
     
-    if (oldValue !== newValue) {
+    // Обнаруживаем изменение только если новое значение не равно 0 (т.е. было введено значение)
+    // Или если старое значение было не 0, а новое изменилось
+    if (oldValue !== newValue && (newValue > 0 || oldValue > 0)) {
       changes.push({
         field,
         oldValue,
@@ -5469,8 +5707,8 @@ export const notifyFriendsAboutChanges = async (
   const lastCall = notificationCache.get(cacheKey);
   const now = Date.now();
   
-  if (lastCall && (now - lastCall) < 30000) { // 30 секунд
-    console.log('⏭️ Пропускаем повторный вызов notifyFriendsAboutChanges для игрока:', playerId);
+  // Предотвращаем дубликаты (60 секунд кеш)
+  if (lastCall && (now - lastCall) < 60000) {
     return;
   }
   
@@ -5492,17 +5730,7 @@ export const notifyFriendsAboutChanges = async (
     // Исключаем самого игрока из списка друзей (на случай ошибки в БД)
     const friends = allFriends.filter(friend => friend.id !== playerId);
     
-    console.log(`👥 Список друзей игрока ${playerName}:`, friends.length, 'из', allFriends.length);
-    
-    // Дополнительная проверка: логируем, если игрок попал в список друзей самому себе
-    if (allFriends.some(friend => friend.id === playerId)) {
-      console.error('🚨 КРИТИЧЕСКАЯ ОШИБКА: Игрок попал в список друзей самому себе!', {
-        playerId,
-        playerName,
-        allFriendsCount: allFriends.length,
-        friendsCount: friends.length
-      });
-    }
+    if (friends.length === 0) return; // Нет друзей - нечего уведомлять
     
     // Функция для генерации UUID v4
     const generateUUID = () => {
@@ -5580,7 +5808,13 @@ export const notifyFriendsAboutChanges = async (
 
     // Создаем уведомления для нормативов (если есть изменения) с локализацией
     const normativeNotifications = [];
+    console.log('🏋️ Проверка нормативов для уведомлений:', {
+      normativeChangesCount: normativeChanges.length,
+      normativeChanges: normativeChanges,
+      friendsCount: friends.length
+    });
     if (normativeChanges.length > 0) {
+      console.log('✅ Создаем уведомления о нормативах для', friends.length, 'друзей');
       const notifications = friends.map(friend => {
         const friendLang = friendLanguages.get(friend.id) || 'en';
         const friendTranslations = loadTranslations(friendLang);
@@ -5610,7 +5844,7 @@ export const notifyFriendsAboutChanges = async (
         return {
         id: generateUUID(),
         user_id: friend.id,
-          type: 'stats_change',
+          type: 'normative_changed',
           title: title,
           message: `${playerName} ${updatedText}: ${normativeChangesText}`,
         data: {
@@ -5625,10 +5859,18 @@ export const notifyFriendsAboutChanges = async (
       });
       
       normativeNotifications.push(...notifications);
+      console.log('✅ Создано уведомлений о нормативах:', notifications.length);
+    } else {
+      console.log('⚠️ Нормативы не изменились или пусты, уведомления не создаются');
     }
 
     // Объединяем все уведомления
     const allNotifications = [...statNotifications, ...normativeNotifications];
+    console.log('📋 Всего уведомлений перед дедупликацией:', {
+      statNotifications: statNotifications.length,
+      normativeNotifications: normativeNotifications.length,
+      total: allNotifications.length
+    });
     
     // Дедуплицируем уведомления по пользователю и типу
     const uniqueNotifications = new Map<string, typeof allNotifications[0]>();
@@ -5636,9 +5878,13 @@ export const notifyFriendsAboutChanges = async (
       const key = `${notification.user_id}_${notification.type}`;
       if (!uniqueNotifications.has(key)) {
         uniqueNotifications.set(key, notification);
+        console.log('✅ Добавлено уведомление:', { user_id: notification.user_id, type: notification.type, title: notification.title });
+      } else {
+        console.log('⏭️ Пропущено дублирующееся уведомление:', { user_id: notification.user_id, type: notification.type });
       }
     }
     const deduplicatedNotifications = Array.from(uniqueNotifications.values());
+    console.log('📋 Уведомлений после дедупликации:', deduplicatedNotifications.length);
     
     // Уведомления получают только друзья, не сам игрок
     
@@ -5686,26 +5932,26 @@ export const notifyFriendsAboutChanges = async (
       });
       
       if (isDuplicate) {
-        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id, 'от игрока:', playerId, 'с теми же изменениями');
+        console.log('⏭️ Пропускаем дубликат уведомления для пользователя:', notification.user_id, 'от игрока:', playerId, 'тип:', notification.type, 'с теми же изменениями');
         continue;
       }
       
-      // console.log('💾 Сохраняем уведомление:', {
-      //   id: notification.id,
-      //   user_id: notification.user_id,
-      //   type: notification.type,
-      //   title: notification.title,
-      //   data: notification.data
-      // });
+      console.log('💾 Сохраняем уведомление:', {
+        id: notification.id,
+        user_id: notification.user_id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message?.substring(0, 50) + '...'
+      });
       
       const { error: insertError } = await supabase
         .from('notifications')
         .insert(notification);
         
       if (insertError) {
-        console.error('❌ Ошибка сохранения уведомления:', insertError);
+        console.error('❌ Ошибка сохранения уведомления:', insertError, 'тип:', notification.type);
       } else {
-        // console.log('✅ Уведомление сохранено в базу данных');
+        console.log('✅ Уведомление сохранено в базу данных:', notification.type, 'для пользователя:', notification.user_id);
         // Запоминаем что уведомление отправлено
         notificationsByUserAndType.set(key, notification);
       }
@@ -5717,124 +5963,174 @@ export const notifyFriendsAboutChanges = async (
     
     // Отправляем push уведомления и обновляем счетчик для каждого друга
     const uniqueUserIds = [...new Set(deduplicatedNotifications.map(n => n.user_id))];
-    const sentPushNotifications = new Set<string>(); // Кеш для предотвращения дублирования
+    const sentPushNotifications = new Set<string>();
+    
+    // Получаем актуальные языки из БД (задержка для синхронизации при смене языка)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { getUserLanguages: getUserLanguagesFresh } = await import('./languageHelper');
+    const freshUserLanguages = await getUserLanguagesFresh(uniqueUserIds);
+    
+    const userLanguagesMap = new Map<string, string>();
+    const userTranslationsMap = new Map<string, any>();
     
     for (const userId of uniqueUserIds) {
-      // Отправляем push уведомление
-      try {
-        const { sendNotificationToUser } = await import('./notificationService');
-        const userNotifications = deduplicatedNotifications.filter(n => n.user_id === userId);
-        const notificationType = userNotifications[0]?.type;
+      const userLang = freshUserLanguages.get(userId) || 'en';
+      userLanguagesMap.set(userId, userLang);
+      userTranslationsMap.set(userId, loadTranslations(userLang));
+    }
+    
+    for (const userId of uniqueUserIds) {
+      // Используем предопределенные язык и переводы для консистентности
+      const userLang = userLanguagesMap.get(userId) || 'en';
+      const userTranslations = userTranslationsMap.get(userId) || loadTranslations('en');
+      
+      // Получаем все уведомления для этого пользователя
+      const userNotifications = deduplicatedNotifications.filter(n => n.user_id === userId);
+      
+      // Отправляем отдельное push-уведомление для каждого типа уведомления
+      for (const userNotification of userNotifications) {
+        const notificationType = userNotification.type;
         
-        // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока с теми же изменениями
-        const changesHash = JSON.stringify(userNotifications[0]?.data?.changes || []);
-        const pushCacheKey = `${userId}_${playerId}_${notificationType}_${changesHash}`;
-        
-        // Двойная проверка: глобальный кеш + локальный кеш
-        if (sentPushNotifications.has(pushCacheKey)) {
-          console.log('⏭️ Пропускаем дублирующееся push-уведомление (локальный кеш):', userId, 'от игрока:', playerId);
-          continue;
-        }
-        
-        const lastPushTime = pushNotificationCache.get(pushCacheKey);
-        const now = Date.now();
-        
-        if (lastPushTime && (now - lastPushTime) < 30000) { // 30 секунд
-          console.log('⏭️ Пропускаем дублирующееся push-уведомление (глобальный кеш):', userId, 'от игрока:', playerId);
-          continue;
-        }
-        
-        // Дополнительная проверка: не отправляем уведомление самому игроку
-        if (userId === playerId) {
-          console.error('🚨 КРИТИЧЕСКАЯ ОШИБКА: Попытка отправить уведомление самому игроку!', {
-            userId,
-            playerId,
-            playerName,
-            notificationType
-          });
-          continue;
-        }
-        
-        // Помечаем как отправленное
-        sentPushNotifications.add(pushCacheKey);
-        pushNotificationCache.set(pushCacheKey, now);
-        
-        // Получаем язык получателя для локализации
-        const userLang = friendLanguages.get(userId) || 'en';
-        const userTranslations = loadTranslations(userLang);
-        
-        // Определяем, есть ли изменения нормативов в уведомлениях
-        const userNotification = deduplicatedNotifications.find(n => n.user_id === userId);
-        const hasNormativeChanges = userNotification?.data?.changes?.some((c: any) => 
-          ['pullUps', 'pushUps', 'plankTime', 'sprint100m', 'longJump', 'jumpRope'].includes(c.field)
-        );
-        
-        let title: string;
-        let body: string;
-        
-        if (hasNormativeChanges) {
-          // Для нормативов используем специальный заголовок
-          title = userNotification?.title || ('💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update'));
-          body = userNotification?.message || `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
-        } else if (notificationType === 'stats_change') {
-          // Для статистики используем стандартный заголовок
-          title = userNotification?.title || ('📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update'));
-          body = userNotification?.message || `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
-        } else if (notificationType === 'physical_data_changed') {
-          title = '💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update');
-          body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
-        } else {
-          title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
-          body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
-        }
-        
-        await sendNotificationToUser(
-          userId,
-          title,
-          body,
-          {
-            type: notificationType,
-            player_id: playerId,
-            action: 'open_profile',
-            deepLink: `/player/${playerId}`
+        try {
+          const { sendNotificationToUser } = await import('./notificationService');
+          
+          // Проверяем, не отправлялось ли уже push-уведомление для этого пользователя и игрока с теми же изменениями
+          // ВАЖНО: Ключ кеша НЕ включает язык, чтобы предотвратить дубликаты при смене языка
+          const changesHash = JSON.stringify(userNotification?.data?.changes || []);
+          const pushCacheKey = `${userId}_${playerId}_${notificationType}_${changesHash}`;
+          
+          // Проверка дубликатов
+          if (sentPushNotifications.has(pushCacheKey)) continue;
+          
+          const lastPushTime = pushNotificationCache.get(pushCacheKey);
+          const now = Date.now();
+          
+          if (lastPushTime && (now - lastPushTime) < 60000) continue;
+          
+          // Не отправляем уведомление самому игроку
+          if (userId === playerId) {
+            console.error('🚨 Попытка отправить уведомление самому игроку:', {
+              userId,
+              playerId,
+              playerName,
+              notificationType
+            });
+            continue;
           }
-        );
-      } catch (pushError) {
-        console.error('⚠️ Ошибка отправки push уведомления об изменениях:', pushError);
+          
+          // Помечаем как отправленное
+          sentPushNotifications.add(pushCacheKey);
+          pushNotificationCache.set(pushCacheKey, now);
+          
+          // Определяем тип уведомления и формируем заголовок и тело
+          // КРИТИЧЕСКИ ВАЖНО: ВСЕГДА формируем title и body заново на актуальном языке из БД
+          // НЕ используем userNotification?.title и userNotification?.message, так как они могут быть на старом языке
+          let title: string;
+          let body: string;
+          
+          // Получаем изменения из data (они не зависят от языка)
+          const changes = (userNotification?.data as any)?.changes || [];
+          
+          if (notificationType === 'normative_changed') {
+            // Для нормативов формируем текст заново на актуальном языке
+            const fieldNames = userTranslations?.normativeFields || {
+              'pullUps': userTranslations?.pullUps || 'pull-ups',
+              'pushUps': userTranslations?.pushUps || 'push-ups',
+              'plankTime': userTranslations?.plankTime || 'plank',
+              'sprint100m': userTranslations?.sprint100m || '100m sprint',
+              'longJump': userTranslations?.longJump || 'long jump',
+              'jumpRope': userTranslations?.jumpRope || 'jump rope'
+            };
+            
+            const changesText = changes
+              .map((change: any) => {
+                const fieldName = fieldNames[change.field] || change.field;
+                const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+                return `${fieldName}: ${changeText}`;
+              })
+              .join(', ');
+            
+            title = '💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Standards Update');
+            body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}: ${changesText}`;
+            
+          } else if (notificationType === 'stats_change') {
+            // Для статистики формируем текст заново на актуальном языке
+            const fieldNames: { [key: string]: string } = {
+              'goals': userLang === 'ru' 
+                ? (userTranslations?.goals === 'Голы' ? 'голов' : userTranslations?.goals || 'голов')
+                : (userTranslations?.goals || 'goals'),
+              'assists': userLang === 'ru'
+                ? (userTranslations?.assists === 'Передачи' ? 'передач' : userTranslations?.assists || 'передач')
+                : (userTranslations?.assists || 'assists'),
+              'games': userLang === 'ru'
+                ? (userTranslations?.games === 'Игры' ? 'игр' : userTranslations?.games || 'игр')
+                : (userTranslations?.games || 'games'),
+              'minutes': userLang === 'ru'
+                ? (userTranslations?.profile?.minutes === 'минуты' ? 'минут' : userTranslations?.profile?.minutes || 'минут')
+                : (userTranslations?.profile?.minutes || 'minutes'),
+              'shots': userLang === 'ru'
+                ? (userTranslations?.profile?.shots === 'броски' ? 'бросков' : userTranslations?.profile?.shots || 'бросков')
+                : (userTranslations?.profile?.shots || 'shots'),
+              'saves': userLang === 'ru'
+                ? (userTranslations?.profile?.saves === 'сэйвы' ? 'сэйвов' : userTranslations?.profile?.saves || 'сэйвов')
+                : (userTranslations?.profile?.saves || 'saves')
+            };
+            
+            const changesText = changes
+              .map((change: any) => {
+                const fieldName = fieldNames[change.field] || change.field;
+                const changeText = change.change > 0 ? `+${change.change}` : change.change.toString();
+                return `${fieldName}: ${changeText}`;
+              })
+              .join(', ');
+            
+            title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
+            body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}: ${changesText}`;
+            
+          } else if (notificationType === 'physical_data_changed') {
+            // Для физических данных (вес, рост)
+            title = '💪 ' + (userTranslations?.pushTitles?.standardsUpdate || 'Physical Data Changed');
+            body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
+          } else {
+            title = '📊 ' + (userTranslations?.pushTitles?.statsUpdate || 'Stats Update');
+            body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
+          }
+          
+          const pushResult = await sendNotificationToUser(
+            userId,
+            title,
+            body,
+            {
+              type: notificationType,
+              player_id: playerId,
+              action: 'open_profile',
+              deepLink: `/player/${playerId}`
+            }
+          );
+          
+        } catch (pushError) {
+          // Ошибка отправки push — не критично
+        }
       }
       
-      // Обновляем счетчик напрямую (гарантирует Realtime событие)
+      // Обновляем счетчик уведомлений
       try {
-        // Получаем текущий счетчик
-        const { data: playerData, error: fetchError } = await supabase
+        const { data: playerData } = await supabase
           .from('players')
           .select('unread_notifications_count')
           .eq('id', userId)
           .single();
 
-        if (fetchError) {
-          console.error('❌ Ошибка получения счетчика уведомлений:', fetchError);
-        } else {
-          const currentCount = playerData?.unread_notifications_count || 0;
-          const newCount = currentCount + 1;
-
-          // Обновляем счетчик напрямую (гарантирует Realtime событие)
-          const { error: updateError } = await supabase
-            .from('players')
-            .update({ 
-              unread_notifications_count: newCount,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId);
-
-          if (updateError) {
-            console.error('❌ Ошибка обновления счетчика уведомлений:', updateError);
-          } else {
-            console.log(`✅ Счетчик уведомлений обновлен для пользователя ${userId}: ${currentCount} → ${newCount}`);
-          }
-        }
+        const currentCount = playerData?.unread_notifications_count || 0;
+        await supabase
+          .from('players')
+          .update({ 
+            unread_notifications_count: currentCount + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
       } catch (counterError) {
-        console.error('⚠️ Ошибка обновления счетчика уведомлений:', counterError);
+        // Ошибка обновления счетчика — не критично
       }
     }
   } catch (error) {

@@ -137,7 +137,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
       containerStyle={{ backgroundColor: 'transparent' }}
     >
       <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
-        {notification.type === 'stats_change' && notification.data && notification.data.changes ? (
+        {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
           <TouchableOpacity
             onPress={() => onPress(notification)}
             activeOpacity={0.7}
@@ -583,6 +583,7 @@ export default function NotificationsScreen() {
             notification.type === 'team_invite' || 
             notification.type === 'system' ||
             notification.type === 'stats_change' ||
+            notification.type === 'normative_changed' ||
             notification.type === 'photo_added' ||
             notification.type === 'new_friendship' ||
             notification.type === 'exercise_completed' ||
@@ -1168,8 +1169,8 @@ export default function NotificationsScreen() {
         if (currentUser) {
           router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
         }
-      } else if (notification.type === 'stats_change') {
-        // Для уведомлений о изменениях статистики показываем статистику игрока
+      } else if (notification.type === 'stats_change' || notification.type === 'normative_changed') {
+        // Для уведомлений о изменениях статистики/нормативов показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
           router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
         }

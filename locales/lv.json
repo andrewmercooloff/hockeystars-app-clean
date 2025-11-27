@@ -2748,9 +2748,9 @@
   "normativeFields": {
     "pullUps": "pievilkšanās",
     "pushUps": "piezemēšanās",
-    "plankTime": "plankas",
-    "sprint100m": "100m sprinta",
-    "longJump": "tāllēkšanas",
+    "plankTime": "planka",
+    "sprint100m": "100m sprints",
+    "longJump": "tāllēkšana",
     "jumpRope": "lecamaukla"
   },
   "socialLinks": {

@@ -963,17 +963,31 @@ export default function PlayerProfile() {
 
     let debounceTimer: NodeJS.Timeout | null = null;
 
-    const syncFriendshipStatus = async () => {
-      // Не синхронизируем статус через realtime в течение 3 секунд после ручного изменения
+    const syncFriendshipStatus = async (eventType?: string, forceUpdate: boolean = false) => {
+      // ВАЖНО: Для критических событий (принятие запроса, удаление из друзей) обновляем всегда
+      // Проверяем только если это наше собственное действие и это не критическое событие
       const timeSinceLastManualChange = Date.now() - lastManualStatusChangeRef.current;
-      if (timeSinceLastManualChange < 3000) {
-        console.log('⏭️ Пропускаем realtime синхронизацию (недавнее ручное изменение)');
+      const isOurAction = timeSinceLastManualChange < 1000;
+      const isCriticalEvent = eventType === 'UPDATE' || eventType === 'DELETE' || forceUpdate;
+      
+      // ВАЖНО: Для критических событий (принятие запроса, удаление из друзей) всегда обновляем,
+      // даже если это наше действие, потому что изменение могло произойти от другого пользователя
+      if (isOurAction && !isCriticalEvent) {
+        // Для наших действий (кроме критических) делаем небольшую задержку
+        console.log('⏭️ Пропускаем realtime синхронизацию (наше недавнее действие)');
         return;
       }
+      
+      // Для критических событий всегда обновляем, даже если это наше действие
+      // Это гарантирует, что если другой пользователь принял запрос или удалил из друзей,
+      // мы увидим изменение немедленно
 
       try {
         const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-        const currentStatus = await getFriendshipStatus(currentUser.id, player.id);
+        
+        // ВАЖНО: Используем skipCache=true для Realtime событий, чтобы получить актуальный статус из БД
+        const currentStatus = await getFriendshipStatus(currentUser.id, player.id, true);
+        console.log('🔄 Realtime: получен статус дружбы из БД:', currentStatus, 'событие:', eventType || 'unknown');
 
         // Обновляем только если статус действительно изменился
         setFriendshipStatusCache(prev => {
@@ -993,38 +1007,107 @@ export default function PlayerProfile() {
       }
     };
 
-    const debouncedSync = () => {
+    const debouncedSync = (eventType?: string) => {
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }
-      debounceTimer = setTimeout(syncFriendshipStatus, 500);
+      // Для DELETE событий (удаление из друзей) обновляем быстрее
+      const delay = eventType === 'DELETE' ? 100 : 300;
+      debounceTimer = setTimeout(() => syncFriendshipStatus(eventType), delay);
     };
 
+    // Функция для проверки, относится ли запись к нашей паре пользователей
+    const isRelevantRequest = (record: any): boolean => {
+      if (!record) return false;
+      const fromId = record.from_id;
+      const toId = record.to_id;
+      return (fromId === currentUser.id && toId === player.id) ||
+             (fromId === player.id && toId === currentUser.id);
+    };
+
+    // Создаем канал с уникальным именем для этой пары пользователей
+    // ОТЛАДКА: Используем подписку БЕЗ фильтра, чтобы проверить, работает ли Realtime
+    console.log('🔌 Создаем Realtime подписку для friend_requests:', {
+      currentUserId: currentUser.id,
+      playerId: player.id,
+      channelName: `friend-requests-sync-${currentUser.id}-${player.id}`
+    });
+    
     const friendRequestsChannel = supabase
       .channel(`friend-requests-sync-${currentUser.id}-${player.id}`)
+      // ВАЖНО: Подписываемся на ВСЕ события таблицы friend_requests БЕЗ фильтра
+      // Фильтрацию делаем на клиенте для надежности
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'friend_requests',
-          filter: `from_id=eq.${currentUser.id},to_id=eq.${player.id}`
+          table: 'friend_requests'
         },
-        debouncedSync
+        (payload) => {
+          const eventType = payload.eventType;
+          const newRecord = payload.new as { from_id?: string; to_id?: string; status?: string } | null;
+          const oldRecord = payload.old as { from_id?: string; to_id?: string; status?: string } | null;
+          
+          console.log('📨 Realtime friend_requests (все события):', eventType, { 
+            new: newRecord, 
+            old: oldRecord,
+            currentUserId: currentUser.id,
+            playerId: player.id
+          });
+          
+          // Проверяем, относится ли это событие к нашей паре пользователей
+          const fromId = newRecord?.from_id || oldRecord?.from_id;
+          const toId = newRecord?.to_id || oldRecord?.to_id;
+          
+          // ВАЖНО: Для DELETE событий payload.old может содержать только {id: "..."}
+          // без from_id и to_id (если REPLICA IDENTITY не FULL)
+          // В этом случае всё равно обновляем статус, чтобы не пропустить удаление
+          if (eventType === 'DELETE') {
+            if (!fromId || !toId) {
+              console.log('🗑️ DELETE событие без from_id/to_id! Обновляем статус на всякий случай');
+              syncFriendshipStatus('DELETE', true);
+              return;
+            }
+          }
+          
+          const isOurPair = (fromId === currentUser.id && toId === player.id) ||
+                           (fromId === player.id && toId === currentUser.id);
+          
+          if (!isOurPair) {
+            console.log('📨 Пропускаем - не наша пара пользователей');
+            return;
+          }
+          
+          console.log('📨 Это событие для нашей пары! Обрабатываем...');
+          
+          // Для DELETE всегда обновляем статус
+          if (eventType === 'DELETE') {
+            console.log('🗑️ DELETE событие! Обновляем статус немедленно');
+            syncFriendshipStatus('DELETE', true);
+            return;
+          }
+          
+          const oldStatus = oldRecord?.status;
+          const newStatus = newRecord?.status;
+          
+          if (eventType === 'UPDATE' && oldStatus === 'pending' && newStatus === 'accepted') {
+            console.log('✅ Запрос принят! Обновляем статус немедленно');
+            syncFriendshipStatus('UPDATE', true);
+          } else if (eventType === 'INSERT') {
+            console.log('📥 Новый запрос! Обновляем статус');
+            debouncedSync(eventType);
+          } else {
+            debouncedSync(eventType);
+          }
+        }
       )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'friend_requests',
-          filter: `from_id=eq.${player.id},to_id=eq.${currentUser.id}`
-        },
-        debouncedSync
-      )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔌 Статус Realtime подписки friend_requests:', status);
+      });
 
     return () => {
+      console.log('🔌 Отключаем Realtime подписку friend_requests');
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }
@@ -1127,6 +1210,98 @@ export default function PlayerProfile() {
       supabase.removeChannel(friendsChannel);
     };
   }, [player?.id, id]);
+
+  // Ref для сохранения позиции прокрутки при обновлении через Realtime
+  const savedScrollPositionRef = useRef<number | null>(null);
+  
+  // Realtime подписка на обновления профиля игрока
+  useEffect(() => {
+    if (!player?.id) return;
+
+    const reloadPlayerProfile = async () => {
+      console.log('🔄 Realtime: Обновление профиля игрока', player.id);
+      
+      // Проверяем, что ID не изменился
+      const checkId = Array.isArray(id) ? id[0] : id;
+      if (checkId !== player.id) {
+        console.log('⚠️ ID изменился, пропускаем обновление профиля');
+        return;
+      }
+
+      try {
+        // Сохраняем текущую позицию прокрутки перед обновлением
+        // Позиция уже сохранена в savedScrollPositionRef через onScroll
+        
+        // Загружаем свежие данные профиля
+        const { getPlayerById, clearPlayerCache } = await import('../../utils/playerStorage');
+        
+        // Очищаем кеш для этого игрока
+        clearPlayerCache(player.id);
+        
+        // Загружаем свежие данные
+        const updatedPlayer = await getPlayerById(player.id);
+        
+        // Проверяем еще раз после загрузки
+        const finalCheckId = Array.isArray(id) ? id[0] : id;
+        if (finalCheckId !== player.id) {
+          console.log('⚠️ ID изменился после загрузки, пропускаем обновление');
+          return;
+        }
+        
+        if (updatedPlayer) {
+          console.log('✅ Профиль обновлен через Realtime');
+          setPlayer(updatedPlayer);
+          
+          // Обновляем кеш состояния
+          setPlayersCache(prev => ({
+            ...prev,
+            [player.id]: updatedPlayer
+          }));
+          
+          // Обновляем дополнительные данные
+          if (currentUser) {
+            loadAdditionalData(updatedPlayer, currentUser);
+          }
+          
+          // Восстанавливаем позицию прокрутки после обновления (если была сохранена)
+          if (savedScrollPositionRef.current !== null && scrollViewRef.current) {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollTo({ 
+                y: savedScrollPositionRef.current!, 
+                animated: false 
+              });
+            }, 100);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Ошибка обновления профиля через Realtime:', error);
+      }
+    };
+
+    const profileChannel = supabase
+      .channel(`player-profile-updates-${player.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players',
+          filter: `id=eq.${player.id}`
+        },
+        async (payload) => {
+          console.log('📨 Realtime: Получено обновление профиля', payload.new);
+          // Небольшая задержка для дебаунсинга множественных обновлений
+          setTimeout(() => {
+            reloadPlayerProfile();
+          }, 300);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(profileChannel);
+    };
+  }, [player?.id, id, currentUser?.id]);
 
   // Ref для отслеживания последнего обновления
   const lastRefreshTime = useRef<number>(0);
@@ -1920,126 +2095,141 @@ export default function PlayerProfile() {
 
     // Защита от повторных вызовов
     if (friendLoading) {
-      console.log('⚠️ handleAddFriend: friendLoading=true, пропускаем');
       return;
     }
 
     if (!currentUser || !player) {
-      console.log('⚠️ handleAddFriend: нет currentUser или player');
       showCustomAlert('Ошибка', 'Необходимо войти в профиль для добавления в друзья', 'error', () => router.push('/login'));
       return;
     }
 
+    const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+    const previousStatus = friendshipStatus;
+    
+    // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI, запрос в фоне
     setFriendLoading(true);
-    try {
-      const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+    lastManualStatusChangeRef.current = Date.now();
 
-      if (friendshipStatus === 'friends') {
-        // Удаляем из друзей
-        const success = await removeFriend(currentUser.id, player.id);
-        if (success) {
-          // Отмечаем время ручного изменения статуса
-          lastManualStatusChangeRef.current = Date.now();
-          
-          // Обновляем статус и кеш
-          setFriendshipStatusCache(prev => ({
-            ...prev,
-            [cacheKey]: 'none'
-          }));
-          setFriendshipStatus('none');
-
-          showCustomAlert(t('common.success'), t('profile.removedFromFriends', { name: player?.name || 'Player' }), 'success');
-        } else {
+    if (friendshipStatus === 'friends') {
+      // Удаляем из друзей - сразу показываем "добавить"
+      setFriendshipStatus('none');
+      setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
+      
+      removeFriend(currentUser.id, player.id).then(success => {
+        setFriendLoading(false);
+        if (!success) {
+          // Откатываем при ошибке
+          setFriendshipStatus(previousStatus);
+          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
           showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
         }
-      } else if (friendshipStatus === 'none') {
-        // Отправляем запрос дружбы
-        console.log('📤 Отправка запроса дружбы:', { fromId: currentUser.id, toId: player.id });
-        const success = await sendFriendRequest(currentUser.id, player.id);
-        console.log('📤 Результат отправки запроса дружбы:', success);
-
+      }).catch(error => {
+        setFriendLoading(false);
+        setFriendshipStatus(previousStatus);
+        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
+        showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
+      });
+      
+    } else if (friendshipStatus === 'none') {
+      // КРИТИЧЕСКАЯ ПРОВЕРКА перед отправкой запроса
+      if (!currentUser?.id || !player?.id) {
+        console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: currentUser.id или player.id пустые!', {
+          currentUserId: currentUser?.id,
+          playerId: player?.id
+        });
+        setFriendLoading(false);
+        showCustomAlert(t('common.error'), 'Ошибка: некорректные данные пользователя', 'error');
+        return;
+      }
+      
+      if (currentUser.id === player.id) {
+        console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: currentUser.id равен player.id!', {
+          currentUserId: currentUser.id,
+          playerId: player.id
+        });
+        setFriendLoading(false);
+        showCustomAlert(t('common.error'), 'Нельзя отправить запрос самому себе', 'error');
+        return;
+      }
+      
+      console.log('📤 [FRIEND_REQUEST] Отправка запроса дружбы:', {
+        fromId: currentUser.id,
+        fromName: currentUser.name,
+        toId: player.id,
+        toName: player.name
+      });
+      
+      // Отправляем запрос - сразу показываем "отменить запрос"
+      setFriendshipStatus('sent_request');
+      setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'sent_request' }));
+      
+      sendFriendRequest(currentUser.id, player.id).then(success => {
+        setFriendLoading(false);
         if (success) {
-          // Отмечаем время ручного изменения статуса
-          lastManualStatusChangeRef.current = Date.now();
-          
-          // Обновляем статус и кеш
-          setFriendshipStatusCache(prev => ({
-            ...prev,
-            [cacheKey]: 'sent_request'
-          }));
-          setFriendshipStatus('sent_request');
-
-          // Трекаем добавление в друзья (не критично, если упадет - не должно влиять на работу)
-          try {
-            await addActivityPoints(currentUser.id, 'FRIEND_ADD');
-          } catch (error) {
-            console.error('⚠️ Failed to track friend add (не критично):', error);
-          }
-
-          showCustomAlert(t('common.success'), t('profile.friendRequestSent'), 'success');
+          addActivityPoints(currentUser.id, 'FRIEND_ADD').catch(() => {});
         } else {
+          // Откатываем при ошибке
+          setFriendshipStatus(previousStatus);
+          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
           showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
         }
-      } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
-        // Отменяем запрос
-        const success = await cancelFriendRequest(currentUser.id, player.id);
-        if (success) {
-          // Отмечаем время ручного изменения статуса
-          lastManualStatusChangeRef.current = Date.now();
-          
-          // Обновляем статус и кеш
-          setFriendshipStatusCache(prev => ({
-            ...prev,
-            [cacheKey]: 'none'
-          }));
-          setFriendshipStatus('none');
-
-          showCustomAlert(t('common.success'), t('profile.friendRequestCancelled'), 'info');
-        } else {
+      }).catch(error => {
+        setFriendLoading(false);
+        // Откатываем при ошибке
+        setFriendshipStatus(previousStatus);
+        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
+        showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
+      });
+      
+    } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
+      // Отменяем запрос - сразу показываем "добавить"
+      setFriendshipStatus('none');
+      setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
+      
+      cancelFriendRequest(currentUser.id, player.id).then(success => {
+        setFriendLoading(false);
+        if (!success) {
+          // Откатываем при ошибке
+          setFriendshipStatus(previousStatus);
+          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
           showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
         }
-      } else if (friendshipStatus === 'received_request') {
-        // Принимаем запрос
-        const success = await acceptFriendRequest(currentUser.id, player.id);
+      }).catch(error => {
+        setFriendLoading(false);
+        setFriendshipStatus(previousStatus);
+        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
+        showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
+      });
+      
+    } else if (friendshipStatus === 'received_request') {
+      // Принимаем запрос - сразу показываем "друзья"
+      setFriendshipStatus('friends');
+      setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'friends' }));
+      
+      acceptFriendRequest(currentUser.id, player.id).then(success => {
+        setFriendLoading(false);
         if (success) {
-          // Отмечаем время ручного изменения статуса
-          lastManualStatusChangeRef.current = Date.now();
-          
-          // Обновляем статус и кеш
-          setFriendshipStatusCache(prev => ({
-            ...prev,
-            [cacheKey]: 'friends'
-          }));
-          setFriendshipStatus('friends');
-
-          // Очищаем кеш игрока и аватара асинхронно
+          // Очищаем кеш асинхронно
           setTimeout(async () => {
             try {
               await clearPlayerCache(player.id);
-              try {
-                const { avatarCache } = await import('../../utils/AvatarCache');
-                avatarCache.clearAvatar(player.id);
-              } catch (error) {
-                // Игнорируем ошибки очистки кеша аватара
-              }
-            } catch (error) {
-              console.error('⚠️ Ошибка очистки кеша после принятия запроса (не критично):', error);
-            }
+              const { avatarCache } = await import('../../utils/AvatarCache');
+              avatarCache.clearAvatar(player.id);
+            } catch (error) {}
           }, 100);
-
-          showCustomAlert(
-            t('common.success'),
-            t('profile.friendshipAccepted', { name: player?.name || 'Player' }),
-            'success'
-          );
         } else {
+          // Откатываем при ошибке
+          setFriendshipStatus(previousStatus);
+          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
-      }
-    } catch (error) {
-      console.error('❌ Ошибка управления друзьями:', error);
-      showCustomAlert('Ошибка', 'Произошла ошибка при управлении друзьями', 'error');
-    } finally {
+      }).catch(error => {
+        setFriendLoading(false);
+        setFriendshipStatus(previousStatus);
+        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
+        showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
+      });
+    } else {
       setFriendLoading(false);
     }
   };
@@ -2178,33 +2368,24 @@ export default function PlayerProfile() {
       return;
     }
     
+    const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+    const previousStatus = friendshipStatus;
+    
+    // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI
     setFriendLoading(true);
-    try {
-      const success = await declineFriendRequest(currentUser.id, player.id);
-      if (success) {
-        // Сразу обновляем статус на 'none' для мгновенной обратной связи
-        setFriendshipStatus('none');
-        
-        // Очищаем кеш статуса дружбы для этого игрока
-        const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-        setFriendshipStatusCache(prev => {
-          const updated = { ...prev };
-          delete updated[cacheKey];
-          return updated;
-        });
-        
-        showCustomAlert('Запрос отклонен', 'Запрос дружбы отклонен', 'info');
-        
-        // Realtime подписка обновит статус автоматически, не нужно делать это вручную
-      } else {
+    lastManualStatusChangeRef.current = Date.now();
+    setFriendshipStatus('none');
+    setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
+    
+    declineFriendRequest(currentUser.id, player.id).then(success => {
+      setFriendLoading(false);
+      if (!success) {
+        // Откатываем при ошибке
+        setFriendshipStatus(previousStatus);
+        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert('Ошибка', 'Не удалось отклонить запрос', 'error');
       }
-    } catch (error) {
-      console.error('Ошибка отклонения запроса дружбы:', error);
-      showCustomAlert('Ошибка', 'Произошла ошибка при отклонении запроса', 'error');
-    } finally {
-      setFriendLoading(false);
-    }
+    });
   };
 
   // Функция для парсинга URL и таймкода
@@ -2739,45 +2920,52 @@ export default function PlayerProfile() {
         // Проверяем изменения нормативов
         const normativeChanges: { field: string, oldValue: number, newValue: number, change: number }[] = [];
         
+        // Вспомогательная функция для безопасного парсинга нормативов
+        const parseNormative = (value: string | null | undefined, defaultValue: number = 0): number => {
+          if (value === null || value === undefined || value === '') return defaultValue;
+          const parsed = parseFloat(value);
+          return isNaN(parsed) ? defaultValue : parsed;
+        };
+        
         // Проверяем pullUps
-        const oldPullUps = parseInt(player.pullUps || '0');
-        const newPullUps = parseInt(editData.pullUps || player.pullUps || '0');
+        const oldPullUps = parseNormative(player.pullUps);
+        const newPullUps = editData.pullUps !== undefined ? parseNormative(editData.pullUps) : parseNormative(player.pullUps);
         if (oldPullUps !== newPullUps) {
           console.log('🏋️ Подтягивания:', oldPullUps, '→', newPullUps);
           normativeChanges.push({ field: 'pullUps', oldValue: oldPullUps, newValue: newPullUps, change: newPullUps - oldPullUps });
         }
         
         // Проверяем pushUps
-        const oldPushUps = parseInt(player.pushUps || '0');
-        const newPushUps = parseInt(editData.pushUps || player.pushUps || '0');
+        const oldPushUps = parseNormative(player.pushUps);
+        const newPushUps = editData.pushUps !== undefined ? parseNormative(editData.pushUps) : parseNormative(player.pushUps);
         if (oldPushUps !== newPushUps) {
           normativeChanges.push({ field: 'pushUps', oldValue: oldPushUps, newValue: newPushUps, change: newPushUps - oldPushUps });
         }
         
         // Проверяем plankTime
-        const oldPlankTime = parseInt(player.plankTime || '0');
-        const newPlankTime = parseInt(editData.plankTime || player.plankTime || '0');
+        const oldPlankTime = parseNormative(player.plankTime);
+        const newPlankTime = editData.plankTime !== undefined ? parseNormative(editData.plankTime) : parseNormative(player.plankTime);
         if (oldPlankTime !== newPlankTime) {
           normativeChanges.push({ field: 'plankTime', oldValue: oldPlankTime, newValue: newPlankTime, change: newPlankTime - oldPlankTime });
         }
         
         // Проверяем sprint100m
-        const oldSprint100m = parseFloat(player.sprint100m || '0');
-        const newSprint100m = parseFloat(editData.sprint100m || player.sprint100m || '0');
+        const oldSprint100m = parseNormative(player.sprint100m);
+        const newSprint100m = editData.sprint100m !== undefined ? parseNormative(editData.sprint100m) : parseNormative(player.sprint100m);
         if (oldSprint100m !== newSprint100m) {
           normativeChanges.push({ field: 'sprint100m', oldValue: oldSprint100m, newValue: newSprint100m, change: newSprint100m - oldSprint100m });
         }
         
         // Проверяем longJump
-        const oldLongJump = parseFloat(player.longJump || '0');
-        const newLongJump = parseFloat(editData.longJump || player.longJump || '0');
+        const oldLongJump = parseNormative(player.longJump);
+        const newLongJump = editData.longJump !== undefined ? parseNormative(editData.longJump) : parseNormative(player.longJump);
         if (oldLongJump !== newLongJump) {
           normativeChanges.push({ field: 'longJump', oldValue: oldLongJump, newValue: newLongJump, change: newLongJump - oldLongJump });
         }
         
         // Проверяем jumpRope
-        const oldJumpRope = parseInt(player.jumpRope || '0');
-        const newJumpRope = parseInt(editData.jumpRope || player.jumpRope || '0');
+        const oldJumpRope = parseNormative(player.jumpRope);
+        const newJumpRope = editData.jumpRope !== undefined ? parseNormative(editData.jumpRope) : parseNormative(player.jumpRope);
         if (oldJumpRope !== newJumpRope) {
           normativeChanges.push({ field: 'jumpRope', oldValue: oldJumpRope, newValue: newJumpRope, change: newJumpRope - oldJumpRope });
         }
@@ -2794,7 +2982,8 @@ export default function PlayerProfile() {
         if (statChangesForNotify.length > 0 || normativeChanges.length > 0) {
           console.log('📊 Отправляем уведомления о статистике и нормативах:', {
             stats: statChangesForNotify.length,
-            normatives: normativeChanges.length
+            normatives: normativeChanges.length,
+            normativeDetails: normativeChanges
           });
           notificationPromises.push(
             notifyFriendsAboutChanges(
@@ -2812,7 +3001,26 @@ export default function PlayerProfile() {
             console.error('❌ Ошибка начисления очков активности за изменение статистики (не критично):', error);
           }
         } else {
-          console.log('ℹ️ Статистика и нормативы НЕ изменились, уведомления НЕ отправляются');
+          console.log('ℹ️ Статистика и нормативы НЕ изменились, уведомления НЕ отправляются', {
+            statsCount: statChangesForNotify.length,
+            normativesCount: normativeChanges.length,
+            playerNormatives: {
+              pullUps: player.pullUps,
+              pushUps: player.pushUps,
+              plankTime: player.plankTime,
+              sprint100m: player.sprint100m,
+              longJump: player.longJump,
+              jumpRope: player.jumpRope
+            },
+            editDataNormatives: {
+              pullUps: editData.pullUps,
+              pushUps: editData.pushUps,
+              plankTime: editData.plankTime,
+              sprint100m: editData.sprint100m,
+              longJump: editData.longJump,
+              jumpRope: editData.jumpRope
+            }
+          });
         }
         
       } catch (notifyError) {
@@ -3397,6 +3605,11 @@ export default function PlayerProfile() {
             keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
               onScrollBeginDrag={Keyboard.dismiss}
+              onScroll={(event) => {
+                // Сохраняем позицию прокрутки для восстановления при Realtime обновлениях
+                savedScrollPositionRef.current = event.nativeEvent.contentOffset.y;
+              }}
+              scrollEventThrottle={16}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <View>
@@ -3979,7 +4192,7 @@ export default function PlayerProfile() {
                         {(shotsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
-                              <Text style={styles.statValueSmall}>{savePercentage}</Text>
+                              <Text style={styles.statValueGoalkeeper}>{savePercentage}</Text>
                             </View>
                             <View style={styles.statLabelContainer}>
                               <Text style={[styles.statLabel, styles.statLabelSmall]}>
@@ -3991,7 +4204,7 @@ export default function PlayerProfile() {
                         {(minutesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
-                              <Text style={styles.statValue}>{gaa}</Text>
+                              <Text style={styles.statValueGoalkeeper}>{gaa}</Text>
                             </View>
                             <View style={styles.statLabelContainer}>
                               <Text style={[styles.statLabel, styles.statLabelSmall]}>
@@ -4884,107 +5097,125 @@ export default function PlayerProfile() {
             {/* Секция команд - не показываем для магазинов, заточки коньков и администраторов */}
             {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && (() => {
               const isOwner = currentUser && currentUser.id === player.id;
-              return playerTeams.length > 0 || pastTeams.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner;
-            })() && (
-              <SectionCard>
-                <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
-                
-                {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                  <>
-                    {/* Текущие команды */}
-                    <View style={styles.teamsSubsection}>
-                      <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
-                      <CurrentTeamsSection
-                        currentTeams={playerTeams}
-                        onCurrentTeamsChange={setPlayerTeams}
-                        onMoveToPastTeams={(team) => {
+              const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              const hasTeams = playerTeams.length > 0 || pastTeams.length > 0;
+              
+              // Показываем секцию только если:
+              // - есть команды ИЛИ
+              // - режим редактирования ИЛИ
+              // - это владелец профиля (чтобы он мог добавить команды)
+              return hasTeams || isEditingMode || isOwner;
+            })() && (() => {
+              const isOwner = currentUser && currentUser.id === player.id;
+              const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              const hasTeams = playerTeams.length > 0 || pastTeams.length > 0;
+              
+              // В режиме просмотра (не редактирования) показываем секцию только если есть команды или это владелец
+              if (!isEditingMode && !hasTeams && !isOwner) {
+                return null;
+              }
+              
+              return (
+                <SectionCard>
+                  <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
                   
-                          setPastTeams(prev => [...prev, team]);
-                        }}
-                        readOnly={false}
-                        isEditing={true}
-                      />
-                    </View>
-                    
-                    {/* Прошлые команды */}
-                    <View style={styles.teamsSubsection}>
-                      <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
-                      <PastTeamsSection
-                        pastTeams={pastTeams}
-                        isEditing={isEditing}
-                        onPastTeamsChange={setPastTeams}
-                        onMoveToCurrentTeams={(team) => {
-                  
-                          setPastTeams(prev => [...prev, team]);
-                        }}
-                        readOnly={false}
-                      />
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    {/* Текущие команды */}
-                    {playerTeams.length > 0 ? (
-                      <>
+                  {isEditingMode ? (
+                    <>
+                      {/* Текущие команды */}
+                      <View style={styles.teamsSubsection}>
                         <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
-                        <View style={styles.teamsListContainer}>
-                          {playerTeams.map((team, index) => (
-                            <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
-                              <Animated.View style={styles.rotatedStar}>
-                                <Ionicons name="shirt-outline" size={18} color="#fa2f40" />
-                              </Animated.View>
-                              <Text style={styles.teamsListText}>
-                                {(() => {
-                        const translationKey = `teams.${team.teamName}`;
-                        const translated = t(translationKey);
-                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
-                        if (translated === translationKey || translated.startsWith('teams.')) {
-                          return team.teamName;
-                        }
-                        return translated;
-                      })()} ({String(team.startYear || '')} - {t('profile.настоящее время')})
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                      </>
-                    ) : isOwner && (
-                      <View style={styles.emptySectionContainer}>
-                        <Ionicons name="shirt-outline" size={48} color="#666" />
-                        <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
-                      </View>
-                    )}
+                        <CurrentTeamsSection
+                          currentTeams={playerTeams}
+                          onCurrentTeamsChange={setPlayerTeams}
+                          onMoveToPastTeams={(team) => {
                     
-                    {/* Прошлые команды */}
-                    {pastTeams.length > 0 ? (
-                      <>
+                            setPastTeams(prev => [...prev, team]);
+                          }}
+                          readOnly={false}
+                          isEditing={true}
+                        />
+                      </View>
+                      
+                      {/* Прошлые команды */}
+                      <View style={styles.teamsSubsection}>
                         <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
-                        <View style={styles.teamsListContainer}>
-                          {pastTeams.map((team, index) => (
-                            <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
-                              <Animated.View style={styles.rotatedStar}>
-                                <Ionicons name="shirt-outline" size={18} color="#888" />
-                              </Animated.View>
-                              <Text style={styles.teamsListText}>
-                                {(() => {
-                        const translationKey = `teams.${team.teamName}`;
-                        const translated = t(translationKey);
-                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
-                        if (translated === translationKey || translated.startsWith('teams.')) {
-                          return team.teamName;
-                        }
-                        return translated;
-                      })()} ({String(team.startYear || '')}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
-                              </Text>
-                            </View>
-                          ))}
+                        <PastTeamsSection
+                          pastTeams={pastTeams}
+                          isEditing={isEditing}
+                          onPastTeamsChange={setPastTeams}
+                          onMoveToCurrentTeams={(team) => {
+                    
+                            setPastTeams(prev => [...prev, team]);
+                          }}
+                          readOnly={false}
+                        />
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      {/* Текущие команды */}
+                      {playerTeams.length > 0 ? (
+                        <>
+                          <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
+                          <View style={styles.teamsListContainer}>
+                            {playerTeams.map((team, index) => (
+                              <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
+                                <Animated.View style={styles.rotatedStar}>
+                                  <Ionicons name="shirt-outline" size={18} color="#fa2f40" />
+                                </Animated.View>
+                                <Text style={styles.teamsListText}>
+                                  {(() => {
+                          const translationKey = `teams.${team.teamName}`;
+                          const translated = t(translationKey);
+                          // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                          if (translated === translationKey || translated.startsWith('teams.')) {
+                            return team.teamName;
+                          }
+                          return translated;
+                        })()} ({String(team.startYear || '')} - {t('profile.настоящее время')})
+                                </Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      ) : isOwner && (
+                        <View style={styles.emptySectionContainer}>
+                          <Ionicons name="shirt-outline" size={48} color="#666" />
+                          <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
                         </View>
-                      </>
-                    ) : null}
-                  </>
-                )}
-              </SectionCard>
-            )}
+                      )}
+                      
+                      {/* Прошлые команды */}
+                      {pastTeams.length > 0 ? (
+                        <>
+                          <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
+                          <View style={styles.teamsListContainer}>
+                            {pastTeams.map((team, index) => (
+                              <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
+                                <Animated.View style={styles.rotatedStar}>
+                                  <Ionicons name="shirt-outline" size={18} color="#888" />
+                                </Animated.View>
+                                <Text style={styles.teamsListText}>
+                                  {(() => {
+                          const translationKey = `teams.${team.teamName}`;
+                          const translated = t(translationKey);
+                          // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                          if (translated === translationKey || translated.startsWith('teams.')) {
+                            return team.teamName;
+                          }
+                          return translated;
+                        })()} ({String(team.startYear || '')}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
+                                </Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      ) : null}
+                    </>
+                  )}
+                </SectionCard>
+              );
+            })()}
 
             {/* Индивидуальные тренировки - только для тренеров */}
               {player.status === 'coach' && (
@@ -5714,8 +5945,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца) и для администраторов */}
-            {player && player.status !== 'admin' && (() => {
+            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца), для администраторов и для звезд */}
+            {player && player.status !== 'admin' && player.status !== 'star' && (() => {
               const hasExercises = player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0;
               const isOwner = currentUser && currentUser.id === player.id;
               return hasExercises || isOwner;
@@ -6034,6 +6265,18 @@ export default function PlayerProfile() {
                         text: t('admin.login') || 'Войти',
                         onPress: async () => {
                           try {
+                            // Удаляем push токены старого пользователя перед входом в другой аккаунт
+                            if (currentUser && currentUser.id !== player.id) {
+                              try {
+                                const { deleteUserPushTokens } = await import('../../utils/notificationService');
+                                await deleteUserPushTokens(currentUser.id);
+                                console.log('✅ Push токены старого пользователя удалены при входе администратора');
+                              } catch (tokenError) {
+                                // Не критично, если не удалось удалить токены
+                                console.warn('⚠️ Не удалось удалить push токены старого пользователя (не критично):', tokenError);
+                              }
+                            }
+                            
                             // Сохраняем нового пользователя
                             await saveCurrentUser(player);
                             
@@ -7323,6 +7566,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     letterSpacing: -0.3,
+  },
+  statValueGoalkeeper: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    textAlign: 'center',
+    letterSpacing: -1.0,
   },
   statLabel: {
     fontSize: 12,

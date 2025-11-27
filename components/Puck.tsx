@@ -209,13 +209,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
+        // Тени отключены на Android для лучшей производительности на слабых устройствах
+        elevation: 0, // Используем elevation вместо shadow для Android
       },
       web: {
         boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
@@ -240,13 +235,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
+        // Тени отключены на Android для лучшей производительности на слабых устройствах
+        elevation: 0, // Используем elevation вместо shadow для Android
       },
       web: {
         boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',

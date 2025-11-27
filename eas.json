@@ -20,7 +20,8 @@
         "simulator": false
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
         "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
@@ -30,6 +31,9 @@
       "autoIncrement": true,
       "ios": {
         "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
       },
       "env": {
         "NPM_CONFIG_LEGACY_PEER_DEPS": "true"

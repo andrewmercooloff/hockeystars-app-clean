@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-import { Tabs, useRouter, useLocalSearchParams } from 'expo-router';
+import { Tabs, useRouter, useLocalSearchParams, usePathname } from 'expo-router';
 import * as React from 'react';
 import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
 import { Asset } from 'expo-asset';
@@ -44,10 +44,25 @@ const GLOBAL_PRELOAD_ASSETS = [
 
 // В режиме разработки показываем предупреждения для отладки
 // В production отключаем логи, но можно включить через EXPO_PUBLIC_ENABLE_LOGS=true для TestFlight
+// Для отключения логов в development: установите DISABLE_LOGS = true
 const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : false;
 const enableLogsInProd = typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
-if (!isDev && !enableLogsInProd) {
+
+// ============================================
+// 🔇 ПЕРЕКЛЮЧАТЕЛЬ ЛОГОВ - измените на true чтобы отключить все логи в терминале
+const DISABLE_LOGS = false; // Включено для отладки push-уведомлений
+// ============================================
+
+if (DISABLE_LOGS || (!isDev && !enableLogsInProd)) {
   LogBox.ignoreAllLogs();
+  
+  // Отключаем console.log/warn/error для чистого терминала
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const noop = () => {};
+  console.log = noop;
+  console.warn = noop;
+  // Оставляем console.error для критических ошибок
+  // console.error = noop;
   // In production, silence runtime logs to avoid noisy output
   // @ts-ignore
   (console as any).log = () => {};
@@ -70,6 +85,8 @@ if (!isDev && !enableLogsInProd) {
 
 
 export default function RootLayout() {
+  const router = useRouter();
+  const pathname = usePathname();
   const lastUserLoadTime = React.useRef<number>(0);
   const loginTracked = React.useRef<boolean>(false); // Флаг для отслеживания логина в сессии
   // Условный импорт AppState только для мобильных платформ
@@ -121,7 +138,6 @@ export default function RootLayout() {
     
     return () => subscription?.remove();
   }, []);
-  const router = useRouter();
   const [loaded, error] = useFonts({
     'Gilroy-Regular': require('../assets/fonts/gilroy-regular.ttf'),
     'Gilroy-Bold': require('../assets/fonts/gilroy-bold.ttf'),
@@ -199,13 +215,19 @@ export default function RootLayout() {
     
     const adjustFriendRequestsCount = React.useCallback((delta: number) => {
       const current = globalUserRef.current;
-      if (!current) return;
+      if (!current) {
+        console.log('📊 adjustFriendRequestsCount: нет текущего пользователя');
+        return;
+      }
       
       const currentCount = current.friendRequestsCount ?? 0;
       const nextCount = Math.max(0, currentCount + delta);
       
+      console.log('📊 adjustFriendRequestsCount:', { delta, currentCount, nextCount });
+      
       // Предотвращаем обновление, если значение не изменилось
       if (nextCount === currentCount) {
+        console.log('📊 adjustFriendRequestsCount: значение не изменилось, пропускаем');
         return;
       }
       
@@ -215,6 +237,8 @@ export default function RootLayout() {
       
       // Также обновляем локальный currentUser для немедленного отображения
       setCurrentUser(updatedUser);
+      
+      console.log('📊 adjustFriendRequestsCount: счётчик обновлён до', nextCount);
     }, [setGlobalUser]);
     
     React.useEffect(() => {
@@ -222,8 +246,10 @@ export default function RootLayout() {
         return;
       }
       
+      // ВАЖНО: Используем простые фильтры, так как сложные OR фильтры могут не работать в Supabase Realtime
       const channel = supabase
         .channel(`friend-requests-indicator-${globalUser.id}`)
+        // INSERT: новый входящий запрос
         .on(
           'postgres_changes',
           {
@@ -234,11 +260,13 @@ export default function RootLayout() {
           },
           (payload) => {
             const newRequest = payload.new as { status?: string } | null;
+            console.log('📨 Indicator INSERT (to_id):', { status: newRequest?.status });
             if (newRequest?.status === 'pending') {
               adjustFriendRequestsCount(1);
             }
           }
         )
+        // UPDATE где мы получатель: статус изменился (принят/отклонён)
         .on(
           'postgres_changes',
           {
@@ -250,6 +278,7 @@ export default function RootLayout() {
           (payload) => {
             const oldStatus = (payload.old as { status?: string } | null)?.status;
             const newStatus = (payload.new as { status?: string } | null)?.status;
+            console.log('📨 Indicator UPDATE (to_id):', { oldStatus, newStatus });
             
             if (oldStatus !== 'pending' && newStatus === 'pending') {
               adjustFriendRequestsCount(1);
@@ -258,6 +287,7 @@ export default function RootLayout() {
             }
           }
         )
+        // DELETE где мы получатель: запрос удалён (отменён отправителем)
         .on(
           'postgres_changes',
           {
@@ -268,6 +298,7 @@ export default function RootLayout() {
           },
           (payload) => {
             const oldStatus = (payload.old as { status?: string } | null)?.status;
+            console.log('📨 Indicator DELETE (to_id):', { oldStatus });
             if (oldStatus === 'pending') {
               adjustFriendRequestsCount(-1);
             }
@@ -517,8 +548,9 @@ export default function RootLayout() {
              }
 
              // Инициализируем push-уведомления для пользователя
+             // forceReinit: true - принудительная переинициализация для очистки старых токенов
              try {
-               const pushResult = await initializePushNotifications(user.id);
+               const pushResult = await initializePushNotifications(user.id, true);
              } catch (error) {
                console.error('❌ Ошибка инициализации push-уведомлений:', error);
                console.error('❌ Error details:', error.message);
@@ -596,6 +628,8 @@ export default function RootLayout() {
                  n.type === 'team_invite' || 
                  n.type === 'system' ||
                  n.type === 'stats_change' ||
+                 n.type === 'normative_changed' ||
+                 n.type === 'physical_data_changed' ||
                  n.type === 'photo_added' ||
                  n.type === 'video_liked' ||
                  n.type === 'photo_liked';
@@ -633,18 +667,18 @@ export default function RootLayout() {
           }
         }
         
-        // Сохраняем текущий friendRequestsCount из globalUser, если он есть
-        // Это предотвращает мигание индикатора при обновлении через loadUser
+        // ВАЖНО: Не перезаписываем friendRequestsCount из БД!
+        // Счётчик обновляется ТОЛЬКО через Realtime подписку (adjustFriendRequestsCount)
+        // Это предотвращает мигание индикатора при загрузке пользователя
+        // Используем значение из currentUser, если оно есть, иначе из БД
         const preservedFriendRequestsCount = currentUser?.friendRequestsCount ?? friendRequestsCount;
         
         const nextUser: Player = {
           ...user,
           unreadMessagesCount,
-          // Используем сохраненное значение, если оно отличается от загруженного не более чем на 1
-          // Это позволяет realtime подписке обновлять счетчик без конфликтов
-          friendRequestsCount: Math.abs(preservedFriendRequestsCount - friendRequestsCount) <= 1 
-            ? preservedFriendRequestsCount 
-            : friendRequestsCount,
+          // Используем сохраненное значение - не перезаписываем из БД
+          // Realtime подписка отвечает за актуальность счётчика
+          friendRequestsCount: preservedFriendRequestsCount,
           giftRequestsCount,
         };
 
@@ -906,6 +940,7 @@ export default function RootLayout() {
   }, []);
 
   // Обработчик push-уведомлений для deep links
+  // ВАЖНО: Этот обработчик срабатывает ТОЛЬКО когда пользователь нажимает на уведомление
   React.useEffect(() => {
     const notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
@@ -913,21 +948,57 @@ export default function RootLayout() {
       
       if (deepLink) {
         console.log('🔗 Deep link из уведомления:', deepLink);
+        console.log('📍 Текущий путь:', pathname);
         
-        // Небольшая задержка для завершения навигации
-        setTimeout(() => {
-          // Добавляем параметр для автоматической прокрутки в чат
-          if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
-            router.push(`${deepLink}?scrollToBottom=true` as any);
-          } else {
-            router.push(deepLink as any);
+        // Проверяем, не находимся ли мы уже в этом чате
+        let shouldNavigate = true;
+        
+        if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
+          // Извлекаем ID чата из deepLink (формат: /chat/[id] или /chat/[id]?scrollToBottom=true)
+          const chatIdFromLink = deepLink.split('/chat/')[1]?.split('?')[0]?.split('/')[0];
+          const currentPath = pathname || '';
+          
+          console.log('💬 ID чата из deepLink:', chatIdFromLink);
+          console.log('💬 Текущий путь:', currentPath);
+          
+          // Если мы уже в этом чате, не делаем навигацию
+          if (currentPath.startsWith('/chat/')) {
+            const currentChatId = currentPath.split('/chat/')[1]?.split('?')[0]?.split('/')[0];
+            if (currentChatId === chatIdFromLink) {
+              console.log('✅ Уже в этом чате, навигация не требуется');
+              shouldNavigate = false;
+            }
           }
-        }, 500);
+          
+          // Если пользователь НЕ в чате, переходим в нужный чат
+          if (shouldNavigate) {
+            console.log('➡️ Переход в чат:', chatIdFromLink);
+          }
+        }
+        
+        // Выполняем навигацию только если нужно
+        if (shouldNavigate) {
+          // Небольшая задержка для завершения навигации
+          setTimeout(() => {
+            try {
+              // Добавляем параметр для автоматической прокрутки в чат
+              if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
+                // Убеждаемся, что deepLink валидный
+                const cleanDeepLink = deepLink.split('?')[0]; // Убираем существующие параметры
+                router.push(`${cleanDeepLink}?scrollToBottom=true` as any);
+              } else {
+                router.push(deepLink as any);
+              }
+            } catch (error) {
+              console.error('❌ Ошибка навигации по deep link:', error);
+            }
+          }, 500);
+        }
       }
     });
 
     return () => notificationListener.remove();
-  }, []);
+  }, [router, pathname]);
 
   // Дополнительная загрузка пользователя при возврате в приложение
   // ОТКЛЮЧЕНО - вызывает редиректы

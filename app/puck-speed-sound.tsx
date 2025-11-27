@@ -67,6 +67,7 @@ export default function PuckSpeedSoundScreen() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
   const isIOS = Platform.OS === 'ios';
+  const isAndroid = Platform.OS === 'android';
   const { currentUser, refreshUser } = useUser();
   const { t } = useLanguage();
   
@@ -381,7 +382,7 @@ export default function PuckSpeedSoundScreen() {
 
   // Инициализация AudioRecorderPlayer для iOS
   useEffect(() => {
-    if (!isIOS || !hasPermission || isWeb) return;
+    if ((!isIOS && !isAndroid) || !hasPermission || isWeb) return;
 
     const initializeIOSAudio = async () => {
       try {
@@ -476,7 +477,7 @@ export default function PuckSpeedSoundScreen() {
         soundTimeoutRef.current = null;
       }
     };
-  }, [isIOS, hasPermission, isWeb]);
+  }, [isIOS, isAndroid, hasPermission, isWeb]);
 
   // Обновляем ref при изменении soundEvents
   useEffect(() => {
@@ -806,7 +807,7 @@ export default function PuckSpeedSoundScreen() {
             console.log('⏱️ Таймаут ожидания второго звука (3 секунды) - сброс состояния');
             setSoundEvents([]);
             soundEventsRef.current = [];
-            setCurrentStatus((isWeb || isIOS) ? (t('puckSpeed.analyzing') || '🎤 Анализирую звук...') : (t('puckSpeed.readyForSound') || 'Готов к первому звуку...'));
+            setCurrentStatus((isWeb || isIOS || isAndroid) ? (t('puckSpeed.analyzing') || '🎤 Анализирую звук...') : (t('puckSpeed.readyForSound') || 'Готов к первому звуку...'));
             previousAmplitudeRef.current = 0;
             lastSoundDetectionTimeRef.current = 0;
           }
@@ -958,7 +959,7 @@ export default function PuckSpeedSoundScreen() {
 
   // Цикл анализа для iOS (AudioRecorderPlayer)
   useEffect(() => {
-    if (!isIOS || !hasPermission) return;
+    if ((!isIOS && !isAndroid) || !hasPermission) return;
     
     if (!audioRecorderPlayerRef.current) {
       return; // AudioRecorderPlayer еще не готов
@@ -1017,23 +1018,24 @@ export default function PuckSpeedSoundScreen() {
         const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : false;
         const shouldLog = isDev || enableLogs;
         
+        const platform = isIOS ? 'iOS' : 'Android';
         if (shouldLog) {
-          console.log('📹 [iOS] Запускаем запись через expo-av (fallback)...');
-          console.log('📹 [iOS] isAnalyzingRef.current:', isAnalyzingRef.current);
-          console.log('📹 [iOS] isMeasuringRef.current:', isMeasuringRef.current);
+          console.log(`📹 [${platform}] Запускаем запись через expo-av...`);
+          console.log(`📹 [${platform}] isAnalyzingRef.current:`, isAnalyzingRef.current);
+          console.log(`📹 [${platform}] isMeasuringRef.current:`, isMeasuringRef.current);
         }
         
         // Настраиваем аудиосессию
         await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
+          allowsRecordingIOS: isIOS,
           staysActiveInBackground: false,
-          playsInSilentModeIOS: true,
+          playsInSilentModeIOS: isIOS,
           shouldDuckAndroid: false,
           playThroughEarpieceAndroid: false,
         });
         
         if (shouldLog) {
-          console.log('✅ [iOS] Аудиосессия настроена');
+          console.log(`✅ [${platform}] Аудиосессия настроена`);
         }
         
         // Создаем запись с включенным метерингом
@@ -1048,7 +1050,7 @@ export default function PuckSpeedSoundScreen() {
         
         expoAVRecordingRef.current = recording;
         if (shouldLog) {
-          console.log('✅ [iOS] Запись через expo-av начата, recording:', recording);
+          console.log(`✅ [${platform}] Запись через expo-av начата, recording:`, recording);
         }
         
         // Запускаем опрос метеринга через интервал
@@ -1083,15 +1085,16 @@ export default function PuckSpeedSoundScreen() {
               const shouldLog = isDev || enableLogs;
               
               if (shouldLog) {
+                const platform = isIOS ? 'iOS' : 'Android';
                 if (meteringCallCount <= 20) {
-                  console.log(`📊 [iOS] Expo AV метринг #${meteringCallCount}:`, {
+                  console.log(`📊 [${platform}] Expo AV метринг #${meteringCallCount}:`, {
                     metering: db,
                     amplitude: averageAmplitude.toFixed(1),
                     isRecording: status.isRecording,
                     normalizedDb: normalizedDb.toFixed(1)
                   });
                 } else if (meteringCallCount % 50 === 0) {
-                  console.log(`📊 [iOS] Expo AV метринг работает (#${meteringCallCount}), metering=${db.toFixed(1)}`);
+                  console.log(`📊 [${platform}] Expo AV метринг работает (#${meteringCallCount}), metering=${db.toFixed(1)}`);
                 }
               }
               
@@ -1102,23 +1105,25 @@ export default function PuckSpeedSoundScreen() {
               const enableLogs = typeof process !== 'undefined' &&
                 process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
               const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : false;
+              const platform = isIOS ? 'iOS' : 'Android';
               if ((isDev || enableLogs) && meteringCallCount <= 20) {
-                console.warn(`⚠️ [iOS] Expo AV метринг #${meteringCallCount}: metering отсутствует, status:`, status);
+                console.warn(`⚠️ [${platform}] Expo AV метринг #${meteringCallCount}: metering отсутствует, status:`, status);
               }
             }
           } catch (statusError) {
             const enableLogs = typeof process !== 'undefined' &&
               process.env?.EXPO_PUBLIC_ENABLE_LOGS === 'true';
             const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : false;
+            const platform = isIOS ? 'iOS' : 'Android';
             if (isDev || enableLogs) {
-              console.error('❌ [iOS] Ошибка получения статуса expo-av:', statusError);
+              console.error(`❌ [${platform}] Ошибка получения статуса expo-av:`, statusError);
             }
           }
         }, 100); // Опрашиваем каждые 100ms
         
-        console.log('✅ [iOS] Цикл опроса метеринга expo-av запущен');
+        console.log(`✅ [${platform}] Цикл опроса метеринга expo-av запущен`);
       } catch (error) {
-        console.error('❌ [iOS] Ошибка запуска expo-av:', error);
+        console.error(`❌ [${platform}] Ошибка запуска expo-av:`, error);
         throw error;
       }
     };
@@ -1187,7 +1192,7 @@ export default function PuckSpeedSoundScreen() {
         }
       }
     };
-  }, [isIOS, isMeasuring, handleSoundDetected, hasPermission]); // Убрали VOLUME_THRESHOLD и PEAK_DETECTION_THRESHOLD из зависимостей, используем ref
+  }, [isIOS, isAndroid, isMeasuring, handleSoundDetected, hasPermission]); // Убрали VOLUME_THRESHOLD и PEAK_DETECTION_THRESHOLD из зависимостей, используем ref
 
   // Останавливаем микрофон при уходе со страницы (используем useFocusEffect для отслеживания фокуса)
   useFocusEffect(
@@ -1220,8 +1225,8 @@ export default function PuckSpeedSoundScreen() {
           }
         }
         
-        // Для iOS: останавливаем запись и удаляем слушатель
-        if (isIOS) {
+        // Для iOS и Android: останавливаем запись и удаляем слушатель
+        if (isIOS || isAndroid) {
           // Очищаем timeout проверки callback
           if (callbackCheckTimeoutRef.current) {
             clearTimeout(callbackCheckTimeoutRef.current);
@@ -1299,8 +1304,8 @@ export default function PuckSpeedSoundScreen() {
         }
       }
       
-      // Для iOS: останавливаем запись и удаляем слушатель
-      if (isIOS) {
+      // Для iOS и Android: останавливаем запись и удаляем слушатель
+      if (isIOS || isAndroid) {
         // Очищаем timeout проверки callback
         if (callbackCheckTimeoutRef.current) {
           clearTimeout(callbackCheckTimeoutRef.current);
@@ -1530,7 +1535,7 @@ export default function PuckSpeedSoundScreen() {
           </View>
 
           {/* Уровень звука (наложен на название снизу) */}
-          {isMeasuring && (isWeb || isIOS) && hasPermission !== null && (
+          {isMeasuring && (isWeb || isIOS || isAndroid) && hasPermission !== null && (
             <View style={styles.amplitudeBarContainer}>
               <View style={styles.amplitudeBar}>
                 <View 
@@ -1848,7 +1853,7 @@ export default function PuckSpeedSoundScreen() {
                   <TouchableOpacity style={styles.startButton} onPress={startMeasuring} activeOpacity={0.8}>
                     <View style={styles.buttonHighlight} />
                     <View style={styles.iconContainer}>
-                      <Ionicons name="play" size={168} color="#fff" />
+                      <Ionicons name="play" size={151} color="#fff" />
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -2461,15 +2466,15 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   buttonShadow: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    width: 225,
+    height: 225,
+    borderRadius: 112.5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.7,
     shadowRadius: 20,
     elevation: 15,
-    marginTop: 0,
+    marginTop: -20,
   },
   startButton: {
     alignItems: 'center',
@@ -2477,9 +2482,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderWidth: 4,
     borderColor: '#000',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    width: 225,
+    height: 225,
+    borderRadius: 112.5,
     overflow: 'hidden',
   },
   buttonHighlight: {
@@ -2489,14 +2494,14 @@ const styles = StyleSheet.create({
     right: 0,
     height: '40%',
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderTopLeftRadius: 125,
-    borderTopRightRadius: 125,
+    borderTopLeftRadius: 112.5,
+    borderTopRightRadius: 112.5,
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 168,
-    height: 168,
+    width: 151,
+    height: 151,
     marginTop: -15,
     marginLeft: 15,
   },

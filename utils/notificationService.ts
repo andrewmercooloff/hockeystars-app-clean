@@ -177,11 +177,14 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
  */
 export async function savePushToken(token: string, userId: string): Promise<boolean> {
   try {
-    console.log('🔔 Сохранение push token для пользователя:', userId);
+    // КРИТИЧЕСКАЯ ПРОВЕРКА: userId должен быть валидным
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      console.error('❌ [PUSH] КРИТИЧЕСКАЯ ОШИБКА: некорректный userId при сохранении токена!', userId);
+      return false;
+    }
     
     // Используем deviceId из Device или генерируем уникальный ID
     const deviceId = Device.osInternalBuildId || `${Platform.OS}-${Date.now()}`;
-    console.log('🔔 Device ID:', deviceId);
     
     const tokenData: PushTokenData = {
       token,
@@ -190,7 +193,38 @@ export async function savePushToken(token: string, userId: string): Promise<bool
       platform: Platform.OS,
     };
 
-    // Проверяем, существует ли уже такой токен для этого пользователя
+    // ВАЖНО: Удаляем все старые токены этого пользователя для текущей платформы
+    // Это предотвращает дублирование токенов от разных сборок (TestFlight, Expo Go, Production)
+    try {
+      const { data: deletedOldTokens, error: deleteOldError } = await supabase
+        .from('push_tokens')
+        .delete()
+        .eq('user_id', userId)
+        .eq('platform', Platform.OS)
+        .neq('token', token) // Не удаляем текущий токен, если он уже есть
+        .select();
+      
+    } catch (deleteError) {
+      // Игнорируем ошибки удаления старых токенов
+    }
+
+    // Удаляем токены с тем же значением token, но другим user_id
+    try {
+      const { data: deletedWrongTokens } = await supabase
+        .from('push_tokens')
+        .delete()
+        .eq('token', token)
+        .neq('user_id', userId)
+        .select();
+      
+      if (deletedWrongTokens && deletedWrongTokens.length > 0) {
+        console.log('🗑️ Удалены старые токены:', deletedWrongTokens.length);
+      }
+    } catch (deleteError) {
+      // Игнорируем ошибки удаления
+    }
+
+    // Проверяем, существует ли уже такой токен для ЭТОГО пользователя
     const { data: existingTokens, error: selectError } = await supabase
       .from('push_tokens')
       .select('*')
@@ -198,17 +232,11 @@ export async function savePushToken(token: string, userId: string): Promise<bool
       .eq('user_id', userId);
 
     if (selectError) {
-      // Если пользователь не найден (foreign key constraint), это нормально
-      if (selectError.code === '23503') {
-        console.warn('⚠️ Пользователь не найден в базе данных, пропускаем сохранение push token');
-        return false;
-      }
-      console.warn('⚠️ Ошибка проверки существующего токена (не критично):', selectError.message);
+      if (selectError.code === '23503') return false;
       return false;
     }
 
     if (existingTokens && existingTokens.length > 0) {
-      console.log('🔔 Токен уже существует, обновляем...');
       // Обновляем существующий токен
       const { error: updateError } = await supabase
         .from('push_tokens')
@@ -221,48 +249,22 @@ export async function savePushToken(token: string, userId: string): Promise<bool
         .eq('user_id', userId);
 
       if (updateError) {
-        // Если пользователь не найден (foreign key constraint), это нормально
-        if (updateError.code === '23503') {
-          console.warn('⚠️ Пользователь не найден в базе данных, пропускаем обновление push token');
-          return false;
-        }
-        console.warn('⚠️ Ошибка обновления push token (не критично):', updateError.message);
+        if (updateError.code === '23503') return false;
         return false;
       }
-      console.log('✅ Push token обновлен');
     } else {
-      console.log('🔔 Создаем новый токен...');
       // Вставляем новый токен
       const { error: insertError } = await supabase
         .from('push_tokens')
         .insert(tokenData);
 
       if (insertError) {
-        // Ошибка foreign key constraint означает, что пользователь не существует в таблице players
-        if (insertError.code === '23503') {
-          console.warn('⚠️ Пользователь не найден в базе данных, пропускаем сохранение push token');
-          console.warn('⚠️ Это может произойти, если пользователь еще не синхронизирован с Supabase');
-          return false;
-        }
-        
-        // Проверяем, не проблема ли это с RLS политиками
-        if (insertError.code === '42501' || insertError.message?.includes('permission') || insertError.message?.includes('policy')) {
-          console.warn('⚠️ Проблема с RLS политиками для push_tokens');
-          console.warn('⚠️ Проверьте политики в Supabase Dashboard');
-          return false;
-        }
-        
-        // Для остальных ошибок логируем как предупреждение
-        console.warn('⚠️ Ошибка вставки push token (не критично):', insertError.message);
         return false;
       }
-      console.log('✅ Push token создан');
     }
 
     return true;
   } catch (error: any) {
-    // Не критичная ошибка - приложение продолжит работать без push-уведомлений
-    console.warn('⚠️ Ошибка сохранения push token (не критично):', error?.message || 'Unknown error');
     return false;
   }
 }
@@ -365,6 +367,27 @@ export async function sendPushNotification(
       
       if (result.data && result.data.status === 'ok') {
         return true;
+      } else if (result.data && result.data.status === 'error') {
+        // Обрабатываем ошибки от Expo Push API
+        const errorDetails = result.data.details?.error || result.data.message;
+        console.error('❌ Ошибка отправки push-уведомления:', errorDetails);
+        
+        // Если токен невалидный - удаляем его из БД
+        if (errorDetails === 'DeviceNotRegistered' || 
+            errorDetails === 'InvalidCredentials' ||
+            result.data.message?.includes('is not a registered push notification recipient')) {
+          console.log('🗑️ Удаляем невалидный push токен:', token.substring(0, 20) + '...');
+          try {
+            await supabase
+              .from('push_tokens')
+              .delete()
+              .eq('token', token);
+            console.log('✅ Невалидный токен удалён из БД');
+          } catch (deleteError) {
+            console.error('⚠️ Ошибка удаления невалидного токена:', deleteError);
+          }
+        }
+        return false;
       } else {
         console.error('❌ Ошибка отправки push-уведомления:', result);
         return false;
@@ -384,30 +407,37 @@ export async function sendPushNotification(
  */
 export async function getUserPushTokens(userId: string): Promise<string[]> {
   try {
+    // КРИТИЧЕСКАЯ ПРОВЕРКА: userId должен быть валидным
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      console.error('❌ [PUSH] КРИТИЧЕСКАЯ ОШИБКА: некорректный userId для получения токенов:', userId);
+      return [];
+    }
+    
+    console.log('📤 [PUSH] getUserPushTokens вызван для userId:', userId);
+    
     const { data, error } = await supabase
       .from('push_tokens')
-      .select('token')
+      .select('token, user_id, device_id, platform')
       .eq('user_id', userId);
 
     if (error) {
-      console.error('❌ Ошибка получения push tokens:', error);
+      console.error('❌ [PUSH] Ошибка получения push tokens:', error, 'для userId:', userId);
       return [];
     }
 
-    const tokens = data?.map(item => item.token) || [];
-    
-    // Дедупликация токенов на уровне базы данных
-    const uniqueTokens = [...new Set(tokens)];
-    
-    if (tokens.length !== uniqueTokens.length) {
-      console.log(`⚠️ PUSH: Найдены дублирующиеся токены для пользователя ${userId}`);
-      console.log(`⚠️ PUSH: Токенов до дедупликации: ${tokens.length}`);
-      console.log(`⚠️ PUSH: Токенов после дедупликации: ${uniqueTokens.length}`);
+    if (!data || data.length === 0) {
+      console.log('⚠️ [PUSH] Нет токенов для userId:', userId);
+      return [];
     }
+
+    // Фильтруем токены с правильным user_id
+    const validTokens = data.filter(item => item.user_id === userId);
+    const tokens = validTokens.map(item => item.token).filter(Boolean);
     
-    return uniqueTokens;
+    // Дедупликация токенов
+    return [...new Set(tokens)];
   } catch (error) {
-    console.error('❌ Ошибка получения push tokens:', error);
+    console.error('❌ [PUSH] Ошибка получения push tokens:', error, 'для userId:', userId);
     return [];
   }
 }
@@ -422,32 +452,29 @@ export async function sendNotificationToUser(
   data?: any
 ): Promise<boolean> {
   try {
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      return false;
+    }
+    
     const tokens = await getUserPushTokens(userId);
     
     if (tokens.length === 0) {
-      // console.log('❌ У пользователя нет зарегистрированных устройств');
       return false;
     }
 
-    // Дедупликация токенов - убираем дубликаты
     const uniqueTokens = [...new Set(tokens)];
-    
-    if (uniqueTokens.length !== tokens.length) {
-      console.log(`🔧 Дедупликация токенов: ${tokens.length} → ${uniqueTokens.length} уникальных токенов`);
-    }
-
     let successCount = 0;
     
-    // Отправляем на все уникальные устройства пользователя
-    for (const token of uniqueTokens) {
+    for (let i = 0; i < uniqueTokens.length; i++) {
+      const token = uniqueTokens[i];
       const success = await sendPushNotification(token, title, body, data);
-      if (success) successCount++;
+      if (success) {
+        successCount++;
+      }
     }
 
-    // console.log(`✅ Уведомления отправлены на ${successCount}/${uniqueTokens.length} устройств для пользователя ${userId}`);
     return successCount > 0;
   } catch (error) {
-    console.error('❌ Ошибка отправки уведомления пользователю:', error);
     return false;
   }
 }
@@ -647,6 +674,48 @@ export function resetPushNotificationCache(userId?: string): void {
   } else {
     initializedUsers.clear();
     console.log('🔔 Кеш инициализации полностью сброшен');
+  }
+}
+
+/**
+ * Удаление всех push токенов пользователя
+ * Используется при выходе из аккаунта или смене пользователя
+ */
+export async function deleteUserPushTokens(userId: string): Promise<boolean> {
+  try {
+    // КРИТИЧЕСКАЯ ПРОВЕРКА: userId должен быть валидным
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      console.error('❌ [PUSH] КРИТИЧЕСКАЯ ОШИБКА: некорректный userId для удаления токенов:', userId);
+      return false;
+    }
+    
+    console.log('🗑️ [PUSH] Удаление всех push токенов для userId:', userId);
+    
+    const { data: deletedTokens, error } = await supabase
+      .from('push_tokens')
+      .delete()
+      .eq('user_id', userId)
+      .select();
+    
+    if (error) {
+      console.error('❌ [PUSH] Ошибка удаления push токенов:', error, 'для userId:', userId);
+      return false;
+    }
+    
+    const deletedCount = deletedTokens?.length || 0;
+    if (deletedCount > 0) {
+      console.log(`✅ [PUSH] Удалено ${deletedCount} push токенов для userId: ${userId}`);
+    } else {
+      console.log(`ℹ️ [PUSH] Не найдено токенов для удаления для userId: ${userId}`);
+    }
+    
+    // Также очищаем кеш инициализации
+    resetPushNotificationCache(userId);
+    
+    return true;
+  } catch (error) {
+    console.error('❌ [PUSH] Ошибка удаления push токенов:', error, 'для userId:', userId);
+    return false;
   }
 }
 
