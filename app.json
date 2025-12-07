@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.0.4",
-    "runtimeVersion": "1.0.4",
+    "version": "1.0.8",
+    "runtimeVersion": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -20,26 +20,47 @@
       "supportsTablet": true,
       "bundleIdentifier": "by.hockeystars.app",
       "icon": "./assets/images/icon.png",
+      "associatedDomains": [
+        "applinks:hockey-stars.com"
+      ],
       "splash": {
         "backgroundColor": "#050008"
       },
       "infoPlist": {
         "UIBackgroundModes": [
-          "remote-notification",
-          "audio"
+          "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false,
-        "NSMicrophoneUsageDescription": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net",
-        "NSCameraUsageDescription": "This app uses camera to measure puck speed by detecting motion through the camera frame",
-        "NSLocationWhenInUseUsageDescription": "This app does not use location services. This permission may be requested by third-party libraries used for analytics or other features."
+        "NSMicrophoneUsageDescription": "This app uses the microphone to measure puck speed by detecting the sound of a puck hitting the net. For example, when you shoot a puck at the net, the app records the sound and calculates the speed based on the time between the shot and the impact sound.",
+        "NSCameraUsageDescription": "This app uses the camera to measure puck speed by detecting motion through the camera frame. For example, when you shoot a puck, the app tracks the puck's movement in the video frame and calculates its speed based on the distance traveled and time elapsed.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile photos, team photos, and achievement photos. For example, you can select a photo from your library to set as your profile picture or add photos to your achievements gallery.",
+        "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your library. For example, you can save achievement photos or team photos to your device's photo library.",
+        "NSLocationWhenInUseUsageDescription": "This app does not directly use location services. However, some third-party libraries integrated for analytics or crash reporting may request location permissions. If prompted, you can deny this permission as it is not required for the app's core functionality."
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/splash-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#000000"
       },
       "package": "by.hockeystars.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "hockey-stars.com",
+              "pathPrefix": "/player"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "splash": {
         "mdpi": "./assets/images/splash-icon.png",
         "hdpi": "./assets/images/splash-icon.png",
@@ -68,7 +89,8 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "navigationBar": {
-        "visible": false
+        "backgroundColor": "#000000",
+        "barStyle": "light-content"
       },
       "userInterfaceStyle": "dark",
       "statusBar": {
@@ -103,7 +125,7 @@
       "twilioAccountSid": "REDACTED_TWILIO_ACCOUNT_SID",
       "twilioAuthToken": "REDACTED_HEX_SECRET",
       "twilioFromNumber": "+46731727922",
-      "twilioWhatsAppFrom": "whatsapp:+14155238886"
+      "twilioWhatsAppFrom": "whatsapp:+46731727922"
     },
     "plugins": [
       "expo-router",

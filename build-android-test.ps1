@@ -15,3 +15,16 @@ Write-Host ""
 Write-Host "После завершения сборки APK будет доступен для скачивания." -ForegroundColor Green
 Write-Host ""
 
+
+
+
+
+
+
+
+
+
+
+
+
+

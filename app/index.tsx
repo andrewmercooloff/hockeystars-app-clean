@@ -22,6 +22,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const PUCK_SIZE = 70;
 
 // Определение уровня производительности устройства
+// ТОЛЬКО для FPS - скорость шайб теперь одинаковая для всех устройств
 const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   const yearClass = Device.deviceYearClass ?? null;
   const totalMemory = Device.totalMemory ?? null;
@@ -35,32 +36,31 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   }
   
   if (Platform.OS === 'android') {
-    const lowEndModels = [
-      'redmi note 9',
-      'redminote 9',
-      'redmi note9',
-      'm2002j2g',
-      'm2002j2i',
-      'note 9'
-    ];
-
-    if (lowEndModels.some(name => modelName.includes(name))) {
-      return 'low';
-    }
-
+    // Определяем только для адаптации FPS, не для скорости
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
-    if (memoryInGb && memoryInGb < 3.5) {
+    
+    // Очень новые устройства (после 2022 года) - всегда high для поддержки 120 Гц
+    if (yearClass && yearClass >= 2022) {
+      return 'high';
+    }
+    
+    // Очень слабые устройства (< 3GB RAM или до 2018 года) - 60 FPS
+    if ((memoryInGb && memoryInGb < 3) || (yearClass && yearClass < 2018)) {
       return 'low';
     }
 
-    if (yearClass && yearClass < 2019) {
-      return 'low';
-    }
-
-    if (yearClass && yearClass < 2021) {
+    // Средние устройства (3-4GB RAM или 2018-2021) - 60 FPS
+    if ((memoryInGb && memoryInGb < 4) || (yearClass && yearClass < 2022)) {
       return 'medium';
     }
 
+    // Мощные устройства (4+ GB RAM или после 2021) - 120 FPS
+    return 'high';
+  }
+  
+  // Для веб-версии всегда используем high для максимальной плавности
+  // (в браузере можно выбрать low-tier/mid mobile в консоли для тестирования, но это нормально)
+  if (Platform.OS === 'web') {
     return 'high';
   }
   
@@ -115,33 +115,37 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   // Тип: объект с value для совместимости с useSharedValue
   const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number } }>>(new Map());
   
-  // Адаптивные константы для плавной физики в зависимости от производительности
+  // Адаптивные константы только для FPS - физика шайб одинаковая для всех устройств
+  // Используем уровень производительности устройства для определения частоты кадров
   const { STEP_MS, FIXED_DT, MAX_STEPS, TARGET_FPS } = useMemo(() => {
     let config;
     switch (performanceLevel) {
       case 'high':
+        // Для мощных устройств (включая новые Android с 120 Гц) используем 120 FPS
         config = {
-          STEP_MS: 1000 / 120, // 120 FPS для мощных устройств
+          STEP_MS: 1000 / 120,
           FIXED_DT: 1 / 120,
           MAX_STEPS: 2,
           TARGET_FPS: 120,
         };
         break;
       case 'medium':
+        // Для средних устройств используем 60 FPS с оптимизацией
         config = {
-          STEP_MS: 1000 / 60, // 60 FPS для средних устройств
+          STEP_MS: 1000 / 60,
           FIXED_DT: 1 / 60,
-          MAX_STEPS: 2,
+          MAX_STEPS: 1, // Уменьшаем MAX_STEPS для слабых устройств
           TARGET_FPS: 60,
         };
         break;
       case 'low':
       default:
+        // Для слабых устройств (Redmi Note 9 и подобные) используем 60 FPS с максимальной оптимизацией
         config = {
-          STEP_MS: 1000 / 20, // 20 FPS для слабых устройств (снижено с 30 для лучшей производительности)
-          FIXED_DT: 1 / 20,
-          MAX_STEPS: 1, // Меньше шагов для слабых устройств
-          TARGET_FPS: 20, // 20 FPS для слабых устройств
+          STEP_MS: 1000 / 60,
+          FIXED_DT: 1 / 60,
+          MAX_STEPS: 1, // Только 1 шаг физики за кадр для слабых устройств
+          TARGET_FPS: 60,
         };
         break;
     }
@@ -149,17 +153,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     return config;
   }, [performanceLevel]);
 
+  // Интервал обновления React state - оптимизирован для производительности
+  // Shared values обновляются каждый кадр, поэтому визуально все плавно
+  // React state обновляем реже для снижения нагрузки на React
   const reactUpdateInterval = useMemo(() => {
-    switch (performanceLevel) {
-      case 'high':
-        return 1;
-      case 'medium':
-        return 2;
-      case 'low':
-      default:
-        return 8; // Увеличено с 4 до 8 для слабых устройств - обновляем React state реже
+    // На Android обновляем каждые 5 кадров для баланса между производительностью и отзывчивостью
+    // Shared values обновляются каждый кадр, поэтому визуально плавно
+    // На iOS и веб обновляем каждый кадр
+    if (Platform.OS === 'android') {
+      return 5; // Каждые 5 кадров на Android - shared values обеспечивают плавность
     }
-  }, [performanceLevel]);
+    
+    // Для iOS и веб обновляем каждый кадр
+    return 1;
+  }, []);
 
   // Получаем безопасные зоны для учета системных элементов
   const insets = useSafeAreaInsets();
@@ -168,12 +175,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   const width = screenWidth ?? windowDimensions.width;
   const height = screenHeight ?? windowDimensions.height;
 
-  // Динамическое вычисление высоты таб-бара на основе Platform.OS
-  // Значения из app/_layout.tsx: height: 80, paddingTop: 10, paddingBottom: 0 (Android) или 10 (iOS)
+  // Динамическое вычисление высоты таб-бара
+  // Значения из app/_layout.tsx: height: 80, paddingTop: 10, paddingBottom: 10
   const tabBarHeight = useMemo(() => {
     const baseHeight = 80; // height из tabBarStyle
     const paddingTop = 10; // paddingTop из tabBarStyle
-    const paddingBottom = Platform.OS === 'android' ? 0 : 10; // paddingBottom из tabBarStyle
+    const paddingBottom = 10; // paddingBottom из tabBarStyle
     return baseHeight + paddingTop + paddingBottom;
   }, []);
 
@@ -215,17 +222,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const isInProtectionPeriod = timeSinceInit < INITIALIZATION_PROTECTION_MS;
 
     // Определяем функцию генерации позиции здесь, чтобы она была доступна ниже
-    const baseSpeedMultiplier = (() => {
-      switch (performanceLevel) {
-        case 'high':
-          return 0.49;
-        case 'medium':
-          return 0.5;
-        case 'low':
-        default:
-          return 0.4;
-      }
-    })();
+    // Единая скорость шайб для всех устройств (как на iOS)
+    const baseSpeedMultiplier = 0.49;
     
     const generatePosition = (existingPositions: PuckPosition[]): PuckPosition => {
     const minDistance = puckSize;
@@ -420,30 +418,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const currentPositions = physicsPositionsRef.current;
     if (currentPositions.length === 0) return;
     
-    // Адаптивные параметры физики
-    const { minSpeed, maxSpeed, friction } = (() => {
-      switch (performanceLevel) {
-        case 'high':
-          return {
-            minSpeed: 0.8,
-            maxSpeed: 6.0, // Снижено для предотвращения разгона (было 10.5)
-            friction: 0.999,
-          };
-        case 'medium':
-          return {
-            minSpeed: 0.6,
-            maxSpeed: 6.0, // Снижено для предотвращения разгона (было 10.0)
-            friction: 0.998,
-          };
-        case 'low':
-        default:
-          return {
-            minSpeed: 0.4, // Снижено для слабых устройств
-            maxSpeed: 4.0, // Снижено для слабых устройств (было 5.0)
-            friction: 0.996, // Увеличено трение для слабых устройств
-          };
-      }
-    })();
+    // Единые параметры физики для всех устройств (как на iOS)
+    const minSpeed = 0.8;
+    const maxSpeed = 6.0;
+    const friction = 0.999;
 
     const hasNonDraggingPucks = currentPositions.some((p) => !p.isDragging);
     if (!hasNonDraggingPucks) return;
@@ -488,16 +466,18 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         vy = -Math.abs(vy);
       }
 
-      // Упрощенная проверка коллизий - только физика столкновений
-      // Геометрические коллизии решаются после обновления всех позиций
+      // Проверка коллизий - оптимизирована для слабых Android устройств
       // Добавляем небольшой зазор (2px) между шайбами, чтобы избежать "примагничивания"
       const minDistance = puckSize;
       const minDistSq = minDistance * minDistance;
-      const useSimplifiedPhysics = performanceLevel === 'low';
 
       // Только физика столкновений для автоматических шайб
       if (!pos.isDragging) {
-        // Проверяем все коллизии (убрали ограничения для правильной работы)
+        // Оптимизация для слабых устройств: проверяем только ближайшие шайбы
+        // Для iOS и мощных Android проверяем все, для слабых Android - только близкие
+        const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
+        const collisionCheckRadius = isWeakDevice ? minDistSq * 2.5 : minDistSq * 4; // Для слабых устройств проверяем только очень близкие
+        
         for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
 
@@ -505,43 +485,48 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           const dy = y - other.y;
           const distSq = dx * dx + dy * dy;
 
+          // Пропускаем далекие шайбы для оптимизации (особенно для слабых устройств)
+          if (distSq > collisionCheckRadius) continue;
+
           if (distSq < minDistSq && distSq > 0) {
-            if (useSimplifiedPhysics) {
-              // Упрощенная физика для слабых устройств - просто отталкивание без Math.sqrt
+            // Для слабых устройств упрощаем физику столкновения
+            if (isWeakDevice) {
+              // Упрощенная физика для слабых устройств - только отталкивание
+              const dist = Math.sqrt(distSq);
               const angle = Math.atan2(dy, dx);
-              // Увеличиваем силу отталкивания для предотвращения кучкования
-              vx += Math.cos(angle) * 0.25;
-              vy += Math.sin(angle) * 0.25;
-              // Ограничиваем скорость без Math.sqrt (используем приближение)
-              const speedSq = vx * vx + vy * vy;
-              const maxSpeedSq = maxSpeed * maxSpeed;
-              if (speedSq > maxSpeedSq) {
-                const ratio = maxSpeed / Math.sqrt(speedSq);
+              const pushForce = 0.3; // Упрощенный импульс
+              vx += Math.cos(angle) * pushForce;
+              vy += Math.sin(angle) * pushForce;
+              
+              // Ограничиваем скорость
+              const speed = Math.sqrt(vx * vx + vy * vy);
+              if (speed > maxSpeed) {
+                const ratio = maxSpeed / speed;
                 vx *= ratio;
                 vy *= ratio;
               }
             } else {
+              // Полная физика для мощных устройств
               const dist = Math.sqrt(distSq);
               const angle = Math.atan2(dy, dx);
 
-              // Физика столкновения
+              // Физика столкновения (полная для всех устройств)
               const relativeVx = vx - other.vx;
               const relativeVy = vy - other.vy;
               const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
 
               if (dot < 0) {
-                // Увеличиваем restitution для лучшего отталкивания и предотвращения кучкования
-                // Для iOS: 0.5 (было 0.4), для других: 0.9 (было 0.8)
-                const restitution = performanceLevel === 'high' ? 0.5 : 0.9;
+                // Коэффициент упругости столкновения
+                const restitution = 0.5;
                 const impulse = dot * restitution;
                 vx -= impulse * Math.cos(angle);
                 vy -= impulse * Math.sin(angle);
-                
+                    
                 // Добавляем дополнительный импульс отталкивания для предотвращения кучкования
                 const additionalPush = 0.2;
                 vx += Math.cos(angle) * additionalPush;
                 vy += Math.sin(angle) * additionalPush;
-                
+                    
                 // Ограничиваем скорость сразу после столкновения
                 const speed = Math.sqrt(vx * vx + vy * vy);
                 if (speed > maxSpeed) {
@@ -590,14 +575,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const minDistance = puckSize;
     const minDistSq = minDistance * minDistance;
     
-    // Для слабых устройств используем упрощенную версию без Math.sqrt
-    const useSimplifiedCollisions = performanceLevel === 'low';
-    
     // Массив для накопления смещений
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
     
-    // Проверяем все коллизии (убрали ограничения для правильной работы)
-    // Один проход: вычисляем все необходимые смещения
+    // Проверяем все коллизии - один проход: вычисляем все необходимые смещения
     for (let i = 0; i < updatedPositions.length; i++) {
       const pos1 = updatedPositions[i];
       
@@ -612,71 +593,58 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         const distSq = dx * dx + dy * dy;
         
         if (distSq < minDistSq && distSq > 0) {
-            let angle: number;
-            let overlap: number;
+          // Полная физика для всех устройств
+          const dist = Math.sqrt(distSq);
+          const angle = Math.atan2(dy, dx);
+          const overlap = minDistance - dist;
+          
+          // Увеличиваем силу отталкивания для предотвращения кучкования
+          const pushStrength = 1.2;
+          const adjustedOverlap = overlap * pushStrength;
+          
+          // Накопление смещений
+          if (pos1.isDragging) {
+            // pos1 перетаскивается, двигаем только pos2
+            offsets[j].x -= Math.cos(angle) * adjustedOverlap;
+            offsets[j].y -= Math.sin(angle) * adjustedOverlap;
+          } else if (pos2.isDragging) {
+            // pos2 перетаскивается, двигаем только pos1
+            offsets[i].x += Math.cos(angle) * adjustedOverlap;
+            offsets[i].y += Math.sin(angle) * adjustedOverlap;
+          } else {
+            // Обе автоматические - двигаем обе
+            const halfOverlap = adjustedOverlap * 0.5;
+            offsets[i].x += Math.cos(angle) * halfOverlap;
+            offsets[i].y += Math.sin(angle) * halfOverlap;
+            offsets[j].x -= Math.cos(angle) * halfOverlap;
+            offsets[j].y -= Math.sin(angle) * halfOverlap;
+          }
+          
+          // Добавляем импульс скорости для лучшего разлета при столкновении
+          // Это помогает предотвратить кучкование, придавая шайбам дополнительную скорость
+          if (!pos1.isDragging && !pos2.isDragging) {
+            const impulseStrength = 0.3; // Сила импульса
+            const cosAngle = Math.cos(angle);
+            const sinAngle = Math.sin(angle);
             
-            if (useSimplifiedCollisions) {
-              // Упрощенная версия для слабых устройств - избегаем Math.sqrt
-              // Используем приближение: dist ≈ distSq / minDistance для малых перекрытий
-              const distApprox = distSq / minDistance;
-              angle = Math.atan2(dy, dx);
-              overlap = minDistance - distApprox;
-              // Ограничиваем overlap, чтобы избежать слишком больших смещений
-              if (overlap > minDistance) overlap = minDistance * 0.5;
-            } else {
-              const dist = Math.sqrt(distSq);
-              angle = Math.atan2(dy, dx);
-              overlap = minDistance - dist;
+            // Придаем скорость в направлении отталкивания
+            updatedPositions[i].vx += cosAngle * impulseStrength;
+            updatedPositions[i].vy += sinAngle * impulseStrength;
+            updatedPositions[j].vx -= cosAngle * impulseStrength;
+            updatedPositions[j].vy -= sinAngle * impulseStrength;
+          }
+          
+          // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
+          if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
+            // Создаем уникальный ключ для пары шайб (сортируем ID для консистентности)
+            const collisionKey = [pos1.id, pos2.id].sort().join('-');
+            
+            // Если это новое столкновение (еще не было вибрации), отмечаем его
+            if (!activeCollisionsRef.current.has(collisionKey)) {
+              activeCollisionsRef.current.add(collisionKey);
+              collisionDetectedRef.current = true;
             }
-            
-            // Увеличиваем силу отталкивания для предотвращения кучкования
-            // Используем коэффициент 1.2 для более сильного отталкивания
-            const pushStrength = 1.2;
-            const adjustedOverlap = overlap * pushStrength;
-            
-            // Накопление смещений
-            if (pos1.isDragging) {
-              // pos1 перетаскивается, двигаем только pos2
-              offsets[j].x -= Math.cos(angle) * adjustedOverlap;
-              offsets[j].y -= Math.sin(angle) * adjustedOverlap;
-            } else if (pos2.isDragging) {
-              // pos2 перетаскивается, двигаем только pos1
-              offsets[i].x += Math.cos(angle) * adjustedOverlap;
-              offsets[i].y += Math.sin(angle) * adjustedOverlap;
-            } else {
-              // Обе автоматические - двигаем обе
-              const halfOverlap = adjustedOverlap * 0.5;
-              offsets[i].x += Math.cos(angle) * halfOverlap;
-              offsets[i].y += Math.sin(angle) * halfOverlap;
-              offsets[j].x -= Math.cos(angle) * halfOverlap;
-              offsets[j].y -= Math.sin(angle) * halfOverlap;
-            }
-            
-            // Добавляем импульс скорости для лучшего разлета при столкновении
-            // Это помогает предотвратить кучкование, придавая шайбам дополнительную скорость
-            if (!pos1.isDragging && !pos2.isDragging) {
-              const impulseStrength = 0.3; // Сила импульса
-              const cosAngle = Math.cos(angle);
-              const sinAngle = Math.sin(angle);
-              
-              // Придаем скорость в направлении отталкивания
-              updatedPositions[i].vx += cosAngle * impulseStrength;
-              updatedPositions[i].vy += sinAngle * impulseStrength;
-              updatedPositions[j].vx -= cosAngle * impulseStrength;
-              updatedPositions[j].vy -= sinAngle * impulseStrength;
-            }
-            
-            // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
-            if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
-              // Создаем уникальный ключ для пары шайб (сортируем ID для консистентности)
-              const collisionKey = [pos1.id, pos2.id].sort().join('-');
-              
-              // Если это новое столкновение (еще не было вибрации), отмечаем его
-              if (!activeCollisionsRef.current.has(collisionKey)) {
-                activeCollisionsRef.current.add(collisionKey);
-                collisionDetectedRef.current = true;
-              }
-            }
+          }
         }
       }
     }
@@ -834,13 +802,6 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
   // Вибрация при столкновениях (только один раз при начале столкновения)
   useEffect(() => {
-    // Отключаем вибрацию для слабых устройств для экономии ресурсов
-    if (performanceLevel === 'low') {
-      collisionDetectedRef.current = false;
-      activeCollisionsRef.current.clear();
-      return;
-    }
-    
     // Вибрация только для НОВЫХ столкновений (не для уже активных)
     // collisionDetectedRef устанавливается только для новых столкновений благодаря проверке activeCollisionsRef
     if (collisionDetectedRef.current && currentScreen === 'home' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
@@ -942,16 +903,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             
           // Прямая формула для решения всех коллизий за один проход
           // Для каждой другой шайбы вычисляем коллизию с перетаскиваемой
-          const useSimplifiedDragCollisions = performanceLevel === 'low';
-          
-          // Для слабых устройств ограничиваем количество проверяемых коллизий
-          const maxDragCollisionChecks = useSimplifiedDragCollisions ? 10 : newPositions.length;
-          let dragCheckedCount = 0;
-          
           for (let i = 0; i < newPositions.length; i++) {
             if (i === draggedIndex) continue;
-            if (useSimplifiedDragCollisions && dragCheckedCount >= maxDragCollisionChecks) break;
-            dragCheckedCount++;
             
             const other = newPositions[i];
             const dx = finalX - other.x;
@@ -959,24 +912,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             const distSq = dx * dx + dy * dy;
 
             if (distSq < minDistSq && distSq > 0) {
-              let angle: number;
-              let overlap: number;
-              
-              if (useSimplifiedDragCollisions) {
-                // Упрощенная версия для слабых устройств
-                const distApprox = distSq / minDistance;
-                angle = Math.atan2(dy, dx);
-                overlap = minDistance - distApprox;
-                if (overlap > minDistance) overlap = minDistance * 0.5;
-              } else {
-                const dist = Math.sqrt(distSq);
-                angle = Math.atan2(dy, dx);
-                overlap = minDistance - dist;
-          }
+              // Полная физика для всех устройств
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
+              const overlap = minDistance - dist;
           
-              // Перетаскиваемая шайба остается на месте (или двигается минимально)
-              // Другая шайба отталкивается полностью
-              // Увеличиваем силу отталкивания для предотвращения кучкования
+              // Перетаскиваемая шайба остается на месте, другая отталкивается
               const pushStrength = 1.2;
               const adjustedOverlap = overlap * pushStrength;
               const pushX = -Math.cos(angle) * adjustedOverlap;
@@ -996,25 +937,23 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
                 y: newOtherY,
               };
 
-              // Отслеживаем столкновения для вибрации (только один раз при начале столкновения)
+              // Отслеживаем столкновения для вибрации
               if (currentUserId && (id === currentUserId || other.id === currentUserId)) {
                 const collisionKey = [id, other.id].sort().join('-');
                 if (!activeCollisionsRef.current.has(collisionKey)) {
                   activeCollisionsRef.current.add(collisionKey);
-              collisionDetectedRef.current = true;
-            }
+                  collisionDetectedRef.current = true;
+                }
               }
             }
           }
 
           // Дополнительная проверка: если перетаскиваемая шайба все еще пересекается,
-          // немного отодвигаем её назад (используем уже обновленные позиции других шайб)
-          // Пропускаем для слабых устройств для экономии ресурсов
-          if (!useSimplifiedDragCollisions) {
-            for (let i = 0; i < newPositions.length; i++) {
-              if (i === draggedIndex) continue;
-              
-              const other = newPositions[i];
+          // немного отодвигаем её назад
+          for (let i = 0; i < newPositions.length; i++) {
+            if (i === draggedIndex) continue;
+            
+            const other = newPositions[i];
             const dx = finalX - other.x;
             const dy = finalY - other.y;
             const distSq = dx * dx + dy * dy;
@@ -1024,31 +963,30 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
               const angle = Math.atan2(dy, dx);
               const overlap = minDistance - dist;
                 
-                // Немного отодвигаем перетаскиваемую шайбу назад
-                finalX -= Math.cos(angle) * overlap * 0.3;
-                finalY -= Math.sin(angle) * overlap * 0.3;
+              // Немного отодвигаем перетаскиваемую шайбу назад
+              finalX -= Math.cos(angle) * overlap * 0.3;
+              finalY -= Math.sin(angle) * overlap * 0.3;
                 
-                // Дополнительно отталкиваем другую шайбу, если она все еще слишком близко
-                const additionalPush = overlap * 0.2;
-                const newOtherX = other.x - Math.cos(angle) * additionalPush;
-                const newOtherY = other.y - Math.sin(angle) * additionalPush;
+              // Дополнительно отталкиваем другую шайбу
+              const additionalPush = overlap * 0.2;
+              const newOtherX = other.x - Math.cos(angle) * additionalPush;
+              const newOtherY = other.y - Math.sin(angle) * additionalPush;
                 
                 newPositions[i] = {
-                  ...other,
-                  x: Math.max(boundaries.left, Math.min(boundaries.right, newOtherX)),
-                  y: Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY)),
-                };
+                ...other,
+                x: Math.max(boundaries.left, Math.min(boundaries.right, newOtherX)),
+                y: Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY)),
+              };
+            }
           }
-        }
-      }
 
           // Обновляем финальную позицию перетаскиваемой шайбы
-        finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
-        finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
+          finalX = Math.max(boundaries.left, Math.min(boundaries.right, finalX));
+          finalY = Math.max(boundaries.top, Math.min(boundaries.bottom, finalY));
           newPositions[draggedIndex] = {
             ...newPositions[draggedIndex],
-                x: finalX,
-                y: finalY,
+            x: finalX,
+            y: finalY,
           };
         } else {
           // Если не перетаскиваем, просто обновляем позицию
@@ -1447,44 +1385,20 @@ export default function HomeScreen() {
   // Вычисляем начальные значения фильтров СИНХРОННО при первом рендере
   // Это гарантирует, что фильтры будут установлены до вычисления allVisiblePlayers
   const initialFilters = useMemo(() => {
-    console.log('🔍 [FILTERS] Пересчет initialFilters:', {
-      isUserLoading,
-      playersCount: players.length,
-      currentUserCountry: currentUser?.country,
-      currentUserName: currentUser?.name
-    });
-
     // Ждем загрузки пользователя перед инициализацией фильтров
     if (isUserLoading || players.length === 0) {
       return { country: null, year: null };
     }
 
-      // Для неавторизованных пользователей показываем "Все"
-      if (!currentUser) {
+    // Для неавторизованных пользователей показываем "Все"
+    if (!currentUser) {
       return { country: null, year: null };
-      }
+    }
 
     // Для авторизованных пользователей вычисляем фильтры синхронно
-      const defaultCountry = currentUser?.country;
-    
-    console.log('🔍 [FILTERS] Проверка инициализации фильтров:', {
-      userName: currentUser?.name,
-      userCountry: defaultCountry,
-      playersCount: players.length,
-      isUserLoading,
-      filtersInitialized: filtersInitializedRef.current,
-      currentSelectedCountry: selectedCountry
-    });
-    
-    // ВАЖНО: Переинициализация фильтров происходит только при первом запуске или
-    // когда пользователь сохранил изменения в своем профиле (currentUser.country изменилась)
-    // НЕ переинициализируем фильтры когда пользователь просто выбирает другую страну в интерфейсе!
-    
-    // initialFilters всегда рассчитывает значения на основе данных пользователя
-    // НЕ возвращаем текущие значения из контекста
+    const defaultCountry = currentUser?.country;
     
     if (!defaultCountry) {
-      console.log('⚠️ [FILTERS] У пользователя не указана страна, показываем "Все"');
       return { country: null, year: null };
     }
       
@@ -1497,24 +1411,20 @@ export default function HomeScreen() {
       (player.status === 'player' || player.status === 'star' || player.status === 'coach' || player.status === 'scout')
     );
 
-    console.log('🔍 [FILTERS] Игроки в стране пользователя:', {
-      country: defaultCountry,
-      playersInCountry: playersInCountry.length,
-      allPlayersInCountry: players.filter(p => p.country === defaultCountry).length,
-      allPlayersWithStatus: players.filter(p => p.status === 'player').length
-    });
-
-        // Если нет игроков в стране пользователя, показываем "Все"
-        if (playersInCountry.length === 0) {
-      console.log('⚠️ [FILTERS] Нет игроков в стране пользователя, показываем "Все"');
+    // Если нет игроков в стране пользователя, показываем "Все"
+    if (playersInCountry.length === 0) {
       return { country: null, year: null };
-        }
+    }
 
-        // Устанавливаем фильтр по году рождения текущего пользователя
-        let defaultYear: number | null = null;
+    // Устанавливаем фильтр по году рождения текущего пользователя
+    let defaultYear: number | null = null;
 
-        if (currentUser?.birthDate) {
-          // Используем год рождения текущего пользователя
+    // Для тренеров и звёзд НЕ устанавливаем фильтр по году рождения
+    // Они должны видеть всех игроков в своей стране ("Все года")
+    if (currentUser?.status === 'coach' || currentUser?.status === 'star') {
+      defaultYear = null;
+        } else if (currentUser?.birthDate) {
+          // Для обычных игроков используем год рождения текущего пользователя
           defaultYear = parseInt(currentUser.birthDate.split('-')[0]);
           
           // Проверяем, есть ли игроки в этом году в стране пользователя
@@ -1576,6 +1486,7 @@ export default function HomeScreen() {
   }, []);
 
   // Отслеживаем изменения страны пользователя и переинициализируем фильтры
+  // ВАЖНО: НЕ вызываем loadAllPlayers(true), так как это unmounts другие экраны (профиль)
   useEffect(() => {
     if (currentUser?.country && lastUserCountryRef.current && currentUser.country !== lastUserCountryRef.current) {
       console.log('🌍 [FILTERS] Страна пользователя изменилась в базе данных:', {
@@ -1584,14 +1495,16 @@ export default function HomeScreen() {
       });
       // Сбрасываем флаг инициализации, чтобы фильтры переинициализировались
       filtersInitializedRef.current = false;
-      // Обновляем список игроков, чтобы отображалась новая страна пользователя
-      loadAllPlayers(true); // Принудительное обновление
+      // ВАЖНО: НЕ вызываем loadAllPlayers(true) здесь!
+      // Это unmounts экран профиля при принятии запроса в друзья
+      // Список обновится автоматически при возвращении на главный экран через useFocusEffect
+      // loadAllPlayers(true); // Убрано - вызывает unmount других экранов
     }
     // Обновляем сохраненную страну пользователя
     if (currentUser?.country !== lastUserCountryRef.current) {
       lastUserCountryRef.current = currentUser?.country || null;
     }
-  }, [currentUser?.country, loadAllPlayers]);
+  }, [currentUser?.country]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
@@ -1604,7 +1517,6 @@ export default function HomeScreen() {
     // Если пользователь загрузился, но фильтры еще не инициализированы, сбрасываем флаг
     // Это позволяет переинициализировать фильтры, если они были установлены как null до загрузки пользователя
     if (currentUser && filtersInitializedRef.current && selectedCountry === null && selectedYear === null && initialFilters.country !== null) {
-      console.log('🔄 [FILTERS] Пользователь загрузился, переинициализируем фильтры');
       filtersInitializedRef.current = false;
     }
 
@@ -1615,28 +1527,10 @@ export default function HomeScreen() {
       (selectedCountry === null && selectedYear === null);
     
     if (shouldInitialize) {
-      console.log('🎯 [FILTERS] Инициализация фильтров синхронно:', {
-        initialFilters,
-        currentUserName: currentUser?.name,
-        currentUserCountry: currentUser?.country,
-        currentUserBirthDate: currentUser?.birthDate,
-        isUserLoading,
-        playersCount: players.length,
-        filtersInitializedFlag: filtersInitializedRef.current,
-        reason: filtersInitializedRef.current === false ? 'flag_reset' : 'first_time'
-      });
-
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
-      
-      if (initialFilters.country) {
-        console.log(`✅ [FILTERS] Фильтры инициализированы: страна=${initialFilters.country}, год=${initialFilters.year}`);
-      } else {
-        console.log('✅ [FILTERS] Фильтры инициализированы: "Все" (страна=null, год=null)');
-      }
-      
-      // Помечаем, что фильтры были инициализированы
       filtersInitializedRef.current = true;
+      console.log(`✅ [FILTERS] Инициализированы: ${initialFilters.country || 'Все'} / ${initialFilters.year || 'Все года'}`);
     }
   }, [players.length, currentUser, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
 
@@ -1646,12 +1540,13 @@ export default function HomeScreen() {
   }, [loadAllPlayers]);
 
   // Обрабатываем параметр refresh для принудительного обновления списка игроков
+  // ВАЖНО: Вызываем только если экран в фокусе, чтобы не unmount другие экраны
   useEffect(() => {
-    if (params.refresh) {
+    if (params.refresh && currentScreen === 'home') {
       console.log('🔄 Принудительное обновление списка игроков после регистрации');
       loadAllPlayers(true); // Принудительное обновление
     }
-  }, [params.refresh, loadAllPlayers]);
+  }, [params.refresh, loadAllPlayers, currentScreen]);
 
   const loadBlockedUsers = useCallback(async (force = false) => {
     const userId = currentUser?.id;
@@ -1768,75 +1663,33 @@ export default function HomeScreen() {
       return [];
     }
 
-    // ВАЖНО: Не показываем игроков до инициализации фильтров, если они должны быть применены
-    // Это предотвращает показ всех игроков при первой загрузке
-    // Если фильтры уже инициализированы - используем их
-    // Если фильтры еще не инициализированы, но initialFilters готовы (игроки и пользователь загружены) - используем их
-    // Если initialFilters еще не готовы (пользователь загружается) - не показываем игроков
-    const filtersReady = filtersInitializedRef.current || 
-      (!isUserLoading && currentUser && players.length > 0); // Данные готовы для вычисления initialFilters
+    // ВАЖНО: Ждём ПОЛНОЙ инициализации фильтров перед показом шайб
+    // Это предотвращает двойной рендер при авторизации:
+    // 1. Раньше: показ шайб когда initialFilters готовы -> потом ещё раз когда setSelectedCountry/Year вызван
+    // 2. Теперь: ждём пока filtersInitializedRef.current = true (после setSelectedCountry/Year)
+    
+    // Для НЕАВТОРИЗОВАННЫХ пользователей: показываем сразу (фильтры = null)
+    // Для АВТОРИЗОВАННЫХ: ждём инициализации фильтров
+    const isAuthorizedUser = !isUserLoading && currentUser;
+    const filtersReady = isAuthorizedUser 
+      ? filtersInitializedRef.current // Для авторизованных - ждём полной инициализации
+      : players.length > 0; // Для неавторизованных - показываем сразу как загрузились игроки
     
     if (!filtersReady) {
-      // Данные еще не готовы - возвращаем предыдущий список, если он есть, или пустой массив
-      if (allVisiblePlayersRef.current.length > 0) {
-        return allVisiblePlayersRef.current;
-      }
-      // Если список пустой, возвращаем пустой массив до готовности данных
+      // Данные еще не готовы - возвращаем пустой массив
+      // НЕ возвращаем предыдущий список, чтобы избежать промежуточных состояний
       return [];
     }
 
     // Определяем эффективные фильтры
-    // Приоритет: 1) selectedCountry/Year из контекста (если установлены)
-    //            2) initialFilters (если вычислены и фильтры не инициализированы)
-    //            3) undefined (показать всех)
-    const effectiveCountry = (() => {
-      // Если фильтры уже установлены пользователем - используем их
-      if (filtersInitializedRef.current) {
-        // Если selectedCountry === null - пользователь выбрал "Все", возвращаем undefined
-        // Если selectedCountry === undefined - еще не установлено, возвращаем undefined
-        // Если selectedCountry - строка - возвращаем её
-        if (selectedCountry === null || selectedCountry === undefined) {
-          return undefined;
-        }
-        return selectedCountry;
-      }
-      // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      // ВАЖНО: Используем initialFilters только если игроки загружены и пользователь загружен
-      if (players.length > 0 && !isUserLoading && currentUser) {
-        if (initialFilters.country !== null && initialFilters.country !== undefined) {
-          return initialFilters.country;
-        }
-        // Если initialFilters.country === null, это означает "Все" - возвращаем undefined
-        return undefined;
-      }
-      // Пока данные загружаются - возвращаем undefined, чтобы не показывать всех
-      // Это предотвратит показ всех игроков до инициализации фильтров
-      return undefined;
-    })();
-    const effectiveYear = (() => {
-      // Если фильтры уже установлены пользователем - используем их
-      if (filtersInitializedRef.current) {
-        // Если selectedYear === null - пользователь выбрал "Все", возвращаем undefined
-        // Если selectedYear === undefined - еще не установлено, возвращаем undefined
-        // Если selectedYear - число - возвращаем его
-        if (selectedYear === null || selectedYear === undefined) {
-          return undefined;
-        }
-        return selectedYear;
-      }
-      // Если фильтры еще не инициализированы, используем initialFilters (если готовы)
-      // ВАЖНО: Используем initialFilters только если игроки загружены и пользователь загружен
-      if (players.length > 0 && !isUserLoading && currentUser) {
-        if (initialFilters.year !== null && initialFilters.year !== undefined) {
-          return initialFilters.year;
-        }
-        // Если initialFilters.year === null, это означает "Все" - возвращаем undefined
-        return undefined;
-      }
-      // Пока данные загружаются - возвращаем undefined, чтобы не показывать всех
-      // Это предотвратит показ всех игроков до инициализации фильтров
-      return undefined;
-    })();
+    // Теперь проще: для авторизованных filtersInitializedRef.current = true (гарантировано выше)
+    // Для неавторизованных: используем selectedCountry/Year напрямую (они null)
+    const effectiveCountry = selectedCountry === null || selectedCountry === undefined 
+      ? undefined 
+      : selectedCountry;
+    const effectiveYear = selectedYear === null || selectedYear === undefined 
+      ? undefined 
+      : selectedYear;
 
     // Проверяем, изменились ли параметры фильтрации
     // Также отслеживаем изменения is_hidden для скрытых игроков
@@ -1861,9 +1714,9 @@ export default function HomeScreen() {
     const lastState = lastFilterStateRef.current;
     
     // ЗАЩИТА: Игнорируем первое изменение currentUser при инициализации (первые 5 секунд)
-    // Это предотвращает остановку анимации при первой загрузке пользователя и инициализации фильтров
+    // НО: Изменения фильтров по нажатию пользователя ВСЕГДА должны применяться!
     const now = Date.now();
-    const INITIALIZATION_PROTECTION_MS = 5000; // 5 секунд защиты - покрывает загрузку игроков, инициализацию фильтров (3.5 сек) и проверку скрытых игроков
+    const INITIALIZATION_PROTECTION_MS = 5000; // 5 секунд защиты
     
     // Инициализируем время защиты при первой загрузке игроков или пользователя
     if (filterInitTimeRef.current === 0 && (currentFilterState.currentUserId || players.length > 0)) {
@@ -1875,32 +1728,32 @@ export default function HomeScreen() {
     const timeSinceInit = filterInitTimeRef.current > 0 ? now - filterInitTimeRef.current : 0;
     const isFirstUserLoad = lastState.currentUserId === undefined && currentFilterState.currentUserId !== undefined;
     
-    // ОПТИМИЗАЦИЯ: В период защиты игнорируем ВСЕ изменения, если список видимых игроков не изменился
-    // Это включает: загрузку пользователя, инициализацию фильтров, изменения скрытых игроков
-    // Сначала проверяем базовые фильтры без учета hiddenChanged, фильтров и пользователя в период защиты
+    // ВАЖНО: Изменения фильтров пользователем ВСЕГДА должны применяться, даже в период защиты!
+    // Период защиты только для автоматических изменений (загрузка пользователя, initialFilters)
+    const userChangedFilters = filtersInitializedRef.current && (
+      currentFilterState.selectedCountry !== lastState.selectedCountry ||
+      currentFilterState.selectedYear !== lastState.selectedYear
+    );
+    
+    // Базовые изменения (не связанные с пользовательскими фильтрами)
     const basicFiltersChanged = 
       currentFilterState.playersLength !== lastState.playersLength ||
       // Игнорируем изменения пользователя в период защиты - они не должны вызывать переинициализацию
       (!isInitializationPhase && !isFirstUserLoad && currentFilterState.currentUserId !== lastState.currentUserId) ||
       (!isInitializationPhase && !isFirstUserLoad && currentFilterState.currentUserStatus !== lastState.currentUserStatus) ||
-      // Игнорируем изменения фильтров в период защиты - они инициализируются позже
-      (!isInitializationPhase && currentFilterState.selectedCountry !== lastState.selectedCountry) ||
-      (!isInitializationPhase && currentFilterState.selectedYear !== lastState.selectedYear) ||
+      // Изменения фильтров пользователем применяются ВСЕГДА
+      userChangedFilters ||
       currentFilterState.randomSeed !== lastState.randomSeed ||
       currentFilterState.blockedUsersLength !== lastState.blockedUsersLength;
     
-    // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ: В период защиты ВСЕГДА проверяем, изменился ли список видимых игроков
-    // перед пересчетом. Это предотвращает ВСЕ переинициализации при:
-    // - загрузке пользователя (currentUser) - первая задержка
-    // - инициализации фильтров (selectedCountry, selectedYear через 3.5 сек) - вторая задержка
-    // - проверке скрытых игроков (hiddenChanged)
-    // - любых других изменениях состояния
-    if (isInitializationPhase && allVisiblePlayersRef.current.length > 0) {
+    // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ: В период защиты проверяем, изменился ли список видимых игроков
+    // НО: Если пользователь изменил фильтры - ВСЕГДА пересчитываем!
+    // Период защиты только для автоматических изменений (загрузка пользователя, initialFilters)
+    if (isInitializationPhase && allVisiblePlayersRef.current.length > 0 && !userChangedFilters) {
       // В период защиты используем предыдущие значения фильтров для проверки,
       // чтобы игнорировать изменения, которые не влияют на список видимых игроков
-      const checkUserId = lastState.currentUserId || currentUser?.id; // Используем предыдущий ID, если есть
+      const checkUserId = lastState.currentUserId || currentUser?.id;
       const checkUserStatus = lastState.currentUserStatus || currentUser?.status;
-      // Используем эффективные значения фильтров для проверки
       const checkCountry = effectiveCountry;
       const checkYear = effectiveYear;
       
@@ -1920,11 +1773,11 @@ export default function HomeScreen() {
       
       // Быстро проверяем, изменился ли список видимых игроков
       const visiblePlayersForHome = players.filter(player => !player.is_hidden);
-    const selected = getSmartPlayerSelection(
+      const selected = getSmartPlayerSelection(
         visiblePlayersForHome,
-        checkUserId, // Используем предыдущий ID пользователя для проверки
+        checkUserId,
         checkUserStatus,
-        checkCountry, // Используем предыдущие фильтры для проверки
+        checkCountry,
         checkYear,
         randomSeed
       );
@@ -1935,7 +1788,7 @@ export default function HomeScreen() {
         filtered = filtered.filter(player => !blockedSet.has(player.id));
       }
       
-      // Сравниваем по ID - если список не изменился, игнорируем ВСЕ изменения в период защиты
+      // Сравниваем по ID - если список не изменился, игнорируем автоматические изменения
       const currentIds = new Set(filtered.map(p => p.id));
       const previousIds = new Set(allVisiblePlayersRef.current.map(p => p.id));
       const idsEqual = currentIds.size === previousIds.size && 
@@ -1944,15 +1797,17 @@ export default function HomeScreen() {
                        Array.from(previousIds).every(id => currentIds.has(id));
       
       if (idsEqual) {
-        // Список видимых игроков не изменился - обновляем только состояние, но НЕ пересчитываем
-        console.log(`✅ [ANIMATION] Период защиты (${Math.round(timeSinceInit)}мс): список не изменился, игнорируем изменения`);
+        console.log(`✅ [ANIMATION] Период защиты (${Math.round(timeSinceInit)}мс): список не изменился, игнорируем`);
         lastFilterStateRef.current = currentFilterState;
         return allVisiblePlayersRef.current;
       } else {
-        console.log(`⚠️ [ANIMATION] Период защиты (${Math.round(timeSinceInit)}мс): список ИЗМЕНИЛСЯ! Будет переинициализация`);
-        console.log(`   Предыдущие ID (${previousIds.size}):`, Array.from(previousIds).slice(0, 5), '...');
-        console.log(`   Текущие ID (${currentIds.size}):`, Array.from(currentIds).slice(0, 5), '...');
+        console.log(`⚠️ [ANIMATION] Период защиты (${Math.round(timeSinceInit)}мс): список ИЗМЕНИЛСЯ!`);
       }
+    }
+    
+    // Если пользователь изменил фильтры в период защиты - логируем это
+    if (userChangedFilters && isInitializationPhase) {
+      console.log(`🎯 [FILTERS] Пользователь изменил фильтры в период защиты - применяем немедленно`);
     }
     
     // Проверяем все фильтры, включая hiddenChanged (но только вне периода защиты)
@@ -1976,19 +1831,8 @@ export default function HomeScreen() {
     // Обновляем состояние фильтров перед пересчетом
     lastFilterStateRef.current = currentFilterState;
     
-    // ЛОГИРОВАНИЕ: Пересчет списка видимых игроков
-    console.log(`🔄 [ANIMATION] Пересчет allVisiblePlayers:`, {
-      isInitializationPhase,
-      timeSinceInit: Math.round(timeSinceInit),
-      playersCount: players.length,
-      currentUserId: currentUser?.id,
-      selectedCountry: effectiveCountry, // Логируем эффективные значения
-      selectedYear: effectiveYear,
-      hiddenCount: hiddenPlayerIds.size,
-      fromContext: { country: selectedCountry, year: selectedYear },
-      fromInitial: { country: initialFilters.country, year: initialFilters.year },
-      effectiveValues: { country: effectiveCountry, year: effectiveYear }
-    });
+    // ЛОГИРОВАНИЕ: Пересчет списка видимых игроков (минимальный)
+    console.log(`🔄 [ANIMATION] Пересчет: ${players.length} игроков, фильтр: ${effectiveCountry || 'Все'} / ${effectiveYear || 'Все года'}`);
 
     // Фильтруем скрытые профили ДО вызова getSmartPlayerSelection для главного экрана
     // На главном экране скрытые игроки не показываются никому, включая админов
@@ -2034,7 +1878,7 @@ export default function HomeScreen() {
     console.log(`✅ [ANIMATION] Список видимых игроков обновлен: ${filtered.length} игроков`);
     allVisiblePlayersRef.current = filtered;
     return filtered;
-  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, initialFilters]);
+  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, isUserLoading]);
 
   // Используем полную логику коллизий из основного экрана
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition } = usePuckCollisionSystem(

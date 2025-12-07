@@ -4,22 +4,46 @@ import Constants from 'expo-constants';
 // Note: Twilio не работает напрямую в React Native, используем fetch API
 
 // Функция форматирования номера телефона
+// Убираем все форматирующие символы (пробелы, скобки, дефисы), оставляем только + и цифры
 const formatPhoneNumber = (phone: string): string => {
-  // Удаляем все символы, кроме цифр
-  const cleanPhone = phone.replace(/\D/g, '');
+  // Убираем все символы кроме + и цифр
+  const cleaned = phone.replace(/[^\d+]/g, '');
   
-  // Если номер начинается с 80 или 375, заменяем на +375
-  if (cleanPhone.startsWith('80') || cleanPhone.startsWith('375')) {
-    return `+375${cleanPhone.slice(-9)}`;
+  // Возвращаем очищенный номер (должен начинаться с +)
+  return cleaned;
+};
+
+// Функция определения кода страны из номера телефона
+const getCountryCode = (phone: string): string => {
+  const cleaned = phone.replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+')) {
+    // Извлекаем код страны (первые 1-3 цифры после +)
+    const match = cleaned.match(/^\+(\d{1,3})/);
+    return match ? match[1] : '';
+  }
+  return '';
+};
+
+// Функция выбора номера отправителя в зависимости от страны получателя
+const getSenderNumber = (recipientPhone: string): string => {
+  const accountSid = Constants.expoConfig?.extra?.twilioAccountSid;
+  const authToken = Constants.expoConfig?.extra?.twilioAuthToken;
+  
+  // Получаем номера отправителей из конфигурации
+  const defaultFromNumber = Constants.expoConfig?.extra?.twilioFromNumber; // Шведский номер
+  const usFromNumber = Constants.expoConfig?.extra?.twilioFromNumberUS; // Американский номер (если есть)
+  
+  // Определяем код страны получателя
+  const countryCode = getCountryCode(recipientPhone);
+  
+  // Если получатель в США (+1) и есть американский номер - используем его
+  if (countryCode === '1' && usFromNumber) {
+    console.log('🇺🇸 Используем американский номер отправителя для США');
+    return usFromNumber;
   }
   
-  // Если номер уже международный, возвращаем как есть
-  if (cleanPhone.startsWith('+')) {
-    return phone;
-  }
-  
-  // Если номер локальный, добавляем код страны
-  return `+375${cleanPhone}`;
+  // Для всех остальных стран используем номер по умолчанию
+  return defaultFromNumber || '';
 };
 
 // Функция отправки SMS через Twilio API
@@ -29,10 +53,17 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
     
     const accountSid = Constants.expoConfig?.extra?.twilioAccountSid;
     const authToken = Constants.expoConfig?.extra?.twilioAuthToken;
-    const twilioPhoneNumber = Constants.expoConfig?.extra?.twilioFromNumber;
     
-    if (!accountSid || !authToken || !twilioPhoneNumber) {
+    if (!accountSid || !authToken) {
       // console.log('❌ Twilio credentials не найдены в конфигурации Expo');
+      return false;
+    }
+    
+    // Выбираем номер отправителя в зависимости от страны получателя
+    const twilioPhoneNumber = getSenderNumber(phone);
+    
+    if (!twilioPhoneNumber) {
+      console.error('❌ Номер отправителя не найден в конфигурации');
       return false;
     }
     
@@ -44,13 +75,16 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
     const message = `Hockeystars code: ${code}`;
 
     // Формируем тело запроса вручную для React Native совместимости
-    const body = `From=${encodeURIComponent(twilioPhoneNumber)}&To=${encodeURIComponent(formattedPhone)}&Body=${encodeURIComponent(message)}`;
+    // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
+    // Это предотвращает блокировку SMS Pumping Protection от Twilio
+    const body = `From=${encodeURIComponent(twilioPhoneNumber)}&To=${encodeURIComponent(formattedPhone)}&Body=${encodeURIComponent(message)}&RiskCheck=disable`;
     
     console.log('📤 Отправляем запрос в Twilio:');
     console.log('   URL:', `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`);
     console.log('   From:', twilioPhoneNumber);
     console.log('   To:', formattedPhone);
     console.log('   Body:', message);
+    console.log('   RiskCheck: disable (легитимное сообщение)');
 
     const response = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -152,13 +186,16 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     const message = `Hockeystars code: ${code}`;
 
     // Формируем тело запроса вручную для React Native совместимости
-    const body = `From=${encodeURIComponent(whatsappFrom)}&To=${encodeURIComponent(whatsappTo)}&Body=${encodeURIComponent(message)}`;
+    // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
+    // Это предотвращает блокировку SMS Pumping Protection от Twilio
+    const body = `From=${encodeURIComponent(whatsappFrom)}&To=${encodeURIComponent(whatsappTo)}&Body=${encodeURIComponent(message)}&RiskCheck=disable`;
     
     console.log('📤 Отправляем WhatsApp запрос в Twilio:');
     console.log('   URL:', `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`);
     console.log('   From:', whatsappFrom);
     console.log('   To:', whatsappTo);
     console.log('   Body:', message);
+    console.log('   RiskCheck: disable (легитимное сообщение)');
     console.log('   Body (encoded):', body);
 
     // Отправляем WhatsApp через Twilio API

@@ -15,10 +15,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import WebTextInput from '../components/WebTextInput';
-import { findPlayerByCredentials, saveCurrentUser, getPlayerByPhone, createPlayer } from '../utils/playerStorage';
-import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
+import { saveCurrentUser, getPlayerByPhone, getPlayerByEmail } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
+import { sendVerificationSMS, verifyCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -26,13 +26,46 @@ export default function LoginScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { currentUser, isUserLoading, refreshUser } = useUser();
-  const phoneRef = useRef<TextInput>(null);
+  const contactRef = useRef<TextInput>(null);
   const codeRef = useRef<TextInput>(null);
   const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [formData, setFormData] = useState({
-    phone: '',
+    contact: '', // Объединенное поле для телефона или email
     code: ''
   });
+  
+  // Функция для определения типа ввода (email или phone)
+  const detectInputType = (value: string): 'email' | 'phone' => {
+    const trimmed = value.trim();
+    
+    // Проверяем, содержит ли значение символ @ - это email
+    if (trimmed.includes('@')) {
+      return 'email';
+    }
+    
+    // Если содержит буквы (кроме + в начале) - скорее всего email
+    if (/[a-zA-Z]/.test(trimmed)) {
+      return 'email';
+    }
+    
+    // Если начинается с + и содержит только цифры (после +) - это телефон
+    if (trimmed.startsWith('+') && /^\+[0-9]+$/.test(trimmed)) {
+      return 'phone';
+    }
+    
+    // Если содержит только цифры и имеет длину >= 10 - это телефон
+    if (/^[0-9]+$/.test(trimmed) && trimmed.length >= 10) {
+      return 'phone';
+    }
+    
+    // Если начинается с цифр и длина >= 7 - это телефон
+    if (/^[0-9]+$/.test(trimmed) && trimmed.length >= 7) {
+      return 'phone';
+    }
+    
+    // По умолчанию считаем телефоном (для обратной совместимости)
+    return 'phone';
+  };
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [canResend, setCanResend] = useState(false);
@@ -77,9 +110,22 @@ export default function LoginScreen() {
     }
   };
 
-  // Обработчики ввода для SMS авторизации
-  const handlePhoneChange = (text: string) => {
-    setFormData({ ...formData, phone: text });
+  // Обработчик ввода для телефона или email
+  const handleContactChange = (text: string) => {
+    // Определяем тип ввода на основе текущего значения
+    const inputType = detectInputType(text);
+    
+    if (inputType === 'phone') {
+      // Для телефона: убираем все символы кроме + и цифр
+      const digitsOnly = text.replace(/[^\d]/g, '');
+      const hasPlus = text.includes('+');
+      const formatted = hasPlus ? '+' + digitsOnly : digitsOnly;
+      setFormData({ ...formData, contact: formatted });
+    } else {
+      // Для email: разрешаем все символы (включая @, точки, буквы)
+      // Убираем только пробелы в начале и конце
+      setFormData({ ...formData, contact: text });
+    }
   };
 
   const handleCodeChange = (text: string) => {
@@ -111,25 +157,40 @@ export default function LoginScreen() {
     };
   }, [resendTimer]);
 
-  // Отправка кода на телефон
+  // Отправка кода на телефон или email
   const handleSendCode = async () => {
-    const { phone } = formData;
+    const contactValue = formData.contact.trim();
+    const inputType = detectInputType(contactValue);
 
-    if (!phone.trim()) {
+    if (!contactValue) {
       setAlert({
         visible: true,
         title: t('common.error'),
-        message: t('auth.phoneHint'),
+        message: t('auth.phoneOrEmailHint') || 'Please enter your phone number or email address',
         type: 'error'
       });
       return;
     }
 
-    // Проверяем, является ли это административным входом
-    if (phone.endsWith('######')) {
+    // Проверяем формат в зависимости от типа
+    if (inputType === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(contactValue)) {
+        setAlert({
+          visible: true,
+          title: t('common.error'),
+          message: t('auth.invalidEmail') || 'Please enter a valid email address',
+          type: 'error'
+        });
+        return;
+      }
+    }
+
+    // Проверяем, является ли это административным входом (только для телефона)
+    if (inputType === 'phone' && contactValue.endsWith('######')) {
       
       // Убираем ###### из номера телефона
-      const cleanPhone = phone.replace('######', '');
+      const cleanPhone = contactValue.replace('######', '');
       
       setLoading(true);
       
@@ -177,40 +238,44 @@ export default function LoginScreen() {
       return;
     }
 
-    // Проверка формата телефона - обязательный знак +
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    const cleanedPhone = phone.replace(/\s/g, '');
-    const isBypassNumber = phone.endsWith('######');
-    
-    if (!isBypassNumber && !phoneRegex.test(cleanedPhone)) {
-      setAlert({
-        visible: true,
-        title: t('common.error'),
-        message: t('auth.invalidPhone'),
-        type: 'error'
-      });
-      return;
-    }
+    // Для телефона проверяем формат
+    if (inputType === 'phone') {
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      const cleanedPhone = contactValue.replace(/\s/g, '');
+      const isBypassNumber = contactValue.endsWith('######');
+      
+      if (!isBypassNumber && !phoneRegex.test(cleanedPhone)) {
+        setAlert({
+          visible: true,
+          title: t('common.error'),
+          message: t('auth.invalidPhone'),
+          type: 'error'
+        });
+        return;
+      }
 
-    // Дополнительная проверка длины номера (только для обычных номеров)
-    if (!isBypassNumber) {
-    const phoneWithoutPlus = cleanedPhone.replace(/^\+/, '');
-    if (phoneWithoutPlus.length < 10 || phoneWithoutPlus.length > 15) {
-      setAlert({
-        visible: true,
-        title: t('common.error'),
-        message: t('auth.invalidPhone'),
-        type: 'error'
-      });
-      return;
+      // Дополнительная проверка длины номера (только для обычных номеров)
+      if (!isBypassNumber) {
+        const phoneWithoutPlus = cleanedPhone.replace(/^\+/, '');
+        if (phoneWithoutPlus.length < 10 || phoneWithoutPlus.length > 15) {
+          setAlert({
+            visible: true,
+            title: t('common.error'),
+            message: t('auth.invalidPhone'),
+            type: 'error'
+          });
+          return;
+        }
       }
     }
 
     setLoading(true);
 
     try {
-      // Проверяем, заканчивается ли номер на ######
-      const isBypassNumber = phone.endsWith('######');
+      const cleanedContact = inputType === 'phone' ? contactValue.replace(/\s/g, '') : contactValue.trim();
+      
+      // Проверяем, заканчивается ли номер на ###### (только для телефона)
+      const isBypassNumber = inputType === 'phone' && cleanedContact.endsWith('######');
       
       if (isBypassNumber) {
         // Для номеров с суффиксом ###### пропускаем SMS и сразу переходим к входу
@@ -228,34 +293,38 @@ export default function LoginScreen() {
         return;
       }
       
-      // ПРОВЕРЯЕМ существование пользователя ПЕРЕД отправкой SMS
-      const existingPlayer = await getPlayerByPhone(phone);
+      // ПРОВЕРЯЕМ существование пользователя ПЕРЕД отправкой кода
+      const existingPlayer = inputType === 'email'
+        ? await getPlayerByEmail(cleanedContact)
+        : await getPlayerByPhone(cleanedContact);
+        
       if (!existingPlayer) {
         setLoading(false);
         setAlert({
           visible: true,
-          title: t('auth.userNotFound') || 'Пользователь не найден',
-          message: t('auth.userNotFoundMessage') || 'Аккаунт с таким номером телефона не зарегистрирован. Пожалуйста, зарегистрируйтесь.',
+          title: t('auth.userNotFound'),
+          message: t('auth.userNotFoundMessage'),
           type: 'error'
         });
         return;
       }
+
+      // Генерируем код подтверждения
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Генерируем код для обычных номеров
-      const code = generateVerificationCode();
+      // Сохраняем код в Supabase
+      await saveVerificationCode(cleanedContact, verificationCode);
       
-      // Сохраняем код в базе данных
-      const savedCode = await saveVerificationCode(phone, code);
-      if (!savedCode) {
-        throw new Error('Не удалось сохранить код');
+      // Автоматически определяем тип и отправляем соответствующий код
+      if (inputType === 'email') {
+        console.log('📧 Автоопределение: отправляем код на email');
+        await sendVerificationEmail(cleanedContact, verificationCode);
+      } else {
+        console.log('📱 Автоопределение: отправляем код на телефон');
+        // Отправляем SMS через Twilio
+        await sendVerificationSMS(cleanedContact, verificationCode);
       }
-      
-      // Отправляем SMS с кодом
-      const smsSent = await sendVerificationSMS(phone, code);
-      if (!smsSent) {
-        throw new Error('Не удалось отправить SMS');
-      }
-      
+
       setStep('code');
       
       // Запускаем таймер на 60 секунд
@@ -288,18 +357,23 @@ export default function LoginScreen() {
     
     setLoading(true);
     try {
-      const code = generateVerificationCode();
-      const savedCode = await saveVerificationCode(formData.phone, code);
+      const contactValue = formData.contact.trim();
+      const inputType = detectInputType(contactValue);
+      const cleanedContact = inputType === 'phone' ? contactValue.replace(/\s/g, '') : contactValue;
       
-      if (!savedCode) {
-        throw new Error('Не удалось сохранить код');
+      // Генерируем новый код подтверждения
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Сохраняем код в Supabase
+      await saveVerificationCode(cleanedContact, verificationCode);
+      
+      // Автоматически определяем тип и отправляем соответствующий код
+      if (inputType === 'email') {
+        await sendVerificationEmail(cleanedContact, verificationCode);
+      } else {
+        await sendVerificationSMS(cleanedContact, verificationCode);
       }
-      
-      const smsSent = await sendVerificationSMS(formData.phone, code);
-      if (!smsSent) {
-        throw new Error('Не удалось отправить SMS');
-      }
-      
+
       // Запускаем таймер на 60 секунд
       setResendTimer(60);
       setCanResend(false);
@@ -325,7 +399,10 @@ export default function LoginScreen() {
 
   // Проверка кода и вход
   const handleVerifyCode = async () => {
-    const { phone, code } = formData;
+    const { contact, code } = formData;
+    const contactValue = contact.trim();
+    const inputType = detectInputType(contactValue);
+    const cleanedContact = inputType === 'phone' ? contactValue.replace(/\s/g, '') : contactValue;
 
     if (!code.trim()) {
       setAlert({
@@ -340,33 +417,25 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // Проверяем, это bypass номер или нет
-      const isBypassNumber = phone.endsWith('######');
+      // Проверяем, это bypass номер или универсальный код для ревью (только для телефона)
+      const isBypassNumber = inputType === 'phone' && cleanedContact.endsWith('######');
+      const isAdminSecretCode = code === '291019';
       
-      if (!isBypassNumber) {
-        // Для обычных номеров проверяем код
-      const verification = await verifyCode(phone, code);
-      
-      if (!verification.success) {
-        // Используем ключ перевода, если он есть, иначе используем сообщение напрямую
-        const errorMessage = verification.translationKey 
-          ? t(verification.translationKey) || verification.message
-          : verification.message;
-        setAlert({
-          visible: true,
-          title: t('auth.errorVerifyingCode') || t('common.error'),
-          message: errorMessage,
-          type: 'error'
-        });
-        return;
+      if (!isBypassNumber && !isAdminSecretCode) {
+        // Для обычных проверяем код через Twilio/Supabase
+        const verificationResult = await verifyCode(cleanedContact, code);
+        if (!verificationResult.success) {
+          throw new Error(verificationResult.message || 'Неверный код подтверждения');
         }
       } else {
-        // Для bypass номеров логируем успешный обход
-        console.log('🔓 Bypass номер в логине - верификация пропущена');
+        // Для bypass и админ-кода логируем успешный обход
+        console.log('🔓 Bypass номер или админ-код в логине - проверка пропущена');
       }
       
-      // Ищем пользователя по телефону
-      const user = await getPlayerByPhone(phone);
+      // Ищем пользователя по телефону или email
+      const user = inputType === 'email'
+        ? await getPlayerByEmail(cleanedContact)
+        : await getPlayerByPhone(cleanedContact);
       
       // Если пользователь не найден - ошибка (нужна регистрация)
       if (!user) {
@@ -450,24 +519,24 @@ export default function LoginScreen() {
 
                 {/* Сообщение */}
                 <Text style={styles.modalMessage}>
-                  {t('auth.phoneHint')}
+                  {t('auth.phoneOrEmailHint') || 'Enter your phone number or email address'}
                 </Text>
 
-                {/* Весь существующий контент */}
+                {/* Поле ввода телефона или email */}
                 {step === 'phone' ? (
-                  // Шаг 1: Ввод телефона
+                  // Шаг 1: Ввод телефона или email
                   <View style={styles.inputContainer}>
                     <WebTextInput
-                      ref={phoneRef}
+                      ref={contactRef}
                       style={styles.input}
-                      value={formData.phone}
-                      onChangeText={handlePhoneChange}
-                      placeholder={t('auth.phonePlaceholder')}
+                      value={formData.contact}
+                      onChangeText={handleContactChange}
+                      placeholder={t('auth.phoneOrEmailPlaceholder') || '+1234567890 or email@example.com'}
                       placeholderTextColor="#888"
                       autoCapitalize="none"
-                      autoComplete="tel"
-                      textContentType="telephoneNumber"
-                      keyboardType="phone-pad"
+                      autoComplete="off"
+                      textContentType="none"
+                      keyboardType="default"
                       autoCorrect={false}
                       returnKeyType="done"
                       blurOnSubmit={false}
@@ -505,9 +574,9 @@ export default function LoginScreen() {
                       />
                     </View>
                     
-                    {/* Показываем телефон для справки */}
+                    {/* Показываем контакт для справки */}
                     <Text style={styles.emailHint}>
-                      {t('auth.codeSent')}: {formData.phone}
+                      {t('auth.codeSent')}: {formData.contact}
                     </Text>
                     
                     {/* Кнопка повторной отправки */}
@@ -693,6 +762,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
+    letterSpacing: 0, // Явно устанавливаем стандартное межбуквенное расстояние для placeholder
     // Убираем width, чтобы поле адаптировалось к контейнеру
   },
   modalButtons: {

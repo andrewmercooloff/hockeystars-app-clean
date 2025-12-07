@@ -143,7 +143,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   return (
     <View style={[imageStyle, { backgroundColor: 'transparent' }]}>
       <Image
-        key={`${playerId}-${effectiveAvatarUrl}`} // Key изменяется при изменении URL для принудительного обновления
         source={{ 
           uri: effectiveAvatarUrl
         }}

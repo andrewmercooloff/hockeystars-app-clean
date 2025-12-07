@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Player, loadCurrentUser, loadPlayers, updatePlayer, deletePlayer, fixMissingCreatedAt } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
+import CachedAvatar from '../../components/CachedAvatar';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -336,7 +337,11 @@ export default function AdminUsersScreen() {
               {filteredPlayers.map((player, index) => (
                 <View key={player.id} style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}>
                   <View style={[styles.cell, styles.cellPhoto]}>
-                    <Image source={getImageSource(player.avatar)} style={styles.avatar} />
+                    <CachedAvatar 
+                      playerId={player.id}
+                      fallbackAvatarUrl={player.avatar}
+                      size={36}
+                    />
                   </View>
                   <View style={[styles.cell, styles.cellName]}>
                     <Text style={styles.cellText} numberOfLines={1}>{player.name || '—'}</Text>

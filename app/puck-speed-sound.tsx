@@ -1505,11 +1505,13 @@ export default function PuckSpeedSoundScreen() {
                   stopMeasuring();
                   return;
                 }
-                // Возвращаемся на предыдущую страницу
-                if (router.canGoBack()) {
+                // Если есть текущий пользователь, переходим в его профиль
+                if (currentUser?.id) {
+                  router.replace(`/player/${currentUser.id}`);
+                } else if (router.canGoBack()) {
                   router.back();
                 } else {
-                  // Если нет истории, возвращаемся на главную
+                  // Если нет истории и нет пользователя, возвращаемся на главную
                   router.replace('/');
                 }
               }} 
@@ -1677,7 +1679,11 @@ export default function PuckSpeedSoundScreen() {
                                     title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
                                     message: `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
                                     type: 'success',
-                                    onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    onConfirm: () => {
+                                      setAlert({ ...alert, visible: false });
+                                      // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
+                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                    },
                                   });
                                 } else {
                                   setAlert({
@@ -1685,7 +1691,11 @@ export default function PuckSpeedSoundScreen() {
                                     title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
                                     message: `${maxSpeedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
                                     type: 'success',
-                                    onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    onConfirm: () => {
+                                      setAlert({ ...alert, visible: false });
+                                      // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
+                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                    },
                                   });
                                 }
                               } else {
@@ -1753,7 +1763,11 @@ export default function PuckSpeedSoundScreen() {
                                       title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
                                       message: `${t('puckSpeed.successNewMax') || 'Новая максимальная скорость:'} ${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
                                       type: 'success',
-                                      onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    onConfirm: () => {
+                                      setAlert({ ...alert, visible: false });
+                                      // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
+                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                    },
                                     });
                                   } else {
                                     setAlert({
@@ -1761,7 +1775,11 @@ export default function PuckSpeedSoundScreen() {
                                       title: t('puckSpeed.successAddedToProfile') || 'Скорость добавлена в профиль',
                                       message: `${speedKmh} ${t('puckSpeed.kmh') || 'км/ч'}`,
                                       type: 'success',
-                                      onConfirm: () => setAlert({ ...alert, visible: false }),
+                                    onConfirm: () => {
+                                      setAlert({ ...alert, visible: false });
+                                      // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
+                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                    },
                                     });
                                   }
                                 } else {

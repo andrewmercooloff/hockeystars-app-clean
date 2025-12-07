@@ -102,8 +102,8 @@ export const verifyAdminSecretCode = (phone: string, inputCode: string): { succe
   try {
     console.log('🔐 Проверяем секретный код администратора для:', phone);
     
-    // Секретный код: "######" (6 решеток)
-    const secretCode = '######';
+    // Секретный код для тестирования (App Store ревьюеры)
+    const secretCode = '291019';
     
     // Проверяем, является ли введенный код секретным кодом
     if (inputCode === secretCode) {
@@ -184,7 +184,24 @@ export const sendVerificationSMS = async (phoneNumber: string, code: string): Pr
   try {
     console.log('📱 Отправляем код подтверждения на:', phoneNumber);
 
-    // Пробуем SMS через Twilio
+    // Определяем код страны
+    const cleaned = phoneNumber.replace(/[^\d+]/g, '');
+    const countryCode = cleaned.startsWith('+') ? cleaned.match(/^\+(\d{1,3})/)?.[1] : '';
+    
+    // Для США (+1) используем WhatsApp вместо SMS
+    // ВАЖНО: WhatsApp требует одобренный шаблон. Пока шаблон не одобрен, используем SMS.
+    if (countryCode === '1') {
+      console.log('🇺🇸 США - пробуем WhatsApp (требует одобренный шаблон)');
+      const { sendWhatsAppViaTwilio } = await import('./smsService');
+      const whatsappSuccess = await sendWhatsAppViaTwilio(phoneNumber, code);
+      if (whatsappSuccess) {
+        return true;
+      }
+      // Если WhatsApp не сработал (шаблон не одобрен), пробуем SMS как fallback
+      console.log('⚠️ WhatsApp не сработал (возможно, шаблон не одобрен), используем SMS');
+    }
+
+    // Для остальных стран используем SMS
     const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
     if (smsSuccess) {
       return true;
@@ -194,14 +211,80 @@ export const sendVerificationSMS = async (phoneNumber: string, code: string): Pr
     console.log('⚠️ SMS недоступен, показываем fallback');
     return await sendSMSFallback(phoneNumber, code);
   } catch (error) {
-    console.error('❌ Ошибка отправки SMS:', error);
+    console.error('❌ Ошибка отправки:', error);
     return await sendSMSFallback(phoneNumber, code);
   }
 };
 
-// Функция sendVerificationEmail удалена - используется только SMS авторизация
+// Отправка email через Supabase Edge Function (используем существующую функцию send-verification-email)
+export const sendVerificationEmail = async (email: string, code: string): Promise<boolean> => {
+  try {
+    console.log('📧 Отправляем код подтверждения на email:', email);
+    
+    // Используем Supabase SDK для вызова Edge Function (как в parentalConsentService)
+    const { supabase } = await import('./supabase');
+    
+    const { data, error } = await supabase.functions.invoke('send-email', {
+      body: {
+        email,
+        code,
+        subject: 'HockeyStars Verification Code'
+      }
+    });
+    
+    if (error) {
+      console.error('❌ Ошибка вызова Edge Function:', error);
+      // Пробуем прямой fetch как fallback
+      return await sendVerificationEmailFallback(email, code);
+    }
+    
+    if (data && data.success) {
+      console.log('✅ Email отправлен успешно через Edge Function');
+      return true;
+    } else {
+      console.error('❌ Ошибка отправки email:', data);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Ошибка отправки email:', error);
+    // Пробуем прямой fetch как fallback
+    return await sendVerificationEmailFallback(email, code);
+  }
+};
 
-// Email функции удалены - используется только SMS авторизация
+// Fallback: прямой вызов через fetch (если SDK не работает)
+const sendVerificationEmailFallback = async (email: string, code: string): Promise<boolean> => {
+  try {
+    const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+    
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        code,
+        subject: 'HockeyStars Verification Code'
+      }),
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      console.log('✅ Email отправлен успешно через fallback');
+      return true;
+    } else {
+      console.error('❌ Ошибка отправки email (fallback):', result);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Ошибка отправки email (fallback):', error);
+    return false;
+  }
+};
 
 // Fallback функция для показа SMS кода в консоли
 const sendSMSFallback = async (phoneNumber: string, code: string): Promise<boolean> => {

@@ -17,9 +17,15 @@ import { useLanguage } from '../contexts/LanguageContext';
 import LikeButton from './LikeButton';
 import { generateVideoContentId } from '../utils/likesService';
 
-// Компонент для изображения с fallback
-const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+// Кеш для успешных форматов превью (чтобы не перебирать форматы каждый раз)
+const thumbnailFormatCache = new Map<string, number>();
+
+// Компонент для изображения с fallback (оптимизированный)
+const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
+  // ОПТИМИЗАЦИЯ: Используем кеш для начального индекса формата
+  const getCachedInitialIndex = (videoId: string) => {
+    return thumbnailFormatCache.get(videoId) || 0;
+  };
   
   // Функция для проверки YouTube ссылки
   const isYouTubeUrl = (url: string): boolean => {
@@ -49,9 +55,17 @@ const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
   
   const youtubeVideoId = getYouTubeVideoId(videoUrl);
   
+  // ОПТИМИЗАЦИЯ: Начинаем с hqdefault (более надежный формат), сохраняем в кеш успешный формат
+  const [currentImageIndex, setCurrentImageIndex] = useState(() => {
+    if (youtubeVideoId) {
+      return getCachedInitialIndex(youtubeVideoId);
+    }
+    return 1; // Начинаем с hqdefault (индекс 1) - он быстрее загружается
+  });
+  
   // Для YouTube видео
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
-    // Разные форматы превью в порядке приоритета
+    // ОПТИМИЗАЦИЯ: Изменен порядок - сначала hqdefault (более надежный и быстрый)
     const thumbnailFormats = [
       `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`,
       `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
@@ -68,12 +82,20 @@ const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
       }
     };
     
+    const handleLoad = () => {
+      // ОПТИМИЗАЦИЯ: Кешируем успешный формат для этого видео
+      if (youtubeVideoId) {
+        thumbnailFormatCache.set(youtubeVideoId, currentImageIndex);
+      }
+    };
+    
     return (
       <Image
         source={{ uri: currentThumbnail }}
         style={styles.thumbnail}
         resizeMode="cover"
         onError={handleError}
+        onLoad={handleLoad}
       />
     );
   }
@@ -85,7 +107,7 @@ const VideoThumbnail = ({ videoUrl }: { videoUrl: string }) => {
       <Text style={styles.errorThumbnailText}>Только YouTube</Text>
     </View>
   );
-};
+});
 
 interface VideoCarouselProps {
   videos: Array<{ url: string; timeCode?: string }>;

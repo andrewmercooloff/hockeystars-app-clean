@@ -42,7 +42,7 @@ async function updatePhones() {
     // Обновляем телефон администратора
     const { data: updatedAdminUser, error: adminUpdateError } = await supabase
       .from('players')
-      .update({ phone: '+375296549728' })
+      .update({ phone: '+123456789' })
       .eq('id', adminUser.id)
       .select()
       .single();

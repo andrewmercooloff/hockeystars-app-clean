@@ -188,10 +188,6 @@ export default function MessagesScreen() {
     }
   }, [loadChatsData]);
 
-  useEffect(() => {
-    loadChats();
-  }, [loadChats]);
-
   // Realtime подписка на новые сообщения (только для обновления UI чатов)
   useEffect(() => {
     if (!currentUser) return;

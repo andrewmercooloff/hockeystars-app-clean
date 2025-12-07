@@ -8,6 +8,7 @@ import CachedAvatar from './CachedAvatar';
 interface PuckSpeedChangedNotificationProps {
   playerName: string;
   playerId: string;
+  playerAvatar?: string;
   newMaxSpeed: number;
   timestamp: string;
 }
@@ -15,6 +16,7 @@ interface PuckSpeedChangedNotificationProps {
 const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotification({
   playerName,
   playerId,
+  playerAvatar,
   newMaxSpeed,
   timestamp
 }: PuckSpeedChangedNotificationProps) {
@@ -48,7 +50,7 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
-          fallbackAvatarUrl={undefined}
+          fallbackAvatarUrl={playerAvatar}
           size={50}
           style={styles.playerAvatar}
         />

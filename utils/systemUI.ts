@@ -4,25 +4,20 @@ import * as NavigationBar from 'expo-navigation-bar';
 
 /**
  * Настройка системного UI для Android
+ * НЕ пытаемся скрыть панель - это не работает надёжно на всех устройствах
+ * Просто делаем её чёрной с белыми кнопками
  */
 export async function configureSystemUI() {
   if (Platform.OS === 'android') {
     try {
-      // Скрываем системную панель навигации
+      // Устанавливаем цвет фона системного UI
       await SystemUI.setBackgroundColorAsync('#000000');
       
-      // Пытаемся скрыть навигационную панель
-      try {
-        await NavigationBar.setVisibilityAsync('hidden');
-        await NavigationBar.setBehaviorAsync('overlay-swipe');
-        // console.log('✅ Навигационная панель скрыта');
-      } catch (navError) {
-        console.log('⚠️ NavigationBar API недоступен (нормально для Expo Go)');
-      }
-      
-      // console.log('✅ Системный UI настроен для Android');
+      // Делаем навигационную панель чёрной (под дизайн приложения)
+      await NavigationBar.setBackgroundColorAsync('#000000');
+      await NavigationBar.setButtonStyleAsync('light'); // Светлые кнопки на тёмном фоне
     } catch (error) {
-      console.error('❌ Ошибка настройки системного UI:', error);
+      // Игнорируем ошибки - на некоторых устройствах API может быть недоступен
     }
   }
 }

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PlayerEditForm from '../components/PlayerEditForm';
+import CachedAvatar from '../components/CachedAvatar';
 import { Player, loadCurrentUser, loadPlayers } from '../utils/playerStorage';
 import { createPlayerManually } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -69,34 +70,14 @@ const AdminHeader = () => {
         onPress={handleProfilePress}
       >
         <View style={styles.profileIcon}>
-          {currentUser?.avatar ? (
-            <Image
-              source={
-                (currentUser.avatar && typeof currentUser.avatar === 'string' && (
-                  currentUser.avatar.startsWith('data:image/') || 
-                  currentUser.avatar.startsWith('http') || 
-                  currentUser.avatar.startsWith('file://') || 
-                  currentUser.avatar.startsWith('content://')
-                ))
-                  ? { 
-                      uri: currentUser.avatar,
-                      cache: 'reload',
-                      headers: {
-                        'Cache-Control': 'no-cache'
-                      }
-                    }
-                  : require('../assets/images/me.jpg')
-              }
-              style={styles.profileImage}
-              resizeMode='cover'
-              onError={(error) => {
-                if (__DEV__) {
-                  console.error('❌ Ошибка загрузки аватара в AdminHeader:', error);
-                }
-              }}
-              onLoad={() => {
-                // Аватар успешно загружен
-              }}
+          {currentUser ? (
+            <CachedAvatar
+              playerId={currentUser.id}
+              fallbackAvatarUrl={currentUser.avatar}
+              size={45}
+              fallbackIcon="person"
+              fallbackSize={25}
+              fallbackColor="#fff"
             />
           ) : (
             <Ionicons name="person" size={25} color="#fff" />
@@ -206,74 +187,19 @@ export default function AdminScreen() {
   };
 
   const renderPlayerItem = ({ item }: { item: Player }) => {
-    // Функция для получения правильного источника изображения
-    const getImageSource = () => {
-      if (!item.avatar) {
-        return require('../assets/images/me.jpg');
-      }
-      
-      if (typeof item.avatar === 'string') {
-        // Проверяем, это ли base64 строка (загруженное фото)
-        if (item.avatar.startsWith('data:image/')) {
-          return { 
-            uri: item.avatar,
-            cache: 'reload',
-            headers: {
-              'Cache-Control': 'no-cache'
-            }
-          };
-        }
-        
-        // Проверяем, это ли URI (фото загруженное пользователем)
-        if (item.avatar.startsWith('http') || item.avatar.startsWith('file://') || item.avatar.startsWith('content://')) {
-          return { 
-            uri: item.avatar,
-            cache: 'reload',
-            headers: {
-              'Cache-Control': 'no-cache'
-            }
-          };
-        }
-        
-        // Проверяем идентификаторы тестовых игроков
-        if (item.avatar.includes('kostitsyn1') || item.avatar.includes('kostitsyn2')) {
-          return require('../assets/images/me.jpg');
-        } else if (item.avatar.includes('grabovsky')) {
-          return require('../assets/images/me.jpg');
-        } else if (item.avatar.includes('sharangovich')) {
-          return require('../assets/images/me.jpg');
-        } else if (item.avatar.includes('merkulov1') || item.avatar.includes('merkulov2')) {
-          return require('../assets/images/me.jpg');
-        } else if (item.avatar.includes('admin')) {
-          return require('../assets/images/me.jpg');
-        } else if (item.avatar === 'new_player') {
-          return require('../assets/images/me.jpg');
-        }
-      }
-      
-      return require('../assets/images/me.jpg');
-    };
-
     return (
       <TouchableOpacity 
         style={styles.playerItem} 
         onPress={() => handleEditPlayer(item)}
       >
-        <Image 
-          source={getImageSource()}
-          style={[
-            styles.playerAvatar,
-            { borderColor: getStatusColor(item.status) }
-          ]}
-          onError={(error) => {
-            if (__DEV__) {
-              console.error('❌ Ошибка загрузки аватара в списке игроков:', error);
-            }
-          }}
-          onLoad={() => {
-            // Аватар успешно загружен
-          }}
-        />
+        <View style={[styles.playerAvatar, { borderColor: getStatusColor(item.status), borderWidth: 2, overflow: 'hidden' }]}>
+          <CachedAvatar
+            playerId={item.id}
+            fallbackAvatarUrl={item.avatar}
+            size={56}
+            status={item.status}
+          />
+        </View>
         <View style={styles.playerInfo}>
           <Text style={styles.playerName}>{item.name || t('admin.noName')}</Text>
           <Text style={styles.playerDetails}>

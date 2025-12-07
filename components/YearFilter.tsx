@@ -26,19 +26,32 @@ export default function YearFilter({ players }: { players: any[] }) {
   const [dropdownOpacity] = useState(new Animated.Value(0));
   const [dropdownTranslateY] = useState(new Animated.Value(-20));
 
-  // Получаем доступные годы рождения (только те, для которых есть игроки)
+  // Получаем доступные годы рождения (только те, для которых есть игроки или тренеры)
   const availableYears = useMemo(() => {
     const yearCounts: Record<number, number> = {};
+    const coachYearsSet: Set<number> = new Set(); // Годы тренеров (из coach_years)
 
     // Ограничиваем по выбранной стране (если выбрана)
     const scopedPlayers = selectedCountry
       ? players.filter(p => p.country === selectedCountry)
       : players;
 
-    // Подсчитываем игроков по годам (исключая тренеров и звезд)
+    // Подсчитываем игроков по годам и собираем годы тренеров
     scopedPlayers.forEach(player => {
-      if ((player.status === 'coach') || (player.status === 'star')) return;
+      // Для тренеров - добавляем их coach_years в список доступных годов
+      if (player.status === 'coach' && player.coach_years && Array.isArray(player.coach_years)) {
+        player.coach_years.forEach((year: number) => {
+          if (year && !isNaN(year) && year > 1900 && year <= new Date().getFullYear() + 1) {
+            coachYearsSet.add(year);
+          }
+        });
+        return; // Не считаем тренеров по дате рождения
+      }
+      
+      // Исключаем звёзд из подсчёта по дате рождения
+      if (player.status === 'star') return;
       if (!player.birthDate) return;
+      
       try {
         let birthYear: number | null = null;
 
@@ -60,6 +73,13 @@ export default function YearFilter({ players }: { players: any[] }) {
         }
       } catch (_) {
         // ignore parse errors
+      }
+    });
+
+    // Добавляем годы тренеров в общий список (даже если нет игроков с такими годами)
+    coachYearsSet.forEach(year => {
+      if (!yearCounts[year]) {
+        yearCounts[year] = 0; // 0 игроков, но год доступен из-за тренера
       }
     });
 

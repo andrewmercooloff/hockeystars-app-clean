@@ -1,0 +1,22 @@
+# Включаем mod_rewrite
+RewriteEngine On
+
+# Правильный Content-Type для Universal Links (важно для iOS!)
+<FilesMatch "apple-app-site-association">
+    Header set Content-Type "application/json"
+</FilesMatch>
+
+<FilesMatch "assetlinks.json">
+    Header set Content-Type "application/json"
+</FilesMatch>
+
+# Редирект /en на index-en.html для английской версии
+RewriteRule ^en/?$ index-en.html [L]
+
+# Редирект /player/{id} на player.php с параметром id
+# Поддерживает оба варианта: /player/{id} и /player/{id}/
+RewriteRule ^player/([^/]+)/?$ player.php?id=$1 [L,QSA]
+
+# Если запрашивается /player без ID, редиректим на главную
+RewriteRule ^player/?$ / [R=301,L]
+

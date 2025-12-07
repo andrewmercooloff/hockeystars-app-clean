@@ -8,6 +8,7 @@ import CachedAvatar from './CachedAvatar';
 interface PhysicalDataChangedNotificationProps {
   playerName: string;
   playerId: string;
+  playerAvatar?: string;
   changes: { field: 'height' | 'weight', oldValue: number, newValue: number }[];
   timestamp: string;
 }
@@ -15,6 +16,7 @@ interface PhysicalDataChangedNotificationProps {
 const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedNotification({
   playerName,
   playerId,
+  playerAvatar,
   changes,
   timestamp
 }: PhysicalDataChangedNotificationProps) {
@@ -60,7 +62,7 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
-          fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+          fallbackAvatarUrl={playerAvatar}
           size={50}
           style={styles.playerAvatar}
         />

@@ -21,8 +21,9 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   const [isPlaying, setIsPlaying] = useState(true);
   const playerRef = useRef<any>(null);
   const hasAttemptedPlay = useRef(false); // Флаг для предотвращения множественных попыток запуска
+  const isReadyRef = useRef(false); // Отслеживаем готовность плеера
 
-  console.log('YouTubeVideo component:', { url, title, timeCode });
+  // Убраны console.log для оптимизации производительности
 
   // Функция для проверки YouTube ссылки
   const isYouTubeUrl = (url: string): boolean => {
@@ -84,18 +85,11 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   // Сбрасываем флаг при изменении видео
   useEffect(() => {
     hasAttemptedPlay.current = false;
+    isReadyRef.current = false;
   }, [youtubeVideoId]);
-
-  console.log('YouTubeVideo parsed:', { 
-    youtubeVideoId, 
-    sessionId,
-    startSeconds, 
-    isYouTube: isYouTubeUrl(url) 
-  });
 
   // Проверяем, что это YouTube ссылка
   if (!isYouTubeUrl(url) || !youtubeVideoId) {
-    console.error('Invalid YouTube URL:', { url, isYouTube: isYouTubeUrl(url), videoId: youtubeVideoId });
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color="#FF4444" />
@@ -105,8 +99,6 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
       </View>
     );
   }
-
-  console.log('Final video ID:', youtubeVideoId, 'Start at:', startSeconds);
 
   return (
     <View style={styles.container}>
@@ -137,17 +129,17 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
               mediaPlaybackRequiresUserAction: false,
             }}
             onReady={() => {
-              // Предотвращаем множественные вызовы
-              if (hasAttemptedPlay.current) {
+              // ОПТИМИЗАЦИЯ: Предотвращаем множественные вызовы
+              if (hasAttemptedPlay.current || isReadyRef.current) {
                 return;
               }
               
-              console.log('YouTube player ready, starting playback');
+              isReadyRef.current = true;
               setLoading(false);
               setIsPlaying(true);
               hasAttemptedPlay.current = true;
               
-              // Одна попытка запуска после небольшой задержки
+              // ОПТИМИЗАЦИЯ: Уменьшена задержка с 300ms до 100ms для более быстрого запуска
               setTimeout(() => {
                 try {
                   if (playerRef.current) {
@@ -155,27 +147,22 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
                     if (startSeconds > 0) {
                       playerRef.current.seekTo(startSeconds, true);
                     }
-                    // Затем запускаем воспроизведение (если autoplay не сработал)
-                    // Проверяем, что playVideo доступен
+                    // Запускаем воспроизведение (если autoplay не сработал)
                     if (typeof playerRef.current.playVideo === 'function') {
                       playerRef.current.playVideo();
                     }
                   }
                 } catch (error) {
-                  console.log('Error in onReady auto-play:', error);
+                  // Тихая обработка ошибки
                 }
-              }, 300);
+              }, 100);
             }}
-            onError={(error) => {
-              console.error('YouTube player error:', error);
+            onError={() => {
               setLoading(false);
             }}
             onChangeState={(state) => {
-              console.log('YouTube player state:', state);
-              // Если видео остановилось, пытаемся запустить снова
-              if (state === 'ended' || state === 'paused') {
-                // Не перезапускаем автоматически, только логируем
-              } else if (state === 'playing') {
+              // ОПТИМИЗАЦИЯ: Быстрое скрытие индикатора загрузки при начале воспроизведения
+              if (state === 'playing') {
                 setLoading(false);
               }
             }}

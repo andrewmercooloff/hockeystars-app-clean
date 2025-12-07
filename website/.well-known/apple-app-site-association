@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "FAL33J6D2V.by.hockeystars.app",
+        "paths": [
+          "/player/*"
+        ]
+      }
+    ]
+  }
+}
+

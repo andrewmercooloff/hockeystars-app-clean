@@ -361,6 +361,26 @@ export default function ChatScreen() {
 
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
+      // ВАЖНО: При возврате в чат загружаем свежие сообщения
+      // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
+      // Используем небольшую задержку, чтобы убедиться, что currentUser и otherPlayer загружены
+      const loadMessagesOnFocus = async () => {
+        if (currentUser && otherPlayer && otherPlayer.id === id) {
+          console.log('📱 Чат в фокусе - загружаем свежие сообщения из БД');
+          await loadMessages();
+        } else {
+          // Если данные еще не загружены, ждем немного и пробуем снова
+          setTimeout(() => {
+            if (currentUser && otherPlayer && otherPlayer.id === id) {
+              console.log('📱 Чат в фокусе (повторная попытка) - загружаем свежие сообщения из БД');
+              loadMessages();
+            }
+          }, 300);
+        }
+      };
+      
+      loadMessagesOnFocus();
+
       // При возврате в чат восстанавливаем позицию или прокручиваем вниз
       if (messages.length > 0 && !loading && scrollViewRef.current) {
         // Небольшая задержка для рендеринга контента
@@ -391,7 +411,7 @@ export default function ChatScreen() {
         backHandler.remove();
         // Позиция уже сохранена в onScroll
       };
-    }, [messages.length, loading])
+    }, [messages.length, loading, currentUser, otherPlayer, id, loadMessages])
   );
 
   // Синхронизируем счетчик с глобальным контекстом после загрузки
@@ -750,7 +770,11 @@ export default function ChatScreen() {
           return;
         }
         
+        // ВАЖНО: Всегда загружаем свежие сообщения из БД при открытии чата
+        // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
+        console.log('📨 Загружаем свежие сообщения из БД для чата:', currentUser.id, '<->', otherPlayer.id);
         const conversation = await getConversation(currentUser.id, otherPlayer.id);
+        console.log('📨 Загружено сообщений из БД:', conversation.length);
         const now = Date.now();
         
         // Проверяем, есть ли действительно новые сообщения по ID
@@ -791,8 +815,31 @@ export default function ChatScreen() {
           };
         });
         
-        // Обновляем состояние сообщений
-        setMessages(parsedConversation);
+        // ВАЖНО: Всегда обновляем состояние сообщений свежими данными из БД
+        // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
+        // При открытии чата всегда показываем актуальные данные из БД
+        setMessages(prevMessages => {
+          // Если количество сообщений изменилось, значит есть новые
+          if (parsedConversation.length !== prevMessages.length) {
+            console.log(`📨 Обновление сообщений: было ${prevMessages.length}, стало ${parsedConversation.length}`);
+            // Всегда используем свежие данные из БД
+            return parsedConversation;
+          }
+          
+          // Даже если количество одинаковое, проверяем по ID - есть ли новые сообщения
+          const prevMessageIds = new Set(prevMessages.map(m => m.id));
+          const hasNewMessages = parsedConversation.some(msg => !prevMessageIds.has(msg.id));
+          
+          if (hasNewMessages) {
+            console.log(`📨 Обнаружены новые сообщения при обновлении (количество не изменилось, но есть новые ID)`);
+            // Всегда используем свежие данные из БД
+            return parsedConversation;
+          }
+          
+          // Если нет новых сообщений, все равно обновляем (на случай изменений в существующих)
+          // Это гарантирует, что при открытии чата видны все актуальные сообщения
+          return parsedConversation;
+        });
         
         // Обновляем отслеживаемые ID сообщений
         lastMessageIdsRef.current = currentMessageIds;
@@ -1727,16 +1774,13 @@ export default function ChatScreen() {
                         activeOpacity={0.7}
                       >
                         <View style={styles.forwardModalItemAvatarContainer}>
-                          {friend.avatar ? (
-                            <Image
-                              source={{ uri: friend.avatar }}
-                              style={styles.forwardModalItemAvatar}
-                            />
-                          ) : (
-                            <View style={[styles.forwardModalItemAvatar, styles.forwardModalItemAvatarPlaceholder]}>
-                              <Ionicons name="person" size={18} color="#fff" />
-                            </View>
-                          )}
+                          <CachedAvatar
+                            playerId={friend.id}
+                            fallbackAvatarUrl={friend.avatar}
+                            size={36}
+                            style={styles.forwardModalItemAvatar}
+                            status={friend.status}
+                          />
                         </View>
                         <Text style={styles.forwardModalItemName} numberOfLines={1}>{friend.name}</Text>
                         <Text style={styles.forwardModalItemStatus}>

@@ -313,6 +313,35 @@ body {
     /* text-transform: uppercase; */
 }
 
+.hero-download-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: nowrap;
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+.hero-download-buttons .download-btn {
+    min-width: 160px;
+    max-width: 180px;
+    padding: 12px 20px;
+    flex: 0 1 auto;
+}
+
+.hero-download-buttons .download-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.hero-download-buttons .download-btn-name {
+    font-size: 18px;
+}
+
+.hero-download-buttons .download-btn-label {
+    font-size: 11px;
+}
+
 /* Features */
 /* For Whom Section */
 .for-whom {
@@ -711,6 +740,35 @@ body {
         font-size: 14px;
     }
 
+    .hero-download-buttons {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 30px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-download-buttons .download-btn {
+        min-width: 140px;
+        max-width: 160px;
+        width: auto;
+        padding: 10px 16px;
+        flex: 0 0 auto;
+    }
+    
+    .hero-download-buttons .download-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .hero-download-buttons .download-btn-name {
+        font-size: 16px;
+    }
+    
+    .hero-download-buttons .download-btn-label {
+        font-size: 10px;
+    }
+
     .section-title {
         font-size: 36px;
     }
@@ -795,6 +853,36 @@ body {
         font-size: 20px;
         /* text-shadow: 0px 0px 9px #00000082; */
         text-transform: uppercase;
+    }
+
+    .hero-download-buttons {
+        margin-bottom: 25px;
+        margin-top: 15px;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-download-buttons .download-btn {
+        min-width: 130px;
+        max-width: 150px;
+        width: auto;
+        padding: 10px 14px;
+        flex: 0 0 auto;
+    }
+
+    .hero-download-buttons .download-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .hero-download-buttons .download-btn-name {
+        font-size: 14px;
+    }
+    
+    .hero-download-buttons .download-btn-label {
+        font-size: 9px;
     }
     
     .header-content {

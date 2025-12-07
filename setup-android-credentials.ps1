@@ -19,3 +19,16 @@ Write-Host "После настройки credentials можно использ�
 Write-Host "  eas build --platform android --profile production --auto-submit --non-interactive" -ForegroundColor Green
 Write-Host ""
 
+
+
+
+
+
+
+
+
+
+
+
+
+

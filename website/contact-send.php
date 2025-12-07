@@ -55,11 +55,11 @@ $body = "Имя / Name: {$name}\n"
 $headers = [];
 $headers[] = 'MIME-Version: 1.0';
 $headers[] = 'Content-type: text/plain; charset=utf-8';
-$headers[] = 'From: HockeyStars <noreply@hockeystars.app>';
+$headers[] = 'From: HockeyStars <noreply@hockey-stars.com>';
 $headers[] = "Reply-To: {$name} <{$email}>";
 $headers[] = 'X-Mailer: PHP/' . phpversion();
 
-$sent = @mail('support@hockeystars.app', $subject, $body, implode("\r\n", $headers));
+$sent = @mail('support@hockey-stars.com', $subject, $body, implode("\r\n", $headers));
 
 if (!$sent) {
     http_response_code(500);

@@ -8,6 +8,7 @@ interface UserContextType {
   setCurrentUser: (user: Player | null) => void;
   refreshUser: (forceRefresh?: boolean) => Promise<void>;
   refreshUserAfterExercise: () => Promise<void>;
+  adjustFriendRequestsCount: (delta: number) => void;
   isUserLoading: boolean;
 }
 
@@ -166,12 +167,20 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [setCurrentUser]);
 
+  // Функция для изменения счётчика запросов дружбы
+  // ВАЖНО: Эта функция устарела! Счётчик теперь управляется через Realtime подписку в _layout.tsx
+  // Оставлена для совместимости интерфейса
+  const adjustFriendRequestsCount = useCallback((delta: number) => {
+    console.log('⚠️ adjustFriendRequestsCount устарела, используйте Realtime подписку');
+  }, []);
+
   return (
     <UserContext.Provider value={{ 
       currentUser, 
       setCurrentUser, 
       refreshUser, 
       refreshUserAfterExercise,
+      adjustFriendRequestsCount,
       isUserLoading 
     }}>
       {children}

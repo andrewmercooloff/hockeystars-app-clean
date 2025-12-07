@@ -8,6 +8,7 @@ import CachedAvatar from './CachedAvatar';
 interface ExerciseNotificationProps {
   playerName: string;
   playerId: string;
+  playerAvatar?: string;
   exerciseId: string;
   timestamp: string;
 }
@@ -15,9 +16,9 @@ interface ExerciseNotificationProps {
 export default function ExerciseNotification({
   playerName,
   playerId,
+  playerAvatar,
   exerciseId,
   timestamp,
-  playerAvatar,
 }: ExerciseNotificationProps) {
   const { t } = useLanguage();
 
@@ -60,7 +61,7 @@ export default function ExerciseNotification({
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
-          fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+          fallbackAvatarUrl={playerAvatar}
           size={50}
           style={styles.playerAvatar}
         />

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HockeyStars Account Deletion Instructions">
+    <title>Account Deletion - HockeyStars</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .rules-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 30px;
+            background: rgba(5, 0, 8, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .rules-content h1 {
+            font-size: 42px;
+            margin-bottom: 30px;
+            color: var(--color-text-white);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .rules-content h2 {
+            font-size: 28px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: var(--color-primary);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+        }
+
+        .rules-content h3 {
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--color-text-white);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 600;
+        }
+
+        .rules-content p {
+            margin-bottom: 15px;
+            color: var(--color-text-gray);
+            line-height: 1.8;
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 400;
+        }
+
+        .rules-content ul, .rules-content ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+            color: var(--color-text-gray);
+        }
+
+        .rules-content li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 400;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            color: #ffc107;
+            margin: 0;
+        }
+
+        .step-box {
+            background: rgba(0, 122, 255, 0.1);
+            border-left: 4px solid #007AFF;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .step-box strong {
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .rules-content {
+                padding: 30px 15px;
+            }
+
+            .rules-content h1 {
+                font-size: 28px;
+            }
+
+            .rules-content h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="pucks-container">
+        <div class="puck puck-1">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-2">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-3">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-4">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-5">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-6">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-7">
+            <div class="puck-avatar"></div>
+        </div>
+        <div class="puck puck-8">
+            <div class="puck-avatar"></div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html">
+                    <img src="logo.png" alt="HockeyStars" class="logo">
+                </a>
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="ru" aria-label="Русский">RU</button>
+                    <button class="lang-btn active" data-lang="en" aria-label="English">EN</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="rules-content">
+                <h1>Account Deletion</h1>
+
+                <p>
+                    <strong>Application:</strong> HockeyStars<br>
+                    <strong>Developer:</strong> Andrey Merkulov
+                </p>
+
+                <p>
+                    You can delete your account and all associated data directly in the HockeyStars application. 
+                    Account deletion is an irreversible action.
+                </p>
+
+                <div class="warning-box">
+                    <p>
+                        <strong>⚠️ Warning:</strong> After deleting your account, all your data will be permanently deleted, 
+                        including your profile, statistics, messages, photos, videos, and other data. 
+                        Account recovery will not be possible.
+                    </p>
+                </div>
+
+                <h2>Step-by-Step Account Deletion Instructions</h2>
+
+                <div class="step-box">
+                    <p><strong>Step 1:</strong> Open the HockeyStars application on your device.</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 2:</strong> Log in to your account using your phone number and the verification code from SMS.</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 3:</strong> Go to your profile by tapping the profile icon in the bottom navigation bar.</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 4:</strong> In the top right corner of the profile screen, tap the menu icon (three dots).</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 5:</strong> In the menu that appears, select "Delete account".</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 6:</strong> Confirm account deletion in the dialog box that appears. 
+                    You will be shown a warning that this action is irreversible.</p>
+                </div>
+
+                <div class="step-box">
+                    <p><strong>Step 7:</strong> After confirmation, your account and all associated data will be immediately deleted, 
+                    and you will be automatically logged out of the application.</p>
+                </div>
+
+                <h2>What Data Will Be Deleted</h2>
+
+                <p>When you delete your account, the following data will be permanently deleted:</p>
+
+                <ul>
+                    <li>User profile (name, date of birth, country, position, grip)</li>
+                    <li>Physical data (height, weight)</li>
+                    <li>Player statistics (goals, assists, games)</li>
+                    <li>All photos and videos uploaded by the user</li>
+                    <li>Team information and achievements</li>
+                    <li>All personal messages</li>
+                    <li>Friend requests</li>
+                    <li>Notifications</li>
+                    <li>Items in the Gift Museum</li>
+                    <li>Gift requests</li>
+                    <li>Blocked users</li>
+                    <li>Exercise statistics</li>
+                    <li>Puck speed records</li>
+                    <li>Phone number and associated authentication data</li>
+                </ul>
+
+                <h2>What Data May Be Retained</h2>
+
+                <p>
+                    Some data may be retained in accordance with legal requirements 
+                    or to ensure system security:
+                </p>
+
+                <ul>
+                    <li>Security and audit logs (retention period: up to 1 year)</li>
+                    <li>Anonymous statistical data for analytics (without personal information)</li>
+                </ul>
+
+                <h2>Data Deletion Timeframes</h2>
+
+                <p>
+                    After confirming account deletion:
+                </p>
+
+                <ul>
+                    <li><strong>Immediate deletion:</strong> User profile, personal data, messages, 
+                    photos, videos, and other user data are deleted immediately after confirmation.</li>
+                    <li><strong>Within 30 days:</strong> All backup copies of data will be deleted from backup systems.</li>
+                    <li><strong>Up to 1 year:</strong> Security logs may be retained for up to 1 year in accordance with security requirements.</li>
+                </ul>
+
+                <h2>Alternative Methods for Account Deletion</h2>
+
+                <p>
+                    If you experience problems deleting your account through the application, 
+                    you can contact support:
+                </p>
+
+                <ul>
+                    <li><strong>Email:</strong> support@hockey-stars.com</li>
+                    <li><strong>Through the app:</strong> Settings section → Support</li>
+                </ul>
+
+                <p>
+                    When contacting support, please provide the phone number associated with your account 
+                    for identification and confirmation of the deletion request.
+                </p>
+
+                <h2>Deletion of Minor Accounts</h2>
+
+                <p>
+                    For users under 13 years of age, account deletion may require confirmation 
+                    from a parent or legal guardian. In this case, please contact support 
+                    from the email address that was used to provide parental consent.
+                </p>
+
+                <a href="index.html" class="back-link">← Back to main page</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HockeyStars. All rights reserved.</p>
+                <a href="privacy-en.html" class="footer-link">Privacy Policy</a>
+                <a href="contact.html" class="footer-link">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ruBtn = document.querySelector('.lang-btn[data-lang="ru"]');
+            const enBtn = document.querySelector('.lang-btn[data-lang="en"]');
+            
+            if (ruBtn) {
+                ruBtn.addEventListener('click', () => {
+                    window.location.href = 'delete-account.html';
+                });
+            }
+            
+            if (enBtn) {
+                enBtn.addEventListener('click', () => {
+                    enBtn.classList.add('active');
+                    if (ruBtn) ruBtn.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

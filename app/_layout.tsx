@@ -2,11 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { Tabs, useRouter, useLocalSearchParams, usePathname } from 'expo-router';
 import * as React from 'react';
-import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar } from 'react-native';
+import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking } from 'react-native';
 import { Asset } from 'expo-asset';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
-import { UserProvider, useUser } from '../contexts/UserContext';
+import { UserProvider, useUser, updateGlobalUserCache } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
 import { LanguageProvider } from '../contexts/LanguageContext';
@@ -84,10 +84,218 @@ if (DISABLE_LOGS || (!isDev && !enableLogsInProd)) {
 
 
 
+  // Внутренний компонент для синхронизации с UserContext
+// Вынесен из RootLayout чтобы избежать пересоздания компонента при каждом рендере
+const UserSync = React.memo(({
+  setCurrentUser,
+  countersDataRef,
+  lastRealtimeFriendRequestsUpdate,
+  lastRealtimeFriendRequestsCount,
+  showSplash,
+  setShowSplash,
+  splashOpacity,
+  splashStartTime,
+  appReady,
+  userLoaded,
+  loadUser,
+}: {
+  setCurrentUser: React.Dispatch<React.SetStateAction<Player | null>>;
+  countersDataRef: React.MutableRefObject<{
+    friendRequestsCount: number;
+    giftRequestsCount: number;
+    unreadMessagesCount: number;
+    loaded: boolean;
+  }>;
+  lastRealtimeFriendRequestsUpdate: React.MutableRefObject<number>;
+  lastRealtimeFriendRequestsCount: React.MutableRefObject<number | null>;
+  showSplash: boolean;
+  setShowSplash: React.Dispatch<React.SetStateAction<boolean>>;
+  splashOpacity: any; // Animated.Value
+  splashStartTime: React.MutableRefObject<number>;
+  appReady: boolean;
+  userLoaded: boolean;
+  loadUser: () => Promise<void>;
+}) => {
+    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
+    const params = useLocalSearchParams();
+    const globalUserRef = React.useRef<Player | null>(globalUser);
+    
+    React.useEffect(() => {
+      globalUserRef.current = globalUser;
+    }, [globalUser]);
+    
+    // ИСПРАВЛЕНО: adjustFriendRequestsCount отключена
+    // Запросы в друзья теперь управляются через уведомления (friend_request)
+    // Счетчик обновляется автоматически через unreadNotificationsCount
+    // Это устраняет двойной подсчет и проблемы с badge
+    const adjustFriendRequestsCount = React.useCallback((delta: number) => {
+      // ОТКЛЮЧЕНО: friendRequestsCount больше не используется для badge
+      // Все запросы в друзья учитываются через уведомления friend_request
+      // Счетчик обновляется через unreadNotificationsCount автоматически
+      console.log('⚠️ adjustFriendRequestsCount отключена - запросы в друзья управляются через уведомления');
+    }, []);
+    
+    React.useEffect(() => {
+      if (!globalUser?.id) {
+        return;
+      }
+      
+      // ВАЖНО: Используем простые фильтры, так как сложные OR фильтры могут не работать в Supabase Realtime
+      const channel = supabase
+        .channel(`friend-requests-indicator-${globalUser.id}`)
+        // INSERT: новый входящий запрос
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'friend_requests',
+            filter: `to_id=eq.${globalUser.id}`,
+          },
+          (payload) => {
+            // ИСПРАВЛЕНО: Не обновляем friendRequestsCount при создании запроса
+            // Запросы в друзья теперь управляются через уведомления (friend_request)
+            // Счетчик обновляется автоматически через unreadNotificationsCount
+            // Это устраняет двойной подсчет
+            const newRequest = payload.new as { status?: string } | null;
+            if (newRequest?.status === 'pending') {
+              // ОТКЛЮЧЕНО: adjustFriendRequestsCount(1);
+              // Счетчик обновится через уведомление friend_request
+            }
+          }
+        )
+        // ИСПРАВЛЕНО: Отключены подписки на UPDATE и DELETE для friend_requests
+        // Теперь запросы в друзья управляются через уведомления (friend_request)
+        // Счетчик обновляется автоматически через unreadNotificationsCount
+        // Это устраняет двойной подсчет (friendRequestsCount + unreadNotificationsCount)
+        
+        // UPDATE где мы получатель: статус изменился (принят/отклонён)
+        // ОТКЛЮЧЕНО - теперь управляется через уведомления
+        // .on(...)
+        
+        // DELETE где мы получатель: запрос удалён (отменён отправителем)
+        // ОТКЛЮЧЕНО - теперь управляется через уведомления
+        // .on(...)
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, [globalUser?.id, adjustFriendRequestsCount]);
+    
+    // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
+  // ВАЖНО: Сохраняем локально загруженные счётчики, но позволяем уменьшать их через UserContext
+    React.useEffect(() => {
+    if (!globalUser) {
+      setCurrentUser(null);
+      return;
+    }
+    
+    // Если счётчики уже были загружены
+    if (countersDataRef.current.loaded) {
+      setCurrentUser(prev => {
+        // Если пользователь сменился - берем нового целиком и сбрасываем счётчики
+        if (!prev || prev.id !== globalUser.id) {
+          countersDataRef.current = {
+            friendRequestsCount: 0,
+            giftRequestsCount: 0,
+            unreadMessagesCount: 0,
+            loaded: false
+          };
+          return globalUser;
+        }
+        
+        // ИСПРАВЛЕНО: friendRequestsCount всегда равен 0, так как запросы в друзья учитываются через уведомления
+        // Синхронизация friendRequestsCount больше не нужна - он всегда 0
+        countersDataRef.current.friendRequestsCount = 0;
+        
+        // Если пользователь тот же, используем сохраненные в ref счётчики
+        // ИСПРАВЛЕНО: friendRequestsCount всегда равен 0, так как запросы в друзья учитываются через уведомления
+        return {
+          ...globalUser,
+          friendRequestsCount: 0, // Всегда 0 - запросы в друзья учитываются через unreadNotificationsCount
+          giftRequestsCount: countersDataRef.current.giftRequestsCount,
+          unreadMessagesCount: countersDataRef.current.unreadMessagesCount,
+        };
+      });
+    } else {
+      // Если счётчики еще не загружены, просто берем данные из контекста
+      setCurrentUser(globalUser);
+      }
+  }, [globalUser, setCurrentUser, countersDataRef]);
+    
+    // Обрабатываем параметр refresh из URL
+    React.useEffect(() => {
+      if (params.refresh === 'true') {
+        // Очищаем кеш пользователя для принудительной перезагрузки
+        const clearUserCache = async () => {
+          try {
+            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+          } catch (error) {
+            console.error('❌ Ошибка очистки кеша:', error);
+          }
+        };
+        
+        clearUserCache().then(() => {
+          // Очищаем кеш и принудительно загружаем пользователя
+          loadUser();
+          // Также обновляем UserContext
+          refreshUser(true);
+        });
+      }
+  }, [params.refresh, loadUser, refreshUser]);
+    
+    // Скрываем splash screen когда приложение готово и пользователь загружен
+    React.useEffect(() => {
+      // Принудительное скрытие splash screen через 2 секунды максимум
+      const maxSplashTime = 2000; // 2 секунды максимум
+      const forceHideSplashTimeout = setTimeout(() => {
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
+      }, maxSplashTime);
+
+      if (appReady && !isUserLoading && userLoaded) {
+        // Плавно скрываем наш кастомный splash screen когда все загружено
+        clearTimeout(forceHideSplashTimeout);
+        
+        // Вычисляем оставшееся время до максимума (2 секунды)
+        const elapsed = Date.now() - splashStartTime.current;
+        const remainingTime = Math.max(0, maxSplashTime - elapsed);
+        
+        // Если уже прошло достаточно времени, скрываем сразу
+        // Если нет, ждем минимальное время для плавности
+        const hideDelay = remainingTime > 100 ? 100 : 0;
+        
+        setTimeout(() => {
+          Animated.timing(splashOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            setShowSplash(false);
+          });
+        }, hideDelay);
+      }
+
+      return () => {
+        clearTimeout(forceHideSplashTimeout);
+      };
+  }, [appReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime]);
+    
+    return null;
+});
+
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const lastUserLoadTime = React.useRef<number>(0);
+  const lastRealtimeFriendRequestsUpdate = React.useRef<number>(0); // Время последнего обновления счётчика через Realtime
+  const lastRealtimeFriendRequestsCount = React.useRef<number | null>(null); // Последнее значение от Realtime
   const loginTracked = React.useRef<boolean>(false); // Флаг для отслеживания логина в сессии
   // Условный импорт AppState только для мобильных платформ
   const getAppState = () => {
@@ -199,236 +407,93 @@ export default function RootLayout() {
   const lastNotificationCountRef = React.useRef<number>(0);
   const lastMessagesCountRef = React.useRef<number>(0);
   const unreadNotificationsStateRef = React.useRef<number>(unreadNotificationsCount);
+  // Ref для хранения актуальных значений счётчиков
+  // Это позволяет избежать проблем с асинхронностью React state и потерей данных при слиянии
+  const countersDataRef = React.useRef<{
+    friendRequestsCount: number;
+    giftRequestsCount: number;
+    unreadMessagesCount: number;
+    loaded: boolean;
+  }>({
+    friendRequestsCount: 0,
+    giftRequestsCount: 0,
+    unreadMessagesCount: 0,
+    loaded: false
+  });
   React.useEffect(() => {
     unreadNotificationsStateRef.current = unreadNotificationsCount;
   }, [unreadNotificationsCount]);
 
-  // Внутренний компонент для синхронизации с UserContext
-  const UserSync = () => {
-    const { currentUser: globalUser, setCurrentUser: setGlobalUser, refreshUser, isUserLoading } = useUser();
-    const params = useLocalSearchParams();
-    const globalUserRef = React.useRef<Player | null>(globalUser);
-    
-    React.useEffect(() => {
-      globalUserRef.current = globalUser;
-    }, [globalUser]);
-    
-    const adjustFriendRequestsCount = React.useCallback((delta: number) => {
-      const current = globalUserRef.current;
-      if (!current) {
-        console.log('📊 adjustFriendRequestsCount: нет текущего пользователя');
-        return;
-      }
-      
-      const currentCount = current.friendRequestsCount ?? 0;
-      const nextCount = Math.max(0, currentCount + delta);
-      
-      console.log('📊 adjustFriendRequestsCount:', { delta, currentCount, nextCount });
-      
-      // Предотвращаем обновление, если значение не изменилось
-      if (nextCount === currentCount) {
-        console.log('📊 adjustFriendRequestsCount: значение не изменилось, пропускаем');
-        return;
-      }
-      
-      // Обновляем пользователя с новым счетчиком
-      const updatedUser = { ...current, friendRequestsCount: nextCount };
-      setGlobalUser(updatedUser);
-      
-      // Также обновляем локальный currentUser для немедленного отображения
-      setCurrentUser(updatedUser);
-      
-      console.log('📊 adjustFriendRequestsCount: счётчик обновлён до', nextCount);
-    }, [setGlobalUser]);
-    
-    React.useEffect(() => {
-      if (!globalUser?.id) {
-        return;
-      }
-      
-      // ВАЖНО: Используем простые фильтры, так как сложные OR фильтры могут не работать в Supabase Realtime
-      const channel = supabase
-        .channel(`friend-requests-indicator-${globalUser.id}`)
-        // INSERT: новый входящий запрос
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'friend_requests',
-            filter: `to_id=eq.${globalUser.id}`,
-          },
-          (payload) => {
-            const newRequest = payload.new as { status?: string } | null;
-            console.log('📨 Indicator INSERT (to_id):', { status: newRequest?.status });
-            if (newRequest?.status === 'pending') {
-              adjustFriendRequestsCount(1);
-            }
-          }
-        )
-        // UPDATE где мы получатель: статус изменился (принят/отклонён)
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'friend_requests',
-            filter: `to_id=eq.${globalUser.id}`,
-          },
-          (payload) => {
-            const oldStatus = (payload.old as { status?: string } | null)?.status;
-            const newStatus = (payload.new as { status?: string } | null)?.status;
-            console.log('📨 Indicator UPDATE (to_id):', { oldStatus, newStatus });
-            
-            if (oldStatus !== 'pending' && newStatus === 'pending') {
-              adjustFriendRequestsCount(1);
-            } else if (oldStatus === 'pending' && newStatus !== 'pending') {
-              adjustFriendRequestsCount(-1);
-            }
-          }
-        )
-        // DELETE где мы получатель: запрос удалён (отменён отправителем)
-        .on(
-          'postgres_changes',
-          {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'friend_requests',
-            filter: `to_id=eq.${globalUser.id}`,
-          },
-          (payload) => {
-            const oldStatus = (payload.old as { status?: string } | null)?.status;
-            console.log('📨 Indicator DELETE (to_id):', { oldStatus });
-            if (oldStatus === 'pending') {
-              adjustFriendRequestsCount(-1);
-            }
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }, [globalUser?.id, adjustFriendRequestsCount]);
-    
-    // Синхронизируем ГЛОБАЛЬНОЕ состояние с ЛОКАЛЬНЫМ (context -> layout)
-    React.useEffect(() => {
-      setCurrentUser(globalUser);
-      // Синхронизируем счетчик из globalUser
-      if (globalUser && globalUser.unreadMessagesCount !== undefined) {
-        // Обновляем только счетчик, не трогая currentUser целиком
-      }
-    }, [globalUser]);
-    
-    // Обрабатываем параметр refresh из URL
-    React.useEffect(() => {
-      if (params.refresh === 'true') {
-        // Очищаем кеш пользователя для принудительной перезагрузки
-        const clearUserCache = async () => {
-          try {
-            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-          } catch (error) {
-            console.error('❌ Ошибка очистки кеша:', error);
-          }
-        };
-        
-        clearUserCache().then(() => {
-          // Очищаем кеш и принудительно загружаем пользователя
-          loadUser();
-          // Также обновляем UserContext
-          refreshUser(true);
-        });
-      }
-    }, [params.refresh]);
-    
-    // Скрываем splash screen когда приложение готово и пользователь загружен
-    React.useEffect(() => {
-      // Принудительное скрытие splash screen через 2 секунды максимум
-      const maxSplashTime = 2000; // 2 секунды максимум
-      const forceHideSplashTimeout = setTimeout(() => {
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowSplash(false);
-        });
-      }, maxSplashTime);
+  // Обновление badge на иконке приложения iOS
+  React.useEffect(() => {
+    if (Platform.OS !== 'ios') {
+      return; // Badge работает только на iOS
+    }
 
-      if (appReady && !isUserLoading && userLoaded) {
-        // Плавно скрываем наш кастомный splash screen когда все загружено
-        clearTimeout(forceHideSplashTimeout);
-        
-        // Вычисляем оставшееся время до максимума (2 секунды)
-        const elapsed = Date.now() - splashStartTime.current;
-        const remainingTime = Math.max(0, maxSplashTime - elapsed);
-        
-        // Если уже прошло достаточно времени, скрываем сразу
-        // Если нет, ждем минимальное время для плавности
-        const hideDelay = remainingTime > 100 ? 100 : 0;
-        
-        setTimeout(() => {
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }).start(() => {
-            setShowSplash(false);
-          });
-        }, hideDelay);
-      }
+    const updateAppIconBadge = async () => {
+      try {
+        // ИСПРАВЛЕНО: friendRequestsCount НЕ добавляем, так как friend_request уже включены в unreadNotificationsCount
+        // giftRequestsCount добавляем отдельно, так как это запросы на подарки (не уведомления)
+        // Вычисляем общий счетчик для badge на иконке
+        const totalBadgeCount = 
+          unreadNotificationsCount +
+          (currentUser?.giftRequestsCount ?? 0) +
+          unreadMessagesCount;
 
-      return () => {
-        clearTimeout(forceHideSplashTimeout);
-      };
-    }, [appReady, isUserLoading, userLoaded, showSplash]);
-    
-    return null;
-  };
+        // Обновляем badge на иконке приложения
+        await Notifications.setBadgeCountAsync(totalBadgeCount);
+      } catch (error) {
+        // Игнорируем ошибки обновления badge (может быть недоступно в некоторых случаях)
+        console.warn('⚠️ Не удалось обновить badge на иконке:', error);
+      }
+    };
+
+    // Обновляем badge только если счетчики загружены
+    if (countersDataRef.current.loaded && currentUser) {
+      updateAppIconBadge();
+    } else if (!currentUser) {
+      // Если пользователь не залогинен, очищаем badge
+      Notifications.setBadgeCountAsync(0).catch(() => {});
+    }
+  }, [unreadNotificationsCount, unreadMessagesCount, currentUser?.giftRequestsCount, currentUser]);
+
+  // Внутренний компонент UserSync вынесен наружу
+  // const UserSync = () => { ... }
   
   // Функция для загрузки счетчика уведомлений из БД
   const loadNotificationCount = React.useCallback(async (userId: string, skipUpdateIfSame: boolean = false) => {
     try {
-      // Пересчитываем реальное количество непрочитанных уведомлений
-      // Исключаем типы уведомлений, которые не должны учитываться в счетчике
-      const { count } = await supabase
-        .from('notifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('is_read', false)
-        .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite,new_friendship)');
+      // ВАЖНО: Только читаем счетчик из БД, НЕ обновляем его
+      // Счетчик в БД обновляется только через SQL функции (increment_unread_notifications)
+      // или через Realtime подписку на изменения в таблице players
+      const { data: playerData, error: playerError } = await supabase
+        .from('players')
+        .select('unread_notifications_count')
+        .eq('id', userId)
+        .single();
       
-      const realCount = count || 0;
+      if (playerError) {
+        console.error('❌ Ошибка загрузки счетчика из players:', playerError);
+        return;
+      }
+      
+      const realCount = playerData?.unread_notifications_count || 0;
       
       // Если счетчик не изменился и мы не хотим обновлять UI, пропускаем
       if (skipUpdateIfSame && realCount === unreadNotificationsCount) {
         return;
       }
       
-      // Обновляем счетчик в БД только если он изменился
-      if (realCount !== lastNotificationCountRef.current) {
-        await supabase
-          .from('players')
-          .update({ 
-            unread_notifications_count: realCount,
-            notifications: JSON.stringify({
-              unread_count: realCount,
-              last_updated: new Date().toISOString()
-            })
-          })
-          .eq('id', userId);
-        
-        lastNotificationCountRef.current = realCount;
-      }
+      // Обновляем ref и синхронизируем RealtimeManager
+      lastNotificationCountRef.current = realCount;
+      realtimeManager.initializeCounts(realCount, lastMessagesCountRef.current);
       
-      // Обновляем UI только если значение действительно изменилось
+      // ВАЖНО: Обновляем UI всегда, чтобы синхронизировать с БД
+      // Это нужно для случаев, когда счетчик обновляется через SQL функцию
+      // и нужно синхронизировать оптимистичное обновление с реальным значением из БД
       if (realCount !== unreadNotificationsCount) {
+        console.log('🔔 loadNotificationCount: Обновление счетчика в UI:', unreadNotificationsCount, '→', realCount);
         setUnreadNotificationsCount(realCount);
-        lastNotificationCountRef.current = realCount;
-        console.log('✅ Счетчик уведомлений пересчитан и обновлен:', realCount);
-      } else {
-        // Обновляем ref даже если значение не изменилось, чтобы избежать повторных обновлений
-        lastNotificationCountRef.current = realCount;
       }
     } catch (error) {
       // Тихая обработка сетевых ошибок (отсутствие интернета)
@@ -438,7 +503,7 @@ export default function RootLayout() {
       
       if (!isNetworkError) {
         // Логируем только не-сетевые ошибки
-      console.error('❌ Ошибка загрузки счетчика:', error);
+        console.error('❌ Ошибка загрузки счетчика:', error);
       }
       // При сетевых ошибках просто пропускаем обновление счетчика
     }
@@ -467,13 +532,20 @@ export default function RootLayout() {
   // }, [currentUser?.notifications, currentUser?.friendRequestsCount, currentUser?.giftRequestsCount]);
 
   // Компонент для иконки уведомлений с оптимизацией
+  // Важно: показываем индикатор ТОЛЬКО после того, как счётчики были загружены
+  // Это предотвращает мигание индикатора при загрузке приложения
   const NotificationsTabIcon = React.useMemo(() => {
     return ({ size, focused }: { size: number; focused: boolean }) => {
+      // ИСПРАВЛЕНО: friendRequestsCount НЕ добавляем, так как friend_request уже включены в unreadNotificationsCount
+      // giftRequestsCount добавляем отдельно, так как это запросы на подарки (не уведомления)
       const total =
         unreadNotificationsCount +
-        (currentUser?.friendRequestsCount ?? 0) +
         (currentUser?.giftRequestsCount ?? 0);
       const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
+      
+      // Проверяем, были ли загружены счётчики
+      // Если нет - не показываем индикатор, чтобы избежать мигания
+      const shouldShowBadge = countersDataRef.current.loaded && currentUser && total > 0;
       
       return (
         <View style={{
@@ -484,7 +556,7 @@ export default function RootLayout() {
           height: size + 4,
         }}>
           <Ionicons name="notifications-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
-          {!currentUser || total <= 0 ? null : (
+          {!shouldShowBadge ? null : (
             <View style={{
               position: 'absolute',
               top: -8,
@@ -510,7 +582,7 @@ export default function RootLayout() {
         </View>
       );
     };
-  }, [unreadNotificationsCount, currentUser?.friendRequestsCount, currentUser?.giftRequestsCount]);
+  }, [unreadNotificationsCount, currentUser?.giftRequestsCount]);
 
   // Функция для обновления счетчика уведомлений (УПРОЩЕННАЯ)
   const updateNotificationCount = React.useCallback(async (user?: Player | null) => {
@@ -519,58 +591,37 @@ export default function RootLayout() {
       return;
     }
     
-    // Просто загружаем счетчик из БД
+    // ВАЖНО: Загружаем счетчик из БД для получения актуального значения
     // База данных управляется SQL функциями increment_unread_notifications и reset_unread_notifications
-    await loadNotificationCount(targetUser.id);
+    await loadNotificationCount(targetUser.id, false); // false = всегда обновляем UI
   }, [currentUser, loadNotificationCount]);
 
   // автоопределение включено: будет использоваться в главном экране
 
   const loadUser = async () => {
+    // Используем currentUser из замыкания
+      const user = currentUser;
+    
+    // Пропускаем если пользователь не авторизован
+    if (!user) {
+      setUserLoaded(true);
+      return;
+    }
+    
     // Минимальный throttling только для предотвращения дублирования
-    if (Date.now() - (lastUserLoadTime.current ?? 0) < 300) {
+    // НО: пропускаем throttling если это первая загрузка для данного пользователя
+    const isFirstLoadForUser = lastUserIdRef.current !== user.id;
+    if (!isFirstLoadForUser && Date.now() - (lastUserLoadTime.current ?? 0) < 300) {
       return;
     }
     lastUserLoadTime.current = Date.now(); // Обновляем время последнего вызова
+    lastUserIdRef.current = user.id; // Обновляем ID пользователя
+    
     try {
-      // НЕ загружаем пользователя здесь - используем UserContext
       setUserLoaded(true);
-      const user = currentUser;
-      if (user) {
-             // Трекаем вход в приложение ТОЛЬКО ОДИН РАЗ за всю сессию приложения
-             if (!loginTracked.current) {
-               try {
-                 await addActivityPoints(user.id, 'LOGIN');
-                 loginTracked.current = true; // Помечаем, что логин уже засчитан
-               } catch (error) {
-                 console.error('Failed to track login activity:', error);
-               }
-             }
-
-             // Инициализируем push-уведомления для пользователя
-             // forceReinit: true - принудительная переинициализация для очистки старых токенов
-             try {
-               const pushResult = await initializePushNotifications(user.id, true);
-             } catch (error) {
-               console.error('❌ Ошибка инициализации push-уведомлений:', error);
-               console.error('❌ Error details:', error.message);
-               console.error('❌ Error stack:', error.stack);
-             }
-
-          // Настраиваем системный UI для скрытия панели навигации
-          try {
-            await configureSystemUI();
-          } catch (error) {
-            console.error('❌ Ошибка настройки системного UI:', error);
-          }
-
-          // Инициализируем звуки сообщений
-          try {
-            await initializeSounds();
-          } catch (error) {
-            console.error('❌ Ошибка инициализации звуков:', error);
-             }
-        
+      // Загружаем счётчики для пользователя
+      {
+        // ПРИОРИТЕТ: Сначала загружаем счётчики для мгновенного отображения индикаторов
         // Загружаем уведомления, предназначенные для текущего пользователя (по user_id)
         try {
         const { data: notificationsData, error } = await supabase
@@ -620,6 +671,7 @@ export default function RootLayout() {
           }
           // Включаем только нужные типы уведомлений
           return n.type === 'friend_request' || 
+                 n.type === 'friend_accepted' ||  // Принятие запроса дружбы
                  n.type === 'autograph_request' || 
                  n.type === 'stick_request' || 
                  n.type === 'gift_request' ||
@@ -635,19 +687,17 @@ export default function RootLayout() {
                  n.type === 'photo_liked';
         });
         
-        // Считаем только непрочитанные уведомления (запросы в друзья показываются отдельно)
-        const unreadNotificationsCount = filteredNotifications.filter((n: any) => !n.is_read && n.type !== 'friend_request').length;
+        // ИСПРАВЛЕНО: Считаем ВСЕ непрочитанные уведомления, включая friend_request
+        // Это позволяет индикатору исчезнуть после просмотра уведомлений (когда они помечаются как прочитанные)
+        // Friend requests теперь считаются вместе с обычными уведомлениями
+        const unreadNotificationsCount = filteredNotifications.filter((n: any) => !n.is_read).length;
+        // friendRequestsCount больше не используется для badge - friend requests включены в unreadNotificationsCount
+        const friendRequestsCount = 0; // Обнуляем, чтобы избежать двойного подсчёта
+        console.log('🔔 Счётчик непрочитанных уведомлений (включая friend_request):', unreadNotificationsCount);
         
         // Загружаем непрочитанные сообщения (без логов)
         const { getUnreadMessageCount } = await import('../utils/playerStorage');
         const unreadMessagesCount = await getUnreadMessageCount(user.id);
-        
-        // Загружаем запросы в друзья для отдельного счетчика
-        // НО: если realtime подписка активна, не перезаписываем счетчик, чтобы избежать мигания
-        // Счетчик будет обновляться через realtime подписку в UserSync
-        const { getReceivedFriendRequests } = await import('../utils/playerStorage');
-        const receivedFriendRequests = await getReceivedFriendRequests(user.id);
-        const friendRequestsCount = receivedFriendRequests.length;
         
         // Загружаем запросы на подарки (только для звезд)
         let giftRequestsCount = 0;
@@ -667,30 +717,89 @@ export default function RootLayout() {
           }
         }
         
-        // ВАЖНО: Не перезаписываем friendRequestsCount из БД!
-        // Счётчик обновляется ТОЛЬКО через Realtime подписку (adjustFriendRequestsCount)
-        // Это предотвращает мигание индикатора при загрузке пользователя
-        // Используем значение из currentUser, если оно есть, иначе из БД
-        const preservedFriendRequestsCount = currentUser?.friendRequestsCount ?? friendRequestsCount;
-        
+        // УПРОЩЕНО: friendRequestsCount теперь основан на непрочитанных friend_request уведомлениях
+        // Realtime обновления больше не нужны - счётчик обновится автоматически при следующей загрузке
         const nextUser: Player = {
           ...user,
           unreadMessagesCount,
-          // Используем сохраненное значение - не перезаписываем из БД
-          // Realtime подписка отвечает за актуальность счётчика
-          friendRequestsCount: preservedFriendRequestsCount,
+          friendRequestsCount,
           giftRequestsCount,
         };
 
-        // НЕ перезаписываем локальный счетчик из базы!
-        // Локальный счетчик обновляется только через updateNotificationCount()
-        // при переходе в уведомления или явном обновлении
+        // СРАЗУ устанавливаем счётчики в UI (до setCurrentUser)
+        // Это обеспечит мгновенное отображение индикаторов
+        console.log('📊 Устанавливаем счётчики:', { 
+          unreadNotificationsCount, 
+          unreadMessagesCount,
+          friendRequestsCount
+        });
+        lastMessagesCountRef.current = unreadMessagesCount;
+        lastNotificationCountRef.current = unreadNotificationsCount;
+        
+        // ОПТИМИЗАЦИЯ: Объединяем обновления состояния в одну батч операцию
+        // Вместо трёх отдельных setState, используем один для обновления обоих счётчиков
+        // React автоматически батчит их в одну операцию
+        setUnreadMessagesCount(unreadMessagesCount);
+        setUnreadNotificationsCount(unreadNotificationsCount);
+        
+        // Инициализируем реалтайм после обновления состояния
+        // но БЕЗ блокировки - используем setTimeout(0) чтобы это запустилось после рендера
+        Promise.resolve().then(() => {
+          realtimeManager.initializeCounts(unreadNotificationsCount, unreadMessagesCount);
+        });
+        
+        // Помечаем, что счётчики успешно загружены и сохраняем их значения
+        // ИСПРАВЛЕНО: friendRequestsCount всегда равен 0, так как запросы в друзья учитываются через уведомления
+        countersDataRef.current = {
+          friendRequestsCount: 0, // Всегда 0 - запросы в друзья учитываются через unreadNotificationsCount
+          giftRequestsCount,
+          unreadMessagesCount,
+          loaded: true
+        };
 
-        // Обновляем пользователя с новыми счетчиками
+        // ОПТИМИЗАЦИЯ: Объединяем обновления в одну батч операцию
+        // setCurrentUser и updateGlobalUserCache вызываются синхронно для минимальной задержки
         setCurrentUser(nextUser);
         
-        // Сразу пересчитываем счетчик уведомлений (без задержки)
-        await loadNotificationCount(nextUser.id);
+        // ВАЖНО: Также обновляем глобальный кеш UserContext
+        // Это нужно чтобы adjustFriendRequestsCount в других компонентах работал с актуальными данными
+        updateGlobalUserCache(nextUser);
+        
+        // ФОНОВЫЕ ОПЕРАЦИИ: запускаем без await, чтобы не блокировать UI и анимацию шайб
+        // Используем setTimeout(0) для вынесения из текущего цикла рендеринга
+        setTimeout(async () => {
+          // Трекаем вход в приложение ТОЛЬКО ОДИН РАЗ за всю сессию приложения
+          if (!loginTracked.current) {
+            try {
+              await addActivityPoints(user.id, 'LOGIN');
+              loginTracked.current = true;
+            } catch (error) {
+              console.error('Failed to track login activity:', error);
+            }
+          }
+
+          // Инициализируем push-уведомления для пользователя
+          try {
+            await initializePushNotifications(user.id, true);
+          } catch (error) {
+            console.error('❌ Ошибка инициализации push-уведомлений:', error);
+          }
+
+          // Настраиваем системный UI
+          try {
+            await configureSystemUI();
+          } catch (error) {
+            console.error('❌ Ошибка настройки системного UI:', error);
+          }
+
+          // Инициализируем звуки сообщений
+          try {
+            await initializeSounds();
+          } catch (error) {
+            console.error('❌ Ошибка инициализации звуков:', error);
+          }
+        }, 0);
+        
         } catch (notificationError) {
           // Тихая обработка сетевых ошибок при загрузке уведомлений (отсутствие интернета)
           const isNetworkError = (notificationError as any)?.message?.includes('Network request failed') || 
@@ -703,10 +812,6 @@ export default function RootLayout() {
           }
           // При сетевых ошибках просто продолжаем работу без уведомлений
         }
-        
-      } else {
-        setUserLoaded(false);
-        setCurrentUser(null);
       }
     } catch (error) {
       console.error('Ошибка загрузки текущего пользователя:', error);
@@ -776,6 +881,15 @@ export default function RootLayout() {
     const initializeApp = async () => {
       try {
         console.log('🚀 Начало инициализации приложения');
+
+        // Очищаем badge на иконке приложения при запуске (на случай, если остался старый badge)
+        if (Platform.OS === 'ios') {
+          try {
+            await Notifications.setBadgeCountAsync(0);
+          } catch (error) {
+            // Игнорируем ошибки
+          }
+        }
 
         // Нативный splash screen уже скрыт в начале файла для iOS
         // Здесь дополнительно скрываем для других платформ
@@ -881,9 +995,18 @@ export default function RootLayout() {
   // Это нужно для корректного выхода из профиля
   const lastAppStateLoadRef = React.useRef<number>(0);
   const isUpdatingRef = React.useRef<boolean>(false);
+  // Флаг для предотвращения конфликта между push notification и focus handler
+  const isNavigatingFromPushRef = React.useRef<boolean>(false);
   
   React.useEffect(() => {
     const handleFocus = () => {
+      // ИСПРАВЛЕНО: Пропускаем обновление если идет навигация из push notification
+      // Это предотвращает конфликт между deep link навигацией и focus handler
+      if (isNavigatingFromPushRef.current) {
+        console.log('⏭️ Пропускаем handleFocus - идет навигация из push notification');
+        return;
+      }
+      
       // Добавляем throttling - максимум один раз в 30 секунд
       // Увеличиваем интервал, чтобы избежать мигания индикатора
       const now = Date.now();
@@ -950,6 +1073,9 @@ export default function RootLayout() {
         console.log('🔗 Deep link из уведомления:', deepLink);
         console.log('📍 Текущий путь:', pathname);
         
+        // ИСПРАВЛЕНО: Устанавливаем флаг чтобы предотвратить конфликт с focus handler
+        isNavigatingFromPushRef.current = true;
+        
         // Проверяем, не находимся ли мы уже в этом чате
         let shouldNavigate = true;
         
@@ -978,27 +1104,100 @@ export default function RootLayout() {
         
         // Выполняем навигацию только если нужно
         if (shouldNavigate) {
-          // Небольшая задержка для завершения навигации
+          // ИСПРАВЛЕНО: Увеличиваем задержку и используем replace для надежной навигации
+          // replace заменяет текущий экран вместо добавления в стек,
+          // что предотвращает проблему с возвратом на главный экран
           setTimeout(() => {
             try {
               // Добавляем параметр для автоматической прокрутки в чат
               if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
                 // Убеждаемся, что deepLink валидный
                 const cleanDeepLink = deepLink.split('?')[0]; // Убираем существующие параметры
-                router.push(`${cleanDeepLink}?scrollToBottom=true` as any);
+                router.replace(`${cleanDeepLink}?scrollToBottom=true` as any);
               } else {
-                router.push(deepLink as any);
+                router.replace(deepLink as any);
               }
             } catch (error) {
               console.error('❌ Ошибка навигации по deep link:', error);
             }
-          }, 500);
+            // Сбрасываем флаг после навигации
+            setTimeout(() => {
+              isNavigatingFromPushRef.current = false;
+            }, 2000);
+          }, 800); // Увеличена задержка для более надежной навигации
+        } else {
+          // Если навигация не требуется, сразу сбрасываем флаг
+          setTimeout(() => {
+            isNavigatingFromPushRef.current = false;
+          }, 1000);
         }
       }
     });
 
     return () => notificationListener.remove();
   }, [router, pathname]);
+
+  // Обработка входящих URL (Universal Links и Deep Links)
+  React.useEffect(() => {
+    if (Platform.OS === 'web') {
+      return; // На веб не обрабатываем
+    }
+
+    // Обработка URL при открытии приложения
+    const handleInitialURL = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+        if (initialUrl) {
+          handleIncomingURL(initialUrl);
+        }
+      } catch (error) {
+        console.error('Ошибка получения initial URL:', error);
+      }
+    };
+
+    // Обработка URL когда приложение уже открыто
+    const handleURL = (event: { url: string }) => {
+      handleIncomingURL(event.url);
+    };
+
+    // Функция для обработки входящего URL
+    const handleIncomingURL = (url: string) => {
+      if (!url) return;
+
+      try {
+        // Обрабатываем Universal Links: https://hockey-stars.com/player/{id}
+        if (url.includes('hockey-stars.com/player/')) {
+          const match = url.match(/\/player\/([^\/\?]+)/);
+          if (match && match[1]) {
+            const playerId = match[1];
+            router.push(`/player/${playerId}` as any);
+            return;
+          }
+        }
+
+        // Обрабатываем custom scheme: hockeystars://player/{id}
+        if (url.startsWith('hockeystars://player/')) {
+          const playerId = url.replace('hockeystars://player/', '').split('?')[0];
+          if (playerId) {
+            router.push(`/player/${playerId}` as any);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка обработки URL:', error);
+      }
+    };
+
+    // Проверяем initial URL при загрузке
+    handleInitialURL();
+
+    // Подписываемся на входящие URL
+    const subscription = Linking.addEventListener('url', handleURL);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [router]);
 
   // Дополнительная загрузка пользователя при возврате в приложение
   // ОТКЛЮЧЕНО - вызывает редиректы
@@ -1008,43 +1207,59 @@ export default function RootLayout() {
   //     }
   // }, [appState, appReady]);
 
-  // Загружаем счетчик уведомлений при смене пользователя
-  // НО не обновляем при возврате из фона, чтобы избежать мигания
+  // Ref для отслеживания ID пользователя (используется в других местах)
   const lastUserIdRef = React.useRef<string | null>(null);
+  
+  // Обновляем ref при смене пользователя (счётчик уведомлений загружается в loadUser)
   React.useEffect(() => {
     if (currentUser?.id) {
-      // Обновляем счетчик только если пользователь действительно изменился
-      // (не при возврате из фона, когда currentUser остается тем же)
       if (lastUserIdRef.current !== currentUser.id) {
         lastUserIdRef.current = currentUser.id;
-        loadNotificationCount(currentUser.id);
-      } else {
-        // Если пользователь не изменился, обновляем счетчик только если он изменился
-        // Используем skipUpdateIfSame, чтобы не мигать индикатором
-        loadNotificationCount(currentUser.id, true);
       }
-    }
-  }, [currentUser?.id, loadNotificationCount]);
+      } else {
+      // Сбрасываем ref при выходе
+      lastUserIdRef.current = null;
+      }
+  }, [currentUser?.id]);
 
-  // Инициализация счетчика при загрузке пользователя
+  // Ref для отслеживания предыдущего пользователя (для определения logout)
+  const previousUserIdRef = React.useRef<string | null | undefined>(currentUser?.id);
+  
+  // Инициализация счетчика при загрузке пользователя или сброс при выходе
   React.useEffect(() => {
+    const previousUserId = previousUserIdRef.current;
+    const currentUserId = currentUser?.id;
+    
+    // Обновляем ref
+    previousUserIdRef.current = currentUserId;
+    
     if (currentUser) {
+      // Синхронизация счётчика сообщений из currentUser
+      // Но только если значение отличается от текущего (избегаем лишних ререндеров)
       if (currentUser.unreadMessagesCount !== undefined) {
+        if (currentUser.unreadMessagesCount !== lastMessagesCountRef.current) {
         lastMessagesCountRef.current = currentUser.unreadMessagesCount;
       setUnreadMessagesCount(currentUser.unreadMessagesCount);
-      } else {
-        // Если счетчик не загружен, загружаем его
-        (async () => {
-          try {
-            const { getUnreadMessageCount } = await import('../utils/playerStorage');
-            const count = await getUnreadMessageCount(currentUser.id);
-            lastMessagesCountRef.current = count;
-            setUnreadMessagesCount(count);
-          } catch (error) {
-            console.error('❌ Ошибка загрузки счетчика сообщений:', error);
-          }
-        })();
+        }
       }
+      // НЕ загружаем счётчик повторно - он уже загружен в loadUser
+    } else if (previousUserId && !currentUserId) {
+      // Сбрасываем счётчики ТОЛЬКО при явном выходе из аккаунта
+      // (когда был пользователь, и теперь его нет)
+      lastMessagesCountRef.current = 0;
+      lastNotificationCountRef.current = 0;
+      lastRealtimeFriendRequestsCount.current = null;
+      lastRealtimeFriendRequestsUpdate.current = 0;
+      // Сбрасываем данные счётчиков
+      countersDataRef.current = {
+        friendRequestsCount: 0,
+        giftRequestsCount: 0,
+        unreadMessagesCount: 0,
+        loaded: false
+      };
+      setUnreadMessagesCount(0);
+      setUnreadNotificationsCount(0);
+      realtimeManager.initializeCounts(0, 0);
     }
   }, [currentUser?.id]);
 
@@ -1057,9 +1272,10 @@ export default function RootLayout() {
     // Устанавливаем callback для обновления счетчика уведомлений
     // Добавляем проверку, чтобы избежать мигания индикатора
     realtimeManager.setNotificationCountCallback((count: number) => {
-      // Обновляем UI только если значение действительно изменилось
+      // ВАЖНО: Обновляем UI только если значение действительно изменилось
       // Используем ref для проверки, чтобы не зависеть от состояния в зависимостях
       if (count !== lastNotificationCountRef.current) {
+        console.log('🔔 Realtime: Обновление счетчика уведомлений:', lastNotificationCountRef.current, '→', count);
         lastNotificationCountRef.current = count;
         setUnreadNotificationsCount(count);
       }
@@ -1081,6 +1297,13 @@ export default function RootLayout() {
       unreadMessagesCount
     );
 
+    // ВАЖНО: Устанавливаем callback для загрузки счетчика из БД
+    // Используется для синхронизации после оптимистичного обновления
+    realtimeManager.setLoadNotificationCountCallback(async (userId: string) => {
+      console.log('🔔 Realtime: Вызов loadNotificationCount для пользователя:', userId);
+      await loadNotificationCount(userId, false); // false = всегда обновляем UI для синхронизации
+    });
+
     // Используем централизованный менеджер подписок
     realtimeManager.setupSubscriptions(currentUser.id);
 
@@ -1089,6 +1312,44 @@ export default function RootLayout() {
       realtimeManager.disconnect();
     };
   }, [currentUser?.id, unreadMessagesCount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ВАЖНО: Обработчик push-уведомлений для обновления счетчика в реальном времени
+  // ИСПРАВЛЕНО: Убрано оптимистичное обновление, так как счетчик уже обновляется через:
+  // 1. SQL функцию increment_unread_notifications при создании уведомления
+  // 2. Realtime подписку на изменения в таблице players
+  // Оптимистичное обновление приводило к двойному увеличению счетчика
+  React.useEffect(() => {
+    if (!currentUser) return;
+
+    const subscription = Notifications.addNotificationReceivedListener(async (notification) => {
+      const notificationType = notification.request.content.data?.type;
+      console.log('🔔 Push уведомление получено:', notificationType);
+      
+      // ВАЖНО: Сообщения (type: 'message') НЕ должны обновлять счетчик уведомлений
+      // Счетчик уведомлений обновляется только для типов: stats_change, photo_added, gift_received, friend_request и т.д.
+      if (notificationType === 'message') {
+        console.log('🔔 Push: Это сообщение, не обновляем счетчик уведомлений');
+        return; // Не обновляем счетчик уведомлений для сообщений
+      }
+      
+      // ИСПРАВЛЕНО: НЕ делаем оптимистичное обновление, так как:
+      // - Счетчик уже увеличен через SQL функцию при создании уведомления
+      // - Realtime подписка уже обновит счетчик автоматически
+      // - Оптимистичное обновление приводило к двойному увеличению (1 → 2 → 3)
+      
+      // Просто загружаем актуальный счетчик из БД для синхронизации
+      // Используем небольшую задержку, чтобы дать время Realtime обновить счетчик
+      setTimeout(() => {
+        loadNotificationCount(currentUser.id, false).catch(error => {
+          console.error('❌ Ошибка загрузки счетчика после push уведомления:', error);
+        });
+      }, 1000);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [currentUser, loadNotificationCount]);
 
   // Обновляем счетчики при фокусе на экране сообщений
   React.useEffect(() => {
@@ -1140,7 +1401,19 @@ export default function RootLayout() {
         <YearFilterProvider>
           <ScreenProvider>
             <UserProvider>
-              <UserSync />
+              <UserSync 
+                setCurrentUser={setCurrentUser}
+                countersDataRef={countersDataRef}
+                lastRealtimeFriendRequestsUpdate={lastRealtimeFriendRequestsUpdate}
+                lastRealtimeFriendRequestsCount={lastRealtimeFriendRequestsCount}
+                showSplash={showSplash}
+                setShowSplash={setShowSplash}
+                splashOpacity={splashOpacity}
+                splashStartTime={splashStartTime}
+                appReady={appReady}
+                userLoaded={userLoaded}
+                loadUser={loadUser}
+              />
               <NotificationProvider updateNotificationCount={updateNotificationCount}>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <StatusBar 
@@ -1159,15 +1432,14 @@ export default function RootLayout() {
               tabBarStyle: { 
                 backgroundColor: '#050008', 
                 borderTopWidth: 0,
-                height: 80,
-                paddingBottom: Platform.OS === 'android' ? 0 : 10, // Убираем отступ снизу для Android
+                // На Android увеличиваем высоту и отступ, чтобы меню было выше системной навигации
+                height: Platform.OS === 'android' ? 95 : 80,
+                paddingBottom: Platform.OS === 'android' ? 25 : 10,
                 paddingTop: 10
               },
               tabBarActiveTintColor: '#fff',
               tabBarInactiveTintColor: '#888',
               tabBarShowLabel: false,
-              // Анимации отключены для лучшей производительности
-              animationEnabled: false,
             }}
           >
         <Tabs.Screen
@@ -1204,6 +1476,8 @@ export default function RootLayout() {
             lazy: false,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
+              // Показываем индикатор только после загрузки счётчиков
+              const showMessagesBadge = countersDataRef.current.loaded && unreadMessagesCount > 0;
               return (
                 <View style={{
                   position: 'relative',
@@ -1213,7 +1487,7 @@ export default function RootLayout() {
                   height: size + 4,
                 }}>
                   <Ionicons name="chatbubble-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
-                  {unreadMessagesCount > 0 && (
+                  {showMessagesBadge && (
                     <View style={{
                       position: 'absolute',
                       top: -8,

@@ -8,12 +8,14 @@ import CachedAvatar from './CachedAvatar';
 interface AvatarChangedNotificationProps {
   playerName: string;
   playerId: string;
+  playerAvatar?: string;
   timestamp: string;
 }
 
 const AvatarChangedNotification = React.memo(function AvatarChangedNotification({
   playerName,
   playerId,
+  playerAvatar,
   timestamp
 }: AvatarChangedNotificationProps) {
   const { t } = useLanguage();
@@ -46,7 +48,7 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
-          fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+          fallbackAvatarUrl={playerAvatar}
           size={50}
           style={styles.playerAvatar}
         />

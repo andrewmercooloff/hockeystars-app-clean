@@ -61,6 +61,45 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   currentUserId?: string;
 }) => {
   const { t } = useLanguage();
+  const swipeableRef = React.useRef<any>(null);
+  const isSwipingRef = React.useRef(false);
+  const lastSwipeTimeRef = React.useRef(0);
+  
+  // Обработчик нажатия, который предотвращает навигацию если был свайп
+  const handlePress = React.useCallback(() => {
+    // Предотвращаем нажатие, если недавно был свайп (в течение 300ms)
+    const timeSinceSwipe = Date.now() - lastSwipeTimeRef.current;
+    if (isSwipingRef.current || timeSinceSwipe < 300) {
+      console.log('⏭️ Предотвращен переход при свайпе уведомления');
+      return;
+    }
+    onPress(notification);
+  }, [notification, onPress]);
+  
+  // Обработчик свайпа для удаления
+  const handleSwipeOpen = React.useCallback(() => {
+    lastSwipeTimeRef.current = Date.now();
+    isSwipingRef.current = true;
+    onDelete(notification.id);
+    // Сбрасываем флаг после небольшой задержки
+    setTimeout(() => {
+      isSwipingRef.current = false;
+    }, 500);
+  }, [notification.id, onDelete]);
+  
+  // Обработчик начала свайпа
+  const handleSwipeStart = React.useCallback(() => {
+    isSwipingRef.current = true;
+    lastSwipeTimeRef.current = Date.now();
+  }, []);
+  
+  // Обработчик отмены свайпа
+  const handleSwipeClose = React.useCallback(() => {
+    // Сбрасываем флаг с небольшой задержкой
+    setTimeout(() => {
+      isSwipingRef.current = false;
+    }, 100);
+  }, []);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -127,9 +166,12 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
 
   return (
     <Swipeable
+      ref={swipeableRef}
       key={notification.id}
       renderRightActions={renderRightActions}
-      onSwipeableOpen={() => onDelete(notification.id)}
+      onSwipeableWillOpen={handleSwipeStart}
+      onSwipeableOpen={handleSwipeOpen}
+      onSwipeableClose={handleSwipeClose}
       overshootRight={false}
       friction={2}
       rightThreshold={40}
@@ -139,7 +181,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
       <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
         {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -153,7 +195,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'photo_added' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -190,20 +232,21 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           />
         ) : notification.type === 'exercise_completed' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <ExerciseNotification
               playerName={notification.data.playerName || 'Игрок'}
               playerId={notification.data.playerId}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               exerciseId={notification.data.exerciseId || 'unknown'}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
         ) : notification.type === 'gift_received' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -219,7 +262,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'friend_gift_received' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -237,12 +280,12 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 }
               }}
               isRead={notification.isRead}
-              onPress={() => onPress(notification)}
+              onPress={handlePress}
             />
           </TouchableOpacity>
         ) : notification.type === 'friend_request' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -255,7 +298,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'friend_accepted' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -280,7 +323,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           />
         ) : notification.type === 'video_added' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -294,19 +337,20 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'avatar_changed' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <AvatarChangedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
         ) : notification.type === 'achievement_added' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -320,33 +364,35 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'physical_data_changed' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <PhysicalDataChangedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               changes={notification.data.changes || []}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
         ) : notification.type === 'puck_speed_changed' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <PuckSpeedChangedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               newMaxSpeed={notification.data.newMaxSpeed || 0}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -360,7 +406,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'user_report' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -376,7 +422,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           </TouchableOpacity>
         ) : notification.type === 'gift_request' ? (
           <TouchableOpacity
-            onPress={() => onPress(notification)}
+            onPress={handlePress}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -391,7 +437,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         ) : (
         <TouchableOpacity
           key={notification.id}
-          onPress={() => onPress(notification)}
+          onPress={handlePress}
           activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -531,7 +577,7 @@ export default function NotificationsScreen() {
   const { t } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser, isUserLoading } = useUser();
+  const { currentUser, isUserLoading, setCurrentUser } = useUser();
   
   // Убираем все анимации - простое мгновенное переключение
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -831,18 +877,20 @@ export default function NotificationsScreen() {
 
   // Автоматически отмечаем все уведомления как прочитанные через 3 секунды ТОЛЬКО когда экран в фокусе
   useEffect(() => {
-    if (isScreenFocused && currentUser && notifications.length > 0) {
+    if (isScreenFocused && currentUser && (notifications.length > 0 || friendRequests.length > 0)) {
       const timer = setTimeout(async () => {
         await markAllNotificationsAsRead();
         // Обновляем счетчик уведомлений через контекст
+        // Это обновит unreadNotificationsCount (который теперь включает friend_request)
         await updateNotificationCount(currentUser);
+        console.log('📊 Уведомления помечены как прочитанные после 3 секунд просмотра');
       }, 3000);
       
       return () => {
         clearTimeout(timer);
       };
     }
-  }, [isScreenFocused, currentUser, notifications.length, updateNotificationCount]);
+  }, [isScreenFocused, currentUser, notifications.length, friendRequests.length, updateNotificationCount]);
 
   // Realtime подписки настроены в главном layout через realtimeManager
   // Загрузка данных происходит через useFocusEffect
@@ -889,10 +937,13 @@ export default function NotificationsScreen() {
       }
       
       // Фильтруем уведомления, исключая actionable уведомления
+      // ИСПРАВЛЕНО: friend_request теперь ВКЛЮЧАЕТСЯ в список для пометки как прочитанные
+      // Это позволяет индикатору badge исчезнуть после просмотра уведомлений
+      // friend_request уведомления всё равно показываются в UI как pending запросы
       const nonActionableNotifications = notificationIds.filter(notification => {
         const type = notification.type;
+        // friend_request уведомления теперь помечаются как прочитанные, но всё равно показываются
         return !(type === 'gift_accepted' || 
-                type === 'friend_request' ||
                 type === 'achievement' ||
                 type === 'team_invite');
       });
@@ -916,14 +967,15 @@ export default function NotificationsScreen() {
       }
       
       // Обновляем локальное состояние только для non-actionable уведомлений
+      // ИСПРАВЛЕНО: friend_request теперь помечается как прочитанное (для badge)
       setNotifications(prev => prev.map(n => {
         const type = n.type;
         const isActionable = type === 'gift_accepted' || 
-                           type === 'friend_request' ||
                            type === 'achievement' ||
                            type === 'team_invite';
         
-        // Отмечаем как прочитанные только non-actionable уведомления
+        // Отмечаем как прочитанные все кроме gift_accepted, achievement, team_invite
+        // friend_request теперь тоже помечается как прочитанное
         return isActionable ? n : { ...n, isRead: true };
       }));
       
@@ -931,13 +983,14 @@ export default function NotificationsScreen() {
       if (currentUser) {
         try {
           // Подсчитываем количество непрочитанных уведомлений (exclude actionable)
-          // Исключаем типы уведомлений, которые не должны учитываться в счетчике
+          // ИСПРАВЛЕНО: friend_request теперь ВКЛЮЧАЕТСЯ в счетчик, чтобы badge исчезал после просмотра
+          // Исключаем только типы уведомлений, которые не должны учитываться в счетчике
           const { count } = await supabase
             .from('notifications')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', currentUser.id)
             .eq('is_read', false)
-            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite,new_friendship)');
+            .not('type', 'in', '(gift_accepted,achievement,team_invite,new_friendship)');
           
           const newCount = count || 0;
           
@@ -1145,12 +1198,12 @@ export default function NotificationsScreen() {
       
       // Обработка нажатия на уведомление с правильными deep links
       if (notification.type === 'friend_request') {
-        // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
-        // Используем тот же fallback механизм, что и в отображении уведомления
+        // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
+        // (кнопки дружбы видны сверху профиля)
         const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
         if (senderId) {
-          console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
-          router.push(`/player/${senderId}?scrollToFriends=true`);
+          console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
+          router.push(`/player/${senderId}`);
         } else {
           console.warn('⚠️ Не удалось определить ID отправителя запроса дружбы');
         }
@@ -1315,11 +1368,12 @@ export default function NotificationsScreen() {
             router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'friend_request') {
-          // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
+          // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
+          // (кнопки дружбы видны сверху профиля)
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
-            console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
-            router.push(`/player/${senderId}?scrollToFriends=true`);
+            console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
+            router.push(`/player/${senderId}`);
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
@@ -1387,11 +1441,12 @@ export default function NotificationsScreen() {
             router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'friend_request') {
-          // Для запросов в друзья показываем профиль игрока с автоматической прокруткой к секции дружбы
+          // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
+          // (кнопки дружбы видны сверху профиля)
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
-            console.log('🔗 Навигация к профилю отправителя запроса дружбы с прокруткой к секции дружбы:', senderId);
-            router.push(`/player/${senderId}?scrollToFriends=true`);
+            console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
+            router.push(`/player/${senderId}`);
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
@@ -1455,14 +1510,13 @@ export default function NotificationsScreen() {
         Alert.alert(t('common.success'), t('notifications.friendRequestDeclined'));
       }
       
+      // Счётчик обновится автоматически через Realtime подписку в _layout.tsx
+      
       // Удаляем из списка запросов
       setFriendRequests(prev => prev.filter(req => req.id !== request.id));
       
       // Удаляем из списка уведомлений, если оно там есть
       setNotifications(prev => prev.filter(n => n.id !== request.id));
-      
-      // Обновляем данные только один раз для синхронизации счетчика
-      await loadNotificationsData();
       
     } catch (error) {
       console.error('Ошибка обработки запроса в друзья:', error);

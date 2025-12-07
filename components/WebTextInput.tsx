@@ -32,6 +32,7 @@ const WebTextInput = forwardRef<TextInput, WebTextInputProps>((props, ref) => {
           borderWidth: 1,
           borderColor: 'rgba(255, 68, 68, 0.3)',
           borderStyle: 'solid',
+          letterSpacing: 0, // Явно устанавливаем стандартное межбуквенное расстояние
         }}
         value={props.value}
         onChange={(e) => props.onChangeText?.(e.target.value)}

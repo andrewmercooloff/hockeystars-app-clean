@@ -178,6 +178,23 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
       } else {
+        // Если перевод не найден, пробуем английский как fallback
+        if (language !== 'en') {
+          let enValue: any = translations['en'];
+          for (const enK of keys) {
+            if (enValue && typeof enValue === 'object' && enK in enValue) {
+              enValue = enValue[enK];
+            } else {
+              // Если и в английском нет, возвращаем ключ
+              console.warn(`Translation missing for key: ${key} in language: ${language} and en`);
+              return key;
+            }
+          }
+          if (typeof enValue === 'string') {
+            value = enValue;
+            break;
+          }
+        }
         // Если перевод не найден, возвращаем ключ
         console.warn(`Translation missing for key: ${key} in language: ${language}`);
         return key;

@@ -17,6 +17,10 @@ async function sendWithResend(email: string, code: string, subject: string) {
     throw new Error('RESEND_API_KEY не настроен')
   }
 
+  // URL логотипа - используем абсолютный URL
+  const baseUrl = Deno.env.get('SITE_URL') || 'https://hockey-stars.com'
+  const logoUrl = `${baseUrl}/logo.png`
+
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -24,36 +28,50 @@ async function sendWithResend(email: string, code: string, subject: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'HockeyStars <noreply@hockeystars.com>',
+      from: 'HockeyStars <noreply@hockey-stars.com>',
       to: [email],
       subject: subject,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-          <div style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #050008; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #050008;">
+          <div style="background-color: #050008; padding: 30px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #FF4444; margin: 0;">🏒 HockeyStars</h1>
+              <img src="${logoUrl}" alt="HockeyStars" style="max-width: 200px; height: auto; margin: 0 auto; display: block; width: 200px;" />
             </div>
             
-            <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Код подтверждения</h2>
+            <h2 style="color: #fff; margin-bottom: 20px; font-family: Arial, sans-serif; text-align: center;">Verification Code</h2>
             
-            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
-              <p style="color: #666; margin: 0 0 10px 0; font-size: 16px;">Ваш код подтверждения:</p>
-              <h1 style="color: #FF4444; font-size: 36px; font-weight: bold; margin: 0; letter-spacing: 5px;">${code}</h1>
-            </div>
-            
-            <p style="color: #666; text-align: center; margin: 20px 0;">
-              Код действителен <strong>10 минут</strong>.<br>
-              Если вы не запрашивали этот код, просто проигнорируйте это письмо.
+            <p style="color: #ccc; line-height: 1.6; margin-bottom: 20px; font-family: Arial, sans-serif; text-align: center;">
+              Your verification code for HockeyStars registration:
             </p>
             
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-              <p style="color: #999; font-size: 12px; margin: 0;">
-                С уважением,<br>
-                Команда HockeyStars
+            <div style="background-color: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0; border: 1px solid rgba(255, 255, 255, 0.2);">
+              <p style="color: #ccc; margin: 0 0 15px 0; font-size: 16px; font-family: Arial, sans-serif;">Your verification code:</p>
+              <h1 style="color: #fa2f40; font-size: 36px; font-weight: bold; margin: 0; letter-spacing: 5px; font-family: Arial, sans-serif;">${code}</h1>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px; font-family: Arial, sans-serif; text-align: center;">
+              <strong style="color: #ccc;">Important:</strong> This code is valid for <strong style="color: #fff;">10 minutes</strong>.<br>
+              If you did not request this code, please ignore this email.
+            </p>
+            
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+              <p style="color: #999; font-size: 12px; margin: 0; font-family: Arial, sans-serif;">
+                Best regards,<br>
+                HockeyStars Team<br>
+                <a href="mailto:support@hockey-stars.com" style="color: #fa2f40; text-decoration: underline;">support@hockey-stars.com</a>
               </p>
             </div>
           </div>
         </div>
+      </body>
+      </html>
       `
     }),
   })
@@ -91,7 +109,7 @@ serve(async (req) => {
 
   try {
     // Парсим запрос
-    const { email, code, subject = 'Код подтверждения HockeyStars' }: EmailRequest = await req.json()
+    const { email, code, subject = 'HockeyStars Verification Code' }: EmailRequest = await req.json()
 
     // Валидация
     if (!email || !code) {

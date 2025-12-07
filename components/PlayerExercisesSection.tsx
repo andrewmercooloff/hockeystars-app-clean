@@ -27,69 +27,100 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
     }
   }, [player.id, player.exerciseStats, language, isLanguageLoaded]); // Добавляем isLanguageLoaded в зависимости
 
+  // Ref для отслеживания предыдущего языка (для очистки кеша только при реальной смене языка)
+  const previousLanguageRef = React.useRef<string | null>(null);
+
   const loadExerciseStats = async () => {
     try {
       setLoading(true);
-      setExerciseTitles({}); // Очищаем названия при перезагрузке
-
-      // Очищаем кеш названий упражнений при смене языка
+      
       const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-      const keys = await AsyncStorage.getAllKeys();
-      const exerciseTitleKeys = keys.filter(key => key.startsWith('exercise_title_'));
-      if (exerciseTitleKeys.length > 0) {
-        await AsyncStorage.multiRemove(exerciseTitleKeys);
-        console.log('🗑️ Очищен кеш названий упражнений при смене языка');
+      
+      // ОПТИМИЗАЦИЯ: Очищаем кеш только при реальной смене языка, не каждый раз
+      if (previousLanguageRef.current !== null && previousLanguageRef.current !== language) {
+        try {
+          const keys = await AsyncStorage.getAllKeys();
+          const exerciseTitleKeys = keys.filter((key: string) => key.startsWith('exercise_title_'));
+          if (exerciseTitleKeys.length > 0) {
+            await AsyncStorage.multiRemove(exerciseTitleKeys);
+          }
+          setExerciseTitles({});
+        } catch (error) {
+          // Игнорируем ошибки очистки кеша
+        }
       }
+      previousLanguageRef.current = language;
+      
       const stats = await getPlayerExerciseStats(player.id);
       setExerciseStats(stats);
       
       // Загружаем названия упражнений только если их нет в кеше
       if (stats && stats.completions.length > 0) {
         const titles: { [key: string]: string } = {};
-        const uncachedTitles: string[] = [];
+        const uncachedExerciseIds: string[] = [];
         
-        // Проверяем, какие названия уже есть в кеше для текущего языка
-        for (const completion of stats.completions) {
-          const cacheKey = `exercise_title_${completion.exerciseId}_${language}`;
-          try {
-            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-            const cachedTitle = await AsyncStorage.getItem(cacheKey);
-            if (cachedTitle) {
-              titles[completion.exerciseId] = cachedTitle;
+        // ОПТИМИЗАЦИЯ: Батч-загрузка всех ключей из AsyncStorage вместо последовательных вызовов
+        const cacheKeys = stats.completions.map(c => `exercise_title_${c.exerciseId}_${language}`);
+        try {
+          const cachedResults = await AsyncStorage.multiGet(cacheKeys);
+          cachedResults.forEach((result: [string, string | null], index: number) => {
+            const exerciseId = stats.completions[index].exerciseId;
+            if (result[1]) {
+              titles[exerciseId] = result[1];
             } else {
-              uncachedTitles.push(completion.exerciseId);
+              uncachedExerciseIds.push(exerciseId);
             }
-          } catch (error) {
-            uncachedTitles.push(completion.exerciseId);
-          }
+          });
+        } catch (error) {
+          // При ошибке считаем все как некешированные
+          uncachedExerciseIds.push(...stats.completions.map(c => c.exerciseId));
         }
         
         // Устанавливаем кешированные названия сразу
         if (Object.keys(titles).length > 0) {
           setExerciseTitles(titles);
+          setLoading(false); // Показываем данные сразу, пока загружаем остальные
         }
         
-        // Загружаем только некешированные названия
-        if (uncachedTitles.length > 0) {
+        // ОПТИМИЗАЦИЯ: Загружаем некешированные названия параллельно вместо последовательно
+        if (uncachedExerciseIds.length > 0) {
           setTitlesLoading(true);
-          for (const exerciseId of uncachedTitles) {
+          
+          const fetchPromises = uncachedExerciseIds.map(async (exerciseId) => {
             try {
               const exercise = await ExerciseService.getExerciseById(exerciseId);
               if (exercise) {
                 const localizedExercise = localizeExercise(exercise, language as Language);
-                titles[exerciseId] = localizedExercise.title;
-                
-                // Кешируем название для текущего языка
-                const cacheKey = `exercise_title_${exerciseId}_${language}`;
-                const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-                await AsyncStorage.setItem(cacheKey, localizedExercise.title);
+                return { exerciseId, title: localizedExercise.title };
               }
             } catch (error) {
-              console.error(`Ошибка загрузки упражнения ${exerciseId}:`, error);
-              titles[exerciseId] = t('exercises.exerciseNumber', { id: exerciseId });
+              // Тихая обработка ошибки
+            }
+            return { exerciseId, title: t('exercises.exerciseNumber', { id: exerciseId }) };
+          });
+          
+          const results = await Promise.all(fetchPromises);
+          
+          // Обновляем названия и кеш
+          const newTitles: { [key: string]: string } = { ...titles };
+          const cacheEntries: [string, string][] = [];
+          
+          results.forEach(result => {
+            newTitles[result.exerciseId] = result.title;
+            cacheEntries.push([`exercise_title_${result.exerciseId}_${language}`, result.title]);
+          });
+          
+          setExerciseTitles(newTitles);
+          
+          // ОПТИМИЗАЦИЯ: Батч-сохранение в AsyncStorage
+          if (cacheEntries.length > 0) {
+            try {
+              await AsyncStorage.multiSet(cacheEntries);
+            } catch (error) {
+              // Игнорируем ошибки кеширования
             }
           }
-          setExerciseTitles(prev => ({ ...prev, ...titles }));
+          
           setTitlesLoading(false);
         }
       }

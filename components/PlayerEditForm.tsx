@@ -67,7 +67,8 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
             const reader = new FileReader();
             reader.onload = async (e) => {
               const base64String = e.target?.result as string;
-              const uploadedUrl = await uploadImageToStorage(base64String);
+              // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
+              const uploadedUrl = await uploadImageToStorage(base64String, `avatar_${player.id}.jpg`);
               if (uploadedUrl) {
                 setEditData({ ...editData, avatar: uploadedUrl });
               }
@@ -91,7 +92,8 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
         });
 
         if (!result.canceled && result.assets[0]) {
-          const uploadedUrl = await uploadImageToStorage(result.assets[0].uri);
+          // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
+          const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, `avatar_${player.id}.jpg`);
           if (uploadedUrl) {
             setEditData({ ...editData, avatar: uploadedUrl });
           }
@@ -123,7 +125,8 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
       });
 
       if (!result.canceled && result.assets[0]) {
-        const uploadedUrl = await uploadImageToStorage(result.assets[0].uri);
+        // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
+        const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, `avatar_${player.id}.jpg`);
         if (uploadedUrl) {
           setEditData({ ...editData, avatar: uploadedUrl });
         }

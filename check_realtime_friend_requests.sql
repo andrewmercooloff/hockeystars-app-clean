@@ -20,3 +20,16 @@ WHERE relname = 'friend_requests';
 -- n = nothing
 -- i = using index
 
+
+
+
+
+
+
+
+
+
+
+
+
+

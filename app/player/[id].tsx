@@ -56,11 +56,12 @@ import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import CachedBackground from '../../components/CachedBackground';
+import { useAvatarCache } from '../../utils/AvatarCache';
 import VideoCarousel from '../../components/VideoCarousel';
 import YouTubeVideo from '../../components/YouTubeVideo';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -160,6 +161,10 @@ export default function PlayerProfile() {
   const giftButtonRef = useRef<View>(null);
   const puckSpeedRef = useRef<View>(null);
   const profileMenuButtonRef = useRef<View>(null);
+  const friendRequestRef = useRef<View>(null); // Ref для секции с кнопками дружбы
+  
+  // Ref для предотвращения повторных запросов статуса дружбы при переходе из уведомления
+  const friendshipFetchedForRef = useRef<string | null>(null);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -195,6 +200,10 @@ export default function PlayerProfile() {
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Используем кэшированный аватар для QR-кода и других мест
+  // Это гарантирует, что аватар обновится везде при изменении
+  const cachedPlayerAvatar = useAvatarCache(player?.id || '', player?.avatar);
   const [playerNotFoundTimeout, setPlayerNotFoundTimeout] = useState<NodeJS.Timeout | null>(null);
   const [activityRefreshKey, setActivityRefreshKey] = useState<number>(0);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
@@ -252,6 +261,9 @@ export default function PlayerProfile() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | 'info'>('info');
   const [isEditing, setIsEditing] = useState(false);
+  const isEditingRef = useRef(false);
+  // Флаг для отслеживания времени последнего сохранения (чтобы игнорировать Realtime обновления сразу после сохранения)
+  const lastSaveTimeRef = useRef<number>(0); // Ref для актуального значения isEditing в callback'ах
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editData, setEditData] = useState<Partial<Player>>({});
   const [showCountryPicker, setShowCountryPicker] = useState(false);
@@ -260,8 +272,11 @@ export default function PlayerProfile() {
   const [countrySearchText, setCountrySearchText] = useState('');
   const [showBirthDatePicker, setShowBirthDatePicker] = useState(false);
   const [selectedBirthDate, setSelectedBirthDate] = useState(new Date());
+  const [showHockeyStartDatePicker, setShowHockeyStartDatePicker] = useState(false);
+  const [selectedHockeyStartDate, setSelectedHockeyStartDate] = useState(new Date());
   const [videoFields, setVideoFields] = useState<Array<{url: string, hours: string, minutes: string, seconds: string}>>([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const initialPhotosCountRef = useRef<number>(0); // Сохраняем исходное количество фото при загрузке профиля
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const isOwner = currentUser && player && currentUser.id === player.id;
@@ -420,8 +435,10 @@ export default function PlayerProfile() {
     // Инициализируем галерею фото
     if (player.photos && Array.isArray(player.photos)) {
       setGalleryPhotos(player.photos);
+      initialPhotosCountRef.current = player.photos.length; // Сохраняем исходное количество фото
     } else {
       setGalleryPhotos([]);
+      initialPhotosCountRef.current = 0;
     }
     
     // Инициализируем достижения
@@ -437,7 +454,13 @@ export default function PlayerProfile() {
     // Текущие команды управляются через CurrentTeamsSection и уже установлены в playerTeams
     
     setIsEditing(true);
+    isEditingRef.current = true; // Синхронизируем ref
   };
+
+  // Синхронизируем isEditingRef с isEditing для callback'ов
+  useEffect(() => {
+    isEditingRef.current = isEditing;
+  }, [isEditing]);
 
   // Используем ref для отслеживания предыдущего id, чтобы избежать показа неправильного профиля
   const previousIdRef = useRef<string | string[] | undefined>(undefined);
@@ -473,10 +496,11 @@ export default function PlayerProfile() {
   };
 
   // Функция для миграции аватара в фоне
+  // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
   const migrateAvatarInBackground = async (playerData: Player, userData: Player | null) => {
     try {
       const { uploadImageToStorage } = await import('../../utils/uploadImage');
-      const migratedAvatarUrl = await uploadImageToStorage(playerData.avatar!);
+      const migratedAvatarUrl = await uploadImageToStorage(playerData.avatar!, `avatar_${playerData.id}.jpg`);
       if (migratedAvatarUrl) {
         const updatedPlayer = { ...playerData, avatar: migratedAvatarUrl };
         await updatePlayer(playerData.id, updatedPlayer, true); // Пропускаем очистку кеша для миграции
@@ -488,136 +512,108 @@ export default function PlayerProfile() {
   };
 
   // Функция для загрузки дополнительных данных в фоне
+  // ОПТИМИЗИРОВАНО: Все запросы выполняются ПАРАЛЛЕЛЬНО для максимальной скорости
   const loadAdditionalData = async (playerData: Player, userData: Player | null) => {
     try {
       // Проверяем, что ID не изменился перед загрузкой дополнительных данных
       const currentId = Array.isArray(id) ? id[0] : id;
       if (currentId !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
-        console.log('⚠️ ID изменился перед загрузкой дополнительных данных, отменяем:', playerData.id, '->', currentId, 'currentLoadingId:', currentLoadingIdRef.current);
+        console.log('⚠️ ID изменился перед загрузкой дополнительных данных, отменяем:', playerData.id, '->', currentId);
         return;
       }
-      
-      // Загружаем команды игрока
-      try {
-        const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
-        const teams = await getPlayerTeamsAsPastTeams(playerData.id);
-        
-        // Проверяем ID после загрузки команд
-        const checkIdAfterTeams = Array.isArray(id) ? id[0] : id;
-        if (checkIdAfterTeams !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
-          console.log('⚠️ ID изменился после загрузки команд, отменяем');
-          return;
-        }
-            
-            // Разделяем команды на текущие и прошлые
-            const currentTeams = teams.filter(team => team.isCurrent);
-            const pastTeams = teams.filter(team => !team.isCurrent);
-            
-            setPlayerTeams(currentTeams);
-            setPastTeams(pastTeams);
-          } catch (error) {
-            console.error('Ошибка загрузки команд игрока:', error);
-            setPlayerTeams([]);
-            setPastTeams([]);
-      }
 
-      // Инициализируем фотографии (без миграции для скорости)
+      // Инициализируем фотографии СРАЗУ (синхронно, без ожидания)
       if (playerData?.photos && playerData.photos.length > 0) {
         setGalleryPhotos(playerData.photos);
-        
-        // Сохраняем фото в кеш состояния для мгновенного переключения
-        setPhotosCache(prev => ({
-          ...prev,
-          [playerData.id]: playerData.photos
-        }));
-        
-        // Миграция локальных фото происходит в фоне
-        migratePhotosInBackground(playerData, userData);
+        initialPhotosCountRef.current = playerData.photos.length; // Обновляем исходное количество фото
+        setPhotosCache(prev => ({ ...prev, [playerData.id]: playerData.photos }));
       } else {
         setGalleryPhotos([]);
-        
-        // Сохраняем пустой массив фото в кеш состояния
-        setPhotosCache(prev => ({
-          ...prev,
-          [playerData.id]: []
-        }));
+        initialPhotosCountRef.current = 0;
+        setPhotosCache(prev => ({ ...prev, [playerData.id]: [] }));
       }
 
-      // Проверяем ID перед загрузкой статуса дружбы и друзей
-      const checkIdBeforeFriends = Array.isArray(id) ? id[0] : id;
-      if (checkIdBeforeFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
-        console.log('⚠️ ID изменился перед загрузкой друзей, отменяем');
+      // Запускаем ВСЕ запросы ПАРАЛЛЕЛЬНО для максимальной скорости
+      const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
+      
+      // Подготавливаем массив промисов
+      const promises: Promise<any>[] = [
+        // 1. Команды игрока
+        getPlayerTeamsAsPastTeams(playerData.id).catch(err => {
+          console.error('Ошибка загрузки команд:', err);
+          return [];
+        }),
+        // 2. Друзья игрока
+        getFriends(playerData.id).catch(err => {
+          console.error('Ошибка загрузки друзей:', err);
+          return [];
+        })
+      ];
+      
+      // 3. Статус дружбы (только если смотрим чужой профиль)
+      if (userData && playerData.id !== userData.id) {
+        promises.push(
+          getFriendshipStatus(userData.id, playerData.id).catch(err => {
+            console.error('Ошибка загрузки статуса дружбы:', err);
+            return 'none' as const;
+          })
+        );
+      }
+
+      // Выполняем ВСЕ запросы ОДНОВРЕМЕННО
+      const results = await Promise.all(promises);
+      
+      // Проверяем ID после загрузки
+      const checkIdAfter = Array.isArray(id) ? id[0] : id;
+      if (checkIdAfter !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
+        console.log('⚠️ ID изменился после загрузки данных, отменяем установку');
         return;
       }
-      
-      // Загружаем статус дружбы и друзей параллельно
-      if (userData && playerData.id !== userData.id) {
-        const [friendsStatus, friendsList] = await Promise.all([
-          getFriendshipStatus(userData.id, playerData.id),
-          getFriends(playerData.id)
-        ]);
-        
-        // Проверяем ID после загрузки друзей перед установкой состояния
-        const checkIdAfterFriends = Array.isArray(id) ? id[0] : id;
-        if (checkIdAfterFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
-          console.log('⚠️ ID изменился после загрузки друзей, отменяем установку');
-          return;
-        }
-        
+
+      // Распаковываем результаты
+      const teams = results[0] as PastTeam[];
+      const friendsList = results[1] as Player[];
+      const friendsStatus = results[2] as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending' | undefined;
+
+      // Устанавливаем команды
+      const currentTeams = teams.filter(team => team.isCurrent);
+      const pastTeamsFiltered = teams.filter(team => !team.isCurrent);
+      setPlayerTeams(currentTeams);
+      setPastTeams(pastTeamsFiltered);
+
+      // Устанавливаем друзей
+      setFriends(friendsList);
+      setFriendsCache(prev => ({ ...prev, [playerData.id]: friendsList }));
+
+      // Устанавливаем статус дружбы
+      if (friendsStatus !== undefined) {
         setFriendshipStatus(friendsStatus);
-        setFriends(friendsList);
-        
-        // Предзагружаем аватары друзей для быстрого отображения
-        friendsList.forEach(friend => {
-          if (friend.avatar) {
-            Image.prefetch(friend.avatar).catch(() => {
-              // Игнорируем ошибки предзагрузки
-            });
-          }
-        });
-        
-        // Сохраняем в кеш состояния для мгновенного переключения
-        setFriendshipStatusCache(prev => ({
-          ...prev,
-          [`${userData.id}_${playerData.id}`]: friendsStatus
-        }));
-        setFriendsCache(prev => ({
-          ...prev,
-          [playerData.id]: friendsList
-        }));
-      } else {
-        // Для собственного профиля загружаем только друзей
-        const friendsList = await getFriends(playerData.id);
-        
-        // Проверяем ID перед установкой друзей для собственного профиля
-        const checkIdAfterOwnFriends = Array.isArray(id) ? id[0] : id;
-        if (checkIdAfterOwnFriends !== playerData.id || currentLoadingIdRef.current !== playerData.id) {
-          console.log('⚠️ ID изменился после загрузки друзей (собственный профиль), отменяем установку');
-          return;
+        if (userData) {
+          setFriendshipStatusCache(prev => ({
+            ...prev,
+            [`${userData.id}_${playerData.id}`]: friendsStatus
+          }));
         }
-        
-        setFriends(friendsList);
-        
-        // Предзагружаем аватары друзей для быстрого отображения
-        friendsList.forEach(friend => {
-          if (friend.avatar) {
-            Image.prefetch(friend.avatar).catch(() => {
-              // Игнорируем ошибки предзагрузки
-            });
-          }
-        });
-        
-        // Сохраняем в кеш состояния для мгновенного переключения
-        setFriendsCache(prev => ({
-          ...prev,
-          [playerData.id]: friendsList
-        }));
       }
 
-      // Мигрируем аватар в фоне если нужно
-      if (playerData?.avatar && (playerData.avatar.startsWith('file://') || playerData.avatar.startsWith('content://') || playerData.avatar.startsWith('data:'))) {
-        migrateAvatarInBackground(playerData, userData);
-      }
+      // Предзагружаем аватары друзей в фоне (не блокируем UI)
+      setTimeout(() => {
+        friendsList.forEach(friend => {
+          if (friend.avatar) {
+            Image.prefetch(friend.avatar).catch(() => {});
+          }
+        });
+      }, 0);
+
+      // Миграции в фоне (низкий приоритет)
+      setTimeout(() => {
+        if (playerData?.photos && playerData.photos.length > 0) {
+          migratePhotosInBackground(playerData, userData);
+        }
+        if (playerData?.avatar && (playerData.avatar.startsWith('file://') || playerData.avatar.startsWith('content://') || playerData.avatar.startsWith('data:'))) {
+          migrateAvatarInBackground(playerData, userData);
+        }
+      }, 100);
       
     } catch (error) {
       console.error('Ошибка загрузки дополнительных данных:', error);
@@ -720,8 +716,14 @@ export default function PlayerProfile() {
             const { logoutUser } = await import('../../utils/playerStorage');
             await logoutUser();
             await refreshUser();
+            router.replace('/');
+            return;
           }
-          router.replace('/');
+          // ВАЖНО: НЕ редиректим на главный экран если это не профиль текущего пользователя
+          // Это может быть временная проблема с загрузкой данных
+          // Просто показываем ошибку загрузки
+          console.log('⚠️ Игрок не найден, но не редиректим - возможно временная проблема');
+          setLoading(false);
           return;
         } else {
           console.log('✅ Игрок найден после повторной попытки');
@@ -835,6 +837,8 @@ export default function PlayerProfile() {
       console.log('🔄 ID изменился, очищаем состояние:', previousId, '->', normalizedId);
       // Отменяем любые текущие загрузки для старого ID
       currentLoadingIdRef.current = null;
+      // Сбрасываем ref для статуса дружбы
+      friendshipFetchedForRef.current = null;
       // Полностью очищаем все состояние СРАЗУ
       setPlayer(null);
       setFriends([]);
@@ -932,25 +936,26 @@ export default function PlayerProfile() {
 
       const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
 
-      // Сначала проверяем локальный кеш
-      if (friendshipStatusCache[cacheKey]) {
-        setFriendshipStatus(friendshipStatusCache[cacheKey]);
-        return;
-      }
-
-      // Если нет в кеше, загружаем из БД
+      // ВАЖНО: Всегда загружаем актуальный статус из БД при открытии профиля
+      // Кеш может быть устаревшим, особенно после отправки/принятия запросов в друзья
       try {
-        const status = await getFriendshipStatus(currentUser.id, player.id);
+        // Используем skipCache=true чтобы получить актуальный статус из БД
+        const status = await getFriendshipStatus(currentUser.id, player.id, true);
         setFriendshipStatus(status);
 
-        // Сохраняем в кеш
+        // Обновляем кеш актуальным значением
         setFriendshipStatusCache(prev => ({
           ...prev,
           [cacheKey]: status
         }));
       } catch (error) {
         console.error('⚠️ Ошибка инициализации статуса дружбы (не критично):', error);
-        setFriendshipStatus('none');
+        // В случае ошибки используем кеш, если он есть
+        if (friendshipStatusCache[cacheKey]) {
+          setFriendshipStatus(friendshipStatusCache[cacheKey]);
+        } else {
+          setFriendshipStatus('none');
+        }
       }
     };
 
@@ -987,13 +992,11 @@ export default function PlayerProfile() {
         
         // ВАЖНО: Используем skipCache=true для Realtime событий, чтобы получить актуальный статус из БД
         const currentStatus = await getFriendshipStatus(currentUser.id, player.id, true);
-        console.log('🔄 Realtime: получен статус дружбы из БД:', currentStatus, 'событие:', eventType || 'unknown');
 
         // Обновляем только если статус действительно изменился
         setFriendshipStatusCache(prev => {
           const cachedStatus = prev[cacheKey];
           if (cachedStatus !== currentStatus) {
-            console.log('🔄 Realtime обновление статуса дружбы:', cachedStatus, '→', currentStatus);
             setFriendshipStatus(currentStatus);
             return {
               ...prev,
@@ -1026,13 +1029,6 @@ export default function PlayerProfile() {
     };
 
     // Создаем канал с уникальным именем для этой пары пользователей
-    // ОТЛАДКА: Используем подписку БЕЗ фильтра, чтобы проверить, работает ли Realtime
-    console.log('🔌 Создаем Realtime подписку для friend_requests:', {
-      currentUserId: currentUser.id,
-      playerId: player.id,
-      channelName: `friend-requests-sync-${currentUser.id}-${player.id}`
-    });
-    
     const friendRequestsChannel = supabase
       .channel(`friend-requests-sync-${currentUser.id}-${player.id}`)
       // ВАЖНО: Подписываемся на ВСЕ события таблицы friend_requests БЕЗ фильтра
@@ -1049,13 +1045,6 @@ export default function PlayerProfile() {
           const newRecord = payload.new as { from_id?: string; to_id?: string; status?: string } | null;
           const oldRecord = payload.old as { from_id?: string; to_id?: string; status?: string } | null;
           
-          console.log('📨 Realtime friend_requests (все события):', eventType, { 
-            new: newRecord, 
-            old: oldRecord,
-            currentUserId: currentUser.id,
-            playerId: player.id
-          });
-          
           // Проверяем, относится ли это событие к нашей паре пользователей
           const fromId = newRecord?.from_id || oldRecord?.from_id;
           const toId = newRecord?.to_id || oldRecord?.to_id;
@@ -1065,7 +1054,6 @@ export default function PlayerProfile() {
           // В этом случае всё равно обновляем статус, чтобы не пропустить удаление
           if (eventType === 'DELETE') {
             if (!fromId || !toId) {
-              console.log('🗑️ DELETE событие без from_id/to_id! Обновляем статус на всякий случай');
               syncFriendshipStatus('DELETE', true);
               return;
             }
@@ -1075,15 +1063,11 @@ export default function PlayerProfile() {
                            (fromId === player.id && toId === currentUser.id);
           
           if (!isOurPair) {
-            console.log('📨 Пропускаем - не наша пара пользователей');
             return;
           }
           
-          console.log('📨 Это событие для нашей пары! Обрабатываем...');
-          
           // Для DELETE всегда обновляем статус
           if (eventType === 'DELETE') {
-            console.log('🗑️ DELETE событие! Обновляем статус немедленно');
             syncFriendshipStatus('DELETE', true);
             return;
           }
@@ -1092,22 +1076,17 @@ export default function PlayerProfile() {
           const newStatus = newRecord?.status;
           
           if (eventType === 'UPDATE' && oldStatus === 'pending' && newStatus === 'accepted') {
-            console.log('✅ Запрос принят! Обновляем статус немедленно');
             syncFriendshipStatus('UPDATE', true);
           } else if (eventType === 'INSERT') {
-            console.log('📥 Новый запрос! Обновляем статус');
             debouncedSync(eventType);
           } else {
             debouncedSync(eventType);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('🔌 Статус Realtime подписки friend_requests:', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('🔌 Отключаем Realtime подписку friend_requests');
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }
@@ -1120,7 +1099,9 @@ export default function PlayerProfile() {
     if (!player) return;
 
     const reloadFriendsList = async () => {
-      console.log('🔄 Обновляем список друзей через Realtime');
+      // Сохраняем текущую позицию прокрутки ПЕРЕД любыми изменениями
+      const currentScrollPosition = savedScrollPositionRef.current;
+      
       // Перезагружаем список друзей
       const friendsList = await getFriends(player.id);
       
@@ -1133,6 +1114,27 @@ export default function PlayerProfile() {
           ...prev,
           [player.id]: friendsList
         }));
+        
+        // Восстанавливаем позицию прокрутки после обновления
+        // НО НЕ восстанавливаем, если позиция была сброшена (например, после принятия дружбы)
+        // Используем несколько попыток для гарантии восстановления
+        if (currentScrollPosition !== null && savedScrollPositionRef.current !== null && scrollViewRef.current) {
+          const restoreScroll = () => {
+            scrollViewRef.current?.scrollTo({ 
+              y: currentScrollPosition, 
+              animated: false 
+            });
+          };
+          setTimeout(restoreScroll, 50);
+          setTimeout(restoreScroll, 150);
+          setTimeout(restoreScroll, 300);
+        } else if (savedScrollPositionRef.current === null) {
+          // Если позиция была сброшена, прокручиваем наверх
+          setTimeout(() => {
+            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+          }, 100);
+          console.log('✅ Прокрутка наверх после обновления друзей (позиция была сброшена)');
+        }
       }
     };
 
@@ -1218,7 +1220,7 @@ export default function PlayerProfile() {
   useEffect(() => {
     if (!player?.id) return;
 
-    const reloadPlayerProfile = async () => {
+    const reloadPlayerProfile = async (payload?: any) => {
       console.log('🔄 Realtime: Обновление профиля игрока', player.id);
       
       // Проверяем, что ID не изменился
@@ -1227,18 +1229,73 @@ export default function PlayerProfile() {
         console.log('⚠️ ID изменился, пропускаем обновление профиля');
         return;
       }
+      
+      // ОПТИМИЗАЦИЯ: Пропускаем перезагрузку если изменились только счётчики уведомлений/сообщений
+      // Это предотвращает нежелательную прокрутку при отправке запроса в друзья
+      if (payload?.new && payload?.old) {
+        const newData = payload.new;
+        const oldData = payload.old;
+        
+        // Проверяем, изменилось ли что-то кроме счётчиков
+        const relevantFieldsChanged = Object.keys(newData).some(key => {
+          // Игнорируем поля счётчиков и timestamps
+          if (key === 'unread_notifications_count' || 
+              key === 'unread_messages_count' || 
+              key === 'notifications' ||
+              key === 'updated_at' ||
+              key === 'last_seen' ||
+              key === 'is_online') {
+            return false;
+          }
+          // Сравниваем значения
+          return JSON.stringify(newData[key]) !== JSON.stringify(oldData[key]);
+        });
+        
+        if (!relevantFieldsChanged) {
+          console.log('⏭️ Пропускаем перезагрузку профиля - изменились только счётчики/timestamps');
+          // ВАЖНО: Даже если пропускаем перезагрузку, обновляем статус дружбы если нужно
+          // Это нужно чтобы кнопки дружбы обновились после принятия/отклонения запроса
+          if (currentUser && currentUser.id !== player.id) {
+            const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+            // Сбрасываем кеш статуса дружбы чтобы он перезагрузился
+            setFriendshipStatusCache(prev => {
+              const newCache = { ...prev };
+              delete newCache[cacheKey];
+              return newCache;
+            });
+            // Загружаем актуальный статус дружбы в фоне
+            getFriendshipStatus(currentUser.id, player.id, true).then(status => {
+              console.log('🔄 Статус дружбы обновлен через Realtime (без перезагрузки профиля):', status);
+              setFriendshipStatus(status);
+              setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: status }));
+            }).catch(() => {
+              // Игнорируем ошибки
+            });
+          }
+          return;
+        }
+      }
+
+      // ВАЖНО: Игнорируем Realtime обновления, которые приходят сразу после сохранения (в течение 3 секунд)
+      // Это предотвращает перезапись только что сохраненных данных старыми данными из Realtime
+      const timeSinceLastSave = Date.now() - lastSaveTimeRef.current;
+      if (timeSinceLastSave < 3000) {
+        console.log(`⏭️ Пропускаем Realtime обновление - прошло только ${timeSinceLastSave}ms после сохранения (защита от перезаписи)`);
+        return;
+      }
+      
+      // ВАЖНО: Сохраняем позицию прокрутки ПЕРЕД любыми изменениями состояния
+      const scrollPositionBeforeUpdate = savedScrollPositionRef.current;
 
       try {
-        // Сохраняем текущую позицию прокрутки перед обновлением
-        // Позиция уже сохранена в savedScrollPositionRef через onScroll
-        
         // Загружаем свежие данные профиля
-        const { getPlayerById, clearPlayerCache } = await import('../../utils/playerStorage');
+        const { getPlayerById, clearPlayerMemoryCache } = await import('../../utils/playerStorage');
         
-        // Очищаем кеш для этого игрока
-        clearPlayerCache(player.id);
+        // ВАЖНО: Очищаем memory cache перед загрузкой, чтобы получить свежие данные из БД
+        // Это предотвращает загрузку старых данных из кеша
+        clearPlayerMemoryCache(player.id);
         
-        // Загружаем свежие данные
+        // Загружаем свежие данные из БД (не из кеша)
         const updatedPlayer = await getPlayerById(player.id);
         
         // Проверяем еще раз после загрузки
@@ -1249,6 +1306,26 @@ export default function PlayerProfile() {
         }
         
         if (updatedPlayer) {
+          // ВАЖНО: Проверяем, что данные из Realtime новее текущих (по timestamp из кеша)
+          // Если текущие данные новее, не обновляем (защита от перезаписи свежих данных)
+          // Используем сравнение по времени последнего сохранения
+          const timeSinceLastSave = Date.now() - lastSaveTimeRef.current;
+          if (timeSinceLastSave < 5000) {
+            // Если прошло меньше 5 секунд с момента сохранения, данные из Realtime могут быть старыми
+            // Сравниваем ключевые поля, чтобы убедиться, что данные действительно изменились
+            const keyFields = ['grip', 'position', 'number', 'height', 'weight', 'name'];
+            const fieldsChanged = keyFields.some(field => {
+              const currentValue = (player as any)[field];
+              const realtimeValue = (updatedPlayer as any)[field];
+              return JSON.stringify(currentValue) !== JSON.stringify(realtimeValue);
+            });
+            
+            if (!fieldsChanged) {
+              console.log('⏭️ Пропускаем Realtime обновление - данные не изменились (защита от перезаписи)');
+              return;
+            }
+          }
+          
           console.log('✅ Профиль обновлен через Realtime');
           setPlayer(updatedPlayer);
           
@@ -1258,19 +1335,29 @@ export default function PlayerProfile() {
             [player.id]: updatedPlayer
           }));
           
-          // Обновляем дополнительные данные
-          if (currentUser) {
+          // ВАЖНО: НЕ обновляем дополнительные данные (команды, друзей) если идёт редактирование!
+          // Иначе локальные изменения команд будут перезаписаны данными из БД (где их ещё нет)
+          // Используем isEditingRef.current чтобы получить актуальное значение в callback
+          if (currentUser && !isEditingRef.current) {
             loadAdditionalData(updatedPlayer, currentUser);
+          } else if (isEditingRef.current) {
+            console.log('⚠️ Пропускаем loadAdditionalData - идёт редактирование профиля');
           }
           
           // Восстанавливаем позицию прокрутки после обновления (если была сохранена)
-          if (savedScrollPositionRef.current !== null && scrollViewRef.current) {
-            setTimeout(() => {
+          // Используем позицию сохранённую ДО начала обновления
+          if (scrollPositionBeforeUpdate !== null && scrollViewRef.current) {
+            // Используем несколько попыток восстановления с разными задержками
+            // чтобы гарантировать восстановление после всех ре-рендеров
+            const restoreScroll = () => {
               scrollViewRef.current?.scrollTo({ 
-                y: savedScrollPositionRef.current!, 
+                y: scrollPositionBeforeUpdate, 
                 animated: false 
               });
-            }, 100);
+            };
+            setTimeout(restoreScroll, 50);
+            setTimeout(restoreScroll, 150);
+            setTimeout(restoreScroll, 300);
           }
         }
       } catch (error) {
@@ -1290,9 +1377,10 @@ export default function PlayerProfile() {
         },
         async (payload) => {
           console.log('📨 Realtime: Получено обновление профиля', payload.new);
+          // Передаём payload для проверки что изменилось
           // Небольшая задержка для дебаунсинга множественных обновлений
           setTimeout(() => {
-            reloadPlayerProfile();
+            reloadPlayerProfile(payload);
           }, 300);
         }
       )
@@ -1310,6 +1398,13 @@ export default function PlayerProfile() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
+
+      // ВАЖНО: Если переходим из уведомления с scrollToFriends, сбрасываем сохраненную позицию прокрутки
+      // чтобы профиль открывался сверху, а не с сохраненной позиции
+      if (scrollToFriends === 'true') {
+        savedScrollPositionRef.current = null;
+        console.log('🔄 Сброшена сохраненная позиция прокрутки для перехода из уведомления');
+      }
 
       // Обновляем данные игрока при возвращении на экран
       // Это нужно чтобы увидеть актуальную статистику упражнений и изменения профиля
@@ -1334,6 +1429,7 @@ export default function PlayerProfile() {
       }
 
       return () => {
+        console.log('🚪 UNMOUNT: Покидаем экран профиля, player:', player?.name, 'id:', player?.id);
         setCurrentScreen(null);
       };
     }, [setCurrentScreen, player?.id, id])
@@ -1370,17 +1466,48 @@ export default function PlayerProfile() {
     } else if (scrollToExercises === 'true') {
       scrollToSection(exercisesRef);
     } else if (scrollToFriends === 'true') {
-      // При переходе по уведомлению о запросе в друзья прокручиваем к началу профиля,
-      // чтобы сразу были видны кнопки "принять" и "отклонить"
-      setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      }, 300);
+      // При переходе по уведомлению о запросе в друзья:
+      // Принудительно обновляем статус дружбы (сбрасываем кэш)
+      // Прокрутка НЕ нужна - профиль и так открывается сверху, кнопки дружбы видны сразу
+      if (currentUser && player && currentUser.id !== player.id) {
+        const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+        
+        // Проверяем, что мы ещё не делали запрос для этой пары
+        if (friendshipFetchedForRef.current === cacheKey) {
+          return; // Уже загрузили для этой пары
+        }
+        friendshipFetchedForRef.current = cacheKey;
+        
+        // Сбрасываем локальный кэш
+        setFriendshipStatusCache(prev => {
+          const newCache = { ...prev };
+          delete newCache[cacheKey];
+          return newCache;
+        });
+        // Принудительно загружаем актуальный статус из БД
+        getFriendshipStatus(currentUser.id, player.id, true).then(status => {
+          console.log('📥 Статус дружбы при переходе из уведомления:', status);
+          setFriendshipStatus(status);
+          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: status }));
+        });
+      }
     } else if (scrollToGift === 'true') {
       scrollToSection(giftButtonRef);
     } else if (scrollToSpeed === 'true') {
-      scrollToSection(puckSpeedRef);
+      // Для раздела радара открываем сразу без анимации прокрутки
+      setTimeout(() => {
+        if (puckSpeedRef.current && scrollViewRef.current) {
+          puckSpeedRef.current.measureLayout(
+            scrollViewRef.current as any,
+            (x, y) => {
+              scrollViewRef.current?.scrollTo({ x: 0, y: y - 50, animated: false });
+            },
+            () => {}
+          );
+        }
+      }, 100);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, player]);
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, player, currentUser]);
 
 
   // Ref для активного поля ввода
@@ -1667,6 +1794,64 @@ export default function PlayerProfile() {
         setEditData({...editData, birthDate: formattedDate});
       } else if (event.type === 'dismissed') {
         setShowBirthDatePicker(false);
+      }
+    }
+  };
+
+  // Функция для показа календаря выбора месяца и года начала хоккея
+  const showHockeyStartDatePickerModal = () => {
+    // Устанавливаем текущую дату начала хоккея или сегодняшнюю дату
+    if (editData.hockeyStartDate || player?.hockeyStartDate) {
+      const dateStr = editData.hockeyStartDate || player?.hockeyStartDate || '';
+      // Формат может быть MM.YYYY или YYYY-MM-DD
+      if (dateStr.includes('.')) {
+        const parts = dateStr.split('.');
+        if (parts.length === 2) {
+          // Формат MM.YYYY
+          const month = parseInt(parts[0]) - 1; // Месяцы в JS начинаются с 0
+          const year = parseInt(parts[1]);
+          setSelectedHockeyStartDate(new Date(year, month, 1));
+        } else if (parts.length === 3) {
+          // Формат DD.MM.YYYY
+          const month = parseInt(parts[1]) - 1;
+          const year = parseInt(parts[2]);
+          setSelectedHockeyStartDate(new Date(year, month, 1));
+        } else {
+          setSelectedHockeyStartDate(new Date());
+        }
+      } else if (dateStr.includes('-')) {
+        // Формат YYYY-MM-DD
+        const [yearStr, monthStr] = dateStr.split('-');
+        const year = parseInt(yearStr);
+        const month = parseInt(monthStr) - 1;
+        setSelectedHockeyStartDate(new Date(year, month, 1));
+      } else {
+        setSelectedHockeyStartDate(new Date());
+      }
+    } else {
+      setSelectedHockeyStartDate(new Date());
+    }
+    setShowHockeyStartDatePicker(true);
+  };
+
+  // Функция для обработки выбора месяца и года начала хоккея
+  const onHockeyStartDateChange = (event: any, date?: Date) => {
+    if (Platform.OS === 'ios') {
+      // На iOS календарь не закрывается автоматически
+      if (date) {
+        setSelectedHockeyStartDate(date);
+      }
+    } else {
+      // На Android календарь закрывается только при полном выборе
+      if (event.type === 'set' && date) {
+        setShowHockeyStartDatePicker(false);
+        setSelectedHockeyStartDate(date);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear().toString();
+        const formattedDate = `${month}.${year}`;
+        setEditData({...editData, hockeyStartDate: formattedDate});
+      } else if (event.type === 'dismissed') {
+        setShowHockeyStartDatePicker(false);
       }
     }
   };
@@ -2103,16 +2288,16 @@ export default function PlayerProfile() {
       return;
     }
 
-    const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+      const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
     const previousStatus = friendshipStatus;
     
     // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI, запрос в фоне
     setFriendLoading(true);
-    lastManualStatusChangeRef.current = Date.now();
-
+          lastManualStatusChangeRef.current = Date.now();
+          
     if (friendshipStatus === 'friends') {
       // Удаляем из друзей - сразу показываем "добавить"
-      setFriendshipStatus('none');
+          setFriendshipStatus('none');
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
       
       removeFriend(currentUser.id, player.id).then(success => {
@@ -2130,7 +2315,7 @@ export default function PlayerProfile() {
         showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
       });
       
-    } else if (friendshipStatus === 'none') {
+      } else if (friendshipStatus === 'none') {
       // КРИТИЧЕСКАЯ ПРОВЕРКА перед отправкой запроса
       if (!currentUser?.id || !player?.id) {
         console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: currentUser.id или player.id пустые!', {
@@ -2158,9 +2343,9 @@ export default function PlayerProfile() {
         toId: player.id,
         toName: player.name
       });
-      
+          
       // Отправляем запрос - сразу показываем "отменить запрос"
-      setFriendshipStatus('sent_request');
+          setFriendshipStatus('sent_request');
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'sent_request' }));
       
       sendFriendRequest(currentUser.id, player.id).then(success => {
@@ -2183,7 +2368,7 @@ export default function PlayerProfile() {
       
     } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
       // Отменяем запрос - сразу показываем "добавить"
-      setFriendshipStatus('none');
+          setFriendshipStatus('none');
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
       
       cancelFriendRequest(currentUser.id, player.id).then(success => {
@@ -2203,20 +2388,24 @@ export default function PlayerProfile() {
       
     } else if (friendshipStatus === 'received_request') {
       // Принимаем запрос - сразу показываем "друзья"
-      setFriendshipStatus('friends');
+          setFriendshipStatus('friends');
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'friends' }));
       
+      // Счётчик обновится автоматически через Realtime подписку в _layout.tsx
+
       acceptFriendRequest(currentUser.id, player.id).then(success => {
         setFriendLoading(false);
         if (success) {
-          // Очищаем кеш асинхронно
-          setTimeout(async () => {
-            try {
-              await clearPlayerCache(player.id);
-              const { avatarCache } = await import('../../utils/AvatarCache');
-              avatarCache.clearAvatar(player.id);
-            } catch (error) {}
+          // ВАЖНО: Сбрасываем сохраненную позицию прокрутки и прокручиваем наверх
+          // чтобы пользователь не оказался внизу профиля после принятия дружбы
+          savedScrollPositionRef.current = null;
+          setTimeout(() => {
+            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
           }, 100);
+          console.log('✅ Прокрутка сброшена наверх после принятия дружбы');
+          
+          // Кеш будет очищен автоматически через Realtime обновления
+          // Не вызываем clearPlayerCache чтобы избежать нежелательных редиректов
         } else {
           // Откатываем при ошибке
           setFriendshipStatus(previousStatus);
@@ -2225,6 +2414,7 @@ export default function PlayerProfile() {
         }
       }).catch(error => {
         setFriendLoading(false);
+        // Откатываем при ошибке
         setFriendshipStatus(previousStatus);
         setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
@@ -2374,7 +2564,7 @@ export default function PlayerProfile() {
     // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI
     setFriendLoading(true);
     lastManualStatusChangeRef.current = Date.now();
-    setFriendshipStatus('none');
+        setFriendshipStatus('none');
     setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
     
     declineFriendRequest(currentUser.id, player.id).then(success => {
@@ -2554,13 +2744,22 @@ export default function PlayerProfile() {
         .join('\n');
       
       // Загружаем аватар в Storage если это локальный файл
+      // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
       let avatarUrl = editData.avatar || player.avatar;
+      let avatarWasUpdated = false;
       if (avatarUrl && (avatarUrl.startsWith('file://') || avatarUrl.startsWith('content://') || avatarUrl.startsWith('data:'))) {
         console.log('📤 Загружаем аватар в Supabase Storage:', avatarUrl.substring(0, 50) + '...');
         const { uploadImageToStorage } = await import('../../utils/uploadImage');
-        const uploadedUrl = await uploadImageToStorage(avatarUrl);
+        const uploadedUrl = await uploadImageToStorage(avatarUrl, `avatar_${player.id}.jpg`);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
+          avatarWasUpdated = true;
+          
+          // КРИТИЧНО: Обновляем аватар ГЛОБАЛЬНО во всех компонентах
+          // forceNotify=true гарантирует перезагрузку даже если URL тот же (файл перезаписан)
+          const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
+          await updateAvatarGlobally(player.id, uploadedUrl);
+          console.log('✅ Аватар обновлён глобально через updateAvatarGlobally');
         } else {
           console.error('❌ Не удалось загрузить аватар в Storage');
         }
@@ -2697,54 +2896,56 @@ export default function PlayerProfile() {
           savedCurrentCount: savedCurrentTeams.length,
           newCurrentCount: currentTeamsForCompare.length,
           savedPastCount: savedPastTeams.length,
-          newPastCount: pastTeamsForCompare.length
+          newPastCount: pastTeamsForCompare.length,
+          // Добавляем детали для отладки
+          playerTeamsLength: playerTeams.length,
+          playerTeamsNames: playerTeams.map(t => t.teamName),
+          pastTeamsLength: pastTeams.length,
+          pastTeamsNames: pastTeams.map(t => t.teamName)
         });
       } catch (error) {
         console.error('❌ Ошибка проверки изменения команд:', error);
         teamsChanged = true; // На всякий случай считаем, что команды могли измениться
       }
       
-      // Выполняем операции параллельно для ускорения
-      const [teamsSyncResult, refreshedPlayer, teams] = await Promise.all([
-        // Синхронизация команд (только если команды изменились)
-        (async () => {
-      try {
-        // Если команды не изменились, пропускаем синхронизацию
-        if (!teamsChanged) {
-          console.log('✅ Команды не изменились, пропускаем синхронизацию');
-          return { success: true };
-        }
-        
-        console.log('🔄 Команды изменились, выполняем синхронизацию...');
-        
-        const { syncPlayerTeams, clearOldPastTeamsData, addTeamOrderField } = await import('../../utils/playerStorage');
-        
-        // Добавляем поле team_order если его еще нет (выполняется один раз)
-        await addTeamOrderField();
-        
-        // Сначала очищаем старые данные команд
-        const clearSuccess = await clearOldPastTeamsData(player.id);
-        if (!clearSuccess) {
-          console.error('❌ Ошибка очистки старых данных команд');
-              return { success: false, error: 'Не удалось очистить старые данные команд' };
-        }
-        
-        const teamsSyncSuccess = await syncPlayerTeams(player.id, playerTeams, pastTeams);
-        
-        if (!teamsSyncSuccess) {
-          console.error('❌ Ошибка синхронизации команд');
-              return { success: false, error: 'Не удалось сохранить команды' };
-        }
+      // СНАЧАЛА синхронизируем команды (если изменились)
+      let teamsSyncResult = { success: true, error: undefined as string | undefined };
+      if (teamsChanged) {
+        try {
+          console.log('🔄 Команды изменились, выполняем синхронизацию...');
+          
+          const { syncPlayerTeams, clearOldPastTeamsData, addTeamOrderField } = await import('../../utils/playerStorage');
+          
+          // Добавляем поле team_order если его еще нет (выполняется один раз)
+          await addTeamOrderField();
+          
+          // Сначала очищаем старые данные команд
+          const clearSuccess = await clearOldPastTeamsData(player.id);
+          if (!clearSuccess) {
+            console.error('❌ Ошибка очистки старых данных команд');
+            teamsSyncResult = { success: false, error: 'Не удалось очистить старые данные команд' };
+          } else {
+            const teamsSyncSuccess = await syncPlayerTeams(player.id, playerTeams, pastTeams);
             
-            return { success: true };
-      } catch (syncError) {
-        console.error('❌ Исключение при синхронизации команд:', syncError);
-            return { success: false, error: 'Не удалось сохранить команды' };
+            if (!teamsSyncSuccess) {
+              console.error('❌ Ошибка синхронизации команд');
+              teamsSyncResult = { success: false, error: 'Не удалось сохранить команды' };
+            }
+          }
+        } catch (syncError) {
+          console.error('❌ Исключение при синхронизации команд:', syncError);
+          teamsSyncResult = { success: false, error: 'Не удалось сохранить команды' };
+        }
+      } else {
+        console.log('✅ Команды не изменились, пропускаем синхронизацию');
       }
-        })(),
+      
+      // ПОСЛЕ синхронизации команд - обновляем игрока и загружаем команды параллельно
+      const [refreshedPlayer, teams] = await Promise.all([
         // Обновление данных игрока
-        updatePlayer(player.id, updatedPlayer, true), // Пропускаем очистку кеша для миграции
-        // Загрузка команд
+        // ВАЖНО: НЕ пропускаем очистку кеша, чтобы при следующей загрузке загрузились свежие данные
+        updatePlayer(player.id, updatedPlayer, false), // Очищаем кеш для загрузки свежих данных
+        // Загрузка команд ПОСЛЕ синхронизации
         import('../../utils/playerStorage').then(({ getPlayerTeamsAsPastTeams }) => getPlayerTeamsAsPastTeams(player.id))
       ]);
       
@@ -3027,6 +3228,74 @@ export default function PlayerProfile() {
         console.error('❌ Ошибка подготовки уведомлений (не критично):', notifyError);
       }
       
+      // ВАЖНО: Проверяем, что refreshedPlayer не null
+      if (!refreshedPlayer) {
+        console.error('❌ handleSave: refreshedPlayer is null после updatePlayer');
+        showCustomAlert(t('common.error'), t('saveError') || 'Не удалось сохранить данные', 'error');
+        return;
+      }
+      
+      // ВАЖНО: Отправляем уведомления о новых фото только при сохранении профиля
+      // Сравниваем исходное количество фото (при загрузке профиля) с текущим количеством в galleryPhotos
+      const oldPhotosCount = initialPhotosCountRef.current;
+      const newPhotosCount = (galleryPhotos && Array.isArray(galleryPhotos)) ? galleryPhotos.length : 0;
+      const addedPhotosCount = newPhotosCount - oldPhotosCount;
+      
+      console.log('📸 Проверка фото для уведомлений:', {
+        initialCount: oldPhotosCount,
+        currentCount: newPhotosCount,
+        addedCount: addedPhotosCount,
+        galleryPhotos: galleryPhotos,
+        refreshedPlayerPhotos: refreshedPlayer.photos
+      });
+      
+      if (addedPhotosCount > 0) {
+        console.log('📸 Отправляем уведомления о новых фото при сохранении:', {
+          oldCount: oldPhotosCount,
+          newCount: newPhotosCount,
+          addedCount: addedPhotosCount,
+          playerId: player.id,
+          playerName: player.name
+        });
+        
+        try {
+          await notifyFriendsAboutPhotos(
+            player.id,
+            player.name,
+            addedPhotosCount,
+            {
+              photoNotification: {
+                added: t('photoNotification.added'),
+                onePhoto: t('photoNotification.onePhoto'),
+                multiplePhotos: t('photoNotification.multiplePhotos')
+              }
+            }
+          );
+          console.log('✅ Уведомления о новых фото отправлены друзьям');
+          
+          // Обновляем исходное количество фото после успешной отправки уведомлений
+          initialPhotosCountRef.current = newPhotosCount;
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомлений о фото:', error);
+        }
+      } else {
+        console.log('ℹ️ Фото не добавились, уведомления не отправляются:', {
+          oldCount: oldPhotosCount,
+          newCount: newPhotosCount,
+          addedCount: addedPhotosCount
+        });
+      }
+      
+      console.log('✅ handleSave: refreshedPlayer получен:', {
+        id: refreshedPlayer.id,
+        name: refreshedPlayer.name,
+        grip: refreshedPlayer.grip,
+        position: refreshedPlayer.position,
+        number: refreshedPlayer.number,
+        height: refreshedPlayer.height,
+        weight: refreshedPlayer.weight
+      });
+      
       // Обновляем состояние команд СРАЗУ после сохранения (только если команды изменились)
       if (teamsChanged && teams && Array.isArray(teams)) {
         const currentTeams = teams.filter(team => team.isCurrent);
@@ -3040,85 +3309,73 @@ export default function PlayerProfile() {
         console.log('❌ Команды не загружены или не являются массивом:', teams);
       }
       
-      // Обновляем состояние игрока
-      if (refreshedPlayer) {
-        setPlayer(refreshedPlayer);
+      // ВАЖНО: СНАЧАЛА сбрасываем editData, чтобы компонент не использовал старые данные
+      setEditData({});
+      console.log('✅ handleSave: editData сброшен');
+      
+      // ВАЖНО: Обновляем состояние СРАЗУ (синхронно), чтобы изменения отобразились немедленно
+      setPlayer(refreshedPlayer);
+      console.log('✅ handleSave: player обновлен через setPlayer');
+      
+      // ВАЖНО: Сохраняем время последнего сохранения, чтобы игнорировать Realtime обновления в течение 3 секунд
+      // Это предотвращает перезапись только что сохраненных данных старыми данными из Realtime
+      lastSaveTimeRef.current = Date.now();
+      console.log('✅ handleSave: установлен флаг lastSaveTime для защиты от Realtime перезаписи');
+      
+      // ВАЖНО: Обновляем кэш состояния для немедленного отображения
+      setPlayersCache(prev => ({
+        ...prev,
+        [player.id]: refreshedPlayer
+      }));
 
-        // ВАЖНО: Обновляем кэш состояния для немедленного отображения при возвращении в профиль
-        setPlayersCache(prev => ({
-          ...prev,
-          [player.id]: refreshedPlayer
-        }));
-
-        // Также очищаем кеш getPlayerById, чтобы при следующем заходе загрузились свежие данные
-        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-        const cacheKey = `player_${player.id}`;
-        AsyncStorage.removeItem(cacheKey).catch(error => {
-          console.warn('⚠️ Не удалось очистить кеш игрока:', error);
-        });
-
-        // Очищаем кеш всех игроков, чтобы изменения отобразились на главной странице
-        const allPlayersCacheKey = 'all_players';
-        AsyncStorage.removeItem(allPlayersCacheKey).catch(error => {
+      // ВАЖНО: Очищаем ВСЕ кеши, чтобы при следующем заходе загрузились свежие данные
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const cacheKey = `player_${player.id}`;
+      await AsyncStorage.removeItem(cacheKey).catch(error => {
+        console.warn('⚠️ Не удалось очистить кеш игрока:', error);
+      });
+      
+      // ВАЖНО: Очищаем memory cache, чтобы getPlayerById загрузил свежие данные из БД
+      const { clearPlayerMemoryCache } = await import('../../utils/playerStorage');
+      clearPlayerMemoryCache(player.id);
+      console.log('✅ handleSave: очищен memory cache для игрока');
+      
+      // ВАЖНО: Очищаем кеш всех игроков ОТЛОЖЕННО, чтобы не вызвать редирект
+      // Делаем это после закрытия модального окна с успешным сообщением
+      const allPlayersCacheKey = 'all_players';
+      setTimeout(async () => {
+        await AsyncStorage.removeItem(allPlayersCacheKey).catch(error => {
           console.warn('⚠️ Не удалось очистить кеш всех игроков:', error);
         });
+        console.log('✅ handleSave: очищен кеш всех игроков (отложенно)');
+      }, 1000); // Задержка 1 секунда, чтобы пользователь успел увидеть сообщение об успехе
+      
+      // Если редактируем свой собственный профиль, обновляем также currentUser
+      if (currentUser.id === player.id) {
+        // ВАЖНО: Обновляем локальное состояние СРАЗУ (синхронно)
+        setCurrentUser(refreshedPlayer);
+        // ВАЖНО: Обновляем ГЛОБАЛЬНЫЙ контекст СРАЗУ для LogoHeader и других компонентов
+        setGlobalCurrentUser(refreshedPlayer);
         
-        // Обновляем изменения из базы данных асинхронно (не блокируем основной поток)
+        // Сохраняем обновленные данные в AsyncStorage ОТЛОЖЕННО
+        // ВАЖНО: НЕ вызываем refreshUser здесь, так как он может вызвать редирект
+        // Вместо этого обновляем только локальное состояние
         setTimeout(async () => {
           try {
-            await refreshChanges();
+            await saveCurrentUser(refreshedPlayer);
+            // Обновляем только локальное состояние, НЕ вызываем refreshUser
+            // чтобы избежать редиректа на главную страницу
+            console.log('✅ handleSave: currentUser обновлен в AsyncStorage без refreshUser');
           } catch (error) {
-            console.error('❌ Ошибка обновления изменений (не критично):', error);
+            console.error('❌ Ошибка обновления currentUser:', error);
           }
-        }, 0);
-        
-        // Если редактируем свой собственный профиль, обновляем также currentUser в AsyncStorage
-        if (currentUser.id === player.id) {
-          setCurrentUser(refreshedPlayer);
-          // Сохраняем обновленные данные в AsyncStorage асинхронно (не блокируем основной поток)
-          setTimeout(async () => {
-            try {
-              await saveCurrentUser(refreshedPlayer);
-            } catch (error) {
-              console.error('❌ Ошибка обновления currentUser в AsyncStorage:', error);
-            }
-          }, 0);
-        }
-        
-        // Обновляем глобальное состояние пользователя асинхронно (не блокируем основной поток)
-        if (currentUser.id === player.id) {
-          setTimeout(async () => {
-            try {
-              // Обновляем локальное состояние для немедленного отображения
-              setCurrentUser(refreshedPlayer);
-
-              // Также обновляем список игроков на главной странице, если он есть
-              // Это нужно для отображения измененной страны на главной странице
-              const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-              try {
-                const cachedPlayers = await AsyncStorage.getItem('all_players');
-                if (cachedPlayers) {
-                  const { players: cachedPlayersList } = JSON.parse(cachedPlayers);
-                  const updatedPlayersList = cachedPlayersList.map((p: Player) =>
-                    p.id === player.id ? refreshedPlayer : p
-                  );
-                  await AsyncStorage.setItem('all_players', JSON.stringify({
-                    players: updatedPlayersList,
-                    timestamp: Date.now()
-                  }));
-                  console.log('✅ Обновили кеш всех игроков с новой страной пользователя');
-                }
-              } catch (error) {
-                console.warn('⚠️ Не удалось обновить кеш всех игроков:', error);
-              }
-            } catch (error) {
-              console.error('❌ Ошибка обновления глобального состояния:', error);
-            }
-          }, 0);
-        }
+        }, 500); // Небольшая задержка, чтобы избежать конфликтов с навигацией
       }
       
+      // ВАЖНО: Выходим из режима редактирования ПОСЛЕ обновления всех состояний
       setIsEditing(false);
+      
+      // Показываем успешное сообщение БЕЗ редиректа
       showCustomAlert(t('common.success'), t('playerUpdated'), 'success');
       
       // Дополнительное обновление команд через небольшую задержку для надежности (только если команды изменились)
@@ -3301,8 +3558,9 @@ export default function PlayerProfile() {
             if (success) {
               console.log('✅ Аккаунт успешно удален, выходим из системы');
               
-              // Очищаем контекст пользователя ПЕРЕД выходом
-              setGlobalCurrentUser(null);
+              // Очищаем кэш всех игроков, чтобы удаленный профиль не отображался на главном экране
+              await clearAllPlayersCache();
+              console.log('✅ Кэш игроков очищен');
               
               // Очищаем контекст пользователя ПЕРЕД выходом
               setGlobalCurrentUser(null);
@@ -3763,8 +4021,8 @@ export default function PlayerProfile() {
                 </Text>
                 ) : null}
                 
-                {/* Номер игрока - не показываем для магазинов и заточки коньков */}
-                {player.status !== 'shop' && player.status !== 'skateSharpening' && (
+                {/* Номер игрока - не показываем для магазинов, заточки коньков, тренеров и скаутов */}
+                {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'coach' && player.status !== 'scout' && (
                   isEditing ? (
                   <TextInput
                     style={[styles.editInput, { 
@@ -3895,7 +4153,7 @@ export default function PlayerProfile() {
 
             {/* Кнопки действий - перемещены вверх перед статистикой */}
             {currentUser && player && currentUser.id !== player.id && (
-              <View style={styles.actionsSectionTop}>
+              <View ref={friendRequestRef} style={styles.actionsSectionTop}>
                 {/* Кнопка управления дружбой - для звезд */}
                 {player.status === 'star' && (
                   <>
@@ -4042,11 +4300,11 @@ export default function PlayerProfile() {
               </View>
             )}
 
-            {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов (кроме админа) и администраторов */}
-            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' &&
+            {/* Статистика текущего сезона - только для обычных игроков с данными, скрыта для скаутов, тренеров (кроме админа) и администраторов */}
+            {player && player.status !== 'star' && player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && player.status !== 'coach' &&
              !(player.status === 'scout' && currentUser?.status !== 'admin') && (() => {
               // Определяем, является ли игрок вратарем (используем функцию нормализации)
-              const currentPosition = editData.position || player.position;
+              const currentPosition = (isEditing && editData.position) ? editData.position : player.position;
               const isGoalkeeper = isGoalkeeperPosition(currentPosition);
               
               if (isGoalkeeper) {
@@ -4557,7 +4815,7 @@ export default function PlayerProfile() {
                         onPress={() => setShowPositionPicker(true)}
                       >
                         <Text style={styles.pickerButtonText}>
-                          {editData.position ? translatePosition(editData.position) : translatePosition(player.position)}
+                          {isEditing && editData.position ? translatePosition(editData.position) : translatePosition(player.position)}
                         </Text>
                         <Ionicons name="chevron-down" size={16} color="#fff" />
                       </TouchableOpacity>
@@ -4640,12 +4898,15 @@ export default function PlayerProfile() {
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.startedHockey')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                    <TextInput
-                      style={styles.editInput}
-                        value={editData.hockeyStartDate !== undefined ? editData.hockeyStartDate : (player.hockeyStartDate || '')}
-                        onChangeText={(text) => setEditData({...editData, hockeyStartDate: text})}
-                        placeholder={t('birthDatePlaceholder')}
-                    />
+                      <TouchableOpacity
+                        style={styles.pickerButton}
+                        onPress={showHockeyStartDatePickerModal}
+                      >
+                        <Text style={styles.pickerButtonText}>
+                          {editData.hockeyStartDate || player.hockeyStartDate || t('register.selectDate')}
+                        </Text>
+                        <Ionicons name="calendar-outline" size={16} color="#fff" />
+                      </TouchableOpacity>
                   ) : (
                       <Text style={styles.infoValue}>
                         {player.hockeyStartDate || t('profile.notSpecified')}
@@ -4662,7 +4923,7 @@ export default function PlayerProfile() {
                         onPress={() => setShowGripPicker(true)}
                       >
                         <Text style={styles.pickerButtonText}>
-                          {editData.grip ? translateGrip(editData.grip) : translateGrip(player.grip || '')}
+                          {isEditing && editData.grip ? translateGrip(editData.grip) : translateGrip(player.grip || '')}
                         </Text>
                         <Ionicons name="chevron-down" size={16} color="#fff" />
                       </TouchableOpacity>
@@ -5116,104 +5377,104 @@ export default function PlayerProfile() {
               }
               
               return (
-                <SectionCard>
-                  <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
-                  
+              <SectionCard>
+                <Text style={styles.teamsSectionTitle}>{t('profile.teams')}</Text>
+                
                   {isEditingMode ? (
-                    <>
-                      {/* Текущие команды */}
-                      <View style={styles.teamsSubsection}>
+                  <>
+                    {/* Текущие команды */}
+                    <View style={styles.teamsSubsection}>
+                      <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
+                      <CurrentTeamsSection
+                        currentTeams={playerTeams}
+                        onCurrentTeamsChange={setPlayerTeams}
+                        onMoveToPastTeams={(team) => {
+                  
+                          setPastTeams(prev => [...prev, team]);
+                        }}
+                        readOnly={false}
+                        isEditing={true}
+                      />
+                    </View>
+                    
+                    {/* Прошлые команды */}
+                    <View style={styles.teamsSubsection}>
+                      <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
+                      <PastTeamsSection
+                        pastTeams={pastTeams}
+                        isEditing={isEditing}
+                        onPastTeamsChange={setPastTeams}
+                        onMoveToCurrentTeams={(team) => {
+                  
+                          setPastTeams(prev => [...prev, team]);
+                        }}
+                        readOnly={false}
+                      />
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    {/* Текущие команды */}
+                    {playerTeams.length > 0 ? (
+                      <>
                         <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
-                        <CurrentTeamsSection
-                          currentTeams={playerTeams}
-                          onCurrentTeamsChange={setPlayerTeams}
-                          onMoveToPastTeams={(team) => {
-                    
-                            setPastTeams(prev => [...prev, team]);
-                          }}
-                          readOnly={false}
-                          isEditing={true}
-                        />
-                      </View>
-                      
-                      {/* Прошлые команды */}
-                      <View style={styles.teamsSubsection}>
-                        <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
-                        <PastTeamsSection
-                          pastTeams={pastTeams}
-                          isEditing={isEditing}
-                          onPastTeamsChange={setPastTeams}
-                          onMoveToCurrentTeams={(team) => {
-                    
-                            setPastTeams(prev => [...prev, team]);
-                          }}
-                          readOnly={false}
-                        />
-                      </View>
-                    </>
-                  ) : (
-                    <>
-                      {/* Текущие команды */}
-                      {playerTeams.length > 0 ? (
-                        <>
-                          <Text style={styles.subsectionTitle}>{t('profile.currentTeams')}</Text>
-                          <View style={styles.teamsListContainer}>
-                            {playerTeams.map((team, index) => (
-                              <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
-                                <Animated.View style={styles.rotatedStar}>
-                                  <Ionicons name="shirt-outline" size={18} color="#fa2f40" />
-                                </Animated.View>
-                                <Text style={styles.teamsListText}>
-                                  {(() => {
-                          const translationKey = `teams.${team.teamName}`;
-                          const translated = t(translationKey);
-                          // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
-                          if (translated === translationKey || translated.startsWith('teams.')) {
-                            return team.teamName;
-                          }
-                          return translated;
-                        })()} ({String(team.startYear || '')} - {t('profile.настоящее время')})
-                                </Text>
-                              </View>
-                            ))}
-                          </View>
-                        </>
-                      ) : isOwner && (
-                        <View style={styles.emptySectionContainer}>
-                          <Ionicons name="shirt-outline" size={48} color="#666" />
-                          <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
+                        <View style={styles.teamsListContainer}>
+                          {playerTeams.map((team, index) => (
+                            <View key={`current-${team.id}-${index}`} style={styles.teamItem}>
+                              <Animated.View style={styles.rotatedStar}>
+                                <Ionicons name="shirt-outline" size={18} color="#fa2f40" />
+                              </Animated.View>
+                              <Text style={styles.teamsListText}>
+                                {(() => {
+                        const translationKey = `teams.${team.teamName}`;
+                        const translated = t(translationKey);
+                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                        if (translated === translationKey || translated.startsWith('teams.')) {
+                          return team.teamName;
+                        }
+                        return translated;
+                      })()} ({String(team.startYear || '')} - {t('profile.настоящее время')})
+                              </Text>
+                            </View>
+                          ))}
                         </View>
-                      )}
-                      
-                      {/* Прошлые команды */}
-                      {pastTeams.length > 0 ? (
-                        <>
-                          <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
-                          <View style={styles.teamsListContainer}>
-                            {pastTeams.map((team, index) => (
-                              <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
-                                <Animated.View style={styles.rotatedStar}>
-                                  <Ionicons name="shirt-outline" size={18} color="#888" />
-                                </Animated.View>
-                                <Text style={styles.teamsListText}>
-                                  {(() => {
-                          const translationKey = `teams.${team.teamName}`;
-                          const translated = t(translationKey);
-                          // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
-                          if (translated === translationKey || translated.startsWith('teams.')) {
-                            return team.teamName;
-                          }
-                          return translated;
-                        })()} ({String(team.startYear || '')}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
-                                </Text>
-                              </View>
-                            ))}
-                          </View>
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                </SectionCard>
+                      </>
+                    ) : isOwner && (
+                      <View style={styles.emptySectionContainer}>
+                        <Ionicons name="shirt-outline" size={48} color="#666" />
+                        <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
+                      </View>
+                    )}
+                    
+                    {/* Прошлые команды */}
+                    {pastTeams.length > 0 ? (
+                      <>
+                        <Text style={styles.subsectionTitle}>{t('profile.pastTeams')}</Text>
+                        <View style={styles.teamsListContainer}>
+                          {pastTeams.map((team, index) => (
+                            <View key={`past-${team.id}-${index}`} style={styles.teamItem}>
+                              <Animated.View style={styles.rotatedStar}>
+                                <Ionicons name="shirt-outline" size={18} color="#888" />
+                              </Animated.View>
+                              <Text style={styles.teamsListText}>
+                                {(() => {
+                        const translationKey = `teams.${team.teamName}`;
+                        const translated = t(translationKey);
+                        // Если функция t() вернула сам ключ, значит перевода нет - используем оригинальное название
+                        if (translated === translationKey || translated.startsWith('teams.')) {
+                          return team.teamName;
+                        }
+                        return translated;
+                      })()} ({String(team.startYear || '')}{team.endYear && team.endYear !== team.startYear ? ` - ${team.endYear}` : ''})
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      </>
+                    ) : null}
+                  </>
+                )}
+              </SectionCard>
               );
             })()}
 
@@ -5357,8 +5618,7 @@ export default function PlayerProfile() {
               const videoContent = isEditingMode ? (
                 <View>
                   <Text style={styles.sectionSubtitle}>
-                    {t('addVideoLink')}{'\n'}
-                    {t('supportedPlatforms')}
+                    {t('addVideoLink')}
                   </Text>
                   <View>
                     {videoFields.map((video, index) => (
@@ -5418,6 +5678,8 @@ export default function PlayerProfile() {
                           placeholderTextColor="#888"
                         />
                         <View style={styles.timeInputContainer}>
+                          <View style={styles.timeInputWithLabel}>
+                            <Text style={styles.timeInputLabel}>{t('timeHour')}</Text>
                         <TextInput
                             style={styles.timeInputField}
                             value={video.hours}
@@ -5461,7 +5723,10 @@ export default function PlayerProfile() {
                             keyboardType="numeric"
                             maxLength={2}
                           />
+                          </View>
                           <Text style={styles.timeSeparator}>:</Text>
+                          <View style={styles.timeInputWithLabel}>
+                            <Text style={styles.timeInputLabel}>{t('timeMinute')}</Text>
                           <TextInput
                             style={styles.timeInputField}
                             value={video.minutes}
@@ -5505,7 +5770,10 @@ export default function PlayerProfile() {
                             keyboardType="numeric"
                             maxLength={2}
                           />
+                          </View>
                           <Text style={styles.timeSeparator}>:</Text>
+                          <View style={styles.timeInputWithLabel}>
+                            <Text style={styles.timeInputLabel}>{t('timeSecond')}</Text>
                           <TextInput
                             style={styles.timeInputField}
                             value={video.seconds}
@@ -5549,6 +5817,7 @@ export default function PlayerProfile() {
                             keyboardType="numeric"
                             maxLength={2}
                         />
+                          </View>
                         </View>
                         {videoFields.length > 1 && (
                           <TouchableOpacity
@@ -5635,7 +5904,7 @@ export default function PlayerProfile() {
                 return (
             <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
                     <Text style={styles.sectionTitle}>
-                      {t('profile.hockeyPhotos')}
+                      {isShopOrSkateSharpening ? t('profile.photos') : t('profile.hockeyPhotos')}
                     </Text>
                     <View style={styles.lockedSectionContainer}>
                       <Ionicons name="lock-closed" size={48} color="#fa2f40" />
@@ -5657,7 +5926,7 @@ export default function PlayerProfile() {
               return (
                 <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
                   <Text style={styles.sectionTitle}>
-                    {t('profile.hockeyPhotos')}
+                    {isShopOrSkateSharpening ? t('profile.photos') : t('profile.hockeyPhotos')}
                   </Text>
                   {galleryPhotos.length === 0 && !isEditingPhotos && isOwner ? (
                     <View style={styles.emptySectionContainer}>
@@ -5931,7 +6200,10 @@ export default function PlayerProfile() {
                       {currentUser && (currentUser.id === player.id || currentUser.status === 'admin') && !isEditing && (
                         <TouchableOpacity
                           style={styles.measureSpeedButton}
-                          onPress={() => router.push('/puck-speed-sound')}
+                          onPress={() => {
+                            // Переходим на экран измерения скорости
+                            router.push('/puck-speed-sound');
+                          }}
                         >
                           <Ionicons name="add-circle" size={24} color="#fff" />
                           <Text style={styles.measureSpeedButtonText}>
@@ -5945,8 +6217,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция упражнений - скрыта если упражнения не выполнены (кроме владельца), для администраторов и для звезд */}
-            {player && player.status !== 'admin' && player.status !== 'star' && (() => {
+            {/* Секция упражнений - только для игроков, скрыта если упражнения не выполнены (кроме владельца) */}
+            {player && player.status === 'player' && (() => {
               const hasExercises = player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0;
               const isOwner = currentUser && currentUser.id === player.id;
               return hasExercises || isOwner;
@@ -5960,8 +6232,8 @@ export default function PlayerProfile() {
               </SectionCard>
             )}
 
-            {/* Достижения - не показываем для магазинов, заточки коньков и администраторов */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && canShowAchievements && (
+            {/* Достижения - не показываем для магазинов, заточки коньков, скаутов и администраторов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && player.status !== 'scout' && canShowAchievements && (
             <SectionCard ref={achievementsRef} wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>{t('profile.achievements')}</Text>
               <AchievementsSection 
@@ -6413,11 +6685,11 @@ export default function PlayerProfile() {
               <View style={styles.qrCodeSection}>
                 <View style={[styles.qrCodeContainer, { borderWidth: 6, borderColor: '#fa2f40', borderRadius: 12 }]}>
                   <QRCode
-                    value={`hockeystars://player/${player.id}`}
+                    value={`https://hockey-stars.com/player/${player.id}`}
                     size={Dimensions.get('window').width - 80}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
-                    logo={player.avatar ? { uri: player.avatar } : require('../../assets/icon.png')}
+                    logo={cachedPlayerAvatar ? { uri: cachedPlayerAvatar } : require('../../assets/icon.png')}
                     logoSize={80}
                     logoBackgroundColor="#fff"
                     logoBorderRadius={40}
@@ -6546,15 +6818,15 @@ export default function PlayerProfile() {
             >
             {player && (
               <>
-                {/* Аватар */}
+                {/* Аватар - используем cachedPlayerAvatar для актуальности */}
                 <View style={styles.shareCardAvatarContainer}>
-                  {player.avatar ? (
+                  {cachedPlayerAvatar ? (
                     <Image 
                       source={{ 
-                        uri: player.avatar,
-                        cache: 'force-cache',
+                        uri: cachedPlayerAvatar,
+                        cache: 'reload',
                         headers: {
-                          'Cache-Control': 'max-age=3600'
+                          'Cache-Control': 'no-cache'
                         }
                       }} 
                       style={styles.shareCardAvatar}
@@ -6689,11 +6961,11 @@ export default function PlayerProfile() {
                 {/* QR-код */}
                 <View style={styles.shareCardQRContainer}>
                   <QRCode
-                    value={`hockeystars://player/${player.id}`}
+                    value={`https://hockey-stars.com/player/${player.id}`}
                     size={180}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
-                    logo={player.avatar ? { uri: player.avatar } : require('../../assets/icon.png')}
+                    logo={cachedPlayerAvatar ? { uri: cachedPlayerAvatar } : require('../../assets/icon.png')}
                     logoSize={50}
                     logoBackgroundColor="#fff"
                     logoBorderRadius={25}
@@ -6993,6 +7265,46 @@ export default function PlayerProfile() {
         </View>
       )}
 
+      {/* Модальное окно выбора месяца и года начала хоккея */}
+      {showHockeyStartDatePicker && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.datePickerModal}>
+            <DateTimePicker
+              value={selectedHockeyStartDate}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onHockeyStartDateChange}
+              maximumDate={new Date()}
+              minimumDate={new Date(1900, 0, 1)}
+              textColor="#fff"
+              themeVariant="dark"
+            />
+            {Platform.OS === 'ios' && (
+              <View style={styles.datePickerButtons}>
+                <TouchableOpacity 
+                  style={styles.datePickerButton} 
+                  onPress={() => setShowHockeyStartDatePicker(false)}
+                >
+                  <Text style={styles.datePickerButtonText}>{t('profile.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.datePickerButton, styles.confirmButton]} 
+                  onPress={() => {
+                    const month = (selectedHockeyStartDate.getMonth() + 1).toString().padStart(2, '0');
+                    const year = selectedHockeyStartDate.getFullYear().toString();
+                    const formattedDate = `${month}.${year}`;
+                    setEditData({...editData, hockeyStartDate: formattedDate});
+                    setShowHockeyStartDatePicker(false);
+                  }}
+                >
+                  <Text style={styles.datePickerButtonText}>{t('common.confirm')}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
+
       {/* Модальное окно подарка */}
       {currentUser && currentUser.status === 'admin' && player && (
         <AdminGiftModal
@@ -7111,23 +7423,29 @@ export default function PlayerProfile() {
       {player.status === 'star' && currentUser && currentUser.id !== player.id && currentUser.status === 'player' && (
         <Modal
           visible={showRequestGiftModal}
-          animationType="slide"
-          presentationStyle="pageSheet"
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setShowRequestGiftModal(false)}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {t('gifts.requestGift')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowRequestGiftModal(false)}
-                style={styles.closeButton}
-              >
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-            </View>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>
+                  {t('gifts.requestGift')}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowRequestGiftModal(false)}
+                  style={styles.closeButton}
+                >
+                  <Ionicons name="close" size={24} color="#fff" />
+                </TouchableOpacity>
+              </View>
 
-            <ScrollView style={styles.modalContent}>
+              <ScrollView 
+                style={styles.modalContent}
+                contentContainerStyle={styles.modalContentContainer}
+                keyboardShouldPersistTaps="handled"
+              >
               <View style={styles.formGroup}>
                 <Text style={styles.label}>{t('gifts.requestMessage')} *</Text>
                 <Text style={styles.helperText}>
@@ -7166,7 +7484,8 @@ export default function PlayerProfile() {
                   {t('gifts.requestInfo') || 'Звезда получит ваше сообщение и сможет выбрать подарок для вас'}
                 </Text>
               </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
           </View>
         </Modal>
       )}
@@ -7874,6 +8193,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  navigateToProfileButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(250, 47, 64, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
   measureSpeedButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -8145,6 +8476,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     fontWeight: 'bold',
+    marginTop: 18, // Выравниваем с полями ввода, которые теперь имеют label сверху
+  },
+  timeInputWithLabel: {
+    alignItems: 'center',
+  },
+  timeInputLabel: {
+    fontSize: 11,
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    marginBottom: 4,
+    textTransform: 'lowercase',
   },
   removeVideoButton: {
     padding: 4,
@@ -8367,10 +8709,19 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 40,
+  },
   modalContainer: {
-    width: '90%',
-    maxWidth: 420,
-    maxHeight: Dimensions.get('window').height * 0.75,
+    width: '100%',
+    maxWidth: 600,
+    height: Dimensions.get('window').height * 0.6,
+    maxHeight: Dimensions.get('window').height * 0.8,
     backgroundColor: '#08010d',
     borderRadius: 20,
     overflow: 'hidden',
@@ -8379,6 +8730,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     borderWidth: 1,
     borderColor: '#fa2f40',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
   },
   pickerModalContainer: {
     width: '100%',
@@ -8437,6 +8796,9 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 16,
+  },
+  modalContentContainer: {
+    paddingBottom: 20,
   },
   pickerModalContent: {
     width: '100%',
@@ -9014,7 +9376,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1, 0, 0, 0.95)',
     borderRadius: 12,
     paddingVertical: 4,
-    minWidth: 180,
+    minWidth: 200,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

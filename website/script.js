@@ -1,6 +1,8 @@
 // Translations
 const translations = {
     ru: {
+        'page.title': 'HockeyStars - Приложение для хоккеистов',
+        'page.description': 'Социальная сеть для будущих звезд хоккея. Заяви о себе на весь хоккейный мир! Получи предложения от ведущих скаутов мира!',
         'hero.subtitle': 'Весь хоккейный мир в одном приложении',
         'hero.description': 'Заяви о себе, стань хоккейной звездой!',
         'forWhom.title': 'Для кого?',
@@ -31,6 +33,7 @@ const translations = {
         'download.playstore.label': 'Скачать в',
         'footer.copyright': '© 2025 HockeyStars. Все права защищены.',
         'footer.privacy': 'Политика конфиденциальности',
+        'footer.deleteAccount': 'Удаление аккаунта',
         'footer.contact': 'Обратная связь',
         'contact.title': 'Связаться с нами',
         'contact.subtitle': 'Есть вопрос или предложение? Напишите нам – мы отвечаем лично и обычно в течение одного рабочего дня.',
@@ -41,7 +44,7 @@ const translations = {
         'contact.form.validation': 'Пожалуйста, заполните все поля.',
         'contact.form.sending': 'Отправляем сообщение…',
         'contact.form.success': 'Сообщение отправлено! Мы свяжемся с вами в течение одного рабочего дня.',
-        'contact.form.error': 'Не удалось отправить сообщение. Попробуйте еще раз или напишите на support@hockeystars.app.',
+        'contact.form.error': 'Не удалось отправить сообщение. Попробуйте еще раз или напишите на support@hockey-stars.com.',
         'contact.back': '← Вернуться на главную',
         'rules.title': 'Политика конфиденциальности',
         'rules.lastUpdated': 'Последнее обновление: 19 ноября 2025 г.',
@@ -96,7 +99,7 @@ const translations = {
         'rules.children.item3': 'Если мы узнаем, что собрали данные от ребенка без согласия, мы немедленно удалим эту информацию',
         'rules.children.item4': 'Родители имеют право запросить доступ к данным своего ребенка, потребовать их исправления или полного удаления',
         'rules.children.item5': 'Мы не продаем и не передаем данные детей третьим лицам для маркетинговых целей',
-        'rules.children.contact': 'Для реализации этих прав родители могут связаться с нашей службой поддержки по email support@hockeystars.app с адреса электронной почты, который использовался для предоставления согласия.',
+        'rules.children.contact': 'Для реализации этих прав родители могут связаться с нашей службой поддержки по email support@hockey-stars.com с адреса электронной почты, который использовался для предоставления согласия.',
         'rules.children.parentalConsent.title': '6.1. Родительское согласие для детей младше 13 лет',
         'rules.children.parentalConsent.text': 'Для регистрации детей младше 13 лет требуется верифицированное согласие родителей:',
         'rules.children.parentalConsent.item1': 'Родительское согласие получается только по электронной почте (не через простую галочку)',
@@ -129,11 +132,13 @@ const translations = {
         'rules.changes.text': 'Мы можем периодически обновлять настоящую Политику конфиденциальности. О существенных изменениях мы уведомим вас через приложение или по электронной почте. Продолжение использования приложения после внесения изменений означает ваше согласие с обновленной политикой.',
         'rules.contact.title': '9. Контакты',
         'rules.contact.text': 'Если у вас есть вопросы или предложения относительно настоящей Политики конфиденциальности, пожалуйста, свяжитесь с нами:',
-        'rules.contact.email': 'Email: support@hockeystars.app',
+        'rules.contact.email': 'Email: support@hockey-stars.com',
         'rules.contact.app': 'Через приложение: раздел "Настройки" → "Поддержка"',
         'rules.back': '← Вернуться на главную'
     },
     en: {
+        'page.title': 'HockeyStars - App for Hockey Players',
+        'page.description': 'Social network for future hockey stars. Make yourself known to the entire hockey world! Get offers from leading scouts worldwide!',
         'hero.subtitle': 'The entire hockey world in one app',
         'hero.description': 'Make yourself known to the world, become a hockey star!',
         'forWhom.title': 'For whom?',
@@ -164,6 +169,7 @@ const translations = {
         'download.playstore.label': 'Get it on',
         'footer.copyright': '© 2025 HockeyStars. All rights reserved.',
         'footer.privacy': 'Privacy Policy',
+        'footer.deleteAccount': 'Delete Account',
         'footer.contact': 'Contact Us',
         'contact.title': 'Contact Us',
         'contact.subtitle': 'Have a question or suggestion? Send us a note — we personally reply within one business day.',
@@ -174,7 +180,7 @@ const translations = {
         'contact.form.validation': 'Please fill in all fields.',
         'contact.form.sending': 'Sending your message…',
         'contact.form.success': 'Message sent! We will get back to you within one business day.',
-        'contact.form.error': 'Message could not be sent. Please try again or email us at support@hockeystars.app.',
+        'contact.form.error': 'Message could not be sent. Please try again or email us at support@hockey-stars.com.',
         'contact.back': '← Back to main page',
         'rules.title': 'Privacy Policy',
         'rules.lastUpdated': 'Last updated: November 19, 2025',
@@ -229,7 +235,7 @@ const translations = {
         'rules.children.item3': 'If we learn that we collected data from a child without consent, we will promptly delete this information',
         'rules.children.item4': 'Parents have the right to request access to their child’s data, demand corrections, or complete deletion',
         'rules.children.item5': 'We do not sell or transfer children’s data to third parties for marketing purposes',
-        'rules.children.contact': 'To exercise these rights, parents can contact our support team at support@hockeystars.app from the email address used to provide consent.',
+        'rules.children.contact': 'To exercise these rights, parents can contact our support team at support@hockey-stars.com from the email address used to provide consent.',
         'rules.children.parentalConsent.title': '6.1. Parental Consent for Children Under 13',
         'rules.children.parentalConsent.text': 'For users under 13 years of age, we require verifiable parental consent:',
         'rules.children.parentalConsent.item1': 'Parental consent is obtained only via email (not through a simple checkbox)',
@@ -262,7 +268,7 @@ const translations = {
         'rules.changes.text': 'We may periodically update this Privacy Policy. We will notify you of material changes through the App or by email. Continued use of the App after changes means your acceptance of the updated policy.',
         'rules.contact.title': '9. Contacts',
         'rules.contact.text': 'If you have questions or suggestions regarding this Privacy Policy, please contact us:',
-        'rules.contact.email': 'Email: support@hockeystars.app',
+        'rules.contact.email': 'Email: support@hockey-stars.com',
         'rules.contact.app': 'Through the app: Settings → Support',
         'rules.back': '← Back to home'
     }
@@ -358,9 +364,59 @@ function setLanguage(lang) {
         }
     }
 
+    // Update delete account links
+    const deleteAccountRu = document.querySelector('.footer-delete-account-ru');
+    const deleteAccountEn = document.querySelector('.footer-delete-account-en');
+    if (deleteAccountRu && deleteAccountEn) {
+        if (lang === 'en') {
+            deleteAccountRu.style.display = 'none';
+            deleteAccountEn.style.display = 'inline-block';
+        } else {
+            deleteAccountRu.style.display = 'inline-block';
+            deleteAccountEn.style.display = 'none';
+        }
+    }
+
     document.querySelectorAll('input[name="lang"]').forEach(input => {
         input.value = lang;
     });
+
+    // Update page title and meta description
+    if (translations[lang] && translations[lang]['page.title']) {
+        document.title = translations[lang]['page.title'];
+    }
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription && translations[lang] && translations[lang]['page.description']) {
+        metaDescription.setAttribute('content', translations[lang]['page.description']);
+    }
+
+    // Update Open Graph tags for SEO
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle && translations[lang] && translations[lang]['page.title']) {
+        ogTitle.setAttribute('content', translations[lang]['page.title']);
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription && translations[lang] && translations[lang]['page.description']) {
+        ogDescription.setAttribute('content', translations[lang]['page.description']);
+    }
+    
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) {
+        ogLocale.setAttribute('content', lang === 'ru' ? 'ru_RU' : 'en_US');
+    }
+
+    // Update Twitter tags for SEO
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle && translations[lang] && translations[lang]['page.title']) {
+        twitterTitle.setAttribute('content', translations[lang]['page.title']);
+    }
+    
+    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+    if (twitterDescription && translations[lang] && translations[lang]['page.description']) {
+        twitterDescription.setAttribute('content', translations[lang]['page.description']);
+    }
 }
 
 function getTranslationValue(key, fallback) {
@@ -551,7 +607,7 @@ function initContactForm() {
             setStatus(
                 getTranslationValue(
                     'contact.form.error',
-                    'Message could not be sent. Please try again or email us at support@hockeystars.app.'
+                    'Message could not be sent. Please try again or email us at support@hockey-stars.com.'
                 ),
                 true
             );
@@ -760,14 +816,27 @@ let puckPhysics = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    const lang = detectLanguage();
+    // Detect language from URL path
+    let lang = 'ru';
+    if (window.location.pathname.includes('/en')) {
+        lang = 'en';
+    } else {
+        lang = detectLanguage();
+    }
     setLanguage(lang);
     
     // Add click handlers to language buttons
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const newLang = btn.getAttribute('data-lang');
-            setLanguage(newLang);
+            // Redirect to appropriate page for SEO
+            if (newLang === 'en' && !window.location.pathname.includes('/en')) {
+                window.location.href = '/en';
+            } else if (newLang === 'ru' && window.location.pathname.includes('/en')) {
+                window.location.href = '/';
+            } else {
+                setLanguage(newLang);
+            }
         });
     });
     

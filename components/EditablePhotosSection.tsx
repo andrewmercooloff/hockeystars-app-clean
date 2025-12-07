@@ -201,7 +201,8 @@ export default function EditablePhotosSection({
 
            onPhotosChange?.(newPhotos);
            
-           // Отправляем уведомления друзьям о добавленных фото
+           // Начисляем очки активности за загруженные фото
+           // ВАЖНО: Уведомления друзьям отправляются только при сохранении профиля (в handleSave)
            const addedPhotosCount = result.assets.length;
            if (addedPhotosCount > 0) {
              try {
@@ -215,22 +216,9 @@ export default function EditablePhotosSection({
                      console.error('❌ Ошибка начисления очков активности за фото (не критично):', error);
                    }
                  }
-                 
-                 await notifyFriendsAboutPhotos(
-                   currentUser.id,
-                   currentUser.name,
-                   addedPhotosCount,
-                   {
-                     photoNotification: {
-                       added: t('photoNotification.added'),
-                       onePhoto: t('photoNotification.onePhoto'),
-                       multiplePhotos: t('photoNotification.multiplePhotos')
-                     }
-                   }
-                 );
                }
              } catch (error) {
-               console.error('❌ Ошибка отправки уведомлений о фото:', error);
+               console.error('❌ Ошибка начисления очков активности за фото:', error);
              }
            }
            

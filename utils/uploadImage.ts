@@ -34,6 +34,8 @@ const ensureAvatarsBucket = async () => {
 };
 
 // Функция для загрузки изображения в Supabase Storage (для аватаров)
+// ВАЖНО: fileName должен быть фиксированным для конкретного игрока (например, avatar_{playerId}.jpg)
+// Это позволяет ПЕРЕЗАПИСЫВАТЬ старый аватар вместо создания нового файла
 export const uploadImageToStorage = async (imageUri: string, fileName?: string): Promise<string | null> => {
   try {
     
@@ -44,10 +46,14 @@ export const uploadImageToStorage = async (imageUri: string, fileName?: string):
       return null;
     }
     
-    // Создаем уникальное имя файла
-    const timestamp = Date.now();
-    const fileExtension = imageUri.split('.').pop() || 'jpg';
-    let finalFileName = fileName || `avatar_${timestamp}.${fileExtension}`;
+    // ВАЖНО: Используем переданное имя файла (должно быть привязано к playerId)
+    // Если имя не передано - это ошибка, но создаём уникальное для обратной совместимости
+    let finalFileName = fileName;
+    if (!finalFileName) {
+      console.warn('⚠️ uploadImageToStorage: fileName не передан, создаём уникальное имя (нежелательно)');
+      const timestamp = Date.now();
+      finalFileName = `avatar_${timestamp}.jpg`;
+    }
     
     // Очищаем имя файла от лишних слешей
     finalFileName = finalFileName.replace(/^\/+/, '').replace(/\/+$/, '');

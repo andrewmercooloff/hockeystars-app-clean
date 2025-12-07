@@ -65,3 +65,6 @@ temp/
 
 expo-env.d.ts
 # @end expo-cli.env
+
+# Google Service Account (секретный файл!)
+google-service-account.json

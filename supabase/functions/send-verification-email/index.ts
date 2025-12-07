@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, code, subject = 'Код подтверждения HockeyStars' } = await req.json()
+    const { email, code, subject = 'HockeyStars Verification Code' } = await req.json()
 
     // Проверяем обязательные параметры
     if (!email || !code) {
@@ -56,22 +56,22 @@ serve(async (req) => {
           <p style="color: #666; margin: 5px 0 0 0;">I'm gonna be a hockey star</p>
         </div>
         
-        <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Код подтверждения</h2>
+        <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Verification Code</h2>
         
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
-          <p style="color: #666; margin: 0 0 10px 0; font-size: 16px;">Ваш код подтверждения:</p>
+          <p style="color: #666; margin: 0 0 10px 0; font-size: 16px;">Your verification code:</p>
           <h1 style="color: #FF4444; font-size: 36px; font-weight: bold; margin: 0; letter-spacing: 5px;">${code}</h1>
         </div>
         
         <p style="color: #666; text-align: center; margin: 20px 0;">
-          Код действителен <strong>10 минут</strong>.<br>
-          Если вы не запрашивали этот код, просто проигнорируйте это письмо.
+          This code is valid for <strong>10 minutes</strong>.<br>
+          If you did not request this code, please ignore this email.
         </p>
         
         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
           <p style="color: #999; font-size: 12px; margin: 0;">
-            С уважением,<br>
-            Команда HockeyStars
+            Best regards,<br>
+            HockeyStars Team
           </p>
         </div>
       </div>
@@ -85,7 +85,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'HockeyStars <noreply@hockeystars.by>',
+        from: 'HockeyStars <noreply@hockey-stars.com>',
         to: [email],
         subject: subject,
         html: htmlContent,

@@ -123,8 +123,9 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
       const blob = await response.blob();
       
       // Создаем FormData
+      // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
       const formData = new FormData();
-      const fileName = `avatar_${Date.now()}.jpg`;
+      const fileName = `avatar_${playerId}.jpg`;
       formData.append('file', blob, fileName);
       
       // Загружаем в Supabase Storage

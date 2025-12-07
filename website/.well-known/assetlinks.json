@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "by.hockeystars.app",
+    "sha256_cert_fingerprints": [
+      "00:7D:37:5A:A7:C2:F4:3A:3F:8C:20:43:C2:63:35:AF:1B:9F:2B:EC:52:D6:94:91:8C:7F:91:86:14:48:E4:24"
+    ]
+  }
+}]
+

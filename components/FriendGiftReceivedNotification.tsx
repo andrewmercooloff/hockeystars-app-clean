@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import CachedAvatar from './CachedAvatar';
@@ -11,9 +11,11 @@ interface FriendGiftReceivedNotificationProps {
     title: string;
     message: string;
     createdAt: string;
+    timestamp?: number;
     data: {
       playerId: string;
       playerName: string;
+      playerAvatar?: string;
       starName: string;
       giftName: string;
     };
@@ -60,20 +62,12 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
         activeOpacity={0.7}
       >
         <View style={styles.avatarContainer}>
-        {playerAvatar ? (
-          <Image
-            source={{ uri: playerAvatar }}
-            style={styles.playerAvatar}
-            resizeMode="cover"
-          />
-        ) : (
           <CachedAvatar
             playerId={notification.data.playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />
-        )}
       </View>
 
       <View style={styles.contentContainer}>
@@ -82,7 +76,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
             {playerName}
           </Text>
           <Text style={styles.timeText}>
-            {formatTime(notification.createdAt || notification.timestamp || new Date().toISOString())}
+            {formatTime(notification.createdAt || (notification.timestamp ? new Date(notification.timestamp).toISOString() : new Date().toISOString()))}
           </Text>
         </View>
 

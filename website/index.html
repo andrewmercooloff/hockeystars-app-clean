@@ -3,10 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HockeyStars - социальная сеть для юных хоккеистов, тренеров и скаутов">
-    <title>HockeyStars - Где каждый игрок становится звездой!</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="description" content="Социальная сеть для будущих звезд хоккея. Заяви о себе на весь хоккейный мир! Получи предложения от ведущих скаутов мира!">
+    <title>HockeyStars - Приложение для хоккеистов</title>
+    
+    <!-- SEO: Alternate language versions for search engines -->
+    <link rel="alternate" hreflang="ru" href="https://hockey-stars.com/">
+    <link rel="alternate" hreflang="en" href="https://hockey-stars.com/en">
+    <link rel="alternate" hreflang="x-default" href="https://hockey-stars.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hockey-stars.com/">
+    <meta property="og:title" content="HockeyStars - Приложение для хоккеистов">
+    <meta property="og:description" content="Социальная сеть для будущих звезд хоккея. Заяви о себе на весь хоккейный мир! Получи предложения от ведущих скаутов мира!">
+    <meta property="og:image" content="https://hockey-stars.com/logo.png">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:locale:alternate" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hockey-stars.com/">
+    <meta property="twitter:title" content="HockeyStars - Приложение для хоккеистов">
+    <meta property="twitter:description" content="Социальная сеть для будущих звезд хоккея. Заяви о себе на весь хоккейный мир! Получи предложения от ведущих скаутов мира!">
+    <meta property="twitter:image" content="https://hockey-stars.com/logo.png">
+    
+    <!-- Favicon для всех устройств с темным фоном -->
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-title" content="HockeyStars" />
+    <meta name="theme-color" content="#050008">
+    <meta name="msapplication-TileColor" content="#050008">
+    <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105715227', 'ym');
+        ym(105715227, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105715227" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YLGFTHQPHE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YLGFTHQPHE');
+    </script>
+    
+    <!-- Метатеги для вебмастеров -->
+    <meta name="yandex-verification" content="d133639f66966a06" />
+    <meta name="google-site-verification" content="t9Gq_2xhpb30q1xhYZzj4MhN_XCnYjTlZUdfStVUOEw" />
 </head>
 <body>
     <div class="background-overlay"></div>
@@ -54,6 +110,26 @@
             <section class="hero">
                 <div class="hero-logo-container">
                     <img src="logo.png" alt="HockeyStars" class="hero-logo">
+                </div>
+                <div class="hero-download-buttons">
+                    <a href="https://apps.apple.com/app/id6753738837" class="download-btn appstore" target="_blank" rel="noopener noreferrer" aria-label="Скачать в App Store">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        <div class="download-btn-text">
+                            <span class="download-btn-label" data-i18n="download.appstore.label">Скачать в</span>
+                            <span class="download-btn-name">App Store</span>
+                        </div>
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=by.hockeystars.app" class="download-btn playstore" target="_blank" rel="noopener noreferrer" aria-label="Скачать в Google Play">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+                        </svg>
+                        <div class="download-btn-text">
+                            <span class="download-btn-label" data-i18n="download.playstore.label">Скачать в</span>
+                            <span class="download-btn-name">Google Play</span>
+                        </div>
+                    </a>
                 </div>
                 <p class="hero-subtitle" data-i18n="hero.subtitle">Где каждый игрок становится звездой!</p>
                 <p class="hero-description" data-i18n="hero.description">
@@ -226,7 +302,7 @@
                     Установите HockeyStars на свое устройство и присоединяйтесь к хоккейному сообществу!
                 </p>
                 <div class="download-buttons">
-                    <a href="https://apps.apple.com/app/hockeystars" class="download-btn appstore" target="_blank" rel="noopener noreferrer" aria-label="Скачать в App Store">
+                    <a href="https://apps.apple.com/app/id6753738837" class="download-btn appstore" target="_blank" rel="noopener noreferrer" aria-label="Скачать в App Store">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                         </svg>
@@ -255,6 +331,8 @@
                 <p class="footer-text" data-i18n="footer.copyright">© 2025 HockeyStars. Все права защищены.</p>
                 <a href="rules.html" class="footer-link footer-privacy-ru" data-i18n="footer.privacy">Политика конфиденциальности</a>
                 <a href="privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
+                <a href="delete-account.html" class="footer-link footer-delete-account-ru" data-i18n="footer.deleteAccount">Удаление аккаунта</a>
+                <a href="delete-account-en.html" class="footer-link footer-delete-account-en" style="display: none;">Delete Account</a>
                 <a href="contact.html" class="footer-link" data-i18n="footer.contact">Обратная связь</a>
             </div>
         </div>

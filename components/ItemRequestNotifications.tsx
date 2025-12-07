@@ -1,7 +1,6 @@
 import SafeIcon from './SafeIcon';
 import React, { useEffect, useState } from 'react';
 import {
-    Image,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -10,6 +9,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedAvatar from './CachedAvatar';
 import { supabase } from '../utils/supabase';
 
 interface ItemRequest {
@@ -165,16 +165,12 @@ const ItemRequestNotifications: React.FC<ItemRequestNotificationsProps> = ({ pla
               <View key={request.id} style={styles.requestCard}>
                 <View style={styles.requestHeader}>
                   <View style={styles.starInfo}>
-                    {request.owner?.avatar_url ? (
-                      <Image 
-                        source={{ uri: request.owner.avatar_url }} 
-                        style={styles.avatar} 
-                      />
-                    ) : (
-                      <View style={styles.avatarPlaceholder}>
-                        <Ionicons name="person" size={20} color="#8E8E93" />
-                      </View>
-                    )}
+                    <CachedAvatar
+                      playerId={request.owner_id}
+                      fallbackAvatarUrl={request.owner?.avatar_url}
+                      size={40}
+                      style={styles.avatar}
+                    />
                     <View style={styles.starDetails}>
                       <Text style={styles.starName}>
                         {request.owner?.name || 'Неизвестная звезда'}
@@ -233,16 +229,12 @@ const ItemRequestNotifications: React.FC<ItemRequestNotificationsProps> = ({ pla
               <View key={request.id} style={styles.requestCard}>
                 <View style={styles.requestHeader}>
                   <View style={styles.starInfo}>
-                    {request.owner?.avatar_url ? (
-                      <Image 
-                        source={{ uri: request.owner.avatar_url }} 
-                        style={styles.avatar} 
-                      />
-                    ) : (
-                      <View style={styles.avatarPlaceholder}>
-                        <Ionicons name="person" size={20} color="#8E8E93" />
-                      </View>
-                    )}
+                    <CachedAvatar
+                      playerId={request.owner_id}
+                      fallbackAvatarUrl={request.owner?.avatar_url}
+                      size={40}
+                      style={styles.avatar}
+                    />
                     <View style={styles.starDetails}>
                       <Text style={styles.starName}>
                         {request.owner?.name || 'Неизвестная звезда'}
@@ -301,16 +293,12 @@ const ItemRequestNotifications: React.FC<ItemRequestNotificationsProps> = ({ pla
               <View key={request.id} style={styles.requestCard}>
                 <View style={styles.requestHeader}>
                   <View style={styles.starInfo}>
-                    {request.owner?.avatar_url ? (
-                      <Image 
-                        source={{ uri: request.owner.avatar_url }} 
-                        style={styles.avatar} 
-                      />
-                    ) : (
-                      <View style={styles.avatarPlaceholder}>
-                        <Ionicons name="person" size={20} color="#8E8E93" />
-                      </View>
-                    )}
+                    <CachedAvatar
+                      playerId={request.owner_id}
+                      fallbackAvatarUrl={request.owner?.avatar_url}
+                      size={40}
+                      style={styles.avatar}
+                    />
                     <View style={styles.starDetails}>
                       <Text style={styles.starName}>
                         {request.owner?.name || 'Неизвестная звезда'}

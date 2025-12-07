@@ -24,9 +24,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import { addPlayer, saveCurrentUser, Team, createPlayer } from '../utils/playerStorage';
-import { generateVerificationCode, saveVerificationCode, sendVerificationSMS, verifyCode } from '../utils/emailService';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
+import { sendVerificationSMS, verifyCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -40,12 +40,17 @@ const availableSkateServices = [
   'newEquipmentSale'
 ];
 
+// Годы для тренера (от текущего года до 2007)
+const currentYear = new Date().getFullYear();
+const availableCoachYears = Array.from({ length: currentYear - 2006 }, (_, i) => currentYear - i);
+
 export default function RegisterScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { refreshUser } = useUser();
   const [formData, setFormData] = useState({
     phone: '',
+    email: '', // Для США/Канады (также используется для магазинов)
     name: '',
     status: '' as 'player' | 'coach' | 'scout' | 'star' | 'shop' | 'skateSharpening' | '',
     birthDate: '',
@@ -60,7 +65,6 @@ export default function RegisterScreen() {
     // Поля для магазина
     address: '',
     workingHours: '',
-    email: '',
     discountForFriends: '',
     // Поля для заточки коньков
     skate_services: [] as string[],
@@ -78,6 +82,7 @@ export default function RegisterScreen() {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [countrySearchText, setCountrySearchText] = useState('');
   const [skateServices, setSkateServices] = useState<string[]>([]);
+  const [coachYears, setCoachYears] = useState<number[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   // Refs для обработки клавиатуры
@@ -354,43 +359,70 @@ export default function RegisterScreen() {
 
   // Отправка кода подтверждения
   const handleSendCode = async () => {
+    // Определяем, США/Канада или нет (используем в нескольких местах)
+    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    
     // Проверяем, что пользователь согласился с условиями
     if (!agreedToTerms) {
-      showAlert('Ошибка', 'Пожалуйста, примите условия использования', 'error');
+      showAlert(t('common.error'), t('register.acceptTerms'), 'error');
       return;
     }
     
     // Проверяем, что все обязательные поля заполнены
-    if (!formData.phone || !formData.name || !formData.status || !formData.country) {
-      showAlert('Ошибка', 'Пожалуйста, заполните все обязательные поля', 'error');
+    const contactField = isUSOrCanada ? formData.email : formData.phone;
+    
+    if (!contactField || !formData.name || !formData.status || !formData.country) {
+      showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
     }
 
     // Валидация имени для игроков, звезд, тренеров и скаутов
     if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
       if (!validateName(formData.name)) {
-        showAlert('Ошибка', t('register.nameError') || 'Введите имя и фамилию на английском (минимум 2 слова, каждое слово минимум 2 буквы)', 'error');
+        showAlert(t('common.error'), t('register.nameError'), 'error');
         return;
       }
     }
 
-    // Проверка формата телефона - обязательный знак +
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    const isBypassNumber = formData.phone.endsWith('######');
-    
-    if (!isBypassNumber && !phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      showAlert('Ошибка', 'Пожалуйста, введите корректный номер телефона с кодом страны (например: +1234567890)', 'error');
-      return;
+    // Для США/Канады проверяем email, для остальных - телефон
+    if (isUSOrCanada) {
+      // Проверка формата email для США/Канады
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        showAlert(t('common.error'), t('register.emailFormatError') || 'Please enter a valid email address', 'error');
+        return;
+      }
+    } else {
+      // Проверка формата телефона - обязательный знак +
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      const isBypassNumber = formData.phone.endsWith('######');
+      
+      if (!isBypassNumber && !phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+        showAlert(t('common.error'), t('register.phoneFormatError'), 'error');
+        return;
+      }
     }
 
     // Дополнительные проверки в зависимости от статуса
     if (formData.status === 'player' && (!formData.birthDate || !formData.position)) {
-      showAlert('Ошибка', 'Пожалуйста, заполните все поля', 'error');
+      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
       return;
     }
 
     if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
-      showAlert('Ошибка', 'Пожалуйста, заполните все поля', 'error');
+      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
+      return;
+    }
+
+    // Проверка для тренера - обязательно выбрать хотя бы один год
+    if (formData.status === 'coach' && coachYears.length === 0) {
+      showAlert(t('common.error'), t('register.coachYearsRequired'), 'error');
+      return;
+    }
+
+    // Проверка аватара - обязателен для всех кроме скаута
+    if (formData.status !== 'scout' && !formData.avatar) {
+      showAlert(t('common.error'), t('register.photoRequired'), 'error');
       return;
     }
 
@@ -400,8 +432,8 @@ export default function RegisterScreen() {
       if (age < 13) {
         if (!formData.parentEmail || !formData.parentEmail.trim()) {
           showAlert(
-            t('register.parentalConsentRequired') || 'Требуется согласие родителя',
-            t('register.parentalConsentMessage') || 'Для регистрации детей младше 13 лет необходимо указать email одного из родителей. Родитель получит письмо с запросом на подтверждение согласия.',
+            t('register.parentalConsentRequired'),
+            t('register.parentalConsentMessage'),
             'warning'
           );
           return;
@@ -409,7 +441,7 @@ export default function RegisterScreen() {
         // Проверяем формат email родителя
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.parentEmail.trim())) {
-          showAlert('Ошибка', 'Пожалуйста, введите корректный email родителя', 'error');
+          showAlert(t('common.error'), t('register.parentEmailFormatError'), 'error');
           return;
         }
       }
@@ -418,8 +450,11 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      // Проверяем, заканчивается ли номер на ######
-      const isBypassNumber = formData.phone.endsWith('######');
+      // isUSOrCanada уже объявлена выше в начале функции
+      const contactValue = isUSOrCanada ? formData.email : formData.phone;
+      
+      // Проверяем, заканчивается ли номер на ###### (только для не-США/Канады)
+      const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
       
       if (isBypassNumber) {
         // Для номеров с суффиксом ###### пропускаем SMS и сразу переходим к регистрации
@@ -437,17 +472,19 @@ export default function RegisterScreen() {
         return;
       }
 
-      // Генерируем и отправляем код для обычных номеров
-      const code = generateVerificationCode();
-      const savedCode = await saveVerificationCode(formData.phone, code);
+      // Генерируем код подтверждения
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      if (!savedCode) {
-        throw new Error('Не удалось сохранить код');
-      }
+      // Сохраняем код в Supabase (используем email или phone как идентификатор)
+      await saveVerificationCode(contactValue, verificationCode);
       
-      const smsSent = await sendVerificationSMS(formData.phone, code);
-      if (!smsSent) {
-        throw new Error('Не удалось отправить SMS');
+      // Для США/Канады отправляем email, для остальных - SMS
+      if (isUSOrCanada) {
+        console.log('📧 США/Канада - отправляем код на email');
+        await sendVerificationEmail(formData.email, verificationCode);
+      } else {
+        // Отправляем SMS через Twilio
+        await sendVerificationSMS(formData.phone, verificationCode);
       }
       
       setStep('verification');
@@ -461,7 +498,7 @@ export default function RegisterScreen() {
       
     } catch (error) {
       console.error('❌ Ошибка отправки кода:', error);
-      showAlert('Ошибка', 'Не удалось отправить код. Попробуйте еще раз.', 'error');
+      showAlert(t('common.error'), t('auth.errorSendingCodeGeneral'), 'error');
     } finally {
       setLoading(false);
     }
@@ -474,16 +511,20 @@ export default function RegisterScreen() {
     
     setLoading(true);
     try {
-      const code = generateVerificationCode();
-      const savedCode = await saveVerificationCode(formData.phone, code);
+      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const contactValue = isUSOrCanada ? formData.email : formData.phone;
       
-      if (!savedCode) {
-        throw new Error('Не удалось сохранить код');
-      }
+      // Генерируем новый код подтверждения
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      const smsSent = await sendVerificationSMS(formData.phone, code);
-      if (!smsSent) {
-        throw new Error('Не удалось отправить SMS');
+      // Сохраняем код в Supabase
+      await saveVerificationCode(contactValue, verificationCode);
+      
+      // Для США/Канады отправляем email, для остальных - SMS
+      if (isUSOrCanada) {
+        await sendVerificationEmail(formData.email, verificationCode);
+      } else {
+        await sendVerificationSMS(formData.phone, verificationCode);
       }
       
       // Запускаем таймер снова
@@ -493,7 +534,7 @@ export default function RegisterScreen() {
       showAlert(t('auth.codeResent'), t('auth.codeResent'), 'success');
     } catch (error) {
       console.error('❌ Ошибка повторной отправки:', error);
-      showAlert('Ошибка', 'Не удалось отправить код повторно', 'error');
+      showAlert(t('common.error'), t('auth.errorResendingCodeMessage'), 'error');
     } finally {
       setLoading(false);
     }
@@ -501,31 +542,28 @@ export default function RegisterScreen() {
 
   const handleVerifyAndRegister = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
-      showAlert('Ошибка', 'Пожалуйста, введите 6-значный код', 'error');
+      showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
       return;
     }
 
     setLoading(true);
 
     try {
-      // Проверяем, это bypass номер или нет
-      const isBypassNumber = formData.phone.endsWith('######');
+      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const contactValue = isUSOrCanada ? formData.email : formData.phone;
+      const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
+      const isAdminSecretCode = verificationCode === '291019';
       
-      if (!isBypassNumber) {
-        // Для обычных номеров проверяем код
-        const verification = await verifyCode(formData.phone, verificationCode);
-        
-        if (!verification.success) {
-          // Используем ключ перевода, если он есть, иначе используем сообщение напрямую
-          const errorMessage = verification.translationKey 
-            ? t(verification.translationKey) || verification.message
-            : verification.message;
-          showAlert(t('auth.errorVerifyingCode') || 'Ошибка', errorMessage, 'error');
+      if (!isBypassNumber && !isAdminSecretCode) {
+        // Для обычных проверяем код через Twilio/Supabase
+        const verificationResult = await verifyCode(contactValue, verificationCode);
+        if (!verificationResult.success) {
+          showAlert(t('common.error'), verificationResult.message || t('auth.errorVerifyingCodeMessage'), 'error');
           return;
         }
       } else {
-        // Для bypass номеров логируем успешный обход
-        console.log('🔓 Bypass номер - верификация пропущена');
+        // Для bypass номеров и универсального кода логируем успешный обход
+        console.log('🔓 Bypass номер или админ-код - проверка пропущена');
       }
       
       // Проверяем возраст для определения необходимости родительского согласия
@@ -536,11 +574,15 @@ export default function RegisterScreen() {
         console.log('👶 Регистрация ребенка < 13 лет, запрашиваем согласие родителя');
         console.log(`🌐 Текущий язык приложения: ${language}`);
         
+        // Генерируем id игрока заранее, чтобы использовать для имени файла аватара
+        const childPlayerId = Date.now().toString();
+        
         // Загружаем аватар в Supabase Storage, если он есть (ТАКЖЕ для детей младше 13 лет!)
+        // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
         let avatarUrl = formData.avatar || '';
         if (formData.avatar && (formData.avatar.startsWith('file://') || formData.avatar.startsWith('content://'))) {
           console.log('📤 Загружаем аватар в Supabase Storage для ребенка < 13 лет...');
-          const uploadedUrl = await uploadImageToStorage(formData.avatar);
+          const uploadedUrl = await uploadImageToStorage(formData.avatar, `avatar_${childPlayerId}.jpg`);
           if (uploadedUrl) {
             avatarUrl = uploadedUrl;
             console.log('✅ Аватар загружен для ребенка:', uploadedUrl);
@@ -569,10 +611,10 @@ export default function RegisterScreen() {
         if (!consentResult.success) {
           // Проверяем, является ли это ошибкой о существующем номере телефона
           const errorMessage = consentResult.error === 'PHONE_ALREADY_EXISTS' 
-            ? t('auth.phoneAlreadyRegistered') || 'Этот номер уже зарегистрирован. Попробуйте войти'
-            : (consentResult.error || (t('register.parentalConsentError') || 'Не удалось отправить запрос родительского согласия'));
+            ? t('auth.phoneAlreadyRegistered')
+            : (consentResult.error || t('register.parentalConsentError'));
           showAlert(
-            t('common.error') || 'Ошибка', 
+            t('common.error'), 
             errorMessage, 
             'error'
           );
@@ -581,8 +623,8 @@ export default function RegisterScreen() {
         
         // Показываем экран ожидания подтверждения
         showAlert(
-          t('register.parentalConsentSent') || 'Запрос отправлен родителю',
-          (t('register.parentalConsentSentMessage') || `Мы отправили письмо на адрес ${formData.parentEmail.trim()} с запросом на подтверждение согласия. После того как родитель подтвердит согласие, вы сможете войти в приложение.`).replace('{{email}}', formData.parentEmail.trim()),
+          t('register.parentalConsentSent'),
+          t('register.parentalConsentSentMessage', { email: formData.parentEmail.trim() }),
           'info',
           () => {
             setAlert(prev => ({ ...prev, visible: false }));
@@ -596,11 +638,15 @@ export default function RegisterScreen() {
       }
       
       // Обычная регистрация для пользователей >= 13 лет
+      // Генерируем id игрока заранее, чтобы использовать для имени файла аватара
+      const playerId = Date.now().toString();
+      
       // Загружаем аватар в Supabase Storage, если он есть
+      // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
       let avatarUrl = formData.avatar || '';
       if (formData.avatar && (formData.avatar.startsWith('file://') || formData.avatar.startsWith('content://'))) {
         console.log('📤 Загружаем аватар в Supabase Storage...');
-        const uploadedUrl = await uploadImageToStorage(formData.avatar);
+        const uploadedUrl = await uploadImageToStorage(formData.avatar, `avatar_${playerId}.jpg`);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
           console.log('✅ Аватар загружен:', uploadedUrl);
@@ -615,9 +661,11 @@ export default function RegisterScreen() {
         team: formData.team
       });
       
+      // isUSOrCanada уже объявлена выше в начале функции
       const playerData = {
-        id: Date.now().toString(),
-        phone: formData.phone,
+        id: playerId,
+        phone: isUSOrCanada ? formData.email : formData.phone, // Для США/Канады используем email как phone для совместимости
+        email: isUSOrCanada ? formData.email : (formData.email || ''), // Сохраняем email отдельно
         name: formData.name,
         status: formData.status || 'player', // Убеждаемся, что статус есть
         birthDate: formData.birthDate || '',
@@ -650,6 +698,10 @@ export default function RegisterScreen() {
         // Добавляем услуги для заточки коньков
         ...(formData.status === 'skateSharpening' ? {
           skate_services: skateServices
+        } : {}),
+        // Добавляем годы тренировки для тренера
+        ...(formData.status === 'coach' ? {
+          coach_years: coachYears.length > 0 ? coachYears : undefined
         } : {})
       };
       
@@ -706,9 +758,9 @@ export default function RegisterScreen() {
           error.message?.includes('already exists') ||
           error.message?.includes('already registered') ||
           (error.code === '23505' && formData.phone)) {
-        showAlert(t('common.error') || 'Ошибка', t('auth.phoneAlreadyRegistered') || 'Этот номер уже зарегистрирован. Попробуйте войти', 'error');
+        showAlert(t('common.error'), t('auth.phoneAlreadyRegistered'), 'error');
       } else {
-      showAlert(t('common.error') || 'Ошибка', t('auth.errorRegistration') || 'Не удалось завершить регистрацию', 'error');
+      showAlert(t('common.error'), t('auth.errorRegistration'), 'error');
       }
     } finally {
       setLoading(false);
@@ -833,27 +885,78 @@ export default function RegisterScreen() {
             </View>
           </View>
           
-          {/* Телефон */}
+          {/* Страна - ПЕРЕД телефоном/email */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
-              {t('register.phone')}
+              {t('register.country')}
               <Text style={{color: '#fa2f40'}}> *</Text>
             </Text>
-            <TextInput
-              style={styles.input}
-              value={formData.phone}
-              onChangeText={(text) => setFormData({...formData, phone: text})}
-              placeholder={t('auth.phonePlaceholder')}
-              placeholderTextColor="#888"
-              autoCapitalize="none"
-              autoComplete="tel"
-              textContentType="telephoneNumber"
-              keyboardType="phone-pad"
-              autoCorrect={false}
-              selectTextOnFocus={true}
-              autoFocus={false}
-            />
+            <TouchableOpacity
+              style={styles.countryButton}
+              onPress={() => setShowCountryPicker(true)}
+            >
+              <Text style={styles.countryButtonText}>
+                {formData.country ? (t(`profile.countries.${formData.country}`) || formData.country) : t('profile.selectCountry')}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#fff" />
+            </TouchableOpacity>
           </View>
+          
+          {/* Телефон или Email (для США/Канады) */}
+          {(formData.country === 'США' || formData.country === 'Канада') ? (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                Email
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={formData.email}
+                onChangeText={(text) => setFormData({...formData, email: text.trim()})}
+                placeholder="your.email@example.com"
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                autoFocus={false}
+              />
+              <Text style={styles.hintText}>
+                For USA and Canada, we use email verification instead of SMS
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                {t('register.phone')}
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={formData.phone}
+                onChangeText={(text) => {
+                  // Убираем все символы кроме + и цифр (пробелы, скобки, дефисы и т.д.)
+                  const digitsOnly = text.replace(/[^\d]/g, '');
+                  // Проверяем, был ли + в исходном тексте
+                  const hasPlus = text.includes('+');
+                  // Форматируем: если был +, ставим его в начало, затем только цифры
+                  const formatted = hasPlus ? '+' + digitsOnly : digitsOnly;
+                  setFormData({...formData, phone: formatted});
+                }}
+                placeholder={t('auth.phonePlaceholder')}
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+                autoComplete="tel"
+                textContentType="telephoneNumber"
+                keyboardType="phone-pad"
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                autoFocus={false}
+              />
+            </View>
+          )}
 
 
           {/* Имя/Название */}
@@ -891,10 +994,12 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Фото/Логотип */}
+          {/* Фото/Логотип - обязательно для всех кроме скаута */}
+          {formData.status !== 'scout' && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
               {(formData.status === 'shop' || formData.status === 'skateSharpening') ? t('profile.logo') : t('profile.photo')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
             </Text>
             <TouchableOpacity 
               style={styles.photoButton}
@@ -925,6 +1030,7 @@ export default function RegisterScreen() {
               )}
             </TouchableOpacity>
           </View>
+          )}
 
           {/* Дата рождения - для игроков и звезд */}
           {(formData.status === 'player' || formData.status === 'star') && (
@@ -964,24 +1070,46 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Страна */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>
-              {t('register.country')}
-              <Text style={{color: '#fa2f40'}}> *</Text>
-            </Text>
-            <TouchableOpacity
-              style={styles.countryButton}
-              onPress={() => setShowCountryPicker(true)}
-            >
-              <Text style={styles.countryButtonText}>
-                {formData.country ? (t(`profile.countries.${formData.country}`) || formData.country) : t('profile.selectCountry')}
+          {/* Годы тренировки - только для тренеров */}
+          {formData.status === 'coach' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                {t('profile.coachingYears') || 'Тренирует годы'}
+                <Text style={{color: '#fa2f40'}}> *</Text>
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-
-
+              <Text style={[styles.label, {fontSize: 12, color: '#aaa', marginBottom: 8}]}>
+                {t('register.coachYearsHint') || 'Выберите годы рождения игроков, которых вы тренируете'}
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{flexDirection: 'row'}}>
+                {availableCoachYears.map(year => {
+                  const isSelected = coachYears.includes(year);
+                  return (
+                    <TouchableOpacity
+                      key={year}
+                      style={[
+                        styles.yearButton,
+                        isSelected && styles.yearButtonSelected
+                      ]}
+                      onPress={() => {
+                        if (isSelected) {
+                          setCoachYears(coachYears.filter(y => y !== year));
+                        } else {
+                          setCoachYears([...coachYears, year].sort((a, b) => b - a));
+                        }
+                      }}
+                    >
+                      <Text style={[
+                        styles.yearButtonText,
+                        isSelected && styles.yearButtonTextSelected
+                      ]}>
+                        {year}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Позиция - для игроков и звезд */}
           {(formData.status === 'player' || formData.status === 'star') && (
@@ -1543,6 +1671,29 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   pickerOptionTextSelected: {
+    color: '#fff',
+    fontFamily: 'Gilroy-Bold',
+  },
+  yearButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  yearButtonSelected: {
+    backgroundColor: '#FF4444',
+    borderColor: '#FF4444',
+  },
+  yearButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+  },
+  yearButtonTextSelected: {
     color: '#fff',
     fontFamily: 'Gilroy-Bold',
   },

@@ -16,17 +16,22 @@ class AvatarCache {
     return AvatarCache.instance;
   }
 
-  // Получаем аватар из кеша с версией для предотвращения использования старого кеша
+  // Получаем аватар из кеша
+  // ВАЖНО: Версию добавляем при обновлении аватара (версия > 1)
+  // При первичной загрузке (версия = 1) НЕ добавляем версию, чтобы избежать мигания
   getAvatar(playerId: string): string | null {
     const url = this.cache.get(playerId);
     if (!url) return null;
     
-    // Если это HTTP/HTTPS URL - добавляем версию для принудительного обновления
-    // Это гарантирует, что expo-image не будет использовать старый кеш
+    // Если это HTTP/HTTPS URL - добавляем версию если она > 1
+    // Версия > 1 означает, что аватар был обновлён после первичной загрузки
     if (url.startsWith('http://') || url.startsWith('https://')) {
       const version = this.avatarVersions.get(playerId) || 1;
+      // Добавляем версию при обновлении (версия > 1)
+      if (version > 1) {
       const separator = url.includes('?') ? '&' : '?';
       return `${url}${separator}_v=${version}`;
+      }
     }
     
     return url;
@@ -38,16 +43,21 @@ class AvatarCache {
   }
 
   // Устанавливаем аватар в кеш
-  async setAvatar(playerId: string, avatarUrl: string): Promise<string | null> {
+  // forceNotify = true - принудительно уведомить listeners (используется при обновлении аватара)
+  async setAvatar(playerId: string, avatarUrl: string, forceNotify: boolean = false): Promise<string | null> {
     const oldUrl = this.cache.get(playerId);
+    const isFirstLoad = !oldUrl && !forceNotify; // Первичная загрузка - в кеше ещё нет URL и не требуется принудительное уведомление
     
-    // КРИТИЧНО: Если URL не изменился, не обновляем версию и не вызываем уведомления
+    // КРИТИЧНО: Если forceNotify = true, ВСЕГДА обновляем (файл мог измениться на сервере)
+    // Это нужно когда URL тот же, но файл перезаписан
+    if (!forceNotify) {
+      // Если URL не изменился, не обновляем версию и не вызываем уведомления
     // Это предотвращает бесконечный цикл обновлений
     if (oldUrl === avatarUrl) {
       return this.getAvatar(playerId); // Возвращаем URL с текущей версией
     }
     
-    // КРИТИЧНО: Если в кеше уже есть URL и новый URL содержит тот же файл
+      // Если в кеше уже есть URL и новый URL содержит тот же файл
     // НЕ обновляем кеш - игнорируем дублирующие аватары из уведомлений
     if (oldUrl && avatarUrl) {
       // Извлекаем имя файла из URL (последняя часть после последнего /)
@@ -67,20 +77,39 @@ class AvatarCache {
         return this.getAvatar(playerId);
       }
     }
+    }
+    
     
     try {
-      // КРИТИЧНО: Инкрементируем версию ТОЛЬКО когда URL действительно изменился
-      // Это гарантирует, что expo-image НЕ будет использовать старый кеш
+      // При forceNotify очищаем кэш изображений, чтобы гарантировать загрузку нового файла
+      if (forceNotify) {
+        try {
+          // Очищаем кэш expo-image для принудительной перезагрузки
+          await Image.clearMemoryCache();
+        } catch (cacheError) {
+          console.warn('⚠️ Не удалось очистить кэш изображений:', cacheError);
+        }
+      }
+      
+      // При forceNotify используем timestamp для гарантированной перезагрузки
+      // Иначе инкрементируем версию
       const currentVersion = this.avatarVersions.get(playerId) || 0;
-      const newVersion = currentVersion + 1;
+      let newVersion: number;
+      
+      if (forceNotify) {
+        // Используем timestamp для 100% уникальности и сброса любого кэша
+        newVersion = Date.now();
+      } else {
+        newVersion = currentVersion + 1;
+      }
       this.avatarVersions.set(playerId, newVersion);
       
-      // Логируем только если URL действительно изменился (не тот же файл)
-      // Это предотвращает избыточное логирование при каждой загрузке
-      
-      // Предзагружаем новое изображение с версией для гарантии обновления
+      // Предзагружаем изображение
+      // При первичной загрузке НЕ добавляем версию к URL
+      // При forceNotify (обновление аватара) - ВСЕГДА добавляем timestamp для сброса кэша
       let urlToPreload = avatarUrl;
-      if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+      // Добавляем версию/timestamp при обновлении
+      if ((newVersion > 1 || forceNotify) && (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://'))) {
         const separator = avatarUrl.includes('?') ? '&' : '?';
         urlToPreload = `${avatarUrl}${separator}_v=${newVersion}`;
       }
@@ -90,13 +119,20 @@ class AvatarCache {
       // Сохраняем чистый URL в кэш (без версии)
       this.cache.set(playerId, avatarUrl);
       
-      // Уведомляем всех слушателей об изменении (отправляем URL с версией)
-      this.notifyListeners(playerId, this.getAvatar(playerId)!);
+      // Уведомляем слушателей ТОЛЬКО при реальном обновлении (не при первичной загрузке)
+      // При первичной загрузке компонент уже получит URL через начальное состояние
+      if (!isFirstLoad) {
+        const urlWithVersion = this.getAvatar(playerId)!;
+        console.log('📢 Уведомляем listeners:', { playerId, urlWithVersion: urlWithVersion.substring(0, 80), listenersCount: this.listeners.size });
+        this.notifyListeners(playerId, urlWithVersion);
+      }
       
       return this.getAvatar(playerId);
     } catch (error) {
       console.error('❌ Ошибка предзагрузки аватара:', error);
-      return null;
+      // При ошибке всё равно сохраняем URL в кеш, чтобы изображение отобразилось
+      this.cache.set(playerId, avatarUrl);
+      return avatarUrl;
     }
   }
 
@@ -122,10 +158,13 @@ class AvatarCache {
   }
 
   // Очищаем кеш для конкретного игрока
+  // ВАЖНО: НЕ удаляем версию, чтобы следующее обновление было с новой версией
   clearAvatar(playerId: string): void {
     this.cache.delete(playerId);
-    this.avatarVersions.delete(playerId);
-    this.notifyListeners(playerId, '');
+    // НЕ удаляем версию: this.avatarVersions.delete(playerId);
+    // Версия сохраняется, чтобы при следующем setAvatar она инкрементировалась
+    // Уведомляем listeners только если нужно показать пустой аватар
+    // При обновлении avatarUrl вызов setAvatar сам уведомит с новым URL
   }
 
   // Предзагружаем аватары для списка игроков
@@ -242,8 +281,9 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
 };
 
 // Функция для обновления аватара во всех местах
+// ВАЖНО: forceNotify = true гарантирует уведомление всех listeners при обновлении
 export const updateAvatarGlobally = async (playerId: string, newAvatarUrl: string): Promise<void> => {
-  await avatarCache.setAvatar(playerId, newAvatarUrl);
+  await avatarCache.setAvatar(playerId, newAvatarUrl, true);
 };
 
 // Функция для предзагрузки аватара

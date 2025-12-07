@@ -13,6 +13,8 @@ class RealtimeManager {
   private messagesCountCallback: ((count: number) => void) | null = null;
   private lastNotificationCount: number | null = null;
   private lastMessagesCount: number | null = null;
+  private lastInitializeTime: number = 0; // Время последней инициализации счётчиков
+  private loadNotificationCountCallback: ((userId: string) => Promise<void>) | null = null; // Callback для загрузки счетчика из БД
 
   static getInstance(): RealtimeManager {
     if (!RealtimeManager.instance) {
@@ -36,12 +38,21 @@ class RealtimeManager {
   }
 
   /**
+   * Устанавливает callback для загрузки счетчика уведомлений из БД
+   * Используется для принудительной перезагрузки при получении нового уведомления
+   */
+  setLoadNotificationCountCallback(callback: (userId: string) => Promise<void>): void {
+    this.loadNotificationCountCallback = callback;
+  }
+
+  /**
    * Инициализирует последние значения счетчиков
    * Используется для синхронизации при настройке подписок
    */
   initializeCounts(notificationCount: number, messagesCount: number): void {
     this.lastNotificationCount = notificationCount;
     this.lastMessagesCount = messagesCount;
+    this.lastInitializeTime = Date.now(); // Запоминаем время инициализации
   }
 
   /**
@@ -75,7 +86,10 @@ class RealtimeManager {
       // 5. Подписка на изменения аватаров всех игроков
       await this.setupAvatarUpdateSubscription();
       
-      // 6. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
+      // 6. Подписка на изменения профилей игроков (видео, фото и др.)
+      await this.setupProfileUpdateSubscription();
+      
+      // 7. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
       // await this.setupMessagesSubscription(userId);
 
       // console.log('✅ Realtime подписки настроены для пользователя:', userId);
@@ -89,7 +103,7 @@ class RealtimeManager {
    */
   private async setupNotificationsSubscription(userId: string): Promise<void> {
     const channel = supabase
-      .channel('notifications-updates')
+      .channel(`notifications-updates-${userId}`)
       .on(
         'postgres_changes',
         {
@@ -99,11 +113,42 @@ class RealtimeManager {
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
-          // Эмитируем событие для обновления UI
-          this.emitNotificationUpdate();
+          const notificationType = payload.new?.type;
+          console.log('🔔 Realtime: Получено новое уведомление:', {
+            type: notificationType,
+            userId: payload.new?.user_id,
+            notificationId: payload.new?.id
+          });
+          
+          // ИСПРАВЛЕНО: Убрано оптимистичное обновление счетчика
+          // Счетчик уже обновлен через SQL функцию increment_unread_notifications при создании уведомления
+          // Realtime подписка на изменения в таблице players автоматически обновит счетчик через setupNotificationCountSubscription
+          // Оптимистичное обновление приводило к двойному увеличению (1 → 2 → 3)
+          
+          // Просто загружаем актуальный счетчик из БД через небольшую задержку
+          // Это нужно для синхронизации после того, как SQL функция обновила счетчик
+          if (this.loadNotificationCountCallback && this.currentUserId) {
+            setTimeout(() => {
+              console.log('🔔 Realtime: Загружаем актуальный счетчик из БД после создания уведомления');
+              this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
+                console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
+              });
+            }, 500);
+          } else if (this.notificationCountCallback && this.lastNotificationCount === null) {
+            // Если счетчик еще не инициализирован, загружаем из БД
+            if (this.loadNotificationCountCallback && this.currentUserId) {
+              setTimeout(() => {
+                this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
+                  console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
+                });
+              }, 200);
+            }
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔔 Realtime: Статус подписки на уведомления:', status);
+      });
 
     this.subscriptions.set('notifications-updates', {
       channel,
@@ -116,7 +161,7 @@ class RealtimeManager {
    */
   private async setupNotificationCountSubscription(userId: string): Promise<void> {
     const channel = supabase
-      .channel('players-notifications-count')
+      .channel(`players-notifications-count-${userId}`)
       .on(
         'postgres_changes',
         {
@@ -129,15 +174,24 @@ class RealtimeManager {
           const newCount = payload.new.unread_notifications_count || 0;
           const oldCount = payload.old?.unread_notifications_count || 0;
           
-          // Вызываем callback только если счетчик уведомлений действительно изменился
-          // и значение отличается от последнего известного
-          if (newCount !== oldCount && newCount !== this.lastNotificationCount) {
-            this.lastNotificationCount = newCount;
+          console.log('🔔 Realtime: Обновление счетчика уведомлений в players:', {
+            oldCount,
+            newCount,
+            lastKnown: this.lastNotificationCount,
+            userId
+          });
+          
+          // ВАЖНО: Вызываем callback если счетчик уведомлений изменился
+          // Обновляем даже если значение совпадает с lastNotificationCount,
+          // так как это может быть синхронизация после создания уведомления
+          if (newCount !== oldCount) {
             this.emitNotificationCountUpdate(newCount);
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔔 Realtime: Статус подписки на счетчик уведомлений:', status);
+      });
 
     this.subscriptions.set('players-notifications-count', {
       channel,
@@ -268,6 +322,64 @@ class RealtimeManager {
   }
 
   /**
+   * Настраивает подписку на изменения профилей игроков (видео, фото и др.)
+   * Очищает кеш профиля при изменениях, чтобы друзья видели обновления сразу
+   */
+  private async setupProfileUpdateSubscription(): Promise<void> {
+    const channel = supabase
+      .channel('players-profile-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players'
+        },
+        async (payload) => {
+          const playerData = payload.new as any;
+          const oldPlayerData = payload.old as any;
+          const playerId = playerData.id;
+          
+          // Проверяем изменение важных полей профиля
+          const favoriteGoalsChanged = playerData.favorite_goals !== oldPlayerData?.favorite_goals;
+          const galleryPhotosChanged = playerData.gallery_photos !== oldPlayerData?.gallery_photos;
+          const achievementsChanged = playerData.achievements !== oldPlayerData?.achievements;
+          const exerciseStatsChanged = playerData.exercise_stats !== oldPlayerData?.exercise_stats;
+          const normativesChanged = playerData.normatives !== oldPlayerData?.normatives;
+          const puckSpeedMaxChanged = playerData.puck_speed_max !== oldPlayerData?.puck_speed_max;
+          
+          // Если изменились важные поля профиля, очищаем кеш этого игрока
+          if (playerId && (favoriteGoalsChanged || galleryPhotosChanged || achievementsChanged || 
+              exerciseStatsChanged || normativesChanged || puckSpeedMaxChanged)) {
+            try {
+              const { clearPlayerCache, clearPlayerMemoryCache } = await import('./playerStorage');
+              
+              // Очищаем кеш профиля игрока
+              clearPlayerMemoryCache(playerId);
+              await clearPlayerCache(playerId);
+              
+              console.log('🔄 Realtime: Кеш профиля очищен при изменении данных:', { 
+                playerId,
+                favoriteGoalsChanged,
+                galleryPhotosChanged,
+                achievementsChanged,
+                exerciseStatsChanged
+              });
+            } catch (error) {
+              console.error('❌ Ошибка очистки кеша профиля через Realtime:', error);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    this.subscriptions.set('players-profile-updates', {
+      channel,
+      name: 'players-profile-updates'
+    });
+  }
+
+  /**
    * Настраивает подписку на запросы в друзья
    */
   private async setupFriendRequestsSubscription(userId: string): Promise<void> {
@@ -386,17 +498,47 @@ class RealtimeManager {
 
   // События для уведомления компонентов
   private emitNotificationUpdate(): void {
-    // Можно использовать EventEmitter или другие механизмы
-    // Пока просто логируем
+    // ВАЖНО: При получении нового уведомления нужно обновить счетчик
+    // Вызываем callback для обновления счетчика, если он установлен
+    // Это заставит UI перезагрузить счетчик из БД
+    if (this.notificationCountCallback && this.lastNotificationCount !== null) {
+      // Вызываем callback с текущим значением + 1 (предполагаем, что счетчик увеличился)
+      // Но лучше перезагрузить из БД, поэтому используем специальный флаг
+      this.emitNotificationCountUpdate(this.lastNotificationCount + 1);
+    }
   }
 
   private emitNotificationCountUpdate(count: number): void {
-    if (this.notificationCountCallback) {
+    // ВАЖНО: Уменьшаем задержку до 500ms, чтобы не пропускать обновления
+    // Игнорируем Realtime обновления только в течение 500ms после инициализации
+    // чтобы избежать race condition с loadNotificationCount
+    const timeSinceInit = Date.now() - this.lastInitializeTime;
+    if (timeSinceInit < 500) {
+      // Если прошло меньше 500ms, все равно обновляем, но с небольшой задержкой
+      // чтобы дать время loadNotificationCount завершиться
+      setTimeout(() => {
+        if (this.notificationCountCallback && count !== this.lastNotificationCount) {
+          this.lastNotificationCount = count;
+          this.notificationCountCallback(count);
+        }
+      }, 300);
+      return;
+    }
+    
+    // Обновляем только если значение действительно изменилось
+    if (this.notificationCountCallback && count !== this.lastNotificationCount) {
+      this.lastNotificationCount = count;
       this.notificationCountCallback(count);
     }
   }
 
   private emitMessagesCountUpdate(count: number): void {
+    // Игнорируем Realtime обновления в течение 2 секунд после инициализации
+    const timeSinceInit = Date.now() - this.lastInitializeTime;
+    if (timeSinceInit < 2000) {
+      return;
+    }
+    
     if (this.messagesCountCallback) {
       this.messagesCountCallback(count);
     }

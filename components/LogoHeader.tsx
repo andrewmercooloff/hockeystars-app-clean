@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import HeaderAvatar from './HeaderAvatar';
+import CachedAvatar from './CachedAvatar';
 import { useUser } from '../contexts/UserContext';
 
 const logo = require('../assets/images/logo.png');
@@ -58,9 +58,10 @@ const LogoHeader = React.memo(() => {
           borderWidth: 2,
           borderColor: '#fff',
         }}>
-          {currentUser?.avatar ? (
-            <HeaderAvatar
-              uri={currentUser.avatar}
+          {currentUser ? (
+            <CachedAvatar
+              playerId={currentUser.id}
+              fallbackAvatarUrl={currentUser.avatar}
               size={45}
               fallbackIcon="person"
               fallbackSize={25}

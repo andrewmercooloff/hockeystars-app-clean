@@ -86,10 +86,10 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
       <View style={styles.container}>
         {/* Аватар слева */}
         <View style={styles.avatarContainer}>
-        {playerAvatar ? (
+        {(playerAvatar || playerId) ? (
           <CachedAvatar
-            playerId={playerId}
-            fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
+            playerId={playerId || ''}
+            fallbackAvatarUrl={playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />
