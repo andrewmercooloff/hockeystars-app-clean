@@ -338,6 +338,11 @@ body {
     font-size: 18px;
 }
 
+.hero-download-buttons .download-btn-coming-soon {
+    font-size: 9px;
+    margin-top: 2px;
+}
+
 .hero-download-buttons .download-btn-label {
     font-size: 11px;
 }
@@ -591,6 +596,34 @@ body {
     font-weight: 700;
 }
 
+.download-btn-coming-soon {
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--color-primary);
+    margin-top: 4px;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+.download-btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+    border-color: rgba(250, 47, 64, 0.4);
+    background: rgba(5, 0, 8, 0.7);
+}
+
+.download-btn.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background: rgba(5, 0, 8, 0.7);
+}
+
+.download-btn.disabled::before {
+    display: none;
+}
+
 /* Footer */
 .footer {
     background: rgba(5, 0, 8, 0.9);
@@ -768,6 +801,11 @@ body {
     .hero-download-buttons .download-btn-label {
         font-size: 10px;
     }
+    
+    .hero-download-buttons .download-btn-coming-soon {
+        font-size: 8px;
+        margin-top: 1px;
+    }
 
     .section-title {
         font-size: 36px;
@@ -883,6 +921,11 @@ body {
     
     .hero-download-buttons .download-btn-label {
         font-size: 9px;
+    }
+    
+    .hero-download-buttons .download-btn-coming-soon {
+        font-size: 7px;
+        margin-top: 1px;
     }
     
     .header-content {
