@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
@@ -350,6 +350,110 @@ export default function ChatScreen() {
       supabase.removeChannel(channel);
     };
   }, [currentUser?.id, otherPlayer?.id, id]);
+
+  // Функция загрузки сообщений - определена до useFocusEffect чтобы избежать ошибки "Cannot access before initialization"
+  const loadMessages = useCallback(async () => {
+    if (currentUser && otherPlayer && otherPlayer.id === id) {
+      try {
+        // Проверяем, не заблокировал ли нас другой пользователь
+        const isBlockedByThem = await isUserBlocked(otherPlayer.id, currentUser.id);
+        if (isBlockedByThem) {
+          Alert.alert(
+            t('common.error') || 'Ошибка',
+            'Вы не можете видеть сообщения этого пользователя.'
+          );
+          router.push('/messages');
+          return;
+        }
+        
+        console.log('📨 Загружаем свежие сообщения из БД для чата:', currentUser.id, '<->', otherPlayer.id);
+        const conversation = await getConversation(currentUser.id, otherPlayer.id);
+        console.log('📨 Загружено сообщений из БД:', conversation.length);
+        const now = Date.now();
+        
+        const currentMessageIds = new Set(conversation.map(m => m.id));
+        const newMessageIds = [...currentMessageIds].filter(msgId => !lastMessageIdsRef.current.has(msgId));
+        
+        // Парсим информацию об ответе для всех сообщений
+        const parsedConversation = conversation.map(msg => {
+          let text = msg.text;
+          let replyToId: string | undefined = msg.replyToId;
+          let replyToText: string | undefined = msg.replyToText;
+          let replyToSenderId: string | undefined = msg.replyToSenderId;
+          
+          if (!replyToId) {
+            const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+            if (replyDataMatch) {
+              try {
+                const replyData = JSON.parse(replyDataMatch[1]);
+                if (replyData.replyTo) {
+                  replyToId = replyData.replyTo.id;
+                  replyToText = replyData.replyTo.text;
+                  replyToSenderId = replyData.replyTo.senderId;
+                  text = replyDataMatch[2];
+                }
+              } catch (e) {
+                console.error('Ошибка парсинга replyTo данных:', e);
+              }
+            }
+          }
+          
+          return { ...msg, text, replyToId, replyToText, replyToSenderId };
+        });
+        
+        setMessages(prevMessages => {
+          if (parsedConversation.length !== prevMessages.length) {
+            console.log(`📨 Обновление сообщений: было ${prevMessages.length}, стало ${parsedConversation.length}`);
+            return parsedConversation;
+          }
+          
+          const prevMessageIds = new Set(prevMessages.map(m => m.id));
+          const hasNewMessages = parsedConversation.some(msg => !prevMessageIds.has(msg.id));
+          
+          if (hasNewMessages) {
+            console.log(`📨 Обнаружены новые сообщения при обновлении`);
+            return parsedConversation;
+          }
+          
+          return parsedConversation;
+        });
+        
+        lastMessageIdsRef.current = currentMessageIds;
+        
+        if (newMessageIds.length > 0 && now - lastLoadTimeRef.current > 1000) {
+          lastLoadTimeRef.current = now;
+          
+          const newMessages = conversation.filter(m => newMessageIds.includes(m.id));
+          
+          if (justSentMessageRef.current) {
+            justSentMessageRef.current = false;
+          } else {
+            const incomingMessages = newMessages.filter(m => m.senderId !== currentUser.id);
+            if (incomingMessages.length > 0) {
+              try {
+                if (Platform.OS === 'ios') {
+                  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                } else {
+                  Vibration.vibrate(75);
+                }
+              } catch (vibError) {
+                console.error('❌ Ошибка вибрации при получении:', vibError);
+              }
+            }
+          }
+          
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+            setIsNearBottom(true);
+            wasNearBottomRef.current = true;
+          }, Platform.OS === 'android' ? 200 : 100);
+        }
+
+      } catch (error) {
+        console.error('Ошибка загрузки сообщений:', error);
+      }
+    }
+  }, [currentUser, otherPlayer, id, t, router]);
 
   // Обработка системной кнопки "назад" и восстановление позиции при возврате в чат
   useFocusEffect(
@@ -754,135 +858,6 @@ export default function ChatScreen() {
     handleCloseChatMenu();
     handleReportChat();
   }, [handleReportChat]);
-
-  const loadMessages = async () => {
-    if (currentUser && otherPlayer && otherPlayer.id === id) {
-      try {
-        // Проверяем, не заблокировал ли нас другой пользователь
-        const isBlockedByThem = await isUserBlocked(otherPlayer.id, currentUser.id);
-        if (isBlockedByThem) {
-          // Если нас заблокировали, не показываем сообщения и редиректим
-          Alert.alert(
-            t('common.error') || 'Ошибка',
-            'Вы не можете видеть сообщения этого пользователя.'
-          );
-          router.push('/messages');
-          return;
-        }
-        
-        // ВАЖНО: Всегда загружаем свежие сообщения из БД при открытии чата
-        // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
-        console.log('📨 Загружаем свежие сообщения из БД для чата:', currentUser.id, '<->', otherPlayer.id);
-        const conversation = await getConversation(currentUser.id, otherPlayer.id);
-        console.log('📨 Загружено сообщений из БД:', conversation.length);
-        const now = Date.now();
-        
-        // Проверяем, есть ли действительно новые сообщения по ID
-        const currentMessageIds = new Set(conversation.map(m => m.id));
-        const newMessageIds = [...currentMessageIds].filter(id => !lastMessageIdsRef.current.has(id));
-        
-        // Парсим информацию об ответе для всех сообщений
-        const parsedConversation = conversation.map(msg => {
-          let text = msg.text;
-          let replyToId: string | undefined = msg.replyToId;
-          let replyToText: string | undefined = msg.replyToText;
-          let replyToSenderId: string | undefined = msg.replyToSenderId;
-          
-          // Если replyTo данные не были распарсены при загрузке, парсим из текста
-          if (!replyToId) {
-            const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
-            if (replyDataMatch) {
-              try {
-                const replyData = JSON.parse(replyDataMatch[1]);
-                if (replyData.replyTo) {
-                  replyToId = replyData.replyTo.id;
-                  replyToText = replyData.replyTo.text;
-                  replyToSenderId = replyData.replyTo.senderId;
-                  text = replyDataMatch[2];
-                }
-              } catch (e) {
-                console.error('Ошибка парсинга replyTo данных:', e);
-              }
-            }
-          }
-          
-          return {
-            ...msg,
-            text,
-            replyToId,
-            replyToText,
-            replyToSenderId
-          };
-        });
-        
-        // ВАЖНО: Всегда обновляем состояние сообщений свежими данными из БД
-        // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
-        // При открытии чата всегда показываем актуальные данные из БД
-        setMessages(prevMessages => {
-          // Если количество сообщений изменилось, значит есть новые
-          if (parsedConversation.length !== prevMessages.length) {
-            console.log(`📨 Обновление сообщений: было ${prevMessages.length}, стало ${parsedConversation.length}`);
-            // Всегда используем свежие данные из БД
-            return parsedConversation;
-          }
-          
-          // Даже если количество одинаковое, проверяем по ID - есть ли новые сообщения
-          const prevMessageIds = new Set(prevMessages.map(m => m.id));
-          const hasNewMessages = parsedConversation.some(msg => !prevMessageIds.has(msg.id));
-          
-          if (hasNewMessages) {
-            console.log(`📨 Обнаружены новые сообщения при обновлении (количество не изменилось, но есть новые ID)`);
-            // Всегда используем свежие данные из БД
-            return parsedConversation;
-          }
-          
-          // Если нет новых сообщений, все равно обновляем (на случай изменений в существующих)
-          // Это гарантирует, что при открытии чата видны все актуальные сообщения
-          return parsedConversation;
-        });
-        
-        // Обновляем отслеживаемые ID сообщений
-        lastMessageIdsRef.current = currentMessageIds;
-        
-        // Проверяем, есть ли действительно новые сообщения и прошло ли достаточно времени
-        if (newMessageIds.length > 0 && now - lastLoadTimeRef.current > 1000) {
-          lastLoadTimeRef.current = now;
-          
-          // Находим новые сообщения по ID
-          const newMessages = conversation.filter(m => newMessageIds.includes(m.id));
-          
-          // Если только что отправили сообщение, не воспроизводим вибрацию получения
-          if (justSentMessageRef.current) {
-            justSentMessageRef.current = false;
-          } else {
-            // Вибрация при получении сообщений от других пользователей
-            const incomingMessages = newMessages.filter(m => m.senderId !== currentUser.id);
-            if (incomingMessages.length > 0) {
-              try {
-                if (Platform.OS === 'ios') {
-                  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                } else {
-                  Vibration.vibrate(75);
-                }
-              } catch (vibError) {
-                console.error('❌ Ошибка вибрации при получении:', vibError);
-              }
-            }
-          }
-          
-          // Прокручиваем вниз при получении новых сообщений
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-            setIsNearBottom(true);
-            wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
-          }, Platform.OS === 'android' ? 200 : 100);
-        }
-
-      } catch (error) {
-        console.error('Ошибка загрузки сообщений:', error);
-      }
-    }
-  };
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !currentUser || !otherPlayer) {
