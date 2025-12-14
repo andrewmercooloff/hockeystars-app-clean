@@ -61,9 +61,9 @@ export default function RegisterScreen() {
     phone: '',
     email: '', // Для США/Канады (также используется для магазинов)
     name: '',
-    status: '' as 'player' | 'coach' | 'scout' | 'star' | 'shop' | 'skateSharpening' | '',
+    status: 'player' as 'player' | 'coach' | 'scout' | 'star' | 'shop' | 'skateSharpening' | '',
     birthDate: '',
-    country: 'Беларусь', // По умолчанию
+    country: '', // Пустое значение - поля показываются только после выбора страны
     team: '', // основная команда (для обратной совместимости)
     position: '',
     number: '',
@@ -1000,8 +1000,8 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
           
-          {/* Телефон или Email (для США/Канады) */}
-          {(formData.country === 'США' || formData.country === 'Канада') ? (
+          {/* Телефон или Email (для США/Канады) - показываем только после выбора страны */}
+          {formData.country && (formData.country === 'США' || formData.country === 'Канада') && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
                 Email
@@ -1022,10 +1022,12 @@ export default function RegisterScreen() {
                 autoFocus={false}
               />
               <Text style={styles.hintText}>
-                For USA and Canada, we use email verification instead of SMS
+                {t('register.usaCanadaEmailHint') || 'For USA and Canada, we use email verification instead of SMS'}
               </Text>
             </View>
-          ) : (
+          )}
+          
+          {formData.country && formData.country !== 'США' && formData.country !== 'Канада' && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
                 {t('register.phone')}
@@ -1056,7 +1058,9 @@ export default function RegisterScreen() {
             </View>
           )}
 
-
+          {/* Остальные поля - показываем только после выбора страны */}
+          {formData.country && (
+          <>
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -1443,9 +1447,11 @@ export default function RegisterScreen() {
               </View>
             </>
           )}
+          </>
+          )}
 
-          {/* Чекбокс принятия условий */}
-          {step === 'form' && (
+          {/* Чекбокс принятия условий - показываем только после выбора страны */}
+          {formData.country && step === 'form' && (
             <View style={styles.termsContainer}>
               <TouchableOpacity 
                 style={styles.checkbox}
@@ -1461,7 +1467,7 @@ export default function RegisterScreen() {
               </Text>
             </View>
           )}
-          {step === 'form' && (
+          {formData.country && step === 'form' && (
             <TouchableOpacity 
               style={styles.termsLink}
               onPress={() => {
@@ -1474,8 +1480,8 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           )}
           
-          {/* Кнопки */}
-          {step === 'form' ? (
+          {/* Кнопки - показываем только после выбора страны */}
+          {formData.country && step === 'form' && (
             <TouchableOpacity 
               style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]} 
               onPress={handleSendCode}
@@ -1490,7 +1496,10 @@ export default function RegisterScreen() {
                 {loading ? t('common.loading') : t('auth.sendCode')}
               </Text>
             </TouchableOpacity>
-          ) : (
+          )}
+          
+          {/* Форма верификации */}
+          {step === 'verification' && (
             <>
               {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
               {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
@@ -1765,8 +1774,9 @@ export default function RegisterScreen() {
                     formData.country === country && styles.countryOptionSelected
                   ]}
                   onPress={() => {
-                    setFormData({...formData, country: country, team: ''}); // Сбрасываем команду при смене страны
-                    setSelectedTeams([]); // Сбрасываем выбранные команды при смене страны
+                    // Сбрасываем phone/email и команду при смене страны
+                    setFormData({...formData, country: country, team: '', phone: '', email: ''});
+                    setSelectedTeams([]);
                     setShowCountryPicker(false);
                     setCountrySearchText('');
                   }}
