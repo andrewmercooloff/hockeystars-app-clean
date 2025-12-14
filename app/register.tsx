@@ -258,7 +258,7 @@ export default function RegisterScreen() {
     showSecondary: false,
     confirmText: t('common.ok'),
     cancelText: t('common.cancel'),
-    secondaryText: t('common.additional') || 'Additional'
+    secondaryText: ''
   });
 
   // Таймер для повторной отправки
@@ -303,7 +303,7 @@ export default function RegisterScreen() {
       showSecondary: false,
       confirmText: t('common.ok'),
       cancelText: t('common.cancel'),
-      secondaryText: t('common.additional') || 'Additional'
+      secondaryText: ''
     });
   };
 
@@ -1094,9 +1094,6 @@ export default function RegisterScreen() {
                 selectTextOnFocus={true}
                 autoFocus={false}
               />
-              <Text style={styles.hintText}>
-                {t('register.usaCanadaEmailHint') || 'For USA and Canada, we use email verification instead of SMS'}
-              </Text>
             </View>
           )}
           
@@ -1520,8 +1517,6 @@ export default function RegisterScreen() {
               </View>
             </>
           )}
-          </>
-          )}
 
           {/* Чекбокс принятия условий - показываем только после выбора страны */}
           {formData.country && step === 'form' && (
@@ -1762,6 +1757,8 @@ export default function RegisterScreen() {
                 </Text>
               </TouchableOpacity>
             </>
+          )}
+          </>
           )}
 
 
