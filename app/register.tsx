@@ -467,9 +467,15 @@ export default function RegisterScreen() {
     }
     
     // Проверяем, что все обязательные поля заполнены
-    const contactField = isUSOrCanada ? formData.email : formData.phone;
+    // Для США/Канады проверяем email, для остальных - телефон
+    const hasContact = isUSOrCanada 
+      ? (formData.email && formData.email.trim().length > 0)
+      : (formData.phone && formData.phone.trim().length > 0);
+    const hasName = formData.name && formData.name.trim().length > 0;
+    const hasStatus = !!formData.status;
+    const hasCountry = !!formData.country;
     
-    if (!contactField || !formData.name || !formData.status || !formData.country) {
+    if (!hasContact || !hasName || !hasStatus || !hasCountry) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
     }
