@@ -1711,7 +1711,11 @@ export default function RegisterScreen() {
                   }}
                 />
                 <Text style={styles.emailHint}>
-                  {t('auth.codeSent')}: {formData.phone}
+                  {t('auth.codeSent')}: {
+                    (formData.country === 'США' || formData.country === 'Канада') 
+                      ? formData.email 
+                      : formData.phone
+                  }
                 </Text>
                 
                 {/* Кнопка повторной отправки */}
