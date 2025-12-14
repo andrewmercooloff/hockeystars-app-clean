@@ -87,3 +87,7 @@ eas build --platform android --profile preview --no-wait
 3. Временно использовать email для регистрации (если доступно)
 
 
+
+
+
+

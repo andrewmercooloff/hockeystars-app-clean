@@ -1583,6 +1583,82 @@ export default function HomeScreen() {
   const hasLoadedBlockedInitiallyRef = useRef(false);
   const resumeAnimationRef = useRef<number | null>(null);
 
+  // Обработка shake gesture для обновления случайных игроков
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      return; // На веб shake не работает
+    }
+
+    let subscription: any = null;
+    let lastShakeTime = 0;
+    const SHAKE_THRESHOLD = 1.5; // Порог для определения shake
+    const SHAKE_COOLDOWN = 2000; // Минимум 2 секунды между shake
+
+    const handleShake = () => {
+      const now = Date.now();
+      if (now - lastShakeTime < SHAKE_COOLDOWN) {
+        return; // Слишком рано после предыдущего shake
+      }
+      
+      lastShakeTime = now;
+      
+      // Обновляем randomSeed для получения новых случайных игроков
+      const newSeed = Date.now(); // Используем текущее время как новый seed
+      setRandomSeed(newSeed);
+      
+      // Вибрация для обратной связи
+      if (Platform.OS === 'ios') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        Vibration.vibrate(50);
+      }
+      
+      console.log('📱 Shake detected - обновляем случайных игроков');
+    };
+
+    // Динамически импортируем expo-sensors для детекции shake
+    let Accelerometer: any = null;
+    const initShakeDetection = async () => {
+      try {
+        const sensors = await import('expo-sensors');
+        Accelerometer = sensors.Accelerometer;
+        
+        if (Accelerometer && Accelerometer.isAvailableAsync) {
+          const isAvailable = await Accelerometer.isAvailableAsync();
+          if (!isAvailable) {
+            console.warn('⚠️ Accelerometer не доступен на этом устройстве');
+            return;
+          }
+        }
+        
+        Accelerometer.setUpdateInterval(100); // Обновление каждые 100мс
+        
+        subscription = Accelerometer.addListener(({ x, y, z }: { x: number; y: number; z: number }) => {
+          // Вычисляем силу ускорения
+          const acceleration = Math.sqrt(x * x + y * y + z * z);
+          
+          // Если ускорение превышает порог - это shake
+          if (acceleration > SHAKE_THRESHOLD) {
+            handleShake();
+          }
+        });
+        
+        console.log('✅ Shake detection активирован');
+      } catch (error) {
+        console.warn('⚠️ expo-sensors не установлен или не доступен:', error);
+        console.warn('💡 Для работы shake gesture установите: npx expo install expo-sensors');
+      }
+    };
+
+    initShakeDetection();
+
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const oneHourMs = 60 * 60 * 1000;
     const updateSeed = () => setRandomSeed(getCurrentHourSeed());

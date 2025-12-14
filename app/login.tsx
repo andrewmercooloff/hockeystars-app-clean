@@ -325,6 +325,7 @@ export default function LoginScreen() {
         await sendVerificationSMS(cleanedContact, verificationCode);
       }
 
+      
       setStep('code');
       
       // Запускаем таймер на 60 секунд
@@ -350,6 +351,8 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
+  // Переключение на email, если SMS не пришло
 
   // Повторная отправка кода
   const handleResendCode = async () => {
@@ -870,5 +873,4 @@ const styles = StyleSheet.create({
   webInput: {
     // Web-specific styles removed for React Native compatibility
   },
-
 }); 

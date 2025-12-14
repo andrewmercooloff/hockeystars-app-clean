@@ -7365,7 +7365,7 @@ export const getSmartPlayerSelection = (
       }
     }
     
-    // Перемешиваем звезд отдельно и берем до 5
+    // Перемешиваем звезд отдельно и берем до 3
     const starsShuffled = [...stars].sort((a, b) => {
       const seedA = `${a.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const seedB = `${b.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -7373,7 +7373,7 @@ export const getSmartPlayerSelection = (
       const randomB = Math.sin(seedB * 1.5);
       return randomA - randomB;
     });
-    const limitedStars = starsShuffled.slice(0, 5);
+    const limitedStars = starsShuffled.slice(0, 3);
     
     // Перемешиваем скаутов отдельно
     const scoutsShuffled = [...selectedScouts].sort((a, b) => {
@@ -7384,7 +7384,7 @@ export const getSmartPlayerSelection = (
       return randomA - randomB;
     });
     
-    // Сначала берем звезд (до 5), затем добавляем скаутов отдельно (если есть место)
+    // Сначала берем звезд (до 3), затем добавляем скаутов отдельно (если есть место)
     const maxTotal = 5;
     const starsCount = limitedStars.length;
     const remainingSlotsForScouts = Math.max(0, maxTotal - starsCount);
@@ -7431,11 +7431,11 @@ export const getSmartPlayerSelection = (
       })
       .slice(0, 5); // Берем только 5 новичков
 
-    // 5. Топ-10 игроков по рейтингу активности
+    // 5. Топ-5 игроков по рейтингу активности
     const topPlayers = otherPlayers
       .filter(player => !newcomers.some(n => n.id === player.id)) // Исключаем новичков
       .sort((a, b) => (b.activityRating || 0) - (a.activityRating || 0))
-      .slice(0, 10);
+      .slice(0, 5);
 
     // 6. Оставшиеся игроки для случайного выбора
     const remainingPlayers = otherPlayers.filter(player => 
@@ -7443,8 +7443,9 @@ export const getSmartPlayerSelection = (
       !topPlayers.some(t => t.id === player.id)
     );
 
-    // 7. Случайные игроки (до 10 человек)
+    // 7. Случайные игроки (могут заполнить все оставшиеся места до MAX_PLAYERS)
     // Используем детерминированный рандом на основе seed для стабильности между пересчетами
+    // НЕ ограничиваем здесь - ограничение будет применено позже на основе оставшихся мест
     const randomPlayers = remainingPlayers
       .sort(() => {
         // Детерминированный рандом на основе seed
@@ -7453,11 +7454,10 @@ export const getSmartPlayerSelection = (
           : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         // Используем другую функцию для другого рандома, чтобы звезды и случайные игроки различались
         return Math.cos(effectiveSeed * 1.5) * 10000 % 1 - 0.5;
-      })
-      .slice(0, 10);
+      });
 
     // 8. Максимальное количество игроков для отображения (применяется к фильтру)
-    const MAX_PLAYERS = 30;
+    const MAX_PLAYERS = 25;
 
     // 9. Определяем постоянных игроков с приоритетами (в порядке важности)
     // Порядок важен: сначала самые важные, потом менее важные
@@ -7485,7 +7485,7 @@ export const getSmartPlayerSelection = (
     // 9.6. Тренеры (выбранные по логике: все при фильтре по году, или до 5 рандомных при "Все года")
     permanentPlayers.push(...selectedCoaches);
     
-    // 9.7. Рандомные звезды и скауты (до 5 человек, выбираются случайно)
+    // 9.7. Рандомные звезды (до 3) и скауты (до 2), выбираются случайно
     permanentPlayers.push(...limitedStarsAndScouts);
 
     // 10. Если постоянных игроков больше максимума, обрезаем до максимума
@@ -7510,7 +7510,7 @@ export const getSmartPlayerSelection = (
       index === self.findIndex(p => p.id === player.id)
     );
     
-    // 15. Финальное ограничение на 30 (на всякий случай, если после удаления дубликатов стало больше)
+    // 15. Финальное ограничение на MAX_PLAYERS (на всякий случай, если после удаления дубликатов стало больше)
     const finalPlayers = uniquePlayers.slice(0, MAX_PLAYERS);
 
     return finalPlayers;

@@ -49,3 +49,7 @@ eas build --platform android --profile preview --no-wait
 - Apple обычно одобряет patch версии за 1-3 дня
 
 
+
+
+
+

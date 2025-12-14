@@ -23,12 +23,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
-import { addPlayer, saveCurrentUser, Team, createPlayer } from '../utils/playerStorage';
+import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone } from '../utils/playerStorage';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
 import { sendVerificationSMS, verifyCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
+
+// Функция для генерации UUID v4
+const generateUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
 const availableSkateServices = [
   'skateSharpeningService',
@@ -84,10 +93,13 @@ export default function RegisterScreen() {
   const [skateServices, setSkateServices] = useState<string[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showEmailInput, setShowEmailInput] = useState(false); // Показывать ли поле для ввода email
+  const [emailInput, setEmailInput] = useState(''); // Поле для ввода email
   
   // Refs для обработки клавиатуры
   const scrollViewRef = useRef<ScrollView>(null);
   const codeInputRef = useRef<TextInput>(null);
+  const emailInputRef = useRef<TextInput>(null);
   
   // Глобальный слушатель клавиатуры для прокрутки к полю ввода кода
   useEffect(() => {
@@ -140,7 +152,7 @@ export default function RegisterScreen() {
     return () => {
       keyboardWillShowListener.remove();
     };
-  }, [step]);
+  }, [step, showEmailInput]);
   
   const filteredCountries = COUNTRIES.filter(country =>
     country.toLowerCase().includes(countrySearchText.toLowerCase())
@@ -339,17 +351,30 @@ export default function RegisterScreen() {
     if (Platform.OS === 'ios') {
       // На iOS календарь не закрывается автоматически
       if (date) {
-        setSelectedDate(date);
+        // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
+        // Создаем нормализованную дату сразу, используя UTC методы для чтения
+        // Это гарантирует правильные значения независимо от часового пояса
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth();
+        const day = date.getUTCDate();
+        const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
+        setSelectedDate(normalizedDate);
       }
     } else {
       // На Android календарь закрывается только при полном выборе
       if (event.type === 'set' && date) {
         setShowDatePicker(false);
-        setSelectedDate(date);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear().toString();
-        const formattedDate = `${day}.${month}.${year}`;
+        // На Android используем локальные методы
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+        // Создаем новую дату в локальном времени с полднем
+        const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
+        setSelectedDate(normalizedDate);
+        const dayStr = normalizedDate.getDate().toString().padStart(2, '0');
+        const monthStr = (normalizedDate.getMonth() + 1).toString().padStart(2, '0');
+        const yearStr = normalizedDate.getFullYear().toString();
+        const formattedDate = `${dayStr}.${monthStr}.${yearStr}`;
         setFormData({...formData, birthDate: formattedDate});
       } else if (event.type === 'dismissed') {
         setShowDatePicker(false);
@@ -540,6 +565,79 @@ export default function RegisterScreen() {
     }
   };
 
+  // Переключение на email, если SMS не пришло
+  const handleSwitchToEmail = async () => {
+    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    
+    // Для США/Канады уже используется email, не нужно переключаться
+    if (isUSOrCanada) {
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const cleanedPhone = formData.phone.replace(/\s/g, '');
+      
+      // Пытаемся найти пользователя по телефону (если он уже зарегистрирован)
+      // Но при регистрации пользователя еще нет, поэтому просто показываем поле для ввода email
+      setShowEmailInput(true);
+      setEmailInput(''); // Очищаем поле для ввода email
+      
+      showAlert(t('auth.enterEmail'), t('auth.enterEmailMessage') || 'Please enter your email address to receive the verification code', 'info');
+    } catch (error) {
+      console.error('❌ Ошибка при переключении на email:', error);
+      showAlert(t('common.error'), t('auth.errorSwitchingToEmail') || 'Error switching to email', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Отправка кода на email
+  const handleSendCodeToEmail = async () => {
+    const emailValue = emailInput.trim();
+    
+    if (!emailValue) {
+      showAlert(t('common.error'), t('auth.enterEmail') || 'Please enter your email address', 'error');
+      return;
+    }
+
+    // Проверяем формат email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+      showAlert(t('common.error'), t('auth.invalidEmail') || 'Please enter a valid email address', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Генерируем новый код подтверждения
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Сохраняем код в Supabase (используем email как идентификатор)
+      await saveVerificationCode(emailValue, verificationCode);
+      
+      // Отправляем код на email
+      await sendVerificationEmail(emailValue, verificationCode);
+
+      // Обновляем formData.phone на email для дальнейшей проверки
+      // Это нужно, чтобы verifyCode работал с email
+      setFormData({ ...formData, phone: emailValue });
+      setShowEmailInput(false);
+      
+      // Запускаем таймер на 60 секунд
+      setResendTimer(60);
+      setCanResend(false);
+      
+      showAlert(t('auth.codeSentSuccess'), t('auth.codeSentToEmailMessage', { email: emailValue }) || `Code sent to ${emailValue}`, 'success');
+    } catch (error) {
+      console.error('❌ Ошибка отправки кода на email:', error);
+      showAlert(t('auth.errorSendingCode'), error instanceof Error ? error.message : t('auth.errorSendingCodeMessage'), 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleVerifyAndRegister = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
       showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
@@ -574,8 +672,8 @@ export default function RegisterScreen() {
         console.log('👶 Регистрация ребенка < 13 лет, запрашиваем согласие родителя');
         console.log(`🌐 Текущий язык приложения: ${language}`);
         
-        // Генерируем id игрока заранее, чтобы использовать для имени файла аватара
-        const childPlayerId = Date.now().toString();
+        // Генерируем UUID для игрока
+        const childPlayerId = generateUUID();
         
         // Загружаем аватар в Supabase Storage, если он есть (ТАКЖЕ для детей младше 13 лет!)
         // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
@@ -638,8 +736,8 @@ export default function RegisterScreen() {
       }
       
       // Обычная регистрация для пользователей >= 13 лет
-      // Генерируем id игрока заранее, чтобы использовать для имени файла аватара
-      const playerId = Date.now().toString();
+      // Генерируем UUID для игрока
+      const playerId = generateUUID();
       
       // Загружаем аватар в Supabase Storage, если он есть
       // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
@@ -1394,6 +1492,101 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           ) : (
             <>
+              {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
+              {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
+                <TouchableOpacity 
+                  style={styles.didntReceiveButton}
+                  onPress={handleSwitchToEmail}
+                  disabled={loading}
+                >
+                  <Text style={styles.didntReceiveButtonText}>
+                    {t('auth.didntReceiveCode')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              
+              {/* Поле для ввода email, если переключились на email - показываем ПЕРЕД полем кода */}
+              {showEmailInput && (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>{t('auth.enterEmail')}</Text>
+                  <TextInput
+                    ref={emailInputRef}
+                    style={styles.input}
+                    value={emailInput}
+                    onChangeText={setEmailInput}
+                    placeholder={t('auth.emailPlaceholder')}
+                    placeholderTextColor="#888"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    keyboardType="email-address"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    blurOnSubmit={false}
+                    enablesReturnKeyAutomatically={true}
+                    onSubmitEditing={handleSendCodeToEmail}
+                    editable={!loading}
+                    selectTextOnFocus={false}
+                    autoFocus={true}
+                    onFocus={() => {
+                      // Прокрутка к полю email при фокусе
+                      setTimeout(() => {
+                        if (emailInputRef.current && scrollViewRef.current) {
+                          emailInputRef.current.measureLayout(
+                            scrollViewRef.current as any,
+                            (x, y, width, height) => {
+                              const screenHeight = Dimensions.get('window').height;
+                              const keyboardHeight = 300; // Примерная высота клавиатуры
+                              const visibleArea = screenHeight - keyboardHeight;
+                              const inputBottom = y + height;
+                              const targetY = inputBottom - visibleArea + 130;
+                              
+                              if (targetY > 0) {
+                                scrollViewRef.current?.scrollTo({ 
+                                  y: targetY, 
+                                  animated: true 
+                                });
+                              }
+                            },
+                            () => {
+                              // Fallback: используем measure если measureLayout не работает
+                              emailInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                                const screenHeight = Dimensions.get('window').height;
+                                const keyboardHeight = 300;
+                                const visibleArea = screenHeight - keyboardHeight;
+                                const inputBottom = pageY + height;
+                                const scrollOffset = inputBottom - visibleArea + 130;
+                                
+                                if (scrollOffset > 0) {
+                                  scrollViewRef.current?.scrollTo({ 
+                                    y: scrollOffset, 
+                                    animated: true 
+                                  });
+                                }
+                              });
+                            }
+                          );
+                        }
+                      }, 300);
+                    }}
+                  />
+                  <TouchableOpacity 
+                    style={[styles.registerButton, styles.sendEmailButton, loading && styles.registerButtonDisabled]} 
+                    onPress={handleSendCodeToEmail}
+                    disabled={loading || !emailInput.trim()}
+                  >
+                    <Ionicons 
+                      name={loading ? "hourglass" : "mail"} 
+                      size={20} 
+                      color="#fff" 
+                    />
+                    <Text style={styles.registerButtonText}>
+                      {loading ? t('common.loading') : t('auth.sendToEmail')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
               {/* Поле для ввода кода */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>{t('auth.code')}</Text>
@@ -1401,7 +1594,11 @@ export default function RegisterScreen() {
                   ref={codeInputRef}
                   style={[styles.input, styles.codeInput]}
                   value={verificationCode}
-                  onChangeText={(text) => setVerificationCode(text.replace(/[^0-9]/g, '').slice(0, 6))}
+                  onChangeText={(text) => {
+                    // Удаляем все нецифровые символы (включая буквы и спецсимволы) и ограничиваем до 6 цифр
+                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
+                    setVerificationCode(cleaned);
+                  }}
                   placeholder={t('auth.codePlaceholder')}
                   placeholderTextColor="#888"
                   keyboardType="number-pad"
@@ -1442,11 +1639,11 @@ export default function RegisterScreen() {
                 
                 {/* Кнопка повторной отправки */}
                 <TouchableOpacity 
-                  style={[styles.resendButton, (!canResend || loading) && styles.resendButtonDisabled]} 
+                  style={[styles.resendButton, (!canResend || loading || showEmailInput) && styles.resendButtonDisabled]} 
                   onPress={handleResendCode}
-                  disabled={!canResend || loading}
+                  disabled={!canResend || loading || showEmailInput}
                 >
-                  <Text style={[styles.resendButtonText, (!canResend || loading) && styles.resendButtonTextDisabled]}>
+                  <Text style={[styles.resendButtonText, (!canResend || loading || showEmailInput) && styles.resendButtonTextDisabled]}>
                     {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
                   </Text>
                 </TouchableOpacity>
@@ -1515,10 +1712,23 @@ export default function RegisterScreen() {
                 <TouchableOpacity 
                   style={[styles.datePickerButton, styles.confirmButton]} 
                   onPress={() => {
-                    const day = selectedDate.getDate().toString().padStart(2, '0');
-                    const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
-                    const year = selectedDate.getFullYear().toString();
-                    const formattedDate = `${day}.${month}.${year}`;
+                    // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
+                    // Используем более надежный способ - форматируем напрямую из selectedDate
+                    // но используем UTC методы для чтения, чтобы избежать смещения
+                    const year = selectedDate.getUTCFullYear();
+                    const month = selectedDate.getUTCMonth();
+                    const day = selectedDate.getUTCDate();
+                    
+                    // Форматируем дату напрямую из UTC компонентов
+                    const dayStr = day.toString().padStart(2, '0');
+                    const monthStr = (month + 1).toString().padStart(2, '0');
+                    const yearStr = year.toString();
+                    const formattedDate = `${dayStr}.${monthStr}.${yearStr}`;
+                    
+                    // Также обновляем selectedDate для корректного отображения
+                    const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
+                    setSelectedDate(normalizedDate);
+                    
                     setFormData({...formData, birthDate: formattedDate});
                     setShowDatePicker(false);
                   }}
@@ -1984,6 +2194,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 8,
+  },
+  didntReceiveButton: {
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: 15,
+    marginBottom: 15,
+    alignSelf: 'center',
+  },
+  didntReceiveButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  sendEmailButton: {
+    marginTop: 10,
   },
   avatarPreview: {
     width: 100,

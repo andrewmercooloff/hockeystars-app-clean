@@ -1107,19 +1107,19 @@ export default function RootLayout() {
           // ИСПРАВЛЕНО: Увеличиваем задержку и используем replace для надежной навигации
           // replace заменяет текущий экран вместо добавления в стек,
           // что предотвращает проблему с возвратом на главный экран
-          setTimeout(() => {
+        setTimeout(() => {
             try {
-              // Добавляем параметр для автоматической прокрутки в чат
-              if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
+          // Добавляем параметр для автоматической прокрутки в чат
+          if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
                 // Убеждаемся, что deepLink валидный
                 const cleanDeepLink = deepLink.split('?')[0]; // Убираем существующие параметры
                 router.replace(`${cleanDeepLink}?scrollToBottom=true` as any);
-              } else {
+          } else {
                 router.replace(deepLink as any);
               }
             } catch (error) {
               console.error('❌ Ошибка навигации по deep link:', error);
-            }
+          }
             // Сбрасываем флаг после навигации
             setTimeout(() => {
               isNavigatingFromPushRef.current = false;

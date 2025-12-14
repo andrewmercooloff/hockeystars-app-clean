@@ -73,3 +73,7 @@
 - **Статус сборок EAS:** https://expo.dev/accounts/[ваш-аккаунт]/projects/[ваш-проект]/builds
 
 
+
+
+
+
