@@ -115,43 +115,17 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   // Тип: объект с value для совместимости с useSharedValue
   const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number } }>>(new Map());
   
-  // Адаптивные константы только для FPS - физика шайб одинаковая для всех устройств
-  // Используем уровень производительности устройства для определения частоты кадров
+  // ОПТИМИЗАЦИЯ: Снижаем FPS до 60 для всех устройств для экономии батареи
+  // 60 FPS достаточно для плавной анимации и значительно снижает нагрузку на CPU
   const { STEP_MS, FIXED_DT, MAX_STEPS, TARGET_FPS } = useMemo(() => {
-    let config;
-    switch (performanceLevel) {
-      case 'high':
-        // Для мощных устройств (включая новые Android с 120 Гц) используем 120 FPS
-        config = {
-          STEP_MS: 1000 / 120,
-          FIXED_DT: 1 / 120,
-          MAX_STEPS: 2,
-          TARGET_FPS: 120,
-        };
-        break;
-      case 'medium':
-        // Для средних устройств используем 60 FPS с оптимизацией
-        config = {
-          STEP_MS: 1000 / 60,
-          FIXED_DT: 1 / 60,
-          MAX_STEPS: 1, // Уменьшаем MAX_STEPS для слабых устройств
-          TARGET_FPS: 60,
-        };
-        break;
-      case 'low':
-      default:
-        // Для слабых устройств (Redmi Note 9 и подобные) используем 60 FPS с максимальной оптимизацией
-        config = {
-          STEP_MS: 1000 / 60,
-          FIXED_DT: 1 / 60,
-          MAX_STEPS: 1, // Только 1 шаг физики за кадр для слабых устройств
-          TARGET_FPS: 60,
-        };
-        break;
-    }
-    
-    return config;
-  }, [performanceLevel]);
+    // Единые настройки 60 FPS для всех устройств - баланс плавности и энергоэффективности
+    return {
+      STEP_MS: 1000 / 60,
+      FIXED_DT: 1 / 60,
+      MAX_STEPS: 1, // Только 1 шаг физики за кадр для экономии CPU
+      TARGET_FPS: 60,
+    };
+  }, []);
 
   // Интервал обновления React state - оптимизирован для производительности
   // Shared values обновляются каждый кадр, поэтому визуально все плавно
@@ -664,6 +638,22 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     physicsPositionsRef.current = updatedPositions;
   }, [boundaries, currentUserId, puckSize, performanceLevel, FIXED_DT, TARGET_FPS]);
 
+  // ОПТИМИЗАЦИЯ: Режим покоя - снижаем частоту обновления когда нет взаимодействия
+  const lastInteractionTimeRef = useRef<number>(Date.now());
+  const isIdleModeRef = useRef<boolean>(false);
+  const IDLE_TIMEOUT_MS = 30000; // 30 секунд без взаимодействия = режим покоя
+  const IDLE_FRAME_SKIP = 2; // В режиме покоя пропускаем каждый 2-й кадр (30 FPS вместо 60)
+  const frameCounterRef = useRef(0);
+  
+  // Функция для обновления времени последнего взаимодействия
+  const updateInteractionTime = useCallback(() => {
+    lastInteractionTimeRef.current = Date.now();
+    if (isIdleModeRef.current) {
+      isIdleModeRef.current = false;
+      console.log('📱 [PERFORMANCE] Выход из режима покоя - пользователь активен');
+    }
+  }, []);
+  
   // Используем requestAnimationFrame с интерполяцией для максимальной плавности
   const animationRunningRef = useRef(false);
   const appIsActiveRef = useRef(appIsActive);
@@ -678,6 +668,14 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       accumulatorRef.current = 0;
     }
   }, [appIsActive]);
+  
+  // ОПТИМИЗАЦИЯ: Экспортируем функцию обновления времени взаимодействия для компонентов
+  useEffect(() => {
+    (window as any).__updatePuckInteraction = updateInteractionTime;
+    return () => {
+      delete (window as any).__updatePuckInteraction;
+    };
+  }, [updateInteractionTime]);
   
   // Отслеживаем наличие шайб для запуска анимации (без перезапуска при изменении количества)
   const hasPucksRef = useRef(puckPositions.length > 0);
@@ -713,6 +711,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       // Пропускаем кадр если нет шайб, но продолжаем анимацию
       if (!hasPucksRef.current || physicsPositionsRef.current.length === 0) {
         lastTimeRef.current = 0; // Сбрасываем время для плавного старта когда шайбы появятся
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+      
+      // ОПТИМИЗАЦИЯ: Проверяем режим покоя
+      const timeSinceInteraction = now - lastInteractionTimeRef.current;
+      if (timeSinceInteraction > IDLE_TIMEOUT_MS && !isIdleModeRef.current) {
+        isIdleModeRef.current = true;
+        console.log('😴 [PERFORMANCE] Режим покоя активирован - снижаем FPS');
+      }
+      
+      // В режиме покоя пропускаем каждый N-й кадр для экономии батареи
+      frameCounterRef.current++;
+      if (isIdleModeRef.current && frameCounterRef.current % IDLE_FRAME_SKIP !== 0) {
         animationFrameId = requestAnimationFrame(tick);
         return;
       }
@@ -1130,6 +1142,11 @@ const OriginalPuckAnimator = React.memo(({
     animatedY.value = position.y;
     
     setIsDragging(true);
+    
+    // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
+    if (typeof (window as any).__updatePuckInteraction === 'function') {
+      (window as any).__updatePuckInteraction();
+    }
   };
 
   const handleTouchMove = (e: any) => {
@@ -1583,16 +1600,18 @@ export default function HomeScreen() {
   const hasLoadedBlockedInitiallyRef = useRef(false);
   const resumeAnimationRef = useRef<number | null>(null);
 
-  // Обработка shake gesture для обновления случайных игроков
+  // ОПТИМИЗАЦИЯ: Обработка shake gesture с увеличенным интервалом и отключением в фоне
   useEffect(() => {
     if (Platform.OS === 'web') {
       return; // На веб shake не работает
     }
 
     let subscription: any = null;
+    let Accelerometer: any = null;
     let lastShakeTime = 0;
     const SHAKE_THRESHOLD = 1.5; // Порог для определения shake
     const SHAKE_COOLDOWN = 2000; // Минимум 2 секунды между shake
+    const ACCELEROMETER_INTERVAL = 250; // ОПТИМИЗАЦИЯ: 250мс вместо 100мс (экономия CPU в 2.5 раза)
 
     const handleShake = () => {
       const now = Date.now();
@@ -1614,10 +1633,37 @@ export default function HomeScreen() {
       }
       
       console.log('📱 Shake detected - обновляем случайных игроков');
+      
+      // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
+      if (typeof (window as any).__updatePuckInteraction === 'function') {
+        (window as any).__updatePuckInteraction();
+      }
+    };
+
+    const startAccelerometer = async () => {
+      if (!Accelerometer) return;
+      
+      Accelerometer.setUpdateInterval(ACCELEROMETER_INTERVAL);
+      
+      subscription = Accelerometer.addListener(({ x, y, z }: { x: number; y: number; z: number }) => {
+        // Вычисляем силу ускорения
+        const acceleration = Math.sqrt(x * x + y * y + z * z);
+        
+        // Если ускорение превышает порог - это shake
+        if (acceleration > SHAKE_THRESHOLD) {
+          handleShake();
+        }
+      });
+    };
+    
+    const stopAccelerometer = () => {
+      if (subscription) {
+        subscription.remove();
+        subscription = null;
+      }
     };
 
     // Динамически импортируем expo-sensors для детекции shake
-    let Accelerometer: any = null;
     const initShakeDetection = async () => {
       try {
         const sensors = await import('expo-sensors');
@@ -1631,31 +1677,30 @@ export default function HomeScreen() {
           }
         }
         
-        Accelerometer.setUpdateInterval(100); // Обновление каждые 100мс
-        
-        subscription = Accelerometer.addListener(({ x, y, z }: { x: number; y: number; z: number }) => {
-          // Вычисляем силу ускорения
-          const acceleration = Math.sqrt(x * x + y * y + z * z);
-          
-          // Если ускорение превышает порог - это shake
-          if (acceleration > SHAKE_THRESHOLD) {
-            handleShake();
-          }
-        });
-        
-        console.log('✅ Shake detection активирован');
+        await startAccelerometer();
+        console.log('✅ Shake detection активирован (интервал: ' + ACCELEROMETER_INTERVAL + 'мс)');
       } catch (error) {
         console.warn('⚠️ expo-sensors не установлен или не доступен:', error);
-        console.warn('💡 Для работы shake gesture установите: npx expo install expo-sensors');
       }
     };
+    
+    // ОПТИМИЗАЦИЯ: Отключаем акселерометр когда приложение уходит в фон
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        startAccelerometer();
+      } else {
+        stopAccelerometer();
+        console.log('📱 [PERFORMANCE] Акселерометр отключен в фоне');
+      }
+    };
+    
+    const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
     initShakeDetection();
 
     return () => {
-      if (subscription) {
-        subscription.remove();
-      }
+      stopAccelerometer();
+      appStateSubscription?.remove();
     };
   }, []);
 

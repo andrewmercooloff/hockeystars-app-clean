@@ -57,6 +57,7 @@ class RealtimeManager {
 
   /**
    * Настраивает все Realtime подписки для пользователя
+   * ОПТИМИЗАЦИЯ: Объединены подписки на players таблицу в один канал для снижения нагрузки
    */
   async setupSubscriptions(userId: string): Promise<void> {
     // Если подписки уже настроены для этого пользователя, не пересоздаем их
@@ -74,25 +75,19 @@ class RealtimeManager {
       // 1. Подписка на уведомления
       await this.setupNotificationsSubscription(userId);
       
-      // 2. Подписка на счетчик уведомлений
-      await this.setupNotificationCountSubscription(userId);
+      // 2. ОПТИМИЗАЦИЯ: Объединенная подписка на все изменения в players (счетчики + аватары + профили)
+      await this.setupUnifiedPlayersSubscription(userId);
       
-      // 3. Подписка на счетчик сообщений
-      await this.setupMessagesCountSubscription(userId);
-      
-      // 4. Подписка на запросы в друзья
+      // 3. Подписка на запросы в друзья
       await this.setupFriendRequestsSubscription(userId);
       
-      // 5. Подписка на изменения аватаров всех игроков
-      await this.setupAvatarUpdateSubscription();
-      
-      // 6. Подписка на изменения профилей игроков (видео, фото и др.)
-      await this.setupProfileUpdateSubscription();
-      
-      // 7. Подписка на новые сообщения для push уведомлений (отключена - используем прямую отправку)
-      // await this.setupMessagesSubscription(userId);
+      // УДАЛЕНЫ отдельные подписки (объединены в setupUnifiedPlayersSubscription):
+      // - setupNotificationCountSubscription
+      // - setupMessagesCountSubscription  
+      // - setupAvatarUpdateSubscription
+      // - setupProfileUpdateSubscription
 
-      // console.log('✅ Realtime подписки настроены для пользователя:', userId);
+      console.log('✅ [PERFORMANCE] Realtime подписки оптимизированы (3 канала вместо 7)');
     } catch (error) {
       console.error('❌ Ошибка настройки Realtime подписок:', error);
     }
@@ -157,11 +152,13 @@ class RealtimeManager {
   }
 
   /**
-   * Настраивает подписку на счетчик уведомлений
+   * ОПТИМИЗАЦИЯ: Объединенная подписка на все изменения в таблице players
+   * Заменяет отдельные подписки: notifications-count, messages-count, avatar-updates, profile-updates
    */
-  private async setupNotificationCountSubscription(userId: string): Promise<void> {
+  private async setupUnifiedPlayersSubscription(userId: string): Promise<void> {
     const channel = supabase
-      .channel(`players-notifications-count-${userId}`)
+      .channel(`players-unified-${userId}`)
+      // Подписка на изменения текущего пользователя (счетчики)
       .on(
         'postgres_changes',
         {
@@ -171,66 +168,92 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          const newCount = payload.new.unread_notifications_count || 0;
-          const oldCount = payload.old?.unread_notifications_count || 0;
+          const playerData = payload.new as any;
+          const oldPlayerData = payload.old as any;
           
-          console.log('🔔 Realtime: Обновление счетчика уведомлений в players:', {
-            oldCount,
-            newCount,
-            lastKnown: this.lastNotificationCount,
-            userId
-          });
+          // Обработка счетчика уведомлений
+          const newNotifCount = playerData.unread_notifications_count || 0;
+          const oldNotifCount = oldPlayerData?.unread_notifications_count || 0;
+          if (newNotifCount !== oldNotifCount) {
+            this.emitNotificationCountUpdate(newNotifCount);
+          }
           
-          // ВАЖНО: Вызываем callback если счетчик уведомлений изменился
-          // Обновляем даже если значение совпадает с lastNotificationCount,
-          // так как это может быть синхронизация после создания уведомления
-          if (newCount !== oldCount) {
-            this.emitNotificationCountUpdate(newCount);
+          // Обработка счетчика сообщений
+          const newMsgCount = playerData.unread_messages_count || 0;
+          const oldMsgCount = oldPlayerData?.unread_messages_count || 0;
+          if (newMsgCount !== oldMsgCount && newMsgCount !== this.lastMessagesCount) {
+            this.lastMessagesCount = newMsgCount;
+            this.emitMessagesCountUpdate(newMsgCount);
+          }
+        }
+      )
+      // Подписка на изменения всех игроков (аватары и профили)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'players'
+        },
+        async (payload) => {
+          const playerData = payload.new as any;
+          const oldPlayerData = payload.old as any;
+          const playerId = playerData.id;
+          
+          // Обработка изменения аватара
+          const newAvatar = playerData.avatar;
+          const oldAvatar = oldPlayerData?.avatar;
+          if (newAvatar && playerId && newAvatar !== oldAvatar) {
+            try {
+              const { avatarCache } = await import('./AvatarCache');
+              await avatarCache.setAvatar(playerId, newAvatar);
+            } catch (error) {
+              console.error('❌ Ошибка обновления аватара в кеше:', error);
+            }
+          }
+          
+          // Обработка изменения профиля
+          const favoriteGoalsChanged = playerData.favorite_goals !== oldPlayerData?.favorite_goals;
+          const galleryPhotosChanged = playerData.gallery_photos !== oldPlayerData?.gallery_photos;
+          const achievementsChanged = playerData.achievements !== oldPlayerData?.achievements;
+          const exerciseStatsChanged = playerData.exercise_stats !== oldPlayerData?.exercise_stats;
+          const normativesChanged = playerData.normatives !== oldPlayerData?.normatives;
+          const puckSpeedMaxChanged = playerData.puck_speed_max !== oldPlayerData?.puck_speed_max;
+          
+          if (playerId && (favoriteGoalsChanged || galleryPhotosChanged || achievementsChanged || 
+              exerciseStatsChanged || normativesChanged || puckSpeedMaxChanged)) {
+            try {
+              const { clearPlayerCache, clearPlayerMemoryCache } = await import('./playerStorage');
+              clearPlayerMemoryCache(playerId);
+              await clearPlayerCache(playerId);
+            } catch (error) {
+              console.error('❌ Ошибка очистки кеша профиля:', error);
+            }
           }
         }
       )
       .subscribe((status) => {
-        console.log('🔔 Realtime: Статус подписки на счетчик уведомлений:', status);
+        console.log('📊 [PERFORMANCE] Unified players subscription status:', status);
       });
 
-    this.subscriptions.set('players-notifications-count', {
+    this.subscriptions.set('players-unified', {
       channel,
-      name: 'players-notifications-count'
+      name: 'players-unified'
     });
   }
 
   /**
-   * Настраивает подписку на счетчик сообщений
+   * @deprecated Заменено на setupUnifiedPlayersSubscription
+   */
+  private async setupNotificationCountSubscription(userId: string): Promise<void> {
+    // Оставлено для совместимости, но больше не используется
+  }
+
+  /**
+   * @deprecated Заменено на setupUnifiedPlayersSubscription
    */
   private async setupMessagesCountSubscription(userId: string): Promise<void> {
-    const channel = supabase
-      .channel('players-messages-count')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'players',
-          filter: `id=eq.${userId}`
-        },
-        (payload) => {
-          const newCount = payload.new.unread_messages_count || 0;
-          const oldCount = payload.old?.unread_messages_count || 0;
-          
-          // Вызываем callback только если счетчик сообщений действительно изменился
-          // и значение отличается от последнего известного
-          if (newCount !== oldCount && newCount !== this.lastMessagesCount) {
-            this.lastMessagesCount = newCount;
-            this.emitMessagesCountUpdate(newCount);
-          }
-        }
-      )
-      .subscribe();
-
-    this.subscriptions.set('players-messages-count', {
-      channel,
-      name: 'players-messages-count'
-    });
+    // Оставлено для совместимости, но больше не используется
   }
 
   /**
@@ -273,110 +296,19 @@ class RealtimeManager {
   }
 
   /**
+   * @deprecated Заменено на setupUnifiedPlayersSubscription
    * Настраивает подписку на изменения аватаров всех игроков
-   * Обновляет кеш только при реальном изменении аватара, не при других обновлениях профиля
    */
   private async setupAvatarUpdateSubscription(): Promise<void> {
-    const channel = supabase
-      .channel('players-avatar-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'players'
-        },
-        async (payload) => {
-          const playerData = payload.new as any;
-          const oldPlayerData = payload.old as any;
-          const playerId = playerData.id;
-          const newAvatar = playerData.avatar;
-          const oldAvatar = oldPlayerData?.avatar;
-          
-          // Обновляем кеш аватара только если аватар действительно изменился
-          if (newAvatar && playerId && newAvatar !== oldAvatar) {
-            try {
-              const { avatarCache } = await import('./AvatarCache');
-              
-              // ВАЖНО: Всегда обновляем кеш при изменении аватара через Realtime
-              // Это гарантирует, что используется только последний актуальный аватар
-              // setAvatar предзагрузит новое изображение для мгновенного отображения
-              await avatarCache.setAvatar(playerId, newAvatar);
-              console.log('🔄 Обновлен аватар в кеше через Realtime:', { 
-                playerId, 
-                oldAvatar: oldAvatar?.substring(0, 50) || 'нет', 
-                newAvatar: newAvatar.substring(0, 50) 
-              });
-            } catch (error) {
-              console.error('❌ Ошибка обновления аватара в кеше:', error);
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    this.subscriptions.set('players-avatar-updates', {
-      channel,
-      name: 'players-avatar-updates'
-    });
+    // Функционал перенесён в setupUnifiedPlayersSubscription для оптимизации
   }
 
   /**
+   * @deprecated Заменено на setupUnifiedPlayersSubscription
    * Настраивает подписку на изменения профилей игроков (видео, фото и др.)
-   * Очищает кеш профиля при изменениях, чтобы друзья видели обновления сразу
    */
   private async setupProfileUpdateSubscription(): Promise<void> {
-    const channel = supabase
-      .channel('players-profile-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'players'
-        },
-        async (payload) => {
-          const playerData = payload.new as any;
-          const oldPlayerData = payload.old as any;
-          const playerId = playerData.id;
-          
-          // Проверяем изменение важных полей профиля
-          const favoriteGoalsChanged = playerData.favorite_goals !== oldPlayerData?.favorite_goals;
-          const galleryPhotosChanged = playerData.gallery_photos !== oldPlayerData?.gallery_photos;
-          const achievementsChanged = playerData.achievements !== oldPlayerData?.achievements;
-          const exerciseStatsChanged = playerData.exercise_stats !== oldPlayerData?.exercise_stats;
-          const normativesChanged = playerData.normatives !== oldPlayerData?.normatives;
-          const puckSpeedMaxChanged = playerData.puck_speed_max !== oldPlayerData?.puck_speed_max;
-          
-          // Если изменились важные поля профиля, очищаем кеш этого игрока
-          if (playerId && (favoriteGoalsChanged || galleryPhotosChanged || achievementsChanged || 
-              exerciseStatsChanged || normativesChanged || puckSpeedMaxChanged)) {
-            try {
-              const { clearPlayerCache, clearPlayerMemoryCache } = await import('./playerStorage');
-              
-              // Очищаем кеш профиля игрока
-              clearPlayerMemoryCache(playerId);
-              await clearPlayerCache(playerId);
-              
-              console.log('🔄 Realtime: Кеш профиля очищен при изменении данных:', { 
-                playerId,
-                favoriteGoalsChanged,
-                galleryPhotosChanged,
-                achievementsChanged,
-                exerciseStatsChanged
-              });
-            } catch (error) {
-              console.error('❌ Ошибка очистки кеша профиля через Realtime:', error);
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    this.subscriptions.set('players-profile-updates', {
-      channel,
-      name: 'players-profile-updates'
-    });
+    // Функционал перенесён в setupUnifiedPlayersSubscription для оптимизации
   }
 
   /**

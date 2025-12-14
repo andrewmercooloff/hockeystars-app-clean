@@ -192,30 +192,15 @@ const Puck: React.FC<PuckProps> = ({
   );
 };
 
+// ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для экономии батареи
+// Рендеринг теней очень ресурсоёмкий, особенно на 40+ шайбах
 const styles = StyleSheet.create({
   puck: {
     position: 'absolute',
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 3,
-        },
-        shadowOpacity: 0.8,
-        shadowRadius: 4,
-      },
-      android: {
-        // Тени отключены на Android для лучшей производительности на слабых устройствах
-        elevation: 0, // Используем elevation вместо shadow для Android
-      },
-      web: {
-        boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
-      },
-    }),
+    // ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для снижения нагрузки на GPU
     borderWidth: 2,
     borderColor: '#333333',
   },
@@ -224,52 +209,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 3,
-        },
-        shadowOpacity: 0.8,
-        shadowRadius: 4,
-      },
-      android: {
-        // Тени отключены на Android для лучшей производительности на слабых устройствах
-        elevation: 0, // Используем elevation вместо shadow для Android
-      },
-      web: {
-        boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
-      },
-    }),
+    // ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для снижения нагрузки на GPU
     borderWidth: 2,
     borderColor: '#333333',
   },
   avatar: {
-    // Базовый стиль для аватара
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.6,
-        shadowRadius: 1,
-      },
-      android: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.4,
-        shadowRadius: 3,
-      },
-      web: {
-        boxShadow: '0 1px 1px rgba(1, 0, 0, 0.6)',
-      },
-    }),
+    // ОПТИМИЗАЦИЯ: Тени отключены для экономии батареи
   },
   avatarPlaceholder: {
     justifyContent: 'center',
@@ -302,7 +247,7 @@ const styles = StyleSheet.create({
   starText: {
     textAlign: 'center',
   },
-  // Дополнительная тень для эффекта "лежания на льду"
+  // ОПТИМИЗАЦИЯ: Тень на льду отключена для экономии батареи
   iceShadow: {
     position: 'absolute',
     bottom: -8,
@@ -311,29 +256,6 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: 'transparent',
     borderRadius: 50,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.7,
-        shadowRadius: 2,
-      },
-      android: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 3,
-      },
-      web: {
-        boxShadow: '0 1px 2px rgba(1, 0, 0, 0.7)',
-      },
-    }),
   },
   onlineIndicator: {
     position: 'absolute',
