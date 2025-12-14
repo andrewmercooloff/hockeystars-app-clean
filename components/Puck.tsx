@@ -192,15 +192,30 @@ const Puck: React.FC<PuckProps> = ({
   );
 };
 
-// ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для экономии батареи
-// Рендеринг теней очень ресурсоёмкий, особенно на 40+ шайбах
+// Лёгкие тени для эффекта "шайба на льду" - оптимизированы для производительности
+// Используем минимальный blur и opacity для снижения нагрузки на GPU
 const styles = StyleSheet.create({
   puck: {
     position: 'absolute',
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    // ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для снижения нагрузки на GPU
+    ...Platform.select({
+      ios: {
+        // Лёгкая тень - минимальный blur для производительности
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 3 },
+        shadowOpacity: 0.4,
+        shadowRadius: 2, // Минимальный blur = меньше нагрузки на GPU
+      },
+      android: {
+        // elevation аппаратно ускорен на Android
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
+      },
+    }),
     borderWidth: 2,
     borderColor: '#333333',
   },
@@ -209,12 +224,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    // ОПТИМИЗАЦИЯ: Тени отключены на всех платформах для снижения нагрузки на GPU
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 3 },
+        shadowOpacity: 0.4,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
+      },
+    }),
     borderWidth: 2,
     borderColor: '#333333',
   },
   avatar: {
-    // ОПТИМИЗАЦИЯ: Тени отключены для экономии батареи
+    // Аватар не нуждается в отдельной тени - тень уже на контейнере
   },
   avatarPlaceholder: {
     justifyContent: 'center',
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
   starText: {
     textAlign: 'center',
   },
-  // ОПТИМИЗАЦИЯ: Тень на льду отключена для экономии батареи
+  // Лёгкая тень на льду (не используется в рендере, но оставлена для совместимости)
   iceShadow: {
     position: 'absolute',
     bottom: -8,

@@ -196,9 +196,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const isInProtectionPeriod = timeSinceInit < INITIALIZATION_PROTECTION_MS;
 
     // Определяем функцию генерации позиции здесь, чтобы она была доступна ниже
-    // Единая скорость шайб для всех устройств (как на iOS)
-    const baseSpeedMultiplier = 0.49;
-    
+    // Разнообразные скорости для интересного движения шайб
     const generatePosition = (existingPositions: PuckPosition[]): PuckPosition => {
     const minDistance = puckSize;
     const minDistSq = minDistance * minDistance;
@@ -226,12 +224,17 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         y = Math.random() * (boundaries.bottom - boundaries.top - 100) + boundaries.top + 50;
       }
 
+      // РАЗНООБРАЗИЕ СКОРОСТЕЙ: каждая шайба получает уникальную скорость
+      // Базовая скорость 0.3-0.8 с случайным направлением
+      const speedVariation = 0.3 + Math.random() * 0.5; // от 0.3 до 0.8
+      const angle = Math.random() * Math.PI * 2; // случайное направление
+      
       return {
         id: '',
         x,
         y,
-        vx: (Math.random() - 0.5) * baseSpeedMultiplier,
-        vy: (Math.random() - 0.5) * baseSpeedMultiplier,
+        vx: Math.cos(angle) * speedVariation,
+        vy: Math.sin(angle) * speedVariation,
         size: puckSize,
         isDragging: false,
       };
@@ -392,10 +395,10 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     const currentPositions = physicsPositionsRef.current;
     if (currentPositions.length === 0) return;
     
-    // Единые параметры физики для всех устройств (как на iOS)
-    const minSpeed = 0.8;
-    const maxSpeed = 6.0;
-    const friction = 0.999;
+    // Параметры физики для разнообразного движения
+    const minSpeed = 0.5; // Снижено для более медленных шайб
+    const maxSpeed = 4.0; // Снижено для экономии CPU при коллизиях
+    const friction = 0.998; // Немного больше трения для плавности
 
     const hasNonDraggingPucks = currentPositions.some((p) => !p.isDragging);
     if (!hasNonDraggingPucks) return;
@@ -405,17 +408,21 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
 
       let { x, y, vx, vy } = pos;
 
-      // Минимальная скорость
+      // Минимальная скорость с вариацией для разнообразия движения
       const currentSpeed = Math.sqrt(vx * vx + vy * vy);
       if (currentSpeed < minSpeed) {
         if (currentSpeed > 0.001) {
-          const ratio = minSpeed / currentSpeed;
+          // Добавляем небольшую случайность при ускорении
+          const targetSpeed = minSpeed + Math.random() * 0.3; // 0.5-0.8
+          const ratio = targetSpeed / currentSpeed;
           vx *= ratio;
           vy *= ratio;
         } else {
+          // Случайное направление и скорость при полной остановке
           const angle = Math.random() * Math.PI * 2;
-          vx = Math.cos(angle) * minSpeed;
-          vy = Math.sin(angle) * minSpeed;
+          const newSpeed = minSpeed + Math.random() * 0.4; // 0.5-0.9
+          vx = Math.cos(angle) * newSpeed;
+          vy = Math.sin(angle) * newSpeed;
         }
       }
 
