@@ -1,8 +1,9 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import * as Localization from 'expo-localization';
 import { useRouter } from 'expo-router';
 import { COUNTRIES } from '../utils/constants';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import {
@@ -52,6 +53,48 @@ const availableSkateServices = [
 // Годы для тренера (от текущего года до 2007)
 const currentYear = new Date().getFullYear();
 const availableCoachYears = Array.from({ length: currentYear - 2006 }, (_, i) => currentYear - i);
+
+// Маппинг ISO кодов регионов на русские названия стран (ключи из COUNTRIES)
+const REGION_TO_COUNTRY: { [key: string]: string } = {
+  'BY': 'Беларусь',
+  'RU': 'Россия',
+  'UA': 'Украина',
+  'KZ': 'Казахстан',
+  'US': 'США',
+  'CA': 'Канада',
+  'DE': 'Германия',
+  'FR': 'Франция',
+  'IT': 'Италия',
+  'PL': 'Польша',
+  'CZ': 'Чехия',
+  'SK': 'Словакия',
+  'LT': 'Литва',
+  'LV': 'Латвия',
+  'EE': 'Эстония',
+  'FI': 'Финляндия',
+  'SE': 'Швеция',
+  'NO': 'Норвегия',
+  'DK': 'Дания',
+  'GB': 'Великобритания',
+  'AT': 'Австрия',
+  'CH': 'Швейцария',
+  'NL': 'Нидерланды',
+  'BE': 'Бельгия',
+  'ES': 'Испания',
+  'PT': 'Португалия',
+  'GR': 'Греция',
+  'TR': 'Турция',
+  'IL': 'Израиль',
+  'AE': 'ОАЭ',
+  'CN': 'Китай',
+  'JP': 'Япония',
+  'KR': 'Южная Корея',
+  'AU': 'Австралия',
+  'NZ': 'Новая Зеландия',
+  'BR': 'Бразилия',
+  'AR': 'Аргентина',
+  'MX': 'Мексика',
+};
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -153,10 +196,40 @@ export default function RegisterScreen() {
       keyboardWillShowListener.remove();
     };
   }, [step, showEmailInput]);
+
+  // Автоопределение страны по региону устройства при первой загрузке
+  useEffect(() => {
+    if (!formData.country) {
+      try {
+        // Получаем регион устройства (например, 'BY', 'RU', 'US')
+        const deviceRegion = Localization.getLocales()[0]?.regionCode || '';
+        const detectedCountry = REGION_TO_COUNTRY[deviceRegion];
+        
+        if (detectedCountry && COUNTRIES.includes(detectedCountry)) {
+          console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion})`);
+          setFormData(prev => ({ ...prev, country: detectedCountry }));
+        }
+      } catch (error) {
+        console.log('⚠️ Не удалось определить регион устройства:', error);
+      }
+    }
+  }, []);
   
-  const filteredCountries = COUNTRIES.filter(country =>
-    country.toLowerCase().includes(countrySearchText.toLowerCase())
-  );
+  // Фильтрация стран - ищем и по русскому названию, и по переведённому
+  const filteredCountries = useMemo(() => {
+    if (!countrySearchText.trim()) {
+      return COUNTRIES;
+    }
+    const searchLower = countrySearchText.toLowerCase().trim();
+    return COUNTRIES.filter(country => {
+      // Поиск по русскому названию (ключ)
+      const matchesRussian = country.toLowerCase().includes(searchLower);
+      // Поиск по переведённому названию
+      const translatedName = t(`profile.countries.${country}`) || country;
+      const matchesTranslated = translatedName.toLowerCase().includes(searchLower);
+      return matchesRussian || matchesTranslated;
+    });
+  }, [countrySearchText, t]);
 
   // Функция для валидации имени (минимум 2 слова, каждое слово минимум 2 буквы)
   const validateName = (name: string): boolean => {
@@ -1832,14 +1905,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(5, 0, 8, 0.75)',
+    backgroundColor: 'rgba(5, 0, 8, 0.85)',
     borderRadius: 20,
     padding: 25,
     marginTop: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    maxWidth: Platform.OS === 'web' ? 500 : 'auto', // Ограничиваем ширину для веб
-    alignSelf: Platform.OS === 'web' ? 'center' : 'stretch', // Центрируем на веб
+    borderColor: 'rgba(255, 68, 68, 0.3)', // Тончайший красный контур
+    maxWidth: Platform.OS === 'web' ? 500 : 'auto',
+    alignSelf: Platform.OS === 'web' ? 'center' : 'stretch',
+    // Тень
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   title: {
     fontSize: 28,
