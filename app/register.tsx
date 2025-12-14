@@ -184,8 +184,8 @@ export default function RegisterScreen() {
     showCancel: false,
     showSecondary: false,
     confirmText: t('common.ok'),
-    cancelText: 'Отмена',
-    secondaryText: 'Дополнительно'
+    cancelText: t('common.cancel'),
+    secondaryText: t('common.additional') || 'Additional'
   });
 
   // Таймер для повторной отправки
@@ -229,8 +229,8 @@ export default function RegisterScreen() {
       showCancel: false,
       showSecondary: false,
       confirmText: t('common.ok'),
-      cancelText: 'Отмена',
-      secondaryText: 'Дополнительно'
+      cancelText: t('common.cancel'),
+      secondaryText: t('common.additional') || 'Additional'
     });
   };
 
@@ -268,23 +268,23 @@ export default function RegisterScreen() {
   const pickImage = async () => {
     // Показываем системное окно выбора источника фото
     Alert.alert(
-      'Выберите источник фото',
-      'Откуда хотите загрузить фото?',
+      t('selectPhotoSource'),
+      t('selectPhotoMessage') || '',
       [
         {
-          text: 'Галерея',
+          text: t('gallery'),
           onPress: () => {
             pickFromGallery();
           }
         },
         {
-          text: 'Камера',
+          text: t('camera'),
           onPress: () => {
             takePhoto();
           }
         },
         {
-          text: 'Отмена',
+          text: t('common.cancel'),
           style: 'cancel'
         }
       ]
