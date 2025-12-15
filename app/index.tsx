@@ -703,6 +703,31 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     };
   }, [updateInteractionTime]);
   
+  // 🎯 ЭФФЕКТ "ВЗРЫВА" при встряске - экспортируем функцию
+  useEffect(() => {
+    (window as any).__triggerPuckExplosion = () => {
+      const currentPositions = physicsPositionsRef.current;
+      if (currentPositions.length > 0) {
+        const explosionSpeed = 8; // Сильный импульс для заметного эффекта
+        const updatedPositions = currentPositions.map(pos => {
+          // Случайное направление для каждой шайбы
+          const angle = Math.random() * Math.PI * 2;
+          const speed = explosionSpeed * (0.7 + Math.random() * 0.6); // Варьируем скорость 70-130%
+          return {
+            ...pos,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+          };
+        });
+        physicsPositionsRef.current = updatedPositions;
+        console.log('💥 Shake explosion effect applied to', updatedPositions.length, 'pucks');
+      }
+    };
+    return () => {
+      delete (window as any).__triggerPuckExplosion;
+    };
+  }, []);
+  
   // Отслеживаем наличие шайб для запуска анимации (без перезапуска при изменении количества)
   const hasPucksRef = useRef(puckPositions.length > 0);
   useEffect(() => {
@@ -1660,22 +1685,9 @@ export default function HomeScreen() {
       
       console.log('📱 Shake detected - обновляем случайных игроков');
       
-      // 🎯 ЭФФЕКТ "ВЗРЫВА" - придаём всем шайбам случайные скорости
-      const currentPositions = physicsPositionsRef.current;
-      if (currentPositions.length > 0) {
-        const explosionSpeed = 8; // Сильный импульс для заметного эффекта
-        const updatedPositions = currentPositions.map(pos => {
-          // Случайное направление для каждой шайбы
-          const angle = Math.random() * Math.PI * 2;
-          const speed = explosionSpeed * (0.7 + Math.random() * 0.6); // Варьируем скорость 70-130%
-          return {
-            ...pos,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-          };
-        });
-        physicsPositionsRef.current = updatedPositions;
-        console.log('💥 Shake explosion effect applied to', updatedPositions.length, 'pucks');
+      // 🎯 ЭФФЕКТ "ВЗРЫВА" - вызываем через глобальную функцию
+      if (typeof (window as any).__triggerPuckExplosion === 'function') {
+        (window as any).__triggerPuckExplosion();
       }
       
       // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
