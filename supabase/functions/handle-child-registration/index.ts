@@ -8,7 +8,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SERVICE_ROLE_KEY')!
 
 interface ChildRegistrationRequest {
-  phone: string
+  phone: string // Для США/Канады может содержать email
   name: string
   birthDate: string // формат: DD.MM.YYYY
   parentEmail: string
@@ -343,12 +343,18 @@ serve(async (req) => {
     }
 
     // Валидация для новой регистрации
+    // phone может содержать email для США/Канады
     if (!phone || !name || !birthDate || !parentEmail) {
+      console.log(`❌ Валидация не пройдена: phone=${!!phone}, name=${!!name}, birthDate=${!!birthDate}, parentEmail=${!!parentEmail}`)
       return new Response(
         JSON.stringify({ error: 'Все обязательные поля должны быть заполнены' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    
+    // Определяем, является ли phone на самом деле email (для США/Канады)
+    const isEmailAsContact = phone.includes('@')
+    console.log(`📧 Контакт: ${phone}, isEmailAsContact: ${isEmailAsContact}`)
 
     // Валидация email родителя
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -359,12 +365,20 @@ serve(async (req) => {
       )
     }
 
-    // Проверяем, что пользователь с таким телефоном еще не существует
-    const { data: existingPlayer, error: checkError } = await supabase
+    // Проверяем, что пользователь с таким контактом (телефон или email) еще не существует
+    // Для США/Канады проверяем по email, для остальных - по phone
+    let existingPlayerQuery = supabase
       .from('players')
       .select('id, status')
-      .eq('phone', phone)
-      .maybeSingle()
+    
+    if (isEmailAsContact) {
+      // Для США/Канады ищем по email (который передан в поле phone)
+      existingPlayerQuery = existingPlayerQuery.eq('email', phone)
+    } else {
+      existingPlayerQuery = existingPlayerQuery.eq('phone', phone)
+    }
+    
+    const { data: existingPlayer, error: checkError } = await existingPlayerQuery.maybeSingle()
 
     // Если ошибка не связана с отсутствием записи (PGRST116), это реальная ошибка
     if (checkError && checkError.code !== 'PGRST116') {
@@ -376,8 +390,9 @@ serve(async (req) => {
     }
 
     if (existingPlayer) {
+      const errorCode = isEmailAsContact ? 'EMAIL_ALREADY_EXISTS' : 'PHONE_ALREADY_EXISTS'
       return new Response(
-        JSON.stringify({ error: 'PHONE_ALREADY_EXISTS', code: 'PHONE_ALREADY_EXISTS' }),
+        JSON.stringify({ error: errorCode, code: errorCode }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -422,30 +437,42 @@ serve(async (req) => {
     const playerLanguage = language || determineLanguage(undefined, country)
     
     const now = new Date().toISOString()
+    // Для США/Канады сохраняем email в поле email, для остальных - phone в поле phone
+    const playerInsertData: Record<string, any> = {
+      id: tempId, // Временный ID, будет заменен на реальный при создании auth пользователя
+      name,
+      birth_date: birthDateISO,
+      age: age, // Вычисленный возраст
+      country: country || 'Беларусь',
+      position: position || '',
+      team: teamWithStatus, // Сохраняем исходный статус в поле team
+      status: 'pending_verification',
+      parent_email: parentEmail,
+      consent_token: consentToken,
+      consent_token_expires_at: expiresAt,
+      language: playerLanguage, // Сохраняем язык в БД
+      avatar: avatar || null, // Сохраняем аватар, если он был загружен
+      grip: grip || '', // Хват игрока
+      height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
+      weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
+      number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '', // Номер игрока
+      created_at: now, // Дата регистрации
+      updated_at: now  // Дата обновления
+    }
+    
+    // Для США/Канады сохраняем email, для остальных - phone
+    if (isEmailAsContact) {
+      playerInsertData.email = phone // phone содержит email для США/Канады
+      playerInsertData.phone = '' // Пустой телефон
+    } else {
+      playerInsertData.phone = phone
+    }
+    
+    console.log(`📧 Создание игрока: isEmailAsContact=${isEmailAsContact}, phone field=${playerInsertData.phone}, email field=${playerInsertData.email || 'не указан'}`)
+    
     const { data: playerData, error: insertError } = await supabase
       .from('players')
-      .insert({
-        id: tempId, // Временный ID, будет заменен на реальный при создании auth пользователя
-        name,
-        phone,
-        birth_date: birthDateISO,
-        age: age, // Вычисленный возраст
-        country: country || 'Беларусь',
-        position: position || '',
-        team: teamWithStatus, // Сохраняем исходный статус в поле team
-        status: 'pending_verification',
-        parent_email: parentEmail,
-        consent_token: consentToken,
-        consent_token_expires_at: expiresAt,
-        language: playerLanguage, // Сохраняем язык в БД
-        avatar: avatar || null, // Сохраняем аватар, если он был загружен
-        grip: grip || '', // Хват игрока
-        height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
-        weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
-        number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '', // Номер игрока
-        created_at: now, // Дата регистрации
-        updated_at: now  // Дата обновления
-      })
+      .insert(playerInsertData)
       .select()
       .single()
 
