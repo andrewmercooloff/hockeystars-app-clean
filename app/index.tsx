@@ -2252,7 +2252,7 @@ export default function HomeScreen() {
             width={iceSize.width} 
             height={iceSize.height} 
             opacity={0.25}
-            topInset={35}  // Небольшой отступ для фильтров
+            topInset={0}  // Без отступа - ворота вплотную к краю
           />
         )}
         
