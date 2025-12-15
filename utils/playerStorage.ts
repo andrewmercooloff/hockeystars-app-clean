@@ -7479,14 +7479,19 @@ export const getSmartPlayerSelection = (
     // 7. Случайные игроки (могут заполнить все оставшиеся места до MAX_PLAYERS)
     // Используем детерминированный рандом на основе seed для стабильности между пересчетами
     // НЕ ограничиваем здесь - ограничение будет применено позже на основе оставшихся мест
+    const effectiveRandomSeed = randomSeed !== undefined && randomSeed !== 0
+      ? randomSeed 
+      : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
     const randomPlayers = remainingPlayers
-      .sort(() => {
-        // Детерминированный рандом на основе seed
-        const effectiveSeed = randomSeed !== undefined 
-          ? randomSeed 
-          : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        // Используем другую функцию для другого рандома, чтобы звезды и случайные игроки различались
-        return Math.cos(effectiveSeed * 1.5) * 10000 % 1 - 0.5;
+      .sort((a, b) => {
+        // Детерминированный рандом на основе seed И id игрока
+        // Каждый игрок получает уникальное значение, которое меняется при изменении seed
+        const seedA = `${a.id}_${effectiveRandomSeed}_rnd`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const seedB = `${b.id}_${effectiveRandomSeed}_rnd`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const valueA = Math.sin(seedA * 1.7) * 0.5 + 0.5;
+        const valueB = Math.sin(seedB * 1.7) * 0.5 + 0.5;
+        return valueA - valueB;
       });
 
     // 8. Максимальное количество игроков для отображения (применяется к фильтру)
