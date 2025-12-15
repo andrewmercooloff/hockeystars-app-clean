@@ -2251,7 +2251,7 @@ export default function HomeScreen() {
           <IceRinkMarkings 
             width={iceSize.width} 
             height={iceSize.height} 
-            opacity={0.25}
+            opacity={0.15}
             topInset={0}  // Без отступа - ворота вплотную к краю
           />
         )}
