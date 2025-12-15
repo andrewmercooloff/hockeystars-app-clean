@@ -1453,6 +1453,9 @@ export default function HomeScreen() {
     currentScreenRef.current = currentScreen;
   }, [currentScreen]);
 
+  // Размеры области льда для разметки
+  const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
+  
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -2238,9 +2241,19 @@ export default function HomeScreen() {
         source={require('../assets/images/led.jpg')}
         style={styles.background}
           resizeMode="cover"
+          onLayout={(e) => {
+            const { width, height } = e.nativeEvent.layout;
+            setIceSize({ width, height });
+          }}
       >
         {/* Разметка хоккейного поля */}
-        <IceRinkMarkings opacity={0.25} topInset={60} bottomInset={90} />
+        {iceSize.width > 0 && iceSize.height > 0 && (
+          <IceRinkMarkings 
+            width={iceSize.width} 
+            height={iceSize.height} 
+            opacity={0.25} 
+          />
+        )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
         {renderedPucks}
