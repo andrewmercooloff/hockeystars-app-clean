@@ -12,6 +12,7 @@ import { Player, loadPlayers, getSmartPlayerSelection, getBlockedUsers } from '.
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
+import IceRinkMarkings from '../components/IceRinkMarkings';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import * as Device from 'expo-device';
@@ -2238,6 +2239,9 @@ export default function HomeScreen() {
         style={styles.background}
           resizeMode="cover"
       >
+        {/* Разметка хоккейного поля */}
+        <IceRinkMarkings opacity={0.45} />
+        
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
         {renderedPucks}
 
