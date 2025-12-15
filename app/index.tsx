@@ -2251,7 +2251,8 @@ export default function HomeScreen() {
           <IceRinkMarkings 
             width={iceSize.width} 
             height={iceSize.height} 
-            opacity={0.25} 
+            opacity={0.25}
+            topInset={70}  // Фильтры занимают ~70px сверху
           />
         )}
         
