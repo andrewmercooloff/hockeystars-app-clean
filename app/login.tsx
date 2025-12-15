@@ -18,7 +18,7 @@ import WebTextInput from '../components/WebTextInput';
 import { saveCurrentUser, getPlayerByPhone, getPlayerByEmail } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
-import { sendVerificationSMS, verifyCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -309,20 +309,17 @@ export default function LoginScreen() {
         return;
       }
 
-      // Генерируем код подтверждения
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Сохраняем код в Supabase
-      await saveVerificationCode(cleanedContact, verificationCode);
-      
       // Автоматически определяем тип и отправляем соответствующий код
       if (inputType === 'email') {
+        // Email: генерируем код, сохраняем в БД, отправляем
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(cleanedContact, verificationCode);
         console.log('📧 Автоопределение: отправляем код на email');
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        console.log('📱 Автоопределение: отправляем код на телефон');
-        // Отправляем SMS через Twilio
-        await sendVerificationSMS(cleanedContact, verificationCode);
+        // SMS: Twilio Verify сам генерирует и управляет кодами!
+        console.log('📱 Отправляем код через Twilio Verify API');
+        await sendVerificationSMS(cleanedContact);
       }
 
       
@@ -364,17 +361,15 @@ export default function LoginScreen() {
       const inputType = detectInputType(contactValue);
       const cleanedContact = inputType === 'phone' ? contactValue.replace(/\s/g, '') : contactValue;
       
-      // Генерируем новый код подтверждения
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Сохраняем код в Supabase
-      await saveVerificationCode(cleanedContact, verificationCode);
-      
       // Автоматически определяем тип и отправляем соответствующий код
       if (inputType === 'email') {
+        // Email: генерируем код, сохраняем в БД, отправляем
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(cleanedContact, verificationCode);
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        await sendVerificationSMS(cleanedContact, verificationCode);
+        // SMS: Twilio Verify сам генерирует и управляет кодами!
+        await sendVerificationSMS(cleanedContact);
       }
 
       // Запускаем таймер на 60 секунд
@@ -425,8 +420,12 @@ export default function LoginScreen() {
       const isAdminSecretCode = code === '291019';
       
       if (!isBypassNumber && !isAdminSecretCode) {
-        // Для обычных проверяем код через Twilio/Supabase
-        const verificationResult = await verifyCode(cleanedContact, code);
+        // Для обычных проверяем код
+        // SMS через Twilio Verify, Email через базу данных
+        const verificationResult = inputType === 'email'
+          ? await verifyCode(cleanedContact, code)  // Email - проверка через БД
+          : await verifySMSCode(cleanedContact, code); // SMS - через Twilio Verify
+        
         if (!verificationResult.success) {
           throw new Error(verificationResult.message || 'Неверный код подтверждения');
         }
