@@ -156,7 +156,9 @@ const ItemRequestsManager: React.FC<ItemRequestsManagerProps> = ({ starId, onReq
             player.name,
             star.name,
             itemType,
-            selectedItem.name || undefined
+            selectedItem.name || undefined,
+            starId,
+            star.avatar || null
           );
         }
       } catch (notificationError) {

@@ -47,6 +47,7 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
   updateNotificationCount
 }) => {
   const [starName, setStarName] = useState<string>('Звезда');
+  const [starAvatar, setStarAvatar] = useState<string | null>(null);
   const { t } = useLanguage();
   const [starItems, setStarItems] = useState<StarItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<StarItem | null>(null);
@@ -66,12 +67,13 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
     try {
       const { data, error } = await supabase
         .from('players')
-        .select('name')
+        .select('name, avatar')
         .eq('id', starId)
         .single();
 
       if (!error && data) {
         setStarName(data.name);
+        setStarAvatar(data.avatar || null);
       }
     } catch (error) {
       console.error('Ошибка загрузки имени звезды:', error);
@@ -277,7 +279,8 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
             giftReceivedPushTitle: t('gifts.giftReceivedPush') || '🎁 Подарок получен!',
             giftReceivedPushBody: t('gifts.giftReceivedFromStarPush', { starName: starName || 'Star', giftName: itemToSend.name }) || `Вы получили подарок от ${starName}: ${itemToSend.name}`
           },
-          starId // Передаем ID звезды, чтобы не отправлять уведомление самому себе
+          starId, // Передаем ID звезды, чтобы не отправлять уведомление самому себе
+          starAvatar // Передаем аватар звезды для уведомлений друзьям
         );
         
         console.log('🎁 STAR: ✅ Уведомления отправлены');

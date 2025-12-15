@@ -6543,7 +6543,9 @@ export const notifyFriendsAboutGiftReceived = async (
   playerName: string,
   starName: string,
   giftType: string,
-  giftName?: string
+  giftName?: string,
+  starId?: string,
+  starAvatar?: string | null
 ): Promise<void> => {
   try {
     // Получаем данные игрока для аватара
@@ -6554,6 +6556,17 @@ export const notifyFriendsAboutGiftReceived = async (
       .single();
 
     const playerAvatar = playerData?.avatar || null;
+    
+    // Если starAvatar не передан, но есть starId - получаем аватар звезды
+    let finalStarAvatar = starAvatar;
+    if (!finalStarAvatar && starId) {
+      const { data: starData } = await supabase
+        .from('players')
+        .select('avatar')
+        .eq('id', starId)
+        .single();
+      finalStarAvatar = starData?.avatar || null;
+    }
 
     // Получаем друзей игрока
     const friends = await getFriends(playerId);
@@ -6617,6 +6630,8 @@ export const notifyFriendsAboutGiftReceived = async (
         playerName,
         playerAvatar,
         starName,
+        starId: starId || null,
+        starAvatar: finalStarAvatar || null,
         giftType,
         giftName: displayName,
         timestamp: new Date().toISOString()
@@ -6727,7 +6742,8 @@ export const sendGiftNotification = async (
     giftReceivedPushTitle: string;
     giftReceivedPushBody: string;
   },
-  senderId?: string
+  senderId?: string,
+  senderAvatar?: string | null
 ): Promise<void> => {
   try {
     // ВАЖНО: Получаем язык получателя из БД
@@ -6772,6 +6788,21 @@ export const sendGiftNotification = async (
     console.log('🎁 NOTIFICATIONS: player:', playerName, playerId);
     console.log('🎁 NOTIFICATIONS: sender:', senderName);
     console.log('🎁 NOTIFICATIONS: gift:', giftName);
+    
+    // Получаем аватар отправителя если не передан
+    let finalSenderAvatar = senderAvatar;
+    if (!finalSenderAvatar && senderId) {
+      try {
+        const { data: senderData } = await supabase
+          .from('players')
+          .select('avatar')
+          .eq('id', senderId)
+          .single();
+        finalSenderAvatar = senderData?.avatar || null;
+      } catch (senderError) {
+        console.error('🎁 NOTIFICATIONS: ⚠️ Ошибка получения аватара отправителя:', senderError);
+      }
+    }
     
     // Получаем данные игрока для аватара (нужно для всех уведомлений)
     let playerDataInfo: any = null;
@@ -6968,7 +6999,9 @@ export const sendGiftNotification = async (
             playerId: playerId, // Добавляем ID игрока для навигации
             playerName: playerName,
             playerAvatar: playerDataInfo?.avatar || null,
+            starId: senderId || null,
             starName: senderName,
+            starAvatar: finalSenderAvatar || null,
             giftName: giftName,
             giftType: 'gift',
             timestamp: new Date().toISOString()

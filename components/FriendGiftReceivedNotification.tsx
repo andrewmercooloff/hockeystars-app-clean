@@ -16,7 +16,9 @@ interface FriendGiftReceivedNotificationProps {
       playerId: string;
       playerName: string;
       playerAvatar?: string;
+      starId?: string;
       starName: string;
+      starAvatar?: string;
       giftName: string;
     };
   };
@@ -30,7 +32,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
   onPress
 }) => {
   const { t } = useLanguage();
-  const { playerId, playerName, playerAvatar, starName, giftName } = notification.data;
+  const { playerId, playerName, playerAvatar, starId, starName, starAvatar, giftName } = notification.data;
 
   const formatTime = (timestamp: string): string => {
     const now = new Date();
@@ -63,8 +65,8 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
       >
         <View style={styles.avatarContainer}>
           <CachedAvatar
-            playerId={notification.data.playerId}
-            fallbackAvatarUrl={playerAvatar}
+            playerId={starId || notification.data.playerId}
+            fallbackAvatarUrl={starAvatar || playerAvatar}
             size={50}
             style={styles.playerAvatar}
           />
