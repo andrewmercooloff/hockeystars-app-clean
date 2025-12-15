@@ -7360,42 +7360,42 @@ export const getSmartPlayerSelection = (
       return true;
     });
     
-    // Выбираем тренеров для показа
-    let selectedCoaches: Player[] = [];
+    // Выбираем тренеров для показа (максимум 5 рандомных)
+    const maxCoaches = 5;
     
+    // Фильтруем тренеров по году, если год выбран
+    let eligibleCoaches = allCoaches;
     if (selectedYear) {
-      // Если выбран год - показываем только тренеров, которые тренируют этот год
-      selectedCoaches = allCoaches.filter(coach => {
+      eligibleCoaches = allCoaches.filter(coach => {
         if (coach.coach_years && coach.coach_years.length > 0) {
           return coach.coach_years.includes(selectedYear);
         }
         // Если годы не указаны - показываем везде (обратная совместимость)
         return true;
       });
+    }
+    
+    // Текущий пользователь-тренер всегда видит себя
+    const currentUserCoach = currentUserId ? eligibleCoaches.find(c => c.id === currentUserId) : null;
+    const otherCoaches = eligibleCoaches.filter(c => c.id !== currentUserId);
+    
+    // Перемешиваем других тренеров детерминированно
+    const shuffledOtherCoaches = [...otherCoaches].sort((a, b) => {
+      const seedA = `${a.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seedB = `${b.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const randomA = Math.sin(seedA * 1.5);
+      const randomB = Math.sin(seedB * 1.5);
+      return randomA - randomB;
+    });
+    
+    // Выбираем до 5 рандомных тренеров
+    // Если текущий пользователь - тренер, берем его + до 4 других
+    let selectedCoaches: Player[] = [];
+    if (currentUserCoach) {
+      const otherCoachesToShow = shuffledOtherCoaches.slice(0, maxCoaches - 1);
+      selectedCoaches = [currentUserCoach, ...otherCoachesToShow];
     } else {
-      // Если год НЕ выбран ("Все года") - показываем до 5 рандомных тренеров
-      // Текущий пользователь-тренер всегда видит себя
-      const currentUserCoach = currentUserId ? allCoaches.find(c => c.id === currentUserId) : null;
-      const otherCoaches = allCoaches.filter(c => c.id !== currentUserId);
-      
-      // Перемешиваем других тренеров детерминированно
-      const shuffledOtherCoaches = [...otherCoaches].sort((a, b) => {
-        const seedA = `${a.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const seedB = `${b.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const randomA = Math.sin(seedA * 1.5);
-        const randomB = Math.sin(seedB * 1.5);
-        return randomA - randomB;
-      });
-      
-      // Если текущий пользователь - тренер, берем его + до 4 других
-      // Иначе берем до 5 рандомных
-      const maxCoaches = 5;
-      if (currentUserCoach) {
-        const otherCoachesToShow = shuffledOtherCoaches.slice(0, maxCoaches - 1);
-        selectedCoaches = [currentUserCoach, ...otherCoachesToShow];
-      } else {
-        selectedCoaches = shuffledOtherCoaches.slice(0, maxCoaches);
-      }
+      selectedCoaches = shuffledOtherCoaches.slice(0, maxCoaches);
     }
     
     // Перемешиваем звезд отдельно и берем до 3
