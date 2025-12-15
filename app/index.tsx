@@ -2240,7 +2240,7 @@ export default function HomeScreen() {
           resizeMode="cover"
       >
         {/* Разметка хоккейного поля */}
-        <IceRinkMarkings opacity={0.5} verticalOffset={50} />
+        <IceRinkMarkings opacity={0.25} topInset={60} bottomInset={90} />
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
         {renderedPucks}
