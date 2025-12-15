@@ -32,19 +32,19 @@ const IceRinkMarkings: React.FC<IceRinkMarkingsProps> = memo(({
   const centerX = width / 2;
   const centerY = visibleTop + (visibleHeight / 2);
   
-  // Размеры элементов (пропорционально ВИДИМОЙ области)
-  const centerCircleRadius = Math.min(width, visibleHeight) * 0.10;
-  const faceoffCircleRadius = Math.min(width, visibleHeight) * 0.07;
-  const goalWidth = width * 0.15;
-  const goalDepth = 8;
+  // Размеры элементов (пропорционально ВИДИМОЙ области) - УВЕЛИЧЕННЫЙ МАСШТАБ
+  const centerCircleRadius = Math.min(width, visibleHeight) * 0.11;
+  const faceoffCircleRadius = Math.min(width, visibleHeight) * 0.08;
+  const goalWidth = width * 0.18;
+  const goalDepth = 10;
   const lineWidth = 2;
   const thinLineWidth = 1.5;
   
-  // Симметричные позиции относительно центра ВИДИМОЙ области
-  const blueLineOffset = visibleHeight * 0.22;      // Расстояние от центра до синих линий
-  const goalLineOffset = visibleHeight * 0.42;      // Расстояние от центра до линий ворот
-  const faceoffCircleOffset = visibleHeight * 0.32; // Расстояние от центра до кругов вбрасывания
-  const neutralFaceoffOffset = visibleHeight * 0.12; // Расстояние от центра до точек в нейтральной зоне
+  // Симметричные позиции относительно центра ВИДИМОЙ области - ВОРОТА У КРАЁВ
+  const blueLineOffset = visibleHeight * 0.28;      // Расстояние от центра до синих линий
+  const goalLineOffset = visibleHeight * 0.48;      // Ворота почти у самых краёв
+  const faceoffCircleOffset = visibleHeight * 0.38; // Круги вбрасывания ближе к воротам
+  const neutralFaceoffOffset = visibleHeight * 0.14; // Точки в нейтральной зоне
   
   // Позиции линий (симметричные относительно центра видимой области)
   const blueLineTop = centerY - blueLineOffset;

@@ -2252,7 +2252,7 @@ export default function HomeScreen() {
             width={iceSize.width} 
             height={iceSize.height} 
             opacity={0.25}
-            topInset={70}  // Фильтры занимают ~70px сверху
+            topInset={35}  // Небольшой отступ для фильтров
           />
         )}
         
