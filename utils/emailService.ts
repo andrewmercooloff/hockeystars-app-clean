@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 // Email функции удалены - используется только SMS авторизация
 import { sendSMSViaTwilio } from './smsService';
+import { sendVerificationCode as sendTwilioVerify, checkVerificationCode as checkTwilioVerify } from './twilioVerifyService';
 
 // Интерфейс для кода подтверждения
 export interface VerificationCode {
@@ -185,40 +186,65 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
   }
 };
 
-// Отправка SMS с кодом подтверждения
-export const sendVerificationSMS = async (phoneNumber: string, code: string): Promise<boolean> => {
+// Отправка SMS с кодом подтверждения через Twilio Verify API
+// ВАЖНО: Twilio Verify сам генерирует и управляет кодами!
+// Параметр code игнорируется - код генерируется Twilio
+export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
   try {
-    console.log('📱 Отправляем код подтверждения на:', phoneNumber);
+    console.log('📱 Отправляем код подтверждения через Twilio Verify на:', phoneNumber);
 
-    // Определяем код страны
-    const cleaned = phoneNumber.replace(/[^\d+]/g, '');
-    const countryCode = cleaned.startsWith('+') ? cleaned.match(/^\+(\d{1,3})/)?.[1] : '';
+    // Используем Twilio Verify API - он сам генерирует и отправляет код
+    const result = await sendTwilioVerify(phoneNumber);
     
-    // Для США (+1) используем WhatsApp вместо SMS
-    // ВАЖНО: WhatsApp требует одобренный шаблон. Пока шаблон не одобрен, используем SMS.
-    if (countryCode === '1') {
-      console.log('🇺🇸 США - пробуем WhatsApp (требует одобренный шаблон)');
-      const { sendWhatsAppViaTwilio } = await import('./smsService');
-      const whatsappSuccess = await sendWhatsAppViaTwilio(phoneNumber, code);
-      if (whatsappSuccess) {
-        return true;
-      }
-      // Если WhatsApp не сработал (шаблон не одобрен), пробуем SMS как fallback
-      console.log('⚠️ WhatsApp не сработал (возможно, шаблон не одобрен), используем SMS');
+    if (result.success) {
+      console.log('✅ Код отправлен через Twilio Verify');
+      return true;
     }
-
-    // Для остальных стран используем SMS
-    const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
+    
+    console.log('⚠️ Twilio Verify не сработал:', result.error);
+    
+    // Fallback на обычный SMS если Verify не работает
+    console.log('🔄 Пробуем fallback на обычный Messaging API...');
+    const smsSuccess = await sendSMSViaTwilio(phoneNumber, _code || generateVerificationCode());
     if (smsSuccess) {
       return true;
     }
 
-    // Если SMS не работает, показываем fallback с кодом
+    // Если и SMS не работает, показываем fallback
     console.log('⚠️ SMS недоступен, показываем fallback');
-    return await sendSMSFallback(phoneNumber, code);
+    return await sendSMSFallback(phoneNumber, _code || '------');
   } catch (error) {
     console.error('❌ Ошибка отправки:', error);
-    return await sendSMSFallback(phoneNumber, code);
+    return await sendSMSFallback(phoneNumber, _code || '------');
+  }
+};
+
+// Проверка SMS кода через Twilio Verify API
+export const verifySMSCode = async (
+  phoneNumber: string, 
+  inputCode: string
+): Promise<{ success: boolean; message: string; translationKey?: string }> => {
+  try {
+    console.log('🔐 Проверяем код через Twilio Verify для:', phoneNumber);
+    
+    const result = await checkTwilioVerify(phoneNumber, inputCode);
+    
+    if (result.success) {
+      return { 
+        success: true, 
+        message: 'auth.codeVerified', 
+        translationKey: 'auth.codeVerified' 
+      };
+    }
+    
+    // Если Twilio Verify вернул ошибку, пробуем проверить в базе данных (fallback)
+    console.log('⚠️ Twilio Verify не подтвердил код, пробуем fallback в БД...');
+    return await verifyCode(phoneNumber, inputCode);
+    
+  } catch (error) {
+    console.error('❌ Ошибка проверки кода:', error);
+    // При ошибке пробуем fallback
+    return await verifyCode(phoneNumber, inputCode);
   }
 };
 

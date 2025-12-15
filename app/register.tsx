@@ -27,7 +27,7 @@ import CustomAlert from '../components/CustomAlert';
 import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone } from '../utils/playerStorage';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
-import { sendVerificationSMS, verifyCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -196,7 +196,7 @@ export default function RegisterScreen() {
       keyboardWillShowListener.remove();
     };
   }, [step, showEmailInput]);
-
+  
   // Автоопределение страны по региону устройства при первой загрузке
   useEffect(() => {
     if (!formData.country) {
@@ -576,19 +576,17 @@ export default function RegisterScreen() {
         return;
       }
 
-      // Генерируем код подтверждения
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Сохраняем код в Supabase (используем email или phone как идентификатор)
-      await saveVerificationCode(contactValue, verificationCode);
-      
-      // Для США/Канады отправляем email, для остальных - SMS
+      // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
       if (isUSOrCanada) {
+        // Email: генерируем код, сохраняем в БД, отправляем
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(contactValue, verificationCode);
         console.log('📧 США/Канада - отправляем код на email');
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // Отправляем SMS через Twilio
-        await sendVerificationSMS(formData.phone, verificationCode);
+        // SMS: Twilio Verify сам генерирует и управляет кодами!
+        console.log('📱 Отправляем код через Twilio Verify API');
+        await sendVerificationSMS(formData.phone);
       }
       
       setStep('verification');
@@ -616,19 +614,16 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
-      const contactValue = isUSOrCanada ? formData.email : formData.phone;
       
-      // Генерируем новый код подтверждения
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Сохраняем код в Supabase
-      await saveVerificationCode(contactValue, verificationCode);
-      
-      // Для США/Канады отправляем email, для остальных - SMS
+      // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
       if (isUSOrCanada) {
+        // Email: генерируем код, сохраняем в БД, отправляем
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(formData.email, verificationCode);
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        await sendVerificationSMS(formData.phone, verificationCode);
+        // SMS: Twilio Verify сам генерирует и управляет кодами!
+        await sendVerificationSMS(formData.phone);
       }
       
       // Запускаем таймер снова
@@ -732,8 +727,12 @@ export default function RegisterScreen() {
       const isAdminSecretCode = verificationCode === '291019';
       
       if (!isBypassNumber && !isAdminSecretCode) {
-        // Для обычных проверяем код через Twilio/Supabase
-        const verificationResult = await verifyCode(contactValue, verificationCode);
+        // Для обычных проверяем код
+        // SMS через Twilio Verify, Email через базу данных
+        const verificationResult = isUSOrCanada 
+          ? await verifyCode(contactValue, verificationCode)  // Email - проверка через БД
+          : await verifySMSCode(contactValue, verificationCode); // SMS - через Twilio Verify
+        
         if (!verificationResult.success) {
           // Используем translationKey если есть, иначе message, иначе fallback
           const errorMessage = verificationResult.translationKey 
@@ -1786,7 +1785,7 @@ export default function RegisterScreen() {
               </TouchableOpacity>
             </>
           )}
-          </>
+            </>
           )}
 
 

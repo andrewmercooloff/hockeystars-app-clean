@@ -123,7 +123,8 @@
       "twilioAccountSid": "REDACTED_TWILIO_ACCOUNT_SID",
       "twilioAuthToken": "REDACTED_HEX_SECRET",
       "twilioFromNumber": "+46731727922",
-      "twilioWhatsAppFrom": "whatsapp:+46731727922"
+      "twilioWhatsAppFrom": "whatsapp:+46731727922",
+      "twilioVerifyServiceSid": "REDACTED_TWILIO_VERIFY_SID"
     },
     "plugins": [
       "expo-router",
