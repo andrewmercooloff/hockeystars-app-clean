@@ -772,8 +772,11 @@ export default function RegisterScreen() {
           }
         }
         
+        // Для США/Канады передаём email вместо phone
+        const contactForRegistration = isUSOrCanada ? formData.email : formData.phone;
+        
         const consentResult = await registerChildWithParentalConsent(
-          formData.phone,
+          contactForRegistration,
           formData.name,
           formData.birthDate,
           formData.parentEmail.trim(),
@@ -790,10 +793,21 @@ export default function RegisterScreen() {
         );
         
         if (!consentResult.success) {
-          // Проверяем, является ли это ошибкой о существующем номере телефона
-          const errorMessage = consentResult.error === 'PHONE_ALREADY_EXISTS' 
-            ? t('auth.phoneAlreadyRegistered')
-            : (consentResult.error || t('register.parentalConsentError'));
+          // Обрабатываем коды ошибок и показываем переведённые сообщения
+          let errorMessage: string;
+          switch (consentResult.error) {
+            case 'PHONE_ALREADY_EXISTS':
+              errorMessage = t('auth.phoneAlreadyRegistered');
+              break;
+            case 'PARENTAL_CONSENT_ERROR':
+            case 'CONSENT_REQUEST_FAILED':
+            case 'UNKNOWN_ERROR':
+              errorMessage = t('auth.errorRegistration');
+              break;
+            default:
+              // Если это не код ошибки, а обычное сообщение - показываем его
+              errorMessage = consentResult.error || t('auth.errorRegistration');
+          }
           showAlert(
             t('common.error'), 
             errorMessage, 

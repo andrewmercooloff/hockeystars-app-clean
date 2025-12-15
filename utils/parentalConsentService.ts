@@ -82,7 +82,7 @@ export async function registerChildWithParentalConsent(
             errorMessage.includes('уже существует') || 
             errorMessage.includes('already exists') ||
             errorMessage.includes('already registered')) {
-          return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
+          return { success: false, error: 'PHONE_ALREADY_EXISTS' };
         }
         return { success: false, error: errorMessage };
       }
@@ -162,18 +162,18 @@ export async function registerChildWithParentalConsent(
         return { success: false, error: 'PHONE_ALREADY_EXISTS' };
       }
       
-      return { success: false, error: errorMessage || 'Ошибка запроса родительского согласия' };
+      return { success: false, error: errorMessage || 'PARENTAL_CONSENT_ERROR' };
     }
 
     // Если нет ни data, ни error, но и нет success
     if (!data || !data.success) {
-      return { success: false, error: data?.error || 'Не удалось отправить запрос согласия' };
+      return { success: false, error: data?.error || 'CONSENT_REQUEST_FAILED' };
     }
 
     return { success: true, playerId: data.playerId };
   } catch (error: any) {
     console.error('❌ Error in registerChildWithParentalConsent:', error);
-    const errorMessage = error.message || 'Неизвестная ошибка';
+    const errorMessage = error.message || 'UNKNOWN_ERROR';
     if (errorMessage.includes('уже зарегистрирован') || 
         errorMessage.includes('уже существует') || 
         errorMessage.includes('already exists') ||
