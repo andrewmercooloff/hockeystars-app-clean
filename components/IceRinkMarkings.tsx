@@ -31,20 +31,26 @@ const IceRinkMarkings: React.FC<IceRinkMarkingsProps> = memo(({
   const lineWidth = 3;
   const thinLineWidth = 2;
   
-  // Позиции линий (вертикальная ориентация - "ворота" сверху и снизу)
-  const blueLineTop = height * 0.28;
-  const blueLineBottom = height * 0.72;
-  const goalLineTop = height * 0.08;
-  const goalLineBottom = height * 0.92;
+  // Симметричные позиции относительно центра
+  const blueLineOffset = height * 0.22; // Расстояние от центра до синих линий
+  const goalLineOffset = height * 0.42; // Расстояние от центра до линий ворот
+  const faceoffCircleOffset = height * 0.32; // Расстояние от центра до кругов вбрасывания
+  const neutralFaceoffOffset = height * 0.12; // Расстояние от центра до точек в нейтральной зоне
   
-  // Позиции кругов вбрасывания
+  // Позиции линий (симметричные)
+  const blueLineTop = centerY - blueLineOffset;
+  const blueLineBottom = centerY + blueLineOffset;
+  const goalLineTop = centerY - goalLineOffset;
+  const goalLineBottom = centerY + goalLineOffset;
+  
+  // Позиции кругов вбрасывания (симметричные)
   const faceoffOffsetX = width * 0.28;
-  const faceoffTopY = height * 0.18;
-  const faceoffBottomY = height * 0.82;
+  const faceoffTopY = centerY - faceoffCircleOffset;
+  const faceoffBottomY = centerY + faceoffCircleOffset;
   
-  // Позиции точек вбрасывания в нейтральной зоне
-  const neutralFaceoffY1 = height * 0.38;
-  const neutralFaceoffY2 = height * 0.62;
+  // Позиции точек вбрасывания в нейтральной зоне (симметричные)
+  const neutralFaceoffY1 = centerY - neutralFaceoffOffset;
+  const neutralFaceoffY2 = centerY + neutralFaceoffOffset;
 
   return (
     <View style={[styles.container, { width, height }]} pointerEvents="none">
@@ -222,24 +228,6 @@ const IceRinkMarkings: React.FC<IceRinkMarkingsProps> = memo(({
             stroke="#666666"
             strokeWidth={2}
             fill="rgba(200, 200, 200, 0.3)"
-          />
-          
-          {/* Вратарские зоны (полукруги) */}
-          <Circle
-            cx={centerX}
-            cy={goalLineTop}
-            r={goalWidth * 0.6}
-            stroke="#CC0000"
-            strokeWidth={thinLineWidth}
-            fill="rgba(135, 206, 250, 0.15)"
-          />
-          <Circle
-            cx={centerX}
-            cy={goalLineBottom}
-            r={goalWidth * 0.6}
-            stroke="#CC0000"
-            strokeWidth={thinLineWidth}
-            fill="rgba(135, 206, 250, 0.15)"
           />
         </G>
       </Svg>
