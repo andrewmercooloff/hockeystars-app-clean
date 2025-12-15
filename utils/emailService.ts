@@ -98,30 +98,36 @@ CREATE TABLE email_verification_codes (
 };
 
 // Проверка секретного кода администратора
-export const verifyAdminSecretCode = (phone: string, inputCode: string): { success: boolean; message: string } => {
+// contact может быть phone или email (для США/Канады)
+export const verifyAdminSecretCode = (contact: string, inputCode: string): { success: boolean; message: string; translationKey?: string } => {
   try {
-    console.log('🔐 Проверяем секретный код администратора для:', phone);
+    console.log('🔐 Проверяем секретный код администратора для:', contact);
     
     // Секретный код для тестирования (App Store ревьюеры)
     const secretCode = '291019';
     
     // Проверяем, является ли введенный код секретным кодом
     if (inputCode === secretCode) {
-      // console.log('✅ Секретный код администратора подтвержден');
       return { 
         success: true, 
-        message: 'Секретный код администратора подтвержден' 
+        message: 'auth.codeVerified',
+        translationKey: 'auth.codeVerified'
       };
     }
     
     return { 
       success: false, 
-      message: 'Неверный секретный код' 
+      message: 'auth.codeInvalid',
+      translationKey: 'auth.codeInvalid'
     };
     
   } catch (error) {
     console.error('❌ Ошибка проверки секретного кода:', error);
-    return { success: false, message: 'Ошибка проверки секретного кода' };
+    return { 
+      success: false, 
+      message: 'auth.codeVerificationError',
+      translationKey: 'auth.codeVerificationError'
+    };
   }
 };
 

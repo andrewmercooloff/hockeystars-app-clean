@@ -735,7 +735,11 @@ export default function RegisterScreen() {
         // Для обычных проверяем код через Twilio/Supabase
         const verificationResult = await verifyCode(contactValue, verificationCode);
         if (!verificationResult.success) {
-          showAlert(t('common.error'), verificationResult.message || t('auth.errorVerifyingCodeMessage'), 'error');
+          // Используем translationKey если есть, иначе message, иначе fallback
+          const errorMessage = verificationResult.translationKey 
+            ? t(verificationResult.translationKey) 
+            : (verificationResult.message || t('auth.errorVerifyingCodeMessage'));
+          showAlert(t('common.error'), errorMessage, 'error');
           return;
         }
       } else {
