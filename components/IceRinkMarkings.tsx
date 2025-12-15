@@ -8,6 +8,7 @@ interface IceRinkMarkingsProps {
   width?: number;
   height?: number;
   opacity?: number;
+  verticalOffset?: number; // Смещение центра вверх (для компенсации нижней навигации)
 }
 
 /**
@@ -17,11 +18,12 @@ interface IceRinkMarkingsProps {
 const IceRinkMarkings: React.FC<IceRinkMarkingsProps> = memo(({ 
   width = SCREEN_WIDTH, 
   height = SCREEN_HEIGHT,
-  opacity = 0.5 
+  opacity = 0.5,
+  verticalOffset = 0
 }) => {
-  // Центр экрана
+  // Центр экрана (со смещением вверх для компенсации нижней навигации)
   const centerX = width / 2;
-  const centerY = height / 2;
+  const centerY = (height / 2) - verticalOffset;
   
   // Размеры элементов (пропорционально экрану)
   const centerCircleRadius = Math.min(width, height) * 0.12;
