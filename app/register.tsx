@@ -726,10 +726,13 @@ export default function RegisterScreen() {
       const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
       const isAdminSecretCode = verificationCode === '291019';
       
+      // Определяем, это email или телефон (для выбора метода проверки)
+      const isEmailContact = contactValue.includes('@');
+      
       if (!isBypassNumber && !isAdminSecretCode) {
         // Для обычных проверяем код
-        // SMS через Twilio Verify, Email через базу данных
-        const verificationResult = isUSOrCanada 
+        // Email через БД, SMS через Twilio Verify
+        const verificationResult = isEmailContact 
           ? await verifyCode(contactValue, verificationCode)  // Email - проверка через БД
           : await verifySMSCode(contactValue, verificationCode); // SMS - через Twilio Verify
         
