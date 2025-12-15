@@ -1672,16 +1672,7 @@ export default function HomeScreen() {
       
       lastShakeTime = now;
       
-      // Обновляем randomSeed для получения новых случайных игроков
-      const newSeed = Date.now(); // Используем текущее время как новый seed
-      setRandomSeed(newSeed);
-      
-      // 🎯 ЭФФЕКТ "ВЗРЫВА" - вызываем через глобальную функцию СНАЧАЛА
-      if (typeof (window as any).__triggerPuckExplosion === 'function') {
-        (window as any).__triggerPuckExplosion();
-      }
-      
-      // Усиленная вибрация для обратной связи - серия импульсов
+      // Усиленная вибрация для обратной связи - серия импульсов (СНАЧАЛА для мгновенного отклика)
       if (Platform.OS === 'ios') {
         // Серия из 3 вибраций для iOS
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -1693,6 +1684,19 @@ export default function HomeScreen() {
       }
       
       console.log('📱 Shake detected - обновляем случайных игроков');
+      
+      // Обновляем randomSeed для получения новых случайных игроков
+      const newSeed = Date.now(); // Используем текущее время как новый seed
+      setRandomSeed(newSeed);
+      
+      // 🎯 ЭФФЕКТ "ВЗРЫВА" - применяем ПОСЛЕ пересчёта игроков (небольшая задержка для React)
+      // Задержка нужна, чтобы новые шайбы успели создаться
+      setTimeout(() => {
+        if (typeof (window as any).__triggerPuckExplosion === 'function') {
+          (window as any).__triggerPuckExplosion();
+          console.log('💥 Explosion triggered after player recalculation');
+        }
+      }, 150); // 150мс достаточно для пересчёта
       
       // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
       if (typeof (window as any).__updatePuckInteraction === 'function') {
