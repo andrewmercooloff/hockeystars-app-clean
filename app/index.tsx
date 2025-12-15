@@ -708,11 +708,11 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     (window as any).__triggerPuckExplosion = () => {
       const currentPositions = physicsPositionsRef.current;
       if (currentPositions.length > 0) {
-        const explosionSpeed = 8; // Сильный импульс для заметного эффекта
+        const explosionSpeed = 20; // Очень сильный импульс для ОЧЕНЬ заметного эффекта
         const updatedPositions = currentPositions.map(pos => {
           // Случайное направление для каждой шайбы
           const angle = Math.random() * Math.PI * 2;
-          const speed = explosionSpeed * (0.7 + Math.random() * 0.6); // Варьируем скорость 70-130%
+          const speed = explosionSpeed * (0.8 + Math.random() * 0.4); // Варьируем скорость 80-120%
           return {
             ...pos,
             vx: Math.cos(angle) * speed,
@@ -720,7 +720,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           };
         });
         physicsPositionsRef.current = updatedPositions;
-        console.log('💥 Shake explosion effect applied to', updatedPositions.length, 'pucks');
+        console.log('💥 Shake explosion effect applied to', updatedPositions.length, 'pucks with speed', explosionSpeed);
       }
     };
     return () => {
@@ -1676,19 +1676,23 @@ export default function HomeScreen() {
       const newSeed = Date.now(); // Используем текущее время как новый seed
       setRandomSeed(newSeed);
       
-      // Вибрация для обратной связи
-      if (Platform.OS === 'ios') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      } else {
-        Vibration.vibrate(100);
-      }
-      
-      console.log('📱 Shake detected - обновляем случайных игроков');
-      
-      // 🎯 ЭФФЕКТ "ВЗРЫВА" - вызываем через глобальную функцию
+      // 🎯 ЭФФЕКТ "ВЗРЫВА" - вызываем через глобальную функцию СНАЧАЛА
       if (typeof (window as any).__triggerPuckExplosion === 'function') {
         (window as any).__triggerPuckExplosion();
       }
+      
+      // Усиленная вибрация для обратной связи - серия импульсов
+      if (Platform.OS === 'ios') {
+        // Серия из 3 вибраций для iOS
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+      } else {
+        // Паттерн вибрации для Android: [пауза, вибрация, пауза, вибрация, пауза, вибрация]
+        Vibration.vibrate([0, 100, 50, 100, 50, 100]);
+      }
+      
+      console.log('📱 Shake detected - обновляем случайных игроков');
       
       // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
       if (typeof (window as any).__updatePuckInteraction === 'function') {
