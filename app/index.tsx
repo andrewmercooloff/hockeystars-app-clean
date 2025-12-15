@@ -13,6 +13,7 @@ import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import IceRinkMarkings from '../components/IceRinkMarkings';
+import ShakeHint from '../components/ShakeHint';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import * as Device from 'expo-device';
@@ -2258,6 +2259,9 @@ export default function HomeScreen() {
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
         {renderedPucks}
+        
+        {/* Подсказка о функции встряски (показывается один раз) */}
+        <ShakeHint delay={2500} />
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
