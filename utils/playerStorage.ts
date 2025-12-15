@@ -7323,10 +7323,14 @@ export const getSmartPlayerSelection = (
     
     // Отдельно обрабатываем скаутов с вероятностью 25% (1 к 4)
     // Скауты показываются во всех странах независимо от фильтра
+    // ВАЖНО: Скауты НЕ зависят от randomSeed (встряска не влияет на них)
+    // Они используют свой собственный seed на основе текущего 5-минутного интервала
+    // Это создаёт ощущение, что скаут появляется "иногда" независимо от действий пользователя
     const allScouts = visiblePlayers.filter(player => player.status === 'scout');
+    const scoutTimeSeed = Math.floor(Date.now() / (5 * 60 * 1000)); // Меняется каждые 5 минут
     const selectedScouts = allScouts.filter(scout => {
-      // Создаем уникальный seed для каждого скаута на основе его ID и общего seed
-      const scoutSeed = `${scout.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      // Создаем уникальный seed для каждого скаута на основе его ID и ВРЕМЕНИ (не randomSeed!)
+      const scoutSeed = `${scout.id}_${scoutTimeSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       // Используем синус для получения значения от -1 до 1, затем преобразуем в вероятность
       const randomValue = Math.sin(scoutSeed * 1.5) * 0.5 + 0.5; // От 0 до 1
       // 25% вероятность показать скаута (1 к 4)
@@ -7408,10 +7412,10 @@ export const getSmartPlayerSelection = (
     });
     const limitedStars = starsShuffled.slice(0, 3);
     
-    // Перемешиваем скаутов отдельно
+    // Перемешиваем скаутов отдельно (используем scoutTimeSeed, чтобы не зависеть от встряски)
     const scoutsShuffled = [...selectedScouts].sort((a, b) => {
-      const seedA = `${a.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const seedB = `${b.id}_${effectiveSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seedA = `${a.id}_${scoutTimeSeed}_scout_sort`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seedB = `${b.id}_${scoutTimeSeed}_scout_sort`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const randomA = Math.sin(seedA * 1.5);
       const randomB = Math.sin(seedB * 1.5);
       return randomA - randomB;
