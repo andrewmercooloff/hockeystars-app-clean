@@ -734,9 +734,19 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     hasPucksRef.current = puckPositions.length > 0;
   }, [puckPositions.length]);
   
+  // Отслеживаем текущий экран для остановки анимации
+  const isOnHomeScreen = currentScreen === 'home';
+  const isOnHomeScreenRef = useRef(isOnHomeScreen);
   useEffect(() => {
-    // Не запускаем анимацию если приложение в фоне
-    if (!appIsActive) {
+    isOnHomeScreenRef.current = isOnHomeScreen;
+    if (!isOnHomeScreen) {
+      console.log('📱 Ушли с главного экрана - приостанавливаем анимацию шайб');
+    }
+  }, [isOnHomeScreen]);
+  
+  useEffect(() => {
+    // Не запускаем анимацию если приложение в фоне или не на главном экране
+    if (!appIsActive || !isOnHomeScreen) {
       animationRunningRef.current = false;
       return;
     }
@@ -752,8 +762,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     let frameCount = 0;
 
     const tick = (now: number) => {
-      // Останавливаем анимацию если приложение ушло в фон
-      if (!appIsActiveRef.current) {
+      // Останавливаем анимацию если приложение ушло в фон или не на главном экране
+      if (!appIsActiveRef.current || !isOnHomeScreenRef.current) {
         animationRunningRef.current = false;
         lastTimeRef.current = 0; // Сбрасываем для моментального продолжения
         return;
@@ -861,7 +871,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       // lastTimeRef.current = 0;
       // accumulatorRef.current = 0;
     };
-  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, appIsActive]); // Убрали puckPositions.length - проверяем через hasPucksRef
+  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, appIsActive, isOnHomeScreen]); // Убрали puckPositions.length - проверяем через hasPucksRef
 
   // Вибрация при столкновениях (только один раз при начале столкновения)
   useEffect(() => {
@@ -1435,6 +1445,12 @@ export default function HomeScreen() {
   const router = useRouter();
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
+  
+  // Ref для currentScreen, чтобы использовать в акселерометре
+  const currentScreenRef = useRef(currentScreen);
+  useEffect(() => {
+    currentScreenRef.current = currentScreen;
+  }, [currentScreen]);
 
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
@@ -1665,6 +1681,11 @@ export default function HomeScreen() {
     const ACCELEROMETER_INTERVAL = 250; // ОПТИМИЗАЦИЯ: 250мс вместо 100мс (экономия CPU в 2.5 раза)
 
     const handleShake = () => {
+      // Не обрабатываем встряску, если не на главном экране
+      if (currentScreenRef.current !== 'home') {
+        return;
+      }
+      
       const now = Date.now();
       if (now - lastShakeTime < SHAKE_COOLDOWN) {
         return; // Слишком рано после предыдущего shake
