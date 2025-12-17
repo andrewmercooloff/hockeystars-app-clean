@@ -285,6 +285,16 @@ export default function SearchScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  
+  // Debounce для поиска - обновляем фильтр с задержкой 300мс
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [selectedHand, setSelectedHand] = useState<string | null>(null);
@@ -762,9 +772,9 @@ export default function SearchScreen() {
         }
       }
       
-      // Фильтр по поиску
-      const matchesSearch = !searchQuery || 
-        player.name.toLowerCase().includes(searchQuery.toLowerCase());
+      // Фильтр по поиску (используем debounced версию для производительности)
+      const matchesSearch = !debouncedSearchQuery || 
+        player.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
       
       // Фильтр по стране
       const matchesCountry = !selectedCountry || player.country === selectedCountry;
@@ -772,20 +782,9 @@ export default function SearchScreen() {
       // Фильтр по команде
       const matchesTeam = !selectedTeam || (() => {
         if (!player.teams || player.teams.length === 0) {
-          console.warn(`🔍 Игрок ${player.name} не имеет команд`);
           return false;
         }
-        const hasTeam = player.teams.some(team => {
-          const matches = team.teamId === selectedTeam;
-          if (matches) {
-            console.warn(`✅ Игрок ${player.name} найден в команде ${team.teamName} (ID: ${team.teamId})`);
-          }
-          return matches;
-        });
-        if (!hasTeam) {
-          console.warn(`❌ Игрок ${player.name} не найден в выбранной команде ${selectedTeam}`);
-        }
-        return hasTeam;
+        return player.teams.some(team => team.teamId === selectedTeam);
       })();
       
       // Фильтр по хвату
@@ -915,7 +914,7 @@ export default function SearchScreen() {
     
     
     return sorted;
-  }, [players, searchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
+  }, [players, debouncedSearchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
 
   // Key extractor для FlatList
   const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
