@@ -188,14 +188,14 @@ export default function MessagesScreen() {
     }
   }, [loadChatsData]);
 
-  // Realtime подписка на новые сообщения (только для обновления UI чатов)
+  // Realtime подписка на новые сообщения (входящие И исходящие для обновления UI чатов)
   useEffect(() => {
     if (!currentUser) return;
 
-    // Подписываемся только на INSERT события для обновления списка чатов
-    // Push уведомления обрабатываются в RealtimeManager
-    const channel = supabase
-      .channel('messages-ui-updates')
+    // Подписываемся на INSERT события для обновления списка чатов
+    // Слушаем как входящие (receiver_id), так и исходящие (sender_id) сообщения
+    const incomingChannel = supabase
+      .channel('messages-incoming-ui')
       .on(
         'postgres_changes',
         {
@@ -205,7 +205,7 @@ export default function MessagesScreen() {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
-          console.log('💬 Новое сообщение для UI обновления:', payload.new);
+          console.log('💬 Входящее сообщение для UI обновления:', payload.new);
           silentLoadChats();
           // Дебаунсинг для обновления UserContext
           if (refreshTimeoutRef.current) {
@@ -216,8 +216,27 @@ export default function MessagesScreen() {
       )
       .subscribe();
 
+    // Подписка на исходящие сообщения (когда я отправляю)
+    const outgoingChannel = supabase
+      .channel('messages-outgoing-ui')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `sender_id=eq.${currentUser.id}`
+        },
+        (payload) => {
+          console.log('💬 Исходящее сообщение для UI обновления:', payload.new);
+          silentLoadChats();
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(incomingChannel);
+      supabase.removeChannel(outgoingChannel);
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
       }

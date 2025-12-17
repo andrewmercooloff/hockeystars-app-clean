@@ -184,6 +184,7 @@ export default function AchievementsSection({
           showsHorizontalScrollIndicator={false}
           style={styles.achievementsScroll}
           contentContainerStyle={styles.achievementsContainer}
+          nestedScrollEnabled={true}
         >
           {normalizedAchievements.map((achievement) => {
             const medal = getMedalIcon(achievement.place);

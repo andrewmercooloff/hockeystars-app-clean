@@ -518,16 +518,22 @@ export async function sendMessageNotification(
 export async function sendGiftNotification(
   receiverTokens: string[],
   senderName: string,
-  giftType: string
+  giftType: string,
+  senderId?: string,
+  receiverId?: string
 ): Promise<boolean> {
   const title = `🎁 Подарок от ${senderName}`;
   const body = `Вам подарен ${giftType}! Откройте приложение, чтобы посмотреть.`;
+  
+  // Deep link ведёт на профиль получателя (где отображается музей с подарками)
+  const deepLink = receiverId ? `/player/${receiverId}` : '/notifications';
   
   const promises = receiverTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'gift',
       action: 'open_gifts',
-      deepLink: '/gifts'
+      senderId,
+      deepLink
     })
   );
   
@@ -540,16 +546,21 @@ export async function sendGiftNotification(
  */
 export async function sendFriendshipNotification(
   receiverTokens: string[],
-  senderName: string
+  senderName: string,
+  senderId?: string
 ): Promise<boolean> {
   const title = `🤝 Новый друг!`;
   const body = `${senderName} принял ваш запрос в друзья`;
+  
+  // Deep link ведёт на профиль нового друга
+  const deepLink = senderId ? `/player/${senderId}` : '/notifications';
   
   const promises = receiverTokens.map(token => 
     sendPushNotification(token, title, body, {
       type: 'friendship',
       action: 'open_friends',
-      deepLink: '/friends'
+      senderId,
+      deepLink
     })
   );
   

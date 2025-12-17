@@ -209,6 +209,40 @@ export default function AdminUsersScreen() {
     router.push(`/player/${player.id}`);
   };
 
+  const handleChangeStatus = (player: Player) => {
+    const statuses = [
+      { key: 'player', label: '🏒 Игрок' },
+      { key: 'star', label: '⭐ Звезда' },
+      { key: 'coach', label: '👨‍🏫 Тренер' },
+      { key: 'admin', label: '👑 Администратор' }
+    ];
+    
+    Alert.alert(
+      'Изменить статус',
+      `Выберите новый статус для ${player.name}\nТекущий: ${player.status || 'player'}`,
+      [
+        ...statuses.map(s => ({
+          text: s.label,
+          onPress: async () => {
+            if (player.status === s.key) {
+              Alert.alert('Внимание', 'Этот статус уже установлен');
+              return;
+            }
+            try {
+              await updatePlayer(player.id, { status: s.key });
+              Alert.alert('Успех', `Статус изменён на "${s.label}"`);
+              loadData();
+            } catch (error) {
+              console.error('Ошибка изменения статуса:', error);
+              Alert.alert('Ошибка', 'Не удалось изменить статус');
+            }
+          }
+        })),
+        { text: 'Отмена', style: 'cancel' }
+      ]
+    );
+  };
+
   const getImageSource = (avatar: string | undefined) => {
     if (!avatar) return require('../../assets/images/me.jpg');
     if (typeof avatar === 'string' && (
@@ -385,6 +419,9 @@ export default function AdminUsersScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleEditPlayer(player)}>
                       <Ionicons name="create" size={18} color="#FFD700" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleChangeStatus(player)}>
+                      <Ionicons name="person" size={18} color="#9C27B0" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleHidePlayer(player)}>
                       <Ionicons name={(player as any).is_hidden ? "eye" : "eye-off"} size={18} color="#FF9800" />

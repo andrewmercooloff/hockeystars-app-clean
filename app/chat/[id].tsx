@@ -40,6 +40,7 @@ import { supabase } from '../../utils/supabase';
 import CachedBackground from '../../components/CachedBackground';
 import CachedAvatar from '../../components/CachedAvatar';
 import { addActivityPoints } from '../../services/activityService';
+import * as Clipboard from 'expo-clipboard';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -1069,7 +1070,7 @@ export default function ChatScreen() {
     setContextMenuMessage(null);
   };
   
-  const handleContextMenuAction = (action: 'reply' | 'forward' | 'delete') => {
+  const handleContextMenuAction = async (action: 'reply' | 'forward' | 'delete' | 'copy') => {
     if (!contextMenuMessage) return;
     
     handleCloseContextMenu();
@@ -1080,6 +1081,18 @@ export default function ChatScreen() {
       handleForwardMessage(contextMenuMessage);
     } else if (action === 'delete') {
       handleDeleteMessage(contextMenuMessage.id);
+    } else if (action === 'copy') {
+      try {
+        await Clipboard.setStringAsync(contextMenuMessage.text);
+        // Вибрация для обратной связи
+        if (Platform.OS === 'ios') {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } else {
+          Vibration.vibrate(50);
+        }
+      } catch (error) {
+        console.error('Ошибка копирования:', error);
+      }
     }
   };
 
@@ -1585,6 +1598,15 @@ export default function ChatScreen() {
                   }
                 ]}
               >
+                <TouchableOpacity
+                  style={styles.contextMenuItem}
+                  onPress={() => handleContextMenuAction('copy')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="copy-outline" size={18} color="#fff" style={styles.contextMenuIcon} />
+                  <Text style={styles.contextMenuText}>{t('chat.copy') || 'Копировать'}</Text>
+                </TouchableOpacity>
+                <View style={styles.contextMenuDivider} />
                 <TouchableOpacity
                   style={styles.contextMenuItem}
                   onPress={() => handleContextMenuAction('reply')}

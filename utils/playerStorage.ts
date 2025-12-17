@@ -1685,7 +1685,8 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
               type: 'friend_request',
               sender_id: fromId,
               playerId: fromId,
-              action: 'open_notifications'
+              action: 'open_notifications',
+              deepLink: '/notifications' // Открывает экран уведомлений
             }
           );
           if (pushResult) {
@@ -2936,7 +2937,8 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
             {
               type: 'friend_accepted',
               acceptor_id: userId1,
-              action: 'open_notifications'
+              action: 'open_notifications',
+              deepLink: `/player/${userId1}` // Открывает профиль нового друга
             }
           );
           console.log('✅ Push уведомление friend_accepted отправлено');
@@ -6358,7 +6360,8 @@ export const notifyFriendsAboutNewFriendship = async (
                 type: 'new_friendship',
                 friend1Id: userId1,
                 friend2Id: userId2,
-                action: 'open_notifications'
+                action: 'open_notifications',
+                deepLink: '/notifications' // Открывает экран уведомлений
               }
             );
           } catch (pushError) {
@@ -6941,7 +6944,9 @@ export const sendGiftNotification = async (
               await sendPushNotification(token, pushTitle, pushBody, {
                 type: 'gift_received',
                 sender_name: senderName,
-                gift_name: giftName
+                gift_name: giftName,
+                senderId: senderId,
+                deepLink: `/player/${playerId}` // Открывает профиль получателя с музеем
               });
               console.log('🎁 NOTIFICATIONS: ✅ Push отправлен получателю на токен:', token.substring(0, 20) + '...');
             } catch (pushError) {
@@ -7119,7 +7124,8 @@ export const sendGiftNotification = async (
                     type: 'friend_gift_received',
                     player_name: playerName,
                     sender_name: senderName,
-                    gift_name: giftName
+                    gift_name: giftName,
+                    deepLink: `/player/${playerId}` // Открывает профиль друга с музеем
                   });
                 } catch (pushError) {
                   console.error('🎁 NOTIFICATIONS: ❌ Ошибка отправки push другу:', pushError);
