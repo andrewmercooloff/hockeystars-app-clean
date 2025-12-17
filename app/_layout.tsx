@@ -12,7 +12,7 @@ import { YearFilterProvider } from '../utils/YearFilterContext';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { ScreenProvider } from '../contexts/ScreenContext';
-import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player } from '../utils/playerStorage';
+import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player, updateOnlineStatus } from '../utils/playerStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../utils/supabase';
 import * as SplashScreen from 'expo-splash-screen';
@@ -337,6 +337,13 @@ export default function RootLayout() {
         if (AppStateModule) {
           subscription = AppStateModule.addEventListener('change', (nextAppState: string) => {
             setAppState(nextAppState);
+            
+            // Обновляем онлайн-статус пользователя в базе данных
+            if (nextAppState === 'active') {
+              updateOnlineStatus(true);
+            } else if (nextAppState === 'background' || nextAppState === 'inactive') {
+              updateOnlineStatus(false);
+            }
           });
         }
       }
@@ -783,6 +790,13 @@ export default function RootLayout() {
             await initializePushNotifications(user.id, true);
           } catch (error) {
             console.error('❌ Ошибка инициализации push-уведомлений:', error);
+          }
+
+          // Устанавливаем онлайн-статус при старте приложения
+          try {
+            await updateOnlineStatus(true);
+          } catch (error) {
+            // Не критично
           }
 
           // Настраиваем системный UI

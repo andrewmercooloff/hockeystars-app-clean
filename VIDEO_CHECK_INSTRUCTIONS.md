@@ -126,3 +126,8 @@ ffmpeg -i "C:\Users\ВашеИмя\Downloads\IMG_5198.MOV" `
 
 
 
+
+
+
+
+

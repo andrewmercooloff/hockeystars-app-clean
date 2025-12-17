@@ -2132,6 +2132,36 @@ export const saveCurrentUser = async (user: Player): Promise<void> => {
   }
 };
 
+// Обновление онлайн-статуса пользователя (вызывается при изменении AppState)
+export const updateOnlineStatus = async (isOnline: boolean): Promise<void> => {
+  try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const userData = await AsyncStorage.getItem('hockeystars_current_user');
+    
+    if (!userData) {
+      return; // Пользователь не авторизован
+    }
+    
+    const user = JSON.parse(userData);
+    
+    const { error } = await supabase
+      .from('players')
+      .update({ 
+        is_online: isOnline,
+        last_seen: new Date().toISOString()
+      })
+      .eq('id', user.id);
+    
+    if (error) {
+      console.warn('⚠️ Не удалось обновить онлайн-статус:', error.message);
+    } else {
+      console.log(`🟢 Онлайн-статус обновлен: ${isOnline ? 'онлайн' : 'офлайн'}`);
+    }
+  } catch (error) {
+    // Молча игнорируем ошибки - не критично
+  }
+};
+
 // Загрузка текущего пользователя
 export const loadCurrentUser = async (forceRefresh = false): Promise<Player | null> => {
   try {
@@ -7379,27 +7409,27 @@ export const getSmartPlayerSelection = (
       });
     }
     
-    // Текущий пользователь-тренер всегда видит себя
+      // Текущий пользователь-тренер всегда видит себя
     const currentUserCoach = currentUserId ? eligibleCoaches.find(c => c.id === currentUserId) : null;
     const otherCoaches = eligibleCoaches.filter(c => c.id !== currentUserId);
-    
-    // Перемешиваем других тренеров детерминированно
-    const shuffledOtherCoaches = [...otherCoaches].sort((a, b) => {
-      const seedA = `${a.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const seedB = `${b.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const randomA = Math.sin(seedA * 1.5);
-      const randomB = Math.sin(seedB * 1.5);
-      return randomA - randomB;
-    });
-    
+      
+      // Перемешиваем других тренеров детерминированно
+      const shuffledOtherCoaches = [...otherCoaches].sort((a, b) => {
+        const seedA = `${a.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const seedB = `${b.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const randomA = Math.sin(seedA * 1.5);
+        const randomB = Math.sin(seedB * 1.5);
+        return randomA - randomB;
+      });
+      
     // Выбираем до 5 рандомных тренеров
-    // Если текущий пользователь - тренер, берем его + до 4 других
+      // Если текущий пользователь - тренер, берем его + до 4 других
     let selectedCoaches: Player[] = [];
-    if (currentUserCoach) {
-      const otherCoachesToShow = shuffledOtherCoaches.slice(0, maxCoaches - 1);
-      selectedCoaches = [currentUserCoach, ...otherCoachesToShow];
-    } else {
-      selectedCoaches = shuffledOtherCoaches.slice(0, maxCoaches);
+      if (currentUserCoach) {
+        const otherCoachesToShow = shuffledOtherCoaches.slice(0, maxCoaches - 1);
+        selectedCoaches = [currentUserCoach, ...otherCoachesToShow];
+      } else {
+        selectedCoaches = shuffledOtherCoaches.slice(0, maxCoaches);
     }
     
     // Перемешиваем звезд отдельно и берем до 3
@@ -7484,8 +7514,8 @@ export const getSmartPlayerSelection = (
     // Используем детерминированный рандом на основе seed для стабильности между пересчетами
     // НЕ ограничиваем здесь - ограничение будет применено позже на основе оставшихся мест
     const effectiveRandomSeed = randomSeed !== undefined && randomSeed !== 0
-      ? randomSeed 
-      : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          ? randomSeed 
+          : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     
     const randomPlayers = remainingPlayers
       .sort((a, b) => {

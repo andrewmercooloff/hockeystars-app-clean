@@ -198,8 +198,8 @@ export const sendVerificationSMS = async (phoneNumber: string, _code?: string): 
     
     if (result.success) {
       console.log('✅ Код отправлен через Twilio Verify');
-      return true;
-    }
+        return true;
+      }
     
     console.log('⚠️ Twilio Verify не сработал:', result.error);
     

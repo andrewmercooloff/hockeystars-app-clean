@@ -579,8 +579,8 @@ export default function RegisterScreen() {
       // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
       if (isUSOrCanada) {
         // Email: генерируем код, сохраняем в БД, отправляем
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        await saveVerificationCode(contactValue, verificationCode);
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      await saveVerificationCode(contactValue, verificationCode);
         console.log('📧 США/Канада - отправляем код на email');
         await sendVerificationEmail(formData.email, verificationCode);
       } else {

@@ -308,7 +308,7 @@ export default function LoginScreen() {
         });
         return;
       }
-
+      
       // Автоматически определяем тип и отправляем соответствующий код
       if (inputType === 'email') {
         // Email: генерируем код, сохраняем в БД, отправляем

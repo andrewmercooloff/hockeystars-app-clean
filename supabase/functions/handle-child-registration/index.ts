@@ -439,25 +439,25 @@ serve(async (req) => {
     const now = new Date().toISOString()
     // Для США/Канады сохраняем email в поле email, для остальных - phone в поле phone
     const playerInsertData: Record<string, any> = {
-      id: tempId, // Временный ID, будет заменен на реальный при создании auth пользователя
-      name,
-      birth_date: birthDateISO,
-      age: age, // Вычисленный возраст
-      country: country || 'Беларусь',
-      position: position || '',
-      team: teamWithStatus, // Сохраняем исходный статус в поле team
-      status: 'pending_verification',
-      parent_email: parentEmail,
-      consent_token: consentToken,
-      consent_token_expires_at: expiresAt,
-      language: playerLanguage, // Сохраняем язык в БД
-      avatar: avatar || null, // Сохраняем аватар, если он был загружен
-      grip: grip || '', // Хват игрока
-      height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
-      weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
-      number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '', // Номер игрока
-      created_at: now, // Дата регистрации
-      updated_at: now  // Дата обновления
+        id: tempId, // Временный ID, будет заменен на реальный при создании auth пользователя
+        name,
+        birth_date: birthDateISO,
+        age: age, // Вычисленный возраст
+        country: country || 'Беларусь',
+        position: position || '',
+        team: teamWithStatus, // Сохраняем исходный статус в поле team
+        status: 'pending_verification',
+        parent_email: parentEmail,
+        consent_token: consentToken,
+        consent_token_expires_at: expiresAt,
+        language: playerLanguage, // Сохраняем язык в БД
+        avatar: avatar || null, // Сохраняем аватар, если он был загружен
+        grip: grip || '', // Хват игрока
+        height: height && height !== '' ? (typeof height === 'string' ? parseInt(height) || 0 : height) : 0, // Рост игрока
+        weight: weight && weight !== '' ? (typeof weight === 'string' ? parseInt(weight) || 0 : weight) : 0, // Вес игрока
+        number: number && number !== '' ? (typeof number === 'string' ? number : String(number)) : '', // Номер игрока
+        created_at: now, // Дата регистрации
+        updated_at: now  // Дата обновления
     }
     
     // Для США/Канады сохраняем email, для остальных - phone

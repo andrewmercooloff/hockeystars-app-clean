@@ -680,7 +680,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       console.log('📱 [PERFORMANCE] Выход из режима покоя - пользователь активен');
     }
   }, []);
-  
+
   // Используем requestAnimationFrame с интерполяцией для максимальной плавности
   const animationRunningRef = useRef(false);
   const appIsActiveRef = useRef(appIsActive);
@@ -1455,7 +1455,7 @@ export default function HomeScreen() {
 
   // Размеры области льда для разметки
   const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
-  
+
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
