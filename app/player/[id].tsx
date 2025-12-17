@@ -2396,13 +2396,8 @@ export default function PlayerProfile() {
       acceptFriendRequest(currentUser.id, player.id).then(success => {
         setFriendLoading(false);
         if (success) {
-          // ВАЖНО: Сбрасываем сохраненную позицию прокрутки и прокручиваем наверх
-          // чтобы пользователь не оказался внизу профиля после принятия дружбы
-          savedScrollPositionRef.current = null;
-          setTimeout(() => {
-            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-          }, 100);
-          console.log('✅ Прокрутка сброшена наверх после принятия дружбы');
+          // Пользователь остаётся на том же месте - не меняем позицию прокрутки
+          console.log('✅ Запрос дружбы принят');
           
           // Кеш будет очищен автоматически через Realtime обновления
           // Не вызываем clearPlayerCache чтобы избежать нежелательных редиректов
@@ -6699,9 +6694,9 @@ export default function PlayerProfile() {
               </View>
             )}
 
-            {/* Кнопка "Поделиться" */}
+            {/* Кнопки "Поделиться" и "Скопировать ссылку" */}
             {player && (
-              <View style={{ marginTop: 10, marginBottom: 10, paddingHorizontal: 20 }}>
+              <View style={{ marginTop: 10, marginBottom: 10, paddingHorizontal: 20, gap: 10 }}>
                 <TouchableOpacity 
                   style={styles.shareButton} 
                   onPress={shareProfile}
@@ -6709,6 +6704,34 @@ export default function PlayerProfile() {
                   <Ionicons name="share-outline" size={20} color="#fff" />
                   <Text style={styles.shareButtonText}>
                     {t('profile.shareProfileSocial') || 'Поделиться профилем в соц. сетях'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.shareButton, { backgroundColor: '#333' }]} 
+                  onPress={async () => {
+                    try {
+                      const profileUrl = `https://hockey-stars.com/player/${player.id}`;
+                      const Clipboard = require('expo-clipboard');
+                      await Clipboard.setStringAsync(profileUrl);
+                      if (Platform.OS === 'ios') {
+                        const Haptics = require('expo-haptics');
+                        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      } else {
+                        Vibration.vibrate(50);
+                      }
+                      showCustomAlert(
+                        t('common.success') || 'Успешно',
+                        t('profile.linkCopied') || 'Ссылка скопирована в буфер обмена',
+                        'success'
+                      );
+                    } catch (error) {
+                      console.error('Ошибка копирования:', error);
+                    }
+                  }}
+                >
+                  <Ionicons name="link-outline" size={20} color="#fff" />
+                  <Text style={styles.shareButtonText}>
+                    {t('profile.copyLink') || 'Скопировать ссылку'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -7665,12 +7688,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 2,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   playerName: {
     fontSize: 28,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     marginRight: 10,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   numberBadge: {
     backgroundColor: '#fa2f40',

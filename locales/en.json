@@ -2133,6 +2133,8 @@
     "qrCodeInfo": "Point your phone camera at the QR code to open profile",
     "shareProfile": "Share Profile",
     "shareProfileSocial": "Share profile on social networks",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied to clipboard",
     "savedToGallery": "Saved to Gallery",
     "noPermission": "No access to gallery",
     "shareError": "Error creating image",

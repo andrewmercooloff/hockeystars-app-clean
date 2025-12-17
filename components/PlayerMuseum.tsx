@@ -194,6 +194,86 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     checkPlayerStatus();
   }, [playerId, cachedMuseumItems, updateTrigger]);
 
+  // Realtime подписка на новые подарки в музее
+  useEffect(() => {
+    if (!playerId) return;
+
+    const channel = supabase
+      .channel(`museum-${playerId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'player_museum_items',
+          filter: `player_id=eq.${playerId}`
+        },
+        (payload) => {
+          console.log('🎁 МУЗЕЙ: Новый подарок получен (realtime):', payload.new);
+          // Очищаем кеш и перезагружаем
+          clearMuseumCache();
+          loadMuseumItemsForce();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'player_museum_items',
+          filter: `player_id=eq.${playerId}`
+        },
+        () => {
+          console.log('🎁 МУЗЕЙ: Подарок удален (realtime)');
+          clearMuseumCache();
+          loadMuseumItemsForce();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [playerId]);
+
+  // Функция загрузки без кэша (для realtime обновлений)
+  const loadMuseumItemsForce = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('player_museum_items')
+        .select(`
+          id,
+          item_id,
+          custom_name,
+          item:shop_items(id, name, image_url, item_type, created_at),
+          received_from:players!player_museum_items_from_player_id_fkey(id, name),
+          received_at
+        `)
+        .eq('player_id', playerId)
+        .order('received_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Ошибка загрузки музея:', error);
+        return;
+      }
+
+      const validItems = (data || []).filter(item => item.item !== null) as MuseumItem[];
+      setMuseumItems(validItems);
+      
+      // Обновляем кеш
+      const cacheKey = `museum_${playerId}`;
+      await AsyncStorage.setItem(cacheKey, JSON.stringify({
+        items: validItems,
+        timestamp: Date.now()
+      }));
+      
+      if (onMuseumItemsLoaded) {
+        onMuseumItemsLoaded(validItems);
+      }
+    } catch (error) {
+      console.error('❌ Ошибка загрузки музея:', error);
+    }
+  };
 
   const loadMuseumItems = async () => {
     // console.log('🎁 МУЗЕЙ: ===== loadMuseumItems ВЫЗВАН =====');
