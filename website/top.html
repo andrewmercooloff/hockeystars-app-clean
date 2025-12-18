@@ -431,9 +431,10 @@
             });
         })();
 
-        // Supabase (как и в приложении)
-        var SUPABASE_URL = 'https://swklaolhfahtunabahqz.supabase.co';
-        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3a2xhb2xoZmFodHVuYWJhaHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTUwNzYsImV4cCI6MjA0NzMzMTA3Nn0.Y3Wqt8M8k99XJuJPNbpPFpN2y74mglqTYJfLyKMVuks';
+        // Supabase (используем тот же проект, что и сайт/приложение)
+        // ВАЖНО: ранее здесь был другой project-ref, из-за этого запросы падали с "Failed to fetch".
+        var SUPABASE_URL = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
 
         function t(key, fallback) {
             try {
