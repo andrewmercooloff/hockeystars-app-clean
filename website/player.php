@@ -167,6 +167,13 @@ if ($isAndroid) {
             max-width: 360px;
             margin: 0 auto;
         }
+
+        .install-logo {
+            max-width: 260px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 18px;
+        }
     </style>
 </head>
 <body>
@@ -186,6 +193,10 @@ if ($isAndroid) {
         <div class="container">
             <div class="header-content">
                 <img src="/logo.png" alt="HockeyStars" class="logo">
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+                    <button class="lang-btn active" data-lang="ru" aria-label="Русский">RU</button>
+                </div>
             </div>
         </div>
     </header>
@@ -193,7 +204,10 @@ if ($isAndroid) {
     <main class="main">
         <div class="container">
             <div class="install-card">
-                <button class="download-btn install-btn" onclick="window.__hsInstall()">Открыть / Установить</button>
+                <div class="hero-logo-container">
+                    <img src="/logo.png" alt="HockeyStars" class="hero-logo install-logo">
+                </div>
+                <button class="download-btn install-btn" onclick="window.__hsInstall()" data-i18n="install.open">Открыть / Установить</button>
             </div>
         </div>
     </main>
