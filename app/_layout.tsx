@@ -1157,6 +1157,27 @@ export default function RootLayout() {
       return; // На веб не обрабатываем
     }
 
+    const PENDING_INVITE_KEY = 'pending_invited_by';
+
+    // 🎟️ Referral: сохраняем inviterId при открытии профиля по ссылке
+    // Важно: это работает, когда приложение УЖЕ установлено и открылось по ссылке.
+    // Для сценария "сначала App Store, потом установка" это не deferred deep link.
+    const savePendingInvite = async (inviterId: string) => {
+      try {
+        // Не сохраняем, если пользователь уже залогинен
+        if (currentUser?.id) return;
+        if (!inviterId || inviterId.length < 8) return;
+
+        await AsyncStorage.setItem(
+          PENDING_INVITE_KEY,
+          JSON.stringify({ inviterId, ts: Date.now() })
+        );
+        console.log('🎟️ [REFERRAL] Pending invite saved from link:', inviterId);
+      } catch (e) {
+        console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
+      }
+    };
+
     // Обработка URL при открытии приложения
     const handleInitialURL = async () => {
       try {
@@ -1184,6 +1205,7 @@ export default function RootLayout() {
           const match = url.match(/\/player\/([^\/\?]+)/);
           if (match && match[1]) {
             const playerId = match[1];
+            savePendingInvite(playerId);
             router.push(`/player/${playerId}` as any);
             return;
           }
@@ -1193,6 +1215,7 @@ export default function RootLayout() {
         if (url.startsWith('hockeystars://player/')) {
           const playerId = url.replace('hockeystars://player/', '').split('?')[0];
           if (playerId) {
+            savePendingInvite(playerId);
             router.push(`/player/${playerId}` as any);
             return;
           }
@@ -1211,7 +1234,7 @@ export default function RootLayout() {
     return () => {
       subscription.remove();
     };
-  }, [router]);
+  }, [router, currentUser?.id]);
 
   // Дополнительная загрузка пользователя при возврате в приложение
   // ОТКЛЮЧЕНО - вызывает редиректы

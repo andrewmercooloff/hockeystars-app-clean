@@ -24,10 +24,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
-import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone } from '../utils/playerStorage';
+import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy } from '../utils/playerStorage';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -100,6 +101,7 @@ export default function RegisterScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { refreshUser } = useUser();
+  const PENDING_INVITE_KEY = 'pending_invited_by';
   const [formData, setFormData] = useState({
     phone: '',
     email: '', // Для США/Канады (также используется для магазинов)
@@ -817,6 +819,29 @@ export default function RegisterScreen() {
           );
           return;
         }
+
+        // 🎟️ Referral: применяем invited_by и для child-registration (до подтверждения родителя)
+        try {
+          const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+          if (pendingRaw && consentResult.playerId) {
+            try {
+              const parsed = JSON.parse(pendingRaw);
+              const inviterId = parsed?.inviterId as string | undefined;
+              const ts = parsed?.ts as number | undefined;
+              const ageMs = ts ? (Date.now() - ts) : 0;
+              const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
+
+              if (inviterId && inviterId !== consentResult.playerId && (ageMs === 0 || ageMs < MAX_AGE_MS)) {
+                await setInvitedBy(consentResult.playerId, inviterId);
+              }
+            } catch {
+              // ignore parse errors
+            }
+            await AsyncStorage.removeItem(PENDING_INVITE_KEY);
+          }
+        } catch (e) {
+          console.warn('⚠️ [REFERRAL] pending invite apply failed (child):', e);
+        }
         
         // Показываем экран ожидания подтверждения
         showAlert(
@@ -922,6 +947,30 @@ export default function RegisterScreen() {
       const playerToSave = newPlayer || playerData;
       
       if (playerToSave) {
+        // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
+        // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
+        try {
+          const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+          if (pendingRaw) {
+            try {
+              const parsed = JSON.parse(pendingRaw);
+              const inviterId = parsed?.inviterId as string | undefined;
+              const ts = parsed?.ts as number | undefined;
+              const ageMs = ts ? (Date.now() - ts) : 0;
+              const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
+
+              if (inviterId && inviterId !== playerToSave.id && (ageMs === 0 || ageMs < MAX_AGE_MS)) {
+                await setInvitedBy(playerToSave.id, inviterId);
+              }
+            } catch {
+              // ignore parse errors
+            }
+            await AsyncStorage.removeItem(PENDING_INVITE_KEY);
+          }
+        } catch (e) {
+          console.warn('⚠️ [REFERRAL] pending invite apply failed:', e);
+        }
+
         await saveCurrentUser(playerToSave);
         
         // Обновляем контекст пользователя для немедленного обновления интерфейса
