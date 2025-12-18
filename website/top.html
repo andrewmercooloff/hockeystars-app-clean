@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Топ приглашающих игроков HockeyStars">
+    <title>Топ приглашающих | HockeyStars</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hockey-stars.com/top">
+    <meta property="og:title" content="Топ приглашающих | HockeyStars">
+    <meta property="og:description" content="Рейтинг игроков, пригласивших больше всего друзей.">
+    <meta property="og:image" content="https://hockey-stars.com/logo.png">
+    <meta property="og:locale" content="ru_RU">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hockey-stars.com/top">
+    <meta property="twitter:title" content="Топ приглашающих | HockeyStars">
+    <meta property="twitter:description" content="Рейтинг игроков, пригласивших больше всего друзей.">
+    <meta property="twitter:image" content="https://hockey-stars.com/logo.png">
+
+    <!-- Favicon (как на главной) -->
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-title" content="HockeyStars" />
+    <meta name="theme-color" content="#050008">
+    <meta name="msapplication-TileColor" content="#050008">
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .top-card {
+            max-width: 820px;
+            margin: 40px auto;
+            padding: 40px 30px;
+            background: rgba(5, 0, 8, 0.85);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .top-title {
+            font-size: 42px;
+            margin-bottom: 10px;
+            color: var(--color-text-white);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        .top-subtitle {
+            color: var(--color-text-gray);
+            font-size: 16px;
+            font-family: 'Gilroy', sans-serif;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .top-points {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 14px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(250, 47, 64, 0.25);
+            background: rgba(250, 47, 64, 0.08);
+            margin-bottom: 22px;
+        }
+
+        .top-point {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-text-white);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .top-point b {
+            color: var(--color-primary);
+        }
+
+        .top-loading {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--color-text-gray);
+            font-family: 'Gilroy', sans-serif;
+        }
+
+        .top-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(250, 47, 64, 0.2);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: topSpin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes topSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .top-row:hover {
+            transform: translateY(-1px);
+            border-color: rgba(250, 47, 64, 0.45);
+        }
+
+        .top-rank {
+            width: 40px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Gilroy', sans-serif;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .top-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+
+        .top-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .top-name {
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--color-text-white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .top-meta {
+            margin-top: 3px;
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--color-text-gray);
+        }
+
+        .top-pointsBadge {
+            background: var(--color-primary);
+            border-radius: 14px;
+            padding: 10px 14px;
+            text-align: center;
+            min-width: 90px;
+            flex-shrink: 0;
+        }
+
+        .top-pointsValue {
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .top-pointsLabel {
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+        }
+
+        .top-btn {
+            background: rgba(5, 0, 8, 0.9);
+            border: 2px solid var(--color-primary);
+            border-radius: 16px;
+            padding: 12px 18px;
+            color: var(--color-text-white);
+            font-family: 'Gilroy', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .top-btn:hover {
+            background: var(--color-primary);
+            transform: translateY(-1px);
+        }
+
+        .top-error {
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 115, 115, 0.35);
+            background: rgba(255, 115, 115, 0.08);
+            color: #ff7373;
+            font-family: 'Gilroy', sans-serif;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .top-card {
+                margin: 20px auto;
+                padding: 28px 18px;
+            }
+
+            .top-title {
+                font-size: 30px;
+            }
+
+            .top-row {
+                padding: 12px 12px;
+                border-radius: 16px;
+            }
+
+            .top-pointsBadge {
+                min-width: 80px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+
+    <!-- Yandex.Metrika + Google tag оставим такими же, как на главной -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105715227', 'ym');
+        ym(105715227, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105715227" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YLGFTHQPHE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YLGFTHQPHE');
+    </script>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="pucks-container">
+        <div class="puck puck-1"><div class="puck-avatar"></div></div>
+        <div class="puck puck-2"><div class="puck-avatar"></div></div>
+        <div class="puck puck-3"><div class="puck-avatar"></div></div>
+        <div class="puck puck-4"><div class="puck-avatar"></div></div>
+        <div class="puck puck-5"><div class="puck-avatar"></div></div>
+        <div class="puck puck-6"><div class="puck-avatar"></div></div>
+        <div class="puck puck-7"><div class="puck-avatar"></div></div>
+        <div class="puck puck-8"><div class="puck-avatar"></div></div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <img src="logo.png" alt="HockeyStars" class="logo">
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+                    <button class="lang-btn active" data-lang="ru" aria-label="Русский">RU</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="top-card">
+                <h1 class="top-title" data-i18n="top.title">🏆 Топ приглашающих</h1>
+                <p class="top-subtitle" data-i18n="top.subtitle">Рейтинг игроков, пригласивших больше всего друзей</p>
+
+                <div class="top-points" aria-label="points">
+                    <div class="top-point"><span>🏒</span><b data-i18n="top.points.player">+1</b><span data-i18n="top.points.playerLabel">игрок</span></div>
+                    <div class="top-point"><span>👨‍🏫</span><b data-i18n="top.points.coach">+5</b><span data-i18n="top.points.coachLabel">тренер</span></div>
+                    <div class="top-point"><span>⭐</span><b data-i18n="top.points.star">+10</b><span data-i18n="top.points.starLabel">звезда</span></div>
+                </div>
+
+                <div id="top-content">
+                    <div class="top-loading">
+                        <div class="top-spinner"></div>
+                        <div data-i18n="top.loading">Загрузка рейтинга…</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text" data-i18n="footer.copyright">© 2025 HockeyStars. Все права защищены.</p>
+                <a href="rules.html" class="footer-link footer-privacy-ru" data-i18n="footer.privacy">Политика конфиденциальности</a>
+                <a href="privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
+                <a href="delete-account.html" class="footer-link footer-delete-account-ru" data-i18n="footer.deleteAccount">Удаление аккаунта</a>
+                <a href="delete-account-en.html" class="footer-link footer-delete-account-en" style="display: none;">Delete Account</a>
+                <a href="contact.html" class="footer-link" data-i18n="footer.contact">Обратная связь</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Дополняем словари переводов для этой страницы
+        try {
+            if (typeof translations === 'object') {
+                translations.ru = translations.ru || {};
+                translations.en = translations.en || {};
+
+                Object.assign(translations.ru, {
+                    'top.title': '🏆 Топ приглашающих',
+                    'top.subtitle': 'Рейтинг игроков, пригласивших больше всего друзей',
+                    'top.points.player': '+1',
+                    'top.points.playerLabel': 'игрок',
+                    'top.points.coach': '+5',
+                    'top.points.coachLabel': 'тренер',
+                    'top.points.star': '+10',
+                    'top.points.starLabel': 'звезда',
+                    'top.loading': 'Загрузка рейтинга…',
+                    'top.refresh': 'Обновить',
+                    'top.error': 'Ошибка загрузки данных',
+                    'top.tryAgain': 'Попробовать снова',
+                    'top.empty': 'Пока никто не пригласил друзей',
+                    'top.pointsLabel': 'баллов',
+                });
+
+                Object.assign(translations.en, {
+                    'top.title': '🏆 Top inviters',
+                    'top.subtitle': 'Leaderboard of users who invited the most friends',
+                    'top.points.player': '+1',
+                    'top.points.playerLabel': 'player',
+                    'top.points.coach': '+5',
+                    'top.points.coachLabel': 'coach',
+                    'top.points.star': '+10',
+                    'top.points.starLabel': 'star',
+                    'top.loading': 'Loading leaderboard…',
+                    'top.refresh': 'Refresh',
+                    'top.error': 'Failed to load data',
+                    'top.tryAgain': 'Try again',
+                    'top.empty': 'No invites yet',
+                    'top.pointsLabel': 'points',
+                });
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        // SEO для этой страницы (script.js на главной меняет title/description на общие)
+        function applyTopSeo(lang) {
+            var isRu = lang === 'ru';
+            document.title = isRu ? 'Топ приглашающих | HockeyStars' : 'Top inviters | HockeyStars';
+
+            var metaDescription = document.querySelector('meta[name="description"]');
+            if (metaDescription) {
+                metaDescription.setAttribute(
+                    'content',
+                    isRu ? 'Топ приглашающих игроков HockeyStars' : 'HockeyStars inviters leaderboard'
+                );
+            }
+
+            var ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', document.title);
+
+            var twitterTitle = document.querySelector('meta[property="twitter:title"]');
+            if (twitterTitle) twitterTitle.setAttribute('content', document.title);
+
+            var ogLocale = document.querySelector('meta[property="og:locale"]');
+            if (ogLocale) ogLocale.setAttribute('content', isRu ? 'ru_RU' : 'en_US');
+        }
+
+        // Переопределяем поведение кнопок языка на этой странице: остаёмся на /top
+        (function overrideLangButtonsForTop() {
+            var pathname = (window.location.pathname || '').toLowerCase();
+            var isTop = pathname.endsWith('/top') || pathname.endsWith('/top.html');
+            if (!isTop) return;
+
+            var parent = document.querySelector('.language-switcher');
+            if (!parent) return;
+
+            // Удаляем слушатели script.js клонированием
+            var buttons = parent.querySelectorAll('.lang-btn');
+            buttons.forEach(function(btn) {
+                var clone = btn.cloneNode(true);
+                btn.parentNode.replaceChild(clone, btn);
+            });
+
+            // Вешаем свои
+            parent.querySelectorAll('.lang-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var newLang = btn.getAttribute('data-lang');
+                    if (newLang !== 'ru' && newLang !== 'en') return;
+
+                    // Обновляем URL параметр lang (script.js умеет его читать)
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('lang', newLang);
+                    window.location.href = url.toString();
+                });
+            });
+        })();
+
+        // Supabase (как и в приложении)
+        var SUPABASE_URL = 'https://swklaolhfahtunabahqz.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3a2xhb2xoZmFodHVuYWJhaHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTUwNzYsImV4cCI6MjA0NzMzMTA3Nn0.Y3Wqt8M8k99XJuJPNbpPFpN2y74mglqTYJfLyKMVuks';
+
+        function t(key, fallback) {
+            try {
+                if (typeof translations === 'object' && typeof currentLanguage === 'string') {
+                    return (translations[currentLanguage] && translations[currentLanguage][key]) ? translations[currentLanguage][key] : fallback;
+                }
+            } catch (_) {}
+            return fallback;
+        }
+
+        async function loadTopLeaderboard() {
+            var root = document.getElementById('top-content');
+            if (!root) return;
+
+            root.innerHTML = '<div class="top-loading"><div class="top-spinner"></div><div>' + t('top.loading', 'Загрузка рейтинга…') + '</div></div>';
+
+            try {
+                // Важно: для работы нужен столбец invited_by (создается SQL-скриптом)
+                var response = await fetch(
+                    SUPABASE_URL + '/rest/v1/players?select=id,name,avatar,status,invited_by&status=neq.admin',
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    var errText = '';
+                    try { errText = await response.text(); } catch (_) {}
+                    throw new Error('HTTP ' + response.status + ' ' + errText);
+                }
+
+                var players = await response.json();
+
+                var referralMap = new Map();
+
+                for (var i = 0; i < players.length; i++) {
+                    var p = players[i];
+                    if (!p || !p.invited_by) continue;
+
+                    var inviterId = p.invited_by;
+                    var entry = referralMap.get(inviterId);
+
+                    if (!entry) {
+                        // Пытаемся найти пригласившего в уже загруженных игроках
+                        var inviter = null;
+                        for (var j = 0; j < players.length; j++) {
+                            if (players[j] && players[j].id === inviterId) {
+                                inviter = players[j];
+                                break;
+                            }
+                        }
+                        if (!inviter) continue;
+
+                        entry = {
+                            id: inviterId,
+                            name: inviter.name || 'Unknown',
+                            avatar: inviter.avatar,
+                            status: inviter.status || 'player',
+                            invited_count: 0,
+                            referral_points: 0,
+                            invited_players: 0,
+                            invited_coaches: 0,
+                            invited_stars: 0,
+                        };
+                        referralMap.set(inviterId, entry);
+                    }
+
+                    entry.invited_count++;
+                    if (p.status === 'star') {
+                        entry.referral_points += 10;
+                        entry.invited_stars++;
+                    } else if (p.status === 'coach') {
+                        entry.referral_points += 5;
+                        entry.invited_coaches++;
+                    } else {
+                        entry.referral_points += 1;
+                        entry.invited_players++;
+                    }
+                }
+
+                var leaderboard = Array.from(referralMap.values())
+                    .sort(function(a, b) {
+                        return (b.referral_points - a.referral_points) || (b.invited_count - a.invited_count);
+                    })
+                    .slice(0, 10);
+
+                renderTopLeaderboard(leaderboard);
+            } catch (e) {
+                console.error('Top leaderboard error:', e);
+                root.innerHTML =
+                    '<div class="top-error">' +
+                        '<div style="font-weight:700; margin-bottom:10px;">' + t('top.error', 'Ошибка загрузки данных') + '</div>' +
+                        '<div style="opacity:0.9; margin-bottom:14px;">' + (e && e.message ? e.message : '') + '</div>' +
+                        '<button class="top-btn" onclick="loadTopLeaderboard()">' + t('top.tryAgain', 'Попробовать снова') + '</button>' +
+                    '</div>';
+            }
+        }
+
+        function renderTopLeaderboard(leaderboard) {
+            var root = document.getElementById('top-content');
+            if (!root) return;
+
+            if (!leaderboard || leaderboard.length === 0) {
+                root.innerHTML =
+                    '<div class="top-error" style="color: var(--color-text-gray); border-color: var(--color-border); background: rgba(255,255,255,0.04);">' +
+                        '<div style="font-weight:700; margin-bottom:10px; color: var(--color-text-white);">' + t('top.empty', 'Пока никто не пригласил друзей') + '</div>' +
+                        '<button class="top-btn" onclick="loadTopLeaderboard()">' + t('top.refresh', 'Обновить') + '</button>' +
+                    '</div>';
+                return;
+            }
+
+            var medals = ['🥇', '🥈', '🥉'];
+
+            var html = '<div class="top-list">';
+
+            leaderboard.forEach(function(p, index) {
+                var rank = (index < 3) ? medals[index] : String(index + 1);
+
+                var avatarUrl = p.avatar || ('https://via.placeholder.com/56/333/fff?text=' + encodeURIComponent((p.name || '?').slice(0,1)));
+
+                var meta = '👥 ' + p.invited_count;
+                if (p.invited_stars > 0) meta += ' • ⭐' + p.invited_stars;
+                if (p.invited_coaches > 0) meta += ' • 👨‍🏫' + p.invited_coaches;
+                if (p.invited_players > 0) meta += ' • 🏒' + p.invited_players;
+
+                html +=
+                    '<div class="top-row">' +
+                        '<div class="top-rank">' + rank + '</div>' +
+                        '<img class="top-avatar" src="' + avatarUrl + '" alt="' + (p.name || '') + '" onerror="this.src=\'' + ('https://via.placeholder.com/56/333/fff?text=' + encodeURIComponent((p.name || '?').slice(0,1))) + '\'" />' +
+                        '<div class="top-info">' +
+                            '<div class="top-name">' + String(p.name || 'UNKNOWN').toUpperCase() + '</div>' +
+                            '<div class="top-meta">' + meta + '</div>' +
+                        '</div>' +
+                        '<div class="top-pointsBadge">' +
+                            '<div class="top-pointsValue">' + p.referral_points + '</div>' +
+                            '<div class="top-pointsLabel">' + t('top.pointsLabel', 'баллов') + '</div>' +
+                        '</div>' +
+                    '</div>';
+            });
+
+            html += '</div>';
+            html += '<div class="top-actions"><button class="top-btn" onclick="loadTopLeaderboard()">🔄 ' + t('top.refresh', 'Обновить') + '</button></div>';
+
+            root.innerHTML = html;
+        }
+
+        // После инициализации языка на сайте — возвращаем правильные SEO теги для /top
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                if (typeof currentLanguage === 'string') {
+                    applyTopSeo(currentLanguage);
+                } else {
+                    applyTopSeo('ru');
+                }
+            } catch (_) {
+                applyTopSeo('ru');
+            }
+
+            loadTopLeaderboard();
+        });
+    </script>
+</body>
+</html>

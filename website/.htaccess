@@ -13,6 +13,9 @@ RewriteEngine On
 # Редирект /en на index-en.html для английской версии
 RewriteRule ^en/?$ index-en.html [L]
 
+# Редирект /top на страницу рейтинга приглашений
+RewriteRule ^top/?$ top.html [L]
+
 # Редирект /player/{id} на player.php с параметром id
 # Поддерживает оба варианта: /player/{id} и /player/{id}/
 RewriteRule ^player/([^/]+)/?$ player.php?id=$1 [L,QSA]
