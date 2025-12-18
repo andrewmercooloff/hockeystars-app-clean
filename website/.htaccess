@@ -1,6 +1,12 @@
 # Включаем mod_rewrite
 RewriteEngine On
 
+# Канонические URL без завершающего слеша для псевдо-роутов
+# Иначе относительные пути (styles.css, script.js, logo.png) ломаются на /en/ и /top/
+RewriteRule ^en/$ /en [R=301,L]
+RewriteRule ^top/$ /top [R=301,L]
+RewriteRule ^player/([^/]+)/$ /player/$1 [R=301,L]
+
 # Правильный Content-Type для Universal Links (важно для iOS!)
 <FilesMatch "apple-app-site-association">
     Header set Content-Type "application/json"
