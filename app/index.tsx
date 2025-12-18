@@ -1465,6 +1465,7 @@ export default function HomeScreen() {
   const previousVisiblePlayersRef = useRef<Set<string>>(new Set()); // Сохраняем ID видимых игроков для сравнения
   const filterInitTimeRef = useRef<number>(0); // Время инициализации фильтров для защиты от пересчета
   const lastUserCountryRef = useRef<string | null>(null); // Отслеживаем изменения страны пользователя
+  const lastUserIdRef = useRef<string | null>(null); // Отслеживаем смену пользователя (например, admin login-as-user)
 
   // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
@@ -1576,23 +1577,34 @@ export default function HomeScreen() {
   // Отслеживаем изменения страны пользователя и переинициализируем фильтры
   // ВАЖНО: НЕ вызываем loadAllPlayers(true), так как это unmounts другие экраны (профиль)
   useEffect(() => {
-    if (currentUser?.country && lastUserCountryRef.current && currentUser.country !== lastUserCountryRef.current) {
+    const userId = currentUser?.id || null;
+    const userCountry = currentUser?.country || null;
+
+    // Если пользователь сменился (включая вход администратора в чужой аккаунт) —
+    // сбрасываем фильтры, чтобы они переинициализировались под нового пользователя.
+    if (userId && lastUserIdRef.current && lastUserIdRef.current !== userId) {
+      console.log('👤 [FILTERS] Смена пользователя (admin login-as-user): сбрасываем фильтры, чтобы не пропадали шайбы');
+      // Сбрасываем флаг инициализации и фильтры в null — useLayoutEffect ниже переинициализирует их
+      filtersInitializedRef.current = false;
+      filterInitTimeRef.current = 0;
+      setSelectedCountry(null);
+      setSelectedYear(null);
+    } else if (userId && userCountry && lastUserCountryRef.current && userCountry !== lastUserCountryRef.current) {
+      // Страна пользователя изменилась в базе данных (для того же userId)
       console.log('🌍 [FILTERS] Страна пользователя изменилась в базе данных:', {
         oldCountry: lastUserCountryRef.current,
-        newCountry: currentUser.country
+        newCountry: userCountry
       });
-      // Сбрасываем флаг инициализации, чтобы фильтры переинициализировались
+      // Переинициализируем фильтры (через сброс в null)
       filtersInitializedRef.current = false;
-      // ВАЖНО: НЕ вызываем loadAllPlayers(true) здесь!
-      // Это unmounts экран профиля при принятии запроса в друзья
-      // Список обновится автоматически при возвращении на главный экран через useFocusEffect
-      // loadAllPlayers(true); // Убрано - вызывает unmount других экранов
+      filterInitTimeRef.current = 0;
+      setSelectedCountry(null);
+      setSelectedYear(null);
     }
-    // Обновляем сохраненную страну пользователя
-    if (currentUser?.country !== lastUserCountryRef.current) {
-      lastUserCountryRef.current = currentUser?.country || null;
-    }
-  }, [currentUser?.country]);
+
+    lastUserIdRef.current = userId;
+    lastUserCountryRef.current = userCountry;
+  }, [currentUser?.id, currentUser?.country, setSelectedCountry, setSelectedYear]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
@@ -1886,9 +1898,9 @@ export default function HomeScreen() {
       : players.length > 0; // Для неавторизованных - показываем сразу как загрузились игроки
     
     if (!filtersReady) {
-      // Данные еще не готовы - возвращаем пустой массив
-      // НЕ возвращаем предыдущий список, чтобы избежать промежуточных состояний
-      return [];
+      // Данные ещё не готовы (например, при смене пользователя) —
+      // возвращаем предыдущий список, чтобы шайбы не исчезали полностью.
+      return allVisiblePlayersRef.current.length > 0 ? allVisiblePlayersRef.current : [];
     }
 
     // Определяем эффективные фильтры
