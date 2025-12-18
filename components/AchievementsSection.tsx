@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
     Alert,
+    FlatList,
     Keyboard,
     KeyboardAvoidingView,
     Modal,
@@ -171,6 +172,36 @@ export default function AchievementsSection({
 
   const containerStyle = [styles.section, style];
 
+  const renderAchievementItem = ({ item: achievement }: { item: Achievement }) => {
+    const medal = getMedalIcon(achievement.place);
+    return (
+      <View style={styles.achievementMedal}>
+        <View style={[styles.medalCircle, { borderColor: medal.color }]}>
+          <Ionicons name={medal.name} size={32} color={medal.color} />
+        </View>
+        <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
+        <Text style={styles.medalYear}>{achievement.year}</Text>
+        <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
+        {isEditing && (
+          <View style={styles.medalEditButtons}>
+            <TouchableOpacity
+              style={styles.medalEditButton}
+              onPress={() => openEditModal(achievement)}
+            >
+              <Ionicons name="create" size={14} color="#FF4444" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.medalDeleteButton}
+              onPress={() => handleDeleteAchievement(achievement.id)}
+            >
+              <Ionicons name="trash" size={14} color="#FF4444" />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <View style={containerStyle}>
       {normalizedAchievements.length === 0 ? (
@@ -179,43 +210,18 @@ export default function AchievementsSection({
           <Text style={styles.emptyText}>{t('profile.noAchievements') || 'Нет достижений'}</Text>
         </View>
       ) : (
-        <ScrollView 
-          horizontal 
+        <FlatList
+          horizontal
+          data={normalizedAchievements}
+          keyExtractor={(item) => item.id}
+          renderItem={renderAchievementItem}
           showsHorizontalScrollIndicator={false}
           style={styles.achievementsScroll}
           contentContainerStyle={styles.achievementsContainer}
           nestedScrollEnabled={true}
-        >
-          {normalizedAchievements.map((achievement) => {
-            const medal = getMedalIcon(achievement.place);
-            return (
-              <View key={achievement.id} style={styles.achievementMedal}>
-                <View style={[styles.medalCircle, { borderColor: medal.color }]}>
-                  <Ionicons name={medal.name} size={32} color={medal.color} />
-                </View>
-                <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
-                <Text style={styles.medalYear}>{achievement.year}</Text>
-                <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
-                {isEditing && (
-                  <View style={styles.medalEditButtons}>
-                    <TouchableOpacity
-                      style={styles.medalEditButton}
-                      onPress={() => openEditModal(achievement)}
-                    >
-                      <Ionicons name="create" size={14} color="#FF4444" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.medalDeleteButton}
-                      onPress={() => handleDeleteAchievement(achievement.id)}
-                    >
-                      <Ionicons name="trash" size={14} color="#FF4444" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            );
-          })}
-        </ScrollView>
+          directionalLockEnabled={true}
+          removeClippedSubviews={true}
+        />
       )}
 
       {isEditing && (
@@ -405,7 +411,7 @@ const styles = StyleSheet.create({
   },
   achievementsContainer: {
     paddingHorizontal: 5,
-    gap: 15,
+    paddingRight: 25, // чтобы крайние справа всегда можно было доскроллить
   },
   achievementMedal: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -413,6 +419,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     width: 120,
+    marginRight: 15,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     position: 'relative',
@@ -485,6 +492,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalContentWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   modalContent: {
     backgroundColor: '#1a1a1a',
