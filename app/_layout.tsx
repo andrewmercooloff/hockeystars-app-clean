@@ -24,6 +24,7 @@ import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
+import Constants from 'expo-constants';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -411,6 +412,83 @@ export default function RootLayout() {
   const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
+
+  // ==========================================================
+  // 🎟️ Referral / Deferred deep links (Branch)
+  // Works even if user went through App Store / Google Play first.
+  // ==========================================================
+  const PENDING_INVITE_KEY = 'pending_invited_by';
+  const savePendingInvite = React.useCallback(async (inviterId: string) => {
+    try {
+      if (currentUser?.id) return; // don't overwrite for logged-in users
+      if (!inviterId || inviterId.length < 8) return;
+      await AsyncStorage.setItem(PENDING_INVITE_KEY, JSON.stringify({ inviterId, ts: Date.now() }));
+      console.log('🎟️ [REFERRAL] Pending invite saved:', inviterId);
+    } catch (e) {
+      console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
+    }
+  }, [currentUser?.id]);
+
+  React.useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    const branchEnabled = Boolean((Constants.expoConfig as any)?.extra?.branchEnabled);
+    if (!branchEnabled) {
+      return;
+    }
+
+    let branch: any;
+    try {
+      const mod = require('react-native-branch');
+      branch = mod?.default ?? mod;
+    } catch (e) {
+      console.warn('⚠️ [REFERRAL] Branch SDK not available:', e);
+      return;
+    }
+
+    // Handle deferred params on first open after install
+    (async () => {
+      try {
+        const firstParams: any = await branch.getFirstReferringParams();
+        const inviterId = firstParams?.inviterId || firstParams?.inviter_id;
+        if (firstParams?.['+clicked_branch_link'] && inviterId) {
+          await savePendingInvite(String(inviterId));
+        }
+      } catch {
+        // ignore
+      }
+    })();
+
+    // Subscribe to link opens
+    const unsubscribe = branch.subscribe(async ({ error, params }: any) => {
+      if (error) return;
+      if (!params || !params['+clicked_branch_link']) return;
+
+      try {
+        const inviterId = params.inviterId || params.inviter_id;
+        if (inviterId) {
+          await savePendingInvite(String(inviterId));
+        }
+
+        const deepLinkPath = params.$deeplink_path || params.deeplink_path || params.deeplink;
+        if (deepLinkPath && typeof deepLinkPath === 'string') {
+          const normalized = deepLinkPath.startsWith('/') ? deepLinkPath : `/${deepLinkPath}`;
+          router.push(normalized as any);
+        }
+      } catch (e) {
+        console.warn('⚠️ [REFERRAL] Branch link handling failed:', e);
+      }
+    });
+
+    return () => {
+      try {
+        unsubscribe?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, [router, savePendingInvite]);
+
   const lastNotificationCountRef = React.useRef<number>(0);
   const lastMessagesCountRef = React.useRef<number>(0);
   const unreadNotificationsStateRef = React.useRef<number>(unreadNotificationsCount);
@@ -1157,27 +1235,6 @@ export default function RootLayout() {
       return; // На веб не обрабатываем
     }
 
-    const PENDING_INVITE_KEY = 'pending_invited_by';
-
-    // 🎟️ Referral: сохраняем inviterId при открытии профиля по ссылке
-    // Важно: это работает, когда приложение УЖЕ установлено и открылось по ссылке.
-    // Для сценария "сначала App Store, потом установка" это не deferred deep link.
-    const savePendingInvite = async (inviterId: string) => {
-      try {
-        // Не сохраняем, если пользователь уже залогинен
-        if (currentUser?.id) return;
-        if (!inviterId || inviterId.length < 8) return;
-
-        await AsyncStorage.setItem(
-          PENDING_INVITE_KEY,
-          JSON.stringify({ inviterId, ts: Date.now() })
-        );
-        console.log('🎟️ [REFERRAL] Pending invite saved from link:', inviterId);
-      } catch (e) {
-        console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
-      }
-    };
-
     // Обработка URL при открытии приложения
     const handleInitialURL = async () => {
       try {
@@ -1234,7 +1291,7 @@ export default function RootLayout() {
     return () => {
       subscription.remove();
     };
-  }, [router, currentUser?.id]);
+  }, [router, savePendingInvite]);
 
   // Дополнительная загрузка пользователя при возврате в приложение
   // ОТКЛЮЧЕНО - вызывает редиректы

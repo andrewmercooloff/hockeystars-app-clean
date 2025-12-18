@@ -36,6 +36,7 @@ import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import Animated from 'react-native-reanimated';
 import QRCode from 'react-native-qrcode-svg';
 import AchievementsSection from '../../components/AchievementsSection';
@@ -70,6 +71,25 @@ import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useUser } from '../../contexts/UserContext';
 
 const iceBg = require('../../assets/images/led.jpg');
+
+// Build a referral-capable link:
+// - If Branch deferred deep links are configured, use Branch long link.
+// - Otherwise fall back to our website profile link (works only when app is already installed).
+const buildInviteLink = (playerId: string) => {
+  const branchDomain =
+    (Constants.expoConfig as any)?.extra?.branchAppDomain ||
+    (process.env.EXPO_PUBLIC_BRANCH_APP_DOMAIN as string | undefined) ||
+    '';
+
+  if (branchDomain) {
+    const key = encodeURIComponent('$deeplink_path');
+    const deepPath = encodeURIComponent(`player/${playerId}`);
+    const inviterId = encodeURIComponent(playerId);
+    return `https://${branchDomain}/?${key}=${deepPath}&inviterId=${inviterId}`;
+  }
+
+  return `https://hockey-stars.com/player/${playerId}`;
+};
 
 type SectionCardProps = {
   children: ReactNode;
@@ -6680,7 +6700,7 @@ export default function PlayerProfile() {
               <View style={styles.qrCodeSection}>
                 <View style={[styles.qrCodeContainer, { borderWidth: 6, borderColor: '#fa2f40', borderRadius: 12 }]}>
                   <QRCode
-                    value={`https://hockey-stars.com/player/${player.id}`}
+                    value={buildInviteLink(player.id)}
                     size={Dimensions.get('window').width - 80}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
@@ -6710,7 +6730,7 @@ export default function PlayerProfile() {
                   style={[styles.shareButton, { backgroundColor: '#333' }]} 
                   onPress={async () => {
                     try {
-                      const profileUrl = `https://hockey-stars.com/player/${player.id}`;
+                      const profileUrl = buildInviteLink(player.id);
                       const Clipboard = require('expo-clipboard');
                       await Clipboard.setStringAsync(profileUrl);
                       if (Platform.OS === 'ios') {
@@ -6984,7 +7004,7 @@ export default function PlayerProfile() {
                 {/* QR-код */}
                 <View style={styles.shareCardQRContainer}>
                   <QRCode
-                    value={`https://hockey-stars.com/player/${player.id}`}
+                    value={buildInviteLink(player.id)}
                     size={180}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
