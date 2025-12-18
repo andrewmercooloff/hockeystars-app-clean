@@ -364,25 +364,8 @@ export default function MessagesScreen() {
     return prefix + text;
   };
 
-
-  // Редирект убран - проверка авторизации происходит в _layout.tsx
-
-  // Если пользователь не авторизован, показываем loading
-  if (currentUser === null) {
-    return (
-      <CachedBackground 
-        source={iceBg} 
-        style={styles.container}
-        resizeMode="cover"
-      >
-        <View style={styles.loadingCenter}>
-          <Text style={styles.loadingText}>{t('common.loading')}</Text>
-        </View>
-      </CachedBackground>
-    );
-  }
-
   // Render item для FlatList (оптимизация производительности)
+  // ВАЖНО: Все useCallback хуки должны быть ДО любых условных return
   const renderChatItem = useCallback(({ item: chat }: { item: ChatPreview }) => (
     <TouchableOpacity
       onPress={() => openChat(chat.player.id)}
@@ -464,6 +447,22 @@ export default function MessagesScreen() {
       </View>
     </View>
   ), [t]);
+
+  // Редирект убран - проверка авторизации происходит в _layout.tsx
+  // Если пользователь не авторизован, показываем loading
+  if (currentUser === null) {
+    return (
+      <CachedBackground 
+        source={iceBg} 
+        style={styles.container}
+        resizeMode="cover"
+      >
+        <View style={styles.loadingCenter}>
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        </View>
+      </CachedBackground>
+    );
+  }
 
   // Если загружается пользователь ИЛИ данные, показываем один loading screen
   if (isUserLoading || currentUser === undefined || (loading && filteredChats.length === 0)) {
