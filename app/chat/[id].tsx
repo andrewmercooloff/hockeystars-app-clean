@@ -80,6 +80,7 @@ export default function ChatScreen() {
   const savedScrollPositionRef = useRef<number | null>(null); // Сохраненная позиция прокрутки
   const wasNearBottomRef = useRef<boolean>(true); // Был ли пользователь внизу перед уходом
   const chatMenuButtonRef = useRef<View>(null);
+  const draftSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
   // Функция сохранения черновика (с временем для сортировки)
@@ -122,6 +123,21 @@ export default function ChatScreen() {
       console.error('Ошибка загрузки черновика:', error);
     }
   };
+
+  // Быстрое сохранение черновика при наборе (чтобы в Messages список обновлялся без задержки)
+  const handleDraftTextChange = useCallback((text: string) => {
+    setNewMessage(text);
+
+    if (!id) return;
+
+    if (draftSaveTimeoutRef.current) {
+      clearTimeout(draftSaveTimeoutRef.current);
+    }
+
+    draftSaveTimeoutRef.current = setTimeout(() => {
+      saveDraft(id as string, text);
+    }, 300);
+  }, [id]);
 
   useEffect(() => {
     // Очищаем сообщения при смене чата
@@ -563,6 +579,10 @@ export default function ChatScreen() {
         backHandler.remove();
         // Позиция уже сохранена в onScroll
         // Сохраняем черновик при выходе
+        if (draftSaveTimeoutRef.current) {
+          clearTimeout(draftSaveTimeoutRef.current);
+          draftSaveTimeoutRef.current = null;
+        }
         if (id) {
           saveDraft(id as string, newMessage);
         }
@@ -1602,7 +1622,7 @@ export default function ChatScreen() {
                 <TextInput
                   style={styles.textInput}
                   value={newMessage}
-                  onChangeText={setNewMessage}
+                  onChangeText={handleDraftTextChange}
                   placeholder={t('chat.enterMessage')}
                   placeholderTextColor="#fff"
                   multiline

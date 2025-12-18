@@ -125,9 +125,9 @@ export default function MessagesScreen() {
       try {
         const allKeys = await AsyncStorage.getAllKeys();
         const draftKeys = allKeys.filter(key => key.startsWith('chat_draft_'));
-        
-        for (const draftKey of draftKeys) {
-          const draftRaw = await AsyncStorage.getItem(draftKey);
+
+        const draftPairs = await AsyncStorage.multiGet(draftKeys);
+        for (const [draftKey, draftRaw] of draftPairs) {
           if (draftRaw && draftRaw.trim()) {
             const playerId = draftKey.replace('chat_draft_', '');
             
@@ -271,6 +271,84 @@ export default function MessagesScreen() {
     }, 500); // 500мс debounce для realtime обновлений
   }, [loadChatsData]);
 
+  // Быстро применяем черновики к уже загруженному списку чатов (без ожидания загрузки из БД)
+  const applyDraftsToExistingChats = useCallback(async () => {
+    if (!currentUser) return;
+
+    try {
+      const allKeys = await AsyncStorage.getAllKeys();
+      const draftKeys = allKeys.filter(key => key.startsWith('chat_draft_'));
+      if (draftKeys.length === 0) return;
+
+      const draftPairs = await AsyncStorage.multiGet(draftKeys);
+      const draftMap = new Map<string, { text: string; timestamp: number }>();
+
+      for (const [key, raw] of draftPairs) {
+        if (!raw) continue;
+        const playerId = key.replace('chat_draft_', '');
+
+        let draftText = '';
+        let draftTime = Date.now();
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed?.text) {
+            draftText = parsed.text;
+            draftTime = parsed.timestamp || Date.now();
+          }
+        } catch {
+          draftText = raw;
+        }
+
+        if (!draftText.trim()) continue;
+        draftMap.set(playerId, { text: draftText, timestamp: draftTime });
+      }
+
+      if (draftMap.size === 0) return;
+
+      setChats(prev => {
+        let changed = false;
+        const next = prev.map(chat => {
+          const draft = draftMap.get(chat.player.id);
+          if (!draft) return chat;
+
+          const existingTime = chat.lastMessage?.timestamp instanceof Date
+            ? chat.lastMessage.timestamp.getTime()
+            : (chat.lastMessage?.timestamp || 0);
+
+          if (draft.timestamp <= existingTime) return chat;
+
+          changed = true;
+          return {
+            ...chat,
+            lastMessage: {
+              id: 'draft',
+              senderId: currentUser.id,
+              receiverId: chat.player.id,
+              text: `✏️ ${draft.text.substring(0, 30)}${draft.text.length > 30 ? '...' : ''}`,
+              timestamp: new Date(draft.timestamp),
+              read: true
+            }
+          };
+        });
+
+        if (!changed) return prev;
+
+        next.sort((a, b) => {
+          if (!a.lastMessage && !b.lastMessage) return 0;
+          if (!a.lastMessage) return 1;
+          if (!b.lastMessage) return -1;
+          const aTime = a.lastMessage.timestamp instanceof Date ? a.lastMessage.timestamp.getTime() : a.lastMessage.timestamp;
+          const bTime = b.lastMessage.timestamp instanceof Date ? b.lastMessage.timestamp.getTime() : b.lastMessage.timestamp;
+          return bTime - aTime;
+        });
+
+        return next;
+      });
+    } catch (e) {
+      console.warn('⚠️ Ошибка быстрого применения черновиков:', e);
+    }
+  }, [currentUser]);
+
   // Realtime подписка на новые сообщения (входящие И исходящие для обновления UI чатов)
   useEffect(() => {
     if (!currentUser) return;
@@ -333,7 +411,9 @@ export default function MessagesScreen() {
   useFocusEffect(
     React.useCallback(() => {
       setCurrentScreen('messages');
-      
+      // Сразу поднимаем чаты с черновиками, не дожидаясь загрузки диалогов из БД
+      applyDraftsToExistingChats();
+
       loadChats();
       
       
@@ -352,7 +432,7 @@ export default function MessagesScreen() {
           clearTimeout(autoHideTimeoutRef.current);
         }
       };
-    }, [loadChats, setCurrentScreen, refreshUser])
+    }, [loadChats, setCurrentScreen, refreshUser, applyDraftsToExistingChats])
   );
 
   const onRefresh = () => {
