@@ -2792,5 +2792,19 @@
   },
   "logout": "Выйти",
   "logoutConfirm": "Выход из профиля",
-  "logoutConfirmMessage": "Вы уверены, что хотите выйти из профиля?"
+  "logoutConfirmMessage": "Вы уверены, что хотите выйти из профиля?",
+  "referral": {
+    "leaderboard": "Топ приглашающих",
+    "points": "баллов",
+    "noInvites": "Пока никто не пригласил друзей",
+    "yourPoints": "Ваши баллы",
+    "invitedPlayers": "Приглашено игроков",
+    "invitedCoaches": "Приглашено тренеров",
+    "invitedStars": "Приглашено звёзд",
+    "pointsPerPlayer": "+1 за игрока",
+    "pointsPerCoach": "+5 за тренера",
+    "pointsPerStar": "+10 за звезду",
+    "inviteCode": "Код приглашения",
+    "enterInviteCode": "Введите код приглашения (необязательно)"
+  }
 }

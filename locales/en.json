@@ -3053,5 +3053,19 @@
     "lastSpeed": "Last Speed",
     "invalidSpeed": "Speed out of range",
     "invalidTime": "Object in frame too long. Throw faster!"
+  },
+  "referral": {
+    "leaderboard": "Top Inviters",
+    "points": "points",
+    "noInvites": "No one has invited friends yet",
+    "yourPoints": "Your Points",
+    "invitedPlayers": "Players invited",
+    "invitedCoaches": "Coaches invited",
+    "invitedStars": "Stars invited",
+    "pointsPerPlayer": "+1 per player",
+    "pointsPerCoach": "+5 per coach",
+    "pointsPerStar": "+10 per star",
+    "inviteCode": "Invite Code",
+    "enterInviteCode": "Enter invite code (optional)"
   }
 }

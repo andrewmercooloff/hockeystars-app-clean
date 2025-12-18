@@ -267,6 +267,8 @@ export interface Player {
   lastSeen?: string; // последний раз когда пользователь был онлайн
   // Скрытие профиля
   is_hidden?: boolean; // флаг скрытия профиля администратором
+  // Реферальная система
+  invited_by?: string; // ID пользователя, который пригласил
 }
 
 // Интерфейс для записи скорости шайбы
@@ -7904,5 +7906,185 @@ export const fixMissingCreatedAt = async (): Promise<number> => {
   } catch (error) {
     console.error('❌ Ошибка исправления дат регистрации:', error);
     return 0;
+  }
+};
+
+// ============================================
+// РЕФЕРАЛЬНАЯ СИСТЕМА
+// ============================================
+
+// Интерфейс для записи в рейтинге рефералов
+export interface ReferralLeaderboardEntry {
+  id: string;
+  name: string;
+  avatar: string | null;
+  status: string;
+  invited_count: number;
+  referral_points: number;
+  invited_players: number;
+  invited_coaches: number;
+  invited_stars: number;
+}
+
+// Получение топ-N рейтинга рефералов
+export const getReferralLeaderboard = async (limit: number = 10): Promise<ReferralLeaderboardEntry[]> => {
+  try {
+    // Используем SQL функцию если она существует, иначе делаем запрос вручную
+    const { data, error } = await supabase
+      .rpc('get_referral_top', { limit_count: limit });
+    
+    if (error) {
+      console.warn('⚠️ Функция get_referral_top не найдена, используем альтернативный запрос');
+      
+      // Альтернативный запрос без функции
+      const { data: players, error: playersError } = await supabase
+        .from('players')
+        .select('id, name, avatar, status, invited_by')
+        .not('status', 'eq', 'admin');
+      
+      if (playersError) {
+        console.error('❌ Ошибка загрузки игроков:', playersError);
+        return [];
+      }
+      
+      // Подсчитываем рефералы вручную
+      const referralMap = new Map<string, ReferralLeaderboardEntry>();
+      
+      for (const player of players || []) {
+        if (player.invited_by) {
+          const inviterId = player.invited_by;
+          
+          if (!referralMap.has(inviterId)) {
+            const inviter = players?.find(p => p.id === inviterId);
+            if (inviter) {
+              referralMap.set(inviterId, {
+                id: inviterId,
+                name: inviter.name || 'Unknown',
+                avatar: inviter.avatar || null,
+                status: inviter.status || 'player',
+                invited_count: 0,
+                referral_points: 0,
+                invited_players: 0,
+                invited_coaches: 0,
+                invited_stars: 0
+              });
+            }
+          }
+          
+          const entry = referralMap.get(inviterId);
+          if (entry) {
+            entry.invited_count++;
+            
+            // Начисляем баллы в зависимости от статуса
+            if (player.status === 'star') {
+              entry.referral_points += 10;
+              entry.invited_stars++;
+            } else if (player.status === 'coach') {
+              entry.referral_points += 5;
+              entry.invited_coaches++;
+            } else {
+              entry.referral_points += 1;
+              entry.invited_players++;
+            }
+          }
+        }
+      }
+      
+      // Сортируем по баллам и возвращаем топ
+      const leaderboard = Array.from(referralMap.values())
+        .sort((a, b) => b.referral_points - a.referral_points || b.invited_count - a.invited_count)
+        .slice(0, limit);
+      
+      return leaderboard;
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('❌ Ошибка получения рейтинга рефералов:', error);
+    return [];
+  }
+};
+
+// Получение реферальных баллов конкретного пользователя
+export const getUserReferralPoints = async (userId: string): Promise<{
+  points: number;
+  invited_count: number;
+  invited_players: number;
+  invited_coaches: number;
+  invited_stars: number;
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from('players')
+      .select('status')
+      .eq('invited_by', userId);
+    
+    if (error) {
+      console.error('❌ Ошибка подсчёта рефералов:', error);
+      return { points: 0, invited_count: 0, invited_players: 0, invited_coaches: 0, invited_stars: 0 };
+    }
+    
+    let points = 0;
+    let invited_players = 0;
+    let invited_coaches = 0;
+    let invited_stars = 0;
+    
+    for (const player of data || []) {
+      if (player.status === 'star') {
+        points += 10;
+        invited_stars++;
+      } else if (player.status === 'coach') {
+        points += 5;
+        invited_coaches++;
+      } else {
+        points += 1;
+        invited_players++;
+      }
+    }
+    
+    return {
+      points,
+      invited_count: (data || []).length,
+      invited_players,
+      invited_coaches,
+      invited_stars
+    };
+  } catch (error) {
+    console.error('❌ Ошибка подсчёта реферальных баллов:', error);
+    return { points: 0, invited_count: 0, invited_players: 0, invited_coaches: 0, invited_stars: 0 };
+  }
+};
+
+// Установка реферала при регистрации
+export const setInvitedBy = async (playerId: string, inviterId: string): Promise<boolean> => {
+  try {
+    // Проверяем, что inviterId существует
+    const { data: inviter, error: inviterError } = await supabase
+      .from('players')
+      .select('id')
+      .eq('id', inviterId)
+      .single();
+    
+    if (inviterError || !inviter) {
+      console.error('❌ Пригласивший пользователь не найден:', inviterId);
+      return false;
+    }
+    
+    // Устанавливаем invited_by
+    const { error } = await supabase
+      .from('players')
+      .update({ invited_by: inviterId })
+      .eq('id', playerId);
+    
+    if (error) {
+      console.error('❌ Ошибка установки реферала:', error);
+      return false;
+    }
+    
+    console.log(`✅ Реферал установлен: ${playerId} приглашён ${inviterId}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Ошибка установки реферала:', error);
+    return false;
   }
 };
