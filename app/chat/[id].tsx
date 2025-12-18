@@ -58,7 +58,6 @@ export default function ChatScreen() {
   const [loading, setLoading] = useState(true);
   const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
-  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false); // Флаг для скрытия контента до прокрутки
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -161,7 +160,6 @@ export default function ChatScreen() {
     }
     savedScrollPositionRef.current = null; // Сбрасываем сохраненную позицию при смене чата
     wasNearBottomRef.current = true; // Сбрасываем флаг при смене чата
-    setIsScrolledToBottom(false); // Сбрасываем флаг прокрутки
     loadChatData();
   }, [id]);
 
@@ -1410,6 +1408,10 @@ export default function ChatScreen() {
               style={styles.messagesContainer}
               contentContainerStyle={styles.messagesContent}
               showsVerticalScrollIndicator={false}
+              onScrollBeginDrag={() => {
+                // Пользователь начал ручную прокрутку — не вмешиваемся автоскроллом
+                // (флаг "внизу" обновится в onScroll)
+              }}
               onScroll={(event) => {
                 const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
                 const paddingToBottom = 100; // Порог для определения "внизу"
@@ -1420,25 +1422,6 @@ export default function ChatScreen() {
                 wasNearBottomRef.current = isAtBottom;
               }}
               scrollEventThrottle={400}
-              onContentSizeChange={(contentWidth, contentHeight) => {
-                if (messages.length > 0 && !loading && scrollViewRef.current) {
-                  if (isInitialLoadRef.current) {
-                    // При первой загрузке просто отмечаем, что контент загружен
-                    // Прокрутка не нужна - контент уже внизу через justifyContent: 'flex-end'
-                    setIsNearBottom(true);
-                    setIsScrolledToBottom(true);
-                    wasNearBottomRef.current = true;
-                    isInitialLoadRef.current = false;
-                  } else if (savedScrollPositionRef.current !== null && !wasNearBottomRef.current) {
-                    // Восстанавливаем сохраненную позицию, если не был внизу
-                    scrollViewRef.current.scrollTo({
-                      y: savedScrollPositionRef.current,
-                      animated: false
-                    });
-                    setIsNearBottom(false);
-                  }
-                }
-              }}
             >
               {!loading && messages.length === 0 ? (
                 <View style={styles.emptyContainer}>
@@ -2014,8 +1997,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
-    flexGrow: 1, // Позволяет контенту растягиваться
-    justifyContent: 'flex-end', // Контент сразу прижат к низу, без прокрутки
+    // Важно: НЕ прижимаем контент к низу через flex-end,
+    // иначе ScrollView может "держать" внизу и мешать читать старые сообщения.
   },
   emptyContainer: {
     flex: 1,
