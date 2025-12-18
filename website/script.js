@@ -829,38 +829,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add click handlers to language buttons
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
+        btn.addEventListener('click', () => {
             const newLang = btn.getAttribute('data-lang');
-            if (!newLang) return;
-
-            const normalizedPath = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
-            const isHomePage =
-                normalizedPath === '/' ||
-                normalizedPath === '/en' ||
-                normalizedPath === '/index.html' ||
-                normalizedPath === '/index-en.html';
-
-            // Redirect only on the homepage for SEO (/ <-> /en).
-            if (isHomePage) {
-                if (newLang === 'en' && normalizedPath !== '/en') {
-                    window.location.href = '/en';
-                    return;
-                }
-                if (newLang === 'ru' && normalizedPath === '/en') {
-                    window.location.href = '/';
-                    return;
-                }
-            }
-
-            // For all other pages, switch language without leaving the page.
-            setLanguage(newLang);
-            try {
-                const url = new URL(window.location.href);
-                url.searchParams.set('lang', newLang);
-                window.history.replaceState({}, '', url.toString());
-            } catch (_) {
-                // ignore
+            // Redirect to appropriate page for SEO
+            if (newLang === 'en' && !window.location.pathname.includes('/en')) {
+                window.location.href = '/en';
+            } else if (newLang === 'ru' && window.location.pathname.includes('/en')) {
+                window.location.href = '/';
+            } else {
+                setLanguage(newLang);
             }
         });
     });
