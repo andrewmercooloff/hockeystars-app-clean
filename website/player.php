@@ -215,12 +215,12 @@ if ($isAndroid) {
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p class="footer-text">© 2025 HockeyStars. Все права защищены.</p>
-                <a href="/rules.html" class="footer-link footer-privacy-ru">Политика конфиденциальности</a>
+                <p class="footer-text" data-i18n="footer.copyright">© 2025 HockeyStars. Все права защищены.</p>
+                <a href="/rules.html" class="footer-link footer-privacy-ru" data-i18n="footer.privacy">Политика конфиденциальности</a>
                 <a href="/privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
-                <a href="/delete-account.html" class="footer-link footer-delete-account-ru">Удаление аккаунта</a>
+                <a href="/delete-account.html" class="footer-link footer-delete-account-ru" data-i18n="footer.deleteAccount">Удаление аккаунта</a>
                 <a href="/delete-account-en.html" class="footer-link footer-delete-account-en" style="display: none;">Delete Account</a>
-                <a href="/contact.html" class="footer-link">Обратная связь</a>
+                <a href="/contact.html" class="footer-link" data-i18n="footer.contact">Обратная связь</a>
             </div>
         </div>
     </footer>
