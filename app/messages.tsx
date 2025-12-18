@@ -121,19 +121,58 @@ export default function MessagesScreen() {
         }
       }
       
-      // Загружаем черновики и добавляем чаты с черновиками
+      // Загружаем черновики и добавляем/обновляем чаты с черновиками
       try {
         const allKeys = await AsyncStorage.getAllKeys();
         const draftKeys = allKeys.filter(key => key.startsWith('chat_draft_'));
         
         for (const draftKey of draftKeys) {
-          const draft = await AsyncStorage.getItem(draftKey);
-          if (draft && draft.trim()) {
+          const draftRaw = await AsyncStorage.getItem(draftKey);
+          if (draftRaw && draftRaw.trim()) {
             const playerId = draftKey.replace('chat_draft_', '');
-            // Проверяем, нет ли уже этого чата в списке
-            const existingChat = chatPreviews.find(c => c.player.id === playerId);
-            if (!existingChat) {
-              // Загружаем данные игрока и создаём чат с черновиком
+            
+            // Парсим черновик (поддержка старого и нового формата)
+            let draftText = '';
+            let draftTime = Date.now();
+            try {
+              const draftData = JSON.parse(draftRaw);
+              if (draftData.text) {
+                draftText = draftData.text;
+                draftTime = draftData.timestamp || Date.now();
+              }
+            } catch {
+              // Старый формат - просто текст
+              draftText = draftRaw;
+            }
+            
+            if (!draftText.trim()) continue;
+            
+            // Проверяем, есть ли уже этот чат в списке
+            const existingChatIndex = chatPreviews.findIndex(c => c.player.id === playerId);
+            
+            if (existingChatIndex !== -1) {
+              // Чат существует - проверяем, новее ли черновик
+              const existingChat = chatPreviews[existingChatIndex];
+              const existingTime = existingChat.lastMessage?.timestamp instanceof Date 
+                ? existingChat.lastMessage.timestamp.getTime() 
+                : (existingChat.lastMessage?.timestamp || 0);
+              
+              // Если черновик новее последнего сообщения - показываем черновик
+              if (draftTime > existingTime) {
+                chatPreviews[existingChatIndex] = {
+                  ...existingChat,
+                  lastMessage: {
+                    id: 'draft',
+                    senderId: currentUser.id,
+                    receiverId: playerId,
+                    text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
+                    timestamp: new Date(draftTime),
+                    read: true
+                  }
+                };
+              }
+            } else {
+              // Чат не существует - создаём новый с черновиком
               const player = await getPlayerById(playerId);
               if (player && !blockedSet.has(playerId)) {
                 chatPreviews.push({
@@ -142,8 +181,8 @@ export default function MessagesScreen() {
                     id: 'draft',
                     senderId: currentUser.id,
                     receiverId: playerId,
-                    text: `✏️ ${draft.substring(0, 30)}${draft.length > 30 ? '...' : ''}`,
-                    timestamp: new Date(),
+                    text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
+                    timestamp: new Date(draftTime),
                     read: true
                   },
                   unreadCount: 0

@@ -82,12 +82,17 @@ export default function ChatScreen() {
   const chatMenuButtonRef = useRef<View>(null);
 
 
-  // Функция сохранения черновика
+  // Функция сохранения черновика (с временем для сортировки)
   const saveDraft = async (chatId: string, text: string) => {
     try {
       const draftKey = `chat_draft_${chatId}`;
       if (text.trim()) {
-        await AsyncStorage.setItem(draftKey, text);
+        // Сохраняем текст и время для правильной сортировки в списке чатов
+        const draftData = JSON.stringify({
+          text: text,
+          timestamp: Date.now()
+        });
+        await AsyncStorage.setItem(draftKey, draftData);
       } else {
         await AsyncStorage.removeItem(draftKey);
       }
@@ -100,9 +105,18 @@ export default function ChatScreen() {
   const loadDraft = async (chatId: string) => {
     try {
       const draftKey = `chat_draft_${chatId}`;
-      const draft = await AsyncStorage.getItem(draftKey);
-      if (draft) {
-        setNewMessage(draft);
+      const draftRaw = await AsyncStorage.getItem(draftKey);
+      if (draftRaw) {
+        // Поддержка старого формата (просто текст) и нового (JSON)
+        try {
+          const draftData = JSON.parse(draftRaw);
+          if (draftData.text) {
+            setNewMessage(draftData.text);
+          }
+        } catch {
+          // Старый формат - просто текст
+          setNewMessage(draftRaw);
+        }
       }
     } catch (error) {
       console.error('Ошибка загрузки черновика:', error);
