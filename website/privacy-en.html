@@ -135,8 +135,8 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <a href="index.html">
-                    <img src="logo.png" alt="HockeyStars" class="logo">
+                <a href="/en">
+                    <img src="/logo.png" alt="HockeyStars" class="logo">
                 </a>
                 <div class="language-switcher">
                     <button class="lang-btn active" data-lang="en" aria-label="English">EN</button>
@@ -363,7 +363,7 @@
                     Through the app: Settings section → Support
                 </p>
 
-                <a href="index.html" class="back-link">← Back to main page</a>
+                <a href="/en" class="back-link">← Back to main page</a>
             </div>
         </div>
     </main>
@@ -371,32 +371,16 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p class="footer-text">© 2025 HockeyStars. All rights reserved.</p>
-                <a href="privacy-en.html" class="footer-link">Privacy Policy</a>
-                <a href="delete-account-en.html" class="footer-link">Delete Account</a>
-                <a href="contact.html" class="footer-link">Contact Us</a>
+                <p class="footer-text" data-i18n="footer.copyright">© 2025 HockeyStars. All rights reserved.</p>
+                <a href="/rules.html" class="footer-link footer-privacy-ru" data-i18n="footer.privacy">Политика конфиденциальности</a>
+                <a href="/privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
+                <a href="/delete-account.html" class="footer-link footer-delete-account-ru" data-i18n="footer.deleteAccount">Удаление аккаунта</a>
+                <a href="/delete-account-en.html" class="footer-link footer-delete-account-en" style="display: none;">Delete Account</a>
+                <a href="/contact.html" class="footer-link" data-i18n="footer.contact">Contact Us</a>
             </div>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const enBtn = document.querySelector('.lang-btn[data-lang="en"]');
-            const ruBtn = document.querySelector('.lang-btn[data-lang="ru"]');
-            
-            if (enBtn) {
-                enBtn.addEventListener('click', () => {
-                    enBtn.classList.add('active');
-                    if (ruBtn) ruBtn.classList.remove('active');
-                });
-            }
-            
-            if (ruBtn) {
-                ruBtn.addEventListener('click', () => {
-                    window.location.href = 'rules.html';
-                });
-            }
-        });
-    </script>
+    <script src="/script.js"></script>
 </body>
 </html>
