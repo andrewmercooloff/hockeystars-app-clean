@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
     Alert,
+    FlatList,
     Image,
     ImageBackground,
     Platform,
@@ -54,6 +55,7 @@ export default function MessagesScreen() {
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const focusRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const silentLoadDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Функция для загрузки чатов (основная логика)
   const loadChatsData = useCallback(async () => {
@@ -180,12 +182,18 @@ export default function MessagesScreen() {
   }, [currentUser, isUserLoading, loadChats]);
 
   // Тихая загрузка чатов (без индикатора)
-  const silentLoadChats = useCallback(async () => {
-    try {
-      await loadChatsData();
-    } catch (error) {
-      console.error('❌ Ошибка тихой загрузки чатов:', error);
+  // Debounced версия для realtime обновлений (предотвращает частые загрузки)
+  const silentLoadChats = useCallback(() => {
+    if (silentLoadDebounceRef.current) {
+      clearTimeout(silentLoadDebounceRef.current);
     }
+    silentLoadDebounceRef.current = setTimeout(async () => {
+      try {
+        await loadChatsData();
+      } catch (error) {
+        console.error('❌ Ошибка тихой загрузки чатов:', error);
+      }
+    }, 500); // 500мс debounce для realtime обновлений
   }, [loadChatsData]);
 
   // Realtime подписка на новые сообщения (входящие И исходящие для обновления UI чатов)
@@ -239,6 +247,9 @@ export default function MessagesScreen() {
       supabase.removeChannel(outgoingChannel);
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
+      }
+      if (silentLoadDebounceRef.current) {
+        clearTimeout(silentLoadDebounceRef.current);
       }
     };
   }, [currentUser, silentLoadChats, refreshUser]);
@@ -335,6 +346,89 @@ export default function MessagesScreen() {
     );
   }
 
+  // Render item для FlatList (оптимизация производительности)
+  const renderChatItem = useCallback(({ item: chat }: { item: ChatPreview }) => (
+    <TouchableOpacity
+      onPress={() => openChat(chat.player.id)}
+      activeOpacity={0.8}
+    >
+      <View style={styles.chatGradientShadow}>
+        <BlurView
+          intensity={20}
+          tint="dark"
+          style={styles.chatItemBlur}
+        >
+          <View style={styles.chatItemOverlay}>
+            <CachedAvatar 
+              playerId={chat.player.id}
+              fallbackAvatarUrl={chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
+              size={50}
+              style={styles.chatAvatar}
+              status={chat.player.status}
+              onError={() => {
+                console.log('Ошибка загрузки аватарки для:', chat.player.name);
+              }}
+            />
+            
+            <View style={styles.chatInfo}>
+              <View style={styles.chatHeader}>
+                <Text style={styles.chatName}>
+                  {chat.player.status === 'scout' 
+                    ? t('profile.scout')?.toUpperCase() || 'SCOUT'
+                    : chat.player.name?.toUpperCase()}
+                </Text>
+                {chat.lastMessage && (
+                  <Text style={styles.chatTime}>
+                    {formatTime(chat.lastMessage.timestamp)}
+                  </Text>
+                )}
+              </View>
+              
+              <View style={styles.chatPreview}>
+                <Text style={styles.chatLastMessage}>
+                  {chat.lastMessage 
+                    ? formatLastMessage(chat.lastMessage, currentUser!.id)
+                    : t('messages.noMessages')
+                  }
+                </Text>
+                
+                {chat.unreadCount > 0 && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadCount}>
+                      {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              
+              <Text style={styles.chatStatus}>
+                {chat.player.status === 'player' ? t('profile.player') : 
+                 chat.player.status === 'coach' ? t('profile.coach') : 
+                 chat.player.status === 'scout' ? t('profile.scout') : 
+                 chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
+              </Text>
+            </View>
+          </View>
+        </BlurView>
+      </View>
+    </TouchableOpacity>
+  ), [currentUser, t, formatTime, formatLastMessage, openChat]);
+
+  const keyExtractor = useCallback((item: ChatPreview) => item.player.id, []);
+
+  // Empty component
+  const ListEmptyComponent = useCallback(() => (
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyContent}>
+        <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
+        <Text style={styles.emptyTitle}>{t('messages.noMessages')}</Text>
+        <Text style={styles.emptySubtitle}>
+          {t('messages.startConversation')}
+        </Text>
+      </View>
+    </View>
+  ), [t]);
+
   // Если загружается пользователь ИЛИ данные, показываем один loading screen
   if (isUserLoading || currentUser === undefined || (loading && filteredChats.length === 0)) {
     return (
@@ -408,10 +502,14 @@ export default function MessagesScreen() {
             </BlurView>
           </View>
           
-          {/* Список чатов */}
-          <ScrollView 
+          {/* Список чатов - FlatList для виртуализации и производительности */}
+          <FlatList
+            data={filteredChats}
+            renderItem={renderChatItem}
+            keyExtractor={keyExtractor}
             style={styles.chatsContainer}
-            contentContainerStyle={styles.chatsContent}
+            contentContainerStyle={filteredChats.length === 0 ? styles.emptyListContent : styles.chatsContent}
+            ListEmptyComponent={!loading ? ListEmptyComponent : null}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -421,89 +519,15 @@ export default function MessagesScreen() {
               />
             }
             removeClippedSubviews={true}
-            decelerationRate="fast"
-          >
-            {filteredChats.length === 0 && !loading ? (
-              <View style={styles.emptyContainer}>
-                <View style={styles.emptyContent}>
-                  <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
-                  <Text style={styles.emptyTitle}>{t('messages.noMessages')}</Text>
-                  <Text style={styles.emptySubtitle}>
-                    {t('messages.startConversation')}
-                  </Text>
-                </View>
-              </View>
-            ) : filteredChats.length > 0 ? (
-              filteredChats.map((chat) => (
-                <TouchableOpacity
-                  key={chat.player.id}
-                  onPress={() => openChat(chat.player.id)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.chatGradientShadow}>
-                    <BlurView
-                      intensity={20}
-                      tint="dark"
-                      style={styles.chatItemBlur}
-                    >
-                      <View style={styles.chatItemOverlay}>
-                  <CachedAvatar 
-                    playerId={chat.player.id}
-                    fallbackAvatarUrl={chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'}
-                    size={50}
-                    style={styles.chatAvatar}
-                    status={chat.player.status}
-                    onError={() => {
-                      // Fallback для аватарки при ошибке загрузки
-                      console.log('Ошибка загрузки аватарки для:', chat.player.name);
-                    }}
-                  />
-                  
-                  <View style={styles.chatInfo}>
-                    <View style={styles.chatHeader}>
-                      <Text style={styles.chatName}>
-                        {chat.player.status === 'scout' 
-                          ? t('profile.scout')?.toUpperCase() || 'SCOUT'
-                          : chat.player.name?.toUpperCase()}
-                      </Text>
-                      {chat.lastMessage && (
-                        <Text style={styles.chatTime}>
-                          {formatTime(chat.lastMessage.timestamp)}
-                        </Text>
-                      )}
-                    </View>
-                    
-                    <View style={styles.chatPreview}>
-                      <Text style={styles.chatLastMessage}>
-                        {chat.lastMessage 
-                          ? formatLastMessage(chat.lastMessage, currentUser!.id)
-                          : t('messages.noMessages')
-                        }
-                      </Text>
-                      
-                      {chat.unreadCount > 0 && (
-                        <View style={styles.unreadBadge}>
-                          <Text style={styles.unreadCount}>
-                            {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                    
-                    <Text style={styles.chatStatus}>
-                      {chat.player.status === 'player' ? t('profile.player') : 
-                       chat.player.status === 'coach' ? t('profile.coach') : 
-                       chat.player.status === 'scout' ? t('profile.scout') : 
-                       chat.player.status === 'admin' ? t('profile.admin') : t('profile.star')}
-                    </Text>
-                  </View>
-                      </View>
-                  </BlurView>
-                  </View>
-                </TouchableOpacity>
-              ))
-            ) : null}
-          </ScrollView>
+            maxToRenderPerBatch={10}
+            windowSize={10}
+            initialNumToRender={10}
+            getItemLayout={(data, index) => ({
+              length: 90,
+              offset: 90 * index,
+              index,
+            })}
+          />
         </View>
       </CachedBackground>
     </View>
@@ -584,6 +608,11 @@ const styles = StyleSheet.create({
   },
   chatsContent: {
     paddingVertical: 8,
+  },
+  emptyListContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   emptyContainer: {
     flex: 1,
