@@ -54,6 +54,7 @@ export default function ChatScreen() {
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const newMessageRef = useRef<string>(''); // актуальный текст (для сохранения черновика без зависимостей)
   const [loading, setLoading] = useState(true);
   const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -112,10 +113,12 @@ export default function ChatScreen() {
         try {
           const draftData = JSON.parse(draftRaw);
           if (draftData.text) {
+            newMessageRef.current = draftData.text;
             setNewMessage(draftData.text);
           }
         } catch {
           // Старый формат - просто текст
+          newMessageRef.current = draftRaw;
           setNewMessage(draftRaw);
         }
       }
@@ -126,6 +129,7 @@ export default function ChatScreen() {
 
   // Быстрое сохранение черновика при наборе (чтобы в Messages список обновлялся без задержки)
   const handleDraftTextChange = useCallback((text: string) => {
+    newMessageRef.current = text;
     setNewMessage(text);
 
     if (!id) return;
@@ -143,6 +147,7 @@ export default function ChatScreen() {
     // Очищаем сообщения при смене чата
     setMessages([]);
     setNewMessage('');
+    newMessageRef.current = '';
     setLoading(true);
     setReplyingToMessage(null); // Очищаем сообщение для ответа при смене чата
     setContextMenuVisible(false); // Закрываем меню при смене чата
@@ -174,6 +179,18 @@ export default function ChatScreen() {
   }, [scrollToBottom, messages.length, loading]);
 
   // Убираем прокрутку - контент сразу будет внизу через contentContainerStyle
+
+  // Автопрокрутка вниз ТОЛЬКО при первом входе в чат
+  useEffect(() => {
+    if (!loading && messages.length > 0 && scrollViewRef.current && isInitialLoadRef.current) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: false });
+        setIsNearBottom(true);
+        wasNearBottomRef.current = true;
+        isInitialLoadRef.current = false;
+      }, Platform.OS === 'android' ? 50 : 0);
+    }
+  }, [loading, messages.length, id]);
 
   useEffect(() => {
     if (!currentUser || !otherPlayer || otherPlayer.id !== id) {
@@ -330,12 +347,14 @@ export default function ChatScreen() {
               }, 100);
             }
             
-            // Прокручиваем вниз после получения нового сообщения
-            setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-              setIsNearBottom(true);
-              wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
-            }, Platform.OS === 'android' ? 200 : 100);
+            // Прокручиваем вниз ТОЛЬКО если пользователь был внизу (иначе мешает читать старые сообщения)
+            if (wasNearBottomRef.current) {
+              setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+                setIsNearBottom(true);
+                wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
+              }, Platform.OS === 'android' ? 200 : 100);
+            }
           }
       )
       .on(
@@ -506,11 +525,14 @@ export default function ChatScreen() {
             }
           }
           
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-            setIsNearBottom(true);
-            wasNearBottomRef.current = true;
-          }, Platform.OS === 'android' ? 200 : 100);
+          // Автоскролл только если пользователь был внизу
+          if (wasNearBottomRef.current) {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+              setIsNearBottom(true);
+              wasNearBottomRef.current = true;
+            }, Platform.OS === 'android' ? 200 : 100);
+          }
         }
 
       } catch (error) {
@@ -549,31 +571,6 @@ export default function ChatScreen() {
       
       loadMessagesOnFocus();
 
-      // При возврате в чат восстанавливаем позицию или прокручиваем вниз
-      if (messages.length > 0 && !loading && scrollViewRef.current) {
-        // Небольшая задержка для рендеринга контента
-        setTimeout(() => {
-          if (isInitialLoadRef.current) {
-            // При первой загрузке прокручиваем вниз
-            scrollViewRef.current?.scrollToEnd({ animated: false });
-            setIsNearBottom(true);
-            wasNearBottomRef.current = true;
-            isInitialLoadRef.current = false;
-          } else if (savedScrollPositionRef.current !== null && !wasNearBottomRef.current) {
-            // Восстанавливаем сохраненную позицию, если не был внизу
-            scrollViewRef.current.scrollTo({
-              y: savedScrollPositionRef.current,
-              animated: false
-            });
-            setIsNearBottom(false);
-          } else if (wasNearBottomRef.current) {
-            // Если был внизу, прокручиваем вниз
-            scrollViewRef.current?.scrollToEnd({ animated: false });
-            setIsNearBottom(true);
-          }
-        }, Platform.OS === 'android' ? 100 : 50);
-      }
-
       // При уходе из чата сохраняем текущую позицию и черновик
       return () => {
         backHandler.remove();
@@ -584,10 +581,10 @@ export default function ChatScreen() {
           draftSaveTimeoutRef.current = null;
         }
         if (id) {
-          saveDraft(id as string, newMessage);
+          saveDraft(id as string, newMessageRef.current);
         }
       };
-    }, [messages.length, loading, currentUser, otherPlayer, id, loadMessages, newMessage])
+    }, [currentUser, otherPlayer, id, loadMessages, router])
   );
 
   // Синхронизируем счетчик с глобальным контекстом после загрузки
@@ -625,23 +622,29 @@ export default function ChatScreen() {
               console.error('❌ Ошибка загрузки диалога:', err);
               return [];
             }),
-            supabase
-              .from('players')
-              .select('is_online, last_seen')
-              .eq('id', otherPlayerData.id)
-              .single()
-              .then(({ data, error }) => ({ data, error }))
-              .catch(err => ({ data: null, error: err }))
+            (async () => {
+              try {
+                const { data, error } = await supabase
+                  .from('players')
+                  .select('is_online, last_seen')
+                  .eq('id', otherPlayerData.id)
+                  .single();
+                return { data, error };
+              } catch (err) {
+                return { data: null, error: err as any };
+              }
+            })()
           ]);
           
           // Обновляем статус онлайн если получен
           if (statusResult.data && !statusResult.error) {
+            const statusData = statusResult.data as any;
             setOtherPlayer(prev => {
               if (!prev) return prev;
               return {
                 ...prev,
-                isOnline: statusResult.data.is_online ?? prev.isOnline,
-                lastSeen: statusResult.data.last_seen ?? prev.lastSeen
+                isOnline: statusData?.is_online ?? prev.isOnline,
+                lastSeen: statusData?.last_seen ?? prev.lastSeen
               };
             });
           }
@@ -939,6 +942,7 @@ export default function ChatScreen() {
     const messageText = newMessage.trim();
     const replyingTo = replyingToMessage;
     setNewMessage(''); // Очищаем поле сразу для лучшего UX
+      newMessageRef.current = '';
     setReplyingToMessage(null); // Очищаем сообщение для ответа
     
     // Удаляем черновик после отправки
