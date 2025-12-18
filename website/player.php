@@ -60,6 +60,12 @@ if ($isAndroid) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HockeyStars</title>
+    <base href="/">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="theme-color" content="#050008">
+    <link rel="stylesheet" href="/styles.css">
     <script>
         (function() {
             const playerId = <?php echo json_encode($playerId); ?>;
@@ -141,25 +147,71 @@ if ($isAndroid) {
         })();
     </script>
     <style>
-        body { margin:0; padding:0; background:#050008; color:#fff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }
-        .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-        .card { width:100%; max-width:520px; background:rgba(5,0,8,0.75); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; text-align:center; }
-        .title { font-size:22px; font-weight:700; margin:0 0 10px; }
-        .text { font-size:14px; opacity:0.85; margin:0 0 18px; line-height:1.5; }
-        .btn { display:inline-block; padding:14px 18px; border-radius:14px; border:2px solid #fa2f40; background:rgba(5,0,8,0.9); color:#fff; font-weight:700; cursor:pointer; }
-        .btn:active { transform: translateY(1px); }
-        .small { margin-top:14px; font-size:12px; opacity:0.65; }
+        /* Minimal page-specific styling; base look comes from styles.css */
+        .install-card {
+            max-width: 720px;
+            margin: 60px auto;
+            padding: 40px 30px;
+            background: rgba(5, 0, 8, 0.85);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            text-align: center;
+        }
+
+        .install-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="card">
-            <div class="title">HockeyStars</div>
-            <div class="text">Чтобы приглашение засчиталось, нажмите кнопку — мы откроем приложение или перейдём в App Store.</div>
-            <button class="btn" onclick="window.__hsInstall()">Открыть / Установить</button>
-            <div class="small">Если приложение уже установлено — откроется профиль. Если нет — откроется App Store.</div>
-        </div>
+    <div class="background-overlay"></div>
+    <div class="pucks-container">
+        <div class="puck puck-1"><div class="puck-avatar"></div></div>
+        <div class="puck puck-2"><div class="puck-avatar"></div></div>
+        <div class="puck puck-3"><div class="puck-avatar"></div></div>
+        <div class="puck puck-4"><div class="puck-avatar"></div></div>
+        <div class="puck puck-5"><div class="puck-avatar"></div></div>
+        <div class="puck puck-6"><div class="puck-avatar"></div></div>
+        <div class="puck puck-7"><div class="puck-avatar"></div></div>
+        <div class="puck puck-8"><div class="puck-avatar"></div></div>
     </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <img src="/logo.png" alt="HockeyStars" class="logo">
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="install-card">
+                <button class="download-btn install-btn" onclick="window.__hsInstall()">Открыть / Установить</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HockeyStars. Все права защищены.</p>
+                <a href="/rules.html" class="footer-link footer-privacy-ru">Политика конфиденциальности</a>
+                <a href="/privacy-en.html" class="footer-link footer-privacy-en" style="display: none;">Privacy Policy</a>
+                <a href="/delete-account.html" class="footer-link footer-delete-account-ru">Удаление аккаунта</a>
+                <a href="/delete-account-en.html" class="footer-link footer-delete-account-en" style="display: none;">Delete Account</a>
+                <a href="/contact.html" class="footer-link">Обратная связь</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
 </body>
 </html>
 
