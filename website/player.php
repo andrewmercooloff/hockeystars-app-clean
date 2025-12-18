@@ -40,9 +40,13 @@ if (empty($playerId)) {
 // Deep link для приложения
 $DEEP_LINK = "hockeystars://player/{$playerId}";
 
+// Android Install Referrer payload (free deferred attribution on Android)
+$referrerPayload = "inviterId={$playerId}&deeplink_path=player/{$playerId}";
+$GOOGLE_PLAY_URL_WITH_REF = $GOOGLE_PLAY_URL . "&referrer=" . urlencode($referrerPayload);
+
 // Для Android используем Intent URL с fallback на Google Play
 if ($isAndroid) {
-    $intentUrl = "intent://player/{$playerId}#Intent;scheme=hockeystars;package={$GOOGLE_PLAY_PACKAGE};S.browser_fallback_url=" . urlencode($GOOGLE_PLAY_URL) . ";end";
+    $intentUrl = "intent://player/{$playerId}#Intent;scheme=hockeystars;package={$GOOGLE_PLAY_PACKAGE};S.browser_fallback_url=" . urlencode($GOOGLE_PLAY_URL_WITH_REF) . ";end";
     header("Location: {$intentUrl}", true, 302);
     exit;
 }
@@ -102,33 +106,60 @@ if ($isAndroid) {
                 }
             }
             
-            // Пытаемся открыть приложение
-            if (document.body) {
+            // iOS deferred attribution via clipboard requires a user gesture.
+            // We expose a button handler that copies inviter data and redirects to App Store.
+            window.__hsInstall = async function() {
+                try {
+                    const inviteUrl = `https://hockey-stars.com/player/${playerId}`;
+                    const text = inviteUrl;
+                    
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                    } else {
+                        const ta = document.createElement('textarea');
+                        ta.value = text;
+                        ta.setAttribute('readonly', '');
+                        ta.style.position = 'absolute';
+                        ta.style.left = '-9999px';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                
+                // If app is installed, try to open it first.
                 tryOpenApp();
-            } else {
-                document.addEventListener('DOMContentLoaded', tryOpenApp);
-            }
-            
-            // Если через 1 секунду приложение не открылось - редиректим на App Store
-            setTimeout(function() {
-                if (!appOpened) {
-                    redirectAttempted = true;
+                
+                // Then go to App Store (install)
+                setTimeout(function() {
                     window.location.href = APP_STORE_URL;
-                }
-            }, 1000);
-            
-            // Дополнительная проверка через 1.5 секунды
-            setTimeout(function() {
-                if (!appOpened && document.visibilityState === 'visible') {
-                    redirectAttempted = true;
-                    window.location.href = APP_STORE_URL;
-                }
-            }, 1500);
+                }, 250);
+            };
         })();
     </script>
+    <style>
+        body { margin:0; padding:0; background:#050008; color:#fff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }
+        .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+        .card { width:100%; max-width:520px; background:rgba(5,0,8,0.75); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; text-align:center; }
+        .title { font-size:22px; font-weight:700; margin:0 0 10px; }
+        .text { font-size:14px; opacity:0.85; margin:0 0 18px; line-height:1.5; }
+        .btn { display:inline-block; padding:14px 18px; border-radius:14px; border:2px solid #fa2f40; background:rgba(5,0,8,0.9); color:#fff; font-weight:700; cursor:pointer; }
+        .btn:active { transform: translateY(1px); }
+        .small { margin-top:14px; font-size:12px; opacity:0.65; }
+    </style>
 </head>
-<body style="margin:0;padding:0;background:#050008;">
-    <!-- Минимальная страница - пытаемся открыть приложение -->
+<body>
+    <div class="wrap">
+        <div class="card">
+            <div class="title">HockeyStars</div>
+            <div class="text">Чтобы приглашение засчиталось, нажмите кнопку — мы откроем приложение или перейдём в App Store.</div>
+            <button class="btn" onclick="window.__hsInstall()">Открыть / Установить</button>
+            <div class="small">Если приложение уже установлено — откроется профиль. Если нет — откроется App Store.</div>
+        </div>
+    </div>
 </body>
 </html>
 

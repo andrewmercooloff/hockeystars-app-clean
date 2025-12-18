@@ -24,7 +24,7 @@ import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
-import Constants from 'expo-constants';
+import AppLinks from 'expo-applinks';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -414,8 +414,9 @@ export default function RootLayout() {
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
 
   // ==========================================================
-  // 🎟️ Referral / Deferred deep links (Branch)
-  // Works even if user went through App Store / Google Play first.
+  // 🎟️ Referral / Deferred deep links (free, via website + expo-applinks)
+  // - iOS: requires a user tap on the website to allow clipboard write.
+  // - Android: uses Play Install Referrer automatically.
   // ==========================================================
   const PENDING_INVITE_KEY = 'pending_invited_by';
   const savePendingInvite = React.useCallback(async (inviterId: string) => {
@@ -432,61 +433,23 @@ export default function RootLayout() {
   React.useEffect(() => {
     if (Platform.OS === 'web') return;
 
-    const branchEnabled = Boolean((Constants.expoConfig as any)?.extra?.branchEnabled);
-    if (!branchEnabled) {
-      return;
-    }
-
-    let branch: any;
-    try {
-      const mod = require('react-native-branch');
-      branch = mod?.default ?? mod;
-    } catch (e) {
-      console.warn('⚠️ [REFERRAL] Branch SDK not available:', e);
-      return;
-    }
-
-    // Handle deferred params on first open after install
     (async () => {
       try {
-        const firstParams: any = await branch.getFirstReferringParams();
-        const inviterId = firstParams?.inviterId || firstParams?.inviter_id;
-        if (firstParams?.['+clicked_branch_link'] && inviterId) {
+        if (currentUser?.id) return;
+        const result = await AppLinks.checkForDeferredDeepLink();
+        if (!result) return;
+
+        const inviterId =
+          (result.params?.inviterId || result.params?.inviter_id) ??
+          (result.path?.startsWith('player/') ? result.path.split('/')[1] : undefined);
+
+        if (inviterId) {
           await savePendingInvite(String(inviterId));
         }
       } catch {
         // ignore
       }
     })();
-
-    // Subscribe to link opens
-    const unsubscribe = branch.subscribe(async ({ error, params }: any) => {
-      if (error) return;
-      if (!params || !params['+clicked_branch_link']) return;
-
-      try {
-        const inviterId = params.inviterId || params.inviter_id;
-        if (inviterId) {
-          await savePendingInvite(String(inviterId));
-        }
-
-        const deepLinkPath = params.$deeplink_path || params.deeplink_path || params.deeplink;
-        if (deepLinkPath && typeof deepLinkPath === 'string') {
-          const normalized = deepLinkPath.startsWith('/') ? deepLinkPath : `/${deepLinkPath}`;
-          router.push(normalized as any);
-        }
-      } catch (e) {
-        console.warn('⚠️ [REFERRAL] Branch link handling failed:', e);
-      }
-    });
-
-    return () => {
-      try {
-        unsubscribe?.();
-      } catch {
-        // ignore
-      }
-    };
   }, [router, savePendingInvite]);
 
   const lastNotificationCountRef = React.useRef<number>(0);

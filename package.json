@@ -13,7 +13,6 @@
     "submit:ios": "eas submit --platform ios --profile production --latest --non-interactive"
   },
   "dependencies": {
-    "@config-plugins/react-native-branch": "^11.0.0",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
@@ -28,6 +27,7 @@
     "csv-writer": "^1.6.0",
     "dotenv": "^17.2.2",
     "expo": "~54.0.23",
+    "expo-applinks": "^1.0.13",
     "expo-audio": "~1.0.14",
     "expo-av": "~16.0.7",
     "expo-blur": "~15.0.7",
@@ -63,7 +63,6 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-audio-recorder-player": "^4.5.0",
-    "react-native-branch": "^6.9.0",
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-nitro-modules": "^0.31.4",
