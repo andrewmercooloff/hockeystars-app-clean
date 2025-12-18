@@ -175,7 +175,17 @@ export default function AchievementsSection({
   const renderAchievementItem = ({ item: achievement }: { item: Achievement }) => {
     const medal = getMedalIcon(achievement.place);
     return (
-      <View style={styles.achievementMedal}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => {
+          // Делаем карточку "touchable", чтобы жесты не перехватывались внешними обертками профиля
+          // (иначе горизонтальный скролл может не срабатывать).
+          if (isEditing) {
+            openEditModal(achievement);
+          }
+        }}
+        style={styles.achievementMedal}
+      >
         <View style={[styles.medalCircle, { borderColor: medal.color }]}>
           <Ionicons name={medal.name} size={32} color={medal.color} />
         </View>
@@ -198,7 +208,7 @@ export default function AchievementsSection({
             </TouchableOpacity>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -220,7 +230,7 @@ export default function AchievementsSection({
           contentContainerStyle={styles.achievementsContainer}
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
-          removeClippedSubviews={true}
+          scrollEnabled={true}
         />
       )}
 
