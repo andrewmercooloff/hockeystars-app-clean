@@ -279,10 +279,53 @@ const translations = {
 let currentLanguage = 'en';
 const CONTACT_FORM_ENDPOINT_DEFAULT = 'contact-send.php';
 
+// Pages with separate RU/EN versions (SEO).
+// If current page is in this map, language switch should navigate between files/paths.
+const SEO_LANGUAGE_PAIRS = [
+    // Home page: Apache rewrites /en -> index-en.html
+    { ru: '/', en: '/en' },
+
+    // Privacy policy
+    { ru: '/rules.html', en: '/privacy-en.html' },
+
+    // Delete account
+    { ru: '/delete-account.html', en: '/delete-account-en.html' }
+];
+
 // Russian-speaking countries
 const russianSpeakingCountries = [
     'RU', 'BY', 'KZ', 'KG', 'TJ', 'UZ', 'AM', 'AZ', 'MD', 'UA'
 ];
+
+function normalizePathname(pathname) {
+    const raw = pathname || '/';
+
+    // Strip trailing slashes (except root)
+    let p = raw === '/' ? '/' : raw.replace(/\/+$/, '');
+
+    // Normalize direct file access to canonical SEO routes
+    if (p === '/index.html') p = '/';
+    if (p === '/index-en.html') p = '/en';
+
+    return p;
+}
+
+function getSeoPairForPath(normalizedPath) {
+    for (const pair of SEO_LANGUAGE_PAIRS) {
+        if (pair.ru === normalizedPath || pair.en === normalizedPath) return pair;
+    }
+    return null;
+}
+
+function buildRedirectUrl(targetPathname) {
+    try {
+        const url = new URL(window.location.href);
+        url.pathname = targetPathname;
+        return url.toString();
+    } catch (e) {
+        return targetPathname;
+    }
+}
 
 // Detect language based on browser locale
 function detectLanguage() {
@@ -818,26 +861,59 @@ let puckPhysics = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // Detect language from URL path
-    let lang = 'ru';
-    if (window.location.pathname.includes('/en')) {
-        lang = 'en';
+    const normalizedPath = normalizePathname(window.location.pathname);
+    const seoPair = getSeoPairForPath(normalizedPath);
+
+    // Desired language:
+    // - stored choice (localStorage) OR ?lang= OR auto-detect by region.
+    const desiredLang = detectLanguage();
+
+    // If this page has separate RU/EN versions, keep user on the correct file/path.
+    if (seoPair) {
+        const currentSeoLang = normalizedPath === seoPair.en ? 'en' : 'ru';
+
+        if (desiredLang !== currentSeoLang) {
+            const targetPath = desiredLang === 'en' ? seoPair.en : seoPair.ru;
+            window.location.replace(buildRedirectUrl(targetPath));
+            return;
+        }
+
+        // Match language to the file/path (SEO version)
+        setLanguage(currentSeoLang);
     } else {
-        lang = detectLanguage();
+        // Single-page (no separate SEO file): just translate in-place.
+        setLanguage(desiredLang);
     }
-    setLanguage(lang);
     
     // Add click handlers to language buttons
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const newLang = btn.getAttribute('data-lang');
-            // Redirect to appropriate page for SEO
-            if (newLang === 'en' && !window.location.pathname.includes('/en')) {
-                window.location.href = '/en';
-            } else if (newLang === 'ru' && window.location.pathname.includes('/en')) {
-                window.location.href = '/';
-            } else {
-                setLanguage(newLang);
+            if (!newLang || (newLang !== 'ru' && newLang !== 'en')) return;
+
+            const currentPath = normalizePathname(window.location.pathname);
+            const pair = getSeoPairForPath(currentPath);
+
+            // Always update local choice immediately
+            setLanguage(newLang);
+
+            // If there is a separate RU/EN SEO page for this route, navigate to it.
+            if (pair) {
+                const targetPath = newLang === 'en' ? pair.en : pair.ru;
+                if (targetPath !== currentPath) {
+                    window.location.href = buildRedirectUrl(targetPath);
+                }
+                return;
+            }
+
+            // Otherwise stay on the same page and reflect language in URL for sharing.
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('lang', newLang);
+                window.history.replaceState({}, '', url.toString());
+            } catch (_) {
+                // ignore
             }
         });
     });

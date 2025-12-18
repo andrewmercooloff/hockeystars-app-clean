@@ -226,35 +226,6 @@ if ($isAndroid) {
     </footer>
 
     <script src="/script.js"></script>
-    <script>
-        // On /player/<id> we must NOT redirect to / or /en when changing language.
-        // We only switch translations in-place.
-        document.addEventListener('DOMContentLoaded', () => {
-            const isPlayerPage = (window.location.pathname || '').includes('/player/');
-            if (!isPlayerPage) return;
-
-            document.querySelectorAll('.lang-btn').forEach((btn) => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    const newLang = btn.getAttribute('data-lang');
-                    if (!newLang) return;
-
-                    if (typeof window.setLanguage === 'function') {
-                        window.setLanguage(newLang);
-                    }
-
-                    try {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('lang', newLang);
-                        window.history.replaceState({}, '', url.toString());
-                    } catch (_) {
-                        // ignore
-                    }
-                }, true);
-            });
-        });
-    </script>
 </body>
 </html>
 
