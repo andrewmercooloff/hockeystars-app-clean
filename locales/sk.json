@@ -2060,6 +2060,8 @@
     "noAchievementsYet": "Úspechy ešte neboli pridané",
     "noStandardsYet": "Normy ešte neboli vyplnené",
     "shareProfileSocial": "Zdieľať profil na sociálnych sieťach",
+    "copyLink": "Kopírovať odkaz",
+    "linkCopied": "Odkaz skopírovaný do schránky",
     "currentSeasonStats": "Štatistiky aktuálnej sezóny"
   },
   "register": {
@@ -2459,6 +2461,7 @@
     "enterMessage": "Zadajte svoju správu...",
     "reply": "Odpovedať",
     "forward": "Preposlať",
+    "copy": "Kopírovať",
     "player": "Hráč",
     "coach": "Tréner",
     "scout": "Skaut",

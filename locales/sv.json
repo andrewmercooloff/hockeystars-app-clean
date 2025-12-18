@@ -2067,6 +2067,8 @@
     "noAchievementsYet": "Prestationer har inte lagts till ännu",
     "noStandardsYet": "Standarder har inte fyllts i ännu",
     "shareProfileSocial": "Dela profil på sociala nätverk",
+    "copyLink": "Kopiera länk",
+    "linkCopied": "Länk kopierad till urklipp",
     "currentSeasonStats": "Nuvarande säsongsstatistik"
   },
   "register": {
@@ -2466,6 +2468,7 @@
     "enterMessage": "Skriv ditt meddelande...",
     "reply": "Svara",
     "forward": "Vidarebefordra",
+    "copy": "Kopiera",
     "player": "Spelare",
     "coach": "Tränare",
     "scout": "Spana",

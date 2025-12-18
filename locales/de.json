@@ -2068,6 +2068,8 @@
     "noAchievementsYet": "Erfolge noch nicht hinzugefügt",
     "noStandardsYet": "Normen noch nicht ausgefüllt",
     "shareProfileSocial": "Profil in sozialen Netzwerken teilen",
+    "copyLink": "Link kopieren",
+    "linkCopied": "Link in die Zwischenablage kopiert",
     "currentSeasonStats": "Aktuelle Saisonstatistiken"
   },
   "register": {
@@ -2484,6 +2486,7 @@
     "enterMessage": "Geben Sie Ihre Nachricht ein...",
     "reply": "Antworten",
     "forward": "Weiterleiten",
+    "copy": "Kopieren",
     "player": "Spieler",
     "coach": "Trainer",
     "scout": "Erkunden",

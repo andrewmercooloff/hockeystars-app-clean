@@ -2068,6 +2068,8 @@
     "noAchievementsYet": "Réalisations pas encore ajoutées",
     "noStandardsYet": "Normes pas encore remplies",
     "shareProfileSocial": "Partager le profil sur les réseaux sociaux",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié dans le presse-papiers",
     "currentSeasonStats": "Statistiques de la saison actuelle"
   },
   "register": {
@@ -2465,6 +2467,7 @@
     "enterMessage": "Entrez votre message...",
     "reply": "Répondre",
     "forward": "Transférer",
+    "copy": "Copier",
     "player": "Joueur",
     "coach": "Entraîneur",
     "scout": "Scout",

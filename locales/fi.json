@@ -2060,6 +2060,8 @@
     "noAchievementsYet": "Saavutukset eivät vielä ole lisätty",
     "noStandardsYet": "Normit eivät vielä ole täytetty",
     "shareProfileSocial": "Jaa profiili sosiaalisessa mediassa",
+    "copyLink": "Kopioi linkki",
+    "linkCopied": "Linkki kopioitu leikepöydälle",
     "currentSeasonStats": "Nykyisen kauden tilastot"
   },
   "register": {
@@ -2459,6 +2461,7 @@
     "enterMessage": "Kirjoita viestisi...",
     "reply": "Vastaa",
     "forward": "Lähetä eteenpäin",
+    "copy": "Kopioi",
     "player": "Pelaaja",
     "coach": "Kouluttaja",
     "scout": "Partiolainen",
