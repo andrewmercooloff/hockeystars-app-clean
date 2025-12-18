@@ -41,6 +41,7 @@ import CachedBackground from '../../components/CachedBackground';
 import CachedAvatar from '../../components/CachedAvatar';
 import { addActivityPoints } from '../../services/activityService';
 import * as Clipboard from 'expo-clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../../assets/images/led.jpg');
 
@@ -81,6 +82,33 @@ export default function ChatScreen() {
   const chatMenuButtonRef = useRef<View>(null);
 
 
+  // Функция сохранения черновика
+  const saveDraft = async (chatId: string, text: string) => {
+    try {
+      const draftKey = `chat_draft_${chatId}`;
+      if (text.trim()) {
+        await AsyncStorage.setItem(draftKey, text);
+      } else {
+        await AsyncStorage.removeItem(draftKey);
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения черновика:', error);
+    }
+  };
+
+  // Функция загрузки черновика
+  const loadDraft = async (chatId: string) => {
+    try {
+      const draftKey = `chat_draft_${chatId}`;
+      const draft = await AsyncStorage.getItem(draftKey);
+      if (draft) {
+        setNewMessage(draft);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки черновика:', error);
+    }
+  };
+
   useEffect(() => {
     // Очищаем сообщения при смене чата
     setMessages([]);
@@ -91,6 +119,11 @@ export default function ChatScreen() {
     setContextMenuMessage(null);
     messageRefs.current.clear(); // Очищаем refs сообщений
     isInitialLoadRef.current = true; // Сбрасываем флаг при смене чата
+    
+    // Загружаем черновик для этого чата
+    if (id) {
+      loadDraft(id as string);
+    }
     savedScrollPositionRef.current = null; // Сбрасываем сохраненную позицию при смене чата
     wasNearBottomRef.current = true; // Сбрасываем флаг при смене чата
     setIsScrolledToBottom(false); // Сбрасываем флаг прокрутки
@@ -511,12 +544,16 @@ export default function ChatScreen() {
         }, Platform.OS === 'android' ? 100 : 50);
       }
 
-      // При уходе из чата сохраняем текущую позицию
+      // При уходе из чата сохраняем текущую позицию и черновик
       return () => {
         backHandler.remove();
         // Позиция уже сохранена в onScroll
+        // Сохраняем черновик при выходе
+        if (id) {
+          saveDraft(id as string, newMessage);
+        }
       };
-    }, [messages.length, loading, currentUser, otherPlayer, id, loadMessages])
+    }, [messages.length, loading, currentUser, otherPlayer, id, loadMessages, newMessage])
   );
 
   // Синхронизируем счетчик с глобальным контекстом после загрузки
@@ -869,6 +906,11 @@ export default function ChatScreen() {
     const replyingTo = replyingToMessage;
     setNewMessage(''); // Очищаем поле сразу для лучшего UX
     setReplyingToMessage(null); // Очищаем сообщение для ответа
+    
+    // Удаляем черновик после отправки
+    if (otherPlayer?.id) {
+      saveDraft(otherPlayer.id, '');
+    }
     
     // Оптимистичное обновление - добавляем сообщение сразу в UI
     const tempMessage: Message = {

@@ -32,6 +32,7 @@ import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import CachedBackground from '../components/CachedBackground';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -118,6 +119,41 @@ export default function MessagesScreen() {
             });
           }
         }
+      }
+      
+      // Загружаем черновики и добавляем чаты с черновиками
+      try {
+        const allKeys = await AsyncStorage.getAllKeys();
+        const draftKeys = allKeys.filter(key => key.startsWith('chat_draft_'));
+        
+        for (const draftKey of draftKeys) {
+          const draft = await AsyncStorage.getItem(draftKey);
+          if (draft && draft.trim()) {
+            const playerId = draftKey.replace('chat_draft_', '');
+            // Проверяем, нет ли уже этого чата в списке
+            const existingChat = chatPreviews.find(c => c.player.id === playerId);
+            if (!existingChat) {
+              // Загружаем данные игрока и создаём чат с черновиком
+              const player = await getPlayerById(playerId);
+              if (player && !blockedSet.has(playerId)) {
+                chatPreviews.push({
+                  player,
+                  lastMessage: {
+                    id: 'draft',
+                    senderId: currentUser.id,
+                    receiverId: playerId,
+                    text: `✏️ ${draft.substring(0, 30)}${draft.length > 30 ? '...' : ''}`,
+                    timestamp: new Date(),
+                    read: true
+                  },
+                  unreadCount: 0
+                });
+              }
+            }
+          }
+        }
+      } catch (draftError) {
+        console.warn('⚠️ Ошибка загрузки черновиков:', draftError);
       }
       
       // Сортируем по времени последнего сообщения
