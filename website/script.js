@@ -317,10 +317,20 @@ function getSeoPairForPath(normalizedPath) {
     return null;
 }
 
-function buildRedirectUrl(targetPathname) {
+function buildRedirectUrl(targetPathname, options) {
     try {
         const url = new URL(window.location.href);
         url.pathname = targetPathname;
+        // By default, avoid carrying `lang` query across SEO page redirects.
+        // It can cause redirect loops (e.g., /rules.html?lang=ru -> /privacy-en.html?lang=ru -> back).
+        const langParam = options && Object.prototype.hasOwnProperty.call(options, 'langParam')
+            ? options.langParam
+            : null;
+        if (langParam === null) {
+            url.searchParams.delete('lang');
+        } else if (typeof langParam === 'string') {
+            url.searchParams.set('lang', langParam);
+        }
         return url.toString();
     } catch (e) {
         return targetPathname;
@@ -328,14 +338,18 @@ function buildRedirectUrl(targetPathname) {
 }
 
 // Detect language based on browser locale
-function detectLanguage() {
-    // First, check URL parameter (highest priority)
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLang = urlParams.get('lang');
-    if (urlLang && (urlLang === 'ru' || urlLang === 'en')) {
-        // Save to localStorage for future visits
-        localStorage.setItem('hockeystars-lang', urlLang);
-        return urlLang;
+function detectLanguage(options) {
+    const ignoreUrlParam = !!(options && options.ignoreUrlParam);
+
+    if (!ignoreUrlParam) {
+        // First, check URL parameter (highest priority)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && (urlLang === 'ru' || urlLang === 'en')) {
+            // Save to localStorage for future visits
+            localStorage.setItem('hockeystars-lang', urlLang);
+            return urlLang;
+        }
     }
 
     // Check if language is stored in localStorage
@@ -866,7 +880,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Desired language:
     // - stored choice (localStorage) OR ?lang= OR auto-detect by region.
-    const desiredLang = detectLanguage();
+    // On SEO-paired pages we ignore `?lang=` to avoid redirect loops.
+    const desiredLang = seoPair ? detectLanguage({ ignoreUrlParam: true }) : detectLanguage();
 
     // If this page has separate RU/EN versions, keep user on the correct file/path.
     if (seoPair) {
@@ -874,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (desiredLang !== currentSeoLang) {
             const targetPath = desiredLang === 'en' ? seoPair.en : seoPair.ru;
-            window.location.replace(buildRedirectUrl(targetPath));
+            window.location.replace(buildRedirectUrl(targetPath, { langParam: null }));
             return;
         }
 
@@ -895,17 +910,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentPath = normalizePathname(window.location.pathname);
             const pair = getSeoPairForPath(currentPath);
 
-            // Always update local choice immediately
-            setLanguage(newLang);
-
             // If there is a separate RU/EN SEO page for this route, navigate to it.
             if (pair) {
+                // Store preference so the target page doesn't auto-redirect back.
+                localStorage.setItem('hockeystars-lang', newLang);
                 const targetPath = newLang === 'en' ? pair.en : pair.ru;
                 if (targetPath !== currentPath) {
-                    window.location.href = buildRedirectUrl(targetPath);
+                    window.location.href = buildRedirectUrl(targetPath, { langParam: null });
                 }
                 return;
             }
+
+            // Single-page (no separate SEO file): translate in-place.
+            setLanguage(newLang);
 
             // Otherwise stay on the same page and reflect language in URL for sharing.
             try {
