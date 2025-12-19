@@ -1591,6 +1591,12 @@ export default function HomeScreen() {
       filterInitTimeRef.current = 0;
       setSelectedCountry(null);
       setSelectedYear(null);
+      // Перезагружаем игроков чтобы новый пользователь появился на льду
+      loadAllPlayers(true);
+    } else if (userId && !lastUserIdRef.current) {
+      // Новый пользователь вошёл (регистрация или первый вход) - перезагружаем список
+      console.log('👤 [PLAYERS] Новый пользователь вошёл - перезагружаем список игроков');
+      loadAllPlayers(true);
     } else if (userId && userCountry && lastUserCountryRef.current && userCountry !== lastUserCountryRef.current) {
       // Страна пользователя изменилась в базе данных (для того же userId)
       console.log('🌍 [FILTERS] Страна пользователя изменилась в базе данных:', {
@@ -1606,7 +1612,7 @@ export default function HomeScreen() {
 
     lastUserIdRef.current = userId;
     lastUserCountryRef.current = userCountry;
-  }, [currentUser?.id, currentUser?.country, setSelectedCountry, setSelectedYear]);
+  }, [currentUser?.id, currentUser?.country, setSelectedCountry, setSelectedYear, loadAllPlayers]);
 
   // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
   // Используем useLayoutEffect для синхронной установки перед отрисовкой
