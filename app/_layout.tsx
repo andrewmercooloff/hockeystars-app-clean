@@ -24,6 +24,7 @@ import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
+import * as Clipboard from 'expo-clipboard';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -429,6 +430,43 @@ export default function RootLayout() {
       console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
     }
   }, [currentUser?.id]);
+
+  // 🎟️ iOS Deferred Deep Link: читаем clipboard при первом запуске
+  // Сайт player.php копирует URL в clipboard при нажатии кнопки "Установить"
+  const clipboardCheckedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    if (currentUser?.id) return; // Уже авторизован
+    if (clipboardCheckedRef.current) return; // Уже проверяли
+    
+    (async () => {
+      try {
+        clipboardCheckedRef.current = true;
+        
+        // Проверяем, есть ли уже сохранённый invite
+        const existing = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+        if (existing) return; // Уже есть invite, не перезаписываем
+        
+        // Читаем clipboard
+        const clipboardText = await Clipboard.getStringAsync();
+        if (!clipboardText) return;
+        
+        // Проверяем, содержит ли URL реферальную ссылку
+        const match = clipboardText.match(/hockey-stars\.com\/player\/([a-zA-Z0-9\-_]+)/);
+        if (match && match[1]) {
+          const inviterId = match[1];
+          console.log('🎟️ [REFERRAL] Found inviter in clipboard:', inviterId);
+          await savePendingInvite(inviterId);
+          
+          // Очищаем clipboard после использования (опционально)
+          // await Clipboard.setStringAsync('');
+        }
+      } catch (e) {
+        // iOS может заблокировать доступ к clipboard - это нормально
+        console.log('🎟️ [REFERRAL] Clipboard read skipped:', e);
+      }
+    })();
+  }, [currentUser?.id, savePendingInvite]);
 
   const lastNotificationCountRef = React.useRef<number>(0);
   const lastMessagesCountRef = React.useRef<number>(0);
