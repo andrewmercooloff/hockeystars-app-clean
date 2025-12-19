@@ -1422,6 +1422,7 @@ const OriginalPuckAnimator = React.memo(({
         isStar={player.status === 'star'}
         status={player.status}
           isOnline={player.isOnline} // Реальный статус онлайн из базы данных
+          isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
         />
       </Suspense>
     </Animated.View>
@@ -1437,7 +1438,8 @@ const OriginalPuckAnimator = React.memo(({
     prevProps.player.id === nextProps.player.id &&
     prevProps.player.avatar === nextProps.player.avatar &&
     prevProps.player.status === nextProps.player.status &&
-    prevProps.player.isOnline === nextProps.player.isOnline
+    prevProps.player.isOnline === nextProps.player.isOnline &&
+    prevProps.player.createdAt === nextProps.player.createdAt
   );
 });
 
