@@ -24,8 +24,6 @@ import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
-// Условный импорт expo-applinks (требует нативного билда, не работает в Expo Go)
-// Используем динамический импорт внутри функции, чтобы избежать крашей при загрузке модуля
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -415,9 +413,9 @@ export default function RootLayout() {
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
 
   // ==========================================================
-  // 🎟️ Referral / Deferred deep links (free, via website + expo-applinks)
-  // - iOS: requires a user tap on the website to allow clipboard write.
-  // - Android: uses Play Install Referrer automatically.
+  // 🎟️ Referral deep links (через Universal Links)
+  // Реферальные ссылки обрабатываются через стандартные Universal Links
+  // в handleIncomingURL ниже
   // ==========================================================
   const PENDING_INVITE_KEY = 'pending_invited_by';
   const savePendingInvite = React.useCallback(async (inviterId: string) => {
@@ -430,40 +428,6 @@ export default function RootLayout() {
       console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
     }
   }, [currentUser?.id]);
-
-  React.useEffect(() => {
-    if (Platform.OS === 'web') return;
-
-    (async () => {
-      try {
-        if (currentUser?.id) return;
-        
-        // Динамический импорт expo-applinks (требует нативного билда)
-        let AppLinks: any = null;
-        try {
-          AppLinks = require('expo-applinks').default;
-        } catch (e) {
-          // Модуль недоступен (Expo Go или другой окружение без нативного билда)
-          return;
-        }
-        
-        if (!AppLinks) return;
-        
-        const result = await AppLinks.checkForDeferredDeepLink();
-        if (!result) return;
-
-        const inviterId =
-          (result.params?.inviterId || result.params?.inviter_id) ??
-          (result.path?.startsWith('player/') ? result.path.split('/')[1] : undefined);
-
-        if (inviterId) {
-          await savePendingInvite(String(inviterId));
-        }
-      } catch {
-        // ignore
-      }
-    })();
-  }, [router, savePendingInvite, currentUser?.id]);
 
   const lastNotificationCountRef = React.useRef<number>(0);
   const lastMessagesCountRef = React.useRef<number>(0);

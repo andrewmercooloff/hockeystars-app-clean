@@ -147,8 +147,7 @@
           "microphonePermission": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net"
         }
       ],
-      "expo-audio",
-      "expo-applinks"
+      "expo-audio"
     ],
     "notification": {
       "icon": "./assets/images/ic_notification.png",
