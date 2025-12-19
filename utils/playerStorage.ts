@@ -7506,10 +7506,26 @@ export const getSmartPlayerSelection = (
       })
       .slice(0, 5); // Берем только 5 новичков
 
-    // 5. Топ-5 игроков по рейтингу активности
-    const topPlayers = otherPlayers
+    // 5. Топ игроки: случайные 5 из первых 20 по рейтингу активности
+    // Сначала берём топ-20 по рейтингу
+    const top20ByRating = otherPlayers
       .filter(player => !newcomers.some(n => n.id === player.id)) // Исключаем новичков
       .sort((a, b) => (b.activityRating || 0) - (a.activityRating || 0))
+      .slice(0, 20);
+    
+    // Затем случайно выбираем 5 из них (детерминированный рандом)
+    const topPlayersSeed = randomSeed !== undefined && randomSeed !== 0
+      ? randomSeed 
+      : `${selectedCountry || 'all'}_${selectedYear || 'all'}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
+    const topPlayers = top20ByRating
+      .sort((a, b) => {
+        const seedA = `${a.id}_${topPlayersSeed}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const seedB = `${b.id}_${topPlayersSeed}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const valueA = Math.sin(seedA * 2.3) * 0.5 + 0.5;
+        const valueB = Math.sin(seedB * 2.3) * 0.5 + 0.5;
+        return valueA - valueB;
+      })
       .slice(0, 5);
 
     // 6. Оставшиеся игроки для случайного выбора
