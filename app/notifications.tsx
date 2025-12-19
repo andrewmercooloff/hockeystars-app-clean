@@ -1276,11 +1276,8 @@ export default function NotificationsScreen() {
           router.push(`/player/${notification.data.changedPlayerId}?scrollToSpeed=true`);
         }
       } else if (notification.type === 'exercise_completed') {
-        // Для уведомлений о выполненных упражнениях показываем конкретное упражнение
-        if (notification.data && notification.data.exerciseId) {
-          router.push(`/exercise-details?id=${notification.data.exerciseId}`);
-        } else if (notification.data && notification.data.changedPlayerId) {
-          // Fallback на профиль игрока с упражнениями
+        // Для уведомлений о выполненных упражнениях переходим в профиль игрока в раздел упражнений
+        if (notification.data && notification.data.changedPlayerId) {
           router.push(`/player/${notification.data.changedPlayerId}?scrollToExercises=true`);
         }
       } else if (notification.type === 'achievement') {
