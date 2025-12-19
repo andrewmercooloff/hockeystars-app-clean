@@ -190,7 +190,7 @@ export default function AdminScreen() {
     return (
       <TouchableOpacity 
         style={styles.playerItem} 
-        onPress={() => handleEditPlayer(item)}
+        onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
       >
         <View style={[styles.playerAvatar, { borderColor: getStatusColor(item.status), borderWidth: 2, overflow: 'hidden' }]}>
           <CachedAvatar
@@ -209,7 +209,9 @@ export default function AdminScreen() {
             <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
           </View>
         </View>
-        <Ionicons name="create" size={24} color="#666" />
+        <TouchableOpacity onPress={() => handleEditPlayer(item)} style={{ padding: 8 }}>
+          <Ionicons name="create" size={24} color="#666" />
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
