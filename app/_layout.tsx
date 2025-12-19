@@ -413,9 +413,10 @@ export default function RootLayout() {
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
 
   // ==========================================================
-  // 🎟️ Referral deep links (через Universal Links)
-  // Реферальные ссылки обрабатываются через стандартные Universal Links
-  // в handleIncomingURL ниже
+  // 🎟️ Referral / Deferred deep links (via Universal Links + Linking API)
+  // - iOS: Universal Links через hockey-stars.com/player/{id}
+  // - Android: App Links через intentFilters в app.json
+  // - Обработка происходит ниже в useEffect с Linking.getInitialURL
   // ==========================================================
   const PENDING_INVITE_KEY = 'pending_invited_by';
   const savePendingInvite = React.useCallback(async (inviterId: string) => {
