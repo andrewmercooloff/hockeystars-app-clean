@@ -1361,7 +1361,7 @@ export default function SearchScreen() {
               <TouchableOpacity
                 style={[
                   styles.resetFiltersButton,
-                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA) && styles.resetFiltersButtonInactive
+                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA || searchQuery) && styles.resetFiltersButtonInactive
                 ]}
                 onPress={() => {
                   setSelectedCountry(null);
@@ -1376,12 +1376,13 @@ export default function SearchScreen() {
                   setSelectedGAA(null);
                   setActiveFilter(null);
                   setOpenFilters(new Set());
+                  setSearchQuery(''); // Сброс текста поиска
                 }}
-                disabled={!(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA)}
+                disabled={!(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA || searchQuery)}
               >
                 <Text style={[
                   styles.resetFiltersButtonText,
-                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA) && styles.resetFiltersButtonTextInactive
+                  !(selectedCountry || selectedTeam || selectedHand || selectedPosition || selectedYear || selectedMinHeight || selectedMinWeight || selectedPPG || selectedSV || selectedGAA || searchQuery) && styles.resetFiltersButtonTextInactive
                 ]}>
                   {t('search.resetFilters')}
                 </Text>
