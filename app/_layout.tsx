@@ -25,15 +25,7 @@ import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
 // Условный импорт expo-applinks (требует нативного билда, не работает в Expo Go)
-let AppLinks: typeof import('expo-applinks').default | null = null;
-try {
-  if (Platform.OS !== 'web') {
-    AppLinks = require('expo-applinks').default;
-  }
-} catch (e) {
-  // Модуль недоступен (Expo Go или другой окружение без нативного билда)
-  AppLinks = null;
-}
+// Используем динамический импорт внутри функции, чтобы избежать крашей при загрузке модуля
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -440,12 +432,24 @@ export default function RootLayout() {
   }, [currentUser?.id]);
 
   React.useEffect(() => {
-    if (Platform.OS === 'web' || !AppLinks) return;
+    if (Platform.OS === 'web') return;
 
     (async () => {
       try {
         if (currentUser?.id) return;
-        const result = await AppLinks!.checkForDeferredDeepLink();
+        
+        // Динамический импорт expo-applinks (требует нативного билда)
+        let AppLinks: any = null;
+        try {
+          AppLinks = require('expo-applinks').default;
+        } catch (e) {
+          // Модуль недоступен (Expo Go или другой окружение без нативного билда)
+          return;
+        }
+        
+        if (!AppLinks) return;
+        
+        const result = await AppLinks.checkForDeferredDeepLink();
         if (!result) return;
 
         const inviterId =
@@ -459,7 +463,7 @@ export default function RootLayout() {
         // ignore
       }
     })();
-  }, [router, savePendingInvite]);
+  }, [router, savePendingInvite, currentUser?.id]);
 
   const lastNotificationCountRef = React.useRef<number>(0);
   const lastMessagesCountRef = React.useRef<number>(0);
