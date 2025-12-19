@@ -6607,6 +6607,46 @@ export default function PlayerProfile() {
             {/* Кнопки редактирования и удаления для администратора */}
             {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
              <SectionCard>
+                {/* Кнопка изменения статуса */}
+                <TouchableOpacity 
+                  style={[styles.adminButton, { backgroundColor: '#6B5B95', marginBottom: 10, alignSelf: 'stretch' }]} 
+                  onPress={() => {
+                    const statuses = [
+                      { key: 'player', label: '🏒 Игрок' },
+                      { key: 'coach', label: '👨‍🏫 Тренер' },
+                      { key: 'star', label: '⭐ Звезда' },
+                      { key: 'scout', label: '🔍 Скаут' },
+                      { key: 'shop', label: '🏪 Магазин' },
+                      { key: 'skateSharpening', label: '⛸️ Заточка' },
+                    ];
+                    Alert.alert(
+                      'Изменить статус',
+                      `Текущий статус: ${player.status}\nВыберите новый статус:`,
+                      [
+                        ...statuses.map(s => ({
+                          text: s.label,
+                          onPress: async () => {
+                            if (s.key === player.status) return;
+                            try {
+                              await updatePlayer(player.id, { status: s.key as any });
+                              Alert.alert('✅', `Статус изменён на "${s.label}"`);
+                              // Обновляем данные игрока
+                              const updated = await getPlayerById(player.id);
+                              if (updated) setPlayer(updated);
+                            } catch (e) {
+                              Alert.alert('Ошибка', 'Не удалось изменить статус');
+                            }
+                          }
+                        })),
+                        { text: 'Отмена', style: 'cancel' }
+                      ]
+                    );
+                  }}
+                >
+                  <Ionicons name="person-circle-outline" size={20} color="#fff" />
+                  <Text style={styles.adminButtonText}>Изменить статус ({player.status})</Text>
+                </TouchableOpacity>
+
                 {/* Кнопка редактирования - на отдельной строке */}
                 <TouchableOpacity 
                   style={[styles.adminButton, styles.editButton, { marginBottom: 10, alignSelf: 'stretch' }]} 
