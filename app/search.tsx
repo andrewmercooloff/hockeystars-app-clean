@@ -966,6 +966,11 @@ export default function SearchScreen() {
                 <Text style={styles.playerName} numberOfLines={1}>
                   {item.name}
                 </Text>
+                {item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 && (
+                  <View style={styles.newBadge}>
+                    <Text style={styles.newBadgeText}>NEW</Text>
+                  </View>
+                )}
                 {item.is_hidden && currentUser?.status === 'admin' && (
                   <Ionicons 
                     name="eye-off-outline" 
@@ -1719,6 +1724,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
     marginLeft: 2,
+  },
+  newBadge: {
+    backgroundColor: '#FF6B00',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  newBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontFamily: 'Gilroy-Bold',
   },
   playerInfo: {
     color: '#ccc',
