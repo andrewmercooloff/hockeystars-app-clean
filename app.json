@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.0.9",
-    "runtimeVersion": "1.0.9",
+    "version": "1.0.10",
+    "runtimeVersion": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
