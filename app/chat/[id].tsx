@@ -1995,7 +1995,7 @@ const styles = StyleSheet.create({
   messagesContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: Platform.OS === 'android' ? 60 : 20, // Еще больше отступ для Android чтобы сообщения не перекрывались
+    paddingBottom: Platform.OS === 'android' ? 120 : 100, // Большой отступ снизу чтобы сообщения не перекрывались полем ввода
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
     // Важно: НЕ прижимаем контент к низу через flex-end,
     // иначе ScrollView может "держать" внизу и мешать читать старые сообщения.
@@ -2004,7 +2004,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingTop: 150, // Отступ сверху для учета заголовка
+    paddingBottom: 100, // Отступ снизу для поля ввода
+    minHeight: 300, // Минимальная высота чтобы контент не обрезался
   },
   emptyContent: {
     backgroundColor: 'rgba(1, 0, 0, 0.8)',

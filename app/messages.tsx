@@ -263,11 +263,11 @@ export default function MessagesScreen() {
       clearTimeout(silentLoadDebounceRef.current);
     }
     silentLoadDebounceRef.current = setTimeout(async () => {
-      try {
-        await loadChatsData();
-      } catch (error) {
-        console.error('❌ Ошибка тихой загрузки чатов:', error);
-      }
+    try {
+      await loadChatsData();
+    } catch (error) {
+      console.error('❌ Ошибка тихой загрузки чатов:', error);
+    }
     }, 500); // 500мс debounce для realtime обновлений
   }, [loadChatsData]);
 
@@ -413,8 +413,14 @@ export default function MessagesScreen() {
       setCurrentScreen('messages');
       // Сразу поднимаем чаты с черновиками, не дожидаясь загрузки диалогов из БД
       applyDraftsToExistingChats();
-
-      loadChats();
+      
+      // Если чаты уже загружены - обновляем в фоне без loading
+      // Если это первая загрузка - показываем loading
+      if (chats.length > 0) {
+        silentLoadChats(); // Фоновое обновление без индикатора загрузки
+      } else {
+        loadChats(); // Первая загрузка с индикатором
+      }
       
       
       // Автоматически скрываем индикатор сообщений через 5 секунд
@@ -432,7 +438,7 @@ export default function MessagesScreen() {
           clearTimeout(autoHideTimeoutRef.current);
         }
       };
-    }, [loadChats, setCurrentScreen, refreshUser, applyDraftsToExistingChats])
+    }, [loadChats, silentLoadChats, chats.length, setCurrentScreen, refreshUser, applyDraftsToExistingChats])
   );
 
   const onRefresh = () => {
