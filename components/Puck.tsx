@@ -14,6 +14,7 @@ interface PuckProps {
   isStar?: boolean;
   status?: string;
   isOnline?: boolean; // статус онлайн пользователя
+  isNew?: boolean; // новый игрок (зарегистрирован < 2 дней назад)
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -25,7 +26,8 @@ const Puck: React.FC<PuckProps> = ({
   points, 
   isStar, 
   status,
-  isOnline = false
+  isOnline = false,
+  isNew = false
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
@@ -187,6 +189,19 @@ const Puck: React.FC<PuckProps> = ({
             }
           ]} />
         )}
+        
+        {/* Бейджик NEW для новых игроков */}
+        {isNew && (
+          <View style={[
+            styles.newBadge,
+            {
+              bottom: size * 0.02,
+              left: size * 0.15,
+            }
+          ]}>
+            <Text style={styles.newBadgeText}>NEW</Text>
+          </View>
+        )}
       </TouchableOpacity>
     </Animated.View>
   );
@@ -291,6 +306,19 @@ const styles = StyleSheet.create({
     borderWidth: 1, // Более тонкая граница для минимализма
     borderColor: '#000',
     zIndex: 10,
+  },
+  newBadge: {
+    position: 'absolute',
+    backgroundColor: '#FF6B00',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+    zIndex: 10,
+  },
+  newBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: 'bold',
   },
 });
 
