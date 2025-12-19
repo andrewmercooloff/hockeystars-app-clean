@@ -7365,7 +7365,7 @@ export const getSmartPlayerSelection = (
     // Они используют свой собственный seed на основе текущего 5-минутного интервала
     // Это создаёт ощущение, что скаут появляется "иногда" независимо от действий пользователя
     const allScouts = visiblePlayers.filter(player => player.status === 'scout');
-    const scoutTimeSeed = Math.floor(Date.now() / (5 * 60 * 1000)); // Меняется каждые 5 минут
+    const scoutTimeSeed = Math.floor(Date.now() / (60 * 60 * 1000)); // Меняется каждый час
     const selectedScouts = allScouts.filter(scout => {
       // Создаем уникальный seed для каждого скаута на основе его ID и ВРЕМЕНИ (не randomSeed!)
       const scoutSeed = `${scout.id}_${scoutTimeSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
