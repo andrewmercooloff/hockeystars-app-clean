@@ -4089,7 +4089,8 @@ export default function PlayerProfile() {
                    player.status === 'scout' ? t('profile.scout') : 
                    player.status === 'admin' ? t('profile.admin') : 
                    player.status === 'shop' ? t('profile.shop') : 
-                   player.status === 'skateSharpening' ? t('profile.skateSharpening') : t('profile.star')}
+                   player.status === 'skateSharpening' ? t('profile.skateSharpening') : 
+                   player.status === 'star' ? t('profile.star') : t('profile.player')}
                 </Text>
               </View>
               {playerTeams.length > 0 && (
