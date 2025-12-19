@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.0.10",
-    "runtimeVersion": "1.0.10",
+    "version": "1.1.0",
+    "runtimeVersion": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -147,7 +147,9 @@
           "microphonePermission": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net"
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-asset",
+      "expo-localization"
     ],
     "notification": {
       "icon": "./assets/images/ic_notification.png",
