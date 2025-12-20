@@ -89,6 +89,46 @@ export default function MessagesScreen() {
         }
       });
       
+      // ОПТИМИЗАЦИЯ: Загружаем все проверки блокировок одним запросом вместо последовательных
+      const userIdsToCheck = userIds.filter(userId => !blockedSet.has(userId));
+      let blockedByThemSet = new Set<string>();
+      
+      if (userIdsToCheck.length > 0) {
+        try {
+          // Загружаем все блокировки одним запросом
+          const { data: blockedData, error: blockedError } = await supabase
+            .from('blocked_users')
+            .select('blocked_id')
+            .eq('blocker_id', currentUser.id)
+            .in('blocked_id', userIdsToCheck);
+          
+          if (!blockedError && blockedData) {
+            // Создаем Set заблокированных пользователей (тех, кто заблокировал текущего)
+            // Нужно проверить обратную связь: кто из userIdsToCheck заблокировал currentUser
+            const { data: reverseBlockedData, error: reverseError } = await supabase
+              .from('blocked_users')
+              .select('blocker_id')
+              .eq('blocked_id', currentUser.id)
+              .in('blocker_id', userIdsToCheck);
+            
+            if (!reverseError && reverseBlockedData) {
+              reverseBlockedData.forEach((item: any) => {
+                blockedByThemSet.add(item.blocker_id);
+              });
+            }
+          }
+        } catch (blockError) {
+          console.warn('⚠️ Ошибка батч-проверки блокировок, используем последовательную проверку:', blockError);
+          // Fallback: последовательная проверка только для оставшихся пользователей
+          const checkPromises = userIdsToCheck.map(async (userId) => {
+            const isBlocked = await isUserBlocked(userId, currentUser.id);
+            return isBlocked ? userId : null;
+          });
+          const blockedIds = (await Promise.all(checkPromises)).filter(Boolean) as string[];
+          blockedIds.forEach(id => blockedByThemSet.add(id));
+        }
+      }
+      
       // Формируем превью чатов
       for (const [otherUserId, messages] of Object.entries(conversations)) {
         if (messages.length > 0) {
@@ -96,7 +136,7 @@ export default function MessagesScreen() {
           // Если текущий пользователь заблокировал другого - показываем (с индикатором)
           // Если другой пользователь заблокировал текущего - скрываем
           const isBlockedByMe = blockedSet.has(otherUserId);
-          const isBlockedByThem = await isUserBlocked(otherUserId, currentUser.id);
+          const isBlockedByThem = blockedByThemSet.has(otherUserId);
           
           // Скрываем, если нас заблокировали
           if (isBlockedByThem) {
@@ -122,11 +162,16 @@ export default function MessagesScreen() {
       }
       
       // Загружаем черновики и добавляем/обновляем чаты с черновиками
+      // ОПТИМИЗАЦИЯ: Обрабатываем черновики батчами для параллельной загрузки
       try {
         const allKeys = await AsyncStorage.getAllKeys();
         const draftKeys = allKeys.filter(key => key.startsWith('chat_draft_'));
 
         const draftPairs = await AsyncStorage.multiGet(draftKeys);
+        
+        // Сначала обрабатываем существующие чаты (быстро, без загрузки игроков)
+        const newDraftChats: Array<{ playerId: string; draftText: string; draftTime: number }> = [];
+        
         for (const [draftKey, draftRaw] of draftPairs) {
           if (draftRaw && draftRaw.trim()) {
             const playerId = draftKey.replace('chat_draft_', '');
@@ -172,24 +217,36 @@ export default function MessagesScreen() {
                 };
               }
             } else {
-              // Чат не существует - создаём новый с черновиком
-              const player = await getPlayerById(playerId);
-              if (player && !blockedSet.has(playerId)) {
-                chatPreviews.push({
-                  player,
-                  lastMessage: {
-                    id: 'draft',
-                    senderId: currentUser.id,
-                    receiverId: playerId,
-                    text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
-                    timestamp: new Date(draftTime),
-                    read: true
-                  },
-                  unreadCount: 0
-                });
-              }
+              // Чат не существует - добавляем в список для параллельной загрузки
+              newDraftChats.push({ playerId, draftText, draftTime });
             }
           }
+        }
+        
+        // ОПТИМИЗАЦИЯ: Загружаем всех игроков для новых черновиков параллельно
+        if (newDraftChats.length > 0) {
+          const draftPlayerIds = newDraftChats.map(d => d.playerId);
+          const draftPlayers = await Promise.all(
+            draftPlayerIds.map(id => getPlayerById(id))
+          );
+          
+          draftPlayers.forEach((player, index) => {
+            const { playerId, draftText, draftTime } = newDraftChats[index];
+            if (player && !blockedSet.has(playerId) && !blockedByThemSet.has(playerId)) {
+              chatPreviews.push({
+                player,
+                lastMessage: {
+                  id: 'draft',
+                  senderId: currentUser.id,
+                  receiverId: playerId,
+                  text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
+                  timestamp: new Date(draftTime),
+                  read: true
+                },
+                unreadCount: 0
+              });
+            }
+          });
         }
       } catch (draftError) {
         console.warn('⚠️ Ошибка загрузки черновиков:', draftError);
@@ -206,6 +263,8 @@ export default function MessagesScreen() {
       });
       
       setChats(chatPreviews);
+      // Отмечаем, что загрузка завершена
+      hasLoadedOnceRef.current = true;
     } catch (error) {
       console.error('❌ Ошибка загрузки чатов:', error);
       // Не показываем ошибку, просто оставляем пустой список
@@ -247,14 +306,28 @@ export default function MessagesScreen() {
   }, [loadChatsData]);
 
   // Запускаем загрузку только когда пользователь авторизован
+  // ОПТИМИЗАЦИЯ: Показываем кешированные данные сразу, затем обновляем
+  const hasLoadedOnceRef = useRef(false);
   useEffect(() => {
     if (currentUser && !isUserLoading) {
-      loadChats();
+      // Если есть кешированные чаты и уже была загрузка - показываем их сразу, затем обновляем
+      if (chats.length > 0 && hasLoadedOnceRef.current) {
+        setLoading(false); // Скрываем loading сразу
+        // Обновляем в фоне
+        loadChatsData().catch(err => {
+          console.error('❌ Ошибка фонового обновления чатов:', err);
+        });
+      } else {
+        // Первая загрузка - показываем loading
+        hasLoadedOnceRef.current = true;
+        loadChats();
+      }
     } else if (!isUserLoading && currentUser === null) {
       // Если загрузка завершена и пользователь не авторизован
       setLoading(false);
+      hasLoadedOnceRef.current = false;
     }
-  }, [currentUser, isUserLoading, loadChats]);
+  }, [currentUser, isUserLoading, loadChats, loadChatsData]);
 
   // Тихая загрузка чатов (без индикатора)
   // Debounced версия для realtime обновлений (предотвращает частые загрузки)

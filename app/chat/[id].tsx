@@ -9,11 +9,13 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
     Dimensions
 } from 'react-native';
@@ -60,6 +62,7 @@ export default function ChatScreen() {
   const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -73,6 +76,7 @@ export default function ChatScreen() {
   const [friendsList, setFriendsList] = useState<Player[]>([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
   const [inputContainerHeight, setInputContainerHeight] = useState(80); // Высота поля ввода
+  const [replyPreviewHeight, setReplyPreviewHeight] = useState(0); // Высота превью ответа
   const messageRefs = useRef<Map<string, View>>(new Map());
   const scrollViewRef = useRef<ScrollView>(null);
   const inputContainerRef = useRef<View>(null);
@@ -87,6 +91,7 @@ export default function ChatScreen() {
   const draftSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isBlockedCheckedRef = useRef<boolean>(false); // Флаг проверки блокировки
   const chatDataLoadedRef = useRef<boolean>(false); // Флаг загрузки данных чата
+  const touchStartYRef = useRef<number | null>(null); // Позиция начала касания для определения тапа/скролла
 
 
   // Функция сохранения черновика (с временем для сортировки)
@@ -171,12 +176,21 @@ export default function ChatScreen() {
     loadChatData();
   }, [id]);
 
+  // Сбрасываем высоту reply preview при его закрытии
+  useEffect(() => {
+    if (!replyingToMessage && replyPreviewHeight > 0) {
+      setReplyPreviewHeight(0);
+    }
+  }, [replyingToMessage, replyPreviewHeight]);
+
   // Слушатель клавиатуры для прокрутки к последнему сообщению
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => {
-        console.log('⌨️ Клавиатура открыта - добавляем paddingBottom: 100');
+      (event) => {
+        const height = event.endCoordinates?.height || 0;
+        console.log('⌨️ Клавиатура открыта - высота:', height);
+        setKeyboardHeight(height);
         setKeyboardVisible(true);
         // Прокручиваем к последнему сообщению при открытии клавиатуры
         setTimeout(() => {
@@ -188,6 +202,7 @@ export default function ChatScreen() {
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
         console.log('⌨️ Клавиатура закрыта - paddingBottom: 20');
+        setKeyboardHeight(0);
         setKeyboardVisible(false);
       }
     );
@@ -214,14 +229,28 @@ export default function ChatScreen() {
   // Убираем прокрутку - контент сразу будет внизу через contentContainerStyle
 
   // Автопрокрутка вниз ТОЛЬКО при первом входе в чат
+  // Используем useLayoutEffect для синхронной прокрутки до отрисовки
+  useLayoutEffect(() => {
+    if (!loading && messages.length > 0 && scrollViewRef.current && isInitialLoadRef.current) {
+      // Прокручиваем синхронно в useLayoutEffect
+      scrollViewRef.current.scrollToEnd({ animated: false });
+      setIsNearBottom(true);
+      wasNearBottomRef.current = true;
+      isInitialLoadRef.current = false;
+    }
+  }, [loading, messages.length, id]);
+  
+  // Дополнительная проверка через useEffect на случай, если useLayoutEffect не сработал
   useEffect(() => {
     if (!loading && messages.length > 0 && scrollViewRef.current && isInitialLoadRef.current) {
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: false });
-        setIsNearBottom(true);
-        wasNearBottomRef.current = true;
-        isInitialLoadRef.current = false;
-      }, Platform.OS === 'android' ? 50 : 0);
+        if (scrollViewRef.current && isInitialLoadRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: false });
+          setIsNearBottom(true);
+          wasNearBottomRef.current = true;
+          isInitialLoadRef.current = false;
+        }
+      }, Platform.OS === 'android' ? 150 : 100);
     }
   }, [loading, messages.length, id]);
 
@@ -727,7 +756,26 @@ export default function ChatScreen() {
           setIsNearBottom(true);
           chatDataLoadedRef.current = true; // Отмечаем, что данные загружены
           lastMessageIdsRef.current = new Set(parsedConversation.map(m => m.id));
-          // useLayoutEffect обработает прокрутку синхронно
+          
+          // Прокручиваем вниз после установки сообщений
+          if (parsedConversation.length > 0 && isInitialLoadRef.current) {
+            // Используем несколько попыток для гарантии прокрутки
+            setTimeout(() => {
+              if (scrollViewRef.current && isInitialLoadRef.current) {
+                scrollViewRef.current.scrollToEnd({ animated: false });
+                setIsNearBottom(true);
+                wasNearBottomRef.current = true;
+              }
+            }, 100);
+            setTimeout(() => {
+              if (scrollViewRef.current && isInitialLoadRef.current) {
+                scrollViewRef.current.scrollToEnd({ animated: false });
+                setIsNearBottom(true);
+                wasNearBottomRef.current = true;
+                isInitialLoadRef.current = false;
+              }
+            }, 300);
+          }
           
           // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
           markMessagesAsRead(userData.id, otherPlayerData.id).catch(err => {
@@ -1473,23 +1521,45 @@ export default function ChatScreen() {
           {/* Сообщения */}
           <KeyboardAvoidingView 
             style={styles.chatContainer} 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 132 : 0}
           >
             <ScrollView 
-              ref={scrollViewRef}
-              style={styles.messagesContainer}
-              contentContainerStyle={[
-                styles.messagesContent,
-                // Просто добавляем отступ снизу когда клавиатура открыта
-                { paddingBottom: keyboardVisible ? 100 : 20 }
-              ]}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              onScrollBeginDrag={() => {
-                // Пользователь начал ручную прокрутку — не вмешиваемся автоскроллом
-                // (флаг "внизу" обновится в onScroll)
-              }}
+                ref={scrollViewRef}
+                style={styles.messagesContainer}
+                contentContainerStyle={[
+                  styles.messagesContent,
+                  // Добавляем достаточный отступ снизу когда клавиатура открыта
+                  // KeyboardAvoidingView уже учитывает высоту клавиатуры на iOS
+                  // Добавляем только высоту поля ввода + высоту reply preview + отступ
+                  { paddingBottom: keyboardVisible 
+                    ? inputContainerHeight + replyPreviewHeight - 60 
+                    : 20 
+                  }
+                ]}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                onTouchStart={(e) => {
+                  // Сохраняем позицию начала касания
+                  touchStartYRef.current = e.nativeEvent.pageY;
+                }}
+                onTouchEnd={(e) => {
+                  // Проверяем, был ли это тап (небольшое перемещение) или скролл
+                  if (touchStartYRef.current !== null) {
+                    const deltaY = Math.abs(e.nativeEvent.pageY - touchStartYRef.current);
+                    // Если перемещение меньше 10px - это тап, закрываем клавиатуру
+                    if (deltaY < 10 && keyboardVisible) {
+                      Keyboard.dismiss();
+                    }
+                    touchStartYRef.current = null;
+                  }
+                }}
+                onScrollBeginDrag={() => {
+                  // Пользователь начал ручную прокрутку — закрываем клавиатуру
+                  Keyboard.dismiss();
+                  touchStartYRef.current = null; // Сбрасываем при скролле
+                  // (флаг "внизу" обновится в onScroll)
+                }}
               onScroll={(event) => {
                 const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
                 const paddingToBottom = 100; // Порог для определения "внизу"
@@ -1554,8 +1624,12 @@ export default function ChatScreen() {
                               activeOpacity={1}
                               onLongPress={() => handleLongPressMessage(message)}
                               delayLongPress={500}
+                              onPress={(e) => {
+                                // Предотвращаем закрытие клавиатуры при нажатии на сообщение
+                                e.stopPropagation();
+                              }}
                             >
-                              <View
+                              <View 
                                 ref={(ref) => {
                                   if (ref) {
                                     messageRefs.current.set(message.id, ref);
@@ -1566,78 +1640,73 @@ export default function ChatScreen() {
                                 style={[
                                   styles.messageContainer,
                                   isMyMessage ? styles.myMessage : styles.otherMessage,
-                                  // Добавляем отступ снизу для последнего сообщения когда клавиатура открыта
-                                  isLastMessageOverall && keyboardVisible && { marginBottom: 100 }
                                 ]}
                               >
-                              <View style={styles.bubbleAndTimeContainer}>
-                                <View style={[
-                                  styles.messageBubble,
-                                  isMyMessage ? styles.myBubble : styles.otherBubble
-                                ]}>
-                                  {/* Превью сообщения, на которое отвечаем */}
-                                  {message.replyToId && message.replyToText && (
-                                    <TouchableOpacity
-                                      activeOpacity={0.7}
-                                      onPress={() => {
-                                        // Прокручиваем к сообщению, на которое отвечаем
-                                        const replyToMessage = messages.find(m => m.id === message.replyToId);
-                                        if (replyToMessage) {
-                                          // Можно добавить подсветку сообщения
-                                          scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-                                        }
-                                      }}
-                                      style={styles.replyPreviewInMessage}
-                                    >
-                                      <View style={[
-                                        styles.replyPreviewLineInMessage,
-                                        isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
-                                      ]} />
-                                      <View style={styles.replyPreviewContentInMessage}>
+                              <View style={[
+                                styles.messageBubble,
+                                isMyMessage ? styles.myBubble : styles.otherBubble
+                              ]}>
+                                {/* Превью сообщения, на которое отвечаем */}
+                                {message.replyToId && message.replyToText && (
+                                  <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={() => {
+                                      // Прокручиваем к сообщению, на которое отвечаем
+                                      const replyToMessage = messages.find(m => m.id === message.replyToId);
+                                      if (replyToMessage) {
+                                        // Можно добавить подсветку сообщения
+                                        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                                      }
+                                    }}
+                                    style={styles.replyPreviewInMessage}
+                                  >
+                                    <View style={[
+                                      styles.replyPreviewLineInMessage,
+                                      isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
+                                    ]} />
+                                    <View style={styles.replyPreviewContentInMessage}>
+                                      <Text style={[
+                                        styles.replyPreviewNameInMessage,
+                                        isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
+                                      ]}>
+                                        {message.replyToSenderId === currentUser.id
+                                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
+                                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
+                                      </Text>
+                                      <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
+                                        {message.replyToText}
+                                      </Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                )}
+                                <View style={styles.messageContentContainer}>
+                                  {message.text.startsWith('[FWD]') ? (
+                                    <View style={styles.forwardedMessageContent}>
+                                      <View style={styles.forwardedHeader}>
+                                        <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
                                         <Text style={[
-                                          styles.replyPreviewNameInMessage,
-                                          isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
-                                        ]}>
-                                          {message.replyToSenderId === currentUser.id
-                                            ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
-                                            : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
-                                        </Text>
-                                        <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
-                                          {message.replyToText}
-                                        </Text>
-                                      </View>
-                                    </TouchableOpacity>
-                                  )}
-                                  <View style={styles.messageContentContainer}>
-                                    {message.text.startsWith('[FWD]') ? (
-                                      <View style={styles.forwardedMessageContent}>
-                                        <View style={styles.forwardedHeader}>
-                                          <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
-                                          <Text style={[
-                                            styles.forwardedSenderName,
-                                            isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                          ]}>
-                                            {message.text.substring(5).split(':\n')[0]}:
-                                          </Text>
-                                        </View>
-                                        <Text style={[
-                                          styles.messageText,
+                                          styles.forwardedSenderName,
                                           isMyMessage ? styles.myMessageText : styles.otherMessageText
                                         ]}>
-                                          {message.text.substring(5).split(':\n').slice(1).join(':\n')}
+                                          {message.text.substring(5).split(':\n')[0]}:
                                         </Text>
                                       </View>
-                                    ) : (
-                                    <Text style={[
-                                      styles.messageText,
-                                      isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                    ]}>
-                                      {message.text}
-                                    </Text>
-                                    )}
-                                  </View>
+                                      <Text style={[
+                                        styles.messageText,
+                                        isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                      ]}>
+                                        {message.text.substring(5).split(':\n').slice(1).join(':\n')}
+                                      </Text>
+                                    </View>
+                                  ) : (
+                                  <Text style={[
+                                    styles.messageText,
+                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                  ]}>
+                                    {message.text}
+                                  </Text>
+                                  )}
                                 </View>
-                                {/* Время и статус вне бабла, чтобы не обрезались */}
                                 <View style={[
                                   styles.messageTimeContainer,
                                   isMyMessage ? styles.myMessageTimeContainer : styles.otherMessageTimeContainer
@@ -1673,6 +1742,11 @@ export default function ChatScreen() {
             <View 
               ref={inputContainerRef}
               style={styles.inputContainer}
+              onStartShouldSetResponder={() => true}
+              onTouchStart={(e) => {
+                // Предотвращаем закрытие клавиатуры при нажатии на поле ввода
+                e.stopPropagation();
+              }}
               onLayout={(event) => {
                 const { height } = event.nativeEvent.layout;
                 if (height > 0) {
@@ -1691,7 +1765,15 @@ export default function ChatScreen() {
             >
               {/* Отображение ответа на сообщение */}
               {replyingToMessage && (
-                <View style={styles.replyPreviewContainer}>
+                <View 
+                  style={styles.replyPreviewContainer}
+                  onLayout={(event) => {
+                    const { height } = event.nativeEvent.layout;
+                    if (height > 0) {
+                      setReplyPreviewHeight(Math.ceil(height));
+                    }
+                  }}
+                >
                   <View style={styles.replyPreviewContent}>
                     <View style={styles.replyPreviewLine} />
                     <View style={styles.replyPreviewTextContainer}>
@@ -1706,7 +1788,10 @@ export default function ChatScreen() {
                     </View>
                   </View>
                   <TouchableOpacity
-                    onPress={() => setReplyingToMessage(null)}
+                    onPress={() => {
+                      setReplyingToMessage(null);
+                      setReplyPreviewHeight(0); // Сбрасываем высоту при закрытии
+                    }}
                     style={styles.replyPreviewClose}
                   >
                     <Ionicons name="close" size={20} color="#fff" />
@@ -2152,13 +2237,8 @@ const styles = StyleSheet.create({
   otherMessage: {
     alignItems: 'flex-start',
   },
-  bubbleAndTimeContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    flexShrink: 0,
-  },
   messageBubble: {
-    maxWidth: '85%', // Увеличиваем до 85% для длинных сообщений
+    maxWidth: '80%',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -2181,10 +2261,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageContentContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    flexWrap: 'nowrap',
+    width: '100%',
   },
   forwardedMessageContent: {
     flexDirection: 'column',
@@ -2205,7 +2285,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     lineHeight: 20,
     flexShrink: 0, // Убираем ограничение, чтобы длинные сообщения показывались полностью
-    marginRight: 6,
+    marginBottom: 4,
   },
   myMessageText: {
     color: '#fff',
@@ -2216,17 +2296,16 @@ const styles = StyleSheet.create({
   messageTimeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 2,
-    paddingHorizontal: 4,
+    marginTop: 2,
     flexShrink: 0,
   },
   myMessageTimeContainer: {
-    marginLeft: 8,
+    justifyContent: 'flex-end',
     alignSelf: 'flex-end',
   },
   otherMessageTimeContainer: {
-    marginRight: 8,
-    alignSelf: 'flex-end',
+    justifyContent: 'flex-start',
+    alignSelf: 'flex-start',
   },
   messageTime: {
     fontSize: 10,
@@ -2247,7 +2326,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
     backgroundColor: 'transparent',
-    // Поле ввода фиксировано внизу, marginBottom на ScrollView создает пространство выше
+    // Поле ввода фиксировано внизу, paddingBottom на ScrollView создает пространство выше
+    // Важно: поле ввода должно быть вне ScrollView, чтобы не перекрывать сообщения
   },
   replyPreviewContainer: {
     flexDirection: 'row',
