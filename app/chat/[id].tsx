@@ -2138,6 +2138,7 @@ const styles = StyleSheet.create({
   messageContainer: {
     marginVertical: 4,
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
+    flexShrink: 0, // Позволяем контейнеру расширяться для длинных сообщений
   },
   myMessage: {
     alignItems: 'flex-end',
@@ -2158,6 +2159,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 2,
+    flexShrink: 0, // Позволяем баблу расширяться по высоте для длинных сообщений
   },
   myBubble: {
     backgroundColor: '#FF4444',
@@ -2191,7 +2193,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     lineHeight: 20,
-    flexShrink: 1,
+    flexShrink: 0, // Убираем ограничение, чтобы длинные сообщения показывались полностью
     marginRight: 6,
   },
   myMessageText: {
