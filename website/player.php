@@ -121,7 +121,7 @@ if ($isAndroid) {
                     
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         await navigator.clipboard.writeText(text);
-                    } else {
+            } else {
                         const ta = document.createElement('textarea');
                         ta.value = text;
                         ta.setAttribute('readonly', '');
@@ -138,9 +138,9 @@ if ($isAndroid) {
                 
                 // If app is installed, try to open it first.
                 tryOpenApp();
-                
+            
                 // Then go to App Store (install)
-                setTimeout(function() {
+            setTimeout(function() {
                     window.location.href = APP_STORE_URL;
                 }, 250);
             };

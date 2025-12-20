@@ -5,6 +5,7 @@ import {
     BackHandler,
     Image,
     ImageBackground,
+    Keyboard,
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -58,6 +59,7 @@ export default function ChatScreen() {
   const [loading, setLoading] = useState(true);
   const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null); // Сообщение, на которое отвечаем
   const [isNearBottom, setIsNearBottom] = useState(true);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -70,8 +72,10 @@ export default function ChatScreen() {
   const [forwardMessage, setForwardMessage] = useState<Message | null>(null);
   const [friendsList, setFriendsList] = useState<Player[]>([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
+  const [inputContainerHeight, setInputContainerHeight] = useState(80); // Высота поля ввода
   const messageRefs = useRef<Map<string, View>>(new Map());
   const scrollViewRef = useRef<ScrollView>(null);
+  const inputContainerRef = useRef<View>(null);
   const lastLoadTimeRef = useRef<number>(0);
   const lastMessageCountRef = useRef<number>(0);
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
@@ -81,6 +85,8 @@ export default function ChatScreen() {
   const wasNearBottomRef = useRef<boolean>(true); // Был ли пользователь внизу перед уходом
   const chatMenuButtonRef = useRef<View>(null);
   const draftSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isBlockedCheckedRef = useRef<boolean>(false); // Флаг проверки блокировки
+  const chatDataLoadedRef = useRef<boolean>(false); // Флаг загрузки данных чата
 
 
   // Функция сохранения черновика (с временем для сортировки)
@@ -153,6 +159,8 @@ export default function ChatScreen() {
     setContextMenuMessage(null);
     messageRefs.current.clear(); // Очищаем refs сообщений
     isInitialLoadRef.current = true; // Сбрасываем флаг при смене чата
+    isBlockedCheckedRef.current = false; // Сбрасываем флаг проверки блокировки
+    chatDataLoadedRef.current = false; // Сбрасываем флаг загрузки данных
     
     // Загружаем черновик для этого чата
     if (id) {
@@ -162,6 +170,33 @@ export default function ChatScreen() {
     wasNearBottomRef.current = true; // Сбрасываем флаг при смене чата
     loadChatData();
   }, [id]);
+
+  // Слушатель клавиатуры для прокрутки к последнему сообщению
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        console.log('⌨️ Клавиатура открыта - добавляем paddingBottom: 100');
+        setKeyboardVisible(true);
+        // Прокручиваем к последнему сообщению при открытии клавиатуры
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, Platform.OS === 'android' ? 150 : 50);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        console.log('⌨️ Клавиатура закрыта - paddingBottom: 20');
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // Обработка автоматической прокрутки при переходе через deep link
   useEffect(() => {
@@ -433,18 +468,21 @@ export default function ChatScreen() {
   }, [currentUser?.id, otherPlayer?.id, id]);
 
   // Функция загрузки сообщений - определена до useFocusEffect чтобы избежать ошибки "Cannot access before initialization"
-  const loadMessages = useCallback(async () => {
+  const loadMessages = useCallback(async (skipBlockCheck = false) => {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
       try {
-        // Проверяем, не заблокировал ли нас другой пользователь
-        const isBlockedByThem = await isUserBlocked(otherPlayer.id, currentUser.id);
-        if (isBlockedByThem) {
-          Alert.alert(
-            t('common.error') || 'Ошибка',
-            'Вы не можете видеть сообщения этого пользователя.'
-          );
-          router.push('/messages');
-          return;
+        // Проверяем блокировку только один раз при первой загрузке
+        if (!skipBlockCheck && !isBlockedCheckedRef.current) {
+          const isBlockedByThem = await isUserBlocked(otherPlayer.id, currentUser.id);
+          isBlockedCheckedRef.current = true;
+          if (isBlockedByThem) {
+            Alert.alert(
+              t('common.error') || 'Ошибка',
+              'Вы не можете видеть сообщения этого пользователя.'
+            );
+            router.push('/messages');
+            return;
+          }
         }
         
         console.log('📨 Загружаем свежие сообщения из БД для чата:', currentUser.id, '<->', otherPlayer.id);
@@ -549,19 +587,25 @@ export default function ChatScreen() {
 
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      // ВАЖНО: При возврате в чат загружаем свежие сообщения
+      // ВАЖНО: При возврате в чат загружаем свежие сообщения только если данные еще не загружены
       // Это нужно, чтобы увидеть сообщения, которые пришли через push-уведомления
       // Используем небольшую задержку, чтобы убедиться, что currentUser и otherPlayer загружены
       const loadMessagesOnFocus = async () => {
+        // Если данные уже загружены через loadChatData, не загружаем повторно
+        if (chatDataLoadedRef.current) {
+          console.log('📱 Чат в фокусе - данные уже загружены, пропускаем повторную загрузку');
+          return;
+        }
+        
         if (currentUser && otherPlayer && otherPlayer.id === id) {
           console.log('📱 Чат в фокусе - загружаем свежие сообщения из БД');
-          await loadMessages();
+          await loadMessages(true); // Пропускаем проверку блокировки, т.к. она уже выполнена
         } else {
           // Если данные еще не загружены, ждем немного и пробуем снова
           setTimeout(() => {
-            if (currentUser && otherPlayer && otherPlayer.id === id) {
+            if (currentUser && otherPlayer && otherPlayer.id === id && !chatDataLoadedRef.current) {
               console.log('📱 Чат в фокусе (повторная попытка) - загружаем свежие сообщения из БД');
-              loadMessages();
+              loadMessages(true);
             }
           }, 300);
         }
@@ -647,13 +691,42 @@ export default function ChatScreen() {
             });
           }
           
+          // Парсим сообщения один раз при загрузке
+          const parsedConversation = conversation.map(msg => {
+            let text = msg.text;
+            let replyToId: string | undefined = msg.replyToId;
+            let replyToText: string | undefined = msg.replyToText;
+            let replyToSenderId: string | undefined = msg.replyToSenderId;
+            
+            if (!replyToId) {
+              const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+              if (replyDataMatch) {
+                try {
+                  const replyData = JSON.parse(replyDataMatch[1]);
+                  if (replyData.replyTo) {
+                    replyToId = replyData.replyTo.id;
+                    replyToText = replyData.replyTo.text;
+                    replyToSenderId = replyData.replyTo.senderId;
+                    text = replyDataMatch[2];
+                  }
+                } catch (e) {
+                  console.error('Ошибка парсинга replyTo данных:', e);
+                }
+              }
+            }
+            
+            return { ...msg, text, replyToId, replyToText, replyToSenderId };
+          });
+          
           // Устанавливаем сообщения
-          console.log(`✅ Загружено ${conversation.length} сообщений в диалоге`);
-          if (conversation.length > 0) {
-            console.log(`📨 Примеры сообщений:`, conversation.slice(0, 3).map(m => ({ id: m.id, text: m.text.substring(0, 30) })));
+          console.log(`✅ Загружено ${parsedConversation.length} сообщений в диалоге`);
+          if (parsedConversation.length > 0) {
+            console.log(`📨 Примеры сообщений:`, parsedConversation.slice(0, 3).map(m => ({ id: m.id, text: m.text.substring(0, 30) })));
           }
-          setMessages(conversation);
+          setMessages(parsedConversation);
           setIsNearBottom(true);
+          chatDataLoadedRef.current = true; // Отмечаем, что данные загружены
+          lastMessageIdsRef.current = new Set(parsedConversation.map(m => m.id));
           // useLayoutEffect обработает прокрутку синхронно
           
           // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
@@ -1406,8 +1479,13 @@ export default function ChatScreen() {
             <ScrollView 
               ref={scrollViewRef}
               style={styles.messagesContainer}
-              contentContainerStyle={styles.messagesContent}
+              contentContainerStyle={[
+                styles.messagesContent,
+                // Просто добавляем отступ снизу когда клавиатура открыта
+                { paddingBottom: keyboardVisible ? 100 : 20 }
+              ]}
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
               onScrollBeginDrag={() => {
                 // Пользователь начал ручную прокрутку — не вмешиваемся автоскроллом
                 // (флаг "внизу" обновится в onScroll)
@@ -1448,7 +1526,7 @@ export default function ChatScreen() {
                     return a.localeCompare(b); // Старые даты вверху
                   });
 
-                  return dateKeys.map(dateKey => (
+                  return dateKeys.map((dateKey, dateIndex) => (
                     <View key={dateKey}>
                       {/* Заголовок даты */}
                       <View style={styles.dateHeader}>
@@ -1456,8 +1534,12 @@ export default function ChatScreen() {
                       </View>
                       
                       {/* Сообщения за этот день */}
-                      {groupedMessages[dateKey].map((message) => {
+                      {groupedMessages[dateKey].map((message, messageIndex) => {
                         const isMyMessage = message.senderId === currentUser.id;
+                        // Определяем, является ли это последним сообщением (последнее в последней группе)
+                        const isLastDateGroup = dateIndex === dateKeys.length - 1;
+                        const isLastMessage = messageIndex === groupedMessages[dateKey].length - 1;
+                        const isLastMessageOverall = isLastDateGroup && isLastMessage;
                         
                         return (
                           <Swipeable
@@ -1483,7 +1565,9 @@ export default function ChatScreen() {
                                 }}
                                 style={[
                                   styles.messageContainer,
-                                  isMyMessage ? styles.myMessage : styles.otherMessage
+                                  isMyMessage ? styles.myMessage : styles.otherMessage,
+                                  // Добавляем отступ снизу для последнего сообщения когда клавиатура открыта
+                                  isLastMessageOverall && keyboardVisible && { marginBottom: 100 }
                                 ]}
                               >
                               <View style={[
@@ -1579,8 +1663,26 @@ export default function ChatScreen() {
               ) : null}
             </ScrollView>
 
-            {/* Поле ввода */}
-            <View style={styles.inputContainer}>
+            {/* Поле ввода - фиксировано внизу */}
+            <View 
+              ref={inputContainerRef}
+              style={styles.inputContainer}
+              onLayout={(event) => {
+                const { height } = event.nativeEvent.layout;
+                if (height > 0) {
+                  // Обновляем высоту сразу при изменении
+                  const newHeight = Math.ceil(height);
+                  if (newHeight !== inputContainerHeight) {
+                    console.log('📏 Высота поля ввода обновлена:', inputContainerHeight, '→', newHeight);
+                    setInputContainerHeight(newHeight);
+                    // Прокручиваем вниз после обновления высоты
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
+                  }
+                }
+              }}
+            >
               {/* Отображение ответа на сообщение */}
               {replyingToMessage && (
                 <View style={styles.replyPreviewContainer}>
@@ -1989,13 +2091,13 @@ const styles = StyleSheet.create({
   messagesContainer: {
     flex: 1,
     paddingTop: 60, // Отступ для фиксированного заголовка
-    paddingBottom: Platform.OS === 'android' ? 30 : 0, // Дополнительный отступ снизу для Android
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
   messagesContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: Platform.OS === 'android' ? 120 : 100, // Большой отступ снизу чтобы сообщения не перекрывались полем ввода
+    // paddingBottom устанавливается динамически в зависимости от состояния клавиатуры
+    // Минимальный отступ 90-100px для поля ввода (включая reply preview)
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
     // Важно: НЕ прижимаем контент к низу через flex-end,
     // иначе ScrollView может "держать" внизу и мешать читать старые сообщения.
@@ -2004,9 +2106,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 150, // Отступ сверху для учета заголовка
-    paddingBottom: 100, // Отступ снизу для поля ввода
-    minHeight: 300, // Минимальная высота чтобы контент не обрезался
+    paddingTop: 100, // Отступ сверху для учета заголовка
+    paddingBottom: 80, // Отступ снизу для поля ввода
+    minHeight: 400, // Минимальная высота чтобы контент не обрезался
   },
   emptyContent: {
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
@@ -2123,6 +2225,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
     backgroundColor: 'transparent',
+    // Поле ввода фиксировано внизу, marginBottom на ScrollView создает пространство выше
   },
   replyPreviewContainer: {
     flexDirection: 'row',

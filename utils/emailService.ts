@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-// Email функции удалены - используется только SMS авторизация
+// SMS провайдеры
 import { sendSMSViaTwilio } from './smsService';
 import { sendVerificationCode as sendTwilioVerify, checkVerificationCode as checkTwilioVerify } from './twilioVerifyService';
 
@@ -186,33 +186,65 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
   }
 };
 
-// Отправка SMS с кодом подтверждения через Twilio Verify API
-// ВАЖНО: Twilio Verify сам генерирует и управляет кодами!
-// Параметр code игнорируется - код генерируется Twilio
+// Проверка СНГ номера (дорогой Verify)
+const isCISNumber = (phone: string): boolean => {
+  const cleaned = phone.replace(/[^\d+]/g, '');
+  const cisCountryCodes = ['+375', '+7', '+380', '+992', '+993', '+994', '+995', '+996', '+998', '+373', '+374'];
+  
+  for (const code of cisCountryCodes) {
+    if (cleaned.startsWith(code)) return true;
+  }
+  
+  // Без + (для России/Беларуси)
+  if (cleaned.startsWith('375') || cleaned.startsWith('7') || cleaned.startsWith('380')) return true;
+  
+  return false;
+};
+
+// Отправка кода подтверждения через Twilio
+// Для СНГ используем Messaging (дешевле ~$0.07), для остальных - Verify
 export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
   try {
-    console.log('📱 Отправляем код подтверждения через Twilio Verify на:', phoneNumber);
+    console.log('📱 Отправляем код подтверждения на:', phoneNumber);
+    
+    // Генерируем код
+    const code = _code || generateVerificationCode();
 
-    // Используем Twilio Verify API - он сам генерирует и отправляет код
+    // ===== СНГ: TWILIO MESSAGING (ДЕШЕВЛЕ ~$0.07 vs $0.50) =====
+    if (isCISNumber(phoneNumber)) {
+      console.log('🇧🇾 СНГ номер - используем Twilio Messaging (дешевле!)');
+      const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
+      if (smsSuccess) {
+        await saveVerificationCode(phoneNumber, code);
+        console.log('✅ Код отправлен через Twilio Messaging');
+        return true;
+      }
+      console.log('⚠️ Twilio Messaging не сработал, пробуем Verify...');
+    }
+
+    // ===== TWILIO VERIFY (для остальных стран) =====
+    console.log('📱 Используем Twilio Verify...');
     const result = await sendTwilioVerify(phoneNumber);
     
     if (result.success) {
       console.log('✅ Код отправлен через Twilio Verify');
-        return true;
-      }
+      return true;
+    }
     
     console.log('⚠️ Twilio Verify не сработал:', result.error);
     
-    // Fallback на обычный SMS если Verify не работает
-    console.log('🔄 Пробуем fallback на обычный Messaging API...');
-    const smsSuccess = await sendSMSViaTwilio(phoneNumber, _code || generateVerificationCode());
+    // ===== TWILIO MESSAGING (SMS FALLBACK) =====
+    console.log('🔄 Пробуем fallback на Twilio Messaging API...');
+    const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
     if (smsSuccess) {
+      // Сохраняем код в БД для проверки
+      await saveVerificationCode(phoneNumber, code);
       return true;
     }
 
-    // Если и SMS не работает, показываем fallback
+    // Если ничего не работает, показываем fallback
     console.log('⚠️ SMS недоступен, показываем fallback');
-    return await sendSMSFallback(phoneNumber, _code || '------');
+    return await sendSMSFallback(phoneNumber, code);
   } catch (error) {
     console.error('❌ Ошибка отправки:', error);
     return await sendSMSFallback(phoneNumber, _code || '------');

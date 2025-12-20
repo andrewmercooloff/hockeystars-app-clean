@@ -242,7 +242,7 @@
             .top-subtitle {
                 font-size: 14px;
                 margin-bottom: 16px;
-            }
+        }
 
             .top-points {
                 gap: 10px;
@@ -286,7 +286,7 @@
             .top-pointsBadge {
                 min-width: 60px;
                 padding: 8px 10px;
-                border-radius: 12px;
+            border-radius: 12px;
             }
 
             .top-pointsValue {
@@ -335,7 +335,7 @@
         <div class="puck puck-6"><div class="puck-avatar"></div></div>
         <div class="puck puck-7"><div class="puck-avatar"></div></div>
         <div class="puck puck-8"><div class="puck-avatar"></div></div>
-    </div>
+        </div>
 
     <header class="header">
         <div class="container">
@@ -522,9 +522,9 @@
                 }
 
                 var players = await response.json();
-
+                
                 var referralMap = new Map();
-
+                
                 for (var i = 0; i < players.length; i++) {
                     var p = players[i];
                     if (!p || !p.invited_by) continue;
@@ -544,38 +544,38 @@
                         if (!inviter) continue;
 
                         entry = {
-                            id: inviterId,
-                            name: inviter.name || 'Unknown',
-                            avatar: inviter.avatar,
-                            status: inviter.status || 'player',
-                            invited_count: 0,
-                            referral_points: 0,
-                            invited_players: 0,
-                            invited_coaches: 0,
+                                    id: inviterId,
+                                    name: inviter.name || 'Unknown',
+                                    avatar: inviter.avatar,
+                                    status: inviter.status || 'player',
+                                    invited_count: 0,
+                                    referral_points: 0,
+                                    invited_players: 0,
+                                    invited_coaches: 0,
                             invited_stars: 0,
                         };
                         referralMap.set(inviterId, entry);
                     }
 
-                    entry.invited_count++;
+                            entry.invited_count++;
                     if (p.status === 'star') {
-                        entry.referral_points += 10;
-                        entry.invited_stars++;
+                                entry.referral_points += 10;
+                                entry.invited_stars++;
                     } else if (p.status === 'coach') {
-                        entry.referral_points += 5;
-                        entry.invited_coaches++;
-                    } else {
-                        entry.referral_points += 1;
-                        entry.invited_players++;
-                    }
+                                entry.referral_points += 5;
+                                entry.invited_coaches++;
+                            } else {
+                                entry.referral_points += 1;
+                                entry.invited_players++;
+                            }
                 }
-
+                
                 var leaderboard = Array.from(referralMap.values())
                     .sort(function(a, b) {
                         return (b.referral_points - a.referral_points) || (b.invited_count - a.invited_count);
                     })
                     .slice(0, 10);
-
+                
                 renderTopLeaderboard(leaderboard);
             } catch (e) {
                 console.error('Top leaderboard error:', e);
@@ -591,7 +591,7 @@
         function renderTopLeaderboard(leaderboard) {
             var root = document.getElementById('top-content');
             if (!root) return;
-
+            
             if (!leaderboard || leaderboard.length === 0) {
                 root.innerHTML =
                     '<div class="top-error" style="color: var(--color-text-gray); border-color: var(--color-border); background: rgba(255,255,255,0.04);">' +
@@ -602,19 +602,19 @@
             }
 
             var medals = ['🥇', '🥈', '🥉'];
-
+            
             var html = '<div class="top-list">';
-
+            
             leaderboard.forEach(function(p, index) {
                 var rank = (index < 3) ? medals[index] : String(index + 1);
-
+                
                 var avatarUrl = p.avatar || ('https://via.placeholder.com/56/333/fff?text=' + encodeURIComponent((p.name || '?').slice(0,1)));
-
+                
                 var meta = '👥 ' + p.invited_count;
                 if (p.invited_stars > 0) meta += ' • ⭐' + p.invited_stars;
                 if (p.invited_coaches > 0) meta += ' • 👨‍🏫' + p.invited_coaches;
                 if (p.invited_players > 0) meta += ' • 🏒' + p.invited_players;
-
+                
                 html +=
                     '<div class="top-row">' +
                         '<div class="top-rank">' + rank + '</div>' +
@@ -629,10 +629,10 @@
                         '</div>' +
                     '</div>';
             });
-
+            
             html += '</div>';
             html += '<div class="top-actions"><button class="top-btn" onclick="loadTopLeaderboard()">🔄 ' + t('top.refresh', 'Обновить') + '</button></div>';
-
+            
             root.innerHTML = html;
         }
 

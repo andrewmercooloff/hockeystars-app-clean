@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   newBadge: {
     position: 'absolute',
-    backgroundColor: '#FF6B00',
+    backgroundColor: '#fa2f40',
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   newBadgeText: {
     color: '#FFFFFF',
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
   },
 });

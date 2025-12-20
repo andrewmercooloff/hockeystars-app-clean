@@ -342,13 +342,13 @@ function detectLanguage(options) {
     const ignoreUrlParam = !!(options && options.ignoreUrlParam);
 
     if (!ignoreUrlParam) {
-        // First, check URL parameter (highest priority)
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlLang = urlParams.get('lang');
-        if (urlLang && (urlLang === 'ru' || urlLang === 'en')) {
-            // Save to localStorage for future visits
-            localStorage.setItem('hockeystars-lang', urlLang);
-            return urlLang;
+    // First, check URL parameter (highest priority)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang && (urlLang === 'ru' || urlLang === 'en')) {
+        // Save to localStorage for future visits
+        localStorage.setItem('hockeystars-lang', urlLang);
+        return urlLang;
         }
     }
 
@@ -922,7 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Single-page (no separate SEO file): translate in-place.
-            setLanguage(newLang);
+                setLanguage(newLang);
 
             // Otherwise stay on the same page and reflect language in URL for sharing.
             try {

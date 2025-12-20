@@ -97,7 +97,8 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   const activeCollisionsRef = useRef<Set<string>>(new Set());
   // Защита от переинициализации в первые секунды после загрузки
   const initializationTimeRef = useRef<number>(0);
-  const INITIALIZATION_PROTECTION_MS = 6000; // 6 секунд защиты - покрывает загрузку пользователя и инициализацию фильтров
+  // ОПТИМИЗАЦИЯ: Уменьшен период защиты с 6000ms до 3000ms для быстрого старта анимации
+  const INITIALIZATION_PROTECTION_MS = 3000; // 3 секунды защиты - покрывает загрузку пользователя и инициализацию фильтров
   
   // Определяем уровень производительности
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
@@ -214,6 +215,9 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       renderPositionsRef.current = [];
       isInitializedRef.current = false;
       sharedPositionsRef.current.clear();
+      // ИСПРАВЛЕНИЕ: Очищаем все рефы для предотвращения "призраков"
+      renderPositionsMapRef.current.clear();
+      activeCollisionsRef.current.clear();
       initializationTimeRef.current = 0;
       return;
     }
@@ -280,6 +284,34 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
           const filtered = prev.filter(pos => currentIds.has(pos.id));
           physicsPositionsRef.current = filtered;
           renderPositionsRef.current = filtered;
+          
+          // ИСПРАВЛЕНИЕ: Очищаем все рефы от удаленных шайб
+          // Это предотвращает столкновения с "призраками" - невидимыми шайбами
+          const removedIds = new Set<string>();
+          Array.from(sharedPositionsRef.current.keys()).forEach(id => {
+            if (!currentIds.has(id)) {
+              sharedPositionsRef.current.delete(id);
+              removedIds.add(id);
+            }
+          });
+          
+          // Очищаем activeCollisionsRef от коллизий с удаленными шайбами
+          if (removedIds.size > 0) {
+            Array.from(activeCollisionsRef.current).forEach(key => {
+              const ids = key.split('-');
+              if (ids.some(id => removedIds.has(id))) {
+                activeCollisionsRef.current.delete(key);
+              }
+            });
+          }
+          
+          // Обновляем renderPositionsMapRef
+          const newMap = new Map<string, PuckPosition>();
+          filtered.forEach(pos => {
+            newMap.set(pos.id, pos);
+          });
+          renderPositionsMapRef.current = newMap;
+          
           return filtered;
         });
         previousPlayersRef.current = players;
@@ -296,14 +328,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         return;
       }
       
-      // В период защиты игнорируем изменения и только добавляем новые шайбы
+      // В период защиты: добавляем новые шайбы И удаляем отфильтрованные
       if (isInProtectionPeriod && currentIds.size > 0) {
         const newPlayerIds = Array.from(currentIds).filter(id => !previousIds.has(id));
-        if (newPlayerIds.length > 0) {
+        const removedPlayerIds = Array.from(previousIds).filter(id => !currentIds.has(id));
+        
+        if (newPlayerIds.length > 0 || removedPlayerIds.length > 0) {
           setPuckPositions(prev => {
-            const existingIds = new Set(prev.map(p => p.id));
-            const newPositions = [...prev];
+            // ИСПРАВЛЕНИЕ: Сначала удаляем шайбы, которых больше нет в списке
+            let newPositions = removedPlayerIds.length > 0 
+              ? prev.filter(pos => currentIds.has(pos.id))
+              : [...prev];
             
+            // Затем добавляем новые шайбы
+            const existingIds = new Set(newPositions.map(p => p.id));
             newPlayerIds.forEach(playerId => {
               if (!existingIds.has(playerId)) {
                 const pos = generatePosition(newPositions);
@@ -314,6 +352,30 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
             
             physicsPositionsRef.current = newPositions;
             renderPositionsRef.current = newPositions;
+            
+            // ИСПРАВЛЕНИЕ: Очищаем все рефы от удаленных шайб
+            if (removedPlayerIds.length > 0) {
+              const removedSet = new Set(removedPlayerIds);
+              removedPlayerIds.forEach(id => {
+                sharedPositionsRef.current.delete(id);
+              });
+              
+              // Очищаем activeCollisionsRef от коллизий с удаленными шайбами
+              Array.from(activeCollisionsRef.current).forEach(key => {
+                const ids = key.split('-');
+                if (ids.some(id => removedSet.has(id))) {
+                  activeCollisionsRef.current.delete(key);
+                }
+              });
+              
+              // Обновляем renderPositionsMapRef
+              const newMap = new Map<string, PuckPosition>();
+              newPositions.forEach(pos => {
+                newMap.set(pos.id, pos);
+              });
+              renderPositionsMapRef.current = newMap;
+            }
+            
             return newPositions;
           });
         }
@@ -362,11 +424,25 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         }
 
         const currentIds = new Set(players.map(p => p.id));
+        
+        // ИСПРАВЛЕНИЕ: Очищаем все рефы от удаленных шайб
+        const removedIds = new Set<string>();
         Array.from(sharedPositionsRef.current.keys()).forEach(id => {
-      if (!currentIds.has(id)) {
-        sharedPositionsRef.current.delete(id);
-      }
+          if (!currentIds.has(id)) {
+            sharedPositionsRef.current.delete(id);
+            removedIds.add(id);
+          }
         });
+        
+        // Очищаем activeCollisionsRef от коллизий с удаленными шайбами
+        if (removedIds.size > 0) {
+          Array.from(activeCollisionsRef.current).forEach(key => {
+            const ids = key.split('-');
+            if (ids.some(id => removedIds.has(id))) {
+              activeCollisionsRef.current.delete(key);
+            }
+          });
+        }
 
         if (!changed) {
           previousPlayersRef.current = players;
@@ -376,11 +452,33 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         physicsPositionsRef.current = newPositions;
         renderPositionsRef.current = newPositions;
         previousPlayersRef.current = players;
+        
+        // Обновляем renderPositionsMapRef
+        const newMap = new Map<string, PuckPosition>();
+        newPositions.forEach(pos => {
+          newMap.set(pos.id, pos);
+        });
+        renderPositionsMapRef.current = newMap;
+        
         return newPositions;
       });
       return;
     }
 
+    // ИСПРАВЛЕНИЕ: Очищаем старые рефы перед инициализацией новых позиций
+    // Это предотвращает "призраков" при полной переинициализации
+    const currentPlayerIds = new Set(players.map(p => p.id));
+    
+    // Очищаем sharedPositionsRef от устаревших записей
+    Array.from(sharedPositionsRef.current.keys()).forEach(id => {
+      if (!currentPlayerIds.has(id)) {
+        sharedPositionsRef.current.delete(id);
+      }
+    });
+    
+    // Очищаем activeCollisionsRef полностью при переинициализации
+    activeCollisionsRef.current.clear();
+    
     const positions: PuckPosition[] = [];
     players.forEach(player => {
       const pos = generatePosition(positions);
@@ -405,12 +503,20 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     renderPositionsRef.current = positions;
     previousPlayersRef.current = players;
     isInitializedRef.current = true;
+    
+    // Обновляем renderPositionsMapRef
+    const newMap = new Map<string, PuckPosition>();
+    positions.forEach(pos => {
+      newMap.set(pos.id, pos);
+    });
+    renderPositionsMapRef.current = newMap;
+    
     // Запоминаем время инициализации для защиты от переинициализации
     if (initializationTimeRef.current === 0) {
       initializationTimeRef.current = Date.now();
-      console.log(`🚀 [ANIMATION] usePuckCollisionSystem: позиции инициализированы для ${puckPositions.length} шайб`);
+      console.log(`🚀 [ANIMATION] usePuckCollisionSystem: позиции инициализированы для ${positions.length} шайб`);
     } else {
-      console.log(`🔄 [ANIMATION] usePuckCollisionSystem: позиции ПЕРЕИНИЦИАЛИЗИРОВАНЫ для ${puckPositions.length} шайб`);
+      console.log(`🔄 [ANIMATION] usePuckCollisionSystem: позиции ПЕРЕИНИЦИАЛИЗИРОВАНЫ для ${positions.length} шайб`);
     }
   }, [players, boundaries, performanceLevel]);
 
@@ -1591,12 +1697,6 @@ export default function HomeScreen() {
       filterInitTimeRef.current = 0;
       setSelectedCountry(null);
       setSelectedYear(null);
-      // Перезагружаем игроков чтобы новый пользователь появился на льду
-      loadAllPlayers(true);
-    } else if (userId && !lastUserIdRef.current) {
-      // Новый пользователь вошёл (регистрация или первый вход) - перезагружаем список
-      console.log('👤 [PLAYERS] Новый пользователь вошёл - перезагружаем список игроков');
-      loadAllPlayers(true);
     } else if (userId && userCountry && lastUserCountryRef.current && userCountry !== lastUserCountryRef.current) {
       // Страна пользователя изменилась в базе данных (для того же userId)
       console.log('🌍 [FILTERS] Страна пользователя изменилась в базе данных:', {
@@ -1612,10 +1712,10 @@ export default function HomeScreen() {
 
     lastUserIdRef.current = userId;
     lastUserCountryRef.current = userCountry;
-  }, [currentUser?.id, currentUser?.country, setSelectedCountry, setSelectedYear, loadAllPlayers]);
+  }, [currentUser?.id, currentUser?.country, setSelectedCountry, setSelectedYear]);
 
-  // Устанавливаем начальные значения фильтров СРАЗУ при первой загрузке
-  // Используем useLayoutEffect для синхронной установки перед отрисовкой
+  // ОПТИМИЗАЦИЯ: Используем useLayoutEffect для синхронной установки перед отрисовкой
+  // Это позволяет показать шайбы быстрее при первой загрузке
   useLayoutEffect(() => {
     // Ждем завершения загрузки пользователя перед инициализацией фильтров
     if (isUserLoading) {
@@ -1628,11 +1728,11 @@ export default function HomeScreen() {
       filtersInitializedRef.current = false;
     }
 
-    // Инициализируем фильтры только один раз при первой загрузке
-    // Переинициализация при изменении страны пользователя обрабатывается в отдельном useEffect выше
-    const shouldInitialize = players.length > 0 &&
-      !filtersInitializedRef.current &&
-      (selectedCountry === null && selectedYear === null);
+    // ОПТИМИЗАЦИЯ: Инициализируем фильтры быстрее - не ждём полной загрузки всех игроков
+    // Достаточно проверить, что initialFilters готовы (вычислены в useMemo)
+    const shouldInitialize = !filtersInitializedRef.current &&
+      (selectedCountry === null && selectedYear === null) &&
+      (players.length > 0 || !currentUser); // Для неавторизованных не ждём игроков
     
     if (shouldInitialize) {
       setSelectedCountry(initialFilters.country);
@@ -1652,6 +1752,9 @@ export default function HomeScreen() {
   useEffect(() => {
     if (params.refresh && currentScreen === 'home') {
       console.log('🔄 Принудительное обновление списка игроков после регистрации');
+      // Сбрасываем фильтры для переинициализации под нового пользователя
+      filtersInitializedRef.current = false;
+      filterInitTimeRef.current = 0;
       loadAllPlayers(true); // Принудительное обновление
     }
   }, [params.refresh, loadAllPlayers, currentScreen]);
@@ -1840,21 +1943,18 @@ export default function HomeScreen() {
     updateSeed();
     scheduleNextUpdate();
     
-    // Загружаем blockedUsers с небольшой задержкой, чтобы не останавливать анимацию при инициализации
-    // Но только если пользователь авторизован
-    let unblockTimeout: ReturnType<typeof setTimeout> | null = null;
+    // ОПТИМИЗАЦИЯ: Убрана задержка загрузки blockedUsers для быстрого старта анимации
+    // Загружаем blockedUsers сразу, но не блокируем анимацию
     if (currentUser?.id) {
-      unblockTimeout = setTimeout(() => {
-      unblockLoadRef.current = true;
-      loadBlockedUsers(true);
-      }, 1000); // Небольшая задержка для авторизованных пользователей
+      // Загружаем в следующем тике event loop, чтобы не блокировать инициализацию
+      Promise.resolve().then(() => {
+        unblockLoadRef.current = true;
+        loadBlockedUsers(true);
+      });
     }
 
     return () => {
       clearTimers();
-      if (unblockTimeout) {
-      clearTimeout(unblockTimeout);
-      }
     };
   }, [loadBlockedUsers, currentUser?.id]);
 
@@ -1893,16 +1993,13 @@ export default function HomeScreen() {
       return [];
     }
 
-    // ВАЖНО: Ждём ПОЛНОЙ инициализации фильтров перед показом шайб
-    // Это предотвращает двойной рендер при авторизации:
-    // 1. Раньше: показ шайб когда initialFilters готовы -> потом ещё раз когда setSelectedCountry/Year вызван
-    // 2. Теперь: ждём пока filtersInitializedRef.current = true (после setSelectedCountry/Year)
-    
+    // ОПТИМИЗАЦИЯ: Показываем шайбы быстрее, не ждём полной инициализации фильтров
+    // Это предотвращает задержку при первой загрузке
     // Для НЕАВТОРИЗОВАННЫХ пользователей: показываем сразу (фильтры = null)
-    // Для АВТОРИЗОВАННЫХ: ждём инициализации фильтров
+    // Для АВТОРИЗОВАННЫХ: показываем как только загрузились игроки и есть initialFilters
     const isAuthorizedUser = !isUserLoading && currentUser;
     const filtersReady = isAuthorizedUser 
-      ? filtersInitializedRef.current // Для авторизованных - ждём полной инициализации
+      ? (players.length > 0 && (filtersInitializedRef.current || initialFilters.country !== null || initialFilters.country === null)) // Показываем если игроки загружены и initialFilters готовы
       : players.length > 0; // Для неавторизованных - показываем сразу как загрузились игроки
     
     if (!filtersReady) {
@@ -1943,10 +2040,11 @@ export default function HomeScreen() {
     
     const lastState = lastFilterStateRef.current;
     
-    // ЗАЩИТА: Игнорируем первое изменение currentUser при инициализации (первые 5 секунд)
+    // ЗАЩИТА: Игнорируем первое изменение currentUser при инициализации (первые 3 секунды)
     // НО: Изменения фильтров по нажатию пользователя ВСЕГДА должны применяться!
     const now = Date.now();
-    const INITIALIZATION_PROTECTION_MS = 5000; // 5 секунд защиты
+    // ОПТИМИЗАЦИЯ: Уменьшен период защиты с 5000ms до 3000ms для быстрого старта анимации
+    const INITIALIZATION_PROTECTION_MS = 3000; // 3 секунды защиты
     
     // Инициализируем время защиты при первой загрузке игроков или пользователя
     if (filterInitTimeRef.current === 0 && (currentFilterState.currentUserId || players.length > 0)) {
@@ -2122,19 +2220,19 @@ export default function HomeScreen() {
   // Перезапускаем анимацию при возвращении на экран
   useFocusEffect(
     useCallback(() => {
-      console.log('🏠 Возвращение на главный экран, перезагрузка игроков');
+      console.log('🏠 Возвращение на главный экран');
       setCurrentScreen('home');
-      // Перезагружаем игроков при возвращении на главный экран (например, после регистрации или изменения профиля)
-      // Используем небольшую задержку, чтобы изменения в профиле успели сохраниться
-        setTimeout(() => {
-        loadAllPlayers();
-      }, 500);
-      // Убрали задержку, чтобы избежать остановки анимации
-      // blockedUsers уже загружаются при монтировании компонента
+      // ОПТИМИЗАЦИЯ: НЕ перезагружаем игроков каждый раз при возврате на экран
+      // Игроки уже загружены при монтировании, перезагрузка происходит только при:
+      // 1. params.refresh (после регистрации)
+      // 2. Realtime событиях (изменение is_hidden и т.д.)
+      // Это убирает задержку 500мс и экономит запросы к БД
+      
+      // blockedUsers загружаем только один раз при первом входе
       if (unblockLoadRef.current && !hasLoadedBlockedInitiallyRef.current) {
         loadBlockedUsers(true);
-            hasLoadedBlockedInitiallyRef.current = true;
-          }
+        hasLoadedBlockedInitiallyRef.current = true;
+      }
       return () => {
         setCurrentScreen(null);
       };

@@ -533,7 +533,8 @@ export default function RegisterScreen() {
     }
 
     // Проверка возраста и родительского согласия для детей < 13 лет
-    if (formData.birthDate && formData.status === 'player') {
+    // ВАЖНО: проверяем для игроков И звёзд (не только player, но и star)
+    if (formData.birthDate && (formData.status === 'player' || formData.status === 'star')) {
       const age = calculateAge(formData.birthDate);
       if (age < 13) {
         if (!formData.parentEmail || !formData.parentEmail.trim()) {
@@ -752,7 +753,8 @@ export default function RegisterScreen() {
       }
       
       // Проверяем возраст для определения необходимости родительского согласия
-      const needsParentalConsent = formData.birthDate && formData.status === 'player' && requiresParentalConsent(formData.birthDate);
+      // ВАЖНО: проверяем для игроков И звёзд (не только player, но и star)
+      const needsParentalConsent = formData.birthDate && (formData.status === 'player' || formData.status === 'star') && requiresParentalConsent(formData.birthDate);
       
       if (needsParentalConsent && formData.parentEmail) {
         // Регистрация ребенка < 13 лет - требуется родительское согласие
@@ -1295,8 +1297,8 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Email родителя - только для детей < 13 лет */}
-          {formData.status === 'player' && formData.birthDate && requiresParentalConsent(formData.birthDate) && (
+          {/* Email родителя - только для детей < 13 лет (игроков и звёзд) */}
+          {(formData.status === 'player' || formData.status === 'star') && formData.birthDate && requiresParentalConsent(formData.birthDate) && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
                 {t('register.parentEmail') || 'Email родителя'} <Text style={{color: '#fa2f40'}}>*</Text>

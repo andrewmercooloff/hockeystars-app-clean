@@ -173,8 +173,8 @@ export default function AchievementsSection({
   const containerStyle = [styles.section, style];
 
   const renderAchievementItem = ({ item: achievement }: { item: Achievement }) => {
-    const medal = getMedalIcon(achievement.place);
-    return (
+            const medal = getMedalIcon(achievement.place);
+            return (
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={() => {
@@ -186,28 +186,28 @@ export default function AchievementsSection({
         }}
         style={styles.achievementMedal}
       >
-        <View style={[styles.medalCircle, { borderColor: medal.color }]}>
-          <Ionicons name={medal.name} size={32} color={medal.color} />
-        </View>
-        <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
-        <Text style={styles.medalYear}>{achievement.year}</Text>
-        <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
-        {isEditing && (
-          <View style={styles.medalEditButtons}>
-            <TouchableOpacity
-              style={styles.medalEditButton}
-              onPress={() => openEditModal(achievement)}
-            >
-              <Ionicons name="create" size={14} color="#FF4444" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.medalDeleteButton}
-              onPress={() => handleDeleteAchievement(achievement.id)}
-            >
-              <Ionicons name="trash" size={14} color="#FF4444" />
-            </TouchableOpacity>
-          </View>
-        )}
+                <View style={[styles.medalCircle, { borderColor: medal.color }]}>
+                  <Ionicons name={medal.name} size={32} color={medal.color} />
+                </View>
+                <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
+                <Text style={styles.medalYear}>{achievement.year}</Text>
+                <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
+                {isEditing && (
+                  <View style={styles.medalEditButtons}>
+                    <TouchableOpacity
+                      style={styles.medalEditButton}
+                      onPress={() => openEditModal(achievement)}
+                    >
+                      <Ionicons name="create" size={14} color="#FF4444" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.medalDeleteButton}
+                      onPress={() => handleDeleteAchievement(achievement.id)}
+                    >
+                      <Ionicons name="trash" size={14} color="#FF4444" />
+                    </TouchableOpacity>
+                  </View>
+                )}
       </TouchableOpacity>
     );
   };
@@ -218,7 +218,7 @@ export default function AchievementsSection({
         <View style={styles.emptyContainer}>
           <Ionicons name="trophy-outline" size={48} color="#666" />
           <Text style={styles.emptyText}>{t('profile.noAchievements') || 'Нет достижений'}</Text>
-        </View>
+              </View>
       ) : (
         <FlatList
           horizontal

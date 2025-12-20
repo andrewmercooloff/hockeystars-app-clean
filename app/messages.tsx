@@ -268,7 +268,7 @@ export default function MessagesScreen() {
     } catch (error) {
       console.error('❌ Ошибка тихой загрузки чатов:', error);
     }
-    }, 500); // 500мс debounce для realtime обновлений
+    }, 150); // Уменьшен debounce до 150мс для быстрого появления чатов
   }, [loadChatsData]);
 
   // Быстро применяем черновики к уже загруженному списку чатов (без ожидания загрузки из БД)

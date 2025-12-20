@@ -1727,7 +1727,7 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   newBadge: {
-    backgroundColor: '#FF6B00',
+    backgroundColor: '#fa2f40',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,

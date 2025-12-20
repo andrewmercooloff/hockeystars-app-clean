@@ -369,7 +369,12 @@ export default function AdminUsersScreen() {
             {/* Table Body */}
             <ScrollView style={styles.tableBody} showsVerticalScrollIndicator={false}>
               {filteredPlayers.map((player, index) => (
-                <View key={player.id} style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}>
+                <TouchableOpacity 
+                  key={player.id} 
+                  style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}
+                  onPress={() => handleViewProfile(player)}
+                  activeOpacity={0.7}
+                >
                   <View style={[styles.cell, styles.cellPhoto]}>
                     <CachedAvatar 
                       playerId={player.id}
@@ -430,7 +435,7 @@ export default function AdminUsersScreen() {
                       <Ionicons name="trash" size={18} color="#FF4444" />
                     </TouchableOpacity>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>

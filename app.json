@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.1.0",
-    "runtimeVersion": "1.1.0",
+    "version": "1.1.2",
+    "runtimeVersion": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,6 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "by.hockeystars.app",
+      "buildNumber": "112",
       "icon": "./assets/images/icon.png",
       "associatedDomains": [
         "applinks:hockey-stars.com"
@@ -44,6 +45,7 @@
         "backgroundColor": "#000000"
       },
       "package": "by.hockeystars.app",
+      "versionCode": 112,
       "intentFilters": [
         {
           "action": "VIEW",
