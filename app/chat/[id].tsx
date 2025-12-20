@@ -1555,7 +1555,7 @@ export default function ChatScreen() {
                               onLongPress={() => handleLongPressMessage(message)}
                               delayLongPress={500}
                             >
-                              <View 
+                              <View
                                 ref={(ref) => {
                                   if (ref) {
                                     messageRefs.current.set(message.id, ref);
@@ -1570,86 +1570,92 @@ export default function ChatScreen() {
                                   isLastMessageOverall && keyboardVisible && { marginBottom: 100 }
                                 ]}
                               >
-                              <View style={[
-                                styles.messageBubble,
-                                isMyMessage ? styles.myBubble : styles.otherBubble
-                              ]}>
-                                {/* Превью сообщения, на которое отвечаем */}
-                                {message.replyToId && message.replyToText && (
-                                  <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={() => {
-                                      // Прокручиваем к сообщению, на которое отвечаем
-                                      const replyToMessage = messages.find(m => m.id === message.replyToId);
-                                      if (replyToMessage) {
-                                        // Можно добавить подсветку сообщения
-                                        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-                                      }
-                                    }}
-                                    style={styles.replyPreviewInMessage}
-                                  >
-                                    <View style={[
-                                      styles.replyPreviewLineInMessage,
-                                      isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
-                                    ]} />
-                                    <View style={styles.replyPreviewContentInMessage}>
-                                      <Text style={[
-                                        styles.replyPreviewNameInMessage,
-                                        isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
-                                      ]}>
-                                        {message.replyToSenderId === currentUser.id
-                                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
-                                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
-                                      </Text>
-                                      <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
-                                        {message.replyToText}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                )}
-                                <View style={styles.messageContentContainer}>
-                                  {message.text.startsWith('[FWD]') ? (
-                                    <View style={styles.forwardedMessageContent}>
-                                      <View style={styles.forwardedHeader}>
-                                        <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
+                              <View style={styles.bubbleAndTimeContainer}>
+                                <View style={[
+                                  styles.messageBubble,
+                                  isMyMessage ? styles.myBubble : styles.otherBubble
+                                ]}>
+                                  {/* Превью сообщения, на которое отвечаем */}
+                                  {message.replyToId && message.replyToText && (
+                                    <TouchableOpacity
+                                      activeOpacity={0.7}
+                                      onPress={() => {
+                                        // Прокручиваем к сообщению, на которое отвечаем
+                                        const replyToMessage = messages.find(m => m.id === message.replyToId);
+                                        if (replyToMessage) {
+                                          // Можно добавить подсветку сообщения
+                                          scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                                        }
+                                      }}
+                                      style={styles.replyPreviewInMessage}
+                                    >
+                                      <View style={[
+                                        styles.replyPreviewLineInMessage,
+                                        isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
+                                      ]} />
+                                      <View style={styles.replyPreviewContentInMessage}>
                                         <Text style={[
-                                          styles.forwardedSenderName,
-                                          isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                          styles.replyPreviewNameInMessage,
+                                          isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
                                         ]}>
-                                          {message.text.substring(5).split(':\n')[0]}:
+                                          {message.replyToSenderId === currentUser.id
+                                            ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
+                                            : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
+                                        </Text>
+                                        <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
+                                          {message.replyToText}
                                         </Text>
                                       </View>
-                                      <Text style={[
-                                        styles.messageText,
-                                        isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                      ]}>
-                                        {message.text.substring(5).split(':\n').slice(1).join(':\n')}
-                                      </Text>
-                                    </View>
-                                  ) : (
-                                  <Text style={[
-                                    styles.messageText,
-                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                  ]}>
-                                    {message.text}
-                                  </Text>
+                                    </TouchableOpacity>
                                   )}
-                                  <View style={styles.messageTimeContainer}>
+                                  <View style={styles.messageContentContainer}>
+                                    {message.text.startsWith('[FWD]') ? (
+                                      <View style={styles.forwardedMessageContent}>
+                                        <View style={styles.forwardedHeader}>
+                                          <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
+                                          <Text style={[
+                                            styles.forwardedSenderName,
+                                            isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                          ]}>
+                                            {message.text.substring(5).split(':\n')[0]}:
+                                          </Text>
+                                        </View>
+                                        <Text style={[
+                                          styles.messageText,
+                                          isMyMessage ? styles.myMessageText : styles.otherMessageText
+                                        ]}>
+                                          {message.text.substring(5).split(':\n').slice(1).join(':\n')}
+                                        </Text>
+                                      </View>
+                                    ) : (
                                     <Text style={[
-                                      styles.messageTime,
-                                      isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                                      styles.messageText,
+                                      isMyMessage ? styles.myMessageText : styles.otherMessageText
                                     ]}>
-                                      {formatTime(message.timestamp)}
+                                      {message.text}
                                     </Text>
-                                    {isMyMessage && (
-                                      <Ionicons
-                                        name={message.read ? "checkmark-done" : "checkmark"}
-                                        size={12}
-                                        color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
-                                        style={styles.readIndicator}
-                                      />
                                     )}
                                   </View>
+                                </View>
+                                {/* Время и статус вне бабла, чтобы не обрезались */}
+                                <View style={[
+                                  styles.messageTimeContainer,
+                                  isMyMessage ? styles.myMessageTimeContainer : styles.otherMessageTimeContainer
+                                ]}>
+                                  <Text style={[
+                                    styles.messageTime,
+                                    isMyMessage ? styles.myMessageTime : styles.otherMessageTime
+                                  ]}>
+                                    {formatTime(message.timestamp)}
+                                  </Text>
+                                  {isMyMessage && (
+                                    <Ionicons
+                                      name={message.read ? "checkmark-done" : "checkmark"}
+                                      size={12}
+                                      color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
+                                      style={styles.readIndicator}
+                                    />
+                                  )}
                                 </View>
                               </View>
                             </View>
@@ -2146,8 +2152,13 @@ const styles = StyleSheet.create({
   otherMessage: {
     alignItems: 'flex-start',
   },
+  bubbleAndTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  },
   messageBubble: {
-    maxWidth: '80%',
+    maxWidth: '85%', // Увеличиваем до 85% для длинных сообщений
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -2206,7 +2217,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 2,
+    paddingHorizontal: 4,
     flexShrink: 0,
+  },
+  myMessageTimeContainer: {
+    marginLeft: 8,
+    alignSelf: 'flex-end',
+  },
+  otherMessageTimeContainer: {
+    marginRight: 8,
+    alignSelf: 'flex-end',
   },
   messageTime: {
     fontSize: 10,
