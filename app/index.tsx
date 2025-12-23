@@ -854,15 +854,35 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   useEffect(() => {
     // Не запускаем анимацию если приложение в фоне или не на главном экране
     if (!appIsActive || !isOnHomeScreen) {
+      if (animationRunningRef.current) {
+        console.log('⏸️ Останавливаем анимацию:', { appIsActive, isOnHomeScreen, hasPucks: hasPucksRef.current });
+      }
       animationRunningRef.current = false;
       return;
     }
 
-    // Если анимация уже запущена, не перезапускаем её
-    if (animationRunningRef.current) {
-      return;
+    // ИСПРАВЛЕНИЕ: Если анимация уже запущена и работает, не перезапускаем её
+    if (animationRunningRef.current && hasPucksRef.current) {
+      return; // Анимация уже запущена и работает
+    }
+    
+    // Если анимация была остановлена, но мы на главном экране и есть шайбы - перезапускаем
+    if (!animationRunningRef.current && hasPucksRef.current && isOnHomeScreen) {
+      console.log('🔄 Возобновляем анимацию шайб после возврата на главный экран:', {
+        appIsActive,
+        isOnHomeScreen,
+        hasPucks: hasPucksRef.current,
+        puckCount: physicsPositionsRef.current.length
+      });
     }
 
+    // Запускаем/возобновляем анимацию
+    console.log('▶️ Запускаем/возобновляем анимацию:', {
+      wasRunning: animationRunningRef.current,
+      appIsActive,
+      isOnHomeScreen,
+      hasPucks: hasPucksRef.current
+    });
     animationRunningRef.current = true;
 
     let animationFrameId: number | null = null;
@@ -1641,7 +1661,7 @@ export default function HomeScreen() {
         }
 
     return { country: defaultCountry, year: defaultYear };
-  }, [players.length, currentUser, isUserLoading]);
+  }, [players.length, currentUser?.id, currentUser?.country, currentUser?.birthDate, currentUser?.status, isUserLoading]);
 
   // Состояние для управления годами рождения
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
@@ -1722,6 +1742,13 @@ export default function HomeScreen() {
       return;
     }
 
+    // ИСПРАВЛЕНИЕ: Если пользователь изменился, сбрасываем флаг инициализации,
+    // чтобы фильтры переинициализировались с новыми значениями из initialFilters
+    if (currentUser?.id && lastUserIdRef.current && lastUserIdRef.current !== currentUser.id) {
+      console.log('🔄 [FILTERS] Пользователь изменился в useLayoutEffect, сбрасываем флаг инициализации');
+      filtersInitializedRef.current = false;
+    }
+
     // Если пользователь загрузился, но фильтры еще не инициализированы, сбрасываем флаг
     // Это позволяет переинициализировать фильтры, если они были установлены как null до загрузки пользователя
     if (currentUser && filtersInitializedRef.current && selectedCountry === null && selectedYear === null && initialFilters.country !== null) {
@@ -1735,12 +1762,27 @@ export default function HomeScreen() {
       (players.length > 0 || !currentUser); // Для неавторизованных не ждём игроков
     
     if (shouldInitialize) {
+      // ИСПРАВЛЕНИЕ: Проверяем, что initialFilters соответствует текущему пользователю
+      // Если страна в initialFilters не совпадает со страной пользователя, значит initialFilters еще не обновился
+      if (currentUser && initialFilters.country && initialFilters.country !== currentUser.country) {
+        console.log(`⚠️ [FILTERS] initialFilters не соответствует текущему пользователю, ждем обновления:`, {
+          initialFiltersCountry: initialFilters.country,
+          userCountry: currentUser.country
+        });
+        return; // Ждем следующего рендера, когда initialFilters обновится
+      }
+      
+      console.log(`🔄 [FILTERS] Инициализируем фильтры для пользователя ${currentUser?.id}:`, {
+        country: initialFilters.country,
+        year: initialFilters.year,
+        userCountry: currentUser?.country
+      });
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
       filtersInitializedRef.current = true;
       console.log(`✅ [FILTERS] Инициализированы: ${initialFilters.country || 'Все'} / ${initialFilters.year || 'Все года'}`);
     }
-  }, [players.length, currentUser, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
+  }, [players.length, currentUser?.id, currentUser?.country, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
 
   // Загружаем игроков при монтировании
   useEffect(() => {
@@ -1758,6 +1800,22 @@ export default function HomeScreen() {
       loadAllPlayers(true); // Принудительное обновление
     }
   }, [params.refresh, loadAllPlayers, currentScreen]);
+
+  // Перезагружаем игроков при смене пользователя (например, после создания нового)
+  // Это важно, чтобы фильтры работали правильно для нового пользователя
+  const lastUserIdForReloadRef = useRef<string | null>(null);
+  useEffect(() => {
+    const currentUserId = currentUser?.id || null;
+    // Если пользователь изменился (не просто загрузился впервые)
+    if (currentUserId && lastUserIdForReloadRef.current && lastUserIdForReloadRef.current !== currentUserId) {
+      console.log('🔄 Пользователь изменился, перезагружаем игроков для обновления фильтров');
+      // Сбрасываем фильтры для переинициализации под нового пользователя
+      filtersInitializedRef.current = false;
+      filterInitTimeRef.current = 0;
+      loadAllPlayers(true); // Принудительное обновление
+    }
+    lastUserIdForReloadRef.current = currentUserId;
+  }, [currentUser?.id, loadAllPlayers]);
 
   const loadBlockedUsers = useCallback(async (force = false) => {
     const userId = currentUser?.id;
@@ -2058,7 +2116,10 @@ export default function HomeScreen() {
     
     // ВАЖНО: Изменения фильтров пользователем ВСЕГДА должны применяться, даже в период защиты!
     // Период защиты только для автоматических изменений (загрузка пользователя, initialFilters)
-    const userChangedFilters = filtersInitializedRef.current && (
+    // ИСПРАВЛЕНИЕ: Убираем проверку filtersInitializedRef.current, чтобы фильтры работали сразу после регистрации
+    // Также проверяем, что фильтры уже были инициализированы хотя бы один раз (lastState не пустой)
+    const filtersWereInitialized = lastState.selectedCountry !== undefined || lastState.selectedYear !== undefined || lastState.playersLength > 0;
+    const userChangedFilters = filtersWereInitialized && (
       currentFilterState.selectedCountry !== lastState.selectedCountry ||
       currentFilterState.selectedYear !== lastState.selectedYear
     );
@@ -2138,15 +2199,24 @@ export default function HomeScreen() {
       console.log(`🎯 [FILTERS] Пользователь изменил фильтры в период защиты - применяем немедленно`);
     }
     
-    // Проверяем все фильтры, включая hiddenChanged (но только вне периода защиты)
+    // ИСПРАВЛЕНИЕ: Если пользователь изменил фильтры вручную, ВСЕГДА применяем изменения,
+    // даже если мы в период защиты. Это критично для работы фильтров после регистрации.
     const filtersChanged = basicFiltersChanged || 
-      (!isInitializationPhase && hiddenChanged);
+      (!isInitializationPhase && hiddenChanged) ||
+      (userChangedFilters && filtersWereInitialized); // Применяем изменения фильтров даже в период защиты, если они были инициализированы
     
     // ЛОГИРОВАНИЕ: Отслеживаем изменения фильтров
-    if (filtersChanged && !isInitializationPhase) {
-      console.log(`🔄 [ANIMATION] Вне периода защиты: фильтры изменились, будет пересчет`);
-      console.log(`   basicFiltersChanged:`, basicFiltersChanged);
-      console.log(`   hiddenChanged:`, hiddenChanged);
+    if (filtersChanged) {
+      if (isInitializationPhase) {
+        console.log(`🔄 [ANIMATION] В период защиты: фильтры изменились, будет пересчет`);
+        console.log(`   userChangedFilters:`, userChangedFilters);
+        console.log(`   filtersWereInitialized:`, filtersWereInitialized);
+        console.log(`   basicFiltersChanged:`, basicFiltersChanged);
+      } else {
+        console.log(`🔄 [ANIMATION] Вне периода защиты: фильтры изменились, будет пересчет`);
+        console.log(`   basicFiltersChanged:`, basicFiltersChanged);
+        console.log(`   hiddenChanged:`, hiddenChanged);
+      }
     }
     
     // Если параметры фильтрации не изменились, возвращаем старую ссылку
@@ -2222,10 +2292,22 @@ export default function HomeScreen() {
     useCallback(() => {
       console.log('🏠 Возвращение на главный экран');
       setCurrentScreen('home');
+      
+      // Если есть параметр refresh, перезагружаем игроков принудительно
+      // Это важно для случая, когда новый пользователь создан и сразу переходит на главный экран
+      if (params.refresh) {
+        console.log('🔄 useFocusEffect: Принудительное обновление списка игроков после регистрации');
+        // Сбрасываем фильтры для переинициализации под нового пользователя
+        filtersInitializedRef.current = false;
+        filterInitTimeRef.current = 0;
+        loadAllPlayers(true); // Принудительное обновление
+      }
+      
       // ОПТИМИЗАЦИЯ: НЕ перезагружаем игроков каждый раз при возврате на экран
       // Игроки уже загружены при монтировании, перезагрузка происходит только при:
       // 1. params.refresh (после регистрации)
       // 2. Realtime событиях (изменение is_hidden и т.д.)
+      // 3. Смене пользователя (обрабатывается в отдельном useEffect)
       // Это убирает задержку 500мс и экономит запросы к БД
       
       // blockedUsers загружаем только один раз при первом входе
@@ -2236,15 +2318,58 @@ export default function HomeScreen() {
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, currentUser?.id, loadBlockedUsers])
+    }, [setCurrentScreen, currentUser?.id, loadBlockedUsers, params.refresh, loadAllPlayers])
   );
 
-  // Realtime подписка на изменения is_hidden для обновления видимости профилей
+  // Realtime подписка на изменения игроков (INSERT, UPDATE, DELETE)
   useEffect(() => {
     if (!currentUser) return;
 
     const channel = supabase
-      .channel('players-visibility-updates')
+      .channel('players-realtime-updates')
+      // Обработка INSERT - создание нового игрока
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'players'
+        },
+        async (payload) => {
+          const newPlayerData = payload.new as any;
+          const playerId = newPlayerData.id;
+          const isHidden = newPlayerData.is_hidden ?? false;
+          
+          console.log(`🆕 Realtime: Новый игрок создан: ${playerId}, is_hidden: ${isHidden}`);
+          
+          // Очищаем кеш всех игроков
+          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          AsyncStorage.removeItem('all_players').catch(err => {
+            console.error('❌ Ошибка очистки кеша all_players:', err);
+          });
+          
+          // Если игрок не скрыт, загружаем его и добавляем в список
+          if (!isHidden) {
+            try {
+              const allPlayers = await loadPlayers(false);
+              const newPlayer = allPlayers.find(p => p.id === playerId);
+              if (newPlayer && !newPlayer.is_hidden) {
+                setPlayers((prev) => {
+                  const exists = prev.find(p => p.id === playerId);
+                  if (!exists) {
+                    console.log(`✅ Realtime: Добавлен новый игрок в список: ${newPlayer.name}`);
+                    return [...prev, newPlayer];
+                  }
+                  return prev;
+                });
+              }
+            } catch (error) {
+              console.error('❌ Ошибка загрузки нового игрока:', error);
+            }
+          }
+        }
+      )
+      // Обработка UPDATE - обновление существующего игрока
       .on(
         'postgres_changes',
         {
@@ -2301,6 +2426,38 @@ export default function HomeScreen() {
               
               // Если игрок скрыт и его нет в списке, не добавляем его
               return currentPlayers;
+            });
+          }
+        }
+      )
+      // Обработка DELETE - удаление игрока
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'players'
+        },
+        (payload) => {
+          const oldPlayerData = payload.old as any;
+          const playerId = oldPlayerData?.id;
+          
+          if (playerId) {
+            console.log(`🗑️ Realtime: Игрок удален: ${playerId}`);
+            
+            // Очищаем кеш всех игроков
+            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+            AsyncStorage.removeItem('all_players').catch(err => {
+              console.error('❌ Ошибка очистки кеша all_players:', err);
+            });
+            
+            // Удаляем игрока из списка
+            setPlayers((prev) => {
+              const filtered = prev.filter(p => p.id !== playerId);
+              if (filtered.length !== prev.length) {
+                console.log(`✅ Realtime: Игрок удален из списка: ${playerId}`);
+              }
+              return filtered;
             });
           }
         }

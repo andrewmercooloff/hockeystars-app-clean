@@ -31,7 +31,16 @@ const translations = {
         'download.description': 'Установите HockeyStars на свое устройство и присоединяйтесь к хоккейному сообществу!',
         'download.appstore.label': 'Скачать в',
         'download.playstore.label': 'Скачать в',
+        'download.android.label': 'Скачать для',
         'install.open': 'Открыть / Установить',
+        'tester.modal.title': 'Стать тестировщиком',
+        'tester.modal.description': 'Введите ваш email Google, чтобы получить доступ к тестовой версии приложения для Android.',
+        'tester.form.email': 'Email Google аккаунта:',
+        'tester.form.submit': 'Отправить',
+        'tester.form.loading': 'Отправка...',
+        'tester.form.success': 'Спасибо! Ваш email добавлен в список тестировщиков. Ссылка на скачивание будет отправлена на ваш email.',
+        'tester.form.error': 'Произошла ошибка. Пожалуйста, попробуйте еще раз или свяжитесь с нами: support@hockey-stars.com',
+        'tester.form.validation': 'Пожалуйста, введите корректный email адрес.',
         'footer.copyright': '© 2025 HockeyStars. Все права защищены.',
         'footer.privacy': 'Политика конфиденциальности',
         'footer.deleteAccount': 'Удаление аккаунта',
@@ -168,7 +177,16 @@ const translations = {
         'download.description': 'Install HockeyStars on your device and join the hockey community!',
         'download.appstore.label': 'Download on',
         'download.playstore.label': 'Get it on',
+        'download.android.label': 'Download for',
         'install.open': 'Open / Install',
+        'tester.modal.title': 'Become a Tester',
+        'tester.modal.description': 'Enter your Google email to get access to the Android test version of the app.',
+        'tester.form.email': 'Google Account Email:',
+        'tester.form.submit': 'Submit',
+        'tester.form.loading': 'Submitting...',
+        'tester.form.success': 'Thank you! Your email has been added to the tester list. A download link will be sent to your email.',
+        'tester.form.error': 'An error occurred. Please try again or contact us: support@hockey-stars.com',
+        'tester.form.validation': 'Please enter a valid email address.',
         'footer.copyright': '© 2025 HockeyStars. All rights reserved.',
         'footer.privacy': 'Privacy Policy',
         'footer.deleteAccount': 'Delete Account',
@@ -966,5 +984,149 @@ document.addEventListener('DOMContentLoaded', () => {
     //     .catch(error => console.error('Error loading avatars:', error));
 
     initContactForm();
+    initAndroidTesterForm();
 });
+
+// Android Tester Modal Functions
+function openAndroidTesterModal() {
+    const modal = document.getElementById('androidTesterModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        // Focus on email input
+        setTimeout(() => {
+            const emailInput = document.getElementById('testerEmail');
+            if (emailInput) {
+                emailInput.focus();
+            }
+        }, 100);
+    }
+}
+
+function closeAndroidTesterModal() {
+    const modal = document.getElementById('androidTesterModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        // Reset form
+        const form = document.getElementById('androidTesterForm');
+        if (form) {
+            form.reset();
+        }
+        const status = document.getElementById('testerStatus');
+        if (status) {
+            status.style.display = 'none';
+            status.className = 'tester-status';
+        }
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('androidTesterModal');
+    if (event.target === modal) {
+        closeAndroidTesterModal();
+    }
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('androidTesterModal');
+        if (modal && modal.style.display === 'block') {
+            closeAndroidTesterModal();
+        }
+    }
+});
+
+function initAndroidTesterForm() {
+    const form = document.getElementById('androidTesterForm');
+    if (!form) {
+        return;
+    }
+
+    const emailInput = document.getElementById('testerEmail');
+    const statusEl = document.getElementById('testerStatus');
+    const submitBtn = form.querySelector('.btn-submit');
+
+    const setStatus = (message, type = '') => {
+        if (!statusEl) {
+            return;
+        }
+        statusEl.textContent = message;
+        statusEl.className = `tester-status ${type}`;
+        statusEl.style.display = type ? 'block' : 'none';
+    };
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = emailInput?.value.trim();
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            setStatus(
+                getTranslationValue('tester.form.validation', 'Please enter a valid email address.'),
+                'error'
+            );
+            return;
+        }
+
+        try {
+            setStatus(
+                getTranslationValue('tester.form.loading', 'Submitting...'),
+                'loading'
+            );
+            submitBtn.disabled = true;
+
+            const response = await fetch('/add-tester.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    lang: currentLanguage
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+
+            setStatus(
+                getTranslationValue(
+                    'tester.form.success',
+                    'Thank you! Your email has been added to the tester list. A download link will be sent to your email.'
+                ),
+                'success'
+            );
+
+            // Reset form after success
+            form.reset();
+
+            // Close modal after 3 seconds
+            setTimeout(() => {
+                closeAndroidTesterModal();
+                // Start download
+                window.location.href = 'https://hockey-stars.com/hockeystars.apk';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Failed to submit tester form', error);
+            setStatus(
+                getTranslationValue(
+                    'tester.form.error',
+                    'An error occurred. Please try again or contact us: support@hockey-stars.com'
+                ),
+                'error'
+            );
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+}
 

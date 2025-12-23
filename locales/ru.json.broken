@@ -607,7 +607,7 @@
     "login": "Выход на лед",
     "register": "Регистрация",
     "phone": "Телефон",
-    "phonePlaceholder": "+375296549728",
+    "phonePlaceholder": "+1234567890",
     "phoneHint": "Введите номер телефона с кодом страны",
     "code": "Код подтверждения",
     "codePlaceholder": "Введите код",

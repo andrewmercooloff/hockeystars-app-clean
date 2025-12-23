@@ -937,51 +937,53 @@ export default function RegisterScreen() {
       
       const newPlayer = await createPlayer(playerData);
       
-      if (newPlayer) {
-        console.log('✅ Игрок создан, полученные данные:', {
-          id: newPlayer.id,
-          name: newPlayer.name,
-          status: newPlayer.status,
-          avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
-        });
+      // ИСПРАВЛЕНИЕ: Если игрок не был создан (ошибка или null), не продолжаем регистрацию
+      if (!newPlayer) {
+        console.error('❌ Игрок не был создан, прерываем регистрацию');
+        // Ошибка уже обработана в createPlayer и выброшена, попадет в catch блок
+        throw new Error('PLAYER_CREATION_FAILED');
       }
       
-      const playerToSave = newPlayer || playerData;
+      console.log('✅ Игрок создан, полученные данные:', {
+        id: newPlayer.id,
+        name: newPlayer.name,
+        status: newPlayer.status,
+        avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
+      });
       
-      if (playerToSave) {
-        // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
-        // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
-        try {
-          const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
-          if (pendingRaw) {
-            try {
-              const parsed = JSON.parse(pendingRaw);
-              const inviterId = parsed?.inviterId as string | undefined;
-              const ts = parsed?.ts as number | undefined;
-              const ageMs = ts ? (Date.now() - ts) : 0;
-              const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
+      // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
+      // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
+      try {
+        const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+        if (pendingRaw) {
+          try {
+            const parsed = JSON.parse(pendingRaw);
+            const inviterId = parsed?.inviterId as string | undefined;
+            const ts = parsed?.ts as number | undefined;
+            const ageMs = ts ? (Date.now() - ts) : 0;
+            const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
 
-              if (inviterId && inviterId !== playerToSave.id && (ageMs === 0 || ageMs < MAX_AGE_MS)) {
-                await setInvitedBy(playerToSave.id, inviterId);
-              }
-            } catch {
-              // ignore parse errors
+            if (inviterId && inviterId !== newPlayer.id && (ageMs === 0 || ageMs < MAX_AGE_MS)) {
+              await setInvitedBy(newPlayer.id, inviterId);
             }
-            await AsyncStorage.removeItem(PENDING_INVITE_KEY);
+          } catch {
+            // ignore parse errors
           }
-        } catch (e) {
-          console.warn('⚠️ [REFERRAL] pending invite apply failed:', e);
+          await AsyncStorage.removeItem(PENDING_INVITE_KEY);
         }
+      } catch (e) {
+        console.warn('⚠️ [REFERRAL] pending invite apply failed:', e);
+      }
 
-        await saveCurrentUser(playerToSave);
-        
-        // Обновляем контекст пользователя для немедленного обновления интерфейса
-        try {
-          await refreshUser(true); // forceRefresh = true
-          console.log('✅ Контекст пользователя обновлен после регистрации');
-        } catch (contextError) {
-          console.warn('⚠️ Не удалось обновить контекст пользователя:', contextError);
-        }
+      // ИСПРАВЛЕНИЕ: Сохраняем только реально созданного игрока, а не данные из формы
+      await saveCurrentUser(newPlayer);
+      
+      // Обновляем контекст пользователя для немедленного обновления интерфейса
+      try {
+        await refreshUser(true); // forceRefresh = true
+        console.log('✅ Контекст пользователя обновлен после регистрации');
+      } catch (contextError) {
+        console.warn('⚠️ Не удалось обновить контекст пользователя:', contextError);
       }
       
       showAlert(
@@ -999,6 +1001,16 @@ export default function RegisterScreen() {
       
     } catch (error: any) {
       console.error('❌ Ошибка регистрации:', error);
+      
+      // ИСПРАВЛЕНИЕ: Если игрок не был создан, не сохраняем пользователя и не обновляем контекст
+      if (error.message === 'PLAYER_CREATION_FAILED') {
+        // Это означает, что createPlayer вернул null, но не выбросил конкретную ошибку
+        // Показываем общую ошибку
+        showAlert(t('common.error'), t('register.registrationFailed') || 'Ошибка регистрации', 'error');
+        setLoading(false);
+        return;
+      }
+      
       // Проверяем, является ли это ошибкой о существующем номере телефона
       if (error.message === 'PHONE_ALREADY_EXISTS' || 
           error.message?.includes('уже зарегистрирован') || 

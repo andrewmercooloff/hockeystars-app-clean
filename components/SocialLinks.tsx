@@ -37,24 +37,35 @@ export default function SocialLinks({ instagram, tiktok, website, onMessagePress
 
   const handleLinkPress = async (url: string, platform: string) => {
     try {
-      // Добавляем протокол, если его нет
-      let formattedUrl = url;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        if (platform === 'website') {
-          formattedUrl = `https://${url}`;
+      // Нормализуем URL: удаляем пробелы в начале и конце
+      let formattedUrl = url.trim();
+      
+      if (platform === 'website') {
+        // Для website ссылок нормализуем протокол
+        if (!formattedUrl.match(/^https?:\/\//i)) {
+          // Если протокола нет, добавляем https://
+          formattedUrl = `https://${formattedUrl}`;
         } else {
-          // Для социальных сетей добавляем соответствующие префиксы
-          switch (platform) {
-            case 'instagram':
-              formattedUrl = `https://instagram.com/${url.replace('@', '').replace('instagram.com/', '')}`;
-              break;
-            case 'tiktok':
-              formattedUrl = `https://tiktok.com/@${url.replace('@', '').replace('tiktok.com/@', '')}`;
-              break;
-            default:
-              formattedUrl = `https://${url}`;
-          }
+          // Если протокол есть, нормализуем его регистр (https:// в нижнем регистре)
+          formattedUrl = formattedUrl.replace(/^https?:\/\//i, 'https://');
         }
+      } else if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        // Для социальных сетей добавляем соответствующие префиксы
+        switch (platform) {
+          case 'instagram':
+            formattedUrl = `https://instagram.com/${formattedUrl.replace('@', '').replace('instagram.com/', '')}`;
+            break;
+          case 'tiktok':
+            // TikTok ссылки чувствительны к регистру, преобразуем в нижний регистр
+            const tiktokUsername = formattedUrl.replace('@', '').replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/i, '').toLowerCase();
+            formattedUrl = `https://tiktok.com/@${tiktokUsername}`;
+            break;
+          default:
+            formattedUrl = `https://${formattedUrl}`;
+        }
+      } else {
+        // Если протокол уже есть, нормализуем его регистр
+        formattedUrl = formattedUrl.replace(/^https?:\/\//i, (match) => match.toLowerCase());
       }
 
       const supported = await Linking.canOpenURL(formattedUrl);

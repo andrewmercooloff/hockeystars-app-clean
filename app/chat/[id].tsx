@@ -1455,7 +1455,7 @@ export default function ChatScreen() {
   return (
     <View style={styles.container}>
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
-        <View style={styles.overlay}>
+          <View style={styles.overlay}>
           {/* Заголовок чата */}
           <BlurView
             intensity={20}

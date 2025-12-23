@@ -2797,9 +2797,9 @@ export default function PlayerProfile() {
         weight: editData.weight !== undefined ? editData.weight : player.weight,
         number: editData.number !== undefined ? editData.number : player.number,
         instagram: editData.instagram !== undefined ? editData.instagram : player.instagram,
-        tiktok: editData.tiktok !== undefined ? editData.tiktok : player.tiktok,
+        tiktok: editData.tiktok !== undefined ? editData.tiktok.toLowerCase() : (player.tiktok ? player.tiktok.toLowerCase() : player.tiktok),
         vk: editData.vk !== undefined ? editData.vk : player.vk,
-        website: editData.website !== undefined ? editData.website : player.website,
+        website: editData.website !== undefined ? editData.website.trim().replace(/^https?:\/\//i, (match) => match.toLowerCase()) : (player.website ? player.website.trim().replace(/^https?:\/\//i, (match) => match.toLowerCase()) : player.website),
         experience: editData.experience !== undefined ? editData.experience : player.experience,
         hockeyStartDate: editData.hockeyStartDate !== undefined ? editData.hockeyStartDate : player.hockeyStartDate,
         goals: editData.goals !== undefined ? editData.goals : player.goals,
@@ -5352,17 +5352,29 @@ export default function PlayerProfile() {
                     <TextInput
                       style={styles.editInput}
                       value={editData.tiktok !== undefined ? editData.tiktok : (player.tiktok || '')}
-                      onChangeText={(text) => setEditData({...editData, tiktok: text})}
+                      onChangeText={(text) => {
+                        // TikTok ссылки чувствительны к регистру, преобразуем в нижний регистр
+                        const normalizedText = text.toLowerCase();
+                        setEditData({...editData, tiktok: normalizedText});
+                      }}
                       placeholder={t('socialLinks.tiktokPlaceholder')}
                       placeholderTextColor="#888"
                     />
-            </View>
+                  </View>
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('socialLinks.website')}</Text>
                     <TextInput
                       style={styles.editInput}
                       value={editData.website !== undefined ? editData.website : (player.website || '')}
-                      onChangeText={(text) => setEditData({...editData, website: text})}
+                      onChangeText={(text) => {
+                        // Нормализуем website ссылку: удаляем пробелы и нормализуем протокол
+                        let normalizedText = text.trim();
+                        // Если есть протокол, нормализуем его регистр
+                        if (normalizedText.match(/^https?:\/\//i)) {
+                          normalizedText = normalizedText.replace(/^https?:\/\//i, (match) => match.toLowerCase());
+                        }
+                        setEditData({...editData, website: normalizedText});
+                      }}
                       placeholder={t('socialLinks.websitePlaceholder')}
                       placeholderTextColor="#888"
                     />

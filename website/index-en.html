@@ -121,16 +121,15 @@
                             <span class="download-btn-name">App Store</span>
                         </div>
                     </a>
-                    <span class="download-btn playstore disabled" aria-label="Available from 20.12">
+                    <button type="button" class="download-btn playstore" onclick="openAndroidTesterModal()" aria-label="Download APK for Android">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                         </svg>
                         <div class="download-btn-text">
-                            <span class="download-btn-label" data-i18n="download.playstore.label">Download from</span>
-                            <span class="download-btn-name">Google Play</span>
-                            <span class="download-btn-coming-soon">Available from 20.12</span>
+                            <span class="download-btn-label" data-i18n="download.android.label">Download for</span>
+                            <span class="download-btn-name">Android</span>
                         </div>
-                    </span>
+                    </button>
                 </div>
                 <p class="hero-subtitle" data-i18n="hero.subtitle">Where every player becomes a star!</p>
                 <p class="hero-description" data-i18n="hero.description">
@@ -312,16 +311,15 @@
                             <span class="download-btn-name">App Store</span>
                         </div>
                     </a>
-                    <span class="download-btn playstore disabled" aria-label="Available from 20.12">
+                    <button type="button" class="download-btn playstore" onclick="openAndroidTesterModal()" aria-label="Download APK for Android">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                         </svg>
                         <div class="download-btn-text">
-                            <span class="download-btn-label" data-i18n="download.playstore.label">Download from</span>
-                            <span class="download-btn-name">Google Play</span>
-                            <span class="download-btn-coming-soon">Available from 20.12</span>
+                            <span class="download-btn-label" data-i18n="download.android.label">Download for</span>
+                            <span class="download-btn-name">Android</span>
                         </div>
-                    </span>
+                    </button>
                 </div>
             </section>
         </div>
@@ -339,6 +337,25 @@
             </div>
         </div>
     </footer>
+
+    <!-- Android Tester Modal -->
+    <div id="androidTesterModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAndroidTesterModal()">&times;</span>
+            <h2 data-i18n="tester.modal.title">Become a Tester</h2>
+            <p data-i18n="tester.modal.description">Enter your Google email to get access to the Android test version of the app.</p>
+            <form id="androidTesterForm" class="tester-form">
+                <div class="form-group">
+                    <label for="testerEmail" data-i18n="tester.form.email">Google Account Email:</label>
+                    <input type="email" id="testerEmail" name="email" required placeholder="example@gmail.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn-submit" data-i18n="tester.form.submit">Submit</button>
+                </div>
+                <div id="testerStatus" class="tester-status"></div>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

@@ -14,14 +14,6 @@
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-  <uses-feature android:name="android.hardware.camera" android:required="false"/>
-  <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
-  <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
-  <uses-feature android:name="android.hardware.microphone" android:required="false"/>
-  <uses-feature android:name="android.hardware.audio.output" android:required="false"/>
-  <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-  <uses-feature android:name="android.software.leanback" android:required="false"/>
-  <uses-feature android:name="android.hardware.wifi" android:required="false"/>
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW"/>
@@ -39,7 +31,7 @@
     <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="@string/expo_runtime_version"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
-    <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustPan" android:theme="@style/Theme.App.SplashScreen" android:exported="true">
+    <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode|locale|layoutDirection" android:launchMode="singleTask" android:windowSoftInputMode="adjustPan" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
@@ -50,6 +42,12 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="hockeystars"/>
         <data android:scheme="exp+hockeystars"/>
+      </intent-filter>
+      <intent-filter android:autoVerify="true" data-generated="true">
+        <action android:name="android.intent.action.VIEW"/>
+        <data android:scheme="https" android:host="hockey-stars.com" android:pathPrefix="/player"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
   </application>

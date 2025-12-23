@@ -1897,6 +1897,20 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     // Получаем старые данные игрока для отслеживания изменений
     const oldPlayer = await getPlayerById(playerId);
     
+    // Нормализуем TikTok ссылку в нижний регистр (TikTok чувствителен к регистру)
+    if (updateData.tiktok !== undefined && updateData.tiktok) {
+      updateData.tiktok = updateData.tiktok.toLowerCase();
+    }
+    
+    // Нормализуем website ссылку: удаляем пробелы и нормализуем протокол
+    if (updateData.website !== undefined && updateData.website) {
+      updateData.website = updateData.website.trim();
+      // Нормализуем протокол: если есть http:// или https://, приводим к https://
+      if (updateData.website.match(/^https?:\/\//i)) {
+        updateData.website = updateData.website.replace(/^https?:\/\//i, 'https://');
+      }
+    }
+    
     // Конвертируем данные в формат Supabase
     const supabaseData = convertPlayerToSupabase(updateData as Player);
     
@@ -4362,7 +4376,8 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
         console.log('⚠️ Обнаружен дубликат телефона');
         throw new Error('PHONE_ALREADY_EXISTS');
       }
-      return null;
+      // ИСПРАВЛЕНИЕ: Выбрасываем ошибку вместо возврата null, чтобы она была обработана в catch
+      throw new Error(`PLAYER_CREATION_FAILED: ${error.message || 'Unknown error'}`);
     }
     
     if (!data) {
@@ -4430,7 +4445,13 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
     
   } catch (error) {
     console.error('❌ Ошибка создания игрока:', error);
-    return null;
+    // ИСПРАВЛЕНИЕ: Пробрасываем ошибку дальше, чтобы она была обработана в register.tsx
+    // Особенно важно для PHONE_ALREADY_EXISTS, чтобы пользователь не сохранялся
+    if (error instanceof Error && error.message === 'PHONE_ALREADY_EXISTS') {
+      throw error; // Пробрасываем ошибку о дубликате телефона
+    }
+    // Для других ошибок также выбрасываем, чтобы не сохранять пользователя
+    throw new Error(`PLAYER_CREATION_FAILED: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -6514,7 +6535,8 @@ export const notifyFriendsAboutExercise = async (
                 type: 'exercise_completed',
                 player_id: playerId,
                 exercise_id: exerciseId,
-                action: 'open_exercise'
+                action: 'open_exercise',
+                deepLink: `/player/${playerId}?scrollToExercises=true`
               }
             );
             

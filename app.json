@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.1.4",
-    "runtimeVersion": "1.1.4",
+    "version": "1.1.5",
+    "runtimeVersion": "1.1.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "by.hockeystars.app",
-      "buildNumber": "114",
+      "buildNumber": "115",
       "icon": "./assets/images/icon.png",
       "associatedDomains": [
         "applinks:hockey-stars.com"
@@ -32,20 +32,49 @@
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleLocalizations": [
+          "ru",
+          "en",
+          "lt",
+          "lv",
+          "pl",
+          "sv",
+          "cs",
+          "sk",
+          "fi",
+          "it",
+          "de",
+          "fr"
+        ],
         "NSMicrophoneUsageDescription": "This app uses the microphone to measure puck speed by detecting the sound of a puck hitting the net. For example, when you shoot a puck at the net, the app records the sound and calculates the speed based on the time between the shot and the impact sound.",
         "NSCameraUsageDescription": "This app uses the camera to measure puck speed by detecting motion through the camera frame. For example, when you shoot a puck, the app tracks the puck's movement in the video frame and calculates its speed based on the distance traveled and time elapsed.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile photos, team photos, and achievement photos. For example, you can select a photo from your library to set as your profile picture or add photos to your achievements gallery.",
         "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your library. For example, you can save achievement photos or team photos to your device's photo library.",
         "NSLocationWhenInUseUsageDescription": "This app does not directly use location services. However, some third-party libraries integrated for analytics or crash reporting may request location permissions. If prompted, you can deny this permission as it is not required for the app's core functionality."
-      }
+      },
+      "locales": [
+        "ru",
+        "en",
+        "lt",
+        "lv",
+        "pl",
+        "sv",
+        "cs",
+        "sk",
+        "fi",
+        "it",
+        "de",
+        "fr"
+      ]
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/icon_android.png",
+        "backgroundColor": "#000000",
+        "monochromeImage": "./assets/icon_android.png"
       },
       "package": "by.hockeystars.app",
-      "versionCode": 114,
+      "versionCode": 115,
       "intentFilters": [
         {
           "action": "VIEW",
@@ -96,7 +125,21 @@
       "userInterfaceStyle": "dark",
       "statusBar": {
         "style": "dark"
-      }
+      },
+      "locales": [
+        "ru",
+        "en",
+        "lt",
+        "lv",
+        "pl",
+        "sv",
+        "cs",
+        "sk",
+        "fi",
+        "it",
+        "de",
+        "fr"
+      ]
     },
     "web": {
       "favicon": "./assets/images/splash-icon.png",

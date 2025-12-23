@@ -1277,8 +1277,12 @@ export default function NotificationsScreen() {
         }
       } else if (notification.type === 'exercise_completed') {
         // Для уведомлений о выполненных упражнениях переходим в профиль игрока в раздел упражнений
-        if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToExercises=true`);
+        const playerId = notification.data?.playerId || notification.playerId;
+        if (playerId) {
+          console.log('🔗 Навигация к профилю игрока с выполненным упражнением:', playerId);
+          router.push(`/player/${playerId}?scrollToExercises=true`);
+        } else {
+          console.warn('⚠️ Не удалось определить ID игрока для уведомления о выполненном упражнении');
         }
       } else if (notification.type === 'achievement') {
         // Для уведомлений о достижениях показываем достижения

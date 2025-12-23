@@ -1,15 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
+    <item name="android:enforceNavigationBarContrast" tools:targetApi="29">true</item>
     <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="android:statusBarColor">#050008</item>
-    <!-- Навигационная панель - тёмная под дизайн приложения -->
-    <item name="android:navigationBarColor">#000000</item>
-    <item name="android:windowTranslucentNavigation">false</item>
-    <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
-    <!-- Edge-to-edge для современных Android -->
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28">shortEdges</item>
   </style>
   <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen">
     <item name="windowSplashScreenBackground">@color/splashscreen_background</item>

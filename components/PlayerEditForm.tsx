@@ -338,7 +338,11 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
           <TextInput
             style={styles.input}
             value={editData.tiktok || ''}
-            onChangeText={(text) => setEditData({...editData, tiktok: text})}
+            onChangeText={(text) => {
+              // TikTok ссылки чувствительны к регистру, преобразуем в нижний регистр
+              const normalizedText = text.toLowerCase();
+              setEditData({...editData, tiktok: normalizedText});
+            }}
             placeholder={t('socialLinks.tiktokPlaceholder')}
             placeholderTextColor="#666"
           />
@@ -360,7 +364,15 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
           <TextInput
             style={styles.input}
             value={editData.website || ''}
-            onChangeText={(text) => setEditData({...editData, website: text})}
+            onChangeText={(text) => {
+              // Нормализуем website ссылку: удаляем пробелы и нормализуем протокол
+              let normalizedText = text.trim();
+              // Если есть протокол, нормализуем его регистр
+              if (normalizedText.match(/^https?:\/\//i)) {
+                normalizedText = normalizedText.replace(/^https?:\/\//i, (match) => match.toLowerCase());
+              }
+              setEditData({...editData, website: normalizedText});
+            }}
             placeholder={t('socialLinks.websitePlaceholder')}
             placeholderTextColor="#666"
           />
