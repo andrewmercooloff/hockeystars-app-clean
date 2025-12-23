@@ -7307,293 +7307,323 @@ export const getSmartPlayerSelection = (
   randomSeed?: number // Добавляем seed для детерминированного рандома
 ): Player[] => {
   try {
-    // 0. Фильтруем скрытые профили (кроме текущего пользователя, если он скрыт)
+    // 0. Константы
+    const MAX_BASE_PLAYERS = 21; // Базовый максимум (до скаута)
+    const MAX_TOTAL_WITH_SCOUT = 22; // Максимум с учетом скаута
+
+    // 1. Фильтруем скрытые профили (кроме текущего пользователя и админов)
     const visiblePlayers = players.filter(player => {
       if (player.is_hidden) {
-        // Скрытый профиль показываем:
-        // 1. Всегда администраторам
-        if (currentUserStatus === 'admin') {
-          return true;
-        }
-        // 2. Самому владельцу профиля
+        if (currentUserStatus === 'admin') return true;
         return currentUserId && player.id === currentUserId;
       }
       return true;
     });
-    
-    // 1. Разделяем не-игроков на категории
-    // Администраторы всегда показываются везде
-    const admins = visiblePlayers.filter(player => player.status === 'admin');
-    
-    // Звезды и скауты - показываем рандомно (обрабатываются отдельно)
-    // Скауты показываются во всех странах независимо от фильтра, но с вероятностью 25% (1 к 4)
-    // Звезды показываются всегда (если проходят фильтр по стране)
-    
-    // Если randomSeed не передан или равен 0, используем текущее время для разнообразия
+
+    // 2. Вспомогательные функции
+    const hashString = (str: string) =>
+      str.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
     const effectiveSeed = randomSeed !== undefined && randomSeed !== 0
-      ? randomSeed 
-      : Date.now() % 1000000; // Используем миллисекунды для разнообразия
-    
-    // Отдельно обрабатываем звезд
-    const stars = visiblePlayers.filter(player => {
-      if (player.status !== 'star') return false;
-      
-      // Звезды фильтруются по стране, если выбран фильтр
-      if (selectedCountry) {
-        return player.country === selectedCountry;
+      ? randomSeed
+      : Date.now() % 1000000;
+
+    const getRandomOrderValue = (id: string, tag: string) => {
+      const seed = hashString(`${id}_${tag}_${effectiveSeed}`);
+      return Math.sin(seed * 1.7) * 0.5 + 0.5; // 0..1
+    };
+
+    const pickRandom = (list: Player[], count: number, tag: string, used: Set<string>): Player[] => {
+      const available = list.filter(p => !used.has(p.id));
+      if (available.length === 0 || count <= 0) return [];
+      return [...available]
+        .sort((a, b) => getRandomOrderValue(a.id, tag) - getRandomOrderValue(b.id, tag))
+        .slice(0, count);
+    };
+
+    const matchesCountry = (p: Player) =>
+      !selectedCountry || p.country === selectedCountry;
+
+    const matchesYearForPlayer = (p: Player) =>
+      !selectedYear ||
+      (p.birthDate && p.birthDate.startsWith(selectedYear.toString()));
+
+    const matchesYearForCoach = (p: Player) => {
+      if (!selectedYear) return true;
+      if (p.coach_years && p.coach_years.length > 0) {
+        return p.coach_years.includes(selectedYear);
       }
       return true;
-    });
-    
-    // Отдельно обрабатываем скаутов с вероятностью 25% (1 к 4)
-    // Скауты показываются во всех странах независимо от фильтра
-    // ВАЖНО: Скауты НЕ зависят от randomSeed (встряска не влияет на них)
-    // Они используют свой собственный seed на основе текущего 5-минутного интервала
-    // Это создаёт ощущение, что скаут появляется "иногда" независимо от действий пользователя
-    const allScouts = visiblePlayers.filter(player => player.status === 'scout');
-    const scoutTimeSeed = Math.floor(Date.now() / (60 * 60 * 1000)); // Меняется каждый час
+    };
+
+    const result: Player[] = [];
+    const usedIds = new Set<string>();
+
+    const addToResult = (player: Player | null | undefined) => {
+      if (!player) return;
+      if (usedIds.has(player.id)) return;
+      if (result.length >= MAX_BASE_PLAYERS) return;
+      result.push(player);
+      usedIds.add(player.id);
+    };
+
+    // 3. Базовые группы по фильтрам
+    const filteredPlayers = visiblePlayers.filter(p =>
+      p.status === 'player' && matchesCountry(p) && matchesYearForPlayer(p)
+    );
+
+    // Админы: всегда, независимо от фильтров страны/года
+    const allAdmins = visiblePlayers.filter(
+      p => p.status === 'admin'
+    );
+
+    const allStars = visiblePlayers.filter(
+      p => p.status === 'star' && matchesCountry(p)
+    );
+
+    const allShops = visiblePlayers.filter(
+      p => p.status === 'shop' && matchesCountry(p)
+    );
+
+    const allSharpenings = visiblePlayers.filter(
+      p => p.status === 'skateSharpening' && matchesCountry(p)
+    );
+
+    const allCoaches = visiblePlayers.filter(
+      p => p.status === 'coach' && matchesCountry(p) && matchesYearForCoach(p)
+    );
+
+    // Скауты по старой логике (25% раз в час, независимо от фильтра)
+    const allScouts = visiblePlayers.filter(p => p.status === 'scout');
+    const scoutTimeSeed = Math.floor(Date.now() / (60 * 60 * 1000));
     const selectedScouts = allScouts.filter(scout => {
-      // Создаем уникальный seed для каждого скаута на основе его ID и ВРЕМЕНИ (не randomSeed!)
-      const scoutSeed = `${scout.id}_${scoutTimeSeed}_scout`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      // Используем синус для получения значения от -1 до 1, затем преобразуем в вероятность
-      const randomValue = Math.sin(scoutSeed * 1.5) * 0.5 + 0.5; // От 0 до 1
-      // 25% вероятность показать скаута (1 к 4)
+      const scoutSeed = hashString(`${scout.id}_${scoutTimeSeed}_scout`);
+      const randomValue = Math.sin(scoutSeed * 1.5) * 0.5 + 0.5;
       return randomValue <= 0.25;
     });
-    
-    // Остальные не-игроки (магазины, заточка коньков) - БЕЗ тренеров (они обрабатываются отдельно)
-    const otherNonPlayers = visiblePlayers.filter(player => {
-      const isOtherNonPlayer = player.status === 'shop' || 
-        player.status === 'skateSharpening';
-      
-      if (!isOtherNonPlayer) return false;
-      
-      // Если выбран фильтр по стране, фильтруем
-      if (selectedCountry) {
-        return player.country === selectedCountry;
-      }
-      
-      return true;
-    });
-    
-    // Отдельно обрабатываем тренеров с особой логикой
-    const allCoaches = visiblePlayers.filter(player => {
-      if (player.status !== 'coach') return false;
-      
-      // Если выбран фильтр по стране, фильтруем
-      if (selectedCountry && player.country !== selectedCountry) {
-        return false;
-      }
-      
-      return true;
-    });
-    
-    // Выбираем тренеров для показа (максимум 5 рандомных)
-    const maxCoaches = 5;
-    
-    // Фильтруем тренеров по году, если год выбран
-    let eligibleCoaches = allCoaches;
-    if (selectedYear) {
-      eligibleCoaches = allCoaches.filter(coach => {
-        if (coach.coach_years && coach.coach_years.length > 0) {
-          return coach.coach_years.includes(selectedYear);
+
+    // 4. Специальный режим для стран с малым количеством игроков:
+    // Если выбрана страна и в ней всего 1–3 не-админов (любого статуса),
+    // мы ВСЕГДА добавляем их в результат до любой рандомной логики.
+    if (selectedCountry) {
+      const smallCountryPlayers = visiblePlayers.filter(
+        p => p.country === selectedCountry && p.status !== 'admin'
+      );
+
+      if (smallCountryPlayers.length > 0 && smallCountryPlayers.length <= 3) {
+        if (__DEV__) {
+          console.log('🌍 [SMART] Маленькая страна, фиксируем всех игроков страны:', {
+            selectedCountry,
+            count: smallCountryPlayers.length,
+            players: smallCountryPlayers.map(p => ({
+              id: p.id,
+              name: p.name,
+              status: p.status,
+              country: p.country,
+            })),
+          });
         }
-        // Если годы не указаны - показываем везде (обратная совместимость)
-        return true;
-      });
+        // Приоритет: player -> coach -> star -> shop -> skateSharpening
+        const priority: Record<string, number> = {
+          player: 0,
+          coach: 1,
+          star: 2,
+          shop: 3,
+          skateSharpening: 4,
+        };
+
+        const sortedSmall = [...smallCountryPlayers].sort((a, b) => {
+          const pa = priority[a.status] ?? 100;
+          const pb = priority[b.status] ?? 100;
+          if (pa !== pb) return pa - pb;
+          return getRandomOrderValue(a.id, 'small-country') - getRandomOrderValue(b.id, 'small-country');
+        });
+
+        sortedSmall.forEach(addToResult);
+      }
     }
-    
-      // Текущий пользователь-тренер всегда видит себя
-    const currentUserCoach = currentUserId ? eligibleCoaches.find(c => c.id === currentUserId) : null;
-    const otherCoaches = eligibleCoaches.filter(c => c.id !== currentUserId);
-      
-      // Перемешиваем других тренеров детерминированно
-      const shuffledOtherCoaches = [...otherCoaches].sort((a, b) => {
-        const seedA = `${a.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const seedB = `${b.id}_${effectiveSeed}_coach`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const randomA = Math.sin(seedA * 1.5);
-        const randomB = Math.sin(seedB * 1.5);
-        return randomA - randomB;
-      });
-      
-    // Выбираем до 5 рандомных тренеров
-      // Если текущий пользователь - тренер, берем его + до 4 других
-    let selectedCoaches: Player[] = [];
-      if (currentUserCoach) {
-        const otherCoachesToShow = shuffledOtherCoaches.slice(0, maxCoaches - 1);
-        selectedCoaches = [currentUserCoach, ...otherCoachesToShow];
-      } else {
-        selectedCoaches = shuffledOtherCoaches.slice(0, maxCoaches);
+
+    // 5. 1) Сам игрок (если он player и подходит под фильтры)
+    const selfPlayer =
+      currentUserId &&
+      filteredPlayers.find(p => p.id === currentUserId) ||
+      null;
+    addToResult(selfPlayer || null);
+
+    // 6. 2) Админ (один, подходящий под страну)
+    if (allAdmins.length > 0) {
+      const admin = [...allAdmins].sort((a, b) => a.id.localeCompare(b.id))[0];
+      addToResult(admin);
     }
-    
-    // Перемешиваем звезд отдельно и берем до 3
-    const starsShuffled = [...stars].sort((a, b) => {
-      const seedA = `${a.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const seedB = `${b.id}_${effectiveSeed}`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const randomA = Math.sin(seedA * 1.5);
-      const randomB = Math.sin(seedB * 1.5);
-      return randomA - randomB;
+
+    // 7. 3) Три случайных игрока (из всех, подходящих под фильтры)
+    pickRandom(filteredPlayers, 3, 'players', usedIds).forEach(addToResult);
+
+    // 8. 4) Три случайных новичка (из последних 10 по дате регистрации)
+    const sortedByCreated = [...filteredPlayers].filter(p => p.createdAt).sort((a, b) => {
+      const aTime = new Date(a.createdAt || '').getTime() || 0;
+      const bTime = new Date(b.createdAt || '').getTime() || 0;
+      return bTime - aTime;
     });
-    const limitedStars = starsShuffled.slice(0, 3);
-    
-    // Перемешиваем скаутов отдельно (используем scoutTimeSeed, чтобы не зависеть от встряски)
-    const scoutsShuffled = [...selectedScouts].sort((a, b) => {
-      const seedA = `${a.id}_${scoutTimeSeed}_scout_sort`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const seedB = `${b.id}_${scoutTimeSeed}_scout_sort`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const randomA = Math.sin(seedA * 1.5);
-      const randomB = Math.sin(seedB * 1.5);
-      return randomA - randomB;
-    });
-    
-    // Сначала берем звезд (до 3), затем добавляем скаутов отдельно (если есть место)
-    const maxTotal = 5;
-    const starsCount = limitedStars.length;
-    const remainingSlotsForScouts = Math.max(0, maxTotal - starsCount);
-    const limitedScouts = scoutsShuffled.slice(0, remainingSlotsForScouts);
-    
-    // Объединяем звезд и скаутов (не перемешивая их между собой)
-    const limitedStarsAndScouts = [...limitedStars, ...limitedScouts];
+    const last10 = sortedByCreated.slice(0, 10);
+    pickRandom(last10, 3, 'newcomers', usedIds).forEach(addToResult);
 
-    // 2. Фильтруем игроков по стране и году
-    const filteredPlayers = visiblePlayers.filter(player => {
-      if (player.status !== 'player') return false;
-      
-      // Фильтр по стране
-      const matchesCountry = !selectedCountry || player.country === selectedCountry;
-      
-      // Фильтр по году
-      const matchesYear = !selectedYear || 
-        (player.birthDate && player.birthDate.startsWith(selectedYear.toString()));
-      
-      return matchesCountry && matchesYear;
-    });
-
-    // 3. Всегда показываем текущего пользователя (если он игрок)
-    const currentUser = currentUserId ? filteredPlayers.find(p => p.id === currentUserId) : null;
-    const otherPlayers = filteredPlayers.filter(p => p.id !== currentUserId);
-
-    // 4. Новички (зарегистрировались в последние 5 дней) - до 5 человек
-    // ВАЖНО: новички берутся из filteredPlayers, чтобы учитывать фильтры по стране и году
-    // Но они всегда имеют приоритет и показываются независимо от рейтинга
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-    
-    const newcomers = otherPlayers
-      .filter(player => {
-        if (!player.createdAt) return false;
-        const createdAt = new Date(player.createdAt);
-        return createdAt >= fiveDaysAgo;
-      })
-      .sort((a, b) => {
-        // Сортируем по дате создания (новые сначала)
-        const dateA = new Date(a.createdAt || 0);
-        const dateB = new Date(b.createdAt || 0);
-        return dateB.getTime() - dateA.getTime();
-      })
-      .slice(0, 5); // Берем только 5 новичков
-
-    // 5. Топ игроки: случайные 5 из первых 20 по рейтингу активности
-    // Сначала берём топ-20 по рейтингу
-    const top20ByRating = otherPlayers
-      .filter(player => !newcomers.some(n => n.id === player.id)) // Исключаем новичков
+    // 9. 5) Три случайных лидера по рейтингу (из топ‑10 по activityRating)
+    const top10ByRating = [...filteredPlayers]
       .sort((a, b) => (b.activityRating || 0) - (a.activityRating || 0))
-      .slice(0, 20);
-    
-    // Затем случайно выбираем 5 из них (детерминированный рандом)
-    const topPlayersSeed = randomSeed !== undefined && randomSeed !== 0
-      ? randomSeed 
-      : `${selectedCountry || 'all'}_${selectedYear || 'all'}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    
-    const topPlayers = top20ByRating
-      .sort((a, b) => {
-        const seedA = `${a.id}_${topPlayersSeed}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const seedB = `${b.id}_${topPlayersSeed}_top`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const valueA = Math.sin(seedA * 2.3) * 0.5 + 0.5;
-        const valueB = Math.sin(seedB * 2.3) * 0.5 + 0.5;
-        return valueA - valueB;
-      })
-      .slice(0, 5);
+      .slice(0, 10);
+    pickRandom(top10ByRating, 3, 'leaders', usedIds).forEach(addToResult);
 
-    // 6. Оставшиеся игроки для случайного выбора
-    const remainingPlayers = otherPlayers.filter(player => 
-      !newcomers.some(n => n.id === player.id) && 
-      !topPlayers.some(t => t.id === player.id)
-    );
+    // 10. 6) Три случайных тренера
+    // 10. 6) Три случайных тренера
+    pickRandom(allCoaches, 3, 'coaches', usedIds).forEach(addToResult);
 
-    // 7. Случайные игроки (могут заполнить все оставшиеся места до MAX_PLAYERS)
-    // Используем детерминированный рандом на основе seed для стабильности между пересчетами
-    // НЕ ограничиваем здесь - ограничение будет применено позже на основе оставшихся мест
-    const effectiveRandomSeed = randomSeed !== undefined && randomSeed !== 0
-          ? randomSeed 
-          : `${selectedCountry || 'all'}_${selectedYear || 'all'}_random`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    
-    const randomPlayers = remainingPlayers
-      .sort((a, b) => {
-        // Детерминированный рандом на основе seed И id игрока
-        // Каждый игрок получает уникальное значение, которое меняется при изменении seed
-        const seedA = `${a.id}_${effectiveRandomSeed}_rnd`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const seedB = `${b.id}_${effectiveRandomSeed}_rnd`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const valueA = Math.sin(seedA * 1.7) * 0.5 + 0.5;
-        const valueB = Math.sin(seedB * 1.7) * 0.5 + 0.5;
-        return valueA - valueB;
+    // 11. 7) Три случайных звезды
+    pickRandom(allStars, 3, 'stars', usedIds).forEach(addToResult);
+
+    // 12. 8) Два случайных магазина
+    pickRandom(allShops, 2, 'shops', usedIds).forEach(addToResult);
+
+    // 13. 9) Две случайные заточки коньков
+    pickRandom(allSharpenings, 2, 'sharpen', usedIds).forEach(addToResult);
+
+    // 14. Дозаполнение до MAX_BASE_PLAYERS (если не хватило) любыми игроками,
+    // соответствующими фильтрам, с приоритетом player, затем coach/star/shop/skateSharpening.
+    if (result.length < MAX_BASE_PLAYERS) {
+      const remainingPool = visiblePlayers.filter(p => {
+        if (usedIds.has(p.id)) return false;
+        // Игроки должны соответствовать стране/году, прочие — только стране
+        if (p.status === 'player') {
+          return matchesCountry(p) && matchesYearForPlayer(p);
+        }
+        if (p.status === 'coach') {
+          return matchesCountry(p) && matchesYearForCoach(p);
+        }
+        if (p.status === 'star' || p.status === 'shop' || p.status === 'skateSharpening' || p.status === 'admin') {
+          return matchesCountry(p);
+        }
+        // скауты сюда не попадают, их обрабатываем отдельно
+        return false;
       });
 
-    // 8. Максимальное количество игроков для отображения (применяется к фильтру)
-    const MAX_PLAYERS = 23; // 20 + 3 дополнительных случайных игрока
+      // Сортируем по статусу приоритета и детерминированному рандому
+      const priorityOrder: Record<string, number> = {
+        admin: 0,
+        player: 1,
+        coach: 2,
+        star: 3,
+        shop: 4,
+        skateSharpening: 5,
+      };
 
-    // 9. Определяем постоянных игроков с приоритетами (в порядке важности)
-    // Порядок важен: сначала самые важные, потом менее важные
-    const permanentPlayers: Player[] = [];
-    
-    // 9.1. Администраторы (всегда в первую очередь)
-    // admins уже объявлен выше, просто используем его
-    permanentPlayers.push(...admins);
-    
-    // 9.2. Текущий пользователь (если он игрок)
-    if (currentUser) {
-      permanentPlayers.push(currentUser);
+      const sortedRemaining = [...remainingPool].sort((a, b) => {
+        const pa = priorityOrder[a.status] ?? 100;
+        const pb = priorityOrder[b.status] ?? 100;
+        if (pa !== pb) return pa - pb;
+        return getRandomOrderValue(a.id, 'fill') - getRandomOrderValue(b.id, 'fill');
+      });
+
+      for (const p of sortedRemaining) {
+        if (result.length >= MAX_BASE_PLAYERS) break;
+        addToResult(p);
+      }
     }
-    
-    // 9.3. Новички (приоритетные игроки)
-    permanentPlayers.push(...newcomers);
-    
-    // 9.4. Топ игроки (по рейтингу)
-    permanentPlayers.push(...topPlayers);
-    
-    // 9.5. Остальные не-игроки (магазины, заточка коньков)
-    // otherNonPlayers уже объявлен выше, просто используем его
-    permanentPlayers.push(...otherNonPlayers);
-    
-    // 9.6. Тренеры (выбранные по логике: все при фильтре по году, или до 5 рандомных при "Все года")
-    permanentPlayers.push(...selectedCoaches);
-    
-    // 9.7. Рандомные звезды (до 3) и скауты (до 2), выбираются случайно
-    permanentPlayers.push(...limitedStarsAndScouts);
 
-    // 10. Если постоянных игроков больше максимума, обрезаем до максимума
-    // Приоритет: администраторы > текущий пользователь > новички > топ > остальные не-игроки
-    const permanentPlayersLimited = permanentPlayers.slice(0, MAX_PLAYERS);
+    // 15. Скаут поверх (может стать 22‑й шайбой)
+    let finalPlayers = result;
+    if (selectedScouts.length > 0 && finalPlayers.length < MAX_TOTAL_WITH_SCOUT) {
+      // Берем первого доступного скаута, которого ещё нет в списке
+      const scout = selectedScouts.find(s => !usedIds.has(s.id));
+      if (scout) {
+        finalPlayers = [...finalPlayers, scout];
+      }
+    }
 
-    // 11. Вычисляем сколько мест осталось для случайных игроков
-    const permanentCount = permanentPlayersLimited.length;
-    const remainingSlots = Math.max(0, MAX_PLAYERS - permanentCount);
+    // 16. Гарантия №1: если есть игроки-игроки, подходящие по фильтрам (filteredPlayers),
+    // но НИ ОДИН из них не попал в итоговый список, принудительно добавляем их.
+    if (filteredPlayers.length > 0) {
+      const finalIds = new Set(finalPlayers.map(p => p.id));
+      const hasAnyFilteredInFinal = filteredPlayers.some(p => finalIds.has(p.id));
 
-    // 12. Берем случайных игроков в пределах оставшихся мест
-    const randomPlayersLimited = randomPlayers.slice(0, remainingSlots);
+      if (!hasAnyFilteredInFinal) {
+        const extended = [...finalPlayers];
+        for (const fp of filteredPlayers) {
+          if (extended.length >= MAX_BASE_PLAYERS) break;
+          if (!extended.some(p => p.id === fp.id)) {
+            extended.push(fp);
+          }
+        }
+        finalPlayers = extended;
+      }
+    }
 
-    // 13. Объединяем всех отобранных игроков
-    const selectedPlayers = [
-      ...permanentPlayersLimited,
-      ...randomPlayersLimited
-    ];
+    // 17. Гарантия №2: для случая "Страна + Все года"
+    // Если выбрана страна, но год не выбран, и в этой стране есть ХОТЯ БЫ ОДИН игрок
+    // любого статуса, то в итоговом списке ОБЯЗАТЕЛЬНО должен быть хотя бы один
+    // игрок из этой страны (кроме админа). Это фиксирует кейс Литва/Латвия/Казахстан.
+    if (selectedCountry && !selectedYear) {
+      const countryPlayersAnyStatus = visiblePlayers.filter(
+        p => p.country === selectedCountry && p.status !== 'admin'
+      );
 
-    // 14. Убираем дубликаты (на всякий случай)
-    const uniquePlayers = selectedPlayers.filter((player, index, self) => 
-      index === self.findIndex(p => p.id === player.id)
-    );
-    
-    // 15. Финальное ограничение на MAX_PLAYERS (на всякий случай, если после удаления дубликатов стало больше)
-    const finalPlayers = uniquePlayers.slice(0, MAX_PLAYERS);
+      if (countryPlayersAnyStatus.length > 0) {
+        const finalIds = new Set(finalPlayers.map(p => p.id));
+        const hasCountryPlayerInFinal = finalPlayers.some(
+          p => p.country === selectedCountry && p.status !== 'admin'
+        );
+
+        if (!hasCountryPlayerInFinal) {
+          if (__DEV__) {
+            console.log('🌍 [SMART] Гарантия страны+все года, добавляем игрока страны:', {
+              selectedCountry,
+              totalCountryPlayers: countryPlayersAnyStatus.length,
+              finalCountBefore: finalPlayers.length,
+            });
+          }
+          // Выбираем одного игрока из страны:
+          // приоритет: player -> coach -> star -> shop -> skateSharpening
+          const priority: Record<string, number> = {
+            player: 0,
+            coach: 1,
+            star: 2,
+            shop: 3,
+            skateSharpening: 4,
+          };
+
+          const sortedByPriority = [...countryPlayersAnyStatus].sort((a, b) => {
+            const pa = priority[a.status] ?? 100;
+            const pb = priority[b.status] ?? 100;
+            if (pa !== pb) return pa - pb;
+            // Детеминированный рандом внутри одного приоритета
+            return getRandomOrderValue(a.id, 'country-fallback') - getRandomOrderValue(b.id, 'country-fallback');
+          });
+
+          const candidate = sortedByPriority.find(p => !finalIds.has(p.id));
+          if (candidate) {
+            if (finalPlayers.length >= MAX_BASE_PLAYERS) {
+              // Если места нет, вытесняем самого низкоприоритетного не-админа
+              let lowestIndex = -1;
+              let lowestScore = -1;
+              finalPlayers.forEach((p, index) => {
+                if (p.status === 'admin') return;
+                const score = priority[p.status] ?? 100;
+                if (score > lowestScore) {
+                  lowestScore = score;
+                  lowestIndex = index;
+                }
+              });
+              if (lowestIndex >= 0) {
+                const replaced = [...finalPlayers];
+                replaced[lowestIndex] = candidate;
+                finalPlayers = replaced;
+              }
+            } else {
+              finalPlayers = [...finalPlayers, candidate];
+            }
+          }
+        }
+      }
+    }
 
     return finalPlayers;
 

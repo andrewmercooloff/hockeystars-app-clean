@@ -905,15 +905,41 @@ export default function SearchScreen() {
       return matches;
     });
 
-    // Сортируем по рейтингу активности (убывание)
-    const sorted = filtered.sort((a, b) => {
+    // *** НОВЫЙ ПОРЯДОК ДЛЯ СПИСКА ПОИСКА ***
+    // 1) сначала показываем НОВИЧКОВ (созданных за последние 2 дня), самые новые СВЕРХУ
+    // 2) потом всех остальных, отсортированных по рейтингу активности (убывание)
+    const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    const newcomers: Player[] = [];
+    const others: Player[] = [];
+
+    filtered.forEach(player => {
+      if (player.createdAt) {
+        const createdTime = new Date(player.createdAt).getTime();
+        if (!isNaN(createdTime) && (now - createdTime) < TWO_DAYS_MS) {
+          newcomers.push(player);
+          return;
+        }
+      }
+      others.push(player);
+    });
+
+    // Новички: самые новые сверху
+    newcomers.sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime; // более новые раньше
+    });
+
+    // Остальные: по рейтингу активности (убывание)
+    others.sort((a, b) => {
       const ratingA = a.activityRating || 0;
       const ratingB = b.activityRating || 0;
       return ratingB - ratingA;
     });
-    
-    
-    return sorted;
+
+    return [...newcomers, ...others];
   }, [players, debouncedSearchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
 
   // Key extractor для FlatList
