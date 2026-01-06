@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Dimensions,
     Image,
@@ -12,7 +12,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import YouTubeVideo from './YouTubeVideo';
+import VideoPlayer from './VideoPlayer';
 import { useLanguage } from '../contexts/LanguageContext';
 import LikeButton from './LikeButton';
 import { generateVideoContentId } from '../utils/likesService';
@@ -22,6 +22,17 @@ const thumbnailFormatCache = new Map<string, number>();
 
 // Компонент для изображения с fallback (оптимизированный)
 const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
+  const [vkThumbnailUrl, setVkThumbnailUrl] = React.useState<string | null>(null);
+  const [vkThumbnailError, setVkThumbnailError] = React.useState(false);
+  const [vkThumbnailIndex, setVkThumbnailIndex] = React.useState(0);
+  
+  // Утилита: декодируем HTML сущности и чистим возможные переносы/пробелы в URL
+  const decodeAndCleanUrl = (url: string): string => {
+    if (!url) return url;
+    let cleaned = url.replace(/&amp;/g, '&').replace(/\s+/g, '');
+    return cleaned;
+  };
+  
   // ОПТИМИЗАЦИЯ: Используем кеш для начального индекса формата
   const getCachedInitialIndex = (videoId: string) => {
     return thumbnailFormatCache.get(videoId) || 0;
@@ -31,6 +42,30 @@ const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
   const isYouTubeUrl = (url: string): boolean => {
     const cleanUrl = url.trim().toLowerCase();
     return cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
+  };
+
+  // Функция для проверки VK ссылки
+  const isVkUrl = (url: string): boolean => {
+    const cleanUrl = url.trim().toLowerCase();
+    return cleanUrl.includes('vk.com/video') || cleanUrl.includes('vk.com/clip') || cleanUrl.includes('vkvideo.ru/video');
+  };
+
+  // Функция для извлечения ID VK видео
+  const getVKVideoId = (url: string): string | null => {
+    const cleanUrl = url.trim();
+    const patterns = [
+      /vk\.com\/(?:video|clip)(-?\d+_\d+)/i,
+      /m\.vk\.com\/(?:video|clip)(-?\d+_\d+)/i,
+      /vkvideo\.ru\/video(-?\d+_\d+)/i
+    ];
+    
+    for (const pattern of patterns) {
+      const match = cleanUrl.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
   };
 
   const getYouTubeVideoId = (url: string): string | null => {
@@ -100,11 +135,126 @@ const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
     );
   }
   
-  // Fallback для не-YouTube ссылок
+  // Для VK видео - пытаемся получить превью через VK oEmbed
+  const vkVideoId = isVkUrl(videoUrl) ? getVKVideoId(videoUrl) : null;
+  
+  // Загружаем превью VK через og:image со страницы (без использования API)
+  useEffect(() => {
+    if (vkVideoId && !vkThumbnailUrl && !vkThumbnailError) {
+      const loadVkThumbnail = async () => {
+        try {
+          console.log('🔍 Загрузка превью VK:', { vkVideoId, videoUrl });
+          
+          // Нормализуем URL
+          let normalizedUrl = videoUrl.trim();
+          normalizedUrl = normalizedUrl.split('?')[0]; // Убираем параметры
+          
+          if (normalizedUrl.includes('vkvideo.ru')) {
+            normalizedUrl = normalizedUrl.replace(/vkvideo\.ru/i, 'vk.com');
+          }
+          if (!normalizedUrl.startsWith('http')) {
+            normalizedUrl = `https://${normalizedUrl}`;
+          }
+          
+          // Используем мобильную версию VK (m.vk.com) - она работает лучше
+          const mobileUrl = normalizedUrl.replace('vk.com', 'm.vk.com');
+          
+          try {
+            console.log('🔎 Получаю превью со страницы:', mobileUrl);
+            const htmlResp = await fetch(mobileUrl, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
+              }
+            });
+            
+            const html = await htmlResp.text();
+            
+            // Ищем og:image в HTML
+            const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+            const twMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+            
+            const foundImage = (ogMatch && ogMatch[1]) || (twMatch && twMatch[1]) || null;
+            
+            if (foundImage) {
+              const cleaned = decodeAndCleanUrl(foundImage);
+              console.log('✅ Найдено превью VK:', cleaned);
+              setVkThumbnailUrl(cleaned);
+              return;
+            }
+          } catch (fetchError) {
+            console.log('⚠️ Ошибка при получении превью:', fetchError);
+          }
+          
+          // Если не получилось, показываем placeholder
+          console.log('ℹ️ Не удалось получить превью VK, показываем placeholder');
+          setVkThumbnailError(true);
+        } catch (error) {
+          console.log('❌ Ошибка загрузки превью VK:', error);
+          setVkThumbnailError(true);
+        }
+      };
+      
+      loadVkThumbnail();
+    }
+  }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
+  
+  if (isVkUrl(videoUrl) && vkVideoId) {
+    // Если есть превью из oEmbed, показываем его
+    if (vkThumbnailUrl && !vkThumbnailError) {
+      return (
+        <View style={styles.vkThumbnail}>
+          <Image
+            source={{ uri: vkThumbnailUrl }}
+            style={styles.thumbnail}
+            resizeMode="cover"
+            onError={() => {
+              console.log('⚠️ Превью из oEmbed не загрузилось');
+              setVkThumbnailError(true);
+            }}
+            onLoad={() => {
+              console.log('✅ VK превью успешно загружено:', vkThumbnailUrl);
+            }}
+          />
+          <View style={styles.vkPlayOverlay}>
+            <Ionicons name="play-circle" size={48} color="#fff" />
+          </View>
+        </View>
+      );
+    }
+    
+    // Если еще загружается, показываем placeholder
+    if (!vkThumbnailError) {
+      return (
+        <View style={styles.vkThumbnail}>
+          <View style={styles.vkThumbnailGradient}>
+            <Ionicons name="play-circle" size={64} color="#fff" />
+            <View style={styles.vkLogoContainer}>
+              <Text style={styles.vkThumbnailText}>VK</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+    
+    // Placeholder для VK видео (когда превью недоступно)
+    return (
+      <View style={styles.vkThumbnail}>
+        <View style={styles.vkThumbnailGradient}>
+          <Ionicons name="play-circle" size={64} color="#fff" />
+          <View style={styles.vkLogoContainer}>
+            <Text style={styles.vkThumbnailText}>VK</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+  
+  // Fallback для не-YouTube и не-VK ссылок
   return (
     <View style={styles.errorThumbnail}>
       <Ionicons name="alert-circle" size={48} color="#FF4444" />
-      <Text style={styles.errorThumbnailText}>Только YouTube</Text>
+      <Text style={styles.errorThumbnailText}>Только YouTube и VK</Text>
     </View>
   );
 });
@@ -250,7 +400,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
             </TouchableOpacity>
             {selectedVideo && (
                 <View pointerEvents="box-only">
-              <YouTubeVideo
+              <VideoPlayer
                     key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
                 url={selectedVideo.url}
                 timeCode={selectedVideo.timeCode}
@@ -403,5 +553,58 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     marginTop: 8,
     textAlign: 'center',
+  },
+  vkThumbnail: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    overflow: 'hidden',
+  },
+  vkThumbnailGradient: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0077FF',
+    opacity: 0.9,
+    position: 'relative',
+  },
+  vkLogoContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    marginTop: 8,
+  },
+  vkThumbnailText: {
+    color: '#fff',
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    letterSpacing: 2,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  vkPlayOverlay: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -24 }, { translateY: -24 }],
+    opacity: 0.9,
+  },
+  vkPlayOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 }); 

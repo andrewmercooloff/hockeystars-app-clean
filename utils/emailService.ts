@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 // SMS провайдеры
 import { sendSMSViaTwilio } from './smsService';
-import { sendVerificationCode as sendTwilioVerify, checkVerificationCode as checkTwilioVerify } from './twilioVerifyService';
+// Twilio Verify отключен - используем только проверку через БД
 
 // Интерфейс для кода подтверждения
 export interface VerificationCode {
@@ -161,9 +161,16 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
     }
     
     const verificationRecord = codes[0];
+    const savedCode = verificationRecord.code;
     
     // Проверяем код
-    if (verificationRecord.code !== inputCode) {
+    // Поддерживаем два варианта:
+    // 1. Полный код (6 цифр) - для обычных SMS
+    // 2. Последние 4 цифры - для Callcheck (звонок через sms.ru)
+    const isFullCodeMatch = savedCode === inputCode;
+    const isLast4DigitsMatch = savedCode.length >= 4 && savedCode.slice(-4) === inputCode;
+    
+    if (!isFullCodeMatch && !isLast4DigitsMatch) {
       return { 
         success: false, 
         message: 'auth.codeInvalid',
@@ -201,8 +208,8 @@ const isCISNumber = (phone: string): boolean => {
   return false;
 };
 
-// Отправка кода подтверждения через Twilio
-// Для СНГ используем Messaging (дешевле ~$0.07), для остальных - Verify
+// Отправка кода подтверждения
+// Для Беларуси используем sms.by, для России - sms.ru (БЕЗ fallback на Twilio), для остальных - Twilio
 export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
   try {
     console.log('📱 Отправляем код подтверждения на:', phoneNumber);
@@ -210,36 +217,31 @@ export const sendVerificationSMS = async (phoneNumber: string, _code?: string): 
     // Генерируем код
     const code = _code || generateVerificationCode();
 
-    // ===== СНГ: TWILIO MESSAGING (ДЕШЕВЛЕ ~$0.07 vs $0.50) =====
-    if (isCISNumber(phoneNumber)) {
-      console.log('🇧🇾 СНГ номер - используем Twilio Messaging (дешевле!)');
-      const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
-      if (smsSuccess) {
-        await saveVerificationCode(phoneNumber, code);
-        console.log('✅ Код отправлен через Twilio Messaging');
-        return true;
-      }
-      console.log('⚠️ Twilio Messaging не сработал, пробуем Verify...');
+    // ===== УМНЫЙ ВЫБОР ПРОВАЙДЕРА ПО СТРАНЕ =====
+    // Беларусь → RocketSMS (БЕЗ fallback на Twilio)
+    // Россия → RocketSMS (БЕЗ fallback на Twilio)
+    // США/Канада → только email (SMS отключены)
+    // Остальные → Twilio
+    const { sendSMSViaProvider, getCountryFromPhone } = await import('./smsService');
+    const country = getCountryFromPhone(phoneNumber);
+    const smsSuccess = await sendSMSViaProvider(phoneNumber, code);
+    
+    if (smsSuccess) {
+      await saveVerificationCode(phoneNumber, code);
+      console.log('✅ Код отправлен успешно');
+      return true;
     }
 
-    // ===== TWILIO VERIFY (для остальных стран) =====
-    console.log('📱 Используем Twilio Verify...');
-    const result = await sendTwilioVerify(phoneNumber);
-    
-    if (result.success) {
-      console.log('✅ Код отправлен через Twilio Verify');
-      return true;
+    // Для Беларуси и России полностью отключаем любые fallback-и на Twilio
+    if (country === 'BY' || country === 'RU') {
+      console.log(`⚠️ RocketSMS не сработал для ${country === 'BY' ? 'Беларуси' : 'России'}, Twilio ОТКЛЮЧЕН. Показываем код только в консоли.`);
+      return await sendSMSFallback(phoneNumber, code);
     }
     
-    console.log('⚠️ Twilio Verify не сработал:', result.error);
-    
-    // ===== TWILIO MESSAGING (SMS FALLBACK) =====
-    console.log('🔄 Пробуем fallback на Twilio Messaging API...');
-    const smsSuccess = await sendSMSViaTwilio(phoneNumber, code);
-    if (smsSuccess) {
-      // Сохраняем код в БД для проверки
-      await saveVerificationCode(phoneNumber, code);
-      return true;
+    // Для США и Канады не отправляем SMS, только email
+    if (country === 'US' || country === 'CA') {
+      console.log(`🇺🇸🇨🇦 ${country === 'US' ? 'США' : 'Канада'} - SMS отключены, используйте email для получения кода`);
+      return await sendSMSFallback(phoneNumber, code);
     }
 
     // Если ничего не работает, показываем fallback
@@ -251,32 +253,23 @@ export const sendVerificationSMS = async (phoneNumber: string, _code?: string): 
   }
 };
 
-// Проверка SMS кода через Twilio Verify API
+// Проверка SMS кода через БД (Twilio Verify отключен)
 export const verifySMSCode = async (
   phoneNumber: string, 
   inputCode: string
 ): Promise<{ success: boolean; message: string; translationKey?: string }> => {
   try {
-    console.log('🔐 Проверяем код через Twilio Verify для:', phoneNumber);
-    
-    const result = await checkTwilioVerify(phoneNumber, inputCode);
-    
-    if (result.success) {
-      return { 
-        success: true, 
-        message: 'auth.codeVerified', 
-        translationKey: 'auth.codeVerified' 
-      };
-    }
-    
-    // Если Twilio Verify вернул ошибку, пробуем проверить в базе данных (fallback)
-    console.log('⚠️ Twilio Verify не подтвердил код, пробуем fallback в БД...');
+    console.log('🔐 Проверяем код через БД для:', phoneNumber);
+    // Всегда используем проверку через БД (коды сохраняются при отправке через SMS)
     return await verifyCode(phoneNumber, inputCode);
     
   } catch (error) {
     console.error('❌ Ошибка проверки кода:', error);
-    // При ошибке пробуем fallback
-    return await verifyCode(phoneNumber, inputCode);
+    return { 
+      success: false, 
+      message: 'auth.codeVerificationError', 
+      translationKey: 'auth.codeVerificationError' 
+    };
   }
 };
 

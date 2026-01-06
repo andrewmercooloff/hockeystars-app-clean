@@ -425,109 +425,6 @@ export default function SearchScreen() {
     }, [setCurrentScreen, currentUser])
   );
 
-  // Загрузка списка команд
-  const [teams, setTeams] = useState<Array<{id: string, name: string, name_ru?: string}>>([]);
-  
-  // Загружаем команды из базы данных только для администраторов
-  useEffect(() => {
-    const loadTeamsFromDatabase = async () => {
-      // Для обычных пользователей команды будут извлекаться из массива players
-      if (currentUser?.status !== 'admin') {
-        return;
-      }
-      
-      try {
-        const { supabase } = await import('../utils/supabase');
-        
-        // Получаем команды, которые реально есть у игроков
-        const { data, error } = await supabase
-          .from('player_teams')
-          .select(`
-            teams!inner(
-              id,
-              name,
-              name_ru
-            )
-          `)
-          .order('teams(name)');
-        
-        if (error) {
-          console.error('❌ Ошибка загрузки команд:', error);
-          setTeams([]);
-          return;
-        }
-        
-        // Собираем уникальные команды
-        const uniqueTeams = new Map();
-        data?.forEach((item: any) => {
-          const team = item.teams;
-          if (team && !uniqueTeams.has(team.id)) {
-            uniqueTeams.set(team.id, {
-              id: team.id,
-              name: language === 'ru' ? team.name_ru || team.name : team.name,
-              name_ru: team.name_ru
-            });
-          }
-        });
-        
-        setTeams(Array.from(uniqueTeams.values()));
-      } catch (error) {
-        console.error('❌ Ошибка загрузки команд:', error);
-        setTeams([]);
-      }
-    };
-    
-    loadTeamsFromDatabase();
-  }, [language, currentUser?.status]);
-  
-  // Для обычных пользователей извлекаем команды из массива players
-  const teamsFromPlayers = useMemo(() => {
-    // Для администраторов используем команды из базы данных
-    if (currentUser?.status === 'admin') {
-      return teams;
-    }
-    
-    // Для обычных пользователей извлекаем команды из массива players
-    const uniqueTeams = new Map<string, {id: string, name: string, name_ru?: string}>();
-    
-    players.forEach(player => {
-      if (player.teams && player.teams.length > 0) {
-        player.teams.forEach(team => {
-          if (team.teamId && !uniqueTeams.has(team.teamId)) {
-            uniqueTeams.set(team.teamId, {
-              id: team.teamId,
-              name: language === 'ru' ? (team.teamNameRu || team.teamName) : team.teamName,
-              name_ru: team.teamNameRu
-            });
-          }
-        });
-      }
-    });
-    
-    return Array.from(uniqueTeams.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [players, teams, currentUser?.status, language]);
-  
-  // Мемоизированные фильтры
-  const countries = useMemo(() => {
-    const rawCountries = Array.from(new Set(players.map(p => p.country).filter((country): country is string => Boolean(country))));
-    
-    // Создаем массив стран с переводами
-    const countriesWithTranslations = rawCountries.map(country => {
-      // Пытаемся найти перевод в секции countries
-      const translated = t(`profile.countries.${country}`);
-      
-      // Если перевод не найден, используем оригинальное название
-      const displayName = translated !== `profile.countries.${country}` ? translated : country;
-      
-      return {
-        original: country,
-        translated: displayName
-      };
-    });
-    
-    return countriesWithTranslations.sort((a, b) => a.translated.localeCompare(b.translated));
-  }, [players, t, language]);
-
   const hands = useMemo(() => [t('search.left'), t('search.right')], [t]);
 
   const positions = useMemo(() => {
@@ -635,33 +532,6 @@ export default function SearchScreen() {
     return uniqueGroups.sort((a, b) => (a?.translated || '').localeCompare(b?.translated || ''));
   }, [players, t, language]);
 
-  const years = useMemo(() => 
-    Array.from(new Set(
-      players
-        .map(p => p.birthDate ? p.birthDate.split('-')[0] : null)
-        .filter((year): year is string => Boolean(year))
-    )).sort(), 
-    [players]
-  );
-
-  const heights = useMemo(() => 
-    Array.from(new Set(
-      players
-        .map(p => p.height ? Math.round(parseInt(p.height) / 10) * 10 : null)
-        .filter(Boolean)
-    )).sort((a, b) => (a || 0) - (b || 0)).map(h => `${h} ${language === 'en' ? 'cm' : 'см'}`), 
-    [players, language]
-  );
-
-  const weights = useMemo(() => 
-    Array.from(new Set(
-      players
-        .map(p => p.weight ? Math.round(parseInt(p.weight) / 10) * 10 : null)
-        .filter(Boolean)
-    )).sort((a, b) => (a || 0) - (b || 0)).map(w => `${w} ${language === 'en' ? 'kg' : 'кг'}`), 
-    [players, language]
-  );
-
   // Определяем, является ли выбранная позиция вратарем
   const isSelectedPositionGoalkeeper = useMemo(() => {
     if (!selectedPosition) return false;
@@ -752,10 +622,36 @@ export default function SearchScreen() {
       { translated: '< 2.0', original: '< 2.0' },
     ];
   }, [players, language]);
+  
+  // Универсальная функция фильтрации игроков с возможностью игнорировать отдельные фильтры
+  const filterPlayers = useCallback((
+    options?: {
+      ignoreCountry?: boolean;
+      ignoreTeam?: boolean;
+      ignoreHand?: boolean;
+      ignorePosition?: boolean;
+      ignoreYear?: boolean;
+      ignoreHeight?: boolean;
+      ignoreWeight?: boolean;
+      ignorePPG?: boolean;
+      ignoreSV?: boolean;
+      ignoreGAA?: boolean;
+    }
+  ) => {
+    const {
+      ignoreCountry = false,
+      ignoreTeam = false,
+      ignoreHand = false,
+      ignorePosition = false,
+      ignoreYear = false,
+      ignoreHeight = false,
+      ignoreWeight = false,
+      ignorePPG = false,
+      ignoreSV = false,
+      ignoreGAA = false,
+    } = options || {};
 
-  // Фильтрация и сортировка игроков
-  const filteredPlayers = useMemo(() => {
-    const filtered = players.filter(player => {
+    return players.filter(player => {
       // Исключаем скрытые профили (кроме текущего пользователя, если он скрыт, и администраторов)
       // Администраторы видят все скрытые профили
       if (player.is_hidden) {
@@ -777,10 +673,10 @@ export default function SearchScreen() {
         player.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
       
       // Фильтр по стране
-      const matchesCountry = !selectedCountry || player.country === selectedCountry;
+      const matchesCountry = ignoreCountry || !selectedCountry || player.country === selectedCountry;
       
       // Фильтр по команде
-      const matchesTeam = !selectedTeam || (() => {
+      const matchesTeam = ignoreTeam || !selectedTeam || (() => {
         if (!player.teams || player.teams.length === 0) {
           return false;
         }
@@ -788,12 +684,12 @@ export default function SearchScreen() {
       })();
       
       // Фильтр по хвату
-      const matchesHand = !selectedHand || 
+      const matchesHand = ignoreHand || !selectedHand || 
         (selectedHand === t('search.left') && player.grip === 'Левый') || 
         (selectedHand === t('search.right') && player.grip === 'Правый');
       
       // Фильтр по позиции
-      const matchesPosition = !selectedPosition || (() => {
+      const matchesPosition = ignorePosition || !selectedPosition || (() => {
         // Находим группу позиций для выбранной позиции
         const selectedGroup = positions.find(p => p?.original === selectedPosition);
         if (selectedGroup && selectedGroup.variants) {
@@ -805,32 +701,32 @@ export default function SearchScreen() {
       })();
       
       // Фильтр по году
-      const matchesYear = !selectedYear || 
+      const matchesYear = ignoreYear || !selectedYear || 
         (player.birthDate && player.birthDate.startsWith(selectedYear));
       
       // Фильтр по росту (от)
-      const matchesHeight = !selectedMinHeight || 
+      const matchesHeight = ignoreHeight || !selectedMinHeight || 
         (player.height && parseInt(player.height) >= parseInt(selectedMinHeight));
       
       // Фильтр по весу (от)
-      const matchesWeight = !selectedMinWeight || 
+      const matchesWeight = ignoreWeight || !selectedMinWeight || 
         (player.weight && parseInt(player.weight) >= parseInt(selectedMinWeight));
       
       // Определяем, является ли игрок вратарем
       const isGoalkeeper = isGoalkeeperPosition(player.position);
       
       // Если выбран PPG, исключаем вратарей из результатов
-      if (selectedPPG && isGoalkeeper) {
+      if (!ignorePPG && selectedPPG && isGoalkeeper) {
         return false;
       }
       
       // Если выбран GAA или SV%, исключаем полевых игроков из результатов
-      if ((selectedGAA || selectedSV) && !isGoalkeeper) {
+      if (!ignoreGAA && !ignoreSV && (selectedGAA || selectedSV) && !isGoalkeeper) {
         return false;
       }
       
       // Фильтр по PPG (для полевых игроков)
-      const matchesPPG = !selectedPPG || (() => {
+      const matchesPPG = ignorePPG || !selectedPPG || (() => {
         // Вратари уже исключены выше
         if (!player.goals || !player.assists || !player.games) return false;
         const goalsNum = parseInt(player.goals) || 0;
@@ -851,7 +747,7 @@ export default function SearchScreen() {
       })();
       
       // Фильтр по SV% (для вратарей)
-      const matchesSV = !selectedSV || (() => {
+      const matchesSV = ignoreSV || !selectedSV || (() => {
         // Полевые игроки уже исключены выше
         if (!player.shots || !player.saves) return false;
         const shotsNum = parseInt(player.shots) || 0;
@@ -870,7 +766,7 @@ export default function SearchScreen() {
       })();
       
       // Фильтр по GAA (для вратарей)
-      const matchesGAA = !selectedGAA || (() => {
+      const matchesGAA = ignoreGAA || !selectedGAA || (() => {
         if (!isGoalkeeperPosition(player.position)) return false; // Полевые игроки не имеют GAA
         if (!player.minutes || !player.shots || !player.saves) return false;
         const minutesNum = parseInt(player.minutes) || 0;
@@ -904,6 +800,27 @@ export default function SearchScreen() {
       
       return matches;
     });
+  }, [
+    players,
+    debouncedSearchQuery,
+    selectedCountry,
+    selectedTeam,
+    selectedHand,
+    selectedPosition,
+    selectedYear,
+    selectedMinHeight,
+    selectedMinWeight,
+    selectedPPG,
+    selectedSV,
+    selectedGAA,
+    currentUser,
+    t,
+    positions,
+  ]);
+
+  // Фильтрация и сортировка игроков
+  const filteredPlayers = useMemo(() => {
+    const filtered = filterPlayers();
 
     // *** НОВЫЙ ПОРЯДОК ДЛЯ СПИСКА ПОИСКА ***
     // 1) сначала показываем НОВИЧКОВ (созданных за последние 2 дня), самые новые СВЕРХУ
@@ -938,9 +855,95 @@ export default function SearchScreen() {
       const ratingB = b.activityRating || 0;
       return ratingB - ratingA;
     });
-
+    
     return [...newcomers, ...others];
   }, [players, debouncedSearchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
+  
+  // Мемоизированные фильтры, зависящие от игроков, отфильтрованных по другим фильтрам (свой фильтр игнорируем)
+  const countries = useMemo(() => {
+    const basePlayers = filterPlayers({ ignoreCountry: true });
+    const rawCountries = Array.from(
+      new Set(
+        basePlayers
+          .map(p => p.country)
+          .filter((country): country is string => Boolean(country))
+      )
+    );
+    
+    const countriesWithTranslations = rawCountries.map(country => {
+      const translated = t(`profile.countries.${country}`);
+      const displayName = translated !== `profile.countries.${country}` ? translated : country;
+      
+      return {
+        original: country,
+        translated: displayName
+      };
+    });
+    
+    return countriesWithTranslations.sort((a, b) => a.translated.localeCompare(b.translated));
+  }, [filterPlayers, t, language]);
+  
+  const years = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          filterPlayers({ ignoreYear: true })
+            .map(p => (p.birthDate ? p.birthDate.split('-')[0] : null))
+            .filter((year): year is string => Boolean(year))
+        )
+      ).sort(),
+    [filterPlayers]
+  );
+  
+  const heights = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          filterPlayers({ ignoreHeight: true })
+            .map(p => (p.height ? Math.round(parseInt(p.height) / 10) * 10 : null))
+            .filter(Boolean)
+        )
+      )
+        .sort((a, b) => (a || 0) - (b || 0))
+        .map(h => `${h} ${language === 'en' ? 'cm' : 'см'}`),
+    [filterPlayers, language]
+  );
+  
+  const weights = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          filterPlayers({ ignoreWeight: true })
+            .map(p => (p.weight ? Math.round(parseInt(p.weight) / 10) * 10 : null))
+            .filter(Boolean)
+        )
+      )
+        .sort((a, b) => (a || 0) - (b || 0))
+        .map(w => `${w} ${language === 'en' ? 'kg' : 'кг'}`),
+    [filterPlayers, language]
+  );
+  
+  // Команды для фильтра — только из уже отфильтрованных игроков
+  const teamsFromPlayers = useMemo(() => {
+    const basePlayers = filterPlayers({ ignoreTeam: true });
+    const uniqueTeams = new Map<string, { id: string; name: string; name_ru?: string }>();
+    
+    basePlayers.forEach(player => {
+      if (player.teams && player.teams.length > 0) {
+        player.teams.forEach(team => {
+          if (team.teamId && !uniqueTeams.has(team.teamId)) {
+            uniqueTeams.set(team.teamId, {
+              id: team.teamId,
+              name: language === 'ru' ? (team.teamNameRu || team.teamName) : team.teamName,
+              name_ru: team.teamNameRu
+            });
+          }
+        });
+      }
+    });
+    
+    return Array.from(uniqueTeams.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [filterPlayers, language]);
 
   // Key extractor для FlatList
   const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
@@ -968,7 +971,10 @@ export default function SearchScreen() {
 
     return (
       <TouchableOpacity 
-        onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
+        onPress={() => router.push({ 
+          pathname: '/player/[id]', 
+          params: { id: item.id, returnTo: 'search' } 
+        })}
         activeOpacity={0.7}
       >
         <View style={styles.playerGradientShadow}>

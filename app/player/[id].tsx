@@ -5,7 +5,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { captureRef } from 'react-native-view-shot';
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter, useSegments, usePathname } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { COUNTRIES } from '../../utils/constants';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -59,7 +60,7 @@ import CachedAvatar from '../../components/CachedAvatar';
 import CachedBackground from '../../components/CachedBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
 import VideoCarousel from '../../components/VideoCarousel';
-import YouTubeVideo from '../../components/YouTubeVideo';
+import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
@@ -163,13 +164,16 @@ SectionCard.displayName = 'SectionCard';
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, returnTo, chatId, returnToPlayerId } = useLocalSearchParams();
   const router = useRouter();
+  const navigation = useNavigation();
+  const segments = useSegments();
   const { t, language } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
+  const previousScreenRef = useRef<string | null>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
   const photosRef = useRef<View>(null);
@@ -1418,6 +1422,7 @@ export default function PlayerProfile() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
+      
 
       // ВАЖНО: Если переходим из уведомления с scrollToFriends, сбрасываем сохраненную позицию прокрутки
       // чтобы профиль открывался сверху, а не с сохраненной позиции
@@ -2643,7 +2648,17 @@ export default function PlayerProfile() {
       /^https?:\/\/m\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i
     ];
     
-    // Проверяем URL на соответствие хотя бы одному паттерну
+    // Проверяем, является ли ссылка VK
+    // Поддерживаем форматы: vk.com/video, vk.com/clip, vkvideo.ru/video
+    const vkPatterns = [
+      /^https?:\/\/(www\.)?vk\.com\/video(-?\d+_\d+)/i,
+      /^https?:\/\/(www\.)?vk\.com\/clip(-?\d+_\d+)/i,
+      /^https?:\/\/m\.vk\.com\/video(-?\d+_\d+)/i,
+      /^https?:\/\/m\.vk\.com\/clip(-?\d+_\d+)/i,
+      /^https?:\/\/(www\.)?vkvideo\.ru\/video(-?\d+_\d+)/i
+    ];
+    
+    // Проверяем URL на соответствие YouTube
     const isValidYouTubeUrl = youtubePatterns.some(pattern => pattern.test(urlWithoutTimeCode));
     
     if (isValidYouTubeUrl) {
@@ -2699,8 +2714,40 @@ export default function PlayerProfile() {
       return { url: embedUrl, timeCode, hours, minutes, seconds };
     }
     
-    console.warn('Неверный формат YouTube URL:', urlWithoutTimeCode);
-    // Если ссылка не соответствует YouTube, возвращаем пустую строку
+    // Проверяем URL на соответствие VK
+    const isValidVkUrl = vkPatterns.some(pattern => pattern.test(urlWithoutTimeCode));
+    
+    if (isValidVkUrl) {
+      // Извлекаем ID видео VK (формат: ownerId_videoId, например: -123456_789012)
+      let vkVideoId: string | null = null;
+      
+      // vk.com/video-123456_789012 или vk.com/video123456_789012
+      let videoMatch = urlWithoutTimeCode.match(/vk\.com\/(?:video|clip)(-?\d+_\d+)/i);
+      if (videoMatch && videoMatch[1]) {
+        vkVideoId = videoMatch[1];
+      }
+      
+      // vkvideo.ru/video-123456_789012
+      if (!vkVideoId) {
+        videoMatch = urlWithoutTimeCode.match(/vkvideo\.ru\/video(-?\d+_\d+)/i);
+        if (videoMatch && videoMatch[1]) {
+          vkVideoId = videoMatch[1];
+        }
+      }
+      
+      if (vkVideoId) {
+        // Конвертируем vkvideo.ru в vk.com для единообразия
+        let normalizedUrl = urlWithoutTimeCode;
+        if (urlWithoutTimeCode.includes('vkvideo.ru')) {
+          normalizedUrl = urlWithoutTimeCode.replace(/vkvideo\.ru/i, 'vk.com');
+        }
+        // Возвращаем нормализованный URL VK (будет обработан компонентом VKVideo)
+        return { url: normalizedUrl, timeCode, hours, minutes, seconds };
+      }
+    }
+    
+    console.warn('Неверный формат видео URL (поддерживаются только YouTube и VK):', urlWithoutTimeCode);
+    // Если ссылка не соответствует YouTube или VK, возвращаем пустую строку
     return { url: '', hours: '0', minutes: '0', seconds: '0' };
   };
 
@@ -3872,6 +3919,68 @@ export default function PlayerProfile() {
     >
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
+          {/* Заголовок страницы с именем игрока */}
+          {player && (
+            <View style={styles.pageHeader}>
+              <TouchableOpacity 
+                onPress={() => {
+                  // Проверяем параметр returnTo для явного указания, куда возвращаться
+                  const returnToValue = Array.isArray(returnTo) ? returnTo[0] : returnTo;
+                  const chatIdValue = Array.isArray(chatId) ? chatId[0] : chatId;
+                  
+                  if (returnToValue === 'chat' && chatIdValue) {
+                    // Возвращаемся в конкретный чат
+                    router.push(`/chat/${chatIdValue}`);
+                  } else if (returnToValue === 'messages') {
+                    // Возвращаемся в список сообщений
+                    router.push('/messages');
+                  } else if (returnToValue === 'notifications') {
+                    // Возвращаемся в уведомления
+                    router.push('/notifications');
+                  } else if (returnToValue === 'search') {
+                    // Возвращаемся в поиск
+                    router.push('/search');
+                  } else if (returnToValue === 'home') {
+                    // Возвращаемся на главный экран
+                    router.push('/');
+                  } else if (returnToValue === 'player' && returnToPlayerId) {
+                    // Возвращаемся в профиль другого игрока (из списка друзей)
+                    const returnPlayerId = Array.isArray(returnToPlayerId) ? returnToPlayerId[0] : returnToPlayerId;
+                    router.push({
+                      pathname: `/player/${returnPlayerId}`,
+                      params: { returnTo: returnToValue }
+                    });
+                  } else {
+                    // Пытаемся вернуться назад через нативный стек навигации
+                    try {
+                      if (navigation.canGoBack()) {
+                        navigation.goBack();
+                      } else if (router.canGoBack()) {
+                        router.back();
+                      } else {
+                        // Если нет истории, переходим на главный экран
+                        router.replace('/');
+                      }
+                    } catch (error) {
+                      // Если произошла ошибка, пробуем router.back()
+                      console.log('⚠️ Ошибка навигации, пробуем router.back():', error);
+                      if (router.canGoBack()) {
+                        router.back();
+                      } else {
+                        router.replace('/');
+                      }
+                    }
+                  }
+                }} 
+                style={styles.backButton}
+              >
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{player.name}</Text>
+              <View style={styles.backButton} />
+            </View>
+          )}
+          
           <ScrollView 
             ref={scrollViewRef} 
             contentContainerStyle={styles.scrollContainer}
@@ -6394,7 +6503,10 @@ export default function PlayerProfile() {
                     <TouchableOpacity
                       key={friend.id}
                       style={styles.friendItem}
-                      onPress={() => router.push(`/player/${friend.id}`)}
+                      onPress={() => router.push({
+                        pathname: `/player/${friend.id}`,
+                        params: { returnTo: 'player', returnToPlayerId: id }
+                      })}
                     >
                       <CachedAvatar
                         playerId={friend.id}
@@ -7132,7 +7244,7 @@ export default function PlayerProfile() {
             </TouchableOpacity>
             {selectedVideo && (
               <View pointerEvents="box-only" style={styles.videoModalContent}>
-              <YouTubeVideo 
+              <VideoPlayer 
                 url={selectedVideo.url}
                 title={t('myMoment')}
                 timeCode={selectedVideo.timeCode}
@@ -7604,7 +7716,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingTop: 0,
+    paddingTop: 48, // Отступ для фиксированного заголовка
     paddingHorizontal: 20,
     paddingBottom: 50, // Уменьшено для устранения большого отступа внизу
   },
@@ -9546,6 +9658,29 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  pageHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 16,
+    width: 24,
+  },
+  pageTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontFamily: 'Gilroy-Bold',
+    flex: 1,
+    textAlign: 'left',
   },
 
 

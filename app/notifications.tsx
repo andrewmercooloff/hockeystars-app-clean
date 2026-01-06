@@ -1203,57 +1203,90 @@ export default function NotificationsScreen() {
         const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
         if (senderId) {
           console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-          router.push(`/player/${senderId}`);
+          router.push({
+            pathname: `/player/${senderId}`,
+            params: { returnTo: 'notifications' }
+          });
         } else {
           console.warn('⚠️ Не удалось определить ID отправителя запроса дружбы');
         }
       } else if (notification.type === 'friend_accepted') {
         // Для уведомлений о принятом запросе показываем профиль игрока, который принял
         if (notification.data && notification.data.acceptor_id) {
-          router.push(`/player/${notification.data.acceptor_id}`);
+          router.push({
+            pathname: `/player/${notification.data.acceptor_id}`,
+            params: { returnTo: 'notifications' }
+          });
         }
       } else if (notification.type === 'autograph_request' || notification.type === 'stick_request') {
         // Для запросов автографов и клюшек показываем профиль игрока
         if (notification.playerId) {
-          router.push(`/player/${notification.playerId}`);
+          router.push({
+  pathname: `/player/${notification.playerId}`,
+  params: { returnTo: 'notifications' }
+});
         }
       } else if (notification.type === 'gift_accepted') {
         // Для уведомлений о принятых подарках переходим в музей
         if (currentUser) {
-          router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         }
       } else if (notification.type === 'stats_change' || notification.type === 'normative_changed') {
         // Для уведомлений о изменениях статистики/нормативов показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToStats: 'true' }
+          });
         }
       } else if (notification.type === 'photo_added') {
         // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToPhotos=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToPhotos: 'true' }
+          });
         }
       } else if (notification.type === 'new_friendship') {
         // Для уведомлений о новой дружбе показываем профиль того, кто подтвердил дружбу
         if (notification.data && notification.data.confirmedBy) {
-          router.push(`/player/${notification.data.confirmedBy}`);
+          router.push({
+            pathname: `/player/${notification.data.confirmedBy}`,
+            params: { returnTo: 'notifications' }
+          });
         }
       } else if (notification.type === 'gift_received') {
         // Для уведомлений о полученных подарках переходим в музей того, кто получил подарок
         if (notification.data && notification.data.playerId) {
-          router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
-          router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         }
       } else if (notification.type === 'friend_gift_received') {
         // Для уведомлений о подарках, полученных друзьями, переходим в музей игрока
         if (notification.data && notification.data.playerId) {
-          router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         }
       } else if (notification.type === 'video_added') {
         // Для уведомлений о добавленных видео показываем видео игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToVideos=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToVideos: 'true' }
+          });
         }
       } else if (notification.type === 'avatar_changed') {
         // Для уведомлений об изменении аватара показываем профиль игрока
@@ -1263,31 +1296,46 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'achievement_added') {
         // Для уведомлений о новых достижениях показываем достижения игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
+          });
         }
       } else if (notification.type === 'physical_data_changed') {
         // Для уведомлений об изменении роста/веса показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToStats=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToStats: 'true' }
+          });
         }
       } else if (notification.type === 'puck_speed_changed') {
         // Для уведомлений об обновлении скорости шайбы показываем профиль игрока и скроллим к разделу скорости
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToSpeed=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToSpeed: 'true' }
+          });
         }
       } else if (notification.type === 'exercise_completed') {
         // Для уведомлений о выполненных упражнениях переходим в профиль игрока в раздел упражнений
         const playerId = notification.data?.playerId || notification.playerId;
         if (playerId) {
           console.log('🔗 Навигация к профилю игрока с выполненным упражнением:', playerId);
-          router.push(`/player/${playerId}?scrollToExercises=true`);
+          router.push({
+            pathname: `/player/${playerId}`,
+            params: { returnTo: 'notifications', scrollToExercises: 'true' }
+          });
         } else {
           console.warn('⚠️ Не удалось определить ID игрока для уведомления о выполненном упражнении');
         }
       } else if (notification.type === 'achievement') {
         // Для уведомлений о достижениях показываем достижения
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
+          });
         }
       } else if (notification.type === 'team_invite') {
         // Для уведомлений о приглашениях в команду показываем команды
@@ -1295,7 +1343,10 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'video_liked') {
         // Для уведомлений о лайках видео переходим на профиль владельца контента с прокруткой к видео
         if (notification.data && notification.data.playerId) {
-          router.push(`/player/${notification.data.playerId}?scrollToVideos=true`);
+          router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToVideos: 'true' }
+          });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
           router.push(`/player/${currentUser.id}?scrollToVideos=true`);
@@ -1303,7 +1354,10 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'photo_liked') {
         // Для уведомлений о лайках фото переходим на профиль владельца контента с прокруткой к фото
         if (notification.data && notification.data.playerId) {
-          router.push(`/player/${notification.data.playerId}?scrollToPhotos=true`);
+          router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToPhotos: 'true' }
+          });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
           router.push(`/player/${currentUser.id}?scrollToPhotos=true`);
@@ -1311,12 +1365,18 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'user_report') {
         // Для уведомлений о жалобах переходим на профиль пользователя, на которого пожаловались
         if (notification.data && notification.data.reportedId) {
-          router.push(`/player/${notification.data.reportedId}`);
+          router.push({
+            pathname: `/player/${notification.data.reportedId}`,
+            params: { returnTo: 'notifications' }
+          });
         }
       } else if (notification.type === 'gift_request') {
         // Для уведомлений о запросе подарка переходим на профиль игрока для отправки подарка
         if (notification.data && notification.data.requesterId) {
-          router.push(`/player/${notification.data.requesterId}?scrollToGift=true`);
+          router.push({
+            pathname: `/player/${notification.data.requesterId}`,
+            params: { returnTo: 'notifications', scrollToGift: 'true' }
+          });
         }
       } else if (notification.type === 'system') {
         // Для системных уведомлений остаемся в разделе уведомлений
@@ -1360,13 +1420,22 @@ export default function NotificationsScreen() {
         
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
-          router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         } else if (notification.type === 'gift_received') {
           // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           } else if (currentUser) {
-            router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           }
         } else if (notification.type === 'friend_request') {
           // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
@@ -1374,18 +1443,27 @@ export default function NotificationsScreen() {
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
             console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-            router.push(`/player/${senderId}`);
+            router.push({
+            pathname: `/player/${senderId}`,
+            params: { returnTo: 'notifications' }
+          });
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           } else if (notification.playerId) {
             router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
-            router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+            router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
+          });
           }
         } else if (notification.type === 'team_invite') {
           router.push('/teams');
@@ -1433,13 +1511,22 @@ export default function NotificationsScreen() {
         
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
-          router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+          router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
         } else if (notification.type === 'gift_received') {
           // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           } else if (currentUser) {
-            router.push(`/player/${currentUser.id}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${currentUser.id}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           }
         } else if (notification.type === 'friend_request') {
           // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
@@ -1447,18 +1534,27 @@ export default function NotificationsScreen() {
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
             console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-            router.push(`/player/${senderId}`);
+            router.push({
+            pathname: `/player/${senderId}`,
+            params: { returnTo: 'notifications' }
+          });
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push(`/player/${notification.data.playerId}?scrollToMuseum=true`);
+            router.push({
+            pathname: `/player/${notification.data.playerId}`,
+            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
+          });
           } else if (notification.playerId) {
             router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
-            router.push(`/player/${notification.data.changedPlayerId}?scrollToAchievements=true`);
+            router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
+          });
           }
         } else if (notification.type === 'team_invite') {
           router.push('/teams');

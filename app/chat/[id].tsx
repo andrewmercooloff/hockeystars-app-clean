@@ -1468,7 +1468,10 @@ export default function ChatScreen() {
               </TouchableOpacity>
               <View style={styles.headerInfo}>
               <TouchableOpacity 
-                onPress={() => router.push(`/player/${otherPlayer.id}`)}
+                onPress={() => router.push({
+                  pathname: `/player/${otherPlayer.id}`,
+                  params: { returnTo: 'chat', chatId: id }
+                })}
                 style={styles.avatarButton}
                 activeOpacity={0.7}
               >
