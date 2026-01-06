@@ -1,0 +1,94 @@
+ИСПРАВЛЕНИЕ ПРОБЛЕМЫ БЕЗОПАСНОСТИ С referral_leaderboard
+=========================================================
+
+ПРОБЛЕМА:
+---------
+View public.referral_leaderboard определен с SECURITY DEFINER, что означает, 
+что представление выполняется с правами создателя, а не пользователя.
+Это может обойти RLS (Row Level Security) политики.
+
+ПРОВЕРКА:
+---------
+✅ Представление НЕ используется НИ В ПРИЛОЖЕНИИ, НИ НА ВЕБ-САЙТЕ:
+
+   МОБИЛЬНОЕ ПРИЛОЖЕНИЕ:
+   - Код использует RPC функцию get_referral_top
+   - Если RPC не работает, есть fallback на прямой запрос к таблице players
+   - Никаких запросов к .from('referral_leaderboard') в коде нет
+   
+   ВЕБ-САЙТ (website/top.html):
+   - Делает прямой запрос к таблице players через REST API
+   - Обрабатывает данные на клиенте (JavaScript)
+   - Подсчитывает баллы и сортирует на стороне браузера
+   - НЕ использует представление referral_leaderboard
+   
+   Файлы проверены:
+   - utils/playerStorage.ts (функция getReferralLeaderboard)
+   - components/ReferralLeaderboard.tsx
+   - website/top.html (функция loadTopLeaderboard)
+   - Все другие файлы проекта
+
+БЕЗОПАСНОЕ РЕШЕНИЕ (ПОШАГОВО):
+-------------------------------
+
+ШАГ 1: Проверка (опционально, но рекомендуется)
+Выполните в Supabase SQL Editor, чтобы убедиться, что представление существует:
+
+SELECT schemaname, viewname 
+FROM pg_views 
+WHERE viewname = 'referral_leaderboard';
+
+ШАГ 2: Удаление представления
+Выполните в Supabase SQL Editor:
+
+DROP VIEW IF EXISTS public.referral_leaderboard CASCADE;
+
+ШАГ 3: Проверка работоспособности приложения
+После удаления представления проверьте:
+1. Откройте приложение
+2. Перейдите в раздел реферальной программы (если есть)
+3. Убедитесь, что рейтинг рефералов загружается корректно
+
+ПОЧЕМУ ЭТО БЕЗОПАСНО:
+---------------------
+✅ Код НЕ использует представление referral_leaderboard
+✅ Используется RPC функция get_referral_top
+✅ Есть fallback на прямой запрос к таблице players с обработкой на клиенте
+✅ Флаг CASCADE автоматически удалит все зависимости (если есть)
+
+
+АЛЬТЕРНАТИВНОЕ РЕШЕНИЕ (если вдруг что-то сломается):
+------------------------------------------------------
+Если после удаления что-то перестанет работать (маловероятно),
+можно пересоздать представление БЕЗ SECURITY DEFINER:
+
+DROP VIEW IF EXISTS public.referral_leaderboard CASCADE;
+
+CREATE OR REPLACE VIEW public.referral_leaderboard AS
+SELECT 
+    p.id,
+    p.name,
+    p.avatar,
+    p.status,
+    COUNT(DISTINCT CASE WHEN p2.status = 'star' THEN p2.id END) * 10 +
+    COUNT(DISTINCT CASE WHEN p2.status = 'coach' THEN p2.id END) * 5 +
+    COUNT(DISTINCT CASE WHEN p2.status = 'player' THEN p2.id END) * 1 AS referral_points,
+    COUNT(DISTINCT p2.id) AS invited_count,
+    COUNT(DISTINCT CASE WHEN p2.status = 'star' THEN p2.id END) AS invited_stars,
+    COUNT(DISTINCT CASE WHEN p2.status = 'coach' THEN p2.id END) AS invited_coaches,
+    COUNT(DISTINCT CASE WHEN p2.status = 'player' THEN p2.id END) AS invited_players
+FROM players p
+LEFT JOIN players p2 ON p2.invited_by = p.id
+WHERE p.invited_by IS NOT NULL OR EXISTS (SELECT 1 FROM players WHERE invited_by = p.id)
+GROUP BY p.id, p.name, p.avatar, p.status
+ORDER BY referral_points DESC, invited_count DESC;
+
+-- Но это НЕ рекомендуется, так как представление не используется.
+
+Как проверить:
+--------------
+1. Откройте Supabase Dashboard
+2. Перейдите в SQL Editor
+3. Выполните запрос DROP VIEW...
+4. Проверьте, что приложение продолжает работать (использует get_referral_top или альтернативный запрос)
+

@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
-import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, Animated as RNAnimated } from 'react-native';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +17,7 @@ import IceRinkMarkings from '../components/IceRinkMarkings';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import * as Device from 'expo-device';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -1765,6 +1767,7 @@ export default function HomeScreen() {
   const { currentUser, isUserLoading } = useUser();
   const router = useRouter();
   const { setCurrentScreen, currentScreen } = useScreenContext();
+  const { t } = useLanguage();
   const params = useLocalSearchParams();
   
   // Ref для currentScreen, чтобы использовать в акселерометре
@@ -1871,6 +1874,11 @@ export default function HomeScreen() {
   const seedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const unblockLoadRef = useRef(false);
+  
+  // Состояние для подсказки о тряске при первом запуске
+  const [showShakeHint, setShowShakeHint] = useState(false);
+  const shakeHintOpacity = useRef(new RNAnimated.Value(0)).current;
+  const shakeIconRotation = useRef(new RNAnimated.Value(0)).current;
 
   // Загрузка игроков (с поддержкой принудительного обновления)
   // ВАЖНО: определяется ДО useEffect, которые его используют
@@ -2165,6 +2173,72 @@ export default function HomeScreen() {
       appStateSubscription?.remove();
     };
   }, []);
+
+  // Показываем подсказку о тряске при первом запуске
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      return; // На веб shake не работает
+    }
+
+    const checkAndShowShakeHint = async () => {
+      try {
+        const hasSeenHint = await AsyncStorage.getItem('hasSeenShakeHint');
+        if (!hasSeenHint && currentScreen === 'home' && !isUserLoading) {
+          // Показываем подсказку через 1 секунду после загрузки
+          setTimeout(() => {
+            setShowShakeHint(true);
+            
+            // Анимация покачивания иконки (бесконечная)
+            const shakeAnimation = RNAnimated.loop(
+              RNAnimated.sequence([
+                RNAnimated.timing(shakeIconRotation, {
+                  toValue: 1,
+                  duration: 200,
+                  useNativeDriver: true,
+                }),
+                RNAnimated.timing(shakeIconRotation, {
+                  toValue: -1,
+                  duration: 200,
+                  useNativeDriver: true,
+                }),
+                RNAnimated.timing(shakeIconRotation, {
+                  toValue: 0,
+                  duration: 200,
+                  useNativeDriver: true,
+                }),
+              ])
+            );
+            shakeAnimation.start();
+            
+            // Анимация появления и исчезновения подсказки
+            RNAnimated.sequence([
+              RNAnimated.timing(shakeHintOpacity, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+              }),
+              RNAnimated.delay(3000), // Показываем 3 секунды
+              RNAnimated.timing(shakeHintOpacity, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+              }),
+            ]).start(() => {
+              shakeAnimation.stop();
+              setShowShakeHint(false);
+              shakeIconRotation.setValue(0);
+              // Сохраняем флаг, что подсказка была показана
+              AsyncStorage.setItem('hasSeenShakeHint', 'true');
+            });
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('❌ Ошибка проверки подсказки о тряске:', error);
+      }
+    };
+
+    checkAndShowShakeHint();
+  }, [currentScreen, isUserLoading]);
 
   useEffect(() => {
     const oneHourMs = 60 * 60 * 1000;
@@ -2599,6 +2673,43 @@ export default function HomeScreen() {
             <YearFilter players={players} />
               </View>
             </View>
+
+        {/* Подсказка о тряске при первом запуске */}
+        {showShakeHint && (
+          <RNAnimated.View 
+            style={[
+              styles.shakeHintContainer,
+              { opacity: shakeHintOpacity }
+            ]}
+            pointerEvents="none"
+          >
+            <View style={styles.shakeHintContent}>
+              <RNAnimated.View
+                style={[
+                  styles.shakeIconContainer,
+                  {
+                    transform: [
+                      {
+                        rotate: shakeIconRotation.interpolate({
+                          inputRange: [-1, 0, 1],
+                          outputRange: ['-20deg', '0deg', '20deg'],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <Ionicons name="phone-portrait-outline" size={40} color="#fff" />
+              </RNAnimated.View>
+              <Text style={styles.shakeHintText}>
+                {t('home.shakeHintTitle')}
+              </Text>
+              <Text style={styles.shakeHintSubtext}>
+                {t('home.shakeHintSubtext')}
+              </Text>
+            </View>
+          </RNAnimated.View>
+        )}
       </ImageBackground>
     </View>
   );
@@ -2665,5 +2776,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     marginBottom: 2,
+  },
+  shakeHintContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  shakeHintContent: {
+    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    maxWidth: 280,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  shakeIconContainer: {
+    marginBottom: 16,
+  },
+  shakeHintText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  shakeHintSubtext: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
   },
 });

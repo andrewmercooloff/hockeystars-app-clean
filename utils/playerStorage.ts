@@ -7319,13 +7319,13 @@ export const getSmartPlayerSelection = (
       }
       return true;
     });
-
+    
     // 2. Вспомогательные функции
     const hashString = (str: string) =>
       str.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
     const effectiveSeed = randomSeed !== undefined && randomSeed !== 0
-      ? randomSeed
+      ? randomSeed 
       : Date.now() % 1000000;
 
     const getRandomOrderValue = (id: string, tag: string) => {
@@ -7456,16 +7456,20 @@ export const getSmartPlayerSelection = (
       addToResult(admin);
     }
 
-    // 7. 3) Три случайных игрока (из всех, подходящих под фильтры)
-    pickRandom(filteredPlayers, 3, 'players', usedIds).forEach(addToResult);
-
-    // 8. 4) Три случайных новичка (из последних 10 по дате регистрации)
+    // 7. 3) Три случайных игрока (из всех, подходящих под фильтры),
+    // НО БЕЗ НОВИЧКОВ — чтобы не «съедать» их до шага 4.
     const sortedByCreated = [...filteredPlayers].filter(p => p.createdAt).sort((a, b) => {
       const aTime = new Date(a.createdAt || '').getTime() || 0;
       const bTime = new Date(b.createdAt || '').getTime() || 0;
       return bTime - aTime;
     });
     const last10 = sortedByCreated.slice(0, 10);
+    const newcomerIds = new Set(last10.map(p => p.id));
+
+    const nonNewcomerPlayers = filteredPlayers.filter(p => !newcomerIds.has(p.id));
+    pickRandom(nonNewcomerPlayers, 3, 'players', usedIds).forEach(addToResult);
+
+    // 8. 4) Три случайных новичка (из последних 10 по дате регистрации)
     pickRandom(last10, 3, 'newcomers', usedIds).forEach(addToResult);
 
     // 9. 5) Три случайных лидера по рейтингу (из топ‑10 по activityRating)

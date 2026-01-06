@@ -944,46 +944,46 @@ export default function RegisterScreen() {
         throw new Error('PLAYER_CREATION_FAILED');
       }
       
-      console.log('✅ Игрок создан, полученные данные:', {
-        id: newPlayer.id,
-        name: newPlayer.name,
-        status: newPlayer.status,
-        avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
-      });
+        console.log('✅ Игрок создан, полученные данные:', {
+          id: newPlayer.id,
+          name: newPlayer.name,
+          status: newPlayer.status,
+          avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
+        });
       
-      // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
-      // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
-      try {
-        const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
-        if (pendingRaw) {
-          try {
-            const parsed = JSON.parse(pendingRaw);
-            const inviterId = parsed?.inviterId as string | undefined;
-            const ts = parsed?.ts as number | undefined;
-            const ageMs = ts ? (Date.now() - ts) : 0;
-            const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
+        // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
+        // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
+        try {
+          const pendingRaw = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+          if (pendingRaw) {
+            try {
+              const parsed = JSON.parse(pendingRaw);
+              const inviterId = parsed?.inviterId as string | undefined;
+              const ts = parsed?.ts as number | undefined;
+              const ageMs = ts ? (Date.now() - ts) : 0;
+              const MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 дней
 
             if (inviterId && inviterId !== newPlayer.id && (ageMs === 0 || ageMs < MAX_AGE_MS)) {
               await setInvitedBy(newPlayer.id, inviterId);
+              }
+            } catch {
+              // ignore parse errors
             }
-          } catch {
-            // ignore parse errors
+            await AsyncStorage.removeItem(PENDING_INVITE_KEY);
           }
-          await AsyncStorage.removeItem(PENDING_INVITE_KEY);
+        } catch (e) {
+          console.warn('⚠️ [REFERRAL] pending invite apply failed:', e);
         }
-      } catch (e) {
-        console.warn('⚠️ [REFERRAL] pending invite apply failed:', e);
-      }
 
       // ИСПРАВЛЕНИЕ: Сохраняем только реально созданного игрока, а не данные из формы
       await saveCurrentUser(newPlayer);
-      
-      // Обновляем контекст пользователя для немедленного обновления интерфейса
-      try {
-        await refreshUser(true); // forceRefresh = true
-        console.log('✅ Контекст пользователя обновлен после регистрации');
-      } catch (contextError) {
-        console.warn('⚠️ Не удалось обновить контекст пользователя:', contextError);
+        
+        // Обновляем контекст пользователя для немедленного обновления интерфейса
+        try {
+          await refreshUser(true); // forceRefresh = true
+          console.log('✅ Контекст пользователя обновлен после регистрации');
+        } catch (contextError) {
+          console.warn('⚠️ Не удалось обновить контекст пользователя:', contextError);
       }
       
       showAlert(

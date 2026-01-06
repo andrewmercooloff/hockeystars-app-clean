@@ -2103,7 +2103,7 @@
     "selectPhoto": "Välj ett foto",
     "takePhoto": "Ta ett foto",
     "chooseFromGallery": "Välj från galleriet",
-    "photoRequired": "Ett foto krävs",
+    "photoRequired": "Vänligen lägg till ett foto",
     "register": "Register",
     "back": "Tillbaka",
     "welcome": "Välkomna!",
@@ -2116,7 +2116,6 @@
     "photoError": "Fel vid uppladdning av foto",
     "coachYearsRequired": "Välj minst ett år som du tränar",
     "coachYearsHint": "Välj födelseår för spelarna du tränar",
-    "photoRequired": "Vänligen lägg till ett foto",
     "acceptTerms": "Vänligen acceptera användarvillkoren",
     "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält",
     "fillAllFields": "Vänligen fyll i alla fält",
@@ -2454,7 +2453,9 @@
     "noPlayersCountry": "Inga spelare från {{country}}",
     "noPlayersYear": "Det finns inga spelare födda i {{year}}",
     "noPlayersCountryYear": "Inga spelare från {{country}} i {{year}}",
-    "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren."
+    "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren.",
+    "shakeHintTitle": "Skaka enheten",
+    "shakeHintSubtext": "för att uppdatera spellarlistan"
   },
   "filters": {
     "year": "år",

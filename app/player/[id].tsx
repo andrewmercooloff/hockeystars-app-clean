@@ -5759,62 +5759,76 @@ export default function PlayerProfile() {
                   </Text>
                   <View>
                     {videoFields.map((video, index) => (
-                      <View key={index} style={styles.videoFieldContainer}>
-                        <TextInput
-                          style={styles.videoUrlInput}
-                          value={video.url}
-                          onChangeText={(text) => {
-                            const newVideoFields = [...videoFields];
-                            newVideoFields[index] = { ...newVideoFields[index], url: text };
-                            setVideoFields(newVideoFields);
-                          }}
-                          onFocus={(e) => {
-                            activeInputRef.current = e.target as any;
-                            // Прокручиваем к полю при фокусе
-                            setTimeout(() => {
-                              if (scrollViewRef.current && e.target) {
-                                (e.target as any).measureLayout(
-                                  scrollViewRef.current as any,
-                                  (x: number, y: number, width: number, height: number) => {
-                                    const screenHeight = Dimensions.get('window').height;
-                                    const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                    const visibleArea = screenHeight - keyboardHeight;
-                                    const inputBottom = y + height;
-                                    const targetY = inputBottom - visibleArea + 200;
-                                    if (targetY > 0) {
-                                      scrollViewRef.current?.scrollTo({ 
-                                        y: targetY, 
-                                        animated: true 
-                                      });
-                                    }
-                                  },
-                                  () => {
-                                    // Fallback если measureLayout не работает
-                                    (e.target as any).measure((fx: number, fy: number, fw: number, fh: number, px: number, py: number) => {
-                                      const screenHeight = Dimensions.get('window').height;
-                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                      const visibleArea = screenHeight - keyboardHeight;
-                                      const inputBottom = py + fh;
-                                      const scrollOffset = inputBottom - visibleArea + 200;
-                                      if (scrollOffset > 0) {
-                                        scrollViewRef.current?.scrollTo({ 
-                                          y: scrollOffset, 
-                                          animated: true 
+                      <View key={index}>
+                        <View style={styles.videoFieldContainer}>
+                          <View style={styles.videoUrlRow}>
+                            <TextInput
+                              style={styles.videoUrlInput}
+                              value={video.url}
+                              onChangeText={(text) => {
+                                const newVideoFields = [...videoFields];
+                                newVideoFields[index] = { ...newVideoFields[index], url: text };
+                                setVideoFields(newVideoFields);
+                              }}
+                              onFocus={(e) => {
+                                activeInputRef.current = e.target as any;
+                                // Прокручиваем к полю при фокусе
+                                setTimeout(() => {
+                                  if (scrollViewRef.current && e.target) {
+                                    (e.target as any).measureLayout(
+                                      scrollViewRef.current as any,
+                                      (x: number, y: number, width: number, height: number) => {
+                                        const screenHeight = Dimensions.get('window').height;
+                                        const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                        const visibleArea = screenHeight - keyboardHeight;
+                                        const inputBottom = y + height;
+                                        const targetY = inputBottom - visibleArea + 200;
+                                        if (targetY > 0) {
+                                          scrollViewRef.current?.scrollTo({ 
+                                            y: targetY, 
+                                            animated: true 
+                                          });
+                                        }
+                                      },
+                                      () => {
+                                        // Fallback если measureLayout не работает
+                                        (e.target as any).measure((fx: number, fy: number, fw: number, fh: number, px: number, py: number) => {
+                                          const screenHeight = Dimensions.get('window').height;
+                                          const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                          const visibleArea = screenHeight - keyboardHeight;
+                                          const inputBottom = py + fh;
+                                          const scrollOffset = inputBottom - visibleArea + 200;
+                                          if (scrollOffset > 0) {
+                                            scrollViewRef.current?.scrollTo({ 
+                                              y: scrollOffset, 
+                                              animated: true 
+                                            });
+                                          }
                                         });
                                       }
-                                    });
+                                    );
                                   }
-                                );
-                              }
-                            }, 300);
-                          }}
-                          onBlur={() => {
-                            activeInputRef.current = null;
-                          }}
-                          placeholder={t('videoUrlPlaceholder')}
-                          placeholderTextColor="#888"
-                        />
-                        <View style={styles.timeInputContainer}>
+                                }, 300);
+                              }}
+                              onBlur={() => {
+                                activeInputRef.current = null;
+                              }}
+                              placeholder={t('videoUrlPlaceholder')}
+                              placeholderTextColor="#888"
+                            />
+                            {videoFields.length > 1 && (
+                              <TouchableOpacity
+                                style={styles.removeVideoButtonInline}
+                                onPress={() => {
+                                  const newVideoFields = videoFields.filter((_, i) => i !== index);
+                                  setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+                                }}
+                              >
+                                <Ionicons name="close-circle" size={20} color="#fa2f40" />
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                          <View style={styles.timeInputContainer}>
                           <View style={styles.timeInputWithLabel}>
                             <Text style={styles.timeInputLabel}>{t('timeHour')}</Text>
                         <TextInput
@@ -5956,16 +5970,9 @@ export default function PlayerProfile() {
                         />
                           </View>
                         </View>
-                        {videoFields.length > 1 && (
-                          <TouchableOpacity
-                            style={styles.removeVideoButton}
-                            onPress={() => {
-                              const newVideoFields = videoFields.filter((_, i) => i !== index);
-                              setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
-                            }}
-                          >
-                            <Ionicons name="close-circle" size={20} color="#fa2f40" />
-                          </TouchableOpacity>
+                        </View>
+                        {index < videoFields.length - 1 && (
+                          <View style={styles.videoSeparator} />
                         )}
                       </View>
                     ))}
@@ -8614,9 +8621,13 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   videoFieldContainer: {
+    flexDirection: 'column',
+    marginBottom: 10,
+    gap: 12,
+  },
+  videoUrlRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
     gap: 10,
   },
   videoUrlInput: {
@@ -8637,6 +8648,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  removeVideoButtonInline: {
+    padding: 4,
+  },
+  videoSeparator: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 15,
+    marginHorizontal: 0,
   },
   timeCodeInput: {
     width: 80,

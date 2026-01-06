@@ -433,22 +433,41 @@ export default function RootLayout() {
 
   // 🎟️ iOS Deferred Deep Link: читаем clipboard при первом запуске
   // Сайт player.php копирует URL в clipboard при нажатии кнопки "Установить"
+  // ВАЖНО: Сохраняем флаг в AsyncStorage, чтобы проверять clipboard только ОДИН РАЗ при первом запуске
+  // Это позволяет избежать постоянных запросов разрешения iOS
+  const CLIPBOARD_CHECKED_KEY = 'clipboard_checked_once';
   const clipboardCheckedRef = React.useRef(false);
   React.useEffect(() => {
     if (Platform.OS !== 'ios') return;
     if (currentUser?.id) return; // Уже авторизован
-    if (clipboardCheckedRef.current) return; // Уже проверяли
+    if (clipboardCheckedRef.current) return; // Уже проверяли в этой сессии
     
     (async () => {
       try {
+        // Проверяем, проверяли ли мы clipboard ранее (сохраняется между запусками)
+        const wasChecked = await AsyncStorage.getItem(CLIPBOARD_CHECKED_KEY);
+        if (wasChecked === 'true') {
+          clipboardCheckedRef.current = true;
+          return; // Уже проверяли при первом запуске, больше не проверяем
+        }
+        
         clipboardCheckedRef.current = true;
         
         // Проверяем, есть ли уже сохранённый invite
         const existing = await AsyncStorage.getItem(PENDING_INVITE_KEY);
-        if (existing) return; // Уже есть invite, не перезаписываем
+        if (existing) {
+          // Уже есть invite, помечаем что проверили clipboard
+          await AsyncStorage.setItem(CLIPBOARD_CHECKED_KEY, 'true');
+          return;
+        }
         
-        // Читаем clipboard
+        // Читаем clipboard только один раз при первом запуске
         const clipboardText = await Clipboard.getStringAsync();
+        
+        // Помечаем, что проверили clipboard (даже если он был пуст)
+        // Это важно - чтобы не спрашивать разрешение снова
+        await AsyncStorage.setItem(CLIPBOARD_CHECKED_KEY, 'true');
+        
         if (!clipboardText) return;
         
         // Проверяем, содержит ли URL реферальную ссылку
@@ -463,6 +482,10 @@ export default function RootLayout() {
         }
       } catch (e) {
         // iOS может заблокировать доступ к clipboard - это нормально
+        // Помечаем что проверили, чтобы не спрашивать снова
+        try {
+          await AsyncStorage.setItem(CLIPBOARD_CHECKED_KEY, 'true');
+        } catch {}
         console.log('🎟️ [REFERRAL] Clipboard read skipped:', e);
       }
     })();
@@ -1492,7 +1515,7 @@ export default function RootLayout() {
               <StatusBar 
                 barStyle="light-content" 
                 backgroundColor="#050008" 
-                translucent={false}
+                translucent={Platform.OS === 'android'}
                 hidden={false}
               />
               
@@ -1505,9 +1528,9 @@ export default function RootLayout() {
               tabBarStyle: { 
                 backgroundColor: '#050008', 
                 borderTopWidth: 0,
-                // На Android увеличиваем высоту и отступ, чтобы меню было выше системной навигации
-                height: Platform.OS === 'android' ? 95 : 80,
-                paddingBottom: Platform.OS === 'android' ? 25 : 10,
+                // Теперь navigation bar скрыт, используем стандартные размеры
+                height: 80,
+                paddingBottom: 10,
                 paddingTop: 10
               },
               tabBarActiveTintColor: '#fff',
