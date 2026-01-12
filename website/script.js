@@ -33,12 +33,13 @@ const translations = {
         'download.playstore.label': 'Скачать в',
         'download.android.label': 'Скачать для',
         'install.open': 'Открыть / Установить',
-        'tester.modal.title': 'Стать тестировщиком',
-        'tester.modal.description': 'Введите ваш email Google, чтобы получить доступ к тестовой версии приложения для Android.',
+        'tester.modal.title': 'Получить доступ к приложению',
+        'tester.modal.description': 'Введите ваш Gmail адрес для доступа к приложению HockeyStars на Android.',
         'tester.form.email': 'Email Google аккаунта:',
         'tester.form.submit': 'Отправить',
         'tester.form.loading': 'Отправка...',
-        'tester.form.success': 'Спасибо! Ваш email добавлен в список тестировщиков. Ссылка на скачивание будет отправлена на ваш email.',
+        'tester.form.success': 'Ожидайте ссылку на приложение на указанном email',
+        'tester.form.validation.gmail': 'Принимаются только Gmail адреса (@gmail.com).',
         'tester.form.error': 'Произошла ошибка. Пожалуйста, попробуйте еще раз или свяжитесь с нами: support@hockey-stars.com',
         'tester.form.validation': 'Пожалуйста, введите корректный email адрес.',
         'footer.copyright': '© 2025 HockeyStars. Все права защищены.',
@@ -179,12 +180,13 @@ const translations = {
         'download.playstore.label': 'Get it on',
         'download.android.label': 'Download for',
         'install.open': 'Open / Install',
-        'tester.modal.title': 'Become a Tester',
-        'tester.modal.description': 'Enter your Google email to get access to the Android test version of the app.',
+        'tester.modal.title': 'Get Access to the App',
+        'tester.modal.description': 'Enter your Gmail address to get access to the HockeyStars app on Android.',
         'tester.form.email': 'Google Account Email:',
         'tester.form.submit': 'Submit',
         'tester.form.loading': 'Submitting...',
-        'tester.form.success': 'Thank you! Your email has been added to the tester list. A download link will be sent to your email.',
+        'tester.form.success': 'Wait for the app link at the specified email',
+        'tester.form.validation.gmail': 'Only Gmail addresses (@gmail.com) are accepted.',
         'tester.form.error': 'An error occurred. Please try again or contact us: support@hockey-stars.com',
         'tester.form.validation': 'Please enter a valid email address.',
         'footer.copyright': '© 2025 HockeyStars. All rights reserved.',
@@ -1072,6 +1074,15 @@ function initAndroidTesterForm() {
             );
             return;
         }
+        
+        // Validate Gmail only
+        if (!email.toLowerCase().endsWith('@gmail.com')) {
+            setStatus(
+                getTranslationValue('tester.form.validation.gmail', 'Only Gmail addresses (@gmail.com) are accepted.'),
+                'error'
+            );
+            return;
+        }
 
         try {
             setStatus(
@@ -1108,12 +1119,11 @@ function initAndroidTesterForm() {
             // Reset form after success
             form.reset();
 
-            // Close modal after 3 seconds
+            // Close modal after 5 seconds
+            // User will receive an email from Google Play Console with download link
             setTimeout(() => {
                 closeAndroidTesterModal();
-                // Start download
-                window.location.href = 'https://hockey-stars.com/hockeystars.apk';
-            }, 3000);
+            }, 5000);
 
         } catch (error) {
             console.error('Failed to submit tester form', error);

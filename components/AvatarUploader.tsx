@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,24 +22,40 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 
   const pickImage = async () => {
     try {
-      // Запрашиваем разрешения
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (permissionResult.granted === false) {
-        Alert.alert('Ошибка', 'Нужно разрешение для доступа к галерее');
-        return;
-      }
+      // На Android 13+ (API 33+) используем Photo Picker без разрешений
+      // На старых версиях Android запрашиваем разрешения
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
 
-      // Выбираем изображение
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
+        if (!result.canceled && result.assets[0]) {
+          await uploadAndProcessAvatar(result.assets[0].uri);
+        }
+      } else {
+        // Для старых версий Android запрашиваем разрешения
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+        if (permissionResult.granted === false) {
+          Alert.alert('Ошибка', 'Нужно разрешение для доступа к галерее');
+          return;
+        }
 
-      if (!result.canceled && result.assets[0]) {
-        await uploadAndProcessAvatar(result.assets[0].uri);
+        // Выбираем изображение
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
+
+        if (!result.canceled && result.assets[0]) {
+          await uploadAndProcessAvatar(result.assets[0].uri);
+        }
       }
     } catch (error) {
       console.error('Ошибка выбора изображения:', error);

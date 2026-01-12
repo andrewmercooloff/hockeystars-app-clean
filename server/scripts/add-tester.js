@@ -47,10 +47,20 @@ async function addTester() {
             ['https://www.googleapis.com/auth/androidpublisher']
         );
 
+        // Проверка, что googleapis загружен
+        if (!google || !google.androidpublisher) {
+            throw new Error('googleapis module not loaded correctly. Check if googleapis and its dependencies are installed.');
+        }
+
         const androidpublisher = google.androidpublisher({
             version: 'v3',
             auth: auth
         });
+
+        // Проверка, что androidpublisher загружен правильно
+        if (!androidpublisher || !androidpublisher.testers) {
+            throw new Error('Failed to initialize Google Play Publisher API. androidpublisher.testers is undefined. Check if googleapis dependencies are installed.');
+        }
 
         // Get current testers list
         let testers = [];

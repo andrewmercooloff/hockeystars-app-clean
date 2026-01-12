@@ -1,21 +1,70 @@
 #!/usr/bin/env node
 
 /**
- * Entry point for cPanel Node.js application
- * This file is located in the 'api' folder created by cPanel
- * It loads and runs the actual API server from server/scripts/add-tester-api.js
+ * Express API server for adding testers to Google Play Console
+ * Google API integration will be added after basic Express works
  */
 
-const path = require('path');
+const express = require('express');
+const cors = require('cors');
 
-// Get the root directory (hockey-stars.com)
-const rootDir = path.resolve(__dirname, '..');
-const serverDir = path.join(rootDir, 'server');
+const app = express();
 
-// Change working directory to server folder (where package.json is)
-process.chdir(serverDir);
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Load and run the actual API server
-// __dirname in add-tester-api.js will be server/scripts/
-require(path.join(serverDir, 'scripts', 'add-tester-api.js'));
 
+// Root endpoint - for testing
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'tester-api',
+        message: 'HockeyStars Tester API is running',
+        endpoints: {
+            health: '/health',
+            addTester: 'POST /add-tester'
+        }
+    });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'tester-api' });
+});
+
+// Main endpoint: POST /add-tester
+// Simplified version - just returns success for now
+// Google API integration will be added after Express works
+app.post('/add-tester', (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Email is required' 
+        });
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Invalid email format' 
+        });
+    }
+    
+    console.log('Email received:', email);
+    
+    // For now, just return success
+    // TODO: Add Google Play API integration
+    res.json({
+        success: true,
+        message: 'Email received (Google API integration pending)'
+    });
+});
+
+
+// Export app for Passenger
+module.exports = app;

@@ -543,6 +543,7 @@ body {
     font-family: 'Gilroy', sans-serif;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .download-btn::before {

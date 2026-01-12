@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -107,17 +108,30 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
 
   const pickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Ошибка', 'Нет доступа к галерее');
-        return;
-      }
+      // На Android 13+ (API 33+) используем Photo Picker без разрешений
+      // На старых версиях Android запрашиваем разрешения
+      let result;
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+        result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: false,
+          quality: 0.8,
+          mediaTypes: ['images'],
+        });
+      } else {
+        // Для старых версий Android запрашиваем разрешения
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Ошибка', 'Нет доступа к галерее');
+          return;
+        }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: false,
-        quality: 0.8,
-        mediaTypes: ['images'],
-      });
+        result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: false,
+          quality: 0.8,
+          mediaTypes: ['images'],
+        });
+      }
 
       if (!result.canceled && result.assets[0]) {
         setImageUri(result.assets[0].uri);

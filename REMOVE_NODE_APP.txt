@@ -1,0 +1,60 @@
+===========================================
+КОМАНДЫ ДЛЯ УДАЛЕНИЯ NODE.JS ПРИЛОЖЕНИЯ
+===========================================
+
+ШАГ 1: Узнайте ваш cPanel username
+- Обычно это первая часть email (до @)
+- Или посмотрите в cPanel в правом верхнем углу
+
+ШАГ 2: Откройте PowerShell или Git Bash
+
+ШАГ 3: Выполните эти команды (замените USERNAME на ваш):
+
+# Подключитесь к серверу
+ssh USERNAME@hockey-stars.com
+
+# После подключения выполните:
+pkill -u $(whoami) node
+
+# Найдите папки приложений
+ls -la ~/nodevenv/
+
+# Удалите приложение для hockey-stars.com
+rm -rf ~/nodevenv/hockey-stars.com
+
+# Переименуйте папку api/ (попробуйте оба варианта)
+cd ~/public_html
+mv api api_old_backup
+
+# Или если папка в другом месте:
+cd ~/domains/hockey-stars.com/public_html
+mv api api_old_backup
+
+# Выйдите
+exit
+
+ШАГ 4: Откройте cPanel → Node.js менеджер и удалите приложение
+
+ШАГ 5: Создайте новое приложение:
+- Application Root: api/
+- Application URL: /app
+- Application Startup File: app.js
+
+===========================================
+
+АЛЬТЕРНАТИВА: Через терминал в cPanel
+
+1. В cPanel найдите "Terminal" или "Advanced" → "Terminal"
+2. Выполните те же команды (без ssh)
+
+===========================================
+
+
+
+
+
+
+
+
+
+

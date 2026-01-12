@@ -1,0 +1,14 @@
+{
+  "name": "hockeystars-api-entry",
+  "version": "1.0.0",
+  "description": "HockeyStars Tester API",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
+
+
+
+

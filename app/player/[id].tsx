@@ -1671,20 +1671,32 @@ export default function PlayerProfile() {
 
   const pickFromGallery = async () => {
     try {
-      // Запрашиваем разрешение на доступ к галерее
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        showCustomAlert('Ошибка', 'Нет доступа к галерее', 'error');
-        return;
-      }
+      // На Android 13+ (API 33+) используем Photo Picker без разрешений
+      // На старых версиях Android запрашиваем разрешения
+      let result;
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+        result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.7, // Уменьшаем качество для экономии места
+        });
+      } else {
+        // Для старых версий Android запрашиваем разрешения
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+        if (status !== 'granted') {
+          showCustomAlert('Ошибка', 'Нет доступа к галерее', 'error');
+          return;
+        }
 
-      // Открываем галерею для выбора фото
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7, // Уменьшаем качество для экономии места
-      });
+        // Открываем галерею для выбора фото
+        result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.7, // Уменьшаем качество для экономии места
+        });
+      }
 
       if (!result.canceled && result.assets[0]) {
         const newAvatarUri = result.assets[0].uri;

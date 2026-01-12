@@ -194,3 +194,14 @@ Write-Host "Результаты сохранены в: $outputFile" -Foreground
 
 
 
+
+
+
+
+
+
+
+
+
+
+

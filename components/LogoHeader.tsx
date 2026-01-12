@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CachedAvatar from './CachedAvatar';
 import { useUser } from '../contexts/UserContext';
 
@@ -11,6 +12,7 @@ const LogoHeader = React.memo(() => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { currentUser, refreshUser } = useUser();
+  const insets = useSafeAreaInsets();
 
   // Обновляем данные только при изменении параметров refresh
   useEffect(() => {
@@ -26,6 +28,7 @@ const LogoHeader = React.memo(() => {
       justifyContent: 'space-between',
       alignItems: 'flex-end',
       paddingBottom: 5,
+      paddingTop: Platform.OS === 'android' ? insets.top : 0,
       backgroundColor: '#000'
     }}>
       {/* Логотип приложения слева */}

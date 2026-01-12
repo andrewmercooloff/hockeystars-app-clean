@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.1.7",
-    "runtimeVersion": "1.1.7",
+    "version": "1.1.13",
+    "runtimeVersion": "1.1.13",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "by.hockeystars.app",
-      "buildNumber": "117",
+      "buildNumber": "122",
       "icon": "./assets/images/icon.png",
       "associatedDomains": [
         "applinks:hockey-stars.com"
@@ -74,7 +74,12 @@
         "monochromeImage": "./assets/icon_android.png"
       },
       "package": "by.hockeystars.app",
-      "versionCode": 116,
+      "versionCode": 122,
+      "blockedPermissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
@@ -93,7 +98,7 @@
         }
       ],
       "splash": {
-        "mdpi": "./assets/images/splash-icon.png",
+"mdpi": "./assets/images/splash-icon.png",
         "hdpi": "./assets/images/splash-icon.png",
         "xhdpi": "./assets/images/splash-icon.png",
         "xxhdpi": "./assets/images/splash-icon.png",
@@ -101,7 +106,6 @@
         "backgroundColor": "#050008"
       },
       "permissions": [
-        "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.VIBRATE",
         "android.permission.WAKE_LOCK",
         "android.permission.POST_NOTIFICATIONS",
@@ -198,7 +202,13 @@
           "microphonePermission": "This app uses microphone to measure puck speed by detecting sound of puck hitting the net"
         }
       ],
-      "expo-audio",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "This app needs access to your photos to upload profile photos, team photos, and achievement photos. The app uses Android Photo Picker for one-time access without requiring persistent permissions."
+        }
+      ],
+      "./plugins/withRemoveBootCompletedReceivers",
       "expo-asset",
       "expo-localization"
     ],

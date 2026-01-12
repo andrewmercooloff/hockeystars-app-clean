@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Alert,
     Image,
+    Platform,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -82,18 +83,29 @@ export default function StarItemManager({ playerId, isEditing = false, onItemsUp
         return;
       }
       
-      // Запрашиваем разрешение на доступ к галерее
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (permissionResult.granted === false) {
-        Alert.alert('Permission Required', 'Permission to access camera roll is required!');
-        return;
-      }
+      // На Android 13+ (API 33+) используем Photo Picker без разрешений
+      // На старых версиях Android запрашиваем разрешения
+      let result;
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          quality: 0.8,
+        });
+      } else {
+        // Для старых версий Android запрашиваем разрешения
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+        if (permissionResult.granted === false) {
+          Alert.alert('Permission Required', 'Permission to access camera roll is required!');
+          return;
+        }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        quality: 0.8,
-      });
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          quality: 0.8,
+        });
+      }
 
       if (!result.canceled && result.assets[0]) {
         

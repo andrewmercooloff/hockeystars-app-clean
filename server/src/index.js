@@ -15,6 +15,7 @@ const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const friendRoutes = require('./routes/friends');
 const uploadRoutes = require('./routes/upload');
+const vkRoutes = require('./routes/vk');
 
 const auth = require('./middleware/auth');
 const setupSocketHandlers = require('./socket/handlers');
@@ -64,6 +65,7 @@ app.use('/api/messages', auth, messageRoutes);
 app.use('/api/notifications', auth, notificationRoutes);
 app.use('/api/friends', auth, friendRoutes);
 app.use('/api/upload', auth, uploadRoutes);
+app.use('/api/vk', vkRoutes); // VK API routes (без auth для публичных видео)
 
 // Health check
 app.get('/api/health', (req, res) => {

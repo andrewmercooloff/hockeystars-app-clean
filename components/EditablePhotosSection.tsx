@@ -153,18 +153,16 @@ export default function EditablePhotosSection({
         input.click();
         return;
       } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert(t('error'), t('galleryPermissionRequired'));
-          return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: false,
-          allowsMultipleSelection: true,
-          quality: 0.7, // Уменьшаем качество для экономии места
-          mediaTypes: ['images'],
-        });
+        // На Android 13+ (API 33+) используем Photo Picker без разрешений
+        // На старых версиях Android запрашиваем разрешения
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+          const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: false,
+            allowsMultipleSelection: true,
+            quality: 0.7, // Уменьшаем качество для экономии места
+            mediaTypes: ['images'],
+          });
 
                           if (!result.canceled && result.assets) {
 
@@ -227,6 +225,80 @@ export default function EditablePhotosSection({
            setUploadProgress(0);
            setUploadingCount(0);
          }
+        } else {
+          // Для старых версий Android запрашиваем разрешения
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert(t('error'), t('galleryPermissionRequired'));
+            return;
+          }
+
+          const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: false,
+            allowsMultipleSelection: true,
+            quality: 0.7, // Уменьшаем качество для экономии места
+            mediaTypes: ['images'],
+          });
+
+          if (!result.canceled && result.assets) {
+            setIsUploading(true);
+            setUploadingCount(result.assets.length);
+            setUploadProgress(0);
+            
+            // Сортируем фото по дате создания (новые сначала)
+            const sortedAssets = [...result.assets].sort((a, b) => {
+              const dateA = new Date(a.creationTime || a.modificationTime || 0).getTime();
+              const dateB = new Date(b.creationTime || b.modificationTime || 0).getTime();
+              return dateB - dateA; // Убывающий порядок (новые сначала)
+            });
+            
+            const newPhotos = [...photos];
+            const uploadedUrls: string[] = [];
+            
+            // Сначала загружаем все фото
+            for (let i = 0; i < sortedAssets.length && newPhotos.length < 50; i++) {
+              const asset = sortedAssets[i];
+              
+              // Обновляем прогресс
+              setUploadProgress(((i + 1) / result.assets.length) * 100);
+              
+              const uploadedUrl = await uploadGalleryPhoto(asset.uri);
+              if (uploadedUrl) {
+                uploadedUrls.push(uploadedUrl);
+              }
+            }
+            
+            // Добавляем загруженные фото в начало (новые сначала)
+            newPhotos.unshift(...uploadedUrls);
+
+            onPhotosChange?.(newPhotos);
+            
+            // Начисляем очки активности за загруженные фото
+            const addedPhotosCount = result.assets.length;
+            if (addedPhotosCount > 0) {
+              try {
+                const currentUser = await loadCurrentUser();
+                if (currentUser) {
+                  // Начисляем 1 звездочку за каждое загруженное фото
+                  for (let i = 0; i < addedPhotosCount; i++) {
+                    try {
+                      await addActivityPoints(currentUser.id, 'PHOTO_UPLOAD');
+                    } catch (error) {
+                      console.error('❌ Ошибка начисления очков активности за фото (не критично):', error);
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('❌ Ошибка начисления очков активности за фото:', error);
+              }
+            }
+            
+            // Скрываем индикатор загрузки
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadingCount(0);
+          }
+        }
       }
          } catch (error) {
        console.error('❌ Ошибка выбора фото из галереи:', error);

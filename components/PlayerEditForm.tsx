@@ -79,17 +79,30 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
         input.click();
         return;
       } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert(t('error'), t('galleryPermissionRequired'));
-          return;
-        }
+        // На Android 13+ (API 33+) используем Photo Picker без разрешений
+        // На старых версиях Android запрашиваем разрешения
+        let result;
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          // Android 13+ использует Photo Picker автоматически, разрешения не нужны
+          result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+          });
+        } else {
+          // Для старых версий Android запрашиваем разрешения
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert(t('error'), t('galleryPermissionRequired'));
+            return;
+          }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.8,
-        });
+          result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+          });
+        }
 
         if (!result.canceled && result.assets[0]) {
           // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов

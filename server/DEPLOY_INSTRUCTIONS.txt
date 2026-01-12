@@ -1,0 +1,420 @@
+ИНСТРУКЦИЯ ПО РАЗВЕРТЫВАНИЮ СИСТЕМЫ ДОБАВЛЕНИЯ ТЕСТИРОВЩИКОВ GOOGLE PLAY
+================================================================================
+
+СТРУКТУРА ФАЙЛОВ (ВАРИАНТ 1 - api в корне хостинга):
+----------------------------------------------------
+/home/seokurs1/
+├── api/                          # Папка Node.js приложения (в корне хостинга)
+│   ├── app.js                    # Точка входа для cPanel Node.js
+│   ├── package.json
+│   └── node_modules/            # Зависимости (создается после npm install)
+│
+├── server/                       # Папка сервера (на том же уровне, что и api)
+│   ├── package.json              # ОБЯЗАТЕЛЬНО: зависимости для add-tester-api.js
+│   ├── node_modules/              # ОБЯЗАТЕЛЬНО: создается после npm install
+│   │   ├── express/              # Должен быть установлен
+│   │   ├── cors/                 # Должен быть установлен
+│   │   └── googleapis/            # Должен быть установлен
+│   └── scripts/
+│       └── add-tester-api.js      # ОБЯЗАТЕЛЬНО: Express API сервер
+│
+└── hockey-stars.com/            # Папка сайта (корень сайта)
+    ├── .htaccess                 # ОБЯЗАТЕЛЬНО: конфигурация Passenger
+    ├── add-tester.php           # PHP прокси (в корне сайта!)
+    ├── script.js                 # JavaScript сайта
+    ├── index.html                # Главная страница
+    └── google-service-account.json # Сервисный аккаунт Google
+
+ЧТО ДОЛЖНО БЫТЬ В ПАПКЕ server/:
+---------------------------------
+ОБЯЗАТЕЛЬНЫЕ ФАЙЛЫ:
+1. package.json - файл с зависимостями
+2. scripts/add-tester-api.js - Express API сервер
+3. node_modules/ - папка с установленными зависимостями (создается после npm install)
+
+ВАЖНО: 
+- После загрузки файлов на сервер нужно выполнить: cd ~/server && npm install
+- Это установит express, cors, googleapis в папку node_modules/
+- Без node_modules/ приложение не запустится (ошибка "Cannot find module")
+
+СТРУКТУРА ФАЙЛОВ (ВАРИАНТ 2 - api в папке сайта):
+-------------------------------------------------
+hockey-stars.com/
+├── api/app.js                    # Точка входа для cPanel Node.js
+├── server/
+│   ├── package.json
+│   └── scripts/add-tester-api.js # Express API сервер
+├── add-tester.php                # PHP прокси (в корне сайта!)
+└── google-service-account.json   # Сервисный аккаунт Google
+
+ШАГ 1: ЗАГРУЗКА ФАЙЛОВ
+----------------------
+1. Загрузите файлы:
+   - api/app.js и api/package.json → в /home/seokurs1/api/
+   - server/ → в /home/seokurs1/server/
+   - add-tester.php → в /home/seokurs1/hockey-stars.com/ (корень сайта, не в подпапку!)
+   - google-service-account.json → в /home/seokurs1/hockey-stars.com/ (корень сайта)
+
+2. Установите права: chmod 600 google-service-account.json
+
+⚠️ ВАЖНО: 
+   - add-tester.php должен быть в корне сайта (hockey-stars.com/), а не в подпапке website/
+   - Это нужно, потому что script.js вызывает /add-tester.php (относительный путь от корня)
+
+ШАГ 2: НАСТРОЙКА NODE.JS В CPANEL
+----------------------------------
+ВАЖНО: Если папка api в корне хостинга (не в hockey-stars.com):
+
+1. УДАЛИТЕ старое приложение в cPanel (если есть)
+
+2. Создайте НОВОЕ Node.js приложение:
+   - Application Root: api (или полный путь: /home/seokurs1/api)
+   - Application URL: app (или полный URL: hockey-stars.com/app)
+   - Startup File: app.js
+   - Node.js Version: 18.x или 20.x
+   
+   ⚠️ ВАЖНО: Application Root должен указывать на папку api в корне хостинга!
+
+3. ПРОВЕРЬТЕ структуру файлов:
+   - /home/seokurs1/api/app.js - должен существовать
+   - /home/seokurs1/api/package.json - должен существовать
+   - /home/seokurs1/server/ - должен существовать на том же уровне, что и api
+
+4. ПРОВЕРЬТЕ .htaccess (если редактируете вручную):
+   - Файл должен быть в корне сайта (hockey-stars.com/.htaccess)
+   - PassengerStartupFile должен быть: app.js (БЕЗ начального слеша!)
+   - НЕ должно быть: PassengerStartupFile /app.js
+   
+   Правильный пример:
+   PassengerAppRoot "/home/seokurs1/api"
+   PassengerBaseURI "/app"
+   PassengerStartupFile app.js  ← БЕЗ слеша в начале!
+
+5. Установите зависимости (ВАЖНО - в правильном порядке!):
+   
+   ⚠️ СНАЧАЛА установите зависимости в api/, ПОТОМ в server/
+   
+   ⚠️ ВАЖНО: cPanel "NPM Install" устанавливает пакеты ТОЛЬКО в api/, 
+   но НЕ в server/! Зависимости в server/ нужно устанавливать ОТДЕЛЬНО через SSH!
+   
+   Вариант А (через cPanel + SSH):
+   - Нажмите "NPM Install" для api/ (установит express, cors, googleapis в api/node_modules/)
+   - ⚠️ После этого ОБЯЗАТЕЛЬНО установите зависимости в server/ через SSH:
+     cd ~/server
+     ~/nodevenv/api/18/bin/npm install --production --no-optional
+   - Без этого приложение не запустится (ошибка "Cannot find module")
+   
+   Вариант Б (через SSH - РЕКОМЕНДУЕТСЯ):
+   # Используйте полный путь к npm из виртуального окружения
+   # Путь зависит от версии Node.js (18 или 20)
+   
+   # Для Node.js 18:
+   ~/nodevenv/api/18/bin/npm install --prefix ~/api
+   ~/nodevenv/api/18/bin/npm install --production --no-optional --prefix ~/server
+   
+   # Или для Node.js 20 (если используется версия 20):
+   # ~/nodevenv/api/20/bin/npm install --prefix ~/api
+   # ~/nodevenv/api/20/bin/npm install --production --no-optional --prefix ~/server
+   
+   # Альтернатива: перейдите в папку и используйте полный путь:
+   cd ~/server
+   ~/nodevenv/api/18/bin/npm install --production --no-optional
+   
+   ⚠️ ВАЖНО: postinstall скрипт удален из api/package.json, 
+   поэтому зависимости в server/ нужно устанавливать ОТДЕЛЬНО!
+
+6. Запустите приложение (Start)
+
+ШАГ 3: ПРОВЕРКА API
+-------------------
+Откройте: https://hockey-stars.com/app/health
+Должен вернуться: {"status":"ok","service":"tester-api"}
+
+ШАГ 4: GOOGLE PLAY CONSOLE
+--------------------------
+1. Создайте Service Account в Google Cloud Console
+2. Включите Google Play Android Developer API
+3. Скачайте JSON ключ → google-service-account.json
+4. В Google Play Console → Settings → API access:
+   - Предоставьте доступ Service Account
+   - Права: View app, Manage releases, Manage testing tracks
+
+ШАГ 5: ТЕСТИРОВАНИЕ
+-------------------
+curl -X POST https://hockey-stars.com/app/add-tester \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","lang":"ru"}'
+
+УСТРАНЕНИЕ ПРОБЛЕМ:
+-------------------
+- "Cannot GET /app/" или "Cannot GET /app/health":
+  
+  ПОШАГОВАЯ ДИАГНОСТИКА:
+  
+  ШАГ 1: Проверьте статус приложения в cPanel
+  --------------------------------------------
+  1. Зайдите в cPanel → Node.js Applications
+  2. Найдите ваше приложение
+  3. Проверьте статус:
+     - ✅ "Running" (зеленый) → переходите к ШАГ 2
+     - ❌ "Stopped" (красный) → нажмите "Start", подождите 15 секунд, затем переходите к ШАГ 2
+  
+  ШАГ 2: Проверьте настройки приложения в cPanel
+  ------------------------------------------------
+  В cPanel → Node.js Applications → ваше приложение, проверьте:
+  - Application Root: должно быть "api" или "/home/seokurs1/api"
+  - Application URL: должно быть "app"
+  - Startup File: должно быть "app.js" (БЕЗ слеша!)
+  - Node.js Version: должна быть указана (18.x или 20.x)
+  
+  ШАГ 3: Проверьте .htaccess в корне сайта
+  ----------------------------------------
+  Файл: /home/seokurs1/hockey-stars.com/.htaccess
+  Должен содержать (в начале файла):
+  
+  PassengerAppRoot "/home/seokurs1/api"
+  PassengerBaseURI "/app"
+  PassengerNodejs "/home/seokurs1/nodevenv/api/18/bin/node"
+  PassengerAppType node
+  PassengerStartupFile app.js
+  
+  ⚠️ ВАЖНО: PassengerStartupFile должен быть "app.js" (БЕЗ слеша /)
+  
+  ШАГ 4: Проверьте файлы через SSH (если есть доступ)
+  ----------------------------------------------------
+  Выполните команды:
+  
+  # Проверьте, что файлы существуют
+  ls -la ~/api/app.js
+  ls -la ~/server/scripts/add-tester-api.js
+  
+   # Проверьте, запущен ли процесс Node.js
+   ps aux | grep node
+   
+   # Попробуйте запустить вручную (для теста, используйте полный путь)
+   cd ~/api
+   ~/nodevenv/api/18/bin/node app.js
+   # Должны появиться сообщения о запуске
+   # Нажмите Ctrl+C для остановки
+  
+  ШАГ 5: Перезапустите приложение
+  --------------------------------
+  1. В cPanel → Node.js Applications
+  2. Нажмите "Stop" (если запущено)
+  3. Подождите 5 секунд
+  4. Нажмите "Start"
+  5. Подождите 20 секунд
+  6. Попробуйте снова: https://hockey-stars.com/app/health
+  
+  ШАГ 6: КРИТИЧЕСКАЯ ПРОБЛЕМА - node_modules не создается
+  --------------------------------------------------------
+  Если npm говорит "up to date", но node_modules нет, проверьте:
+  
+  1. Проверьте, куда на самом деле устанавливаются пакеты:
+     # Проверьте в api/
+     ls -la ~/api/node_modules/
+     
+     # Проверьте в домашней директории
+     ls -la ~/node_modules/
+     
+     # Проверьте в server/
+     ls -la ~/server/node_modules/
+     
+  2. Проверьте права доступа на папку server/:
+     ls -ld ~/server
+     # Должны быть права на запись (rwx для владельца)
+     
+  3. Попробуйте создать папку вручную и установить туда:
+     cd ~/server
+     mkdir -p node_modules
+     chmod 755 node_modules
+     ~/nodevenv/api/18/bin/npm install --production --no-optional
+     
+  4. Если не помогает, проверьте конфигурацию npm:
+     ~/nodevenv/api/18/bin/npm config get prefix
+     # Это покажет, куда npm устанавливает глобальные пакеты
+     
+  5. Попробуйте установить с явным указанием папки:
+     cd ~/server
+     NPM_CONFIG_PREFIX=~/server ~/nodevenv/api/18/bin/npm install --production --no-optional
+     
+  6. АЛЬТЕРНАТИВА: Скопируйте node_modules из api/ (если там есть нужные пакеты):
+     # Проверьте, что в api/ есть нужные пакеты:
+     ls -la ~/api/node_modules/express/
+     ls -la ~/api/node_modules/cors/
+     ls -la ~/api/node_modules/googleapis/
+     
+     # Если есть, можно создать симлинки или скопировать:
+     cd ~/server
+     mkdir -p node_modules
+     # Создайте симлинки на нужные пакеты:
+     ln -s ~/api/node_modules/express node_modules/express
+     ln -s ~/api/node_modules/cors node_modules/cors
+     ln -s ~/api/node_modules/googleapis node_modules/googleapis
+
+ШАГ 7: Проверьте, что node_modules установлены в ОБОИХ папках
+  -------------------------------------------------------------
+  ⚠️ ВАЖНО: cPanel "NPM Install" устанавливает пакеты ТОЛЬКО в api/, 
+  но НЕ в server/! Это частая причина ошибок!
+  
+  Если вы видите ошибку 404, проверьте:
+  
+  1. Проверьте node_modules в api/:
+     ls -la ~/api/node_modules/
+     # Должна существовать папка с express, cors, googleapis
+     # Если нет - нажмите "NPM Install" в cPanel
+  
+  2. Проверьте node_modules в server/:
+     ls -la ~/server/node_modules/
+     # Должна существовать папка node_modules с подпапками express, cors, googleapis
+  
+  3. Если node_modules нет в server/, установите через SSH:
+     # ВАЖНО: Сначала перейдите в папку server/
+     cd ~/server
+     
+     # Проверьте, что вы в правильной папке:
+     pwd
+     # Должно показать: /home/seokurs1/server
+     
+     # Проверьте, что package.json существует:
+     ls -la package.json
+     
+     # Если npm говорит "up to date", но node_modules нет, принудительно переустановите:
+     # 1. Очистите кэш npm:
+     ~/nodevenv/api/18/bin/npm cache clean --force
+     
+     # 2. Удалите package-lock.json если есть:
+     rm -f package-lock.json
+     
+     # 3. Принудительно установите зависимости заново:
+     ~/nodevenv/api/18/bin/npm install --production --no-optional --force
+     # Или для версии 20:
+     # ~/nodevenv/api/20/bin/npm install --production --no-optional --force
+     
+     # 4. Если не помогло, попробуйте без флагов:
+     ~/nodevenv/api/18/bin/npm install
+     
+     # Подождите завершения установки (может занять несколько минут)
+     # После установки проверьте:
+     ls -la node_modules/
+     
+  4. Если --prefix не работает, используйте cd:
+     # Флаг --prefix иногда не работает правильно
+     # Лучше использовать cd:
+     cd ~/server
+     ~/nodevenv/api/18/bin/npm install --production --no-optional
+  
+  3. Также проверьте node_modules в api/:
+     ls -la ~/api/node_modules/
+     # Если нет, установите:
+     cd ~/api
+     ~/nodevenv/api/18/bin/npm install
+
+ШАГ 7: Если все еще не работает - пересоздайте приложение
+  ---------------------------------------------------------
+  1. Удалите приложение в cPanel
+  2. Убедитесь, что node_modules установлены в обоих папках (api/ и server/)
+  3. Создайте заново с параметрами:
+     - Application Root: api
+     - Application URL: app
+     - Startup File: app.js
+     - Node.js Version: 18.x или 20.x
+  4. После создания подождите 30 секунд
+  5. Запустите приложение (Start)
+  6. Подождите 20 секунд
+  7. Проверьте: https://hockey-stars.com/app/health
+
+- 503: Проверьте, что приложение запущено в cPanel
+- 404: Проверьте URL приложения (должен быть "app")
+- Cannot find module: Установите зависимости в server/
+- Permission denied: Проверьте доступ Service Account в Google Play Console
+
+- "Отсутствует файл package.json" (хотя файл есть):
+  1. Обновите страницу в cPanel (F5 или Ctrl+R)
+  2. Перезапустите приложение (Stop → Start)
+  3. Если не помогло - установите зависимости вручную через SSH:
+     cd ~/api && npm install
+     cd ~/server && npm install
+  4. Или удалите и создайте приложение заново в cPanel
+
+- "Несуществующее или поврежденное приложение. Невозможно найти каталог виртуа...":
+  1. УДАЛИТЕ приложение в cPanel полностью
+  2. Проверьте структуру файлов:
+     - api/ должен быть в корне хостинга (/home/seokurs1/api)
+     - В api/ должны быть: app.js и package.json
+  3. Создайте приложение ЗАНОВО с правильными путями:
+     - Application Root: api (или полный путь)
+     - Application URL: app
+     - Startup File: app.js
+  4. После создания подождите 30-60 секунд для создания виртуального окружения
+  5. Попробуйте установить пакеты снова
+
+- "sh: line 1: cd: ../server: No such file or directory":
+  Это ошибка из postinstall скрипта. Решение:
+  1. Установите зависимости в api/ через cPanel или SSH:
+     cd ~/api && npm install
+  2. Установите зависимости в server/ ОТДЕЛЬНО:
+     cd ~/server && npm install --production --no-optional
+  3. postinstall скрипт удален из api/package.json, 
+     поэтому зависимости устанавливаются вручную
+
+- "npm error TAR_ENTRY_ERROR Unknown system error -122":
+  Это ошибка обычно означает ПРЕВЫШЕНИЕ КВОТЫ ДИСКА или нехватку места.
+  
+  РЕШЕНИЕ 1 (через SSH):
+  1. Проверьте квоту диска:
+     quota -s
+     df -h ~
+  2. Очистите кэш npm (используйте полный путь):
+     ~/nodevenv/api/18/bin/npm cache clean --force
+  3. Удалите старые node_modules (если есть):
+     rm -rf ~/api/node_modules
+     rm -rf ~/server/node_modules
+  4. Установите пакеты с минимальными зависимостями (используйте полный путь):
+     ~/nodevenv/api/18/bin/npm install --no-optional --production --prefix ~/api
+     ~/nodevenv/api/18/bin/npm install --no-optional --production --prefix ~/server
+  
+  РЕШЕНИЕ 2 (если квота превышена):
+  1. Очистите старые логи и временные файлы в cPanel
+  2. Удалите неиспользуемые файлы
+  3. Обратитесь в поддержку хостинга для увеличения квоты
+  4. Или используйте только необходимые зависимости в package.json
+  
+  РЕШЕНИЕ 3 (упрощенный package.json):
+  Если квота очень маленькая, можно оставить только критичные зависимости:
+  - В api/package.json оставьте только: express, cors, googleapis
+  - В server/package.json удалите неиспользуемые зависимости
+
+ЛОГИ:
+-----
+- Node.js: 
+  * cPanel → Node.js Applications → View Logs (если доступно)
+  * Или через SSH: tail -f ~/api/logs/*.log
+  * Или через SSH: cat ~/.npm/_logs/*.log | tail -50
+  * Или через SSH: journalctl -u nodejs-* (если используется systemd)
+  * Или проверьте файлы в: ~/api/logs/ или ~/logs/
+- PHP fallback: hockey-stars.com/tester-emails.log (создается автоматически в корне сайта)
+
+ПРОВЕРКА РАБОТЫ ПРИЛОЖЕНИЯ (если нет логов в cPanel):
+-----------------------------------------------------
+1. Проверьте статус приложения в cPanel → Node.js Applications
+   - Должно быть "Running" (зеленый)
+   - Если "Stopped" → нажмите "Start"
+
+2. Проверьте через SSH (если есть доступ):
+   ps aux | grep node
+   # Должен быть процесс node, запущенный от вашего пользователя
+
+3. Проверьте файлы напрямую:
+   ls -la ~/api/app.js
+   ls -la ~/server/scripts/add-tester-api.js
+   # Оба файла должны существовать
+
+4. Попробуйте запустить вручную через SSH (для теста):
+   cd ~/api && node app.js
+   # Должны появиться сообщения о запуске
+   # Нажмите Ctrl+C для остановки
+
+
+
+
