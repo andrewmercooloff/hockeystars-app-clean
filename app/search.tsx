@@ -369,9 +369,15 @@ export default function SearchScreen() {
           filteredPlayers = allPlayers;
           console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
         } else {
-          filteredPlayers = allPlayers.filter(player => 
-            player.status === 'player' || 
-            player.status === 'admin'
+          // Показываем игроков, звёзд, тренеров, магазины; скаутов не показываем
+          filteredPlayers = allPlayers.filter(player =>
+            player.status !== 'scout' &&
+            (player.status === 'player' ||
+              player.status === 'admin' ||
+              player.status === 'star' ||
+              player.status === 'coach' ||
+              player.status === 'shop' ||
+              player.status === 'skateSharpening')
           );
         }
         
@@ -407,9 +413,15 @@ export default function SearchScreen() {
               filteredPlayers = allPlayers;
               console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
             } else {
-              filteredPlayers = allPlayers.filter(player => 
-                player.status === 'player' || 
-                player.status === 'admin'
+              // Показываем игроков, звёзд, тренеров, магазины; скаутов не показываем
+              filteredPlayers = allPlayers.filter(player =>
+                player.status !== 'scout' &&
+                (player.status === 'player' ||
+                  player.status === 'admin' ||
+                  player.status === 'star' ||
+                  player.status === 'coach' ||
+                  player.status === 'shop' ||
+                  player.status === 'skateSharpening')
               );
             }
             setPlayers(filteredPlayers);

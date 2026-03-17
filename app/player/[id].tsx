@@ -1998,10 +1998,13 @@ export default function PlayerProfile() {
     if (!response.ok || data.error) throw new Error(data.error || 'Translation failed');
 
     const translated = data.translation;
+    if (!translated || typeof translated !== 'string') {
+      throw new Error('Invalid translation response');
+    }
     // Update local cache
     setAiAnalysis(prev => prev ? {
       ...prev,
-      translations: { ...prev.translations, [lang]: translated },
+      translations: { ...(prev.translations || {}), [lang]: translated },
     } : prev);
     return translated;
   };

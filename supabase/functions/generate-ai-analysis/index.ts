@@ -265,7 +265,7 @@ function isValidYouTubeUrl(url: string): boolean {
 
 async function translateAnalysis(text: string, targetLang: string): Promise<string> {
   const langNames: Record<string, string> = {
-    ru: "Russian", de: "German", fr: "French", it: "Italian",
+    en: "English", ru: "Russian", de: "German", fr: "French", it: "Italian",
     es: "Spanish", lt: "Lithuanian", lv: "Latvian", pl: "Polish",
     sv: "Swedish", cs: "Czech", sk: "Slovak", fi: "Finnish",
   };
@@ -329,7 +329,7 @@ serve(async (req) => {
     }
 
     // ACTION: translate
-    if (action === "translate" && target_lang && target_lang !== "en") {
+    if (action === "translate" && target_lang) {
       const { data: playerRow } = await supabase
         .from("players")
         .select("ai_analysis")

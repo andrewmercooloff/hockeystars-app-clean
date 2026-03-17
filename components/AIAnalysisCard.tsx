@@ -10,6 +10,7 @@ import {
   Switch,
   Image,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { captureRef } from 'react-native-view-shot';
@@ -85,6 +86,8 @@ const i18n: Record<string, Record<string, string>> = {
   completeProfile:  { en: 'Complete profile to unlock', ru: 'Заполните профиль для разблокировки', de: 'Profil vervollständigen zum Entsperren', fr: 'Compléter le profil pour déverrouiller', it: 'Completa il profilo per sbloccare', pl: 'Uzupełnij profil, aby odblokować', sv: 'Slutför profilen för att låsa upp', cs: 'Dokončete profil pro odemknutí', sk: 'Dokončite profil na odomknutie', fi: 'Täydennä profiili avataksesi', lv: 'Aizpildiet profilu, lai atbloķētu', lt: 'Užpildykite profilį norėdami atrakinti' },
   translate:        { en: 'Translate', ru: 'Перевести', de: 'Übersetzen', fr: 'Traduire', it: 'Traduci', pl: 'Przetłumacz', sv: 'Översätt', cs: 'Přeložit', sk: 'Preložiť', fi: 'Käännä', lv: 'Tulkot', lt: 'Versti' },
   showOriginal:     { en: 'Original', ru: 'Оригинал', de: 'Original', fr: 'Original', it: 'Originale', pl: 'Oryginał', sv: 'Original', cs: 'Originál', sk: 'Originál', fi: 'Alkuperäinen', lv: 'Oriģināls', lt: 'Originalas' },
+  showRussian:      { en: 'Russian', ru: 'Русский', de: 'Russisch', fr: 'Russe', it: 'Russo', pl: 'Rosyjski', sv: 'Ryska', cs: 'Ruština', sk: 'Ruština', fi: 'Venäjä', lv: 'Krievu', lt: 'Rusų' },
+  showEnglish:      { en: 'English', ru: 'Английский', de: 'Englisch', fr: 'Anglais', it: 'Inglese', pl: 'Angielski', sv: 'Engelska', cs: 'Angličtina', sk: 'Angličtina', fi: 'Englanti', lv: 'Angļu', lt: 'Anglų' },
   save:             { en: 'Share', ru: 'Поделиться', de: 'Teilen', fr: 'Partager', it: 'Condividi', pl: 'Udostępnij', sv: 'Dela', cs: 'Sdílet', sk: 'Zdieľať', fi: 'Jaa', lv: 'Dalīties', lt: 'Dalintis' },
   readMore:         { en: 'Read full report', ru: 'Читать полный отчет', de: 'Vollständigen Scout-Bericht lesen', fr: 'Lire le rapport complet', it: 'Leggi rapporto completo', pl: 'Czytaj pełny raport', sv: 'Läs fullständig rapport', cs: 'Číst celou zprávu', sk: 'Čítať celú správu', fi: 'Lue koko raportti', lv: 'Lasīt pilnu ziņojumu', lt: 'Skaityti visą ataskaitą' },
   readLess:         { en: 'Collapse', ru: 'Свернуть', de: 'Einklappen', fr: 'Réduire', it: 'Comprimi', pl: 'Zwiń', sv: 'Dölj', cs: 'Sbalit', sk: 'Zbaliť', fi: 'Tiivistä', lv: 'Sakļaut', lt: 'Sutraukti' },
@@ -205,14 +208,19 @@ export default function AIAnalysisCard({
   onCollapse,
   activeInputRef,
 }: Props) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const tr = (key: string) => i18n[key]?.[language] || i18n[key]?.['en'] || key;
 
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [translatedText, setTranslatedText] = useState<string | null>(
-    analysis?.translations?.[language] || null
-  );
+  // Russian for Russian speakers, English for everyone else
+  const preferredLang = language === 'ru' ? 'ru' : 'en';
+  const textRussian = analysis?.translations?.ru ?? (analysis?.generation_language === 'ru' ? analysis?.text : null);
+  const textEnglish = analysis?.translations?.en ?? (analysis?.generation_language === 'en' ? analysis?.text : null);
+  const hasRussian = !!textRussian;
+  const hasEnglish = !!textEnglish;
+
+  const [showOtherLang, setShowOtherLang] = useState(false); // manual switch to non-preferred
   const [translating, setTranslating] = useState(false);
+
   const [showMissingModal, setShowMissingModal] = useState(false);
   const [isRegenerateMode, setIsRegenerateMode] = useState(false);
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
@@ -225,7 +233,15 @@ export default function AIAnalysisCard({
 
   const remaining = maxUsage - usageCount;
   const hasAnalysis = !!analysis?.text;
-  const displayText = showTranslation && translatedText ? translatedText : analysis?.text;
+
+  // Auto-select: Russian for Russian UI, English for all others. Manual override via showOtherLang.
+  const displayText = (() => {
+    if (!hasAnalysis) return '';
+    const preferred = preferredLang === 'ru' ? textRussian : textEnglish;
+    const other = preferredLang === 'ru' ? textEnglish : textRussian;
+    if (showOtherLang && other) return other;
+    return preferred ?? analysis?.text ?? '';
+  })();
 
   const prevGeneratingRef = useRef(isGenerating);
   useEffect(() => {
@@ -235,26 +251,27 @@ export default function AIAnalysisCard({
     prevGeneratingRef.current = isGenerating;
   }, [isGenerating, hasAnalysis]);
 
-  // Only show translate button when analysis language differs from current UI language
-  const analysisLang = analysis?.generation_language || 'en';
-  const showTranslateBtn = hasAnalysis && language !== analysisLang;
+  // Need to fetch translation when we don't have the preferred version yet
+  const needTranslate = hasAnalysis && preferredLang === 'ru' && !hasRussian;
+  const needTranslateEn = hasAnalysis && preferredLang === 'en' && !hasEnglish;
+  const showTranslateBtn = needTranslate || needTranslateEn;
+  const showSwitchBtn = hasRussian && hasEnglish;
+  const showAddOtherBtn = hasAnalysis && !showTranslateBtn && !showSwitchBtn;
   // Video section hidden (video processing disabled — too expensive)
   const showEditFields = isOwner && (isEditing || isRegenerateMode);
 
-  const handleTranslate = async () => {
-    if (language === 'en') return;
-    if (analysis?.translations?.[language]) {
-      setTranslatedText(analysis.translations[language]);
-      setShowTranslation(true);
-      return;
-    }
+  const handleTranslate = async (targetLang?: 'ru' | 'en') => {
+    const lang = targetLang ?? (needTranslate ? 'ru' : 'en');
+    if (analysis?.translations?.[lang]) return;
     setTranslating(true);
     try {
-      const result = await onTranslate(language);
-      setTranslatedText(result);
-      setShowTranslation(true);
-    } catch {}
-    finally { setTranslating(false); }
+      await onTranslate(lang);
+    } catch (e) {
+      console.error('Translation failed:', e);
+      Alert.alert(t('common.error') || 'Error', (e as Error)?.message || 'Translation failed');
+    } finally {
+      setTranslating(false);
+    }
   };
 
   const handleShare = async () => {
@@ -365,8 +382,6 @@ export default function AIAnalysisCard({
           </TouchableOpacity>
         )}
       </View>
-        );
-      })}
       <Text style={styles.videoHint}>{tr('videoHint')}</Text>
     </View>
   ) : null;
@@ -568,20 +583,48 @@ export default function AIAnalysisCard({
         />
       </TouchableOpacity>
 
-      {/* Action row: Translate + Save */}
+      {/* Action row: Translate / Switch language + Save */}
       <View style={styles.actionsRow}>
         {showTranslateBtn && (
           <TouchableOpacity
-            style={[styles.actionBtn, showTranslation && styles.actionBtnActive]}
-            onPress={showTranslation ? () => setShowTranslation(false) : handleTranslate}
+            style={[styles.actionBtn, styles.actionBtnActive]}
+            onPress={handleTranslate}
             disabled={translating}
           >
             {translating
               ? <ActivityIndicator size="small" color="#fa2f40" />
-              : <Ionicons name="language-outline" size={16} color={showTranslation ? '#fa2f40' : '#aaa'} />
+              : <Ionicons name="language-outline" size={16} color="#fa2f40" />
             }
-            <Text style={[styles.actionBtnText, showTranslation && { color: '#fa2f40' }]}>
-              {showTranslation ? tr('showOriginal') : tr('translate')}
+            <Text style={[styles.actionBtnText, { color: '#fa2f40' }]}>
+              {tr('translate')} ({preferredLang === 'ru' ? tr('showRussian') : tr('showEnglish')})
+            </Text>
+          </TouchableOpacity>
+        )}
+        {showSwitchBtn && (
+          <TouchableOpacity
+            style={[styles.actionBtn, showOtherLang && styles.actionBtnActive]}
+            onPress={() => setShowOtherLang(!showOtherLang)}
+          >
+            <Ionicons name="swap-horizontal-outline" size={16} color={showOtherLang ? '#fa2f40' : '#aaa'} />
+            <Text style={[styles.actionBtnText, showOtherLang && { color: '#fa2f40' }]}>
+              {showOtherLang
+                ? (preferredLang === 'ru' ? tr('showRussian') : tr('showEnglish'))
+                : (preferredLang === 'ru' ? tr('showEnglish') : tr('showRussian'))}
+            </Text>
+          </TouchableOpacity>
+        )}
+        {showAddOtherBtn && (
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => handleTranslate(preferredLang === 'ru' ? 'en' : 'ru')}
+            disabled={translating}
+          >
+            {translating
+              ? <ActivityIndicator size="small" color="#aaa" />
+              : <Ionicons name="language-outline" size={16} color="#aaa" />
+            }
+            <Text style={styles.actionBtnText}>
+              {tr('translate')} ({preferredLang === 'ru' ? tr('showEnglish') : tr('showRussian')})
             </Text>
           </TouchableOpacity>
         )}
