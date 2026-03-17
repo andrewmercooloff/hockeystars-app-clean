@@ -1898,7 +1898,10 @@ export default function PlayerProfile() {
   // --- AI Analysis helpers ---
 
   /** Returns true if the player profile has enough data for analysis */
-  const checkProfileCompleteness = (p: Player): { complete: boolean; missing: string[] } => {
+  const checkProfileCompleteness = (
+    p: Player,
+    teams: { current: PastTeam[]; past: PastTeam[] }
+  ): { complete: boolean; missing: string[] } => {
     const missing: string[] = [];
     if (!p.avatar) missing.push('Profile photo');
     if (!p.position) missing.push('Position');
@@ -1907,6 +1910,8 @@ export default function PlayerProfile() {
     if (!p.height || p.height === '0') missing.push('Height');
     if (!p.weight || p.weight === '0') missing.push('Weight');
     if (!p.grip) missing.push('Stick grip');
+    const hasTeams = (teams.current?.length || 0) + (teams.past?.length || 0) > 0;
+    if (!hasTeams) missing.push(t('profile.teams') || 'Team');
     const isGoalie = p.position === 'goalie';
     if (isGoalie) {
       if (!p.games && !p.minutes && !p.shots) missing.push('Season stats (games/shots/saves)');
@@ -5963,7 +5968,7 @@ export default function PlayerProfile() {
 
             {/* Scout Report — full section (button + videos + report) */}
             {player && (isOwner || (aiAnalysis && aiAnalysis.is_public)) && (() => {
-              const completeness = checkProfileCompleteness(player);
+              const completeness = checkProfileCompleteness(player, { current: playerTeams, past: pastTeams });
               return (
                 <View ref={aiSectionRef} collapsable={false}>
                   <SectionCard>
