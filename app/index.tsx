@@ -18,11 +18,13 @@ import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import * as Device from 'expo-device';
 import { useLanguage } from '../contexts/LanguageContext';
+import PuckGame from '../components/PuckGame';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 // Размер шайбы
 const PUCK_SIZE = 70;
+const GAME_PUCK_ID = '__game__';
 
 // Определение уровня производительности устройства
 // ТОЛЬКО для FPS - скорость шайб теперь одинаковая для всех устройств
@@ -1776,6 +1778,9 @@ export default function HomeScreen() {
     currentScreenRef.current = currentScreen;
   }, [currentScreen]);
 
+  // Мини-игра
+  const [showGame, setShowGame] = useState(false);
+
   // Размеры области льда для разметки
   const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
 
@@ -1789,6 +1794,11 @@ export default function HomeScreen() {
   const filterInitTimeRef = useRef<number>(0); // Время инициализации фильтров для защиты от пересчета
   const lastUserCountryRef = useRef<string | null>(null); // Отслеживаем изменения страны пользователя
   const lastUserIdRef = useRef<string | null>(null); // Отслеживаем смену пользователя (например, admin login-as-user)
+  // Рефы для чтения актуального currentUser внутри loadAllPlayers без добавления в deps
+  const currentUserRef = useRef(currentUser);
+  const isUserLoadingRef = useRef(isUserLoading);
+  useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
+  useEffect(() => { isUserLoadingRef.current = isUserLoading; }, [isUserLoading]);
 
   // Фильтры
   const { selectedCountry, setSelectedCountry, showCountryFilter, setShowCountryFilter } = useCountryFilter();
@@ -1880,27 +1890,61 @@ export default function HomeScreen() {
   const shakeHintOpacity = useRef(new RNAnimated.Value(0)).current;
   const shakeIconRotation = useRef(new RNAnimated.Value(0)).current;
 
+  // Вспомогательная функция: вычисляет начальные фильтры по загруженным игрокам и пользователю.
+  // Дублирует логику initialFilters useMemo, но работает синхронно внутри loadAllPlayers,
+  // чтобы мы могли выставить setPlayers + setSelectedCountry + setSelectedYear В ОДНОМ рендере
+  // и избежать двойного торможения шайб при старте.
+  const computeFiltersForPlayers = useCallback((loadedPlayers: Player[], user: Player | null): { country: string | null; year: number | null } => {
+    if (!user?.country || loadedPlayers.length === 0) return { country: null, year: null };
+    const defaultCountry = user.country;
+    const playersInCountry = loadedPlayers.filter(p =>
+      p.country === defaultCountry && p.birthDate &&
+      (p.status === 'player' || p.status === 'star' || p.status === 'coach' || p.status === 'scout')
+    );
+    if (playersInCountry.length === 0) return { country: null, year: null };
+    let defaultYear: number | null = null;
+    if (user.status !== 'coach' && user.status !== 'star' && user.birthDate) {
+      const year = parseInt(user.birthDate.split('-')[0]);
+      const inYear = playersInCountry.filter(p => p.birthDate?.startsWith(year.toString()));
+      defaultYear = inYear.length > 0 ? year : null;
+    }
+    return { country: defaultCountry, year: defaultYear };
+  }, []);
+
   // Загрузка игроков (с поддержкой принудительного обновления)
   // ВАЖНО: определяется ДО useEffect, которые его используют
   const loadAllPlayers = useCallback(async (forceRefresh = false) => {
-      try {
-        setLoading(true);
-        console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
-      const loadedPlayers = await loadPlayers(forceRefresh); // Принудительное обновление при необходимости
+    try {
+      setLoading(true);
+      console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
+      const loadedPlayers = await loadPlayers(forceRefresh);
+
+      // Если пользователь уже определён — вычисляем фильтры немедленно и выставляем
+      // setPlayers + setSelectedCountry + setSelectedYear В ОДНОМ рендере (React 18 auto-batching).
+      // Это устраняет двойное торможение шайб при старте: раньше фильтры ставились из
+      // useLayoutEffect в ОТДЕЛЬНОМ рендере, что вызывало полную переинициализацию позиций.
+      const user = currentUserRef.current;
+      const userStillLoading = isUserLoadingRef.current;
+
+      if (!filtersInitializedRef.current && !userStillLoading && loadedPlayers.length > 0) {
+        const { country, year } = computeFiltersForPlayers(loadedPlayers, user);
+        // Все три вызова попадут в один React-рендер (React 18 batching в async-контексте)
+        setPlayers(loadedPlayers);
+        setSelectedCountry(country);
+        setSelectedYear(year);
+        filtersInitializedRef.current = true;
+        console.log(`✅ Игроки загружены (${loadedPlayers.length}) + фильтры за один рендер:`, country, year);
+      } else {
+        // Пользователь ещё не загружен — ставим только игроков; фильтры подхватит useLayoutEffect
         setPlayers(loadedPlayers);
         console.log(`✅ Игроки загружены${forceRefresh ? ' (принудительно)' : ''}:`, loadedPlayers.length);
-
-        // Логируем страну текущего пользователя в загруженных данных
-        if (currentUser) {
-          const currentUserInList = loadedPlayers.find(p => p.id === currentUser.id);
-          console.log('👤 Страна текущего пользователя в списке:', currentUserInList?.country);
-        }
-        } catch (error) {
-        console.error('❌ Ошибка загрузки игроков:', error);
-      } finally {
-        setLoading(false);
       }
-  }, []);
+    } catch (error) {
+      console.error('❌ Ошибка загрузки игроков:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [computeFiltersForPlayers, setSelectedCountry, setSelectedYear]);
 
   // Отслеживаем изменения страны пользователя и переинициализируем фильтры
   // ВАЖНО: НЕ вызываем loadAllPlayers(true), так как это unmounts другие экраны (профиль)
@@ -2369,8 +2413,25 @@ export default function HomeScreen() {
       blockedUsersLength: blockedUsers.length
     };
 
-    return filtered;
+    // Добавляем “игровую” шайбу всегда, независимо от фильтров
+    const gamePuck: Player = {
+      id: GAME_PUCK_ID,
+      name: 'Game',
+      status: 'game' as any,
+      avatar: null,
+    } as any;
+
+    return [...filtered, gamePuck];
   }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers]);
+
+  // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
+  // но сохраняем ограничения скрытых/заблокированных, чтобы не показывать их нигде.
+  const gamePlayers = useMemo(() => {
+    const base = players.filter((p) => !p.is_hidden);
+    if (blockedUsers.length === 0) return base;
+    const blockedSet = new Set(blockedUsers);
+    return base.filter((p) => !blockedSet.has(p.id));
+  }, [players, blockedUsers]);
 
   // Используем полную логику коллизий из основного экрана
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
@@ -2582,6 +2643,10 @@ export default function HomeScreen() {
 
   // Обработчик нажатия на шайбу (навигация в профиль) - мемоизирован для оптимизации
   const handlePuckPress = useCallback((playerId: string) => {
+    if (playerId === GAME_PUCK_ID) {
+      setShowGame(true);
+      return;
+    }
     if (!currentUser) {
       router.push('/login');
       return;
@@ -2666,13 +2731,13 @@ export default function HomeScreen() {
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
 
-        {/* Фильтры - как в основном экране */}
+        {/* Фильтры */}
         <View style={styles.filtersWrapper}>
           <View style={styles.filtersContainer}>
             <CountryFilter players={players} />
             <YearFilter players={players} />
-              </View>
-            </View>
+          </View>
+        </View>
 
         {/* Подсказка о тряске при первом запуске */}
         {showShakeHint && (
@@ -2711,6 +2776,13 @@ export default function HomeScreen() {
           </RNAnimated.View>
         )}
       </ImageBackground>
+
+      <PuckGame
+        visible={showGame}
+        onClose={() => setShowGame(false)}
+        visiblePlayers={gamePlayers}
+        currentUser={currentUser}
+      />
     </View>
   );
 }
@@ -2743,10 +2815,12 @@ const styles = StyleSheet.create({
   },
   filtersWrapper: {
     position: 'absolute',
-    top: 20, // В левом верхнем углу как на главной
+    top: 20,
     left: 20,
     right: 20,
-    alignItems: 'flex-start', // Выравнивание влево
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   filtersContainer: {
     flexDirection: 'row',

@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
 
@@ -31,7 +38,26 @@ const Puck: React.FC<PuckProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
-  
+
+  // Переливание цветов для шайбы с джойстиком (игра)
+  const colorProgress = useSharedValue(0);
+  useEffect(() => {
+    if (status !== 'game') return;
+    colorProgress.value = withRepeat(
+      withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [status, colorProgress]);
+
+  const gamePuckAnimatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      colorProgress.value,
+      [0, 0.25, 0.5, 0.75, 1],
+      ['#4b0b12', '#6b2a4a', '#4a3a8b', '#2a6b6b', '#4b0b12']
+    ),
+  }));
+
   // Анимация для тени на льду - отключена для лучшей производительности
   // const shadowOpacity = useSharedValue(0.4);
   
@@ -151,23 +177,39 @@ const Puck: React.FC<PuckProps> = ({
             />
           </View>
         ) : (
-          <View style={[
-            styles.avatarPlaceholder,
-            {
-              width: dimensions.avatarSize,
-              height: dimensions.avatarSize,
-              borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
-              borderColor: avatarBorderColor,
-              backgroundColor: '#2C3E50'
-            }
-          ]}>
-            <Ionicons
-              name={status === 'shop' ? 'storefront' : 'person'}
-              size={dimensions.iconSize}
-              color="#FFFFFF"
-            />
-          </View>
+          status === 'game' ? (
+            <Animated.View style={[
+              styles.avatarPlaceholder,
+              {
+                width: dimensions.avatarSize,
+                height: dimensions.avatarSize,
+                borderRadius: dimensions.avatarBorderRadius,
+                borderWidth: 2,
+                borderColor: avatarBorderColor,
+              },
+              gamePuckAnimatedStyle,
+            ]}>
+              <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
+            </Animated.View>
+          ) : (
+            <View style={[
+              styles.avatarPlaceholder,
+              {
+                width: dimensions.avatarSize,
+                height: dimensions.avatarSize,
+                borderRadius: dimensions.avatarBorderRadius,
+                borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
+                borderColor: avatarBorderColor,
+                backgroundColor: '#2C3E50',
+              }
+            ]}>
+              <Ionicons
+                name={status === 'shop' ? 'storefront' : 'person'}
+                size={dimensions.iconSize}
+                color="#FFFFFF"
+              />
+            </View>
+          )
         )}
         
         {points && status === 'player' && points !== 'NaN' && points !== 'undefined' && typeof points === 'string' && points.length > 0 && (

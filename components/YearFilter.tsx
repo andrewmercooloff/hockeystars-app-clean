@@ -5,8 +5,12 @@ import {
     TouchableOpacity,
     View,
     Platform,
-    Animated
+    Animated,
+    ScrollView,
+    Dimensions,
 } from 'react-native';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -177,55 +181,62 @@ export default function YearFilter({ players }: { players: any[] }) {
             transform: [{ translateY: dropdownTranslateY }],
           }
         ]}>
-          {/* Опция "Все" */}
-          <TouchableOpacity
-            style={[
-              styles.yearItem,
-              !selectedYear && styles.selectedYearItem
-            ]}
-            onPress={() => handleYearSelect(null)}
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+            bounces={false}
+            keyboardShouldPersistTaps="handled"
+            style={{ maxHeight: SCREEN_HEIGHT * 0.6 }}
           >
-            <Text style={[
-              styles.yearText,
-              !selectedYear && styles.selectedYearText
-            ]}>
-              {t('filters.allYears') || 'Все'}
-            </Text>
-          </TouchableOpacity>
-          
-          {availableYears.map(({ year }, index) => {
-            const isSelected = selectedYear === year;
-            const isFirst = index === 0;
-            const isLast = index === availableYears.length - 1;
-            const isOnly = availableYears.length === 1;
+            {/* Опция "Все" */}
+            <TouchableOpacity
+              style={[
+                styles.yearItem,
+                !selectedYear && styles.selectedYearItem
+              ]}
+              onPress={() => handleYearSelect(null)}
+            >
+              <Text style={[
+                styles.yearText,
+                !selectedYear && styles.selectedYearText
+              ]}>
+                {t('filters.allYears') || 'Все'}
+              </Text>
+            </TouchableOpacity>
             
-            let selectedStyle = styles.selectedYearItem;
-            if (isOnly) {
-              selectedStyle = styles.onlySelectedItem;
-            } else if (isFirst) {
-              selectedStyle = styles.firstSelectedItem;
-            } else if (isLast) {
-              selectedStyle = styles.lastSelectedItem;
-            }
-            
-            return (
-              <TouchableOpacity
-                key={year}
-                style={[
-                  styles.yearItem, 
-                  isSelected && selectedStyle
-                ]}
-                onPress={() => handleYearSelect(year)}
-              >
-                <Text style={[
-                  styles.yearText, 
-                  isSelected && styles.selectedYearText
-                ]}>
-                  {year}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+            {availableYears.map(({ year }, index) => {
+              const isSelected = selectedYear === year;
+              const isFirst = index === 0;
+              const isLast = index === availableYears.length - 1;
+              const isOnly = availableYears.length === 1;
+              
+              let selectedStyle = styles.selectedYearItem;
+              if (isOnly) {
+                selectedStyle = styles.onlySelectedItem;
+              } else if (isFirst) {
+                selectedStyle = styles.firstSelectedItem;
+              } else if (isLast) {
+                selectedStyle = styles.lastSelectedItem;
+              }
+              
+              return (
+                <TouchableOpacity
+                  key={year}
+                  style={[
+                    styles.yearItem, 
+                    isSelected && selectedStyle
+                  ]}
+                  onPress={() => handleYearSelect(year)}
+                >
+                  <Text style={[
+                    styles.yearText, 
+                    isSelected && styles.selectedYearText
+                  ]}>
+                    {year}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </Animated.View>
       )}
     </View>
@@ -248,30 +259,34 @@ const styles = StyleSheet.create({
     width: 100,
   },
   filterButtonText: {
-    color: '#fff', // Белый текст
+    color: '#fff',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
     flex: 1,
   },
   filterButtonIcon: {
-    color: '#fff', // Белый цвет иконки
+    color: '#fff',
     fontSize: 10,
     fontFamily: 'Gilroy-Regular',
+    fontWeight: '400',
   },
   yearsList: {
     position: 'absolute',
     top: '100%',
     left: 0,
     width: 100,
+    maxHeight: SCREEN_HEIGHT * 0.65,
     backgroundColor: 'rgba(1, 0, 0, 0.9)',
     borderRadius: 12,
     marginTop: 4,
     zIndex: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#000', // Черный цвет тени
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -288,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)', // Белый цвет разделителя
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   selectedYearItem: {
     backgroundColor: '#fa2f40',
@@ -298,11 +313,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
   selectedYearText: {
     color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
   },
   firstSelectedItem: {
     backgroundColor: '#fa2f40',

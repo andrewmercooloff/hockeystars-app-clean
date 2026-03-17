@@ -29,6 +29,8 @@ import PuckSpeedChangedNotification from '../components/PuckSpeedChangedNotifica
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
 import FriendAcceptedNotification from '../components/FriendAcceptedNotification';
 import FriendGiftReceivedNotification from '../components/FriendGiftReceivedNotification';
+import ScoutReportNotification from '../components/ScoutReportNotification';
+import GameFirstPlaceNotification from '../components/GameFirstPlaceNotification';
 import LikeNotification from '../components/LikeNotification';
 import UserReportNotification from '../components/UserReportNotification';
 import CachedAvatar from '../components/CachedAvatar';
@@ -119,6 +121,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         return 'people';
       case 'stats_change':
         return 'trending-up';
+      case 'scout_report':
+        return 'document-text';
+      case 'game_first_place':
+        return 'trophy';
       case 'system':
         return 'information-circle';
       default:
@@ -275,7 +281,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 data: {
                   playerId: notification.data?.playerId || '',
                   playerName: notification.data?.playerName || 'Игрок',
+                  playerAvatar: notification.data?.playerAvatar || undefined,
+                  starId: notification.data?.starId || undefined,
                   starName: notification.data?.starName || 'Звезда',
+                  starAvatar: notification.data?.starAvatar || undefined,
                   giftName: notification.data?.giftName || 'Подарок',
                 }
               }}
@@ -388,6 +397,34 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               newMaxSpeed={notification.data.newMaxSpeed || 0}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'scout_report' ? (
+          <TouchableOpacity
+            onPress={handlePress}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <ScoutReportNotification
+              playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar}
+              message={notification.message || ''}
+              timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
+            />
+          </TouchableOpacity>
+        ) : notification.type === 'game_first_place' ? (
+          <TouchableOpacity
+            onPress={handlePress}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <GameFirstPlaceNotification
+              playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
+              playerId={notification.data.changedPlayerId}
+              playerAvatar={notification.data.changedPlayerAvatar}
+              message={notification.message || ''}
+              timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
             />
           </TouchableOpacity>
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
@@ -585,12 +622,38 @@ export default function NotificationsScreen() {
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isScreenFocused, setIsScreenFocused] = useState(false);
-  
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+
   // Состояние для отслеживания новых уведомлений (для анимации)
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
-  
+
+  // Категории фильтров и типы уведомлений, которые в них входят
+  const FILTER_TYPES: Record<string, string[]> = {
+    all: [],
+    friends: ['friend_request', 'friend_accepted', 'new_friendship'],
+    video: ['video_added', 'video_liked'],
+    photo: ['photo_added', 'photo_liked', 'avatar_changed'],
+    gifts: ['gift_received', 'friend_gift_received', 'gift_accepted', 'gift_request', 'autograph_request', 'stick_request'],
+    stats: ['stats_change', 'normative_changed', 'physical_data_changed', 'puck_speed_changed', 'achievement_added', 'achievement', 'scout_report'],
+    exercises: ['exercise_completed', 'game_first_place'],
+  };
+
+  const FILTER_ICONS: Record<string, string> = {
+    all: 'apps-outline',
+    friends: 'people-outline',
+    video: 'play-circle-outline',
+    photo: 'camera-outline',
+    gifts: 'gift-outline',
+    stats: 'bar-chart-outline',
+    exercises: 'barbell-outline',
+  };
+
   // Мемоизируем список уведомлений для предотвращения ненужных перерендеров
-  const memoizedNotifications = React.useMemo(() => notifications, [notifications]);
+  const memoizedNotifications = React.useMemo(() => {
+    if (activeFilter === 'all') return notifications;
+    const allowed = FILTER_TYPES[activeFilter] || [];
+    return notifications.filter(n => allowed.includes(n.type));
+  }, [notifications, activeFilter]);
   const memoizedFriendRequests = React.useMemo(() => friendRequests, [friendRequests]);
   const memoizedGiftRequests = React.useMemo(() => giftRequests, [giftRequests]);
 
@@ -642,7 +705,9 @@ export default function NotificationsScreen() {
             notification.type === 'puck_speed_changed' ||
             notification.type === 'video_liked' ||
             notification.type === 'photo_liked' ||
-            notification.type === 'user_report') {
+            notification.type === 'user_report' ||
+            notification.type === 'scout_report' ||
+            notification.type === 'game_first_place') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
         }
         
@@ -751,35 +816,7 @@ export default function NotificationsScreen() {
         // Обрабатываем ошибки отдельно, так как .then() возвращает Promise<void>
       }
       
-      // ВАЖНО: Ограничиваем количество уведомлений до 20
-      // Удаляем самые старые уведомления, если их больше 20
-      const MAX_NOTIFICATIONS = 20;
-      
-      let limitedNotifications = userNotifications;
-      if (userNotifications.length > MAX_NOTIFICATIONS) {
-        // Сортируем по времени (новые первыми) и берем первые 20
-        limitedNotifications = userNotifications
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, MAX_NOTIFICATIONS);
-        
-        // Удаляем старые уведомления из базы данных в фоне
-        const notificationsToDelete = userNotifications.slice(MAX_NOTIFICATIONS);
-        if (notificationsToDelete.length > 0) {
-          // Удаляем асинхронно в фоне, не блокируя UI
-          const idsToDelete = notificationsToDelete.map(n => n.id);
-          supabase
-            .from('notifications')
-            .delete()
-            .in('id', idsToDelete)
-            .then(({ error }) => {
-              if (error) {
-                console.error('Ошибка удаления старых уведомлений:', error);
-              } else {
-                console.log(`🗑️ Удалено ${notificationsToDelete.length} старых уведомлений, оставлено ${MAX_NOTIFICATIONS}`);
-              }
-            });
-        }
-      }
+      const limitedNotifications = userNotifications;
       
       // Если это первая загрузка, помечаем все уведомления как "старые" (без анимации)
       if (isInitialLoad) {
@@ -1242,6 +1279,20 @@ export default function NotificationsScreen() {
             params: { returnTo: 'notifications', scrollToStats: 'true' }
           });
         }
+      } else if (notification.type === 'scout_report') {
+        if (notification.data && notification.data.changedPlayerId) {
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToAnalysis: 'true' }
+          });
+        }
+      } else if (notification.type === 'game_first_place') {
+        if (notification.data && notification.data.changedPlayerId) {
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications' }
+          });
+        }
       } else if (notification.type === 'photo_added') {
         // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
@@ -1606,12 +1657,18 @@ export default function NotificationsScreen() {
         await declineFriendRequest(request.receiverId, request.playerId);
         Alert.alert(t('common.success'), t('notifications.friendRequestDeclined'));
       }
-      
+
+      // Удаляем уведомление из базы данных
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', request.id);
+
       // Счётчик обновится автоматически через Realtime подписку в _layout.tsx
-      
+
       // Удаляем из списка запросов
       setFriendRequests(prev => prev.filter(req => req.id !== request.id));
-      
+
       // Удаляем из списка уведомлений, если оно там есть
       setNotifications(prev => prev.filter(n => n.id !== request.id));
       
@@ -1686,17 +1743,38 @@ export default function NotificationsScreen() {
       >
         <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
-          {/* Заголовок страницы */}
-          <View style={styles.pageHeader}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
-            <TouchableOpacity onPress={handleClearAllNotifications} style={styles.clearAllButton}>
-              <Ionicons name="trash-outline" size={24} color="#fa2f40" />
-            </TouchableOpacity>
+          {/* Фиксированная шапка: заголовок + фильтры */}
+          <View style={styles.stickyHeader}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
+              <TouchableOpacity onPress={handleClearAllNotifications} style={styles.clearAllButton}>
+                <Ionicons name="trash-outline" size={24} color="#fa2f40" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.filterBar}>
+              {Object.keys(FILTER_ICONS).map((key) => {
+                const isActive = activeFilter === key;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    style={[styles.filterBtn, isActive && styles.filterBtnActive]}
+                    onPress={() => setActiveFilter(key)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons
+                      name={FILTER_ICONS[key] as any}
+                      size={20}
+                      color={isActive ? '#ffffff' : '#888'}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
-          
+
           {/* Список уведомлений */}
           <FlatList 
             data={memoizedNotifications}
@@ -1731,9 +1809,6 @@ export default function NotificationsScreen() {
                   <View style={styles.emptyContent}>
                     <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
                     <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-                    <Text style={styles.emptySubtitle}>
-                      {t('notifications.noNotificationsSubtitle')}
-                    </Text>
                   </View>
                 </View>
               </View>
@@ -1800,20 +1875,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   notificationsContent: {
-    paddingTop: 48, // Отступ для фиксированного заголовка (уменьшено на 20px)
+    paddingTop: 96,
     paddingBottom: 8,
   },
-  pageHeader: {
+  stickyHeader: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+  },
+  pageHeader: {
+    backgroundColor: 'rgba(1, 0, 0, 0.75)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  filterBar: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(1, 0, 0, 0.85)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  filterBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterBtnActive: {
+    backgroundColor: '#fa2f40',
   },
   backButton: {
     marginRight: 16,

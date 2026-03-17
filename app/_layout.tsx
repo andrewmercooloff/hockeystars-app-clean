@@ -25,6 +25,7 @@ import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
 import * as Clipboard from 'expo-clipboard';
+import * as Application from 'expo-application';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -430,6 +431,70 @@ export default function RootLayout() {
       console.warn('⚠️ [REFERRAL] Failed to save pending invite:', e);
     }
   }, [currentUser?.id]);
+
+  // 🎟️ Android Install Referrer: читаем referrer из Google Play при первом запуске
+  // Сайт player.php передает inviterId через параметр referrer в Google Play URL
+  // Формат: https://play.google.com/store/apps/details?id=by.hockeystars.app&referrer=inviterId={id}&deeplink_path=player/{id}
+  const INSTALL_REFERRER_CHECKED_KEY = 'install_referrer_checked_once';
+  const installReferrerCheckedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    if (currentUser?.id) return; // Уже авторизован
+    if (installReferrerCheckedRef.current) return; // Уже проверяли в этой сессии
+    
+    (async () => {
+      try {
+        // Проверяем, проверяли ли мы Install Referrer ранее
+        const wasChecked = await AsyncStorage.getItem(INSTALL_REFERRER_CHECKED_KEY);
+        if (wasChecked === 'true') {
+          installReferrerCheckedRef.current = true;
+          return; // Уже проверяли при первом запуске
+        }
+        
+        installReferrerCheckedRef.current = true;
+        
+        // Проверяем, есть ли уже сохранённый invite
+        const existing = await AsyncStorage.getItem(PENDING_INVITE_KEY);
+        if (existing) {
+          // Уже есть invite, помечаем что проверили Install Referrer
+          await AsyncStorage.setItem(INSTALL_REFERRER_CHECKED_KEY, 'true');
+          return;
+        }
+        
+        // Читаем Install Referrer только один раз при первом запуске
+        try {
+          const referrerUrl = await Application.getInstallReferrerAsync();
+          
+          // Помечаем, что проверили Install Referrer (даже если он был пуст)
+          await AsyncStorage.setItem(INSTALL_REFERRER_CHECKED_KEY, 'true');
+          
+          if (!referrerUrl) return;
+          
+          console.log('🎟️ [REFERRAL] Install Referrer URL:', referrerUrl);
+          
+          // Парсим referrer URL: формат "inviterId={id}&deeplink_path=player/{id}"
+          // Или может быть просто "inviterId={id}"
+          const inviterIdMatch = referrerUrl.match(/inviterId=([a-zA-Z0-9\-_]+)/);
+          if (inviterIdMatch && inviterIdMatch[1]) {
+            const inviterId = inviterIdMatch[1];
+            console.log('🎟️ [REFERRAL] Found inviter in Install Referrer:', inviterId);
+            await savePendingInvite(inviterId);
+          }
+        } catch (referrerError: any) {
+          // Install Referrer может быть недоступен (старая версия Play Store, эмулятор и т.д.)
+          // Это нормально, просто помечаем что проверили
+          await AsyncStorage.setItem(INSTALL_REFERRER_CHECKED_KEY, 'true');
+          console.log('🎟️ [REFERRAL] Install Referrer unavailable:', referrerError?.code || referrerError?.message);
+        }
+      } catch (e) {
+        // Общая ошибка - помечаем что проверили
+        try {
+          await AsyncStorage.setItem(INSTALL_REFERRER_CHECKED_KEY, 'true');
+        } catch {}
+        console.log('🎟️ [REFERRAL] Install Referrer check failed:', e);
+      }
+    })();
+  }, [currentUser?.id, savePendingInvite]);
 
   // 🎟️ iOS Deferred Deep Link: читаем clipboard при первом запуске
   // Сайт player.php копирует URL в clipboard при нажатии кнопки "Установить"

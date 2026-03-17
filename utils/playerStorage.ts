@@ -108,6 +108,16 @@ export interface SupabasePlayer {
   is_online?: boolean; // статус онлайн пользователя
   last_seen?: string; // время последней активности (ISO string)
   is_hidden?: boolean; // флаг скрытия профиля администратором
+  game_videos?: string; // JSON array of YouTube game video URLs for AI analysis
+  profile_views_today?: number;
+  profile_views_total?: number;
+  profile_views_reset_at?: string; // date
+  ai_analysis?: {
+    text: string;
+    generated_at: string;
+    is_public: boolean;
+    translations: Record<string, string>;
+  };
 }
 
 // Интерфейс для приложения (camelCase) - совместимый со старым кодом
@@ -257,6 +267,8 @@ export interface Player {
   skate_services?: string[]; // услуги заточки коньков
   // Рейтинг активности
   activityRating?: number; // рейтинг активности игрока
+  profileViewsToday?: number;
+  profileViewsTotal?: number;
   // Дата создания
   createdAt?: string; // дата создания игрока в БД
   // Скорость шайбы
@@ -269,6 +281,15 @@ export interface Player {
   is_hidden?: boolean; // флаг скрытия профиля администратором
   // Реферальная система
   invited_by?: string; // ID пользователя, который пригласил
+  // YouTube videos for AI analysis
+  gameVideos?: string[]; // array of YouTube URLs player added for AI scout analysis
+  // AI Scout Analysis
+  aiAnalysis?: {
+    text: string;
+    generated_at: string;
+    is_public: boolean;
+    translations: Record<string, string>;
+  };
 }
 
 // Интерфейс для записи скорости шайбы
@@ -467,12 +488,25 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     // Онлайн статус
     isOnline: supabasePlayer.is_online ?? false,
     lastSeen: supabasePlayer.last_seen || undefined,
-    // Скрытие профиля
-    is_hidden: supabasePlayer.is_hidden ?? false,
-  };
-  
-  
-  return result;
+  // Скрытие профиля
+  is_hidden: supabasePlayer.is_hidden ?? false,
+  // YouTube game videos for AI analysis
+  gameVideos: (() => {
+    if (!supabasePlayer.game_videos) return undefined;
+    try {
+      const parsed = JSON.parse(supabasePlayer.game_videos);
+      return Array.isArray(parsed) ? parsed : undefined;
+    } catch { return undefined; }
+  })(),
+  // AI Analysis
+  aiAnalysis: supabasePlayer.ai_analysis ?? undefined,
+  // Profile view counts
+  profileViewsToday: supabasePlayer.profile_views_today ?? 0,
+  profileViewsTotal: supabasePlayer.profile_views_total ?? 0,
+};
+
+
+return result;
 };
 
 // Функции для работы с командами
@@ -1062,7 +1096,11 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
         });
       }
       return undefined;
-    })()
+    })(),
+    // YouTube game videos for AI analysis
+    game_videos: player.gameVideos && player.gameVideos.length > 0
+      ? JSON.stringify(player.gameVideos)
+      : undefined,
   };
 };
 
@@ -1108,11 +1146,34 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     }
 
     console.log('🌐 Загружаем игроков из базы данных' + (forceRefresh ? ' (принудительно)' : ''));
-    
-    const { data, error } = await supabase
+
+    // Выбираем только лёгкие поля, нужные для отображения шайб и поиска.
+    // Тяжёлые JSONB-поля (ai_analysis, photos, achievements, puck_speed_data,
+    // game_videos, favorite_goals, exercise_stats) загружаются отдельно в getPlayerById
+    // при открытии полного профиля игрока.
+    const LIGHT_COLUMNS = [
+      'id', 'name', 'position', 'team', 'age', 'height', 'weight', 'avatar',
+      'email', 'status', 'parent_email', 'birth_date', 'hockey_start_date',
+      'experience', 'phone', 'city', 'goals', 'assists', 'country', 'grip',
+      'games', 'minutes', 'shots', 'saves',
+      'pull_ups', 'push_ups', 'plank_time', 'sprint_100m', 'long_jump', 'jump_rope',
+      'number', 'instagram', 'tiktok', 'vk', 'website',
+      'created_at', 'updated_at',
+      'address', 'working_hours', 'discount_for_friends',
+      'coach_years', 'individual_training', 'skate_services',
+      'is_online', 'last_seen', 'is_hidden',
+      'profile_views_total', 'profile_views_today', 'profile_views_reset_at',
+    ].join(', ');
+
+    const { getPlayersActivityRatings } = await import('../services/activityService');
+
+    const { data: rawData, error } = await supabase
       .from('players')
-      .select('*')
+      .select(LIGHT_COLUMNS)
       .order('created_at', { ascending: false });
+
+    // Явное приведение типа: Supabase не может вывести тип при динамической строке колонок
+    const data = rawData as unknown as SupabasePlayer[] | null;
     
     if (error) {
       console.error('❌ Ошибка загрузки игроков из Supabase:', error);
@@ -1120,9 +1181,6 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     }
     
     if (data) {
-      // Преобразуем данные из Supabase в формат приложения
-      // НЕ фильтруем скрытые профили здесь - они будут отфильтрованы в компонентах
-      // Это нужно, чтобы администраторы могли видеть скрытые профили в поиске
       const players = data.map(convertSupabaseToPlayer);
       
       // Обновляем кеш аватаров для всех игроков
@@ -1136,59 +1194,23 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
       preloadPlayerAvatars(players).catch(error => {
         console.error('❌ Ошибка предзагрузки аватаров:', error);
       });
-      
+
       // Загружаем рейтинги активности для сортировки в поиске
       try {
-        const { getPlayersActivityRatings } = await import('../services/activityService');
         const playerIds = players.map(p => p.id);
-        
         const activityRatings = await getPlayersActivityRatings(playerIds);
-        
         players.forEach(player => {
           player.activityRating = activityRatings[player.id] || 0;
         });
-        
       } catch (ratingError) {
         console.error('❌ Ошибка загрузки рейтингов активности:', ratingError);
-        // Устанавливаем рейтинг по умолчанию если не удалось загрузить
-        players.forEach(player => {
-          player.activityRating = 0;
-        });
+        players.forEach(player => { player.activityRating = 0; });
       }
-      
-      // Загружаем команды для каждого игрока (без тяжёлых логов для производительности)
-      try {
-        const teamPromises = players.map(async (player) => {
-          try {
-            const teams = await getPlayerTeamsAsPastTeams(player.id);
-            // Преобразуем PastTeam[] в PlayerTeam[] для совместимости
-            player.teams = teams.map(team => ({
-              teamId: team.id,
-              teamName: team.teamName,
-              teamNameRu: team.teamNameRu,
-              teamType: team.teamType || 'club',
-              teamCountry: team.teamCountry,
-              teamCity: team.teamCity,
-              isPrimary: team.isCurrent,
-              joinedDate: team.joinedDate,
-              startYear: team.startYear,
-              endYear: team.endYear,
-              teamOrder: team.teamOrder || 0
-            }));
-          } catch (error) {
-            console.error(`❌ Ошибка загрузки команд для игрока ${player.id}:`, error);
-            player.teams = [];
-          }
-        });
-        
-        await Promise.all(teamPromises);
-      } catch (teamsError) {
-        console.error('❌ Ошибка загрузки команд:', teamsError);
-        // Устанавливаем пустые команды если не удалось загрузить
-        players.forEach(player => {
-          player.teams = [];
-        });
-      }
+
+      // Команды игроков НЕ загружаем здесь — они нужны только при открытии
+      // полного профиля и загружаются там через getPlayerTeamsAsPastTeams.
+      // Это убирает N+1 запросов (500 запросов для 500 игроков).
+      players.forEach(player => { player.teams = player.teams ?? []; });
       
       // Кешируем результат
       await AsyncStorage.setItem(cacheKey, JSON.stringify({
@@ -6748,6 +6770,142 @@ export const notifyFriendsAboutGiftReceived = async (
 
   } catch (error) {
     console.error('❌ Ошибка отправки уведомлений о подарке:', error);
+  }
+};
+
+// Переводы для уведомления о скаутском отчёте (fallback если нет в locales)
+const SCOUT_REPORT_MSG: Record<string, string> = {
+  en: 'received scout report', ru: 'получил скаутский отчет', lt: 'gavo skauto ataskaitą', lv: 'saņēma skauta ziņojumu',
+  pl: 'otrzymał raport skauta', sv: 'fick scoutrapport', cs: 'obdržel skautskou zprávu', sk: 'obdržal skautskú správu',
+  fi: 'sai tiedusteluraportin', it: 'ha ricevuto rapporto scout', de: 'hat Scout-Bericht erhalten', fr: 'a reçu le rapport scout',
+};
+const SCOUT_REPORT_TITLE: Record<string, string> = {
+  en: 'Scout Report', ru: 'Скаутский отчет', lt: 'Skauto ataskaita', lv: 'Skauta ziņojums', pl: 'Raport skauta',
+  sv: 'Scoutrapport', cs: 'Skautská zpráva', sk: 'Skautská správa', fi: 'Tiedusteluraportti', it: 'Rapporto scout',
+  de: 'Scout-Bericht', fr: 'Rapport scout',
+};
+const GAME_FIRST_MSG: Record<string, string> = {
+  en: 'reached 1st place', ru: 'занял 1 место', lt: 'pasiekė 1 vietą', lv: 'sasniedza 1. vietu', pl: 'zajął 1. miejsce',
+  sv: 'nådde 1:a plats', cs: 'dosáhl 1. místa', sk: 'dosiahol 1. miesto', fi: 'sai 1. sijan', it: 'ha raggiunto il 1° posto',
+  de: 'hat den 1. Platz erreicht', fr: 'a atteint la 1ère place',
+};
+const GAME_FIRST_TITLE: Record<string, string> = {
+  en: 'Game Champion', ru: 'Чемпион игры', lt: 'Žaidimo čempionas', lv: 'Spēles čempions', pl: 'Mistrz gry',
+  sv: 'Spelchampion', cs: 'Šampion hry', sk: 'Šampión hry', fi: 'Pelin mestari', it: 'Campione del gioco',
+  de: 'Spielchampion', fr: 'Champion du jeu',
+};
+
+export const notifyFriendsAboutScoutReport = async (playerId: string, playerName: string): Promise<void> => {
+  try {
+    const friends = await getFriends(playerId);
+    if (friends.length === 0) return;
+
+    const { data: playerData } = await supabase.from('players').select('avatar').eq('id', playerId).single();
+    const playerAvatar = playerData?.avatar || null;
+
+    const generateUUID = (): string =>
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+      });
+
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map((f) => f.id));
+
+    const notifications = friends.map((friend) => {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const received = tr?.scoutReportNotification?.received || SCOUT_REPORT_MSG[lang] || SCOUT_REPORT_MSG.en;
+      const title = tr?.pushTitles?.scoutReport || SCOUT_REPORT_TITLE[lang] || SCOUT_REPORT_TITLE.en;
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'scout_report',
+        title,
+        message: `${playerName} ${received}`,
+        data: { changedPlayerId: playerId, changedPlayerName: playerName, changedPlayerAvatar: playerAvatar, timestamp: new Date().toISOString() },
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+    });
+
+    const { error } = await supabase.from('notifications').insert(notifications);
+    if (error) {
+      console.error('❌ Ошибка сохранения уведомлений о скаутском отчёте:', error);
+      return;
+    }
+
+    for (const friend of friends) {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const received = tr?.scoutReportNotification?.received || SCOUT_REPORT_MSG[lang] || SCOUT_REPORT_MSG.en;
+      const title = tr?.pushTitles?.scoutReport || SCOUT_REPORT_TITLE[lang] || SCOUT_REPORT_TITLE.en;
+      try {
+        const { sendNotificationToUser } = await import('./notificationService');
+        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, { type: 'scout_report', player_id: playerId, action: 'open_player' });
+        await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
+      } catch (e) {
+        console.error('⚠️ Ошибка push/scout_report:', e);
+      }
+    }
+  } catch (e) {
+    console.error('❌ notifyFriendsAboutScoutReport:', e);
+  }
+};
+
+export const notifyFriendsAboutGameFirstPlace = async (playerId: string, playerName: string, playerAvatar?: string | null): Promise<void> => {
+  try {
+    const allFriends = await getFriends(playerId);
+    const friends = allFriends.filter((f) => f.id !== playerId);
+    if (friends.length === 0) return;
+
+    const generateUUID = (): string =>
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+      });
+
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map((f) => f.id));
+
+    const notifications = friends.map((friend) => {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const reached = tr?.gameFirstPlaceNotification?.reachedTop || GAME_FIRST_MSG[lang] || GAME_FIRST_MSG.en;
+      const title = tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'game_first_place',
+        title,
+        message: `${playerName} ${reached}`,
+        data: { changedPlayerId: playerId, changedPlayerName: playerName, changedPlayerAvatar: playerAvatar, timestamp: new Date().toISOString() },
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+    });
+
+    const { error } = await supabase.from('notifications').insert(notifications);
+    if (error) {
+      console.error('❌ Ошибка сохранения уведомлений о 1 месте:', error);
+      return;
+    }
+
+    for (const friend of friends) {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const reached = tr?.gameFirstPlaceNotification?.reachedTop || GAME_FIRST_MSG[lang] || GAME_FIRST_MSG.en;
+      const title = tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
+      try {
+        const { sendNotificationToUser } = await import('./notificationService');
+        await sendNotificationToUser(friend.id, '🏆 ' + title, `${playerName} ${reached}`, { type: 'game_first_place', player_id: playerId, action: 'open_player' });
+        await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
+      } catch (e) {
+        console.error('⚠️ Ошибка push/game_first_place:', e);
+      }
+    }
+  } catch (e) {
+    console.error('❌ notifyFriendsAboutGameFirstPlace:', e);
   }
 };
 

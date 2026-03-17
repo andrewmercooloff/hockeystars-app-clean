@@ -13,6 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useScreenContext } from '../../contexts/ScreenContext';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import {
+    ActivityIndicator,
     Alert,
     Dimensions,
     Image,
@@ -59,11 +60,12 @@ import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import CachedBackground from '../../components/CachedBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
+import AIAnalysisCard, { AIAnalysis } from '../../components/AIAnalysisCard';
 import VideoCarousel from '../../components/VideoCarousel';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -174,6 +176,7 @@ export default function PlayerProfile() {
   const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
   const previousScreenRef = useRef<string | null>(null);
+  const aiSectionRef = useRef<View>(null);
   const museumRef = useRef<View>(null);
   const statsRef = useRef<View>(null);
   const photosRef = useRef<View>(null);
@@ -224,6 +227,15 @@ export default function PlayerProfile() {
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
+  // Счётчики просмотров — отдельный state, не зависящий от кэша player
+  const [profileViews, setProfileViews] = useState<{ total: number; today: number } | null>(null);
+  // Ref для предотвращения двойного инкремента в рамках одного фокуса экрана
+  const viewsIncrementedRef = useRef<string | null>(null);
+  // Защита от гонок: применяем только самый свежий ответ по счётчикам просмотров
+  const profileViewsRequestRef = useRef(0);
+  // Счётчик фокусов: увеличивается при каждом новом входе на экран профиля,
+  // чтобы useEffect с инкрементом перезапускался даже для того же player.id.
+  const [focusCounter, setFocusCounter] = useState(0);
   
   // Используем кэшированный аватар для QR-кода и других мест
   // Это гарантирует, что аватар обновится везде при изменении
@@ -318,7 +330,15 @@ export default function PlayerProfile() {
   const [profileMenuPosition, setProfileMenuPosition] = useState({ x: 0, y: 0 });
   const [isBlockingUser, setIsBlockingUser] = useState(false);
   const [isUserBlockedState, setIsUserBlockedState] = useState(false);
-  
+
+  // --- AI Analysis state ---
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [aiUsageCount, setAiUsageCount] = useState<number>(0);
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  // YouTube game videos for AI analysis (editable list)
+  const [gameVideoLinks, setGameVideoLinks] = useState<string[]>(['']);
+  // -------------------------
+
   // Используем английские ключи для позиций (стандарт в базе данных)
   const positions = ['center', 'winger', 'defender', 'goalie'];
   
@@ -777,7 +797,7 @@ export default function PlayerProfile() {
       // Сразу устанавливаем основные данные для быстрого отображения
       setPlayer(finalPlayerData);
       setCurrentUser(userData);
-      
+
       // Сохраняем в кеш состояния для мгновенного переключения
       setPlayersCache(prev => ({
         ...prev,
@@ -826,6 +846,35 @@ export default function PlayerProfile() {
         if (userData && finalPlayerData.id === userData.id) {
           setFriendshipStatus('friends');
         }
+
+        // Sync AI analysis from player data
+        if (finalPlayerData.aiAnalysis) {
+          setAiAnalysis(finalPlayerData.aiAnalysis as AIAnalysis);
+        } else {
+          setAiAnalysis(null);
+        }
+
+        // Init game video links
+        if (finalPlayerData.gameVideos && finalPlayerData.gameVideos.length > 0) {
+          setGameVideoLinks([...finalPlayerData.gameVideos, '']);
+        } else {
+          setGameVideoLinks(['']);
+        }
+
+        // Load AI usage count for owner
+        if (userData && finalPlayerData.id === userData.id) {
+          const now = new Date();
+          supabase
+            .from('ai_analysis_usage')
+            .select('count')
+            .eq('player_id', finalPlayerData.id)
+            .eq('year', now.getFullYear())
+            .eq('month', now.getMonth() + 1)
+            .maybeSingle()
+            .then(({ data: usageRow }) => {
+              setAiUsageCount(usageRow?.count || 0);
+            });
+        }
         
         // Финальная проверка перед завершением загрузки
         const finalVerifyId = Array.isArray(id) ? id[0] : id;
@@ -863,6 +912,9 @@ export default function PlayerProfile() {
       currentLoadingIdRef.current = null;
       // Сбрасываем ref для статуса дружбы
       friendshipFetchedForRef.current = null;
+      // Сбрасываем счётчик просмотров и флаг инкремента для нового профиля
+      setProfileViews(null);
+      viewsIncrementedRef.current = null;
       // Полностью очищаем все состояние СРАЗУ
       setPlayer(null);
       setFriends([]);
@@ -909,7 +961,6 @@ export default function PlayerProfile() {
       
       setIsEditing(false);
       setEditData({});
-      
       // Устанавливаем текущий загружаемый ID
       currentLoadingIdRef.current = normalizedId;
       
@@ -945,6 +996,52 @@ export default function PlayerProfile() {
     // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
   }, [id, loadPlayerData]);
 
+  const refreshProfileViews = useCallback(async (playerId: string) => {
+    const requestId = ++profileViewsRequestRef.current;
+    const { data, error } = await supabase
+      .from('players')
+      .select('profile_views_total, profile_views_today')
+      .eq('id', playerId)
+      .single();
+
+    if (requestId !== profileViewsRequestRef.current) return;
+    if (error || !data) return;
+
+    setProfileViews({
+      total: data.profile_views_total ?? 0,
+      today: data.profile_views_today ?? 0,
+    });
+  }, []);
+
+  // ── Инкремент просмотров — при каждом заходе в профиль ──────────────────────
+  // focusCounter увеличивается в useFocusEffect при каждом фокусе экрана,
+  // а также viewsIncrementedRef сбрасывается при смене id и re-focus.
+  useEffect(() => {
+    if (!player?.id) return;
+
+    if (viewsIncrementedRef.current === player.id) return;
+    viewsIncrementedRef.current = player.id;
+
+    const isOwnProfile = currentUser?.id === player.id;
+    const targetId = player.id;
+
+    if (isOwnProfile) {
+      void refreshProfileViews(targetId);
+      return;
+    }
+
+    supabase
+      .rpc('increment_profile_views', { profile_player_id: targetId })
+      .then(({ error }) => {
+        if (error) {
+          console.error('⚠️ increment_profile_views RPC error:', error.message);
+        }
+      })
+      .finally(() => {
+        void refreshProfileViews(targetId);
+      });
+  }, [player?.id, currentUser?.id, focusCounter, refreshProfileViews]);
+  // ────────────────────────────────────────────────────────────────────────────
 
   // Инициализация статуса дружбы при загрузке профиля
   useEffect(() => {
@@ -1418,35 +1515,40 @@ export default function PlayerProfile() {
   // Ref для отслеживания последнего обновления
   const lastRefreshTime = useRef<number>(0);
   
+  // Ref-ы для доступа к актуальным значениям внутри useFocusEffect без лишних зависимостей
+  const playerRef = useRef(player);
+  const currentUserRef = useRef(currentUser);
+  const loadingRef = useRef(loading);
+  playerRef.current = player;
+  currentUserRef.current = currentUser;
+  loadingRef.current = loading;
+
   // Отслеживаем, что мы на экране профиля
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('player');
-      
 
-      // ВАЖНО: Если переходим из уведомления с scrollToFriends, сбрасываем сохраненную позицию прокрутки
-      // чтобы профиль открывался сверху, а не с сохраненной позиции
       if (scrollToFriends === 'true') {
         savedScrollPositionRef.current = null;
-        console.log('🔄 Сброшена сохраненная позиция прокрутки для перехода из уведомления');
       }
 
-      // Обновляем данные игрока при возвращении на экран
-      // Это нужно чтобы увидеть актуальную статистику упражнений и изменения профиля
+      // Сбрасываем флаг инкремента и поднимаем счётчик фокуса,
+      // чтобы useEffect перезапустил инкремент при повторном заходе.
+      viewsIncrementedRef.current = null;
+      setFocusCounter(c => c + 1);
+      console.log('👁️ useFocusEffect: фокус получен, viewsIncrementedRef сброшен, id =', id);
+
       const now = Date.now();
+      const p = playerRef.current;
+      const cu = currentUserRef.current;
       const normalizedId = Array.isArray(id) ? id[0] : id;
 
-      if (player && player.id && normalizedId && !loading) {
-        // Обновляем данные профиля при возвращении, но не слишком часто (раз в 2 секунды)
-        // Важно: всегда обновляем данные после редактирования профиля
+      if (p && p.id && normalizedId && !loadingRef.current) {
         if (now - lastRefreshTime.current > 2000) {
           lastRefreshTime.current = now;
-          console.log('🔄 Обновляем данные профиля при возвращении на экран');
           loadPlayerData();
-          
-          // Принудительно обновляем статус дружбы
-          if (currentUser && currentUser.id !== player.id) {
-            getFriendshipStatus(currentUser.id, player.id).then(status => {
+          if (cu && cu.id !== p.id) {
+            getFriendshipStatus(cu.id, p.id).then(status => {
               setFriendshipStatus(status);
             });
           }
@@ -1454,10 +1556,9 @@ export default function PlayerProfile() {
       }
 
       return () => {
-        console.log('🚪 UNMOUNT: Покидаем экран профиля, player:', player?.name, 'id:', player?.id);
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, player?.id, id])
+    }, [id])
   );
 
   // Обработка прокрутки к разным разделам
@@ -1793,6 +1894,121 @@ export default function PlayerProfile() {
       );
     }
   };
+
+  // --- AI Analysis helpers ---
+
+  /** Returns true if the player profile has enough data for analysis */
+  const checkProfileCompleteness = (p: Player): { complete: boolean; missing: string[] } => {
+    const missing: string[] = [];
+    if (!p.avatar) missing.push('Profile photo');
+    if (!p.position) missing.push('Position');
+    if (!p.country) missing.push('Country');
+    if (!p.birthDate) missing.push('Date of birth');
+    if (!p.height || p.height === '0') missing.push('Height');
+    if (!p.weight || p.weight === '0') missing.push('Weight');
+    if (!p.grip) missing.push('Stick grip');
+    const isGoalie = p.position === 'goalie';
+    if (isGoalie) {
+      if (!p.games && !p.minutes && !p.shots) missing.push('Season stats (games/shots/saves)');
+    } else {
+      if (!p.goals && !p.assists && !p.games) missing.push('Season stats (goals/assists/games)');
+    }
+    return { complete: missing.length === 0, missing };
+  };
+
+  const handleGenerateAnalysis = async () => {
+    if (!player || !currentUser || currentUser.id !== player.id) return;
+    if (isGeneratingAnalysis) return;
+
+    setIsGeneratingAnalysis(true);
+    try {
+      const functionUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co/functions/v1/generate-ai-analysis';
+      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`,
+          'apikey': anonKey,
+        },
+        body: JSON.stringify({
+          player_id: player.id,
+          language,
+          game_videos: gameVideoLinks.filter(v => v.trim() !== ''),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 429) {
+        showCustomAlert('Limit Reached', data.message || 'You have used all 5 analyses for this month.', 'info');
+        return;
+      }
+
+      if (!response.ok || data.error) {
+        showCustomAlert('Error', data.error || 'Failed to generate analysis', 'error');
+        return;
+      }
+
+      const newAnalysis: AIAnalysis = {
+        text: data.analysis,
+        generated_at: new Date().toISOString(),
+        is_public: aiAnalysis?.is_public ?? true,
+        translations: {},
+        generation_language: language,
+      };
+      setAiAnalysis(newAnalysis);
+      setAiUsageCount(data.count || aiUsageCount + 1);
+
+      // Update local player state
+      setPlayer(prev => prev ? { ...prev, aiAnalysis: newAnalysis } : prev);
+
+      // Уведомляем друзей о скаутском отчёте
+      notifyFriendsAboutScoutReport(player.id, player.name || 'Player').catch(() => {});
+    } catch (err: any) {
+      showCustomAlert('Error', err.message || 'Network error', 'error');
+    } finally {
+      setIsGeneratingAnalysis(false);
+    }
+  };
+
+  const handleTranslateAnalysis = async (lang: string): Promise<string> => {
+    if (!player) return '';
+
+    const functionUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co/functions/v1/generate-ai-analysis';
+    const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+        'apikey': anonKey,
+      },
+      body: JSON.stringify({ player_id: player.id, action: 'translate', target_lang: lang }),
+    });
+
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(data.error || 'Translation failed');
+
+    const translated = data.translation;
+    // Update local cache
+    setAiAnalysis(prev => prev ? {
+      ...prev,
+      translations: { ...prev.translations, [lang]: translated },
+    } : prev);
+    return translated;
+  };
+
+  const handleToggleAnalysisPublic = async (isPublic: boolean) => {
+    if (!player || !aiAnalysis) return;
+    const updated: AIAnalysis = { ...aiAnalysis, is_public: isPublic };
+    setAiAnalysis(updated);
+    await supabase.from('players').update({ ai_analysis: updated }).eq('id', player.id);
+  };
+
+  // ---------------------------
 
   const showBirthDatePickerModal = () => {
     // Устанавливаем текущую дату рождения или сегодняшнюю дату
@@ -2877,6 +3093,8 @@ export default function PlayerProfile() {
         favoriteGoals: goalsText,
         photos: galleryPhotos,
         achievements: achievements,
+        // Save game video links for AI analysis
+        gameVideos: gameVideoLinks.filter(url => url.trim() !== ''),
         // Добавляем годы тренера если это тренер
         ...(player.status === 'coach' ? {
           coach_years: coachYears.length > 0 ? coachYears : undefined,
@@ -3989,7 +4207,15 @@ export default function PlayerProfile() {
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{player.name}</Text>
-              <View style={styles.backButton} />
+              {profileViews !== null && (
+                <View style={styles.profileViewsHeaderWrap}>
+                  <Ionicons name="eye-outline" size={14} color="#888" />
+                  <Text style={styles.profileViewsHeaderNum}>{profileViews.total}</Text>
+                  {profileViews.today > 0 && (
+                    <Text style={styles.profileViewsHeaderToday}> +{profileViews.today}</Text>
+                  )}
+                </View>
+              )}
             </View>
           )}
           
@@ -4141,45 +4367,33 @@ export default function PlayerProfile() {
                     value={editData.name || player.name || ''}
                     onFocus={handleInputFocus}
                     onChangeText={(text) => {
-                      // Фильтруем только латинские буквы, пробелы и дефисы
                       const latinOnly = text.replace(/[^a-zA-Z\s\-]/g, '');
-                      // Преобразуем в верхний регистр
-                      const upperCaseText = latinOnly.toUpperCase();
-                      setEditData({...editData, name: upperCaseText});
+                      setEditData({...editData, name: latinOnly.toUpperCase()});
                     }}
                     placeholder="NAME SURNAME"
                     placeholderTextColor="#888"
                     autoCapitalize="characters"
                   />
                 ) : player.status !== 'scout' ? (
-                <Text style={styles.playerName}>
-                  {player.name?.toUpperCase()}
-                </Text>
+                  <Text style={styles.playerName}>
+                    {player.name?.toUpperCase()}
+                  </Text>
                 ) : null}
-                
-                {/* Номер игрока - не показываем для магазинов, заточки коньков, тренеров и скаутов */}
                 {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'coach' && player.status !== 'scout' && (
                   isEditing ? (
-                  <TextInput
-                    style={[styles.editInput, { 
-                      width: 60, 
-                      marginLeft: 10, 
-                      marginTop: -4,
-                      fontSize: 28,
-                      fontFamily: 'Gilroy-Bold',
-                      textAlign: 'center'
-                    }]}
-                    value={editData.number !== undefined ? editData.number : (player.number || '')}
-                    onFocus={handleInputFocus}
-                    onChangeText={(text) => setEditData({...editData, number: text})}
-                    placeholder="#"
-                    keyboardType="numeric"
-                    maxLength={2}
-                  />
-                ) : (player.number || (currentUser && currentUser.id === player.id)) ? (
-                  <View style={styles.numberBadge}>
-                    <Text style={styles.numberText}>#{player.number || '?'}</Text>
-                  </View>
+                    <TextInput
+                      style={[styles.editInput, { width: 60, marginLeft: 10, marginTop: -4, fontSize: 28, fontFamily: 'Gilroy-Bold', textAlign: 'center' }]}
+                      value={editData.number !== undefined ? editData.number : (player.number || '')}
+                      onFocus={handleInputFocus}
+                      onChangeText={(text) => setEditData({...editData, number: text})}
+                      placeholder="#"
+                      keyboardType="numeric"
+                      maxLength={2}
+                    />
+                  ) : (player.number || (currentUser && currentUser.id === player.id)) ? (
+                    <View style={styles.numberBadge}>
+                      <Text style={styles.numberText}>#{player.number || '?'}</Text>
+                    </View>
                   ) : null
                 )}
               </View>
@@ -4287,6 +4501,7 @@ export default function PlayerProfile() {
                 </TouchableOpacity>
               </SectionCard>
             )}
+
 
             {/* Кнопки действий - перемещены вверх перед статистикой */}
             {currentUser && player && currentUser.id !== player.id && (
@@ -5746,6 +5961,47 @@ export default function PlayerProfile() {
               );
             })()}
 
+            {/* Scout Report — full section (button + videos + report) */}
+            {player && (isOwner || (aiAnalysis && aiAnalysis.is_public)) && (() => {
+              const completeness = checkProfileCompleteness(player);
+              return (
+                <View ref={aiSectionRef} collapsable={false}>
+                  <SectionCard>
+                    <AIAnalysisCard
+                      analysis={aiAnalysis}
+                      playerName={player.name}
+                      playerAvatar={player.avatar || undefined}
+                      profileUrl={buildInviteLink(player.id)}
+                      isOwner={!!isOwner}
+                      usageCount={aiUsageCount}
+                      maxUsage={5}
+                      onGenerate={handleGenerateAnalysis}
+                      onTogglePublic={handleToggleAnalysisPublic}
+                      onTranslate={handleTranslateAnalysis}
+                      isGenerating={isGeneratingAnalysis}
+                      canGenerate={completeness.complete}
+                      missingFields={completeness.missing}
+                      gameVideos={gameVideoLinks.filter(v => v.trim() !== '')}
+                      onUpdateGameVideos={setGameVideoLinks}
+                      isEditing={!!isEditing}
+                      activeInputRef={activeInputRef}
+                      onCollapse={() => {
+                        setTimeout(() => {
+                          aiSectionRef.current?.measureLayout(
+                            scrollViewRef.current as any,
+                            (_x, y) => {
+                              scrollViewRef.current?.scrollTo({ y: Math.max(0, y - 24), animated: true });
+                            },
+                            () => {}
+                          );
+                        }, 150);
+                      }}
+                    />
+                  </SectionCard>
+                </View>
+              );
+            })()}
+
             {/* Видео моментов - только для игроков (не тренеры и не администраторы) */}
             {player.status === 'player' && (() => {
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
@@ -6045,6 +6301,8 @@ export default function PlayerProfile() {
                 </SectionCard>
               );
             })()}
+
+{/* Game videos are now inside AIAnalysisCard above */}
 
             {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
             {player.status !== 'star' && player.status !== 'admin' && (() => {
@@ -6907,7 +7165,7 @@ export default function PlayerProfile() {
                 >
                   <Ionicons name="share-outline" size={20} color="#fff" />
                   <Text style={styles.shareButtonText}>
-                    {t('profile.shareProfileSocial') || 'Поделиться профилем в соц. сетях'}
+                    {t('profile.shareProfile') || 'Поделиться профилем'}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
@@ -7894,6 +8152,23 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     flexWrap: 'wrap',
     justifyContent: 'center',
+  },
+  profileViewsHeaderWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    minWidth: 40,
+    justifyContent: 'flex-end',
+  },
+  profileViewsHeaderNum: {
+    fontFamily: 'Gilroy-Bold',
+    fontSize: 12,
+    color: '#aaa',
+  },
+  profileViewsHeaderToday: {
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 11,
+    color: '#666',
   },
   playerName: {
     fontSize: 28,

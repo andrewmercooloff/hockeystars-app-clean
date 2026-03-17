@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import CachedAvatar from './CachedAvatar';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface FriendGiftReceivedNotificationProps {
@@ -34,6 +34,10 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
   const { t } = useLanguage();
   const { playerId, playerName, playerAvatar, starId, starName, starAvatar, giftName } = notification.data;
 
+  // Аватар для отображения: сначала дарителя, потом получателя как запасной вариант
+  const displayAvatarUrl: string | null = starAvatar || playerAvatar || null;
+  const [avatarError, setAvatarError] = React.useState(false);
+
   const formatTime = (timestamp: string): string => {
     const now = new Date();
     const time = new Date(timestamp);
@@ -64,12 +68,19 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
         activeOpacity={0.7}
       >
         <View style={styles.avatarContainer}>
-          <CachedAvatar
-            playerId={starId || notification.data.playerId}
-            fallbackAvatarUrl={starAvatar || playerAvatar}
-            size={50}
-            style={styles.playerAvatar}
-          />
+          {displayAvatarUrl && !avatarError ? (
+            <Image
+              source={{ uri: displayAvatarUrl }}
+              style={styles.playerAvatar}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              onError={() => setAvatarError(true)}
+            />
+          ) : (
+            <View style={[styles.playerAvatar, styles.avatarFallback]}>
+              <Ionicons name="gift" size={22} color="#fff" />
+            </View>
+          )}
       </View>
 
       <View style={styles.contentContainer}>
@@ -137,6 +148,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+  },
+  avatarFallback: {
+    backgroundColor: '#9C27B0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     flex: 1,

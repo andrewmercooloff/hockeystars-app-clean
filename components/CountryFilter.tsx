@@ -232,15 +232,17 @@ const styles = StyleSheet.create({
     width: 100,
   },
   filterButtonText: {
-    color: '#fff', // Белый текст
+    color: '#fff',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
     flex: 1,
   },
   filterButtonIcon: {
-    color: '#fff', // Белый цвет иконки
+    color: '#fff',
     fontSize: 10,
     fontFamily: 'Gilroy-Regular',
+    fontWeight: '400',
   },
   countriesList: {
     position: 'absolute',
@@ -282,11 +284,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
   selectedCountryText: {
     color: '#FFFFFF',
     fontFamily: 'Gilroy-Bold',
+    fontWeight: '700',
   },
   firstSelectedItem: {
     backgroundColor: '#fa2f40',
