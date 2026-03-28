@@ -4,6 +4,9 @@ import * as Crypto from 'expo-crypto';
 // SMS Service - React Native Compatible (using Twilio)
 // Note: Twilio не работает напрямую в React Native, используем fetch API
 
+/** Текст OTP в SMS — только код (без префикса приложения). */
+const verificationSmsBody = (code: string): string => code;
+
 // Функция форматирования номера телефона
 // Убираем все форматирующие символы (пробелы, скобки, дефисы), оставляем только + и цифры
 const formatPhoneNumber = (phone: string): string => {
@@ -72,8 +75,7 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
 
     const formattedPhone = formatPhoneNumber(phone);
 
-    // Текст сообщения (упрощенный для многоязычности)
-    const message = `Hockeystars code: ${code}`;
+    const message = verificationSmsBody(code);
 
     // Формируем тело запроса вручную для React Native совместимости
     // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
@@ -183,8 +185,7 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     
     const whatsappTo = `whatsapp:${formattedPhone}`;
     
-    // Текст сообщения
-    const message = `Hockeystars code: ${code}`;
+    const message = verificationSmsBody(code);
 
     // Формируем тело запроса вручную для React Native совместимости
     // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
@@ -375,7 +376,7 @@ export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<
       return false;
     }
 
-    const text = `Hockeystars code: ${code}`;
+    const text = verificationSmsBody(code);
 
     const baseUrl = 'https://api.rocketsms.by/simple/send';
     
@@ -502,7 +503,7 @@ export const sendSMSViaSmsBy = async (phone: string, code: string): Promise<bool
       return false;
     }
     
-    const message = `Hockeystars code: ${code}`;
+    const message = verificationSmsBody(code);
     const fullPhone = `375${formattedPhone}`; // Полный номер с кодом страны (375296549728)
     const fullPhoneWithPlus = `+375${formattedPhone}`; // Полный номер с кодом страны и знаком + (+375296549728)
     
@@ -754,7 +755,7 @@ export const sendSMSViaSmsRu = async (phone: string, code: string): Promise<bool
       return false;
     }
     
-    const message = `Hockeystars code: ${code}`;
+    const message = verificationSmsBody(code);
     
     // Получаем номер отправителя из конфигурации (если указан)
     // ВАЖНО: По умолчанию НЕ передаем параметр from - sms.ru использует бесплатный канал

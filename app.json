@@ -2,8 +2,13 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.2",
-    "runtimeVersion": "1.2",
+    "version": "1.2.1",
+    "runtimeVersion": "1.2.1",
+    "updates": {
+      "url": "https://u.expo.dev/ccb608ca-e849-4a98-b337-d38863d3ebff",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,7 +24,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "by.hockeystars.app",
-      "buildNumber": "123",
+      "buildNumber": "124",
       "icon": "./assets/images/icon.png",
       "associatedDomains": [
         "applinks:hockey-stars.com"
@@ -74,7 +79,7 @@
         "monochromeImage": "./assets/icon_android.png"
       },
       "package": "by.hockeystars.app",
-      "versionCode": 123,
+      "versionCode": 124,
       "blockedPermissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.READ_MEDIA_IMAGES",

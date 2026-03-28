@@ -1962,12 +1962,35 @@ export default function PlayerProfile() {
         is_public: aiAnalysis?.is_public ?? true,
         translations: {},
         generation_language: language,
+        has_video_analysis: !!data.has_video_analysis,
       };
       setAiAnalysis(newAnalysis);
       setAiUsageCount(data.count || aiUsageCount + 1);
 
+      const vids = gameVideoLinks.filter(v => v.trim() !== '');
+      if (vids.length > 0) {
+        await supabase.from('players').update({ game_videos: JSON.stringify(vids) }).eq('id', player.id);
+      }
+
       // Update local player state
-      setPlayer(prev => prev ? { ...prev, aiAnalysis: newAnalysis } : prev);
+      setPlayer(prev =>
+        prev
+          ? { ...prev, aiAnalysis: newAnalysis, gameVideos: vids.length > 0 ? vids : prev.gameVideos }
+          : prev
+      );
+      setPlayersCache(prev => {
+        const pid = player.id;
+        const row = prev[pid];
+        if (!row) return prev;
+        return {
+          ...prev,
+          [pid]: {
+            ...row,
+            aiAnalysis: newAnalysis,
+            gameVideos: vids.length > 0 ? vids : row.gameVideos,
+          },
+        };
+      });
 
       // Уведомляем друзей о скаутском отчёте
       notifyFriendsAboutScoutReport(player.id, player.name || 'Player').catch(() => {});
@@ -2014,6 +2037,24 @@ export default function PlayerProfile() {
     const updated: AIAnalysis = { ...aiAnalysis, is_public: isPublic };
     setAiAnalysis(updated);
     await supabase.from('players').update({ ai_analysis: updated }).eq('id', player.id);
+  };
+
+  const handleDeleteAnalysis = async () => {
+    if (!player || !currentUser || currentUser.id !== player.id) return;
+    if (!aiAnalysis) return;
+    const { error } = await supabase.from('players').update({ ai_analysis: null }).eq('id', player.id);
+    if (error) {
+      showCustomAlert('Error', error.message || 'Failed to delete report', 'error');
+      return;
+    }
+    setAiAnalysis(null);
+    setPlayer(prev => (prev ? { ...prev, aiAnalysis: undefined } : prev));
+    setPlayersCache(prev => {
+      const pid = player.id;
+      const row = prev[pid];
+      if (!row) return prev;
+      return { ...prev, [pid]: { ...row, aiAnalysis: undefined } };
+    });
   };
 
   // ---------------------------
@@ -5993,6 +6034,7 @@ export default function PlayerProfile() {
                       onUpdateGameVideos={setGameVideoLinks}
                       isEditing={!!isEditing}
                       activeInputRef={activeInputRef}
+                      onDeleteReport={isOwner ? handleDeleteAnalysis : undefined}
                       onCollapse={() => {
                         setTimeout(() => {
                           aiSectionRef.current?.measureLayout(

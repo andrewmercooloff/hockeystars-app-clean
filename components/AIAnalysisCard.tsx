@@ -114,6 +114,10 @@ const i18n: Record<string, Record<string, string>> = {
   missingTitle:     { en: 'Complete Your Profile First', ru: 'Сначала заполните профиль', de: 'Zuerst Profil vervollständigen', fr: 'Complétez d\'abord votre profil', it: 'Completa prima il tuo profilo', pl: 'Najpierw uzupełnij profil', sv: 'Slutför din profil först', cs: 'Nejprve dokončete profil', sk: 'Najprv dokončite profil', fi: 'Täydennä profiilisi ensin', lv: 'Vispirms aizpildiet profilu', lt: 'Pirmiausia užpildykite profilį' },
   missingSubtitle:  { en: 'Fill in these fields to unlock Scout Report:', ru: 'Заполните эти поля для разблокировки скаутского отчета:', de: 'Füllen Sie diese Felder aus, um den Scout-Bericht freizuschalten:', fr: 'Remplissez ces champs pour déverrouiller le rapport scout:', it: 'Compila questi campi per sbloccare il rapporto scout:', pl: 'Wypełnij te pola, aby odblokować raport skauta:', sv: 'Fyll i dessa fält för att låsa upp scoutrapporten:', cs: 'Vyplňte tato pole pro odemknutí skautské zprávy:', sk: 'Vyplňte tieto polia na odomknutie skautskej správy:', fi: 'Täytä nämä kentät avataksesi tiedusteluraportin:', lv: 'Aizpildiet šos laukus, lai atbloķētu skauta ziņojumu:', lt: 'Užpildykite šiuos laukus norėdami atrakinti skauto ataskaitą:' },
   gotIt:            { en: 'Got it', ru: 'Понятно', de: 'Verstanden', fr: 'Compris', it: 'Capito', pl: 'Rozumiem', sv: 'Förstått', cs: 'Rozumím', sk: 'Rozumiem', fi: 'Selvä', lv: 'Sapratu', lt: 'Supratau' },
+  deleteReport:     { en: 'Delete scout report', ru: 'Удалить скаутский отчет', de: 'Scout-Bericht löschen', fr: 'Supprimer le rapport scout', it: 'Elimina rapporto scout', pl: 'Usuń raport skauta', sv: 'Ta bort scoutrapport', cs: 'Smazat skautskou zprávu', sk: 'Zmazať skautskú správu', fi: 'Poista tiedusteluraportti', lv: 'Dzēst skauta ziņojumu', lt: 'Ištrinti skauto ataskaitą' },
+  deleteReportTitle: { en: 'Delete scout report?', ru: 'Удалить скаутский отчет?', de: 'Scout-Bericht löschen?', fr: 'Supprimer le rapport scout ?', it: 'Eliminare il rapporto scout?', pl: 'Usunąć raport skauta?', sv: 'Ta bort scoutrapport?', cs: 'Smazat skautskou zprávu?', sk: 'Zmazať skautskú správu?', fi: 'Poistetaanko tiedusteluraportti?', lv: 'Dzēst skauta ziņojumu?', lt: 'Ištrinti skauto ataskaitą?' },
+  deleteReportMessage: { en: 'The report and all saved translations will be removed from your profile.', ru: 'Отчёт и все сохранённые переводы будут удалены из профиля.', de: 'Der Bericht und alle gespeicherten Übersetzungen werden aus deinem Profil entfernt.', fr: 'Le rapport et toutes les traductions enregistrées seront supprimés de votre profil.', it: 'Il rapporto e tutte le traduzioni salvate verranno rimossi dal profilo.', pl: 'Raport i wszystkie zapisane tłumaczenia zostaną usunięte z profilu.', sv: 'Rapporten och alla sparade översättningar tas bort från din profil.', cs: 'Zpráva a všechny uložené překlady budou z profilu odstraněny.', sk: 'Správa a všetky uložené preklady budú z profilu odstránené.', fi: 'Raportti ja kaikki tallennetut käännökset poistetaan profiilistasi.', lv: 'Ziņojums un visi saglabātie tulkojumi tiks noņemti no tava profila.', lt: 'Ataskaita ir visi išsaugoti vertimai bus pašalinti iš profilio.' },
+  deleteReportConfirm: { en: 'Delete', ru: 'Удалить', de: 'Löschen', fr: 'Supprimer', it: 'Elimina', pl: 'Usuń', sv: 'Ta bort', cs: 'Smazat', sk: 'Zmazať', fi: 'Poista', lv: 'Dzēst', lt: 'Ištrinti' },
   generatedOn:      { en: 'Generated', ru: 'Создан', de: 'Erstellt', fr: 'Généré', it: 'Generato', pl: 'Wygenerowano', sv: 'Genererad', cs: 'Vygenerováno', sk: 'Vygenerované', fi: 'Luotu', lv: 'Ģenerēts', lt: 'Sukurta' },
   withVideo:        { en: '• includes video in report', ru: '• включает видео в отчет', de: '• enthält Video im Bericht', fr: '• inclut la vidéo dans le rapport', it: '• include video nel rapporto', pl: '• zawiera wideo w raporcie', sv: '• inkluderar video i rapporten', cs: '• obsahuje video ve zprávě', sk: '• obsahuje video v správe', fi: '• sisältää videon raportissa', lv: '• ietver video ziņojumā', lt: '• apima vaizdo įrašą ataskaitoje' },
   scanProfile:      { en: 'Scan to view profile', ru: 'Сканируй профиль', de: 'Profil scannen', fr: 'Scanner le profil', it: 'Scansiona profilo', pl: 'Skanuj profil', sv: 'Scanna profil', cs: 'Naskenuj profil', sk: 'Naskenuj profil', fi: 'Skannaa profiili', lv: 'Skenē profilu', lt: 'Nuskenuok profilį' },
@@ -140,6 +144,8 @@ interface Props {
   onCollapse?: () => void;
   /** Ref to track the active input for keyboard-scroll (same pattern as [id].tsx) */
   activeInputRef?: React.MutableRefObject<any>;
+  /** Owner: remove report from profile (DB); card shows confirmation first */
+  onDeleteReport?: () => void | Promise<void>;
 }
 
 /** Render markdown text inline */
@@ -207,6 +213,7 @@ export default function AIAnalysisCard({
   isEditing,
   onCollapse,
   activeInputRef,
+  onDeleteReport,
 }: Props) {
   const { language, t } = useLanguage();
   const tr = (key: string) => i18n[key]?.[language] || i18n[key]?.['en'] || key;
@@ -257,7 +264,7 @@ export default function AIAnalysisCard({
   const showTranslateBtn = needTranslate || needTranslateEn;
   const showSwitchBtn = hasRussian && hasEnglish;
   const showAddOtherBtn = hasAnalysis && !showTranslateBtn && !showSwitchBtn;
-  // Video section hidden (video processing disabled — too expensive)
+  const showVideoInput = isOwner && (!hasAnalysis || isEditing || isRegenerateMode);
   const showEditFields = isOwner && (isEditing || isRegenerateMode);
 
   const handleTranslate = async (targetLang?: 'ru' | 'en') => {
@@ -331,6 +338,20 @@ export default function AIAnalysisCard({
     onGenerate();
   };
 
+  const handleDeleteReportPress = () => {
+    if (!onDeleteReport) return;
+    Alert.alert(tr('deleteReportTitle'), tr('deleteReportMessage'), [
+      { text: tr('cancel'), style: 'cancel' },
+      {
+        text: tr('deleteReportConfirm'),
+        style: 'destructive',
+        onPress: () => {
+          void Promise.resolve(onDeleteReport()).catch((e) => console.error('delete report:', e));
+        },
+      },
+    ]);
+  };
+
   const genDate = analysis?.generated_at
     ? new Date(analysis.generated_at).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })
     : null;
@@ -350,7 +371,7 @@ export default function AIAnalysisCard({
 
   // ---- YOUTUBE LINK SECTION (single video) ----
   const currentVideo = gameVideos.length > 0 ? gameVideos[0] : '';
-  const videoSection = showEditFields ? (
+  const videoSection = showVideoInput ? (
     <View style={styles.videosBlock}>
       <View style={styles.videosHeaderRow}>
         <Ionicons name="logo-youtube" size={15} color="#ff4444" />
@@ -638,6 +659,13 @@ export default function AIAnalysisCard({
         </TouchableOpacity>
       </View>
 
+      {isOwner && onDeleteReport && (
+        <TouchableOpacity style={styles.deleteReportRow} onPress={handleDeleteReportPress} activeOpacity={0.7}>
+          <Ionicons name="trash-outline" size={17} color="#888" />
+          <Text style={styles.deleteReportLabel}>{tr('deleteReport')}</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Edit/regenerate fields */}
       {videoSection}
       {privacySection}
@@ -841,6 +869,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 10,
+  },
+  deleteReportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+  },
+  deleteReportLabel: {
+    fontFamily: 'Gilroy-Regular',
+    color: '#888',
+    fontSize: 13,
   },
   metaRow: {
     flexDirection: 'row',

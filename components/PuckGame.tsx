@@ -1642,20 +1642,26 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 
     if (currentUser && finalScore > 0) {
       try {
-        // Кто был №1 ДО сохранения результата (один игрок = одно место)
+        // Кто был №1 ДО сохранения (один игрок = одно место) + глобальный макс. для детекта нового рекорда
         const { data: beforeScores } = await supabase
           .from('puck_game_scores')
           .select('player_id, score')
           .order('score', { ascending: false });
         const seenBefore = new Set<string>();
         const uniqueBefore: { player_id: string }[] = [];
+        const playerBestBefore = new Map<string, number>();
         for (const row of beforeScores || []) {
+          if (!playerBestBefore.has(row.player_id)) {
+            playerBestBefore.set(row.player_id, row.score);
+          }
           if (!seenBefore.has(row.player_id)) {
             seenBefore.add(row.player_id);
             uniqueBefore.push({ player_id: row.player_id });
           }
         }
         const oldLeaderId = uniqueBefore[0]?.player_id;
+        const prevGlobalMax =
+          playerBestBefore.size > 0 ? Math.max(...playerBestBefore.values()) : 0;
 
         await supabase.from('puck_game_scores').insert({
           player_id: currentUser.id,
@@ -1679,7 +1685,10 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
             }
           }
           const newLeaderId = unique[0]?.player_id;
-          if (newLeaderId === currentUser.id && oldLeaderId !== currentUser.id) {
+          const becameLeader = newLeaderId === currentUser.id && oldLeaderId !== currentUser.id;
+          const newGlobalRecordWhileLeader =
+            newLeaderId === currentUser.id && finalScore > prevGlobalMax;
+          if (becameLeader || newGlobalRecordWhileLeader) {
             notifyFriendsAboutGameFirstPlace(currentUser.id, currentUser.name || 'Player', currentUser.avatar).catch(() => {});
           }
         }
