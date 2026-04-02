@@ -1190,8 +1190,11 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
         }
       });
       
-      // Предзагружаем аватары в фоне
-      preloadPlayerAvatars(players).catch(error => {
+      // Предзагружаем аватары только для части списка — полный прогрев сотен/тысяч URL
+      // бьёт по сети и UI; остальные подтянутся через CachedAvatar при появлении на экране.
+      const AVATAR_PRELOAD_CAP = 90;
+      const playersForAvatarPreload = players.filter(p => p.avatar).slice(0, AVATAR_PRELOAD_CAP);
+      preloadPlayerAvatars(playersForAvatarPreload).catch(error => {
         console.error('❌ Ошибка предзагрузки аватаров:', error);
       });
 

@@ -471,9 +471,8 @@ export default function SearchScreen() {
           return;
         }
 
-        // Загрузка игроков (включая скрытые профили)
-        // Принудительно обновляем данные, чтобы получить актуальную информацию о скрытых профилях
-        const allPlayers = await loadPlayers(true); // forceRefresh = true для администраторов
+        // Админам нужен сетевой свежий список (в т.ч. скрытые); остальным достаточно кеша loadPlayers при открытии
+        const allPlayers = await loadPlayers(currentUser.status === 'admin');
         
         // Для администраторов показываем всех игроков (включая скрытые профили)
         // Для обычных пользователей фильтруем по статусу
@@ -517,11 +516,11 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
-      // Обновляем список игроков при возврате на экран поиска
+      // При возврате — без принудительного сброса кеша (10 мин в loadPlayers); админ при монтировании уже тянул сеть
       if (currentUser) {
         const refreshData = async () => {
           try {
-            const allPlayers = await loadPlayers(true); // forceRefresh = true
+            const allPlayers = await loadPlayers(false);
             let filteredPlayers: Player[];
             if (currentUser.status === 'admin') {
               filteredPlayers = allPlayers;

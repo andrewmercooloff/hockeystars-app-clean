@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { Tabs, useRouter, useLocalSearchParams, usePathname } from 'expo-router';
 import * as React from 'react';
-import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking } from 'react-native';
+import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking, InteractionManager } from 'react-native';
 import { Asset } from 'expo-asset';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LogoHeader from '../components/LogoHeader';
@@ -1121,7 +1121,7 @@ export default function RootLayout() {
           console.error('❌ Ошибка периодического обновления счетчика сообщений:', error);
         }
       }
-    }, 30000); // ОПТИМИЗАЦИЯ: Каждые 30 секунд (было 5)
+    }, 120000); // Realtime ведёт счётчик; опрос раз в 2 мин как страховка и для синка БД
     
     return () => {
       clearInterval(messagesInterval);
@@ -1237,27 +1237,24 @@ export default function RootLayout() {
         
         // Выполняем навигацию только если нужно
         if (shouldNavigate) {
-          // ИСПРАВЛЕНО: Увеличиваем задержку и используем replace для надежной навигации
-          // replace заменяет текущий экран вместо добавления в стек,
-          // что предотвращает проблему с возвратом на главный экран
-        setTimeout(() => {
-            try {
-          // Добавляем параметр для автоматической прокрутки в чат
-          if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
-                // Убеждаемся, что deepLink валидный
-                const cleanDeepLink = deepLink.split('?')[0]; // Убираем существующие параметры
-                router.replace(`${cleanDeepLink}?scrollToBottom=true` as any);
-          } else {
-                router.replace(deepLink as any);
-              }
-            } catch (error) {
-              console.error('❌ Ошибка навигации по deep link:', error);
-          }
-            // Сбрасываем флаг после навигации
+          // После анимаций запуска навигации — короче фиксированная задержка, чем раньше 800ms
+          InteractionManager.runAfterInteractions(() => {
             setTimeout(() => {
-              isNavigatingFromPushRef.current = false;
-            }, 2000);
-          }, 800); // Увеличена задержка для более надежной навигации
+              try {
+                if (typeof deepLink === 'string' && deepLink.startsWith('/chat/')) {
+                  const cleanDeepLink = deepLink.split('?')[0];
+                  router.replace(`${cleanDeepLink}?scrollToBottom=true` as any);
+                } else {
+                  router.replace(deepLink as any);
+                }
+              } catch (error) {
+                console.error('❌ Ошибка навигации по deep link:', error);
+              }
+              setTimeout(() => {
+                isNavigatingFromPushRef.current = false;
+              }, 1200);
+            }, 200);
+          });
         } else {
           // Если навигация не требуется, сразу сбрасываем флаг
           setTimeout(() => {
