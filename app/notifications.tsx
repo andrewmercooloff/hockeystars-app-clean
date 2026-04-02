@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
     Alert,
     FlatList, 
@@ -620,7 +620,8 @@ export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequestItem[]>([]);
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  /** Пока false — не показываем пустой экран до завершения первой загрузки для currentUser.id */
+  const [listReady, setListReady] = useState(false);
   const [isScreenFocused, setIsScreenFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
@@ -629,6 +630,14 @@ export default function NotificationsScreen() {
 
   /** Первый заход на экран для данного userId — isInitialLoad; повторный фокус — обновление с анимацией новых */
   const notificationsInitialLoadDoneForUserRef = React.useRef<string | null>(null);
+
+  useLayoutEffect(() => {
+    notificationsInitialLoadDoneForUserRef.current = null;
+    setListReady(false);
+    setNotifications([]);
+    setFriendRequests([]);
+    setGiftRequests([]);
+  }, [currentUser?.id]);
 
   // Категории фильтров и типы уведомлений, которые в них входят
   const FILTER_TYPES: Record<string, string[]> = {
@@ -663,7 +672,6 @@ export default function NotificationsScreen() {
   // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
   const loadNotificationsData = useCallback(async (isInitialLoad = false) => {
     try {
-      // Убираем setLoading(true) чтобы не показывать индикатор загрузки при каждом обновлении
       if (!currentUser) return;
 
       // Загружаем все уведомления из хранилища
@@ -879,17 +887,9 @@ export default function NotificationsScreen() {
       }
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     } finally {
-      // ВАЖНО: Всегда выключаем loading, даже если произошла ошибка
-      setLoading(false);
+      setListReady(true);
     }
   }, [currentUser, t]);
-
-  useEffect(() => {
-    if (currentUser === null) {
-      setLoading(false);
-      notificationsInitialLoadDoneForUserRef.current = null;
-    }
-  }, [currentUser]);
 
   // Загрузка списка только при фокусе экрана (без дубля mount + focus — один запрос при открытии)
   useFocusEffect(
@@ -1715,7 +1715,7 @@ export default function NotificationsScreen() {
   }
 
   // Если загружается пользователь ИЛИ данные, показываем один loading screen
-  if (isUserLoading || currentUser === undefined || (loading && notifications.length === 0 && friendRequests.length === 0 && giftRequests.length === 0)) {
+  if (isUserLoading || currentUser === undefined || (currentUser != null && !listReady)) {
     return (
       <View style={styles.container}>
         <CachedBackground 
