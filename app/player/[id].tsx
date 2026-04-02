@@ -8,7 +8,7 @@ import { captureRef } from 'react-native-view-shot';
 import { useFocusEffect, useLocalSearchParams, useRouter, useSegments, usePathname } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { COUNTRIES } from '../../utils/constants';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useScreenContext } from '../../contexts/ScreenContext';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
@@ -509,6 +509,28 @@ export default function PlayerProfile() {
 
   // Используем ref для отслеживания предыдущего id, чтобы избежать показа неправильного профиля
   const previousIdRef = useRef<string | string[] | undefined>(undefined);
+  /** Последний id из маршрута — сброс stale state до paint при смене профиля */
+  const lastRoutePlayerIdRef = useRef<string | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const nid = Array.isArray(id) ? id[0] : id;
+    if (!nid || typeof nid !== 'string') {
+      return;
+    }
+    const prev = lastRoutePlayerIdRef.current;
+    if (prev !== undefined && prev !== nid) {
+      setPlayer(null);
+      setLoading(true);
+      currentLoadingIdRef.current = null;
+      friendshipFetchedForRef.current = null;
+      setFriends([]);
+      setGalleryPhotos([]);
+      setFriendshipStatus('none');
+      setIsEditing(false);
+      setEditData({});
+    }
+    lastRoutePlayerIdRef.current = nid;
+  }, [id]);
   
   // Функция для миграции фото в фоне
   const migratePhotosInBackground = async (playerData: Player, userData: Player | null) => {
@@ -4077,6 +4099,10 @@ export default function PlayerProfile() {
 
   // Нормализуем id для проверки
   const normalizedId = Array.isArray(id) ? id[0] : id;
+  /** Загруженный профиль ещё от существующего маршрута — не показываем контент с «чужим» игроком */
+  const playerRouteMismatch = Boolean(
+    normalizedId && player && typeof player.id === 'string' && player.id !== normalizedId
+  );
   
   // Проверяем, является ли это профилем текущего пользователя
   const isCurrentUserProfile = currentUser && normalizedId && currentUser.id === normalizedId;
@@ -4114,7 +4140,7 @@ export default function PlayerProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, loading, normalizedId, isCurrentUserProfile]);
 
-  if (loading) {
+  if (loading || playerRouteMismatch) {
     return (
       <View style={styles.container}>
         <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
@@ -4130,35 +4156,11 @@ export default function PlayerProfile() {
     );
   }
   
-  // Если player не загружен или его ID не совпадает с текущим - показываем loading
-  if (!player || (normalizedId && player.id !== normalizedId)) {
+  if (!player) {
     return (
       <View style={styles.container}>
         <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
-            {loading ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Загрузка профиля...</Text>
-                {isCurrentUserProfile && (
-                  <TouchableOpacity
-                    style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
-                    onPress={async () => {
-                      try {
-                        const { logoutUser } = await import('../../utils/playerStorage');
-                        await logoutUser();
-                        await refreshUser();
-                        router.replace('/');
-                      } catch (error) {
-                        console.error('❌ Ошибка при выходе:', error);
-                        router.replace('/');
-                      }
-                    }}
-                  >
-                    <Text style={styles.buttonText}>Выйти из аккаунта</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ) : (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
                 {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Игрок не найден' : t('profile.playerNotFound')}
@@ -4188,7 +4190,6 @@ export default function PlayerProfile() {
                 <Text style={styles.buttonText}>На главную</Text>
               </TouchableOpacity>
             </View>
-            )}
           </View>
         </CachedBackground>
       </View>
