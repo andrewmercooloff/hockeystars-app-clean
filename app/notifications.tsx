@@ -49,8 +49,12 @@ import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import { preloadPlayerAvatars } from '../utils/AvatarCache';
 import CachedBackground from '../components/CachedBackground';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../assets/images/led.jpg');
+
+const notificationsListStorageKey = (playerId: string) =>
+  `hs_notifications_list_v1_${playerId}`;
 
 // Мемоизированный компонент для элемента уведомления
 const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete, currentUserId }: {
@@ -648,9 +652,16 @@ export default function NotificationsScreen() {
     g: giftRequests.length,
   };
 
+  /** Смена пользователя / новый заход: отменяет устаревшие ответы диска и сети. */
+  const notificationsScreenEpochRef = React.useRef(0);
+  /** Успешная запись списка из сети за текущий epoch — отменяет отложенный hydrate с диска. */
+  const networkWroteListRef = React.useRef(false);
+
   useLayoutEffect(() => {
     const id = currentUser?.id;
     if (!id) {
+      notificationsScreenEpochRef.current += 1;
+      networkWroteListRef.current = false;
       notificationsInitialLoadDoneForUserRef.current = null;
       notificationsListSessionCache = null;
       setListReady(false);
@@ -673,11 +684,51 @@ export default function NotificationsScreen() {
       return;
     }
 
+    notificationsScreenEpochRef.current += 1;
+    const epoch = notificationsScreenEpochRef.current;
+    networkWroteListRef.current = false;
     notificationsInitialLoadDoneForUserRef.current = null;
     setListReady(false);
     setNotifications([]);
     setFriendRequests([]);
     setGiftRequests([]);
+
+    let cancelled = false;
+    void AsyncStorage.getItem(notificationsListStorageKey(id))
+      .then(raw => {
+        if (cancelled) return;
+        if (notificationsScreenEpochRef.current !== epoch) return;
+        if (networkWroteListRef.current) return;
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw) as NotificationsListSessionCache;
+          if (parsed.userId !== id) return;
+          if (notificationsScreenEpochRef.current !== epoch) return;
+          if (networkWroteListRef.current) return;
+          const nList = parsed.notifications || [];
+          const frList = parsed.friendRequests || [];
+          const grList = parsed.giftRequests || [];
+          setNotifications(nList.map(x => ({ ...x })));
+          setFriendRequests(frList.map(x => ({ ...x })));
+          setGiftRequests(grList.map(x => ({ ...x })));
+          setListReady(true);
+          setNewNotificationIds(new Set());
+          notificationsInitialLoadDoneForUserRef.current = id;
+          notificationsListSessionCache = {
+            userId: id,
+            notifications: nList.map(x => ({ ...x })),
+            friendRequests: frList.map(x => ({ ...x })),
+            giftRequests: grList.map(x => ({ ...x })),
+          };
+        } catch {
+          /* ignore corrupt cache */
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentUser?.id]);
 
   useEffect(() => {
@@ -687,12 +738,16 @@ export default function NotificationsScreen() {
       return;
     }
     if (!listReady) return;
-    notificationsListSessionCache = {
+    const snap = {
       userId: id,
       notifications: notifications.map(n => ({ ...n })),
       friendRequests: friendRequests.map(r => ({ ...r })),
       giftRequests: giftRequests.map(g => ({ ...g })),
     };
+    notificationsListSessionCache = snap;
+    void AsyncStorage.setItem(notificationsListStorageKey(id), JSON.stringify(snap)).catch(
+      () => {}
+    );
   }, [currentUser?.id, listReady, notifications, friendRequests, giftRequests]);
 
   // Категории фильтров и типы уведомлений, которые в них входят
@@ -727,9 +782,9 @@ export default function NotificationsScreen() {
 
   // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
   const loadNotificationsData = useCallback(async (isInitialLoad = false) => {
+    if (!currentUser) return;
+    const loadEpoch = notificationsScreenEpochRef.current;
     try {
-      if (!currentUser) return;
-
       // Загружаем все уведомления из хранилища
       const storedNotifications = await loadNotifications(currentUser.id);
       
@@ -910,6 +965,10 @@ export default function NotificationsScreen() {
         }, 1000);
       }
 
+      if (notificationsScreenEpochRef.current !== loadEpoch) {
+        return;
+      }
+      networkWroteListRef.current = true;
       setNotifications(limitedNotifications);
       setFriendRequests(friendRequestItems);
       // giftRequestItems загружаются асинхронно выше
@@ -943,7 +1002,9 @@ export default function NotificationsScreen() {
       }
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     } finally {
-      setListReady(true);
+      if (notificationsScreenEpochRef.current === loadEpoch) {
+        setListReady(true);
+      }
     }
   }, [currentUser, t]);
 
