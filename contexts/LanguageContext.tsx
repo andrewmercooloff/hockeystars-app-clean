@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
+import { getDeviceIanaTimeZone } from '../utils/deviceTimezone';
 
 // Импортируем переводы
 import ruTranslations from '../locales/ru.json';
@@ -136,7 +137,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           const { supabase } = await import('../utils/supabase');
           const { error } = await supabase
             .from('players')
-            .update({ language: resolvedForProfile })
+            .update({
+              language: resolvedForProfile,
+              notification_timezone: getDeviceIanaTimeZone(),
+            })
             .eq('id', user.id);
           if (error) {
             console.warn('⚠️ Не удалось синхронизировать язык в профиль игрока:', error);
@@ -171,7 +175,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           const { supabase } = await import('../utils/supabase');
           const { error } = await supabase
             .from('players')
-            .update({ language: lang })
+            .update({ language: lang, notification_timezone: getDeviceIanaTimeZone() })
             .eq('id', currentUser.id);
           
           if (error) {

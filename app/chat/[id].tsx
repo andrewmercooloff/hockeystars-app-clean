@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
@@ -20,7 +20,7 @@ import {
     Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../../components/BlurOrSolid';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
     getConversation,
@@ -47,6 +47,60 @@ import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../../assets/images/led.jpg');
+
+function messageTimestampMs(m: Message): number {
+  return m.timestamp instanceof Date
+    ? m.timestamp.getTime()
+    : new Date(m.timestamp as unknown as string | number).getTime();
+}
+
+function formatChatDateLabel(timestamp: Date | number): string {
+  const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  if (messageDate.getTime() === today.getTime()) {
+    return 'Сегодня';
+  }
+  if (messageDate.getTime() === yesterday.getTime()) {
+    return 'Вчера';
+  }
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
+function groupChatMessagesByDate(messages: Message[]): Record<string, Message[]> {
+  const sorted = [...messages].sort((a, b) => {
+      const t = messageTimestampMs(a) - messageTimestampMs(b);
+      if (t !== 0) return t;
+      return a.id.localeCompare(b.id);
+  });
+  const grouped: Record<string, Message[]> = {};
+  for (const message of sorted) {
+    const dateKey = formatChatDateLabel(message.timestamp);
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = [];
+    }
+    grouped[dateKey].push(message);
+  }
+  return grouped;
+}
+
+/** Хронологический порядок секций: старые даты выше, сегодня ниже (localeCompare по ДД.ММ.ГГГГ ломает порядок между месяцами). */
+function sortDateKeysChronologically(grouped: Record<string, Message[]>): string[] {
+  return Object.keys(grouped).sort((a, b) => {
+    const minA = Math.min(...grouped[a].map(messageTimestampMs));
+    const minB = Math.min(...grouped[b].map(messageTimestampMs));
+    if (minA !== minB) return minA - minB;
+    return a.localeCompare(b);
+  });
+}
 
 export default function ChatScreen() {
   const { t } = useLanguage();
@@ -1159,120 +1213,102 @@ export default function ChatScreen() {
     }
   };
 
-  const formatTime = (timestamp: Date | number) => {
+  const formatTime = useCallback((timestamp: Date | number) => {
     const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
-    return date.toLocaleTimeString('ru-RU', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
-  };
+  }, []);
 
-  // Функция для форматирования даты (сегодня/вчера/дата)
-  const formatDate = (timestamp: Date | number) => {
-    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-    if (messageDate.getTime() === today.getTime()) {
-      return 'Сегодня';
-    } else if (messageDate.getTime() === yesterday.getTime()) {
-      return 'Вчера';
-    } else {
-      return date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    }
-  };
-
-  // Функция для группировки сообщений по дням
-  const groupMessagesByDate = (messages: Message[]) => {
-    const grouped: { [key: string]: Message[] } = {};
-    
-    messages.forEach(message => {
-      const dateKey = formatDate(message.timestamp);
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey].push(message);
-    });
-    
-    return grouped;
-  };
+  const chatGrouped = useMemo(() => {
+    const grouped = groupChatMessagesByDate(messages);
+    const dateKeys = sortDateKeysChronologically(grouped);
+    return { grouped, dateKeys };
+  }, [messages]);
 
   // Ответ на сообщение
-  const handleReplyToMessage = (message: Message) => {
+  const handleReplyToMessage = useCallback((message: Message) => {
     try {
-      // Сохраняем сообщение для ответа
       setReplyingToMessage(message);
-      
-      // Прокручиваем к полю ввода
+
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
         setIsNearBottom(true);
-        wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
+        wasNearBottomRef.current = true;
         console.log('Ответ на сообщение:', message.text);
       }, 100);
     } catch (error) {
       console.error('Ошибка ответа на сообщение:', error);
     }
-  };
+  }, []);
 
   // Обработка долгого нажатия на сообщение
-  const handleLongPressMessage = (message: Message) => {
-    const messageRef = messageRefs.current.get(message.id);
-    if (!messageRef) {
-      console.warn('Message ref not found for message:', message.id);
-      return;
-    }
-    
-    // Получаем позицию сообщения на экране
-    messageRef.measure((x, y, width, height, pageX, pageY) => {
-      const screenWidth = Dimensions.get('window').width;
-      const screenHeight = Dimensions.get('window').height;
-      
-      // Позиционируем меню прямо под сообщением
-      const isMyMessage = message.senderId === currentUser?.id;
-      const menuWidth = 160;
-      const menuHeight = 120; // 3 пункта меню
-      
-      // Вычисляем позицию меню
-      let menuX: number;
-      let menuY: number;
-      
-      // Для моих сообщений (справа) - меню справа от сообщения
-      // Для чужих сообщений (слева) - меню слева от сообщения
-      if (isMyMessage) {
-        // Мое сообщение - меню справа от него, выровнено по правому краю
-        menuX = Math.max(10, pageX + width - menuWidth);
-      } else {
-        // Чужое сообщение - меню слева от него, выровнено по левому краю
-        menuX = Math.min(screenWidth - menuWidth - 10, pageX);
+  const handleLongPressMessage = useCallback(
+    (message: Message) => {
+      const messageRef = messageRefs.current.get(message.id);
+      if (!messageRef) {
+        console.warn('Message ref not found for message:', message.id);
+        return;
       }
-      
-      // Вертикальная позиция - прямо под сообщением
-      menuY = Math.min(screenHeight - menuHeight - 10, pageY + height + 5);
-      
-      setContextMenuPosition({ x: menuX, y: menuY });
-      setContextMenuMessage(message);
-      setContextMenuVisible(true);
-      
-      // Вибрация при открытии меню
-      try {
-        if (Platform.OS === 'ios') {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      messageRef.measure((x, y, width, height, pageX, pageY) => {
+        const screenWidth = Dimensions.get('window').width;
+        const screenHeight = Dimensions.get('window').height;
+
+        const isMyMessage = message.senderId === currentUser?.id;
+        const menuWidth = 160;
+        const menuHeight = 120;
+
+        let menuX: number;
+        let menuY: number;
+
+        if (isMyMessage) {
+          menuX = Math.max(10, pageX + width - menuWidth);
         } else {
-          Vibration.vibrate(50);
+          menuX = Math.min(screenWidth - menuWidth - 10, pageX);
         }
-      } catch (e) {
-        // Игнорируем ошибки вибрации
-      }
-    });
-  };
+
+        menuY = Math.min(screenHeight - menuHeight - 10, pageY + height + 5);
+
+        setContextMenuPosition({ x: menuX, y: menuY });
+        setContextMenuMessage(message);
+        setContextMenuVisible(true);
+
+        try {
+          if (Platform.OS === 'ios') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } else {
+            Vibration.vibrate(50);
+          }
+        } catch (e) {
+          // Игнорируем ошибки вибрации
+        }
+      });
+    },
+    [currentUser?.id]
+  );
+
+  const setMessageBubbleRef = useCallback((id: string, ref: View | null) => {
+    if (ref) {
+      messageRefs.current.set(id, ref);
+    } else {
+      messageRefs.current.delete(id);
+    }
+  }, []);
+
+  const scrollReplyPreviewTarget = useCallback(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
+
+  const chatYouLabel = useMemo(
+    () => currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU',
+    [currentUser?.name, t]
+  );
+  const chatOtherLabel = useMemo(
+    () => otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER',
+    [otherPlayer?.name, t]
+  );
   
   const handleCloseContextMenu = () => {
     setContextMenuVisible(false);
@@ -1428,18 +1464,6 @@ export default function ChatScreen() {
     );
   };
 
-  // Рендер левой кнопки ответа при свайпе
-  const renderLeftActions = (message: Message) => {
-    return (
-      <View style={styles.replyButton}>
-        <Ionicons name="arrow-undo-outline" size={24} color="#fff" />
-      </View>
-    );
-  };
-
-
-
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -1467,7 +1491,7 @@ export default function ChatScreen() {
       <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
           {/* Заголовок чата */}
-          <BlurView
+          <BlurOrSolid
             intensity={20}
             tint="dark"
             style={styles.headerBlur}
@@ -1529,7 +1553,7 @@ export default function ChatScreen() {
               </View>
             )}
             </View>
-          </BlurView>
+          </BlurOrSolid>
 
           {/* Сообщения */}
           <KeyboardAvoidingView 
@@ -1598,18 +1622,7 @@ export default function ChatScreen() {
                   </View>
                 </View>
               ) : !loading ? (
-                (() => {
-                  const groupedMessages = groupMessagesByDate(messages);
-                  const dateKeys = Object.keys(groupedMessages).sort((a, b) => {
-                    // Сортируем даты: старые -> вчера -> сегодня (новые внизу)
-                    if (a === 'Сегодня') return 1;
-                    if (b === 'Сегодня') return -1;
-                    if (a === 'Вчера') return 1;
-                    if (b === 'Вчера') return -1;
-                    return a.localeCompare(b); // Старые даты вверху
-                  });
-
-                  return dateKeys.map((dateKey, dateIndex) => (
+                chatGrouped.dateKeys.map((dateKey) => (
                     <View key={dateKey}>
                       {/* Заголовок даты */}
                       <View style={styles.dateHeader}>
@@ -1617,137 +1630,22 @@ export default function ChatScreen() {
                       </View>
                       
                       {/* Сообщения за этот день */}
-                      {groupedMessages[dateKey].map((message, messageIndex) => {
-                        const isMyMessage = message.senderId === currentUser.id;
-                        // Определяем, является ли это последним сообщением (последнее в последней группе)
-                        const isLastDateGroup = dateIndex === dateKeys.length - 1;
-                        const isLastMessage = messageIndex === groupedMessages[dateKey].length - 1;
-                        const isLastMessageOverall = isLastDateGroup && isLastMessage;
-                        
-                        return (
-                          <Swipeable
-                            key={message.id}
-                            renderLeftActions={() => renderLeftActions(message)}
-                            onSwipeableLeftOpen={() => handleReplyToMessage(message)}
-                            overshootLeft={false}
-                            friction={2}
-                            leftThreshold={40}
-                          >
-                            <TouchableOpacity
-                              activeOpacity={1}
-                              onLongPress={() => handleLongPressMessage(message)}
-                              delayLongPress={500}
-                              onPress={(e) => {
-                                // Предотвращаем закрытие клавиатуры при нажатии на сообщение
-                                e.stopPropagation();
-                              }}
-                            >
-                              <View 
-                                ref={(ref) => {
-                                  if (ref) {
-                                    messageRefs.current.set(message.id, ref);
-                                  } else {
-                                    messageRefs.current.delete(message.id);
-                                  }
-                                }}
-                                style={[
-                                  styles.messageContainer,
-                                  isMyMessage ? styles.myMessage : styles.otherMessage,
-                                ]}
-                              >
-                              <View style={[
-                                styles.messageBubble,
-                                isMyMessage ? styles.myBubble : styles.otherBubble
-                              ]}>
-                                {/* Превью сообщения, на которое отвечаем */}
-                                {message.replyToId && message.replyToText && (
-                                  <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={() => {
-                                      // Прокручиваем к сообщению, на которое отвечаем
-                                      const replyToMessage = messages.find(m => m.id === message.replyToId);
-                                      if (replyToMessage) {
-                                        // Можно добавить подсветку сообщения
-                                        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-                                      }
-                                    }}
-                                    style={styles.replyPreviewInMessage}
-                                  >
-                                    <View style={[
-                                      styles.replyPreviewLineInMessage,
-                                      isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage
-                                    ]} />
-                                    <View style={styles.replyPreviewContentInMessage}>
-                                      <Text style={[
-                                        styles.replyPreviewNameInMessage,
-                                        isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage
-                                      ]}>
-                                        {message.replyToSenderId === currentUser.id
-                                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
-                                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
-                                      </Text>
-                                      <Text style={styles.replyPreviewTextInMessage} numberOfLines={1}>
-                                        {message.replyToText}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                )}
-                                <View style={styles.messageContentContainer}>
-                                  {message.text.startsWith('[FWD]') ? (
-                                    <View style={styles.forwardedMessageContent}>
-                                      <View style={styles.forwardedHeader}>
-                                        <Ionicons name="arrow-redo-outline" size={14} color={isMyMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} />
-                                        <Text style={[
-                                          styles.forwardedSenderName,
-                                          isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                        ]}>
-                                          {message.text.substring(5).split(':\n')[0]}:
-                                        </Text>
-                                      </View>
-                                      <Text style={[
-                                        styles.messageText,
-                                        isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                      ]}>
-                                        {message.text.substring(5).split(':\n').slice(1).join(':\n')}
-                                      </Text>
-                                    </View>
-                                  ) : (
-                                  <Text style={[
-                                    styles.messageText,
-                                    isMyMessage ? styles.myMessageText : styles.otherMessageText
-                                  ]}>
-                                    {message.text}
-                                  </Text>
-                                  )}
-                                </View>
-                                <View style={[
-                                  styles.messageTimeContainer,
-                                  isMyMessage ? styles.myMessageTimeContainer : styles.otherMessageTimeContainer
-                                ]}>
-                                  <Text style={[
-                                    styles.messageTime,
-                                    isMyMessage ? styles.myMessageTime : styles.otherMessageTime
-                                  ]}>
-                                    {formatTime(message.timestamp)}
-                                  </Text>
-                                  {isMyMessage && (
-                                    <Ionicons
-                                      name={message.read ? "checkmark-done" : "checkmark"}
-                                      size={12}
-                                      color={message.read ? "#fff" : "rgba(255, 255, 255, 0.5)"}
-                                      style={styles.readIndicator}
-                                    />
-                                  )}
-                                </View>
-                              </View>
-                            </View>
-                            </TouchableOpacity>
-                          </Swipeable>
-                        );
-                      })}
+                      {chatGrouped.grouped[dateKey].map((message) => (
+                        <ChatMessageRow
+                          key={message.id}
+                          message={message}
+                          currentUserId={currentUser.id}
+                          formatTime={formatTime}
+                          onReplySwipe={handleReplyToMessage}
+                          onLongPress={handleLongPressMessage}
+                          setMessageBubbleRef={setMessageBubbleRef}
+                          onReplyPreviewPress={scrollReplyPreviewTarget}
+                          youLabel={chatYouLabel}
+                          otherLabel={chatOtherLabel}
+                        />
+                      ))}
                     </View>
-                  ));
-                })()
+                  ))
               ) : null}
             </ScrollView>
 
@@ -1795,7 +1693,7 @@ export default function ChatScreen() {
                           ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
                           : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
                       </Text>
-                      <Text style={styles.replyPreviewText} numberOfLines={1}>
+                      <Text style={styles.replyPreviewText} numberOfLines={3}>
                         {replyingToMessage.text}
                       </Text>
                     </View>
@@ -2265,6 +2163,10 @@ const styles = StyleSheet.create({
     elevation: 2,
     flexShrink: 0, // Позволяем баблу расширяться по высоте для длинных сообщений
   },
+  /** Короткий текст ответа не должен сжимать цитируемое сообщение до узкой полоски */
+  messageBubbleWithReply: {
+    minWidth: '78%',
+  },
   myBubble: {
     backgroundColor: '#FF4444',
     borderBottomRightRadius: 4,
@@ -2382,6 +2284,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Gilroy-Regular',
     opacity: 0.8,
+    lineHeight: 18,
   },
   replyPreviewClose: {
     padding: 4,
@@ -2389,7 +2292,8 @@ const styles = StyleSheet.create({
   },
   replyPreviewInMessage: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    alignSelf: 'stretch',
     marginBottom: 8,
     paddingBottom: 8,
     borderBottomWidth: 1,
@@ -2397,7 +2301,8 @@ const styles = StyleSheet.create({
   },
   replyPreviewLineInMessage: {
     width: 3,
-    height: 35,
+    alignSelf: 'stretch',
+    minHeight: 36,
     borderRadius: 2,
     marginRight: 8,
   },
@@ -2409,6 +2314,7 @@ const styles = StyleSheet.create({
   },
   replyPreviewContentInMessage: {
     flex: 1,
+    minWidth: 0,
   },
   replyPreviewNameInMessage: {
     fontSize: 11,
@@ -2425,6 +2331,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
+    lineHeight: 16,
   },
   contextMenuOverlay: {
     flex: 1,
@@ -2649,4 +2556,161 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
-}); 
+});
+
+type ChatMessageRowProps = {
+  message: Message;
+  currentUserId: string;
+  formatTime: (timestamp: Date | number) => string;
+  onReplySwipe: (message: Message) => void;
+  onLongPress: (message: Message) => void;
+  setMessageBubbleRef: (id: string, ref: View | null) => void;
+  onReplyPreviewPress: () => void;
+  youLabel: string;
+  otherLabel: string;
+};
+
+function areChatMessageRowPropsEqual(prev: ChatMessageRowProps, next: ChatMessageRowProps): boolean {
+  if (prev.currentUserId !== next.currentUserId) return false;
+  if (prev.message.id !== next.message.id) return false;
+  if (prev.message.text !== next.message.text) return false;
+  if (prev.message.read !== next.message.read) return false;
+  if (prev.message.senderId !== next.message.senderId) return false;
+  if (prev.message.replyToId !== next.message.replyToId) return false;
+  if (prev.message.replyToText !== next.message.replyToText) return false;
+  if (prev.message.replyToSenderId !== next.message.replyToSenderId) return false;
+  if (messageTimestampMs(prev.message) !== messageTimestampMs(next.message)) return false;
+  if (prev.youLabel !== next.youLabel) return false;
+  if (prev.otherLabel !== next.otherLabel) return false;
+  if (prev.formatTime !== next.formatTime) return false;
+  if (prev.onReplySwipe !== next.onReplySwipe) return false;
+  if (prev.onLongPress !== next.onLongPress) return false;
+  if (prev.setMessageBubbleRef !== next.setMessageBubbleRef) return false;
+  if (prev.onReplyPreviewPress !== next.onReplyPreviewPress) return false;
+  return true;
+}
+
+function renderChatReplySwipeLeft() {
+  return (
+    <View style={styles.replyButton}>
+      <Ionicons name="arrow-undo-outline" size={24} color="#fff" />
+    </View>
+  );
+}
+
+const ChatMessageRow = React.memo(function ChatMessageRow({
+  message,
+  currentUserId,
+  formatTime,
+  onReplySwipe,
+  onLongPress,
+  setMessageBubbleRef,
+  onReplyPreviewPress,
+  youLabel,
+  otherLabel,
+}: ChatMessageRowProps) {
+  const isMyMessage = message.senderId === currentUserId;
+
+  return (
+    <Swipeable
+      renderLeftActions={renderChatReplySwipeLeft}
+      onSwipeableLeftOpen={() => onReplySwipe(message)}
+      overshootLeft={false}
+      friction={2}
+      leftThreshold={40}
+    >
+      <TouchableOpacity
+        activeOpacity={1}
+        onLongPress={() => onLongPress(message)}
+        delayLongPress={500}
+        onPress={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <View
+          ref={(ref) => setMessageBubbleRef(message.id, ref)}
+          style={[styles.messageContainer, isMyMessage ? styles.myMessage : styles.otherMessage]}
+        >
+          <View
+            style={[
+              styles.messageBubble,
+              isMyMessage ? styles.myBubble : styles.otherBubble,
+              message.replyToId && message.replyToText ? styles.messageBubbleWithReply : null,
+            ]}
+          >
+            {message.replyToId && message.replyToText && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onReplyPreviewPress}
+                style={styles.replyPreviewInMessage}
+              >
+                <View
+                  style={[
+                    styles.replyPreviewLineInMessage,
+                    isMyMessage ? styles.replyPreviewLineInMyMessage : styles.replyPreviewLineInOtherMessage,
+                  ]}
+                />
+                <View style={styles.replyPreviewContentInMessage}>
+                  <Text
+                    style={[
+                      styles.replyPreviewNameInMessage,
+                      isMyMessage ? styles.replyPreviewNameInMyMessage : styles.replyPreviewNameInOtherMessage,
+                    ]}
+                  >
+                    {message.replyToSenderId === currentUserId ? youLabel : otherLabel}
+                  </Text>
+                  <Text style={styles.replyPreviewTextInMessage} numberOfLines={3}>
+                    {message.replyToText}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            <View style={styles.messageContentContainer}>
+              {message.text.startsWith('[FWD]') ? (
+                <View style={styles.forwardedMessageContent}>
+                  <View style={styles.forwardedHeader}>
+                    <Ionicons
+                      name="arrow-redo-outline"
+                      size={14}
+                      color={isMyMessage ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)'}
+                    />
+                    <Text
+                      style={[styles.forwardedSenderName, isMyMessage ? styles.myMessageText : styles.otherMessageText]}
+                    >
+                      {message.text.substring(5).split(':\n')[0]}:
+                    </Text>
+                  </View>
+                  <Text style={[styles.messageText, isMyMessage ? styles.myMessageText : styles.otherMessageText]}>
+                    {message.text.substring(5).split(':\n').slice(1).join(':\n')}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[styles.messageText, isMyMessage ? styles.myMessageText : styles.otherMessageText]}>
+                  {message.text}
+                </Text>
+              )}
+            </View>
+            <View
+              style={[
+                styles.messageTimeContainer,
+                isMyMessage ? styles.myMessageTimeContainer : styles.otherMessageTimeContainer,
+              ]}
+            >
+              <Text style={[styles.messageTime, isMyMessage ? styles.myMessageTime : styles.otherMessageTime]}>
+                {formatTime(message.timestamp)}
+              </Text>
+              {isMyMessage && (
+                <Ionicons
+                  name={message.read ? 'checkmark-done' : 'checkmark'}
+                  size={12}
+                  color={message.read ? '#fff' : 'rgba(255, 255, 255, 0.5)'}
+                  style={styles.readIndicator}
+                />
+              )}
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
+  );
+}, areChatMessageRowPropsEqual);

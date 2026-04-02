@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -43,8 +43,10 @@ export default function AchievementsSection({
     description: ''
   });
   
-  // Нормализуем achievements - убеждаемся, что это массив
-  const normalizedAchievements = Array.isArray(achievements) ? achievements : [];
+  const normalizedAchievements = useMemo(
+    () => (Array.isArray(achievements) ? achievements : []),
+    [achievements]
+  );
 
   const getMedalIcon = (place: number) => {
     switch (place) {
@@ -147,70 +149,76 @@ export default function AchievementsSection({
     setModalVisible(false);
   };
 
-  const handleDeleteAchievement = (id: string) => {
-    Alert.alert(
-      t('common.deleteConfirm'),
-      t('common.deleteAchievementConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => {
-            const updatedAchievements = normalizedAchievements.filter(achievement => achievement.id !== id);
-            onAchievementsChange?.(updatedAchievements);
-          }
-        }
-      ]
-    );
-  };
+  const handleDeleteAchievement = useCallback(
+    (id: string) => {
+      Alert.alert(
+        t('common.deleteConfirm'),
+        t('common.deleteAchievementConfirm'),
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('common.delete'),
+            style: 'destructive',
+            onPress: () => {
+              const updatedAchievements = normalizedAchievements.filter(achievement => achievement.id !== id);
+              onAchievementsChange?.(updatedAchievements);
+            },
+          },
+        ]
+      );
+    },
+    [normalizedAchievements, onAchievementsChange, t]
+  );
 
-  const openEditModal = (achievement: Achievement) => {
+  const openEditModal = useCallback((achievement: Achievement) => {
     setEditingAchievement(achievement);
     setModalVisible(true);
-  };
+  }, []);
 
   const containerStyle = [styles.section, style];
 
-  const renderAchievementItem = ({ item: achievement }: { item: Achievement }) => {
-            const medal = getMedalIcon(achievement.place);
-            return (
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={() => {
-          // Делаем карточку "touchable", чтобы жесты не перехватывались внешними обертками профиля
-          // (иначе горизонтальный скролл может не срабатывать).
-          if (isEditing) {
-            openEditModal(achievement);
-          }
-        }}
-        style={styles.achievementMedal}
-      >
-                <View style={[styles.medalCircle, { borderColor: medal.color }]}>
-                  <Ionicons name={medal.name} size={32} color={medal.color} />
-                </View>
-                <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
-                <Text style={styles.medalYear}>{achievement.year}</Text>
-                <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
-                {isEditing && (
-                  <View style={styles.medalEditButtons}>
-                    <TouchableOpacity
-                      style={styles.medalEditButton}
-                      onPress={() => openEditModal(achievement)}
-                    >
-                      <Ionicons name="create" size={14} color="#FF4444" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.medalDeleteButton}
-                      onPress={() => handleDeleteAchievement(achievement.id)}
-                    >
-                      <Ionicons name="trash" size={14} color="#FF4444" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-      </TouchableOpacity>
-    );
-  };
+  const achievementKeyExtractor = useCallback((item: Achievement) => item.id, []);
+
+  const renderAchievementItem = useCallback(
+    ({ item: achievement }: { item: Achievement }) => {
+      const medal = getMedalIcon(achievement.place);
+      return (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => {
+            if (isEditing) {
+              openEditModal(achievement);
+            }
+          }}
+          style={styles.achievementMedal}
+        >
+          <View style={[styles.medalCircle, { borderColor: medal.color }]}>
+            <Ionicons name={medal.name} size={32} color={medal.color} />
+          </View>
+          <Text style={styles.medalTitle}>{getCompetitionText(achievement.competition)}</Text>
+          <Text style={styles.medalYear}>{achievement.year}</Text>
+          <Text style={[styles.medalPlace, { color: medal.color }]}>{getPlaceText(achievement.place)}</Text>
+          {isEditing && (
+            <View style={styles.medalEditButtons}>
+              <TouchableOpacity
+                style={styles.medalEditButton}
+                onPress={() => openEditModal(achievement)}
+              >
+                <Ionicons name="create" size={14} color="#FF4444" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.medalDeleteButton}
+                onPress={() => handleDeleteAchievement(achievement.id)}
+              >
+                <Ionicons name="trash" size={14} color="#FF4444" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </TouchableOpacity>
+      );
+    },
+    [isEditing, openEditModal, handleDeleteAchievement, t]
+  );
 
   return (
     <View style={containerStyle}>
@@ -223,7 +231,7 @@ export default function AchievementsSection({
         <FlatList
           horizontal
           data={normalizedAchievements}
-          keyExtractor={(item) => item.id}
+          keyExtractor={achievementKeyExtractor}
           renderItem={renderAchievementItem}
           showsHorizontalScrollIndicator={false}
           style={styles.achievementsScroll}
@@ -231,6 +239,10 @@ export default function AchievementsSection({
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
           scrollEnabled={true}
+          initialNumToRender={10}
+          maxToRenderPerBatch={8}
+          windowSize={7}
+          removeClippedSubviews={true}
         />
       )}
 

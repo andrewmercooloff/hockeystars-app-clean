@@ -1,7 +1,7 @@
 import SafeIcon from './SafeIcon';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Image,
@@ -41,11 +41,7 @@ export default function StarItemManager({ playerId, isEditing = false, onItemsUp
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadItems();
-  }, [playerId]);
-
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -65,13 +61,17 @@ export default function StarItemManager({ playerId, isEditing = false, onItemsUp
     } finally {
       setLoading(false);
     }
-  };
+  }, [playerId]);
 
-  const onRefresh = async () => {
+  useEffect(() => {
+    void loadItems();
+  }, [loadItems]);
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadItems();
     setRefreshing(false);
-  };
+  }, [loadItems]);
 
   const pickImage = async (itemType: 'autograph' | 'stick' | 'puck' | 'jersey', existingItemId?: string) => {
     try {

@@ -2414,7 +2414,14 @@
     "giftRequestRejected": "Richiesta regalo rifiutata",
     "player": "Giocatore",
     "unknownPlayer": "Giocatore sconosciuto",
-    "star": "Stella"
+    "star": "Stella",
+    "profileViewsDigest": {
+      "title": "Visualizzazioni del profilo",
+      "body": {
+        "one": "Oggi il tuo profilo è stato visualizzato {{count}} volta.",
+        "other": "Oggi il tuo profilo è stato visualizzato {{count}} volte."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Seleziona una fonte fotografica",

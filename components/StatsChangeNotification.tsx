@@ -1,7 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from './BlurOrSolid';
+import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -78,7 +79,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
   }, [t]);
 
   return (
-    <BlurView
+    <BlurOrSolid
       intensity={20}
       tint="dark"
       style={styles.containerBlur}
@@ -133,7 +134,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           </View>
       </View>
       </View>
-    </BlurView>
+    </BlurOrSolid>
   );
 });
 
@@ -143,14 +144,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   container: {
     backgroundColor: 'rgba(1, 0, 0, 0.75)',

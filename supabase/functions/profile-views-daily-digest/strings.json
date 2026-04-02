@@ -1,0 +1,98 @@
+{
+  "en": {
+    "title": "Profile views",
+    "body": {
+      "one": "Today your profile was viewed {{count}} time.",
+      "other": "Today your profile was viewed {{count}} times."
+    }
+  },
+  "ru": {
+    "title": "Просмотры профиля",
+    "body": {
+      "one": "Сегодня ваш профиль посмотрели {{count}} раз.",
+      "few": "Сегодня ваш профиль посмотрели {{count}} раза.",
+      "many": "Сегодня ваш профиль посмотрели {{count}} раз.",
+      "other": "Сегодня ваш профиль посмотрели {{count}} раз."
+    }
+  },
+  "lt": {
+    "title": "Profilio peržiūros",
+    "body": {
+      "one": "Šiandien jūsų profilį peržiūrėjo {{count}} kartą.",
+      "few": "Šiandien jūsų profilį peržiūrėjo {{count}} kartus.",
+      "many": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų.",
+      "other": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų."
+    }
+  },
+  "lv": {
+    "title": "Profila skatījumi",
+    "body": {
+      "zero": "Šodien tavu profilu skatīja {{count}} reižu.",
+      "one": "Šodien tavu profilu skatīja {{count}} reizi.",
+      "other": "Šodien tavu profilu skatīja {{count}} reizes."
+    }
+  },
+  "pl": {
+    "title": "Wyświetlenia profilu",
+    "body": {
+      "one": "Dzisiaj Twój profil obejrzano {{count}} raz.",
+      "few": "Dzisiaj Twój profil obejrzano {{count}} razy.",
+      "many": "Dzisiaj Twój profil obejrzano {{count}} razy.",
+      "other": "Dzisiaj Twój profil obejrzano {{count}} razy."
+    }
+  },
+  "sv": {
+    "title": "Profilvisningar",
+    "body": {
+      "one": "Idag visades din profil {{count}} gång.",
+      "other": "Idag visades din profil {{count}} gånger."
+    }
+  },
+  "cs": {
+    "title": "Zobrazení profilu",
+    "body": {
+      "one": "Dnes byl tvůj profil zobrazen {{count}}krát.",
+      "few": "Dnes byl tvůj profil zobrazen {{count}}krát.",
+      "many": "Dnes byl tvůj profil zobrazen {{count}}krát.",
+      "other": "Dnes byl tvůj profil zobrazen {{count}}krát."
+    }
+  },
+  "sk": {
+    "title": "Zobrazenia profilu",
+    "body": {
+      "one": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+      "few": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+      "many": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+      "other": "Dnes bol tvoj profil zobrazený {{count}}-krát."
+    }
+  },
+  "fi": {
+    "title": "Profiilin katselut",
+    "body": {
+      "one": "Profiiliasi katsottiin tänään {{count}} kerran.",
+      "other": "Profiiliasi katsottiin tänään {{count}} kertaa."
+    }
+  },
+  "it": {
+    "title": "Visualizzazioni del profilo",
+    "body": {
+      "one": "Oggi il tuo profilo è stato visualizzato {{count}} volta.",
+      "other": "Oggi il tuo profilo è stato visualizzato {{count}} volte."
+    }
+  },
+  "de": {
+    "title": "Profilaufrufe",
+    "body": {
+      "one": "Heute wurde dein Profil {{count}} Mal angesehen.",
+      "other": "Heute wurde dein Profil {{count}} Mal angesehen."
+    }
+  },
+  "fr": {
+    "title": "Vues du profil",
+    "body": {
+      "one": "Aujourd’hui, ton profil a été consulté {{count}} fois.",
+      "many": "Aujourd’hui, ton profil a été consulté {{count}} fois.",
+      "other": "Aujourd’hui, ton profil a été consulté {{count}} fois."
+    }
+  }
+}

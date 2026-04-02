@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, memo, useState } from 'react';
 import {
     Alert,
     Dimensions,
@@ -51,6 +51,134 @@ interface PlayerMuseumProps {
 
 const { width } = Dimensions.get('window');
 
+function parseMuseumGiftName(customName: string): string {
+  if (!customName) return '';
+  let giftName = customName;
+  giftName = giftName.replace(/\s*от\s+Админ\s*$/i, '');
+  giftName = giftName.replace(/\s*от\s+Admin\s*$/i, '');
+  giftName = giftName.replace(/\s*from\s+Админ\s*$/i, '');
+  giftName = giftName.replace(/\s*from\s+Admin\s*$/i, '');
+  giftName = giftName.replace(/\s+Админ\s*$/i, '');
+  giftName = giftName.replace(/\s+Admin\s*$/i, '');
+  giftName = giftName.replace(/\s+от\s+.+$/i, '');
+  giftName = giftName.replace(/\s+from\s+.+$/i, '');
+  return giftName.trim();
+}
+
+function translateMuseumGiftName(
+  t: (key: string) => string,
+  itemName: string,
+  itemType?: string
+): string {
+  if (itemName.includes('от Админ')) {
+    return itemName;
+  }
+  const type = itemType || itemName.toLowerCase();
+  if (type.includes('автограф') || type === 'autograph') {
+    return t('gifts.autograph');
+  }
+  if (type.includes('клюшка') || type === 'stick') {
+    return t('gifts.stick');
+  }
+  if (type.includes('шайба') || type === 'puck') {
+    return t('gifts.puck');
+  }
+  if (type.includes('джерси') || type.includes('майка') || type === 'jersey') {
+    return t('gifts.jersey');
+  }
+  return itemName;
+}
+
+type MuseumGridItemProps = {
+  item: MuseumItem;
+  isOwner: boolean;
+  isAdmin: boolean;
+  isEditing: boolean;
+  t: (key: string, ...args: unknown[]) => string;
+  onNavigateStar: (starId: string) => void;
+  onDelete: (museumItemId: string, itemId: string) => void;
+};
+
+const MuseumGridItem = memo(function MuseumGridItem({
+  item,
+  isOwner,
+  isAdmin,
+  isEditing,
+  t,
+  onNavigateStar,
+  onDelete,
+}: MuseumGridItemProps) {
+  let giftName = '';
+  if (item.custom_name) {
+    giftName = parseMuseumGiftName(item.custom_name);
+  } else if (item.item.name.includes('от Админ')) {
+    giftName = item.item.name.replace(' от Админ', '').trim();
+  } else {
+    giftName = translateMuseumGiftName(t, item.item.name, item.item.item_type);
+  }
+  if (!giftName) {
+    giftName = translateMuseumGiftName(t, item.item.name, item.item.item_type);
+  }
+
+  return (
+    <View style={styles.itemCard}>
+      {item.item.image_url ? (
+        <CachedImage
+          imageUrl={item.item.image_url}
+          style={[
+            styles.itemImage,
+            item.item.image_url.toLowerCase().includes('.png') && styles.pngImage,
+          ]}
+          resizeMode="contain"
+        />
+      ) : (
+        <View style={styles.placeholderImage}>
+          <Text style={styles.placeholderText}>?</Text>
+        </View>
+      )}
+
+      <Text style={styles.itemSource} numberOfLines={2}>
+        {giftName} {t('gifts.from')}{' '}
+        <Text style={styles.starNameLink} onPress={() => onNavigateStar(item.received_from.id)}>
+          {item.received_from.name}
+        </Text>
+      </Text>
+
+      {!item.item.image_url && (
+        <Text style={styles.warningText}>
+          ⚠️ {t('gifts.invalidGift')} ({t('gifts.noImage')})
+        </Text>
+      )}
+
+      {(isOwner || isAdmin) && isEditing && (
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => {
+            Alert.alert(
+              t('common.deleteConfirm'),
+              t('gifts.deleteGiftQuestion'),
+              [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                  text: t('common.delete'),
+                  style: 'destructive',
+                  onPress: () => onDelete(item.id, item.item.id),
+                },
+              ]
+            );
+          }}
+        >
+          <Ionicons
+            name="trash-outline"
+            size={16}
+            color={item.item.image_url ? '#fa2f40' : '#FF8800'}
+          />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+});
+
 const PlayerMuseum: React.FC<PlayerMuseumProps> = ({ 
   playerId, 
   currentUserId, 
@@ -72,8 +200,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   const [refreshing, setRefreshing] = useState(false);
   const [isStar, setIsStar] = useState(false);
 
-  // Функция для очистки кеша музея
-  const clearMuseumCache = async () => {
+  const clearMuseumCache = useCallback(async () => {
     try {
       const cacheKey = `museum_${playerId}`;
       await AsyncStorage.removeItem(cacheKey);
@@ -81,64 +208,14 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     } catch (error) {
       console.error('❌ Ошибка очистки кеша музея:', error);
     }
-  };
+  }, [playerId]);
 
-  // Функция для перевода названий призов
-  const translateItemName = (itemName: string, itemType?: string): string => {
-    // Если это подарок от администратора, не переводим название
-    if (itemName.includes('от Админ')) {
-      return itemName;
-    }
-    
-    // Пытаемся определить тип по названию или использовать переданный тип
-    const type = itemType || itemName.toLowerCase();
-    
-    if (type.includes('автограф') || type === 'autograph') {
-      return t('gifts.autograph');
-    } else if (type.includes('клюшка') || type === 'stick') {
-      return t('gifts.stick');
-    } else if (type.includes('шайба') || type === 'puck') {
-      return t('gifts.puck');
-    } else if (type.includes('джерси') || type.includes('майка') || type === 'jersey') {
-      return t('gifts.jersey');
-    }
-    
-    return itemName; // Возвращаем оригинальное название, если не смогли определить
-  };
-
-  // Функция для парсинга custom_name и извлечения названия подарка
-  // Возвращает только название подарка без предлога и имени дарителя
-  const parseGiftName = (customName: string): string => {
-    if (!customName) return '';
-    
-    let giftName = customName;
-    
-    // Убираем "от Админ" или "от Admin" в конце
-    giftName = giftName.replace(/\s*от\s+Админ\s*$/i, '');
-    giftName = giftName.replace(/\s*от\s+Admin\s*$/i, '');
-    
-    // Убираем "from Админ" или "from Admin" в конце
-    giftName = giftName.replace(/\s*from\s+Админ\s*$/i, '');
-    giftName = giftName.replace(/\s*from\s+Admin\s*$/i, '');
-    
-    // Убираем просто "Админ" или "Admin" в конце (без предлога)
-    giftName = giftName.replace(/\s+Админ\s*$/i, '');
-    giftName = giftName.replace(/\s+Admin\s*$/i, '');
-    
-    // Убираем "от [любое имя]" в конце (может быть несколько слов в имени)
-    // Используем более точное регулярное выражение для захвата всего имени
-    giftName = giftName.replace(/\s+от\s+.+$/i, '');
-    
-    // Убираем "from [любое имя]" в конце (может быть несколько слов в имени)
-    giftName = giftName.replace(/\s+from\s+.+$/i, '');
-    
-    return giftName.trim();
-  };
-
-  // Функция для навигации к профилю звезды
-  const navigateToStarProfile = (starId: string) => {
-    router.push(`/player/${starId}`);
-  };
+  const navigateToStarProfile = useCallback(
+    (starId: string) => {
+      router.push(`/player/${starId}`);
+    },
+    [router]
+  );
 
   // Проверяем, что пользователь не является звездой
   // У звезд не должно быть музея, так как они не просят подарки у других
@@ -380,8 +457,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     }
   };
 
-  // Функция для удаления подарка из музея игрока
-  const deleteMuseumItem = async (museumItemId: string, itemId: string) => {
+  const deleteMuseumItem = useCallback(async (museumItemId: string, itemId: string) => {
     // console.log('🗑️ МУЗЕЙ: Начало удаления подарка');
     // console.log('🗑️ МУЗЕЙ: museumItemId:', museumItemId);
     // console.log('🗑️ МУЗЕЙ: itemId:', itemId);
@@ -463,7 +539,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
       console.error('🗑️ МУЗЕЙ: ❌❌❌ КРИТИЧЕСКАЯ ОШИБКА удаления подарка:', error);
       Alert.alert(t('common.error') || 'Ошибка', t('gifts.errorDelete'));
     }
-  };
+  }, [museumItems, currentUserId, playerId, t, onMuseumItemsLoaded, clearMuseumCache]);
 
   // Функция для кеширования изображений в AsyncStorage
   const cacheImageInStorage = async (imageUrl: string, itemName: string) => {
@@ -560,94 +636,17 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     <>
       <View style={styles.gridContainer}>
         {museumItems.map((item) => (
-            <View key={item.id} style={styles.itemCard}>
-              {item.item.image_url ? (
-                <>
-                  <CachedImage
-                    imageUrl={item.item.image_url}
-                    style={[
-                      styles.itemImage,
-                      // Для PNG изображений убираем фон и добавляем поддержку прозрачности
-                      item.item.image_url.toLowerCase().includes('.png') && styles.pngImage
-                    ]}
-                    resizeMode="contain"
-                  />
-                </>
-              ) : (
-                <View style={styles.placeholderImage}>
-                  <Text style={styles.placeholderText}>?</Text>
-                </View>
-              )}
-              
-              <Text style={styles.itemSource} numberOfLines={2}>
-                {/* Унифицированный формат: "Название подарка" от "Имя дарителя" */}
-                {(() => {
-                  let giftName = '';
-                  
-                  if (item.custom_name) {
-                    // Если есть custom_name - парсим его, убирая предлоги и имена
-                    giftName = parseGiftName(item.custom_name);
-                  } else if (item.item.name.includes('от Админ')) {
-                    // Для старых административных подарков убираем "от Админ" из названия
-                    giftName = item.item.name.replace(' от Админ', '').trim();
-                  } else {
-                    // Для старых обычных подарков используем переведенное название
-                    giftName = translateItemName(item.item.name, item.item.item_type);
-                  }
-                  
-                  // Если после парсинга название пустое, используем название из item
-                  if (!giftName) {
-                    giftName = translateItemName(item.item.name, item.item.item_type);
-                  }
-                  
-                  return (
-                    <>
-                      {giftName} {t('gifts.from')}{' '}
-                      <Text 
-                        style={styles.starNameLink}
-                        onPress={() => navigateToStarProfile(item.received_from.id)}
-                      >
-                        {item.received_from.name}
-                      </Text>
-                    </>
-                  );
-                })()}
-              </Text>
-              
-              {!item.item.image_url && (
-                <Text style={styles.warningText}>
-                  ⚠️ {t('gifts.invalidGift')} ({t('gifts.noImage')})
-                </Text>
-              )}
-              
-              {(isOwner || isAdmin) && isEditing && (
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={() => {
-                    const itemName = item.item.image_url ? t('gifts.gifts') : t('gifts.invalidGift');
-                    Alert.alert(
-                      t('common.deleteConfirm'),
-                      t('gifts.deleteGiftQuestion'),
-                      [
-                        { text: t('common.cancel'), style: 'cancel' },
-                        {
-                          text: t('common.delete'),
-                          style: 'destructive',
-                          onPress: () => deleteMuseumItem(item.id, item.item.id)
-                        }
-                      ]
-                    );
-                  }}
-                >
-                  <Ionicons 
-                    name="trash-outline" 
-                    size={16} 
-                    color={item.item.image_url ? "#fa2f40" : "#FF8800"} 
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
+          <MuseumGridItem
+            key={item.id}
+            item={item}
+            isOwner={isOwner}
+            isAdmin={isAdmin}
+            isEditing={isEditing}
+            t={t}
+            onNavigateStar={navigateToStarProfile}
+            onDelete={deleteMuseumItem}
+          />
+        ))}
       </View>
     </>
   );

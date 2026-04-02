@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from './BlurOrSolid';
+import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -38,7 +39,7 @@ export default function FriendAcceptedNotification({
   };
 
   return (
-    <BlurView
+    <BlurOrSolid
       intensity={20}
       tint="dark"
       style={styles.containerBlur}
@@ -82,7 +83,7 @@ export default function FriendAcceptedNotification({
         </View>
       </View>
       </View>
-    </BlurView>
+    </BlurOrSolid>
   );
 }
 
@@ -92,14 +93,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   container: {
     backgroundColor: 'rgba(1, 0, 0, 0.75)',

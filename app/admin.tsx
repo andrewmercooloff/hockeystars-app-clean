@@ -1,5 +1,5 @@
 import { useRouter, useFocusEffect } from 'expo-router';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     Alert,
     FlatList,
@@ -25,6 +25,7 @@ const logo = require('../assets/images/logo.png');
 
 const AdminHeader = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
 
   const loadUser = async () => {
@@ -128,7 +129,7 @@ export default function AdminScreen() {
     } catch (error) {
       console.error('❌ Ошибка загрузки данных:', error);
     }
-  }, []);
+  }, [t, router]);
 
   useEffect(() => {
     loadData();
@@ -148,20 +149,22 @@ export default function AdminScreen() {
     }, [setCurrentScreen, loadData])
   );
 
-  const filteredPlayers = players.filter(player => 
-    player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    player.team?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    player.status?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPlayers = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return players.filter(
+      player =>
+        player.name.toLowerCase().includes(q) ||
+        player.team?.toLowerCase().includes(q) ||
+        player.status?.toLowerCase().includes(q)
+    );
+  }, [players, searchQuery]);
 
 
 
-
-
-  const handleEditPlayer = (player: Player) => {
+  const handleEditPlayer = useCallback((player: Player) => {
     setSelectedPlayer(player);
     setShowPlayerModal(true);
-  };
+  }, []);
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
@@ -186,35 +189,47 @@ export default function AdminScreen() {
     }
   };
 
-  const renderPlayerItem = ({ item }: { item: Player }) => {
-    return (
-      <TouchableOpacity 
-        style={styles.playerItem} 
-        onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
-      >
-        <View style={[styles.playerAvatar, { borderColor: getStatusColor(item.status), borderWidth: 2, overflow: 'hidden' }]}>
-          <CachedAvatar
-            playerId={item.id}
-            fallbackAvatarUrl={item.avatar}
-            size={56}
-            status={item.status}
-          />
-        </View>
-        <View style={styles.playerInfo}>
-          <Text style={styles.playerName}>{item.name || t('admin.noName')}</Text>
-          <Text style={styles.playerDetails}>
-            {item.position ? t(`profile.${item.position}`) : t('admin.noPosition')} • {item.team ? t(`teams.${item.team}`) : t('admin.noTeam')} • {item.age || 0} {t('admin.yearsOld')}
-          </Text>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-            <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
+  const renderPlayerItem = useCallback(
+    ({ item }: { item: Player }) => {
+      return (
+        <TouchableOpacity
+          style={styles.playerItem}
+          onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
+        >
+          <View
+            style={[
+              styles.playerAvatar,
+              { borderColor: getStatusColor(item.status), borderWidth: 2, overflow: 'hidden' },
+            ]}
+          >
+            <CachedAvatar
+              playerId={item.id}
+              fallbackAvatarUrl={item.avatar}
+              size={56}
+              status={item.status}
+            />
           </View>
-        </View>
-        <TouchableOpacity onPress={() => handleEditPlayer(item)} style={{ padding: 8 }}>
-          <Ionicons name="create" size={24} color="#666" />
+          <View style={styles.playerInfo}>
+            <Text style={styles.playerName}>{item.name || t('admin.noName')}</Text>
+            <Text style={styles.playerDetails}>
+              {item.position ? t(`profile.${item.position}`) : t('admin.noPosition')} •{' '}
+              {item.team ? t(`teams.${item.team}`) : t('admin.noTeam')} • {item.age || 0}{' '}
+              {t('admin.yearsOld')}
+            </Text>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+              <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
+            </View>
+          </View>
+          <TouchableOpacity onPress={() => handleEditPlayer(item)} style={{ padding: 8 }}>
+            <Ionicons name="create" size={24} color="#666" />
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+      );
+    },
+    [router, t, handleEditPlayer]
+  );
+
+  const adminPlayerKeyExtractor = useCallback((item: Player) => item.id, []);
 
   const handleCreateUser = async () => {
     if (!currentUser || currentUser.status !== 'admin') {
@@ -615,10 +630,13 @@ export default function AdminScreen() {
       <FlatList
         data={filteredPlayers}
         renderItem={renderPlayerItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={adminPlayerKeyExtractor}
         style={styles.playerList}
         showsVerticalScrollIndicator={false}
-
+        initialNumToRender={12}
+        maxToRenderPerBatch={16}
+        windowSize={10}
+        removeClippedSubviews={Platform.OS === 'android'}
       />
 
       {/* Модальное окно редактирования игрока */}

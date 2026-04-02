@@ -2433,7 +2433,14 @@
     "giftRequestRejected": "Geschenkanfrage abgelehnt",
     "player": "Spieler",
     "unknownPlayer": "Unbekannter Spieler",
-    "star": "Stern"
+    "star": "Stern",
+    "profileViewsDigest": {
+      "title": "Profilaufrufe",
+      "body": {
+        "one": "Heute wurde dein Profil {{count}} Mal angesehen.",
+        "other": "Heute wurde dein Profil {{count}} Mal angesehen."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Wählen Sie eine Fotoquelle",

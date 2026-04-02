@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useGlobalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../components/BlurOrSolid';
 import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, getLastExerciseCompletion } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useExercises } from '../hooks/useExercises';
@@ -308,7 +308,7 @@ export default function ExerciseDetailsScreen() {
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
             {/* Основная информация */}
-            <BlurView
+            <BlurOrSolid
               intensity={20}
               tint="dark"
               style={styles.infoSectionBlur}
@@ -339,11 +339,11 @@ export default function ExerciseDetailsScreen() {
                   </View>
                 </View>
               </View>
-            </BlurView>
+            </BlurOrSolid>
 
             {/* Описание */}
             <View style={styles.sectionWrapper}>
-              <BlurView
+              <BlurOrSolid
                 intensity={20}
                 tint="dark"
                 style={styles.sectionContainerBlur}
@@ -352,12 +352,12 @@ export default function ExerciseDetailsScreen() {
                   <Text style={styles.sectionTitle}>{t('exercises.details.description')}</Text>
                   <Text style={styles.description}>{exercise?.description || ''}</Text>
                 </View>
-              </BlurView>
+              </BlurOrSolid>
             </View>
 
             {/* Польза */}
             <View style={styles.sectionWrapper}>
-              <BlurView
+              <BlurOrSolid
                 intensity={20}
                 tint="dark"
                 style={styles.sectionContainerBlur}
@@ -371,12 +371,12 @@ export default function ExerciseDetailsScreen() {
                     </View>
                   ))}
                 </View>
-              </BlurView>
+              </BlurOrSolid>
             </View>
 
             {/* Инструкции */}
             <View style={styles.sectionWrapper}>
-              <BlurView
+              <BlurOrSolid
                 intensity={20}
                 tint="dark"
                 style={styles.sectionContainerBlur}
@@ -392,12 +392,12 @@ export default function ExerciseDetailsScreen() {
                     </View>
                   ))}
                 </View>
-              </BlurView>
+              </BlurOrSolid>
             </View>
 
             {/* Советы */}
             <View style={styles.sectionWrapper}>
-              <BlurView
+              <BlurOrSolid
                 intensity={20}
                 tint="dark"
                 style={styles.sectionContainerBlur}
@@ -411,12 +411,12 @@ export default function ExerciseDetailsScreen() {
                     </View>
                   ))}
                 </View>
-              </BlurView>
+              </BlurOrSolid>
             </View>
 
         {/* Дополнительная информация */}
             <View style={styles.sectionWrapper}>
-              <BlurView
+              <BlurOrSolid
                 intensity={20}
                 tint="dark"
                 style={styles.sectionContainerBlur}
@@ -435,13 +435,13 @@ export default function ExerciseDetailsScreen() {
                     <Text style={styles.bottomInfoValue}>{exercise?.calories || ''}</Text>
                   </View>
                 </View>
-              </BlurView>
+              </BlurOrSolid>
             </View>
 
         {/* Статистика выполнения */}
         {currentUser && (
           <View style={styles.completionStatsWrapper}>
-            <BlurView
+            <BlurOrSolid
               intensity={20}
               tint="dark"
               style={styles.sectionContainerBlur}
@@ -454,7 +454,7 @@ export default function ExerciseDetailsScreen() {
                   </Text>
                 </View>
               </View>
-            </BlurView>
+            </BlurOrSolid>
           </View>
         )}
 

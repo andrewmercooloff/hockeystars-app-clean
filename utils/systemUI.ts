@@ -3,22 +3,28 @@ import * as SystemUI from 'expo-system-ui';
 import * as NavigationBar from 'expo-navigation-bar';
 
 /**
- * Настройка системного UI для Android
- * НЕ пытаемся скрыть панель - это не работает надёжно на всех устройствах
- * Просто делаем её чёрной с белыми кнопками
+ * Настройка системного UI для Android.
+ * Панель навигации — прозрачная (виден лёд/контент под ней), кнопки светлые.
+ * Плагин expo-navigation-bar: enforceContrast: false в app.json.
  */
-const NAV_BG = '#050008';
+const NAV_BG_FALLBACK = '#050008';
 
 export async function configureSystemUI() {
   if (Platform.OS === 'android') {
     try {
-      await SystemUI.setBackgroundColorAsync(NAV_BG);
-      // Работает при enforceContrast: false (тема + плагин expo-navigation-bar)
+      await SystemUI.setBackgroundColorAsync('transparent');
       NavigationBar.setStyle('dark');
-      await NavigationBar.setBackgroundColorAsync(NAV_BG);
+      await NavigationBar.setBackgroundColorAsync('#00000000');
       await NavigationBar.setButtonStyleAsync('light');
-    } catch (error) {
-      // Игнорируем ошибки - на некоторых устройствах API может быть недоступен
+    } catch {
+      try {
+        await SystemUI.setBackgroundColorAsync(NAV_BG_FALLBACK);
+        NavigationBar.setStyle('dark');
+        await NavigationBar.setBackgroundColorAsync(NAV_BG_FALLBACK);
+        await NavigationBar.setButtonStyleAsync('light');
+      } catch {
+        /* API может отсутствовать на части прошивок */
+      }
     }
   }
 }

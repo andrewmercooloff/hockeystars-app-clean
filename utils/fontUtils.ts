@@ -1,37 +1,50 @@
-import { Platform, PixelRatio, Dimensions } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 
-// Получаем размеры экрана
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+function readWindowMetrics() {
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const shortest = Math.min(screenWidth, screenHeight);
+  return { screenWidth, screenHeight, shortest };
+}
 
 // Размеры экрана для компактных Android устройств
 // Redmi Note 9: 1080x2340 (393x851 в dp)
-// Увеличиваем лимит для захвата Redmi Note 9 и подобных устройств
 const COMPACT_ANDROID_WIDTH = 410;
 const COMPACT_ANDROID_HEIGHT = 900;
+/** Очень узкие / низкие экраны — сильнее уменьшаем типографику */
+const VERY_COMPACT_SHORTEST = 352;
+const VERY_COMPACT_HEIGHT = 740;
+
+/** Единый коэффициент для Android по логическому размеру экрана */
+function getAndroidUiScale(): number {
+  const { screenWidth, screenHeight, shortest } = readWindowMetrics();
+  if (shortest <= VERY_COMPACT_SHORTEST || screenHeight <= VERY_COMPACT_HEIGHT) {
+    return 0.85;
+  }
+  if (screenWidth <= COMPACT_ANDROID_WIDTH || screenHeight <= COMPACT_ANDROID_HEIGHT) {
+    return 0.9;
+  }
+  return 1.0;
+}
 
 // Функция для масштабирования размеров
 export function scaleSize(size: number): number {
-  // Для Android устройств с компактным экраном (включая Redmi Note 9)
-  if (Platform.OS === 'android' && 
-      (screenWidth <= COMPACT_ANDROID_WIDTH || screenHeight <= COMPACT_ANDROID_HEIGHT)) {
-    return size * 0.9; // Уменьшаем на 10%
+  if (Platform.OS === 'android') {
+    return size * getAndroidUiScale();
   }
   return size;
 }
 
 // Функция для глобального масштабирования всего интерфейса
 export function getGlobalScale(): number {
-  if (Platform.OS === 'android' && 
-      (screenWidth <= COMPACT_ANDROID_WIDTH || screenHeight <= COMPACT_ANDROID_HEIGHT)) {
-    return 0.9; // 10% уменьшение
+  if (Platform.OS === 'android') {
+    return getAndroidUiScale();
   }
   return 1.0;
 }
 
 // Проверка, нужно ли масштабирование
 export function shouldScale(): boolean {
-  return Platform.OS === 'android' && 
-         (screenWidth <= COMPACT_ANDROID_WIDTH || screenHeight <= COMPACT_ANDROID_HEIGHT);
+  return Platform.OS === 'android' && getAndroidUiScale() < 1;
 }
 
 // Функция для масштабирования шрифтов

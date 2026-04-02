@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -335,7 +335,7 @@ export default function CurrentTeamsSection({
         <DraggableFlatList
           data={currentTeams}
           renderItem={renderCurrentTeamItem}
-          keyExtractor={(item, index) => `${item.id}-${index}`}
+          keyExtractor={currentTeamKeyExtractor}
           onDragEnd={handleDragEnd}
           scrollEnabled={false}
           contentContainerStyle={styles.teamsList}

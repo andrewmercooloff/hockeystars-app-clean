@@ -135,62 +135,56 @@ const usePuckCollisionSystem = (
   // ИСПРАВЛЕНИЕ: Увеличено до 80 FPS для максимальной плавности
   // 80 FPS обеспечивает очень плавную анимацию, но с оптимизациями нагрузка будет контролируемой
   // Используем уровень производительности устройства для определения частоты кадров
+  // Частота физики: на большинстве экранов 60 Гц — 80 Гц лишняя нагрузка; на слабых Android ещё ниже.
   const { STEP_MS, FIXED_DT, MAX_STEPS, TARGET_FPS } = useMemo(() => {
-    let config;
+    let fps: number;
     switch (performanceLevel) {
       case 'high':
-        // Используем 80 FPS для максимальной плавности
-        config = {
-          STEP_MS: 1000 / 80,
-          FIXED_DT: 1 / 80,
-          MAX_STEPS: 1,
-          TARGET_FPS: 80,
-        };
+        // Android: чаще 60 Гц экран — не гоняем физику 80 Гц. iOS: чуть выше для ProMotion.
+        if (Platform.OS === 'android') fps = 60;
+        else if (Platform.OS === 'ios') fps = 80;
+        else fps = 80;
         break;
       case 'medium':
-        // Для средних устройств используем 80 FPS
-        config = {
-          STEP_MS: 1000 / 80,
-          FIXED_DT: 1 / 80,
-          MAX_STEPS: 1,
-          TARGET_FPS: 80,
-        };
+        fps = 45;
         break;
       case 'low':
       default:
-        // Для слабых устройств используем 80 FPS
-        config = {
-          STEP_MS: 1000 / 80,
-          FIXED_DT: 1 / 80,
-          MAX_STEPS: 1,
-          TARGET_FPS: 80,
-        };
+        fps = 30;
         break;
     }
-    
-    return config;
+    return {
+      STEP_MS: 1000 / fps,
+      FIXED_DT: 1 / fps,
+      MAX_STEPS: 1,
+      TARGET_FPS: fps,
+    };
   }, [performanceLevel]);
 
   // Интервал обновления React state - оптимизирован для производительности
-  // ОПТИМИЗАЦИЯ: Увеличен интервал обновления для снижения нагрузки на React
-  // Shared values обновляются каждый кадр, поэтому визуально плавно
-  // React state обновляем реже для снижения нагрузки на React
+  // Shared values обновляются отдельно; реже трогаем React на слабом железе.
   const reactUpdateInterval = useMemo(() => {
-    // На Android обновляем каждые 5 кадров для баланса между производительностью и отзывчивостью
-    // Shared values обновляются каждый кадр, поэтому визуально плавно
+    if (Platform.OS === 'web') {
+      return 1;
+    }
     if (Platform.OS === 'android') {
-      return 5; // Каждые 5 кадров на Android - shared values обеспечивают плавность
+      if (performanceLevel === 'low') return 8;
+      if (performanceLevel === 'medium') return 6;
+      return 5;
     }
-    
-    // ОПТИМИЗАЦИЯ: Для iOS обновляем каждые 3 кадра вместо каждого кадра для снижения нагрузки
-    // Это снижает количество перерисовок React, но визуально остается плавно благодаря shared values
     if (Platform.OS === 'ios') {
-      return 3; // Каждые 3 кадра на iOS - shared values обеспечивают плавность
+      if (performanceLevel === 'low') return 5;
+      return 3;
     }
-    
-    // Для веб обновляем каждый кадр
     return 1;
-  }, []);
+  }, [performanceLevel]);
+
+  // В режиме покоя реже считаем физику: на low — ещё реже
+  const idleFrameSkip = useMemo(() => {
+    if (performanceLevel === 'low') return 5;
+    if (performanceLevel === 'medium') return 4;
+    return 3;
+  }, [performanceLevel]);
 
   // Получаем безопасные зоны для учета системных элементов
   const insets = useSafeAreaInsets();
@@ -210,9 +204,10 @@ const usePuckCollisionSystem = (
 
   const boundaries = useMemo(() => {
     if (boundsFromPlayfieldLayout) {
-      // Совпадает с styles.innerBorder (top/left/right/bottom: 8) + небольшой зазор
+      // Совпадает с styles.innerBorder (top/left/right/bottom: 8), плюс зазор,
+      // чтобы шайба (и визуал аватара) не заезжала за белую линию и скругления.
       const innerInset = 8;
-      const edgePad = 2;
+      const edgePad = Platform.OS === 'android' ? 8 : 4;
       return {
         left: innerInset + edgePad,
         top: innerInset + edgePad,
@@ -970,8 +965,6 @@ const usePuckCollisionSystem = (
   const isIdleModeRef = useRef<boolean>(false);
   // ОПТИМИЗАЦИЯ: Уменьшено с 30 до 12 секунд для быстрого перехода в режим покоя и снижения нагрузки
   const IDLE_TIMEOUT_MS = 12000; // 12 секунд без взаимодействия = режим покоя
-  // ОПТИМИЗАЦИЯ: Увеличено пропускание кадров для снижения FPS в режиме покоя до ~20 FPS
-  const IDLE_FRAME_SKIP = 3; // В режиме покоя пропускаем каждый 3-й кадр (~20 FPS вместо 60)
   const frameCounterRef = useRef(0);
   
   // Функция для обновления времени последнего взаимодействия
@@ -1116,7 +1109,7 @@ const usePuckCollisionSystem = (
       
       // В режиме покоя пропускаем каждый N-й кадр для экономии батареи
       frameCounterRef.current++;
-      if (isIdleModeRef.current && frameCounterRef.current % IDLE_FRAME_SKIP !== 0) {
+      if (isIdleModeRef.current && frameCounterRef.current % idleFrameSkip !== 0) {
         animationFrameId = requestAnimationFrame(tick);
         return;
       }
@@ -1203,7 +1196,7 @@ const usePuckCollisionSystem = (
       // lastTimeRef.current = 0;
       // accumulatorRef.current = 0;
     };
-  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, appIsActive, isOnHomeScreen]); // Убрали puckPositions.length - проверяем через hasPucksRef
+  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, idleFrameSkip, appIsActive, isOnHomeScreen]);
 
   // Вибрация при столкновениях (только один раз при начале столкновения)
   useEffect(() => {
@@ -2424,6 +2417,15 @@ export default function HomeScreen() {
   }, [loadBlockedUsers, currentUser?.id]);
 
 
+  /** Меньше шайб на главной на слабых Android (меньше одновременных аватаров и коллизий). */
+  const homeScreenPuckCapAndroid = useMemo(() => {
+    if (Platform.OS !== 'android') return Infinity;
+    const level = getPerformanceLevel();
+    if (level === 'low') return 12;
+    if (level === 'medium') return 17;
+    return Infinity;
+  }, []);
+
   // Умный отбор игроков с ограничением количества
   // Используем useRef для стабильной ссылки, чтобы избежать переинициализации позиций
   const allVisiblePlayersRef = useRef<Player[]>([]);
@@ -2484,7 +2486,11 @@ export default function HomeScreen() {
       const blockedSet = new Set(blockedUsers);
       filtered = filtered.filter(player => !blockedSet.has(player.id));
     }
-    
+
+    if (homeScreenPuckCapAndroid < Infinity && filtered.length > homeScreenPuckCapAndroid) {
+      filtered = filtered.slice(0, homeScreenPuckCapAndroid);
+    }
+
     // Обновляем ref для использования в других местах
     if (__DEV__) {
       console.log('✅ [ANIMATION] Список видимых игроков обновлен:', {
@@ -2519,7 +2525,7 @@ export default function HomeScreen() {
     } as any;
 
     return [...filtered, gamePuck];
-  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers]);
+  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, homeScreenPuckCapAndroid]);
 
   // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
   // но сохраняем ограничения скрытых/заблокированных, чтобы не показывать их нигде.

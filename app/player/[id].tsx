@@ -37,7 +37,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../../components/BlurOrSolid';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import Animated from 'react-native-reanimated';
@@ -67,6 +67,7 @@ import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
 import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -133,11 +134,11 @@ const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurS
     // Используем отфильтрованные children
     return (
       <View style={[styles.sectionWrapper, wrapperStyle]}>
-        <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
+        <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
           <View ref={ref} style={[styles.section, style]}>
             {filteredChildren}
           </View>
-        </BlurView>
+        </BlurOrSolid>
       </View>
     );
   }
@@ -154,11 +155,11 @@ const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurS
   
   return (
     <View style={[styles.sectionWrapper, wrapperStyle]}>
-      <BlurView intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
+      <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
         <View ref={ref} style={[styles.section, style]}>
           {children}
         </View>
-      </BlurView>
+      </BlurOrSolid>
     </View>
   );
 });
@@ -176,6 +177,8 @@ export default function PlayerProfile() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
+  /** Пока timestamp в будущем — не восстанавливать scroll после Realtime (иначе откат с позиции из уведомления scrollTo*). */
+  const suppressProfileScrollRestoreUntilRef = useRef(0);
   const previousScreenRef = useRef<string | null>(null);
   const aiSectionRef = useRef<View>(null);
   const museumRef = useRef<View>(null);
@@ -774,14 +777,15 @@ export default function PlayerProfile() {
         if (!retryPlayerData) {
           console.log('❌ Игрок не найден после повторной попытки');
           // Проверяем, является ли это профилем текущего пользователя
-          const { loadCurrentUser } = await import('../../utils/playerStorage');
+            const { loadCurrentUser } = await import('../../utils/playerStorage');
           const currentUserData = await loadCurrentUser();
           if (currentUserData && currentUserData.id === normalizedId) {
             console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
-            const { logoutUser } = await import('../../utils/playerStorage');
             await logoutUser();
-            await refreshUser();
+            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+            setGlobalCurrentUser(null);
             router.replace('/');
+            void refreshUser(true);
             return;
           }
           // ВАЖНО: НЕ редиректим на главный экран если это не профиль текущего пользователя
@@ -1267,8 +1271,10 @@ export default function PlayerProfile() {
         
         // Восстанавливаем позицию прокрутки после обновления
         // НО НЕ восстанавливаем, если позиция была сброшена (например, после принятия дружбы)
-        // Используем несколько попыток для гарантии восстановления
-        if (currentScrollPosition !== null && savedScrollPositionRef.current !== null && scrollViewRef.current) {
+        // И пропускаем после перехода из уведомления с scrollTo* (тайминг совпадает с 300ms Realtime)
+        if (Date.now() < suppressProfileScrollRestoreUntilRef.current) {
+          // не трогаем ScrollView
+        } else if (currentScrollPosition !== null && savedScrollPositionRef.current !== null && scrollViewRef.current) {
           const restoreScroll = () => {
             scrollViewRef.current?.scrollTo({ 
               y: currentScrollPosition, 
@@ -1495,10 +1501,12 @@ export default function PlayerProfile() {
           }
           
           // Восстанавливаем позицию прокрутки после обновления (если была сохранена)
-          // Используем позицию сохранённую ДО начала обновления
-          if (scrollPositionBeforeUpdate !== null && scrollViewRef.current) {
-            // Используем несколько попыток восстановления с разными задержками
-            // чтобы гарантировать восстановление после всех ре-рендеров
+          // Не затираем целевую прокрутку из уведомления: Realtime приходит ~300ms, scrollTo — позже
+          if (
+            scrollPositionBeforeUpdate !== null &&
+            scrollViewRef.current &&
+            Date.now() >= suppressProfileScrollRestoreUntilRef.current
+          ) {
             const restoreScroll = () => {
               scrollViewRef.current?.scrollTo({ 
                 y: scrollPositionBeforeUpdate, 
@@ -1594,18 +1602,50 @@ export default function PlayerProfile() {
   useEffect(() => {
     if (!player) return;
 
+    const hasDeepLinkScroll =
+      scrollToMuseum === 'true' ||
+      scrollToStats === 'true' ||
+      scrollToPhotos === 'true' ||
+      scrollToVideos === 'true' ||
+      scrollToAchievements === 'true' ||
+      scrollToFriends === 'true' ||
+      scrollToNormatives === 'true' ||
+      scrollToExercises === 'true' ||
+      scrollToGift === 'true' ||
+      scrollToSpeed === 'true' ||
+      scrollToAnalysis === 'true';
+
+    if (hasDeepLinkScroll) {
+      suppressProfileScrollRestoreUntilRef.current = Date.now() + 5000;
+    }
+
+    /** Повторы measureLayout: после Realtime layout меняется; одна задержка 500ms давала сдвиг «через мгновение». */
     const scrollToSection = (ref: React.RefObject<View>, offset: number = 100) => {
-      if (ref.current) {
+      const scrollOnce = (attempt: number) => {
+        const delay = attempt === 0 ? 80 : 300;
         setTimeout(() => {
-          ref.current?.measureLayout(
-            scrollViewRef.current as any,
-            (x, y) => {
-              scrollViewRef.current?.scrollTo({ x: 0, y: y - offset, animated: true });
-            },
-            () => {}
-          );
-        }, 500);
-      }
+          InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => {
+              const target = ref.current;
+              const scrollParent = scrollViewRef.current;
+              if (!target || !scrollParent) {
+                if (attempt < 5) scrollOnce(attempt + 1);
+                return;
+              }
+              target.measureLayout(
+                scrollParent as any,
+                (_x, y) => {
+                  scrollParent.scrollTo({ x: 0, y: Math.max(0, y - offset), animated: true });
+                },
+                () => {
+                  if (attempt < 5) scrollOnce(attempt + 1);
+                }
+              );
+            });
+          });
+        }, delay);
+      };
+      scrollOnce(0);
     };
 
     if (scrollToMuseum === 'true') {
@@ -1670,18 +1710,29 @@ export default function PlayerProfile() {
     } else if (scrollToGift === 'true') {
       scrollToSection(giftButtonRef);
     } else if (scrollToSpeed === 'true') {
-      // Для раздела радара открываем сразу без анимации прокрутки
-      setTimeout(() => {
-        if (puckSpeedRef.current && scrollViewRef.current) {
-          puckSpeedRef.current.measureLayout(
-            scrollViewRef.current as any,
-            (x, y) => {
-              scrollViewRef.current?.scrollTo({ x: 0, y: y - 50, animated: false });
-            },
-            () => {}
-          );
-        }
-      }, 100);
+      const scrollSpeed = (attempt: number) => {
+        const delay = attempt === 0 ? 80 : 280;
+        setTimeout(() => {
+          InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => {
+              if (puckSpeedRef.current && scrollViewRef.current) {
+                puckSpeedRef.current.measureLayout(
+                  scrollViewRef.current as any,
+                  (_x, y) => {
+                    scrollViewRef.current?.scrollTo({ x: 0, y: Math.max(0, y - 50), animated: false });
+                  },
+                  () => {
+                    if (attempt < 4) scrollSpeed(attempt + 1);
+                  }
+                );
+              } else if (attempt < 4) {
+                scrollSpeed(attempt + 1);
+              }
+            });
+          });
+        }, delay);
+      };
+      scrollSpeed(0);
     } else if (scrollToAnalysis === 'true') {
       scrollToSection(aiSectionRef, 100);
     }
@@ -4014,24 +4065,16 @@ export default function PlayerProfile() {
       type: 'warning',
       onConfirm: async () => {
         try {
-          // Очищаем данные текущего пользователя
-          const { logoutUser } = await import('../../utils/playerStorage');
           await logoutUser();
-          
-          // Очищаем кеш пользователя
-          const { dataCache, CACHE_KEYS } = await import('../../utils/DataCache');
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-          
-          // Принудительно обновляем глобальное состояние пользователя
-          await refreshUser();
-          
-          // Переходим на главную страницу
+          setGlobalCurrentUser(null);
           router.replace('/');
+          void refreshUser(true);
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
-          // Даже если произошла ошибка, все равно переходим на главную
-          await refreshUser();
+          setGlobalCurrentUser(null);
           router.replace('/');
+          void refreshUser(true);
         }
       },
       onCancel: () => {
@@ -4127,9 +4170,10 @@ export default function PlayerProfile() {
         console.log('⏰ Таймаут: игрок не найден, выполняем редирект');
         if (isCurrentUserProfile) {
           try {
-            const { logoutUser } = await import('../../utils/playerStorage');
             await logoutUser();
-            await refreshUser();
+            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+            setGlobalCurrentUser(null);
+            void refreshUser(true);
           } catch (error) {
             console.error('❌ Ошибка при выходе:', error);
           }
@@ -4182,12 +4226,14 @@ export default function PlayerProfile() {
                   style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
                   onPress={async () => {
                     try {
-                      const { logoutUser } = await import('../../utils/playerStorage');
                       await logoutUser();
-                      await refreshUser();
+                      await dataCache.remove(CACHE_KEYS.USER_PROFILE);
+                      setGlobalCurrentUser(null);
                       router.replace('/');
+                      void refreshUser(true);
                     } catch (error) {
                       console.error('❌ Ошибка при выходе:', error);
+                      setGlobalCurrentUser(null);
                       router.replace('/');
                     }
                   }}

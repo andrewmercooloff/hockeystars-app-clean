@@ -16,7 +16,7 @@ import {
 import { Image } from 'expo-image';
 import CachedBackground from './CachedBackground';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from './BlurOrSolid';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -2106,7 +2106,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
               <TouchableOpacity style={[gs.overlayCloseBtn, { top: insets.top + 8 }]} onPress={onClose} hitSlop={12}>
                 <Ionicons name="close" size={28} color="#fff" />
               </TouchableOpacity>
-              <BlurView intensity={40} style={gs.overlayBlur}>
+              <BlurOrSolid intensity={40} tint="dark" style={gs.overlayBlur}>
                 <Text style={gs.overlayTitle}>{tr('score').replace('{score}', String(score))}</Text>
                 {bestScore > 0 && (
                   <Text style={gs.bestScoreText}>{tr('yourBest').replace('{score}', String(bestScore))}</Text>
@@ -2139,7 +2139,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
                 <TouchableOpacity style={gs.closeBtnBig} onPress={onClose}>
                   <Text style={gs.closeBtnBigText}>{tr('close')}</Text>
                 </TouchableOpacity>
-              </BlurView>
+              </BlurOrSolid>
             </View>
           )}
           </View>

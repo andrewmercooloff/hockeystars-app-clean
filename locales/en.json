@@ -2542,7 +2542,14 @@
     "giftRequestApproved": "Request Approved",
     "giftRequestApprovedMessage": "{starName} approved your request for {itemType}",
     "giftRequestAccepted": "Gift request accepted!",
-    "giftRequestRejected": "Gift request rejected"
+    "giftRequestRejected": "Gift request rejected",
+    "profileViewsDigest": {
+      "title": "Profile views",
+      "body": {
+        "one": "Today your profile was viewed {{count}} time.",
+        "other": "Today your profile was viewed {{count}} times."
+      }
+    }
   },
   "gifts": {
     "requestGift": "Request a Gift",

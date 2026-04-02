@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import {
     Dimensions,
     Image,
@@ -21,7 +21,7 @@ import { generateVideoContentId } from '../utils/likesService';
 const thumbnailFormatCache = new Map<string, number>();
 
 // Компонент для изображения с fallback (оптимизированный)
-const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
+const VideoThumbnail = React.memo(function VideoThumbnail({ videoUrl }: { videoUrl: string }) {
   const [vkThumbnailUrl, setVkThumbnailUrl] = React.useState<string | null>(null);
   const [vkThumbnailError, setVkThumbnailError] = React.useState(false);
   const [vkThumbnailIndex, setVkThumbnailIndex] = React.useState(0);
@@ -97,7 +97,70 @@ const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
     }
     return 1; // Начинаем с hqdefault (индекс 1) - он быстрее загружается
   });
-  
+
+  const vkVideoId = isVkUrl(videoUrl) ? getVKVideoId(videoUrl) : null;
+
+  // Загружаем превью VK через og:image со страницы (без использования API)
+  useEffect(() => {
+    if (vkVideoId && !vkThumbnailUrl && !vkThumbnailError) {
+      const loadVkThumbnail = async () => {
+        try {
+          console.log('🔍 Загрузка превью VK:', { vkVideoId, videoUrl });
+
+          // Нормализуем URL
+          let normalizedUrl = videoUrl.trim();
+          normalizedUrl = normalizedUrl.split('?')[0]; // Убираем параметры
+
+          if (normalizedUrl.includes('vkvideo.ru')) {
+            normalizedUrl = normalizedUrl.replace(/vkvideo\.ru/i, 'vk.com');
+          }
+          if (!normalizedUrl.startsWith('http')) {
+            normalizedUrl = `https://${normalizedUrl}`;
+          }
+
+          // Используем мобильную версию VK (m.vk.com) - она работает лучше
+          const mobileUrl = normalizedUrl.replace('vk.com', 'm.vk.com');
+
+          try {
+            console.log('🔎 Получаю превью со страницы:', mobileUrl);
+            const htmlResp = await fetch(mobileUrl, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+              },
+            });
+
+            const html = await htmlResp.text();
+
+            // Ищем og:image в HTML
+            const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+            const twMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+
+            const foundImage = (ogMatch && ogMatch[1]) || (twMatch && twMatch[1]) || null;
+
+            if (foundImage) {
+              const cleaned = decodeAndCleanUrl(foundImage);
+              console.log('✅ Найдено превью VK:', cleaned);
+              setVkThumbnailUrl(cleaned);
+              return;
+            }
+          } catch (fetchError) {
+            console.log('⚠️ Ошибка при получении превью:', fetchError);
+          }
+
+          // Если не получилось, показываем placeholder
+          console.log('ℹ️ Не удалось получить превью VK, показываем placeholder');
+          setVkThumbnailError(true);
+        } catch (error) {
+          console.log('❌ Ошибка загрузки превью VK:', error);
+          setVkThumbnailError(true);
+        }
+      };
+
+      loadVkThumbnail();
+    }
+  }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
+
   // Для YouTube видео
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
     // ОПТИМИЗАЦИЯ: Изменен порядок - сначала hqdefault (более надежный и быстрый)
@@ -134,71 +197,7 @@ const VideoThumbnail = React.memo(({ videoUrl }: { videoUrl: string }) => {
       />
     );
   }
-  
-  // Для VK видео - пытаемся получить превью через VK oEmbed
-  const vkVideoId = isVkUrl(videoUrl) ? getVKVideoId(videoUrl) : null;
-  
-  // Загружаем превью VK через og:image со страницы (без использования API)
-  useEffect(() => {
-    if (vkVideoId && !vkThumbnailUrl && !vkThumbnailError) {
-      const loadVkThumbnail = async () => {
-        try {
-          console.log('🔍 Загрузка превью VK:', { vkVideoId, videoUrl });
-          
-          // Нормализуем URL
-          let normalizedUrl = videoUrl.trim();
-          normalizedUrl = normalizedUrl.split('?')[0]; // Убираем параметры
-          
-          if (normalizedUrl.includes('vkvideo.ru')) {
-            normalizedUrl = normalizedUrl.replace(/vkvideo\.ru/i, 'vk.com');
-          }
-          if (!normalizedUrl.startsWith('http')) {
-            normalizedUrl = `https://${normalizedUrl}`;
-          }
-          
-          // Используем мобильную версию VK (m.vk.com) - она работает лучше
-          const mobileUrl = normalizedUrl.replace('vk.com', 'm.vk.com');
-          
-          try {
-            console.log('🔎 Получаю превью со страницы:', mobileUrl);
-            const htmlResp = await fetch(mobileUrl, {
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
-              }
-            });
-            
-            const html = await htmlResp.text();
-            
-            // Ищем og:image в HTML
-            const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-            const twMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-            
-            const foundImage = (ogMatch && ogMatch[1]) || (twMatch && twMatch[1]) || null;
-            
-            if (foundImage) {
-              const cleaned = decodeAndCleanUrl(foundImage);
-              console.log('✅ Найдено превью VK:', cleaned);
-              setVkThumbnailUrl(cleaned);
-              return;
-            }
-          } catch (fetchError) {
-            console.log('⚠️ Ошибка при получении превью:', fetchError);
-          }
-          
-          // Если не получилось, показываем placeholder
-          console.log('ℹ️ Не удалось получить превью VK, показываем placeholder');
-          setVkThumbnailError(true);
-        } catch (error) {
-          console.log('❌ Ошибка загрузки превью VK:', error);
-          setVkThumbnailError(true);
-        }
-      };
-      
-      loadVkThumbnail();
-    }
-  }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
-  
+
   if (isVkUrl(videoUrl) && vkVideoId) {
     // Если есть превью из oEmbed, показываем его
     if (vkThumbnailUrl && !vkThumbnailError) {
@@ -268,14 +267,56 @@ interface VideoCarouselProps {
 
 const { width: screenWidth } = Dimensions.get('window');
 
+type VideoCarouselCardProps = {
+  video: { url: string; timeCode?: string };
+  index: number;
+  playerId?: string;
+  effectiveRefreshTrigger: number;
+  onPress: (video: { url: string; timeCode?: string }) => void;
+};
+
+const VideoCarouselCard = React.memo(function VideoCarouselCard({
+  video,
+  index,
+  playerId,
+  effectiveRefreshTrigger,
+  onPress,
+}: VideoCarouselCardProps) {
+  const contentId = generateVideoContentId(video.url, video.timeCode);
+  return (
+    <TouchableOpacity style={styles.videoCard} onPress={() => onPress(video)} activeOpacity={0.85}>
+      <VideoThumbnail videoUrl={video.url} />
+      <View style={styles.playButton}>
+        <Ionicons name="play-circle" size={40} color="#FF4444" />
+      </View>
+      {video.timeCode && (
+        <View style={styles.timeCodeBadge}>
+          <Text style={styles.timeCodeText}>{video.timeCode}</Text>
+        </View>
+      )}
+      {playerId ? (
+        <View style={styles.likeButtonContainer}>
+          <LikeButton
+            playerId={playerId}
+            contentId={contentId}
+            contentType="video"
+            size="small"
+            refreshTrigger={effectiveRefreshTrigger}
+          />
+        </View>
+      ) : null}
+      <View style={styles.videoInfo}>
+        <Text style={styles.videoTitle}>{index + 1}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
 export default function VideoCarousel({ videos, onVideoPress, playerId, externalRefreshTrigger = 0 }: VideoCarouselProps) {
   const { t } = useLanguage();
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
-  
-  // Используем максимальное значение между внутренним и внешним trigger
-  const effectiveRefreshTrigger = Math.max(likeRefreshTrigger, externalRefreshTrigger);
   
   const panResponder = useRef(
     PanResponder.create({
@@ -293,19 +334,26 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
     })
   ).current;
 
-  const handleVideoPress = (video: { url: string; timeCode?: string }) => {
-    if (onVideoPress) {
-      onVideoPress(video);
-    } else {
-      setSelectedVideo(video);
-    }
-  };
+  const handleVideoPress = useCallback(
+    (video: { url: string; timeCode?: string }) => {
+      if (onVideoPress) {
+        onVideoPress(video);
+      } else {
+        setSelectedVideo(video);
+      }
+    },
+    [onVideoPress]
+  );
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setSelectedVideo(null);
-    // Обновляем trigger для перезагрузки данных лайков в карусели
     setLikeRefreshTrigger(prev => prev + 1);
-  };
+  }, []);
+
+  const effectiveRefreshTrigger = useMemo(
+    () => Math.max(likeRefreshTrigger, externalRefreshTrigger),
+    [likeRefreshTrigger, externalRefreshTrigger]
+  );
 
   if (!videos || videos.length === 0) {
     return (
@@ -333,41 +381,16 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
         removeClippedSubviews={true}
         decelerationRate="fast"
       >
-        {videos.map((video, index) => {
-          const contentId = generateVideoContentId(video.url, video.timeCode);
-          
-          return (
-          <TouchableOpacity
-            key={index}
-            style={styles.videoCard}
-            onPress={() => handleVideoPress(video)}
-          >
-            <VideoThumbnail videoUrl={video.url} />
-            <View style={styles.playButton}>
-              <Ionicons name="play-circle" size={40} color="#FF4444" />
-            </View>
-            {video.timeCode && (
-              <View style={styles.timeCodeBadge}>
-                <Text style={styles.timeCodeText}>{video.timeCode}</Text>
-              </View>
-            )}
-              {playerId && (
-                <View style={styles.likeButtonContainer}>
-                  <LikeButton
-                    playerId={playerId}
-                    contentId={contentId}
-                    contentType="video"
-                    size="small"
-                    refreshTrigger={effectiveRefreshTrigger}
-                  />
-                </View>
-              )}
-            <View style={styles.videoInfo}>
-              <Text style={styles.videoTitle}>{index + 1}</Text>
-            </View>
-          </TouchableOpacity>
-          );
-        })}
+        {videos.map((video, index) => (
+          <VideoCarouselCard
+            key={`${video.url}${video.timeCode ?? ''}`}
+            video={video}
+            index={index}
+            playerId={playerId}
+            effectiveRefreshTrigger={effectiveRefreshTrigger}
+            onPress={handleVideoPress}
+          />
+        ))}
       </ScrollView>
 
       {/* Точки-индикаторы */}
@@ -596,15 +619,5 @@ const styles = StyleSheet.create({
     left: '50%',
     transform: [{ translateX: -24 }, { translateY: -24 }],
     opacity: 0.9,
-  },
-  vkPlayOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 }); 

@@ -4,6 +4,7 @@ import { Platform, AppState } from 'react-native';
 import Constants from 'expo-constants';
 import { supabase } from './supabase';
 import { playNotificationSound } from './soundService';
+import { getDeviceIanaTimeZone } from './deviceTimezone';
 
 // Настройка обработчика уведомлений
 Notifications.setNotificationHandler({
@@ -654,6 +655,7 @@ export async function initializePushNotifications(userId: string, forceReinit: b
     // Сохраняем token в базе данных
     const saved = await savePushToken(token, userId);
     if (saved) {
+      void syncPlayerNotificationTimezone(userId);
       // Помечаем пользователя как инициализированного
       initializedUsers.set(userId, now);
       console.log('✅ Push-уведомления успешно инициализированы для пользователя:', userId);

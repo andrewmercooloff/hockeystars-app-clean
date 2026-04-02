@@ -13,8 +13,8 @@ import {
     Animated
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import CachedAvatar from '../components/CachedAvatar';
+import { BlurOrSolid } from '../components/BlurOrSolid';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam, isGoalkeeperPosition } from '../utils/playerStorage';
@@ -1163,7 +1163,7 @@ export default function SearchScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <BlurView
+          <BlurOrSolid
             intensity={20}
             tint="dark"
             style={styles.searchSectionBlur}
@@ -1402,7 +1402,7 @@ export default function SearchScreen() {
             </View>
             </View>
             </View>
-          </BlurView>
+          </BlurOrSolid>
 
           {/* Список игроков */}
           <FlatList
@@ -1827,7 +1827,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   return (
     <TouchableOpacity onPress={() => onPress(player.id)} activeOpacity={0.7}>
       <View style={styles.playerGradientShadow}>
-        <BlurView intensity={20} tint="dark" style={styles.playerItemBlur}>
+        <BlurOrSolid intensity={20} tint="dark" style={styles.playerItemBlur}>
           <View style={styles.playerItem}>
             <View style={photoContainerStyle}>
               <CachedAvatar
@@ -1866,7 +1866,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
               <Text style={styles.playerInfo}>{subtitle}</Text>
             </View>
           </View>
-        </BlurView>
+        </BlurOrSolid>
       </View>
     </TouchableOpacity>
   );

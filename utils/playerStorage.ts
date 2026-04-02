@@ -112,6 +112,9 @@ export interface SupabasePlayer {
   profile_views_today?: number;
   profile_views_total?: number;
   profile_views_reset_at?: string; // date
+  language?: string;
+  notification_timezone?: string;
+  profile_views_digest_sent_on?: string;
   ai_analysis?: {
     text: string;
     generated_at: string;
@@ -2342,42 +2345,46 @@ export const logoutUser = async (skipStatusUpdate: boolean = false): Promise<voi
     
     // Проверим, есть ли данные пользователя перед удалением
     const userData = await AsyncStorage.getItem('hockeystars_current_user');
-    let userId: string | null = null;
-    
+
     if (userData && !skipStatusUpdate) {
       const user = JSON.parse(userData);
-      userId = user.id;
-      
-      // Обновляем онлайн-статус в базе данных при выходе (только если пользователь не удален)
-      try {
-        await supabase
-          .from('players')
-          .update({ 
-            is_online: false,
-            last_seen: new Date().toISOString()
-          })
-          .eq('id', user.id);
-      } catch (statusError) {
-        // Не критично, если не удалось обновить статус (возможно, пользователь уже удален)
-        console.warn('⚠️ Не удалось обновить офлайн-статус:', statusError);
-      }
-      
-      // Удаляем все push токены пользователя при выходе из аккаунта
-      try {
-        const { deleteUserPushTokens } = await import('./notificationService');
-        await deleteUserPushTokens(user.id);
-        console.log('✅ Push токены удалены при выходе из аккаунта');
-      } catch (tokenError) {
-        // Не критично, если не удалось удалить токены
-        console.warn('⚠️ Не удалось удалить push токены при выходе (не критично):', tokenError);
-      }
+
+      // Параллельно: офлайн в players и удаление push-токенов — раньше шли друг за другом и заметно тормозили выход.
+      await Promise.all([
+        (async () => {
+          try {
+            const { error } = await supabase
+              .from('players')
+              .update({
+                is_online: false,
+                last_seen: new Date().toISOString(),
+              })
+              .eq('id', user.id);
+            if (error) {
+              console.warn('⚠️ Не удалось обновить офлайн-статус:', error);
+            }
+          } catch (statusError) {
+            console.warn('⚠️ Не удалось обновить офлайн-статус:', statusError);
+          }
+        })(),
+        (async () => {
+          try {
+            const { deleteUserPushTokens } = await import('./notificationService');
+            await deleteUserPushTokens(user.id);
+            console.log('✅ Push токены удалены при выходе из аккаунта');
+          } catch (tokenError) {
+            console.warn('⚠️ Не удалось удалить push токены при выходе (не критично):', tokenError);
+          }
+        })(),
+      ]);
     }
-    
-    // Очищаем все связанные данные
-    await AsyncStorage.removeItem('hockeystars_current_user');
-    await AsyncStorage.removeItem('hockeystars_user_cache');
-    await AsyncStorage.removeItem('hockeystars_last_user_id');
-    await AsyncStorage.removeItem('all_players');
+
+    await AsyncStorage.multiRemove([
+      'hockeystars_current_user',
+      'hockeystars_user_cache',
+      'hockeystars_last_user_id',
+      'all_players',
+    ]);
     
     // Обновляем глобальный кеш и контекст пользователя
     try {
@@ -2791,6 +2798,60 @@ export async function fetchInboxMessagesPage(
     hasMore && last ? { mode: 'cursor', cursor: inboxRowToCursor(last) } : null;
 
   return { rows, hasMore, nextState, error: null };
+}
+
+const GLOBAL_MESSAGE_SEARCH_MIN_LENGTH = 2;
+const GLOBAL_MESSAGE_SEARCH_ROW_CAP = 800;
+
+function escapeIlikePattern(fragment: string): string {
+  return fragment.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
+/**
+ * Поиск по полю text во всех сообщениях пользователя (входящие и исходящие).
+ * На каждого собеседника — одно самое новое совпадение (по created_at).
+ */
+export async function searchMessagesAcrossAllDialogs(
+  userId: string,
+  rawQuery: string
+): Promise<{ matchesByPeerId: Map<string, Message>; error: unknown | null }> {
+  const q = rawQuery.trim();
+  if (q.length < GLOBAL_MESSAGE_SEARCH_MIN_LENGTH) {
+    return { matchesByPeerId: new Map(), error: null };
+  }
+
+  const pattern = `%${escapeIlikePattern(q)}%`;
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('id, sender_id, receiver_id, text, created_at, read')
+    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .ilike('text', pattern)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(GLOBAL_MESSAGE_SEARCH_ROW_CAP);
+
+  if (error) {
+    console.error('❌ searchMessagesAcrossAllDialogs:', error);
+    return { matchesByPeerId: new Map(), error };
+  }
+
+  const matchesByPeerId = new Map<string, Message>();
+  for (const row of data || []) {
+    const peerId = row.sender_id === userId ? row.receiver_id : row.sender_id;
+    const pid = peerId != null ? String(peerId) : '';
+    if (!pid || matchesByPeerId.has(pid)) continue;
+    matchesByPeerId.set(pid, {
+      id: String(row.id),
+      senderId: String(row.sender_id),
+      receiverId: String(row.receiver_id),
+      text: row.text ?? '',
+      timestamp: new Date(row.created_at),
+      read: !!row.read,
+    });
+  }
+
+  return { matchesByPeerId, error: null };
 }
 
 // Получение сообщений между двумя пользователями

@@ -2220,6 +2220,15 @@
     "photo_liked": {
       "title": "Polubiono Twoje zdjęcie",
       "message": "{name} polubił Twoje zdjęcie"
+    },
+    "profileViewsDigest": {
+      "title": "Wyświetlenia profilu",
+      "body": {
+        "one": "Dzisiaj Twój profil obejrzano {{count}} raz.",
+        "few": "Dzisiaj Twój profil obejrzano {{count}} razy.",
+        "many": "Dzisiaj Twój profil obejrzano {{count}} razy.",
+        "other": "Dzisiaj Twój profil obejrzano {{count}} razy."
+      }
     }
   },
   "editProfile": {

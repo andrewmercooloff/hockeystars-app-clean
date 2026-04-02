@@ -2,8 +2,9 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
     Alert,
-    FlatList, 
+    FlatList,
     ImageBackground,
+    ListRenderItemInfo,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -1177,7 +1178,7 @@ export default function NotificationsScreen() {
   };
 
   // Удаление одного уведомления
-  const handleDeleteNotification = async (notificationId: string) => {
+  const handleDeleteNotification = useCallback(async (notificationId: string) => {
     try {
       // Сначала удаляем из UI для плавной анимации
       const notification = notifications.find(n => n.id === notificationId);
@@ -1221,7 +1222,7 @@ export default function NotificationsScreen() {
     } catch (error) {
       console.error('Ошибка удаления уведомления:', error);
     }
-  };
+  }, [notifications, currentUser]);
 
 
   const handleClearAllNotifications = async () => {
@@ -1325,7 +1326,7 @@ export default function NotificationsScreen() {
     }
   };
 
-  const handleNotificationPress = async (notification: NotificationItem) => {
+  const handleNotificationPress = useCallback(async (notification: NotificationItem) => {
     
     try {
       // Для actionable уведомлений не выполняем автоматическую отметку как прочитанное
@@ -1562,9 +1563,9 @@ export default function NotificationsScreen() {
     } catch (error) {
       console.error('❌ Ошибка обработки уведомления:', error);
     }
-  };
+  }, [currentUser, router]);
 
-  const handleSuperAction = async (notification: NotificationItem) => {
+  const handleSuperAction = useCallback(async (notification: NotificationItem) => {
     try {
       if (!currentUser || !notification.id) {
         console.error('❌ Некорректные данные уведомления:', { currentUser: !!currentUser, notificationId: notification.id });
@@ -1751,7 +1752,50 @@ export default function NotificationsScreen() {
       
       Alert.alert('Ошибка', 'Не удалось обработать уведомление. Попробуйте еще раз.');
     }
-  };
+  }, [currentUser, router, loadNotificationsData]);
+
+  const notificationKeyExtractor = useCallback((item: NotificationItem) => item.id, []);
+
+  const renderNotificationItem = useCallback(
+    ({ item, index }: ListRenderItemInfo<NotificationItem>) => (
+      <NotificationItem
+        notification={item}
+        index={index}
+        isNew={newNotificationIds.has(item.id)}
+        onPress={handleNotificationPress}
+        onSuperAction={handleSuperAction}
+        onDelete={handleDeleteNotification}
+        currentUserId={currentUser?.id}
+      />
+    ),
+    [
+      newNotificationIds,
+      handleNotificationPress,
+      handleSuperAction,
+      handleDeleteNotification,
+      currentUser?.id,
+    ]
+  );
+
+  const notificationsListEmpty = useMemo(() => {
+    if (!listReady) {
+      return (
+        <View style={[styles.emptyContainer, styles.listLoadingInline]}>
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={styles.emptyContainer}>
+        <View style={styles.emptyGradientShadow}>
+          <View style={styles.emptyContent}>
+            <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
+            <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }, [listReady, t]);
 
   const handleFriendRequest = async (request: FriendRequestItem, action: 'accept' | 'decline') => {
     try {
@@ -1901,21 +1945,10 @@ export default function NotificationsScreen() {
           </View>
 
           {/* Список уведомлений */}
-          <FlatList 
+          <FlatList
             data={memoizedNotifications}
-            renderItem={({ item, index }) => (
-              <NotificationItem
-                key={item.id}
-                notification={item}
-                index={index}
-                isNew={newNotificationIds.has(item.id)}
-                onPress={handleNotificationPress}
-                onSuperAction={handleSuperAction}
-                onDelete={handleDeleteNotification}
-                currentUserId={currentUser?.id}
-              />
-            )}
-            keyExtractor={(item) => item.id}
+            renderItem={renderNotificationItem}
+            keyExtractor={notificationKeyExtractor}
             contentContainerStyle={styles.notificationsContent}
             removeClippedSubviews={true}
             decelerationRate="fast"
@@ -1923,24 +1956,7 @@ export default function NotificationsScreen() {
             maxToRenderPerBatch={10}
             windowSize={10}
             updateCellsBatchingPeriod={50}
-            ListEmptyComponent={
-              !listReady
-                ? () => (
-                    <View style={[styles.emptyContainer, styles.listLoadingInline]}>
-                      <Text style={styles.loadingText}>{t('common.loading')}</Text>
-                    </View>
-                  )
-                : () => (
-                    <View style={styles.emptyContainer}>
-                      <View style={styles.emptyGradientShadow}>
-                        <View style={styles.emptyContent}>
-                          <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
-                          <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-                        </View>
-                      </View>
-                    </View>
-                  )
-            }
+            ListEmptyComponent={notificationsListEmpty}
           />
         </View>
       </CachedBackground>

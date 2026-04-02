@@ -2408,7 +2408,16 @@
     "giftRequestRejected": "Žiadosť o darček zamietnutá",
     "player": "Hráč",
     "unknownPlayer": "Neznámy hráč",
-    "star": "Hviezda"
+    "star": "Hviezda",
+    "profileViewsDigest": {
+      "title": "Zobrazenia profilu",
+      "body": {
+        "one": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+        "few": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+        "many": "Dnes bol tvoj profil zobrazený {{count}}-krát.",
+        "other": "Dnes bol tvoj profil zobrazený {{count}}-krát."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Vyberte zdroj fotografie",

@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from './BlurOrSolid';
+import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -32,7 +33,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
   }, [t]);
 
   return (
-    <BlurView intensity={20} tint="dark" style={styles.containerBlur}>
+    <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
@@ -51,7 +52,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
           <Text style={styles.message}>{message}</Text>
         </View>
       </View>
-    </BlurView>
+    </BlurOrSolid>
   );
 });
 
@@ -61,11 +62,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   container: {
     backgroundColor: 'rgba(1, 0, 0, 0.75)',

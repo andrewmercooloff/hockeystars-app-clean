@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from './BlurOrSolid';
+import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface FriendGiftReceivedNotificationProps {
@@ -57,7 +58,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
   };
 
   return (
-    <BlurView
+    <BlurOrSolid
       intensity={20}
       tint="dark"
       style={styles.containerBlur}
@@ -107,7 +108,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
         </View>
       </View>
       </TouchableOpacity>
-    </BlurView>
+    </BlurOrSolid>
   );
 };
 
@@ -117,14 +118,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   container: {
     backgroundColor: 'rgba(1, 0, 0, 0.75)',

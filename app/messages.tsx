@@ -3,13 +3,8 @@ import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
     ActivityIndicator,
-    Alert,
     FlatList,
-    Image,
-    ImageBackground,
-    Platform,
     RefreshControl,
-    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -32,12 +27,12 @@ import {
     Message,
     Player,
     getBlockedUsers,
-    isUserBlocked
+    isUserBlocked,
+    searchMessagesAcrossAllDialogs
 } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
-import OptimizedBackground from '../components/OptimizedBackground';
 import CachedBackground from '../components/CachedBackground';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -54,9 +49,23 @@ interface ChatPreview {
   unreadCount: number;
 }
 
+/** Текст для поиска по превью: убираем служебные префиксы, как в отображении. */
+function normalizeLastMessageTextForSearch(raw: string | null | undefined): string {
+  if (!raw) return '';
+  let text = raw;
+  const replyMatch = text.match(/^\[REPLY_DATA:(.+?)\]([\s\S]*)$/);
+  if (replyMatch) {
+    text = replyMatch[2] ?? '';
+  }
+  if (text.startsWith('✏️')) {
+    text = text.replace(/^✏️\s*/, '');
+  }
+  return text.trim().toLowerCase();
+}
+
 export default function MessagesScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading, refreshUser } = useUser();
   
@@ -65,6 +74,11 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  /** Совпадения по всей истории (peerId → самое свежее сообщение с подстрокой). null — поиск по истории не запускали (короткий запрос или сброс). */
+  const [historyMatchesByPeerId, setHistoryMatchesByPeerId] = useState<Map<string, Message> | null>(null);
+  const [historySearchLoading, setHistorySearchLoading] = useState(false);
+  /** Диалоги, найденные только в истории и ещё не попавшие в подгруженный список чатов. */
+  const [extraSearchChats, setExtraSearchChats] = useState<ChatPreview[]>([]);
   const [loadingMoreChats, setLoadingMoreChats] = useState(false);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const focusRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -491,25 +505,135 @@ export default function MessagesScreen() {
     };
   }, []);
 
-  // Фильтрация чатов по поиску
+  // Поиск по тексту во всех сообщениях (debounce + запрос к БД)
+  useEffect(() => {
+    const rawQ = searchQuery.trim();
+    if (rawQ.length < 2) {
+      setHistoryMatchesByPeerId(null);
+      setHistorySearchLoading(false);
+      return;
+    }
+    if (!currentUser?.id) {
+      setHistoryMatchesByPeerId(null);
+      setHistorySearchLoading(false);
+      return;
+    }
+
+    setHistorySearchLoading(true);
+    let cancelled = false;
+    const tid = setTimeout(async () => {
+      const { matchesByPeerId, error } = await searchMessagesAcrossAllDialogs(currentUser.id, rawQ);
+      if (cancelled) return;
+      if (error) {
+        setHistoryMatchesByPeerId(new Map());
+      } else {
+        setHistoryMatchesByPeerId(matchesByPeerId);
+      }
+      setHistorySearchLoading(false);
+    }, 320);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(tid);
+    };
+  }, [searchQuery, currentUser?.id]);
+
+  // Догружаем игроков для диалогов, которые есть только в результатах поиска по истории
+  useEffect(() => {
+    const rawQ = searchQuery.trim();
+    if (!historyMatchesByPeerId || rawQ.length < 2 || !currentUser?.id) {
+      setExtraSearchChats([]);
+      return;
+    }
+
+    const inList = new Set(chats.map((c) => c.player.id));
+    const missing: string[] = [];
+    historyMatchesByPeerId.forEach((_, peerId) => {
+      if (!inList.has(peerId)) missing.push(peerId);
+    });
+
+    if (missing.length === 0) {
+      setExtraSearchChats([]);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const blocked = await getBlockedUsers(currentUser.id);
+        const blockedSet = new Set(blocked);
+        const allowed = missing.filter((id) => !blockedSet.has(id));
+        if (allowed.length === 0) {
+          if (!cancelled) setExtraSearchChats([]);
+          return;
+        }
+        const playersMap = await getPlayersByIdsInBatches(allowed);
+        if (cancelled) return;
+        const previews: ChatPreview[] = [];
+        for (const id of allowed) {
+          const p = playersMap.get(id);
+          if (!p) continue;
+          const hit = historyMatchesByPeerId.get(id);
+          previews.push({
+            player: p,
+            lastMessage: hit ?? null,
+            unreadCount: 0,
+          });
+        }
+        setExtraSearchChats(previews);
+      } catch {
+        if (!cancelled) setExtraSearchChats([]);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [historyMatchesByPeerId, chats, searchQuery, currentUser?.id]);
+
+  // Фильтрация чатов по поиску (имя, последнее сообщение, любое сообщение в диалоге)
   const filteredChats = useMemo(() => {
-    if (!searchQuery.trim()) {
+    const rawQ = searchQuery.trim();
+    if (!rawQ) {
       return chats;
     }
 
-    const searchLower = searchQuery.toLowerCase().trim();
-    return chats.filter(chat => {
-      // Поиск по имени игрока
-      const playerName = chat.player.name?.toLowerCase() || '';
-      const matchesName = playerName.includes(searchLower);
-      
-      // Поиск по последнему сообщению
-      const lastMessageText = chat.lastMessage?.text?.toLowerCase() || '';
-      const matchesMessage = lastMessageText.includes(searchLower);
-      
-      return matchesName || matchesMessage;
-    });
-  }, [chats, searchQuery]);
+    const searchLower = rawQ.toLowerCase();
+    const hist = historyMatchesByPeerId;
+
+    const peerInHistory = (pid: string) =>
+      hist != null && rawQ.length >= 2 && hist.has(pid);
+
+    const withHistoryPreview = (chat: ChatPreview): ChatPreview => {
+      const hit = hist?.get(chat.player.id);
+      if (!hit || rawQ.length < 2) return chat;
+      const hitOk = normalizeLastMessageTextForSearch(hit.text).includes(searchLower);
+      const lastOk = normalizeLastMessageTextForSearch(chat.lastMessage?.text).includes(searchLower);
+      if (hitOk && !lastOk) return { ...chat, lastMessage: hit };
+      return chat;
+    };
+
+    const out: ChatPreview[] = [];
+    const seen = new Set<string>();
+
+    for (const chat of chats) {
+      const matchesName = chat.player.name?.toLowerCase().includes(searchLower);
+      const matchesMessage = normalizeLastMessageTextForSearch(chat.lastMessage?.text).includes(searchLower);
+      if (matchesName || matchesMessage || peerInHistory(chat.player.id)) {
+        out.push(withHistoryPreview(chat));
+        seen.add(chat.player.id);
+      }
+    }
+
+    for (const ex of extraSearchChats) {
+      if (!seen.has(ex.player.id)) {
+        out.push(ex);
+        seen.add(ex.player.id);
+      }
+    }
+
+    return out;
+  }, [chats, searchQuery, historyMatchesByPeerId, extraSearchChats]);
 
   // Загрузка чатов с индикатором
   const loadChats = useCallback(async () => {
@@ -733,10 +857,14 @@ export default function MessagesScreen() {
     }, [loadChats, silentLoadChats, chats.length, setCurrentScreen, refreshUser, applyDraftsToExistingChats])
   );
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     loadChats();
-  };
+  }, [loadChats]);
+
+  const handleGoBack = useCallback(() => {
+    router.back();
+  }, [router]);
 
   const openChat = useCallback(
     (playerId: string) => {
@@ -800,10 +928,11 @@ export default function MessagesScreen() {
           formatTime={formatTime}
           formatLastMessage={formatLastMessage}
           t={t}
+          language={language}
         />
       );
     },
-    [currentUser, openChat, formatTime, formatLastMessage, t]
+    [currentUser, openChat, formatTime, formatLastMessage, t, language]
   );
 
   const keyExtractor = useCallback((item: ChatPreview) => item.player.id, []);
@@ -820,6 +949,33 @@ export default function MessagesScreen() {
       </View>
     </View>
   ), [t]);
+
+  const onChatsContentSizeChange = useCallback(
+    (_w: number, h: number) => {
+      if (searchQuery.trim()) return;
+      if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
+      const vh = listViewportHeightRef.current;
+      if (vh < 1 || h < 1) return;
+      if (h >= vh - 24) return;
+      if (contentSizeLoadTimerRef.current) clearTimeout(contentSizeLoadTimerRef.current);
+      contentSizeLoadTimerRef.current = setTimeout(() => {
+        contentSizeLoadTimerRef.current = null;
+        if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
+        loadOlderChatsPage();
+      }, 85);
+    },
+    [searchQuery, loadOlderChatsPage]
+  );
+
+  const listFooterElement = useMemo(
+    () =>
+      loadingMoreChats ? (
+        <View style={styles.chatsListFooter}>
+          <ActivityIndicator color="#fa2f40" />
+        </View>
+      ) : null,
+    [loadingMoreChats]
+  );
 
   // Редирект убран - проверка авторизации происходит в _layout.tsx
   // Если пользователь не авторизован, показываем loading
@@ -848,7 +1004,7 @@ export default function MessagesScreen() {
         >
           <View style={styles.overlay}>
             <View style={styles.pageHeader}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('messages.title')}</Text>
@@ -874,7 +1030,7 @@ export default function MessagesScreen() {
         <View style={styles.overlay}>
           {/* Заголовок страницы с поиском */}
           <View style={styles.pageHeader}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.pageTitle}>{t('messages.title')}</Text>
@@ -909,6 +1065,13 @@ export default function MessagesScreen() {
               </View>
             </BlurOrSolid>
           </View>
+
+          {searchQuery.trim().length >= 2 && historySearchLoading && (
+            <View style={styles.historySearchHint}>
+              <ActivityIndicator size="small" color="#fa2f40" style={styles.historySearchSpinner} />
+              <Text style={styles.historySearchHintText}>{t('messages.searchHistoryLoading')}</Text>
+            </View>
+          )}
           
           {/* Список чатов - FlatList для виртуализации и производительности */}
           <FlatList
@@ -934,30 +1097,10 @@ export default function MessagesScreen() {
             onLayout={(e) => {
               listViewportHeightRef.current = e.nativeEvent.layout.height;
             }}
-            onContentSizeChange={(_w, h) => {
-              if (searchQuery.trim()) return;
-              if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current)
-                return;
-              const vh = listViewportHeightRef.current;
-              if (vh < 1 || h < 1) return;
-              if (h >= vh - 24) return;
-              if (contentSizeLoadTimerRef.current) clearTimeout(contentSizeLoadTimerRef.current);
-              contentSizeLoadTimerRef.current = setTimeout(() => {
-                contentSizeLoadTimerRef.current = null;
-                if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current)
-                  return;
-                loadOlderChatsPage();
-              }, 85);
-            }}
+            onContentSizeChange={onChatsContentSizeChange}
             onEndReached={loadOlderChatsPage}
             onEndReachedThreshold={0.55}
-            ListFooterComponent={
-              loadingMoreChats ? (
-                <View style={{ paddingVertical: 16, alignItems: 'center' }}>
-                  <ActivityIndicator color="#fa2f40" />
-                </View>
-              ) : null
-            }
+            ListFooterComponent={listFooterElement}
           />
         </View>
       </CachedBackground>
@@ -1043,6 +1186,10 @@ const styles = StyleSheet.create({
   emptyListContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chatsListFooter: {
+    paddingVertical: 16,
     alignItems: 'center',
   },
   emptyContainer: {
@@ -1204,6 +1351,20 @@ const styles = StyleSheet.create({
   clearSearchButton: {
     marginLeft: 8,
   },
+  historySearchHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+  },
+  historySearchSpinner: {
+    marginRight: 8,
+  },
+  historySearchHintText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    fontFamily: 'Gilroy-Regular',
+  },
   chatGradientShadow: {
     marginHorizontal: 16,
     marginVertical: 6,
@@ -1229,6 +1390,11 @@ function areMessagesChatRowPropsEqual(
   prev: MessagesChatRowProps,
   next: MessagesChatRowProps
 ): boolean {
+  if (prev.onOpen !== next.onOpen) return false;
+  if (prev.formatTime !== next.formatTime) return false;
+  if (prev.formatLastMessage !== next.formatLastMessage) return false;
+  if (prev.t !== next.t) return false;
+  if (prev.language !== next.language) return false;
   if (prev.currentUserId !== next.currentUserId) return false;
   if (prev.chat.player.id !== next.chat.player.id) return false;
   if (prev.chat.unreadCount !== next.chat.unreadCount) return false;
@@ -1253,6 +1419,7 @@ type MessagesChatRowProps = {
   formatTime: (timestamp: Date | number) => string;
   formatLastMessage: (message: Message, currentUserId: string) => string;
   t: (key: string) => string;
+  language: string;
 };
 
 const MessagesChatRowMemo = React.memo(function MessagesChatRow({
@@ -1262,6 +1429,7 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
   formatTime,
   formatLastMessage,
   t,
+  language: _language,
 }: MessagesChatRowProps) {
   return (
     <TouchableOpacity onPress={() => onOpen(chat.player.id)} activeOpacity={0.8}>

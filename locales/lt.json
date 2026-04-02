@@ -2436,7 +2436,16 @@
     "giftRequestRejected": "Dovanų prašymas atmestas",
     "player": "Žaidėjas",
     "unknownPlayer": "Nežinomas žaidėjas",
-    "star": "Žvaigždė"
+    "star": "Žvaigždė",
+    "profileViewsDigest": {
+      "title": "Profilio peržiūros",
+      "body": {
+        "one": "Šiandien jūsų profilį peržiūrėjo {{count}} kartą.",
+        "few": "Šiandien jūsų profilį peržiūrėjo {{count}} kartus.",
+        "many": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų.",
+        "other": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Pasirinkite nuotraukos šaltinį",

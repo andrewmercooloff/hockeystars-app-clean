@@ -2408,7 +2408,14 @@
     "giftRequestRejected": "Lahjapyyntö hylätty",
     "player": "Pelaaja",
     "unknownPlayer": "Tuntematon pelaaja",
-    "star": "Tähti"
+    "star": "Tähti",
+    "profileViewsDigest": {
+      "title": "Profiilin katselut",
+      "body": {
+        "one": "Profiiliasi katsottiin tänään {{count}} kerran.",
+        "other": "Profiiliasi katsottiin tänään {{count}} kertaa."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Valitse valokuvalähde",

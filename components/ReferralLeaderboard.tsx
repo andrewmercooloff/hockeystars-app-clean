@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadLeaderboard = async () => {
+  const loadLeaderboard = useCallback(async () => {
     try {
       const data = await getReferralLeaderboard(limit);
       setLeaderboard(data);
@@ -39,16 +39,16 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [limit]);
 
   useEffect(() => {
     loadLeaderboard();
-  }, [limit]);
+  }, [loadLeaderboard]);
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    loadLeaderboard();
-  };
+    void loadLeaderboard();
+  }, [loadLeaderboard]);
 
   const getMedalIcon = (position: number) => {
     switch (position) {
@@ -59,7 +59,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
     }
   };
 
-  const renderItem = ({ item, index }: { item: ReferralLeaderboardEntry; index: number }) => {
+  const renderItem = useCallback(({ item, index }: { item: ReferralLeaderboardEntry; index: number }) => {
     const medal = getMedalIcon(index);
     
     return (
@@ -108,7 +108,9 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [router, t]);
+
+  const referralKeyExtractor = useCallback((item: ReferralLeaderboardEntry) => item.id, []);
 
   if (loading) {
     return (
@@ -149,7 +151,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
       <FlatList
         data={leaderboard}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={referralKeyExtractor}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

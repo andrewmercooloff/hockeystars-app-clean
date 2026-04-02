@@ -2416,7 +2416,14 @@
     "giftRequestRejected": "Gåva begäran avvisad",
     "player": "Spelare",
     "unknownPlayer": "Okänd spelare",
-    "star": "Stjärna"
+    "star": "Stjärna",
+    "profileViewsDigest": {
+      "title": "Profilvisningar",
+      "body": {
+        "one": "Idag visades din profil {{count}} gång.",
+        "other": "Idag visades din profil {{count}} gånger."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Välj en fotokälla",

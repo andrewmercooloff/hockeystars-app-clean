@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -328,9 +328,9 @@ export default function PastTeamsSection({
         </View>
              ) : (
          <DraggableFlatList
-           data={pastTeams.filter(team => !team.isCurrent)}
+           data={displayPastTeams}
            renderItem={renderPastTeamItem}
-           keyExtractor={(item, index) => `${item.id}-${index}`}
+           keyExtractor={pastTeamKeyExtractor}
            onDragEnd={handleDragEnd}
            scrollEnabled={false}
            contentContainerStyle={styles.teamsList}

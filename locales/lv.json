@@ -2432,7 +2432,15 @@
     "giftRequestRejected": "Dāvanas pieprasījums noraidīts",
     "player": "Spēlētājs",
     "unknownPlayer": "Nezināms spēlētājs",
-    "star": "Zvaigzne"
+    "star": "Zvaigzne",
+    "profileViewsDigest": {
+      "title": "Profila skatījumi",
+      "body": {
+        "zero": "Šodien tavu profilu skatīja {{count}} reižu.",
+        "one": "Šodien tavu profilu skatīja {{count}} reizi.",
+        "other": "Šodien tavu profilu skatīja {{count}} reizes."
+      }
+    }
   },
   "editProfile": {
     "selectPhotoSource": "Izvēlieties fotoattēla avotu",

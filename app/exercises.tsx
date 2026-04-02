@@ -123,7 +123,29 @@ export default function ExercisesScreen() {
       const bId = parseInt(b.exerciseId);
       return aId - bId;
     });
-  }, [allExercises, selectedCategory, searchQuery, exerciseRankings, loading, language]);
+  }, [
+    allExercises,
+    selectedCategory,
+    searchQuery,
+    exerciseRankings,
+    loading,
+    language,
+    isLanguageLoaded,
+  ]);
+
+  const openExerciseDetails = useCallback(
+    (exerciseId: string) => {
+      try {
+        router.navigate({
+          pathname: '/exercise-details',
+          params: { id: exerciseId },
+        });
+      } catch {
+        router.push(`/exercise-details?id=${exerciseId}`);
+      }
+    },
+    [router]
+  );
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -352,22 +374,10 @@ export default function ExercisesScreen() {
 
           {/* Список упражнений */}
           <View style={styles.exercisesContainer}>
-            {sortedExercises.map((exercise, index) => (
+            {sortedExercises.map((exercise) => (
               <TouchableOpacity
-                key={`${exercise.exerciseId}-${index}`}
-                onPress={() => {
-                  // Навигация к деталям упражнения
-                  try {
-                    router.navigate({
-                      pathname: '/exercise-details',
-                      params: { id: exercise.exerciseId }
-                    });
-                  } catch (error) {
-                    console.error('❌ Ошибка навигации:', error);
-                    // Fallback к старому способу
-                    router.push(`/exercise-details?id=${exercise.exerciseId}`);
-                  }
-                }}
+                key={exercise.exerciseId}
+                onPress={() => openExerciseDetails(exercise.exerciseId)}
               >
                 <View style={styles.exerciseGradientShadow}>
                   <BlurOrSolid
