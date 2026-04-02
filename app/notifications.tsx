@@ -1803,7 +1803,7 @@ export default function NotificationsScreen() {
             maxToRenderPerBatch={10}
             windowSize={10}
             updateCellsBatchingPeriod={50}
-            ListEmptyComponent =
+            ListEmptyComponent={
               !listReady
                 ? () => (
                     <View style={[styles.emptyContainer, styles.listLoadingInline]}>
@@ -1820,6 +1820,7 @@ export default function NotificationsScreen() {
                       </View>
                     </View>
                   )
+            }
           />
         </View>
       </CachedBackground>
