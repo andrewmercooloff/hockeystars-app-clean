@@ -66,7 +66,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
@@ -227,6 +227,8 @@ export default function PlayerProfile() {
   const [photosCache, setPhotosCache] = useState<Record<string, string[]>>({});
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
+  const currentUserLoadRef = useRef<Player | null>(null);
+  currentUserLoadRef.current = currentUser;
   const [loading, setLoading] = useState(true);
   // Счётчики просмотров — отдельный state, не зависящий от кэша player
   const [profileViews, setProfileViews] = useState<{ total: number; today: number } | null>(null);
@@ -582,7 +584,7 @@ export default function PlayerProfile() {
 
   // Функция для загрузки дополнительных данных в фоне
   // ОПТИМИЗИРОВАНО: Все запросы выполняются ПАРАЛЛЕЛЬНО для максимальной скорости
-  const loadAdditionalData = async (playerData: Player, userData: Player | null) => {
+  const loadAdditionalData = async (playerData: Player, userData: Player | null, preloadedTeams?: PastTeam[]) => {
     try {
       // Проверяем, что ID не изменился перед загрузкой дополнительных данных
       const currentId = Array.isArray(id) ? id[0] : id;
@@ -602,17 +604,16 @@ export default function PlayerProfile() {
         setPhotosCache(prev => ({ ...prev, [playerData.id]: [] }));
       }
 
-      // Запускаем ВСЕ запросы ПАРАЛЛЕЛЬНО для максимальной скорости
-      const { getPlayerTeamsAsPastTeams } = await import('../../utils/playerStorage');
-      
-      // Подготавливаем массив промисов
+      const teamsPromise: Promise<PastTeam[]> =
+        preloadedTeams !== undefined
+          ? Promise.resolve(preloadedTeams)
+          : getPlayerTeamsAsPastTeams(playerData.id).catch(err => {
+              console.error('Ошибка загрузки команд:', err);
+              return [];
+            });
+
       const promises: Promise<any>[] = [
-        // 1. Команды игрока
-        getPlayerTeamsAsPastTeams(playerData.id).catch(err => {
-          console.error('Ошибка загрузки команд:', err);
-          return [];
-        }),
-        // 2. Друзья игрока
+        teamsPromise,
         getFriends(playerData.id).catch(err => {
           console.error('Ошибка загрузки друзей:', err);
           return [];
@@ -713,15 +714,9 @@ export default function PlayerProfile() {
         setPlayer(cachedPlayer);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
         
-        // Загружаем текущего пользователя параллельно
-        const userData = await loadCurrentUser();
-        setCurrentUser(userData);
-        
-        // Загружаем дополнительные данные в фоне
-        loadAdditionalData(cachedPlayer, userData);
-        
-        // Продолжаем загрузку свежих данных в фоне для обновления (не блокируем UI)
-        // Realtime обновления работают независимо через подписки
+        // Команды/друзья — сразу (не ждём loadCurrentUser — он раньше задерживал команды)
+        loadAdditionalData(cachedPlayer, currentUserLoadRef.current);
+        void loadCurrentUser().then(setCurrentUser);
       } else {
         // Если кешированных данных нет, показываем индикатор загрузки
         setLoading(true);
@@ -745,10 +740,11 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные параллельно (без кеша — рост/данные профиля должны быть актуальны)
-      const [playerData, userData] = await Promise.all([
+      // Загружаем основные данные + команды параллельно (команды раньше приходили только после loadAdditionalData)
+      const [playerData, userData, teamsFromNetwork] = await Promise.all([
         getPlayerById(normalizedId as string, { skipCache: true }),
-        loadCurrentUser()
+        loadCurrentUser(),
+        getPlayerTeamsAsPastTeams(normalizedId as string).catch(() => [] as PastTeam[])
       ]);
       
       // Проверяем еще раз после загрузки данных
@@ -822,6 +818,12 @@ export default function PlayerProfile() {
       // Сразу устанавливаем основные данные для быстрого отображения
       setPlayer(finalPlayerData);
       setCurrentUser(userData);
+
+      // Команды уже загружены параллельно с getPlayerById — показываем сразу, без второго round-trip
+      const currentTeamsNow = teamsFromNetwork.filter(team => team.isCurrent);
+      const pastTeamsNow = teamsFromNetwork.filter(team => !team.isCurrent);
+      setPlayerTeams(currentTeamsNow);
+      setPastTeams(pastTeamsNow);
 
       // Сохраняем в кеш состояния для мгновенного переключения
       setPlayersCache(prev => ({
@@ -910,8 +912,8 @@ export default function PlayerProfile() {
         
         setLoading(false);
         
-        // Загружаем дополнительные данные в фоне
-        loadAdditionalData(finalPlayerData, userData);
+        // Загружаем дополнительные данные в фоне (команды уже есть — не дублируем запрос)
+        loadAdditionalData(finalPlayerData, userData, teamsFromNetwork);
     } catch (error) {
       console.error('❌ Ошибка загрузки данных игрока:', error);
       setLoading(false);
