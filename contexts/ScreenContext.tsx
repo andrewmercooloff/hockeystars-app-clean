@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 
 interface ScreenContextType {
   isMainScreen: boolean;
@@ -32,8 +32,13 @@ export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
     setIsMainScreen(isMain);
   }, [currentScreen]);
 
+  const value = useMemo(
+    () => ({ isMainScreen, setIsMainScreen, currentScreen, setCurrentScreen }),
+    [isMainScreen, currentScreen]
+  );
+
   return (
-    <ScreenContext.Provider value={{ isMainScreen, setIsMainScreen, currentScreen, setCurrentScreen }}>
+    <ScreenContext.Provider value={value}>
       {children}
     </ScreenContext.Provider>
   );

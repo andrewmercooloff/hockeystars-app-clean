@@ -125,7 +125,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     }
   };
 
-  const setLanguage = async (lang: Language) => {
+  const setLanguage = useCallback(async (lang: Language) => {
     try {
       setLanguageState(lang);
       setIsLanguageLoaded(true); // Язык уже загружен при ручной смене
@@ -156,10 +156,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     } catch (error) {
       console.warn('Ошибка сохранения языка:', error);
     }
-  };
+  }, []);
 
   // Функция для сброса языка на автоматическое определение устройства
-  const resetToDeviceLanguage = async () => {
+  const resetToDeviceLanguage = useCallback(async () => {
     try {
       const deviceLanguage = getDeviceLanguage();
       setLanguageState(deviceLanguage);
@@ -167,10 +167,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     } catch (error) {
       console.warn('Ошибка сброса языка:', error);
     }
-  };
+  }, []);
 
   // Функция для получения перевода по ключу с поддержкой интерполяции
-  const t = (key: string, params?: Record<string, any>): string => {
+  const t = useCallback((key: string, params?: Record<string, any>): string => {
     const keys = key.split('.');
     let value: any = translations[language];
     
@@ -218,10 +218,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     }
     
     return value;
-  };
+  }, [language]);
+
+  const contextValue = useMemo(
+    () => ({ language, isLanguageLoaded, setLanguage, resetToDeviceLanguage, t }),
+    [language, isLanguageLoaded, setLanguage, resetToDeviceLanguage, t]
+  );
 
   return (
-    <LanguageContext.Provider value={{ language, isLanguageLoaded, setLanguage, resetToDeviceLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

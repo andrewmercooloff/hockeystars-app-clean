@@ -627,6 +627,9 @@ export default function NotificationsScreen() {
   // Состояние для отслеживания новых уведомлений (для анимации)
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
 
+  /** Первый заход на экран для данного userId — isInitialLoad; повторный фокус — обновление с анимацией новых */
+  const notificationsInitialLoadDoneForUserRef = React.useRef<string | null>(null);
+
   // Категории фильтров и типы уведомлений, которые в них входят
   const FILTER_TYPES: Record<string, string[]> = {
     all: [],
@@ -881,28 +884,26 @@ export default function NotificationsScreen() {
     }
   }, [currentUser, t]);
 
-  // Запускаем загрузку когда пользователь авторизован (не ждем isUserLoading)
   useEffect(() => {
-    if (currentUser) {
-      // Начинаем загрузку сразу, не дожидаясь полной загрузки пользователя
-      loadNotificationsData(true).then(() => {
-        setLoading(false); // Убираем индикатор загрузки после завершения загрузки данных
-      });
-    } else if (currentUser === null) {
-      // Если пользователь не авторизован
+    if (currentUser === null) {
       setLoading(false);
+      notificationsInitialLoadDoneForUserRef.current = null;
     }
-  }, [currentUser, loadNotificationsData]);
+  }, [currentUser]);
 
-  // Обновляем уведомления при фокусе на экран
+  // Загрузка списка только при фокусе экрана (без дубля mount + focus — один запрос при открытии)
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('notifications');
       setIsScreenFocused(true);
       
       if (currentUser && !isUserLoading) {
-        loadNotificationsData();
-        
+        const isInitial =
+          notificationsInitialLoadDoneForUserRef.current !== currentUser.id;
+        if (isInitial) {
+          notificationsInitialLoadDoneForUserRef.current = currentUser.id;
+        }
+        loadNotificationsData(isInitial);
       }
       
       return () => {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 import { Player, loadCurrentUser } from '../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { router } from 'expo-router';
@@ -174,15 +174,27 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     console.log('⚠️ adjustFriendRequestsCount устарела, используйте Realtime подписку');
   }, []);
 
-  return (
-    <UserContext.Provider value={{ 
-      currentUser, 
-      setCurrentUser, 
-      refreshUser, 
+  const value = useMemo(
+    () => ({
+      currentUser,
+      setCurrentUser,
+      refreshUser,
       refreshUserAfterExercise,
       adjustFriendRequestsCount,
-      isUserLoading 
-    }}>
+      isUserLoading,
+    }),
+    [
+      currentUser,
+      setCurrentUser,
+      refreshUser,
+      refreshUserAfterExercise,
+      adjustFriendRequestsCount,
+      isUserLoading,
+    ]
+  );
+
+  return (
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );

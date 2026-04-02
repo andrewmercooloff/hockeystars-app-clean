@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 import { Player } from '../utils/playerStorage';
 
 interface NotificationContextType {
@@ -24,8 +24,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children, 
   updateNotificationCount 
 }) => {
+  const value = useMemo(
+    () => ({ updateNotificationCount }),
+    [updateNotificationCount]
+  );
   return (
-    <NotificationContext.Provider value={{ updateNotificationCount }}>
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );
