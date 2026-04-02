@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from 'expo-image';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet, View, ViewStyle } from 'react-native';
 
 interface CachedBackgroundProps {
   source: number | { uri: string };
@@ -33,8 +33,9 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Ближе к тону льда, пока expo-image не отрисовал кадр (меньше «вспышки» чёрного)
-    backgroundColor: '#0c1418',
+    overflow: Platform.OS === 'android' ? 'hidden' : undefined,
+    // Android: тот же тон, что у экранов с льдом — меньше тёмной «рамки», если слой изображения чуть меньше вьюport
+    backgroundColor: Platform.OS === 'android' ? '#87A3B1' : '#0c1418',
   }
 });
 

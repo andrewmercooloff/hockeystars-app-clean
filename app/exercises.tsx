@@ -12,7 +12,7 @@ import {
     ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../components/BlurOrSolid';
 import { loadCurrentUser } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
@@ -201,7 +201,7 @@ export default function ExercisesScreen() {
                         activeOpacity={0.8}
                       >
                         <View style={styles.exerciseGradientShadow}>
-                          <BlurView
+                          <BlurOrSolid
                             intensity={20}
                             tint="dark"
                             style={styles.exerciseCardBlur}
@@ -243,7 +243,7 @@ export default function ExercisesScreen() {
                               )}
                             </View>
                           </View>
-                            </BlurView>
+                            </BlurOrSolid>
                         </View>
                       </TouchableOpacity>
                     ))}
@@ -277,7 +277,7 @@ export default function ExercisesScreen() {
           </View>
           
           {/* Общий контейнер для поиска и фильтров */}
-          <BlurView
+          <BlurOrSolid
             intensity={20}
             tint="dark"
             style={styles.searchAndFiltersContainerBlur}
@@ -345,7 +345,7 @@ export default function ExercisesScreen() {
             </ScrollView>
               </View>
             </View>
-          </BlurView>
+          </BlurOrSolid>
 
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
@@ -369,7 +369,7 @@ export default function ExercisesScreen() {
                 }}
               >
                 <View style={styles.exerciseGradientShadow}>
-                  <BlurView
+                  <BlurOrSolid
                     intensity={20}
                     tint="dark"
                     style={styles.exerciseCardBlur}
@@ -434,7 +434,7 @@ export default function ExercisesScreen() {
                   </View>
                 </View>
                   </View>
-                    </BlurView>
+                    </BlurOrSolid>
                 </View>
               </TouchableOpacity>
             ))}

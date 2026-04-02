@@ -1547,7 +1547,12 @@ export default function RootLayout() {
                 loadUser={loadUser}
               />
               <NotificationProvider updateNotificationCount={updateNotificationCount}>
-            <GestureHandlerRootView style={{ flex: 1 }}>
+            <GestureHandlerRootView
+              style={{
+                flex: 1,
+                ...(Platform.OS === 'android' ? { backgroundColor: '#87A3B1' } : {}),
+              }}
+            >
               <StatusBar 
                 barStyle="light-content" 
                 backgroundColor="#050008" 
@@ -1572,6 +1577,11 @@ export default function RootLayout() {
               tabBarActiveTintColor: '#fff',
               tabBarInactiveTintColor: '#888',
               tabBarShowLabel: false,
+              ...(Platform.OS === 'android'
+                ? {
+                    sceneContainerStyle: { backgroundColor: '#87A3B1', flex: 1 },
+                  }
+                : {}),
             }}
           >
         <Tabs.Screen

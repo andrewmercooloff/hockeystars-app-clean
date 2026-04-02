@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../components/BlurOrSolid';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -483,7 +483,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <View style={styles.notificationGradientShadow}>
-            <BlurView
+            <BlurOrSolid
               intensity={20}
               tint="dark"
               style={styles.notificationItemBlur}
@@ -542,7 +542,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             )}
             </View>
             </View>
-            </BlurView>
+            </BlurOrSolid>
           </View>
         </TouchableOpacity>
         )}

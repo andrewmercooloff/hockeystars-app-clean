@@ -17,7 +17,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { BlurOrSolid } from '../components/BlurOrSolid';
 import CachedAvatar from '../components/CachedAvatar';
 // Убираем все анимации переходов
 import {
@@ -881,7 +881,7 @@ export default function MessagesScreen() {
           
           {/* Строка поиска */}
           <View style={styles.searchContainer}>
-            <BlurView
+            <BlurOrSolid
               intensity={20}
               tint="dark"
               style={styles.searchInputBlur}
@@ -906,7 +906,7 @@ export default function MessagesScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-            </BlurView>
+            </BlurOrSolid>
           </View>
           
           {/* Список чатов - FlatList для виртуализации и производительности */}
@@ -1267,7 +1267,7 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
   return (
     <TouchableOpacity onPress={() => onOpen(chat.player.id)} activeOpacity={0.8}>
       <View style={styles.chatGradientShadow}>
-        <BlurView intensity={20} tint="dark" style={styles.chatItemBlur}>
+        <BlurOrSolid intensity={20} tint="dark" style={styles.chatItemBlur}>
           <View style={styles.chatItemOverlay}>
             <CachedAvatar
               playerId={chat.player.id}
@@ -1325,7 +1325,7 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
               </Text>
             </View>
           </View>
-        </BlurView>
+        </BlurOrSolid>
       </View>
     </TouchableOpacity>
   );
