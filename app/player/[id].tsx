@@ -528,6 +528,8 @@ export default function PlayerProfile() {
       setFriendshipStatus('none');
       setIsEditing(false);
       setEditData({});
+      setPlayerTeams([]);
+      setPastTeams([]);
     }
     lastRoutePlayerIdRef.current = nid;
   }, [id]);
@@ -950,6 +952,8 @@ export default function PlayerProfile() {
       setIndividualTraining([]);
       setSkateServices([]);
       setVideoFields([{ url: '', timeCode: '' }]);
+      setPlayerTeams([]);
+      setPastTeams([]);
       setLoading(true); // Показываем loading для нового профиля
       // Обновляем previousId сразу
       previousIdRef.current = normalizedId;
@@ -4846,7 +4850,7 @@ export default function PlayerProfile() {
                         {(shotsNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
-                              <Text style={styles.statValue}>{shotsNum.toString()}</Text>
+                              <Text style={styles.statValueGoalkeeperCount}>{shotsNum.toString()}</Text>
                               <ChangeIndicator 
                                 change={getChangeForField('shots')} 
                                 size="small" 
@@ -4862,7 +4866,7 @@ export default function PlayerProfile() {
                         {(savesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
-                              <Text style={styles.statValue}>{savesNum.toString()}</Text>
+                              <Text style={styles.statValueGoalkeeperCount}>{savesNum.toString()}</Text>
                               <ChangeIndicator 
                                 change={getChangeForField('saves')} 
                                 size="small" 
@@ -8459,6 +8463,14 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 18,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    textAlign: 'center',
+    letterSpacing: -0.5,
+  },
+  /** Броски/сэйвы вратаря в узком круге — на 20% меньше statValue */
+  statValueGoalkeeperCount: {
+    fontSize: 14.4,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     textAlign: 'center',
