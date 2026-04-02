@@ -1,6 +1,7 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     FlatList, 
     ImageBackground,
@@ -1714,8 +1715,8 @@ export default function NotificationsScreen() {
     );
   }
 
-  // Если загружается пользователь ИЛИ данные, показываем один loading screen
-  if (isUserLoading || currentUser === undefined || (currentUser != null && !listReady)) {
+  // Загрузка только пока неизвестен пользователь контекста; список подгружается в фоне — как остальные разделы
+  if (isUserLoading || currentUser === undefined) {
     return (
       <View style={styles.container}>
         <CachedBackground 
@@ -1802,16 +1803,23 @@ export default function NotificationsScreen() {
             maxToRenderPerBatch={10}
             windowSize={10}
             updateCellsBatchingPeriod={50}
-            ListEmptyComponent={() => (
-              <View style={styles.emptyContainer}>
-                <View style={styles.emptyGradientShadow}>
-                  <View style={styles.emptyContent}>
-                    <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
-                    <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-                  </View>
-                </View>
-              </View>
-            )}
+            ListEmptyComponent =
+              !listReady
+                ? () => (
+                    <View style={[styles.emptyContainer, styles.listLoadingInline]}>
+                      <ActivityIndicator size="large" color="#fa2f40" />
+                    </View>
+                  )
+                : () => (
+                    <View style={styles.emptyContainer}>
+                      <View style={styles.emptyGradientShadow}>
+                        <View style={styles.emptyContent}>
+                          <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
+                          <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  )
           />
         </View>
       </CachedBackground>
@@ -1929,6 +1937,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 60,
+  },
+  listLoadingInline: {
+    paddingVertical: 80,
+    minHeight: 200,
   },
   emptyContent: {
     borderRadius: 15,
