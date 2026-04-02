@@ -4834,7 +4834,7 @@ export default function PlayerProfile() {
                         {(minutesNum > 0 || isOwner) && (
                           <View style={styles.statItem}>
                             <View style={styles.statCircle}>
-                              <Text style={styles.statValue}>{minutesNum.toString()}</Text>
+                              <Text style={styles.statValueGoalkeeperCount}>{minutesNum.toString()}</Text>
                               <ChangeIndicator 
                                 change={getChangeForField('minutes')} 
                                 size="small" 
