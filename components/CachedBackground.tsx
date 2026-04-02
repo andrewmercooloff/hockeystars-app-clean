@@ -33,7 +33,8 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black', // Фоновый цвет на случай медленной загрузки
+    // Ближе к тону льда, пока expo-image не отрисовал кадр (меньше «вспышки» чёрного)
+    backgroundColor: '#0c1418',
   }
 });
 

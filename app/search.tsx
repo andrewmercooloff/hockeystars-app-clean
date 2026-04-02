@@ -30,6 +30,120 @@ import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
+const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+
+function buildSearchPlayerSubtitle(
+  item: Player,
+  t: (key: string) => string,
+  language: string
+): string {
+  if (item.status === 'admin') {
+    return language === 'en' ? 'Administrator' : 'Администратор';
+  }
+
+  const parts: string[] = [];
+
+  if (item.position) {
+    parts.push(t(`profile.positions.${item.position}`) || item.position);
+  }
+
+  if (item.country) {
+    const countryTranslation = t(`profile.countries.${item.country}`);
+    const countryDisplay =
+      countryTranslation !== `profile.countries.${item.country}` ? countryTranslation : item.country;
+    parts.push(countryDisplay);
+  }
+
+  if (item.birthDate) {
+    const birthYear = new Date(item.birthDate).getFullYear();
+    if (!isNaN(birthYear)) {
+      parts.push(birthYear.toString());
+    }
+  } else if (item.age) {
+    const currentYear = new Date().getFullYear();
+    parts.push((currentYear - item.age).toString());
+  }
+
+  if (item.grip) {
+    let gripDisplay = item.grip;
+    if (item.grip === 'Левый' || item.grip === 'Left') {
+      gripDisplay = t('search.left');
+    } else if (item.grip === 'Правый' || item.grip === 'Right') {
+      gripDisplay = t('search.right');
+    }
+    parts.push(gripDisplay);
+  }
+
+  if (item.height && item.height.trim() !== '' && item.height !== '0') {
+    parts.push(`${item.height} ${t('cm')}`);
+  }
+
+  if (item.weight && item.weight.trim() !== '' && item.weight !== '0') {
+    parts.push(`${item.weight} ${t('kg')}`);
+  }
+
+  const isGoalkeeper = isGoalkeeperPosition(item.position);
+
+  if (isGoalkeeper) {
+    if (item.shots && item.saves) {
+      const shotsNum = parseInt(item.shots, 10) || 0;
+      const savesNum = parseInt(item.saves, 10) || 0;
+      if (shotsNum > 0) {
+        const sv = (savesNum / shotsNum).toFixed(3);
+        parts.push(`SV%: ${sv}`);
+      }
+    }
+
+    if (item.minutes && item.shots && item.saves) {
+      const minutesNum = parseInt(item.minutes, 10) || 0;
+      const shotsNum = parseInt(item.shots, 10) || 0;
+      const savesNum = parseInt(item.saves, 10) || 0;
+      if (minutesNum > 0) {
+        const goalsAgainst = shotsNum - savesNum;
+        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
+        parts.push(`GAA: ${gaa}`);
+      }
+    }
+  } else if (item.goals && item.assists && item.games) {
+    const goalsNum = parseInt(item.goals, 10) || 0;
+    const assistsNum = parseInt(item.assists, 10) || 0;
+    const gamesNum = parseInt(item.games, 10) || 0;
+    if (gamesNum > 0) {
+      const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
+      parts.push(`PPG: ${ppg}`);
+    }
+  }
+
+  return parts.join(' • ');
+}
+
+function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
+  if (a === b) return true;
+  if (a.id !== b.id) return false;
+  return (
+    a.name === b.name &&
+    a.avatar === b.avatar &&
+    a.status === b.status &&
+    (a.activityRating ?? 0) === (b.activityRating ?? 0) &&
+    !!a.is_hidden === !!b.is_hidden &&
+    a.createdAt === b.createdAt &&
+    a.position === b.position &&
+    a.country === b.country &&
+    a.birthDate === b.birthDate &&
+    (a.age ?? 0) === (b.age ?? 0) &&
+    a.grip === b.grip &&
+    a.height === b.height &&
+    a.weight === b.weight &&
+    a.goals === b.goals &&
+    a.assists === b.assists &&
+    a.games === b.games &&
+    a.shots === b.shots &&
+    a.saves === b.saves &&
+    a.minutes === b.minutes &&
+    (a.photos?.[0] ?? '') === (b.photos?.[0] ?? '')
+  );
+}
+
 // Компонент для фильтра
 const FilterButton = React.memo(({ 
   title, 
@@ -967,174 +1081,28 @@ export default function SearchScreen() {
     </View>
   ), [t]);
 
-  // Рендер элемента списка игроков
-  const renderPlayerItem = useCallback(({ item }: { item: Player }) => {
-    // Приоритет: avatar, photos[0], default
-    const playerPhoto = 
-      item.avatar || 
-      (item.photos && item.photos.length > 0 && item.photos[0]) || 
-      null; // Убираем require, будем использовать fallback в CachedAvatar
+  const openPlayerFromSearch = useCallback(
+    (playerId: string) => {
+      router.push({
+        pathname: '/player/[id]',
+        params: { id: playerId, returnTo: 'search' },
+      });
+    },
+    [router]
+  );
 
-    // Определяем стиль контура в зависимости от статуса
-    const photoContainerStyle = 
-      item.status === 'coach' 
-        ? styles.coachPhotoContainer 
-        : styles.playerPhotoContainer;
-
-    return (
-      <TouchableOpacity 
-        onPress={() => router.push({ 
-          pathname: '/player/[id]', 
-          params: { id: item.id, returnTo: 'search' } 
-        })}
-        activeOpacity={0.7}
-      >
-        <View style={styles.playerGradientShadow}>
-          <BlurView
-            intensity={20}
-            tint="dark"
-            style={styles.playerItemBlur}
-          >
-            <View style={styles.playerItem}>
-            <View style={photoContainerStyle}>
-              <CachedAvatar 
-                playerId={item.id}
-                fallbackAvatarUrl={playerPhoto}
-                size={60}
-                style={styles.playerPhoto}
-                status={item.status}
-              />
-            </View>
-            <View style={styles.playerDetails}>
-              <View style={styles.playerNameRow}>
-                <Text style={styles.playerName} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                {item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 && (
-                  <View style={styles.newBadge}>
-                    <Text style={styles.newBadgeText}>NEW</Text>
-                  </View>
-                )}
-                {item.is_hidden && currentUser?.status === 'admin' && (
-                  <Ionicons 
-                    name="eye-off-outline" 
-                    size={18} 
-                    color="#fa2f40" 
-                    style={{ marginLeft: 8 }}
-                  />
-                )}
-                {item.activityRating !== undefined && item.activityRating > 0 && (
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={11} color="#AA3333" />
-                    <Text style={styles.ratingText}>{Math.round(item.activityRating)}</Text>
-                  </View>
-                )}
-              </View>
-              <Text style={styles.playerInfo}>
-                {(() => {
-                  // Для администратора показываем только "Администратор"
-                  if (item.status === 'admin') {
-                    return language === 'en' ? 'Administrator' : 'Администратор';
-                  }
-                  
-                  const parts: string[] = [];
-                  
-                  // Позиция
-                  if (item.position) {
-                    parts.push(t(`profile.positions.${item.position}`) || item.position);
-                  }
-                  
-                  // Страна
-                  if (item.country) {
-                    const countryTranslation = t(`profile.countries.${item.country}`);
-                    const countryDisplay = countryTranslation !== `profile.countries.${item.country}` 
-                      ? countryTranslation 
-                      : item.country;
-                    parts.push(countryDisplay);
-                  }
-                  
-                  // Год рождения
-                  if (item.birthDate) {
-                    const birthYear = new Date(item.birthDate).getFullYear();
-                    if (!isNaN(birthYear)) {
-                      parts.push(birthYear.toString());
-                    }
-                  } else if (item.age) {
-                    const currentYear = new Date().getFullYear();
-                    const birthYear = currentYear - item.age;
-                    parts.push(birthYear.toString());
-                  }
-                  
-                  // Хват
-                  if (item.grip) {
-                    let gripDisplay = item.grip;
-                    if (item.grip === 'Левый' || item.grip === 'Left') {
-                      gripDisplay = t('search.left');
-                    } else if (item.grip === 'Правый' || item.grip === 'Right') {
-                      gripDisplay = t('search.right');
-                    }
-                    parts.push(gripDisplay);
-                  }
-                  
-                  // Рост
-                  if (item.height && item.height.trim() !== '' && item.height !== '0') {
-                    parts.push(`${item.height} ${t('cm')}`);
-                  }
-                  
-                  // Вес
-                  if (item.weight && item.weight.trim() !== '' && item.weight !== '0') {
-                    parts.push(`${item.weight} ${t('kg')}`);
-                  }
-                  
-                  // Определяем, является ли игрок вратарем
-                  const isGoalkeeper = isGoalkeeperPosition(item.position);
-                  
-                  // Для вратарей показываем SV% и GAA (если измерены)
-                  if (isGoalkeeper) {
-                    // SV%
-                    if (item.shots && item.saves) {
-                      const shotsNum = parseInt(item.shots) || 0;
-                      const savesNum = parseInt(item.saves) || 0;
-                      if (shotsNum > 0) {
-                        const sv = (savesNum / shotsNum).toFixed(3);
-                        parts.push(`SV%: ${sv}`);
-                      }
-                    }
-                    
-                    // GAA
-                    if (item.minutes && item.shots && item.saves) {
-                      const minutesNum = parseInt(item.minutes) || 0;
-                      const shotsNum = parseInt(item.shots) || 0;
-                      const savesNum = parseInt(item.saves) || 0;
-                      if (minutesNum > 0) {
-                        const goalsAgainst = shotsNum - savesNum;
-                        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
-                        parts.push(`GAA: ${gaa}`);
-                      }
-                    }
-                  } else {
-                    // Для полевых игроков показываем PPG (если измерен)
-                    if (item.goals && item.assists && item.games) {
-                      const goalsNum = parseInt(item.goals) || 0;
-                      const assistsNum = parseInt(item.assists) || 0;
-                      const gamesNum = parseInt(item.games) || 0;
-                      if (gamesNum > 0) {
-                        const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
-                        parts.push(`PPG: ${ppg}`);
-                      }
-                    }
-                  }
-                  
-                  return parts.join(' • ');
-                })()}
-              </Text>
-            </View>
-          </View>
-          </BlurView>
-        </View>
-      </TouchableOpacity>
-    );
-  }, [router, t, currentUser]);
+  const renderPlayerItem = useCallback(
+    ({ item }: { item: Player }) => (
+      <SearchPlayerRowMemo
+        player={item}
+        isAdmin={currentUser?.status === 'admin'}
+        language={language}
+        onPress={openPlayerFromSearch}
+        t={t}
+      />
+    ),
+    [currentUser?.status, language, openPlayerFromSearch, t]
+  );
 
   // Показываем загрузку пока проверяем авторизацию
   // Если пользователь не авторизован, показываем загрузку или перенаправляем
@@ -1443,16 +1411,12 @@ export default function SearchScreen() {
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
             contentContainerStyle={styles.playersList}
-            removeClippedSubviews={true}
-            maxToRenderPerBatch={5}
-            updateCellsBatchingPeriod={50}
-            windowSize={7}
-            initialNumToRender={8}
-            getItemLayout={(data, index) => ({
-              length: 80, // примерная высота элемента
-              offset: 80 * index,
-              index,
-            })}
+            removeClippedSubviews={false}
+            maxToRenderPerBatch={12}
+            updateCellsBatchingPeriod={80}
+            windowSize={21}
+            initialNumToRender={14}
+            extraData={language}
           />
 
           {/* Кнопка массовой отправки сообщений (только для администратора) */}
@@ -1830,4 +1794,83 @@ const styles = StyleSheet.create({
   },
 });
 
+type SearchPlayerRowProps = {
+  player: Player;
+  isAdmin?: boolean;
+  language: string;
+  onPress: (id: string) => void;
+  t: (key: string) => string;
+};
+
+function areSearchPlayerRowPropsEqual(
+  prev: SearchPlayerRowProps,
+  next: SearchPlayerRowProps
+): boolean {
+  if (prev.isAdmin !== next.isAdmin || prev.language !== next.language) return false;
+  return searchPlayerRowDataEqual(prev.player, next.player);
+}
+
+const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
+  player,
+  isAdmin,
+  language,
+  onPress,
+  t,
+}: SearchPlayerRowProps) {
+  const playerPhoto =
+    player.avatar || (player.photos && player.photos.length > 0 && player.photos[0]) || undefined;
+  const photoContainerStyle =
+    player.status === 'coach' ? styles.coachPhotoContainer : styles.playerPhotoContainer;
+  const subtitle = buildSearchPlayerSubtitle(player, t, language);
+  const showNewBadge =
+    !!player.createdAt &&
+    Date.now() - new Date(player.createdAt).getTime() < SEARCH_NEWCOMER_MAX_MS;
+
+  return (
+    <TouchableOpacity onPress={() => onPress(player.id)} activeOpacity={0.7}>
+      <View style={styles.playerGradientShadow}>
+        <BlurView intensity={20} tint="dark" style={styles.playerItemBlur}>
+          <View style={styles.playerItem}>
+            <View style={photoContainerStyle}>
+              <CachedAvatar
+                playerId={player.id}
+                fallbackAvatarUrl={playerPhoto}
+                size={60}
+                style={styles.playerPhoto}
+                status={player.status}
+              />
+            </View>
+            <View style={styles.playerDetails}>
+              <View style={styles.playerNameRow}>
+                <Text style={styles.playerName} numberOfLines={1}>
+                  {player.name}
+                </Text>
+                {showNewBadge ? (
+                  <View style={styles.newBadge}>
+                    <Text style={styles.newBadgeText}>NEW</Text>
+                  </View>
+                ) : null}
+                {player.is_hidden && isAdmin ? (
+                  <Ionicons
+                    name="eye-off-outline"
+                    size={18}
+                    color="#fa2f40"
+                    style={{ marginLeft: 8 }}
+                  />
+                ) : null}
+                {player.activityRating !== undefined && player.activityRating > 0 ? (
+                  <View style={styles.ratingContainer}>
+                    <Ionicons name="star" size={11} color="#AA3333" />
+                    <Text style={styles.ratingText}>{Math.round(player.activityRating)}</Text>
+                  </View>
+                ) : null}
+              </View>
+              <Text style={styles.playerInfo}>{subtitle}</Text>
+            </View>
+          </View>
+        </BlurView>
+      </View>
+    </TouchableOpacity>
+  );
+}, areSearchPlayerRowPropsEqual);
 

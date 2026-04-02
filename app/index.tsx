@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, Animated as RNAnimated } from 'react-native';
+import { View, StyleSheet, Dimensions, ImageBackground, Image as RNImage, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, Animated as RNAnimated } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,11 +21,10 @@ import * as Device from 'expo-device';
 import { useLanguage } from '../contexts/LanguageContext';
 import PuckGame from '../components/PuckGame';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
 // Размер шайбы
 const PUCK_SIZE = 70;
 const GAME_PUCK_ID = '__game__';
+const LED_TEXTURE = require('../assets/images/led.jpg');
 
 // Определение уровня производительности устройства
 // ТОЛЬКО для FPS - скорость шайб теперь одинаковая для всех устройств
@@ -73,7 +73,15 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
 };
 
 // Упрощенная версия usePuckCollisionSystem для тестового экрана
-const usePuckCollisionSystem = (players: Player[], currentUserId?: string, currentScreen?: string, screenWidth?: number, screenHeight?: number) => {
+// boundsFromPlayfieldLayout: width/height пришли с onLayout поля (льда) — без повторного вычета таб-бара
+const usePuckCollisionSystem = (
+  players: Player[],
+  currentUserId?: string,
+  currentScreen?: string,
+  screenWidth?: number,
+  screenHeight?: number,
+  boundsFromPlayfieldLayout?: boolean
+) => {
   const puckSize = 70;
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const [appIsActive, setAppIsActive] = useState(true);
@@ -99,10 +107,12 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   }, []);
   // Отслеживаем активные столкновения для предотвращения повторной вибрации
   const activeCollisionsRef = useRef<Set<string>>(new Set());
+  /** Подпись границ — при переходе с fallback на размер льда с onLayout не пересоздаём шайбы, а поджимаем к новому прямоугольнику */
+  const prevBoundsSigRef = useRef<string>('');
   // Защита от переинициализации в первые секунды после загрузки
   const initializationTimeRef = useRef<number>(0);
   // ОПТИМИЗАЦИЯ: Уменьшен период защиты с 6000ms до 3000ms для быстрого старта анимации
-  const INITIALIZATION_PROTECTION_MS = 3000; // 3 секунды защиты - покрывает загрузку пользователя и инициализацию фильтров
+  const INITIALIZATION_PROTECTION_MS = 1200; // Короче — меньше «ступенек» при старте; защита от частых пересозданий при фильтрах
   
   // Определяем уровень производительности
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
@@ -199,26 +209,32 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
   }, []);
 
   const boundaries = useMemo(() => {
-    // Платформо-зависимая корректировка отступа снизу
-    // iOS: шайбы залетают ниже, нужно значительно увеличить отступ
-    // Android: используем insets.bottom (в полной сборке будет 0, т.к. navigation bar скрыт; в Expo Go будет корректное значение)
+    if (boundsFromPlayfieldLayout) {
+      // Совпадает с styles.innerBorder (top/left/right/bottom: 8) + небольшой зазор
+      const innerInset = 8;
+      const edgePad = 2;
+      return {
+        left: innerInset + edgePad,
+        top: innerInset + edgePad,
+        right: width - puckSize - innerInset - edgePad,
+        bottom: height - puckSize - innerInset - edgePad,
+      };
+    }
+
+    // Fallback: размеры окна без onLayout льда — вычитаем таб-бар (устаревшая модель)
     const bottomPaddingAdjustment = Platform.OS === 'ios' ? 67 : -20;
     const baseBottomPadding = 15;
     const adjustedBottomPadding = baseBottomPadding + bottomPaddingAdjustment;
-    
-    // Вычисляем нижнюю границу с учетом реальной высоты таб-бара и безопасных зон
-    // В полной сборке Android: navigation bar скрыт → insets.bottom = 0 автоматически
-    // В Expo Go: navigation bar виден → insets.bottom > 0 (корректно)
     const bottomInset = insets.bottom;
     const bottomOffset = tabBarHeight + bottomInset + puckSize + adjustedBottomPadding;
-    
+
     return {
-    left: 10, // Отступ 10 пикселей слева
-    top: 10, // Отступ 10 пикселей сверху
-    right: width - puckSize - 10, // Отступ 10 пикселей справа
-      bottom: height - bottomOffset, // Динамическая нижняя граница
+      left: 10,
+      top: 10,
+      right: width - puckSize - 10,
+      bottom: height - bottomOffset,
     };
-  }, [width, height, puckSize, tabBarHeight, insets.bottom]);
+  }, [width, height, puckSize, tabBarHeight, insets.bottom, boundsFromPlayfieldLayout]);
 
   // Инициализация и обновление позиций
   useEffect(() => {
@@ -233,6 +249,42 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
       renderPositionsMapRef.current.clear();
       activeCollisionsRef.current.clear();
       initializationTimeRef.current = 0;
+      prevBoundsSigRef.current = '';
+      return;
+    }
+
+    const boundsSig = `${boundaries.left}|${boundaries.top}|${boundaries.right}|${boundaries.bottom}`;
+    const playerSig = players.map((p) => p.id).sort().join(',');
+    const prevListSig = previousPlayersRef.current.map((p) => p.id).sort().join(',');
+
+    if (
+      isInitializedRef.current &&
+      physicsPositionsRef.current.length > 0 &&
+      prevBoundsSigRef.current !== '' &&
+      prevBoundsSigRef.current !== boundsSig &&
+      playerSig === prevListSig
+    ) {
+      prevBoundsSigRef.current = boundsSig;
+      lastTimeRef.current = 0;
+      accumulatorRef.current = 0;
+      const clamped = physicsPositionsRef.current.map((p) => ({
+        ...p,
+        x: Math.max(boundaries.left, Math.min(boundaries.right, p.x)),
+        y: Math.max(boundaries.top, Math.min(boundaries.bottom, p.y)),
+      }));
+      physicsPositionsRef.current = clamped;
+      renderPositionsRef.current = clamped;
+      clamped.forEach((p) => {
+        const sh = sharedPositionsRef.current.get(p.id);
+        if (sh) {
+          sh.x.value = p.x;
+          sh.y.value = p.y;
+        }
+      });
+      setPuckPositions(clamped);
+      const newMap = new Map<string, PuckPosition>();
+      clamped.forEach((p) => newMap.set(p.id, p));
+      renderPositionsMapRef.current = newMap;
       return;
     }
 
@@ -462,6 +514,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
         renderPositionsMapRef.current = newMap;
         
         previousPlayersRef.current = players;
+        prevBoundsSigRef.current = boundsSig;
         return;
       }
       
@@ -645,6 +698,7 @@ const usePuckCollisionSystem = (players: Player[], currentUserId?: string, curre
     } else {
       console.log(`🔄 [ANIMATION] usePuckCollisionSystem: позиции ПЕРЕИНИЦИАЛИЗИРОВАНЫ для ${positions.length} шайб`);
     }
+    prevBoundsSigRef.current = boundsSig;
   }, [players, boundaries, performanceLevel]);
 
   // Физический шаг с адаптивными константами в зависимости от производительности
@@ -1780,9 +1834,52 @@ export default function HomeScreen() {
 
   // Мини-игра
   const [showGame, setShowGame] = useState(false);
+  const [gameOpenToResults, setGameOpenToResults] = useState(false);
 
   // Размеры области льда для разметки
   const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
+  /** После onLayout один кадр геометрия ещё «плавает» — ждём 2× rAF, чтобы сменить границы шайб один раз */
+  const [collisionLayoutReady, setCollisionLayoutReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const resolved = RNImage.resolveAssetSource(LED_TEXTURE);
+      if (resolved?.uri) {
+        ExpoImage.prefetch(resolved.uri).catch(() => {});
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (iceSize.width <= 0 || iceSize.height <= 0) {
+      setCollisionLayoutReady(false);
+      return;
+    }
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setCollisionLayoutReady(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [iceSize.width, iceSize.height]);
+
+  const openGameResultsParam =
+    params.openGameResults === 'true' ||
+    (Array.isArray(params.openGameResults) && params.openGameResults[0] === 'true');
+
+  useEffect(() => {
+    if (!openGameResultsParam) return;
+    setShowGame(true);
+    setGameOpenToResults(true);
+    requestAnimationFrame(() => {
+      router.setParams({ openGameResults: undefined } as Record<string, undefined>);
+    });
+  }, [openGameResultsParam, router]);
 
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
@@ -2434,12 +2531,18 @@ export default function HomeScreen() {
   }, [players, blockedUsers]);
 
   // Используем полную логику коллизий из основного экрана
+  const windowForPucks = Dimensions.get('window');
+  const playfieldLayoutReady = collisionLayoutReady && iceSize.width > 0 && iceSize.height > 0;
+  const puckFieldWidth = playfieldLayoutReady ? iceSize.width : windowForPucks.width;
+  const puckFieldHeight = playfieldLayoutReady ? iceSize.height : windowForPucks.height;
+
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
     allVisiblePlayers, // передаем всех видимых игроков
     currentUser?.id,
     currentScreen || undefined, // передаем currentScreen из контекста
-    screenWidth,
-    screenHeight
+    puckFieldWidth,
+    puckFieldHeight,
+    playfieldLayoutReady
   );
 
   // Перезапускаем анимацию при возвращении на экран
@@ -2707,7 +2810,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.container}>
         <ImageBackground 
-        source={require('../assets/images/led.jpg')}
+        source={LED_TEXTURE}
         style={styles.background}
           resizeMode="cover"
           onLayout={(e) => {
@@ -2779,7 +2882,11 @@ export default function HomeScreen() {
 
       <PuckGame
         visible={showGame}
-        onClose={() => setShowGame(false)}
+        onClose={() => {
+          setShowGame(false);
+          setGameOpenToResults(false);
+        }}
+        openToResults={gameOpenToResults}
         visiblePlayers={gamePlayers}
         currentUser={currentUser}
       />

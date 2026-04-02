@@ -189,6 +189,14 @@
     "plugins": [
       "expo-router",
       "expo-web-browser",
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "visibility": "visible",
+          "barStyle": "light"
+        }
+      ],
       "expo-splash-screen",
       [
         "expo-notifications",

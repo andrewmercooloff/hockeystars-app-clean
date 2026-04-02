@@ -7,15 +7,16 @@ import * as NavigationBar from 'expo-navigation-bar';
  * НЕ пытаемся скрыть панель - это не работает надёжно на всех устройствах
  * Просто делаем её чёрной с белыми кнопками
  */
+const NAV_BG = '#050008';
+
 export async function configureSystemUI() {
   if (Platform.OS === 'android') {
     try {
-      // Устанавливаем цвет фона системного UI
-      await SystemUI.setBackgroundColorAsync('#000000');
-      
-      // Делаем навигационную панель чёрной (под дизайн приложения)
-      await NavigationBar.setBackgroundColorAsync('#000000');
-      await NavigationBar.setButtonStyleAsync('light'); // Светлые кнопки на тёмном фоне
+      await SystemUI.setBackgroundColorAsync(NAV_BG);
+      // Работает при enforceContrast: false (тема + плагин expo-navigation-bar)
+      NavigationBar.setStyle('dark');
+      await NavigationBar.setBackgroundColorAsync(NAV_BG);
+      await NavigationBar.setButtonStyleAsync('light');
     } catch (error) {
       // Игнорируем ошибки - на некоторых устройствах API может быть недоступен
     }

@@ -18,6 +18,7 @@ import {
     Dimensions,
     Image,
     ImageBackground,
+    InteractionManager,
     Keyboard,
     KeyboardAvoidingView,
     Linking,
@@ -166,7 +167,7 @@ SectionCard.displayName = 'SectionCard';
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, returnTo, chatId, returnToPlayerId } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId } = useLocalSearchParams();
   const router = useRouter();
   const navigation = useNavigation();
   const segments = useSegments();
@@ -182,7 +183,7 @@ export default function PlayerProfile() {
   const photosRef = useRef<View>(null);
   const videosRef = useRef<View>(null);
   const achievementsRef = useRef<View>(null);
-  const exercisesRef = useRef<View>(null);
+  const normativesRef = useRef<View>(null);
   const shareCardRef = useRef<View>(null);
   const friendsRef = useRef<View>(null);
   const giftButtonRef = useRef<View>(null);
@@ -720,9 +721,9 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные параллельно (getPlayerById уже использует кеш)
+      // Загружаем основные данные параллельно (без кеша — рост/данные профиля должны быть актуальны)
       const [playerData, userData] = await Promise.all([
-        getPlayerById(normalizedId as string),
+        getPlayerById(normalizedId as string, { skipCache: true }),
         loadCurrentUser()
       ]);
       
@@ -748,7 +749,7 @@ export default function PlayerProfile() {
           return;
         }
         
-        const retryPlayerData = await getPlayerById(normalizedId as string);
+        const retryPlayerData = await getPlayerById(normalizedId as string, { skipCache: true });
         
         if (!retryPlayerData) {
           console.log('❌ Игрок не найден после повторной попытки');
@@ -1589,34 +1590,55 @@ export default function PlayerProfile() {
       scrollToSection(videosRef);
     } else if (scrollToAchievements === 'true') {
       scrollToSection(achievementsRef);
-    } else if (scrollToExercises === 'true') {
-      scrollToSection(exercisesRef);
     } else if (scrollToFriends === 'true') {
-      // При переходе по уведомлению о запросе в друзья:
-      // Принудительно обновляем статус дружбы (сбрасываем кэш)
-      // Прокрутка НЕ нужна - профиль и так открывается сверху, кнопки дружбы видны сразу
-      if (currentUser && player && currentUser.id !== player.id) {
-        const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
-        
-        // Проверяем, что мы ещё не делали запрос для этой пары
-        if (friendshipFetchedForRef.current === cacheKey) {
-          return; // Уже загрузили для этой пары
+      // Выше нормативов/«упражнений» в цепочке: уведомление о дружбе не уезжает на старый scrollToExercises
+      scrollToSection(friendsRef);
+      const cu = currentUserRef.current;
+      const pl = playerRef.current;
+      if (cu && pl && cu.id !== pl.id) {
+        const cacheKey = `${Math.min(cu.id, pl.id)}_${Math.max(cu.id, pl.id)}`;
+        if (friendshipFetchedForRef.current !== cacheKey) {
+          friendshipFetchedForRef.current = cacheKey;
+          setFriendshipStatusCache(prev => {
+            const newCache = { ...prev };
+            delete newCache[cacheKey];
+            return newCache;
+          });
+          getFriendshipStatus(cu.id, pl.id, true).then(status => {
+            console.log('📥 Статус дружбы при переходе из уведомления:', status);
+            setFriendshipStatus(status);
+            setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: status }));
+          });
         }
-        friendshipFetchedForRef.current = cacheKey;
-        
-        // Сбрасываем локальный кэш
-        setFriendshipStatusCache(prev => {
-          const newCache = { ...prev };
-          delete newCache[cacheKey];
-          return newCache;
-        });
-        // Принудительно загружаем актуальный статус из БД
-        getFriendshipStatus(currentUser.id, player.id, true).then(status => {
-          console.log('📥 Статус дружбы при переходе из уведомления:', status);
-          setFriendshipStatus(status);
-          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: status }));
-        });
       }
+    } else if (scrollToNormatives === 'true' || scrollToExercises === 'true') {
+      // Нормативы ниже по экрану — после фото; ждём отрисовку, при необходимости повторяем measureLayout
+      const offset = 100;
+      const scrollNormativesSection = (attempt: number) => {
+        const delay = attempt === 0 ? 0 : 320;
+        setTimeout(() => {
+          InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => {
+              const target = normativesRef.current;
+              const scrollParent = scrollViewRef.current;
+              if (!target || !scrollParent) {
+                if (attempt < 3) scrollNormativesSection(attempt + 1);
+                return;
+              }
+              target.measureLayout(
+                scrollParent as any,
+                (x, y) => {
+                  scrollParent.scrollTo({ x: 0, y: Math.max(0, y - offset), animated: true });
+                },
+                () => {
+                  if (attempt < 3) scrollNormativesSection(attempt + 1);
+                }
+              );
+            });
+          });
+        }, delay);
+      };
+      scrollNormativesSection(0);
     } else if (scrollToGift === 'true') {
       scrollToSection(giftButtonRef);
     } else if (scrollToSpeed === 'true') {
@@ -1632,8 +1654,10 @@ export default function PlayerProfile() {
           );
         }
       }, 100);
+    } else if (scrollToAnalysis === 'true') {
+      scrollToSection(aiSectionRef, 100);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToFriends, scrollToGift, scrollToSpeed, player, currentUser]);
+  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, player?.id]);
 
 
   // Ref для активного поля ввода
@@ -2596,6 +2620,13 @@ export default function PlayerProfile() {
     // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI, запрос в фоне
     setFriendLoading(true);
           lastManualStatusChangeRef.current = Date.now();
+
+    const releaseFriendLoading = () => setFriendLoading(false);
+    const loadingGuard = setTimeout(releaseFriendLoading, 28000);
+    const doneFriendAction = () => {
+      clearTimeout(loadingGuard);
+      releaseFriendLoading();
+    };
           
     if (friendshipStatus === 'friends') {
       // Удаляем из друзей - сразу показываем "добавить"
@@ -2603,7 +2634,6 @@ export default function PlayerProfile() {
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
       
       removeFriend(currentUser.id, player.id).then(success => {
-        setFriendLoading(false);
         if (!success) {
           // Откатываем при ошибке
           setFriendshipStatus(previousStatus);
@@ -2611,11 +2641,10 @@ export default function PlayerProfile() {
           showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
         }
       }).catch(error => {
-        setFriendLoading(false);
         setFriendshipStatus(previousStatus);
         setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
-      });
+      }).finally(doneFriendAction);
       
       } else if (friendshipStatus === 'none') {
       // КРИТИЧЕСКАЯ ПРОВЕРКА перед отправкой запроса
@@ -2624,6 +2653,7 @@ export default function PlayerProfile() {
           currentUserId: currentUser?.id,
           playerId: player?.id
         });
+        clearTimeout(loadingGuard);
         setFriendLoading(false);
         showCustomAlert(t('common.error'), 'Ошибка: некорректные данные пользователя', 'error');
         return;
@@ -2634,6 +2664,7 @@ export default function PlayerProfile() {
           currentUserId: currentUser.id,
           playerId: player.id
         });
+        clearTimeout(loadingGuard);
         setFriendLoading(false);
         showCustomAlert(t('common.error'), 'Нельзя отправить запрос самому себе', 'error');
         return;
@@ -2651,7 +2682,6 @@ export default function PlayerProfile() {
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'sent_request' }));
       
       sendFriendRequest(currentUser.id, player.id).then(success => {
-        setFriendLoading(false);
         if (success) {
           addActivityPoints(currentUser.id, 'FRIEND_ADD').catch(() => {});
         } else {
@@ -2661,12 +2691,11 @@ export default function PlayerProfile() {
           showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
         }
       }).catch(error => {
-        setFriendLoading(false);
         // Откатываем при ошибке
         setFriendshipStatus(previousStatus);
         setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert(t('common.error'), t('profile.friendRequestError') || 'Не удалось отправить запрос дружбы', 'error');
-      });
+      }).finally(doneFriendAction);
       
     } else if (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') {
       // Отменяем запрос - сразу показываем "добавить"
@@ -2674,7 +2703,6 @@ export default function PlayerProfile() {
       setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
       
       cancelFriendRequest(currentUser.id, player.id).then(success => {
-        setFriendLoading(false);
         if (!success) {
           // Откатываем при ошибке
           setFriendshipStatus(previousStatus);
@@ -2682,11 +2710,10 @@ export default function PlayerProfile() {
           showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
         }
       }).catch(error => {
-        setFriendLoading(false);
         setFriendshipStatus(previousStatus);
         setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert(t('common.error'), t('profile.friendRequestCancelError'), 'error');
-      });
+      }).finally(doneFriendAction);
       
     } else if (friendshipStatus === 'received_request') {
       // Принимаем запрос - сразу показываем "друзья"
@@ -2696,7 +2723,6 @@ export default function PlayerProfile() {
       // Счётчик обновится автоматически через Realtime подписку в _layout.tsx
 
       acceptFriendRequest(currentUser.id, player.id).then(success => {
-        setFriendLoading(false);
         if (success) {
           // Пользователь остаётся на том же месте - не меняем позицию прокрутки
           console.log('✅ Запрос дружбы принят');
@@ -2710,13 +2736,13 @@ export default function PlayerProfile() {
           showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
         }
       }).catch(error => {
-        setFriendLoading(false);
         // Откатываем при ошибке
         setFriendshipStatus(previousStatus);
         setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
         showCustomAlert(t('common.error'), t('profile.friendRequestAcceptError'), 'error');
-      });
+      }).finally(doneFriendAction);
     } else {
+      clearTimeout(loadingGuard);
       setFriendLoading(false);
     }
   };
@@ -6436,7 +6462,7 @@ export default function PlayerProfile() {
                 (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) ? (
                   isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                     // Редактируемая версия нормативов
-                    <SectionCard ref={exercisesRef}>
+                    <SectionCard ref={normativesRef}>
                       <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                       <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
@@ -6527,7 +6553,7 @@ export default function PlayerProfile() {
                     // Если нет нормативов, но это владелец - показываем пустое состояние
                     if (!hasAnyNormative && isOwner) {
                       return (
-                        <SectionCard ref={exercisesRef}>
+                        <SectionCard ref={normativesRef}>
                           <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                           <View style={styles.emptySectionContainer}>
                             <Ionicons name="fitness-outline" size={48} color="#666" />
@@ -6538,7 +6564,7 @@ export default function PlayerProfile() {
                     }
                     
                     return (
-                      <SectionCard ref={exercisesRef}>
+                      <SectionCard ref={normativesRef}>
                         <NormativesSection
                           pullUps={player.pullUps}
                           pushUps={player.pushUps}
@@ -6820,7 +6846,7 @@ export default function PlayerProfile() {
 
             {/* Друзья - скрыты для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <SectionCard wrapperStyle={styles.compactSectionWrapper}>
+            <SectionCard ref={friendsRef} wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>
                 {t('profile.friends')} ({friends.length})
               </Text>
@@ -8354,7 +8380,9 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
       },
       android: {
-        elevation: 5,
+        // elevation внутри BlurView с overflow:hidden на старых Android даёт «грязные» тени; контур уже есть
+        elevation: 0,
+        borderColor: 'rgba(250, 47, 64, 0.38)',
       },
       web: {
         boxShadow: '0 2px 4px rgba(1, 0, 0, 0.25)',

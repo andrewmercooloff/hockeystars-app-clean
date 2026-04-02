@@ -67,11 +67,6 @@ export default function ExercisesScreen() {
     loadUserData();
   }, []);
 
-  // Обновляем упражнения при изменении категории (поиск теперь клиентский)
-  useEffect(() => {
-    refreshExercises();
-  }, [selectedCategory]);
-
   // Устанавливаем currentScreen при фокусе на экране упражнений
   useFocusEffect(
     useCallback(() => {

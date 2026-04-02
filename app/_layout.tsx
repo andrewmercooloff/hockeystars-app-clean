@@ -342,6 +342,9 @@ export default function RootLayout() {
             
             // Обновляем онлайн-статус пользователя в базе данных
             if (nextAppState === 'active') {
+              if (Platform.OS === 'android') {
+                void configureSystemUI();
+              }
               updateOnlineStatus(true);
             } else if (nextAppState === 'background' || nextAppState === 'inactive') {
               updateOnlineStatus(false);
@@ -370,6 +373,13 @@ export default function RootLayout() {
       safeHideSplashScreen();
     }
   }, []); // Выполняется один раз при монтировании
+
+  // Android: чёрная навигационная панель сразу при запуске (раньше вызывалось только после loadUser)
+  React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      void configureSystemUI();
+    }
+  }, []);
 
   // Принудительно загружаем Ionicons и устанавливаем глобальный шрифт
   React.useEffect(() => {
@@ -815,33 +825,8 @@ export default function RootLayout() {
           }
         }
         
-        // Фильтруем уведомления, исключая сообщения
-        const filteredNotifications = notifications.filter((n: any) => {
-          // Исключаем уведомления о сообщениях
-          if (n.type === 'message') {
-            return false;
-          }
-          // Включаем только нужные типы уведомлений
-          return n.type === 'friend_request' || 
-                 n.type === 'friend_accepted' ||  // Принятие запроса дружбы
-                 n.type === 'autograph_request' || 
-                 n.type === 'stick_request' || 
-                 n.type === 'gift_request' ||
-                 n.type === 'gift_accepted' ||
-                 n.type === 'achievement' || 
-                 n.type === 'team_invite' || 
-                 n.type === 'system' ||
-                 n.type === 'stats_change' ||
-                 n.type === 'normative_changed' ||
-                 n.type === 'physical_data_changed' ||
-                 n.type === 'photo_added' ||
-                 n.type === 'video_liked' ||
-                 n.type === 'photo_liked';
-        });
-        
-        // ИСПРАВЛЕНО: Считаем ВСЕ непрочитанные уведомления, включая friend_request
-        // Это позволяет индикатору исчезнуть после просмотра уведомлений (когда они помечаются как прочитанные)
-        // Friend requests теперь считаются вместе с обычными уведомлениями
+        // Бейдж: все непрочитанные, кроме type message (чаты — отдельный счётчик)
+        const filteredNotifications = notifications.filter((n: any) => n.type !== 'message');
         const unreadNotificationsCount = filteredNotifications.filter((n: any) => !n.is_read).length;
         // friendRequestsCount больше не используется для badge - friend requests включены в unreadNotificationsCount
         const friendRequestsCount = 0; // Обнуляем, чтобы избежать двойного подсчёта
@@ -1041,14 +1026,7 @@ export default function RootLayout() {
       try {
         console.log('🚀 Начало инициализации приложения');
 
-        // Очищаем badge на иконке приложения при запуске (на случай, если остался старый badge)
-        if (Platform.OS === 'ios') {
-          try {
-            await Notifications.setBadgeCountAsync(0);
-          } catch (error) {
-            // Игнорируем ошибки
-          }
-        }
+        // Не сбрасываем badge в ноль при старте — это давало вспышку до loadUser()
 
         // Нативный splash screen уже скрыт в начале файла для iOS
         // Здесь дополнительно скрываем для других платформ
@@ -1184,16 +1162,12 @@ export default function RootLayout() {
       lastAppStateLoadRef.current = now;
       isUpdatingRef.current = true;
 
-      refreshBadgeCountsRef.current?.();
+      refreshBadgeCountsRef.current?.().finally(() => {
+        isUpdatingRef.current = false;
+      });
 
-      // Увеличиваем задержку для более плавного обновления
-      // НЕ обновляем счетчик уведомлений при возврате из фона, чтобы избежать мигания
-      // Счетчик обновляется через Realtime подписку автоматически
-      setTimeout(() => {
-        loadUserRef.current?.().finally(() => {
-          isUpdatingRef.current = false;
-        });
-      }, 1000); // Увеличено до 1 секунды для более плавного обновления
+      // Полный loadUser() убран: второй волной перезаписывал счётчики и давал мигание бейджей.
+      // refreshBadgeCounts уже подтягивает сообщения + unread_notifications_count из БД.
     };
 
     // Добавляем слушатель для обновления при фокусе на приложении

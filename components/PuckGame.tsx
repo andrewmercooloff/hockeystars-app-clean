@@ -4,7 +4,7 @@ import {
   AppState,
   AppStateStatus,
   Dimensions,
-  ImageBackground,
+  Image as _RNImage,
   Modal,
   Platform,
   StyleSheet,
@@ -13,6 +13,8 @@ import {
   Vibration,
   View,
 } from 'react-native';
+import { Image } from 'expo-image';
+import CachedBackground from './CachedBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
@@ -56,6 +58,8 @@ interface Props {
   onClose: () => void;
   visiblePlayers: Player[];
   currentUser: Player | null;
+  /** Открыть сразу экран результатов (топ таблица), без игры */
+  openToResults?: boolean;
 }
 
 function splitNameTwoLines(fullName?: string | null) {
@@ -756,6 +760,8 @@ const usePuckCollisionSystem = (
   const IDLE_TIMEOUT_MS = currentScreen === 'game' ? 5000 : 12000;
   const IDLE_FRAME_SKIP = currentScreen === 'game' ? 5 : 3;
   const frameCounterRef = useRef(0);
+  /** Пока идёт активная игра — реже считаем физику на слабых устройствах (меньше нагрев) */
+  const gamePhysicsSkipRef = useRef(0);
 
   const updateInteractionTime = useCallback(() => {
     lastInteractionTimeRef.current = Date.now();
@@ -823,6 +829,18 @@ const usePuckCollisionSystem = (
         return;
       }
 
+      if (currentScreen === 'game' && !isIdleModeRef.current) {
+        const stride =
+          performanceLevel === 'low' ? 2 : performanceLevel === 'medium' ? 1 : 0;
+        if (stride > 0) {
+          gamePhysicsSkipRef.current++;
+          if (gamePhysicsSkipRef.current % (stride + 1) !== 0) {
+            animationFrameId = requestAnimationFrame(tick);
+            return;
+          }
+        }
+      }
+
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = now;
         animationFrameId = requestAnimationFrame(tick);
@@ -875,7 +893,18 @@ const usePuckCollisionSystem = (
       if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
       animationRunningRef.current = false;
     };
-  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, appIsActive, isOnHomeScreen, IDLE_TIMEOUT_MS, IDLE_FRAME_SKIP]);
+  }, [
+    stepPhysics,
+    STEP_MS,
+    MAX_STEPS,
+    reactUpdateInterval,
+    appIsActive,
+    isOnHomeScreen,
+    IDLE_TIMEOUT_MS,
+    IDLE_FRAME_SKIP,
+    currentScreen,
+    performanceLevel,
+  ]);
 
   useEffect(() => {
     if (collisionDetectedRef.current && currentScreen === 'home' && (Platform.OS === 'ios' || Platform.OS === 'android')) {
@@ -1306,8 +1335,28 @@ const OriginalPuckAnimator = React.memo(
     prevProps.player.createdAt === nextProps.player.createdAt
 );
 
-export default function PuckGame({ visible, onClose, visiblePlayers, currentUser }: Props) {
+const LED_BG = require('../assets/images/led.jpg');
+
+export default function PuckGame({ visible, onClose, visiblePlayers, currentUser, openToResults = false }: Props) {
   const { language } = useLanguage();
+
+  useEffect(() => {
+    try {
+      const resolved = _RNImage.resolveAssetSource(LED_BG);
+      if (resolved?.uri) {
+        Image.prefetch(resolved.uri).catch(() => {});
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const gameLimits = useMemo(() => {
+    const perf = getPerformanceLevel();
+    if (perf === 'low') return { maxPucks: 12, spawnMs: 850, rafStride: 3 };
+    if (perf === 'medium') return { maxPucks: 18, spawnMs: 650, rafStride: 2 };
+    return { maxPucks: MAX_PUCKS, spawnMs: SPAWN_INTERVAL_MS, rafStride: 1 };
+  }, []);
   const [gameState, setGameState] = useState<'countdown' | 'playing' | 'finished'>('countdown');
   const [countdownValue, setCountdownValue] = useState<number | 'Go'>(5);
   const countdownScale = useSharedValue(0.5);
@@ -1327,6 +1376,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   const spawnQueueRef = useRef<Player[]>([]);
   const spawnedIdsRef = useRef<Set<string>>(new Set());
   const spawnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scoringRafTickRef = useRef(0);
   const activePlayersCountRef = useRef(0);
   const visiblePlayersRef = useRef<Player[]>(visiblePlayers);
   useEffect(() => {
@@ -1349,7 +1399,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   }, []);
 
   const spawnOneRandom = useCallback(() => {
-    if (activePlayersCountRef.current >= MAX_PUCKS) return;
+    if (activePlayersCountRef.current >= gameLimits.maxPucks) return;
     const pool = spawnQueueRef.current;
     if (!pool || pool.length === 0) return;
     const idx = Math.floor(Math.random() * pool.length);
@@ -1358,17 +1408,17 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     if (spawnedIdsRef.current.has(next.id)) return;
     spawnedIdsRef.current.add(next.id);
     setActivePlayers((prev) => {
-      if (prev.length >= MAX_PUCKS) return prev;
+      if (prev.length >= gameLimits.maxPucks) return prev;
       return [...prev, next];
     });
-  }, []);
+  }, [gameLimits.maxPucks]);
 
   const ensureSpawnLoop = useCallback(() => {
     if (spawnTimerRef.current) return;
     spawnTimerRef.current = setInterval(() => {
       spawnOneRandom();
-    }, SPAWN_INTERVAL_MS);
-  }, [spawnOneRandom]);
+    }, gameLimits.spawnMs);
+  }, [spawnOneRandom, gameLimits.spawnMs]);
 
   const initSpawnQueueFromVisiblePlayers = useCallback(() => {
     const source = visiblePlayersRef.current || [];
@@ -1487,6 +1537,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
         | 'score'
         | 'yourBest'
         | 'go'
+        | 'results'
     ) => {
       const dict: Record<string, Record<string, string>> = {
         title: {
@@ -1615,6 +1666,20 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
           de: 'Go',
           fr: 'Go',
         },
+        results: {
+          ru: 'Результаты',
+          en: 'Results',
+          lt: 'Rezultatai',
+          lv: 'Rezultāti',
+          pl: 'Wyniki',
+          sv: 'Resultat',
+          cs: 'Výsledky',
+          sk: 'Výsledky',
+          fi: 'Tulokset',
+          it: 'Risultati',
+          de: 'Ergebnis',
+          fr: 'Résultats',
+        },
         yourBest: {
           ru: 'Твой рекорд: {score}',
           en: 'Your best: {score}',
@@ -1737,6 +1802,13 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     if (gameState !== 'playing') return;
     let raf: number | null = null;
     const loop = () => {
+      if (gameLimits.rafStride > 1) {
+        scoringRafTickRef.current++;
+        if (scoringRafTickRef.current % gameLimits.rafStride !== 0) {
+          raf = requestAnimationFrame(loop);
+          return;
+        }
+      }
       const now = Date.now();
       const elapsed = (now - gameStartRef.current) / 1000;
       const remaining = Math.max(0, GAME_DURATION - elapsed);
@@ -1823,24 +1895,30 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     return () => {
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [gameState, activePlayers, getSharedPosition, goalRect, boundaries, updatePuckPosition, endGame]);
+  }, [gameState, activePlayers, getSharedPosition, goalRect, boundaries, updatePuckPosition, endGame, gameLimits.rafStride]);
 
   useEffect(() => {
-    if (visible) {
+    if (!visible) return;
+    loadLeaderboard();
+    setActivePlayers([]);
+    spawnQueueRef.current = [];
+    spawnedIdsRef.current = new Set();
+    if (spawnTimerRef.current) {
+      clearInterval(spawnTimerRef.current);
+      spawnTimerRef.current = null;
+    }
+    if (openToResults) {
+      setGameState('finished');
+      setCountdownValue(5);
+      setScore(0);
+      setTimeLeft(0);
+    } else {
       setGameState('countdown');
       setCountdownValue(5);
       setScore(0);
       setTimeLeft(GAME_DURATION);
-      loadLeaderboard();
-      setActivePlayers([]);
-      spawnQueueRef.current = [];
-      spawnedIdsRef.current = new Set();
-      if (spawnTimerRef.current) {
-        clearInterval(spawnTimerRef.current);
-        spawnTimerRef.current = null;
-      }
     }
-  }, [visible, loadLeaderboard]);
+  }, [visible, openToResults, loadLeaderboard]);
 
   // Плавное увеличение цифры при смене
   const countdownAnimatedStyle = useAnimatedStyle(() => ({
@@ -1891,15 +1969,14 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   return (
     <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose}>
       <View style={gs.container}>
-        <ImageBackground
-          source={require('../assets/images/led.jpg')}
-          style={gs.background}
-          resizeMode="cover"
-          onLayout={(e) => {
-            const { width, height } = e.nativeEvent.layout;
-            setIceSize({ width, height });
-          }}
-        >
+        <CachedBackground source={LED_BG} style={gs.background} resizeMode="cover">
+          <View
+            style={gs.background}
+            onLayout={(e) => {
+              const { width, height } = e.nativeEvent.layout;
+              setIceSize({ width, height });
+            }}
+          >
           {iceSize.width > 0 && iceSize.height > 0 && (
             <IceRinkMarkings width={iceSize.width} height={iceSize.height} opacity={0.15} topInset={0} />
           )}
@@ -1954,9 +2031,20 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
               <Ionicons name="disc" size={18} color="#fa2f40" />
               <Text style={gs.hudScore}>{score}</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={gs.closeBtn} hitSlop={10}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
+            <View style={gs.hudRight}>
+              <TouchableOpacity
+                onPress={() => void endGame()}
+                style={gs.resultsBtn}
+                hitSlop={14}
+                accessibilityRole="button"
+                accessibilityLabel={tr('results')}
+              >
+                <Ionicons name="trophy-outline" size={22} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onClose} style={gs.closeBtn} hitSlop={10}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </View>
           )}
 
@@ -2054,7 +2142,8 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
               </BlurView>
             </View>
           )}
-        </ImageBackground>
+          </View>
+        </CachedBackground>
       </View>
     </Modal>
   );
@@ -2063,7 +2152,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 const gs = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0c1418',
   },
   background: {
     flex: 1,
@@ -2079,6 +2168,8 @@ const gs = StyleSheet.create({
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
     zIndex: 100,
   },
   hudItem: {
@@ -2091,6 +2182,12 @@ const gs = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 10,
   },
+  hudRight: {
+    marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   hudText: {
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
@@ -2101,8 +2198,16 @@ const gs = StyleSheet.create({
     color: '#fa2f40',
     fontSize: 20,
   },
+  resultsBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
+    padding: 10,
+    minWidth: 44,
+    minHeight: 44,
+  },
   closeBtn: {
-    marginLeft: 'auto',
     backgroundColor: 'rgba(0,0,0,0.6)',
     borderRadius: 20,
     padding: 8,

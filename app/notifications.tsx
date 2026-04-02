@@ -1271,12 +1271,18 @@ export default function NotificationsScreen() {
             params: { returnTo: 'notifications', scrollToMuseum: 'true' }
           });
         }
-      } else if (notification.type === 'stats_change' || notification.type === 'normative_changed') {
-        // Для уведомлений о изменениях статистики/нормативов показываем статистику игрока
+      } else if (notification.type === 'stats_change') {
         if (notification.data && notification.data.changedPlayerId) {
           router.push({
             pathname: `/player/${notification.data.changedPlayerId}`,
             params: { returnTo: 'notifications', scrollToStats: 'true' }
+          });
+        }
+      } else if (notification.type === 'normative_changed') {
+        if (notification.data && notification.data.changedPlayerId) {
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications', scrollToNormatives: 'true' }
           });
         }
       } else if (notification.type === 'scout_report') {
@@ -1287,12 +1293,7 @@ export default function NotificationsScreen() {
           });
         }
       } else if (notification.type === 'game_first_place') {
-        if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications' }
-          });
-        }
+        router.push({ pathname: '/', params: { openGameResults: 'true' } });
       } else if (notification.type === 'photo_added') {
         // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
@@ -1302,11 +1303,11 @@ export default function NotificationsScreen() {
           });
         }
       } else if (notification.type === 'new_friendship') {
-        // Для уведомлений о новой дружбе показываем профиль того, кто подтвердил дружбу
+        // Профиль того, кто подтвердил дружбу — прокрутка к блоку «Друзья»
         if (notification.data && notification.data.confirmedBy) {
           router.push({
             pathname: `/player/${notification.data.confirmedBy}`,
-            params: { returnTo: 'notifications' }
+            params: { returnTo: 'notifications', scrollToFriends: 'true' }
           });
         }
       } else if (notification.type === 'gift_received') {
@@ -1340,9 +1341,11 @@ export default function NotificationsScreen() {
           });
         }
       } else if (notification.type === 'avatar_changed') {
-        // Для уведомлений об изменении аватара показываем профиль игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push(`/player/${notification.data.changedPlayerId}`);
+          router.push({
+            pathname: `/player/${notification.data.changedPlayerId}`,
+            params: { returnTo: 'notifications' },
+          });
         }
       } else if (notification.type === 'achievement_added') {
         // Для уведомлений о новых достижениях показываем достижения игрока
@@ -1798,11 +1801,6 @@ export default function NotificationsScreen() {
             maxToRenderPerBatch={10}
             windowSize={10}
             updateCellsBatchingPeriod={50}
-            getItemLayout={(data, index) => ({
-              length: 100, // Примерная высота элемента
-              offset: 100 * index,
-              index,
-            })}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyGradientShadow}>

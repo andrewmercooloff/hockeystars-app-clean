@@ -1804,27 +1804,33 @@ export const getFriendshipStatus = async (userId1: string, userId2: string, skip
 };
 
 // Получение игрока по ID с кешированием
-export const getPlayerById = async (id: string): Promise<Player | null> => {
+export const getPlayerById = async (
+  id: string,
+  options?: { skipCache?: boolean }
+): Promise<Player | null> => {
   try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const skipCache = options?.skipCache === true;
     const cacheKey = `player_${id}`;
     const cacheTime = 10 * 60 * 1000; // 10 минут
     
-    // 1. Сначала проверяем in-memory кэш (мгновенно!)
-    const memCached = playersMemoryCache.get(id);
-    if (memCached && Date.now() - memCached.timestamp < cacheTime) {
-      return memCached.player;
-    }
-    
-    // 2. Затем проверяем AsyncStorage кэш
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-    
-    if (cachedData) {
-      const { player, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < cacheTime) {
-        // Сохраняем в memory кэш для следующих обращений
-        playersMemoryCache.set(id, { player, timestamp });
-        return player;
+    if (!skipCache) {
+      // 1. Сначала проверяем in-memory кэш (мгновенно!)
+      const memCached = playersMemoryCache.get(id);
+      if (memCached && Date.now() - memCached.timestamp < cacheTime) {
+        return memCached.player;
+      }
+      
+      // 2. Затем проверяем AsyncStorage кэш
+      const cachedData = await AsyncStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        const { player, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < cacheTime) {
+          // Сохраняем в memory кэш для следующих обращений
+          playersMemoryCache.set(id, { player, timestamp });
+          return player;
+        }
       }
     }
     
@@ -1867,6 +1873,32 @@ export const getPlayerById = async (id: string): Promise<Player | null> => {
     return null;
   }
 };
+
+const PLAYERS_ID_QUERY_CHUNK = 100;
+
+/** Без тысяч параллельных getPlayerById: надёжно для длинного списка чатов. */
+export async function getPlayersByIdsInBatches(ids: string[]): Promise<Map<string, Player>> {
+  const map = new Map<string, Player>();
+  const unique = [...new Set(ids.filter(Boolean))];
+  for (let i = 0; i < unique.length; i += PLAYERS_ID_QUERY_CHUNK) {
+    const chunk = unique.slice(i, i + PLAYERS_ID_QUERY_CHUNK);
+    const { data, error } = await supabase.from('players').select('*').in('id', chunk);
+    if (error) {
+      console.warn('⚠️ getPlayersByIdsInBatches: батч не удался, по одному id:', error);
+      for (const id of chunk) {
+        const p = await getPlayerById(id);
+        if (p) map.set(id, p);
+      }
+      continue;
+    }
+    for (const row of data || []) {
+      const p = convertSupabaseToPlayer(row as SupabasePlayer);
+      map.set(p.id, p);
+      playersMemoryCache.set(p.id, { player: p, timestamp: Date.now() });
+    }
+  }
+  return map;
+}
 
 // Очистка memory кэша игрока (вызывается при обновлении)
 export const clearPlayerMemoryCache = (playerId?: string) => {
@@ -2425,57 +2457,344 @@ export const sendMessage = async (message: Omit<Message, 'id' | 'timestamp'>): P
   }
 };
 
-// Получение сообщений между двумя пользователями
-export const getMessages = async (userId1: string, userId2: string): Promise<Message[]> => {
-  try {
-    // ВАЖНО: Всегда загружаем свежие данные из БД (без кеширования)
-    // Это гарантирует, что при открытии чата видны все новые сообщения
+/** PostgREST/Supabase по умолчанию отдаёт не больше ~1000 строк за один select — без пагинации теряются новые сообщения. */
+const MESSAGE_PAGE_SIZE = 1000;
+
+/** Размер пачки для экрана «Сообщения» (список диалогов): плавная подгрузка мелкими шагами. */
+export const INBOX_LIST_BATCH_SIZE = 20;
+
+function mapDbMessageRowToMessage(msg: any): Message {
+  let text = msg.text;
+  let replyToId: string | undefined;
+  let replyToText: string | undefined;
+  let replyToSenderId: string | undefined;
+
+  const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
+  if (replyDataMatch) {
+    try {
+      const replyData = JSON.parse(replyDataMatch[1]);
+      if (replyData.replyTo) {
+        replyToId = replyData.replyTo.id;
+        replyToText = replyData.replyTo.text;
+        replyToSenderId = replyData.replyTo.senderId;
+        text = replyDataMatch[2];
+      }
+    } catch (e) {
+      console.error('Ошибка парсинга replyTo данных:', e);
+    }
+  }
+
+  return {
+    id: msg.id,
+    senderId: msg.sender_id,
+    receiverId: msg.receiver_id,
+    text,
+    timestamp: new Date(msg.created_at),
+    read: msg.read,
+    replyToId,
+    replyToText,
+    replyToSenderId
+  };
+}
+
+async function fetchAllMessagesBetweenUsers(userId1: string, userId2: string): Promise<any[]> {
+  const all: any[] = [];
+  let offset = 0;
+  const pairOr = `and(sender_id.eq.${userId1},receiver_id.eq.${userId2}),and(sender_id.eq.${userId2},receiver_id.eq.${userId1})`;
+
+  while (true) {
     const { data, error } = await supabase
       .from('messages')
       .select('*')
-      .or(`and(sender_id.eq.${userId1},receiver_id.eq.${userId2}),and(sender_id.eq.${userId2},receiver_id.eq.${userId1})`)
-      .order('created_at', { ascending: true });
-    
+      .or(pairOr)
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + MESSAGE_PAGE_SIZE - 1);
+
     if (error) {
       console.error('❌ Ошибка получения сообщений:', error);
       return [];
     }
-    
-    return (data || []).map(msg => {
-      // Парсим информацию об ответе из текста сообщения
-      let text = msg.text;
-      let replyToId: string | undefined;
-      let replyToText: string | undefined;
-      let replyToSenderId: string | undefined;
-      
-      // Проверяем, есть ли в начале текста метаданные об ответе
-      const replyDataMatch = text.match(/^\[REPLY_DATA:(.+?)\](.*)$/);
-      if (replyDataMatch) {
-        try {
-          const replyData = JSON.parse(replyDataMatch[1]);
-          if (replyData.replyTo) {
-            replyToId = replyData.replyTo.id;
-            replyToText = replyData.replyTo.text;
-            replyToSenderId = replyData.replyTo.senderId;
-            text = replyDataMatch[2]; // Убираем метаданные из текста
-          }
-        } catch (e) {
-          console.error('Ошибка парсинга replyTo данных:', e);
-        }
-      }
-      
-      return {
-        id: msg.id,
-        senderId: msg.sender_id,
-        receiverId: msg.receiver_id,
-        text: text,
-        timestamp: new Date(msg.created_at),
-        read: msg.read,
-        replyToId,
-        replyToText,
-        replyToSenderId
-      };
+    if (!data?.length) break;
+    all.push(...data);
+    if (data.length < MESSAGE_PAGE_SIZE) break;
+    offset += MESSAGE_PAGE_SIZE;
+  }
+  return all;
+}
+
+async function fetchAllMessagesInvolvingUserFallback(userId: string): Promise<{ data: any[]; error: any }> {
+  const fetchSide = async (column: 'sender_id' | 'receiver_id') => {
+    const rows: any[] = [];
+    let offset = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq(column, userId)
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
+        .range(offset, offset + MESSAGE_PAGE_SIZE - 1);
+      if (error) return { rows, error };
+      if (!data?.length) break;
+      rows.push(...data);
+      if (data.length < MESSAGE_PAGE_SIZE) break;
+      offset += MESSAGE_PAGE_SIZE;
+    }
+    return { rows, error: null as any };
+  };
+
+  const sent = await fetchSide('sender_id');
+  if (sent.error) return { data: [], error: sent.error };
+  const received = await fetchSide('receiver_id');
+  if (received.error) return { data: [], error: received.error };
+
+  const byId = new Map<string, any>();
+  for (const m of sent.rows) byId.set(m.id, m);
+  for (const m of received.rows) byId.set(m.id, m);
+  const merged = Array.from(byId.values());
+  merged.sort((a, b) => {
+    const t = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (t !== 0) return t;
+    return String(a.id).localeCompare(String(b.id));
+  });
+  return { data: merged, error: null };
+}
+
+async function fetchAllMessagesInvolvingUser(userId: string): Promise<{ data: any[]; error: any }> {
+  const all: any[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + MESSAGE_PAGE_SIZE - 1);
+
+    if (error) {
+      console.error('❌ Ошибка с .or() запросом:', error);
+      console.warn('⚠️ Пробуем два отдельных запроса...');
+      return fetchAllMessagesInvolvingUserFallback(userId);
+    }
+    if (!data?.length) break;
+    all.push(...data);
+    if (data.length < MESSAGE_PAGE_SIZE) break;
+    offset += MESSAGE_PAGE_SIZE;
+  }
+
+  return { data: all, error: null };
+}
+
+/** Слияние сырых строк messages в карту диалогов (без дубликатов id). */
+export function mergeRawMessageRowsIntoConversations(
+  userId: string,
+  existing: Record<string, Message[]>,
+  rawRows: any[]
+): Record<string, Message[]> {
+  const next: Record<string, Message[]> = {};
+  for (const k of Object.keys(existing)) {
+    next[k] = existing[k].map(m => ({ ...m, timestamp: new Date(m.timestamp) }));
+  }
+  const seenByPeer = new Map<string, Set<string>>();
+  for (const k of Object.keys(next)) {
+    seenByPeer.set(k, new Set(next[k].map(m => m.id)));
+  }
+
+  for (const msg of rawRows) {
+    const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+    if (!next[otherUserId]) {
+      next[otherUserId] = [];
+      seenByPeer.set(otherUserId, new Set());
+    }
+    const seen = seenByPeer.get(otherUserId)!;
+    if (seen.has(msg.id)) continue;
+    seen.add(msg.id);
+    next[otherUserId].push({
+      id: msg.id,
+      senderId: msg.sender_id,
+      receiverId: msg.receiver_id,
+      text: msg.text,
+      timestamp: new Date(msg.created_at),
+      read: msg.read
     });
+  }
+
+  for (const k of Object.keys(next)) {
+    next[k].sort((a, b) => {
+      const t = a.timestamp.getTime() - b.timestamp.getTime();
+      if (t !== 0) return t;
+      return a.id.localeCompare(b.id);
+    });
+  }
+  return next;
+}
+
+/**
+ * Сколько сообщений из сырой страницы ещё не было в аккумуляторе.
+ * Если 0 при непустой странице — сервер отдал те же id (часто сломанный курсор: неверный тип id в RPC).
+ */
+export function countNewRawMessageIdsInBatch(
+  existing: Record<string, Message[]>,
+  rawRows: any[]
+): number {
+  const known = new Set<string>();
+  for (const msgs of Object.values(existing)) {
+    for (const m of msgs) known.add(String(m.id));
+  }
+  let n = 0;
+  for (const r of rawRows) {
+    const id = r?.id != null ? String(r.id) : '';
+    if (id && !known.has(id)) n++;
+  }
+  return n;
+}
+
+/** Курсор для списка диалогов (без OFFSET — он ломается на глубоких страницах). */
+export type MessagesInboxCursor = { created_at: string; id: string };
+
+export type InboxMessagesPageState =
+  | { mode: 'cursor'; cursor: MessagesInboxCursor | null }
+  | { mode: 'offset'; pageIndex: number };
+
+/** Только для логов: раньше переключали весь клиент на OFFSET — это ломало глубокую подгрузку после появления RPC. */
+let inboxRpcWasMissingLogged = false;
+
+/*
+ * SQL для Supabase (обязательно для больших аккаунтов): создайте функцию fetch_inbox_messages_page.
+ * ВАЖНО: тип p_cursor_id должен совпадать с messages.id (uuid или bigint). Иначе курсор «не двигается»
+ * и клиент получает одну и ту же страницу — спиннер крутится, число диалогов не растёт.
+ *
+ * Вариант, если messages.id — uuid:
+ *
+CREATE OR REPLACE FUNCTION public.fetch_inbox_messages_page(
+  p_user_id uuid, p_cursor_created_at timestamptz, p_cursor_id uuid, p_limit int
+) RETURNS SETOF public.messages LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public AS $$
+  SELECT m.* FROM public.messages m
+  WHERE (m.sender_id = p_user_id OR m.receiver_id = p_user_id)
+    AND (p_cursor_created_at IS NULL OR m.created_at < p_cursor_created_at
+      OR (m.created_at = p_cursor_created_at AND m.id < p_cursor_id))
+  ORDER BY m.created_at DESC, m.id DESC
+  LIMIT LEAST(GREATEST(COALESCE(p_limit, 1000), 1), 1000);
+$$;
+GRANT EXECUTE ON FUNCTION public.fetch_inbox_messages_page(uuid,timestamptz,uuid,int) TO anon, authenticated;
+ *
+ * Если messages.id — bigint, замените последний параметр и сравнение, например:
+ *   p_cursor_id bigint, и в WHERE то же условие: m.id < p_cursor_id
+ */
+
+function isInboxRpcMissingError(error: any): boolean {
+  const msg = (error?.message || '').toString();
+  const code = error?.code;
+  return code === 'PGRST202' || code === '42883' || /could not find.*function/i.test(msg);
+}
+
+function inboxRowToCursor(row: any): MessagesInboxCursor {
+  const ca = row?.created_at;
+  const created_at =
+    typeof ca === 'string'
+      ? ca
+      : ca instanceof Date
+        ? ca.toISOString()
+        : new Date(ca).toISOString();
+  return { created_at, id: String(row.id) };
+}
+
+/** Запрашиваем на 1 строку больше, чтобы не ошибиться с hasMore на границе страницы. */
+function trimInboxPageRows(raw: any[], pageSize: number): { rows: any[]; hasMore: boolean } {
+  const hasMore = raw.length > pageSize;
+  const rows = hasMore ? raw.slice(0, pageSize) : raw;
+  return { rows, hasMore };
+}
+
+async function fetchInboxMessagesPageOffset(
+  userId: string,
+  pageIndex: number,
+  pageSize: number
+): Promise<{ rows: any[]; hasMore: boolean; nextState: InboxMessagesPageState | null; error: any }> {
+  const offset = pageIndex * pageSize;
+  const to = offset + pageSize;
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .range(offset, to);
+
+  if (error) {
+    console.error('❌ fetchInboxMessagesPageOffset:', error);
+    return { rows: [], hasMore: false, nextState: null, error };
+  }
+  const raw = data || [];
+  const { rows, hasMore } = trimInboxPageRows(raw, pageSize);
+  return {
+    rows,
+    hasMore,
+    nextState: hasMore ? { mode: 'offset', pageIndex: pageIndex + 1 } : null,
+    error: null
+  };
+}
+
+/**
+ * Страница сообщений для экрана «Сообщения» (новые → старые).
+ * Предпочтительно RPC `fetch_inbox_messages_page` (курсор); иначе OFFSET (хуже на больших объёмах).
+ */
+export async function fetchInboxMessagesPage(
+  userId: string,
+  state: InboxMessagesPageState,
+  batchSize: number = INBOX_LIST_BATCH_SIZE
+): Promise<{
+  rows: any[];
+  hasMore: boolean;
+  nextState: InboxMessagesPageState | null;
+  error: any;
+}> {
+  const limit = Math.max(1, Math.min(1000, batchSize));
+
+  if (state.mode === 'offset') {
+    return fetchInboxMessagesPageOffset(userId, state.pageIndex, limit);
+  }
+
+  const cursor = state.cursor;
+  const requestLimit = Math.min(limit + 1, 1000);
+  const { data, error } = await supabase.rpc('fetch_inbox_messages_page', {
+    p_user_id: userId,
+    p_cursor_created_at: cursor?.created_at ?? null,
+    p_cursor_id: cursor?.id != null && cursor.id !== '' ? cursor.id : null,
+    p_limit: requestLimit
+  });
+
+  if (error) {
+    if (isInboxRpcMissingError(error)) {
+      if (!inboxRpcWasMissingLogged) {
+        inboxRpcWasMissingLogged = true;
+        console.warn(
+          '⚠️ fetch_inbox_messages_page недоступна — временный fallback OFFSET (только с первой страницы). Добавьте функцию в БД (см. комментарий в playerStorage).'
+        );
+      }
+      return fetchInboxMessagesPageOffset(userId, 0, limit);
+    }
+    console.error('❌ fetchInboxMessagesPage RPC:', error);
+    return { rows: [], hasMore: false, nextState: null, error };
+  }
+
+  const raw = (data || []) as any[];
+  const { rows, hasMore } = trimInboxPageRows(raw, limit);
+  const last = rows[rows.length - 1];
+  const nextState: InboxMessagesPageState | null =
+    hasMore && last ? { mode: 'cursor', cursor: inboxRowToCursor(last) } : null;
+
+  return { rows, hasMore, nextState, error: null };
+}
+
+// Получение сообщений между двумя пользователями
+export const getMessages = async (userId1: string, userId2: string): Promise<Message[]> => {
+  try {
+    const rows = await fetchAllMessagesBetweenUsers(userId1, userId2);
+    return rows.map(mapDbMessageRowToMessage);
   } catch (error) {
     console.error('❌ Ошибка получения сообщений:', error);
     return [];
@@ -2487,7 +2806,11 @@ export const getConversation = async (userId1: string, userId2: string): Promise
   try {
     console.log(`📨 getConversation: загружаем диалог между ${userId1} и ${userId2}`);
     const messages = await getMessages(userId1, userId2);
-    const sorted = messages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const sorted = messages.sort((a, b) => {
+      const t = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      if (t !== 0) return t;
+      return a.id.localeCompare(b.id);
+    });
     console.log(`✅ getConversation: получено ${sorted.length} сообщений`);
     return sorted;
   } catch (error) {
@@ -2645,68 +2968,17 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string): P
 export const getUserConversations = async (userId: string): Promise<Record<string, Message[]>> => {
   try {
     console.log(`📨 getUserConversations: загружаем диалоги для пользователя ${userId}...`);
-    
-    // Пробуем два подхода: сначала с .or(), если не работает - два отдельных запроса
-    let data: any[] = [];
-    let error: any = null;
-    
-    // Подход 1: Используем .or() запрос
-    const { data: orData, error: orError } = await supabase
-      .from('messages')
-      .select('*')
-      .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-      .order('created_at', { ascending: true });
-    
-    if (orError) {
-      console.error('❌ Ошибка с .or() запросом:', orError);
-      console.error('❌ Детали ошибки:', JSON.stringify(orError, null, 2));
-      console.warn('⚠️ Пробуем два отдельных запроса...');
-      
-      // Подход 2: Два отдельных запроса
-      const [sentResult, receivedResult] = await Promise.all([
-        supabase
-          .from('messages')
-          .select('*')
-          .eq('sender_id', userId)
-          .order('created_at', { ascending: true }),
-        supabase
-          .from('messages')
-          .select('*')
-          .eq('receiver_id', userId)
-          .order('created_at', { ascending: true })
-      ]);
-      
-      if (sentResult.error) {
-        console.error('❌ Ошибка получения отправленных сообщений:', sentResult.error);
-      }
-      if (receivedResult.error) {
-        console.error('❌ Ошибка получения полученных сообщений:', receivedResult.error);
-      }
-      
-      // Объединяем результаты и убираем дубликаты по id
-      const sentMessages = sentResult.data || [];
-      const receivedMessages = receivedResult.data || [];
-      const messageMap = new Map();
-      
-      [...sentMessages, ...receivedMessages].forEach(msg => {
-        if (!messageMap.has(msg.id)) {
-          messageMap.set(msg.id, msg);
-        }
-      });
-      
-      data = Array.from(messageMap.values());
-      error = sentResult.error || receivedResult.error;
-    } else {
-      data = orData || [];
-      error = orError;
-    }
-    
+
+    const { data: rows, error } = await fetchAllMessagesInvolvingUser(userId);
+
     if (error) {
       console.error('❌ Ошибка получения диалогов:', error);
       console.error('❌ Детали ошибки:', JSON.stringify(error, null, 2));
       return {};
     }
-    
+
+    const data = rows || [];
+
     console.log(`✅ getUserConversations: получено ${data.length} сообщений из БД`);
     
     // Группируем сообщения по собеседникам
@@ -6178,6 +6450,13 @@ export const notifyFriendsAboutChanges = async (
             body = `${playerName} ${userTranslations?.statsNotification?.updated || 'updated'}`;
         }
         
+          let profileDeepLink = `/player/${playerId}`;
+          if (notificationType === 'normative_changed') {
+            profileDeepLink = `/player/${playerId}?scrollToNormatives=true`;
+          } else if (notificationType === 'stats_change') {
+            profileDeepLink = `/player/${playerId}?scrollToStats=true`;
+          }
+
           const pushResult = await sendNotificationToUser(
           userId,
           title,
@@ -6186,7 +6465,7 @@ export const notifyFriendsAboutChanges = async (
             type: notificationType,
             player_id: playerId,
             action: 'open_profile',
-            deepLink: `/player/${playerId}`
+            deepLink: profileDeepLink
           }
         );
           
@@ -6898,7 +7177,12 @@ export const notifyFriendsAboutGameFirstPlace = async (playerId: string, playerN
       const title = tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        await sendNotificationToUser(friend.id, '🏆 ' + title, `${playerName} ${reached}`, { type: 'game_first_place', player_id: playerId, action: 'open_player' });
+        await sendNotificationToUser(friend.id, '🏆 ' + title, `${playerName} ${reached}`, {
+          type: 'game_first_place',
+          player_id: playerId,
+          action: 'open_game_results',
+          deepLink: '/?openGameResults=true',
+        });
         await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
       } catch (e) {
         console.error('⚠️ Ошибка push/game_first_place:', e);

@@ -2271,6 +2271,9 @@ const styles = StyleSheet.create({
   },
   forwardedMessageContent: {
     flexDirection: 'column',
+    alignSelf: 'stretch',
+    width: '100%',
+    minWidth: 0,
   },
   forwardedHeader: {
     flexDirection: 'row',
