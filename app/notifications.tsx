@@ -49,6 +49,7 @@ import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
 import { preloadPlayerAvatars } from '../utils/AvatarCache';
 import CachedBackground from '../components/CachedBackground';
+import { platformCardShadow } from '../utils/androidShadow';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../assets/images/led.jpg');
@@ -2073,14 +2074,13 @@ const styles = StyleSheet.create({
   },
   emptyGradientShadow: {
     borderRadius: 15,
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.5,
+      shadowRadius: 8,
+      elevation: 8,
+    }),
   },
   emptyTitle: {
     color: '#FFFFFF', // Изменили с #fff на #FFFFFF (белый)
@@ -2115,14 +2115,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 20,
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   notificationIcon: {
     width: 40,
@@ -2240,14 +2239,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.3)',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   friendRequestActions: {
     flexDirection: 'row',
@@ -2268,14 +2266,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderWidth: 1,
     borderColor: '#4CAF50',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    }),
   },
   acceptButtonText: {
     color: '#fff',
@@ -2287,14 +2284,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    }),
   },
   declineButtonText: {
     color: '#fff',
@@ -2361,14 +2357,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#fa2f40',
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    }),
   },
   superActionButtonText: {
     color: '#fff',

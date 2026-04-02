@@ -26,6 +26,7 @@ import { useUser } from '../contexts/UserContext';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import CachedBackground from '../components/CachedBackground';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
+import { platformCardShadow } from '../utils/androidShadow';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -1672,14 +1673,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 20,
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   playerPhotoContainer: {
     width: 60,
@@ -1776,14 +1776,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 6,
+      elevation: 8,
+    }),
   },
   sendMessageButtonText: {
     color: '#fff',

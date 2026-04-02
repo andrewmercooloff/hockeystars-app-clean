@@ -18,6 +18,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useExercises } from '../hooks/useExercises';
 import { LocalizedExercise, Language } from '../types/exercise';
+import { platformCardShadow } from '../utils/androidShadow';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -565,14 +566,13 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     marginHorizontal: 16,
     borderRadius: 20,
-    shadowColor: 'rgb(1,0,0)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
+    ...platformCardShadow({
+      shadowColor: 'rgb(1,0,0)',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 5,
+      elevation: 8,
+    }),
   },
   exerciseHeader: {
     flexDirection: 'row',
