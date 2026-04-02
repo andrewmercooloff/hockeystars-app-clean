@@ -1,7 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
-    ActivityIndicator,
     Alert,
     FlatList, 
     ImageBackground,
@@ -610,6 +609,16 @@ interface GiftRequestItem {
   requestMessage: string;
 }
 
+/** Кеш списка на время сессии JS — без задержки при повторном заходе (аналогично сообщениям с уже загруженными чатами). */
+type NotificationsListSessionCache = {
+  userId: string;
+  notifications: NotificationItem[];
+  friendRequests: FriendRequestItem[];
+  giftRequests: GiftRequestItem[];
+};
+
+let notificationsListSessionCache: NotificationsListSessionCache | null = null;
+
 export default function NotificationsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -631,14 +640,60 @@ export default function NotificationsScreen() {
 
   /** Первый заход на экран для данного userId — isInitialLoad; повторный фокус — обновление с анимацией новых */
   const notificationsInitialLoadDoneForUserRef = React.useRef<string | null>(null);
+  /** Актуальные размеры списков без лишних deps у useFocusEffect (иначе повторные запросы при каждом обновлении). */
+  const listCountsRef = React.useRef({ n: 0, f: 0, g: 0 });
+  listCountsRef.current = {
+    n: notifications.length,
+    f: friendRequests.length,
+    g: giftRequests.length,
+  };
 
   useLayoutEffect(() => {
+    const id = currentUser?.id;
+    if (!id) {
+      notificationsInitialLoadDoneForUserRef.current = null;
+      notificationsListSessionCache = null;
+      setListReady(false);
+      setNotifications([]);
+      setFriendRequests([]);
+      setGiftRequests([]);
+      return;
+    }
+
+    if (
+      notificationsListSessionCache &&
+      notificationsListSessionCache.userId === id
+    ) {
+      setNotifications(notificationsListSessionCache.notifications);
+      setFriendRequests(notificationsListSessionCache.friendRequests);
+      setGiftRequests(notificationsListSessionCache.giftRequests);
+      setListReady(true);
+      setNewNotificationIds(new Set());
+      notificationsInitialLoadDoneForUserRef.current = id;
+      return;
+    }
+
     notificationsInitialLoadDoneForUserRef.current = null;
     setListReady(false);
     setNotifications([]);
     setFriendRequests([]);
     setGiftRequests([]);
   }, [currentUser?.id]);
+
+  useEffect(() => {
+    const id = currentUser?.id;
+    if (!id) {
+      notificationsListSessionCache = null;
+      return;
+    }
+    if (!listReady) return;
+    notificationsListSessionCache = {
+      userId: id,
+      notifications: notifications.map(n => ({ ...n })),
+      friendRequests: friendRequests.map(r => ({ ...r })),
+      giftRequests: giftRequests.map(g => ({ ...g })),
+    };
+  }, [currentUser?.id, listReady, notifications, friendRequests, giftRequests]);
 
   // Категории фильтров и типы уведомлений, которые в них входят
   const FILTER_TYPES: Record<string, string[]> = {
@@ -899,12 +954,15 @@ export default function NotificationsScreen() {
       setIsScreenFocused(true);
       
       if (currentUser && !isUserLoading) {
+        const { n, f, g } = listCountsRef.current;
+        const hasCachedLists = n > 0 || f > 0 || g > 0;
         const isInitial =
           notificationsInitialLoadDoneForUserRef.current !== currentUser.id;
         if (isInitial) {
           notificationsInitialLoadDoneForUserRef.current = currentUser.id;
         }
-        loadNotificationsData(isInitial);
+        // Уже есть данные (кеш сессии) — обновляем в фоне без пустого «Загрузка»
+        void loadNotificationsData(hasCachedLists ? false : isInitial);
       }
       
       return () => {
@@ -1807,7 +1865,7 @@ export default function NotificationsScreen() {
               !listReady
                 ? () => (
                     <View style={[styles.emptyContainer, styles.listLoadingInline]}>
-                      <ActivityIndicator size="large" color="#fa2f40" />
+                      <Text style={styles.loadingText}>{t('common.loading')}</Text>
                     </View>
                   )
                 : () => (
