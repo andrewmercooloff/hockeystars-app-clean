@@ -112,7 +112,34 @@ export async function getUserLanguages(userIds: string[]): Promise<Map<string, s
   }
 }
 
+/** Интерполяция `{name}` / `{{name}}` как в LanguageContext.t */
+export function interpolateTemplate(template: string, params?: Record<string, any>): string {
+  if (!params) return template;
+  let value = template;
+  value = value.replace(/\{\{(\w+)\}\}/g, (_, paramKey) =>
+    params[paramKey] !== undefined ? String(params[paramKey]) : _);
+  value = value.replace(/\{(\w+)\}/g, (_, paramKey) =>
+    params[paramKey] !== undefined ? String(params[paramKey]) : _);
+  return value;
+}
 
+/** Текст жалобы на языке получателя (админа). */
+export function localizedAdminReportText(
+  language: string,
+  key: 'reportNotification' | 'reportChatNotification',
+  params: { reporterName: string; reportedName: string }
+): string {
+  const tr = loadTranslations(language);
+  let raw = tr?.admin?.[key];
+  if (typeof raw !== 'string') {
+    const enTr = loadTranslations('en');
+    raw = enTr?.admin?.[key];
+  }
+  if (typeof raw !== 'string') {
+    return `${params.reporterName} → ${params.reportedName}`;
+  }
+  return interpolateTemplate(raw, params);
+}
 
 
 

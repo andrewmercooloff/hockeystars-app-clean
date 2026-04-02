@@ -845,31 +845,36 @@ export default function ChatScreen() {
       };
 
       const timestamp = new Date().toISOString();
-      const notificationMessage =
-        t('admin.reportChatNotification', {
-          reporterName: currentUser.name,
-          reportedName: otherPlayer.name,
-        }) || `${currentUser.name} пожаловался на чат с ${otherPlayer.name}`;
 
-      const notifications = admins.map(admin => ({
-        id: generateUUID(),
-        user_id: admin.id,
-        type: 'user_report',
-        title: notificationMessage,
-        message: notificationMessage,
-        data: {
-          reporterId: currentUser.id,
+      const { getUserLanguages, localizedAdminReportText } = await import('../../utils/languageHelper');
+      const adminLangMap = await getUserLanguages(adminIds);
+
+      const notifications = admins.map(admin => {
+        const adminLang = adminLangMap.get(admin.id) || 'en';
+        const reportText = localizedAdminReportText(adminLang, 'reportChatNotification', {
           reporterName: currentUser.name,
-          reporterAvatar: currentUser.avatar,
-          reportedId: otherPlayer.id,
           reportedName: otherPlayer.name,
-          reportedAvatar: otherPlayer.avatar,
-          context: 'chat',
-          timestamp,
-        },
-        created_at: timestamp,
-        is_read: false,
-      }));
+        });
+        return {
+          id: generateUUID(),
+          user_id: admin.id,
+          type: 'user_report',
+          title: reportText,
+          message: reportText,
+          data: {
+            reporterId: currentUser.id,
+            reporterName: currentUser.name,
+            reporterAvatar: currentUser.avatar,
+            reportedId: otherPlayer.id,
+            reportedName: otherPlayer.name,
+            reportedAvatar: otherPlayer.avatar,
+            context: 'chat',
+            timestamp,
+          },
+          created_at: timestamp,
+          is_read: false,
+        };
+      });
 
       if (notifications.length > 0) {
         const { error: notificationError } = await supabase
@@ -887,9 +892,14 @@ export default function ChatScreen() {
           if (adminTokens && adminTokens.length > 0) {
             try {
               const { sendNotificationToUser } = await import('../../utils/notificationService');
+              const adminLang = adminLangMap.get(admin.id) || 'en';
+              const pushText = localizedAdminReportText(adminLang, 'reportChatNotification', {
+                reporterName: currentUser.name,
+                reportedName: otherPlayer.name,
+              });
               await sendNotificationToUser(
                 admin.id,
-                notificationMessage,
+                pushText,
                 '',
                 {
                   type: 'user_report',

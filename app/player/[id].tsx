@@ -2305,18 +2305,21 @@ export default function PlayerProfile() {
         });
       };
 
-      const notifications = admins.map(admin => ({
+      const { getUserLanguages, localizedAdminReportText } = await import('../../utils/languageHelper');
+      const adminLangMap = await getUserLanguages(adminIds);
+
+      const notifications = admins.map(admin => {
+        const adminLang = adminLangMap.get(admin.id) || 'en';
+        const reportText = localizedAdminReportText(adminLang, 'reportNotification', {
+          reporterName: currentUser.name,
+          reportedName: player.name,
+        });
+        return {
         id: generateUUID(),
         user_id: admin.id,
         type: 'user_report',
-        title: t('admin.reportNotification', { 
-          reporterName: currentUser.name, 
-          reportedName: player.name 
-        }) || `${currentUser.name} пожаловался на ${player.name}`,
-        message: t('admin.reportNotification', { 
-          reporterName: currentUser.name, 
-          reportedName: player.name 
-        }) || `${currentUser.name} пожаловался на ${player.name}`,
+        title: reportText,
+        message: reportText,
         data: {
           reporterId: currentUser.id,
           reporterName: currentUser.name,
@@ -2328,7 +2331,8 @@ export default function PlayerProfile() {
         },
         created_at: new Date().toISOString(),
         is_read: false
-      }));
+      };
+      });
 
       if (notifications.length > 0) {
         const { error: notificationError } = await supabase
@@ -2343,12 +2347,14 @@ export default function PlayerProfile() {
             if (adminTokens && adminTokens.length > 0) {
               try {
                 const { sendNotificationToUser } = await import('../../utils/notificationService');
+                const adminLang = adminLangMap.get(admin.id) || 'en';
+                const pushText = localizedAdminReportText(adminLang, 'reportNotification', {
+                  reporterName: currentUser.name,
+                  reportedName: player.name,
+                });
                 await sendNotificationToUser(
                   admin.id,
-                  t('admin.reportNotification', { 
-                    reporterName: currentUser.name, 
-                    reportedName: player.name 
-                  }) || `${currentUser.name} пожаловался на ${player.name}`,
+                  pushText,
                   '',
                   {
                     type: 'user_report',

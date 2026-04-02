@@ -7202,7 +7202,8 @@ export const sendGiftNotification = async (
   playerName: string,
   senderName: string,
   giftName: string,
-  translations?: {
+  /** @deprecated Игнорируется: раньше сюда передавали t() отправителя и ломали язык получателя. */
+  _translations?: {
     giftReceived: string;
     giftReceivedMessage: string;
     giftReceivedPushTitle: string;
@@ -7212,43 +7213,24 @@ export const sendGiftNotification = async (
   senderAvatar?: string | null
 ): Promise<void> => {
   try {
-    // ВАЖНО: Получаем язык получателя из БД
-    const { getUserLanguage } = await import('./languageHelper');
+    const { getUserLanguage, loadTranslations } = await import('./languageHelper');
     const userLanguage = await getUserLanguage(playerId);
-    
-    // Загружаем переводы
-    let giftNotificationTranslations: any = null;
-    try {
-      const translationsMap: any = {
-        ru: require('../locales/ru.json'),
-        en: require('../locales/en.json'),
-        lt: require('../locales/lt.json'),
-        lv: require('../locales/lv.json'),
-        pl: require('../locales/pl.json'),
-        sv: require('../locales/sv.json'),
-        cs: require('../locales/cs.json'),
-        sk: require('../locales/sk.json'),
-        fi: require('../locales/fi.json'),
-        it: require('../locales/it.json'),
-        de: require('../locales/de.json'),
-        fr: require('../locales/fr.json'),
-      };
-      giftNotificationTranslations = translationsMap[userLanguage]?.giftNotification || translationsMap.en?.giftNotification;
-    } catch (translationError) {
-      // Используем английский fallback
-    }
-    
-    // Используем локализованные тексты или переданные translations, или fallback на русский/английский
-    const title = translations?.giftReceived || giftNotificationTranslations?.title || (userLanguage === 'ru' ? 'Подарок получен!' : 'Gift received!');
-    const message = translations?.giftReceivedMessage || 
-      (giftNotificationTranslations?.message 
-        ? giftNotificationTranslations.message.replace('{playerName}', 'Вы').replace('{giftName}', giftName).replace('{starName}', senderName)
-        : userLanguage === 'ru' ? `Вы получили подарок от ${senderName}: ${giftName}` : `You received a gift from ${senderName}: ${giftName}`);
-    const pushTitle = translations?.giftReceivedPushTitle || `🎁 ${giftNotificationTranslations?.title || (userLanguage === 'ru' ? 'Подарок получен!' : 'Gift received!')}`;
-    const pushBody = translations?.giftReceivedPushBody || 
-      (giftNotificationTranslations?.message 
-        ? giftNotificationTranslations.message.replace('{playerName}', 'Вы').replace('{giftName}', giftName).replace('{starName}', senderName)
-        : userLanguage === 'ru' ? `Вы получили подарок от ${senderName}: ${giftName}` : `You received a gift from ${senderName}: ${giftName}`);
+    const tr = loadTranslations(userLanguage);
+    const giftNotificationTranslations = tr?.giftNotification;
+
+    const title =
+      giftNotificationTranslations?.title ||
+      (userLanguage === 'ru' ? 'Подарок получен!' : 'Gift received!');
+    const message = giftNotificationTranslations?.message
+      ? giftNotificationTranslations.message
+          .replace(/\{playerName\}/g, playerName)
+          .replace(/\{giftName\}/g, giftName)
+          .replace(/\{starName\}/g, senderName)
+      : userLanguage === 'ru'
+        ? `Вы получили подарок от ${senderName}: ${giftName}`
+        : `You received a gift from ${senderName}: ${giftName}`;
+    const pushTitle = `🎁 ${title}`;
+    const pushBody = message;
     
     console.log('🎁 NOTIFICATIONS: Отправка уведомлений о подарке');
     console.log('🎁 NOTIFICATIONS: player:', playerName, playerId);

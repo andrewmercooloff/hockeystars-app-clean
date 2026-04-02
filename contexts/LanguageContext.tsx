@@ -112,16 +112,38 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       // Сначала проверяем, есть ли сохраненный язык
       const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
 
+      let resolvedForProfile: Language = 'en';
+
       if (savedLanguage && supportedLanguages.includes(savedLanguage as Language)) {
         // Если есть сохраненный язык, используем его
+        resolvedForProfile = savedLanguage as Language;
         setLanguageState(savedLanguage as Language);
       } else {
         // Если нет сохраненного языка, определяем язык устройства
         const deviceLanguage = getDeviceLanguage();
+        resolvedForProfile = deviceLanguage;
         setLanguageState(deviceLanguage);
 
         // Сохраняем определенный язык для будущих запусков
         await AsyncStorage.setItem('selectedLanguage', deviceLanguage);
+      }
+
+      // Синхронизируем с БД — иначе getUserLanguage() стартует с en/null, а интерфейс уже на ru/en из AsyncStorage
+      try {
+        const { loadCurrentUser } = await import('../utils/playerStorage');
+        const user = await loadCurrentUser();
+        if (user?.id) {
+          const { supabase } = await import('../utils/supabase');
+          const { error } = await supabase
+            .from('players')
+            .update({ language: resolvedForProfile })
+            .eq('id', user.id);
+          if (error) {
+            console.warn('⚠️ Не удалось синхронизировать язык в профиль игрока:', error);
+          }
+        }
+      } catch (syncErr) {
+        console.warn('⚠️ Пропуск синхронизации языка в БД при старте:', syncErr);
       }
     } catch (error) {
       console.warn('❌ Ошибка загрузки языка:', error);
