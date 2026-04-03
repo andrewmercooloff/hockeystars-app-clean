@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck from '../components/Puck';
 import { useUser } from '../contexts/UserContext';
 import { useScreenContext } from '../contexts/ScreenContext';
-import { Player, loadPlayers, getSmartPlayerSelection, getBlockedUsers } from '../utils/playerStorage';
+import { Player, loadPlayers, getSmartPlayerSelection, getBlockedUsers, ALL_PLAYERS_LIST_CACHE_KEYS } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -2610,8 +2610,8 @@ export default function HomeScreen() {
           
           // Очищаем кеш всех игроков
           const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-          await AsyncStorage.removeItem('all_players').catch(err => {
-            console.error('❌ Ошибка очистки кеша all_players:', err);
+          await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(err => {
+            console.error('❌ Ошибка очистки кеша списка игроков:', err);
           });
           
           // ИСПРАВЛЕНИЕ: Если игрок не скрыт, загружаем его с принудительным обновлением
@@ -2666,8 +2666,8 @@ export default function HomeScreen() {
             
             // Очищаем кеш всех игроков для главного экрана при изменении is_hidden
             const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-            AsyncStorage.removeItem('all_players').catch(err => {
-              console.error('❌ Ошибка очистки кеша all_players:', err);
+            AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(err => {
+              console.error('❌ Ошибка очистки кеша списка игроков:', err);
             });
             
             // Обновляем конкретного игрока в массиве players
@@ -2723,8 +2723,8 @@ export default function HomeScreen() {
             
             // Очищаем кеш всех игроков
             const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-            AsyncStorage.removeItem('all_players').catch(err => {
-              console.error('❌ Ошибка очистки кеша all_players:', err);
+            AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(err => {
+              console.error('❌ Ошибка очистки кеша списка игроков:', err);
             });
             
             // Удаляем игрока из списка

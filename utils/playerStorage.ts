@@ -11,6 +11,10 @@ let globalUserCache: Player | null = null;
 const playersMemoryCache = new Map<string, { player: Player, timestamp: number }>();
 const teamsMemoryCache = new Map<string, { teams: PlayerTeam[], timestamp: number }>();
 
+/** Кеш списка игроков (loadPlayers). v2 включает player.teams для поиска по командам. */
+export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v2';
+export const ALL_PLAYERS_LIST_CACHE_KEYS: readonly string[] = ['all_players', ALL_PLAYERS_LIST_CACHE_KEY];
+
 // Функция для нормализации позиции игрока (приводит все варианты к стандартным английским ключам)
 export const normalizePosition = (position: string | undefined | null): string | undefined => {
   if (!position) return undefined;
@@ -618,6 +622,86 @@ export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | nul
   }
 };
 
+/** Одна выборка player_teams для списка игроков (поиск, фильтр по командам) — без N+1. */
+const batchLoadPlayerTeamsForPlayerIds = async (
+  playerIds: string[]
+): Promise<Map<string, PlayerTeam[]>> => {
+  const byPlayer = new Map<string, PlayerTeam[]>();
+  if (playerIds.length === 0) return byPlayer;
+
+  const CHUNK = 250;
+  const mapRow = (row: any): PlayerTeam => {
+    const teamData = row.teams;
+    return {
+      teamId: row.team_id,
+      teamName: teamData.name,
+      teamNameRu: teamData.name_ru,
+      teamType: teamData.type,
+      teamCountry: teamData.country,
+      teamCity: teamData.city,
+      isPrimary: row.is_primary,
+      joinedDate: row.joined_date,
+      startYear: row.start_year,
+      endYear: row.end_year,
+      teamOrder: row.team_order || 0,
+    };
+  };
+
+  const sortTeams = (teams: PlayerTeam[]) => {
+    teams.sort((a, b) => {
+      if (a.teamOrder !== undefined && b.teamOrder !== undefined) {
+        return a.teamOrder - b.teamOrder;
+      }
+      const dateA = new Date(a.joinedDate || '1970-01-01');
+      const dateB = new Date(b.joinedDate || '1970-01-01');
+      return dateB.getTime() - dateA.getTime();
+    });
+  };
+
+  for (let i = 0; i < playerIds.length; i += CHUNK) {
+    const chunk = playerIds.slice(i, i + CHUNK);
+    const { data, error } = await supabase
+      .from('player_teams')
+      .select(`
+        player_id,
+        team_id,
+        is_primary,
+        joined_date,
+        start_year,
+        end_year,
+        team_order,
+        teams!inner(
+          id,
+          name,
+          name_ru,
+          type,
+          country,
+          city
+        )
+      `)
+      .in('player_id', chunk);
+
+    if (error) {
+      console.error('❌ batchLoadPlayerTeamsForPlayerIds:', error);
+      continue;
+    }
+
+    for (const row of data || []) {
+      const pid = row.player_id as string;
+      if (!pid) continue;
+      const pt = mapRow(row);
+      if (!byPlayer.has(pid)) byPlayer.set(pid, []);
+      byPlayer.get(pid)!.push(pt);
+    }
+  }
+
+  for (const teams of byPlayer.values()) {
+    sortTeams(teams);
+  }
+
+  return byPlayer;
+};
+
 // Получение команд игрока с кешированием
 export const getPlayerTeams = async (playerId: string): Promise<PlayerTeam[]> => {
   try {
@@ -1131,7 +1215,7 @@ export const initializeStorage = async (): Promise<void> => {
 // Загрузка всех игроков
 export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
   try {
-    const cacheKey = 'all_players';
+    const cacheKey = ALL_PLAYERS_LIST_CACHE_KEY;
     const cacheTime = 10 * 60 * 1000; // 10 минут
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     
@@ -1142,7 +1226,7 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
       if (cachedData) {
         const { players, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < cacheTime) {
-          console.log('💾 Загрузили игроков из кеша all_players');
+          console.log('💾 Загрузили игроков из кеша', cacheKey);
           return players;
         }
       }
@@ -1213,10 +1297,16 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
         players.forEach(player => { player.activityRating = 0; });
       }
 
-      // Команды игроков НЕ загружаем здесь — они нужны только при открытии
-      // полного профиля и загружаются там через getPlayerTeamsAsPastTeams.
-      // Это убирает N+1 запросов (500 запросов для 500 игроков).
-      players.forEach(player => { player.teams = player.teams ?? []; });
+      // Команды: один батч-запрос на весь список (фильтр «Команда» в поиске).
+      try {
+        const teamsByPlayer = await batchLoadPlayerTeamsForPlayerIds(players.map(p => p.id));
+        players.forEach(player => {
+          player.teams = teamsByPlayer.get(player.id) ?? [];
+        });
+      } catch (teamsErr) {
+        console.error('❌ Ошибка пакетной загрузки команд:', teamsErr);
+        players.forEach(player => { player.teams = []; });
+      }
       
       // Кешируем результат
       await AsyncStorage.setItem(cacheKey, JSON.stringify({
@@ -1259,7 +1349,9 @@ export const clearAllPlayersCache = async (): Promise<void> => {
   try {
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const keys = await AsyncStorage.getAllKeys();
-    const playerCacheKeys = keys.filter((key: string) => key.startsWith('player_') || key === 'all_players');
+    const playerCacheKeys = keys.filter(
+      (key: string) => key.startsWith('player_') || ALL_PLAYERS_LIST_CACHE_KEYS.includes(key)
+    );
     
     if (playerCacheKeys.length > 0) {
       await AsyncStorage.multiRemove(playerCacheKeys);
@@ -2030,7 +2122,7 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
 
       // Очищаем AsyncStorage кэш всех игроков для главной страницы (чтобы изменения отображались)
       const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-      await AsyncStorage.removeItem('all_players');
+      await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
 
       // НЕ очищаем кеш всех игроков при каждом обновлении
       // await clearAllPlayersCache(); // Закомментировано для лучшей производительности
@@ -2383,7 +2475,7 @@ export const logoutUser = async (skipStatusUpdate: boolean = false): Promise<voi
       'hockeystars_current_user',
       'hockeystars_user_cache',
       'hockeystars_last_user_id',
-      'all_players',
+      ...ALL_PLAYERS_LIST_CACHE_KEYS,
     ]);
     
     // Обновляем глобальный кеш и контекст пользователя
@@ -3572,7 +3664,7 @@ export const deletePlayer = async (playerId: string, isOwnAccount: boolean = fal
           await clearPlayerCache(playerId);
           dataCache.invalidate(CACHE_KEYS.PLAYERS);
           const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-          await AsyncStorage.removeItem('all_players');
+          await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
           await clearAllPlayersCache();
           console.log(`✅ Кеши очищены для удаленного игрока`);
         } catch (cacheError) {
@@ -3661,7 +3753,7 @@ export const deletePlayer = async (playerId: string, isOwnAccount: boolean = fal
 
       // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
       const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-      await AsyncStorage.removeItem('all_players');
+      await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
 
       // Очищаем кэш всех игроков для гарантии
       await clearAllPlayersCache();
@@ -4774,7 +4866,7 @@ export const createPlayer = async (playerData: Player): Promise<Player | null> =
 
     // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    await AsyncStorage.removeItem('all_players');
+    await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
 
     try {
       dataCache.invalidate(CACHE_KEYS.PLAYERS);
@@ -4940,7 +5032,7 @@ export const createPlayerManually = async (playerData: Player, adminId: string):
 
     // Очищаем AsyncStorage кэш всех игроков (используется главной страницей)
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    await AsyncStorage.removeItem('all_players');
+    await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
 
     try {
       dataCache.invalidate(CACHE_KEYS.PLAYERS);

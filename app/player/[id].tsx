@@ -66,7 +66,7 @@ import VideoCarousel from '../../components/VideoCarousel';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
 import { supabase } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -2617,7 +2617,7 @@ export default function PlayerProfile() {
         
         // Очищаем кеш всех игроков для главного экрана, чтобы изменения отображались сразу
         const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-        await AsyncStorage.removeItem('all_players');
+        await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
         
         // Сразу обновляем состояние с новым значением is_hidden
         setPlayer({ ...player, is_hidden: true });
@@ -2663,7 +2663,7 @@ export default function PlayerProfile() {
         
         // Очищаем кеш всех игроков для главного экрана, чтобы изменения отображались сразу
         const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-        await AsyncStorage.removeItem('all_players');
+        await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]);
         
         // Сразу обновляем состояние с новым значением is_hidden
         setPlayer({ ...player, is_hidden: false });
@@ -3794,9 +3794,8 @@ export default function PlayerProfile() {
       
       // ВАЖНО: Очищаем кеш всех игроков ОТЛОЖЕННО, чтобы не вызвать редирект
       // Делаем это после закрытия модального окна с успешным сообщением
-      const allPlayersCacheKey = 'all_players';
       setTimeout(async () => {
-        await AsyncStorage.removeItem(allPlayersCacheKey).catch(error => {
+        await AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(error => {
           console.warn('⚠️ Не удалось очистить кеш всех игроков:', error);
         });
         console.log('✅ handleSave: очищен кеш всех игроков (отложенно)');
