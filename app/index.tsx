@@ -10,7 +10,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck from '../components/Puck';
 import { useUser } from '../contexts/UserContext';
 import { useScreenContext } from '../contexts/ScreenContext';
-import { Player, loadPlayers, getSmartPlayerSelection, getBlockedUsers, ALL_PLAYERS_LIST_CACHE_KEYS } from '../utils/playerStorage';
+import {
+  Player,
+  loadPlayers,
+  getSmartPlayerSelection,
+  getBlockedUsers,
+  ALL_PLAYERS_LIST_CACHE_KEYS,
+  mergePlayerFromPlayersRealtimeRow,
+} from '../utils/playerStorage';
+import { updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -2656,12 +2664,14 @@ export default function HomeScreen() {
         (payload) => {
           const playerData = payload.new as any;
           const oldPlayerData = payload.old as any;
-          const playerId = playerData.id;
+          const playerId = playerData?.id;
+          if (!playerId) return;
+
           const newIsHidden = playerData.is_hidden ?? false;
           const oldIsHidden = oldPlayerData?.is_hidden ?? false;
           
           // Обновляем только если is_hidden действительно изменился
-          if (newIsHidden !== oldIsHidden && playerId) {
+          if (newIsHidden !== oldIsHidden) {
             console.log(`🔄 Realtime: Обновление is_hidden для игрока ${playerId}: ${oldIsHidden} -> ${newIsHidden}`);
             
             // Очищаем кеш всех игроков для главного экрана при изменении is_hidden
@@ -2704,6 +2714,23 @@ export default function HomeScreen() {
               return currentPlayers;
             });
           }
+
+          // Аватар, голы/передачи и т.д. на шайбах: раньше игнорировалось, если is_hidden не менялся
+          setPlayers((currentPlayers) => {
+            const idx = currentPlayers.findIndex(p => p.id === playerId);
+            if (idx === -1) return currentPlayers;
+            const cur = currentPlayers[idx];
+            const merged = mergePlayerFromPlayersRealtimeRow(cur, playerData as Record<string, unknown>);
+            if (!merged) return currentPlayers;
+            if (merged.invalidatePlayersListCache) {
+              const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+              AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+            }
+            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+              void updateAvatarGlobally(playerId, playerData.avatar as string);
+            }
+            return currentPlayers.map((p, i) => (i === idx ? merged.next : p));
+          });
         }
       )
       // Обработка DELETE - удаление игрока

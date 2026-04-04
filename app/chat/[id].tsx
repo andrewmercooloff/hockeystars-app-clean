@@ -146,7 +146,16 @@ export default function ChatScreen() {
   const isBlockedCheckedRef = useRef<boolean>(false); // Флаг проверки блокировки
   const chatDataLoadedRef = useRef<boolean>(false); // Флаг загрузки данных чата
   const touchStartYRef = useRef<number | null>(null); // Позиция начала касания для определения тапа/скролла
+  /** Пока активен — при росте контента (разметка сообщений/картинки) повторно прижимаем к низу */
+  const pinScrollToBottomUntilRef = useRef<number>(0);
 
+  const handleMessagesContentSizeChange = useCallback(() => {
+    if (loading || messages.length === 0) return;
+    if (Date.now() > pinScrollToBottomUntilRef.current) return;
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: false });
+    });
+  }, [loading, messages.length]);
 
   // Функция сохранения черновика (с временем для сортировки)
   const saveDraft = async (chatId: string, text: string) => {
@@ -220,7 +229,8 @@ export default function ChatScreen() {
     isInitialLoadRef.current = true; // Сбрасываем флаг при смене чата
     isBlockedCheckedRef.current = false; // Сбрасываем флаг проверки блокировки
     chatDataLoadedRef.current = false; // Сбрасываем флаг загрузки данных
-    
+    pinScrollToBottomUntilRef.current = 0;
+
     // Загружаем черновик для этого чата
     if (id) {
       loadDraft(id as string);
@@ -273,6 +283,8 @@ export default function ChatScreen() {
       console.log('🔗 Автоматическая прокрутка в чат через deep link');
       // При первой загрузке - без анимации, сразу вниз
       if (isInitialLoadRef.current) {
+        const until = Date.now() + 2500;
+        pinScrollToBottomUntilRef.current = Math.max(pinScrollToBottomUntilRef.current, until);
         scrollViewRef.current.scrollToEnd({ animated: false });
         setIsNearBottom(true);
         isInitialLoadRef.current = false;
@@ -290,7 +302,7 @@ export default function ChatScreen() {
       scrollViewRef.current.scrollToEnd({ animated: false });
       setIsNearBottom(true);
       wasNearBottomRef.current = true;
-      isInitialLoadRef.current = false;
+      // Не сбрасываем isInitialLoadRef здесь: контент ещё дорисовывается — дожидаемся onContentSizeChange / таймаута
     }
   }, [loading, messages.length, id]);
   
@@ -810,7 +822,10 @@ export default function ChatScreen() {
           setIsNearBottom(true);
           chatDataLoadedRef.current = true; // Отмечаем, что данные загружены
           lastMessageIdsRef.current = new Set(parsedConversation.map(m => m.id));
-          
+          if (parsedConversation.length > 0) {
+            pinScrollToBottomUntilRef.current = Date.now() + 2500;
+          }
+
           // Прокручиваем вниз после установки сообщений
           if (parsedConversation.length > 0 && isInitialLoadRef.current) {
             // Используем несколько попыток для гарантии прокрутки
@@ -1558,7 +1573,7 @@ export default function ChatScreen() {
           {/* Сообщения */}
           <KeyboardAvoidingView 
             style={styles.chatContainer} 
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            behavior="padding"
             keyboardVerticalOffset={Platform.OS === 'ios' ? 132 : 0}
           >
             <ScrollView 
@@ -1566,14 +1581,18 @@ export default function ChatScreen() {
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                   styles.messagesContent,
-                  // Добавляем достаточный отступ снизу когда клавиатура открыта
-                  // KeyboardAvoidingView уже учитывает высоту клавиатуры на iOS
-                  // Добавляем только высоту поля ввода + высоту reply preview + отступ
-                  { paddingBottom: keyboardVisible 
-                    ? inputContainerHeight + replyPreviewHeight - 60 
-                    : 20 
-                  }
+                  // При softwareKeyboardLayoutMode: pan / adjustPan окно не сжимается — запас снизу
+                  // по высоте клавиатуры + композер, иначе баблы оказываются под полем ввода.
+                  {
+                    paddingBottom: keyboardVisible
+                      ? inputContainerHeight +
+                        replyPreviewHeight +
+                        (Platform.OS === 'android' ? keyboardHeight : 0) +
+                        24
+                      : 20,
+                  },
                 ]}
+                onContentSizeChange={handleMessagesContentSizeChange}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 onTouchStart={(e) => {

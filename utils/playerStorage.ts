@@ -518,40 +518,93 @@ return result;
 
 // Функции для работы с командами
 
-import { findTeamTranslation } from './teamTranslations';
+import { teamTranslations } from './teamTranslations';
 
-// Поиск команд по названию с поддержкой переводов
+function escapeIlikeTerm(term: string): string {
+  return term.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
+const mapTeamRow = (team: any): Team => ({
+  id: team.id,
+  name: team.name,
+  type: team.type,
+  country: team.country,
+  city: team.city,
+});
+
+// Поиск команд: запрос в БД по подстроке (раньше брались только первые 100 строк — часть каталога терялась).
 export const searchTeams = async (searchTerm: string, language: string = 'ru'): Promise<Team[]> => {
   try {
-    // Сначала получаем все команды
-    const { data, error } = await supabase
-      .from('teams')
-      .select('*')
-      .limit(100);
-    
-    if (error) {
-      console.error('❌ Ошибка получения команд:', error);
-      return [];
+    const trim = searchTerm.trim();
+    if (!trim) {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .order('name', { ascending: true })
+        .limit(10);
+      if (error) {
+        console.error('❌ Ошибка получения команд:', error);
+        return [];
+      }
+      return (data || []).map(mapTeamRow);
     }
-    
-    const teams = (data || []).map((team: any) => ({
-      id: team.id,
-      name: team.name,
-      type: team.type,
-      country: team.country,
-      city: team.city
-    }));
-    
-    if (!searchTerm.trim()) {
-      return teams.slice(0, 10);
+
+    const safe = escapeIlikeTerm(trim);
+    const pattern = `%${safe}%`;
+    const byId = new Map<string, any>();
+
+    const runIlike = async (orClause: string) => {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .or(orClause)
+        .order('name', { ascending: true })
+        .limit(45);
+      return { data, error };
+    };
+
+    let { data: ilikeData, error: ilikeError } = await runIlike(
+      `name.ilike.${pattern},name_ru.ilike.${pattern},city.ilike.${pattern}`
+    );
+    if (ilikeError) {
+      const retry = await runIlike(`name.ilike.${pattern},city.ilike.${pattern}`);
+      ilikeData = retry.data;
+      ilikeError = retry.error;
     }
-    
-    // Фильтруем команды по поисковому запросу с использованием словаря переводов
-    const filteredTeams = teams.filter((team: Team) => {
-      return findTeamTranslation(team.name, searchTerm);
-    });
-    
-    return filteredTeams.slice(0, 10); // Ограничиваем результаты
+    if (ilikeError) {
+      console.error('❌ Ошибка поиска команд (ilike):', ilikeError);
+    }
+    for (const row of ilikeData || []) {
+      byId.set(row.id, row);
+    }
+
+    const lower = trim.toLowerCase();
+    const dictKeys = Object.entries(teamTranslations)
+      .filter(([ru, en]) => {
+        const enL = (en || '').toLowerCase();
+        const ruL = ru.toLowerCase();
+        return ruL.includes(lower) || enL.includes(lower) || lower.includes(ruL) || lower.includes(enL);
+      })
+      .map(([ru]) => ru);
+
+    if (dictKeys.length > 0) {
+      const uniqueKeys = [...new Set(dictKeys)].slice(0, 80);
+      const { data: dictRows, error: dictErr } = await supabase
+        .from('teams')
+        .select('*')
+        .in('name', uniqueKeys)
+        .limit(35);
+      if (dictErr) {
+        console.warn('⚠️ Поиск команд по словарю:', dictErr);
+      } else {
+        for (const row of dictRows || []) {
+          if (!byId.has(row.id)) byId.set(row.id, row);
+        }
+      }
+    }
+
+    const merged = [...byId.values()].map(mapTeamRow);
+    return merged.slice(0, 25);
   } catch (error) {
     console.error('❌ Ошибка поиска команд:', error);
     return [];
@@ -1973,6 +2026,108 @@ export const getPlayerById = async (
 };
 
 const PLAYERS_ID_QUERY_CHUNK = 100;
+
+/**
+ * Лёгкие поля для строки диалога (список сообщений): без select * по каждому peer.
+ * Вызывать при rebuild превью, чтобы аватар/имя не залипали после смены у собеседника.
+ */
+export async function fetchPlayersInboxFieldsByIds(
+  ids: string[]
+): Promise<Map<string, { name: string; avatar?: string; status?: string }>> {
+  const map = new Map<string, { name: string; avatar?: string; status?: string }>();
+  const unique = [...new Set(ids.filter(Boolean))];
+  for (let i = 0; i < unique.length; i += PLAYERS_ID_QUERY_CHUNK) {
+    const chunk = unique.slice(i, i + PLAYERS_ID_QUERY_CHUNK);
+    const { data, error } = await supabase
+      .from('players')
+      .select('id, name, avatar, status')
+      .in('id', chunk);
+    if (error) {
+      console.warn('⚠️ fetchPlayersInboxFieldsByIds:', error.message);
+      continue;
+    }
+    for (const row of data || []) {
+      const r = row as { id: string; name?: string | null; avatar?: string | null; status?: string | null };
+      map.set(r.id, {
+        name: r.name || '',
+        avatar: r.avatar ?? undefined,
+        status: r.status ?? undefined,
+      });
+    }
+  }
+  return map;
+}
+
+/** Строка Realtime (players) → локальный Player: шайбы, поиск; те же поля, что merge на главной. */
+export function mergePlayerFromPlayersRealtimeRow(
+  cur: Player,
+  row: Record<string, unknown>
+): { next: Player; invalidatePlayersListCache: boolean } | null {
+  let changed = false;
+  let invalidatePlayersListCache = false;
+  const next: Player = { ...cur };
+  const str = (v: unknown) => (v != null ? String(v) : '');
+
+  if (row.avatar !== undefined && row.avatar !== cur.avatar) {
+    next.avatar = row.avatar as string;
+    changed = true;
+    invalidatePlayersListCache = true;
+  }
+
+  const statPairs: [keyof Player, string][] = [
+    ['goals', 'goals'],
+    ['assists', 'assists'],
+    ['games', 'games'],
+    ['minutes', 'minutes'],
+    ['shots', 'shots'],
+    ['saves', 'saves'],
+  ];
+  for (const [key, snake] of statPairs) {
+    if (row[snake] === undefined) continue;
+    const v = str(row[snake]);
+    if (cur[key] !== v) {
+      (next as unknown as Record<string, string>)[key as string] = v;
+      changed = true;
+      invalidatePlayersListCache = true;
+    }
+  }
+
+  if (row.country !== undefined && row.country !== cur.country) {
+    next.country = row.country as string;
+    changed = true;
+    invalidatePlayersListCache = true;
+  }
+  if (row.position !== undefined && row.position !== cur.position) {
+    next.position = row.position as string;
+    changed = true;
+  }
+  if (row.name !== undefined && row.name !== cur.name) {
+    next.name = row.name as string;
+    changed = true;
+  }
+
+  if (row.status !== undefined && row.status !== cur.status) {
+    next.status = row.status as string;
+    changed = true;
+  }
+
+  if (row.puck_speed_data !== undefined) {
+    try {
+      const parsed = JSON.parse(String(row.puck_speed_data)) as { maxSpeed?: number };
+      const maxSpeed = typeof parsed.maxSpeed === 'number' ? parsed.maxSpeed : cur.puckSpeed;
+      if (maxSpeed !== cur.puckSpeed) {
+        next.puckSpeed = maxSpeed;
+        changed = true;
+        invalidatePlayersListCache = true;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (!changed) return null;
+  return { next, invalidatePlayersListCache };
+}
 
 /** Без тысяч параллельных getPlayerById: надёжно для длинного списка чатов. */
 export async function getPlayersByIdsInBatches(ids: string[]): Promise<Map<string, Player>> {

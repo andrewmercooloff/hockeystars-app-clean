@@ -1469,7 +1469,10 @@ export default function PlayerProfile() {
           if (timeSinceLastSave < 5000) {
             // Если прошло меньше 5 секунд с момента сохранения, данные из Realtime могут быть старыми
             // Сравниваем ключевые поля, чтобы убедиться, что данные действительно изменились
-            const keyFields = ['grip', 'position', 'number', 'height', 'weight', 'name'];
+            const keyFields = [
+              'grip', 'position', 'number', 'height', 'weight', 'name',
+              'avatar', 'goals', 'assists', 'games', 'puckSpeed',
+            ];
             const fieldsChanged = keyFields.some(field => {
               const currentValue = (player as any)[field];
               const realtimeValue = (updatedPlayer as any)[field];
@@ -1484,7 +1487,11 @@ export default function PlayerProfile() {
           
           console.log('✅ Профиль обновлен через Realtime');
           setPlayer(updatedPlayer);
-          
+          if (updatedPlayer.avatar && updatedPlayer.avatar !== player.avatar) {
+            const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
+            await updateAvatarGlobally(player.id, updatedPlayer.avatar);
+          }
+
           // Обновляем кеш состояния
           setPlayersCache(prev => ({
             ...prev,

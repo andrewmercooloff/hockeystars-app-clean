@@ -15,9 +15,20 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from '../components/CachedAvatar';
 import { BlurOrSolid } from '../components/BlurOrSolid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { loadPlayers, Player, loadCurrentUser, searchTeams, PlayerTeam, isGoalkeeperPosition } from '../utils/playerStorage';
+import {
+  loadPlayers,
+  Player,
+  loadCurrentUser,
+  searchTeams,
+  PlayerTeam,
+  isGoalkeeperPosition,
+  ALL_PLAYERS_LIST_CACHE_KEYS,
+  mergePlayerFromPlayersRealtimeRow,
+} from '../utils/playerStorage';
+import { updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -32,6 +43,20 @@ import { platformCardShadow } from '../utils/androidShadow';
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+
+/** Те же правила отбора, что при загрузке списка поиска (не админ). */
+function isPlayerInSearchDirectory(player: Player, isAdmin: boolean): boolean {
+  if (isAdmin) return true;
+  return (
+    player.status !== 'scout' &&
+    (player.status === 'player' ||
+      player.status === 'admin' ||
+      player.status === 'star' ||
+      player.status === 'coach' ||
+      player.status === 'shop' ||
+      player.status === 'skateSharpening')
+  );
+}
 
 function buildSearchPlayerSubtitle(
   item: Player,
@@ -550,6 +575,92 @@ export default function SearchScreen() {
       };
     }, [setCurrentScreen, currentUser])
   );
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const isAdmin = currentUser.status === 'admin';
+
+    const channel = supabase
+      .channel(`players-realtime-search-${currentUser.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'players' },
+        (payload) => {
+          const playerData = payload.new as Record<string, unknown>;
+          const oldPlayerData = payload.old as Record<string, unknown> | undefined;
+          const playerId = playerData?.id as string | undefined;
+          if (!playerId) return;
+
+          const newIsHidden = Boolean(playerData.is_hidden);
+          const oldIsHidden = Boolean(oldPlayerData?.is_hidden);
+
+          if (newIsHidden !== oldIsHidden) {
+            void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+
+            setPlayers((currentPlayers) => {
+              const playerExists = currentPlayers.some((p) => p.id === playerId);
+
+              if (playerExists) {
+                return currentPlayers.map((player) =>
+                  player.id === playerId ? { ...player, is_hidden: newIsHidden } : player
+                );
+              }
+
+              if (!newIsHidden) {
+                void loadPlayers(false).then((allPlayers) => {
+                  const updatedPlayer = allPlayers.find((p) => p.id === playerId);
+                  if (updatedPlayer && isPlayerInSearchDirectory(updatedPlayer, isAdmin)) {
+                    setPlayers((prev) => {
+                      if (prev.some((p) => p.id === playerId)) {
+                        return prev.map((p) => (p.id === playerId ? updatedPlayer : p));
+                      }
+                      return [...prev, updatedPlayer];
+                    });
+                  }
+                });
+              }
+
+              return currentPlayers;
+            });
+          }
+
+          setPlayers((currentPlayers) => {
+            const idx = currentPlayers.findIndex((p) => p.id === playerId);
+            if (idx === -1) return currentPlayers;
+            const cur = currentPlayers[idx];
+            const merged = mergePlayerFromPlayersRealtimeRow(cur, playerData);
+            if (!merged) return currentPlayers;
+            if (merged.invalidatePlayersListCache) {
+              void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+            }
+            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+              void updateAvatarGlobally(playerId, String(playerData.avatar));
+            }
+            const row = merged.next;
+            if (!isAdmin && !isPlayerInSearchDirectory(row, isAdmin)) {
+              return currentPlayers.filter((p) => p.id !== playerId);
+            }
+            return currentPlayers.map((p, i) => (i === idx ? row : p));
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'players' },
+        (payload) => {
+          const oldId = (payload.old as { id?: string })?.id;
+          if (!oldId) return;
+          void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+          setPlayers((prev) => prev.filter((p) => p.id !== oldId));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [currentUser]);
 
   const hands = useMemo(() => [t('search.left'), t('search.right')], [t]);
 

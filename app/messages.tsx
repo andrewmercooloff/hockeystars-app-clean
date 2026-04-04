@@ -18,6 +18,7 @@ import { platformCardShadow } from '../utils/androidShadow';
 // Убираем все анимации переходов
 import {
     getPlayersByIdsInBatches,
+    fetchPlayersInboxFieldsByIds,
     getUserConversations,
     mergeRawMessageRowsIntoConversations,
     countNewRawMessageIdsInBatch,
@@ -30,6 +31,7 @@ import {
     isUserBlocked,
     searchMessagesAcrossAllDialogs
 } from '../utils/playerStorage';
+import { updateAvatarGlobally } from '../utils/AvatarCache';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
@@ -193,6 +195,25 @@ export default function MessagesScreen() {
         height: '',
         weight: '',
       });
+
+      if (userIds.length > 0) {
+        const lightRows = await fetchPlayersInboxFieldsByIds(userIds);
+        lightRows.forEach((row, peerId) => {
+          const cur = inboxPlayerCacheRef.current.get(peerId);
+          const base = cur ?? placeholderPlayer(peerId);
+          const nextAvatar = row.avatar ?? base.avatar;
+          const avatarChanged = Boolean(row.avatar && row.avatar !== base.avatar);
+          inboxPlayerCacheRef.current.set(peerId, {
+            ...base,
+            name: row.name || base.name,
+            avatar: nextAvatar,
+            status: row.status ?? base.status,
+          });
+          if (avatarChanged && row.avatar) {
+            void updateAvatarGlobally(peerId, row.avatar);
+          }
+        });
+      }
 
       if (includeDrafts) {
         inboxReverseBlockCheckedRef.current.clear();
