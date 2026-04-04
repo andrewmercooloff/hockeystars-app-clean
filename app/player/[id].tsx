@@ -4410,15 +4410,15 @@ export default function PlayerProfile() {
                         );
 
                         if (hasValidImage) {
+                          // В режиме редактирования не используем CachedAvatar — глобальный кэш/realtime подмешивают старый URL.
                           return (
                             <View style={[styles.profileImage]}>
                               <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                                <CachedAvatar
-                                  key={imageSource} // Добавляем key для принудительного перерендеринга при изменении аватара
-                                  playerId={player.id}
-                                  fallbackAvatarUrl={imageSource}
-                                  size={100}
+                                <Image
+                                  key={imageSource}
+                                  source={{ uri: imageSource }}
                                   style={styles.avatarImage}
+                                  resizeMode="cover"
                                 />
                               </View>
                             </View>

@@ -287,6 +287,16 @@ export default function PastTeamsSection({
     onPastTeamsChange?.(data);
   };
 
+  const displayPastTeams = useMemo(
+    () => pastTeams.filter((team) => !team.isCurrent),
+    [pastTeams]
+  );
+
+  const pastTeamKeyExtractor = useCallback((item: PastTeam, index: number) => {
+    if (item?.id) return String(item.id);
+    return `past-team-${index}`;
+  }, []);
+
   // Рендер элемента прошлой команды
   const renderPastTeamItem = ({ item, drag, isActive }: RenderItemParams<PastTeam>) => {
     return (

@@ -622,6 +622,23 @@ export async function sendAchievementNotification(
 const initializedUsers = new Map<string, number>();
 const INITIALIZATION_COOLDOWN = 5 * 60 * 1000; // 5 минут между попытками инициализации
 
+/** Сохраняет IANA-часовой пояс устройства в `players.notification_timezone` (даджесты и т.п.). */
+export async function syncPlayerNotificationTimezone(userId: string): Promise<void> {
+  try {
+    const tz = getDeviceIanaTimeZone();
+    if (!tz || !userId) return;
+    const { error } = await supabase
+      .from('players')
+      .update({ notification_timezone: tz })
+      .eq('id', userId);
+    if (error) {
+      console.warn('⚠️ syncPlayerNotificationTimezone:', error.message);
+    }
+  } catch (e) {
+    console.warn('⚠️ syncPlayerNotificationTimezone failed', e);
+  }
+}
+
 /**
  * Инициализация push-уведомлений для пользователя
  */

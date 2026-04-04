@@ -306,6 +306,11 @@ export default function CurrentTeamsSection({
     onCurrentTeamsChange?.(data);
   };
 
+  const currentTeamKeyExtractor = useCallback((item: PastTeam, index: number) => {
+    if (item?.id) return String(item.id);
+    return `current-team-${index}`;
+  }, []);
+
   const renderCurrentTeamItem = ({ item, drag, isActive }: RenderItemParams<PastTeam>) => {
     return (
       <DraggableTeamItem
