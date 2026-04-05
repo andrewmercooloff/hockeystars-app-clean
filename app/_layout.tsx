@@ -1393,7 +1393,7 @@ export default function RootLayout() {
       setUnreadNotificationsCount(0);
       realtimeManager.initializeCounts(0, 0);
     }
-  }, [currentUser?.id]);
+  }, [currentUser?.id, currentUser?.unreadMessagesCount]);
 
   // Realtime подписка на изменения счетчиков
   React.useEffect(() => {

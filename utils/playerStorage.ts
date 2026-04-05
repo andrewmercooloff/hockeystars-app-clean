@@ -2526,12 +2526,19 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     // ВАЖНО: Загружаем актуальные данные пользователя из базы данных, чтобы убедиться, что страна и другие поля актуальны
     try {
-      const { data: playerData, error: playerError } = await supabase
-        .from('players')
-        .select('id, name, country, birth_date, status, unread_messages_count')
-        .eq('id', user.id)
-        .single();
-      
+      const [{ data: playerData, error: playerError }, actualUnreadMessages] = await Promise.all([
+        supabase
+          .from('players')
+          .select('id, name, country, birth_date, status')
+          .eq('id', user.id)
+          .single(),
+        getUnreadMessageCount(user.id),
+      ]);
+
+      // Бейдж по фактическим строкам messages (read=false), как в _layout loadUser —
+      // колонка players.unread_messages_count может отставать от триггеров.
+      user.unreadMessagesCount = actualUnreadMessages;
+
       if (!playerError && playerData) {
         // Обновляем критически важные поля из базы данных
         if (playerData.country && playerData.country !== user.country) {
@@ -2552,11 +2559,6 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
         if (playerData.status && playerData.status !== user.status) {
           user.status = playerData.status;
         }
-        
-        user.unreadMessagesCount = playerData.unread_messages_count || 0;
-      } else {
-        // Fallback на 0 если не удалось загрузить
-        user.unreadMessagesCount = 0;
       }
     } catch (error) {
       console.error('❌ Ошибка загрузки данных пользователя из БД:', error);
@@ -2867,7 +2869,19 @@ export function mergeRawMessageRowsIntoConversations(
       seenByPeer.set(otherUserId, new Set());
     }
     const seen = seenByPeer.get(otherUserId)!;
-    if (seen.has(msg.id)) continue;
+    if (seen.has(msg.id)) {
+      const arr = next[otherUserId];
+      const idx = arr.findIndex(m => String(m.id) === String(msg.id));
+      if (idx >= 0) {
+        arr[idx] = {
+          ...arr[idx],
+          read: !!msg.read,
+          text: msg.text ?? arr[idx].text,
+          timestamp: new Date(msg.created_at),
+        };
+      }
+      continue;
+    }
     seen.add(msg.id);
     next[otherUserId].push({
       id: msg.id,

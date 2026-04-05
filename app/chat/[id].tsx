@@ -847,9 +847,11 @@ export default function ChatScreen() {
           }
           
           // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
-          markMessagesAsRead(userData.id, otherPlayerData.id).catch(err => {
-            console.error('⚠️ Ошибка отметки сообщений как прочитанных (не критично):', err);
-          });
+          markMessagesAsRead(userData.id, otherPlayerData.id)
+            .then(() => refreshUser(true))
+            .catch(err => {
+              console.error('⚠️ Ошибка отметки сообщений как прочитанных (не критично):', err);
+            });
         }
       }
     } catch (error) {

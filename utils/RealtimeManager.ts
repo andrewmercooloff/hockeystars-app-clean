@@ -178,12 +178,11 @@ class RealtimeManager {
             this.emitNotificationCountUpdate(newNotifCount);
           }
           
-          // Обработка счетчика сообщений
-          const newMsgCount = playerData.unread_messages_count || 0;
-          const oldMsgCount = oldPlayerData?.unread_messages_count || 0;
-          if (newMsgCount !== oldMsgCount && newMsgCount !== this.lastMessagesCount) {
-            this.lastMessagesCount = newMsgCount;
-            this.emitMessagesCountUpdate(newMsgCount);
+          // Счётчик сообщений: сверяемся с messages, т.к. players.unread_messages_count может рассинхрониться с read.
+          const newMsgCount = playerData.unread_messages_count ?? 0;
+          const oldMsgCount = oldPlayerData?.unread_messages_count ?? 0;
+          if (newMsgCount !== oldMsgCount) {
+            this.syncMessagesCountFromMessagesTable(userId);
           }
         }
       )
@@ -474,6 +473,22 @@ class RealtimeManager {
     if (this.messagesCountCallback) {
       this.messagesCountCallback(count);
     }
+  }
+
+  /** Фактическое число непрочитанных по таблице messages (совпадает с loadUser / бейдж). */
+  private syncMessagesCountFromMessagesTable(userId: string): void {
+    void (async () => {
+      try {
+        const { getUnreadMessageCount } = await import('./playerStorage');
+        const trueCount = await getUnreadMessageCount(userId);
+        if (trueCount !== this.lastMessagesCount) {
+          this.lastMessagesCount = trueCount;
+          this.emitMessagesCountUpdate(trueCount);
+        }
+      } catch (e) {
+        console.error('❌ Ошибка синхронизации счётчика сообщений из БД:', e);
+      }
+    })();
   }
 
   private emitFriendRequestUpdate(): void {
