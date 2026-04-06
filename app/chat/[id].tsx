@@ -48,6 +48,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../../assets/images/led.jpg');
 
+const ChatShell = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+
 function messageTimestampMs(m: Message): number {
   return m.timestamp instanceof Date
     ? m.timestamp.getTime()
@@ -1572,22 +1574,25 @@ export default function ChatScreen() {
             </View>
           </BlurOrSolid>
 
-          {/* Сообщения */}
-          <KeyboardAvoidingView 
-            style={styles.chatContainer} 
-            behavior="padding"
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 132 : 0}
+          {/* Сообщения: на Android без KAV (иначе flex часто ломается); список в flex:1+minHeight:0 — иначе ScrollView
+              растягивается на всю высоту и сообщения визуально оказываются под композером. */}
+          <ChatShell
+            style={[styles.chatContainer, styles.chatColumn]}
+            {...(Platform.OS === 'ios'
+              ? ({ behavior: 'padding' as const, keyboardVerticalOffset: 132 } as const)
+              : {})}
           >
+            <View style={styles.messagesScrollWrap}>
             <ScrollView 
                 ref={scrollViewRef}
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                   styles.messagesContent,
-                  // Всегда резервируем высоту композера под списком (reply уже внутри inputContainer onLayout).
-                  // Раньше при закрытой клавиатуре было 20px — баблы уходили под строку ввода (Android).
                   {
                     paddingBottom:
-                      inputContainerHeight +
+                      (Platform.OS === 'android'
+                        ? Math.max(inputContainerHeight, 108)
+                        : inputContainerHeight) +
                       (keyboardVisible && Platform.OS === 'android'
                         ? keyboardHeight
                         : 0) +
@@ -1669,6 +1674,7 @@ export default function ChatScreen() {
                   ))
               ) : null}
             </ScrollView>
+            </View>
 
             {/* Поле ввода - фиксировано внизу */}
             <View 
@@ -1763,7 +1769,7 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </KeyboardAvoidingView>
+          </ChatShell>
 
           {/* Кастомное меню в стиле Telegram */}
           <Modal
@@ -2111,6 +2117,15 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
   },
+  /** Колонка: список сжимается, композер не перекрывается областью скролла (важно для Android + flex). */
+  chatColumn: {
+    flexDirection: 'column',
+  },
+  /** minHeight:0 — дочерний ScrollView с flex:1 получает реальную высоту, а не всю overlay. */
+  messagesScrollWrap: {
+    flex: 1,
+    minHeight: 0,
+  },
   messagesContainer: {
     flex: 1,
     paddingTop: 60, // Отступ для фиксированного заголовка
@@ -2261,12 +2276,14 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'column',
+    flexShrink: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
     backgroundColor: 'transparent',
-    // Поле ввода фиксировано внизу, paddingBottom на ScrollView создает пространство выше
-    // Важно: поле ввода должно быть вне ScrollView, чтобы не перекрывать сообщения
+    ...(Platform.OS === 'android'
+      ? { zIndex: 10, elevation: 10 }
+      : {}),
   },
   replyPreviewContainer: {
     flexDirection: 'row',
