@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars } from './AvatarCache';
+import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
 
@@ -1323,12 +1323,8 @@ export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
     if (data) {
       const players = data.map(convertSupabaseToPlayer);
       
-      // Обновляем кеш аватаров для всех игроков
-      players.forEach(player => {
-        if (player.avatar) {
-          avatarCache.setAvatar(player.id, player.avatar);
-        }
-      });
+      // In-memory URL без сети; setAvatar здесь давал бы N параллельных prefetch.
+      seedPlayerAvatarUrls(players);
       
       // Предзагружаем аватары только для части списка — полный прогрев сотен/тысяч URL
       // бьёт по сети и UI; остальные подтянутся через CachedAvatar при появлении на экране.

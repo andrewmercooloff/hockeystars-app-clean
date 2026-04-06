@@ -265,7 +265,7 @@ export default function ChatScreen() {
     const keyboardDidHideListener = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
-        console.log('⌨️ Клавиатура закрыта - paddingBottom: 20');
+        console.log('⌨️ Клавиатура закрыта');
         setKeyboardHeight(0);
         setKeyboardVisible(false);
       }
@@ -1583,15 +1583,15 @@ export default function ChatScreen() {
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                   styles.messagesContent,
-                  // При softwareKeyboardLayoutMode: pan / adjustPan окно не сжимается — запас снизу
-                  // по высоте клавиатуры + композер, иначе баблы оказываются под полем ввода.
+                  // Всегда резервируем высоту композера под списком (reply уже внутри inputContainer onLayout).
+                  // Раньше при закрытой клавиатуре было 20px — баблы уходили под строку ввода (Android).
                   {
-                    paddingBottom: keyboardVisible
-                      ? inputContainerHeight +
-                        replyPreviewHeight +
-                        (Platform.OS === 'android' ? keyboardHeight : 0) +
-                        24
-                      : 20,
+                    paddingBottom:
+                      inputContainerHeight +
+                      (keyboardVisible && Platform.OS === 'android'
+                        ? keyboardHeight
+                        : 0) +
+                      (keyboardVisible ? 24 : 16),
                   },
                 ]}
                 onContentSizeChange={handleMessagesContentSizeChange}

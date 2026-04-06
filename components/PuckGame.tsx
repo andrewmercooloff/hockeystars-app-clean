@@ -131,20 +131,44 @@ const usePuckCollisionSystem = (
 
   const sharedPositionsRef = useRef<Map<string, { x: { value: number }; y: { value: number } }>>(new Map());
 
+  // Как на главном (index.tsx): на Android не гоним физику 80 Гц — иначе игра подтормаживает при 22+ шайбах.
   const { STEP_MS, FIXED_DT, MAX_STEPS, TARGET_FPS } = useMemo(() => {
+    let fps: number;
+    switch (performanceLevel) {
+      case 'high':
+        if (Platform.OS === 'android') fps = 60;
+        else if (Platform.OS === 'ios') fps = 80;
+        else fps = 80;
+        break;
+      case 'medium':
+        fps = 45;
+        break;
+      case 'low':
+      default:
+        fps = 30;
+        break;
+    }
     return {
-      STEP_MS: 1000 / 80,
-      FIXED_DT: 1 / 80,
+      STEP_MS: 1000 / fps,
+      FIXED_DT: 1 / fps,
       MAX_STEPS: 1,
-      TARGET_FPS: 80,
+      TARGET_FPS: fps,
     };
-  }, []);
+  }, [performanceLevel]);
 
   const reactUpdateInterval = useMemo(() => {
-    if (Platform.OS === 'android') return 5;
-    if (Platform.OS === 'ios') return 3;
+    if (Platform.OS === 'web') return 1;
+    if (Platform.OS === 'android') {
+      if (performanceLevel === 'low') return 8;
+      if (performanceLevel === 'medium') return 6;
+      return 5;
+    }
+    if (Platform.OS === 'ios') {
+      if (performanceLevel === 'low') return 5;
+      return 3;
+    }
     return 1;
-  }, []);
+  }, [performanceLevel]);
 
   const insets = useSafeAreaInsets();
   const windowDimensions = Dimensions.get('window');
@@ -1353,6 +1377,12 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 
   const gameLimits = useMemo(() => {
     const perf = getPerformanceLevel();
+    // На Android больше одновременных шайб = тяжёлый O(n²) по коллизиям при полном экране.
+    if (Platform.OS === 'android') {
+      if (perf === 'low') return { maxPucks: 12, spawnMs: 850, rafStride: 3 };
+      if (perf === 'medium') return { maxPucks: 16, spawnMs: 700, rafStride: 2 };
+      return { maxPucks: 20, spawnMs: 580, rafStride: 1 };
+    }
     if (perf === 'low') return { maxPucks: 12, spawnMs: 850, rafStride: 3 };
     if (perf === 'medium') return { maxPucks: 18, spawnMs: 650, rafStride: 2 };
     return { maxPucks: MAX_PUCKS, spawnMs: SPAWN_INTERVAL_MS, rafStride: 1 };

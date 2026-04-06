@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { Image } from 'expo-image';
 
 // Глобальный кеш для аватаров
@@ -167,19 +168,16 @@ class AvatarCache {
     // При обновлении avatarUrl вызов setAvatar сам уведомит с новым URL
   }
 
-  // Предзагружаем аватары для списка игроков
-  async preloadPlayerAvatars(players: { id: string; avatar?: string | null }[]): Promise<void> {
-    const preloadTasks = players
-      .filter(p => p.avatar)
-      .map(async p => {
-        try {
-          await this.setAvatar(p.id, p.avatar!);
-        } catch (error) {
-          console.error(`❌ Ошибка предзагрузки аватара для ${p.id}:`, error);
-        }
-      });
-    
-    await Promise.allSettled(preloadTasks);
+  /**
+   * Только память: URL из ответа БД без сети и без инкремента версий.
+   * Перед батчевым prefetch, чтобы не вызывать setAvatar × N (двойной prefetch).
+   */
+  seedPlayerAvatarUrls(players: Array<{ id: string; avatar?: string | null }>): void {
+    for (const p of players) {
+      if (p.avatar) {
+        this.cache.set(p.id, p.avatar);
+      }
+    }
   }
 
   // Получаем все кешированные аватары
@@ -299,20 +297,44 @@ export const preloadAvatar = async (avatarUrl: string): Promise<void> => {
   }
 };
 
-// Функция для предзагрузки аватаров игроков
-export const preloadPlayerAvatars = async (players: Array<{ id: string; avatar?: string }>): Promise<void> => {
-  const preloadTasks = players
-    .filter(player => player.avatar)
-    .map(async player => {
-      // Предзагружаем через expo-image
-      await preloadAvatar(player.avatar!);
-      // И сохраняем в AvatarCache для мгновенного доступа в профилях
-      await avatarCache.setAvatar(player.id, player.avatar!);
-    });
+export type PreloadPlayerAvatarsOptions = {
+  /** Одновременных загрузок; на Android мало — меньше очередь на хосте и стабильнее UI. */
+  concurrency?: number;
+};
 
-  try {
-    await Promise.all(preloadTasks);
-  } catch (error) {
-    // Ignore prefetch errors
+/** Заполнить in-memory карту id→URL без сети (после loadPlayers и т.п.). */
+export const seedPlayerAvatarUrls = (
+  players: Array<{ id: string; avatar?: string | null }>
+): void => {
+  avatarCache.seedPlayerAvatarUrls(players);
+};
+
+/**
+ * Только прогрев диска/памяти expo-image через Image.prefetch (чанки).
+ * URL в avatarCache должны быть уже записаны (seed) или придут из setAvatar/realtime.
+ */
+export const preloadPlayerAvatars = async (
+  players: Array<{ id: string; avatar?: string }>,
+  options?: PreloadPlayerAvatarsOptions
+): Promise<void> => {
+  const list = players.filter((player) => player.avatar);
+  const concurrency =
+    options?.concurrency ?? (Platform.OS === 'android' ? 4 : 8);
+
+  for (let i = 0; i < list.length; i += concurrency) {
+    const chunk = list.slice(i, i + concurrency);
+    try {
+      await Promise.all(
+        chunk.map(async (player) => {
+          try {
+            await preloadAvatar(player.avatar!);
+          } catch {
+            /* CachedAvatar догрузит */
+          }
+        })
+      );
+    } catch {
+      /* chunk-level */
+    }
   }
 };

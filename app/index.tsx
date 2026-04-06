@@ -18,7 +18,7 @@ import {
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
 } from '../utils/playerStorage';
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import { preloadPlayerAvatars, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -2534,6 +2534,17 @@ export default function HomeScreen() {
 
     return [...filtered, gamePuck];
   }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, homeScreenPuckCapAndroid]);
+
+  // Прицельный prefetch аватаров именно для шайб на льду (без новой сборки, только JS / OTA).
+  // Раньше в loadPlayers грелись «первые 90» из БД — часто не те же люди, что в getSmartPlayerSelection.
+  useEffect(() => {
+    const puckPlayers = allVisiblePlayers.filter(
+      (p) => p.id !== GAME_PUCK_ID && !!p.avatar
+    );
+    if (puckPlayers.length === 0) return;
+    const concurrency = Platform.OS === 'android' ? 6 : 10;
+    preloadPlayerAvatars(puckPlayers, { concurrency }).catch(() => {});
+  }, [allVisiblePlayers]);
 
   // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
   // но сохраняем ограничения скрытых/заблокированных, чтобы не показывать их нигде.
