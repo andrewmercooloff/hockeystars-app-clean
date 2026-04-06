@@ -1582,6 +1582,7 @@ export default function ChatScreen() {
               ? ({ behavior: 'padding' as const, keyboardVerticalOffset: 132 } as const)
               : {})}
           >
+            <View style={styles.chatInner}>
             <View style={styles.messagesScrollWrap}>
             <ScrollView 
                 ref={scrollViewRef}
@@ -1589,14 +1590,16 @@ export default function ChatScreen() {
                 contentContainerStyle={[
                   styles.messagesContent,
                   {
+                    // Android: композер absolute — список на всю высоту; запас = измеренная высота + буфер.
+                    // Отрицательные margin у TextInput уменьшали onLayout — добавляем EXTRA_ANDROID_COMPOSER.
                     paddingBottom:
                       (Platform.OS === 'android'
-                        ? Math.max(inputContainerHeight, 108)
-                        : inputContainerHeight) +
-                      (keyboardVisible && Platform.OS === 'android'
-                        ? keyboardHeight
-                        : 0) +
-                      (keyboardVisible ? 24 : 16),
+                        ? Math.max(inputContainerHeight, 120) +
+                          (keyboardVisible ? keyboardHeight : 0) +
+                          (keyboardVisible ? 24 : 20) +
+                          28
+                        : inputContainerHeight +
+                          (keyboardVisible ? 24 : 16)),
                   },
                 ]}
                 onContentSizeChange={handleMessagesContentSizeChange}
@@ -1676,10 +1679,13 @@ export default function ChatScreen() {
             </ScrollView>
             </View>
 
-            {/* Поле ввода - фиксировано внизу */}
+            {/* Поле ввода: на Android поверх скролла (absolute), иначе flex ломался и баблы рисовались под баром */}
             <View 
               ref={inputContainerRef}
-              style={styles.inputContainer}
+              style={[
+                styles.inputContainer,
+                Platform.OS === 'android' && styles.inputContainerFloatingAndroid,
+              ]}
               onStartShouldSetResponder={() => true}
               onTouchStart={(e) => {
                 // Предотвращаем закрытие клавиатуры при нажатии на поле ввода
@@ -1738,7 +1744,7 @@ export default function ChatScreen() {
               )}
               <View style={styles.textInputContainer}>
                 <TextInput
-                  style={styles.textInput}
+                  style={[styles.textInput, Platform.OS === 'android' && styles.textInputAndroid]}
                   value={newMessage}
                   onChangeText={handleDraftTextChange}
                   placeholder={t('chat.enterMessage')}
@@ -1755,7 +1761,8 @@ export default function ChatScreen() {
                 />
                 <TouchableOpacity 
                   style={[
-                    styles.sendButton, 
+                    styles.sendButton,
+                    Platform.OS === 'android' && styles.sendButtonAndroid,
                     !newMessage.trim() && styles.sendButtonDisabled
                   ]} 
                   onPress={handleSendMessage}
@@ -1768,6 +1775,7 @@ export default function ChatScreen() {
                   />
                 </TouchableOpacity>
               </View>
+            </View>
             </View>
           </ChatShell>
 
@@ -1992,7 +2000,14 @@ export default function ChatScreen() {
           {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
           {!isNearBottom && messages.length > 0 && (
             <TouchableOpacity
-              style={styles.scrollToBottomButton}
+              style={[
+                styles.scrollToBottomButton,
+                {
+                  bottom:
+                    Math.max(inputContainerHeight, Platform.OS === 'android' ? 96 : 72) +
+                    (Platform.OS === 'android' ? 20 : 16),
+                },
+              ]}
               onPress={() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true });
                 setTimeout(() => {
@@ -2120,6 +2135,11 @@ const styles = StyleSheet.create({
   /** Колонка: список сжимается, композер не перекрывается областью скролла (важно для Android + flex). */
   chatColumn: {
     flexDirection: 'column',
+  },
+  chatInner: {
+    flex: 1,
+    minHeight: 0,
+    position: 'relative',
   },
   /** minHeight:0 — дочерний ScrollView с flex:1 получает реальную высоту, а не всю overlay. */
   messagesScrollWrap: {
@@ -2279,11 +2299,17 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: Platform.OS === 'android' ? 8 : 12, // Небольшой отступ снизу для Android
-    backgroundColor: 'transparent',
+    paddingBottom: Platform.OS === 'android' ? 8 : 12,
+    backgroundColor: Platform.OS === 'android' ? 'rgba(23, 23, 23, 0.92)' : 'transparent',
     ...(Platform.OS === 'android'
-      ? { zIndex: 10, elevation: 10 }
+      ? { zIndex: 10, elevation: 12 }
       : {}),
+  },
+  inputContainerFloatingAndroid: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   replyPreviewContainer: {
     flexDirection: 'row',
@@ -2523,6 +2549,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.5)',
   },
+  /** На Android отрицательный margin давал заниженный onLayout родителя и обрезание последнего сообщения. */
+  textInputAndroid: {
+    marginBottom: 0,
+  },
   sendButton: {
     backgroundColor: '#fa2f40',
     opacity: 1,
@@ -2541,13 +2571,15 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  sendButtonAndroid: {
+    marginBottom: 0,
+  },
   sendButtonDisabled: {
     backgroundColor: '#fa2f40',
     opacity: 0.7,
   },
   scrollToBottomButton: {
     position: 'absolute',
-    bottom: 80,
     right: 16,
     width: 44,
     height: 44,
