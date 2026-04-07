@@ -22,6 +22,8 @@ interface PuckProps {
   status?: string;
   isOnline?: boolean; // статус онлайн пользователя
   isNew?: boolean; // новый игрок (зарегистрирован < 2 дней назад)
+  /** Много шайб на экране (мини-игра): чуть легче тень на Android — меньше нагрузка на GPU. */
+  denseScene?: boolean;
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -34,21 +36,24 @@ const Puck: React.FC<PuckProps> = ({
   isStar, 
   status,
   isOnline = false,
-  isNew = false
+  isNew = false,
+  denseScene = false,
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
 
-  // Переливание цветов для шайбы с джойстиком (игра)
+  // Переливание цветов для шайбы с джойстиком (игра). На Android отключаем —
+  // постоянный interpolateColor + тайминг даёт лишнюю нагрузку на композитинг при многих шайбах.
   const colorProgress = useSharedValue(0);
+  const gameColorAnimationEnabled = Platform.OS !== 'android';
   useEffect(() => {
-    if (status !== 'game') return;
+    if (status !== 'game' || !gameColorAnimationEnabled) return;
     colorProgress.value = withRepeat(
       withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
       -1,
       true
     );
-  }, [status, colorProgress]);
+  }, [status, colorProgress, gameColorAnimationEnabled]);
 
   const gamePuckAnimatedStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
@@ -115,15 +120,18 @@ const Puck: React.FC<PuckProps> = ({
   }, [avatar]);
 
   return (
-    <Animated.View style={[
-      isStar ? styles.starPuck : styles.puck,
-      { 
-        width: size, 
-        height: size, 
-        borderRadius: dimensions.borderRadius 
-      },
-      animatedStyle
-    ]}>
+    <Animated.View
+      style={[
+        isStar ? styles.starPuck : styles.puck,
+        {
+          width: size,
+          height: size,
+          borderRadius: dimensions.borderRadius,
+        },
+        Platform.OS === 'android' && denseScene ? { elevation: 2 } : null,
+        animatedStyle,
+      ]}
+    >
       {/* Дополнительная тень на льду - отключена для производительности */}
       {/* <Animated.View style={[
         styles.iceShadow,
@@ -178,19 +186,35 @@ const Puck: React.FC<PuckProps> = ({
           </View>
         ) : (
           status === 'game' ? (
-            <Animated.View style={[
-              styles.avatarPlaceholder,
-              {
-                width: dimensions.avatarSize,
-                height: dimensions.avatarSize,
-                borderRadius: dimensions.avatarBorderRadius,
-                borderWidth: 2,
-                borderColor: avatarBorderColor,
-              },
-              gamePuckAnimatedStyle,
-            ]}>
-              <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
-            </Animated.View>
+            gameColorAnimationEnabled ? (
+              <Animated.View style={[
+                styles.avatarPlaceholder,
+                {
+                  width: dimensions.avatarSize,
+                  height: dimensions.avatarSize,
+                  borderRadius: dimensions.avatarBorderRadius,
+                  borderWidth: 2,
+                  borderColor: avatarBorderColor,
+                },
+                gamePuckAnimatedStyle,
+              ]}>
+                <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
+              </Animated.View>
+            ) : (
+              <View style={[
+                styles.avatarPlaceholder,
+                {
+                  width: dimensions.avatarSize,
+                  height: dimensions.avatarSize,
+                  borderRadius: dimensions.avatarBorderRadius,
+                  borderWidth: 2,
+                  borderColor: avatarBorderColor,
+                  backgroundColor: '#5c1a28',
+                },
+              ]}>
+                <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
+              </View>
+            )
           ) : (
             <View style={[
               styles.avatarPlaceholder,

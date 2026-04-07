@@ -33,7 +33,23 @@ const GAME_DURATION = 30;
 const PUCK_SIZE = 70; // ВАЖНО: как на главном экране
 const GOAL_DEPTH = 10; // как в IceRinkMarkings
 const SPAWN_INTERVAL_MS = 500;
+/** Максимум шайб в игре (одинаково на Android и iOS). */
 const MAX_PUCKS = 25;
+
+/** Уникальный id экземпляра шайбы в игре: ginst:<playerUuid>:<seq> — один игрок может быть несколько раз. */
+const GAME_INSTANCE_PREFIX = 'ginst:';
+
+function gamePuckCanonicalPlayerId(puckId: string): string {
+  if (!puckId.startsWith(GAME_INSTANCE_PREFIX)) return puckId;
+  const rest = puckId.slice(GAME_INSTANCE_PREFIX.length);
+  const last = rest.lastIndexOf(':');
+  if (last <= 0) return puckId;
+  return rest.slice(0, last);
+}
+
+function makeGamePuckInstanceId(basePlayerId: string, seq: number): string {
+  return `${GAME_INSTANCE_PREFIX}${basePlayerId}:${seq}`;
+}
 
 interface PuckPosition {
   id: string;
@@ -80,6 +96,8 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   }
 
   if (Platform.OS === 'android') {
+    if (Device.isDevice === false) return 'low';
+
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
     if (yearClass && yearClass >= 2023) return 'high';
     if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) return 'low';
@@ -687,7 +705,7 @@ const usePuckCollisionSystem = (
               vy *= 0.95;
             }
 
-            if (currentUserId && pos.id === currentUserId) {
+            if (currentUserId && gamePuckCanonicalPlayerId(pos.id) === currentUserId) {
               const collisionKey = [pos.id, other.id].sort().join('-');
               if (!activeCollisionsRef.current.has(collisionKey)) {
                 activeCollisionsRef.current.add(collisionKey);
@@ -764,7 +782,11 @@ const usePuckCollisionSystem = (
             updatedPositions[j].vy -= ny * impulseStrength;
           }
 
-          if (currentUserId && (pos1.id === currentUserId || pos2.id === currentUserId)) {
+          if (
+            currentUserId &&
+            (gamePuckCanonicalPlayerId(pos1.id) === currentUserId ||
+              gamePuckCanonicalPlayerId(pos2.id) === currentUserId)
+          ) {
             const collisionKey = [pos1.id, pos2.id].sort().join('-');
             if (!activeCollisionsRef.current.has(collisionKey)) {
               activeCollisionsRef.current.add(collisionKey);
@@ -1037,7 +1059,11 @@ const usePuckCollisionSystem = (
             newOtherY = Math.max(boundaries.top, Math.min(boundaries.bottom, newOtherY));
             newPositions[i] = { ...other, x: newOtherX, y: newOtherY };
 
-            if (currentUserId && (id === currentUserId || other.id === currentUserId)) {
+            if (
+              currentUserId &&
+              (gamePuckCanonicalPlayerId(id) === currentUserId ||
+                gamePuckCanonicalPlayerId(other.id) === currentUserId)
+            ) {
               const collisionKey = [id, other.id].sort().join('-');
               if (!activeCollisionsRef.current.has(collisionKey)) {
                 activeCollisionsRef.current.add(collisionKey);
@@ -1316,7 +1342,7 @@ const OriginalPuckAnimator = React.memo(
         <Suspense fallback={null}>
           <Puck
             avatar={player.avatar}
-            playerId={player.id}
+            playerId={gamePuckCanonicalPlayerId(player.id)}
             onPress={() => {
               if (!hasDragged) onNav();
             }}
@@ -1339,6 +1365,7 @@ const OriginalPuckAnimator = React.memo(
             status={player.status}
             isOnline={(player as any).isOnline}
             isNew={player.createdAt ? Date.now() - new Date(player.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000 : false}
+            denseScene
           />
         </Suspense>
       </Animated.View>
@@ -1373,17 +1400,15 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     }
   }, []);
 
-  const gameLimits = useMemo(() => {
-    const perf = getPerformanceLevel();
-    if (Platform.OS === 'android') {
-      if (perf === 'low') return { maxPucks: 5, spawnMs: 1400, rafStride: 5 };
-      if (perf === 'medium') return { maxPucks: 10, spawnMs: 950, rafStride: 3 };
-      return { maxPucks: 20, spawnMs: 580, rafStride: 1 };
-    }
-    if (perf === 'low') return { maxPucks: 10, spawnMs: 900, rafStride: 3 };
-    if (perf === 'medium') return { maxPucks: 18, spawnMs: 650, rafStride: 2 };
-    return { maxPucks: MAX_PUCKS, spawnMs: SPAWN_INTERVAL_MS, rafStride: 1 };
-  }, []);
+  // Одинаковые лимиты на всех платформах и уровнях производительности (по задумке продукта).
+  const gameLimits = useMemo(
+    () => ({
+      maxPucks: MAX_PUCKS,
+      spawnMs: SPAWN_INTERVAL_MS,
+      rafStride: 1 as const,
+    }),
+    []
+  );
   const [gameState, setGameState] = useState<'countdown' | 'playing' | 'finished'>('countdown');
   const [countdownValue, setCountdownValue] = useState<number | 'Go'>(5);
   const countdownScale = useSharedValue(0.5);
@@ -1400,8 +1425,9 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   const lastCenterYRef = useRef<Map<string, number>>(new Map());
   const lastHitYRef = useRef<Map<string, number>>(new Map());
   const [offsideVisible, setOffsideVisible] = useState(false);
-  const spawnQueueRef = useRef<Player[]>([]);
-  const spawnedIdsRef = useRef<Set<string>>(new Set());
+  /** Шаблоны игроков для случайного спавна (с повторениями — много шайб с небольшого пула). */
+  const gameTemplatePoolRef = useRef<Player[]>([]);
+  const gameSpawnSeqRef = useRef(0);
   const spawnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scoringRafTickRef = useRef(0);
   const activePlayersCountRef = useRef(0);
@@ -1427,16 +1453,15 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 
   const spawnOneRandom = useCallback(() => {
     if (activePlayersCountRef.current >= gameLimits.maxPucks) return;
-    const pool = spawnQueueRef.current;
+    const pool = gameTemplatePoolRef.current;
     if (!pool || pool.length === 0) return;
-    const idx = Math.floor(Math.random() * pool.length);
-    const next = pool.splice(idx, 1)[0];
-    if (!next) return;
-    if (spawnedIdsRef.current.has(next.id)) return;
-    spawnedIdsRef.current.add(next.id);
+    const base = pool[Math.floor(Math.random() * pool.length)];
+    if (!base?.id) return;
+    const seq = ++gameSpawnSeqRef.current;
+    const instance: Player = { ...base, id: makeGamePuckInstanceId(base.id, seq) };
     setActivePlayers((prev) => {
       if (prev.length >= gameLimits.maxPucks) return prev;
-      return [...prev, next];
+      return [...prev, instance];
     });
   }, [gameLimits.maxPucks]);
 
@@ -1447,13 +1472,13 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     }, gameLimits.spawnMs);
   }, [spawnOneRandom, gameLimits.spawnMs]);
 
-  const initSpawnQueueFromVisiblePlayers = useCallback(() => {
+  const initSpawnTemplatePoolFromVisiblePlayers = useCallback(() => {
     const source = visiblePlayersRef.current || [];
     let pool = source.filter((p) => p?.id && p.status !== 'game' && !p.is_hidden);
     if (pool.length === 0) {
       pool = source.filter((p) => p?.id && p.status !== 'game');
     }
-    spawnQueueRef.current = shuffle(pool);
+    gameTemplatePoolRef.current = shuffle(pool);
     ensureSpawnLoop();
   }, [ensureSpawnLoop, shuffle]);
 
@@ -1496,31 +1521,38 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     lastCenterYRef.current.clear();
     lastHitYRef.current.clear();
     scoredCooldownRef.current.clear();
-    spawnedIdsRef.current = new Set();
-
     const source = visiblePlayersRef.current || [];
     let pool = source.filter((p) => p?.id && p.status !== 'game' && !p.is_hidden);
     // Если вдруг у кого-то нет name — всё равно допускаем, чтобы поле не было пустым
     if (pool.length === 0) {
       pool = source.filter((p) => p?.id && p.status !== 'game');
     }
-    spawnQueueRef.current = shuffle(pool);
-    setActivePlayers([]); // старт — пустое поле
+    gameTemplatePoolRef.current = shuffle(pool);
+    gameSpawnSeqRef.current = 0;
+
+    const burst = Math.min(12, MAX_PUCKS, pool.length > 0 ? MAX_PUCKS : 0);
+    const initial: Player[] = [];
+    for (let b = 0; b < burst && pool.length > 0; b++) {
+      const base = pool[Math.floor(Math.random() * pool.length)];
+      if (!base?.id) continue;
+      initial.push({ ...base, id: makeGamePuckInstanceId(base.id, ++gameSpawnSeqRef.current) });
+    }
+    setActivePlayers(initial);
 
     if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
     spawnTimerRef.current = null;
     ensureSpawnLoop();
-    spawnOneRandom(); // первая шайба сразу
+    if (initial.length < MAX_PUCKS) spawnOneRandom();
   }, [ensureSpawnLoop, shuffle, spawnOneRandom]);
 
   // Если игру начали до загрузки игроков — как только пул придёт, запустим очередь спавна
   useEffect(() => {
     if (gameState !== 'playing') return;
     if (activePlayers.length > 0) return;
-    if (spawnQueueRef.current.length > 0) return;
+    if (gameTemplatePoolRef.current.length > 0) return;
     if ((visiblePlayersRef.current || []).length === 0) return;
-    initSpawnQueueFromVisiblePlayers();
-  }, [activePlayers.length, gameState, initSpawnQueueFromVisiblePlayers]);
+    initSpawnTemplatePoolFromVisiblePlayers();
+  }, [activePlayers.length, gameState, initSpawnTemplatePoolFromVisiblePlayers]);
 
   // Останавливаем спавн, когда игра не идёт
   useEffect(() => {
@@ -1928,8 +1960,8 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     if (!visible) return;
     loadLeaderboard();
     setActivePlayers([]);
-    spawnQueueRef.current = [];
-    spawnedIdsRef.current = new Set();
+    gameTemplatePoolRef.current = [];
+    gameSpawnSeqRef.current = 0;
     if (spawnTimerRef.current) {
       clearInterval(spawnTimerRef.current);
       spawnTimerRef.current = null;

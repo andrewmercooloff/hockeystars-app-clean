@@ -46,6 +46,9 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   }
   
   if (Platform.OS === 'android') {
+    // Эмуляторы (AVD, часть окружений) сильно медленнее реального железа в RN.
+    if (Device.isDevice === false) return 'low';
+
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
     
     if (yearClass && yearClass >= 2023) return 'high';
@@ -718,11 +721,12 @@ const usePuckCollisionSystem = (
         }
       }
 
-      // Интеграция с фиксированным timestep для плавности (адаптивная)
-      // ОПТИМИЗАЦИЯ: Увеличена скорость движения на 20% для более динамичной анимации
+      // Как в PuckGame: эталон 80 FPS в интеграции, чтобы скорость по экрану не зависела от TARGET_FPS.
+      // Иначе на Android (часто 60 шагов/с) шайбы медленнее, чем на iPhone (80), и главная «тормознее» игры.
       const SPEED_MULTIPLIER = 1.2;
-      x += vx * FIXED_DT * TARGET_FPS * SPEED_MULTIPLIER;
-      y += vy * FIXED_DT * TARGET_FPS * SPEED_MULTIPLIER;
+      const REFERENCE_HOME_FPS = 80;
+      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER;
+      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER;
 
       // Границы
       if (x <= boundaries.left) {
@@ -2414,18 +2418,6 @@ export default function HomeScreen() {
   }, [loadBlockedUsers, currentUser?.id]);
 
 
-  /** Меньше шайб на главной на слабых Android (меньше одновременных аватаров и коллизий O(n²)). */
-  const homeScreenPuckCapAndroid = useMemo(() => {
-    if (Platform.OS !== 'android') return Infinity;
-    const { width, height } = Dimensions.get('window');
-    const isLowResolutionScreen =
-      Math.min(width, height) <= 360 || Math.max(width, height) <= 740;
-    const level = getPerformanceLevel();
-    if (level === 'low') return isLowResolutionScreen ? 5 : 6;
-    if (level === 'medium') return isLowResolutionScreen ? 8 : 10;
-    return Infinity;
-  }, []);
-
   // Умный отбор игроков с ограничением количества
   // Используем useRef для стабильной ссылки, чтобы избежать переинициализации позиций
   const allVisiblePlayersRef = useRef<Player[]>([]);
@@ -2487,10 +2479,6 @@ export default function HomeScreen() {
       filtered = filtered.filter(player => !blockedSet.has(player.id));
     }
 
-    if (homeScreenPuckCapAndroid < Infinity && filtered.length > homeScreenPuckCapAndroid) {
-      filtered = filtered.slice(0, homeScreenPuckCapAndroid);
-    }
-
     // Обновляем ref для использования в других местах
     if (__DEV__) {
       console.log('✅ [ANIMATION] Список видимых игроков обновлен:', {
@@ -2525,7 +2513,7 @@ export default function HomeScreen() {
     } as any;
 
     return [...filtered, gamePuck];
-  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers, homeScreenPuckCapAndroid]);
+  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers]);
 
   // Прицельный prefetch аватаров именно для шайб на льду (без новой сборки, только JS / OTA).
   // Раньше в loadPlayers грелись «первые 90» из БД — часто не те же люди, что в getSmartPlayerSelection.

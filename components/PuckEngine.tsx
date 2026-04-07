@@ -22,6 +22,8 @@ export const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   }
 
   if (Platform.OS === 'android') {
+    if (Device.isDevice === false) return 'low';
+
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
     if (yearClass && yearClass >= 2023) return 'high';
     if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) return 'low';
