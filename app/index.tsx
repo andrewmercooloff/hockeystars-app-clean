@@ -138,12 +138,12 @@ const usePuckCollisionSystem = (
         else fps = 80;
         break;
       case 'medium':
-        if (Platform.OS === 'android') fps = 40;
+        if (Platform.OS === 'android') fps = 32;
         else fps = 45;
         break;
       case 'low':
       default:
-        fps = 24;
+        fps = 18;
         break;
     }
     return {
@@ -159,8 +159,8 @@ const usePuckCollisionSystem = (
   const reactUpdateInterval = useMemo(() => {
     if (Platform.OS === 'web') return 1;
     if (Platform.OS === 'android') {
-      if (performanceLevel === 'low') return 12;
-      if (performanceLevel === 'medium') return 8;
+      if (performanceLevel === 'low') return 16;
+      if (performanceLevel === 'medium') return 10;
       return 5;
     }
     if (Platform.OS === 'ios') {
@@ -172,8 +172,8 @@ const usePuckCollisionSystem = (
 
   // В режиме покоя реже считаем физику: на low — ещё реже
   const idleFrameSkip = useMemo(() => {
-    if (performanceLevel === 'low') return 8;
-    if (performanceLevel === 'medium') return 5;
+    if (performanceLevel === 'low') return 10;
+    if (performanceLevel === 'medium') return 6;
     return 3;
   }, [performanceLevel]);
 
@@ -183,7 +183,6 @@ const usePuckCollisionSystem = (
   const windowDimensions = Dimensions.get('window');
   const width = screenWidth ?? windowDimensions.width;
   const height = screenHeight ?? windowDimensions.height;
-
   // Динамическое вычисление высоты таб-бара
   // Значения из app/_layout.tsx: height: 80, paddingTop: 10, paddingBottom: 10
   const tabBarHeight = useMemo(() => {
@@ -752,7 +751,7 @@ const usePuckCollisionSystem = (
         // Оптимизация для слабых устройств: проверяем только ближайшие шайбы
         // Для iOS и мощных Android проверяем все, для слабых Android - только близкие
         const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
-        const collisionCheckRadius = isWeakDevice ? minDistSq * 2.5 : minDistSq * 4; // Для слабых устройств проверяем только очень близкие
+        const collisionCheckRadius = isWeakDevice ? minDistSq * 1.8 : minDistSq * 4;
         
         for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
@@ -851,8 +850,14 @@ const usePuckCollisionSystem = (
     // ОПТИМИЗАЦИЯ: Добавлена ранняя проверка расстояния для пропуска далеких шайб
     const minDistance = puckSize;
     const minDistSq = minDistance * minDistance;
-    // ОПТИМИЗАЦИЯ: Проверяем только шайбы в радиусе 2*puckSize для снижения нагрузки
-    const checkRadiusSq = (puckSize * 2) * (puckSize * 2);
+    // На слабых Android ещё агрессивнее режем широкую фазу коллизий.
+    const checkRadiusMul =
+      Platform.OS === 'android' && performanceLevel === 'low'
+        ? 1.55
+        : Platform.OS === 'android' && performanceLevel === 'medium'
+          ? 1.8
+          : 2;
+    const checkRadiusSq = (puckSize * checkRadiusMul) * (puckSize * checkRadiusMul);
     
     // Массив для накопления смещений
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
@@ -1965,6 +1970,7 @@ export default function HomeScreen() {
   const seedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const unblockLoadRef = useRef(false);
+  const homePuckRecoveryAttemptedRef = useRef(false);
   
   // Состояние для подсказки о тряске при первом запуске
   const [showShakeHint, setShowShakeHint] = useState(false);
@@ -2411,9 +2417,12 @@ export default function HomeScreen() {
   /** Меньше шайб на главной на слабых Android (меньше одновременных аватаров и коллизий O(n²)). */
   const homeScreenPuckCapAndroid = useMemo(() => {
     if (Platform.OS !== 'android') return Infinity;
+    const { width, height } = Dimensions.get('window');
+    const isLowResolutionScreen =
+      Math.min(width, height) <= 360 || Math.max(width, height) <= 740;
     const level = getPerformanceLevel();
-    if (level === 'low') return 8;
-    if (level === 'medium') return 14;
+    if (level === 'low') return isLowResolutionScreen ? 5 : 6;
+    if (level === 'medium') return isLowResolutionScreen ? 8 : 10;
     return Infinity;
   }, []);
 
@@ -2552,6 +2561,36 @@ export default function HomeScreen() {
     puckFieldHeight,
     playfieldLayoutReady
   );
+
+  // Watchdog для старта главного экрана: иногда игроки уже загружены,
+  // но шайбы не инициализируются до ручной перезагрузки (наблюдалось в Expo, в т.ч. на Android;
+  // потенциально может случаться и на iPhone).
+  // Один раз мягко повторяем инициализацию тем же набором players.
+  useEffect(() => {
+    const shouldRecover =
+      currentScreen === 'home' &&
+      !loading &&
+      players.length > 0 &&
+      allVisiblePlayers.length > 0 &&
+      puckPositions.length === 0 &&
+      !homePuckRecoveryAttemptedRef.current;
+
+    if (!shouldRecover) {
+      if (puckPositions.length > 0 || allVisiblePlayers.length === 0 || loading) {
+        homePuckRecoveryAttemptedRef.current = false;
+      }
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      if (homePuckRecoveryAttemptedRef.current) return;
+      homePuckRecoveryAttemptedRef.current = true;
+      console.warn('⚠️ [HOME] Watchdog: игроки есть, но шайбы не появились — повторно инициализируем');
+      setPlayers((prev) => [...prev]);
+    }, 1200);
+
+    return () => clearTimeout(timeout);
+  }, [currentScreen, loading, players.length, allVisiblePlayers.length, puckPositions.length]);
 
   // Перезапускаем анимацию при возвращении на экран
   useFocusEffect(

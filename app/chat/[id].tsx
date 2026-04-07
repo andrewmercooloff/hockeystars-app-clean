@@ -2,6 +2,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
+    Animated,
     BackHandler,
     Image,
     ImageBackground,
@@ -16,7 +17,8 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
-    Dimensions
+    Dimensions,
+    Easing
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
@@ -117,6 +119,7 @@ export default function ChatScreen() {
   const [isNearBottom, setIsNearBottom] = useState(true);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const iosKeyboardInset = useRef(new Animated.Value(0)).current;
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -249,23 +252,40 @@ export default function ChatScreen() {
 
   // Слушатель клавиатуры для прокрутки к последнему сообщению
   useEffect(() => {
+    const animateIosKeyboardInset = (toValue: number, duration?: number) => {
+      Animated.timing(iosKeyboardInset, {
+        toValue,
+        duration: Math.max(100, Math.round((duration ?? 250) * 0.64)),
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }).start();
+    };
+
     const keyboardDidShowListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === 'ios' ? 'keyboardWillChangeFrame' : 'keyboardDidShow',
       (event) => {
         const height = event.endCoordinates?.height || 0;
-        console.log('⌨️ Клавиатура открыта - высота:', height);
+        if (Platform.OS === 'ios') {
+          const screenHeight = Dimensions.get('window').height;
+          const keyboardTop = event.endCoordinates?.screenY ?? screenHeight;
+          const overlap = Math.max(0, screenHeight - keyboardTop - 80);
+          animateIosKeyboardInset(overlap, event.duration);
+        }
         setKeyboardHeight(height);
-        setKeyboardVisible(true);
-        // Прокручиваем к последнему сообщению — ждём пока marginBottom/paddingBottom применится
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, Platform.OS === 'android' ? 350 : 50);
+        setKeyboardVisible(height > 0);
+        if (Platform.OS !== 'ios') {
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 500);
+        }
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => {
-        console.log('⌨️ Клавиатура закрыта');
+      (event) => {
+        if (Platform.OS === 'ios') {
+          animateIosKeyboardInset(0, event.duration);
+        }
         setKeyboardHeight(0);
         setKeyboardVisible(false);
       }
@@ -1486,6 +1506,24 @@ export default function ChatScreen() {
       <View style={styles.container}>
         <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
+            <BlurOrSolid
+              intensity={20}
+              tint="dark"
+              style={styles.headerBlur}
+            >
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.headerInfo}>
+                  <View style={styles.headerAvatar} />
+                  <View style={styles.headerText}>
+                    <Text style={styles.headerName}>{t('messages.title') || 'Сообщения'}</Text>
+                    <Text style={styles.headerStatus}>{t('chat.loading') || 'Загрузка...'}</Text>
+                  </View>
+                </View>
+              </View>
+            </BlurOrSolid>
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>{t('chat.loading')}</Text>
             </View>
@@ -1500,7 +1538,35 @@ export default function ChatScreen() {
   }
 
   if (!otherPlayer) {
-    return null;
+    return (
+      <View style={styles.container}>
+        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
+          <View style={styles.overlay}>
+            <BlurOrSolid
+              intensity={20}
+              tint="dark"
+              style={styles.headerBlur}
+            >
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.push('/messages')} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.headerInfo}>
+                  <View style={styles.headerAvatar} />
+                  <View style={styles.headerText}>
+                    <Text style={styles.headerName}>{t('messages.title') || 'Сообщения'}</Text>
+                    <Text style={styles.headerStatus}>{t('chat.loading') || 'Загрузка...'}</Text>
+                  </View>
+                </View>
+              </View>
+            </BlurOrSolid>
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>{t('chat.loading')}</Text>
+            </View>
+          </View>
+        </CachedBackground>
+      </View>
+    );
   }
 
   return (
@@ -1572,17 +1638,31 @@ export default function ChatScreen() {
             </View>
           </BlurOrSolid>
 
-          {/* Сообщения + ввод: простой flex-столбец.
-              iOS: KeyboardAvoidingView поднимает всё.
-              Android (adjustPan): вручную добавляем paddingBottom=keyboardHeight чтобы
-              последнее сообщение было видно выше клавиатуры + строки ввода. */}
-          <View style={styles.chatColumn}>
+          {/* iOS: двигаем весь чат-столбец вверх через translateY.
+              Так сообщения и строка ввода поднимаются одним блоком, как в Telegram.
+              Android (adjustPan): ОС сама панит экран. */}
+          <Animated.View
+            style={[
+              styles.chatColumn,
+              Platform.OS === 'ios'
+                ? { transform: [{ translateY: Animated.multiply(iosKeyboardInset, -1) }] }
+                : undefined,
+            ]}
+          >
             <ScrollView 
                 ref={scrollViewRef}
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                   styles.messagesContent,
                   {
+                    // flexGrow+justifyContent:flex-end — как в Telegram:
+                    // мало сообщений → прижаты к полю ввода снизу, не к верху экрана.
+                    flexGrow: 1,
+                    justifyContent: 'flex-end',
+                    // paddingTop — отступ под абсолютным заголовком (60px).
+                    paddingTop: 60,
+                    // Инпут находится в flex-потоке (не перекрывает скролл),
+                    // поэтому достаточно небольшого зазора снизу.
                     paddingBottom: 16,
                   },
                 ]}
@@ -1662,13 +1742,15 @@ export default function ChatScreen() {
               ) : null}
             </ScrollView>
 
-            {/* Поле ввода — обычный блок внизу flex-столбца.
-                На Android: marginBottom = keyboardHeight чтобы оно поднималось вместе с клавиатурой. */}
+            {/* Поле ввода — flex-shrink:0, сидит внизу столбца.
+                iOS: столбец поднимается через keyboardHeight.
+                Android: adjustPan панит экран; для стабильного gap над разными клавиатурами
+                используем визуальный translateY вместо marginBottom. */}
             <View 
               ref={inputContainerRef}
               style={[
                 styles.inputContainer,
-                Platform.OS === 'android' && keyboardVisible && { marginBottom: keyboardHeight },
+                Platform.OS === 'android' && keyboardVisible ? styles.inputContainerAndroidOffset : null,
               ]}
               onStartShouldSetResponder={() => true}
               onTouchStart={(e) => {
@@ -1736,11 +1818,16 @@ export default function ChatScreen() {
                   multiline
                   maxLength={500}
                   onFocus={() => {
-                    setTimeout(() => {
-                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    if (Platform.OS === 'android') {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                        setIsNearBottom(true);
+                        wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
+                      }, 300);
+                    } else {
                       setIsNearBottom(true);
-                      wasNearBottomRef.current = true; // Обновляем флаг при прокрутке вниз
-                    }, Platform.OS === 'android' ? 300 : 100);
+                      wasNearBottomRef.current = true;
+                    }
                   }}
                 />
                 <TouchableOpacity 
@@ -1760,7 +1847,7 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </Animated.View>
 
           {/* Кастомное меню в стиле Telegram */}
           <Modal
@@ -2110,17 +2197,14 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
-    paddingTop: 60, // Отступ для фиксированного заголовка
-    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
+    // overflow НЕ visible — иначе на Android сообщения могут визуально
+    // "протекать" ниже inputContainer (рисоваться за его пределами).
   },
   messagesContent: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    // paddingBottom устанавливается динамически в зависимости от состояния клавиатуры
-    // Минимальный отступ 90-100px для поля ввода (включая reply preview)
-    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
-    // Важно: НЕ прижимаем контент к низу через flex-end,
-    // иначе ScrollView может "держать" внизу и мешать читать старые сообщения.
+    // paddingTop/Bottom и flex задаются динамически в JSX contentContainerStyle.
+    // overflow:visible нужен только для горизонтального свайпа Swipeable — оставляем.
+    overflow: 'visible',
   },
   emptyContainer: {
     flex: 1,
@@ -2171,6 +2255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
+    opacity: 1,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
@@ -2186,11 +2271,11 @@ const styles = StyleSheet.create({
     minWidth: '78%',
   },
   myBubble: {
-    backgroundColor: '#FF4444',
+    backgroundColor: 'rgba(255, 68, 68, 0.9)',
     borderBottomRightRadius: 4,
   },
   otherBubble: {
-    backgroundColor: 'rgb(1,0,0)',
+    backgroundColor: 'rgba(18, 18, 18, 0.88)',
     borderBottomLeftRadius: 4,
   },
   messageContentContainer: {
@@ -2260,9 +2345,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flexShrink: 0,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === 'android' ? 8 : 12,
+    paddingTop: 12,
+    paddingBottom: 12,
     backgroundColor: 'transparent',
+  },
+  inputContainerAndroidOffset: {
+    transform: [{ translateY: -7 }],
   },
   replyPreviewContainer: {
     flexDirection: 'row',

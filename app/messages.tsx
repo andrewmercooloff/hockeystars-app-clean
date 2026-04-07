@@ -332,7 +332,7 @@ export default function MessagesScreen() {
                     id: 'draft',
                     senderId: currentUser.id,
                     receiverId: playerId,
-                    text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
+                    text: `✏️ ${draftText}`,
                     timestamp: new Date(draftTime),
                     read: true
                   }
@@ -360,7 +360,7 @@ export default function MessagesScreen() {
                 id: 'draft',
                 senderId: currentUser.id,
                 receiverId: playerId,
-                text: `✏️ ${draftText.substring(0, 30)}${draftText.length > 30 ? '...' : ''}`,
+                text: `✏️ ${draftText}`,
                 timestamp: new Date(draftTime),
                 read: true
               },
@@ -761,7 +761,7 @@ export default function MessagesScreen() {
               id: 'draft',
               senderId: currentUser.id,
               receiverId: chat.player.id,
-              text: `✏️ ${draft.text.substring(0, 30)}${draft.text.length > 30 ? '...' : ''}`,
+              text: `✏️ ${draft.text}`,
               timestamp: new Date(draft.timestamp),
               read: true
             }
@@ -928,9 +928,6 @@ export default function MessagesScreen() {
         text = replyDataMatch[2];
       }
 
-      text =
-        text.length > 30 ? text.substring(0, 30) + '...' : text;
-
       return prefix + text;
     },
     [t]
@@ -984,6 +981,23 @@ export default function MessagesScreen() {
         if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
         loadOlderChatsPage();
       }, 85);
+    },
+    [searchQuery, loadOlderChatsPage]
+  );
+
+  const onChatsScroll = useCallback(
+    (event: any) => {
+      if (searchQuery.trim()) return;
+      if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
+
+      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+      const distanceToBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+
+      // Запасной триггер пагинации: FlatList onEndReached на некоторых устройствах/верстках
+      // срабатывает нестабильно, поэтому дёргаем подгрузку вручную рядом с низом списка.
+      if (distanceToBottom <= 180) {
+        loadOlderChatsPage();
+      }
     },
     [searchQuery, loadOlderChatsPage]
   );
@@ -1118,6 +1132,8 @@ export default function MessagesScreen() {
             onLayout={(e) => {
               listViewportHeightRef.current = e.nativeEvent.layout.height;
             }}
+            onScroll={onChatsScroll}
+            scrollEventThrottle={120}
             onContentSizeChange={onChatsContentSizeChange}
             onEndReached={loadOlderChatsPage}
             onEndReachedThreshold={0.55}
@@ -1139,7 +1155,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
   },
   overlayLoading: {
     flex: 1,
@@ -1199,10 +1215,10 @@ const styles = StyleSheet.create({
   },
   chatsContainer: {
     flex: 1,
-    paddingTop: 91, // Отступ для заголовка + поиска (еще на 1px выше)
+    paddingTop: 100, // Небольшой зазор под строкой поиска, чтобы список не налезал на неё
   },
   chatsContent: {
-    paddingVertical: 8,
+    paddingVertical: 0,
   },
   emptyListContent: {
     flexGrow: 1,
@@ -1249,67 +1265,68 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20, // Уменьшили с 40 до 20 (в 2 раза)
   },
-  chatItemBlur: {
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  chatItemOverlay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: 'rgba(250, 47, 64, 0.2)',
-  },
   chatItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: '#800000',
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 6,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+  },
+  chatSeparator: {
+    position: 'absolute',
+    left: 82,
+    right: 0,
+    bottom: 0,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(210, 210, 210, 0.38)',
   },
   chatAvatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
     marginRight: 16,
+    marginTop: 2,
   },
   chatInfo: {
     flex: 1,
+    alignSelf: 'stretch',
+    justifyContent: 'flex-start',
+    paddingTop: 0,
+    paddingBottom: 4,
   },
   chatHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 0,
   },
   chatName: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
+    lineHeight: 18,
   },
   chatTime: {
-    color: '#fff',
+    color: 'rgba(180, 180, 180, 0.9)',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
+    lineHeight: 14,
   },
   chatPreview: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginTop: 5,
   },
   chatLastMessage: {
-    color: '#fff',
-    fontSize: 14,
+    color: 'rgba(180, 180, 180, 0.9)',
+    fontSize: 13,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
     marginRight: 8,
+    lineHeight: 16,
   },
   unreadBadge: {
     backgroundColor: '#fa2f40',
@@ -1326,9 +1343,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   chatStatus: {
-    color: '#fa2f40',
-    fontSize: 12,
+    color: 'rgba(250, 47, 64, 0.6)',
+    fontSize: 11,
     fontFamily: 'Gilroy-Regular',
+    lineHeight: 13,
+    marginTop: 1,
   },
   // Стили для поиска
   searchContainer: {
@@ -1386,18 +1405,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Gilroy-Regular',
   },
-  chatGradientShadow: {
-    marginHorizontal: 16,
-    marginVertical: 6,
-    borderRadius: 12,
-    ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 5,
-      elevation: 8,
-    }),
-  },
 });
 
 function inboxMessageTimestampMs(msg: Message | null | undefined): number {
@@ -1454,66 +1461,63 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
 }: MessagesChatRowProps) {
   return (
     <TouchableOpacity onPress={() => onOpen(chat.player.id)} activeOpacity={0.8}>
-      <View style={styles.chatGradientShadow}>
-        <BlurOrSolid intensity={20} tint="dark" style={styles.chatItemBlur}>
-          <View style={styles.chatItemOverlay}>
-            <CachedAvatar
-              playerId={chat.player.id}
-              fallbackAvatarUrl={
-                chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'
-              }
-              size={50}
-              style={styles.chatAvatar}
-              status={chat.player.status}
-              onError={
-                __DEV__
-                  ? () => console.log('Ошибка загрузки аватарки для:', chat.player.name)
-                  : undefined
-              }
-            />
+      <View style={styles.chatItem}>
+        <CachedAvatar
+          playerId={chat.player.id}
+          fallbackAvatarUrl={
+            chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'
+          }
+          size={50}
+          style={styles.chatAvatar}
+          status={chat.player.status}
+          onError={
+            __DEV__
+              ? () => console.log('Ошибка загрузки аватарки для:', chat.player.name)
+              : undefined
+          }
+        />
 
-            <View style={styles.chatInfo}>
-              <View style={styles.chatHeader}>
-                <Text style={styles.chatName}>
-                  {chat.player.status === 'scout'
-                    ? t('profile.scout')?.toUpperCase() || 'SCOUT'
-                    : chat.player.name?.toUpperCase()}
-                </Text>
-                {chat.lastMessage ? (
-                  <Text style={styles.chatTime}>{formatTime(chat.lastMessage.timestamp)}</Text>
-                ) : null}
-              </View>
-
-              <View style={styles.chatPreview}>
-                <Text style={styles.chatLastMessage}>
-                  {chat.lastMessage
-                    ? formatLastMessage(chat.lastMessage, currentUserId)
-                    : t('messages.noMessages')}
-                </Text>
-
-                {chat.unreadCount > 0 ? (
-                  <View style={styles.unreadBadge}>
-                    <Text style={styles.unreadCount}>
-                      {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-
-              <Text style={styles.chatStatus}>
-                {chat.player.status === 'player'
-                  ? t('profile.player')
-                  : chat.player.status === 'coach'
-                    ? t('profile.coach')
-                    : chat.player.status === 'scout'
-                      ? t('profile.scout')
-                      : chat.player.status === 'admin'
-                        ? t('profile.admin')
-                        : t('profile.star')}
-              </Text>
-            </View>
+        <View style={styles.chatInfo}>
+          <View style={styles.chatHeader}>
+            <Text style={styles.chatName}>
+              {chat.player.status === 'scout'
+                ? t('profile.scout')?.toUpperCase() || 'SCOUT'
+                : chat.player.name?.toUpperCase()}
+            </Text>
+            {chat.lastMessage ? (
+              <Text style={styles.chatTime}>{formatTime(chat.lastMessage.timestamp)}</Text>
+            ) : null}
           </View>
-        </BlurOrSolid>
+
+          <Text style={styles.chatStatus}>
+            {chat.player.status === 'player'
+              ? t('profile.player')
+              : chat.player.status === 'coach'
+                ? t('profile.coach')
+                : chat.player.status === 'scout'
+                  ? t('profile.scout')
+                  : chat.player.status === 'admin'
+                    ? t('profile.admin')
+                    : t('profile.star')}
+          </Text>
+
+          <View style={styles.chatPreview}>
+            <Text style={styles.chatLastMessage} numberOfLines={2}>
+              {chat.lastMessage
+                ? formatLastMessage(chat.lastMessage, currentUserId)
+                : t('messages.noMessages')}
+            </Text>
+
+            {chat.unreadCount > 0 ? (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadCount}>
+                  {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </View>
+        <View pointerEvents="none" style={styles.chatSeparator} />
       </View>
     </TouchableOpacity>
   );

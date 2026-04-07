@@ -1387,7 +1387,9 @@ export const clearPlayerCache = async (playerId: string): Promise<void> => {
       AsyncStorage.removeItem(`player_${playerId}`),
       AsyncStorage.removeItem(`teams_${playerId}`)
     ]);
-    console.log(`🗑️ Кеш игрока ${playerId} очищен`);
+    if (__DEV__) {
+      console.log(`🗑️ Кеш игрока ${playerId} очищен`);
+    }
   } catch (error) {
     console.error('❌ Ошибка очистки кеша игрока:', error);
   }

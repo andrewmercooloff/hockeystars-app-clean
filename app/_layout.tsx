@@ -1560,7 +1560,7 @@ export default function RootLayout() {
                 hidden={false}
               />
               
-              {/* Глобальный хедер - не перерендеривается при переходах */}
+              {/* Глобальный хедер приложения */}
               <LogoHeader />
               
               <Tabs
@@ -1571,8 +1571,8 @@ export default function RootLayout() {
                 borderTopWidth: 0,
                 // Теперь navigation bar скрыт, используем стандартные размеры
                 height: 80,
-                paddingBottom: 10,
-                paddingTop: 10
+                paddingBottom: Platform.OS === 'android' ? 13 : 10,
+                paddingTop: Platform.OS === 'android' ? 7 : 10
               },
               tabBarActiveTintColor: '#fff',
               tabBarInactiveTintColor: '#888',

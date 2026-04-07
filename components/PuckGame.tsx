@@ -99,7 +99,7 @@ const usePuckCollisionSystem = (
   screenWidth?: number,
   screenHeight?: number
 ) => {
-  const puckSize = 70;
+  const puckSize = PUCK_SIZE;
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const [appIsActive, setAppIsActive] = useState(true);
   const collisionDetectedRef = useRef(false);
@@ -140,12 +140,12 @@ const usePuckCollisionSystem = (
         else fps = 80;
         break;
       case 'medium':
-        if (Platform.OS === 'android') fps = 35;
+        if (Platform.OS === 'android') fps = 45;
         else fps = 45;
         break;
       case 'low':
       default:
-        fps = 20;
+        fps = 36;
         break;
     }
     return {
@@ -159,8 +159,8 @@ const usePuckCollisionSystem = (
   const reactUpdateInterval = useMemo(() => {
     if (Platform.OS === 'web') return 1;
     if (Platform.OS === 'android') {
-      if (performanceLevel === 'low') return 14;
-      if (performanceLevel === 'medium') return 10;
+      if (performanceLevel === 'low') return 8;
+      if (performanceLevel === 'medium') return 6;
       return 5;
     }
     if (Platform.OS === 'ios') {
@@ -613,9 +613,13 @@ const usePuckCollisionSystem = (
         }
       }
 
+      // В игре скорость движения должна быть одинаковой на всех устройствах.
+      // Берём "эталон" 80 FPS (как на быстром iPhone) и нормализуем шаг по dt,
+      // чтобы low/medium Android не замедляли шайбы, а только были менее плавными.
       const SPEED_MULTIPLIER = 1.2;
-      x += vx * FIXED_DT * TARGET_FPS * SPEED_MULTIPLIER;
-      y += vy * FIXED_DT * TARGET_FPS * SPEED_MULTIPLIER;
+      const REFERENCE_GAME_FPS = 80;
+      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER;
+      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER;
 
       if (x <= boundaries.left) {
         x = boundaries.left;
@@ -638,7 +642,7 @@ const usePuckCollisionSystem = (
 
       if (!pos.isDragging) {
         const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
-        const collisionCheckRadius = isWeakDevice ? minDistSq * 2.5 : minDistSq * 4;
+        const collisionCheckRadius = isWeakDevice ? minDistSq * 1.8 : minDistSq * 4;
         for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
           const dx = x - other.x;
@@ -711,7 +715,13 @@ const usePuckCollisionSystem = (
 
     const minDistance = puckSize;
     const minDistSq = minDistance * minDistance;
-    const checkRadiusSq = (puckSize * 2) * (puckSize * 2);
+    const checkRadiusMul =
+      Platform.OS === 'android' && performanceLevel === 'low'
+        ? 1.55
+        : Platform.OS === 'android' && performanceLevel === 'medium'
+          ? 1.8
+          : 2;
+    const checkRadiusSq = (puckSize * checkRadiusMul) * (puckSize * checkRadiusMul);
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
 
     for (let i = 0; i < updatedPositions.length; i++) {
@@ -854,8 +864,7 @@ const usePuckCollisionSystem = (
       }
 
       if (currentScreen === 'game' && !isIdleModeRef.current) {
-        const stride =
-          performanceLevel === 'low' ? 2 : performanceLevel === 'medium' ? 1 : 0;
+        const stride = 0;
         if (stride > 0) {
           gamePhysicsSkipRef.current++;
           if (gamePhysicsSkipRef.current % (stride + 1) !== 0) {
@@ -1270,18 +1279,7 @@ const OriginalPuckAnimator = React.memo(
           finalVy = (lastDragVelocityRef.current.vy * speedMultiplier) / 60;
         }
 
-        const performanceLevel = getAndroidPerformanceLevel?.() || 'medium';
-        const maxReleaseSpeed = (() => {
-          switch (performanceLevel) {
-            case 'high':
-              return 6.0;
-            case 'medium':
-              return 6.0;
-            case 'low':
-            default:
-              return 5.0;
-          }
-        })();
+        const maxReleaseSpeed = 6.0;
 
         const releaseSpeed = Math.sqrt(finalVx * finalVx + finalVy * finalVy);
         if (releaseSpeed > maxReleaseSpeed) {
@@ -1378,8 +1376,8 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   const gameLimits = useMemo(() => {
     const perf = getPerformanceLevel();
     if (Platform.OS === 'android') {
-      if (perf === 'low') return { maxPucks: 6, spawnMs: 1200, rafStride: 4 };
-      if (perf === 'medium') return { maxPucks: 12, spawnMs: 800, rafStride: 2 };
+      if (perf === 'low') return { maxPucks: 5, spawnMs: 1400, rafStride: 5 };
+      if (perf === 'medium') return { maxPucks: 10, spawnMs: 950, rafStride: 3 };
       return { maxPucks: 20, spawnMs: 580, rafStride: 1 };
     }
     if (perf === 'low') return { maxPucks: 10, spawnMs: 900, rafStride: 3 };
