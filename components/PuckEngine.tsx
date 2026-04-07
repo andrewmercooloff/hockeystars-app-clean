@@ -17,39 +17,19 @@ export const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   const totalMemory = Device.totalMemory ?? null;
 
   if (Platform.OS === 'ios') {
-    if (yearClass && yearClass < 2020) {
-      return 'medium';
-    }
+    if (yearClass && yearClass < 2020) return 'medium';
     return 'high';
   }
 
   if (Platform.OS === 'android') {
-    // Определяем только для адаптации FPS, не для скорости
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
-
-    // Очень новые устройства (после 2022 года) - всегда high для поддержки 120 Гц
-    if (yearClass && yearClass >= 2022) {
-      return 'high';
-    }
-
-    // Очень слабые устройства (< 3GB RAM или до 2018 года) - 60 FPS
-    if ((memoryInGb && memoryInGb < 3) || (yearClass && yearClass < 2018)) {
-      return 'low';
-    }
-
-    // Средние устройства (3-4GB RAM или 2018-2021) - 60 FPS
-    if ((memoryInGb && memoryInGb < 4) || (yearClass && yearClass < 2022)) {
-      return 'medium';
-    }
-
-    // Мощные устройства (4+ GB RAM или после 2021) - 120 FPS
+    if (yearClass && yearClass >= 2023) return 'high';
+    if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) return 'low';
+    if (yearClass && yearClass < 2023) return 'medium';
     return 'high';
   }
 
-  if (Platform.OS === 'web') {
-    return 'high';
-  }
-
+  if (Platform.OS === 'web') return 'high';
   return 'high';
 };
 

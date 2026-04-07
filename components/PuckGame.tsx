@@ -69,7 +69,7 @@ function splitNameTwoLines(fullName?: string | null) {
   return { first: parts[0], last: parts.slice(1).join(' ') };
 }
 
-// Определение уровня производительности устройства (как на главном)
+// Определение уровня производительности (синхронизировано с index.tsx)
 const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   const yearClass = Device.deviceYearClass ?? null;
   const totalMemory = Device.totalMemory ?? null;
@@ -81,9 +81,9 @@ const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
 
   if (Platform.OS === 'android') {
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
-    if (yearClass && yearClass >= 2022) return 'high';
-    if ((memoryInGb && memoryInGb < 3) || (yearClass && yearClass < 2018)) return 'low';
-    if ((memoryInGb && memoryInGb < 4) || (yearClass && yearClass < 2022)) return 'medium';
+    if (yearClass && yearClass >= 2023) return 'high';
+    if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) return 'low';
+    if (yearClass && yearClass < 2023) return 'medium';
     return 'high';
   }
 
@@ -131,7 +131,6 @@ const usePuckCollisionSystem = (
 
   const sharedPositionsRef = useRef<Map<string, { x: { value: number }; y: { value: number } }>>(new Map());
 
-  // Как на главном (index.tsx): на Android не гоним физику 80 Гц — иначе игра подтормаживает при 22+ шайбах.
   const { STEP_MS, FIXED_DT, MAX_STEPS, TARGET_FPS } = useMemo(() => {
     let fps: number;
     switch (performanceLevel) {
@@ -141,11 +140,12 @@ const usePuckCollisionSystem = (
         else fps = 80;
         break;
       case 'medium':
-        fps = 45;
+        if (Platform.OS === 'android') fps = 35;
+        else fps = 45;
         break;
       case 'low':
       default:
-        fps = 30;
+        fps = 20;
         break;
     }
     return {
@@ -159,8 +159,8 @@ const usePuckCollisionSystem = (
   const reactUpdateInterval = useMemo(() => {
     if (Platform.OS === 'web') return 1;
     if (Platform.OS === 'android') {
-      if (performanceLevel === 'low') return 8;
-      if (performanceLevel === 'medium') return 6;
+      if (performanceLevel === 'low') return 14;
+      if (performanceLevel === 'medium') return 10;
       return 5;
     }
     if (Platform.OS === 'ios') {
@@ -1377,13 +1377,12 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 
   const gameLimits = useMemo(() => {
     const perf = getPerformanceLevel();
-    // На Android больше одновременных шайб = тяжёлый O(n²) по коллизиям при полном экране.
     if (Platform.OS === 'android') {
-      if (perf === 'low') return { maxPucks: 12, spawnMs: 850, rafStride: 3 };
-      if (perf === 'medium') return { maxPucks: 16, spawnMs: 700, rafStride: 2 };
+      if (perf === 'low') return { maxPucks: 6, spawnMs: 1200, rafStride: 4 };
+      if (perf === 'medium') return { maxPucks: 12, spawnMs: 800, rafStride: 2 };
       return { maxPucks: 20, spawnMs: 580, rafStride: 1 };
     }
-    if (perf === 'low') return { maxPucks: 12, spawnMs: 850, rafStride: 3 };
+    if (perf === 'low') return { maxPucks: 10, spawnMs: 900, rafStride: 3 };
     if (perf === 'medium') return { maxPucks: 18, spawnMs: 650, rafStride: 2 };
     return { maxPucks: MAX_PUCKS, spawnMs: SPAWN_INTERVAL_MS, rafStride: 1 };
   }, []);

@@ -319,7 +319,7 @@ export const preloadPlayerAvatars = async (
 ): Promise<void> => {
   const list = players.filter((player) => player.avatar);
   const concurrency =
-    options?.concurrency ?? (Platform.OS === 'android' ? 4 : 8);
+    options?.concurrency ?? (Platform.OS === 'android' ? 2 : 8);
 
   for (let i = 0; i < list.length; i += concurrency) {
     const chunk = list.slice(i, i + concurrency);

@@ -39,44 +39,29 @@ const LED_TEXTURE = require('../assets/images/led.jpg');
 const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
   const yearClass = Device.deviceYearClass ?? null;
   const totalMemory = Device.totalMemory ?? null;
-  const modelName = (Device.modelName || '').toLowerCase();
 
   if (Platform.OS === 'ios') {
-    if (yearClass && yearClass < 2020) {
-      return 'medium';
-    }
+    if (yearClass && yearClass < 2020) return 'medium';
     return 'high';
   }
   
   if (Platform.OS === 'android') {
-    // Определяем только для адаптации FPS, не для скорости
     const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
     
-    // Очень новые устройства (после 2022 года) - всегда high для поддержки 120 Гц
-    if (yearClass && yearClass >= 2022) {
-      return 'high';
-    }
-    
-    // Очень слабые устройства (< 3GB RAM или до 2018 года) - 60 FPS
-    if ((memoryInGb && memoryInGb < 3) || (yearClass && yearClass < 2018)) {
+    if (yearClass && yearClass >= 2023) return 'high';
+
+    // ≤4 ГБ или до 2020 — low (Redmi 9, Galaxy A12 и т.п.)
+    if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) {
       return 'low';
     }
 
-    // Средние устройства (3-4GB RAM или 2018-2021) - 60 FPS
-    if ((memoryInGb && memoryInGb < 4) || (yearClass && yearClass < 2022)) {
-      return 'medium';
-    }
+    // 2021-2022, >4 ГБ — medium
+    if (yearClass && yearClass < 2023) return 'medium';
 
-    // Мощные устройства (4+ GB RAM или после 2021) - 120 FPS
     return 'high';
   }
   
-  // Для веб-версии всегда используем high для максимальной плавности
-  // (в браузере можно выбрать low-tier/mid mobile в консоли для тестирования, но это нормально)
-  if (Platform.OS === 'web') {
-    return 'high';
-  }
-  
+  if (Platform.OS === 'web') return 'high';
   return 'high';
 };
 
@@ -148,17 +133,17 @@ const usePuckCollisionSystem = (
     let fps: number;
     switch (performanceLevel) {
       case 'high':
-        // Android: чаще 60 Гц экран — не гоняем физику 80 Гц. iOS: чуть выше для ProMotion.
         if (Platform.OS === 'android') fps = 60;
         else if (Platform.OS === 'ios') fps = 80;
         else fps = 80;
         break;
       case 'medium':
-        fps = 45;
+        if (Platform.OS === 'android') fps = 40;
+        else fps = 45;
         break;
       case 'low':
       default:
-        fps = 30;
+        fps = 24;
         break;
     }
     return {
@@ -172,12 +157,10 @@ const usePuckCollisionSystem = (
   // Интервал обновления React state - оптимизирован для производительности
   // Shared values обновляются отдельно; реже трогаем React на слабом железе.
   const reactUpdateInterval = useMemo(() => {
-    if (Platform.OS === 'web') {
-      return 1;
-    }
+    if (Platform.OS === 'web') return 1;
     if (Platform.OS === 'android') {
-      if (performanceLevel === 'low') return 8;
-      if (performanceLevel === 'medium') return 6;
+      if (performanceLevel === 'low') return 12;
+      if (performanceLevel === 'medium') return 8;
       return 5;
     }
     if (Platform.OS === 'ios') {
@@ -189,8 +172,8 @@ const usePuckCollisionSystem = (
 
   // В режиме покоя реже считаем физику: на low — ещё реже
   const idleFrameSkip = useMemo(() => {
-    if (performanceLevel === 'low') return 5;
-    if (performanceLevel === 'medium') return 4;
+    if (performanceLevel === 'low') return 8;
+    if (performanceLevel === 'medium') return 5;
     return 3;
   }, [performanceLevel]);
 
@@ -2425,12 +2408,12 @@ export default function HomeScreen() {
   }, [loadBlockedUsers, currentUser?.id]);
 
 
-  /** Меньше шайб на главной на слабых Android (меньше одновременных аватаров и коллизий). */
+  /** Меньше шайб на главной на слабых Android (меньше одновременных аватаров и коллизий O(n²)). */
   const homeScreenPuckCapAndroid = useMemo(() => {
     if (Platform.OS !== 'android') return Infinity;
     const level = getPerformanceLevel();
-    if (level === 'low') return 12;
-    if (level === 'medium') return 17;
+    if (level === 'low') return 8;
+    if (level === 'medium') return 14;
     return Infinity;
   }, []);
 

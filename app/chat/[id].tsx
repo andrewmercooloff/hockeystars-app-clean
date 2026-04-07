@@ -6,7 +6,6 @@ import {
     Image,
     ImageBackground,
     Keyboard,
-    KeyboardAvoidingView,
     Modal,
     Platform,
     Pressable,
@@ -48,7 +47,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iceBg = require('../../assets/images/led.jpg');
 
-const ChatShell = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
 
 function messageTimestampMs(m: Message): number {
   return m.timestamp instanceof Date
@@ -258,10 +256,10 @@ export default function ChatScreen() {
         console.log('⌨️ Клавиатура открыта - высота:', height);
         setKeyboardHeight(height);
         setKeyboardVisible(true);
-        // Прокручиваем к последнему сообщению при открытии клавиатуры
+        // Прокручиваем к последнему сообщению — ждём пока marginBottom/paddingBottom применится
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, Platform.OS === 'android' ? 150 : 50);
+        }, Platform.OS === 'android' ? 350 : 50);
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
@@ -1574,32 +1572,18 @@ export default function ChatScreen() {
             </View>
           </BlurOrSolid>
 
-          {/* Сообщения: на Android без KAV (иначе flex часто ломается); список в flex:1+minHeight:0 — иначе ScrollView
-              растягивается на всю высоту и сообщения визуально оказываются под композером. */}
-          <ChatShell
-            style={[styles.chatContainer, styles.chatColumn]}
-            {...(Platform.OS === 'ios'
-              ? ({ behavior: 'padding' as const, keyboardVerticalOffset: 132 } as const)
-              : {})}
-          >
-            <View style={styles.chatInner}>
-            <View style={styles.messagesScrollWrap}>
+          {/* Сообщения + ввод: простой flex-столбец.
+              iOS: KeyboardAvoidingView поднимает всё.
+              Android (adjustPan): вручную добавляем paddingBottom=keyboardHeight чтобы
+              последнее сообщение было видно выше клавиатуры + строки ввода. */}
+          <View style={styles.chatColumn}>
             <ScrollView 
                 ref={scrollViewRef}
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                   styles.messagesContent,
                   {
-                    // Android: композер absolute — список на всю высоту; запас = измеренная высота + буфер.
-                    // Отрицательные margin у TextInput уменьшали onLayout — добавляем EXTRA_ANDROID_COMPOSER.
-                    paddingBottom:
-                      (Platform.OS === 'android'
-                        ? Math.max(inputContainerHeight, 120) +
-                          (keyboardVisible ? keyboardHeight : 0) +
-                          (keyboardVisible ? 24 : 20) +
-                          28
-                        : inputContainerHeight +
-                          (keyboardVisible ? 24 : 16)),
+                    paddingBottom: 16,
                   },
                 ]}
                 onContentSizeChange={handleMessagesContentSizeChange}
@@ -1677,14 +1661,14 @@ export default function ChatScreen() {
                   ))
               ) : null}
             </ScrollView>
-            </View>
 
-            {/* Поле ввода: на Android поверх скролла (absolute), иначе flex ломался и баблы рисовались под баром */}
+            {/* Поле ввода — обычный блок внизу flex-столбца.
+                На Android: marginBottom = keyboardHeight чтобы оно поднималось вместе с клавиатурой. */}
             <View 
               ref={inputContainerRef}
               style={[
                 styles.inputContainer,
-                Platform.OS === 'android' && styles.inputContainerFloatingAndroid,
+                Platform.OS === 'android' && keyboardVisible && { marginBottom: keyboardHeight },
               ]}
               onStartShouldSetResponder={() => true}
               onTouchStart={(e) => {
@@ -1776,8 +1760,7 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-            </View>
-          </ChatShell>
+          </View>
 
           {/* Кастомное меню в стиле Telegram */}
           <Modal
@@ -2000,14 +1983,7 @@ export default function ChatScreen() {
           {/* Кнопка прокрутки вниз - вне KeyboardAvoidingView, чтобы всегда была видна */}
           {!isNearBottom && messages.length > 0 && (
             <TouchableOpacity
-              style={[
-                styles.scrollToBottomButton,
-                {
-                  bottom:
-                    Math.max(inputContainerHeight, Platform.OS === 'android' ? 96 : 72) +
-                    (Platform.OS === 'android' ? 20 : 16),
-                },
-              ]}
+              style={styles.scrollToBottomButton}
               onPress={() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true });
                 setTimeout(() => {
@@ -2128,23 +2104,9 @@ const styles = StyleSheet.create({
   headerActionIconDisabled: {
     opacity: 0.4,
   },
-  chatContainer: {
-    flex: 1,
-    overflow: 'visible', // Позволяем сообщениям выходить за пределы при свайпе
-  },
-  /** Колонка: список сжимается, композер не перекрывается областью скролла (важно для Android + flex). */
   chatColumn: {
+    flex: 1,
     flexDirection: 'column',
-  },
-  chatInner: {
-    flex: 1,
-    minHeight: 0,
-    position: 'relative',
-  },
-  /** minHeight:0 — дочерний ScrollView с flex:1 получает реальную высоту, а не всю overlay. */
-  messagesScrollWrap: {
-    flex: 1,
-    minHeight: 0,
   },
   messagesContainer: {
     flex: 1,
@@ -2300,16 +2262,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: Platform.OS === 'android' ? 8 : 12,
-    backgroundColor: Platform.OS === 'android' ? 'rgba(23, 23, 23, 0.92)' : 'transparent',
-    ...(Platform.OS === 'android'
-      ? { zIndex: 10, elevation: 12 }
-      : {}),
-  },
-  inputContainerFloatingAndroid: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    backgroundColor: 'transparent',
   },
   replyPreviewContainer: {
     flexDirection: 'row',
@@ -2580,6 +2533,7 @@ const styles = StyleSheet.create({
   },
   scrollToBottomButton: {
     position: 'absolute',
+    bottom: 90,
     right: 16,
     width: 44,
     height: 44,
