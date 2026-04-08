@@ -31,6 +31,9 @@ import PuckGame from '../components/PuckGame';
 
 // Размер шайбы
 const PUCK_SIZE = 70;
+
+/** Android: шаг позиции × множитель к iPhone (0.88 ≈ на 12 % медленнее). Подстройте 0.90 (−10 %) или 0.85 (−15 %). */
+const ANDROID_PUCK_MOVE_SCALE = Platform.OS === 'android' ? 0.88 : 1;
 const GAME_PUCK_ID = '__game__';
 const LED_TEXTURE = require('../assets/images/led.jpg');
 
@@ -725,8 +728,8 @@ const usePuckCollisionSystem = (
       // Иначе на Android (часто 60 шагов/с) шайбы медленнее, чем на iPhone (80), и главная «тормознее» игры.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_HOME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER;
-      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER;
+      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
+      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
 
       // Границы
       if (x <= boundaries.left) {

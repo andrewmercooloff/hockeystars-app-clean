@@ -51,6 +51,9 @@ function makeGamePuckInstanceId(basePlayerId: string, seq: number): string {
   return `${GAME_INSTANCE_PREFIX}${basePlayerId}:${seq}`;
 }
 
+/** Как на главной: Android чуть медленнее iPhone (0.88 ≈ −12 %). */
+const ANDROID_PUCK_MOVE_SCALE = Platform.OS === 'android' ? 0.88 : 1;
+
 interface PuckPosition {
   id: string;
   x: number;
@@ -636,8 +639,8 @@ const usePuckCollisionSystem = (
       // чтобы low/medium Android не замедляли шайбы, а только были менее плавными.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_GAME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER;
-      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER;
+      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
+      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
 
       if (x <= boundaries.left) {
         x = boundaries.left;
