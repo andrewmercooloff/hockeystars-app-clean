@@ -51,8 +51,8 @@ function makeGamePuckInstanceId(basePlayerId: string, seq: number): string {
   return `${GAME_INSTANCE_PREFIX}${basePlayerId}:${seq}`;
 }
 
-/** Как на главной: Android чуть медленнее iPhone (0.88 ≈ −12 %). */
-const ANDROID_PUCK_MOVE_SCALE = Platform.OS === 'android' ? 0.88 : 1;
+/** Android: ~30 % мягче скорость, отскоки и спавн в игре (калибровка к iPhone). */
+const ANDROID_PUCK_SOFT = Platform.OS === 'android' ? 0.7 : 1;
 
 interface PuckPosition {
   id: string;
@@ -235,7 +235,7 @@ const usePuckCollisionSystem = (
     const now = Date.now();
     const timeSinceInit = initializationTimeRef.current > 0 ? now - initializationTimeRef.current : Infinity;
     const isInProtectionPeriod = timeSinceInit < INITIALIZATION_PROTECTION_MS;
-    const baseSpeedMultiplier = 0.49;
+    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
     const spawnX = (boundaries.left + boundaries.right) / 2;
     const spawnY = height + puckSize * 0.4; // близко к нижнему краю — шайба появляется быстро
 
@@ -639,8 +639,8 @@ const usePuckCollisionSystem = (
       // чтобы low/medium Android не замедляли шайбы, а только были менее плавными.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_GAME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
-      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
+      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
 
       if (x <= boundaries.left) {
         x = boundaries.left;
@@ -674,7 +674,7 @@ const usePuckCollisionSystem = (
             if (isWeakDevice) {
               const dist = Math.sqrt(distSq);
               const angle = Math.atan2(dy, dx);
-              const pushForce = 0.3;
+              const pushForce = 0.3 * ANDROID_PUCK_SOFT;
               vx += Math.cos(angle) * pushForce;
               vy += Math.sin(angle) * pushForce;
               const speed = Math.sqrt(vx * vx + vy * vy);
@@ -691,10 +691,10 @@ const usePuckCollisionSystem = (
               const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
               if (dot < 0) {
                 const restitution = 0.5;
-                const impulse = dot * restitution;
+                const impulse = dot * restitution * ANDROID_PUCK_SOFT;
                 vx -= impulse * Math.cos(angle);
                 vy -= impulse * Math.sin(angle);
-                const additionalPush = 0.2;
+                const additionalPush = 0.2 * ANDROID_PUCK_SOFT;
                 vx += Math.cos(angle) * additionalPush;
                 vy += Math.sin(angle) * additionalPush;
                 const speed = Math.sqrt(vx * vx + vy * vy);
@@ -760,7 +760,7 @@ const usePuckCollisionSystem = (
           const invDist = 1 / dist;
           const nx = dx * invDist;
           const ny = dy * invDist;
-          const pushStrength = 1.2;
+          const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
           const adjustedOverlap = overlap * pushStrength;
 
           if (pos1.isDragging) {
@@ -778,7 +778,7 @@ const usePuckCollisionSystem = (
           }
 
           if (!pos1.isDragging && !pos2.isDragging) {
-            const impulseStrength = 0.3;
+            const impulseStrength = 0.3 * ANDROID_PUCK_SOFT;
             updatedPositions[i].vx += nx * impulseStrength;
             updatedPositions[i].vy += ny * impulseStrength;
             updatedPositions[j].vx -= nx * impulseStrength;
@@ -1052,7 +1052,7 @@ const usePuckCollisionSystem = (
             const dist = Math.sqrt(distSq);
             const angle = Math.atan2(dy, dx);
             const overlap = minDistance - dist;
-            const pushStrength = 1.2;
+            const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
             const adjustedOverlap = overlap * pushStrength;
             const pushX = -Math.cos(angle) * adjustedOverlap;
             const pushY = -Math.sin(angle) * adjustedOverlap;
@@ -1086,9 +1086,9 @@ const usePuckCollisionSystem = (
             const dist = Math.sqrt(distSq);
             const angle = Math.atan2(dy, dx);
             const overlap = minDistance - dist;
-            finalX -= Math.cos(angle) * overlap * 0.3;
-            finalY -= Math.sin(angle) * overlap * 0.3;
-            const additionalPush = overlap * 0.2;
+            finalX -= Math.cos(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
+            finalY -= Math.sin(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
+            const additionalPush = overlap * 0.2 * ANDROID_PUCK_SOFT;
             const newOtherX = other.x - Math.cos(angle) * additionalPush;
             const newOtherY = other.y - Math.sin(angle) * additionalPush;
             newPositions[i] = {
@@ -1128,7 +1128,7 @@ const usePuckCollisionSystem = (
   const resetPucksMotion = useCallback(() => {
     const current = physicsPositionsRef.current;
     if (!current || current.length === 0) return;
-    const baseSpeedMultiplier = 0.49;
+    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
     const newPositions = current.map((pos) => ({
       ...pos,
       vx: (Math.random() - 0.5) * baseSpeedMultiplier,
@@ -1403,11 +1403,11 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     }
   }, []);
 
-  // Одинаковые лимиты на всех платформах и уровнях производительности (по задумке продукта).
+  // Лимиты игры; на Android интервал спавна длиннее (~30 % реже новых шайб).
   const gameLimits = useMemo(
     () => ({
       maxPucks: MAX_PUCKS,
-      spawnMs: SPAWN_INTERVAL_MS,
+      spawnMs: Math.round(SPAWN_INTERVAL_MS / ANDROID_PUCK_SOFT),
       rafStride: 1 as const,
     }),
     []
@@ -1533,7 +1533,8 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     gameTemplatePoolRef.current = shuffle(pool);
     gameSpawnSeqRef.current = 0;
 
-    const burst = Math.min(12, MAX_PUCKS, pool.length > 0 ? MAX_PUCKS : 0);
+    const burstCap = Math.max(1, Math.round(12 * ANDROID_PUCK_SOFT));
+    const burst = Math.min(burstCap, MAX_PUCKS, pool.length > 0 ? MAX_PUCKS : 0);
     const initial: Player[] = [];
     for (let b = 0; b < burst && pool.length > 0; b++) {
       const base = pool[Math.floor(Math.random() * pool.length)];
@@ -1572,7 +1573,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     if (gameState !== 'playing') return;
     const spawnX = (boundaries.left + boundaries.right) / 2;
     const spawnY = boundaries.bottom;
-    const baseSpeedMultiplier = 0.49;
+    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
     activePlayers.forEach((p) => {
       if (lastCenterYRef.current.has(p.id)) return; // уже “видели” шайбу
       updatePuckPosition(
@@ -1890,7 +1891,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
       const spawnX = (boundaries.left + boundaries.right) / 2;
       // Шайба “выпрыгивает” из центра снизу, но из точки вне экрана
       const spawnY = boundaries.bottom;
-      const baseSpeedMultiplier = 0.49;
+      const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
 
       for (const p of activePlayers) {
         const shared = getSharedPosition(p.id);

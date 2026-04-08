@@ -32,8 +32,8 @@ import PuckGame from '../components/PuckGame';
 // Размер шайбы
 const PUCK_SIZE = 70;
 
-/** Android: шаг позиции × множитель к iPhone (0.88 ≈ на 12 % медленнее). Подстройте 0.90 (−10 %) или 0.85 (−15 %). */
-const ANDROID_PUCK_MOVE_SCALE = Platform.OS === 'android' ? 0.88 : 1;
+/** Android: ~30 % мягче движение и отскоки относительно iPhone (подстройте 0.75–0.85). */
+const ANDROID_PUCK_SOFT = Platform.OS === 'android' ? 0.7 : 1;
 const GAME_PUCK_ID = '__game__';
 const LED_TEXTURE = require('../assets/images/led.jpg');
 
@@ -285,7 +285,7 @@ const usePuckCollisionSystem = (
 
     // Определяем функцию генерации позиции здесь, чтобы она была доступна ниже
     // Единая скорость шайб для всех устройств (как на iOS)
-    const baseSpeedMultiplier = 0.49;
+    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
     
     const generatePosition = (existingPositions: PuckPosition[]): PuckPosition => {
     const minDistance = puckSize;
@@ -728,8 +728,8 @@ const usePuckCollisionSystem = (
       // Иначе на Android (часто 60 шагов/с) шайбы медленнее, чем на iPhone (80), и главная «тормознее» игры.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_HOME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
-      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_MOVE_SCALE;
+      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
 
       // Границы
       if (x <= boundaries.left) {
@@ -776,7 +776,7 @@ const usePuckCollisionSystem = (
               // Упрощенная физика для слабых устройств - только отталкивание
               const dist = Math.sqrt(distSq);
               const angle = Math.atan2(dy, dx);
-              const pushForce = 0.3; // Упрощенный импульс
+              const pushForce = 0.3 * ANDROID_PUCK_SOFT; // Упрощенный импульс
               vx += Math.cos(angle) * pushForce;
               vy += Math.sin(angle) * pushForce;
               
@@ -800,12 +800,12 @@ const usePuckCollisionSystem = (
               if (dot < 0) {
                 // Коэффициент упругости столкновения
                 const restitution = 0.5;
-                const impulse = dot * restitution;
+                const impulse = dot * restitution * ANDROID_PUCK_SOFT;
                 vx -= impulse * Math.cos(angle);
                 vy -= impulse * Math.sin(angle);
                     
                 // Добавляем дополнительный импульс отталкивания для предотвращения кучкования
-                const additionalPush = 0.2;
+                const additionalPush = 0.2 * ANDROID_PUCK_SOFT;
                 vx += Math.cos(angle) * additionalPush;
                 vy += Math.sin(angle) * additionalPush;
                     
@@ -900,7 +900,7 @@ const usePuckCollisionSystem = (
           const ny = dy * invDist; // Нормализованный вектор Y (заменяет sin(angle))
           
           // Увеличиваем силу отталкивания для предотвращения кучкования
-          const pushStrength = 1.2;
+          const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
           const adjustedOverlap = overlap * pushStrength;
           
           // Накопление смещений
@@ -924,7 +924,7 @@ const usePuckCollisionSystem = (
           // Добавляем импульс скорости для лучшего разлета при столкновении
           // ОПТИМИЗАЦИЯ: Используем уже вычисленные нормализованные векторы вместо cos/sin
           if (!pos1.isDragging && !pos2.isDragging) {
-            const impulseStrength = 0.3; // Сила импульса
+            const impulseStrength = 0.3 * ANDROID_PUCK_SOFT; // Сила импульса
             
             // Придаем скорость в направлении отталкивания (используем nx, ny вместо cos/sin)
             updatedPositions[i].vx += nx * impulseStrength;
@@ -1332,7 +1332,7 @@ const usePuckCollisionSystem = (
               const overlap = minDistance - dist;
           
               // Перетаскиваемая шайба остается на месте, другая отталкивается
-              const pushStrength = 1.2;
+              const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
               const adjustedOverlap = overlap * pushStrength;
               const pushX = -Math.cos(angle) * adjustedOverlap;
               const pushY = -Math.sin(angle) * adjustedOverlap;
@@ -1378,11 +1378,11 @@ const usePuckCollisionSystem = (
               const overlap = minDistance - dist;
                 
               // Немного отодвигаем перетаскиваемую шайбу назад
-              finalX -= Math.cos(angle) * overlap * 0.3;
-              finalY -= Math.sin(angle) * overlap * 0.3;
+              finalX -= Math.cos(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
+              finalY -= Math.sin(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
                 
               // Дополнительно отталкиваем другую шайбу
-              const additionalPush = overlap * 0.2;
+              const additionalPush = overlap * 0.2 * ANDROID_PUCK_SOFT;
               const newOtherX = other.x - Math.cos(angle) * additionalPush;
               const newOtherY = other.y - Math.sin(angle) * additionalPush;
                 
@@ -1435,7 +1435,7 @@ const usePuckCollisionSystem = (
     const current = physicsPositionsRef.current;
     if (!current || current.length === 0) return;
 
-    const baseSpeedMultiplier = 0.49;
+    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
 
     const newPositions = current.map(pos => {
       // Если шайба сейчас "залипла", даём ей небольшую случайную скорость
