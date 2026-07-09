@@ -1,0 +1,6 @@
+android/.gradle/
+android/app/build/
+android/build/
+dist-test/
+**/__pycache__/
+*.pyc
