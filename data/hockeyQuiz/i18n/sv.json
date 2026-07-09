@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Hur många skridskoåkare per lag är på isen under jämn styrka (exklusive målvakter)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Hur många regleringsperioder finns det i ett vanligt NHL-spel?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Offside synas när en anfallande spelare går in i offensiv zon innan vad?",
+    "options": [
+      "Mittlinjen",
+      "Pucken",
+      "Målvakten",
+      "Domaren"
+    ]
+  },
+  "rules_icing": {
+    "question": "Icing skjuter pucken bakom mittlinjen förbi motståndarens mållinje utan beröring. Sann?",
+    "options": [
+      "Falskt – aldrig i NHL",
+      "Sann",
+      "Sant - bara på övertid",
+      "Falskt — endast från defensiv zon"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Vem har NHL-rekordet för flest mål i karriären?",
+    "options": [
+      "Alex Ovechkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin är känd som vänsterytter som bär nummer 8 för vilken lagstad?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Vad är ett hattrick i hockey?",
+    "options": [
+      "Tre mål av en spelare i en match",
+      "Tre räddningar i rad",
+      "Tre assist i en match",
+      "Tre straffar"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Ett maktspel inträffar när:",
+    "options": [
+      "Målvakten dras",
+      "Ett slagsmål bryter ut",
+      "Ett lag har fler skridskoåkare på grund av en straff",
+      "Övertid startar"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Stanley Cup är mästerskapstrofén i vilken liga?",
+    "options": [
+      "IIHF världsmästerskap",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Vad är en vanlig hockeypuck gjord av?",
+    "options": [
+      "Vulkaniserat gummi",
+      "Aluminium",
+      "Trä",
+      "Plast"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Hur många minuter är en vanlig mindre straff?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Hur många minuter är ett standardstraff?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Spelet börjar med ett:",
+    "options": [
+      "Straffskott",
+      "Faceoff",
+      "Strömavbrott",
+      "Isande samtal"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Om en NHL-match är oavgjord efter övertid, vad händer?",
+    "options": [
+      "Andra förlängningen",
+      "Shootout",
+      "Slutspelsperiod",
+      "Rita stativ"
+    ]
+  },
+  "rules_crease": {
+    "question": "Kan en anfallare stå i målvaktsfältet utan konsekvenser?",
+    "options": [
+      "Ja alltid",
+      "Bara i slutspel",
+      "Nej – mål kan underkännas",
+      "Bara sista minuten"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "High-sticking är när stickan träffar en motståndare ovanför:",
+    "options": [
+      "Tvärstång",
+      "Axlar",
+      "Midja",
+      "Endast hjälm"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Dra målvaktsriskerna:",
+    "options": [
+      "Straffskott",
+      "Tomt mål mot",
+      "Offside",
+      "Endast glasyr"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Ett straffslag döms ofta för fouling av en:",
+    "options": [
+      "När som helst",
+      "Bara övertid",
+      "Bara slutspel",
+      "Tydlig utbrytning"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "En bänk mindre serveras av alla spelare utom:",
+    "options": [
+      "Målvakten (vanligtvis)",
+      "En forward",
+      "En försvarare",
+      "Kaptenen"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "NHL ordinarie säsong OT spelas med hur många skridskoåkare per sida?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Hur många spelare (inklusive målvakt) kan ett lag ha på is?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Hur många poäng är ett mål värt på resultattavlan?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "På en försenad straff gör det icke-förseende laget ofta:",
+    "options": [
+      "Isar pucken",
+      "Timeout för samtal",
+      "Stoppar uppspelningen",
+      "Drar målvakten"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Målvakter kan bara spela pucken bakom nätet i:",
+    "options": [
+      "Mittcirkel",
+      "Neutral zon",
+      "Full zon",
+      "Trapetsområdet"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Slåss resulterar vanligtvis i en:",
+    "options": [
+      "Stort straff",
+      "Endast spelfel",
+      "Mindre straff",
+      "Inget straff"
+    ]
+  },
+  "terms_puck": {
+    "question": "Det hårda gummiobjektet som spelarna skjuter kallas en:",
+    "options": [
+      "Puck",
+      "Diskus",
+      "Sten",
+      "Boll"
+    ]
+  },
+  "terms_saucer": {
+    "question": "En passning som lyfter pucken kallas en:",
+    "options": [
+      "Tefat pass",
+      "Styrelsekort",
+      "Slappdump",
+      "Skrynkpass"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Ett slagskott innebär:",
+    "options": [
+      "Endast backhand",
+      "En hand på pinne",
+      "Knacka lätt på pucken",
+      "Avveckling och slå mot isen först"
+    ]
+  },
+  "terms_deke": {
+    "question": "En deke är:",
+    "options": [
+      "En typ av straff",
+      "Ett falskt drag för att slå en försvarare",
+      "En defensiv blockering",
+      "Ett linjebyte"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "En utbrytning är när:",
+    "options": [
+      "Pucken är isad",
+      "En skridskoåkare går in ensam på målvakten",
+      "Två spelare slåss",
+      "Ett linjebyte sker"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Plus/minus spår:",
+    "options": [
+      "Skott på mål",
+      "Målskillnad medan spelaren är på is med jämn styrka",
+      "Straffminuter",
+      "Faceoff vinner bara"
+    ]
+  },
+  "terms_assist": {
+    "question": "En primär assist går till spelaren som:",
+    "options": [
+      "Gör målet",
+      "Vann matchen",
+      "Senast berörde pucken före målskytt",
+      "Fick en straff"
+    ]
+  },
+  "terms_block": {
+    "question": "Ett blockerat skott är när:",
+    "options": [
+      "Puck slår inlägg",
+      "Åkare stoppar pucken med kropp/pinne före mål",
+      "Målvakten räddar den",
+      "Skottet missar nätet"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Förhandskontroll betyder:",
+    "options": [
+      "Endast linjebytestrategi",
+      "Försvara din blå linje",
+      "Att pressa motståndare i sin zon för att återta pucken",
+      "Drar målvakten"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Backchecking betyder:",
+    "options": [
+      "Åka tillbaka för att hjälpa försvaret",
+      "Att skjuta från punkten",
+      "Vinnande faceoff",
+      "Målvaktsräddning"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "En one-timer är:",
+    "options": [
+      "Väntar sedan skjuter",
+      "Målvaktsdrag",
+      "Skjut direkt från en passning",
+      "En straff"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "En prickcheck:",
+    "options": [
+      "Lyft pucken över pinnen",
+      "Korskolla",
+      "Slå bort pucken från motståndaren",
+      "Kroka motståndare"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Översta hyllan betyder poäng i:",
+    "options": [
+      "Övre delen av nätet",
+      "Endast från mitten is",
+      "Endast på tomt nät",
+      "Fem hål"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Fem hål är mellan målvaktens:",
+    "options": [
+      "Stick och handske",
+      "Mask och bröst",
+      "Arm och kropp",
+      "Ben"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "En tillsynsman tillhandahåller:",
+    "options": [
+      "Coaching",
+      "Göra mål",
+      "Fysiskt skydd och strid",
+      "Endast faceoffs"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Linjebyten sker vanligtvis:",
+    "options": [
+      "Först efter mål",
+      "Endast på straffar",
+      "Endast vid paus",
+      "I farten under spel"
+    ]
+  },
+  "terms_rink": {
+    "question": "Spelytan i hockey heter:",
+    "options": [
+      "Fält",
+      "Domstol",
+      "Spåra",
+      "Skridskobana"
+    ]
+  },
+  "terms_goal": {
+    "question": "Nätspelarna skjuter på kallas:",
+    "options": [
+      "Mål",
+      "Korg",
+      "Mål",
+      "Zon"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Att spela short-handed betyder:",
+    "options": [
+      "Övertid",
+      "Målvakten drog",
+      "Färre åkare på grund av straff",
+      "Tomt nät"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Sudden-death-övertid betyder:",
+    "options": [
+      "Första målet vinner",
+      "Hel period",
+      "Endast shootout",
+      "Ingen vinnare"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Hur många lag i NHL Original Six-eran?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Modern ishockey utvecklades mest inom:",
+    "options": [
+      "Ryssland",
+      "Sverige",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: USA slog vem 1980?",
+    "options": [
+      "Sovjetunionen",
+      "Kanada",
+      "Tjeckoslovakien",
+      "Sverige"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Wayne Gretzkys poängrekord i karriären är över:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Hockey Hall of Fame är i:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL är främst baserat på:",
+    "options": [
+      "Ryssland",
+      "Finland",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Summit-serien 1972: Kanada vs:",
+    "options": [
+      "USSR",
+      "USA",
+      "Tjeckien",
+      "Sverige"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL grundades i:",
+    "options": [
+      "1900-talet",
+      "2000-talet",
+      "1800-talet",
+      "1700-talet"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby draftades 1:a totalt i:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid draftades 1:a totalt i:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Stanley Cup delades först ut i:",
+    "options": [
+      "1900-talet",
+      "2000-talet",
+      "1700-talet",
+      "1800-talet"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr rankas bland NHL-ledare genom tiderna i:",
+    "options": [
+      "Poäng",
+      "Coaching",
+      "Endast straffminuter",
+      "Målvakt vinner"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin tillbringade sin NHL-karriär främst med:",
+    "options": [
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Washington huvudstäder",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux vann Stanley Cups med:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "En NHL-rink handlar om hur länge?",
+    "options": [
+      "200 fot",
+      "150 fot",
+      "300 fot",
+      "250 fot"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "En NHL-rink är ungefär hur bred?",
+    "options": [
+      "100 fot",
+      "150 fot",
+      "120 fot",
+      "85 fot"
+    ]
+  },
+  "gen_zones": {
+    "question": "Blå linjer delar upp isbanan i hur många zoner?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Den röda mittlinjen används för:",
+    "options": [
+      "Isande samtal",
+      "Penalty box",
+      "Endast faceoffs",
+      "Offside i mitten"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Stickbladskurva hjälper till med:",
+    "options": [
+      "Skridskohastighet",
+      "Målvakten räddar",
+      "Lyfta och kontrollera puck",
+      "Stridande"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate hollow påverkar:",
+    "options": [
+      "Stick flex",
+      "Grepp på is och svängar",
+      "Hjälmpassform",
+      "Jersey storlek"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Benskydd skyddar:",
+    "options": [
+      "Axlar",
+      "Huvud",
+      "Underben",
+      "Endast händer"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kaptenen bär brev:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Suppleant kaptener bär:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Hemmalaget bär vanligtvis:",
+    "options": [
+      "Mörk/färgad",
+      "Vit/ljus",
+      "Inga tröjor",
+      "Endast målvakt"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Paus mellan perioderna handlar om:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 timme"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL slutspelsserier är till största delen:",
+    "options": [
+      "Alltid bäst av 5",
+      "Endast final",
+      "Sällsynta undantag - mestadels bäst av 7",
+      "Aldrig"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "En Zamboni används för att:",
+    "options": [
+      "Mät hastighet",
+      "Förvara puckar",
+      "Vässa skridskor",
+      "Återyta is"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Tjänstemän på isen bär:",
+    "options": [
+      "Lagtröjor",
+      "Målvaktsutrustning",
+      "Svarta och vita ränder",
+      "Kostymer"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hockeyspelare går vidare:",
+    "options": [
+      "Rullskridskor",
+      "Skridskor",
+      "Bara fötter",
+      "Skidor"
+    ]
+  },
+  "gen_stick": {
+    "question": "Spelare styr pucken med en:",
+    "options": [
+      "Stick",
+      "Netto",
+      "Endast händer",
+      "Hjälm"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Vilket lag är Sidney Crosby mest förknippat med?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Vilken position spelade Sidney Crosby främst?",
+    "options": [
+      "Vänster ytter",
+      "Höger ytter",
+      "Försvarsman",
+      "Centrum"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Vilket lag är Connor McDavid mest förknippat med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Vilken position spelade Connor McDavid främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Vilket lag är Nathan MacKinnon mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado Avalanche",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Vilken position spelade Nathan MacKinnon främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Vilket lag är Victor Hedman mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Vilken position spelade Victor Hedman främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Vilket lag är Carey Price mest förknippat med?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Vilken position spelade Carey Price främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Höger ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Vilket lag är Jaromir Jagr mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Vilken position spelade Jaromir Jagr främst?",
+    "options": [
+      "Höger ytter",
+      "Centrum",
+      "Målvakt",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Vilket lag är Mario Lemieux mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Vilken position spelade Mario Lemieux främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Vilket lag är Patrick Kane mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Vilken position spelade Patrick Kane främst?",
+    "options": [
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum",
+      "Målvakt"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Vilket lag är Nicklas Lidström mest förknippad med?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Vilken position spelade Nicklas Lidström främst?",
+    "options": [
+      "Centrum",
+      "Målvakt",
+      "Vänster ytter",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Vilket lag är Martin Brodeur mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Vilken position spelade Martin Brodeur främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Målvakt",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Vilket lag är Steven Stamkos mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Vilken position spelade Steven Stamkos främst?",
+    "options": [
+      "Centrum",
+      "Försvarsman",
+      "Höger ytter",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Vilket lag är Auston Matthews mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Vilken position spelade Auston Matthews främst?",
+    "options": [
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Vilket lag är Leon Draisaitl mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Vilken position spelade Leon Draisaitl främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Vänster ytter",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Vilket lag är Erik Karlsson mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Vilken position spelade Erik Karlsson i första hand?",
+    "options": [
+      "Centrum",
+      "Målvakt",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Vilket lag är Pavel Datsyuk mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Vilken position spelade Pavel Datsyuk främst?",
+    "options": [
+      "Centrum",
+      "Försvarsman",
+      "Höger ytter",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Vilket lag är Henrik Lundqvist mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Vilken position spelade Henrik Lundqvist i första hand?",
+    "options": [
+      "Försvarsman",
+      "Höger ytter",
+      "Centrum",
+      "Målvakt"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Vilket lag är Evgeni Malkin mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Vilken position spelade Evgeni Malkin främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Vänster ytter",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Vilket lag är Artemi Panarin mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Vilken position spelade Artemi Panarin främst?",
+    "options": [
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Vilket lag är Nikita Kucherov mest förknippat med?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Vilken position spelade Nikita Kucherov främst?",
+    "options": [
+      "Centrum",
+      "Målvakt",
+      "Höger ytter",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Vilket lag är Brad Marchand mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Vilken position spelade Brad Marchand främst?",
+    "options": [
+      "Höger ytter",
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Vilket lag är David Pastrnak mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Vilken position spelade David Pastrnak främst?",
+    "options": [
+      "Vänster ytter",
+      "Målvakt",
+      "Centrum",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Vilket lag är Shea Weber mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Vilken position spelade Shea Weber främst?",
+    "options": [
+      "Vänster ytter",
+      "Målvakt",
+      "Försvarsman",
+      "Centrum"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Vilket lag är Sergei Bobrovsky mest förknippat med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Vilken position spelade Sergei Bobrovsky främst?",
+    "options": [
+      "Försvarsman",
+      "Höger ytter",
+      "Målvakt",
+      "Centrum"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Vilket lag är Jonathan Toews mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Vilken position spelade Jonathan Toews främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Vänster ytter",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Vilket lag är Anze Kopitar mest förknippat med?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Vilken position spelade Anze Kopitar främst?",
+    "options": [
+      "Vänster ytter",
+      "Försvarsman",
+      "Höger ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Vilket lag är Mark Messier mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Vilken position spelade Mark Messier främst?",
+    "options": [
+      "Höger ytter",
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Vilket lag är Ray Bourque mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Vilken position spelade Ray Bourque främst?",
+    "options": [
+      "Målvakt",
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Vilket lag är Dominik Hasek mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Vilken position spelade Dominik Hasek främst?",
+    "options": [
+      "Målvakt",
+      "Centrum",
+      "Försvarsman",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Vilket lag är Teemu Selanne mest förknippad med?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Vilken position spelade Teemu Selanne främst?",
+    "options": [
+      "Centrum",
+      "Målvakt",
+      "Vänster ytter",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Vilket lag är Pavel Bure mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Vilken position spelade Pavel Bure främst?",
+    "options": [
+      "Höger ytter",
+      "Målvakt",
+      "Centrum",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Vilket lag är Alexander Mogilny mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Vilken position spelade Alexander Mogilny främst?",
+    "options": [
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum",
+      "Målvakt"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Vilket lag är Peter Forsberg mest förknippad med?",
+    "options": [
+      "Colorado Avalanche",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Vilken position spelade Peter Forsberg i första hand?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Vilket lag är Joe Sakic mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Colorado Avalanche",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Vilken position spelade Joe Sakic främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Vilket lag är Steve Yzerman mest förknippad med?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Vilken position spelade Steve Yzerman främst?",
+    "options": [
+      "Vänster ytter",
+      "Höger ytter",
+      "Försvarsman",
+      "Centrum"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Vilket lag är Bobby Orr mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Vilken position spelade Bobby Orr främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Vilket lag är Gordie Howe mest förknippat med?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Vilken position spelade Gordie Howe främst?",
+    "options": [
+      "Målvakt",
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Vilket lag är Wayne Gretzky mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Vilken position spelade Wayne Gretzky främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Vilket lag är Valeri Kharlamov mest förknippad med?",
+    "options": [
+      "CSKA Moskva",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Vilken position spelade Valeri Kharlamov främst?",
+    "options": [
+      "Höger ytter",
+      "Centrum",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Vilket lag är Vladislav Tretiak mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "CSKA Moskva"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Vilken position spelade Vladislav Tretiak främst?",
+    "options": [
+      "Målvakt",
+      "Försvarsman",
+      "Centrum",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Vilket lag är Bobby Hull mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Vilken position spelade Bobby Hull främst?",
+    "options": [
+      "Försvarsman",
+      "Vänster ytter",
+      "Höger ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Vilket lag är Maurice Richard mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Vilken position spelade Maurice Richard främst?",
+    "options": [
+      "Målvakt",
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Vilket lag är Guy Lafleur mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Vilken position spelade Guy Lafleur främst?",
+    "options": [
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum",
+      "Målvakt"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Vilket lag är Patrick Roy mest förknippad med?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Vilken position spelade Patrick Roy främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Höger ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Vilket lag är Roberto Luongo mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Vilken position spelade Roberto Luongo främst?",
+    "options": [
+      "Målvakt",
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Vilket lag är Ilya Kovalchuk mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Vilken position spelade Ilya Kovalchuk främst?",
+    "options": [
+      "Försvarsman",
+      "Vänster ytter",
+      "Höger ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Vilket lag är Pavel Bure mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Vilken position spelade Pavel Bure främst?",
+    "options": [
+      "Höger ytter",
+      "Vänster ytter",
+      "Centrum",
+      "Målvakt"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Vilket lag är Alexei Kovalev mest förknippad med?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Vilken position spelade Alexei Kovalev främst?",
+    "options": [
+      "Vänster ytter",
+      "Centrum",
+      "Målvakt",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Vilket lag är Sergei Gonchar mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Vilken position spelade Sergej Gonchar främst?",
+    "options": [
+      "Försvarsman",
+      "Vänster ytter",
+      "Målvakt",
+      "Centrum"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Vilket lag är Viacheslav Fetisov mest förknippat med?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Vilken position spelade Viacheslav Fetisov främst?",
+    "options": [
+      "Målvakt",
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Vilket lag är Chris Chelios mest förknippad med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Vilken position spelade Chris Chelios främst?",
+    "options": [
+      "Försvarsman",
+      "Centrum",
+      "Vänster ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Vilket lag är Scott Stevens mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Vilken position spelade Scott Stevens främst?",
+    "options": [
+      "Försvarsman",
+      "Målvakt",
+      "Vänster ytter",
+      "Centrum"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Vilket lag är Paul Coffey mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Vilken position spelade Paul Coffey främst?",
+    "options": [
+      "Vänster ytter",
+      "Målvakt",
+      "Centrum",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Vilket lag är Grant Fuhr mest förknippat med?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Vilken position spelade Grant Fuhr främst?",
+    "options": [
+      "Centrum",
+      "Försvarsman",
+      "Målvakt",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Vilket lag är Mike Bossy mest förknippad med?",
+    "options": [
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Vilken position spelade Mike Bossy främst?",
+    "options": [
+      "Vänster ytter",
+      "Höger ytter",
+      "Målvakt",
+      "Centrum"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Vilket lag är Bryan Trottier mest förknippat med?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Vilken position spelade Bryan Trottier främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Vilket lag är Denis Potvin mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Vilken position spelade Denis Potvin främst?",
+    "options": [
+      "Vänster ytter",
+      "Målvakt",
+      "Centrum",
+      "Försvarsman"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Vilket lag är Cam Neely mest förknippad med?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Vilken position spelade Cam Neely främst?",
+    "options": [
+      "Centrum",
+      "Vänster ytter",
+      "Höger ytter",
+      "Målvakt"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Vilket lag är Adam Oates mest förknippad med?",
+    "options": [
+      "Washington huvudstäder",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Vilken position spelade Adam Oates främst?",
+    "options": [
+      "Vänster ytter",
+      "Centrum",
+      "Försvarsman",
+      "Höger ytter"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Vilket lag är Doug Gilmour mest förknippad med?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Vilken position spelade Doug Gilmour främst?",
+    "options": [
+      "Centrum",
+      "Höger ytter",
+      "Försvarsman",
+      "Vänster ytter"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Vad står KHL för?",
+    "options": [
+      "Kontinental Hockey League",
+      "Kazakiska Hockey League",
+      "Koreanska Hockey League",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF arrangerar:",
+    "options": [
+      "KHL slutspel",
+      "NHL-draft",
+      "Stanley Cup",
+      "Världsmästerskap"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olympisk hockey spelas på:",
+    "options": [
+      "Is",
+      "Sand",
+      "Gräs",
+      "Betong"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Vilket land vann många världstitlar med stjärnor från Jagr och Hašek?",
+    "options": [
+      "Finland",
+      "Tjeckien",
+      "Kanada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Många NHL-stjärnor kommer från:",
+    "options": [
+      "Spanien",
+      "Brasilien",
+      "Sverige",
+      "Indien"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Finland är känt för att producera fantastiska:",
+    "options": [
+      "Målvakter",
+      "Endast tränare",
+      "Zamboni förare",
+      "Domare"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Den sovjetiska \"röda maskinen\" dominerade i:",
+    "options": [
+      "1970-80-tal",
+      "2000-talet",
+      "2010-talet",
+      "Endast 1990-talet"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL-lagen väljer nya spelare på:",
+    "options": [
+      "Deadline för handel",
+      "All-Star spel",
+      "Världscupen",
+      "Inträdesutkast"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Tre stjärnor i spelet tilldelas:",
+    "options": [
+      "En gång per säsong",
+      "Bara i slutspel",
+      "Aldrig i NHL",
+      "Efter varje match"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Damhockey är en olympisk sport sedan:",
+    "options": [
+      "1998",
+      "Aldrig",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "I jämn styrka har varje lag hur många skridskoåkare (inga målvakter)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Hur många minuter varar en NHL-period?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Ditt lag är på powerplay när motståndaren är:",
+    "options": [
+      "Isande puck",
+      "Dragande målvakt",
+      "Shorthanded från straff",
+      "Vinnande faceoff"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Penalty kill betyder:",
+    "options": [
+      "Övertid",
+      "Försvara medan korthänt",
+      "Extra anfallare",
+      "Målvaktskamp"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Professionell hockey spelas på:",
+    "options": [
+      "Smuts",
+      "Gräs",
+      "Is",
+      "Vatten"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "NHL-mästerskapets trofé är:",
+    "options": [
+      "Världscupen",
+      "Olympiska cupen",
+      "Stanley Cup",
+      "Gretzky Cup"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard vann flest Stanley Cups som spelare med:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Wayne Gretzkys berömda tröjnummer var:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux bar nummer:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby bär nummer:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid bär nummer:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Hur många lag finns i NHL (ungefär)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Hur många lag finns i NHL (ungefär)? (avancerad)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Hur många klädda spelare har en vanlig hockeybänk?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Hur många klädda spelare har en vanlig hockeybänk? (avancerad)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Hur många minuter är regleringstiden i NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Hur många minuter är regleringstiden i NHL? (avancerad)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Hur många funktionärer brukar vara på is i NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Hur många funktionärer brukar vara på is i NHL? (avancerad)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Max antal spelare på roster (ca)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Max antal spelare på roster (ca)? (avancerad)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "En försvarares huvudsakliga uppgift i den defensiva zonen är att:",
+    "options": [
+      "Vinn faceoffs",
+      "Gör mål först",
+      "Skydda nätet och spåret",
+      "Byt rader snabbt"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "I en-mot-en-försvar bör försvararen:",
+    "options": [
+      "Åk till bänken omedelbart",
+      "Håll dig mellan angripare och nät",
+      "Lämna öppningen öppen",
+      "Jaga bara bakom nätet"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Defensiv hållning: hålla sig på isen hjälper till att:",
+    "options": [
+      "Signal timeout",
+      "Undvik att slå puck",
+      "Blockera passerande körfält",
+      "Resa lagkamrater"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "När pucken tappas i attacken ska en försvarare:",
+    "options": [
+      "Dra målvakt",
+      "Åka tillbaka för att hjälpa försvaret",
+      "Stanna vid röd linje",
+      "Bråka med domaren"
+    ]
+  },
+  "theory_d_block": {
+    "question": "En försvarare bör blockera skott när:",
+    "options": [
+      "Pucken är endast i neutral zon",
+      "Paus startar",
+      "Banan till nätet är öppen",
+      "Laget är på powerplay"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "På en 2-mot-1-mot bör försvararen vanligtvis:",
+    "options": [
+      "Båda stannar vid den blå linjen",
+      "Båda rusar ihop puckhållaren",
+      "Ta puckhållaren och vinkla honom brett",
+      "Skridsko till bänken"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Vid straffdöd är prioritet ofta att:",
+    "options": [
+      "Skridsko med pucken ensam upp i mitten",
+      "Byt linjer i farten först",
+      "Håll pucken i hörnet för alltid",
+      "Rensa pucken ur zonen"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Bra luckkontroll betyder att försvararen:",
+    "options": [
+      "Säkerhetskopierar aldrig",
+      "Bara träffar bakifrån",
+      "Matchar hastighet och avstånd till angriparen",
+      "Håller sig alltid på mittis"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Framför nätet måste en försvarare:",
+    "options": [
+      "Skate till punkten",
+      "Ring för offside",
+      "Titta bara på pucken och ignorera spelare",
+      "Boxa ut och binda upp motståndare"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Under förkontrolltryck bör en försvarares första blick vara:",
+    "options": [
+      "Skjut på eget nät",
+      "Passera först till lågt stöd eller säkert uttag",
+      "Passera alltid genom mitten under tryck",
+      "Rim blindt runt brädorna"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "När det gäller powerplay vid punkten bör en försvarare:",
+    "options": [
+      "Åka tillbaka till neutral zon",
+      "Byt med målvakten",
+      "Håll pucken i zonen och skapa skott/passningar",
+      "Skjut aldrig"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Ett lagligt försvarsspel på en rush är:",
+    "options": [
+      "Lagligt mete och sticka på pucksidan",
+      "Kroka och dra ner motståndaren",
+      "Stick-check bakifrån på en utbrytning",
+      "Cross-check till huvudet"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Professionella försvarare blockerar skott eftersom:",
+    "options": [
+      "Det räknas som assist",
+      "Blockera aldrig skott",
+      "Blockera skott och offra kropp när det behövs",
+      "Domaren stoppar spelet"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "När två anfallare korsar din zon ska försvarare:",
+    "options": [
+      "Båda jagar bara pucken",
+      "Lämna vecket",
+      "Kommunicera och byt om det behövs",
+      "Ignorera den bortre angriparen"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "När motståndare dumpar pucken ska en försvarare:",
+    "options": [
+      "Hämta pucken eller nåla fast den på brädorna",
+      "Åk skridskor till bänken för förändring",
+      "Vänta på visselpipa",
+      "Skjut från röd linje"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "På en 3-mot-2 rusning bör backbacken vanligtvis:",
+    "options": [
+      "Täck hotet från den svaga sidan (bakdörren).",
+      "Skridsko till den röda linjen",
+      "Byt rader",
+      "Nyp aggressivt varje gång"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "En försvarare kan nypa på den offensiva blå linjen när:",
+    "options": [
+      "Laget är shorthanded",
+      "Målvakt dras",
+      "Partneröverdrag och puck är återställbara vid brädorna",
+      "Alltid på första skiftet"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Om försvararen blir slagen i rusningen bör:",
+    "options": [
+      "Skridsko till bänken",
+      "Stanna upp och argumentera med domaren",
+      "Vänd och jaga genom mitten till nätet",
+      "Kroka bakifrån"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "I defensiv zontäckning betyder låg försvarare vs hög försvarare:",
+    "options": [
+      "Båda vid punkten",
+      "Båda i neutral zon",
+      "Båda i vecket",
+      "Låg puck, hög täcker spår och bakdörr"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "På en uddamansrusning mot är nyckeln:",
+    "options": [
+      "Ta en straff varje gång",
+      "Fördröj och tvinga fram en dålig vinkel eller pass",
+      "Dyk alltid för att blockera",
+      "Lämna spelet för målvakten"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "På straffdöd vs engångsman från flanken bör försvararen:",
+    "options": [
+      "Stå i målvaktsvecket",
+      "Åk skridskor till mitten för förändring",
+      "Ta bort passfilen till luckan",
+      "Tryck på målvakten"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Varför är en blindfälg runt brädorna ofta dålig?",
+    "options": [
+      "Det ger motståndarna en gratis apport",
+      "Det är alltid offside",
+      "Det orsakar alltid isbildning",
+      "Domaren ger straff"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Efter en seger i defensiv zon bör försvarare:",
+    "options": [
+      "Vänta fem sekunder",
+      "Läs forecheck och använd snabb första pass",
+      "Skjut alltid från punkten först",
+      "Skridsko till röd linje med puck"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Skydda en ettmålsledning sent, försvarare bör:",
+    "options": [
+      "Skjut alltid från mitten",
+      "Nyp varje gång vid blå linje",
+      "Hantera puck säkert och undvik onödiga risker",
+      "Dra alltid målvakt tidigt"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Man-mot-man i luckan betyder:",
+    "options": [
+      "Ignorera off-puck hot",
+      "Jaga bara pucken",
+      "Gapkontroll",
+      "Man-mot-man täckning på puckhållaren"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Vid den offensiva blå linjen försöker en försvarare som håller linjen att:",
+    "options": [
+      "Ändra med framåt",
+      "Håll den blå linjen och håll pucken i zon",
+      "Åka tillbaka till neutral zon",
+      "Orsak offside avsiktligt alltid"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Efter en räddning med en retur i luckan måste en försvarare:",
+    "options": [
+      "Fira med målvakten",
+      "Skjut på tomt nät",
+      "Skridsko till bänken",
+      "Rensa returen eller bind angriparen"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Efter isbildning (no-touch) i defensiv zon, på faceoff:",
+    "options": [
+      "Rimma alltid pucken",
+      "Ta mindre straff",
+      "Sätt struktur och vinn ren utgång",
+      "Dra målvakt"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Mot aggressiv forecheck används ett stretchpass för att:",
+    "options": [
+      "Sluta alltid spela för offside",
+      "Bara slösa tid",
+      "Garanti glasyr",
+      "Slå forechecken med ett långpass"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Att stänga en skjutbana betyder:",
+    "options": [
+      "Att få kropp/pinne i skottets väg",
+      "Viftande käpp i luften bara",
+      "Åka skridskor till den röda linjen",
+      "Står bakom nätet"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "När din partner nyper måste du:",
+    "options": [
+      "Skridsko till bänken",
+      "Lämna zonen öppen",
+      "Nyp också omedelbart",
+      "Cover högt som sista försvarare"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "När en försvarare lämnar utvisningsbåset bör:",
+    "options": [
+      "Matcha leken och undvik att bli fångad platt",
+      "Ignorera brådskan",
+      "Byt alltid omedelbart",
+      "Skridsko direkt till motståndarens nät"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Med tomt mål emot bör försvarare i sista minuten:",
+    "options": [
+      "Allt förutseende djupt",
+      "Dra självmålvakt också alltid",
+      "Blockera skott och skydda mitten",
+      "Rensa aldrig pucken"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Om du inte kan nå puckhållaren bör du:",
+    "options": [
+      "Ge upp och förändra",
+      "Lämna öppningen",
+      "Ta bort tid och utrymme med bra positionering",
+      "Kroka bakifrån"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Försvararen ska försvara en kontrollerad zoninträde:",
+    "options": [
+      "Åka bakåt till bänken",
+      "Stå upp vid linjen eller gap tidigt",
+      "Dra dig alltid tillbaka till vecket",
+      "Rör aldrig angriparen"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "I den defensiva zonen är en handpassning av en försvarare till en lagkamrat:",
+    "options": [
+      "Tillåtet om det genomförs i samma zon",
+      "Alltid isbildning",
+      "Alltid offside",
+      "Alltid ett straffslag"
+    ]
+  },
+  "theory_f_support": {
+    "question": "När en lagkamrat har pucken ska en forward:",
+    "options": [
+      "Åka alltid till den röda linjen ensam",
+      "Ignorera pucken på linjebytet",
+      "Gå till öppen is för ett pass",
+      "Stå stilla vid den blå linjen"
+    ]
+  },
+  "theory_f_net": {
+    "question": "En ytter nära nätet på ett skott bör:",
+    "options": [
+      "Skridsko till bänken",
+      "Gå till nätet för returer och tips",
+      "Titta bara från punkten",
+      "Vänta vid mitten is"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "När besittning förloras måste forwards:",
+    "options": [
+      "Byt omedelbart från isen",
+      "Bråka med domaren",
+      "Håll dig i offensiv zon",
+      "Backcheck och hjälp defensivt"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "På en rusning betyder \"head-manning\" pucken:",
+    "options": [
+      "Häll den högt från glaset alltid",
+      "Stanna vid den röda linjen",
+      "Head-man pucken (passa framåt)",
+      "Åka bakåt bara till din egen bänk"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Att cykla pucken lågt i den offensiva zonen hjälper till att:",
+    "options": [
+      "Garanti glasyr",
+      "Forcera offside alltid",
+      "Skapa utrymme för skott eller passning",
+      "Bara slösa tid"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Till att börja med är centerns uppgift ofta att:",
+    "options": [
+      "Alla tre forwards djupt i hörnet",
+      "Lämna cirkeln tidigt",
+      "Skjut omedelbart från pricken",
+      "Vinn lottningen till en ytter- eller D-man plats"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "I en 2-1-2 forecheck, F1 och F2 vanligtvis:",
+    "options": [
+      "Båda jagar bara bakom nätet",
+      "Båda byter linjer",
+      "F1 trycker, F2 tar bort passfilen",
+      "Båda står vid den röda linjen"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "På powerplay bör en forward vid nätfronten:",
+    "options": [
+      "Skridsko till neutral zon",
+      "Täck punkten på straffdöd",
+      "Ta nätfronten på powerplay",
+      "Rör aldrig pucken"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "På en 3-mot-2 rusning bör den tredje forwarden:",
+    "options": [
+      "Skridsko till bänken",
+      "Stå i vecket",
+      "Håll dig hög som tredje man i rusningen",
+      "Jaga pucken djupt utan stöd"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "I en rusning bör en ytter med snabbhet ofta:",
+    "options": [
+      "Stanna vid den blå linjen varje gång",
+      "Passera bakåt till målvakten",
+      "Winger kör brett med fart på rusning",
+      "Åka alltid genom mitten"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "En nyckelroll i maktspelet för en forward är att:",
+    "options": [
+      "Lämna luckan öppen i försvaret",
+      "Alltid endast punktskott",
+      "Gå aldrig till nätet",
+      "Screena målvakten på PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Vid straffdöd täcker en forward ofta:",
+    "options": [
+      "Täck punkten på straffdöd",
+      "Domaren",
+      "Ta nätfronten på powerplay",
+      "Zamboni-föraren"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "För att undvika offside vid den blå linjen kan en forward:",
+    "options": [
+      "Skridsko bakåt in i zonen",
+      "Hoppa över den blå linjen",
+      "Håll dig inne genom att fördröja zoninträde",
+      "Gå alltid in i zonen före pucken"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Att ställa in en entimer kräver vanligtvis:",
+    "options": [
+      "Entidsinställning: skicka till öppna skjutspelet",
+      "Rimma runt pucken utan att titta",
+      "Deka alltid på ett straffslag",
+      "Dumpa och jaga utan att förutse planen"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Efter ett poängskott på powerplay ska forwards:",
+    "options": [
+      "Alla byter rader på en gång",
+      "Vinka till publiken",
+      "Krockar nätet efter skott från punkt",
+      "Skridsko till neutral zon"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "I offensiv zonstruktur, centern ofta:",
+    "options": [
+      "Går aldrig in i öppningen",
+      "Alla tre forwards djupt i hörnet",
+      "Mittstöd lågt, vingen förblir hög",
+      "Täcker bara poängen"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Vid en breakout betyder framåtstöd från svag sida:",
+    "options": [
+      "Stöd från den svaga sidan vid utgång från D-zonen",
+      "Stå stilla vid röd linje",
+      "Skjut på eget nät",
+      "Åk skridskor till motståndarbänken för förändring"
+    ]
+  },
+  "theory_g_track": {
+    "question": "En målvakt ska alltid försöka:",
+    "options": [
+      "Spåra pucken genom trafiken",
+      "Stå vid den röda linjen",
+      "Titta bara på skyttens ögon",
+      "Lämna nätet för ett linjebyte"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "När pucken är lös i vecket ska målvakten:",
+    "options": [
+      "Frys pucken för att stoppa spelet",
+      "Skjut på det tomma nätet",
+      "Åk skridskor till centrerad is och fira",
+      "Passera till domaren"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Efter en räddning är den perfekta returkontrollen:",
+    "options": [
+      "Rebound-kontroll till säkert område",
+      "Återhämta sig alltid till luckan",
+      "Rebound över glaset alltid",
+      "Ignorera returen"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "På uddamansrusningar bör målvakten:",
+    "options": [
+      "Var alltid tyst",
+      "Titta på publiken",
+      "Skridsko till bänken",
+      "Målvakt pratar om udda rusningar"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "I NHL får målvakten spela pucken bakom nätet endast i:",
+    "options": [
+      "Offensiv zon",
+      "Spela puck endast i trapetsen bakom nätet",
+      "Full defensiv zon",
+      "Endast neutral zon"
+    ]
+  },
+  "theory_g_post": {
+    "question": "På en sidopassning över vecket använder målvakten:",
+    "options": [
+      "Stå alltid bara på en stolpe",
+      "Lämna nätet",
+      "Post-to-post-rörelse vid laterala pass",
+      "Åka skridskor till den blå linjen"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Bra vinkelspel betyder att målvakten:",
+    "options": [
+      "Utmaningar till den röda linjen",
+      "Står alltid djupt i vecket",
+      "Vinkelskuren för att minska nätets synlighet",
+      "Vänder tillbaka till skytten"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Målvaktens \"hus\" att skydda är huvudsakligen:",
+    "options": [
+      "Skydda huset (platsområde)",
+      "Zamboni-dörren",
+      "Mitten av iscirkeln",
+      "Utvisningsbåset"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "På en utbrytning föredrar många målvakter att:",
+    "options": [
+      "Åka skridskor mot bänken",
+      "Blunda och hoppas",
+      "Matcha skytten och läs releasen",
+      "Utmana till toppen av cirklarna alltid"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "På ett wraparound-försök bör målvakten:",
+    "options": [
+      "Lämna närposten öppen",
+      "Skate till punkten",
+      "Spela pucken i hörnet",
+      "Håll stolpen på kortsidans omslag"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Om en målvakt spelar pucken bakom nätet UTANFÖR trapetsen är det:",
+    "options": [
+      "Lagligt spel alltid",
+      "Isande samtal",
+      "Fördröjning av spelstraff",
+      "Automatiskt mål"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "När pucken är avskärmad ska målvakten:",
+    "options": [
+      "Lämna vecket",
+      "Signal offside",
+      "Ge alltid upp kortsidan",
+      "Hitta pucken genom trafiken eller justera positionen"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "En målvaktskontroll måste vara:",
+    "options": [
+      "Poke check endast framifrån lagligt",
+      "Med en hög sticka i ansiktet",
+      "Bakifrån skytten alltid",
+      "Medan du står vid mitten is"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "På en lång ledningspassning gör målvakten ofta:",
+    "options": [
+      "Skridskor till motståndarens bänk",
+      "Ignorerar pjäsen",
+      "Skjuter på domaren",
+      "Stoppar eller spelar pucken lagligt bakom nätet"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Hockeyintelligens innebär att varje spelare bör:",
+    "options": [
+      "Varje spelare hjälper till i försvaret",
+      "Bara målvakter pratar",
+      "Bara försvarare backcheckar",
+      "Endast forwards gör mål"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Att hålla din käpp på isen hjälper dig:",
+    "options": [
+      "Blockera passerande körfält och ta emot pass",
+      "Signalisning",
+      "Undvik pucken",
+      "Kör dig snabbare"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Ett smart linjebyte sker vanligtvis:",
+    "options": [
+      "I farten när leken tillåter",
+      "Aldrig i farten",
+      "Under ett utbrott mot",
+      "Alltid bara i offensiv zon"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Innan spelare byter försvarsmärken bör spelare:",
+    "options": [
+      "skrik alltid på domaren",
+      "Ändra utan att titta",
+      "Kommunicera innan du byter märken",
+      "Prata aldrig på isen"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Att byta linjer på fel sida av isen kan:",
+    "options": [
+      "Garantera ett mål",
+      "Hjälp alltid laget",
+      "Orsak för många män eller dålig timing",
+      "Stanna klockan"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Att läsa pjäsen betyder:",
+    "options": [
+      "Ignorera lagkamrater",
+      "Byt aldrig struktur",
+      "Titta alltid bara på pucken",
+      "Förutse var puck och motståndare går härnäst"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Andramansstöd på pucken betyder:",
+    "options": [
+      "Skridsko bort från pucken",
+      "Titta bara på målvakten",
+      "Stå vid den röda linjen",
+      "Matcha hastigheten och stödja puckhållaren"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Stark sida och svag sida hänvisar till:",
+    "options": [
+      "Sida där pucken är mot motsatt sida",
+      "Hemma- och bortalag",
+      "Första och andra perioden",
+      "Endast vänster- och högerhänta spelare"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "När det gäller maktspel är strukturen viktig eftersom:",
+    "options": [
+      "Rörelse öppnar körfält och sträcker ut PK",
+      "Att stå still är bäst",
+      "Endast en spelare bör röra pucken",
+      "Offside spelar ingen roll"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Penalty kill \"box + one\" betyder ofta:",
+    "options": [
+      "Alla fem jagar pucken",
+      "Alla fem står vid den röda linjen",
+      "Ingen struktur behövs",
+      "Fyra i en box, en pressar pucken"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Fusk på en faceoff (timing) betyder:",
+    "options": [
+      "Tajma droppen för att vinna pucken tidigt",
+      "Sparka motståndarens pinne",
+      "Gå in i cirkeln före pucken",
+      "Lämna faceoff-punkten"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Skydda en ledning sena, smarta team:",
+    "options": [
+      "Ta risker varje skift",
+      "Dra alltid målvakt i första perioden",
+      "Rensa aldrig zonen",
+      "Hantera puckar och undvik onödiga straffar"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Tränare byter linje för matchups till:",
+    "options": [
+      "Få gynnsamma spelare-mot-spelare-situationer",
+      "Garantera offside",
+      "Undvik alla faceoffs",
+      "Bara slösa tid"
+    ]
+  },
+  "ref_goal": {
+    "question": "När ett mål görs, gör domaren vanligtvis:",
+    "options": [
+      "Peka på mitten av isen",
+      "Signalera en försenad straff",
+      "Forma ett T med händerna",
+      "Signalisningen avstår från"
+    ]
+  },
+  "ref_timeout": {
+    "question": "En timeout-signal ser ut så här:",
+    "options": [
+      "Händerna bildar ett T",
+      "Peka på mitten av isen",
+      "Sex fingrar visas",
+      "Båda knytnävarna trycker fram"
+    ]
+  },
+  "ref_delayed": {
+    "question": "En försenad straff visas av domaren med:",
+    "options": [
+      "Målsignal",
+      "Timeout T-signal",
+      "Tvätta ur isbildningssignalen",
+      "Ena armen höjd rakt upp"
+    ]
+  },
+  "ref_minor": {
+    "question": "När domaren dömer ett mindre straff signalerar domaren ofta med:",
+    "options": [
+      "Öppna handflatan mot utvisningsrutan",
+      "Arm endast över bröstet",
+      "Händerna bildar ett T",
+      "Peka på mitt is för ett mål"
+    ]
+  },
+  "ref_offside": {
+    "question": "Ett offsidesamtal av domaren signaleras ofta med:",
+    "options": [
+      "Peka på mitten av isen",
+      "Sex fingrar visas",
+      "Stängd knytnäve pumpande rörelse",
+      "Hackrörelse parallellt med isen"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "En signal för handpassering är ofta:",
+    "options": [
+      "Stängd knytnäve pumpande rörelse",
+      "Båda armarna i kors för strid",
+      "Öppna handflatan till utvisningsrutan",
+      "Peka på mitten av isen"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "High-sticking straffsignal: domaren rör ofta:",
+    "options": [
+      "Handflatan mot eget ansikte/käkeområde",
+      "Målstolpen",
+      "Pucken",
+      "Endast eget knä"
+    ]
+  },
+  "ref_too_many": {
+    "question": "För många män på isen signaleras genom att visa:",
+    "options": [
+      "Endast en arm rakt upp",
+      "Peka på mitten av isen",
+      "Händerna bildar ett T",
+      "Sex fingrar visas"
+    ]
+  },
+  "ref_tripping": {
+    "question": "En utlösningsstraffsignal ser ofta ut så här:",
+    "options": [
+      "Utlösningssignal (bensveprörelse)",
+      "Händerna bildar ett T",
+      "Peka på mitten av isen",
+      "Båda knytnävarna trycker fram"
+    ]
+  },
+  "ref_hooking": {
+    "question": "En hooking penalty-signal ser ofta ut så här:",
+    "options": [
+      "Sex fingrar",
+      "Hacka parallellt med is",
+      "Hooking-signal (dragrörelse)",
+      "Stängd knytnäve pumpning"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Korskontrollsignal från domaren är ofta:",
+    "options": [
+      "Båda knytnävarna trycker fram",
+      "Peka på mitten av isen",
+      "Händerna bildar ett T",
+      "Endast handflata mot ansikte"
+    ]
+  },
+  "ref_fighting": {
+    "question": "En kämpande major signaleras ofta med:",
+    "options": [
+      "Hackande offsiderörelse",
+      "Stridmajor (båda armarna i kors)",
+      "En arm upp för försenad straff",
+      "Öppna endast handflatan till lådan"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "När domaren dömer ett straffslag brukar domaren:",
+    "options": [
+      "Visar timeout T",
+      "Tvättar ur isbildning",
+      "Pekar på mittis för straffslag",
+      "Visar sex fingrar"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "När domaren vinkar iväg ett mål kan domaren:",
+    "options": [
+      "Mål otillåtet signal (kors armarna sedan vifta av)",
+      "Peka mot mitten för ett mål",
+      "Lyft armen endast för försenat straff",
+      "Visa timeout T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Fördröjd spelsignal (puck över glas) är ofta:",
+    "options": [
+      "Snubblande bensvep",
+      "Fördröjning av spelet (domaren klappar imaginärt glas)",
+      "Stridande armar i kors",
+      "Hooking pull rörelse"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "En linjeman signalerar offside genom att:",
+    "options": [
+      "Öppna handflatan till utvisningsrutan",
+      "Bilda ett T för timeout",
+      "Peka på mitten is för mål",
+      "Linjemannen båda armarna upp (offside)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "När glasyr viftas bort (t.ex. på PK), kan linjemannen:",
+    "options": [
+      "Korsa armarna för att slåss",
+      "Signalisningen avstår från",
+      "Peka mot mitten för ett mål",
+      "Visa sex fingrar"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "En dubbel mindre straff kan visas med:",
+    "options": [
+      "T för timeout",
+      "Endast en arm rakt upp",
+      "Dubbel moll (två fingrar)",
+      "Sex fingrar för för många män"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Signalen för ombordstigningsstraff innebär ofta:",
+    "options": [
+      "T för timeout",
+      "Peka mot mitten för mål",
+      "Stängd näve för handpassering",
+      "Signal för ombordstigningsstraff (armarna trycker)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Under en försenad straffsignal fortsätter spelet eftersom:",
+    "options": [
+      "Mål gjordes",
+      "Isningen var klar",
+      "Timeout anropades",
+      "Försenad straff (spelet fortsätter)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Motståndaren startar en attack genom mitten. Vad ska centret göra?",
+    "options": [
+      "Gå tillbaka till mitten av din zon och hjälp försvararna",
+      "Stå vid brädorna",
+      "Byt rader utan anledning",
+      "Åka skridskor till motståndarens nät"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "En motståndare bakom nätet försöker göra mål med en lacrosse-stil. Vad ska målvakten göra?",
+    "options": [
+      "Skate ut till mitten av zonen",
+      "Titta på publiken",
+      "Håll dig tätt till den bortre stolpen och titta på pinnen",
+      "Ligg med ansiktet nedåt på isen"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Du är en försvarare som står inför en 2-mot-1 rusning. Vad är viktigast?",
+    "options": [
+      "Ta bort passet",
+      "Attackera puckhållaren omedelbart",
+      "Titta bara på pucken",
+      "Åk till bänken för ett linjebyte"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Du är en ytter och den första spelaren som går in i den offensiva zonen. Vad ska du göra?",
+    "options": [
+      "Pressa försvararen med pucken",
+      "Stå vid den blå linjen",
+      "Åka skridskor i cirklar",
+      "Skate rakt till bänken"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Ditt lag är i maktspelet. Var är mitten vanligtvis placerad?",
+    "options": [
+      "Vid din egen blå linje",
+      "På bänken",
+      "Bakom ditt eget nät",
+      "Framför nätet"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Du tappade pucken i offensiv zon. Vad ska du göra härnäst?",
+    "options": [
+      "Gå genast med i forecheck",
+      "Åka långsamt tillbaka",
+      "Bråka med domaren",
+      "Titta på tränaren"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Centern tappade matchen. Vad kommer härnäst?",
+    "options": [
+      "Skaka in i attacken",
+      "Hjälp i försvaret direkt",
+      "Ta av dig hjälmen",
+      "Sluta röra på dig"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Pucken ligger längs brädorna i din zon. Vad ska den andra spelaren göra?",
+    "options": [
+      "Stöd din partner i närheten",
+      "Stå stilla",
+      "Titta på läktarna",
+      "Åka skridskor till motståndarens nät"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Vad är viktigast i en 3-mot-2 rusning?",
+    "options": [
+      "Alla åker skridskor till samma plats",
+      "Skjut från vilken position som helst",
+      "Stanna vid den blå linjen",
+      "Sträck försvaret med passningar"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Efter ett skott studsade pucken framför nätet. Vad ska målvakten göra?",
+    "options": [
+      "Lyft pinnen i luften",
+      "Hitta pucken och täck över den",
+      "Åka skridskor bakom nätet",
+      "Titta på tränaren"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "När är bästa tiden att byta linje?",
+    "options": [
+      "När ditt lag kontrollerar pucken",
+      "När motståndaren anfaller",
+      "När pucken ligger framför nätet",
+      "Under en farlig målchans"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Vad ska en försvarare göra när han är under hårt förkontrolltryck?",
+    "options": [
+      "Stå stilla med pucken",
+      "Skjut pucken till mitten av zonen",
+      "Fall till isen",
+      "Gör ett snabbt, exakt första pass"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Vad är viktigt att göra när man inte har pucken?",
+    "options": [
+      "Titta i taket",
+      "Håll pinnen med endast en hand",
+      "Öppna för ett pass",
+      "Stå på ett ställe"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Vilken utbrytning anses vara mest tillförlitlig?",
+    "options": [
+      "Förlorar pucken",
+      "Med en kort, exakt passning",
+      "En blind soptipp",
+      "En passage genom mitten av din zon"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Vad är viktigast på straffen?",
+    "options": [
+      "Blockera passerande körfält",
+      "Attackera ständigt",
+      "Skridsko utan struktur",
+      "Spela bara längs brädorna"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "När kan en försvarare vara med i rusningen?",
+    "options": [
+      "Alltid",
+      "Bara på övertid",
+      "Aldrig",
+      "När hans partner täcker sin position"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Varför är en passage genom öppningen farlig?",
+    "options": [
+      "Tjänstemän kan inte se det",
+      "Det saktar ner spelet",
+      "Det kan leda till ett mål",
+      "Det är alltid olagligt"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "När ska en målvakt spela pucken bakom nätet?",
+    "options": [
+      "Att lämna isen",
+      "För att hjälpa försvarare att starta breakouten",
+      "Att vila",
+      "Att argumentera med tjänstemän"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Varför kör en framåt till bortre stolpen?",
+    "options": [
+      "För returer och engångsspelare",
+      "Att hålla sig utanför pjäsen",
+      "Att vila",
+      "Att komma i vägen för en lagkamrat"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Vad ska en försvarare göra innan han skjuter från punkten?",
+    "options": [
+      "Kontrollera om det finns trafik framför nätet",
+      "Skjut rakt in i brädorna",
+      "Slut hans ögon",
+      "Dekes baklänges"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Vem ska slåss först om pucken efter en faceoff?",
+    "options": [
+      "Bara målvakten",
+      "Ingen",
+      "Närmaste spelare",
+      "Bara försvararen"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Varför är puckkontroll viktigt?",
+    "options": [
+      "Motståndaren kan inte attackera utan pucken",
+      "Du kan åka skridskor mindre",
+      "Tjänstemän ger poäng för det",
+      "Det ser bra ut"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Vad är viktigast i en hörnstrid?",
+    "options": [
+      "Ett högt skott",
+      "Hoppning",
+      "Endast bakåtåkning",
+      "Kroppsställning och pinnplacering"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Vilket är det bästa sättet att öppna sig?",
+    "options": [
+      "Flytta in i ett öppet utrymme",
+      "In i ett mörkt hörn",
+      "Åka skridskor bakom en lagkamrats rygg",
+      "Genom att stå still"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Vad ska en forward göra efter att ha tagit ett skott?",
+    "options": [
+      "Byt linjer omedelbart",
+      "Titta på resultattavlan",
+      "Gå till nätet för en rebound",
+      "Stå stilla"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Vad är viktigast för en försvarare i spelautomaten?",
+    "options": [
+      "Håll dig långt från nätet",
+      "Spela utan en pinne",
+      "Förhindra motståndare från att ta sig till returer",
+      "Titta bara på målvakten"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Vilket är det bästa sättet att komma in i zonen?",
+    "options": [
+      "Utan fart",
+      "Åka baklänges in i zonen",
+      "Genom mitten utan stöd",
+      "Med puckkontroll"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "När är ett backhand-skott användbart?",
+    "options": [
+      "Bara i praktiken",
+      "Aldrig",
+      "När det inte finns tid att flytta pucken till forehanden",
+      "Endast för försvarare"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Varför är centern viktig i anfall?",
+    "options": [
+      "Han står alltid still",
+      "Han gör aldrig passningar",
+      "Han kopplar ihop hela linjen",
+      "Han spelar aldrig försvar"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Vad är viktigt i 1-mot-1 försvarsspel?",
+    "options": [
+      "Hoppa på motståndaren direkt",
+      "Titta på läktarna",
+      "Åka skridskor bakåt utan kontroll",
+      "Kontrollera gap och vinkel"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Din linje hade ett långt offensivt skifte. Motståndarens försvarare tog tillbaka pucken bakom nätet men ser trött ut. Din linje har legat på isen länge också. Vad är bäst?",
+    "options": [
+      "Fortsätt att forechecka aggressivt med hela linjen",
+      "Fall tillbaka till den neutrala zonen utan tryck",
+      "En forward fortsätter att trycka medan de andra byter",
+      "Hela raden ändras på en gång"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Varför är det ibland användbart med en passning bakåt?",
+    "options": [
+      "Att tappa fart",
+      "För att slippa attackera",
+      "Att behålla besittning",
+      "För att sluta spela"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Vad spelar roll när du blockerar ett skott?",
+    "options": [
+      "Blockera puckens väg",
+      "Hoppa uppåt",
+      "Vänd ryggen till",
+      "Titta ner"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Hur ska en back spela mot en snabb forward?",
+    "options": [
+      "Fortsätt åka framåt utan att stanna",
+      "Spela för tight varje gång",
+      "Stå stilla",
+      "Ge honom inte öppen is"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "När är en engångsfunktion mest effektiv?",
+    "options": [
+      "När skytten inte är redo",
+      "Bara i praktiken",
+      "När målvakten inte kan komma i tid",
+      "När pucken står stilla"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Varför är kommunikation på isen viktig?",
+    "options": [
+      "Det distraherar motståndaren",
+      "Det ersätter skridskoåkning",
+      "Det hjälper lagkamrater att fatta beslut snabbare",
+      "Tjänstemän gillar det"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Hur ska du spela en 2-mot-0 rusning?",
+    "options": [
+      "Gör målvakten i rörelse med en passning",
+      "Stanna framför nätet",
+      "Skjut från långt håll",
+      "Tappa pucken"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Varför använder forwards utrymmet bakom nätet?",
+    "options": [
+      "Att gömma sig från pjäsen",
+      "För att stoppa uppspelningen",
+      "För att slippa skjuta",
+      "För att tänja på försvaret"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Varför är det viktigt att hålla sig lugn?",
+    "options": [
+      "Det påverkar isen",
+      "Det gör nätet mindre",
+      "Det hjälper dig att fatta bättre beslut",
+      "Det gör pucken snabbare"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Vad ska en försvarare göra vid den offensiva blå linjen?",
+    "options": [
+      "Håll pucken i zonen",
+      "Stå bara i mitten",
+      "Ignorera lagkamrater",
+      "Dra dig alltid tillbaka"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Vad gör en retur farlig?",
+    "options": [
+      "Spelaren står stilla",
+      "Pucken blir lättare",
+      "Domaren kan inte se pucken",
+      "Målvakten kontrollerar inte alltid returen"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Varför är det användbart att ändra attackriktningen?",
+    "options": [
+      "Det skadar ditt eget lag",
+      "Det saktar ner spelet",
+      "Det skapar öppna ytor",
+      "Det tröttar ut tjänstemännen"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Vad är viktigt i en offensiv zon?",
+    "options": [
+      "Åka tillbaka omedelbart",
+      "Vinn puckinnehav snabbt",
+      "Titta på resultattavlan",
+      "Rör dig inte"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Vad innebär det att täcka för en lagkamrat?",
+    "options": [
+      "Fyll hans position när han går med i rusningen",
+      "Spela bara offensiv",
+      "Kopiera hans exakta rutt",
+      "Stå bredvid honom utan att röra på sig"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Om en försvarare tappar position, vad ska han göra?",
+    "options": [
+      "Titta bara på pucken",
+      "Bråka med en lagkamrat",
+      "Sluta åka skridskor",
+      "Kom snabbt tillbaka till försvaret"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Varför skjuter spelare ofta lågt?",
+    "options": [
+      "Det är långsammare",
+      "Eftersom höga skott är olagliga",
+      "För avböjningar och returer",
+      "Det är lättare för tjänstemän"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "När är ett långt pass särskilt användbart?",
+    "options": [
+      "I en skara spelare",
+      "Under ett linjebyte",
+      "På en snabb kontring",
+      "Utan mål"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Varför är rörelse utan pucken viktigt?",
+    "options": [
+      "Det skapar passningsalternativ",
+      "Det är bara för försvarare",
+      "Det påverkar inte spelet",
+      "Det hamnar i lagkamraternas väg"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "När kan ett skott från en skarp vinkel vara användbart?",
+    "options": [
+      "Bara på maktspelet",
+      "Endast på straffdöden",
+      "Aldrig",
+      "För en oväntad återhämtning"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Varför är det viktigt att screena målvakten?",
+    "options": [
+      "Domaren kan inte se pucken",
+      "Det är svårare för honom att se skottet",
+      "Målvakten slutar röra sig",
+      "Det gör att attacken ser bättre ut"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Vad hjälper dig att fånga passningar?",
+    "options": [
+      "Läser pjäsen",
+      "Ensam tur",
+      "Åka skridskor långsamt",
+      "Spelar utan pinne"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Hur fäster man en motståndare längs brädorna korrekt?",
+    "options": [
+      "Skjut honom i ryggen",
+      "Med slutna ögon",
+      "Med händerna och ingen pinne",
+      "Använd din kropp och stick medan du kontrollerar pucken"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Vad spelar roll när en försvarare kommer ut bakom nätet?",
+    "options": [
+      "Slå upp och hitta ett pass",
+      "Åka långsamt",
+      "Skjut pucken omedelbart",
+      "Titta bara på isen"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Varför saktar lag ibland ner spelet?",
+    "options": [
+      "Att tappa pucken",
+      "Att behålla besittning och energi",
+      "För att slippa attackera",
+      "För att stoppa spelet"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Vem är en andra vågsspelare?",
+    "options": [
+      "En domare",
+      "Reservmålvakten",
+      "En spelare som ansluter sig till attacken senare",
+      "Den långsammaste spelaren"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Varför är snabba korta pass effektiva?",
+    "options": [
+      "De är alltid långsamma",
+      "De skadade attacken",
+      "De är bara för försvarare",
+      "De är svårare för motståndare att stjäla"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Vad ska en målvakt göra efter en räddning?",
+    "options": [
+      "Spåra snabbt pucken",
+      "Åk skridskor till brädorna",
+      "Ta av hans handske",
+      "Titta på resultattavlan"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "När är ett anfall genom mitten särskilt farligt?",
+    "options": [
+      "När en spelare är ensam",
+      "När det är fart och stöd",
+      "När det inte finns någon puck",
+      "När alla står stilla"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Vad hjälper dig att fatta beslut snabbare?",
+    "options": [
+      "Åka skridskor långsamt",
+      "Titta bara på pucken",
+      "Skannade hela tiden isen",
+      "Spela utan att prata"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Vad gör en bra kapten?",
+    "options": [
+      "Stöttar teamet och föregår med gott exempel",
+      "Spelar bara offensiv",
+      "Skriker på alla",
+      "Spelar aldrig försvar"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Vad hjälper dig att undkomma förhandskontrolltrycket?",
+    "options": [
+      "Spelar ensam",
+      "Flytta pucken snabbt",
+      "Håller i pucken länge",
+      "Stanna längs brädorna"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Varför kan du inte tveka vid den blå linjen?",
+    "options": [
+      "Målvakten kommer att tröttna",
+      "Isen kommer att bli värre",
+      "Du kan förlora zonen",
+      "Domaren kommer att stoppa spelet"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Varför är ett skott direkt efter en passning farligt?",
+    "options": [
+      "Den är alltid svag",
+      "Det är svårt att genomföra",
+      "Domaren kommer att underkänna målet",
+      "Målvakten är inte inställd i tid"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Vem ska komma tillbaka först efter att ha tappat pucken?",
+    "options": [
+      "Närmaste spelare",
+      "Bara centrum",
+      "Bara försvararen",
+      "Bara målvakten"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Hur ska en försvarare spela mot en hård skytt?",
+    "options": [
+      "Titta bara på målvakten",
+      "Minska hans tid och utrymme att skjuta",
+      "Ge honom öppet utrymme",
+      "Stå långt borta"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Varför flyttas pucken ofta till hörna i försvaret?",
+    "options": [
+      "Tjänstemän kan inte se pjäsen",
+      "Isen är långsammare där",
+      "Det är mindre fara för nätet",
+      "Det är lättare att göra mål där"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Vad gör en forward framför nätet?",
+    "options": [
+      "Står med ryggen mot pjäsen",
+      "Skridskor till brädorna",
+      "Rör sig inte",
+      "Skapar trafik och jagar returer"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Varför är det viktigt att leka med huvudet uppåt?",
+    "options": [
+      "Att se lagkamrater och motståndare",
+      "För att göra pucken lättare",
+      "Att åka skridskor snabbare",
+      "Så tjänstemän kan se dig"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Vad är viktigast efter att ha vunnit en PK faceoff?",
+    "options": [
+      "Försök att gå igenom alla",
+      "Ta en lång paus",
+      "Rensa pucken ur zonen",
+      "Stå stilla"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Varför är det viktigt att pressa motståndare?",
+    "options": [
+      "Det skadar ditt lag",
+      "Det påverkar inte spelet",
+      "Det stoppar spelet",
+      "Det kan tvinga fram ett misstag"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "När är ett beröringspass användbart?",
+    "options": [
+      "Att utveckla attacken snabbt",
+      "När spelaren står stilla",
+      "När det inte finns några lagkamrater",
+      "Bara i försvaret"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Vad ska centern göra framför sitt eget nät?",
+    "options": [
+      "Vänta på en pass up is",
+      "Åka till den neutrala zonen",
+      "Hjälp försvarare att täcka luckan",
+      "Stå vid brädorna"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Varför är kors och tvärs rörelse av framåt effektiv?",
+    "options": [
+      "Det förvirrar försvarare",
+      "Det skadar ditt eget lag",
+      "Det bromsar attacken",
+      "Det är olagligt"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Vad spelar roll när man slåss om en lös puck?",
+    "options": [
+      "Håll i pucken länge",
+      "Stå stilla",
+      "Titta ner",
+      "Bestäm snabbt vad du ska göra härnäst"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Varför ändrar spelare hastighet?",
+    "options": [
+      "Att sluta åka skridskor",
+      "Att tappa pucken",
+      "Att slå en motståndare",
+      "För att tröttna snabbare"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Det är 40 sekunder kvar. Du leder med ett mål. Motståndaren spelar 6-mot-5. Deras försvarare har pucken vid den blå linjen och din ytter kan hoppa för en stjäl. Vad är bäst?",
+    "options": [
+      "Flyg på pucken aggressivt direkt",
+      "Spåra endast den främre spelare",
+      "Tryck endast med en kontrollerad vinkel för att ta pucken",
+      "Kollapsa helt till nätet"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "När kan en målvakt komma långt utanför sitt nät?",
+    "options": [
+      "Att snappa upp pucken och hjälpa försvaret",
+      "Aldrig",
+      "Alltid",
+      "Först efter ett mål"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Vad är viktigt för ett framgångsrikt reboundförsök?",
+    "options": [
+      "En stor avveckling",
+      "Stå långt från nätet",
+      "Långsam rörelse",
+      "Snabb reaktion"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Varför är stöd för andra spelare viktigt?",
+    "options": [
+      "Det skapar extra alternativ",
+      "Det är bara för försvarare",
+      "Det behövs inte",
+      "Det skadar attacken"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Vad betyder \"läsa pjäsen\"?",
+    "options": [
+      "Förutse vad motståndarna kommer att göra",
+      "Räkna pass",
+      "Följ bara pucken",
+      "Titta på resultattavlan"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Varför är det viktigt att skydda pucken med sin kropp?",
+    "options": [
+      "Det gör isen snabbare",
+      "Det är bara för försvarare",
+      "Det påverkar domaren",
+      "Det hjälper till att skydda pucken"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "När är ett utbrott längs brädorna användbart?",
+    "options": [
+      "Aldrig",
+      "Alltid",
+      "När mitten är täckt",
+      "Bara på maktspelet"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Vad spelar roll när man försvarar sig mot ett maktspel?",
+    "options": [
+      "Ständiga dekar",
+      "Håll dig kompakt defensivt",
+      "Långsamma linjebyten",
+      "Spelar en-mot-en överallt"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Vad är en passning för ett skott?",
+    "options": [
+      "En passning till en spelare i ett bra skottläge",
+      "En passning tillbaka till målvakten",
+      "Ett slumpmässigt pass",
+      "En passning till hörnet"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Varför är en deke före ett skott användbart?",
+    "options": [
+      "Det bromsar alltid attacken",
+      "Det är olagligt",
+      "Det är bara för försvarare",
+      "Det kan flytta målvakten eller en försvarare"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Efter att ha blockerat ett skott bör en spelare:",
+    "options": [
+      "Leta genast efter pucken",
+      "Stå stilla",
+      "Titta på domaren",
+      "Lämna isen"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Hur hjälper forwards försvarare?",
+    "options": [
+      "Håll dig i offensiv zon",
+      "Backcheck och öppna för ett pass",
+      "Spela bara längs brädorna",
+      "Spela inte försvar"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Vad hjälper mot tung forechecking?",
+    "options": [
+      "Snabba beslut och puckrörelser",
+      "Åka skridskor långsamt",
+      "Spelar ensam",
+      "Lång puckinnehav"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "När är en stickavböjning användbar?",
+    "options": [
+      "Aldrig",
+      "Bara i praktiken",
+      "Bara i försvaret",
+      "För att styra om pucken"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Vad spelar roll när man anfaller längs brädorna?",
+    "options": [
+      "Passar tillbaka till målvakten",
+      "Stöd från en närliggande lagkamrat",
+      "Spelar ensam",
+      "Att stoppa rörelse"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Vad är viktigt för en målvakt på ett utbrytning?",
+    "options": [
+      "Håll god positionering och tålamod",
+      "Släpp till isen omedelbart",
+      "Skridsko bakåt",
+      "Titta på försvararna"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Vad är viktigt vid en snabb övergång till brott?",
+    "options": [
+      "Långsamma passningar",
+      "Lång puckinnehav",
+      "Stannade vid den blå linjen",
+      "Snabbhet för beslutsfattande"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Vad gör en försvarare på powerplay?",
+    "options": [
+      "Skridskor till nätet",
+      "Går inte med i attacken",
+      "Rör på pucken och letar efter ett skott",
+      "Står stilla"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Varför är trafik framför nätet farlig?",
+    "options": [
+      "Pucken blir långsammare",
+      "Målvakten har svårare att se pucken",
+      "Domaren kan inte räkna spelare",
+      "Spelare tröttnar snabbare"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Vad spelar roll efter att ha snappat upp pucken?",
+    "options": [
+      "Övergång snabbt till brott",
+      "Sluta åka skridskor",
+      "Dumpa pucken direkt",
+      "Åk skridskor till brädorna"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Vad är särskilt viktigt på övertid?",
+    "options": [
+      "Ständiga långskott",
+      "Spelar utan pass",
+      "Långa pass",
+      "Puckkontroll och få misstag"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Vad ska en försvarare göra om en motståndare skärmar målvakten?",
+    "options": [
+      "Titta på domaren",
+      "Åk skridskor till brädorna",
+      "Rensa luckan och bind motståndaren",
+      "Stå i närheten utan att röra på dig"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Varför är lagspel viktigare än individuellt spel?",
+    "options": [
+      "Laget påverkar inte resultatet",
+      "En linje skapar fler chanser tillsammans",
+      "En spelare bestämmer alltid spelet",
+      "Passningar skadar spelet"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Vad är viktigt innan du tar ett skott?",
+    "options": [
+      "Läs snabbt av målvaktens position",
+      "Titta bara ner på pucken",
+      "Kom till punkt",
+      "Blunda"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Vad utvecklar bäst hockey IQ?",
+    "options": [
+      "Endast styrketräning",
+      "Tittar bara på mål",
+      "Endast skridskoåkning",
+      "Att studera spelet, öva och förstå situationer"
+    ]
+  }
+}

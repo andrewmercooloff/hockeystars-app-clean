@@ -4,8 +4,60 @@ import * as Crypto from 'expo-crypto';
 // SMS Service - React Native Compatible (using Twilio)
 // Note: Twilio не работает напрямую в React Native, используем fetch API
 
-/** Текст OTP в SMS — только код (без префикса приложения). */
-const verificationSmsBody = (code: string): string => code;
+/** OTP для Twilio / sms.ru — только цифры (KZ и др. могут резать бренд). */
+const plainOtpSmsBody = (code: string): string => code;
+
+/** Беларусь (RocketSMS + HockstarsBy): шаблон с брендом — быстрее проходит по маршруту. */
+const rocketSmsVerificationBody = (code: string): string => {
+  const template =
+    Constants.expoConfig?.extra?.rocketSmsMessageTemplate || 'Hockeystars code: {code}';
+  return template.replace('{code}', code);
+};
+
+/** Notificore fixname (RU): в тексте обязательно название сервиса кириллицей (требование оператора). */
+const getNotificoreServiceNameCyrl = (): string =>
+  Constants.expoConfig?.extra?.notificoreServiceNameCyrl || 'ХоккейСтарс';
+
+const notificoreVerificationSmsBody = (code: string): string =>
+  `Код ${getNotificoreServiceNameCyrl()}: ${code}`;
+
+/** Шаблон 2FA для кабинета Notificore (поддержка: «Код ХоккейСтарс: {code2fa}»). */
+export const getNotificore2faTemplateText = (): string =>
+  `Код ${getNotificoreServiceNameCyrl()}: {code2fa}`;
+
+const sleepMs = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const SMS_HTTP_TIMEOUT_MS = 15000;
+
+const fetchWithTimeout = async (
+  url: string,
+  init: RequestInit = {},
+  timeoutMs = SMS_HTTP_TIMEOUT_MS
+): Promise<Response> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
+let rocketSmsPasswordHashCache: string | null = null;
+
+const getRocketSmsPasswordHash = async (password: string): Promise<string> => {
+  if (rocketSmsPasswordHashCache) {
+    return rocketSmsPasswordHashCache;
+  }
+  rocketSmsPasswordHashCache = (
+    await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.MD5, password)
+  ).toLowerCase();
+  return rocketSmsPasswordHashCache;
+};
+
+/** 2FA Notificore: шаблон + live API key → JWT через /api/auth/login */
+export const isNotificore2faConfigured = (): boolean =>
+  !!(getNotificore2faTemplateId() && getNotificoreApiKey());
 
 // Функция форматирования номера телефона
 // Убираем все форматирующие символы (пробелы, скобки, дефисы), оставляем только + и цифры
@@ -75,7 +127,7 @@ export const sendSMSViaTwilio = async (phone: string, code: string): Promise<boo
 
     const formattedPhone = formatPhoneNumber(phone);
 
-    const message = verificationSmsBody(code);
+    const message = plainOtpSmsBody(code);
 
     // Формируем тело запроса вручную для React Native совместимости
     // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
@@ -185,7 +237,7 @@ export const sendWhatsAppViaTwilio = async (phoneNumber: string, code: string): 
     
     const whatsappTo = `whatsapp:${formattedPhone}`;
     
-    const message = verificationSmsBody(code);
+    const message = plainOtpSmsBody(code);
 
     // Формируем тело запроса вручную для React Native совместимости
     // ВАЖНО: Добавляем RiskCheck=disable для легитимных сообщений (коды подтверждения)
@@ -290,30 +342,474 @@ export const checkTwilioConfig = () => {
   return true;
 };
 
+/** Национальные 10 цифр после кода страны +7 (РФ и KZ делят +7). */
+const getNationalDigitsAfterSeven = (phone: string): string | null => {
+  const cleaned = phone.replace(/[^\d+]/g, '');
+  let national = '';
+  if (cleaned.startsWith('+7')) {
+    national = cleaned.slice(2);
+  } else if (cleaned.startsWith('7') && cleaned.length === 11) {
+    national = cleaned.slice(1);
+  } else if (cleaned.startsWith('8') && cleaned.length === 11) {
+    national = cleaned.slice(1);
+  } else {
+    return null;
+  }
+  return national.length === 10 ? national : null;
+};
+
+/** KZ и RU используют +7; мобильные РФ — 9xx, KZ — 6xx/7xx. */
+const isKazakhstanMobileAfterSeven = (national10: string): boolean => {
+  if (national10.startsWith('9')) return false;
+  return national10.startsWith('6') || national10.startsWith('7');
+};
+
 // Функция определения страны по номеру телефона
-export const getCountryFromPhone = (phone: string): 'BY' | 'RU' | 'US' | 'CA' | 'OTHER' => {
+export const getCountryFromPhone = (
+  phone: string
+): 'BY' | 'RU' | 'KZ' | 'US' | 'CA' | 'OTHER' => {
   const cleaned = phone.replace(/[^\d+]/g, '');
   
-  // Беларусь: +375
   if (cleaned.startsWith('+375') || cleaned.startsWith('375')) {
     return 'BY';
   }
   
-  // Россия: +7
-  if (cleaned.startsWith('+7') || cleaned.startsWith('7')) {
+  if (
+    cleaned.startsWith('+7') ||
+    (cleaned.startsWith('7') && cleaned.length === 11) ||
+    (cleaned.startsWith('8') && cleaned.length === 11)
+  ) {
+    const national = getNationalDigitsAfterSeven(phone);
+    if (national && isKazakhstanMobileAfterSeven(national)) {
+      return 'KZ';
+    }
     return 'RU';
   }
   
-  // США и Канада: +1
   if (cleaned.startsWith('+1') || cleaned.startsWith('1')) {
-    // Для простоты считаем все +1 как США (можно добавить более точное определение для Канады)
     return 'US';
   }
   
   return 'OTHER';
 };
 
-// Функция отправки SMS через RocketSMS API (Беларусь)
+// Формат msisdn для Notificore (+7): 79001234567, без «+»
+const formatRussianMsisdn = (phone: string): string | null => {
+  const cleaned = phone.replace(/[^\d+]/g, '');
+  let digits = cleaned;
+  if (digits.startsWith('+7')) {
+    digits = digits.substring(2);
+  } else if (digits.startsWith('7') && digits.length === 11) {
+    digits = digits.substring(1);
+  } else if (digits.startsWith('8') && digits.length === 11) {
+    digits = digits.substring(1);
+  }
+  if (digits.length !== 10) {
+    return null;
+  }
+  return `7${digits}`;
+};
+
+// Notificore SMS API (Россия) — https://api.notificore.ru/v1.0/sms/create
+const parseNotificoreResponse = (responseData: any): { ok: boolean; errorCode?: unknown; errorDescription?: string } => {
+  const errorCode = responseData?.result?.error ?? responseData?.error;
+  const errorDescription =
+    responseData?.result?.errorDescription ?? responseData?.errorDescription;
+  const ok = errorCode === 0 || errorCode === '0';
+  return { ok, errorCode, errorDescription };
+};
+
+const NOTIFICORE_SMS_URL = 'https://api.notificore.ru/v1.0/sms/create';
+const NOTIFICORE_2FA_BASE = 'https://one-api.notificore.ru/api/2fa/authentications';
+const NOTIFICORE_AUTH_LOGIN_URL = 'https://one-api.notificore.ru/api/auth/login';
+const NOTIFICORE_AUTH_REFRESH_URL = 'https://one-api.notificore.ru/api/auth/refresh';
+const NOTIFICORE_2FA_OTP_URL = `${NOTIFICORE_2FA_BASE}/otp`;
+const NOTIFICORE_2FA_VERIFY_URL = `${NOTIFICORE_2FA_BASE}/otp`;
+/** Префикс в БД: код генерирует Notificore 2FA, не приложение. */
+export const NOTIFICORE_2FA_CODE_PREFIX = '2FA:';
+
+let pendingNotificore2faAuthId: string | null = null;
+let cachedNotificoreBearer: { token: string; expiresAtMs: number } | null = null;
+
+const getNotificoreApiKey = (): string | null => {
+  const live = Constants.expoConfig?.extra?.notificoreApiKey;
+  return typeof live === 'string' && live.trim().length > 10 ? live.trim() : null;
+};
+
+const getNotificore2faTemplateId = (): number | null => {
+  const id = Constants.expoConfig?.extra?.notificore2faTemplateId;
+  if (id === undefined || id === null || id === '') return null;
+  const n = Number(id);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+const storeNotificoreBearer = (bearer: string): string => {
+  cachedNotificoreBearer = {
+    token: bearer,
+    // JWT ~1 ч; обновляем за 5 мин до истечения
+    expiresAtMs: Date.now() + 55 * 60 * 1000,
+  };
+  return bearer;
+};
+
+/** API 2.0: JWT через POST /api/auth/login { api_key: live_… } — см. help.notificore.ru/article/67056 */
+const fetchNotificoreBearer = async (forceLogin = false): Promise<string | null> => {
+  const staticBearer = Constants.expoConfig?.extra?.notificore2faJwt;
+  if (
+    typeof staticBearer === 'string' &&
+    staticBearer.trim().length > 20 &&
+    staticBearer.includes('.')
+  ) {
+    return staticBearer.trim();
+  }
+
+  const now = Date.now();
+  if (
+    !forceLogin &&
+    cachedNotificoreBearer &&
+    cachedNotificoreBearer.expiresAtMs > now + 60_000
+  ) {
+    return cachedNotificoreBearer.token;
+  }
+
+  if (!forceLogin && cachedNotificoreBearer?.token) {
+    try {
+      const refreshRes = await fetchWithTimeout(NOTIFICORE_AUTH_REFRESH_URL, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${cachedNotificoreBearer.token}`,
+        },
+      });
+      if (refreshRes.ok) {
+        const refreshData = await refreshRes.json();
+        if (typeof refreshData?.bearer === 'string' && refreshData.bearer.length > 20) {
+          return storeNotificoreBearer(refreshData.bearer);
+        }
+      }
+    } catch {
+      /* login ниже */
+    }
+  }
+
+  const apiKey = getNotificoreApiKey();
+  if (!apiKey) return null;
+
+  try {
+    const loginRes = await fetchWithTimeout(NOTIFICORE_AUTH_LOGIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ api_key: apiKey }),
+    });
+    const loginData = await loginRes.json();
+    if (loginRes.ok && typeof loginData?.bearer === 'string' && loginData.bearer.length > 20) {
+      console.log('✅ Notificore 2FA: JWT получен через /api/auth/login');
+      return storeNotificoreBearer(loginData.bearer);
+    }
+    console.warn('⚠️ Notificore auth/login:', loginRes.status, loginData);
+  } catch (error) {
+    console.warn('⚠️ Notificore auth/login error:', error);
+  }
+  return null;
+};
+
+export const takeNotificore2faAuthId = (): string | null => {
+  const id = pendingNotificore2faAuthId;
+  pendingNotificore2faAuthId = null;
+  return id;
+};
+
+const postNotificore2fa = async (
+  path: string,
+  body: Record<string, unknown>,
+  retryOn401 = true
+): Promise<{ ok: boolean; status: number; data: any }> => {
+  const jwt = await fetchNotificoreBearer();
+  if (!jwt) return { ok: false, status: 0, data: null };
+
+  const doPost = async (token: string) => {
+    const response = await fetchWithTimeout(`${NOTIFICORE_2FA_BASE}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+    const text = await response.text();
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
+    return { ok: response.ok, status: response.status, data };
+  };
+
+  try {
+    const result = await doPost(jwt);
+    if (result.status === 401 && retryOn401) {
+      cachedNotificoreBearer = null;
+      const fresh = await fetchNotificoreBearer(true);
+      if (fresh) return doPost(fresh);
+    }
+    return result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { ok: false, status: 0, data: { message } };
+  }
+};
+
+/** 2FA OTP — шаблон 211, см. https://help.notificore.ru/article/67201 */
+const sendSMSViaNotificore2FA = async (phone: string): Promise<boolean> => {
+  const templateId = getNotificore2faTemplateId();
+  const sender = Constants.expoConfig?.extra?.notificoreOriginator || 'HockeyStars';
+
+  if (!templateId) {
+    return false;
+  }
+
+  const msisdn = formatRussianMsisdn(phone);
+  if (!msisdn) {
+    console.error('❌ Notificore 2FA: неверный номер RU:', phone);
+    return false;
+  }
+
+  console.log('🇷🇺 Notificore 2FA OTP:', { msisdn, templateId, sender });
+
+  const { ok, status, data } = await postNotificore2fa('/otp', {
+    recipient: msisdn,
+    channel: 'sms',
+    sender,
+    template_id: templateId,
+    code_digits: 6,
+    code_lifetime: 300,
+    code_max_tries: 5,
+  });
+
+  const authId = data?.data?.id;
+  if (ok && authId && data?.data?.status === 'pending') {
+    pendingNotificore2faAuthId = String(authId);
+    console.log('✅ Notificore 2FA: OTP отправлен, auth id:', authId);
+    return true;
+  }
+
+  console.warn('⚠️ Notificore 2FA не отправил OTP:', { status, response: data });
+  if (status === 401) {
+    console.warn('💡 2FA API 401: проверьте live API key и шаблон в кабинете Notificore.');
+  } else if (status === 422) {
+    console.warn(`💡 Шаблон 2FA (RU): «${getNotificore2faTemplateText()}» — статус Approved.`);
+  }
+  return false;
+};
+
+/** Проверка кода через Notificore 2FA API (код генерирует Notificore, не приложение). */
+export const verifyNotificore2faOtp = async (
+  authId: string,
+  accessCode: string
+): Promise<boolean> => {
+  const jwt = await fetchNotificoreBearer();
+  if (!jwt || !authId) return false;
+
+  const digits = accessCode.replace(/\D/g, '');
+  if (!digits) return false;
+
+  try {
+    const response = await fetchWithTimeout(`${NOTIFICORE_2FA_VERIFY_URL}/${authId}/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({ access_code: digits }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      console.warn('⚠️ Notificore 2FA verify HTTP', response.status, data?.errors ?? data);
+      return false;
+    }
+    const verified = data?.data?.status === 'verified';
+    if (verified) {
+      console.log('✅ Notificore 2FA: код подтверждён');
+      return true;
+    }
+    console.warn('⚠️ Notificore 2FA verify:', data?.errors ?? data);
+    return false;
+  } catch (error) {
+    console.warn('⚠️ Notificore 2FA verify error:', error);
+    return false;
+  }
+};
+
+const NOTIFICORE_DELIVERY_OK = new Set(['delivered', 'sent']);
+const NOTIFICORE_DELIVERY_FAIL = new Set(['rejected', 'undeliverable', 'expired']);
+
+const fetchNotificoreSmsStatus = async (
+  apiKey: string,
+  smsId: string
+): Promise<string | null> => {
+  try {
+    const response = await fetch(`${NOTIFICORE_SMS_URL.replace('/create', '')}/${smsId}`, {
+      headers: { Accept: 'application/json', 'X-API-KEY': apiKey },
+    });
+    const data = await response.json();
+    if (data?.error !== 0 && data?.error !== '0') return null;
+    return typeof data?.status === 'string' ? data.status.toLowerCase() : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Фоновая проверка DLR — только для логов, не блокирует UI. */
+const logNotificoreDeliveryLater = (apiKey: string, smsId: string): void => {
+  void (async () => {
+    const result = await waitNotificoreDelivery(apiKey, smsId);
+    if (result === 'delivered') {
+      console.log('✅ Notificore DLR: доставлено', { id: smsId });
+    } else if (result === 'failed') {
+      console.warn('❌ Notificore DLR: отклонено (rejected)', { id: smsId });
+    } else {
+      console.warn('⚠️ Notificore DLR: статус не получен', { id: smsId });
+    }
+  })();
+};
+
+const waitNotificoreDelivery = async (
+  apiKey: string,
+  smsId: string
+): Promise<'delivered' | 'failed' | 'timeout'> => {
+  const delaysMs = [3000, 5000, 8000, 10000, 15000, 20000, 30000, 30000];
+  for (const delay of delaysMs) {
+    await sleepMs(delay);
+    const status = await fetchNotificoreSmsStatus(apiKey, smsId);
+    if (!status) continue;
+    if (NOTIFICORE_DELIVERY_OK.has(status)) return 'delivered';
+    if (NOTIFICORE_DELIVERY_FAIL.has(status)) return 'failed';
+    // accepted / scheduled — в очереди или на модерации, ещё не финал
+  }
+  const last = await fetchNotificoreSmsStatus(apiKey, smsId);
+  if (last && NOTIFICORE_DELIVERY_FAIL.has(last)) return 'failed';
+  // Принято оператором, но DLR ещё нет — не считаем ошибкой (SMS может идти 1–5 мин)
+  if (last === 'accepted' || last === 'scheduled') return 'delivered';
+  return 'timeout';
+};
+
+const postNotificoreSms = async (
+  apiKey: string,
+  payload: Record<string, unknown>
+): Promise<{ ok: boolean; responseData: any; status: number; networkError?: string }> => {
+  try {
+    const response = await fetchWithTimeout(NOTIFICORE_SMS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseText = await response.text();
+    let responseData: any;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch {
+      console.warn(`⚠️ Notificore: не JSON ответ:`, responseText.slice(0, 300));
+      return { ok: false, responseData: null, status: response.status };
+    }
+
+    const parsed = parseNotificoreResponse(responseData);
+    return { ok: response.ok && parsed.ok, responseData, status: response.status };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn('⚠️ Notificore: сетевая ошибка:', message);
+    return { ok: false, responseData: null, status: 0, networkError: message };
+  }
+};
+
+export const sendSMSViaNotificore = async (phone: string, code: string): Promise<boolean> => {
+  // 2FA + утверждённый шаблон — рекомендуемый способ OTP для РФ
+  if (isNotificore2faConfigured()) {
+    const twoFaOk = await sendSMSViaNotificore2FA(phone);
+    if (twoFaOk) return true;
+    console.log('⚠️ Notificore 2FA не сработал, пробуем обычный SMS API…');
+  }
+
+  console.log('🇷🇺 Отправляем SMS через Notificore SMS API');
+
+  const liveKey = Constants.expoConfig?.extra?.notificoreApiKey;
+  const originator = Constants.expoConfig?.extra?.notificoreOriginator || 'HockeyStars';
+
+  if (!liveKey) {
+    console.error('❌ Notificore Live API key не найден в конфигурации');
+    return false;
+  }
+
+  const msisdn = formatRussianMsisdn(phone);
+  if (!msisdn) {
+    console.error('❌ Неверный формат номера для Notificore (RU):', phone);
+    return false;
+  }
+
+  const body = notificoreVerificationSmsBody(code);
+  const reference = `hs_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+  const payload = {
+    destination: 'phone',
+    originator,
+    body,
+    msisdn,
+    reference,
+    // Notificore: validity в часах (1–72), не в секундах. 600 → error 5.
+    validity: '1',
+    tariff: '0',
+  };
+
+  console.log('📤 Notificore запрос (live):', { msisdn, originator, reference, body });
+
+  const { ok, responseData, status, networkError } = await postNotificoreSms(liveKey, payload);
+  if (ok) {
+    const smsId = String(responseData?.result?.id ?? '');
+    console.log('✅ Notificore принял SMS:', {
+      msisdn,
+      id: smsId || undefined,
+      reference: responseData?.result?.reference ?? reference,
+    });
+    // Не ждём DLR в UI — SMS уходит 5–120 сек, пользователь видит экран ввода сразу
+    if (smsId) {
+      logNotificoreDeliveryLater(liveKey, smsId);
+    }
+    return true;
+  }
+
+  const parsed = parseNotificoreResponse(responseData ?? {});
+  console.warn('⚠️ Notificore live не отправил SMS:', {
+    status,
+    error: parsed.errorCode,
+    errorDescription: parsed.errorDescription,
+    networkError,
+    response: responseData,
+  });
+
+  // Подсказки по типичным причинам (кабинет Notificore не настроен)
+  const err = Number(parsed.errorCode);
+  if (err === 5 || err === 8) {
+    console.warn(
+      '💡 Notificore error 5: часто неверный validity (нужны часы 1–72, не секунды) или маршрут/баланс. ' +
+        'Error 8 — пополните баланс live-ключа.'
+    );
+  } else if (err === 25 || err === 32) {
+    console.warn(
+      '💡 Notificore: отправитель — латиница до 11 символов (HockeyStars), не NTF. Кабинет 2FA → настройки.'
+    );
+  }
+
+  return false;
+};
+
+// Функция отправки SMS через RocketSMS API (Беларусь + резерв для России)
 // Документация: https://rocketsms.by/storage/rocketsms_api.pdf
 // По документации используется HTTP POST на /simple/send с параметрами в query string.
 export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<boolean> => {
@@ -329,54 +825,28 @@ export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<
       return false;
     }
 
-    // RocketSMS требует MD5-хеш пароля для авторизации (в нижнем регистре)
-    const passwordHash = (await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.MD5,
-      password
-    )).toLowerCase();
-    
-    console.log('🔐 RocketSMS авторизация:', {
-      login: login,
-      passwordHashLength: passwordHash.length,
-      passwordHashPreview: passwordHash.substring(0, 8) + '...'
-    });
+    const passwordHash = await getRocketSmsPasswordHash(password);
 
-    // Форматируем номер для RocketSMS (поддерживаем Беларусь и Россию)
     const cleaned = phone.replace(/[^\d+]/g, '');
-    let formattedPhone = cleaned;
     let fullPhone: string;
 
-    // Беларусь: +375
-    if (formattedPhone.startsWith('+375') || formattedPhone.startsWith('375')) {
-      if (formattedPhone.startsWith('+375')) {
-        formattedPhone = formattedPhone.substring(4);
-      } else {
-        formattedPhone = formattedPhone.substring(3);
-      }
-      if (formattedPhone.length !== 9) {
-        console.error('❌ Неверный формат номера для Беларуси:', formattedPhone);
+    if (cleaned.startsWith('+375') || cleaned.startsWith('375')) {
+      let national = cleaned.startsWith('+375') ? cleaned.substring(4) : cleaned.substring(3);
+      if (national.length !== 9) {
+        console.error('❌ Неверный формат номера для Беларуси:', national);
         return false;
       }
-      fullPhone = `375${formattedPhone}`;
-    }
-    // Россия: +7
-    else if (formattedPhone.startsWith('+7') || formattedPhone.startsWith('7')) {
-      if (formattedPhone.startsWith('+7')) {
-        formattedPhone = formattedPhone.substring(2);
+      fullPhone = `375${national}`;
       } else {
-        formattedPhone = formattedPhone.substring(1);
-      }
-      if (formattedPhone.length !== 10) {
-        console.error('❌ Неверный формат номера для России:', formattedPhone);
+      const ruMsisdn = formatRussianMsisdn(phone);
+      if (!ruMsisdn) {
+        console.error('❌ RocketSMS: неподдерживаемый формат номера:', phone);
         return false;
       }
-      fullPhone = `7${formattedPhone}`;
-    } else {
-      console.error('❌ RocketSMS поддерживает только Беларусь (+375) и Россию (+7)');
-      return false;
+      fullPhone = ruMsisdn;
     }
 
-    const text = verificationSmsBody(code);
+    const text = rocketSmsVerificationBody(code);
 
     const baseUrl = 'https://api.rocketsms.by/simple/send';
     
@@ -389,17 +859,22 @@ export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<
     if (sender) {
       url.searchParams.append('sender', sender);
     }
+    // OTP: priority=true — по доке RocketSMS SMS уходит мимо очереди (коды, пароли)
+    url.searchParams.append('priority', 'true');
 
     console.log('📤 RocketSMS запрос:', {
       url: url.toString().replace(passwordHash, '***'),
       phone: fullPhone,
-      hasSender: !!sender,
+      sender: sender || '(default)',
+      textPreview: text.replace(/\d{4,6}/, '******'),
+      priority: true,
     });
 
-    const response = await fetch(url.toString(), {
+    const t0 = Date.now();
+    const response = await fetchWithTimeout(url.toString(), {
       method: 'POST',
       headers: {
-        'Accept': 'application/json,text/plain,*/*',
+        Accept: 'application/json,text/plain,*/*',
       },
     });
 
@@ -439,7 +914,7 @@ export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<
       logData.data = responseData;
     }
 
-    console.log('📥 RocketSMS ответ:', logData);
+    console.log('📥 RocketSMS ответ:', { ...logData, apiMs: Date.now() - t0 });
 
     if (!response.ok) {
       return false;
@@ -503,7 +978,7 @@ export const sendSMSViaSmsBy = async (phone: string, code: string): Promise<bool
       return false;
     }
     
-    const message = verificationSmsBody(code);
+    const message = plainOtpSmsBody(code);
     const fullPhone = `375${formattedPhone}`; // Полный номер с кодом страны (375296549728)
     const fullPhoneWithPlus = `+375${formattedPhone}`; // Полный номер с кодом страны и знаком + (+375296549728)
     
@@ -553,23 +1028,6 @@ export const sendSMSViaSmsBy = async (phone: string, code: string): Promise<bool
         
         let response: Response;
         
-        if (endpoint.method === 'GET') {
-          const url = new URL(endpoint.url);
-          url.searchParams.append('token', apiKey);
-          url.searchParams.append('message', message);
-          url.searchParams.append('phone', fullPhone);
-          // Добавляем sender только если он указан (может быть null для вариантов без альфа-имени)
-          if (endpoint.sender) {
-            url.searchParams.append('sender', endpoint.sender);
-          }
-          
-          response = await fetch(url.toString(), {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json'
-            }
-          });
-        } else {
           // Пробуем разные форматы параметров для POST запроса
           let requestBody: string;
           let headers: Record<string, string>;
@@ -642,7 +1100,6 @@ export const sendSMSViaSmsBy = async (phone: string, code: string): Promise<bool
             headers: headers,
             body: requestBody
           });
-        }
         
         const responseText = await response.text();
         let responseData: any;
@@ -755,7 +1212,7 @@ export const sendSMSViaSmsRu = async (phone: string, code: string): Promise<bool
       return false;
     }
     
-    const message = verificationSmsBody(code);
+    const message = plainOtpSmsBody(code);
     
     // Получаем номер отправителя из конфигурации (если указан)
     // ВАЖНО: По умолчанию НЕ передаем параметр from - sms.ru использует бесплатный канал
@@ -967,14 +1424,20 @@ export const sendSMSViaProvider = async (phone: string, code: string): Promise<b
     return success;
   }
   
-  // Россия: используем только RocketSMS
+  // Россия: Notificore (2FA или SMS API, отправитель HockeyStars)
   if (country === 'RU') {
-    console.log('🇷🇺 Россия - используем RocketSMS');
-    const success = await sendSMSViaRocketSMS(phone, code);
-    if (!success) {
-      console.log('⚠️ RocketSMS не сработал для России. Код только в консоли, Twilio отключен для RU.');
+    console.log('🇷🇺 Россия - используем Notificore');
+    const notificoreOk = await sendSMSViaNotificore(phone, code);
+    if (!notificoreOk) {
+      console.log('⚠️ Notificore не доставил SMS для России.');
     }
-    return success;
+    return notificoreOk;
+  }
+
+  // Казахстан (+7): у Notificore нужна регистрация имени — пока Twilio
+  if (country === 'KZ') {
+    console.log('🇰🇿 Казахстан - Twilio (Notificore KZ требует регистрацию отправителя)');
+    return await sendSMSViaTwilio(phone, code);
   }
   
   // США и Канада: не отправляем SMS, только email

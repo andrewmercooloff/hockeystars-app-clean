@@ -502,3 +502,130 @@ export const getWorkingImageUrl = async (imageUrl: string, fallbackUrl?: string)
     return fallbackUrl || imageUrl; // Возвращаем fallback или оригинальный URL
   }
 };
+
+// Копируем content:// / ph:// в cache — readAsStringAsync и иногда FormData не работают напрямую
+const resolveVideoUploadUri = async (videoUri: string): Promise<string> => {
+  if (videoUri.startsWith('file://')) {
+    return videoUri;
+  }
+  const cachePath = `${FileSystem.cacheDirectory}video_upload_${Date.now()}.mp4`;
+  await FileSystem.copyAsync({ from: videoUri, to: cachePath });
+  return cachePath;
+};
+
+export type UploadVideoResult = { url: string | null; thumbUrl?: string | null; error?: string };
+
+// Загрузка видео в Supabase Storage (bucket: videos)
+// Лимит: 20 секунд, выбор из галереи через expo-image-picker
+export const uploadVideoToStorage = async (
+  videoUri: string,
+  playerId: string,
+  onProgress?: (progress: number) => void,
+  thumbUri?: string,
+): Promise<UploadVideoResult> => {
+  let localUri = videoUri;
+  try {
+    // НЕ проверяем supabase.auth.getSession(): приложение использует собственную
+    // авторизацию (таблица players), а не Supabase Auth — сессии там никогда нет.
+    // Политика bucket'а videos разрешает INSERT для public, поэтому загрузка работает без неё.
+    if (!playerId) {
+      return { url: null, error: 'Нужно войти в аккаунт' };
+    }
+
+    console.log('📹 Загружаем видео в Supabase Storage:', videoUri.substring(0, 60));
+
+    const timestamp = Date.now();
+    const fileName = `${playerId}/${timestamp}.mp4`;
+    const thumbFileName = `${playerId}/${timestamp}_thumb.jpg`;
+    localUri = await resolveVideoUploadUri(videoUri);
+    onProgress?.(20);
+
+    const fileResponse = await fetch(localUri);
+    if (!fileResponse.ok) {
+      return { url: null, error: 'Не удалось прочитать файл с устройства' };
+    }
+
+    const arrayBuffer = await fileResponse.arrayBuffer();
+    if (!arrayBuffer.byteLength) {
+      return { url: null, error: 'Пустой файл видео' };
+    }
+
+    onProgress?.(40);
+
+    const { data, error } = await supabase.storage
+      .from('videos')
+      .upload(fileName, arrayBuffer, {
+        contentType: 'video/mp4',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('❌ Ошибка загрузки видео:', error.message, error);
+      const msg = error.message || '';
+      if (msg.toLowerCase().includes('row-level security') || error.message?.includes('403')) {
+        return {
+          url: null,
+          error: 'Нет прав на загрузку. В Supabase выполните database/videos_storage_policies.sql',
+        };
+      }
+      return { url: null, error: msg || 'Ошибка Storage' };
+    }
+
+    onProgress?.(70);
+
+    let thumbPublicUrl: string | null = null;
+    if (thumbUri) {
+      try {
+        const thumbResponse = await fetch(thumbUri);
+        if (thumbResponse.ok) {
+          const thumbBuffer = await thumbResponse.arrayBuffer();
+          if (thumbBuffer.byteLength > 0) {
+            const { error: thumbError } = await supabase.storage.from('videos').upload(thumbFileName, thumbBuffer, {
+              contentType: 'image/jpeg',
+              upsert: false,
+            });
+            if (!thumbError) {
+              const { data: thumbUrlData } = supabase.storage.from('videos').getPublicUrl(thumbFileName);
+              thumbPublicUrl = thumbUrlData.publicUrl;
+            }
+          }
+        }
+      } catch (thumbErr) {
+        console.warn('⚠️ Не удалось загрузить превью видео:', thumbErr);
+      }
+    }
+
+    onProgress?.(90);
+
+    const { data: urlData } = supabase.storage
+      .from('videos')
+      .getPublicUrl(data?.path ?? fileName);
+
+    onProgress?.(100);
+    console.log('✅ Видео загружено:', urlData.publicUrl);
+    return { url: urlData.publicUrl, thumbUrl: thumbPublicUrl };
+  } catch (err) {
+    console.error('❌ Ошибка uploadVideoToStorage:', err);
+    return { url: null, error: err instanceof Error ? err.message : 'Неизвестная ошибка' };
+  } finally {
+    if (localUri !== videoUri && localUri.startsWith(FileSystem.cacheDirectory ?? '')) {
+      FileSystem.deleteAsync(localUri, { idempotent: true }).catch(() => {});
+    }
+  }
+};
+
+// Удаление видео из Supabase Storage по публичному URL
+export const deleteVideoFromStorage = async (publicUrl: string): Promise<void> => {
+  try {
+    const url = new URL(publicUrl);
+    const pathParts = url.pathname.split('/videos/');
+    if (pathParts.length < 2) return;
+    const filePath = pathParts[1];
+    const thumbPath = filePath.replace(/\.mp4$/i, '_thumb.jpg');
+  const pathsToRemove = thumbPath !== filePath ? [filePath, thumbPath] : [filePath];
+    await supabase.storage.from('videos').remove(pathsToRemove);
+    console.log('🗑️ Видео удалено из Storage:', pathsToRemove.join(', '));
+  } catch (err) {
+    console.error('❌ Ошибка deleteVideoFromStorage:', err);
+  }
+};

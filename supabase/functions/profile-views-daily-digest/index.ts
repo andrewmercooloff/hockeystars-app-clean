@@ -158,6 +158,14 @@ serve(async (req) => {
 
   try {
     const now = new Date()
+
+    // Сбрасываем profile_views_today для всех у кого дата сброса не сегодня (UTC).
+    // Это гарантирует, что старые счётчики не "зависают" и дайджест не повторяет одно значение.
+    await supabase
+      .from('players')
+      .update({ profile_views_today: 0, profile_views_reset_at: now.toISOString().slice(0, 10) })
+      .lt('profile_views_reset_at', now.toISOString().slice(0, 10))
+
     const { data: players, error: pErr } = await supabase
       .from('players')
       .select(

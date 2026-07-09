@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
     Dimensions,
     ScrollView,
@@ -9,18 +9,19 @@ import {
     TouchableOpacity,
     View,
     Alert,
-    ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurOrSolid } from '../components/BlurOrSolid';
-import { loadCurrentUser } from '../utils/playerStorage';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useScreenContext } from '../contexts/ScreenContext';
-import { useExercises } from '../hooks/useExercises';
-import { LocalizedExercise, Language } from '../types/exercise';
-import { platformCardShadow } from '../utils/androidShadow';
-
-const iceBg = require('../assets/images/led.jpg');
+import { BlurOrSolid } from '../../components/BlurOrSolid';
+import LoadingCenter from '../../components/LoadingCenter';
+import CachedBackground from '../../components/CachedBackground';
+import { loadCurrentUser } from '../../utils/playerStorage';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useScreenContext } from '../../contexts/ScreenContext';
+import { useExercises } from '../../hooks/useExercises';
+import { LocalizedExercise, Language } from '../../types/exercise';
+import { platformCardShadow } from '../../utils/androidShadow';
+import { colors } from '../../theme/colors';
+import { registerTabScrollHandler } from '../../utils/tabScrollRegistry';
 
 const { width } = Dimensions.get('window');
 
@@ -133,16 +134,20 @@ export default function ExercisesScreen() {
     isLanguageLoaded,
   ]);
 
+  const scrollRef = useRef<ScrollView>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      registerTabScrollHandler('exercises', () => {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      });
+      return () => registerTabScrollHandler('exercises', null);
+    }, [])
+  );
+
   const openExerciseDetails = useCallback(
     (exerciseId: string) => {
-      try {
-        router.navigate({
-          pathname: '/exercise-details',
-          params: { id: exerciseId },
-        });
-      } catch {
-        router.push(`/exercise-details?id=${exerciseId}`);
-      }
+      router.push(`/exercises/${exerciseId}`);
     },
     [router]
   );
@@ -185,15 +190,9 @@ export default function ExercisesScreen() {
   if (!isLanguageLoaded || loading) {
     return (
       <View style={styles.container}>
-        <ImageBackground
-          source={require('../assets/images/led.jpg')}
-          style={styles.background}
-          resizeMode="cover"
-        >
-          <View style={styles.overlayLoading}>
-            <Text style={styles.loadingText}>{t('common.loading')}</Text>
-          </View>
-        </ImageBackground>
+        <CachedBackground style={styles.background} resizeMode="cover">
+          <LoadingCenter />
+        </CachedBackground>
       </View>
     );
   }
@@ -201,7 +200,7 @@ export default function ExercisesScreen() {
   if (error) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             {/* Заголовок страницы */}
             <View style={styles.pageHeader}>
@@ -219,9 +218,9 @@ export default function ExercisesScreen() {
                   <View style={styles.exercisesContainer}>
                     {sortedExercises.map((exercise) => (
                       <TouchableOpacity
-                        key={exercise.id}
-                        onPress={() => router.push(`/exercise-details?id=${exercise.id}`)}
-                        activeOpacity={0.8}
+                        key={exercise.exerciseId}
+                        onPress={() => openExerciseDetails(exercise.exerciseId)}
+                        activeOpacity={0.7}
                       >
                         <View style={styles.exerciseGradientShadow}>
                           <BlurOrSolid
@@ -282,14 +281,14 @@ export default function ExercisesScreen() {
               </View>
             )}
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
@@ -370,7 +369,11 @@ export default function ExercisesScreen() {
             </View>
           </BlurOrSolid>
 
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            ref={scrollRef}
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
 
           {/* Список упражнений */}
           <View style={styles.exercisesContainer}>
@@ -378,6 +381,7 @@ export default function ExercisesScreen() {
               <TouchableOpacity
                 key={exercise.exerciseId}
                 onPress={() => openExerciseDetails(exercise.exerciseId)}
+                activeOpacity={0.7}
               >
                 <View style={styles.exerciseGradientShadow}>
                   <BlurOrSolid
@@ -452,7 +456,7 @@ export default function ExercisesScreen() {
           </View>
           </ScrollView>
         </View>
-      </ImageBackground>
+      </CachedBackground>
     </View>
   );
 }
@@ -460,7 +464,7 @@ export default function ExercisesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87A3B1',
+    backgroundColor: colors.scene,
   },
   background: {
     flex: 1,

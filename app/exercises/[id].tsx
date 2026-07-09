@@ -1,15 +1,18 @@
 import { useLocalSearchParams, useGlobalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
-import { BlurOrSolid } from '../components/BlurOrSolid';
-import { completeExercise, getExerciseCompletionCount, getPlayerById, loadCurrentUser, saveCurrentUser, Player, getLastExerciseCompletion } from '../utils/playerStorage';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useExercises } from '../hooks/useExercises';
-import { Language } from '../types/exercise';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import CachedBackground from '../../components/CachedBackground';
+import { BlurOrSolid } from '../../components/BlurOrSolid';
+import { colors } from '../../theme/colors';
+import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
+import { LocalizedExercise } from '../../types/exercise';
+import { getExerciseCompletionCount, loadCurrentUser, Player, getLastExerciseCompletion } from '../../utils/playerStorage';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useExercises } from '../../hooks/useExercises';
+import { Language } from '../../types/exercise';
 import { Ionicons } from '@expo/vector-icons';
-import { addActivityPoints } from '../services/activityService';
+import { addActivityPoints } from '../../services/activityService';
 
-const iceBg = require('../assets/images/led.jpg');
 const { width } = Dimensions.get('window');
 
 export default function ExerciseDetailsScreen() {
@@ -46,7 +49,11 @@ export default function ExerciseDetailsScreen() {
 
   // Функция для навигации назад - возвращаемся на экран упражнений
   const handleGoBack = () => {
-    router.push('/exercises');
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/exercises');
+    }
   };
   
   // Загружаем данные пользователя при изменении exerciseId
@@ -67,9 +74,19 @@ export default function ExerciseDetailsScreen() {
   
   const loadExercise = async () => {
     if (exerciseId && language) {
+      const id = String(exerciseId);
       try {
-        setExerciseLoading(true);
-        const exerciseData = await getExerciseById(exerciseId as string);
+        const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
+        const cachedList = await dataCache.get<LocalizedExercise[]>(cacheKey);
+        const cachedOne = cachedList?.find((e) => String(e.exerciseId) === id);
+        if (cachedOne) {
+          setExercise(cachedOne);
+          setExerciseLoading(false);
+        } else {
+          setExerciseLoading(true);
+        }
+
+        const exerciseData = await getExerciseById(id);
         setExercise(exerciseData);
         
        // Трекаем просмотр упражнения
@@ -183,15 +200,6 @@ export default function ExerciseDetailsScreen() {
         [{ text: t('common.ok') }]
       );
       
-      // Принудительно обновляем данные пользователя через UserContext
-      try {
-        const { useUser } = await import('../contexts/UserContext');
-        // Получаем функцию из контекста (это будет работать только если мы в компоненте)
-        // Для этого нужно передать функцию через props или использовать другой подход
-      } catch (error) {
-        console.error('❌ Ошибка обновления данных пользователя:', error);
-      }
-      
     } catch (error) {
       console.error('❌ Ошибка сохранения:', error);
       Alert.alert(
@@ -230,13 +238,13 @@ export default function ExerciseDetailsScreen() {
   if (exerciseLoading) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             {/* Заголовок */}
             <View style={styles.header}>
               <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => router.push('/exercises')}
+                onPress={handleGoBack}
               >
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
@@ -249,7 +257,7 @@ export default function ExerciseDetailsScreen() {
               <Text style={styles.loadingText}>{t('exercises.loadingExercise')}</Text>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
@@ -257,13 +265,13 @@ export default function ExerciseDetailsScreen() {
   if (error || !exercise) {
     return (
       <View style={styles.container}>
-        <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+        <CachedBackground style={styles.background} resizeMode="cover">
           <View style={styles.overlay}>
             {/* Заголовок */}
             <View style={styles.header}>
               <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => router.push('/exercises')}
+                onPress={handleGoBack}
               >
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
@@ -288,21 +296,23 @@ export default function ExerciseDetailsScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </ImageBackground>
+        </CachedBackground>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground style={styles.background} resizeMode="cover">
         <View style={styles.overlay}>
           {/* Заголовок страницы */}
           <View style={styles.pageHeader}>
             <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.pageTitle}>{exercise?.title || t('exercises.details.title')}</Text>
+            <Text style={styles.pageTitle} numberOfLines={2} ellipsizeMode="tail">
+              {exercise?.title || t('exercises.details.title')}
+            </Text>
           </View>
           
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -487,7 +497,7 @@ export default function ExerciseDetailsScreen() {
             )}
           </ScrollView>
         </View>
-      </ImageBackground>
+      </CachedBackground>
     </View>
   );
 }
@@ -495,7 +505,7 @@ export default function ExerciseDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(1,0,0)',
+    backgroundColor: colors.scene,
   },
   background: {
     flex: 1,
@@ -517,15 +527,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontFamily: 'Gilroy-Bold',
-    color: '#fff',
-    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -551,6 +552,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
+    flexShrink: 1,
+    lineHeight: 28,
     textAlign: 'left',
   },
   infoSectionBlur: {
@@ -569,7 +572,7 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 10,
   },
   infoLabel: {
@@ -578,11 +581,15 @@ const styles = StyleSheet.create({
     color: '#ccc',
     marginLeft: 10,
     marginRight: 10,
+    flexShrink: 0,
   },
   infoValue: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+    flex: 1,
+    flexShrink: 1,
+    lineHeight: 22,
   },
   difficultyBadge: {
     paddingHorizontal: 12,
@@ -691,7 +698,7 @@ const styles = StyleSheet.create({
   },
   bottomInfoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 12,
     paddingVertical: 4,
   },
@@ -701,11 +708,15 @@ const styles = StyleSheet.create({
     color: '#ccc',
     marginLeft: 12,
     marginRight: 8,
+    flexShrink: 0,
   },
   bottomInfoValue: {
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+    flex: 1,
+    flexShrink: 1,
+    lineHeight: 20,
   },
   statsSection: {
     paddingHorizontal: 20,

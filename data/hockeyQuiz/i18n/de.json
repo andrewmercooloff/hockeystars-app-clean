@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Wie viele Läufer pro Mannschaft sind im ausgeglichenen Spiel auf dem Eis (Torhüter ausgenommen)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Wie viele reguläre Spielzeiten gibt es in einem Standard-NHL-Spiel?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Abseits wird genannt, wenn ein angreifender Spieler die Angriffszone betritt, bevor was?",
+    "options": [
+      "Die Mittellinie",
+      "Der Puck",
+      "Der Torwart",
+      "Der Schiedsrichter"
+    ]
+  },
+  "rules_icing": {
+    "question": "Beim Icing wird der Puck ohne Berührung von hinter der Mittellinie über die gegnerische Torlinie hinaus geschossen. WAHR?",
+    "options": [
+      "Falsch – nie in der NHL",
+      "WAHR",
+      "Stimmt – nur in der Verlängerung",
+      "Falsch – nur aus der Verteidigungszone"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Wer hält den NHL-Rekord für die meisten Karriereziele?",
+    "options": [
+      "Alex Owetschkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin ist als linker Flügelspieler mit der Nummer 8 berühmt, für welches Team City?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Was ist ein Hattrick im Eishockey?",
+    "options": [
+      "Drei Tore eines Spielers in einem Spiel",
+      "Drei Paraden in Folge",
+      "Drei Assists in einem Spiel",
+      "Drei Strafen"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Ein Machtspiel liegt vor, wenn:",
+    "options": [
+      "Der Torwart wird gezogen",
+      "Es kommt zu einer Schlägerei",
+      "Ein Team hat aufgrund einer Strafe mehr Feldspieler",
+      "Die Verlängerung beginnt"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Der Stanley Cup ist der Meisterpokal welcher Liga?",
+    "options": [
+      "IIHF-Weltmeisterschaft",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Woraus besteht ein normaler Hockey-Puck?",
+    "options": [
+      "Vulkanisierter Gummi",
+      "Aluminium",
+      "Holz",
+      "Plastik"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Wie viele Minuten dauert eine normale kleine Strafe?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Wie viele Minuten dauert eine normale große Strafe?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Das Spiel beginnt mit:",
+    "options": [
+      "Elfmeterschuss",
+      "Faceoff",
+      "Stromunterbrechung",
+      "Sahnehäubchen"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Was passiert, wenn ein NHL-Spiel der regulären Saison nach der Verlängerung unentschieden steht?",
+    "options": [
+      "Zweite Verlängerung",
+      "Schießerei",
+      "Playoff-Zeitraum",
+      "Ziehständer"
+    ]
+  },
+  "rules_crease": {
+    "question": "Kann ein Angreifer folgenlos im Torraum stehen bleiben?",
+    "options": [
+      "Ja immer",
+      "Nur in Playoffs",
+      "Nein – das Tor kann annulliert werden",
+      "Nur in letzter Minute"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "High-Sticking bedeutet, dass der Schläger einen Gegner oberhalb von Folgendem trifft:",
+    "options": [
+      "Querlatte",
+      "Schultern",
+      "Taille",
+      "Nur Helm"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Das Ziehen des Torwarts birgt Risiken:",
+    "options": [
+      "Elfmeterschuss",
+      "Empty-Net-Tor gegen",
+      "Abseits",
+      "Nur Zuckerguss"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Ein Strafschuss wird häufig für das Foul an einem:",
+    "options": [
+      "Jederzeit",
+      "Nur Überstunden",
+      "Nur Playoffs",
+      "Klarer Ausreißer"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Ein Bank-Minor wird von jedem Spieler bedient, außer:",
+    "options": [
+      "Der Torwart (normalerweise)",
+      "Ein Stürmer",
+      "Ein Verteidiger",
+      "Der Kapitän"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "Mit wie vielen Spielern pro Mannschaft wird die OT der regulären NHL-Saison gespielt?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Wie viele Spieler (einschließlich Torwart) kann eine Mannschaft auf dem Eis haben?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Wie viele Punkte ist ein Tor auf der Anzeigetafel wert?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Bei einer verspäteten Strafe führt die nicht schuldige Mannschaft oft:",
+    "options": [
+      "Vereist den Puck",
+      "Anruf-Timeout",
+      "Stoppt die Wiedergabe",
+      "Zieht den Torwart"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Torhüter können den Puck nur hinter dem Netz spielen in:",
+    "options": [
+      "Mittelkreis",
+      "Neutrale Zone",
+      "Volle Zone",
+      "Trapezförmiger Bereich"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Kämpfe führen typischerweise zu Folgendem:",
+    "options": [
+      "Schwere Strafe",
+      "Nur Spielfehlverhalten",
+      "Kleine Strafe",
+      "Keine Strafe"
+    ]
+  },
+  "terms_puck": {
+    "question": "Das Objekt, auf das die Spieler schießen, heißt:",
+    "options": [
+      "Puck",
+      "Diskus",
+      "Stein",
+      "Ball"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Ein Pass, der den Puck hochhebt, wird als Folgendes bezeichnet:",
+    "options": [
+      "Untertassenpass",
+      "Bordkarte",
+      "Slap-Dump",
+      "Faltpass"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Ein Schlagschuss beinhaltet:",
+    "options": [
+      "Nur Rückhand",
+      "Eine Hand am Stock",
+      "Den Puck leicht antippen",
+      "Aufziehen und zuerst auf dem Eis aufschlagen"
+    ]
+  },
+  "terms_deke": {
+    "question": "Ein Deke ist:",
+    "options": [
+      "Eine Art Strafe",
+      "Ein falscher Schachzug, um einen Verteidiger zu besiegen",
+      "Ein Verteidigungsblock",
+      "Ein Zeilenwechsel"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Ein Ausreißer liegt vor, wenn:",
+    "options": [
+      "Der Puck ist vereist",
+      "Ein Skater geht allein auf den Torwart zu",
+      "Zwei Spieler kämpfen",
+      "Es kommt zu einem Zeilenwechsel"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Plus-/Minus-Spuren:",
+    "options": [
+      "Schüsse aufs Tor",
+      "Tordifferenz, während der Spieler mit gleichmäßiger Stärke auf dem Eis ist",
+      "Strafminuten",
+      "Nur Faceoff gewinnt"
+    ]
+  },
+  "terms_assist": {
+    "question": "Ein primärer Assist geht an den Spieler, der:",
+    "options": [
+      "Erzielt das Tor",
+      "Gewann das Anspiel",
+      "Letzter berührter Puck vor dem Torschützen",
+      "Habe eine Strafe bekommen"
+    ]
+  },
+  "terms_block": {
+    "question": "Ein geblockter Schuss liegt vor, wenn:",
+    "options": [
+      "Puck trifft Pfosten",
+      "Der Spieler stoppt den Puck mit dem Körper/Schläger vor dem Tor",
+      "Der Torwart rettet",
+      "Schuss verfehlt das Netz"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Forechecking bedeutet:",
+    "options": [
+      "Nur Linienwechselstrategie",
+      "Verteidige deine blaue Linie",
+      "Gegner in ihrer Zone unter Druck setzen, um den Puck zurückzugewinnen",
+      "Den Torwart ziehen"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Rückprüfung bedeutet:",
+    "options": [
+      "Zurücklaufen, um die Verteidigung zu unterstützen",
+      "Schießen vom Punkt",
+      "Gewinnendes Anspiel",
+      "Torwart pariert"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Ein One-Timer ist:",
+    "options": [
+      "Warten, dann schießen",
+      "Torwartzug",
+      "Sofortiges Schießen nach einem Pass",
+      "Eine Strafe"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Ein Poke-Check:",
+    "options": [
+      "Heben Sie den Puck über den Stock",
+      "Gegenprüfung",
+      "Schlage den Puck vom Gegner weg",
+      "Gegner einhaken"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Top-Regal bedeutet Punkte in den folgenden Kategorien:",
+    "options": [
+      "Oberer Teil des Netzes",
+      "Nur vom Mitteleis aus",
+      "Nur im leeren Netz",
+      "Fünf-Loch"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Fünf-Loch liegt zwischen dem Torwart:",
+    "options": [
+      "Stock und Handschuh",
+      "Maske und Brust",
+      "Arm und Körper",
+      "Beine"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Ein Vollstrecker bietet:",
+    "options": [
+      "Coaching",
+      "Torerzielung",
+      "Körperlicher Schutz und Kampf",
+      "Nur Faceoffs"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Zeilenänderungen passieren normalerweise:",
+    "options": [
+      "Erst nach Toren",
+      "Nur im Elfmeterschießen",
+      "Nur in der Pause",
+      "Im Handumdrehen während des Spiels"
+    ]
+  },
+  "terms_rink": {
+    "question": "Die Spielfläche im Hockey heißt:",
+    "options": [
+      "Feld",
+      "Gericht",
+      "Schiene",
+      "Eisbahn"
+    ]
+  },
+  "terms_goal": {
+    "question": "Das Netz, auf das Spieler schießen, heißt:",
+    "options": [
+      "Ziel",
+      "Korb",
+      "Ziel",
+      "Zone"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Unterzahl zu spielen bedeutet:",
+    "options": [
+      "Im Laufe der Zeit",
+      "Torwart zog",
+      "Weniger Skater wegen Strafe",
+      "Leeres Netz"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Überstunden mit plötzlichem Tod bedeuten:",
+    "options": [
+      "Das erste Tor gewinnt",
+      "Volle Periode",
+      "Nur Shootout",
+      "Kein Gewinner"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Wie viele Teams gab es in der NHL Original Six-Ära?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Das moderne Eishockey hat sich am meisten entwickelt in:",
+    "options": [
+      "Russland",
+      "Schweden",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: Die USA haben 1980 wen geschlagen?",
+    "options": [
+      "die Sowjetunion",
+      "Kanada",
+      "Tschechoslowakei",
+      "Schweden"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Wayne Gretzkys Karriere-Punkterekord ist vorbei:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Die Hockey Hall of Fame befindet sich in:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "Die KHL hat ihren Hauptsitz in:",
+    "options": [
+      "Russland",
+      "Finnland",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Die Summit Series 1972: Kanada vs.",
+    "options": [
+      "UdSSR",
+      "USA",
+      "Tschechien",
+      "Schweden"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "Die NHL wurde gegründet im:",
+    "options": [
+      "20. Jahrhundert",
+      "21. Jahrhundert",
+      "19. Jahrhundert",
+      "18. Jahrhundert"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby wurde als Erster in der Gesamtwertung ausgewählt in:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid wurde als Erster in der Gesamtwertung ausgewählt in:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Der Stanley Cup wurde erstmals verliehen in:",
+    "options": [
+      "20. Jahrhundert",
+      "21. Jahrhundert",
+      "18. Jahrhundert",
+      "19. Jahrhundert"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr zählt zu den NHL-Spitzenreitern aller Zeiten in:",
+    "options": [
+      "Punkte",
+      "Coaching",
+      "Nur Strafminuten",
+      "Torwart gewinnt"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin verbrachte seine NHL-Karriere hauptsächlich bei:",
+    "options": [
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Washington Capitals",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux gewann den Stanley Cup mit:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Wie lange dauert ein NHL-Spielfeld?",
+    "options": [
+      "200 Fuß",
+      "150 Fuß",
+      "300 Fuß",
+      "250 Fuß"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Wie breit ist eine NHL-Eisbahn?",
+    "options": [
+      "100 Fuß",
+      "150 Fuß",
+      "120 Fuß",
+      "85 Fuß"
+    ]
+  },
+  "gen_zones": {
+    "question": "Blaue Linien unterteilen die Eisbahn in wie viele Zonen?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Die mittlere rote Linie wird verwendet für:",
+    "options": [
+      "Eisige Anrufe",
+      "Strafraum",
+      "Nur Faceoffs",
+      "Abseits in der Mitte"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Die Stabklingenkurve hilft bei:",
+    "options": [
+      "Skating-Geschwindigkeit",
+      "Torwart rettet",
+      "Heben und Kontrollieren des Pucks",
+      "Kampf"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate Hollow betrifft:",
+    "options": [
+      "Stockflex",
+      "Grip auf Eis und Kurven",
+      "Helmpassform",
+      "Jerseygröße"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Schienbeinschoner schützen:",
+    "options": [
+      "Schultern",
+      "Kopf",
+      "Unterschenkel",
+      "Nur Hände"
+    ]
+  },
+  "gen_captain": {
+    "question": "Der Kapitän trägt den Brief:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Ersatzkapitäne tragen:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Die Heimmannschaft trägt normalerweise:",
+    "options": [
+      "Dunkel/farbig",
+      "Weiß/hell",
+      "Keine Trikots",
+      "Nur Torwart"
+    ]
+  },
+  "gen_intermission": {
+    "question": "In der Pause zwischen den Unterrichtsstunden geht es um:",
+    "options": [
+      "5 Min",
+      "30 Min",
+      "15-18 Min",
+      "1 Stunde"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL-Playoff-Serien sind hauptsächlich:",
+    "options": [
+      "Immer Best of 5",
+      "Nur endgültig",
+      "Seltene Ausnahmen – meist Best of 7",
+      "Niemals"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Ein Zamboni wird verwendet um:",
+    "options": [
+      "Geschwindigkeit messen",
+      "Pucks aufbewahren",
+      "Schlittschuhe schärfen",
+      "Eis wieder auftauchen"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Spieloffizielle tragen:",
+    "options": [
+      "Teamtrikots",
+      "Torwartausrüstung",
+      "Schwarz-weiße Streifen",
+      "Anzüge"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hockeyspieler ziehen weiter:",
+    "options": [
+      "Rollschuhe",
+      "Schlittschuhe",
+      "Nackte Füße",
+      "Skier"
+    ]
+  },
+  "gen_stick": {
+    "question": "Spieler kontrollieren den Puck mit:",
+    "options": [
+      "Stock",
+      "Netto",
+      "Nur Hände",
+      "Helm"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Mit welchem ​​Team ist Sidney Crosby am meisten verbunden?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Auf welcher Position spielte Sidney Crosby hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Center"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Mit welchem ​​Team ist Connor McDavid am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Auf welcher Position spielte Connor McDavid hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Mit welchem ​​Team ist Nathan MacKinnon am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado-Lawine",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Auf welcher Position spielte Nathan MacKinnon hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Mit welchem ​​Team ist Victor Hedman am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Auf welcher Position spielte Victor Hedman hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Mit welchem ​​Team ist Carey Price am meisten verbunden?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Auf welcher Position spielte Carey Price hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Rechtsaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Mit welchem ​​Team ist Jaromir Jagr am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Auf welcher Position spielte Jaromir Jagr hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Center",
+      "Tormann",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Mit welchem ​​Team ist Mario Lemieux am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Auf welcher Position spielte Mario Lemieux hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Mit welchem ​​Team ist Patrick Kane am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Auf welcher Position spielte Patrick Kane hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center",
+      "Tormann"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Mit welchem ​​Team ist Nicklas Lidstrom am meisten verbunden?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Auf welcher Position spielte Nicklas Lidstrom hauptsächlich?",
+    "options": [
+      "Center",
+      "Tormann",
+      "Linksaußen",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Mit welchem ​​Team ist Martin Brodeur am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Auf welcher Position spielte Martin Brodeur hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Tormann",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Mit welchem ​​Team ist Steven Stamkos am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Auf welcher Position spielte Steven Stamkos hauptsächlich?",
+    "options": [
+      "Center",
+      "Verteidiger",
+      "Rechtsaußen",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Mit welchem ​​Team ist Auston Matthews am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Auf welcher Position spielte Auston Matthews hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen",
+      "Center"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Mit welchem ​​Team ist Leon Draisaitl am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Auf welcher Position spielte Leon Draisaitl hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Linksaußen",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Mit welchem ​​Team ist Erik Karlsson am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Auf welcher Position spielte Erik Karlsson hauptsächlich?",
+    "options": [
+      "Center",
+      "Tormann",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Mit welchem ​​Team ist Pavel Datsyuk am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Auf welcher Position spielte Pavel Datsyuk hauptsächlich?",
+    "options": [
+      "Center",
+      "Verteidiger",
+      "Rechtsaußen",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Mit welchem ​​Team ist Henrik Lundqvist am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Auf welcher Position spielte Henrik Lundqvist hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Rechtsaußen",
+      "Center",
+      "Tormann"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Mit welchem ​​Team ist Evgeni Malkin am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Auf welcher Position spielte Evgeni Malkin hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Linksaußen",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Mit welchem ​​Team wird Artemi Panarin am meisten in Verbindung gebracht?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Auf welcher Position spielte Artemi Panarin hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen",
+      "Center"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Mit welchem ​​Team ist Nikita Kucherov am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Auf welcher Position spielte Nikita Kucherov hauptsächlich?",
+    "options": [
+      "Center",
+      "Tormann",
+      "Rechtsaußen",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Mit welchem ​​Team ist Brad Marchand am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Auf welcher Position spielte Brad Marchand hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Verteidiger",
+      "Center",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Mit welchem ​​Team ist David Pastrnak am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Auf welcher Position spielte David Pastrnak hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Tormann",
+      "Center",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Mit welchem ​​Team ist Shea Weber am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Auf welcher Position spielte Shea Weber hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Tormann",
+      "Verteidiger",
+      "Center"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Mit welchem ​​Team ist Sergei Bobrovsky am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Auf welcher Position spielte Sergei Bobrovsky hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Rechtsaußen",
+      "Tormann",
+      "Center"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Mit welchem ​​Team ist Jonathan Toews am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Auf welcher Position spielte Jonathan Toews hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Linksaußen",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Mit welchem ​​Team ist Anze Kopitar am meisten verbunden?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Auf welcher Position spielte Anze Kopitar hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Verteidiger",
+      "Rechtsaußen",
+      "Center"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Mit welchem ​​Team ist Mark Messier am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Auf welcher Position spielte Mark Messier hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Verteidiger",
+      "Center",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Mit welchem ​​Team ist Ray Bourque am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Auf welcher Position spielte Ray Bourque hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Verteidiger",
+      "Center",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Mit welchem ​​Team ist Dominik Hasek am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Büffelsäbel"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Auf welcher Position spielte Dominik Hasek hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Center",
+      "Verteidiger",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Mit welchem ​​Team ist Teemu Selanne am meisten verbunden?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Auf welcher Position spielte Teemu Selanne hauptsächlich?",
+    "options": [
+      "Center",
+      "Tormann",
+      "Linksaußen",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Mit welchem ​​Team ist Pavel Bure am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Auf welcher Position spielte Pavel Bure hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Tormann",
+      "Center",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Mit welchem ​​Team ist Alexander Mogilny am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Büffelsäbel"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Auf welcher Position spielte Alexander Mogilny hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center",
+      "Tormann"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Mit welchem ​​Team ist Peter Forsberg am meisten verbunden?",
+    "options": [
+      "Colorado-Lawine",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Auf welcher Position spielte Peter Forsberg hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Mit welchem ​​Team ist Joe Sakic am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Colorado-Lawine",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Auf welcher Position spielte Joe Sakic hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Mit welchem ​​Team ist Steve Yzerman am meisten verbunden?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Auf welcher Position spielte Steve Yzerman hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Center"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Mit welchem ​​Team ist Bobby Orr am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Auf welcher Position spielte Bobby Orr hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Mit welchem ​​Team ist Gordie Howe am meisten verbunden?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Auf welcher Position spielte Gordie Howe hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Mit welchem ​​Team ist Wayne Gretzky am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Auf welcher Position spielte Wayne Gretzky hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Mit welchem ​​Team wird Valeri Kharlamov am meisten in Verbindung gebracht?",
+    "options": [
+      "ZSKA Moskau",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Auf welcher Position spielte Valeri Kharlamov hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Center",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Mit welchem ​​Team ist Vladislav Tretiak am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "ZSKA Moskau"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Auf welcher Position spielte Vladislav Tretiak hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Verteidiger",
+      "Center",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Mit welchem ​​Team ist Bobby Hull am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Auf welcher Position spielte Bobby Hull hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Linksaußen",
+      "Rechtsaußen",
+      "Center"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Mit welchem ​​Team ist Maurice Richard am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Auf welcher Position spielte Maurice Richard hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Mit welchem ​​Team ist Guy Lafleur am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Auf welcher Position spielte Guy Lafleur hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center",
+      "Tormann"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Mit welchem ​​Team ist Patrick Roy am meisten verbunden?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Auf welcher Position spielte Patrick Roy hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Rechtsaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Mit welchem ​​Team ist Roberto Luongo am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Auf welcher Position spielte Roberto Luongo hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Mit welchem ​​Team ist Ilya Kovalchuk am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Auf welcher Position spielte Ilya Kovalchuk hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Linksaußen",
+      "Rechtsaußen",
+      "Center"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Mit welchem ​​Team ist Pavel Bure am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Auf welcher Position spielte Pavel Bure hauptsächlich?",
+    "options": [
+      "Rechtsaußen",
+      "Linksaußen",
+      "Center",
+      "Tormann"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Mit welchem ​​Team ist Alexei Kovalev am meisten verbunden?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Auf welcher Position spielte Alexei Kovalev hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Center",
+      "Tormann",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Mit welchem ​​Team ist Sergei Gonchar am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Auf welcher Position spielte Sergei Gonchar hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Linksaußen",
+      "Tormann",
+      "Center"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Mit welchem ​​Team ist Viacheslav Fetisov am meisten verbunden?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Auf welcher Position spielte Viacheslav Fetisov hauptsächlich?",
+    "options": [
+      "Tormann",
+      "Verteidiger",
+      "Center",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Mit welchem ​​Team ist Chris Chelios am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Auf welcher Position spielte Chris Chelios hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Center",
+      "Linksaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Mit welchem ​​Team ist Scott Stevens am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Auf welcher Position spielte Scott Stevens hauptsächlich?",
+    "options": [
+      "Verteidiger",
+      "Tormann",
+      "Linksaußen",
+      "Center"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Mit welchem ​​Team ist Paul Coffey am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Auf welcher Position spielte Paul Coffey hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Tormann",
+      "Center",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Mit welchem ​​Team ist Grant Fuhr am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Auf welcher Position spielte Grant Fuhr hauptsächlich?",
+    "options": [
+      "Center",
+      "Verteidiger",
+      "Tormann",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Mit welchem ​​Team ist Mike Bossy am meisten verbunden?",
+    "options": [
+      "New Yorker Inselbewohner",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Auf welcher Position spielte Mike Bossy hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Rechtsaußen",
+      "Tormann",
+      "Center"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Mit welchem ​​Team ist Bryan Trottier am meisten verbunden?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New Yorker Inselbewohner",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Auf welcher Position spielte Bryan Trottier hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Mit welchem ​​Team ist Denis Potvin am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New Yorker Inselbewohner",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Auf welcher Position spielte Denis Potvin hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Tormann",
+      "Center",
+      "Verteidiger"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Mit welchem ​​Team ist Cam Neely am meisten verbunden?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Auf welcher Position spielte Cam Neely hauptsächlich?",
+    "options": [
+      "Center",
+      "Linksaußen",
+      "Rechtsaußen",
+      "Tormann"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Mit welchem ​​Team ist Adam Oates am meisten verbunden?",
+    "options": [
+      "Washington Capitals",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Auf welcher Position spielte Adam Oates hauptsächlich?",
+    "options": [
+      "Linksaußen",
+      "Center",
+      "Verteidiger",
+      "Rechtsaußen"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Mit welchem ​​Team ist Doug Gilmour am meisten verbunden?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Auf welcher Position spielte Doug Gilmour hauptsächlich?",
+    "options": [
+      "Center",
+      "Rechtsaußen",
+      "Verteidiger",
+      "Linksaußen"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Wofür steht KHL?",
+    "options": [
+      "Kontinentale Hockey-Liga",
+      "Kasachische Eishockeyliga",
+      "Koreanische Eishockeyliga",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "Die IIHF organisiert:",
+    "options": [
+      "KHL-Playoffs",
+      "NHL-Entwurf",
+      "Stanley Cup",
+      "Weltmeisterschaft"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olympisches Eishockey wird gespielt auf:",
+    "options": [
+      "Eis",
+      "Sand",
+      "Gras",
+      "Beton"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Welches Land gewann viele Weltmeistertitel mit Stars aus der Jagr- und Hašek-Ära?",
+    "options": [
+      "Finnland",
+      "Tschechien",
+      "Kanada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Viele NHL-Stars kommen aus:",
+    "options": [
+      "Spanien",
+      "Brasilien",
+      "Schweden",
+      "Indien"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Finnland ist bekannt für seine großartige Produktion:",
+    "options": [
+      "Torhüter",
+      "Nur Trainer",
+      "Zamboni-Fahrer",
+      "Schiedsrichter"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Die sowjetische „Rote Maschine“ dominierte in:",
+    "options": [
+      "1970er-80er Jahre",
+      "2000er Jahre",
+      "2010er Jahre",
+      "Nur 1990er Jahre"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL-Teams wählen neue Spieler aus bei:",
+    "options": [
+      "Handelsschluss",
+      "All-Star-Spiel",
+      "Weltmeisterschaft",
+      "Beitragsentwurf"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Es werden drei Sterne des Spiels vergeben:",
+    "options": [
+      "Einmal pro Saison",
+      "Nur in Playoffs",
+      "Nie in der NHL",
+      "Nach jedem Spiel"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Frauenhockey ist eine olympische Sportart seit:",
+    "options": [
+      "1998",
+      "Niemals",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Wie viele Feldspieler (keine Torhüter) hat jedes Team bei gleichmäßiger Stärke?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Wie viele Minuten dauert eine NHL-Periode?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Ihr Team befindet sich im Powerplay, wenn der Gegner:",
+    "options": [
+      "Zuckerguss-Puck",
+      "Torwart ziehen",
+      "Nach Strafe in Unterzahl",
+      "Gewinnendes Anspiel"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Penalty Kill bedeutet:",
+    "options": [
+      "Im Laufe der Zeit",
+      "Verteidigen, während man unterbesetzt ist",
+      "Zusätzlicher Angreifer",
+      "Torwartkampf"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Professionelles Eishockey wird gespielt auf:",
+    "options": [
+      "Schmutz",
+      "Gras",
+      "Eis",
+      "Wasser"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Die NHL-Meisterschaftstrophäe ist:",
+    "options": [
+      "Weltmeisterschaft",
+      "Olympiapokal",
+      "Stanley Cup",
+      "Gretzky-Cup"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard gewann als Spieler die meisten Stanley Cups mit:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Wayne Gretzkys berühmte Trikotnummer war:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux trug die Nummer:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby trägt die Nummer:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid trägt die Nummer:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Wie viele Teams gibt es in der NHL (ungefähr)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Wie viele Teams gibt es in der NHL (ungefähr)? (fortschrittlich)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Wie viele Spieler sind auf einer Standard-Hockeybank gekleidet?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Wie viele Spieler sind auf einer Standard-Hockeybank gekleidet? (fortschrittlich)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Wie viele Minuten beträgt die reguläre Spielzeit in der NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Wie viele Minuten beträgt die reguläre Spielzeit in der NHL? (fortschrittlich)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Wie viele Offizielle sind normalerweise in der NHL auf dem Eis?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Wie viele Offizielle sind normalerweise in der NHL auf dem Eis? (fortschrittlich)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Maximale Anzahl an Spielern im Kader (ungefähr)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Maximale Anzahl an Spielern im Kader (ungefähr)? (fortschrittlich)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Die Hauptaufgabe eines Verteidigers in der Verteidigungszone besteht darin:",
+    "options": [
+      "Gewinne Bullys",
+      "Erziele zuerst Tore",
+      "Schützen Sie das Netz und den Schlitz",
+      "Wechseln Sie schnell die Zeilen"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Bei der Eins-gegen-Eins-Verteidigung sollte der Verteidiger:",
+    "options": [
+      "Gehen Sie sofort zur Bank",
+      "Bleiben Sie zwischen Angreifer und Netz",
+      "Lassen Sie den Schlitz offen",
+      "Nur hinter das Netz jagen"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Defensive Haltung: Der Stock auf dem Eis hilft:",
+    "options": [
+      "Signal-Timeout",
+      "Vermeiden Sie es, den Puck zu schlagen",
+      "Überholspuren sperren",
+      "Trip-Teamkollegen"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Wenn der Puck im Angriff verloren geht, sollte ein Verteidiger:",
+    "options": [
+      "Torwart ziehen",
+      "Skaten Sie zurück, um die Verteidigung zu unterstützen",
+      "Bleiben Sie bei der roten Linie",
+      "Streiten Sie mit dem Schiedsrichter"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Ein Verteidiger sollte Schüsse blockieren, wenn:",
+    "options": [
+      "Der Puck befindet sich nur in der neutralen Zone",
+      "Die Pause beginnt",
+      "Der Weg zum Netz ist frei",
+      "Das Team ist im Powerplay"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "Bei einem 2-gegen-1-Duell sollte der Verteidiger normalerweise:",
+    "options": [
+      "Beide bleiben an der blauen Linie",
+      "Beide stürmen gemeinsam den Puckträger",
+      "Nehmen Sie den Puckträger und winkeln Sie ihn weit ab",
+      "Skaten Sie zur Bank"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Beim Elfmeterschießen liegt die Priorität häufig auf Folgendem:",
+    "options": [
+      "Skaten Sie mit dem Puck allein in der Mitte",
+      "Wechseln Sie zuerst die Zeilen im Handumdrehen",
+      "Halte den Puck für immer in der Ecke",
+      "Räumen Sie den Puck aus der Zone"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Eine gute Lückenkontrolle bedeutet für den Verteidiger:",
+    "options": [
+      "Es wird nie ein Backup erstellt",
+      "Nur Schläge von hinten",
+      "Passt Geschwindigkeit und Distanz zum Angreifer an",
+      "Bleibt immer in der Mitte des Eises"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Vor dem Netz muss ein Verteidiger:",
+    "options": [
+      "Skaten Sie auf den Punkt",
+      "Ruf nach Abseits",
+      "Beobachten Sie nur den Puck und ignorieren Sie die Spieler",
+      "Boxen Sie Gegner aus und fesseln Sie sie"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Unter dem Druck der Forechecks sollte der erste Blick eines Verteidigers wie folgt aussehen:",
+    "options": [
+      "Auf das eigene Netz schießen",
+      "Gehen Sie zuerst zu einer niedrigen Stütze oder einem sicheren Auslass",
+      "Gehen Sie immer unter Druck durch die Mitte",
+      "Rande blind um die Bretter herum"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Beim Powerplay am Punkt sollte ein Verteidiger:",
+    "options": [
+      "Skaten Sie zurück in die neutrale Zone",
+      "Wechsel mit dem Torwart",
+      "Halten Sie den Puck in der Zone und führen Sie Schüsse/Pässe aus",
+      "Schießen Sie niemals"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Ein legaler Verteidigungsspielzug bei einem Ansturm ist:",
+    "options": [
+      "Legales Angeln und Stock auf der Puckseite",
+      "Haken Sie den Gegner ein und ziehen Sie ihn nach unten",
+      "Stickcheck von hinten bei einem Ausreißer",
+      "Gegenprobe zum Kopf"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Professionelle Verteidiger blockieren Schüsse, weil:",
+    "options": [
+      "Es zählt als Assist",
+      "Blockieren Sie niemals Schüsse",
+      "Blockiere Schüsse und opfere bei Bedarf deinen Körper",
+      "Der Schiedsrichter unterbricht das Spiel"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Wenn sich zwei Angreifer in Ihrer Zone kreuzen, sollten die Verteidiger:",
+    "options": [
+      "Beide jagen nur dem Puck hinterher",
+      "Lassen Sie die Falte",
+      "Kommunizieren Sie und wechseln Sie bei Bedarf",
+      "Ignorieren Sie den Angreifer auf der anderen Seite"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Wenn der Gegner den Puck reinwirft, sollte ein Verteidiger:",
+    "options": [
+      "Holen Sie sich den Puck oder stecken Sie ihn auf die Bretter",
+      "Zur Abwechslung auf die Bank laufen",
+      "Warten Sie auf den Pfiff",
+      "Schießen Sie von der roten Linie aus"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "Bei einem 3-gegen-2-Ansturm sollte der Außenverteidiger normalerweise:",
+    "options": [
+      "Decken Sie die Bedrohung durch die schwache Seite (Hintertür) ab",
+      "Skaten Sie bis zur roten Linie",
+      "Zeilen ändern",
+      "Kneifen Sie jedes Mal aggressiv"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Ein Verteidiger darf an der offensiven blauen Linie kneifen, wenn:",
+    "options": [
+      "Das Team ist unterbesetzt",
+      "Torwart wird gezogen",
+      "Der Partner deckt ab und der Puck kann an der Bande abgeholt werden",
+      "Immer in der ersten Schicht"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Wenn der Verteidiger im Ansturm weit geschlagen wird, sollte er:",
+    "options": [
+      "Skaten Sie zur Bank",
+      "Halten Sie inne und diskutieren Sie mit dem Schiedsrichter",
+      "Drehen Sie sich um und jagen Sie durch die Mitte zum Netz",
+      "Haken von hinten"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Bei der Abdeckung der Verteidigungszone bedeutet „niedriger Verteidiger“ vs. „hoher Verteidiger“:",
+    "options": [
+      "Beides auf den Punkt",
+      "Beide in der neutralen Zone",
+      "Beides in der Falte",
+      "Wenig Puck, hoch deckt Schlitz und Hintertür ab"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Bei einem Odd-Man-Ansturm ist der Schlüssel:",
+    "options": [
+      "Nehmen Sie jedes Mal einen Elfmeter",
+      "Einen schlechten Winkel oder Pass verzögern und erzwingen",
+      "Immer abtauchen, um zu blockieren",
+      "Überlassen Sie das Spiel dem Torwart"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "Bei einem Elfmeterschießen gegen einen One-Timer von der Flanke sollte der Verteidiger:",
+    "options": [
+      "Stellen Sie sich in den Torraum des Torwarts",
+      "Skaten Sie zur Mitte, um sich zu verändern",
+      "Nehmen Sie die Passspur zum Slot weg",
+      "Drücken Sie den Torwart"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Warum ist ein blinder Rand um die Dielen oft schlecht?",
+    "options": [
+      "Es gibt Gegnern einen kostenlosen Rückruf",
+      "Es ist immer Abseits",
+      "Es kommt immer zu Vereisung",
+      "Schiedsrichter gibt Strafe"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Nach einem Bully-Sieg in der Defensivzone sollten die Verteidiger:",
+    "options": [
+      "Warten Sie fünf Sekunden",
+      "Lesen Sie die Vorprüfung und nutzen Sie den schnellen ersten Durchgang",
+      "Schießen Sie immer zuerst von der Spitze aus",
+      "Mit dem Puck zur roten Linie laufen"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Um spät einen Vorsprung von einem Tor zu sichern, sollten die Verteidiger:",
+    "options": [
+      "Schießen Sie immer aus der Mitte",
+      "Drücken Sie jedes Mal an der blauen Linie",
+      "Verwalten Sie den Puck sicher und vermeiden Sie unnötige Risiken",
+      "Ziehen Sie den Torwart immer früh ab"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Mann gegen Mann im Slot bedeutet:",
+    "options": [
+      "Ignorieren Sie Bedrohungen außerhalb des Pucks",
+      "Verfolge nur den Puck",
+      "Lückenkontrolle",
+      "Mann-gegen-Mann-Abdeckung des Puckträgers"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "An der offensiven blauen Linie versucht ein Verteidiger, der die Linie hält:",
+    "options": [
+      "Mit vorwärts wechseln",
+      "Halten Sie die blaue Linie und halten Sie den Puck in der Zone",
+      "Skaten Sie zurück in die neutrale Zone",
+      "Immer absichtlich Abseits verursachen"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Nach einem Save mit einem Rebound im Slot muss ein Verteidiger:",
+    "options": [
+      "Feiern Sie mit dem Torwart",
+      "Schießen Sie auf ein leeres Netz",
+      "Skaten Sie zur Bank",
+      "Kläre den Abpraller oder fessele den Angreifer"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Nach dem Icing (No-Touch) in der Verteidigungszone, beim Bully:",
+    "options": [
+      "Den Puck immer umranden",
+      "Nehmen Sie eine kleine Strafe",
+      "Legen Sie die Struktur fest und gewinnen Sie einen sauberen Ausgang",
+      "Torwart ziehen"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Gegen aggressives Forecheck wird ein Stretch Pass verwendet, um:",
+    "options": [
+      "Unterbrechen Sie das Spiel immer wegen Abseits",
+      "Nur Zeitverschwendung",
+      "Glasur garantieren",
+      "Schlagen Sie den Forecheck mit einem langen Pass"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Die Schließung einer Schießbahn bedeutet:",
+    "options": [
+      "Körper/Stock in die Schussbahn bringen",
+      "Winkender Stock nur in der Luft",
+      "Skaten bis zur roten Linie",
+      "Hinter dem Netz stehen"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Wenn Ihr Partner zwickt, müssen Sie:",
+    "options": [
+      "Skaten Sie zur Bank",
+      "Lassen Sie die Zone offen",
+      "Auch sofort kneifen",
+      "Hohe Deckung als letzter Verteidiger"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Beim Verlassen der Strafbank sollte ein Verteidiger:",
+    "options": [
+      "Passen Sie das Spiel an und vermeiden Sie es, flach erwischt zu werden",
+      "Ignorieren Sie die Eile",
+      "Wechseln Sie immer sofort",
+      "Laufen Sie direkt zum gegnerischen Netz"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Bei leerem Tor sollten die Verteidiger in der letzten Minute:",
+    "options": [
+      "Alle Forechecks tiefgreifend",
+      "Ziehe auch immer deinen eigenen Torwart",
+      "Blocken Sie Schüsse und schützen Sie die Mitte",
+      "Räumen Sie niemals den Puck ab"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Wenn Sie den Puckträger nicht erreichen können, sollten Sie:",
+    "options": [
+      "Aufgeben und ändern",
+      "Verlasse den Slot",
+      "Nehmen Sie sich mit einer guten Positionierung Zeit und Platz",
+      "Haken von hinten"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Bei der Verteidigung eines kontrollierten Zoneneintritts sollte der Verteidiger:",
+    "options": [
+      "Skaten Sie rückwärts zur Bank",
+      "Stehen Sie frühzeitig an der Linie oder Lücke",
+      "Ziehen Sie sich immer in die Falte zurück",
+      "Berühren Sie niemals den Angreifer"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "In der Verteidigungszone ist ein Handpass eines Verteidigers an einen Mitspieler:",
+    "options": [
+      "Erlaubt, wenn der Abschluss in derselben Zone erfolgt",
+      "Immer Zuckerguss",
+      "Immer im Abseits",
+      "Immer ein Elfmeter"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Wenn ein Mitspieler den Puck hat, sollte ein Stürmer:",
+    "options": [
+      "Skate immer alleine bis zur roten Linie",
+      "Ignorieren Sie den Puck beim Linienwechsel",
+      "Gehen Sie für einen Pass zum offenen Eis",
+      "Bleiben Sie an der blauen Linie stehen"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Ein Flügelspieler in der Nähe des Netzes sollte bei einem Schuss:",
+    "options": [
+      "Skaten Sie zur Bank",
+      "Gehen Sie ans Netz, um Rebounds und Tipps zu erhalten",
+      "Beobachten Sie nur vom Standpunkt aus",
+      "Warten Sie in der Mitte des Eises"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Bei Ballverlust müssen Stürmer:",
+    "options": [
+      "Sofort vom Eis wechseln",
+      "Diskutieren Sie mit dem Schiedsrichter",
+      "Bleiben Sie in der Angriffszone",
+      "Backchecken und defensiv helfen"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Bei einem Ansturm bedeutet „Kopfbemannung“ des Pucks:",
+    "options": [
+      "Schütten Sie es immer hoch über dem Glas ab",
+      "Halten Sie an der roten Linie an",
+      "Headman des Pucks (Vorwärtspass)",
+      "Nur rückwärts zur eigenen Bank laufen"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Den Puck tief in die Angriffszone zu lenken hilft:",
+    "options": [
+      "Glasur garantieren",
+      "Immer Abseits erzwingen",
+      "Schaffen Sie Platz für Schuss oder Pass",
+      "Nur Zeitverschwendung"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Bei einem Anspiel besteht die Aufgabe des Centers oft darin:",
+    "options": [
+      "Alle drei Stürmer tief in der Ecke",
+      "Verlassen Sie den Kreis frühzeitig",
+      "Schießen Sie sofort aus dem Punkt",
+      "Gewinnen Sie die Auslosung für einen Flügelspieler- oder D-Mann-Platz"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "Bei einem 2-1-2-Forecheck sind F1 und F2 typischerweise:",
+    "options": [
+      "Beide jagen nur hinter das Netz",
+      "Beide wechseln die Zeilen",
+      "F1 macht Druck, F2 nimmt die Passspur weg",
+      "Beide stehen an der roten Linie"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Im Powerplay sollte ein Stürmer an der Netzfront:",
+    "options": [
+      "Skaten Sie in die neutrale Zone",
+      "Decken Sie den Punkt beim Elfmeterschießen ab",
+      "Übernimm im Powerplay die Netzfront",
+      "Berühren Sie niemals den Puck"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "Bei einem 3-gegen-2-Ansturm sollte der dritte Stürmer:",
+    "options": [
+      "Skaten Sie zur Bank",
+      "Stellen Sie sich in die Falte",
+      "Bleiben Sie als dritter Mann im Ansturm hoch oben",
+      "Verfolge den Puck ohne Unterstützung"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Bei einem Ansturm sollte ein Flügelspieler mit Schnelligkeit oft Folgendes tun:",
+    "options": [
+      "Halten Sie jedes Mal an der blauen Linie an",
+      "Rückwärtspass zum Torwart",
+      "Der Flügelspieler schießt im Ansturm schnell am Tor vorbei",
+      "Skate immer durch die Mitte"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Eine wichtige Powerplay-Rolle für einen Stürmer besteht darin:",
+    "options": [
+      "Lassen Sie den Slot für die Verteidigung offen",
+      "Immer nur Punktschüsse",
+      "Gehen Sie niemals ins Netz",
+      "Überprüfen Sie den Torwart auf PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Bei einem Elfmeterschießen deckt ein Stürmer häufig Folgendes ab:",
+    "options": [
+      "Decken Sie den Punkt beim Elfmeterschießen ab",
+      "Der Schiedsrichter",
+      "Übernimm im Powerplay die Netzfront",
+      "Der Zamboni-Fahrer"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Um ein Abseits an der blauen Linie zu vermeiden, kann ein Stürmer:",
+    "options": [
+      "Skaten Sie rückwärts in die Zone",
+      "Springe über die blaue Linie",
+      "Bleiben Sie dran, indem Sie den Zoneneintritt verzögern",
+      "Betreten Sie die Zone immer vor dem Puck"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Das Einrichten eines One-Timers erfordert normalerweise:",
+    "options": [
+      "One-Timer-Setup: Pass zum offenen Shooter",
+      "Lass den Puck herumlaufen, ohne hinzusehen",
+      "Deke immer bei einem Elfmeter",
+      "Dump and Chase, ohne den Plan vorher zu prüfen"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Nach einem Punktwurf im Powerplay sollten Stürmer:",
+    "options": [
+      "Alle wechseln gleichzeitig die Zeilen",
+      "Winken Sie der Menge zu",
+      "Absturz des Netzes nach Schuss vom Punkt",
+      "Skaten Sie in die neutrale Zone"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "In der Offensivzonenstruktur hat der Center oft:",
+    "options": [
+      "Betritt niemals den Schlitz",
+      "Alle drei Stürmer tief in der Ecke",
+      "Mittelstützen niedrig, Flügel bleibt hoch",
+      "Deckt nur den Punkt ab"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Bei einem Ausbruch bedeutet die Vorwärtsunterstützung der schwachen Seite:",
+    "options": [
+      "Unterstützung von der schwachen Seite beim Ausstieg aus der D-Zone",
+      "Bleiben Sie an der roten Linie stehen",
+      "Auf das eigene Netz schießen",
+      "Zur Abwechslung auf die Bank des Gegners laufen"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Ein Torwart sollte immer versuchen:",
+    "options": [
+      "Verfolgen Sie den Puck durch den Verkehr",
+      "Stehen Sie an der roten Linie",
+      "Achten Sie nur auf die Augen des Schützen",
+      "Verlassen Sie das Netz für einen Linienwechsel"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Wenn der Puck locker im Torraum liegt, sollte der Torwart:",
+    "options": [
+      "Frieren Sie den Puck ein, um das Spiel zu stoppen",
+      "Schieße auf das leere Netz",
+      "Skaten Sie zur Mitte des Eises und feiern Sie",
+      "Pass zum Schiedsrichter"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Nach einem Save ist die ideale Rebound-Kontrolle:",
+    "options": [
+      "Rückprallkontrolle in den sicheren Bereich",
+      "Rebound immer zum Slot",
+      "Rebound immer über das Glas",
+      "Ignorieren Sie den Rebound"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Bei Odd-Man-Anstürmen sollte der Torwart:",
+    "options": [
+      "Bleib immer still",
+      "Beobachten Sie die Menge",
+      "Skaten Sie zur Bank",
+      "Torwart spricht über Odd-Man-Anstürme"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "In der NHL darf der Torwart den Puck nur hinter dem Netz spielen:",
+    "options": [
+      "Offensivzone",
+      "Spielen Sie den Puck nur im Trapez hinter dem Netz",
+      "Vollständige Verteidigungszone",
+      "Nur neutrale Zone"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Bei einem seitlichen Pass über den Torraum verwendet der Torwart:",
+    "options": [
+      "Stehen Sie immer nur auf einem Pfosten",
+      "Verlasse das Netz",
+      "Post-to-Post-Bewegung bei seitlichen Pässen",
+      "Skaten Sie bis zur blauen Linie"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Gutes Winkelspiel bedeutet für den Torwart:",
+    "options": [
+      "Herausforderungen an die rote Linie",
+      "Steht immer tief in der Falte",
+      "Winkelschnitt zur Reduzierung der Sichtbarkeit des Netzes",
+      "Wendet sich wieder dem Schützen zu"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Das „Haus“ des Torwarts, das es zu schützen gilt, besteht hauptsächlich aus:",
+    "options": [
+      "Schützen Sie das Haus (Slotbereich)",
+      "Die Zamboni-Tür",
+      "Eiskreis in der Mitte",
+      "Die Strafbank"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Bei einem Ausreißer bevorzugen viele Torhüter Folgendes:",
+    "options": [
+      "Skaten Sie zur Bank",
+      "Augen schließen und hoffen",
+      "Ordnen Sie den Schützen zu und lesen Sie die Veröffentlichung",
+      "Fordern Sie sich immer an die Spitze der Kreise"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Bei einem Wraparound-Versuch sollte der Torwart:",
+    "options": [
+      "Lassen Sie den Nahpfosten offen",
+      "Skaten Sie auf den Punkt",
+      "Spielen Sie den Puck in die Ecke",
+      "Halten Sie den Pfosten an der kurzen Seite fest"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Wenn ein Torwart den Puck hinter das Netz AUSSERHALB des Trapezes spielt, gilt Folgendes:",
+    "options": [
+      "Legales Spielen immer",
+      "Sahnehäubchen",
+      "Strafe für Spielverzögerung",
+      "Automatisches Ziel"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Wenn der Puck gescreent wird, sollte der Torwart:",
+    "options": [
+      "Lassen Sie die Falte",
+      "Signal Abseits",
+      "Geben Sie immer die kurze Seite auf",
+      "Finden Sie den Puck im Verkehr oder passen Sie die Position an"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Ein Torwart-Poke-Check muss sein:",
+    "options": [
+      "Poke-Check nur von vorne, legal",
+      "Mit einem hohen Stick im Gesicht",
+      "Immer von hinten der Schütze",
+      "Während man in der Mitte des Eises steht"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Bei einem langen Pass passiert der Torwart oft:",
+    "options": [
+      "Skatet zur gegnerischen Bank",
+      "Ignoriert das Spiel",
+      "Schießt auf den Schiedsrichter",
+      "Stoppt oder spielt den Puck legal hinter dem Netz"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Hockey Intelligence bedeutet, dass jeder Spieler:",
+    "options": [
+      "Jeder Spieler hilft bei der Verteidigung",
+      "Nur Torhüter reden",
+      "Nur die Verteidiger checken",
+      "Nur Stürmer punkten"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Wenn Sie Ihren Stock auf dem Eis lassen, hilft Ihnen das:",
+    "options": [
+      "Überholspuren blockieren und Überholspuren entgegennehmen",
+      "Signalvereisung",
+      "Vermeiden Sie den Puck",
+      "Machen Sie sich schneller ein Bein"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Ein intelligenter Zeilenwechsel geschieht normalerweise:",
+    "options": [
+      "Im Handumdrehen, wenn das Spiel es zulässt",
+      "Niemals spontan",
+      "Während einer Ausreißergruppe gegen",
+      "Immer nur in der Angriffszone"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Bevor die Verteidigungsmarken gewechselt werden, sollten Spieler:",
+    "options": [
+      "Schreien Sie immer den Schiedsrichter an",
+      "Ändern Sie, ohne hinzusehen",
+      "Kommunizieren Sie, bevor Sie die Marke wechseln",
+      "Reden Sie niemals auf dem Eis"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Das Ändern der Linien auf der falschen Seite des Eises kann Folgendes bewirken:",
+    "options": [
+      "Ein Ziel garantieren",
+      "Helfen Sie dem Team immer",
+      "Ursache: zu viele Männer oder schlechtes Timing",
+      "Stoppen Sie die Uhr"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Das Stück lesen bedeutet:",
+    "options": [
+      "Teamkollegen ignorieren",
+      "Ändern Sie niemals die Struktur",
+      "Beobachten Sie immer nur den Puck",
+      "Voraussehen, wohin Puck und Gegner als nächstes gehen"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Die Unterstützung des zweiten Mannes am Puck bedeutet:",
+    "options": [
+      "Laufen Sie vom Puck weg",
+      "Beobachten Sie nur den Torwart",
+      "Stehen Sie an der roten Linie",
+      "Passen Sie die Geschwindigkeit an und unterstützen Sie den Puckträger"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Starke Seite und schwache Seite beziehen sich auf:",
+    "options": [
+      "Seite, auf der sich der Puck befindet, vs. Gegenseite",
+      "Heim- und Auswärtsmannschaften",
+      "Erste und zweite Periode",
+      "Nur für Links- und Rechtshänder"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Beim Powerplay kommt es auf die Struktur an, weil:",
+    "options": [
+      "Bewegung öffnet Bahnen und streckt die PK",
+      "Stillstand ist am besten",
+      "Nur ein Spieler sollte den Puck berühren",
+      "Abseits spielt keine Rolle"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Penaltykill „Box + eins“ bedeutet oft:",
+    "options": [
+      "Alle fünf jagen den Puck",
+      "Alle fünf stehen an der roten Linie",
+      "Keine Struktur erforderlich",
+      "Vier in einer Box, einer übt Druck auf den Puck aus"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Bei einem Anspiel (Timing) zu schummeln bedeutet:",
+    "options": [
+      "Timing des Drops, um den Puck früh zu gewinnen",
+      "Treten Sie gegen den Stock des Gegners",
+      "Betreten Sie den Kreis vor dem Puck",
+      "Verlassen Sie den Anspielpunkt"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Intelligente Teams schützen einen Vorsprung spät:",
+    "options": [
+      "Gehen Sie bei jeder Schicht Risiken ein",
+      "Ziehen Sie im ersten Drittel immer den Torwart",
+      "Räumen Sie niemals die Zone frei",
+      "Verwalten Sie den Puck und vermeiden Sie unnötige Strafen"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Trainer ändern die Aufstellung für Begegnungen wie folgt:",
+    "options": [
+      "Erhalten Sie günstige Spieler-gegen-Spieler-Situationen",
+      "Abseitsgarantie",
+      "Vermeiden Sie alle Konfrontationen",
+      "Nur Zeitverschwendung"
+    ]
+  },
+  "ref_goal": {
+    "question": "Wenn ein Tor geschossen wird, geht der Schiedsrichter normalerweise wie folgt vor:",
+    "options": [
+      "Zeigen Sie auf die Mitte des Eises",
+      "Signalisieren Sie eine verspätete Strafe",
+      "Bilden Sie mit den Händen ein T",
+      "Auf Signalvereisung wird verzichtet"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Ein Timeout-Signal sieht folgendermaßen aus:",
+    "options": [
+      "Hände bilden ein T",
+      "Zeigen Sie auf die Mitte des Eises",
+      "Dargestellt sind sechs Finger",
+      "Beide Fäuste stoßen nach vorne"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Eine verspätete Strafe wird vom Schiedsrichter angezeigt mit:",
+    "options": [
+      "Tor erzieltes Signal",
+      "Timeout T-Signal",
+      "Vereisungssignal auswaschen",
+      "Ein Arm gerade nach oben erhoben"
+    ]
+  },
+  "ref_minor": {
+    "question": "Wenn der Schiedsrichter eine kleine Strafe verhängt, signalisiert er dies oft mit:",
+    "options": [
+      "Handfläche zum Strafraum öffnen",
+      "Arm nur über die Brust legen",
+      "Hände bilden ein T",
+      "Zeigen Sie auf die Mitte des Eises, um ein Tor zu erzielen"
+    ]
+  },
+  "ref_offside": {
+    "question": "Eine Abseitsansage des Schiedsrichters wird oft wie folgt signalisiert:",
+    "options": [
+      "Zeigen Sie auf die Mitte des Eises",
+      "Dargestellt sind sechs Finger",
+      "Pumpbewegung mit geschlossener Faust",
+      "Hackbewegung parallel zum Eis"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Ein Handpass-Verletzungssignal ist häufig:",
+    "options": [
+      "Pumpbewegung mit geschlossener Faust",
+      "Beide Arme zum Kampf verschränkt",
+      "Handfläche zum Strafraum öffnen",
+      "Zeigen Sie auf die Mitte des Eises"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Signal für hohen Strafstoß: Schiedsrichter berührt oft:",
+    "options": [
+      "Handfläche zum eigenen Gesichts-/Kieferbereich",
+      "Der Torpfosten",
+      "Der Puck",
+      "Nur eigenes Knie"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Zu viele Männer auf dem Eis werden durch Folgendes angezeigt:",
+    "options": [
+      "Nur ein Arm gerade nach oben",
+      "Zeigen Sie auf die Mitte des Eises",
+      "Hände bilden ein T",
+      "Dargestellt sind sechs Finger"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Ein Stolperstrafensignal sieht oft so aus:",
+    "options": [
+      "Auslösesignal (Beinschwungbewegung)",
+      "Hände bilden ein T",
+      "Zeigen Sie auf die Mitte des Eises",
+      "Beide Fäuste stoßen nach vorne"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Ein Hooking-Strafsignal sieht oft so aus:",
+    "options": [
+      "Sechs Finger",
+      "Parallel zum Eis hacken",
+      "Hakensignal (Ziehbewegung)",
+      "Pumpen mit geschlossener Faust"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Das Gegenkontrollsignal des Schiedsrichters ist oft:",
+    "options": [
+      "Beide Fäuste stoßen nach vorne",
+      "Zeigen Sie auf die Mitte des Eises",
+      "Hände bilden ein T",
+      "Nur Handfläche zum Gesicht"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Ein Kampfmajor wird oft mit Folgendem gekennzeichnet:",
+    "options": [
+      "Hackende Abseitsbewegung",
+      "Kampfmajor (beide Arme verschränkt)",
+      "Ein Arm hoch für die verspätete Strafe",
+      "Öffnen Sie die Handfläche nur zur Box"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Bei der Vergabe eines Strafschusses geht der Schiedsrichter in der Regel wie folgt vor:",
+    "options": [
+      "Zeigt Timeout T an",
+      "Wäscht Zuckerguss aus",
+      "Zeigt für den Strafschuss auf die Eismitte",
+      "Zeigt sechs Finger"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Wenn der Schiedsrichter ein Tor abwehrt, kann er:",
+    "options": [
+      "Signal „Tor nicht erlaubt“ (Arme verschränken, dann abwinken)",
+      "Zeigen Sie auf die Mitte, um ein Tor zu erzielen",
+      "Heben Sie den Arm nur für eine verzögerte Strafe",
+      "Timeout T anzeigen"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Das Signal einer Spielverzögerung (Puck über Glas) ist oft:",
+    "options": [
+      "Stolpernder Beinschwung",
+      "Spielverzögerung (Schiedsrichter klopft auf imaginäres Glas)",
+      "Kämpfend mit verschränkten Armen",
+      "Einhakende Zugbewegung"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Ein Linienrichter signalisiert Abseits durch:",
+    "options": [
+      "Handfläche zum Strafraum öffnen",
+      "Bilden Sie ein T für Timeout",
+      "Richten Sie den Ball auf die Mitte des Eises, um das Tor zu erzielen",
+      "Linienrichter beide Arme nach oben (Abseits)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Wenn das Icing abgewinkt wird (z. B. bei PK), kann der Linienrichter:",
+    "options": [
+      "Kreuzarme zum Kämpfen",
+      "Auf Signalvereisung wird verzichtet",
+      "Zeigen Sie auf die Mitte, um ein Tor zu erzielen",
+      "Zeige sechs Finger"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Eine doppelte Kleine Strafe kann verhängt werden mit:",
+    "options": [
+      "T für Timeout",
+      "Nur ein Arm gerade nach oben",
+      "Doppel-Moll (zwei Finger)",
+      "Sechs Finger für zu viele Männer"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Beim Boarding-Strafsignal handelt es sich häufig um Folgendes:",
+    "options": [
+      "T für Timeout",
+      "Zeigen Sie auf die Mitte, um das Ziel zu erreichen",
+      "Geschlossene Faust für den Handpass",
+      "Boarding-Strafsignal (Armstoßen)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Während eines verzögerten Strafsignals wird das Spiel fortgesetzt, weil:",
+    "options": [
+      "Das Tor wurde geschossen",
+      "Die Vereisung war abgeschlossen",
+      "Timeout wurde aufgerufen",
+      "Aufgeschobene Strafe (Spiel geht weiter)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Der Gegner startet einen Angriff durch die Mitte. Was soll das Zentrum tun?",
+    "options": [
+      "Kehren Sie in die Mitte Ihrer Zone zurück und helfen Sie den Verteidigern",
+      "Stehen Sie bei den Brettern",
+      "Ändern Sie die Zeilen ohne Grund",
+      "Skaten Sie zum gegnerischen Netz"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Ein Gegner hinter dem Netz versucht mit einem Wrap im Lacrosse-Stil zu punkten. Was soll der Torwart tun?",
+    "options": [
+      "Skaten Sie in die Mitte der Zone",
+      "Beobachten Sie die Menge",
+      "Bleiben Sie dicht am langen Pfosten und achten Sie auf den Schläger",
+      "Legen Sie sich mit dem Gesicht nach unten auf das Eis"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Sie sind ein Verteidiger, der einem 2-gegen-1-Ansturm gegenübersteht. Was ist am wichtigsten?",
+    "options": [
+      "Nimm den Pass weg",
+      "Greife den Puckträger sofort an",
+      "Beobachten Sie nur den Puck",
+      "Skaten Sie zur Bank, um die Linie zu wechseln"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Du bist ein Flügelspieler und der erste Spieler, der die Offensivzone betritt. Was sollten Sie tun?",
+    "options": [
+      "Setzen Sie den Verteidiger mit dem Puck unter Druck",
+      "Stellen Sie sich an die blaue Linie",
+      "Laufen Sie im Kreis",
+      "Skaten Sie direkt zur Bank"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Ihr Team ist im Powerplay. Wo ist normalerweise das Zentrum positioniert?",
+    "options": [
+      "An Ihrer eigenen blauen Linie",
+      "Auf der Bank",
+      "Hinter deinem eigenen Netz",
+      "Vor dem Netz"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Du hast den Puck in der Angriffszone verloren. Was sollten Sie als nächstes tun?",
+    "options": [
+      "Nehmen Sie sofort am Forecheck teil",
+      "Langsam zurücklaufen",
+      "Diskutieren Sie mit dem Schiedsrichter",
+      "Schauen Sie sich den Trainer an"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Der Center verlor das Bully. Was kommt als nächstes?",
+    "options": [
+      "Stürze dich in den Angriff",
+      "Sofortige Hilfe bei der Verteidigung",
+      "Nehmen Sie Ihren Helm ab",
+      "Hör auf, dich zu bewegen"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Der Puck liegt entlang der Bande in Ihrer Zone. Was soll der zweite Spieler tun?",
+    "options": [
+      "Unterstützen Sie Ihren Partner in der Nähe",
+      "Bleiben Sie stehen",
+      "Beobachten Sie die Stände",
+      "Skaten Sie zum gegnerischen Netz"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Was ist bei einem 3-gegen-2-Ansturm am wichtigsten?",
+    "options": [
+      "Alle skaten zum gleichen Spot",
+      "Schießen Sie aus jeder Position",
+      "Halten Sie an der blauen Linie an",
+      "Dehnen Sie die Verteidigung mit Pässen"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Nach einem Schuss prallte der Puck vor das Netz. Was soll der Torwart tun?",
+    "options": [
+      "Heben Sie den Stock in die Luft",
+      "Finden Sie den Puck und decken Sie ihn ab",
+      "Schlittschuhlaufen Sie hinter dem Netz",
+      "Schauen Sie sich den Trainer an"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Wann ist der beste Zeitpunkt für einen Linienwechsel?",
+    "options": [
+      "Wenn Ihr Team den Puck kontrolliert",
+      "Wenn der Gegner angreift",
+      "Wenn der Puck vor dem Netz ist",
+      "Bei einer gefährlichen Torchance"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Was sollte ein Verteidiger tun, wenn er unter starkem Forecheck-Druck steht?",
+    "options": [
+      "Stehen Sie mit dem Puck still",
+      "Schieße den Puck in die Mitte der Zone",
+      "Fallen Sie auf das Eis",
+      "Machen Sie einen schnellen und präzisen ersten Durchgang"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Was ist wichtig, wenn man den Puck nicht hat?",
+    "options": [
+      "Schauen Sie sich die Decke an",
+      "Halten Sie den Stock nur mit einer Hand",
+      "Machen Sie sich für einen Pass frei",
+      "Bleiben Sie an einer Stelle stehen"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Welcher Ausbruch gilt als der zuverlässigste?",
+    "options": [
+      "Den Puck verlieren",
+      "Mit einem kurzen, präzisen Pass",
+      "Eine blinde Müllkippe",
+      "Ein Durchgang durch die Mitte Ihrer Zone"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Was ist beim Elfmeterschießen am wichtigsten?",
+    "options": [
+      "Überholspuren sperren",
+      "Ständig angreifen",
+      "Skaten ohne Struktur",
+      "Spielen Sie nur entlang der Bretter"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Wann kann sich ein Verteidiger dem Ansturm anschließen?",
+    "options": [
+      "Stets",
+      "Nur in der Verlängerung",
+      "Niemals",
+      "Wenn sein Partner seine Position vertritt"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Warum ist ein Pass durch den Schlitz gefährlich?",
+    "options": [
+      "Beamte können es nicht sehen",
+      "Es verlangsamt das Spiel",
+      "Es kann zu einem Ziel führen",
+      "Es ist immer illegal"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Wann sollte ein Torwart den Puck hinter das Netz spielen?",
+    "options": [
+      "Das Eis verlassen",
+      "Um den Verteidigern zu helfen, den Ausbruch zu starten",
+      "Zum Ausruhen",
+      "Mit Beamten streiten"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Warum fährt ein Stürmer zum langen Pfosten?",
+    "options": [
+      "Für Rebounds und One-Timer",
+      "Sich aus dem Spiel heraushalten",
+      "Zum Ausruhen",
+      "Einem Teamkollegen in die Quere kommen"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Was sollte ein Verteidiger tun, bevor er vom Punkt aus schießt?",
+    "options": [
+      "Überprüfen Sie den Verkehr vor dem Netz",
+      "Schieße direkt in die Bretter",
+      "Schließe seine Augen",
+      "Dekes rückwärts"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Wer sollte nach einem Anspiel als Erster um den Puck kämpfen?",
+    "options": [
+      "Nur der Torwart",
+      "Niemand",
+      "Der nächste Spieler",
+      "Nur der Verteidiger"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Warum ist Puckkontrolle wichtig?",
+    "options": [
+      "Ohne den Puck kann der Gegner nicht angreifen",
+      "Sie können weniger skaten",
+      "Dafür vergeben die Funktionäre Punkte",
+      "Es sieht gut aus"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Was ist in einem Eckkampf am wichtigsten?",
+    "options": [
+      "Ein hoher Schuss",
+      "Springen",
+      "Nur rückwärts laufen",
+      "Körperposition und Stockplatzierung"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Wie öffnet man sich am besten?",
+    "options": [
+      "Bewegen Sie sich in den offenen Raum",
+      "In eine blinde Ecke",
+      "Skaten Sie hinter dem Rücken eines Teamkollegen",
+      "Durch Stillstand"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Was sollte ein Stürmer nach einem Schuss tun?",
+    "options": [
+      "Wechseln Sie sofort die Zeilen",
+      "Beobachten Sie die Anzeigetafel",
+      "Gehen Sie für einen Rebound ans Netz",
+      "Bleiben Sie stehen"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Was ist für einen Verteidiger im Slot am wichtigsten?",
+    "options": [
+      "Halten Sie sich vom Netz fern",
+      "Spielen Sie ohne Stock",
+      "Verhindern Sie, dass Gegner zu Rebounds gelangen",
+      "Beobachten Sie nur den Torwart"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Wie gelangt man am besten in die Zone?",
+    "options": [
+      "Ohne Geschwindigkeit",
+      "Rückwärts in die Zone skaten",
+      "Durch die Mitte ohne Unterstützung",
+      "Mit Puckkontrolle"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Wann ist ein Rückhandschlag sinnvoll?",
+    "options": [
+      "Nur in der Praxis",
+      "Niemals",
+      "Wenn keine Zeit bleibt, den Puck in die Vorhand zu bewegen",
+      "Nur für Verteidiger"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Warum ist das Zentrum im Angriff wichtig?",
+    "options": [
+      "Er steht immer still",
+      "Er macht nie Pässe",
+      "Er verbindet die ganze Linie",
+      "Er spielt nie Verteidigung"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Worauf kommt es im 1-gegen-1-Defensivspiel an?",
+    "options": [
+      "Springe sofort auf den Gegner",
+      "Beobachten Sie die Stände",
+      "Ohne Kontrolle rückwärts laufen",
+      "Spalt und Winkel kontrollieren"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Ihre Linie hatte eine lange Offensivschicht. Der gegnerische Verteidiger holte den Puck hinter dem Netz zurück, sieht aber müde aus. Auch Ihre Linie liegt schon lange auf dem Eis. Was ist das Beste?",
+    "options": [
+      "Führen Sie weiterhin aggressives Forechecking mit der gesamten Linie durch",
+      "Ohne Druck in die neutrale Zone zurückfallen",
+      "Ein Stürmer drückt weiter, während die anderen wechseln",
+      "Die ganze Zeile ändert sich auf einmal"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Warum ist ein Rückwärtspass manchmal sinnvoll?",
+    "options": [
+      "Den Schwung verlieren",
+      "Um Angriffe zu vermeiden",
+      "Um den Besitz zu behalten",
+      "Um das Spiel zu stoppen"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Worauf kommt es beim Blocken eines Schusses an?",
+    "options": [
+      "Blockieren Sie den Weg des Pucks",
+      "Springe nach oben",
+      "Dreh dir den Rücken zu",
+      "Schauen Sie nach unten"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Wie sollte ein Verteidiger gegen einen Schnellstürmer spielen?",
+    "options": [
+      "Fahren Sie weiter vorwärts, ohne anzuhalten",
+      "Spielen Sie jedes Mal zu eng",
+      "Bleiben Sie stehen",
+      "Geben Sie ihm kein offenes Eis"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Wann ist ein One-Timer am effektivsten?",
+    "options": [
+      "Wenn der Schütze nicht bereit ist",
+      "Nur in der Praxis",
+      "Wenn der Torwart nicht rechtzeitig in Aktion treten kann",
+      "Wenn der Puck stillsteht"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Warum ist Kommunikation auf dem Eis wichtig?",
+    "options": [
+      "Es lenkt den Gegner ab",
+      "Es ersetzt das Skaten",
+      "Es hilft Teamkollegen, Entscheidungen schneller zu treffen",
+      "Den Beamten gefällt es"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Wie sollte man einen 2-gegen-0-Rush spielen?",
+    "options": [
+      "Bringen Sie den Torwart mit einem Pass in Bewegung",
+      "Bleiben Sie vor dem Netz stehen",
+      "Schießen Sie aus der Ferne",
+      "Den Puck verlieren"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Warum nutzen Stürmer den Raum hinter dem Netz?",
+    "options": [
+      "Um mich vor dem Stück zu verstecken",
+      "Um das Spiel zu stoppen",
+      "Um Schüsse zu vermeiden",
+      "Um die Verteidigung zu stärken"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Warum ist es wichtig, ruhig zu bleiben?",
+    "options": [
+      "Es betrifft das Eis",
+      "Dadurch wird das Netz kleiner",
+      "Es hilft Ihnen, bessere Entscheidungen zu treffen",
+      "Dadurch wird der Puck schneller"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Was sollte ein Verteidiger an der offensiven blauen Linie tun?",
+    "options": [
+      "Halten Sie den Puck in der Zone",
+      "Stehen Sie nur in der Mitte",
+      "Teamkollegen ignorieren",
+      "Ziehen Sie sich immer zurück"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Was macht einen Rebound gefährlich?",
+    "options": [
+      "Der Spieler steht still",
+      "Der Puck wird leichter",
+      "Der Schiedsrichter kann den Puck nicht sehen",
+      "Der Torwart kontrolliert den Abprall nicht immer"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Warum ist es sinnvoll, die Angriffsrichtung zu ändern?",
+    "options": [
+      "Es schadet Ihrem eigenen Team",
+      "Es verlangsamt das Spiel",
+      "Es entstehen Freiflächen",
+      "Es ermüdet die Beamten"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Worauf kommt es bei einem Anspiel in der Offensivzone an?",
+    "options": [
+      "Sofort zurücklaufen",
+      "Erobere schnell den Puckbesitz",
+      "Beobachten Sie die Anzeigetafel",
+      "Nicht bewegen"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Was bedeutet es, einen Teamkollegen zu vertreten?",
+    "options": [
+      "Besetzen Sie seine Position, wenn er sich dem Ansturm anschließt",
+      "Spielen Sie nur die Offensive",
+      "Kopieren Sie seine genaue Route",
+      "Stehen Sie neben ihm, ohne sich zu bewegen"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Was sollte ein Verteidiger tun, wenn er seine Position verliert?",
+    "options": [
+      "Beobachten Sie nur den Puck",
+      "Streiten Sie mit einem Teamkollegen",
+      "Hör auf zu skaten",
+      "Gehen Sie schnell wieder zurück in die Verteidigung"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Warum schießen Spieler oft tief?",
+    "options": [
+      "Es ist langsamer",
+      "Denn hohe Schüsse sind illegal",
+      "Für Ablenkungen und Rückpraller",
+      "Für Beamte ist es einfacher"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Wann ist ein langer Pass besonders sinnvoll?",
+    "options": [
+      "In einer Menge Spieler",
+      "Während eines Zeilenwechsels",
+      "Auf einen schnellen Gegenangriff",
+      "Ohne Ziel"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Warum ist Bewegung ohne Puck wichtig?",
+    "options": [
+      "Es schafft Passmöglichkeiten",
+      "Es ist nur für Verteidiger",
+      "Es hat keinen Einfluss auf das Spiel",
+      "Es steht den Teamkollegen im Weg"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Wann kann ein Schuss aus spitzem Winkel sinnvoll sein?",
+    "options": [
+      "Nur beim Powerplay",
+      "Nur beim Elfmeterschießen",
+      "Niemals",
+      "Für einen unerwarteten Aufschwung"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Warum ist die Überprüfung des Torwarts wichtig?",
+    "options": [
+      "Der Schiedsrichter kann den Puck nicht sehen",
+      "Es fällt ihm schwerer, den Schuss zu sehen",
+      "Der Torwart bleibt stehen",
+      "Dadurch sieht der Angriff besser aus"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Was hilft Ihnen, Pässe abzufangen?",
+    "options": [
+      "Das Stück lesen",
+      "Nur das Glück",
+      "Langsam skaten",
+      "Spielen ohne Stock"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Wie pinnt man einen Gegner richtig an der Bande?",
+    "options": [
+      "Schieben Sie ihn nach hinten",
+      "Mit geschlossenen Augen",
+      "Mit den Händen und ohne Stock",
+      "Benutze deinen Körper und deinen Schläger, während du den Puck kontrollierst"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Was zählt, wenn ein Verteidiger hinter dem Netz hervorkommt?",
+    "options": [
+      "Schauen Sie nach oben und finden Sie einen Pass",
+      "Langsam skaten",
+      "Schieße den Puck sofort ab",
+      "Schauen Sie nur auf das Eis"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Warum verlangsamen Teams manchmal das Spiel?",
+    "options": [
+      "Den Puck verlieren",
+      "Um Besitz und Energie zu behalten",
+      "Um Angriffe zu vermeiden",
+      "Um das Spiel zu stoppen"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Wer ist ein Second-Wave-Spieler?",
+    "options": [
+      "Ein Schiedsrichter",
+      "Der Ersatztorwart",
+      "Ein Spieler, der sich später dem Angriff anschließt",
+      "Der langsamste Spieler"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Warum sind schnelle Kurzpässe effektiv?",
+    "options": [
+      "Sie sind immer langsam",
+      "Sie haben den Angriff verletzt",
+      "Sie sind nur für Verteidiger",
+      "Sie sind für Gegner schwerer zu stehlen"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Was sollte ein Torwart nach einer Parade tun?",
+    "options": [
+      "Verfolgen Sie den Puck schnell",
+      "Skaten Sie auf die Bretter",
+      "Zieh ihm den Handschuh aus",
+      "Schauen Sie sich die Anzeigetafel an"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Wann ist ein Angriff durch die Mitte besonders gefährlich?",
+    "options": [
+      "Wenn ein Spieler alleine ist",
+      "Wenn es Geschwindigkeit und Unterstützung gibt",
+      "Wenn kein Puck da ist",
+      "Wenn alle still stehen"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Was hilft Ihnen, Entscheidungen schneller zu treffen?",
+    "options": [
+      "Langsam skaten",
+      "Beobachten Sie nur den Puck",
+      "Ständig das Eis absuchen",
+      "Spielen Sie, ohne zu reden"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Was macht ein guter Kapitän?",
+    "options": [
+      "Unterstützt das Team und geht mit gutem Beispiel voran",
+      "Spielt nur Angriff",
+      "Schreit jeden an",
+      "Spielt nie Verteidigung"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Was hilft Ihnen, dem Druck der Vorkontrollen zu entgehen?",
+    "options": [
+      "Allein spielen",
+      "Den Puck schnell bewegen",
+      "Den Puck lange halten",
+      "Anhalten entlang der Bretter"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Warum können Sie an der blauen Linie nicht zögern?",
+    "options": [
+      "Der Torwart wird müde",
+      "Das Eis wird schlimmer",
+      "Sie können die Zone verlieren",
+      "Der Schiedsrichter unterbricht das Spiel"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Warum ist ein Schuss direkt nach einem Pass gefährlich?",
+    "options": [
+      "Es ist immer schwach",
+      "Es ist schwer auszuführen",
+      "Der Schiedsrichter erkennt das Tor nicht an",
+      "Der Torwart wird nicht rechtzeitig gesetzt"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Wer sollte nach einem Puckverlust zuerst zurückkommen?",
+    "options": [
+      "Der nächste Spieler",
+      "Nur die Mitte",
+      "Nur der Verteidiger",
+      "Nur der Torwart"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Wie sollte ein Verteidiger gegen einen harten Schützen spielen?",
+    "options": [
+      "Beobachten Sie nur den Torwart",
+      "Reduzieren Sie seine Zeit und seinen Platz zum Schießen",
+      "Gib ihm Freiraum",
+      "Bleiben Sie weit weg"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Warum wird der Puck in der Verteidigung oft in die Ecke bewegt?",
+    "options": [
+      "Beamte können das Stück nicht sehen",
+      "Dort ist das Eis langsamer",
+      "Es besteht weniger Gefahr für das Netz",
+      "Dort ist es einfacher zu punkten"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Was macht ein Stürmer vor dem Netz?",
+    "options": [
+      "Steht mit dem Rücken zum Stück",
+      "Skates zu den Brettern",
+      "Bewegt sich nicht",
+      "Erzeugt Traffic und jagt Rebounds"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Warum ist es wichtig, mit erhobenem Kopf zu spielen?",
+    "options": [
+      "Um Mitspieler und Gegner zu sehen",
+      "Um den Puck leichter zu machen",
+      "Schneller skaten",
+      "Damit die Beamten Sie sehen können"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Was ist nach dem Gewinn eines PK-Anspiels am wichtigsten?",
+    "options": [
+      "Versuchen Sie, alle zu durchdringen",
+      "Machen Sie eine lange Pause",
+      "Räumen Sie den Puck aus der Zone",
+      "Bleiben Sie stehen"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Warum ist es wichtig, gegnerische Verteidiger unter Druck zu setzen?",
+    "options": [
+      "Es schadet Ihrem Team",
+      "Es hat keinen Einfluss auf das Spiel",
+      "Es stoppt das Spiel",
+      "Es kann einen Fehler erzwingen"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Wann ist ein Touch-Pass sinnvoll?",
+    "options": [
+      "Den Angriff schnell entwickeln",
+      "Wenn der Spieler stillsteht",
+      "Wenn es keine Teamkollegen gibt",
+      "Nur in der Verteidigung"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Was soll der Center vor seinem eigenen Netz tun?",
+    "options": [
+      "Warten Sie auf ein Pass-Up-Eis",
+      "Skaten Sie in die neutrale Zone",
+      "Helfen Sie den Verteidigern, die Lücke zu schließen",
+      "Stehen Sie bei den Brettern"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Warum ist eine kreuz und quer verlaufende Bewegung nach vorne effektiv?",
+    "options": [
+      "Es verwirrt die Verteidiger",
+      "Es schadet Ihrem eigenen Team",
+      "Es verlangsamt den Angriff",
+      "Es ist illegal"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Was zählt im Kampf um einen freien Puck?",
+    "options": [
+      "Halten Sie den Puck lange",
+      "Bleiben Sie stehen",
+      "Schauen Sie nach unten",
+      "Entscheiden Sie schnell, was als nächstes zu tun ist"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Warum ändern Spieler ihre Geschwindigkeit?",
+    "options": [
+      "Mit dem Skaten aufhören",
+      "Den Puck verlieren",
+      "Einen Gegner besiegen",
+      "Um schneller müde zu werden"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Es sind noch 40 Sekunden übrig. Sie führen mit einem Ziel. Der Gegner spielt 6 gegen 5. Ihr Verteidiger hat den Puck an der blauen Linie und Ihr Flügelspieler kann zum Steal springen. Was ist das Beste?",
+    "options": [
+      "Fliege sofort aggressiv auf den Puck zu",
+      "Verfolgen Sie nur den Netto-Frontspieler",
+      "Drücken Sie nur in einem kontrollierten Winkel, um den Puck zu nehmen",
+      "Vollständig ins Netz fallen"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Wann kann ein Torwart weit aus seinem Tor herauskommen?",
+    "options": [
+      "Den Puck abfangen und der Verteidigung helfen",
+      "Niemals",
+      "Stets",
+      "Erst nach einem Tor"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Was ist für einen erfolgreichen Rebound-Versuch wichtig?",
+    "options": [
+      "Eine große Überraschung",
+      "Halten Sie sich vom Netz fern",
+      "Langsame Bewegung",
+      "Schnelle Reaktion"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Warum ist die Unterstützung des zweiten Spielers wichtig?",
+    "options": [
+      "Es schafft zusätzliche Optionen",
+      "Es ist nur für Verteidiger",
+      "Es ist nicht erforderlich",
+      "Es tut dem Angriff weh"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Was bedeutet „das Stück lesen“?",
+    "options": [
+      "Antizipieren Sie, was Ihre Gegner tun werden",
+      "Zähldurchgänge",
+      "Folge nur dem Puck",
+      "Beobachten Sie die Anzeigetafel"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Warum ist es wichtig, den Puck mit dem Körper zu schützen?",
+    "options": [
+      "Es macht das Eis schneller",
+      "Es ist nur für Verteidiger",
+      "Es betrifft den Schiedsrichter",
+      "Es hilft, den Puck abzuschirmen"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Wann ist ein Ausbruch entlang der Tafeln sinnvoll?",
+    "options": [
+      "Niemals",
+      "Stets",
+      "Wenn die Mitte bedeckt ist",
+      "Nur beim Powerplay"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Worauf kommt es bei der Verteidigung gegen ein Powerplay an?",
+    "options": [
+      "Ständige Dekes",
+      "Bleiben Sie defensiv kompakt",
+      "Langsame Zeilenwechsel",
+      "Überall eins gegen eins spielen"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Was ist ein Pass für einen Schuss?",
+    "options": [
+      "Ein Pass zu einem Spieler in einer guten Schussposition",
+      "Ein Pass zurück zum Torwart",
+      "Ein zufälliger Pass",
+      "Ein Pass zur Ecke"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Warum ist ein Deke vor einem Schuss sinnvoll?",
+    "options": [
+      "Es verlangsamt immer den Angriff",
+      "Es ist illegal",
+      "Es ist nur für Verteidiger",
+      "Es kann den Torwart oder einen Verteidiger bewegen"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Nachdem ein Spieler einen Schuss geblockt hat, sollte er:",
+    "options": [
+      "Suchen Sie sofort nach dem Puck",
+      "Bleiben Sie stehen",
+      "Schauen Sie sich den Schiedsrichter an",
+      "Verlasse das Eis"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Wie helfen Stürmer Verteidigern?",
+    "options": [
+      "Bleiben Sie in der Angriffszone",
+      "Überprüfen Sie noch einmal und machen Sie sich für einen Pass frei",
+      "Spielen Sie nur entlang der Bretter",
+      "Spielen Sie nicht in der Verteidigung"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Was hilft gegen starkes Forechecking?",
+    "options": [
+      "Schnelle Entscheidungen und Puckbewegungen",
+      "Langsam skaten",
+      "Allein spielen",
+      "Langer Puckbesitz"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Wann ist eine Stockauslenkung sinnvoll?",
+    "options": [
+      "Niemals",
+      "Nur in der Praxis",
+      "Nur in der Verteidigung",
+      "Um den Puck umzuleiten"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Worauf kommt es beim Angriff über die Bande an?",
+    "options": [
+      "Zurück zum Torwart",
+      "Unterstützung durch einen Teamkollegen in der Nähe",
+      "Allein spielen",
+      "Bewegung stoppen"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Was ist für einen Torwart bei einem Ausreißer wichtig?",
+    "options": [
+      "Behalten Sie eine gute Positionierung und Geduld bei",
+      "Sofort aufs Eis fallen lassen",
+      "Skaten Sie rückwärts",
+      "Beobachten Sie die Verteidiger"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Worauf kommt es bei einem schnellen Übergang in die Offensive an?",
+    "options": [
+      "Langsame Pässe",
+      "Langer Puckbesitz",
+      "Stoppen Sie an der blauen Linie",
+      "Geschwindigkeit der Entscheidungsfindung"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Was macht ein Verteidiger im Powerplay?",
+    "options": [
+      "Schlittschuhe zum Netz",
+      "Schließt sich dem Angriff nicht an",
+      "Bewegt den Puck und sucht nach einem Schuss",
+      "Steht still"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Warum ist der Verkehr vor dem Netz gefährlich?",
+    "options": [
+      "Der Puck wird langsamer",
+      "Für den Torwart ist es schwieriger, den Puck zu sehen",
+      "Der Schiedsrichter kann keine Spieler zählen",
+      "Spieler werden schneller müde"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Was zählt nach dem Abfangen des Pucks?",
+    "options": [
+      "Schneller Übergang zur Offensive",
+      "Hör auf zu skaten",
+      "Wirf den Puck sofort weg",
+      "Skaten Sie auf die Bretter"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Was ist bei Überstunden besonders wichtig?",
+    "options": [
+      "Ständige Totalaufnahmen",
+      "Spielen ohne Pässe",
+      "Lange Schichten",
+      "Puckkontrolle und wenige Fehler"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Was sollte ein Verteidiger tun, wenn ein Gegner den Torwart überwacht?",
+    "options": [
+      "Schauen Sie sich den Schiedsrichter an",
+      "Skaten Sie auf die Bretter",
+      "Räumen Sie den Slot frei und fesseln Sie den Gegner",
+      "Stehen Sie in der Nähe, ohne sich zu bewegen"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Warum ist Teamspiel wichtiger als Einzelspiel?",
+    "options": [
+      "Das Team hat keinen Einfluss auf das Ergebnis",
+      "Eine Linie schafft gemeinsam mehr Chancen",
+      "Es entscheidet immer ein Spieler über das Spiel",
+      "Pässe schadeten dem Spiel"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Was ist vor einer Impfung wichtig?",
+    "options": [
+      "Lesen Sie schnell die Position des Torwarts",
+      "Schauen Sie nur nach unten auf den Puck",
+      "Kommen Sie zum Stillstand",
+      "Schließe deine Augen"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Was entwickelt den Hockey-IQ am besten?",
+    "options": [
+      "Nur Krafttraining",
+      "Nur Tore beobachten",
+      "Nur Skaten",
+      "Das Spiel studieren, üben und Situationen verstehen"
+    ]
+  }
+}

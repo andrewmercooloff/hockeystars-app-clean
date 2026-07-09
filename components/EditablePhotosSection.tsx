@@ -16,15 +16,61 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { uploadGalleryPhoto } from '../utils/uploadImage';
-import { loadCurrentUser, notifyFriendsAboutPhotos } from '../utils/playerStorage';
+import { loadCurrentUser } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedImage from './CachedImage';
 import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
 import { addActivityPoints } from '../services/activityService';
+import { useMediaAspectSize } from '../utils/mediaAspectSize';
 
 const { width: screenWidth } = Dimensions.get('window');
+const PHOTO_VIEW_WIDTH = Math.round(screenWidth * 0.42);
+
+function ViewModePhoto({
+  photo,
+  index,
+  playerId,
+  likeRefreshTrigger,
+  onPress,
+}: {
+  photo: string;
+  index: number;
+  playerId?: string;
+  likeRefreshTrigger: number;
+  onPress: (index: number) => void;
+}) {
+  const { width, height } = useMediaAspectSize(photo, PHOTO_VIEW_WIDTH, 'image');
+  const contentId = generatePhotoContentId(photo);
+
+  return (
+    <View style={styles.photoContainer}>
+      <TouchableOpacity
+        style={[styles.photoWrapper, { width, height }]}
+        onPress={() => onPress(index)}
+        activeOpacity={0.8}
+      >
+        <CachedImage
+          imageUrl={photo}
+          style={styles.photoAdaptive}
+          resizeMode="contain"
+        />
+        {playerId ? (
+          <View style={styles.photoLikeButtonContainer}>
+            <LikeButton
+              playerId={playerId}
+              contentId={contentId}
+              contentType="photo"
+              size="small"
+              refreshTrigger={likeRefreshTrigger}
+            />
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 interface EditablePhotosSectionProps {
   photos?: string[];
@@ -516,7 +562,7 @@ export default function EditablePhotosSection({
                         <CachedImage
                           imageUrl={photo}
                           style={styles.photoGrid}
-                          resizeMode="cover"
+                          resizeMode="contain"
                         />
                         <View style={styles.photoIndexGrid}>
                           <Text style={styles.photoIndexTextGrid}>{index + 1}</Text>
@@ -559,36 +605,16 @@ export default function EditablePhotosSection({
               removeClippedSubviews={true}
               decelerationRate="fast"
             >
-              {photos.map((photo, index) => {
-                const contentId = generatePhotoContentId(photo);
-                
-                return (
-                <View key={photo} style={styles.photoContainer}>
-                  <TouchableOpacity
-                    style={styles.photoWrapper}
-                    onPress={() => openPhotoViewer(index)}
-                    activeOpacity={0.8}
-                  >
-                    <CachedImage
-                      imageUrl={photo}
-                      style={styles.photo}
-                      resizeMode="cover"
-                    />
-                      {playerId && (
-                        <View style={styles.photoLikeButtonContainer}>
-                          <LikeButton
-                            playerId={playerId}
-                            contentId={contentId}
-                            contentType="photo"
-                            size="small"
-                            refreshTrigger={likeRefreshTrigger}
-                          />
-                        </View>
-                      )}
-                  </TouchableOpacity>
-                </View>
-                );
-              })}
+              {photos.map((photo, index) => (
+                <ViewModePhoto
+                  key={photo}
+                  photo={photo}
+                  index={index}
+                  playerId={playerId}
+                  likeRefreshTrigger={likeRefreshTrigger}
+                  onPress={openPhotoViewer}
+                />
+              ))}
             </ScrollView>
           )}
         </View>
@@ -724,6 +750,13 @@ const styles = StyleSheet.create({
   },
   photoWrapper: {
     position: 'relative',
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+  },
+  photoAdaptive: {
+    width: '100%',
+    height: '100%',
   },
   photoLikeButtonContainer: {
     position: 'absolute',

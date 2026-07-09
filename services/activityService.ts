@@ -73,6 +73,46 @@ async function createNewActivityPoints(userId: string, points: number): Promise<
 }
 
 /**
+ * Начисляет 50 очков за регистрацию, если ещё не начисляли (дети после parental consent).
+ */
+export async function ensureRegistrationActivityPoints(
+  userId: string,
+  playerName?: string
+): Promise<{ success: boolean; awarded: boolean }> {
+  try {
+    const { data: existing, error: checkError } = await supabase
+      .from('activity_log')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('activity_type', ACTIVITY_TYPES.REGISTRATION.type)
+      .limit(1)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError.code === '42501') {
+        return { success: true, awarded: false };
+      }
+      console.error('Error checking registration activity:', checkError);
+      return { success: false, awarded: false };
+    }
+
+    if (existing) {
+      return { success: true, awarded: false };
+    }
+
+    const result = await addActivityPoints(
+      userId,
+      'REGISTRATION',
+      playerName ? `Регистрация профиля: ${playerName}` : undefined
+    );
+    return { success: result.success, awarded: result.success };
+  } catch (error) {
+    console.error('Unexpected error in ensureRegistrationActivityPoints:', error);
+    return { success: false, awarded: false };
+  }
+}
+
+/**
  * Добавляет очки активности пользователю
  */
 export async function addActivityPoints(
@@ -175,6 +215,31 @@ export async function addActivityPoints(
   }
 }
 
+export type PlayerWithActivityRating = {
+  id: string;
+  activityRating?: number | null;
+};
+
+/** Проставить activityRating на список игроков (поиск, лёд) */
+export async function applyActivityRatingsToPlayers<T extends PlayerWithActivityRating>(
+  players: T[],
+): Promise<T[]> {
+  if (players.length === 0) return players;
+  try {
+    const activityRatings = await getPlayersActivityRatings(players.map((p) => p.id));
+    if (Object.keys(activityRatings).length > 0) {
+      players.forEach((player) => {
+        if (activityRatings[player.id] !== undefined) {
+          player.activityRating = activityRatings[player.id];
+        }
+      });
+    }
+  } catch (error) {
+    console.warn('⚠️ Не удалось применить рейтинги активности:', error);
+  }
+  return players;
+}
+
 /**
  * Получить рейтинги активности для списка игроков
  */
@@ -182,21 +247,27 @@ export async function getPlayersActivityRatings(playerIds: string[]): Promise<{ 
   try {
     if (playerIds.length === 0) return {};
 
-    const { data, error } = await supabase
-      .from('activity_points')
-      .select('user_id, points')
-      .in('user_id', playerIds);
-
-    if (error) {
-      console.error('Ошибка загрузки рейтингов активности:', error);
-      return {};
-    }
-
     const ratings: { [playerId: string]: number } = {};
-    data?.forEach(entry => {
-      ratings[entry.user_id] = entry.points || 0;
-    });
+    // Keep URL/query headers small for the Timeweb nginx proxy.
+    // Large `.in()` lists previously triggered "upstream sent too big header" -> 502.
+    const BATCH_SIZE = 50;
 
+    for (let offset = 0; offset < playerIds.length; offset += BATCH_SIZE) {
+      const batch = playerIds.slice(offset, offset + BATCH_SIZE);
+      const { data, error } = await supabase
+        .from('activity_points')
+        .select('user_id, points')
+        .in('user_id', batch);
+
+      if (error) {
+        console.error('Ошибка загрузки рейтингов активности (batch):', error);
+        continue;
+      }
+
+      data?.forEach(entry => {
+        ratings[entry.user_id] = entry.points || 0;
+      });
+    }
 
     return ratings;
   } catch (error) {

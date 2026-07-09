@@ -512,7 +512,7 @@ export default function AdminScreen() {
         style={[styles.imageButton, styles.addUserButton]}
         onPress={() => setShowCreateUserModal(true)}
       >
-        <SafeIcon name="person-add" size={16} color="#fff" />
+        <Ionicons name="person-add" size={16} color="#fff" />
         <Text style={styles.imageButtonText}>Добавить</Text>
       </TouchableOpacity>
 
@@ -530,7 +530,7 @@ export default function AdminScreen() {
               style={styles.closeButton}
               onPress={() => setShowCreateUserModal(false)}
             >
-              <SafeIcon name="close" size={24} color="#fff" />
+              <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>
               {t('admin.createUser')}
@@ -620,7 +620,7 @@ export default function AdminScreen() {
               style={[styles.footerButton, { backgroundColor: '#FF4444' }]}
               onPress={handleCreateUser}
             >
-              <SafeIcon name="save" size={20} color="#fff" />
+              <Ionicons name="save" size={20} color="#fff" />
               <Text style={styles.modalButtonText}>Создать</Text>
             </TouchableOpacity>
           </View>
@@ -653,7 +653,7 @@ export default function AdminScreen() {
               style={styles.closeButton}
               onPress={() => setShowPlayerModal(false)}
             >
-              <SafeIcon name="close" size={24} color="#fff" />
+              <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>
               Редактирование игрока
@@ -789,20 +789,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2a2a',
     borderBottomWidth: 1,
     borderBottomColor: '#444',
-  },
-  closeButton: {
-    padding: 10,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  saveButtonContainer: {
-    padding: 10,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,

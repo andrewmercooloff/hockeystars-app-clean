@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Сколько полевых игроков одной команды на льду в равных составах (без вратарей)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Сколько периодов в стандартном матче NHL?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Офсайд — если атакующий вошёл в зону соперника раньше чего?",
+    "options": [
+      "Центральная линия",
+      "Шайба",
+      "Вратарь",
+      "Судья"
+    ]
+  },
+  "rules_icing": {
+    "question": "Айсинг — бросок из-за центра за линию ворот соперника без касания. Верно?",
+    "options": [
+      "Неверно — в NHL не бывает",
+      "Верно",
+      "Верно — только в овертайме",
+      "Неверно — только из зоны защиты"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "У кого рекорд NHL по голам за карьеру?",
+    "options": [
+      "Alex Ovechkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Александр Овечкин — левый крайний под №8. За какой город он играет?",
+    "options": [
+      "Бостон",
+      "Торонто",
+      "Вашингтон",
+      "Питтсбург"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Что такое хет-трик в хоккее?",
+    "options": [
+      "Три гола одного игрока в матче",
+      "Три сейва подряд",
+      "Три передачи в одном матче",
+      "Три удаления"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Большинство возникает, когда:",
+    "options": [
+      "Вратарь снят",
+      "Начинается драка",
+      "У одной команды больше игроков из-за удаления",
+      "Начинается овертайм"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Кубок Стэнли — трофей какой лиги?",
+    "options": [
+      "IIHF World Championship",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Из чего сделана стандартная хоккейная шайба?",
+    "options": [
+      "Вулканизированная резина",
+      "Алюминий",
+      "Дерево",
+      "Пластик"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Сколько минут длится малый штраф?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Сколько минут длится большой штраф?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Игра начинается с:",
+    "options": [
+      "Буллит",
+      "Вбрасывание",
+      "Перерыв на большинство",
+      "Айсинг"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Если после овертайма ничья в регулярке NHL, что дальше?",
+    "options": [
+      "Второй овертайм",
+      "Серия буллитов",
+      "Плей-офф период",
+      "Ничья сохраняется"
+    ]
+  },
+  "rules_crease": {
+    "question": "Может ли атакующий стоять на площадке вратаря без последствий?",
+    "options": [
+      "Да, всегда",
+      "Только в плей-офф",
+      "Нет — гол могут не засчитать",
+      "Только в последнюю минуту"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Высокая клюшка — удар выше:",
+    "options": [
+      "Перекладина",
+      "Плечи",
+      "Пояс",
+      "Только шлем"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Снятие вратаря рискует:",
+    "options": [
+      "Буллит",
+      "Гол в пустые ворота",
+      "Офсайд",
+      "Только айсинг"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Буллит часто назначают за фол на:",
+    "options": [
+      "В любой момент",
+      "Только в овертайме",
+      "Только в плей-офф",
+      "Чистый выход один на один"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Скамейный штраф отбывает любой, кроме:",
+    "options": [
+      "Вратарь (обычно)",
+      "Нападающий",
+      "Защитник",
+      "Капитан"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "Овертайм NHL в регулярке — сколько полевых с каждой стороны?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Сколько игроков (с вратарём) команда может иметь на льду?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Сколько очков на табло даёт гол?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "При отложенном штрафе команда без нарушения часто:",
+    "options": [
+      "Отправляет шайбу в айсинг",
+      "Берёт тайм-аут",
+      "Останавливает игру",
+      "Снимает вратаря"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Вратарь может играть клюшкой за воротами только в:",
+    "options": [
+      "Центральном круге",
+      "Нейтральной зоне",
+      "Всей зоне",
+      "Трапеции"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Драка обычно приводит к:",
+    "options": [
+      "Большому штрафу",
+      "Только удалению до конца",
+      "Малому штрафу",
+      "Без штрафа"
+    ]
+  },
+  "terms_puck": {
+    "question": "Твёрдый резиновый предмет, который бросают, называют:",
+    "options": [
+      "Шайба",
+      "Диск",
+      "Камень",
+      "Мяч"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Пас, при котором шайба летит над льдом, называют:",
+    "options": [
+      "Пас «блюдцем»",
+      "Пас от борта",
+      "Сильный сброс",
+      "Пас на площадку вратаря"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Щелчок выполняют так:",
+    "options": [
+      "Только с неудобной руки",
+      "Одной рукой на клюшке",
+      "Лёгкое касание шайбы",
+      "Замах и удар по льду"
+    ]
+  },
+  "terms_deke": {
+    "question": "Дек — это:",
+    "options": [
+      "Вид штрафа",
+      "Обманное движение для обхода защитника",
+      "Блок в защите",
+      "Смена звена"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Выход один на один — это когда:",
+    "options": [
+      "Шайба отправлена в айсинг",
+      "Игрок выходит один на вратаря",
+      "Двое игроков дерутся",
+      "Происходит смена"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Показатель +/- учитывает:",
+    "options": [
+      "Броски в створ",
+      "Разница голов при равных составах на льду",
+      "Штрафные минуты",
+      "Только выигранные вбрасывания"
+    ]
+  },
+  "terms_assist": {
+    "question": "Первая передача — игроку, который:",
+    "options": [
+      "Забивает гол",
+      "Выиграл вбрасывание",
+      "Последний коснулся шайбы перед голом",
+      "Получил штраф"
+    ]
+  },
+  "terms_block": {
+    "question": "Заблокированный бросок — когда:",
+    "options": [
+      "Шайба попадает в штангу",
+      "Игрок блокирует шайбу телом/клюшкой",
+      "Вратарь отбивает",
+      "Бросок мимо ворот"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Форчекинг — это:",
+    "options": [
+      "Только тактика смен",
+      "Защита своей синей линии",
+      "Давление в зоне соперника для отбора шайбы",
+      "Снятие вратаря"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Бэкчекинг — это:",
+    "options": [
+      "Откат назад в защиту",
+      "Бросок с синей линии",
+      "Выигрыш вбрасывания",
+      "Сейв вратаря"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "One-timer — это:",
+    "options": [
+      "Ожидание и бросок",
+      "Приём вратаря",
+      "Бросок сразу после паса",
+      "Штраф"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Пок-чек — это:",
+    "options": [
+      "Поднять шайбу над клюшкой",
+      "Подножка клюшкой",
+      "Выбить шайбу у соперника",
+      "Подсечка соперника"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "«Верхняя полка» — забить в:",
+    "options": [
+      "Верхняя часть ворот",
+      "Только с центра поля",
+      "Только в пустые ворота",
+      "«Пятая дырка»"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "«Пятая дырка» — между:",
+    "options": [
+      "Клюшка и ловушка",
+      "Маска и грудь",
+      "Рука и тело",
+      "Ноги"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Enforcer в команде:",
+    "options": [
+      "Тренерство",
+      "Забивание голов",
+      "Физическая защита и драки",
+      "Только вбрасывания"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Смена звена обычно происходит:",
+    "options": [
+      "Только после голов",
+      "Только при удалениях",
+      "Только в перерыве",
+      "На ходу во время игры"
+    ]
+  },
+  "terms_rink": {
+    "question": "Игровая поверхность в хоккее называется:",
+    "options": [
+      "Поле",
+      "Корт",
+      "Трек",
+      "Каток"
+    ]
+  },
+  "terms_goal": {
+    "question": "Сетка, в которую бросают, называется:",
+    "options": [
+      "Мишень",
+      "Корзина",
+      "Ворота",
+      "Зона"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Игра в меньшинстве означает:",
+    "options": [
+      "Овертайм",
+      "Вратарь снят",
+      "Меньше игроков из-за штрафа",
+      "Пустые ворота"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Овертайм «золотой гол» означает:",
+    "options": [
+      "Первый гол решает",
+      "Полный период",
+      "Только буллиты",
+      "Без победителя"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Сколько команд в эпоху Original Six?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Современный хоккей сильнее всего развился в:",
+    "options": [
+      "Russia",
+      "Sweden",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Чудо на льду: США победили кого в 1980?",
+    "options": [
+      "Soviet Union",
+      "Canada",
+      "Czechoslovakia",
+      "Sweden"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Рекорд Гретцки по очкам за карьеру — более:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Зал хоккейной славы находится в:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "КХЛ базируется преимущественно в:",
+    "options": [
+      "Russia",
+      "Finland",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Серия-1972: Канада против:",
+    "options": [
+      "USSR",
+      "USA",
+      "Czechia",
+      "Sweden"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL основана в:",
+    "options": [
+      "20th century",
+      "21st century",
+      "19th century",
+      "18th century"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Сидни Кросби — первый на драфте:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Коннор Макдэвид — первый на драфте:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Кубок Стэнли впервые вручили в:",
+    "options": [
+      "XX веке",
+      "XXI веке",
+      "XVIII веке",
+      "XIX веке"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Яромир Ягр среди лидеров NHL по:",
+    "options": [
+      "Очкам",
+      "Тренерству",
+      "Только штрафным",
+      "Победам вратарей"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Овечкин провёл карьеру в NHL в основном в:",
+    "options": [
+      "Нью-Йорк Рейнджерс",
+      "Питтсбург Пингвинз",
+      "Вашингтон Кэпиталз",
+      "Бостон Брюинз"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Марио Лемьё выиграл Кубок Стэнли с:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Длина площадки NHL примерно:",
+    "options": [
+      "200 ft",
+      "150 ft",
+      "300 ft",
+      "250 ft"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Ширина площадки NHL примерно:",
+    "options": [
+      "100 ft",
+      "150 ft",
+      "120 ft",
+      "85 ft"
+    ]
+  },
+  "gen_zones": {
+    "question": "Синие линии делят площадку на сколько зон?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Красная центральная линия нужна для:",
+    "options": [
+      "Айсинг",
+      "Скамейка штрафников",
+      "Только вбрасывания",
+      "Офсайд на центре"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Изгиб крюка помогает:",
+    "options": [
+      "Скорость катания",
+      "Сейвы вратаря",
+      "Подъём и контроль шайбы",
+      "Драки"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Радиус заточки конька влияет на:",
+    "options": [
+      "Жёсткость клюшки",
+      "Сцепление со льдом и повороты",
+      "Посадка шлема",
+      "Размер свитера"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Щитки защищают:",
+    "options": [
+      "Плечи",
+      "Голову",
+      "Голени",
+      "Только кисти"
+    ]
+  },
+  "gen_captain": {
+    "question": "Капитан носит букву:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Альтернативные капитаны носят:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Домашняя команда обычно в:",
+    "options": [
+      "Тёмная/цветная",
+      "Белая/светлая",
+      "Без формы",
+      "Только вратарь"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Перерыв между периодами около:",
+    "options": [
+      "5 мин",
+      "30 мин",
+      "15–18 мин",
+      "1 час"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "Серии плей-офф NHL в основном:",
+    "options": [
+      "Всегда до 3 побед",
+      "Только финал",
+      "Редкие исключения — обычно до 4 побед",
+      "Никогда"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zamboni используют для:",
+    "options": [
+      "Измерение скорости",
+      "Хранение шайб",
+      "Заточка коньков",
+      "Заливка льда"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Судьи на льду носят:",
+    "options": [
+      "Форма команд",
+      "Экипировка вратаря",
+      "Чёрно-белая полоска",
+      "Костюмы"
+    ]
+  },
+  "gen_skates": {
+    "question": "Хоккеисты передвигаются на:",
+    "options": [
+      "Роликах",
+      "Коньках",
+      "Босиком",
+      "Лыжах"
+    ]
+  },
+  "gen_stick": {
+    "question": "Игроки контролируют шайбу с помощью:",
+    "options": [
+      "Клюшки",
+      "Сетки",
+      "Только рук",
+      "Шлема"
+    ]
+  },
+  "pl_team_0": {
+    "question": "С какой командой больше всего ассоциируют Sidney Crosby?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "На какой позиции в основном играл Sidney Crosby?",
+    "options": [
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_1": {
+    "question": "С какой командой больше всего ассоциируют Connor McDavid?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "На какой позиции в основном играл Connor McDavid?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_2": {
+    "question": "С какой командой больше всего ассоциируют Nathan MacKinnon?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado Avalanche",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "На какой позиции в основном играл Nathan MacKinnon?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_3": {
+    "question": "С какой командой больше всего ассоциируют Victor Hedman?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "На какой позиции в основном играл Victor Hedman?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_4": {
+    "question": "С какой командой больше всего ассоциируют Carey Price?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "На какой позиции в основном играл Carey Price?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_5": {
+    "question": "С какой командой больше всего ассоциируют Jaromir Jagr?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "На какой позиции в основном играл Jaromir Jagr?",
+    "options": [
+      "Правый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_6": {
+    "question": "С какой командой больше всего ассоциируют Mario Lemieux?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "На какой позиции в основном играл Mario Lemieux?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_7": {
+    "question": "С какой командой больше всего ассоциируют Patrick Kane?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "На какой позиции в основном играл Patrick Kane?",
+    "options": [
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_8": {
+    "question": "С какой командой больше всего ассоциируют Nicklas Lidstrom?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "На какой позиции в основном играл Nicklas Lidstrom?",
+    "options": [
+      "Центральный нападающий",
+      "Вратарь",
+      "Левый крайний нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_9": {
+    "question": "С какой командой больше всего ассоциируют Martin Brodeur?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "На какой позиции в основном играл Martin Brodeur?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Вратарь",
+      "Защитник"
+    ]
+  },
+  "pl_team_10": {
+    "question": "С какой командой больше всего ассоциируют Steven Stamkos?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "На какой позиции в основном играл Steven Stamkos?",
+    "options": [
+      "Центральный нападающий",
+      "Защитник",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_11": {
+    "question": "С какой командой больше всего ассоциируют Auston Matthews?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "На какой позиции в основном играл Auston Matthews?",
+    "options": [
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_12": {
+    "question": "С какой командой больше всего ассоциируют Leon Draisaitl?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "На какой позиции в основном играл Leon Draisaitl?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_13": {
+    "question": "С какой командой больше всего ассоциируют Erik Karlsson?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "На какой позиции в основном играл Erik Karlsson?",
+    "options": [
+      "Центральный нападающий",
+      "Вратарь",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_14": {
+    "question": "С какой командой больше всего ассоциируют Pavel Datsyuk?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "На какой позиции в основном играл Pavel Datsyuk?",
+    "options": [
+      "Центральный нападающий",
+      "Защитник",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_15": {
+    "question": "С какой командой больше всего ассоциируют Henrik Lundqvist?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "На какой позиции в основном играл Henrik Lundqvist?",
+    "options": [
+      "Защитник",
+      "Правый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_16": {
+    "question": "С какой командой больше всего ассоциируют Evgeni Malkin?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "На какой позиции в основном играл Evgeni Malkin?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_17": {
+    "question": "С какой командой больше всего ассоциируют Artemi Panarin?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "На какой позиции в основном играл Artemi Panarin?",
+    "options": [
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_18": {
+    "question": "С какой командой больше всего ассоциируют Nikita Kucherov?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "На какой позиции в основном играл Nikita Kucherov?",
+    "options": [
+      "Центральный нападающий",
+      "Вратарь",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_19": {
+    "question": "С какой командой больше всего ассоциируют Brad Marchand?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "На какой позиции в основном играл Brad Marchand?",
+    "options": [
+      "Правый крайний нападающий",
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_20": {
+    "question": "С какой командой больше всего ассоциируют David Pastrnak?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "На какой позиции в основном играл David Pastrnak?",
+    "options": [
+      "Левый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_21": {
+    "question": "С какой командой больше всего ассоциируют Shea Weber?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "На какой позиции в основном играл Shea Weber?",
+    "options": [
+      "Левый крайний нападающий",
+      "Вратарь",
+      "Защитник",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_22": {
+    "question": "С какой командой больше всего ассоциируют Sergei Bobrovsky?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "На какой позиции в основном играл Sergei Bobrovsky?",
+    "options": [
+      "Защитник",
+      "Правый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_23": {
+    "question": "С какой командой больше всего ассоциируют Jonathan Toews?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "На какой позиции в основном играл Jonathan Toews?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_24": {
+    "question": "С какой командой больше всего ассоциируют Anze Kopitar?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "На какой позиции в основном играл Anze Kopitar?",
+    "options": [
+      "Левый крайний нападающий",
+      "Защитник",
+      "Правый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_25": {
+    "question": "С какой командой больше всего ассоциируют Mark Messier?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "На какой позиции в основном играл Mark Messier?",
+    "options": [
+      "Правый крайний нападающий",
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_26": {
+    "question": "С какой командой больше всего ассоциируют Ray Bourque?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "На какой позиции в основном играл Ray Bourque?",
+    "options": [
+      "Вратарь",
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_27": {
+    "question": "С какой командой больше всего ассоциируют Dominik Hasek?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "На какой позиции в основном играл Dominik Hasek?",
+    "options": [
+      "Вратарь",
+      "Центральный нападающий",
+      "Защитник",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_28": {
+    "question": "С какой командой больше всего ассоциируют Teemu Selanne?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "На какой позиции в основном играл Teemu Selanne?",
+    "options": [
+      "Центральный нападающий",
+      "Вратарь",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_29": {
+    "question": "С какой командой больше всего ассоциируют Pavel Bure?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "На какой позиции в основном играл Pavel Bure?",
+    "options": [
+      "Правый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_30": {
+    "question": "С какой командой больше всего ассоциируют Alexander Mogilny?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "На какой позиции в основном играл Alexander Mogilny?",
+    "options": [
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_31": {
+    "question": "С какой командой больше всего ассоциируют Peter Forsberg?",
+    "options": [
+      "Colorado Avalanche",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "На какой позиции в основном играл Peter Forsberg?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_32": {
+    "question": "С какой командой больше всего ассоциируют Joe Sakic?",
+    "options": [
+      "New York Rangers",
+      "Colorado Avalanche",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "На какой позиции в основном играл Joe Sakic?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_33": {
+    "question": "С какой командой больше всего ассоциируют Steve Yzerman?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "На какой позиции в основном играл Steve Yzerman?",
+    "options": [
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_34": {
+    "question": "С какой командой больше всего ассоциируют Bobby Orr?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "На какой позиции в основном играл Bobby Orr?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_35": {
+    "question": "С какой командой больше всего ассоциируют Gordie Howe?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "На какой позиции в основном играл Gordie Howe?",
+    "options": [
+      "Вратарь",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_36": {
+    "question": "С какой командой больше всего ассоциируют Wayne Gretzky?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "На какой позиции в основном играл Wayne Gretzky?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_37": {
+    "question": "С какой командой больше всего ассоциируют Valeri Kharlamov?",
+    "options": [
+      "CSKA Moscow",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "На какой позиции в основном играл Valeri Kharlamov?",
+    "options": [
+      "Правый крайний нападающий",
+      "Центральный нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_38": {
+    "question": "С какой командой больше всего ассоциируют Vladislav Tretiak?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "CSKA Moscow"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "На какой позиции в основном играл Vladislav Tretiak?",
+    "options": [
+      "Вратарь",
+      "Защитник",
+      "Центральный нападающий",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_39": {
+    "question": "С какой командой больше всего ассоциируют Bobby Hull?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "На какой позиции в основном играл Bobby Hull?",
+    "options": [
+      "Защитник",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_40": {
+    "question": "С какой командой больше всего ассоциируют Maurice Richard?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "На какой позиции в основном играл Maurice Richard?",
+    "options": [
+      "Вратарь",
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_41": {
+    "question": "С какой командой больше всего ассоциируют Guy Lafleur?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "На какой позиции в основном играл Guy Lafleur?",
+    "options": [
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_42": {
+    "question": "С какой командой больше всего ассоциируют Patrick Roy?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "На какой позиции в основном играл Patrick Roy?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_43": {
+    "question": "С какой командой больше всего ассоциируют Roberto Luongo?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "На какой позиции в основном играл Roberto Luongo?",
+    "options": [
+      "Вратарь",
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_44": {
+    "question": "С какой командой больше всего ассоциируют Ilya Kovalchuk?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "На какой позиции в основном играл Ilya Kovalchuk?",
+    "options": [
+      "Защитник",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_45": {
+    "question": "С какой командой больше всего ассоциируют Pavel Bure?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "На какой позиции в основном играл Pavel Bure?",
+    "options": [
+      "Правый крайний нападающий",
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_46": {
+    "question": "С какой командой больше всего ассоциируют Alexei Kovalev?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "На какой позиции в основном играл Alexei Kovalev?",
+    "options": [
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Вратарь",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_47": {
+    "question": "С какой командой больше всего ассоциируют Sergei Gonchar?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "На какой позиции в основном играл Sergei Gonchar?",
+    "options": [
+      "Защитник",
+      "Левый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_48": {
+    "question": "С какой командой больше всего ассоциируют Viacheslav Fetisov?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "На какой позиции в основном играл Viacheslav Fetisov?",
+    "options": [
+      "Вратарь",
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_49": {
+    "question": "С какой командой больше всего ассоциируют Chris Chelios?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "На какой позиции в основном играл Chris Chelios?",
+    "options": [
+      "Защитник",
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_50": {
+    "question": "С какой командой больше всего ассоциируют Scott Stevens?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "На какой позиции в основном играл Scott Stevens?",
+    "options": [
+      "Защитник",
+      "Вратарь",
+      "Левый крайний нападающий",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_51": {
+    "question": "С какой командой больше всего ассоциируют Paul Coffey?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "На какой позиции в основном играл Paul Coffey?",
+    "options": [
+      "Левый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_52": {
+    "question": "С какой командой больше всего ассоциируют Grant Fuhr?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "На какой позиции в основном играл Grant Fuhr?",
+    "options": [
+      "Центральный нападающий",
+      "Защитник",
+      "Вратарь",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_53": {
+    "question": "С какой командой больше всего ассоциируют Mike Bossy?",
+    "options": [
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "На какой позиции в основном играл Mike Bossy?",
+    "options": [
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий"
+    ]
+  },
+  "pl_team_54": {
+    "question": "С какой командой больше всего ассоциируют Bryan Trottier?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "На какой позиции в основном играл Bryan Trottier?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "pl_team_55": {
+    "question": "С какой командой больше всего ассоциируют Denis Potvin?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "На какой позиции в основном играл Denis Potvin?",
+    "options": [
+      "Левый крайний нападающий",
+      "Вратарь",
+      "Центральный нападающий",
+      "Защитник"
+    ]
+  },
+  "pl_team_56": {
+    "question": "С какой командой больше всего ассоциируют Cam Neely?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "На какой позиции в основном играл Cam Neely?",
+    "options": [
+      "Центральный нападающий",
+      "Левый крайний нападающий",
+      "Правый крайний нападающий",
+      "Вратарь"
+    ]
+  },
+  "pl_team_57": {
+    "question": "С какой командой больше всего ассоциируют Adam Oates?",
+    "options": [
+      "Washington Capitals",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "На какой позиции в основном играл Adam Oates?",
+    "options": [
+      "Левый крайний нападающий",
+      "Центральный нападающий",
+      "Защитник",
+      "Правый крайний нападающий"
+    ]
+  },
+  "pl_team_58": {
+    "question": "С какой командой больше всего ассоциируют Doug Gilmour?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "На какой позиции в основном играл Doug Gilmour?",
+    "options": [
+      "Центральный нападающий",
+      "Правый крайний нападающий",
+      "Защитник",
+      "Левый крайний нападающий"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Как расшифровывается КХЛ?",
+    "options": [
+      "Континентальная хоккейная лига",
+      "Казахстанская хоккейная лига",
+      "Корейская хоккейная лига",
+      "Королевская хоккейная лига"
+    ]
+  },
+  "intl_iihf": {
+    "question": "ИИХФ организует:",
+    "options": [
+      "Плей-офф КХЛ",
+      "Драфт NHL",
+      "Кубок Стэнли",
+      "Чемпионат мира"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Олимпийский хоккей играют на:",
+    "options": [
+      "Льду",
+      "Песке",
+      "Траве",
+      "Бетоне"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Какая страна выигрывала много чемпионатов мира с Ягром и Гашеком?",
+    "options": [
+      "Finland",
+      "Czechia",
+      "Canada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Много звёзд NHL приходят из:",
+    "options": [
+      "Испании",
+      "Бразилии",
+      "Швеции",
+      "Индии"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Финляндия славится великими:",
+    "options": [
+      "Вратарями",
+      "Только тренерами",
+      "Водителями Zamboni",
+      "Судьями"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Советская «Красная машина» доминировала в:",
+    "options": [
+      "1970–80-х",
+      "2000-х",
+      "2010-х",
+      "Только 1990-х"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "Команды NHL выбирают новичков на:",
+    "options": [
+      "Дедлайне обменов",
+      "Матче всех звёзд",
+      "Кубке мира",
+      "Драфте"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Три звезды матча вручают:",
+    "options": [
+      "Раз в сезон",
+      "Только в плей-офф",
+      "Никогда в NHL",
+      "После каждого матча"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Женский хоккей в Олимпиаде с:",
+    "options": [
+      "1998",
+      "Никогда",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "В равных составах у каждой команды сколько полевых (без вратарей)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Один период NHL длится сколько минут?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Вы на большинстве, когда соперник:",
+    "options": [
+      "Отправляет в айсинг",
+      "Снимает вратаря",
+      "В меньшинстве из-за штрафа",
+      "Выигрывает вбрасывание"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Игра в меньшинстве означает:",
+    "options": [
+      "Овертайм",
+      "Защиту в меньшинстве",
+      "Лишнего нападающего",
+      "Драку вратарей"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Профессиональный хоккей играют на:",
+    "options": [
+      "Грунте",
+      "Траве",
+      "Льду",
+      "Воде"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Трофей чемпиона NHL — это:",
+    "options": [
+      "Кубок мира",
+      "Олимпийский кубок",
+      "Кубок Стэнли",
+      "Кубок Гретцки"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Анри Ришар выиграл больше всего Кубков Стэнли с:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Знаменитый номер Уэйна Гретцки:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Марио Лемьё носил номер:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Сидни Кросби носит номер:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Коннор Макдэвид носит номер:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Сколько команд в NHL (примерно)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Сколько команд в NHL (примерно)? (сложный)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Сколько игроков обычно заявлено на матч?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Сколько игроков обычно заявлено на матч? (сложный)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Регламент NHL — сколько минут?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Регламент NHL — сколько минут? (сложный)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Сколько судей обычно на льду в NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Сколько судей обычно на льду в NHL? (сложный)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Максимум игроков в заявке (примерно)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Максимум игроков в заявке (примерно)? (сложный)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Главная задача защитника в зоне защиты —",
+    "options": [
+      "Выигрывать вбрасывания",
+      "Сначала забивать голы",
+      "Защищать ворота и слот",
+      "Быстро меняться"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "В игре один на один защитник должен:",
+    "options": [
+      "Сразу кататься на скамейку",
+      "Держаться между соперником и воротами",
+      "Оставить слот открытым",
+      "Гнаться только за воротами"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "В защите клюшка на льду помогает:",
+    "options": [
+      "Запросить тайм-аут",
+      "Не касаться шайбы",
+      "Закрыть линии паса",
+      "Подставить партнёров"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Если шайба потеряна в атаке, защитник должен:",
+    "options": [
+      "Снять вратаря",
+      "Откатиться назад в защиту",
+      "Остаться на красной линии",
+      "Спорить с судьёй"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Защитник должен блокировать бросок, когда:",
+    "options": [
+      "Шайба только в нейтральной зоне",
+      "Начинается перерыв",
+      "Путь к воротам открыт",
+      "Команда на большинстве"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "При игре 2 на 1 в меньшинстве защитник обычно должен:",
+    "options": [
+      "Оба стоять на синей линии",
+      "Оба броситься на шайбу одновременно",
+      "Взять владельца шайбы и увести его на край",
+      "Кататься на скамейку"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "В меньшинстве приоритет часто —",
+    "options": [
+      "Кататься с шайбой через центр в одиночку",
+      "Сначала смениться на ходу",
+      "Бесконечно держать шайбу в углу",
+      "Выбросить шайбу из зоны"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Хороший gap control — это когда защитник:",
+    "options": [
+      "Никогда не отступает",
+      "Бьёт только сзади",
+      "Подстраивает скорость и дистанцию к нападающему",
+      "Всегда стоит на центре поля"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Перед воротами защитник обязан:",
+    "options": [
+      "Уехать на синюю линию",
+      "Требовать офсайд",
+      "Смотреть только на шайбу, игнорируя соперников",
+      "Закрывать соперников и не давать свободы"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Под прессингом первый выбор защитника —",
+    "options": [
+      "Бросить в свои ворота",
+      "Первый пас на низкую поддержку или безопасный выход",
+      "Всегда пасовать через центр под прессингом",
+      "Слепо отправить шайбу вдоль бортов"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "На большинстве с синей линии защитник должен:",
+    "options": [
+      "Откатиться в нейтральную зону",
+      "Меняться с вратарём",
+      "Держать шайбу в зоне и создавать броски/пасы",
+      "Никогда не бросать"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Легальная защита на контратаке — это:",
+    "options": [
+      "Легальное уведение и клюшка со стороны шайбы",
+      "Зацепить и повалить соперника",
+      "Подрезать клюшкой сзади на выходе один на один",
+      "Подножка клюшкой в голову"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Профессионалы блокируют броски, потому что:",
+    "options": [
+      "Это засчитывается как передача",
+      "Никогда не блокировать броски",
+      "Блокировать броски и закрывать тело при необходимости",
+      "Судья останавливает игру"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Когда двое нападающих меняются местами в вашей зоне, защитники должны:",
+    "options": [
+      "Оба гнаться только за шайбой",
+      "Покинуть площадку вратаря",
+      "Общаться и при необходимости переключаться",
+      "Игнорировать дальнего нападающего"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Если соперник отправил шайбу в зону, защитник должен:",
+    "options": [
+      "Забрать шайбу или прижать к борту",
+      "Кататься на скамейку для смены",
+      "Ждать свистка",
+      "Бросить с красной линии"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "При контратаке 3 на 2 задний защитник обычно должен:",
+    "options": [
+      "Закрыть угрозу с «слабой» стороны (backdoor)",
+      "Кататься к красной линии",
+      "Меняться",
+      "Каждый раз агрессивно подключаться в атаку"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Защитник может подключиться на синей линии соперника, когда:",
+    "options": [
+      "Команда в меньшинстве",
+      "Вратарь снят",
+      "Партнёр прикрывает и шайбу можно забрать у борта",
+      "Всегда в первой смене"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Если обыграли с фланга на контратаке, защитник должен:",
+    "options": [
+      "Кататься на скамейку",
+      "Остановиться и спорить с судьёй",
+      "Развернуться и преследовать через центр к воротам",
+      "Зацепить сзади"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "В зоне защиты «низкий» и «высокий» защитник — это:",
+    "options": [
+      "Оба на синей линии",
+      "Оба в нейтральной зоне",
+      "Оба на площадке вратаря",
+      "Низкий на шайбе, высокий закрывает слот и backdoor"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "При нечётном контрнаступлении соперника ключ —",
+    "options": [
+      "Каждый раз получать штраф",
+      "Задержать и вынудить плохой угол или пас",
+      "Всегда ложиться блоком",
+      "Оставить всё только вратарю"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "В меньшинстве против one-timer с фланга защитник должен:",
+    "options": [
+      "Стоять на площадке вратаря",
+      "Кататься на центр для смены",
+      "Закрыть линию паса в слот",
+      "Давить на вратаря"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Почему слепой «rim» вдоль бортов часто плох?",
+    "options": [
+      "Соперник легко забирает шайбу",
+      "Всегда офсайд",
+      "Всегда даёт айсинг",
+      "Судья даёт штраф"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "После выигранного вбрасывания в зоне защиты защитники должны:",
+    "options": [
+      "Ждать пять секунд",
+      "Читать форчекинг и быстро отдать первый пас",
+      "Всегда сначала бросать с синей линии",
+      "Кататься с шайбой к красной линии"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Удерживая преимущество в один гол в концовке, защитники должны:",
+    "options": [
+      "Всегда бросать с центра",
+      "Каждый раз подключаться на синей",
+      "Безопасно владеть шайбой и не рисковать",
+      "Всегда рано снимать вратаря"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Персональная опека в слоте означает:",
+    "options": [
+      "Игнорировать соперников без шайбы",
+      "Гнаться только за шайбой",
+      "Контроль дистанции (gap)",
+      "Персональная опека владельца шайбы"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "На синей линии соперника защитник, «держa линию», пытается:",
+    "options": [
+      "Меняться с нападающим",
+      "Держать синюю линию и оставить шайбу в зоне",
+      "Откатиться в нейтральную зону",
+      "Всегда специально создавать офсайд"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "После сейва и отскока в слот защитник обязан:",
+    "options": [
+      "Праздновать с вратарём",
+      "Бросить в пустые ворота",
+      "Кататься на скамейку",
+      "Выбить отскок или связать соперника"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "После айсинга в зоне защиты на вбрасывании:",
+    "options": [
+      "Всегда отправлять шайбу вдоль борта",
+      "Получить малый штраф",
+      "Выстроить структуру и чисто выйти из зоны",
+      "Снять вратаря"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Против агрессивного форчекинга «stretch»-пас нужен, чтобы:",
+    "options": [
+      "Всегда остановить игру офсайдом",
+      "Только тянуть время",
+      "Гарантировать айсинг",
+      "Обойти прессинг длинным пасом"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Закрытие линии броска означает:",
+    "options": [
+      "Поставить тело/клюшку на траекторию броска",
+      "Только махать клюшкой в воздухе",
+      "Кататься к красной линии",
+      "Стоять за воротами"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Когда партнёр подключается в атаку, вы должны:",
+    "options": [
+      "Кататься на скамейку",
+      "Оставить зону открытой",
+      "Тоже сразу подключаться",
+      "Прикрыть «высоко» как последний защитник"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Выходя из штрафной, защитник должен:",
+    "options": [
+      "Подстроиться под игру и не оказаться «плоским»",
+      "Игнорировать контратаку",
+      "Всегда сразу меняться",
+      "Кататься прямо к воротам соперника"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "При пустых воротах соперника в последнюю минуту защитники должны:",
+    "options": [
+      "Все глубоко форчекить",
+      "Всегда тоже снимать вратаря",
+      "Блокировать броски и закрывать центр",
+      "Никогда не выбивать шайбу"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Если не успеваете к владельцу шайбы, нужно:",
+    "options": [
+      "Сдаться и меняться",
+      "Оставить слот",
+      "Отнять время и пространство правильной позицией",
+      "Зацепить сзади"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Против контролируемого входа в зону защитник должен:",
+    "options": [
+      "Кататься назад на скамейку",
+      "Встретить на линии или рано контролировать gap",
+      "Всегда отступать на площадку вратаря",
+      "Никогда не касаться нападающего"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "В зоне защиты пас рукой защитника партнёру — это:",
+    "options": [
+      "Разрешён, если выполнен в той же зоне",
+      "Всегда айсинг",
+      "Всегда офсайд",
+      "Всегда буллит"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Когда у партнёра шайба, нападающий должен:",
+    "options": [
+      "Всегда один кататься к красной линии",
+      "Игнорировать шайбу при смене",
+      "Выйти на свободное место для паса",
+      "Стоять на синей линии"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Крайний у ворот при броске должен:",
+    "options": [
+      "Кататься на скамейку",
+      "Выходить к воротам на отскоки и подставления",
+      "Только смотреть с синей линии",
+      "Ждать на центре"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "При потере шайбы нападающие обязаны:",
+    "options": [
+      "Сразу уходить на смену",
+      "Спорить с судьёй",
+      "Оставаться в зоне атаки",
+      "Откатываться и помогать в защите"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "На контратаке «head-man» означает:",
+    "options": [
+      "Всегда выбивать высоко в стекло",
+      "Остановиться на красной линии",
+      "Отдать шайбу вперёд партнёру",
+      "Кататься назад только к своей скамейке"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Кручение шайбы низом в зоне атаки помогает:",
+    "options": [
+      "Гарантировать айсинг",
+      "Всегда создавать офсайд",
+      "Создать пространство для броска/паса",
+      "Только тянуть время"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "На вбрасывании центр часто должен:",
+    "options": [
+      "Все трое в углу",
+      "Рано покидать круг",
+      "Сразу бросать с точки",
+      "Выиграть вбрасывание на точку партнёра"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "При форчекинге 2-1-2 нападающие F1 и F2 обычно:",
+    "options": [
+      "Оба только за воротами",
+      "Оба меняются",
+      "F1 давит, F2 закрывает линию паса",
+      "Оба стоят на красной линии"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "На большинстве нападающий перед воротами должен:",
+    "options": [
+      "Кататься в нейтральную зону",
+      "Закрывать синюю линию в меньшинстве",
+      "Работать перед воротами, экран и отскоки",
+      "Не касаться шайбы"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "При контратаке 3 на 2 третий нападающий должен:",
+    "options": [
+      "Кататься на скамейку",
+      "Стоять на площадке вратаря",
+      "Держаться «высоко» третьим на контратаке",
+      "Гнаться за шайбой глубоко без поддержки"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "На контратаке быстрый крайний часто должен:",
+    "options": [
+      "Каждый раз останавливаться на синей",
+      "Пасовать назад вратарю",
+      "Идти с скоростью по флангу, растягивая защиту",
+      "Всегда кататься через центр"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Важная роль нападающего на большинстве —",
+    "options": [
+      "Оставлять слот открытым в защите",
+      "Только бросать с синей",
+      "Никогда не идти к воротам",
+      "Загораживать вратаря и работать на отскоке"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "В меньшинстве нападающий часто закрывает:",
+    "options": [
+      "Игрока с синей линии (point)",
+      "Судью",
+      "Работу перед воротами на большинстве",
+      "Водителя Zamboni"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Чтобы не создать офсайд на синей, нападающий может:",
+    "options": [
+      "Кататься назад в зону",
+      "Перепрыгнуть синюю линию",
+      "Задержать вход в зону, дождаться шайбы",
+      "Всегда входить раньше шайбы"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "One-timer обычно требует:",
+    "options": [
+      "Пас на открытого бросающего в темп",
+      "Слепой rim вдоль борта",
+      "Всегда обводить на буллите",
+      "Dump-and-chase без плана"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "После броска с синей на большинстве нападающие должны:",
+    "options": [
+      "Все разом меняться",
+      "Махать трибунам",
+      "Выходить к воротам на отскок и подставление",
+      "Уехать в нейтральную зону"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "В зоне атаки центр часто:",
+    "options": [
+      "Никогда не заходит в слот",
+      "Все трое только в углу",
+      "Поддерживает низ, пока крайний «высоко»",
+      "Только закрывает синюю"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "При выходе из зоны поддержка со слабой стороны —",
+    "options": [
+      "Быть доступным для паса с «слабой» стороны",
+      "Стоять на красной линии",
+      "Бросать в свои ворота",
+      "Кататься к скамейке соперника"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Вратарь всегда должен стараться:",
+    "options": [
+      "Следить за шайбой сквозь трафик",
+      "Стоять на красной линии",
+      "Смотреть только в глаза бросающему",
+      "Покинуть ворота для смены"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Если шайба свободна на площадке, вратарь должен:",
+    "options": [
+      "Прижать шайбу и остановить игру",
+      "Бросить в пустые ворота",
+      "Кататься на центр и праздновать",
+      "Отдать шайбу судье"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "После сейва идеальный контроль отскока —",
+    "options": [
+      "Направить отскок в безопасную зону/угол",
+      "Всегда отскок в слот",
+      "Всегда отскок за стекло",
+      "Игнорировать отскок"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "При нечётных контратаках вратарь должен:",
+    "options": [
+      "Всегда молчать",
+      "Смотреть на трибуны",
+      "Кататься на скамейку",
+      "Громко подсказывать защитникам"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "В NHL вратарь может играть клюшкой за воротами только в:",
+    "options": [
+      "Зоне атаки",
+      "Трапеции за воротами",
+      "Всей зоне защиты",
+      "Только нейтральной зоне"
+    ]
+  },
+  "theory_g_post": {
+    "question": "При пасе через площадку вратарь использует:",
+    "options": [
+      "Всегда стоять только на одной штанге",
+      "Покидать ворота",
+      "Движение от штанги к штанге",
+      "Кататься на синюю линию"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Хорошая работа углов означает, что вратарь:",
+    "options": [
+      "Выходит к красной линии",
+      "Всегда глубоко в воротах",
+      "Сокращает угол, закрывая обзор ворот",
+      "Поворачивается спиной к бросающему"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "«Дом» вратаря, который нужно защищать —",
+    "options": [
+      "Зона слота перед воротами",
+      "Дверь для Zamboni",
+      "Центральный круг",
+      "Скамейка штрафников"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "На выходе один на один многие вратари предпочитают:",
+    "options": [
+      "Кататься к скамейке",
+      "Закрыть глаза и надеяться",
+      "Подстроиться под бросающего и читать бросок",
+      "Всегда выходить к верху кругов"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "При обводке за воротами вратарь должен:",
+    "options": [
+      "Оставить ближнюю штангу открытой",
+      "Кататься на синюю",
+      "Играть клюшкой в углу",
+      "Держать штангу на короткой стороне"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Если вратарь играет клюшкой за воротами ВНЕ трапеции, это:",
+    "options": [
+      "Всегда разрешено",
+      "Айсинг",
+      "Штраф за задержку игры",
+      "Автоматический гол"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "При загораживании броска вратарь должен:",
+    "options": [
+      "Покинуть площадку",
+      "Показывать офсайд",
+      "Всегда отдавать короткую сторону",
+      "Найти шайбу сквозь трафик или сдвинуться"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Пок-чек вратаря должен быть:",
+    "options": [
+      "Только спереди и легально",
+      "Высокой клюшкой в лицо",
+      "Всегда сзади бросающего",
+      "Стоя на центре поля"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "При длинном пасе в пустые ворота вратарь часто:",
+    "options": [
+      "Кататься к скамейке соперника",
+      "Игнорирует игру",
+      "Бросает в судью",
+      "Останавливает или играет клюшкой легально"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Хоккейный интеллект — это когда каждый игрок:",
+    "options": [
+      "Помогает в защите при потере шайбы",
+      "Только вратарь говорит",
+      "Только защитники откатываются",
+      "Только нападающие забрасывают"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Клюшка на льду помогает:",
+    "options": [
+      "Закрыть линии паса и принять шайбу",
+      "Показать айсинг",
+      "Избегать шайбы",
+      "Быстрее подставить себя"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Умная смена обычно происходит:",
+    "options": [
+      "На ходу, когда это безопасно",
+      "Никогда на ходу",
+      "Во время контратаки соперника",
+      "Только в зоне атаки"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Перед переключением опеки игроки должны:",
+    "options": [
+      "Всегда кричать на судью",
+      "Меняться не глядя",
+      "Общаться («switch» / «mine»)",
+      "Никогда не говорить на льду"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Смена с «неправильной» стороны площадки может:",
+    "options": [
+      "Гарантировать гол",
+      "Всегда помогать команде",
+      "Привести к лишнему игроку или плохому таймингу",
+      "Остановить время"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "«Читать игру» означает:",
+    "options": [
+      "Игнорировать партнёров",
+      "Никогда не менять структуру",
+      "Смотреть только на шайбу",
+      "Предвидеть, куда пойдёт шайба и соперники"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Поддержка «вторым» у шайбы означает:",
+    "options": [
+      "Уехать от шайбы",
+      "Только смотреть на вратаря",
+      "Стоять на красной линии",
+      "Подстроить скорость и быть доступным для паса"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Сильная и слабая сторона — это:",
+    "options": [
+      "Сторона, где шайба, и противоположная",
+      "Домашняя и гостевая команды",
+      "Первый и второй период",
+      "Только левые и правые хват"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "На большинстве структура важна, потому что:",
+    "options": [
+      "Движение открывает линии и растягивает меньшинство",
+      "Лучше стоять на месте",
+      "Шайбу должен трогать только один",
+      "Офсайд не важен"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Меньшинство «box + one» часто означает:",
+    "options": [
+      "Все пятеро гонятся за шайбой",
+      "Все пятеро на красной линии",
+      "Структура не нужна",
+      "Четверо «коробкой», один давит на шайбу"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "«Читинг» на вбрасывании — это:",
+    "options": [
+      "Подстроиться под сброс, чтобы выиграть раньше",
+      "Ударить клюшку соперника ногой",
+      "Войти в круг до шайбы",
+      "Уйти с точки вбрасывания"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Удерживая лид в концовке, умные команды:",
+    "options": [
+      "Рискуют каждую смену",
+      "Всегда снимают вратаря в первом периоде",
+      "Никогда не выбивают из зоны",
+      "Контролируют шайбу и избегают лишних штрафов"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Тренеры меняют звенья для сочетаний, чтобы:",
+    "options": [
+      "Получить выгодные пары «игрок на игрока»",
+      "Гарантировать офсайд",
+      "Избегать всех вбрасываний",
+      "Только тянуть время"
+    ]
+  },
+  "ref_goal": {
+    "question": "Когда забит гол, судья обычно:",
+    "options": [
+      "Указывает на центр площадки",
+      "Показывает отложенный штраф",
+      "Образует руками букву T",
+      "Показывает отмену айсинга"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Сигнал тайм-аута выглядит так:",
+    "options": [
+      "Руки образуют букву T",
+      "Указание на центр",
+      "Показать шесть пальцев",
+      "Оба кулака вперёд"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Отложенный штраф судья показывает так:",
+    "options": [
+      "Сигнал гола",
+      "Буква T",
+      "Отмена айсинга",
+      "Одна рука поднята вверх"
+    ]
+  },
+  "ref_minor": {
+    "question": "Назначая малый штраф, судья часто показывает:",
+    "options": [
+      "Открытую ладонь в сторону скамейки штрафников",
+      "Только руку через грудь",
+      "Букву T",
+      "Указание на центр (гол)"
+    ]
+  },
+  "ref_offside": {
+    "question": "Офсайд судья часто показывает так:",
+    "options": [
+      "Указание на центр",
+      "Шесть пальцев",
+      "Движение сжатого кулака",
+      "Рубящее движение параллельно льду"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Сигнал нарушения паса рукой часто —",
+    "options": [
+      "Движение сжатого кулака",
+      "Скрещённые руки (драка)",
+      "Открытая ладонь к скамейке",
+      "Указание на центр"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Сигнал высокой клюшки: судья часто касается:",
+    "options": [
+      "Ладонью своего лица/челюсти (уровень удара)",
+      "Штанги",
+      "Шайбы",
+      "Только колена"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Лишний игрок на льду показывают так:",
+    "options": [
+      "Только одну руку вверх",
+      "Указание на центр",
+      "Букву T",
+      "Шесть пальцев"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Сигнал подножки часто выглядит как:",
+    "options": [
+      "Движение ногой (подметание)",
+      "Букву T",
+      "Указание на центр",
+      "Оба кулака вперёд"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Сигнал зацепа часто выглядит как:",
+    "options": [
+      "Шесть пальцев",
+      "Рубящее движение",
+      "Движение «подтягивания» рукой",
+      "Сжатый кулак"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Сигнал подножки клюшкой (cross-check) часто —",
+    "options": [
+      "Оба кулака толкают вперёд",
+      "Указание на центр",
+      "Букву T",
+      "Только ладонь к лицу"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Большой штраф за драку часто показывают так:",
+    "options": [
+      "Рубящее движение (офсайд)",
+      "Обе руки скрещены над головой",
+      "Одна рука вверх (отложенный штраф)",
+      "Только ладонь к скамейке"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "При назначении буллита судья обычно:",
+    "options": [
+      "Показывает T (тайм-аут)",
+      "Отменяет айсинг",
+      "Указывает на центр / назначает буллит",
+      "Показывает шесть пальцев"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "При отмене гола судья может:",
+    "options": [
+      "Скрестить руки и отменить гол",
+      "Указать на центр (гол)",
+      "Только поднять руку (отложенный штраф)",
+      "Показать T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Задержка игры (шайба за стекло) часто —",
+    "options": [
+      "Подножка ногой",
+      "Похлопывание по «стеклу»",
+      "Скрещённые руки (драка)",
+      "Зацеп «подтягиванием»"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Линейный судья показывает офсайд так:",
+    "options": [
+      "Ладонь к скамейке",
+      "Буква T (тайм-аут)",
+      "Указывает на центр (гол)",
+      "Поднимает обе руки (офсайд)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Если айсинг отменён (напр. в меньшинстве), линейный может:",
+    "options": [
+      "Скрестить руки (драка)",
+      "Показать отмену айсинга (рука вниз/«wash out»)",
+      "Указать на центр (гол)",
+      "Показать шесть пальцев"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Двойной малый штраф могут показать так:",
+    "options": [
+      "Буква T",
+      "Только одна рука вверх",
+      "Два пальца",
+      "Шесть пальцев (лишний игрок)"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Сигнал бросания в борт часто включает:",
+    "options": [
+      "Букву T",
+      "Указание на центр (гол)",
+      "Кулак (пас рукой)",
+      "Движение рук «толкание в борт»"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "При отложенном штрафе игра продолжается, потому что:",
+    "options": [
+      "Был забит гол",
+      "Айсинг завершён",
+      "Был взят тайм-аут",
+      "Нарушившая команда ещё не коснулась шайбы"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Команда соперника начинает атаку через центр. Что должен делать центральный нападающий?",
+    "options": [
+      "Вернуться в центр своей зоны и помогать защитникам",
+      "Стоять у борта",
+      "Меняться без причины",
+      "Уехать к воротам соперника"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Игрок соперника за воротами пытается забить лакросс. Что должен делать вратарь?",
+    "options": [
+      "Выкатиться в центр зоны",
+      "Смотреть на зрителей",
+      "Прижаться к дальней штанге и следить за клюшкой",
+      "Лечь на лед лицом вниз"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Вы защитник, против вас выходят два соперника. Что важнее?",
+    "options": [
+      "Перекрыть передачу",
+      "Сразу атаковать игрока с шайбой",
+      "Смотреть только на шайбу",
+      "Уехать на смену"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Ты крайний нападающий и первым входишь в чужую зону. Что делать?",
+    "options": [
+      "Давить на защитника с шайбой",
+      "Стоять у синей линии",
+      "Кататься кругами",
+      "Сразу ехать на скамейку"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Команда играет в большинстве. Где обычно находится центральный нападающий?",
+    "options": [
+      "На своей синей линии",
+      "На скамейке",
+      "За воротами своей команды",
+      "Перед воротами"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Ты потерял шайбу в чужой зоне. Что делать дальше?",
+    "options": [
+      "Немедленно вступить в отбор",
+      "Медленно ехать назад",
+      "Спорить с судьей",
+      "Смотреть на тренера"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Центральный проиграл вбрасывание. Что дальше?",
+    "options": [
+      "Уехать в атаку",
+      "Сразу помогать в обороне",
+      "Снять шлем",
+      "Остановиться"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Шайба у борта в вашей зоне. Что должен делать второй игрок?",
+    "options": [
+      "Поддержать партнера рядом",
+      "Стоять без движения",
+      "Смотреть на трибуны",
+      "Уехать к чужим воротам"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Что самое важное в атаке 3 в 2?",
+    "options": [
+      "Всем ехать в одну точку",
+      "Бросать из любого положения",
+      "Остановиться у синей линии",
+      "Растянуть оборону передачами"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "После броска шайба отскочила перед воротами. Что должен делать вратарь?",
+    "options": [
+      "Поднять клюшку вверх",
+      "Найти шайбу и накрыть ее",
+      "Уехать за ворота",
+      "Смотреть на тренера"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Когда лучше делать смену?",
+    "options": [
+      "Когда команда контролирует шайбу",
+      "Когда соперник атакует",
+      "Когда шайба перед воротами",
+      "Во время опасного момента"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Что должен делать защитник, если его активно прессингуют?",
+    "options": [
+      "Стоять с шайбой",
+      "Бросать шайбу в центр зоны",
+      "Падать на лед",
+      "Быстро отдать точный первый пас"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Что важно делать без шайбы?",
+    "options": [
+      "Смотреть на потолок",
+      "Держать клюшку одной рукой",
+      "Открыться под передачу",
+      "Стоять на месте"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Какой выход из зоны считается самым надежным?",
+    "options": [
+      "Потеря шайбы",
+      "Через короткий точный пас",
+      "Слепой выброс",
+      "Передача через центр своей зоны"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Что главное в меньшинстве?",
+    "options": [
+      "Перекрывать линии передач",
+      "Постоянно атаковать",
+      "Кататься без схемы",
+      "Играть только у бортов"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Когда защитнику можно подключаться в атаку?",
+    "options": [
+      "Всегда",
+      "Только в овертайме",
+      "Никогда",
+      "Когда партнер страхует его позицию"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Почему опасна передача через пятак?",
+    "options": [
+      "Ее не видно судьям",
+      "Она замедляет игру",
+      "Может привести к голу",
+      "Она всегда запрещена"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Когда вратарю стоит играть клюшкой за воротами?",
+    "options": [
+      "Чтобы уйти со льда",
+      "Чтобы помочь защитникам начать атаку",
+      "Чтобы отдохнуть",
+      "Чтобы спорить с судьями"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Зачем нападающий едет на дальнюю штангу?",
+    "options": [
+      "Для добивания и замыкания передачи",
+      "Чтобы не участвовать в игре",
+      "Чтобы отдохнуть",
+      "Чтобы мешать партнеру"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Что должен делать защитник перед броском от синей линии?",
+    "options": [
+      "Посмотреть, есть ли трафик перед воротами",
+      "Бросать сразу в борт",
+      "Закрыть глаза",
+      "Делать финт назад"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Кто должен первым бороться за подбор после вбрасывания?",
+    "options": [
+      "Только вратарь",
+      "Никто",
+      "Ближайший игрок",
+      "Только защитник"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Почему важно контролировать шайбу?",
+    "options": [
+      "Соперник не может атаковать без шайбы",
+      "Можно меньше кататься",
+      "Судьи дают очки",
+      "Это красиво выглядит"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Что главное в борьбе в углу?",
+    "options": [
+      "Высокий бросок",
+      "Прыжки",
+      "Катание спиной",
+      "Положение корпуса и клюшки"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Как лучше открываться?",
+    "options": [
+      "В свободное пространство",
+      "В угол без обзора",
+      "За спину партнеру",
+      "Стоя на месте"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Что должен делать нападающий после броска?",
+    "options": [
+      "Уезжать на смену сразу",
+      "Смотреть на табло",
+      "Искать добивание",
+      "Стоять на месте"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Что главное для защитника на пятаке?",
+    "options": [
+      "Стоять далеко от ворот",
+      "Играть без клюшки",
+      "Не дать сопернику добить шайбу",
+      "Смотреть только на вратаря"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Как лучше входить в зону?",
+    "options": [
+      "Без скорости",
+      "Спиной вперед",
+      "Через центр без поддержки",
+      "С контролем шайбы"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Когда полезен бросок с неудобной?",
+    "options": [
+      "Только на тренировке",
+      "Никогда",
+      "Когда нет времени перекладывать шайбу",
+      "Только защитникам"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Почему центр важен в атаке?",
+    "options": [
+      "Он всегда стоит на месте",
+      "Он не делает передачи",
+      "Он связывает всю пятерку",
+      "Он не играет в обороне"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Что важно при игре 1 в 1 в защите?",
+    "options": [
+      "Сразу прыгать на соперника",
+      "Смотреть на трибуны",
+      "Катиться назад без контроля",
+      "Держать дистанцию и направление"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Ваша пятерка провела длинную атаку. Защитник соперника подобрал шайбу за воротами, но выглядит уставшим. Ваше звено тоже долго на льду. Что лучше сделать?",
+    "options": [
+      "Продолжать агрессивный форчек всей пятеркой",
+      "Полностью откатиться в среднюю зону без давления",
+      "Один нападающий остается давить, остальные меняются",
+      "Вся пятерка сразу едет на смену"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Почему иногда полезен пас назад?",
+    "options": [
+      "Чтобы потерять темп",
+      "Чтобы избежать атаки",
+      "Чтобы сохранить контроль шайбы",
+      "Чтобы остановить игру"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Что важно при блокировке броска?",
+    "options": [
+      "Перекрыть траекторию шайбы",
+      "Прыгнуть вверх",
+      "Отвернуться спиной",
+      "Смотреть вниз"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Как защитнику играть против быстрого нападающего?",
+    "options": [
+      "Катиться вперед без остановки",
+      "Играть слишком близко",
+      "Стоять на месте",
+      "Не давать свободный лед"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Когда эффективен бросок в касание?",
+    "options": [
+      "Когда игрок не готов",
+      "Только на тренировке",
+      "Когда вратарь не успевает переместиться",
+      "Когда шайба стоит"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Почему важно разговаривать на льду?",
+    "options": [
+      "Это мешает сопернику",
+      "Это заменяет катание",
+      "Это помогает партнерам быстрее принимать решения",
+      "Это нравится судьям"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Как лучше разыграть выход 2 в 0?",
+    "options": [
+      "Заставить вратаря двигаться передачей",
+      "Остановиться перед воротами",
+      "Бросить издалека",
+      "Потерять шайбу"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Почему нападающие используют пространство за воротами?",
+    "options": [
+      "Чтобы спрятаться",
+      "Чтобы остановить игру",
+      "Чтобы не бросать",
+      "Чтобы растянуть оборону"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Почему важно сохранять спокойствие?",
+    "options": [
+      "Это влияет на лед",
+      "Это уменьшает размеры ворот",
+      "Это помогает принимать правильные решения",
+      "Это ускоряет шайбу"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Что должен делать защитник у синей линии?",
+    "options": [
+      "Удерживать шайбу в зоне",
+      "Стоять в центре",
+      "Не смотреть на партнеров",
+      "Всегда уходить назад"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Что делает добивание опасным?",
+    "options": [
+      "Игрок стоит без движения",
+      "Шайба становится легче",
+      "Судья не видит шайбу",
+      "Вратарь не всегда контролирует отскок"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Почему полезно менять направление атаки?",
+    "options": [
+      "Это мешает своим",
+      "Это замедляет игру",
+      "Это создает свободные зоны",
+      "Это утомляет судей"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Что важно при вбрасывании в чужой зоне?",
+    "options": [
+      "Сразу уехать назад",
+      "Быстро получить контроль шайбы",
+      "Смотреть на табло",
+      "Не двигаться"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Что значит страховать партнера?",
+    "options": [
+      "Закрывать его позицию при подключении",
+      "Играть только вперед",
+      "Повторять его маршрут",
+      "Стоять рядом без движения"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Если защитник потерял позицию, что делать?",
+    "options": [
+      "Смотреть на шайбу",
+      "Спорить с партнером",
+      "Остановиться",
+      "Быстро возвращаться в оборону"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Почему часто бросают низом?",
+    "options": [
+      "Это медленнее",
+      "Потому что нельзя бросать верхом",
+      "Для рикошетов и добиваний",
+      "Это легче судить"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Когда длинный пас особенно полезен?",
+    "options": [
+      "В толпе игроков",
+      "При смене звена",
+      "При быстрой контратаке",
+      "Без адресата"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Почему движение без шайбы важно?",
+    "options": [
+      "Оно создает варианты для передачи",
+      "Оно только для защитников",
+      "Оно не влияет на игру",
+      "Оно мешает своим"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Когда бросок с острого угла может быть полезен?",
+    "options": [
+      "Только в большинстве",
+      "Только в меньшинстве",
+      "Никогда",
+      "Для неожиданного отскока"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Почему важно закрывать обзор вратарю?",
+    "options": [
+      "Судья не видит шайбу",
+      "Ему сложнее увидеть бросок",
+      "Вратарь перестает двигаться",
+      "Это украшает атаку"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Что помогает перехватывать передачи?",
+    "options": [
+      "Чтение игры",
+      "Случайность",
+      "Медленное катание",
+      "Игра без клюшки"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Как правильно прижимать соперника к борту?",
+    "options": [
+      "Толкая в спину",
+      "Закрывая глаза",
+      "Руками без клюшки",
+      "Корпусом и клюшкой контролируя шайбу"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Что важно при выходе защитника из-за ворот?",
+    "options": [
+      "Поднять голову и найти пас",
+      "Катиться медленно",
+      "Сразу бросать шайбу",
+      "Смотреть только вниз"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Почему команды иногда замедляют игру?",
+    "options": [
+      "Чтобы потерять шайбу",
+      "Чтобы сохранить контроль и силы",
+      "Чтобы не атаковать",
+      "Чтобы остановить матч"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Кто такой игрок второго темпа?",
+    "options": [
+      "Судья",
+      "Запасной вратарь",
+      "Игрок, подключающийся позже к атаке",
+      "Самый медленный игрок"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Почему быстрые короткие передачи эффективны?",
+    "options": [
+      "Они всегда медленные",
+      "Они мешают атаке",
+      "Они нужны только защитникам",
+      "Сопернику сложнее отбирать шайбу"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Что должен делать вратарь после сейва?",
+    "options": [
+      "Быстро искать шайбу",
+      "Уезжать к борту",
+      "Снимать ловушку",
+      "Смотреть на табло"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Когда атака через центр особенно опасна?",
+    "options": [
+      "Когда игрок один",
+      "Когда есть скорость и поддержка",
+      "Когда нет шайбы",
+      "Когда все стоят"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Что помогает быстрее принимать решения?",
+    "options": [
+      "Медленное катание",
+      "Смотреть только на шайбу",
+      "Постоянный просмотр площадки",
+      "Играть без общения"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Что делает хороший капитан?",
+    "options": [
+      "Поддерживает команду и ведет примером",
+      "Играет только в атаке",
+      "Кричит на всех",
+      "Не играет в обороне"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Что помогает выйти из-под прессинга?",
+    "options": [
+      "Игра в одиночку",
+      "Быстрое движение шайбы",
+      "Долгое удержание шайбы",
+      "Остановка у борта"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Почему нельзя медлить на синей линии?",
+    "options": [
+      "Вратарь устанет",
+      "Лед станет хуже",
+      "Можно потерять зону",
+      "Судья остановит игру"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Почему опасен бросок сразу после паса?",
+    "options": [
+      "Он всегда слабый",
+      "Его сложно выполнить",
+      "Судья не засчитает гол",
+      "Вратарь не успевает подготовиться"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Кто первым должен возвращаться после потери шайбы?",
+    "options": [
+      "Ближайший игрок",
+      "Только центр",
+      "Только защитник",
+      "Только вратарь"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Как защитнику играть против игрока с сильным броском?",
+    "options": [
+      "Смотреть только на вратаря",
+      "Сокращать время на бросок",
+      "Давать свободное пространство",
+      "Стоять далеко"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Почему шайбу часто уводят в угол в обороне?",
+    "options": [
+      "Судья не видит игру",
+      "Там медленнее лед",
+      "Там меньше опасность для ворот",
+      "Там легче забить"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Что делает нападающий перед воротами?",
+    "options": [
+      "Стоит спиной к игре",
+      "Уходит к борту",
+      "Не двигается",
+      "Создает трафик и ищет добивание"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Почему важно играть с поднятой головой?",
+    "options": [
+      "Чтобы видеть партнеров и соперников",
+      "Чтобы шайба была легче",
+      "Чтобы быстрее кататься",
+      "Чтобы судья видел игрока"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Что главное после выигранного вбрасывания в меньшинстве?",
+    "options": [
+      "Идти в обводку",
+      "Делать длинную паузу",
+      "Вывести шайбу из зоны",
+      "Стоять на месте"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Почему важно давить на защитников соперника?",
+    "options": [
+      "Это мешает своим",
+      "Это не влияет на матч",
+      "Это останавливает игру",
+      "Это может привести к ошибке"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Когда полезен пас в касание?",
+    "options": [
+      "Для быстрого развития атаки",
+      "Когда игрок стоит",
+      "Когда нет партнеров",
+      "Только в обороне"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Что должен делать центр у своих ворот?",
+    "options": [
+      "Ждать передачу вперед",
+      "Уезжать в среднюю зону",
+      "Помогать защитникам закрывать пятак",
+      "Стоять у борта"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Почему перекрестное движение нападающих эффективно?",
+    "options": [
+      "Оно путает защитников",
+      "Оно мешает своим",
+      "Оно замедляет атаку",
+      "Оно запрещено"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Что важно при подборе шайбы?",
+    "options": [
+      "Долго держать шайбу",
+      "Стоять на месте",
+      "Смотреть вниз",
+      "Быстро принять решение"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Почему игроки меняют скорость?",
+    "options": [
+      "Чтобы остановиться",
+      "Чтобы потерять шайбу",
+      "Чтобы обыграть соперника",
+      "Чтобы устать быстрее"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "До конца матча 40 секунд. Вы ведете в одну шайбу. Соперник играет 6 на 5. Шайба у их защитника на синей линии, а ваш крайний может выбежать на перехват. Что лучше?",
+    "options": [
+      "Сразу агрессивно вылетать на шайбу",
+      "Следить только за игроком перед воротами",
+      "Атаковать только при уверенном угле отбора",
+      "Полностью опуститься к воротам"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Когда вратарь может выйти далеко из ворот?",
+    "options": [
+      "Чтобы перехватить шайбу и помочь защите",
+      "Никогда",
+      "Всегда",
+      "Только после гола"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Что важно для успешного добивания?",
+    "options": [
+      "Высокий замах",
+      "Стоять далеко от ворот",
+      "Медленное движение",
+      "Быстрая реакция"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Почему важна поддержка второго игрока?",
+    "options": [
+      "Она дает дополнительные варианты",
+      "Она только для защитников",
+      "Она не нужна",
+      "Она мешает атаке"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Что значит «читать игру»?",
+    "options": [
+      "Предугадывать действия соперника",
+      "Считать передачи",
+      "Следить только за шайбой",
+      "Смотреть на табло"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Почему важно уметь играть корпусом?",
+    "options": [
+      "Это ускоряет лед",
+      "Это нужно только защитникам",
+      "Это влияет на судью",
+      "Это помогает защищать шайбу"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Когда полезен выход через борт?",
+    "options": [
+      "Никогда",
+      "Всегда",
+      "Когда центр перекрыт",
+      "Только в большинстве"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Что важно против большинства соперника?",
+    "options": [
+      "Постоянные обводки",
+      "Компактная оборона",
+      "Медленные смены",
+      "Игра по одному"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Что такое передача под бросок?",
+    "options": [
+      "Пас игроку в удобную позицию для броска",
+      "Пас назад вратарю",
+      "Случайная передача",
+      "Пас в угол"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Почему полезен финт перед броском?",
+    "options": [
+      "Он всегда замедляет атаку",
+      "Он запрещен",
+      "Он нужен только защитникам",
+      "Он может сместить вратаря или защитника"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "После блокировки броска игрок должен:",
+    "options": [
+      "Сразу искать шайбу",
+      "Стоять на месте",
+      "Смотреть на судью",
+      "Уезжать со льда"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Как нападающие помогают защитникам?",
+    "options": [
+      "Стоят в атаке",
+      "Возвращаются назад и открываются под пас",
+      "Играют только у бортов",
+      "Не участвуют в обороне"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Что помогает против сильного прессинга?",
+    "options": [
+      "Быстрые решения и движение",
+      "Медленное катание",
+      "Игра в одиночку",
+      "Долгое владение шайбой"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Когда полезно подставление клюшки?",
+    "options": [
+      "Никогда",
+      "Только на тренировке",
+      "Только в защите",
+      "Для изменения направления шайбы"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Что важно при атаке через борт?",
+    "options": [
+      "Передача назад вратарю",
+      "Поддержка партнера рядом",
+      "Игра в одиночку",
+      "Остановка движения"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Что важно вратарю при выходе один в ноль?",
+    "options": [
+      "Сохранять правильную позицию и терпение",
+      "Сразу падать на лед",
+      "Уезжать назад",
+      "Смотреть на защитников"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Что важно при быстром переходе в атаку?",
+    "options": [
+      "Медленные передачи",
+      "Долгий контроль шайбы",
+      "Остановка у синей линии",
+      "Скорость принятия решений"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Что делает защитник в большинстве?",
+    "options": [
+      "Уходит к воротам",
+      "Не участвует в атаке",
+      "Двигает шайбу и ищет момент для броска",
+      "Стоит без движения"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Почему трафик перед воротами опасен?",
+    "options": [
+      "Шайба становится медленнее",
+      "Вратарь хуже видит шайбу",
+      "Судья не может считать игроков",
+      "Игроки устают быстрее"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Что важно после перехвата шайбы?",
+    "options": [
+      "Быстро перейти в атаку",
+      "Остановиться",
+      "Сразу выбросить шайбу",
+      "Катиться к борту"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Что особенно важно в овертайме?",
+    "options": [
+      "Постоянные дальние броски",
+      "Игра без пасов",
+      "Долгие смены",
+      "Контроль шайбы и минимум ошибок"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Что делать защитнику, если соперник закрывает обзор вратарю?",
+    "options": [
+      "Смотреть на судью",
+      "Уехать к борту",
+      "Освободить пятак и мешать сопернику",
+      "Стоять рядом без движения"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Почему командная игра важнее индивидуальной?",
+    "options": [
+      "Команда не влияет на результат",
+      "Пятерка создает больше моментов вместе",
+      "Один игрок всегда решает матч",
+      "Передачи мешают игре"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Что важно перед броском?",
+    "options": [
+      "Быстро оценить позицию вратаря",
+      "Смотреть только вниз",
+      "Остановиться полностью",
+      "Закрыть глаза"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Что лучше всего развивает хоккейный интеллект?",
+    "options": [
+      "Только силовые тренировки",
+      "Только просмотр голов",
+      "Только катание",
+      "Анализ игры, практика и понимание ситуаций"
+    ]
+  }
+}

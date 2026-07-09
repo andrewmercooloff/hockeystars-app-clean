@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { getSupabaseFunctionUrl, supabase, supabaseAnonKey, supabaseFetch } from './supabase';
 // SMS провайдеры
 import { sendSMSViaTwilio } from './smsService';
 // Twilio Verify отключен - используем только проверку через БД
@@ -20,8 +20,61 @@ export const generateVerificationCode = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+/** Единый ключ для email/телефона в email_verification_codes (RU: 79001234567). */
+export const normalizeVerificationContact = (contact: string): string => {
+  const trimmed = contact.trim();
+  if (trimmed.includes('@')) {
+    return trimmed.toLowerCase();
+  }
+  const cleaned = trimmed.replace(/\s/g, '').replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+375') || cleaned.startsWith('375')) {
+    return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
+  }
+  if (cleaned.startsWith('+7')) {
+    const national = cleaned.slice(2);
+    if (national.length === 10) return `7${national}`;
+  } else if (cleaned.startsWith('7') && cleaned.length === 11) {
+    return cleaned;
+  } else if (cleaned.startsWith('8') && cleaned.length === 11) {
+    return `7${cleaned.slice(1)}`;
+  }
+  return trimmed.replace(/\s/g, '');
+};
+
+const NOTIFICORE_2FA_TTL_MS = 10 * 60 * 1000;
+const notificore2faAuthByContact = new Map<string, { authId: string; expiresAt: number }>();
+
+const rememberNotificore2faAuth = (contact: string, authId: string): void => {
+  notificore2faAuthByContact.set(normalizeVerificationContact(contact), {
+    authId,
+    expiresAt: Date.now() + NOTIFICORE_2FA_TTL_MS,
+  });
+};
+
+const recallNotificore2faAuth = (contact: string): string | null => {
+  const key = normalizeVerificationContact(contact);
+  const entry = notificore2faAuthByContact.get(key);
+  if (!entry || entry.expiresAt < Date.now()) {
+    notificore2faAuthByContact.delete(key);
+    return null;
+  }
+  return entry.authId;
+};
+
+const extractNotificore2faAuthId = (savedCode: string): string | null => {
+  if (!savedCode.startsWith('2FA:')) return null;
+  const authId = savedCode.slice(4);
+  // UUID auth id — если в БД VARCHAR(6), значение обрезано и бесполезно
+  return authId.length >= 32 ? authId : null;
+};
+
 // Создание таблицы если её нет
+let verificationTableVerified = false;
+
 const ensureTableExists = async (): Promise<boolean> => {
+  if (verificationTableVerified) {
+    return true;
+  }
   try {
     // Пробуем выполнить простой запрос к таблице
     const { error } = await supabase
@@ -35,7 +88,8 @@ const ensureTableExists = async (): Promise<boolean> => {
       // Возвращаем false чтобы показать инструкцию пользователю
       return false;
     }
-    
+
+    verificationTableVerified = true;
     return true;
   } catch (error) {
     console.error('❌ Ошибка проверки таблицы:', error);
@@ -46,7 +100,8 @@ const ensureTableExists = async (): Promise<boolean> => {
 // Сохранение кода подтверждения в базе данных
 export const saveVerificationCode = async (email: string, code: string): Promise<boolean> => {
   try {
-    console.log('💾 Сохраняем код подтверждения для:', email);
+    const contactKey = normalizeVerificationContact(email);
+    console.log('💾 Сохраняем код подтверждения для:', contactKey);
     
     // Проверяем существование таблицы
     const tableExists = await ensureTableExists();
@@ -57,7 +112,7 @@ export const saveVerificationCode = async (email: string, code: string): Promise
 CREATE TABLE email_verification_codes (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) NOT NULL,
-  code VARCHAR(6) NOT NULL,
+  code VARCHAR(64) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   expires_at TIMESTAMP NOT NULL,
   used BOOLEAN DEFAULT FALSE,
@@ -72,7 +127,7 @@ CREATE TABLE email_verification_codes (
     await supabase
       .from('email_verification_codes')
       .delete()
-      .eq('email', email);
+      .eq('email', contactKey);
     
     // Создаем новый код с истечением через 10 минут
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
@@ -80,7 +135,7 @@ CREATE TABLE email_verification_codes (
     const { error } = await supabase
       .from('email_verification_codes')
       .insert({
-        email,
+        email: contactKey,
         code,
         expires_at: expiresAt
       });
@@ -135,9 +190,10 @@ export const verifyAdminSecretCode = (contact: string, inputCode: string): { suc
 // Проверка кода подтверждения
 export const verifyCode = async (email: string, inputCode: string): Promise<{ success: boolean; message: string; translationKey?: string }> => {
   try {
+    const contactKey = normalizeVerificationContact(email);
     
     // Сначала проверяем, не является ли это секретным кодом администратора
-    const adminCheck = verifyAdminSecretCode(email, inputCode);
+    const adminCheck = verifyAdminSecretCode(contactKey, inputCode);
     if (adminCheck.success) {
       return adminCheck;
     }
@@ -146,7 +202,7 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
     const { data: codes, error } = await supabase
       .from('email_verification_codes')
       .select('*')
-      .eq('email', email)
+      .eq('email', contactKey)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1);
@@ -157,12 +213,44 @@ export const verifyCode = async (email: string, inputCode: string): Promise<{ su
     }
     
     if (!codes || codes.length === 0) {
+      const cachedAuthId = recallNotificore2faAuth(contactKey);
+      if (cachedAuthId) {
+        const { verifyNotificore2faOtp } = await import('./smsService');
+        const verified = await verifyNotificore2faOtp(cachedAuthId, inputCode);
+        if (verified) {
+          notificore2faAuthByContact.delete(contactKey);
+          return { success: true, message: 'auth.codeVerified', translationKey: 'auth.codeVerified' };
+        }
+        return {
+          success: false,
+          message: 'auth.codeInvalid',
+          translationKey: 'auth.codeInvalid',
+        };
+      }
       return { success: false, message: 'auth.codeNotFoundOrExpired', translationKey: 'auth.codeNotFoundOrExpired' };
     }
     
     const verificationRecord = codes[0];
     const savedCode = verificationRecord.code;
-    
+
+    // Notificore 2FA: код генерирует провайдер, проверяем через их API
+    const authIdFromDb = extractNotificore2faAuthId(savedCode);
+    const authId = authIdFromDb ?? recallNotificore2faAuth(contactKey);
+    if (authId) {
+      const { verifyNotificore2faOtp } = await import('./smsService');
+      const verified = await verifyNotificore2faOtp(authId, inputCode);
+      if (!verified) {
+        return {
+          success: false,
+          message: 'auth.codeInvalid',
+          translationKey: 'auth.codeInvalid',
+        };
+      }
+      notificore2faAuthByContact.delete(contactKey);
+      await supabase.from('email_verification_codes').delete().eq('id', verificationRecord.id);
+      return { success: true, message: 'auth.codeVerified', translationKey: 'auth.codeVerified' };
+    }
+
     // Проверяем код
     // Поддерживаем два варианта:
     // 1. Полный код (6 цифр) - для обычных SMS
@@ -209,44 +297,71 @@ const isCISNumber = (phone: string): boolean => {
 };
 
 // Отправка кода подтверждения
-// Для Беларуси используем sms.by, для России - sms.ru (БЕЗ fallback на Twilio), для остальных - Twilio
+// BY → RocketSMS, RU → Notificore (NTF), KZ → Twilio, остальные → Twilio
+const dispatchVerificationSms = async (
+  phoneNumber: string,
+  code: string,
+  country: ReturnType<typeof import('./smsService').getCountryFromPhone>
+): Promise<void> => {
+  try {
+    const { sendSMSViaProvider } = await import('./smsService');
+    const smsSuccess = await sendSMSViaProvider(phoneNumber, code);
+    if (smsSuccess) {
+      console.log('✅ SMS принят провайдером');
+      return;
+    }
+    const provider = country === 'BY' ? 'RocketSMS' : country === 'RU' ? 'Notificore' : 'Twilio';
+    console.warn(
+      `⚠️ ${provider} не принял SMS (код уже сохранён в БД — можно нажать «Отправить снова»)`
+    );
+  } catch (error) {
+    console.warn('⚠️ Фоновая отправка SMS:', error);
+  }
+};
+
 export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
   try {
     console.log('📱 Отправляем код подтверждения на:', phoneNumber);
-    
-    // Генерируем код
+
     const code = _code || generateVerificationCode();
-
-    // ===== УМНЫЙ ВЫБОР ПРОВАЙДЕРА ПО СТРАНЕ =====
-    // Беларусь → RocketSMS (БЕЗ fallback на Twilio)
-    // Россия → RocketSMS (БЕЗ fallback на Twilio)
-    // США/Канада → только email (SMS отключены)
-    // Остальные → Twilio
-    const { sendSMSViaProvider, getCountryFromPhone } = await import('./smsService');
+    const { sendSMSViaProvider, getCountryFromPhone, takeNotificore2faAuthId, isNotificore2faConfigured } =
+      await import('./smsService');
     const country = getCountryFromPhone(phoneNumber);
-    const smsSuccess = await sendSMSViaProvider(phoneNumber, code);
-    
-    if (smsSuccess) {
-      await saveVerificationCode(phoneNumber, code);
-      console.log('✅ Код отправлен успешно');
-      return true;
-    }
 
-    // Для Беларуси и России полностью отключаем любые fallback-и на Twilio
-    if (country === 'BY' || country === 'RU') {
-      console.log(`⚠️ RocketSMS не сработал для ${country === 'BY' ? 'Беларуси' : 'России'}, Twilio ОТКЛЮЧЕН. Показываем код только в консоли.`);
+    // Notificore 2FA: код генерирует провайдер — нужен синхронный ответ API
+    if (country === 'RU' && isNotificore2faConfigured()) {
+      const smsSuccess = await sendSMSViaProvider(phoneNumber, code);
+      if (smsSuccess) {
+        const notificore2faAuthId = takeNotificore2faAuthId();
+        if (notificore2faAuthId) {
+          rememberNotificore2faAuth(phoneNumber, notificore2faAuthId);
+          const saved = await saveVerificationCode(phoneNumber, `2FA:${notificore2faAuthId}`);
+          if (!saved) {
+            console.warn(
+              '⚠️ 2FA auth id не сохранился в БД (ALTER code VARCHAR(64)) — проверка через кэш приложения'
+            );
+          }
+        } else {
+          console.warn('⚠️ Notificore 2FA без auth id — сохраняем локальный код (проверка может не сработать)');
+          await saveVerificationCode(phoneNumber, code);
+        }
+        console.log('✅ Код отправлен успешно (Notificore 2FA)');
+        return true;
+      }
+      console.log('⚠️ Notificore 2FA не сработал для России, Twilio ОТКЛЮЧЕН. Показываем код только в консоли.');
       return await sendSMSFallback(phoneNumber, code);
     }
-    
-    // Для США и Канады не отправляем SMS, только email
-    if (country === 'US' || country === 'CA') {
-      console.log(`🇺🇸🇨🇦 ${country === 'US' ? 'США' : 'Канада'} - SMS отключены, используйте email для получения кода`);
-      return await sendSMSFallback(phoneNumber, code);
+
+    // Быстрый путь: сохраняем код в БД и сразу показываем экран ввода; SMS — в фоне
+    const saved = await saveVerificationCode(phoneNumber, code);
+    if (!saved) {
+      console.error('❌ Не удалось сохранить код в БД');
+      return false;
     }
 
-    // Если ничего не работает, показываем fallback
-    console.log('⚠️ SMS недоступен, показываем fallback');
-    return await sendSMSFallback(phoneNumber, code);
+    void dispatchVerificationSms(phoneNumber, code, country);
+    console.log('✅ Код сохранён, SMS отправляется в фоне');
+    return true;
   } catch (error) {
     console.error('❌ Ошибка отправки:', error);
     return await sendSMSFallback(phoneNumber, _code || '------');
@@ -312,10 +427,7 @@ export const sendVerificationEmail = async (email: string, code: string): Promis
 // Fallback: прямой вызов через fetch (если SDK не работает)
 const sendVerificationEmailFallback = async (email: string, code: string): Promise<boolean> => {
   try {
-    const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
-    
-    const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+    const response = await supabaseFetch(getSupabaseFunctionUrl('send-email'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${supabaseAnonKey}`,
@@ -363,7 +475,8 @@ const sendSMSFallback = async (phoneNumber: string, code: string): Promise<boole
   
   ═══════════════════════════════════
   `);
-  
+
+  await saveVerificationCode(phoneNumber, code);
   return true;
 };
 

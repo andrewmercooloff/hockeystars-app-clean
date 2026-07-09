@@ -12,6 +12,8 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import LoadingCenter from '../components/LoadingCenter';
+import { colors } from '../theme/colors';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import CachedAvatar from '../components/CachedAvatar';
 import { platformCardShadow } from '../utils/androidShadow';
@@ -23,7 +25,6 @@ import {
     mergeRawMessageRowsIntoConversations,
     countNewRawMessageIdsInBatch,
     fetchInboxMessagesPage,
-    INBOX_LIST_BATCH_SIZE,
     type InboxMessagesPageState,
     Message,
     Player,
@@ -31,19 +32,34 @@ import {
     isUserBlocked,
     searchMessagesAcrossAllDialogs
 } from '../utils/playerStorage';
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import { avatarCache, seedPlayerAvatarUrls } from '../utils/AvatarCache';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import CachedBackground from '../components/CachedBackground';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 
 const iceBg = require('../assets/images/led.jpg');
 
-/** Пауза между пачками по 20 сообщений (плавная догрузка списка диалогов). */
-const INBOX_DRAIN_PAUSE_MS = 48;
-/** Не вызывать rebuildChatPreviews на каждой пачке — там тяжёлые запросы по сотням peer id. */
-const INBOX_DRAIN_REBUILD_EVERY_BATCHES = 10;
+/** Первая порция — быстрый показ списка. */
+const INBOX_FIRST_BATCH_SIZE = 100;
+/** Фоновые пачки сообщений. */
+const INBOX_BG_BATCH_SIZE = 200;
+/** Как часто обновлять UI при фоновой догрузке. */
+const INBOX_BG_REBUILD_EVERY = 3;
+const INBOX_FIRST_BATCH_TIMEOUT_MS = 18000;
+const INBOX_BG_BATCH_TIMEOUT_MS = 25000;
+const INBOX_BG_PAUSE_MS = 40;
+const INBOX_SPINNER_MAX_MS = 20000;
+
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  let tid: ReturnType<typeof setTimeout> | null = null;
+  const timeout = new Promise<T>((_, reject) => {
+    tid = setTimeout(() => reject(new Error(`timeout:${label}`)), ms);
+  });
+  return Promise.race([p.finally(() => { if (tid) clearTimeout(tid); }), timeout]);
+}
 
 interface ChatPreview {
   player: Player;
@@ -65,15 +81,106 @@ function normalizeLastMessageTextForSearch(raw: string | null | undefined): stri
   return text.trim().toLowerCase();
 }
 
+function sortChatsByTime(list: ChatPreview[]): ChatPreview[] {
+  return [...list].sort((a, b) => {
+    if (!a.lastMessage && !b.lastMessage) return 0;
+    if (!a.lastMessage) return 1;
+    if (!b.lastMessage) return -1;
+    const aTime =
+      a.lastMessage.timestamp instanceof Date
+        ? a.lastMessage.timestamp.getTime()
+        : a.lastMessage.timestamp;
+    const bTime =
+      b.lastMessage.timestamp instanceof Date
+        ? b.lastMessage.timestamp.getTime()
+        : b.lastMessage.timestamp;
+    return bTime - aTime;
+  });
+}
+
+function mergePlayerStable(prev: Player, next: Player): Player {
+  return {
+    ...next,
+    name:
+      next.name && next.name.trim() && next.name !== 'Пользователь'
+        ? next.name
+        : prev.name || next.name,
+    avatar: next.avatar || prev.avatar,
+    status: next.status ?? prev.status,
+  };
+}
+
+/** Обновление списка без «усохания» и без сброса аватаров. */
+function applyInboxChatListUpdate(
+  prev: ChatPreview[],
+  chatPreviews: ChatPreview[],
+  mode: 'merge' | 'ifMore'
+): ChatPreview[] {
+  if (chatPreviews.length === 0 && prev.length > 0) return prev;
+
+  const prevById = new Map(prev.map((c) => [c.player.id, c]));
+  const nextById = new Map(chatPreviews.map((c) => [c.player.id, c]));
+
+  if (mode === 'ifMore' && prev.length > 0) {
+    let changed = false;
+    const updated = prev.map((old) => {
+      const neu = nextById.get(old.player.id);
+      if (!neu) return old;
+      const merged: ChatPreview = {
+        ...neu,
+        player: mergePlayerStable(old.player, neu.player),
+      };
+      if (
+        old.unreadCount !== merged.unreadCount ||
+        old.lastMessage?.id !== merged.lastMessage?.id ||
+        old.lastMessage?.text !== merged.lastMessage?.text ||
+        old.player.avatar !== merged.player.avatar ||
+        old.player.name !== merged.player.name
+      ) {
+        changed = true;
+        return merged;
+      }
+      return old;
+    });
+
+    const added = chatPreviews
+      .filter((c) => !prevById.has(c.player.id))
+      .map((c) => ({
+        ...c,
+        player: mergePlayerStable(c.player, c.player),
+      }));
+
+    if (!changed && added.length === 0) return prev;
+    return sortChatsByTime([...updated, ...added]);
+  }
+
+  const enriched = chatPreviews.map((c) => {
+    const old = prevById.get(c.player.id);
+    return old ? { ...c, player: mergePlayerStable(old.player, c.player) } : c;
+  });
+
+  if (enriched.length >= prev.length || prev.length === 0) {
+    return sortChatsByTime(enriched);
+  }
+
+  const ids = new Set(enriched.map((c) => c.player.id));
+  const merged = [...enriched];
+  for (const old of prev) {
+    if (!ids.has(old.player.id)) merged.push(old);
+  }
+  return sortChatsByTime(merged);
+}
+
 export default function MessagesScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
-  const { currentUser, isUserLoading, refreshUser } = useUser();
+  const { currentUser, isUserLoading } = useUser();
   
   // Убираем все анимации - простое мгновенное переключение
   const [chats, setChats] = useState<ChatPreview[]>([]);
-  const [loading, setLoading] = useState(true);
+  /** true — первый кадр уже показан (кэш или первая пачка). Блокирующий спиннер больше не нужен. */
+  const [inboxReady, setInboxReady] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   /** Совпадения по всей истории (peerId → самое свежее сообщение с подстрокой). null — поиск по истории не запускали (короткий запрос или сброс). */
@@ -81,89 +188,117 @@ export default function MessagesScreen() {
   const [historySearchLoading, setHistorySearchLoading] = useState(false);
   /** Диалоги, найденные только в истории и ещё не попавшие в подгруженный список чатов. */
   const [extraSearchChats, setExtraSearchChats] = useState<ChatPreview[]>([]);
-  const [loadingMoreChats, setLoadingMoreChats] = useState(false);
-  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const focusRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Фоновая догрузка старых диалогов — маленький спиннер внизу, не блокирует экран. */
+  const [syncingMore, setSyncingMore] = useState(false);
+  const chatsListRef = useRef<FlatList<ChatPreview>>(null);
   const silentLoadDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncingHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bgSyncRunningRef = useRef(false);
 
-  /** Накопитель сообщений для списка чатов (первая страница — новые, дальше подгрузка к старым). */
   const conversationsAccRef = useRef<Record<string, Message[]>>({});
-  /** Следующая страница списка диалогов: курсор (RPC) или номер страницы (OFFSET fallback). */
-  /** null = новых страниц нет (догрузили всё). Первая страница: { mode: 'cursor', cursor: null }. */
-  const nextInboxPageStateRef = useRef<InboxMessagesPageState | null>({
-    mode: 'cursor',
-    cursor: null
-  });
-  const hasMorePagesRef = useRef(true);
-  const loadMoreInFlightRef = useRef(false);
-  const listViewportHeightRef = useRef(0);
-  const drainGenerationRef = useRef(0);
-  const drainRunningRef = useRef(false);
-  const contentSizeLoadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadGenerationRef = useRef(0);
+  const nextInboxPageRef = useRef<InboxMessagesPageState | null>({ mode: 'cursor', cursor: null });
+  const hasMoreInboxRef = useRef(true);
+  const inboxUseOffsetRef = useRef(false);
   const lastRebuildLogPeerCountRef = useRef<number>(-1);
+  const inboxPreviewsCacheKey = useMemo(
+    () => (currentUser?.id ? `hs_inbox_previews_v1_${currentUser.id}` : null),
+    [currentUser?.id]
+  );
+  const chatsRef = useRef<ChatPreview[]>([]);
+  useEffect(() => {
+    chatsRef.current = chats;
+  }, [chats]);
 
   /** Кэш игроков для списка диалогов — догружаем только новые peer id. */
   const inboxPlayerCacheRef = useRef<Map<string, Player>>(new Map());
   /** Уже проверены на «peer заблокировал меня» (инкрементально между шагами drain). */
   const inboxReverseBlockCheckedRef = useRef<Set<string>>(new Set());
   const inboxReverseBlockedThemRef = useRef<Set<string>>(new Set());
+  /** Мой список блокировок: кэшируем, чтобы rebuildChatPreviews не бил БД на каждый batch. */
+  const blockedByMeSetRef = useRef<Set<string> | null>(null);
+  const setSyncingMoreStable = useCallback((visible: boolean) => {
+    if (visible) {
+      if (syncingHideTimerRef.current) {
+        clearTimeout(syncingHideTimerRef.current);
+        syncingHideTimerRef.current = null;
+      }
+      setSyncingMore(true);
+      return;
+    }
+    if (syncingHideTimerRef.current) clearTimeout(syncingHideTimerRef.current);
+    syncingHideTimerRef.current = setTimeout(() => {
+      syncingHideTimerRef.current = null;
+      setSyncingMore(false);
+    }, 400);
+  }, []);
 
   const resetInboxListAuxCaches = useCallback(() => {
     inboxPlayerCacheRef.current.clear();
     inboxReverseBlockCheckedRef.current.clear();
     inboxReverseBlockedThemRef.current.clear();
+    blockedByMeSetRef.current = null;
   }, []);
 
-  /**
-   * Одна пачка из INBOX_LIST_BATCH_SIZE сообщений. `gen` — поколение загрузки;
-   * при обновлении списка устаревшие ответы не мержатся.
-   */
-  const appendNextInboxBatch = useCallback(
-    async (gen: number): Promise<boolean> => {
-      if (!currentUser || drainGenerationRef.current !== gen) return false;
-      const inboxState = nextInboxPageStateRef.current;
-      if (inboxState == null || !hasMorePagesRef.current) return false;
+  /** Сохраняем имена/аватары из уже показанного списка при rebuild (не затираем при сбое сети). */
+  const seedInboxPlayerCacheFromChats = useCallback(() => {
+    for (const chat of chatsRef.current) {
+      const p = chat.player;
+      if (!p?.id) continue;
+      const existing = inboxPlayerCacheRef.current.get(p.id);
+      if (!existing) {
+        inboxPlayerCacheRef.current.set(p.id, p);
+      } else if (
+        (p.name && p.name !== 'Пользователь' && (!existing.name || existing.name === 'Пользователь')) ||
+        (p.avatar && !existing.avatar)
+      ) {
+        inboxPlayerCacheRef.current.set(p.id, { ...existing, name: p.name || existing.name, avatar: p.avatar || existing.avatar });
+      }
+    }
+    seedPlayerAvatarUrls(chatsRef.current.map((c) => c.player).filter((p) => p?.id && p.avatar));
+  }, []);
 
-      const batch = await fetchInboxMessagesPage(
-        currentUser.id,
-        inboxState,
-        INBOX_LIST_BATCH_SIZE
-      );
-      if (drainGenerationRef.current !== gen) return false;
-      if (batch.error || !batch.rows.length) {
-        hasMorePagesRef.current = false;
-        nextInboxPageStateRef.current = null;
-        return false;
-      }
-      const freshIds = countNewRawMessageIdsInBatch(conversationsAccRef.current, batch.rows);
-      if (freshIds === 0) {
-        console.warn(
-          '⚠️ Inbox: страница без новых сообщений (курсор или тип id в fetch_inbox_messages_page). Пагинация остановлена.'
-        );
-        hasMorePagesRef.current = false;
-        nextInboxPageStateRef.current = null;
-        return false;
-      }
-      conversationsAccRef.current = mergeRawMessageRowsIntoConversations(
-        currentUser.id,
-        conversationsAccRef.current,
-        batch.rows
-      );
-      nextInboxPageStateRef.current = batch.nextState;
-      hasMorePagesRef.current = batch.hasMore && batch.nextState != null;
-      return hasMorePagesRef.current;
-    },
-    [currentUser]
-  );
+  /** Мгновенно поднимаем превью из AsyncStorage — без сетевых запросов. */
+  const hydrateInboxFromCache = useCallback(async (): Promise<boolean> => {
+    if (!inboxPreviewsCacheKey || chatsRef.current.length > 0) return false;
+    try {
+      const raw = await AsyncStorage.getItem(inboxPreviewsCacheKey);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw) as { chats?: any[] } | null;
+      const cached = Array.isArray(parsed?.chats) ? parsed!.chats : [];
+      if (cached.length === 0) return false;
+      const revived: ChatPreview[] = cached.map((c: any) => ({
+        ...c,
+        lastMessage: c.lastMessage
+          ? {
+              ...c.lastMessage,
+              timestamp: new Date(c.lastMessage.timestamp),
+            }
+          : null,
+      }));
+      chatsRef.current = revived;
+      setChats(revived);
+      setInboxReady(true);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [inboxPreviewsCacheKey, currentUser?.id]);
 
   const rebuildChatPreviews = useCallback(
-    async (options?: { includeDrafts?: boolean }) => {
+    async (options?: {
+      includeDrafts?: boolean;
+      skipReverseBlockCheck?: boolean;
+      /** always — полное обновление; ifMore — только дополнение / правки без дергания */
+      updateList?: 'always' | 'ifMore';
+    }) => {
     if (!currentUser) {
       return;
     }
     const includeDrafts = options?.includeDrafts !== false;
+    const skipReverseBlockCheck = options?.skipReverseBlockCheck === true;
     const conversations = conversationsAccRef.current;
+    seedInboxPlayerCacheFromChats();
     try {
       const peerCount = Object.keys(conversations).length;
       if (__DEV__ && peerCount !== lastRebuildLogPeerCountRef.current) {
@@ -171,8 +306,22 @@ export default function MessagesScreen() {
         console.log(`📨 rebuildChatPreviews: диалогов в аккумуляторе ${peerCount}`);
       }
 
-      const blockedUsers = await getBlockedUsers(currentUser.id);
-      const blockedSet = new Set(blockedUsers);
+      // Важно: на больших аккаунтах rebuildChatPreviews вызывается много раз (пагинация),
+      // поэтому блокировки кэшируем. Обновляем их только на "полной" сборке (includeDrafts),
+      // т.к. это триггерится при первом построении и в конце drain.
+      if (!blockedByMeSetRef.current || includeDrafts) {
+        try {
+          const blockedUsers = await withTimeout(
+            getBlockedUsers(currentUser.id),
+            8000,
+            'inbox_blocked_users'
+          );
+          blockedByMeSetRef.current = new Set(blockedUsers);
+        } catch {
+          blockedByMeSetRef.current = blockedByMeSetRef.current ?? new Set<string>();
+        }
+      }
+      const blockedSet = blockedByMeSetRef.current ?? new Set<string>();
 
       const chatPreviews: ChatPreview[] = [];
 
@@ -196,21 +345,28 @@ export default function MessagesScreen() {
         weight: '',
       });
 
-      if (userIds.length > 0) {
-        const lightRows = await fetchPlayersInboxFieldsByIds(userIds);
+      const peersNeedingFields = userIds.filter((id) => {
+        const p = inboxPlayerCacheRef.current.get(id);
+        return !p?.avatar || !p.name || p.name === 'Пользователь';
+      });
+      if (peersNeedingFields.length > 0) {
+        const lightRows = await fetchPlayersInboxFieldsByIds(peersNeedingFields);
         lightRows.forEach((row, peerId) => {
           const cur = inboxPlayerCacheRef.current.get(peerId);
           const base = cur ?? placeholderPlayer(peerId);
-          const nextAvatar = row.avatar ?? base.avatar;
-          const avatarChanged = Boolean(row.avatar && row.avatar !== base.avatar);
+          const nextName =
+            row.name && row.name.trim() && row.name !== 'Пользователь'
+              ? row.name
+              : base.name;
+          const nextAvatar = row.avatar || base.avatar;
           inboxPlayerCacheRef.current.set(peerId, {
             ...base,
-            name: row.name || base.name,
+            name: nextName,
             avatar: nextAvatar,
             status: row.status ?? base.status,
           });
-          if (avatarChanged && row.avatar) {
-            void updateAvatarGlobally(peerId, row.avatar);
+          if (row.avatar && row.avatar !== base.avatar) {
+            void avatarCache.setAvatar(peerId, row.avatar);
           }
         });
       }
@@ -226,7 +382,7 @@ export default function MessagesScreen() {
       );
 
       const IN_CHUNK = 100;
-      if (toVerifyReverse.length > 0) {
+      if (!skipReverseBlockCheck && toVerifyReverse.length > 0) {
         try {
           for (let i = 0; i < toVerifyReverse.length; i += IN_CHUNK) {
             const idChunk = toVerifyReverse.slice(i, i + IN_CHUNK);
@@ -383,30 +539,211 @@ export default function MessagesScreen() {
         return bTime - aTime;
       });
       
-      setChats(chatPreviews);
-      hasLoadedOnceRef.current = true;
+      const updateMode = options?.updateList ?? 'merge';
+      setChats((prev) =>
+        applyInboxChatListUpdate(
+          prev,
+          chatPreviews,
+          updateMode === 'ifMore' ? 'ifMore' : 'merge'
+        )
+      );
+      if (inboxPreviewsCacheKey) {
+        try {
+          const snapshot = chatPreviews.map((c) => ({
+            ...c,
+            lastMessage: c.lastMessage
+              ? {
+                  ...c.lastMessage,
+                  timestamp:
+                    c.lastMessage.timestamp instanceof Date
+                      ? c.lastMessage.timestamp.toISOString()
+                      : c.lastMessage.timestamp,
+                }
+              : null,
+          }));
+          void AsyncStorage.setItem(inboxPreviewsCacheKey, JSON.stringify({ chats: snapshot })).catch(
+            () => {}
+          );
+        } catch {
+          /* ignore */
+        }
+      }
     } catch (error) {
       console.error('❌ Ошибка загрузки чатов:', error);
     }
   },
-  [currentUser]
+  [currentUser, inboxPreviewsCacheKey, seedInboxPlayerCacheFromChats]
+  );
+
+  const markInitialPaintDone = useCallback(() => {
+    setInboxReady(true);
+  }, []);
+
+  /** Следующая пачка сообщений для фоновой догрузки. */
+  const fetchNextInboxBatch = useCallback(
+    async (gen: number): Promise<boolean> => {
+      if (!currentUser || loadGenerationRef.current !== gen) return false;
+      if (!hasMoreInboxRef.current || nextInboxPageRef.current == null) return false;
+
+      let state = nextInboxPageRef.current;
+      let batch: Awaited<ReturnType<typeof fetchInboxMessagesPage>> | null = null;
+
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (loadGenerationRef.current !== gen) return false;
+        try {
+          batch = await withTimeout(
+            fetchInboxMessagesPage(currentUser.id, state, INBOX_BG_BATCH_SIZE),
+            INBOX_BG_BATCH_TIMEOUT_MS,
+            'inbox_bg_batch'
+          );
+        } catch {
+          if (attempt < 2) {
+            await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+            continue;
+          }
+          return false;
+        }
+        if (!batch.error) break;
+        if (attempt < 2) {
+          await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+          continue;
+        }
+        return false;
+      }
+
+      if (!batch || loadGenerationRef.current !== gen) return false;
+      if (!batch.rows.length) {
+        hasMoreInboxRef.current = false;
+        nextInboxPageRef.current = null;
+        return false;
+      }
+
+      const freshIds = countNewRawMessageIdsInBatch(conversationsAccRef.current, batch.rows);
+      if (freshIds === 0) {
+        if (state.mode === 'cursor' && !inboxUseOffsetRef.current) {
+          inboxUseOffsetRef.current = true;
+          const loaded = Object.values(conversationsAccRef.current).reduce(
+            (s, a) => s + a.length,
+            0
+          );
+          const pageIndex = Math.max(1, Math.floor(loaded / INBOX_BG_BATCH_SIZE));
+          nextInboxPageRef.current = { mode: 'offset', pageIndex };
+          hasMoreInboxRef.current = true;
+          return true;
+        }
+        if (state.mode === 'offset') {
+          const nextPage = state.pageIndex + 1;
+          if (nextPage > 300) {
+            hasMoreInboxRef.current = false;
+            nextInboxPageRef.current = null;
+            return false;
+          }
+          nextInboxPageRef.current = { mode: 'offset', pageIndex: nextPage };
+          hasMoreInboxRef.current = true;
+          return true;
+        }
+        hasMoreInboxRef.current = false;
+        nextInboxPageRef.current = null;
+        return false;
+      }
+
+      conversationsAccRef.current = mergeRawMessageRowsIntoConversations(
+        currentUser.id,
+        conversationsAccRef.current,
+        batch.rows
+      );
+      nextInboxPageRef.current = batch.nextState;
+      hasMoreInboxRef.current = batch.hasMore && batch.nextState != null;
+      return hasMoreInboxRef.current;
+    },
+    [currentUser]
+  );
+
+  const runBackgroundInboxSync = useCallback(
+    async (gen: number) => {
+      if (!currentUser || bgSyncRunningRef.current) return;
+      bgSyncRunningRef.current = true;
+      setSyncingMoreStable(true);
+      let batchesSinceRebuild = 0;
+      let peersAtLastRebuild = Object.keys(conversationsAccRef.current).length;
+
+      try {
+        while (
+          loadGenerationRef.current === gen &&
+          hasMoreInboxRef.current &&
+          nextInboxPageRef.current != null
+        ) {
+          const more = await fetchNextInboxBatch(gen);
+          batchesSinceRebuild++;
+          const peerCount = Object.keys(conversationsAccRef.current).length;
+
+          if (
+            !more ||
+            batchesSinceRebuild >= INBOX_BG_REBUILD_EVERY ||
+            peerCount - peersAtLastRebuild >= 10
+          ) {
+            await rebuildChatPreviews({
+              includeDrafts: false,
+              skipReverseBlockCheck: true,
+              updateList: peerCount > peersAtLastRebuild ? 'always' : 'ifMore',
+            });
+            batchesSinceRebuild = 0;
+            peersAtLastRebuild = peerCount;
+          }
+
+          if (!more) break;
+          await new Promise<void>((r) => setTimeout(r, INBOX_BG_PAUSE_MS));
+        }
+
+        if (loadGenerationRef.current === gen) {
+          await rebuildChatPreviews({ includeDrafts: true, updateList: 'always' });
+        }
+      } catch (e) {
+        console.error('❌ Фоновая догрузка диалогов:', e);
+      } finally {
+        bgSyncRunningRef.current = false;
+        if (loadGenerationRef.current === gen) {
+          setSyncingMoreStable(false);
+        }
+      }
+    },
+    [currentUser, fetchNextInboxBatch, rebuildChatPreviews, setSyncingMoreStable]
   );
 
   const loadChatsData = useCallback(
-    async (opts?: { silent?: boolean }) => {
+    async (opts?: { silent?: boolean; forceReset?: boolean }) => {
       if (!currentUser) return;
       const silent = opts?.silent === true;
+      const forceReset = opts?.forceReset === true;
+
+      if (!silent) {
+        loadGenerationRef.current += 1;
+      }
+      const myGen = loadGenerationRef.current;
+
       try {
-        drainGenerationRef.current += 1;
-        const myGen = drainGenerationRef.current;
+        if (!silent) {
+          await hydrateInboxFromCache();
+          if (chatsRef.current.length > 0) {
+            markInitialPaintDone();
+          }
+        }
+
+        if (forceReset) {
+          conversationsAccRef.current = {};
+        }
 
         if (silent) {
-          const silentRes = await fetchInboxMessagesPage(
-            currentUser.id,
-            { mode: 'cursor', cursor: null },
-            INBOX_LIST_BATCH_SIZE
+          const silentRes = await withTimeout(
+            fetchInboxMessagesPage(
+              currentUser.id,
+              { mode: 'cursor', cursor: null },
+              INBOX_FIRST_BATCH_SIZE
+            ),
+            INBOX_FIRST_BATCH_TIMEOUT_MS,
+            'inbox_silent_batch'
           );
-          if (drainGenerationRef.current !== myGen) return;
+          if (loadGenerationRef.current !== myGen) return;
           if (!silentRes.error && silentRes.rows.length) {
             conversationsAccRef.current = mergeRawMessageRowsIntoConversations(
               currentUser.id,
@@ -414,117 +751,121 @@ export default function MessagesScreen() {
               silentRes.rows
             );
           }
-          await rebuildChatPreviews();
+          await rebuildChatPreviews({
+            includeDrafts: false,
+            skipReverseBlockCheck: true,
+            updateList: 'ifMore',
+          });
+          if (hasMoreInboxRef.current && nextInboxPageRef.current && !bgSyncRunningRef.current) {
+            void runBackgroundInboxSync(myGen);
+          }
           return;
         }
 
-        conversationsAccRef.current = {};
-        resetInboxListAuxCaches();
-        hasMorePagesRef.current = true;
-        nextInboxPageStateRef.current = { mode: 'cursor', cursor: null };
+        inboxUseOffsetRef.current = false;
+        hasMoreInboxRef.current = true;
+        nextInboxPageRef.current = { mode: 'cursor', cursor: null };
 
-        const first = await fetchInboxMessagesPage(
-          currentUser.id,
-          { mode: 'cursor', cursor: null },
-          INBOX_LIST_BATCH_SIZE
-        );
-        if (drainGenerationRef.current !== myGen) return;
-        if (first.error) {
-          conversationsAccRef.current = await getUserConversations(currentUser.id);
-          hasMorePagesRef.current = false;
-          nextInboxPageStateRef.current = null;
-          await rebuildChatPreviews();
+        let first: Awaited<ReturnType<typeof fetchInboxMessagesPage>>;
+        try {
+          first = await withTimeout(
+            fetchInboxMessagesPage(
+              currentUser.id,
+              { mode: 'cursor', cursor: null },
+              INBOX_FIRST_BATCH_SIZE
+            ),
+            INBOX_FIRST_BATCH_TIMEOUT_MS,
+            'inbox_first_batch'
+          );
+        } catch (fetchErr) {
+          console.warn('⚠️ Первая пачка не загрузилась, fallback getUserConversations:', fetchErr);
+          try {
+            const fallback = await withTimeout(
+              getUserConversations(currentUser.id),
+              60000,
+              'inbox_fallback_full'
+            );
+            if (loadGenerationRef.current !== myGen) return;
+            if (Object.keys(fallback).length > 0) {
+              conversationsAccRef.current = fallback;
+              hasMoreInboxRef.current = false;
+              nextInboxPageRef.current = null;
+            }
+          } catch {
+            /* оставляем кэш */
+          }
+          await rebuildChatPreviews({ includeDrafts: true, updateList: 'always' });
+          markInitialPaintDone();
+          return;
+        }
+
+        if (loadGenerationRef.current !== myGen) return;
+
+        if (first.error || !first.rows.length) {
+          try {
+            const fallback = await withTimeout(
+              getUserConversations(currentUser.id),
+              60000,
+              'inbox_fallback_full'
+            );
+            if (loadGenerationRef.current !== myGen) return;
+            if (Object.keys(fallback).length > 0) {
+              conversationsAccRef.current = fallback;
+            }
+          } catch {
+            /* keep cache */
+          }
+          hasMoreInboxRef.current = false;
+          nextInboxPageRef.current = null;
+          await rebuildChatPreviews({ includeDrafts: true, updateList: 'always' });
+          markInitialPaintDone();
           return;
         }
 
         conversationsAccRef.current = mergeRawMessageRowsIntoConversations(
           currentUser.id,
-          {},
+          forceReset ? {} : conversationsAccRef.current,
           first.rows
         );
-        nextInboxPageStateRef.current = first.nextState;
-        hasMorePagesRef.current = first.hasMore && first.nextState != null;
-        await rebuildChatPreviews();
+        nextInboxPageRef.current = first.nextState;
+        hasMoreInboxRef.current = first.hasMore && first.nextState != null;
 
-        /** Фон: плавно догружаем пачками по 20 до конца истории (прерывается при новом refresh / смене gen). */
-        const runDrain = async () => {
-          drainRunningRef.current = true;
-          setLoadingMoreChats(true);
-          let drainIterations = 0;
-          let batchesSinceRebuild = 0;
-          try {
-            while (
-              drainGenerationRef.current === myGen &&
-              hasMorePagesRef.current &&
-              nextInboxPageStateRef.current != null &&
-              drainIterations < 200000
-            ) {
-              drainIterations++;
-              const more = await appendNextInboxBatch(myGen);
-              batchesSinceRebuild++;
-              if (!more || batchesSinceRebuild >= INBOX_DRAIN_REBUILD_EVERY_BATCHES) {
-                await rebuildChatPreviews({ includeDrafts: false });
-                batchesSinceRebuild = 0;
-              }
-              if (!more) break;
-              await new Promise<void>(resolve => setTimeout(resolve, INBOX_DRAIN_PAUSE_MS));
-            }
-            if (drainIterations > 0) {
-              await rebuildChatPreviews({ includeDrafts: true });
-            }
-          } catch (e) {
-            console.error('❌ Ошибка фоновой догрузки чатов:', e);
-          } finally {
-            drainRunningRef.current = false;
-            if (drainGenerationRef.current === myGen) {
-              setLoadingMoreChats(false);
-            }
+        if (!hasMoreInboxRef.current && first.rows.length >= INBOX_FIRST_BATCH_SIZE) {
+          const last = first.rows[first.rows.length - 1];
+          if (last?.created_at != null && last?.id != null) {
+            hasMoreInboxRef.current = true;
+            nextInboxPageRef.current = {
+              mode: 'cursor',
+              cursor: {
+                created_at:
+                  typeof last.created_at === 'string'
+                    ? last.created_at
+                    : new Date(last.created_at).toISOString(),
+                id: String(last.id),
+              },
+            };
           }
-        };
-        void runDrain();
+        }
+
+        await rebuildChatPreviews({ includeDrafts: true, updateList: 'always' });
+        markInitialPaintDone();
+
+        if (hasMoreInboxRef.current && nextInboxPageRef.current) {
+          void runBackgroundInboxSync(myGen);
+        }
       } catch (error) {
         console.error('❌ Ошибка загрузки чатов:', error);
+        markInitialPaintDone();
       }
     },
-    [currentUser, rebuildChatPreviews, appendNextInboxBatch, resetInboxListAuxCaches]
+    [
+      currentUser,
+      rebuildChatPreviews,
+      hydrateInboxFromCache,
+      markInitialPaintDone,
+      runBackgroundInboxSync,
+    ]
   );
-
-  const loadOlderChatsPage = useCallback(async () => {
-    if (!currentUser || !hasMorePagesRef.current) return;
-    if (searchQuery.trim().length > 0) return;
-    if (loadMoreInFlightRef.current || drainRunningRef.current) return;
-
-    const inboxState = nextInboxPageStateRef.current;
-    if (inboxState == null) {
-      hasMorePagesRef.current = false;
-      return;
-    }
-
-    const gen = drainGenerationRef.current;
-    loadMoreInFlightRef.current = true;
-    setLoadingMoreChats(true);
-    try {
-      await appendNextInboxBatch(gen);
-      await rebuildChatPreviews();
-    } catch (e) {
-      console.error('❌ Ошибка подгрузки страницы чатов:', e);
-      hasMorePagesRef.current = false;
-      nextInboxPageStateRef.current = null;
-    } finally {
-      loadMoreInFlightRef.current = false;
-      if (!drainRunningRef.current) {
-        setLoadingMoreChats(false);
-      }
-    }
-  }, [currentUser, rebuildChatPreviews, searchQuery, appendNextInboxBatch]);
-
-  useEffect(() => {
-    return () => {
-      if (contentSizeLoadTimerRef.current) {
-        clearTimeout(contentSizeLoadTimerRef.current);
-      }
-    };
-  }, []);
 
   // Поиск по тексту во всех сообщениях (debounce + запрос к БД)
   useEffect(() => {
@@ -656,42 +997,78 @@ export default function MessagesScreen() {
     return out;
   }, [chats, searchQuery, historyMatchesByPeerId, extraSearchChats]);
 
-  // Загрузка чатов с индикатором
+  // Загрузка чатов с индикатором и страховкой от «вечного» спиннера
   const loadChats = useCallback(async () => {
     try {
-      await loadChatsData();
+      await loadChatsData({ forceReset: true });
     } catch (error) {
       console.error('Ошибка загрузки чатов:', error);
-      // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   }, [loadChatsData]);
 
+  const inboxUserIdRef = useRef<string | null>(null);
   // Запускаем загрузку только когда пользователь авторизован
-  // ОПТИМИЗАЦИЯ: Показываем кешированные данные сразу, затем обновляем
   const hasLoadedOnceRef = useRef(false);
   useEffect(() => {
-    if (currentUser && !isUserLoading) {
-      // Если есть кешированные чаты и уже была загрузка - показываем их сразу, затем обновляем
-      if (chats.length > 0 && hasLoadedOnceRef.current) {
-        setLoading(false); // Скрываем loading сразу
-        // Обновляем в фоне
-        loadChatsData().catch(err => {
-          console.error('❌ Ошибка фонового обновления чатов:', err);
-        });
-      } else {
-        // Первая загрузка - показываем loading
-        hasLoadedOnceRef.current = true;
-        loadChats();
-      }
-    } else if (!isUserLoading && currentUser === null) {
-      // Если загрузка завершена и пользователь не авторизован
-      setLoading(false);
+    if (isUserLoading) return;
+
+    if (!currentUser) {
+      setInboxReady(true);
       hasLoadedOnceRef.current = false;
+      inboxUserIdRef.current = null;
+      return;
     }
-  }, [currentUser, isUserLoading, loadChats, loadChatsData]);
+
+    const userId = currentUser.id;
+    const userChanged = inboxUserIdRef.current !== userId;
+    if (userChanged) {
+      inboxUserIdRef.current = userId;
+      hasLoadedOnceRef.current = false;
+      loadGenerationRef.current += 1;
+      conversationsAccRef.current = {};
+      chatsRef.current = [];
+      resetInboxListAuxCaches();
+      hasMoreInboxRef.current = true;
+      nextInboxPageRef.current = { mode: 'cursor', cursor: null };
+      inboxUseOffsetRef.current = false;
+      bgSyncRunningRef.current = false;
+      setSyncingMoreStable(false);
+      setChats([]);
+      setInboxReady(false);
+    }
+
+    let cancelled = false;
+    void (async () => {
+      const hadCache = await hydrateInboxFromCache();
+      if (cancelled) return;
+
+      const safetyTimer = setTimeout(() => {
+        if (!cancelled) setInboxReady(true);
+      }, INBOX_SPINNER_MAX_MS);
+
+      try {
+        if (hasLoadedOnceRef.current && chatsRef.current.length > 0 && !userChanged) {
+          await loadChatsData({ silent: true });
+        } else {
+          await loadChatsData({ forceReset: false });
+        }
+      } catch (err) {
+        console.error('❌ Ошибка загрузки чатов:', err);
+      } finally {
+        clearTimeout(safetyTimer);
+        if (!cancelled) {
+          setInboxReady(true);
+          hasLoadedOnceRef.current = true;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser?.id, isUserLoading, loadChatsData, hydrateInboxFromCache, resetInboxListAuxCaches, setSyncingMoreStable]);
 
   // Тихая загрузка чатов (без индикатора)
   // Debounced версия для realtime обновлений (предотвращает частые загрузки)
@@ -705,7 +1082,7 @@ export default function MessagesScreen() {
     } catch (error) {
       console.error('❌ Ошибка тихой загрузки чатов:', error);
     }
-    }, 150); // Уменьшен debounce до 150мс для быстрого появления чатов
+    }, 600);
   }, [loadChatsData]);
 
   // Быстро применяем черновики к уже загруженному списку чатов (без ожидания загрузки из БД)
@@ -805,11 +1182,6 @@ export default function MessagesScreen() {
         (payload) => {
           console.log('💬 Входящее сообщение для UI обновления:', payload.new);
           silentLoadChats();
-          // Дебаунсинг для обновления UserContext
-          if (refreshTimeoutRef.current) {
-            clearTimeout(refreshTimeoutRef.current);
-          }
-          refreshTimeoutRef.current = setTimeout(() => refreshUser(true), 500);
         }
       )
       .subscribe();
@@ -835,47 +1207,54 @@ export default function MessagesScreen() {
     return () => {
       supabase.removeChannel(incomingChannel);
       supabase.removeChannel(outgoingChannel);
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
       if (silentLoadDebounceRef.current) {
         clearTimeout(silentLoadDebounceRef.current);
       }
     };
-  }, [currentUser, silentLoadChats, refreshUser]);
+  }, [currentUser, silentLoadChats]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      registerTabScrollHandler('messages', () => {
+        chatsListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      });
+      return () => registerTabScrollHandler('messages', null);
+    }, []),
+  );
 
   // Обновляем список сообщений при фокусе на экране
   useFocusEffect(
     React.useCallback(() => {
       setCurrentScreen('messages');
-      // Сразу поднимаем чаты с черновиками, не дожидаясь загрузки диалогов из БД
-      applyDraftsToExistingChats();
-      
-      // Если чаты уже загружены - обновляем в фоне без loading
-      // Если это первая загрузка - показываем loading
-      if (chats.length > 0) {
-        silentLoadChats(); // Фоновое обновление без индикатора загрузки
-      } else {
-        loadChats(); // Первая загрузка с индикатором
-      }
-      
-      
-      // Автоматически скрываем индикатор сообщений через 5 секунд
-      if (autoHideTimeoutRef.current) {
-        clearTimeout(autoHideTimeoutRef.current);
-      }
-      autoHideTimeoutRef.current = setTimeout(async () => {
-        // Убираем refreshUser - теперь счетчик управляется через БД и Realtime
-        // await refreshUser(true);
-      }, 5000);
-      
-      return () => {
-        setCurrentScreen(null);
-        if (autoHideTimeoutRef.current) {
-          clearTimeout(autoHideTimeoutRef.current);
+      let cancelled = false;
+      void (async () => {
+        await hydrateInboxFromCache();
+        if (cancelled) return;
+        applyDraftsToExistingChats();
+        if (
+          inboxReady &&
+          hasMoreInboxRef.current &&
+          nextInboxPageRef.current &&
+          !bgSyncRunningRef.current
+        ) {
+          void runBackgroundInboxSync(loadGenerationRef.current);
+        } else if (inboxReady && chatsRef.current.length > 0) {
+          silentLoadChats();
         }
+      })();
+
+      return () => {
+        cancelled = true;
+        setCurrentScreen(null);
       };
-    }, [loadChats, silentLoadChats, chats.length, setCurrentScreen, refreshUser, applyDraftsToExistingChats])
+    }, [
+      silentLoadChats,
+      setCurrentScreen,
+      applyDraftsToExistingChats,
+      hydrateInboxFromCache,
+      inboxReady,
+      runBackgroundInboxSync,
+    ])
   );
 
   const onRefresh = useCallback(() => {
@@ -958,62 +1337,32 @@ export default function MessagesScreen() {
   // Empty component
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
-      <View style={styles.emptyContent}>
-        <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
-        <Text style={styles.emptyTitle}>{t('messages.noMessages')}</Text>
-        <Text style={styles.emptySubtitle}>
-          {t('messages.startConversation')}
-        </Text>
-      </View>
+      {!inboxReady ? (
+        <LoadingCenter style={styles.loadingCenter} />
+      ) : (
+        <View style={styles.emptyContent}>
+          <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
+          <Text style={styles.emptyTitle}>{t('messages.noMessages')}</Text>
+          <Text style={styles.emptySubtitle}>
+            {t('messages.startConversation')}
+          </Text>
+        </View>
+      )}
     </View>
-  ), [t]);
-
-  const onChatsContentSizeChange = useCallback(
-    (_w: number, h: number) => {
-      if (searchQuery.trim()) return;
-      if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
-      const vh = listViewportHeightRef.current;
-      if (vh < 1 || h < 1) return;
-      if (h >= vh - 24) return;
-      if (contentSizeLoadTimerRef.current) clearTimeout(contentSizeLoadTimerRef.current);
-      contentSizeLoadTimerRef.current = setTimeout(() => {
-        contentSizeLoadTimerRef.current = null;
-        if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
-        loadOlderChatsPage();
-      }, 85);
-    },
-    [searchQuery, loadOlderChatsPage]
-  );
-
-  const onChatsScroll = useCallback(
-    (event: any) => {
-      if (searchQuery.trim()) return;
-      if (!hasMorePagesRef.current || loadMoreInFlightRef.current || drainRunningRef.current) return;
-
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const distanceToBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
-
-      // Запасной триггер пагинации: FlatList onEndReached на некоторых устройствах/верстках
-      // срабатывает нестабильно, поэтому дёргаем подгрузку вручную рядом с низом списка.
-      if (distanceToBottom <= 180) {
-        loadOlderChatsPage();
-      }
-    },
-    [searchQuery, loadOlderChatsPage]
-  );
+  ), [t, inboxReady]);
 
   const listFooterElement = useMemo(
     () =>
-      loadingMoreChats ? (
+      syncingMore && chats.length > 0 ? (
         <View style={styles.chatsListFooter}>
-          <ActivityIndicator color="#fa2f40" />
+          <ActivityIndicator color="#fa2f40" size="small" />
         </View>
       ) : null,
-    [loadingMoreChats]
+    [syncingMore, chats.length]
   );
 
   // Редирект убран - проверка авторизации происходит в _layout.tsx
-  // Если пользователь не авторизован, показываем loading
+  // Если пользователь не авторизован — не зависаем на вечной загрузке.
   if (currentUser === null) {
     return (
       <CachedBackground 
@@ -1021,15 +1370,33 @@ export default function MessagesScreen() {
         style={styles.container}
         resizeMode="cover"
       >
-        <View style={styles.loadingCenter}>
-          <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        <View style={styles.overlay}>
+          <View style={styles.pageHeader}>
+            <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.pageTitle}>{t('messages.title')}</Text>
+          </View>
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyContent}>
+              <Ionicons name="person-circle-outline" size={64} color="#fa2f40" />
+              <Text style={styles.emptyTitle}>{t('auth.login') || 'Войти'}</Text>
+              <TouchableOpacity
+                style={{ marginTop: 14, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fa2f40' }}
+                onPress={() => router.push('/login')}
+                activeOpacity={0.85}
+              >
+                <Text style={{ color: '#fff', fontFamily: 'Gilroy-Bold' }}>{t('auth.login') || 'Войти'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </CachedBackground>
     );
   }
 
-  // Если загружается пользователь ИЛИ данные, показываем один loading screen
-  if (isUserLoading || currentUser === undefined || (loading && filteredChats.length === 0)) {
+  // Полноэкранная загрузка только пока грузится пользователь.
+  if (isUserLoading) {
     return (
       <View style={styles.container}>
         <CachedBackground 
@@ -1044,9 +1411,7 @@ export default function MessagesScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('messages.title')}</Text>
             </View>
-            <View style={styles.loadingCenter}>
-              <Text style={styles.loadingText}>{t('common.loading')}</Text>
-            </View>
+            <LoadingCenter style={styles.loadingCenter} />
           </View>
         </CachedBackground>
       </View>
@@ -1110,12 +1475,13 @@ export default function MessagesScreen() {
           
           {/* Список чатов - FlatList для виртуализации и производительности */}
           <FlatList
+            ref={chatsListRef}
             data={filteredChats}
             renderItem={renderChatItem}
             keyExtractor={keyExtractor}
             style={styles.chatsContainer}
             contentContainerStyle={filteredChats.length === 0 ? styles.emptyListContent : styles.chatsContent}
-            ListEmptyComponent={!loading ? ListEmptyComponent : null}
+            ListEmptyComponent={ListEmptyComponent}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -1129,14 +1495,6 @@ export default function MessagesScreen() {
             windowSize={21}
             initialNumToRender={14}
             updateCellsBatchingPeriod={80}
-            onLayout={(e) => {
-              listViewportHeightRef.current = e.nativeEvent.layout.height;
-            }}
-            onScroll={onChatsScroll}
-            scrollEventThrottle={120}
-            onContentSizeChange={onChatsContentSizeChange}
-            onEndReached={loadOlderChatsPage}
-            onEndReachedThreshold={0.55}
             ListFooterComponent={listFooterElement}
           />
         </View>
@@ -1148,7 +1506,7 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87A3B1',
+    backgroundColor: colors.scene,
   },
   background: {
     flex: 1,
@@ -1464,9 +1822,7 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
       <View style={styles.chatItem}>
         <CachedAvatar
           playerId={chat.player.id}
-          fallbackAvatarUrl={
-            chat.player.avatar || 'https://via.placeholder.com/50/333/fff?text=Player'
-          }
+          fallbackAvatarUrl={chat.player.avatar}
           size={50}
           style={styles.chatAvatar}
           status={chat.player.status}

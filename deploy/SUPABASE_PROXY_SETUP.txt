@@ -1,0 +1,15 @@
+Supabase proxy setup - see deploy/nginx/api.hockey-stars.com.conf
+
+STEP 1: Supabase Dashboard -> Delete custom domain api.hockey-stars.com
+
+STEP 2: DNS A record api -> 178.172.217.60 (NOT CNAME to supabase.co)
+
+STEP 3: nginx on server - copy deploy/nginx/api.hockey-stars.com.conf
+        certbot --nginx -d api.hockey-stars.com
+
+STEP 4: Test: curl -I https://api.hockey-stars.com/rest/v1/  (expect 401)
+        Phone without VPN: open same URL in browser
+
+STEP 5: Restart mobile app
+
+OAuth callback: https://api.hockey-stars.com/auth/v1/callback

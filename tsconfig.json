@@ -20,7 +20,15 @@
     "scripts/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    "dist-test",
+    "prev_playerStorage.ts",
+    "utils/playerStorage-backup.ts",
+    "utils/playerStorage-supabase.ts",
+    "utils/serverSync.ts",
+    "scripts/generateThumbnails.ts",
+    "supabase/functions"
   ],
   "extends": "expo/tsconfig.base"
 }

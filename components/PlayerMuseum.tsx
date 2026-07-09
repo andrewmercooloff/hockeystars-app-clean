@@ -2,15 +2,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, memo, useState } from 'react';
 import {
     Alert,
-    Dimensions,
     Image,
-    RefreshControl,
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { supabase } from '../utils/supabase';
@@ -49,7 +47,9 @@ interface PlayerMuseumProps {
   playerName?: string; // Имя игрока для отображения в сообщении о пустом музее
 }
 
-const { width } = Dimensions.get('window');
+const MUSEUM_COLUMN_WIDTH = 152;
+const MUSEUM_COLUMN_GAP = 12;
+const MUSEUM_SCROLLER_HEIGHT = 370;
 
 function parseMuseumGiftName(customName: string): string {
   if (!customName) return '';
@@ -199,6 +199,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isStar, setIsStar] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(0);
 
   const clearMuseumCache = useCallback(async () => {
     try {
@@ -632,23 +633,63 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     );
   }
 
+  const museumColumns: MuseumItem[][] = [];
+  for (let i = 0; i < museumItems.length; i += 2) {
+    museumColumns.push(museumItems.slice(i, i + 2));
+  }
+
+  const contentWidth =
+    museumColumns.length * MUSEUM_COLUMN_WIDTH +
+    Math.max(0, museumColumns.length - 1) * MUSEUM_COLUMN_GAP;
+  const canScrollHorizontally =
+    museumColumns.length > 1 &&
+    (viewportWidth === 0 || contentWidth > viewportWidth + 2);
+
   return (
-    <>
-      <View style={styles.gridContainer}>
-        {museumItems.map((item) => (
-          <MuseumGridItem
-            key={item.id}
-            item={item}
-            isOwner={isOwner}
-            isAdmin={isAdmin}
-            isEditing={isEditing}
-            t={t}
-            onNavigateStar={navigateToStarProfile}
-            onDelete={deleteMuseumItem}
-          />
-        ))}
-      </View>
-    </>
+    <View
+      style={styles.museumScrollerWrap}
+      onLayout={(event) => {
+        const nextWidth = event.nativeEvent.layout.width;
+        if (nextWidth > 0) {
+          setViewportWidth((prev) => (Math.abs(prev - nextWidth) > 1 ? nextWidth : prev));
+        }
+      }}
+    >
+      <FlatList
+        horizontal
+        data={museumColumns}
+        keyExtractor={(_, index) => `museum-col-${index}`}
+        renderItem={({ item: column, index }) => (
+          <View
+            style={[
+              styles.museumColumn,
+              index < museumColumns.length - 1 && styles.museumColumnGap,
+            ]}
+          >
+            {column.map((museumItem) => (
+              <MuseumGridItem
+                key={museumItem.id}
+                item={museumItem}
+                isOwner={isOwner}
+                isAdmin={isAdmin}
+                isEditing={isEditing}
+                t={t}
+                onNavigateStar={navigateToStarProfile}
+                onDelete={deleteMuseumItem}
+              />
+            ))}
+          </View>
+        )}
+        showsHorizontalScrollIndicator={false}
+        style={styles.museumScroller}
+        contentContainerStyle={styles.museumScroll}
+        nestedScrollEnabled
+        scrollEnabled={canScrollHorizontally}
+        decelerationRate="fast"
+        keyboardShouldPersistTaps="handled"
+        removeClippedSubviews={false}
+      />
+    </View>
   );
 };
 
@@ -664,15 +705,33 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+  museumScrollerWrap: {
+    marginHorizontal: -4,
+  },
+  museumScroller: {
+    height: MUSEUM_SCROLLER_HEIGHT,
+    flexGrow: 0,
+  },
+  museumScroll: {
+    paddingHorizontal: 4,
+    paddingRight: 20,
+    alignItems: 'flex-start',
+  },
+  museumColumn: {
+    width: MUSEUM_COLUMN_WIDTH,
+  },
+  museumColumnGap: {
+    marginRight: MUSEUM_COLUMN_GAP,
+  },
   itemCard: {
     alignItems: 'center',
-    marginBottom: 20,
-    position: 'relative', // Для позиционирования кнопки удаления
-    width: '48%',
+    marginBottom: 12,
+    position: 'relative',
+    width: MUSEUM_COLUMN_WIDTH,
   },
   itemImage: {
     width: '100%',
-    height: 120,
+    height: 144,
     borderRadius: 12,
     marginBottom: 8,
     resizeMode: 'contain',
@@ -694,7 +753,7 @@ const styles = StyleSheet.create({
   },
   placeholderImage: {
     width: '100%',
-    aspectRatio: 1,
+    height: 144,
     backgroundColor: '#FF8800',
     justifyContent: 'center',
     alignItems: 'center',

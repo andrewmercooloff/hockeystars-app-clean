@@ -55,6 +55,10 @@ class RealtimeManager {
     this.lastInitializeTime = Date.now(); // Запоминаем время инициализации
   }
 
+  getConnectedUserId(): string | null {
+    return this.currentUserId;
+  }
+
   /**
    * Настраивает все Realtime подписки для пользователя
    * ОПТИМИЗАЦИЯ: Объединены подписки на players таблицу в один канал для снижения нагрузки
@@ -108,41 +112,67 @@ class RealtimeManager {
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
-          const notificationType = payload.new?.type;
-          console.log('🔔 Realtime: Получено новое уведомление:', {
-            type: notificationType,
-            userId: payload.new?.user_id,
-            notificationId: payload.new?.id
-          });
-          
-          // ИСПРАВЛЕНО: Убрано оптимистичное обновление счетчика
-          // Счетчик уже обновлен через SQL функцию increment_unread_notifications при создании уведомления
-          // Realtime подписка на изменения в таблице players автоматически обновит счетчик через setupNotificationCountSubscription
-          // Оптимистичное обновление приводило к двойному увеличению (1 → 2 → 3)
-          
-          // Просто загружаем актуальный счетчик из БД через небольшую задержку
-          // Это нужно для синхронизации после того, как SQL функция обновила счетчик
-          if (this.loadNotificationCountCallback && this.currentUserId) {
-            setTimeout(() => {
-              console.log('🔔 Realtime: Загружаем актуальный счетчик из БД после создания уведомления');
-              this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
-                console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
-              });
-            }, 500);
-          } else if (this.notificationCountCallback && this.lastNotificationCount === null) {
-            // Если счетчик еще не инициализирован, загружаем из БД
+          try {
+            const notificationType = payload.new?.type;
+            const eventType = payload.eventType;
+            console.log('🔔 Realtime: Изменение уведомления:', {
+              event: eventType,
+              type: notificationType,
+              userId: payload.new?.user_id,
+              notificationId: payload.new?.id,
+              isRead: payload.new?.is_read,
+            });
+            
             if (this.loadNotificationCountCallback && this.currentUserId) {
               setTimeout(() => {
-                this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
-                  console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
-                });
-              }, 200);
+                try {
+                  this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
+                    console.error('❌ Ошибка загрузки счетчика уведомлений:', error);
+                  });
+                } catch (e) {
+                  console.error('❌ Realtime notifications: callback crash:', e);
+                }
+              }, eventType === 'INSERT' ? 500 : 150);
             }
+          } catch (e) {
+            console.error('❌ Realtime notifications handler crashed:', e);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          try {
+            const isRead = payload.new?.is_read === true && payload.old?.is_read !== true;
+            if (!isRead) return;
+            if (this.loadNotificationCountCallback && this.currentUserId) {
+              setTimeout(() => {
+                try {
+                  this.loadNotificationCountCallback!(this.currentUserId!).catch(error => {
+                    console.error('❌ Ошибка загрузки счетчика после прочтения:', error);
+                  });
+                } catch (e) {
+                  console.error('❌ Realtime notifications update handler crashed:', e);
+                }
+              }, 150);
+            }
+          } catch (e) {
+            console.error('❌ Realtime notifications UPDATE handler crashed:', e);
           }
         }
       )
       .subscribe((status) => {
-        console.log('🔔 Realtime: Статус подписки на уведомления:', status);
+        try {
+          console.log('🔔 Realtime: Статус подписки на уведомления:', status);
+        } catch (e) {
+          console.error('❌ Realtime notifications status handler crashed:', e);
+        }
       });
 
     this.subscriptions.set('notifications-updates', {
@@ -168,21 +198,29 @@ class RealtimeManager {
           filter: `id=eq.${userId}`
         },
         (payload) => {
-          const playerData = payload.new as any;
-          const oldPlayerData = payload.old as any;
-          
-          // Обработка счетчика уведомлений
-          const newNotifCount = playerData.unread_notifications_count || 0;
-          const oldNotifCount = oldPlayerData?.unread_notifications_count || 0;
-          if (newNotifCount !== oldNotifCount) {
-            this.emitNotificationCountUpdate(newNotifCount);
-          }
-          
-          // Счётчик сообщений: сверяемся с messages, т.к. players.unread_messages_count может рассинхрониться с read.
-          const newMsgCount = playerData.unread_messages_count ?? 0;
-          const oldMsgCount = oldPlayerData?.unread_messages_count ?? 0;
-          if (newMsgCount !== oldMsgCount) {
-            this.syncMessagesCountFromMessagesTable(userId);
+          try {
+            const playerData = payload.new as any;
+            const oldPlayerData = payload.old as any;
+            
+            // players.unread_notifications_count может отставать — пересчитываем по notifications.
+            const newNotifCount = playerData?.unread_notifications_count || 0;
+            const oldNotifCount = oldPlayerData?.unread_notifications_count || 0;
+            if (newNotifCount !== oldNotifCount) {
+              if (this.loadNotificationCountCallback && this.currentUserId) {
+                void this.loadNotificationCountCallback(this.currentUserId).catch(() => {});
+              } else {
+                this.emitNotificationCountUpdate(newNotifCount);
+              }
+            }
+            
+            // Счётчик сообщений: сверяемся с messages, т.к. players.unread_messages_count может рассинхрониться с read.
+            const newMsgCount = playerData?.unread_messages_count ?? 0;
+            const oldMsgCount = oldPlayerData?.unread_messages_count ?? 0;
+            if (newMsgCount !== oldMsgCount) {
+              this.syncMessagesCountFromMessagesTable(userId);
+            }
+          } catch (e) {
+            console.error('❌ Realtime players(self) handler crashed:', e);
           }
         }
       )
@@ -195,29 +233,30 @@ class RealtimeManager {
           table: 'players'
         },
         async (payload) => {
-          const playerData = payload.new as any;
-          const oldPlayerData = payload.old as any;
-          const playerId = playerData.id;
-          
-          // Обработка изменения аватара
-          const newAvatar = playerData.avatar;
-          const oldAvatar = oldPlayerData?.avatar;
-          if (newAvatar && playerId && newAvatar !== oldAvatar) {
-            try {
-              const { avatarCache } = await import('./AvatarCache');
-              await avatarCache.setAvatar(playerId, newAvatar);
-            } catch (error) {
-              console.error('❌ Ошибка обновления аватара в кеше:', error);
+          try {
+            const playerData = payload.new as any;
+            const oldPlayerData = payload.old as any;
+            const playerId = playerData?.id;
+            
+            // Обработка изменения аватара
+            const newAvatar = playerData?.avatar;
+            const oldAvatar = oldPlayerData?.avatar;
+            if (newAvatar && playerId && newAvatar !== oldAvatar) {
+              try {
+                const { avatarCache } = await import('./AvatarCache');
+                await avatarCache.setAvatar(playerId, newAvatar);
+              } catch (error) {
+                console.error('❌ Ошибка обновления аватара в кеше:', error);
+              }
             }
-          }
-          
-          // Обработка изменения профиля
-          const favoriteGoalsChanged = playerData.favorite_goals !== oldPlayerData?.favorite_goals;
-          const galleryPhotosChanged = playerData.gallery_photos !== oldPlayerData?.gallery_photos;
-          const achievementsChanged = playerData.achievements !== oldPlayerData?.achievements;
-          const exerciseStatsChanged = playerData.exercise_stats !== oldPlayerData?.exercise_stats;
-          const normativesChanged = playerData.normatives !== oldPlayerData?.normatives;
-          const puckSpeedMaxChanged = playerData.puck_speed_max !== oldPlayerData?.puck_speed_max;
+            
+            // Обработка изменения профиля
+            const favoriteGoalsChanged = playerData?.favorite_goals !== oldPlayerData?.favorite_goals;
+            const galleryPhotosChanged = playerData?.gallery_photos !== oldPlayerData?.gallery_photos;
+            const achievementsChanged = playerData?.achievements !== oldPlayerData?.achievements;
+            const exerciseStatsChanged = playerData?.exercise_stats !== oldPlayerData?.exercise_stats;
+            const normativesChanged = playerData?.normatives !== oldPlayerData?.normatives;
+            const puckSpeedMaxChanged = playerData?.puck_speed_max !== oldPlayerData?.puck_speed_max;
           
           if (playerId && (favoriteGoalsChanged || galleryPhotosChanged || achievementsChanged || 
               exerciseStatsChanged || normativesChanged || puckSpeedMaxChanged)) {
@@ -229,10 +268,17 @@ class RealtimeManager {
               console.error('❌ Ошибка очистки кеша профиля:', error);
             }
           }
+          } catch (e) {
+            console.error('❌ Realtime players(all) handler crashed:', e);
+          }
         }
       )
       .subscribe((status) => {
-        console.log('📊 [PERFORMANCE] Unified players subscription status:', status);
+        try {
+          console.log('📊 [PERFORMANCE] Unified players subscription status:', status);
+        } catch (e) {
+          console.error('❌ Realtime players status handler crashed:', e);
+        }
       });
 
     this.subscriptions.set('players-unified', {

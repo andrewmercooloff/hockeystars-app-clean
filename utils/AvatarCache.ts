@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { Image } from 'expo-image';
+import { rewriteSupabasePublicUrl } from './supabase';
 
 // Глобальный кеш для аватаров
 class AvatarCache {
@@ -46,6 +47,7 @@ class AvatarCache {
   // Устанавливаем аватар в кеш
   // forceNotify = true - принудительно уведомить listeners (используется при обновлении аватара)
   async setAvatar(playerId: string, avatarUrl: string, forceNotify: boolean = false): Promise<string | null> {
+    avatarUrl = rewriteSupabasePublicUrl(avatarUrl) || avatarUrl;
     const oldUrl = this.cache.get(playerId);
     const isFirstLoad = !oldUrl && !forceNotify; // Первичная загрузка - в кеше ещё нет URL и не требуется принудительное уведомление
     
@@ -175,7 +177,7 @@ class AvatarCache {
   seedPlayerAvatarUrls(players: Array<{ id: string; avatar?: string | null }>): void {
     for (const p of players) {
       if (p.avatar) {
-        this.cache.set(p.id, p.avatar);
+        this.cache.set(p.id, rewriteSupabasePublicUrl(p.avatar) || p.avatar);
       }
     }
   }
@@ -217,7 +219,8 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
       if (!currentCachedAvatar && fallbackUrl && fallbackUrl !== prevUrl) {
         return fallbackUrl;
       }
-      
+
+      // Не сбрасываем URL, если fallback временно пропал (refreshUser без avatar).
       return prevUrl;
     });
     
@@ -227,7 +230,12 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
     // Это предотвращает перезапись актуального аватара старым fallbackUrl
     // КРИТИЧНО: НЕ вызываем setAvatar, если fallbackUrl уже установлен в кеш
     // Это предотвращает бесконечный цикл инкрементирования версий
-    if (fallbackUrl && !rawCachedAvatar) {
+    if (fallbackUrl && rawCachedAvatar && rawCachedAvatar.includes('.supabase.co')) {
+      const rwFallback = rewriteSupabasePublicUrl(fallbackUrl);
+      if (rwFallback) {
+        void avatarCache.setAvatar(playerId, rwFallback);
+      }
+    } else if (fallbackUrl && !rawCachedAvatar) {
       // Проверяем, что fallbackUrl действительно новый
       const cachedRawUrl = avatarCache.getRawAvatar(playerId);
       if (cachedRawUrl !== fallbackUrl) {
@@ -286,13 +294,14 @@ export const updateAvatarGlobally = async (playerId: string, newAvatarUrl: strin
 
 // Функция для предзагрузки аватара
 export const preloadAvatar = async (avatarUrl: string): Promise<void> => {
-  if (!avatarUrl || avatarUrl.startsWith('file://') || avatarUrl.startsWith('content://')) {
+  const url = rewriteSupabasePublicUrl(avatarUrl);
+  if (!url || url.startsWith('file://') || url.startsWith('content://')) {
     return; // Не предзагружаем локальные файлы
   }
 
   try {
-    await Image.prefetch(avatarUrl);
-  } catch (error) {
+    await Image.prefetch(url);
+  } catch {
     // Ignore prefetch errors
   }
 };

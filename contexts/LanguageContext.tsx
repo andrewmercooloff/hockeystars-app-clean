@@ -59,22 +59,12 @@ const supportedLanguages: Language[] = ['ru', 'en', 'lt', 'lv', 'pl', 'sv', 'cs'
 // Функция для определения языка устройства
 const getDeviceLanguage = (): Language => {
   try {
-    // Получаем локаль устройства (например, 'ru-RU', 'en-US', 'lt-LT')
-    const deviceLocale = Localization.locale;
-    
+    // Получаем локаль устройства через getLocales() (например, 'ru-RU', 'en-US', 'lt-LT')
+    const locales = Localization.getLocales();
+    const deviceLocale = locales?.[0]?.languageTag || locales?.[0]?.languageCode;
+
     // Проверяем, что локаль не undefined (баг в Expo Go)
     if (!deviceLocale) {
-      // Пробуем альтернативный метод через getLocales()
-      const locales = Localization.getLocales();
-      
-      if (locales && locales.length > 0 && locales[0].languageCode) {
-        const languageCode = locales[0].languageCode.toLowerCase();
-        
-        if (supportedLanguages.includes(languageCode as Language)) {
-          return languageCode as Language;
-        }
-      }
-      
       console.warn('⚠️ Не удалось определить язык устройства, используем английский');
       return 'en';
     }
@@ -242,12 +232,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     // Интерполяция переменных (поддерживаем оба формата: {name} и {{name}})
     if (params) {
       // Сначала обрабатываем двойные скобки {{name}}
-      value = value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
-        return params[paramKey] !== undefined ? params[paramKey] : match;
+      value = value.replace(/\{\{(\w+)\}\}/g, (match: string, paramKey: string) => {
+        return params[paramKey] !== undefined ? String(params[paramKey]) : match;
       });
       // Затем обрабатываем одинарные скобки {name}
-      value = value.replace(/\{(\w+)\}/g, (match, paramKey) => {
-        return params[paramKey] !== undefined ? params[paramKey] : match;
+      value = value.replace(/\{(\w+)\}/g, (match: string, paramKey: string) => {
+        return params[paramKey] !== undefined ? String(params[paramKey]) : match;
       });
     }
     

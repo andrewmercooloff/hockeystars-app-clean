@@ -92,7 +92,7 @@
   "uploading": "Belastning...",
   "uploadingPhotos": "Laddar {count} foton... {progress}%",
   "info": "Information",
-  "addVideoLink": "Lägg till en länk till YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sek",
@@ -1689,6 +1689,1406 @@
           "Utför 2-3 gånger i veckan",
           "Minska belastningen när du känner dig trött"
         ]
+      },
+      "66": {
+        "title": "Sidoplanka med bålrotation",
+        "description": "Bygger obliques och kärnstabilisatorer för skottkraft och kroppskontrollstabilitet.",
+        "benefits": [
+          "Stabiliserar kärnan i kontakt",
+          "Förbättrar rotationsskottkraften",
+          "Minskar risken för skador på ländryggen",
+          "Bygger kärnuthållighet"
+        ],
+        "instructions": [
+          "Sätt upp en sidoplanka för underarmen",
+          "Sträck överarmen mot taket",
+          "Svep armen under bålen och gå tillbaka",
+          "Håll höfterna i nivå utan att hänga",
+          "Gör 8–10 reps per sida"
+        ],
+        "tips": [
+          "Rotera långsamt med kontroll",
+          "Andas stadigt",
+          "Gå ner på knä om det behövs",
+          "2–3 set per sida"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Rumänsk marklyft med hantel",
+        "description": "Utvecklar den bakre kedjan för kraftfull skridskoåkning och acceleration i första steg.",
+        "benefits": [
+          "Stärker hamstrings och glutes",
+          "Förbättrar framåtlutande mekanik",
+          "Bygger greppstyrka",
+          "Stöder förebyggande av hamstringsskador"
+        ],
+        "instructions": [
+          "Stå med hantlar vid låren",
+          "Håll en lätt knäböj",
+          "Gångjärn höfterna bakåt, sänka klockorna längs benen",
+          "Stanna vid mid-shin eller mild stretch",
+          "Kör fram höfterna för att stå"
+        ],
+        "tips": [
+          "Håll en neutral ryggrad",
+          "Vikter håller sig nära benen",
+          "Undvik att runda nedre delen av ryggen",
+          "3–4 set med 8–12 reps"
+        ],
+        "equipment": "Hantlar",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Goblet squat",
+        "description": "Ett hockeyvänligt knäböjsmönster för ben- och corestyrka med upprätt hållning.",
+        "benefits": [
+          "Bygger quad-styrka",
+          "Lär ut vertikal bålposition",
+          "Förbättrar fotledsrörlighet",
+          "Bra under säsongen off-ice alternativ"
+        ],
+        "instructions": [
+          "Håll en hantel eller kettlebell vid bröstet",
+          "Fötterna axelbrett, tårna något ut",
+          "Knäböj till parallell eller under",
+          "Knän spår över tårna",
+          "3–4 set med 10–15 reps"
+        ],
+        "tips": [
+          "Armbågar inuti knäna nedtill",
+          "Klackarna stannar nere",
+          "Kontrollera nedstigningen",
+          "Håll dig lång genom bröstet"
+        ],
+        "equipment": "Hantel eller kettlebell",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Band roterande hacka",
+        "description": "Efterliknar skott- och passrotation för att bygga kraft i hockeyrörelseplanet.",
+        "benefits": [
+          "Förbättrar skott- och passningskraften",
+          "Tränar antirotationsstabilitet",
+          "Axelvänlig lastning",
+          "Kan göras hemma"
+        ],
+        "instructions": [
+          "Ankarband i brösthöjd",
+          "Stå i sidled för att förankra",
+          "Håll i stickan eller handtaget med båda händerna",
+          "Rotera från höfterna med kontroll",
+          "12–15 reps på varje sida"
+        ],
+        "tips": [
+          "Kraft kommer från höfter",
+          "Skydda nedre delen av ryggen från överrotation",
+          "Använd atletisk hockeyhållning",
+          "2–3 set"
+        ],
+        "equipment": "Motståndsband",
+        "calories": "100–150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Enbens glute bridge",
+        "description": "Aktiverar glutes och höftstabilisatorer för kraftfull push-off på skridskor.",
+        "benefits": [
+          "Stärker sätesmusklerna",
+          "Stabiliserar bäckenet vid skridskoåkning",
+          "Förbättrar bensymmetri",
+          "Stöder förebyggande av knäskador"
+        ],
+        "instructions": [
+          "Ligg på rygg, en fot planterad",
+          "Andra ben utsträckt eller böjt i luften",
+          "Kör upp höfterna till en rak linje",
+          "Pausa 1 sekund överst",
+          "10–12 reps per ben"
+        ],
+        "tips": [
+          "Undvik lumbal hyperextension",
+          "Fortsätt att arbeta knä i linje",
+          "Pressa glute på toppen",
+          "2–3 set"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Stående vadhöjningar",
+        "description": "Bygger vader och fötter för benuthållighet i sent skift och stabilitet i skridskor.",
+        "benefits": [
+          "Förbättrar vadstyrkan",
+          "Minskar trötthet i underbenen i spel",
+          "Stärker fötterna",
+          "Snabbt omklädningsrumsalternativ"
+        ],
+        "instructions": [
+          "Stå på kanten av steget på bollar av fötter",
+          "Sänk klackarna under stegnivå",
+          "Stig så högt som möjligt",
+          "Paus överst",
+          "15–20 reps, 3 set"
+        ],
+        "tips": [
+          "Använd vägg för balans om det behövs",
+          "Fullt rörelseomfång",
+          "Undvik att studsa",
+          "Lägg till lätt vikt när du är klar"
+        ],
+        "equipment": "Steg eller plattform",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Planka axelkranar",
+        "description": "Anti-rotations kärna för kontaktstabilitet och atletisk hållning.",
+        "benefits": [
+          "Bygger kärnstabilitet",
+          "Förbättrar balansen vid kontakt",
+          "Utvecklar kärnuthållighet",
+          "Fungerar för alla befattningar"
+        ],
+        "instructions": [
+          "Börja i hög planka",
+          "Byt vikt och knacka på motsatt axel",
+          "Gå tillbaka och byta armar",
+          "Håll höfterna raka",
+          "Totalt 16–20 kranar"
+        ],
+        "tips": [
+          "Bredda fötter för stabilitet",
+          "Gädda inte upp höfterna",
+          "Andas stadigt",
+          "2–3 set"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "80–120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprint med full vila",
+        "description": "Simulerar korta växlingar för att förbättra förmågan till upprepad acceleration.",
+        "benefits": [
+          "Förbättrar upprepad sprinthastighet",
+          "Tränar återhämtning mellan skift",
+          "Utvecklar startmekanik",
+          "Ökar spelets uthållighet"
+        ],
+        "instructions": [
+          "Värm upp 8–10 minuter",
+          "Sprint 20 m vid 95 % hastighet",
+          "Vila 40–60 sekunders gång",
+          "Upprepa 10–12 gånger",
+          "Kyl ner 5 minuter"
+        ],
+        "tips": [
+          "Behåll sprintformen varje rep",
+          "Klipp inte vila för tidigt",
+          "Prioritera kvalitet framför kvantitet",
+          "1–2 pass per vecka"
+        ],
+        "equipment": "20 m öppen yta",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "30–30–30 sekunders löpintervaller",
+        "description": "Intervall i klassisk hockeystil: 30 sekunder hårt, 30 sekunder lätt.",
+        "benefits": [
+          "Bygger upp laktattolerans",
+          "Efterliknar skiftintensitet",
+          "Förbättrar mental seghet",
+          "Effektiv off-ice session"
+        ],
+        "instructions": [
+          "Värm upp 10 minuter",
+          "30 sek hårt löpning / 30 sek promenad",
+          "Upprepa 12–16 cykler",
+          "Håll konsekvent ansträngning varje omgång",
+          "Kyl ner och stretcha"
+        ],
+        "tips": [
+          "Gå inte all-out tidigt",
+          "Behåll löpformen",
+          "Hydrera mellan blocken",
+          "Fortsätt de totala cyklerna långsamt"
+        ],
+        "equipment": "Spår eller löpband",
+        "calories": "300–400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike intervaller",
+        "description": "Lågpåverkande högintensiv konditionsträning som är knävänlig under lågsäsong.",
+        "benefits": [
+          "Bygger VO2max",
+          "Ledvänlig lastning",
+          "Tränar armar och ben tillsammans",
+          "Snabb återhämtning efter pass"
+        ],
+        "instructions": [
+          "5 min lätt snurr",
+          "20 sek max / 40 sek lätt",
+          "10–12 omgångar",
+          "Övervaka varvtal och andning",
+          "5 min kyla ner"
+        ],
+        "tips": [
+          "Slappna av greppet om handtagen",
+          "Sitt stabilt",
+          "Undvik maximal ansträngning dagligen",
+          "Spåra kalorier för framsteg"
+        ],
+        "equipment": "AirBike / attackcykel",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m skyttelkörning",
+        "description": "Korta riktningsändringar som forechecking och defensiva återhämtningar.",
+        "benefits": [
+          "Förbättrar riktningsändring",
+          "Bygger upp första stegs hastighet",
+          "Tåg reaktion",
+          "Kompakt gymvänlig borrmaskin"
+        ],
+        "instructions": [
+          "Markera två linjer 5 m från varandra",
+          "Rör linjen med handen, sprint tillbaka",
+          "6–8 reps = 1 set",
+          "Vila 90 sek",
+          "3–4 set"
+        ],
+        "tips": [
+          "Rör linjen helt varje gång",
+          "Explodera första stegen",
+          "Plantera hårt i svängar",
+          "Använd greppvänliga skor"
+        ],
+        "equipment": "Koner eller golvlinjer",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Accelerationer från hockeyställning",
+        "description": "Låga atletiska starter som går över till face-offs och puckstrider.",
+        "benefits": [
+          "Förbättrar första steget",
+          "Utbildar lågstartsmekaniker",
+          "Bygger benkraft",
+          "Hockeyspecifikt"
+        ],
+        "instructions": [
+          "Ställ in atletisk hållning: böjda knän, framåtriktad bål",
+          "På kösprint 10–15 m",
+          "Full vila 60–90 sek",
+          "8–10 reps",
+          "Alternativt blyben"
+        ],
+        "tips": [
+          "Stanna framåt, hoppa inte upp tidigt",
+          "Kör tillbaka benet hårt",
+          "Använd armarna aggressivt",
+          "Cap vid 10 kvalitetsrepetitioner"
+        ],
+        "equipment": "20 m körfält",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m tempolöpningar",
+        "description": "Kontrollerad snabb löpning för att upprätthålla hög skiftliknande ansträngning.",
+        "benefits": [
+          "Bygger aerob kraft",
+          "Lär ut pacing",
+          "Förbättrar benens uthållighet",
+          "Bra arbete under lågsäsong"
+        ],
+        "instructions": [
+          "Värm upp 10 minuter",
+          "400 m vid 75–80 % max",
+          "Vila 2 min promenad",
+          "4–6 reps",
+          "Kyl ner 5 minuter"
+        ],
+        "tips": [
+          "Jämnt tempo, inte en sprint",
+          "Övervaka andningen",
+          "Använd spårbanor säkert",
+          "Progress reps gradvis"
+        ],
+        "equipment": "Spår eller uppmätt slinga",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata jump squats",
+        "description": "Fyra minuter av hög intensitet som efterliknar trötthet i sena skift.",
+        "benefits": [
+          "Bygger anaerob uthållighet",
+          "Kort men effektiv pass",
+          "Stärker benen",
+          "Hemtrevligt"
+        ],
+        "instructions": [
+          "20 sek max jump squats",
+          "10 sek vila",
+          "8 omgångar = 4 minuter",
+          "Värm upp innan och kyl ner efter",
+          "1–2 gånger i veckan"
+        ],
+        "tips": [
+          "Landa mjukt",
+          "Hoppa aldrig över uppvärmning",
+          "Undvik på speldagen",
+          "Skydda knäna med bra form"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU balans med sticka",
+        "description": "Instabil yta plus stickhantering för på-is-liknande balans.",
+        "benefits": [
+          "Förbättrar proprioception",
+          "Tränar ställningsbalans",
+          "Länkar ihop händer och fötter",
+          "Bygger fotledsstabilitet"
+        ],
+        "instructions": [
+          "Stå på BOSU med båda fötterna",
+          "Håll pinne, lätt puckhantering",
+          "Håll i 30–45 sekunder",
+          "Vila och upprepa 4–6 gånger",
+          "Prova ett ben när du är klar"
+        ],
+        "tips": [
+          "Blicken framåt, inte nedåt",
+          "Mjuk knäböj",
+          "Vägg i närheten för säkerhet",
+          "Starta utan puck"
+        ],
+        "equipment": "BOSU, hockeyklubba",
+        "calories": "70–100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Enbens RDL-räckvidd",
+        "description": "Balans plus bakre kedja som enbensskridskoåkning i svängar.",
+        "benefits": [
+          "Bygger enbensbalans",
+          "Stärker hamstring och glute",
+          "Förbättrar höftkontroll",
+          "Skridsko-specifik"
+        ],
+        "instructions": [
+          "Stå på ett ben med lätt hantel",
+          "Gångjärn framåt, fritt ben bakåt",
+          "Rör vid golvet eller smalbenet",
+          "Återgå till vertikal",
+          "8–10 reps per ben"
+        ],
+        "tips": [
+          "Fokusera ögonen på en punkt",
+          "Rör dig långsamt",
+          "Håll höfterna i nivå",
+          "2–3 set"
+        ],
+        "equipment": "Hantel",
+        "calories": "120–170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Enbens tåbalans",
+        "description": "Enkel ankel- och fotstabilitetsborr för skridskoåkning.",
+        "benefits": [
+          "Stärker fötterna",
+          "Förbättrar balansen",
+          "Snabb daglig övning",
+          "Kan göra var som helst"
+        ],
+        "instructions": [
+          "Stå på ett ben",
+          "Stig upp på tårna",
+          "Håll i 15–20 sekunder",
+          "Sänk och byt ben",
+          "6–8 reps per ben"
+        ],
+        "tips": [
+          "Använd support om det behövs",
+          "Blicken framåt",
+          "Andas normalt",
+          "Barfota eller skor"
+        ],
+        "equipment": "Ingen",
+        "calories": "30–50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partnerpass på ett ben",
+        "description": "Balans och passningskoordination som rörelse i spelet.",
+        "benefits": [
+          "Länkar balans och passning",
+          "Förbättrar kärnans stabilitet",
+          "Tågen fokuserar",
+          "Partner borr"
+        ],
+        "instructions": [
+          "Stå på ett ben med puck/boll",
+          "Partner 3–4 m bort",
+          "Gör exakta passningar",
+          "30 sekunder, byt ben",
+          "4 omgångar"
+        ],
+        "tips": [
+          "Mjuka knän",
+          "Skarpa passningar",
+          "Offra inte balansen för makten",
+          "Wall rebounder fungerar också"
+        ],
+        "equipment": "Puck/boll, partner",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Walking lunge med rotation",
+        "description": "Dynamisk balans och rotation för förberedelser för kroppskontroll.",
+        "benefits": [
+          "Förbättrar dynamisk balans",
+          "Bygger rotation från ben",
+          "Stärker benen",
+          "Funktionell för hockey"
+        ],
+        "instructions": [
+          "Kliv in i utfall framåt",
+          "Rotera bålen mot främre benet",
+          "Gå tillbaka och steg andra benet",
+          "10 steg per ben",
+          "2–3 set"
+        ],
+        "tips": [
+          "Knäspår över fot",
+          "Håll dig lång",
+          "Håll bollen vid bröstet valfritt",
+          "Kontrollera tempo"
+        ],
+        "equipment": "Ingen",
+        "calories": "100–150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Skjutbräda sidosteg",
+        "description": "Simulerar skridskoåkning i sidled med betoning på balansen.",
+        "benefits": [
+          "Bygger sidokraft",
+          "Förbättrar balansen från sida till sida",
+          "Utvecklar adduktorer",
+          "Bra för försvarare"
+        ],
+        "instructions": [
+          "Skjutbräda eller strumpor",
+          "Sidosteg 20–30 sekunder",
+          "Håll dig låg i hållningen",
+          "Vila 60 sek",
+          "6–8 set"
+        ],
+        "tips": [
+          "Stå inte upprätt",
+          "Händerna i redo position",
+          "Styr hastighet",
+          "Använd bräda stötfångare"
+        ],
+        "equipment": "Skjutbräda",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Hopphopp",
+        "description": "Bygger upp benexplosivitet för förstastegsskurar och stridshopp.",
+        "benefits": [
+          "Ökar vertikal och horisontell kraft",
+          "Förbättrar reaktiviteten",
+          "Utvecklar koordination",
+          "Övergår till isacceleration"
+        ],
+        "instructions": [
+          "Ställ häcken 60–90 cm från varandra",
+          "Två fots hopp över varje",
+          "Mjuk landning",
+          "6–8 hinder per set",
+          "3–4 set"
+        ],
+        "tips": [
+          "Mjuka knän vid landning",
+          "Använd armarna aktivt",
+          "Börja med låga hinder",
+          "Full vila mellan seten"
+        ],
+        "equipment": "Häck eller kottar",
+        "calories": "140–200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sit-to-sprint start",
+        "description": "Tar bort försträckning för att träna ren explosivitet i första steget.",
+        "benefits": [
+          "Bygger startkraft",
+          "Förbättrar reaktionen",
+          "Tränar höftförlängning",
+          "Enkel fältövning"
+        ],
+        "instructions": [
+          "Sitt på marken, benen framåt",
+          "Stå på kö och sprint 10 m",
+          "8–10 reps",
+          "Vila 60–90 sek",
+          "Värm upp först"
+        ],
+        "tips": [
+          "Luta dig inte före kö",
+          "Stå upp explosivt",
+          "Första 3 stegen max effekt",
+          "Alternativa vägbeskrivningar"
+        ],
+        "equipment": "10 m körfält",
+        "calories": "100–150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Bredhoppsserie",
+        "description": "Horisontell kraft användbar för brädstrider och push-offs.",
+        "benefits": [
+          "Bygger horisontell kraft",
+          "Förbättrar koordinationen",
+          "Stärker benen",
+          "Kort pass"
+        ],
+        "instructions": [
+          "Stående brett hopp",
+          "Mjuk landning",
+          "Genast nästa hoppa framåt",
+          "5 hopp i rad = 1 set",
+          "4–5 set med vila"
+        ],
+        "tips": [
+          "Använd armsving",
+          "Land balanserat",
+          "Flöde hoppa för att hoppa",
+          "Värm upp knäna"
+        ],
+        "equipment": "Öppen plats",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Medicin boll slam",
+        "description": "Explosivt kast nedåt för total kroppskontaktkraft.",
+        "benefits": [
+          "Bygger explosiv kärna",
+          "Hög intensitet snabbt",
+          "Länkar ben-kärna-armar",
+          "Bra stressavlastning"
+        ],
+        "instructions": [
+          "Lyft med bollen över huvudet",
+          "Slå i golvet med full kraft",
+          "Plocka upp och upprepa",
+          "10–12 reps",
+          "3 set"
+        ],
+        "tips": [
+          "Använd ben och kärna",
+          "Neutral ryggrad vid lyft",
+          "Titta på rebound",
+          "Använd 4–8 kg boll"
+        ],
+        "equipment": "Medicinboll",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Släde push",
+        "description": "Tung horisontell drift som maximala stående starter.",
+        "benefits": [
+          "Max bendrift",
+          "Låg slagbelastning",
+          "Bygger mental tuffhet",
+          "Perfekt för power forwards"
+        ],
+        "instructions": [
+          "Låg ställning bakom släden",
+          "Skjut 15–20 m",
+          "Full vila 2 min",
+          "4–6 tryck",
+          "Gemensam uppvärmning först"
+        ],
+        "tips": [
+          "Håll dig låg",
+          "Korta kraftfulla steg",
+          "Gå inte upp tidigt",
+          "Startljus vid belastning"
+        ],
+        "equipment": "Prowler släde",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike stadigt 10 minuter",
+        "description": "Aerob bas för långa pass och konditionering under lågsäsong.",
+        "benefits": [
+          "Bygger aerob uthållighet",
+          "Ledvänlig",
+          "Pulskontroll",
+          "Snabb off-ice session"
+        ],
+        "instructions": [
+          "5 min uppvärmning",
+          "10 min vid 65–70 % ansträngning",
+          "Stadigt varvtal",
+          "5 min kyla ner",
+          "Övervaka andningen"
+        ],
+        "tips": [
+          "Håll dig utanför anaerob zon",
+          "Stabil hållning",
+          "Hydrat",
+          "2–3 gånger i veckan"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Rodd erg intervaller",
+        "description": "Konditionsträning för hela kroppen utan påverkan för bål- och benuthållighet.",
+        "benefits": [
+          "Helkroppskonditionering",
+          "Förbättrar roddhållningen",
+          "Bygger grepp och kärna",
+          "Löpningsalternativ"
+        ],
+        "instructions": [
+          "500 m hårt / 1 min lätt",
+          "6–8 omgångar",
+          "Kör från ben och kärna",
+          "5 min uppvärmning",
+          "Kyl ner stretch"
+        ],
+        "tips": [
+          "Neutral ryggrad",
+          "Armbågar till höfter",
+          "Även delat tempo",
+          "Justera spjället klokt"
+        ],
+        "equipment": "Rodd erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Kontinuerliga skridskohopp",
+        "description": "Rytmiska laterala hopp för ben- och sidokonditionering.",
+        "benefits": [
+          "Bygger uthållighet i sidled",
+          "Stärker benen",
+          "Härmar riktningsförändringar",
+          "Kompakt borr"
+        ],
+        "instructions": [
+          "Hoppa sida till sida på ett ben till det andra",
+          "Armar som skridskoåkning",
+          "30 sek arbete / 30 sek vila",
+          "10 omgångar",
+          "Mjuka landningar"
+        ],
+        "tips": [
+          "Knäspår över fot",
+          "Bröstet upp",
+          "Kontrollera hoppavstånd",
+          "Värm upp först"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 cirkelträning",
+        "description": "Fyra stationskretsar för total hockeykonditionering.",
+        "benefits": [
+          "Arbetsbelastning för hela kroppen",
+          "Tidseffektivt",
+          "Bygger arbetskapacitet",
+          "Gym anpassningsbar"
+        ],
+        "instructions": [
+          "Burpees, bergsklättrare, jump squats, armhävningar",
+          "45 sek arbete / 15 sek övergång",
+          "4 drag × 4 varv",
+          "2 min vila mellan varven",
+          "Värm upp och kyl ner"
+        ],
+        "tips": [
+          "Skala till din nivå",
+          "Forma över hastighet",
+          "Håll dig hydrerad",
+          "Undvik på speldagen"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Låga häckgenomkörningar",
+        "description": "Cardio plus koordination med snabba steg som hård skridskoåkning.",
+        "benefits": [
+          "Förbättrar kadensen",
+          "Bygger koordination",
+          "Ökar aerob kapacitet",
+          "Varierar löparbetet"
+        ],
+        "instructions": [
+          "6–8 låga häck över 20 m",
+          "Spring igenom med höga knän",
+          "6 pass",
+          "Vila 90 sek",
+          "3–4-serien"
+        ],
+        "tips": [
+          "Klipp inte hinder",
+          "Snabba korta steg",
+          "Aktiva armar",
+          "Värm upp lederna"
+        ],
+        "equipment": "Mini häck",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Stege snabba fötter",
+        "description": "Snabb fotbas för att ducka och snäva svängar.",
+        "benefits": [
+          "Förbättrar fothastigheten",
+          "Bygger koordination",
+          "Ökar reaktionen",
+          "Uppvärmning före isen"
+        ],
+        "instructions": [
+          "In-in-ut-ut genom stege",
+          "30 sek max / 30 sek vila",
+          "8 omgångar",
+          "Variera mönster vartannat varv",
+          "Lätt uppvärmning först"
+        ],
+        "tips": [
+          "Ögonen upp",
+          "Korta steg",
+          "Händer i atletisk redo",
+          "Hoppa inte över stegpinnarna"
+        ],
+        "equipment": "Agilitystege",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-drill smidighet",
+        "description": "Klassiskt T-test: sprint, shuffle och backpedal som på is.",
+        "benefits": [
+          "Komplett agilitypaket",
+          "Tåg alla riktningar",
+          "Spårbara framsteg",
+          "För skridskoåkare"
+        ],
+        "instructions": [
+          "Sprint 10 m framåt",
+          "Blanda 5 m vänster och höger",
+          "Backpedal 10 m till start",
+          "3–5 reps",
+          "Vila 90 sek"
+        ],
+        "tips": [
+          "Håll dig låg i shuffle",
+          "Korsa inte fötterna",
+          "Rör kottar",
+          "Logga dina tider"
+        ],
+        "equipment": "Kottar",
+        "calories": "100–150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Puck figur-8 borr",
+        "description": "Stickhandtag en 8-figur som förbinder händer och fotarbete.",
+        "benefits": [
+          "Förbättrar stickhantering",
+          "Länkar ihop händer och fötter",
+          "Tränar perifert seende",
+          "Hemtrevligt"
+        ],
+        "instructions": [
+          "Två koner 2 m från varandra",
+          "Puck figur-8 runt koner",
+          "30 sek max hastighet",
+          "Vila 30 sek",
+          "10 omgångar"
+        ],
+        "tips": [
+          "Huvudet upp",
+          "Mjuka händer",
+          "Snabba fötter",
+          "Byt riktning var 5:e varv"
+        ],
+        "equipment": "Puck, 2 kottar, pinne",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktiva konanrop",
+        "description": "Partner kallar en kon - reaktion och första steg som läser i spelet.",
+        "benefits": [
+          "Tränar spelreaktion",
+          "Förbättrar kognitiv hastighet",
+          "Bygger första steget",
+          "Partner borr"
+        ],
+        "instructions": [
+          "4 kottar i 3 m kvadrat",
+          "Partner ringer färg/nummer",
+          "Sprint till kon",
+          "Peka och gå tillbaka",
+          "20 reaktioner"
+        ],
+        "tips": [
+          "Var ärlig, ingen gissning tidigt",
+          "Låg hållning",
+          "Explosivt första steg",
+          "Variera layout"
+        ],
+        "equipment": "4 koner, partner",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Sidoblandningssteg",
+        "description": "Sidoblandningar i hockeyställning som efterliknar sidoåkning.",
+        "benefits": [
+          "Bygger snabbhet i sidled",
+          "Stärker höftabduktorer",
+          "Förbättrar hållningen",
+          "Uppvärmning före isen"
+        ],
+        "instructions": [
+          "5 m blanda vänster och höger",
+          "Korsa inte fötterna",
+          "30 sek / 30 sek vila",
+          "8 omgångar",
+          "Händer på imaginär pinne"
+        ],
+        "tips": [
+          "Håll dig låg",
+          "Tryck av utsidan av benet",
+          "Bröstet framåt",
+          "Snabba kontakter"
+        ],
+        "equipment": "Koner eller linjer",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynamisk höftöppnare",
+        "description": "Uppvärmning av höftrörlighet för djup hockeyställning.",
+        "benefits": [
+          "Förbättrar höftrörligheten",
+          "Minskar risken för ljumskskador",
+          "Förbereder för skridskoåkning",
+          "Snabb rutin"
+        ],
+        "instructions": [
+          "Ben svänger fram-bak 10 vardera",
+          "Ben svänger sid-sida 10 vardera",
+          "Djup knäböj håller 30 sek",
+          "Höftcirklar 10 vardera",
+          "Walking knä kramar 10 m"
+        ],
+        "tips": [
+          "Kontrollerat räckvidd",
+          "Ingen smärta",
+          "Andas djupt",
+          "Inför varje pass"
+        ],
+        "equipment": "Ingen",
+        "calories": "40–60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Världens största sträcka",
+        "description": "Dynamisk stretch som träffar höfter, bröstrygg och hamstrings.",
+        "benefits": [
+          "Rörlighet för hela kroppen",
+          "Tidseffektivt",
+          "Förbereder hela kroppen",
+          "Vanlig proffsuppvärmning"
+        ],
+        "instructions": [
+          "Kliv in i utfall",
+          "Armbåge ner inuti foten",
+          "Thorax rotationsarm upp",
+          "Räta fram benet för hamstring",
+          "5 reps per sida"
+        ],
+        "tips": [
+          "Rör dig långsamt",
+          "Ingen studsning",
+          "Spår framknä",
+          "Lika båda sidor"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "50–70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Bandet dras isär",
+        "description": "Aktiverar övre delen av ryggen och axlarna före skjutning och kontakt.",
+        "benefits": [
+          "Aktiverar bakre delts och romboider",
+          "Förbättrar hållningen",
+          "Värmer axlarna",
+          "Skadeförebyggande"
+        ],
+        "instructions": [
+          "Håll bandet i brösthöjd",
+          "Armarna raka",
+          "Dra isär till skulderbladen",
+          "15–20 reps",
+          "2–3 set"
+        ],
+        "tips": [
+          "Ingen axelryckning",
+          "Kontrollerad retur",
+          "Lätt band till start",
+          "Innan is eller gym"
+        ],
+        "equipment": "Motståndsband",
+        "calories": "30–50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Höga knän + rumpsparkar",
+        "description": "Dynamisk benuppvärmning och pulshöjning före isen.",
+        "benefits": [
+          "Höjer hjärtfrekvensen",
+          "Värmer quads och hamstrings",
+          "Förbättrar koordinationen",
+          "Snabb effekt"
+        ],
+        "instructions": [
+          "20 m höga knän",
+          "20 m rumpspark",
+          "20 m hoppning",
+          "Upprepa 3–4 gånger",
+          "Lätt jogga mellan"
+        ],
+        "tips": [
+          "Håll dig på framfoten",
+          "Aktiva armar",
+          "Bygg upp tempot gradvis",
+          "Spring inte kallt"
+        ],
+        "equipment": "20 m utrymme",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Armgungor + stickuppvärmning",
+        "description": "Axeluppvärmning plus lätt stickhantering innan is.",
+        "benefits": [
+          "Mobiliserar axlarna",
+          "Aktiverar rotatorkuffen",
+          "Länkar överkroppen till sticka",
+          "Hockeyspecifikt"
+        ],
+        "instructions": [
+          "Armcirklar 10 vardera",
+          "Svängningar över kroppen 10",
+          "Stickhandtag långsamt till snabbt 60 sek",
+          "Handledsrullar med pinne 20",
+          "Lätt skottrörelse x10"
+        ],
+        "tips": [
+          "Framstegshastighet",
+          "Båda händerna",
+          "Ingen forcerad räckvidd",
+          "Varje ispass"
+        ],
+        "equipment": "Stick, puck",
+        "calories": "50–80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Knäböjande höftböjarstretch",
+        "description": "Höftböjande stretch för att motverka skridskohållning.",
+        "benefits": [
+          "Minskar höftspänning",
+          "Kan förbättra stegen",
+          "Hjälper hållningen",
+          "Efter is eller gym"
+        ],
+        "instructions": [
+          "Knästående utfallsställning",
+          "Pressa tillbaka glute",
+          "Torso hög",
+          "Håll 30–45 sek",
+          "2–3 gånger per ben"
+        ],
+        "tips": [
+          "Undvik ländbåge",
+          "Andas in i stretch",
+          "Främre knä över ankel",
+          "Dagligen om möjligt"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 höftrotation",
+        "description": "Höftrörlighet för svängar och djup hukning på skridskor.",
+        "benefits": [
+          "Förbättrar höftrotationen",
+          "Minskar risken för spänningar i ljumsken",
+          "Lugnt återhämtningsarbete",
+          "Vänskapsmatch efter match"
+        ],
+        "instructions": [
+          "Sitt i 90/90 position",
+          "Vrid knäna sida till sida",
+          "Händerna bakom för stöd",
+          "10 långsamma reps vardera",
+          "Håll i slutet 20 sek"
+        ],
+        "tips": [
+          "Inget forceringsområde",
+          "Bröstet högt",
+          "Båda höfterna ner om möjligt",
+          "Använd andedräkt"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Toraxrotationssträcka",
+        "description": "Bröströrlighet för skottrotation och hållning.",
+        "benefits": [
+          "Förbättrar T-ryggradens rotation",
+          "Lossar nedre delen av ryggen",
+          "Hjälper skottmekanik",
+          "Snabb daglig övning"
+        ],
+        "instructions": [
+          "Fyrbäddsläge",
+          "Hand bakom huvudet",
+          "Vrid armbågen till taket",
+          "10 reps på varje sida",
+          "Pausa 2 sek överst"
+        ],
+        "tips": [
+          "Höfterna förblir fyrkantiga",
+          "Andas ut vid rotation",
+          "Ingen spinal smärta",
+          "Rör dig långsamt"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "30–45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Väggkalvstretch",
+        "description": "Kalvar och akilles ofta överbelastade i skridskor.",
+        "benefits": [
+          "Minskar täthet i vaden",
+          "Förbättrar ankel dorsalflexion",
+          "Förebyggande av benskenor",
+          "Efter varje pass"
+        ],
+        "instructions": [
+          "Händerna på väggen",
+          "Bakre ben rak häl ner",
+          "Håll i 30 sek",
+          "Böj knä för soleus",
+          "2–3 omgångar varje ben"
+        ],
+        "tips": [
+          "Klack på golv",
+          "Fyrkantiga höfter",
+          "Ingen studsning",
+          "Båda benen"
+        ],
+        "equipment": "Vägg",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Cross-body axelstretch",
+        "description": "Bakre axelsträckning efter skjutvolym.",
+        "benefits": [
+          "Minskar axelspänning",
+          "Hjälper skottavstånd",
+          "Snabb stretch",
+          "Dagligt underhåll"
+        ],
+        "instructions": [
+          "Dra armen över bröstet",
+          "Håll armbågen med andra handen",
+          "30 sek varje arm",
+          "Upprepa 2–3 gånger",
+          "Avslappnad nacke"
+        ],
+        "tips": [
+          "Rycka inte på axlarna",
+          "Endast försiktigt drag",
+          "Andas ut och slappna av",
+          "Efter is"
+        ],
+        "equipment": "Ingen",
+        "calories": "20–35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Diafragmatisk andning",
+        "description": "Djup andning för parasympatisk återhämtning efter matchen.",
+        "benefits": [
+          "Minskar stress",
+          "Stöder återhämtning",
+          "Kan förbättra sömnen",
+          "Omklädningsrum vänlig"
+        ],
+        "instructions": [
+          "Ligg eller sitt bekvämt",
+          "Handen på magen",
+          "Andas in 4 sek näsan",
+          "Andas ut 6 sekunders mun",
+          "5 minuter kontinuerligt"
+        ],
+        "tips": [
+          "Magen inte bröstet reser sig",
+          "Tyst utrymme",
+          "Daglig vana",
+          "Efter sena matcher"
+        ],
+        "equipment": "Ingen",
+        "calories": "15–25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Benen uppför väggen",
+        "description": "Venös återgång och benavslappning efter tunga spel.",
+        "benefits": [
+          "Kan minska bensvullnad",
+          "Främjar avkoppling",
+          "Passiv återhämtning",
+          "Efter resespel"
+        ],
+        "instructions": [
+          "Höfter nära vägg liggande",
+          "Ben vertikala på väggen",
+          "Armarna avslappnade",
+          "Håll i 8–10 minuter",
+          "Långsam andning"
+        ],
+        "tips": [
+          "Bekväm yta",
+          "Koppla från telefonen",
+          "Valfri lugn musik",
+          "Bäst på kvällen"
+        ],
+        "equipment": "Vägg, matta",
+        "calories": "20–30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Foam roll quads och hamstrings",
+        "description": "Myofascial frigöring för ben efter tung belastning.",
+        "benefits": [
+          "Minskar ömhet",
+          "Förbättrar vävnadskvaliteten",
+          "Snabbare återhämtning",
+          "Egenvård"
+        ],
+        "instructions": [
+          "Rulla fyrhjulingar 60 sek vardera",
+          "Rulla hamstrings 60 sek vardera",
+          "Pausa ömma fläckar 20 sek",
+          "Endast lätt IT-band",
+          "Återfukta efteråt"
+        ],
+        "tips": [
+          "Undvik leder",
+          "Andas genom trånga ställen",
+          "Måttligt tryck",
+          "Inte föris"
+        ],
+        "equipment": "Foam roller",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Höfter och anklar rörlighet flyter",
+        "description": "Skonsam rörlighet under dagen för att bibehålla rörelseomfånget.",
+        "benefits": [
+          "Upprätthåller rörlighet",
+          "Låg trötthet",
+          "Aktiv återhämtning",
+          "Skadeförebyggande"
+        ],
+        "instructions": [
+          "Ankelcirklar 10 st",
+          "Hip CARs 5 varje väg",
+          "Katt-ko 10 reps",
+          "Barnpose 60 sek",
+          "2 omgångar"
+        ],
+        "tips": [
+          "Smärtfri räckvidd",
+          "Långsam och kontrollerad",
+          "Off-day eller morgon",
+          "Lägg till andning"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Sömnförberedande stretch och andning",
+        "description": "Lätt stretch och andning före sänggåendet för återhämtning över natten.",
+        "benefits": [
+          "Stöder sömnstart",
+          "Avslappnar nervsystemet",
+          "Återhämtning medan du sover",
+          "Kvällsritual"
+        ],
+        "instructions": [
+          "Hamstring stretch 30 sek vardera",
+          "Barnpose 60 sek",
+          "Liggande vridning 30 sek vardera",
+          "Boxandning 4-4-4-4 i 3 min",
+          "Mörkt tyst rum"
+        ],
+        "tips": [
+          "Inga skärmar efter",
+          "Konsekvent läggdags",
+          "Coolt rum",
+          "Gör det till en vana"
+        ],
+        "equipment": "Träningsmatta",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     }
   },
@@ -1735,6 +3135,8 @@
     "codeSentToEmailMessage": "Kod skickad till {email}",
     "userNotFound": "Användaren hittades inte",
     "userNotFoundMessage": "Ett konto med detta telefonnummer finns inte. Vänligen registrera dig.",
+    "networkError": "Anslutningsproblem",
+    "networkErrorMessage": "Kunde inte nå servern. Kontrollera internetanslutningen och försök igen.",
     "errorSendingCode": "Fel",
     "errorSendingCodeMessage": "Det gick inte att skicka koden. Kontrollera ditt telefonnummer och internetuppkoppling.",
     "errorResendingCode": "Fel",
@@ -1918,6 +3320,8 @@
     "rightShort": "P",
     "startedHockey": "I hockey med",
     "noFriendsYet": "{name} har inga vänner än",
+    "inviteYourTeam": "Bjud in ditt lag",
+    "inviteTeamMessage": "Jag är på HockeyStars – appen för hockeyspelare. Häng med:",
     "beFirstToAdd": "Var den första att lägga till {name} som vän",
     "writeMessage": "Skriv ett meddelande",
     "edit": "Redigera",
@@ -2376,9 +3780,17 @@
     "weightFrom": "Vikt",
     "all": "Alla",
     "noPlayersFound": "Inga spelare hittades",
+    "newcomers": "Nykomlingar",
+    "topByPoints": "Top efter poäng",
     "left": "Vänster",
     "right": "Rätt",
-    "resetFilters": "Återställ filter"
+    "resetFilters": "Återställ filter",
+    "topBySV": "Top SV%",
+    "shareRating": "Dela ranking",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "poäng",
+    "allCountries": "Alla länder",
+    "allYears": "Alla år"
   },
   "messages": {
     "title": "Meddelanden",
@@ -2832,6 +4244,23 @@
     "physicalDataUpdate": "Fysisk datauppdatering",
     "friendRequest": "Vänförfrågan",
     "newFriendship": "Ny vänskap",
-    "speedRecord": "Nytt hastighetsrekord"
+    "speedRecord": "Nytt hastighetsrekord",
+    "gameFirstPlace": "Spelchampion",
+    "quizFirstPlace": "Hockeystjärna"
+  },
+  "videoUploadHint": "Max 20 sekunder per video, upp till 10 videor",
+  "gameFirstPlaceNotification": {
+    "title": "Spelchampion",
+    "message": "{playerName} nådde 1:a plats"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hockeystjärna",
+    "message": "{playerName} tjänade {prize}"
+  },
+  "tabs": {
+    "chat": "Chatt",
+    "feed": "Flöde",
+    "scout": "Scout",
+    "skills": "Skills"
   }
 }

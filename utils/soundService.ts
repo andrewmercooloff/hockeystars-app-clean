@@ -45,7 +45,7 @@ export async function initializeSounds(): Promise<void> {
         playThroughEarpieceAndroid: false,
       });
     } catch (audioModeError) {
-      console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError.message);
+      console.log('⚠️ Ошибка настройки аудио режима (продолжаем без него):', audioModeError instanceof Error ? audioModeError.message : String(audioModeError));
       // Продолжаем без настройки аудио режима
     }
 

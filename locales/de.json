@@ -92,7 +92,7 @@
   "uploading": "Laden...",
   "uploadingPhotos": "{count} Fotos werden geladen... {progress} %",
   "info": "Information",
-  "addVideoLink": "Fügen Sie einen Link zu YouTube hinzu",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "Min:Sek",
@@ -1683,6 +1683,1406 @@
           "2-3 mal pro Woche durchführen",
           "Reduzieren Sie die Belastung, wenn Sie sich müde fühlen"
         ]
+      },
+      "66": {
+        "title": "Seitenplanke mit Rumpfrotation",
+        "description": "Baut Schräg- und Kernstabilisatoren für Schusskraft und Körperkontrollstabilität auf.",
+        "benefits": [
+          "Stabilisiert den Kern im Kontakt",
+          "Verbessert die Rotationsschusskraft",
+          "Reduziert das Verletzungsrisiko im unteren Rückenbereich",
+          "Stärkt die Kernausdauer"
+        ],
+        "instructions": [
+          "Stellen Sie eine Unterarm-Seitenplanke auf",
+          "Oberarm zur Decke strecken",
+          "Arm unter den Oberkörper streichen und zurückführen",
+          "Halten Sie die Hüften gerade, ohne durchzuhängen",
+          "Machen Sie 8–10 Wiederholungen pro Seite"
+        ],
+        "tips": [
+          "Langsam und kontrolliert drehen",
+          "Atme gleichmäßig",
+          "Gehen Sie bei Bedarf auf die Knie",
+          "2–3 Sätze pro Seite"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Rumänisches Kreuzheben mit Hanteln",
+        "description": "Entwickelt die hintere Kette für kraftvolles Skaten und Beschleunigung beim ersten Schritt.",
+        "benefits": [
+          "Stärkt die Oberschenkel- und Gesäßmuskulatur",
+          "Verbessert die Vorwärtsneigungsmechanik",
+          "Baut Griffstärke auf",
+          "Unterstützt die Vorbeugung von Oberschenkelverletzungen"
+        ],
+        "instructions": [
+          "Stehen Sie und halten Sie die Hanteln an den Oberschenkeln",
+          "Behalten Sie eine leichte Kniebeugung bei",
+          "Beugen Sie die Hüften nach hinten und senken Sie die Glocken entlang der Beine ab",
+          "Stoppen Sie in der Mitte des Schienbeins oder bei leichter Dehnung",
+          "Bewegen Sie die Hüften nach vorne, um aufzustehen"
+        ],
+        "tips": [
+          "Behalten Sie eine neutrale Haltung",
+          "Die Gewichte bleiben nah an den Beinen",
+          "Vermeiden Sie es, den unteren Rücken abzurunden",
+          "3–4 Sätze mit 8–12 Wiederholungen"
+        ],
+        "equipment": "Hanteln",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Goblet-Kniebeuge",
+        "description": "Ein Hockey-freundliches Kniebeugenmuster für Bein- und Rumpfstärke bei aufrechter Haltung.",
+        "benefits": [
+          "Baut Quadrizeps-Kraft auf",
+          "Lehrt die vertikale Rumpfposition",
+          "Verbessert die Beweglichkeit des Knöchels",
+          "Gute Off-Ice-Option in der Saison"
+        ],
+        "instructions": [
+          "Halten Sie eine Hantel oder Kettlebell an der Brust",
+          "Füße schulterbreit, Zehen leicht ausgestreckt",
+          "Gehen Sie parallel oder tiefer in die Hocke",
+          "Die Knie verlaufen über den Zehen",
+          "3–4 Sätze mit 10–15 Wiederholungen"
+        ],
+        "tips": [
+          "Ellenbogen unten innen an den Knien",
+          "Die Absätze bleiben unten",
+          "Kontrollieren Sie den Abstieg",
+          "Bleiben Sie aufrecht bis zur Brust"
+        ],
+        "equipment": "Hantel oder Kettlebell",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Bandrotationshacken",
+        "description": "Imitiert die Schuss- und Passrotation, um Kraft in der Hockey-Bewegungsebene aufzubauen.",
+        "benefits": [
+          "Verbessert die Schuss- und Passkraft",
+          "Trainiert die Antirotationsstabilität",
+          "Schulterschonendes Beladen",
+          "Kann zu Hause durchgeführt werden"
+        ],
+        "instructions": [
+          "Ankerband auf Brusthöhe",
+          "Stellen Sie sich zum Ankern seitlich hin",
+          "Halten Sie den Stock oder Griff mit beiden Händen fest",
+          "Kontrolliert aus der Hüfte drehen",
+          "12–15 Wiederholungen auf jeder Seite"
+        ],
+        "tips": [
+          "Kraft kommt aus den Hüften",
+          "Schützen Sie den unteren Rücken vor Überdrehung",
+          "Nehmen Sie eine athletische Hockeyhaltung ein",
+          "2–3 Sätze"
+        ],
+        "equipment": "Widerstandsband",
+        "calories": "100–150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Einbeinige Gesäßbrücke",
+        "description": "Aktiviert Gesäßmuskeln und Hüftstabilisatoren für kraftvolles Abstoßen beim Skaten.",
+        "benefits": [
+          "Stärkt die Gesäßmuskulatur",
+          "Stabilisiert das Becken beim Skaten",
+          "Verbessert die Beinsymmetrie",
+          "Unterstützt die Vorbeugung von Knieverletzungen"
+        ],
+        "instructions": [
+          "Legen Sie sich auf den Rücken, einen Fuß aufgesetzt",
+          "Anderes Bein in der Luft gestreckt oder gebeugt",
+          "Fahren Sie die Hüften in eine gerade Linie",
+          "Halten Sie oben 1 Sekunde inne",
+          "10–12 Wiederholungen pro Bein"
+        ],
+        "tips": [
+          "Vermeiden Sie eine Überstreckung der Lendenwirbelsäule",
+          "Halten Sie das Arbeitsknie ausgerichtet",
+          "Drücken Sie den Gesäßmuskel oben zusammen",
+          "2–3 Sätze"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Wadenheben im Stehen",
+        "description": "Stärkt Waden und Füße für Beinausdauer in der Spätschicht und Stabilität beim Schlittschuhlaufen.",
+        "benefits": [
+          "Verbessert die Wadenkraft",
+          "Reduziert die Ermüdung der Unterschenkel beim Spielen",
+          "Stärkt die Füße",
+          "Schnelle Umkleideraum-Option"
+        ],
+        "instructions": [
+          "Stellen Sie sich mit den Fußballen auf die Stufenkante",
+          "Senken Sie die Fersen unter die Stufenhöhe",
+          "Steigen Sie so hoch wie möglich",
+          "Oben pausieren",
+          "15–20 Wiederholungen, 3 Sätze"
+        ],
+        "tips": [
+          "Benutzen Sie bei Bedarf eine Wand zum Ausbalancieren",
+          "Volle Bewegungsfreiheit",
+          "Vermeiden Sie es, zu hüpfen",
+          "Fügen Sie leichtes Gewicht hinzu, wenn Sie fertig sind"
+        ],
+        "equipment": "Stufe oder Plattform",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Plank-Schulterklopfen",
+        "description": "Anti-Rotations-Kernarbeit für Kontaktstabilität und athletische Haltung.",
+        "benefits": [
+          "Baut Rumpfstabilität auf",
+          "Verbessert das Gleichgewicht bei Kontakt",
+          "Entwickelt die Kernausdauer",
+          "Funktioniert für alle Positionen"
+        ],
+        "instructions": [
+          "Beginnen Sie im High Plank",
+          "Verlagern Sie das Gewicht und tippen Sie auf die gegenüberliegende Schulter",
+          "Rückkehr und abwechselnde Arme",
+          "Halten Sie die Hüften gerade",
+          "Insgesamt 16–20 Klicks"
+        ],
+        "tips": [
+          "Verbreitern Sie die Füße für mehr Stabilität",
+          "Heben Sie die Hüften nicht an",
+          "Atme gleichmäßig",
+          "2–3 Sätze"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "80–120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20-m-Sprints mit voller Pause",
+        "description": "Simuliert kurze Schaltvorgänge, um die Fähigkeit zur wiederholten Beschleunigung zu verbessern.",
+        "benefits": [
+          "Verbessert die Geschwindigkeit wiederholter Sprints",
+          "Trainiert die Erholung zwischen den Schichten",
+          "Entwickelt die Startmechanik",
+          "Steigert die Spielausdauer"
+        ],
+        "instructions": [
+          "8–10 Minuten aufwärmen",
+          "Sprinten Sie 20 m mit 95 % Geschwindigkeit",
+          "Machen Sie beim Gehen eine Pause von 40–60 Sekunden",
+          "10–12 Mal wiederholen",
+          "5 Minuten abkühlen lassen"
+        ],
+        "tips": [
+          "Behalten Sie bei jeder Wiederholung die Sprintform bei",
+          "Schneiden Sie den Rest nicht zu früh ab",
+          "Geben Sie Qualität Vorrang vor Quantität",
+          "1–2 Sitzungen pro Woche"
+        ],
+        "equipment": "20 m Freifläche",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "Laufintervalle von 30–30–30 Sekunden",
+        "description": "Klassisches Intervall im Hockey-Stil: 30 Sekunden schwer, 30 Sekunden leicht.",
+        "benefits": [
+          "Baut Laktattoleranz auf",
+          "Imitiert die Intensitätsverschiebung",
+          "Verbessert die mentale Stärke",
+          "Effiziente Off-Ice-Session"
+        ],
+        "instructions": [
+          "10 Minuten aufwärmen",
+          "30 Sek. harter Lauf / 30 Sek. Gehen",
+          "Wiederholen Sie 12–16 Zyklen",
+          "Bemühen Sie sich in jeder Runde konsequent",
+          "Abkühlen und dehnen"
+        ],
+        "tips": [
+          "Gehen Sie nicht zu früh aufs Ganze",
+          "Behalten Sie die Laufform bei",
+          "Zwischen den Blöcken hydratisieren",
+          "Führen Sie die gesamten Zyklen langsam durch"
+        ],
+        "equipment": "Bahn oder Laufband",
+        "calories": "300–400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike-Intervalle",
+        "description": "Schonendes, hochintensives Cardiotraining, das in der Nebensaison knieschonend ist.",
+        "benefits": [
+          "Baut VO2max auf",
+          "Gelenkschonende Belastung",
+          "Trainiert Arme und Beine gemeinsam",
+          "Schnelle Erholung nach der Sitzung"
+        ],
+        "instructions": [
+          "5 Minuten leichtes Schleudern",
+          "Maximal 20 Sek. / 40 Sek. einfach",
+          "10–12 Runden",
+          "Überwachen Sie Drehzahl und Atmung",
+          "5 Minuten abkühlen lassen"
+        ],
+        "tips": [
+          "Entspannen Sie den Griff an den Griffen",
+          "Bleiben Sie stabil sitzen",
+          "Vermeiden Sie täglich maximale Anstrengung",
+          "Verfolgen Sie Kalorien für den Fortschritt"
+        ],
+        "equipment": "AirBike / Sturmfahrrad",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m Pendelbahn",
+        "description": "Kurze Richtungswechsel wie Forechecking und defensive Erholungen.",
+        "benefits": [
+          "Verbessert den Richtungswechsel",
+          "Baut die Geschwindigkeit beim ersten Schritt auf",
+          "Trainiert die Reaktion",
+          "Kompakte, für das Fitnessstudio geeignete Bohrmaschine"
+        ],
+        "instructions": [
+          "Markieren Sie zwei Linien im Abstand von 5 m",
+          "Linie mit der Hand berühren, zurücksprinten",
+          "6–8 Wiederholungen = 1 Satz",
+          "Ruhen Sie sich 90 Sek. aus",
+          "3–4 Sätze"
+        ],
+        "tips": [
+          "Berühren Sie die Linie jedes Mal vollständig",
+          "Explodieren Sie die ersten Schritte",
+          "In Kurven kräftig pflanzen",
+          "Benutzen Sie griffige Schuhe"
+        ],
+        "equipment": "Kegel oder Bodenlinien",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Beschleunigungen aus der Hockeyhaltung",
+        "description": "Niedrige sportliche Starts, die in Bullys und Puckkämpfe übergehen.",
+        "benefits": [
+          "Verbessert den ersten Schritt",
+          "Trainiert Low-Start-Mechaniker",
+          "Baut Beinkraft auf",
+          "Hockeyspezifisch"
+        ],
+        "instructions": [
+          "Stellen Sie eine athletische Haltung ein: Knie gebeugt, Oberkörper nach vorne",
+          "Auf Stichwort Sprint 10–15 m",
+          "Volle Pause 60–90 Sek",
+          "8–10 Wiederholungen",
+          "Alternatives Führungsbein"
+        ],
+        "tips": [
+          "Bleiben Sie vorne und springen Sie nicht zu früh auf",
+          "Fahren Sie das hintere Bein kräftig",
+          "Benutze deine Arme aggressiv",
+          "Maximal 10 hochwertige Wiederholungen"
+        ],
+        "equipment": "20 m Spur",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m Tempoläufe",
+        "description": "Kontrolliertes schnelles Laufen, um hohe schaltähnliche Anstrengungen aufrechtzuerhalten.",
+        "benefits": [
+          "Baut aerobe Kraft auf",
+          "Lehrt das Tempo",
+          "Verbessert die Beinausdauer",
+          "Gute Arbeit außerhalb der Saison"
+        ],
+        "instructions": [
+          "10 Minuten aufwärmen",
+          "400 m bei 75–80 % max",
+          "Ruhen Sie sich 2 Minuten zu Fuß aus",
+          "4–6 Wiederholungen",
+          "5 Minuten abkühlen lassen"
+        ],
+        "tips": [
+          "Gleichmäßiges Tempo, kein Sprint",
+          "Überwachen Sie die Atmung",
+          "Benutzen Sie Gleisspuren sicher",
+          "Machen Sie mit den Wiederholungen schrittweise Fortschritte"
+        ],
+        "equipment": "Gleis oder gemessene Schleife",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata-Sprungkniebeugen",
+        "description": "Vier Minuten hoher Intensität, die die Müdigkeit der Spätschicht nachahmen.",
+        "benefits": [
+          "Baut die anaerobe Ausdauer auf",
+          "Kurze, aber effektive Sitzung",
+          "Stärkt die Beine",
+          "Heimfreundlich"
+        ],
+        "instructions": [
+          "Maximal 20 Sekunden Sprungkniebeugen",
+          "10 Sekunden Pause",
+          "8 Runden = 4 Minuten",
+          "Vorher aufwärmen und danach abkühlen",
+          "1–2 mal wöchentlich"
+        ],
+        "tips": [
+          "Lande sanft",
+          "Überspringen Sie niemals das Aufwärmen",
+          "Vermeiden Sie es am Spieltag",
+          "Schützen Sie die Knie durch eine gute Form"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU-Waage mit Stock",
+        "description": "Instabile Oberfläche und Stockhandling für eine Balance wie auf Eis.",
+        "benefits": [
+          "Verbessert die Propriozeption",
+          "Trainiert die Standbalance",
+          "Verbindet Hände und Füße",
+          "Stärkt die Stabilität des Knöchels"
+        ],
+        "instructions": [
+          "Stehen Sie mit beiden Füßen auf BOSU",
+          "Stock halten, leichte Puckhandhabung",
+          "30–45 Sekunden lang gedrückt halten",
+          "Ruhen Sie sich aus und wiederholen Sie den Vorgang 4–6 Mal",
+          "Versuchen Sie es mit einem Bein, wenn Sie bereit sind"
+        ],
+        "tips": [
+          "Blick nach vorne, nicht nach unten",
+          "Weiche Kniebeuge",
+          "Zur Sicherheit eine Mauer in der Nähe",
+          "Start ohne Puck"
+        ],
+        "equipment": "BOSU, Hockeyschläger",
+        "calories": "70–100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Einbeinige RDL-Reichweite",
+        "description": "Balance plus hintere Kette wie einbeiniges Schlittschuhlaufen in Kurven.",
+        "benefits": [
+          "Baut das einbeinige Gleichgewicht auf",
+          "Stärkt die Oberschenkel- und Gesäßmuskulatur",
+          "Verbessert die Hüftkontrolle",
+          "Skating-spezifisch"
+        ],
+        "instructions": [
+          "Stehen Sie mit einer leichten Hantel auf einem Bein",
+          "Scharnier nach vorne, Spielbein nach hinten",
+          "Boden oder Schienbein berühren",
+          "Kehren Sie in die Vertikale zurück",
+          "8–10 Wiederholungen pro Bein"
+        ],
+        "tips": [
+          "Konzentrieren Sie den Blick auf einen Punkt",
+          "Bewegen Sie sich langsam",
+          "Halten Sie die Hüften gerade",
+          "2–3 Sätze"
+        ],
+        "equipment": "Hantel",
+        "calories": "120–170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Einbeinige Zehenbalance",
+        "description": "Einfache Knöchel- und Fußstabilitätsübung zum Skaten.",
+        "benefits": [
+          "Stärkt die Füße",
+          "Verbessert das Gleichgewicht",
+          "Schnelle tägliche Übung",
+          "Kann überall gemacht werden"
+        ],
+        "instructions": [
+          "Stehen Sie auf einem Bein",
+          "Stellen Sie sich auf die Zehenspitzen",
+          "15–20 Sekunden lang gedrückt halten",
+          "Senken Sie die Beine und wechseln Sie sie",
+          "6–8 Wiederholungen pro Bein"
+        ],
+        "tips": [
+          "Nutzen Sie bei Bedarf Unterstützung",
+          "Blick nach vorn",
+          "Atmen Sie normal",
+          "Barfuß oder Schuhe"
+        ],
+        "equipment": "Keiner",
+        "calories": "30–50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partnerpass auf einem Bein",
+        "description": "Gleichgewicht und Passkoordination wie Bewegungen im Spiel.",
+        "benefits": [
+          "Verbindet Balance und Passspiel",
+          "Verbessert die Rumpfstabilität",
+          "Züge konzentrieren sich",
+          "Partnerübung"
+        ],
+        "instructions": [
+          "Mit Puck/Ball auf einem Bein stehen",
+          "Partner 3–4 m entfernt",
+          "Machen Sie präzise Pässe",
+          "30 Sekunden, Bein wechseln",
+          "4 Runden"
+        ],
+        "tips": [
+          "Weiche Knie",
+          "Knackige Pässe",
+          "Opfern Sie nicht das Gleichgewicht für die Macht",
+          "Wall Rebounder funktioniert auch"
+        ],
+        "equipment": "Puck/Ball, Partner",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Ausfallschritt mit Rotation",
+        "description": "Dynamisches Gleichgewicht und Rotation zur Vorbereitung auf Körperkontrollen.",
+        "benefits": [
+          "Verbessert das dynamische Gleichgewicht",
+          "Baut Rotation aus den Beinen auf",
+          "Stärkt die Beine",
+          "Funktional für Hockey"
+        ],
+        "instructions": [
+          "Machen Sie einen Ausfallschritt nach vorne",
+          "Drehen Sie den Oberkörper in Richtung Vorderbein",
+          "Gehen Sie zurück und treten Sie auf das andere Bein",
+          "10 Schritte pro Bein",
+          "2–3 Sätze"
+        ],
+        "tips": [
+          "Kniespuren über dem Fuß",
+          "Bleib groß",
+          "Den Ball optional an die Brust halten",
+          "Kontrollieren Sie das Tempo"
+        ],
+        "equipment": "Keiner",
+        "calories": "100–150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Seitliche Stufen des Gleitbretts",
+        "description": "Simuliert seitliches Skaten mit Schwerpunkt auf dem Gleichgewicht.",
+        "benefits": [
+          "Baut seitliche Kraft auf",
+          "Verbessert die seitliche Balance",
+          "Entwickelt Adduktoren",
+          "Ideal für Verteidiger"
+        ],
+        "instructions": [
+          "Gleitbrett- oder Sockenschieber",
+          "Seitliche Schritte 20–30 Sekunden",
+          "Bleiben Sie tief in der Haltung",
+          "60 Sek. ruhen lassen",
+          "6–8 Sätze"
+        ],
+        "tips": [
+          "Stehen Sie nicht aufrecht",
+          "Hände in Bereitschaftsposition",
+          "Geschwindigkeit steuern",
+          "Verwenden Sie Board-Stoßfänger"
+        ],
+        "equipment": "Rutschbrett",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Hürdensprünge",
+        "description": "Baut die Explosivität der Beine für Antrittsstöße und Kampfsprünge auf.",
+        "benefits": [
+          "Erhöht die vertikale und horizontale Kraft",
+          "Verbessert die Reaktionsfähigkeit",
+          "Entwickelt Koordination",
+          "Überträgt Eisbeschleunigung"
+        ],
+        "instructions": [
+          "Stellen Sie die Hürden im Abstand von 60–90 cm auf",
+          "Über beide hüpfe ich mit zwei Fuß",
+          "Sanfte Landung",
+          "6–8 Hürden pro Satz",
+          "3–4 Sätze"
+        ],
+        "tips": [
+          "Weiche Knie bei der Landung",
+          "Benutzen Sie die Arme aktiv",
+          "Beginnen Sie mit niedrigen Hürden",
+          "Volle Pause zwischen den Sätzen"
+        ],
+        "equipment": "Hürden oder Kegel",
+        "calories": "140–200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sitz-Sprint-Start",
+        "description": "Entfernt die Vordehnung, um pure Explosivität beim ersten Schritt zu trainieren.",
+        "benefits": [
+          "Baut Startkraft auf",
+          "Verbessert die Reaktion",
+          "Trainiert die Hüftstreckung",
+          "Einfache Feldübung"
+        ],
+        "instructions": [
+          "Setzen Sie sich mit den Beinen nach vorne auf den Boden",
+          "Am Queue stehen und 10 m sprinten",
+          "8–10 Wiederholungen",
+          "60–90 Sek. ruhen lassen",
+          "Zuerst aufwärmen"
+        ],
+        "tips": [
+          "Lehnen Sie sich nicht vor dem Stichwort zurück",
+          "Stehen Sie explosionsartig auf",
+          "Erste 3 Schritte maximale Leistung",
+          "Alternative Richtungen"
+        ],
+        "equipment": "10 m Spur",
+        "calories": "100–150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Weitsprungserie",
+        "description": "Horizontale Kraft, nützlich für Brettkämpfe und Abstöße.",
+        "benefits": [
+          "Baut horizontale Kraft auf",
+          "Verbessert die Koordination",
+          "Stärkt die Beine",
+          "Kurze Sitzung"
+        ],
+        "instructions": [
+          "Stehender Weitsprung",
+          "Sanfte Landung",
+          "Sofort weiter nach vorne springen",
+          "5 Sprünge hintereinander = 1 Satz",
+          "4–5 Sätze mit Pause"
+        ],
+        "tips": [
+          "Benutzen Sie Armschwung",
+          "Land ausgeglichen",
+          "Fließender Sprung zum Sprung",
+          "Knie aufwärmen"
+        ],
+        "equipment": "Freiraum",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Medizinball-Slam",
+        "description": "Explosiver Abwärtswurf für die gesamte Körperkontaktkraft.",
+        "benefits": [
+          "Baut einen explosiven Kern auf",
+          "Schnell hohe Intensität",
+          "Verbindet Beine-Kern-Arme",
+          "Toller Stressabbau"
+        ],
+        "instructions": [
+          "Heben Sie den Medizinball über den Kopf",
+          "Mit voller Wucht auf den Boden knallen",
+          "Aufnehmen und wiederholen",
+          "10–12 Wiederholungen",
+          "3 Sätze"
+        ],
+        "tips": [
+          "Benutzen Sie Beine und Rumpf",
+          "Neutrale Wirbelsäule beim Heben",
+          "Beobachten Sie den Rebound",
+          "Verwenden Sie einen 4–8 kg schweren Ball"
+        ],
+        "equipment": "Medizinball",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Schlittenschieben",
+        "description": "Schwerer horizontaler Antrieb wie maximale Starts aus dem Stand.",
+        "benefits": [
+          "Maximaler Beinantrieb",
+          "Geringe Stoßbelastung",
+          "Baut mentale Stärke auf",
+          "Ideal für Power Forwards"
+        ],
+        "instructions": [
+          "Niedriger Stand hinter dem Schlitten",
+          "15–20 m schieben",
+          "Volle Ruhe 2 Min",
+          "4–6 Stöße",
+          "Zunächst gemeinsames Aufwärmen"
+        ],
+        "tips": [
+          "Bleib niedrig",
+          "Kurze kraftvolle Schritte",
+          "Stehen Sie nicht früh auf",
+          "Startlicht unter Last"
+        ],
+        "equipment": "Prowler-Schlitten",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike 10 Minuten lang stabil halten",
+        "description": "Aerobic-Basis für lange Schichten und Konditionierung außerhalb der Saison.",
+        "benefits": [
+          "Baut die aerobe Ausdauer auf",
+          "Gelenkschonend",
+          "Herzfrequenzkontrolle",
+          "Kurze Off-Ice-Session"
+        ],
+        "instructions": [
+          "5 Minuten Aufwärmen",
+          "10 Minuten bei 65–70 % Anstrengung",
+          "Konstante Drehzahl",
+          "5 Minuten abkühlen lassen",
+          "Überwachen Sie die Atmung"
+        ],
+        "tips": [
+          "Halten Sie sich von der anaeroben Zone fern",
+          "Stabile Haltung",
+          "Hydrat",
+          "2–3 mal wöchentlich"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Erg-Intervalle beim Rudern",
+        "description": "Ganzkörper-Cardio ohne Belastung für Rumpf- und Beinausdauer.",
+        "benefits": [
+          "Ganzkörperkonditionierung",
+          "Verbessert die Ruderhaltung",
+          "Baut Griffigkeit und Kern auf",
+          "Laufalternative"
+        ],
+        "instructions": [
+          "500 m schwer / 1 Minute leicht",
+          "6–8 Runden",
+          "Antrieb aus Beinen und Rumpf",
+          "5 Minuten Aufwärmen",
+          "Cool-Down-Strecke"
+        ],
+        "tips": [
+          "Neutrale Wirbelsäule",
+          "Ellenbogen bis Hüfte",
+          "Sogar Split-Pace",
+          "Stellen Sie den Dämpfer mit Bedacht ein"
+        ],
+        "equipment": "Rudern erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Kontinuierliche Skater-Hops",
+        "description": "Rhythmische seitliche Sprünge zur Bein- und seitlichen Konditionierung.",
+        "benefits": [
+          "Baut seitliche Ausdauer auf",
+          "Stärkt die Beine",
+          "Imitiert Richtungsänderungen",
+          "Kompakter Bohrer"
+        ],
+        "instructions": [
+          "Springen Sie von einem Bein zum anderen",
+          "Arme wie Skaten",
+          "30 Sek. Arbeit / 30 Sek. Pause",
+          "10 Runden",
+          "Sanfte Landungen"
+        ],
+        "tips": [
+          "Kniespuren über dem Fuß",
+          "Brust hoch",
+          "Kontrollieren Sie die Sprungweite",
+          "Zuerst aufwärmen"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 Zirkeltraining",
+        "description": "Vier-Stationen-Zirkel für die allgemeine Eishockey-Konditionierung.",
+        "benefits": [
+          "Ganzkörperarbeitsbelastung",
+          "Zeiteffizient",
+          "Stärkt die Arbeitskapazität",
+          "Fitnessstudio anpassbar"
+        ],
+        "instructions": [
+          "Burpees, Mountain Climbers, Jump Squats, Liegestütze",
+          "45 Sek. Arbeit / 15 Sek. Übergang",
+          "4 Züge × 4 Runden",
+          "2 Minuten Pause zwischen den Runden",
+          "Aufwärmen und abkühlen"
+        ],
+        "tips": [
+          "Skalieren Sie auf Ihr Niveau",
+          "Form über Geschwindigkeit",
+          "Bleiben Sie hydriert",
+          "Vermeiden Sie es am Spieltag"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Durchläufe mit niedrigen Hürden",
+        "description": "Cardio plus Koordination mit schnellen Schritten wie hartem Skaten.",
+        "benefits": [
+          "Verbessert die Trittfrequenz",
+          "Baut Koordination auf",
+          "Steigert die aerobe Kapazität",
+          "Variiert die Laufarbeit"
+        ],
+        "instructions": [
+          "6–8 niedrige Hürden über 20 m",
+          "Mit hohen Knien durchlaufen",
+          "6 Durchgänge",
+          "Ruhen Sie sich 90 Sek. aus",
+          "3–4 Serie"
+        ],
+        "tips": [
+          "Überspringen Sie keine Hürden",
+          "Schnelle kurze Schritte",
+          "Aktive Arme",
+          "Gelenke aufwärmen"
+        ],
+        "equipment": "Mini-Hürden",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Leiterschnelle Füße",
+        "description": "Schnelle Fußbasis für Ausweichmanöver und enge Kurven.",
+        "benefits": [
+          "Verbessert die Fußgeschwindigkeit",
+          "Baut Koordination auf",
+          "Steigert die Reaktion",
+          "Aufwärmen vor dem Eis"
+        ],
+        "instructions": [
+          "Rein-rein-raus-raus über die Leiter",
+          "Maximal 30 Sek. / 30 Sek. Pause",
+          "8 Runden",
+          "Variieren Sie die Muster jede zweite Runde",
+          "Zuerst leichtes Aufwärmen"
+        ],
+        "tips": [
+          "Augen hoch",
+          "Kurze Schritte",
+          "Hände in sportlicher Bereitschaft",
+          "Überspringen Sie keine Sprossen"
+        ],
+        "equipment": "Agility-Leiter",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-Drill-Agilität",
+        "description": "Klassischer T-Test: Sprint, Shuffle und Rücktritt wie auf Eis.",
+        "benefits": [
+          "Komplettes Agilitätspaket",
+          "Züge in alle Richtungen",
+          "Nachverfolgbarer Fortschritt",
+          "Für Skater"
+        ],
+        "instructions": [
+          "Sprinte 10 m vorwärts",
+          "Mische 5 m nach links und rechts",
+          "Zum Start 10 m zurücktreten",
+          "3–5 Wiederholungen",
+          "Ruhen Sie sich 90 Sek. aus"
+        ],
+        "tips": [
+          "Bleiben Sie im Shuffle niedrig",
+          "Überkreuzen Sie nicht die Füße",
+          "Kegel berühren",
+          "Protokollieren Sie Ihre Zeiten"
+        ],
+        "equipment": "Kegel",
+        "calories": "100–150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Puck-Achter-Übung",
+        "description": "Führen Sie eine Acht mit dem Stockgriff durch und verbinden Sie Hände und Beinarbeit.",
+        "benefits": [
+          "Verbessert das Stickhandling",
+          "Verbindet Hände und Füße",
+          "Trainiert das periphere Sehen",
+          "Heimfreundlich"
+        ],
+        "instructions": [
+          "Zwei Kegel im Abstand von 2 m",
+          "Puck die Acht um die Kegel herum",
+          "30 Sek. Höchstgeschwindigkeit",
+          "30 Sek. ruhen lassen",
+          "10 Runden"
+        ],
+        "tips": [
+          "Kopf hoch",
+          "Weiche Hände",
+          "Schnelle Füße",
+          "Wechseln Sie alle 5 Runden die Richtung"
+        ],
+        "equipment": "Puck, 2 Kegel, Stock",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktive Kegelrufe",
+        "description": "Partner ruft einen Kegel – Reaktion und erster Schritt wie im Spiel.",
+        "benefits": [
+          "Trainiert die Spielreaktion",
+          "Verbessert die kognitive Geschwindigkeit",
+          "Baut den ersten Schritt auf",
+          "Partnerübung"
+        ],
+        "instructions": [
+          "4 Kegel auf 3 m im Quadrat",
+          "Partner ruft Farbe/Nummer an",
+          "Sprint zum Kegel",
+          "Berühren und zurückkehren",
+          "20 Reaktionen"
+        ],
+        "tips": [
+          "Bleiben Sie ehrlich und raten Sie nicht zu früh",
+          "Niedrige Haltung",
+          "Brisanter erster Schritt",
+          "Variieren Sie das Layout"
+        ],
+        "equipment": "4 Kegel, Partner",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Seitliche Shuffle-Schritte",
+        "description": "Seitliche Bewegungen im Hockey-Stand, die das seitliche Schlittschuhlaufen imitieren.",
+        "benefits": [
+          "Baut seitliche Schnelligkeit auf",
+          "Stärkt die Hüftabduktoren",
+          "Verbessert die Haltung",
+          "Aufwärmen vor dem Eis"
+        ],
+        "instructions": [
+          "5 m links und rechts schlurfen",
+          "Überkreuzen Sie nicht die Füße",
+          "30 Sek. / 30 Sek. Pause",
+          "8 Runden",
+          "Hände am imaginären Stock"
+        ],
+        "tips": [
+          "Bleib niedrig",
+          "Äußeres Bein abstoßen",
+          "Brust nach vorne",
+          "Schnelle Kontakte"
+        ],
+        "equipment": "Kegel oder Linien",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynamischer Hüftöffner",
+        "description": "Aufwärmen der Hüftbeweglichkeit für eine tiefe Hockeyhaltung.",
+        "benefits": [
+          "Verbessert die Beweglichkeit der Hüfte",
+          "Reduziert das Risiko von Leistenverletzungen",
+          "Bereitet sich auf das Skaten vor",
+          "Schnelle Routine"
+        ],
+        "instructions": [
+          "Beinschwünge jeweils 10 Mal vorn und hinten",
+          "Bein schwingt jeweils 10 Mal zur Seite",
+          "Tiefe Kniebeuge 30 Sek. halten",
+          "Hüftkreise 10 pro Strecke",
+          "Knieumarmungen 10 m gehen"
+        ],
+        "tips": [
+          "Kontrollierte Reichweite",
+          "Kein Schmerz",
+          "Atme tief durch",
+          "Vor jeder Sitzung"
+        ],
+        "equipment": "Keiner",
+        "calories": "40–60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Die größte Strecke der Welt",
+        "description": "Dynamische Dehnung auf Hüfte, Brustwirbelsäule und Oberschenkelmuskulatur.",
+        "benefits": [
+          "Ganzkörpermobilität",
+          "Zeiteffizient",
+          "Bereitet den gesamten Körper vor",
+          "Gemeinsames Aufwärmen für Profis"
+        ],
+        "instructions": [
+          "Begib dich in den Ausfallschritt",
+          "Ellenbogen nach innen zeigen",
+          "Brustrotationsarm nach oben",
+          "Strecken Sie das Vorderbein für die Oberschenkelmuskulatur",
+          "5 Wiederholungen pro Seite"
+        ],
+        "tips": [
+          "Bewegen Sie sich langsam",
+          "Kein Springen",
+          "Verfolgen Sie das vordere Knie",
+          "Beide Seiten gleich"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "50–70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Ausziehbare Bänder",
+        "description": "Aktiviert den oberen Rücken und die Schultern vor dem Schießen und Kontakt.",
+        "benefits": [
+          "Aktiviert die hinteren Deltamuskeln und Rautenmuskeln",
+          "Verbessert die Körperhaltung",
+          "Wärmt die Schultern",
+          "Verletzungsprävention"
+        ],
+        "instructions": [
+          "Halten Sie das Band auf Brusthöhe",
+          "Arme gerade",
+          "Bis zu den Schulterblättern auseinanderziehen",
+          "15–20 Wiederholungen",
+          "2–3 Sätze"
+        ],
+        "tips": [
+          "Kein Schulterzucken",
+          "Kontrollierte Rückgabe",
+          "Lichtband zum Start",
+          "Vor dem Eis oder im Fitnessstudio"
+        ],
+        "equipment": "Widerstandsband",
+        "calories": "30–50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Hohe Knie + Tritte in den Hintern",
+        "description": "Dynamisches Aufwärmen der Beine und Erhöhung der Herzfrequenz vor dem Eis.",
+        "benefits": [
+          "Erhöht die Herzfrequenz",
+          "Wärmt Quadrizeps und Kniesehnen",
+          "Verbessert die Koordination",
+          "Schnelle Wirkung"
+        ],
+        "instructions": [
+          "20 m hohe Knie",
+          "20 m Hinterntritte",
+          "20 m Springen",
+          "3–4 Mal wiederholen",
+          "Einfaches Joggen dazwischen"
+        ],
+        "tips": [
+          "Bleiben Sie am Vorderfuß",
+          "Aktive Arme",
+          "Steigern Sie das Tempo schrittweise",
+          "Sprinten Sie nicht kalt"
+        ],
+        "equipment": "20 m² Platz",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Armschwünge + Stockaufwärmen",
+        "description": "Aufwärmen der Schultern und leichtes Stockhandling vor dem Eis.",
+        "benefits": [
+          "Mobilisiert die Schultern",
+          "Aktiviert die Rotatorenmanschette",
+          "Verbindet den Oberkörper mit dem Stock",
+          "Hockeyspezifisch"
+        ],
+        "instructions": [
+          "10 Armkreise in jede Richtung",
+          "Cross-Body-Swings 10",
+          "Stockgriff langsam bis schnell 60 Sek",
+          "Handgelenksrollen mit Stock 20",
+          "Leichte Schussbewegung x10"
+        ],
+        "tips": [
+          "Fortschrittsgeschwindigkeit",
+          "Beide Hände",
+          "Keine erzwungene Reichweite",
+          "Bei jeder Eissession"
+        ],
+        "equipment": "Stock, Puck",
+        "calories": "50–80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Kniende Hüftbeugerdehnung",
+        "description": "Dehnung der Hüftbeuger, um der Skating-Haltung entgegenzuwirken.",
+        "benefits": [
+          "Reduziert Verspannungen in der Hüfte",
+          "Kann den Schritt verbessern",
+          "Hilft bei der Körperhaltung",
+          "Nach dem Eis oder im Fitnessstudio"
+        ],
+        "instructions": [
+          "Kniender Ausfallschritt",
+          "Drücken Sie den Gesäßmuskel nach hinten",
+          "Oberkörper hoch",
+          "30–45 Sek. gedrückt halten",
+          "2–3 Mal pro Bein"
+        ],
+        "tips": [
+          "Vermeiden Sie einen Lendenwirbelbogen",
+          "Atmen Sie in die Dehnung ein",
+          "Vorderes Knie über Knöchel",
+          "Möglichst täglich"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 Hüftrotation",
+        "description": "Hüftbeweglichkeit für Drehungen und tiefes Ducken auf Skates.",
+        "benefits": [
+          "Verbessert die Hüftrotation",
+          "Reduziert das Risiko einer Leistenzerrung",
+          "Ruhige Erholungsarbeit",
+          "Freundlich nach dem Spiel"
+        ],
+        "instructions": [
+          "Setzen Sie sich in die 90/90-Position",
+          "Drehen Sie die Knie hin und her",
+          "Hände zurück zur Unterstützung",
+          "10 langsame Wiederholungen in jede Richtung",
+          "Ende 20 Sek. gedrückt halten"
+        ],
+        "tips": [
+          "Kein Forcierungsbereich",
+          "Brust hoch",
+          "Möglichst beide Hüften nach unten",
+          "Benutze den Atem"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Dehnung der Thoraxrotation",
+        "description": "Brustbeweglichkeit für Schussrotation und Haltung.",
+        "benefits": [
+          "Verbessert die Rotation der T-Wirbelsäule",
+          "Entlastet den unteren Rücken",
+          "Hilft bei der Schussmechanik",
+          "Schnelle tägliche Übung"
+        ],
+        "instructions": [
+          "Vierfüßlerstand",
+          "Hand hinter dem Kopf",
+          "Ellenbogen zur Decke drehen",
+          "10 Wiederholungen pro Seite",
+          "Oben 2 Sekunden pausieren"
+        ],
+        "tips": [
+          "Die Hüften bleiben gerade",
+          "Atmen Sie beim Drehen aus",
+          "Keine Wirbelsäulenschmerzen",
+          "Bewegen Sie sich langsam"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "30–45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Wadendehnung an der Wand",
+        "description": "Waden und Achilles sind beim Schlittschuhlaufen oft überlastet.",
+        "benefits": [
+          "Reduziert Wadenspannung",
+          "Verbessert die Dorsalflexion des Knöchels",
+          "Vorbeugung von Schienbeinschienen",
+          "Nach jeder Sitzung"
+        ],
+        "instructions": [
+          "Hände an der Wand",
+          "Hinteres Bein gerade mit der Ferse nach unten",
+          "30 Sek. gedrückt halten",
+          "Beugen Sie das Knie für den Soleus",
+          "2–3 Runden pro Bein"
+        ],
+        "tips": [
+          "Ferse auf dem Boden",
+          "Hüften quadratisch",
+          "Kein Springen",
+          "Beide Beine"
+        ],
+        "equipment": "Wand",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Schulterdehnung über den Körper hinweg",
+        "description": "Dehnung der hinteren Schulter nach Aufnahme des Volumens.",
+        "benefits": [
+          "Reduziert Schulterverspannungen",
+          "Hilft bei der Schussreichweite",
+          "Schnelle Dehnung",
+          "Tägliche Wartung"
+        ],
+        "instructions": [
+          "Arm über die Brust ziehen",
+          "Mit der anderen Hand den Ellenbogen festhalten",
+          "30 Sek. pro Arm",
+          "2–3 Mal wiederholen",
+          "Entspannter Nacken"
+        ],
+        "tips": [
+          "Zucken Sie nicht mit den Schultern",
+          "Nur sanftes Ziehen",
+          "Atmen Sie aus und entspannen Sie sich",
+          "Nach Eis"
+        ],
+        "equipment": "Keiner",
+        "calories": "20–35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Zwerchfellatmung",
+        "description": "Tiefes Atmen für die Erholung des Parasympathikus nach dem Spiel.",
+        "benefits": [
+          "Reduziert Stress",
+          "Unterstützt die Genesung",
+          "Kann den Schlaf verbessern",
+          "Umkleideraumfreundlich"
+        ],
+        "instructions": [
+          "Liegen oder sitzen Sie bequem",
+          "Hand auf Bauch",
+          "Atme 4 Sekunden lang durch die Nase ein",
+          "Atmen Sie 6 Sekunden lang mit dem Mund aus",
+          "5 Minuten ununterbrochen"
+        ],
+        "tips": [
+          "Der Bauch, nicht die Brust, hebt sich",
+          "Ruhiger Raum",
+          "Tägliche Gewohnheit",
+          "Nach späten Spielen"
+        ],
+        "equipment": "Keiner",
+        "calories": "15–25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Beine an der Wand",
+        "description": "Venöser Rückfluss und Entspannung der Beine nach schweren Spielen.",
+        "benefits": [
+          "Kann die Schwellung der Beine reduzieren",
+          "Fördert Entspannung",
+          "Passive Erholung",
+          "Nach Reisespielen"
+        ],
+        "instructions": [
+          "Hüften nahe der Wand liegend",
+          "Beine senkrecht an der Wand",
+          "Arme entspannt",
+          "8–10 Minuten halten",
+          "Langsames Atmen"
+        ],
+        "tips": [
+          "Angenehme Oberfläche",
+          "Trennen Sie den Stecker vom Telefon",
+          "Optional ruhige Musik",
+          "Am besten abends"
+        ],
+        "equipment": "Wand, Matte",
+        "calories": "20–30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Schaumstoffrollen für Quadrizeps und Kniesehnen",
+        "description": "Myofasziale Entlastung der Beine nach starker Belastung.",
+        "benefits": [
+          "Reduziert Schmerzen",
+          "Verbessert die Gewebequalität",
+          "Schnellere Genesung",
+          "Selbstpflege"
+        ],
+        "instructions": [
+          "Rollen Sie jeweils 60 Sekunden lang Quads",
+          "Rollen Sie die Kniesehnen jeweils 60 Sekunden lang",
+          "Pausieren Sie die empfindlichen Stellen 20 Sek. lang",
+          "Nur leichtes IT-Band",
+          "Anschließend mit Feuchtigkeit versorgen"
+        ],
+        "tips": [
+          "Vermeiden Sie Gelenke",
+          "Atmen Sie durch enge Stellen",
+          "Mäßiger Druck",
+          "Kein Voreis"
+        ],
+        "equipment": "Schaumstoffrolle",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Fördert die Beweglichkeit der Hüften und Knöchel",
+        "description": "Sanfte Mobilität außerhalb des Tages, um die Bewegungsfreiheit aufrechtzuerhalten.",
+        "benefits": [
+          "Behält die Mobilität bei",
+          "Geringe Ermüdung",
+          "Aktive Erholung",
+          "Verletzungsprävention"
+        ],
+        "instructions": [
+          "Knöchelkreise jeweils 10 Stück",
+          "Hippe Autos 5 pro Strecke",
+          "Katze-Kuh 10 Wiederholungen",
+          "Kinderpose 60 Sek",
+          "2 Runden"
+        ],
+        "tips": [
+          "Schmerzfreie Reichweite",
+          "Langsam und kontrolliert",
+          "Ruhetag oder Morgen",
+          "Atmen Sie hinzu"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Dehnen und atmen Sie zur Schlafvorbereitung ein",
+        "description": "Leichtes Dehnen und Atmen vor dem Schlafengehen zur Erholung über Nacht.",
+        "benefits": [
+          "Unterstützt das Einschlafen",
+          "Entspannt das Nervensystem",
+          "Erholung im Schlaf",
+          "Abendritual"
+        ],
+        "instructions": [
+          "Dehnung der hinteren Oberschenkelmuskulatur jeweils 30 Sekunden lang",
+          "Kinderpose 60 Sek",
+          "Jeweils 30 Sekunden lang auf dem Rücken drehen",
+          "Boxatmung 4-4-4-4 für 3 Minuten",
+          "Dunkler, ruhiger Raum"
+        ],
+        "tips": [
+          "Keine Bildschirme danach",
+          "Konsequente Schlafenszeit",
+          "Kühles Zimmer",
+          "Machen Sie es zur Gewohnheit"
+        ],
+        "equipment": "Trainingsmatte",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     },
     "difficulties": {
@@ -1735,6 +3135,8 @@
     "codeSentToEmailMessage": "Code wurde an {email} gesendet",
     "userNotFound": "Benutzer nicht gefunden",
     "userNotFoundMessage": "Ein Konto mit dieser Telefonnummer existiert nicht. Bitte registrieren Sie sich.",
+    "networkError": "Verbindungsproblem",
+    "networkErrorMessage": "Server konnte nicht erreicht werden. Überprüfe deine Internetverbindung und versuche es erneut.",
     "errorSendingCode": "Fehler",
     "errorSendingCodeMessage": "Der Code konnte nicht gesendet werden. Überprüfen Sie Ihre Telefonnummer und Internetverbindung.",
     "errorResendingCode": "Fehler",
@@ -1918,6 +3320,8 @@
     "rightShort": "P",
     "startedHockey": "Im Hockey mit",
     "noFriendsYet": "{name} hat noch keine Freunde",
+    "inviteYourTeam": "Lade dein Team ein",
+    "inviteTeamMessage": "Ich bin bei HockeyStars – der App für Eishockeyspieler. Mach mit:",
     "beFirstToAdd": "Seien Sie der Erste, der {name} als Freund hinzufügt",
     "writeMessage": "Nachricht schreiben",
     "edit": "Bearbeiten",
@@ -2393,9 +3797,17 @@
     "weightFrom": "Gewicht",
     "all": "Alle",
     "noPlayersFound": "Keine Spieler gefunden",
+    "newcomers": "Neuzugänge",
+    "topByPoints": "Top nach Punkten",
     "left": "Links",
     "right": "Rechts",
-    "resetFilters": "Filter zurücksetzen"
+    "resetFilters": "Filter zurücksetzen",
+    "topBySV": "Top nach SV%",
+    "shareRating": "Ranking teilen",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "Punkte",
+    "allCountries": "Alle Länder",
+    "allYears": "Alle Jahre"
   },
   "messages": {
     "title": "Nachrichten",
@@ -2849,6 +4261,23 @@
     "physicalDataUpdate": "Physische Daten aktualisiert",
     "friendRequest": "Freundschaftsanfrage",
     "newFriendship": "Neue Freundschaft",
-    "speedRecord": "Neuer Geschwindigkeitsrekord"
+    "speedRecord": "Neuer Geschwindigkeitsrekord",
+    "gameFirstPlace": "Spielchampion",
+    "quizFirstPlace": "Hockey-Star"
+  },
+  "videoUploadHint": "Max. 20 Sekunden pro Video, bis zu 10 Videos",
+  "gameFirstPlaceNotification": {
+    "title": "Spielchampion",
+    "message": "{playerName} hat den 1. Platz erreicht"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hockey-Star",
+    "message": "{playerName} hat {prize} verdient"
+  },
+  "tabs": {
+    "chat": "Chat",
+    "feed": "Feed",
+    "scout": "Scout",
+    "skills": "Skills"
   }
 }

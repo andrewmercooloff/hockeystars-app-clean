@@ -1,4 +1,3 @@
-import SafeIcon from './SafeIcon';
 import React, { useState } from 'react';
 import {
     Dimensions,
@@ -11,8 +10,45 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import PhotoViewer from './PhotoViewer';
+import { useMediaAspectSize } from '../utils/mediaAspectSize';
 
 const { width: screenWidth } = Dimensions.get('window');
+const PHOTO_TILE_WIDTH = Math.round(screenWidth * 0.42);
+
+function PhotoTile({
+  photo,
+  index,
+  onPress,
+}: {
+  photo: string;
+  index: number;
+  onPress: (index: number) => void;
+}) {
+  const { width, height } = useMediaAspectSize(photo, PHOTO_TILE_WIDTH, 'image');
+  return (
+    <TouchableOpacity
+      style={[styles.photoContainer, { width, height }]}
+      onPress={() => onPress(index)}
+      activeOpacity={0.8}
+    >
+      <Image
+        source={{
+          uri: photo,
+          headers: {
+            'Cache-Control': 'public, max-age=31536000',
+          },
+        }}
+        style={styles.photo}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={0}
+      />
+      <View style={styles.photoOverlay}>
+        <Ionicons name="expand-outline" size={20} color="#fff" />
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 interface PhotosSectionProps {
   photos?: string[];
@@ -41,28 +77,7 @@ const PhotosSection = React.memo(function PhotosSection({ photos = [] }: PhotosS
         contentContainerStyle={styles.photosScroll}
       >
         {photos.map((photo, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.photoContainer}
-            onPress={() => openPhotoViewer(index)}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={{ 
-                uri: photo,
-                headers: {
-                  'Cache-Control': 'public, max-age=31536000'
-                }
-              }}
-              style={styles.photo}
-              contentFit="contain"
-              cachePolicy="memory-disk"
-              transition={0}
-            />
-            <View style={styles.photoOverlay}>
-              <Ionicons name="expand-outline" size={20} color="#fff" />
-            </View>
-          </TouchableOpacity>
+          <PhotoTile key={index} photo={photo} index={index} onPress={openPhotoViewer} />
         ))}
       </ScrollView>
 
@@ -115,14 +130,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   photoContainer: {
-    width: screenWidth * 0.25,
-    height: screenWidth * 0.25,
     marginHorizontal: 5,
     borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',
     borderWidth: 2,
     borderColor: '#FF4444',
+    backgroundColor: 'rgba(1, 0, 0, 0.3)',
   },
   photo: {
     width: '100%',

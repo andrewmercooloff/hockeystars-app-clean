@@ -1,4 +1,10 @@
-import { supabase } from './supabase';
+import {
+  supabase,
+  rewriteSupabasePublicUrl,
+  rewriteSupabaseUrlsDeep,
+  throwIfSupabaseNetworkError,
+  ensureSupabaseRouting,
+} from './supabase';
 import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
@@ -8,11 +14,16 @@ let globalUserCache: Player | null = null;
 
 // In-memory кэш для игроков и команд (мгновенный доступ)
 // Объявляем здесь для использования в clearPlayerCache и других функциях
-const playersMemoryCache = new Map<string, { player: Player, timestamp: number }>();
+const playersMemoryCache = new Map<string, { player: Player; timestamp: number; fullProfile: boolean }>();
 const teamsMemoryCache = new Map<string, { teams: PlayerTeam[], timestamp: number }>();
 
 /** Кеш списка игроков (loadPlayers). v2 включает player.teams для поиска по командам. */
-export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v2';
+export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v3';
+
+/** Последняя ошибка loadPlayers — для экрана диагностики */
+export let lastLoadPlayersError: string | null = null;
+
+
 export const ALL_PLAYERS_LIST_CACHE_KEYS: readonly string[] = ['all_players', ALL_PLAYERS_LIST_CACHE_KEY];
 
 // Функция для нормализации позиции игрока (приводит все варианты к стандартным английским ключам)
@@ -299,6 +310,35 @@ export interface Player {
   };
 }
 
+/** Очки сезона в профиле: голы + передачи. */
+export const getPlayerSeasonPoints = (player: Player): number => {
+  const goals = parseInt(String(player.goals ?? '0'), 10) || 0;
+  const assists = parseInt(String(player.assists ?? '0'), 10) || 0;
+  return goals + assists;
+};
+
+/** Есть ли у вратаря данные для честного GAA (не пустой профиль). */
+export const hasValidGoalieGAAStats = (player: Player): boolean => {
+  const minutes = parseInt(String(player.minutes ?? ''), 10);
+  const shots = parseInt(String(player.shots ?? ''), 10);
+  const saves = parseInt(String(player.saves ?? ''), 10);
+  if (!Number.isFinite(minutes) || !Number.isFinite(shots) || !Number.isFinite(saves)) {
+    return false;
+  }
+  // Минуты и хотя бы 1 бросок — иначе GAA=0 у «пустого» профиля
+  return minutes > 0 && shots > 0 && saves >= 0 && saves <= shots;
+};
+
+/** GAA вратаря (чем меньше — тем лучше). -1 если нет данных. */
+export const getPlayerGAA = (player: Player): number => {
+  if (!hasValidGoalieGAAStats(player)) return -1;
+  const minutes = parseInt(String(player.minutes ?? '0'), 10) || 0;
+  const shots = parseInt(String(player.shots ?? '0'), 10) || 0;
+  const saves = parseInt(String(player.saves ?? '0'), 10) || 0;
+  const goalsAgainst = shots - saves;
+  return (goalsAgainst * 60) / minutes;
+};
+
 // Интерфейс для записи скорости шайбы
 export interface PuckSpeedRecord {
   speed: number; // скорость в км/ч
@@ -348,7 +388,7 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     age: supabasePlayer.age,
     height: supabasePlayer.height ? supabasePlayer.height.toString() : '',
     weight: supabasePlayer.weight ? supabasePlayer.weight.toString() : '',
-    avatar: supabasePlayer.avatar,
+    avatar: rewriteSupabasePublicUrl(supabasePlayer.avatar),
     email: supabasePlayer.email,
     password: supabasePlayer.password,
     status: supabasePlayer.status,
@@ -402,7 +442,7 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     photos: supabasePlayer.photos && supabasePlayer.photos !== '[]' && supabasePlayer.photos !== 'null' ? 
       (() => {
         try {
-          return JSON.parse(supabasePlayer.photos);
+          return rewriteSupabaseUrlsDeep(JSON.parse(supabasePlayer.photos));
         } catch (error) {
           // console.error('Ошибка парсинга photos:', error);
           return [];
@@ -1247,129 +1287,242 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
 // Инициализация хранилища
 export const initializeStorage = async (): Promise<void> => {
   try {
-    
-    // Проверяем подключение к Supabase
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('players')
-      .select('count')
+      .select('id')
       .limit(1);
-    
+
     if (error) {
-      console.error('❌ Ошибка подключения к Supabase:', error);
-      throw error;
+      console.warn('⚠️ Supabase недоступен при старте (используем кеш):', error.message);
     }
-    
   } catch (error) {
-    console.error('❌ Ошибка инициализации Supabase:', error);
-    throw error;
+    console.warn('⚠️ Supabase недоступен при старте (используем кеш):', error);
   }
 };
 
 // Загрузка всех игроков
-export const loadPlayers = async (forceRefresh = false): Promise<Player[]> => {
+export type LoadPlayersOptions = {
+  /** Вызывается после фонового обновления (stale-while-revalidate) */
+  onUpdated?: (players: Player[]) => void;
+};
+
+const PLAYERS_LIST_COLUMNS = [
+  'id', 'name', 'position', 'team', 'age', 'height', 'weight', 'avatar',
+  'email', 'status', 'parent_email', 'birth_date', 'hockey_start_date',
+  'experience', 'phone', 'city', 'goals', 'assists', 'country', 'grip',
+  'games', 'minutes', 'shots', 'saves',
+  'pull_ups', 'push_ups', 'plank_time', 'sprint_100m', 'long_jump', 'jump_rope',
+  'number', 'instagram', 'tiktok', 'vk', 'website',
+  'created_at', 'updated_at',
+  'address', 'working_hours', 'discount_for_friends',
+  'coach_years', 'individual_training', 'skate_services',
+  'is_online', 'last_seen', 'is_hidden',
+  'profile_views_total', 'profile_views_today', 'profile_views_reset_at',
+].join(', ');
+
+const AVATAR_PRELOAD_CAP = 90;
+
+/** Отложенный массовый прогрев аватаров: коалесцируем повторные вызовы при старте. */
+let avatarWarmTimer: ReturnType<typeof setTimeout> | null = null;
+let avatarWarmPending: Array<{ id: string; avatar?: string }> | null = null;
+
+/** In-memory seed + фоновый prefetch (важно и для ответа из AsyncStorage-кеша). */
+function warmPlayerAvatarsFromList(players: Player[]): void {
+  if (players.length === 0) return;
+  seedPlayersMemoryCache(players);
+  seedPlayerAvatarUrls(players);
+  // Массовый прогрев (до 90 аватаров) откладываем на пару секунд после последнего вызова:
+  // при старте эта пачка загрузок шла одновременно с разгоном анимации шайб и давала рывки.
+  // Видимые шайбы это не задерживает — их аватары грузят CachedAvatar и прицельный
+  // prefetch в index.tsx.
+  avatarWarmPending = players.filter((p) => p.avatar).slice(0, AVATAR_PRELOAD_CAP);
+  if (avatarWarmTimer) clearTimeout(avatarWarmTimer);
+  avatarWarmTimer = setTimeout(() => {
+    avatarWarmTimer = null;
+    const list = avatarWarmPending;
+    avatarWarmPending = null;
+    if (list && list.length > 0) {
+      preloadPlayerAvatars(list).catch(() => {});
+    }
+  }, 2500);
+}
+
+const PLAYER_MEMORY_CACHE_TTL_MS = 10 * 60 * 1000;
+
+/** Мгновенный доступ к игроку из in-memory кеша (список на льду, прошлые визиты). */
+export function getCachedPlayerSync(id: string): Player | null {
+  const memCached = playersMemoryCache.get(id);
+  if (
+    memCached &&
+    memCached.fullProfile &&
+    Date.now() - memCached.timestamp < PLAYER_MEMORY_CACHE_TTL_MS
+  ) {
+    return memCached.player;
+  }
+  return null;
+}
+
+export function seedPlayersMemoryCache(players: Player[]): void {
+  const timestamp = Date.now();
+  for (const player of players) {
+    if (player?.id) {
+      const existing = playersMemoryCache.get(player.id);
+      // Не затираем полный профиль урезанными данными со списка на льду
+      if (existing?.fullProfile) continue;
+      playersMemoryCache.set(player.id, { player, timestamp, fullProfile: false });
+    }
+  }
+}
+
+async function enrichPlayersMeta(
+  players: Player[],
+  cacheKey: string,
+  onUpdated?: (players: Player[]) => void,
+  writeCacheOnFailure = false,
+): Promise<void> {
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  try {
+    const { getPlayersActivityRatings } = await import('../services/activityService');
+    const playerIds = players.map((p) => p.id);
+    const [activityRatings, teamsByPlayer] = await Promise.all([
+      getPlayersActivityRatings(playerIds),
+      batchLoadPlayerTeamsForPlayerIds(playerIds),
+    ]);
+    players.forEach((player) => {
+      if (activityRatings[player.id] !== undefined) {
+        player.activityRating = activityRatings[player.id];
+      }
+      player.teams = teamsByPlayer.get(player.id) ?? [];
+    });
+    await AsyncStorage.setItem(cacheKey, JSON.stringify({ players, timestamp: Date.now() }));
+    onUpdated?.(players);
+  } catch (metaErr) {
+    console.warn('⚠️ Ошибка догрузки рейтингов/команд:', metaErr);
+    // Сеть с рейтингами не удалась, но свежий список игроков всё равно кешируем,
+    // если вызывающая сторона отложила запись кеша до этого места.
+    if (writeCacheOnFailure) {
+      try {
+        await AsyncStorage.setItem(cacheKey, JSON.stringify({ players, timestamp: Date.now() }));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+}
+
+async function fetchPlayersFromNetwork(
+  cacheKey: string,
+  forceRefresh: boolean,
+  staleFallback: Player[] | null,
+  onUpdated?: (players: Player[]) => void,
+): Promise<Player[]> {
+  await ensureSupabaseRouting();
+  console.log('🌐 Загружаем игроков из базы данных' + (forceRefresh ? ' (принудительно)' : ''));
+
+  const { data: rawData, error } = await supabase
+    .from('players')
+    .select(PLAYERS_LIST_COLUMNS)
+    .order('created_at', { ascending: false });
+
+  const data = rawData as unknown as SupabasePlayer[] | null;
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+
+  if (error) {
+    lastLoadPlayersError = `${error.code ?? 'error'}: ${error.message ?? 'unknown'}`;
+    console.error('❌ Ошибка загрузки игроков из Supabase:', error);
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+      if (cachedData) {
+        const { players } = JSON.parse(cachedData);
+        if (Array.isArray(players) && players.length > 0) {
+          console.log('💾 Используем кеш игроков после ошибки сети');
+          warmPlayerAvatarsFromList(players);
+          return players;
+        }
+      }
+      if (staleFallback && staleFallback.length > 0) {
+        console.log('💾 Используем устаревший кеш игроков после ошибки сети');
+        warmPlayerAvatarsFromList(staleFallback);
+        return staleFallback;
+      }
+    return [];
+  }
+
+  if (!data) {
+    return staleFallback && staleFallback.length > 0 ? staleFallback : [];
+  }
+
+  const players = data.map(convertSupabaseToPlayer);
+  warmPlayerAvatarsFromList(players);
+
+  // Кеш пишем один раз — внутри enrichPlayersMeta (с рейтингами), а не дважды подряд:
+  // двойной JSON.stringify большого списка на старте давал заметные рывки анимации.
+  void enrichPlayersMeta(players, cacheKey, onUpdated, players.length > 0);
+  return players;
+}
+
+export const loadPlayers = async (
+  forceRefresh = false,
+  options?: LoadPlayersOptions,
+): Promise<Player[]> => {
+  const onUpdated = options?.onUpdated;
+  lastLoadPlayersError = null;
+  let staleCachedPlayers: Player[] | null = null;
   try {
     const cacheKey = ALL_PLAYERS_LIST_CACHE_KEY;
     const cacheTime = 10 * 60 * 1000; // 10 минут
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    
-    // Если forceRefresh = true, пропускаем проверку кэша
+
     if (!forceRefresh) {
       const cachedData = await AsyncStorage.getItem(cacheKey);
-      
+
       if (cachedData) {
         const { players, timestamp } = JSON.parse(cachedData);
-        if (Date.now() - timestamp < cacheTime) {
-          console.log('💾 Загрузили игроков из кеша', cacheKey);
-          return players;
+        if (Array.isArray(players) && players.length > 0) {
+          if (Date.now() - timestamp < cacheTime) {
+            console.log('💾 Загрузили игроков из кеша', cacheKey);
+            warmPlayerAvatarsFromList(players);
+            const needsRatings = players.some(
+              (player: Player) => player.activityRating === undefined || player.activityRating === null
+            );
+            if (needsRatings) {
+              void enrichPlayersMeta(players, cacheKey, onUpdated);
+            }
+            return players;
+          }
+          staleCachedPlayers = players;
+          console.log('💾 Устаревший кеш — показываем сразу, обновляем в фоне');
+          warmPlayerAvatarsFromList(staleCachedPlayers);
+          void fetchPlayersFromNetwork(cacheKey, false, staleCachedPlayers, onUpdated);
+          return staleCachedPlayers;
         }
       }
     }
 
-    console.log('🌐 Загружаем игроков из базы данных' + (forceRefresh ? ' (принудительно)' : ''));
-
-    // Выбираем только лёгкие поля, нужные для отображения шайб и поиска.
-    // Тяжёлые JSONB-поля (ai_analysis, photos, achievements, puck_speed_data,
-    // game_videos, favorite_goals, exercise_stats) загружаются отдельно в getPlayerById
-    // при открытии полного профиля игрока.
-    const LIGHT_COLUMNS = [
-      'id', 'name', 'position', 'team', 'age', 'height', 'weight', 'avatar',
-      'email', 'status', 'parent_email', 'birth_date', 'hockey_start_date',
-      'experience', 'phone', 'city', 'goals', 'assists', 'country', 'grip',
-      'games', 'minutes', 'shots', 'saves',
-      'pull_ups', 'push_ups', 'plank_time', 'sprint_100m', 'long_jump', 'jump_rope',
-      'number', 'instagram', 'tiktok', 'vk', 'website',
-      'created_at', 'updated_at',
-      'address', 'working_hours', 'discount_for_friends',
-      'coach_years', 'individual_training', 'skate_services',
-      'is_online', 'last_seen', 'is_hidden',
-      'profile_views_total', 'profile_views_today', 'profile_views_reset_at',
-    ].join(', ');
-
-    const { getPlayersActivityRatings } = await import('../services/activityService');
-
-    const { data: rawData, error } = await supabase
-      .from('players')
-      .select(LIGHT_COLUMNS)
-      .order('created_at', { ascending: false });
-
-    // Явное приведение типа: Supabase не может вывести тип при динамической строке колонок
-    const data = rawData as unknown as SupabasePlayer[] | null;
-    
-    if (error) {
-      console.error('❌ Ошибка загрузки игроков из Supabase:', error);
-      return [];
-    }
-    
-    if (data) {
-      const players = data.map(convertSupabaseToPlayer);
-      
-      // In-memory URL без сети; setAvatar здесь давал бы N параллельных prefetch.
-      seedPlayerAvatarUrls(players);
-      
-      // Предзагружаем аватары только для части списка — полный прогрев сотен/тысяч URL
-      // бьёт по сети и UI; остальные подтянутся через CachedAvatar при появлении на экране.
-      const AVATAR_PRELOAD_CAP = 90;
-      const playersForAvatarPreload = players.filter(p => p.avatar).slice(0, AVATAR_PRELOAD_CAP);
-      preloadPlayerAvatars(playersForAvatarPreload).catch(error => {
-        console.error('❌ Ошибка предзагрузки аватаров:', error);
-      });
-
-      // Загружаем рейтинги активности для сортировки в поиске
-      try {
-        const playerIds = players.map(p => p.id);
-        const activityRatings = await getPlayersActivityRatings(playerIds);
-        players.forEach(player => {
-          player.activityRating = activityRatings[player.id] || 0;
-        });
-      } catch (ratingError) {
-        console.error('❌ Ошибка загрузки рейтингов активности:', ratingError);
-        players.forEach(player => { player.activityRating = 0; });
-      }
-
-      // Команды: один батч-запрос на весь список (фильтр «Команда» в поиске).
-      try {
-        const teamsByPlayer = await batchLoadPlayerTeamsForPlayerIds(players.map(p => p.id));
-        players.forEach(player => {
-          player.teams = teamsByPlayer.get(player.id) ?? [];
-        });
-      } catch (teamsErr) {
-        console.error('❌ Ошибка пакетной загрузки команд:', teamsErr);
-        players.forEach(player => { player.teams = []; });
-      }
-      
-      // Кешируем результат
-      await AsyncStorage.setItem(cacheKey, JSON.stringify({
-        players,
-        timestamp: Date.now()
-      }));
-      
-      return players;
-    }
-    
-    return [];
+    return await fetchPlayersFromNetwork(cacheKey, forceRefresh, staleCachedPlayers, onUpdated);
     
   } catch (error) {
+    lastLoadPlayersError =
+      error instanceof Error ? error.message : String(error);
     console.error('❌ Ошибка загрузки игроков:', error);
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const cachedData = await AsyncStorage.getItem(ALL_PLAYERS_LIST_CACHE_KEY);
+      if (cachedData) {
+        const { players } = JSON.parse(cachedData);
+        if (Array.isArray(players) && players.length > 0) {
+          console.log('💾 Используем кеш игроков после исключения');
+          warmPlayerAvatarsFromList(players);
+          return players;
+        }
+      }
+      if (staleCachedPlayers && staleCachedPlayers.length > 0) {
+        console.log('💾 Используем устаревший кеш игроков после исключения');
+        warmPlayerAvatarsFromList(staleCachedPlayers);
+        return staleCachedPlayers;
+      }
+    } catch {
+      // ignore
+    }
     return [];
   }
 };
@@ -1642,7 +1795,11 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
 
     // Очищаем кеш статуса дружбы при отправке запроса
     await clearFriendshipCache(fromId, toId);
-    
+
+    // ВАЖНО ДЛЯ ОТЗЫВЧИВОСТИ: сам запрос дружбы уже создан — возвращаем управление UI.
+    // Уведомления, счётчики и push (ещё ~6-8 сетевых запросов) выполняем в фоне:
+    // на медленном интернете они держали кнопку в состоянии загрузки по 5-15 секунд.
+    void (async () => {
     // Получаем данные отправителя для уведомления
     console.log('📤 [FRIEND_REQUEST] Получение данных отправителя для fromId:', fromId);
     const { data: senderData, error: senderDataError } = await supabase
@@ -1874,7 +2031,10 @@ export const sendFriendRequest = async (fromId: string, toId: string): Promise<b
       console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: senderData не определен! Не удалось получить данные отправителя для fromId:', fromId);
       console.error('❌ [FRIEND_REQUEST] Это означает, что уведомление не будет создано!');
     }
-    
+    })().catch((bgError) => {
+      console.error('❌ [FRIEND_REQUEST] Фоновая доставка уведомлений не удалась:', bgError);
+    });
+
     return true;
   } catch (error) {
     console.error('❌ Ошибка отправки запроса дружбы:', error);
@@ -1961,12 +2121,16 @@ export const getPlayerById = async (
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const skipCache = options?.skipCache === true;
     const cacheKey = `player_${id}`;
-    const cacheTime = 10 * 60 * 1000; // 10 минут
+    const cacheTime = PLAYER_MEMORY_CACHE_TTL_MS;
     
     if (!skipCache) {
-      // 1. Сначала проверяем in-memory кэш (мгновенно!)
+      // 1. Сначала проверяем in-memory кэш (мгновенно!) — только полный профиль
       const memCached = playersMemoryCache.get(id);
-      if (memCached && Date.now() - memCached.timestamp < cacheTime) {
+      if (
+        memCached &&
+        memCached.fullProfile &&
+        Date.now() - memCached.timestamp < cacheTime
+      ) {
         return memCached.player;
       }
       
@@ -1974,10 +2138,10 @@ export const getPlayerById = async (
       const cachedData = await AsyncStorage.getItem(cacheKey);
       
       if (cachedData) {
-        const { player, timestamp } = JSON.parse(cachedData);
-        if (Date.now() - timestamp < cacheTime) {
-          // Сохраняем в memory кэш для следующих обращений
-          playersMemoryCache.set(id, { player, timestamp });
+        const { player, timestamp, fullProfile } = JSON.parse(cachedData);
+        const isFull = fullProfile !== false;
+        if (isFull && Date.now() - timestamp < cacheTime) {
+          playersMemoryCache.set(id, { player, timestamp, fullProfile: true });
           return player;
         }
       }
@@ -2011,10 +2175,10 @@ export const getPlayerById = async (
       avatarCache.setAvatar(player.id, player.avatar);
     }
     
-    // Кешируем результат в AsyncStorage и memory
+    // Кешируем результат в AsyncStorage и memory (полный профиль)
     const timestamp = Date.now();
-    playersMemoryCache.set(id, { player, timestamp });
-    await AsyncStorage.setItem(cacheKey, JSON.stringify({ player, timestamp }));
+    playersMemoryCache.set(id, { player, timestamp, fullProfile: true });
+    await AsyncStorage.setItem(cacheKey, JSON.stringify({ player, timestamp, fullProfile: true }));
     
     return player;
   } catch (error) {
@@ -2036,20 +2200,33 @@ export async function fetchPlayersInboxFieldsByIds(
   const unique = [...new Set(ids.filter(Boolean))];
   for (let i = 0; i < unique.length; i += PLAYERS_ID_QUERY_CHUNK) {
     const chunk = unique.slice(i, i + PLAYERS_ID_QUERY_CHUNK);
-    const { data, error } = await supabase
-      .from('players')
-      .select('id, name, avatar, status')
-      .in('id', chunk);
-    if (error) {
-      console.warn('⚠️ fetchPlayersInboxFieldsByIds:', error.message);
-      continue;
+    let rows: Array<{ id: string; name?: string | null; avatar?: string | null; status?: string | null }> | null =
+      null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data, error } = await supabase
+        .from('players')
+        .select('id, name, avatar, status')
+        .in('id', chunk);
+      if (!error && data) {
+        rows = data;
+        break;
+      }
+      if (attempt < 2) {
+        console.warn(
+          `⚠️ fetchPlayersInboxFieldsByIds chunk failed (attempt ${attempt + 1}):`,
+          error?.message
+        );
+        await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+      } else {
+        console.warn('⚠️ fetchPlayersInboxFieldsByIds chunk failed after retries:', error?.message);
+      }
     }
-    for (const row of data || []) {
-      const r = row as { id: string; name?: string | null; avatar?: string | null; status?: string | null };
-      map.set(r.id, {
-        name: r.name || '',
-        avatar: r.avatar ?? undefined,
-        status: r.status ?? undefined,
+    if (!rows) continue;
+    for (const row of rows) {
+      map.set(row.id, {
+        name: row.name || '',
+        avatar: rewriteSupabasePublicUrl(row.avatar ?? undefined) ?? undefined,
+        status: row.status ?? undefined,
       });
     }
   }
@@ -2145,7 +2322,7 @@ export async function getPlayersByIdsInBatches(ids: string[]): Promise<Map<strin
     for (const row of data || []) {
       const p = convertSupabaseToPlayer(row as SupabasePlayer);
       map.set(p.id, p);
-      playersMemoryCache.set(p.id, { player: p, timestamp: Date.now() });
+      playersMemoryCache.set(p.id, { player: p, timestamp: Date.now(), fullProfile: true });
     }
   }
   return map;
@@ -2220,7 +2397,7 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     const supabaseData = convertPlayerToSupabase(updateData as Player);
     
     // Явно обновляем updated_at для срабатывания Realtime подписок
-    supabaseData.updated_at = new Date().toISOString();
+    (supabaseData as Record<string, unknown>).updated_at = new Date().toISOString();
     
     const { data, error } = await supabase
       .from('players')
@@ -2508,7 +2685,26 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
           // ОПТИМИЗАЦИЯ: Возвращаем кешированные данные сразу без запроса к БД
           // Страна и статус обновляются при forceRefresh или при смене пользователя
           // Это значительно ускоряет загрузку главного экрана (экономия 200-500мс)
-          return user;
+          // Важно: старые записи кеша могли быть без avatar. Если в кеше нет аватара —
+          // подтягиваем его из источника истины `hockeystars_current_user`.
+          if (!user?.avatar) {
+            try {
+              const rawStored = await AsyncStorage.getItem('hockeystars_current_user');
+              if (rawStored) {
+                const stored = JSON.parse(rawStored);
+                const nextAvatar = rewriteSupabasePublicUrl(stored?.avatar);
+                if (nextAvatar) {
+                  user.avatar = nextAvatar;
+                }
+              }
+            } catch {
+              /* ignore */
+            }
+          }
+          if (user?.avatar && user?.id) {
+            void updateAvatarGlobally(user.id, user.avatar);
+          }
+          return user as Player;
         }
       }
     }
@@ -2521,13 +2717,14 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     }
     
     const user = JSON.parse(userData);
+    const storedAvatar = rewriteSupabasePublicUrl(user.avatar);
     
     // ВАЖНО: Загружаем актуальные данные пользователя из базы данных, чтобы убедиться, что страна и другие поля актуальны
     try {
       const [{ data: playerData, error: playerError }, actualUnreadMessages] = await Promise.all([
         supabase
           .from('players')
-          .select('id, name, country, birth_date, status')
+          .select('id, name, country, birth_date, status, avatar')
           .eq('id', user.id)
           .single(),
         getUnreadMessageCount(user.id),
@@ -2557,6 +2754,18 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
         if (playerData.status && playerData.status !== user.status) {
           user.status = playerData.status;
         }
+
+        // Аватар нужен для мгновенного отображения в шапке/на шайбе после смены аккаунта.
+        // Раньше при "частичном" select он мог остаться пустым в кеше.
+        const nextAvatar = rewriteSupabasePublicUrl((playerData as any).avatar);
+        if (nextAvatar && nextAvatar !== user.avatar) {
+          user.avatar = nextAvatar;
+          try {
+            await updateAvatarGlobally(user.id, nextAvatar);
+          } catch {
+            // ignore
+          }
+        }
       }
     } catch (error) {
       console.error('❌ Ошибка загрузки данных пользователя из БД:', error);
@@ -2565,14 +2774,24 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     
     // ВАЖНО: Обновляем данные пользователя в AsyncStorage, если они были изменены из базы данных
     // Это гарантирует, что при следующей загрузке будут использоваться актуальные данные
-    if (user.country !== JSON.parse(userData).country || 
-        user.birthDate !== JSON.parse(userData).birthDate || 
-        user.status !== JSON.parse(userData).status) {
+    const parsedStored = JSON.parse(userData);
+    if (
+      user.country !== parsedStored.country ||
+      user.birthDate !== parsedStored.birthDate ||
+      user.status !== parsedStored.status ||
+      user.avatar !== parsedStored.avatar
+    ) {
       console.log('🔄 [USER] Обновляем данные пользователя в AsyncStorage с актуальными данными из БД');
       await AsyncStorage.setItem('hockeystars_current_user', JSON.stringify(user));
     }
     
     // Кэшируем результат
+    if (!user.avatar && storedAvatar) {
+      user.avatar = storedAvatar;
+    }
+    if (user.avatar && user.id) {
+      void updateAvatarGlobally(user.id, user.avatar);
+    }
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
       user,
       timestamp: Date.now()
@@ -2581,6 +2800,16 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
     return user;
   } catch (error) {
     console.error('❌ Ошибка загрузки текущего пользователя:', error);
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const userData = await AsyncStorage.getItem('hockeystars_current_user');
+      if (userData) {
+        console.log('💾 Возвращаем пользователя из локального хранилища после ошибки сети');
+        return JSON.parse(userData);
+      }
+    } catch (fallbackError) {
+      console.error('❌ Не удалось прочитать локального пользователя:', fallbackError);
+    }
     return null;
   }
 };
@@ -3225,65 +3454,27 @@ export const sendMessageSimple = async (
   }
 };
 
-// Отметка сообщений как прочитанные
+// Отметка сообщений как прочитанные. Идемпотентно — безопасно повторять.
 export const markMessagesAsRead = async (userId: string, otherUserId: string): Promise<void> => {
-  try {
-    // Сначала проверим, сколько непрочитанных сообщений есть
-    const { data: unreadData, error: unreadError } = await supabase
-      .from('messages')
-      .select('id')
-      .eq('sender_id', otherUserId)
-      .eq('receiver_id', userId)
-      .eq('read', false);
-    
-    if (unreadError) {
-      console.error('❌ Ошибка проверки непрочитанных сообщений:', unreadError);
-      return;
-    }
-    
-    if ((unreadData?.length || 0) === 0) {
-      return;
-    }
-    
-    const { data, error } = await supabase
-      .from('messages')
-      .update({ read: true })
-      .eq('sender_id', otherUserId)
-      .eq('receiver_id', userId)
-      .eq('read', false)
-      .select();
-    
-    if (error) {
-      console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
-    } else {
-      
-      // Проверим, что сообщения действительно обновились
-      const { data: verifyData, error: verifyError } = await supabase
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const { error } = await supabase
         .from('messages')
-        .select('id, read')
+        .update({ read: true })
         .eq('sender_id', otherUserId)
         .eq('receiver_id', userId)
         .eq('read', false);
-      
-      if (verifyError) {
-        console.error('❌ Ошибка проверки обновления:', verifyError);
-      } else {
-      }
-      
-      // Проверим, что счетчик в БД обновился (триггер должен был сработать)
-      const { data: countData, error: countError } = await supabase
-        .from('players')
-        .select('unread_messages_count')
-        .eq('id', userId)
-        .single();
-      
-      if (countError) {
-        console.error('❌ Ошибка проверки счетчика в БД:', countError);
-      } else {
-      }
+
+      if (!error) return;
+
+      console.warn(`⚠️ markMessagesAsRead attempt ${attempt} failed:`, error.message);
+    } catch (error) {
+      console.warn(`⚠️ markMessagesAsRead attempt ${attempt} threw:`, (error as Error)?.message);
     }
-  } catch (error) {
-    console.error('❌ Ошибка отметки сообщений как прочитанные:', error);
+    if (attempt < MAX_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, 300 * attempt));
+    }
   }
 };
 
@@ -3407,7 +3598,12 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     await clearFriendsCache(userId1);
     await clearFriendsCache(userId2);
     console.log('✅ Кеш друзей очищен для обоих пользователей');
-    
+
+    // ВАЖНО ДЛЯ ОТЗЫВЧИВОСТИ: дружба уже принята и кеши очищены — возвращаем управление UI.
+    // Удаление уведомлений, пересчёт счётчиков, уведомление отправителя и рассылка
+    // друзьям (до 10+ сетевых запросов) выполняются в фоне: на медленном интернете
+    // они держали кнопку «Принять» в состоянии загрузки по 5-20 секунд.
+    void (async () => {
     // ВАЖНО: Удаляем уведомление о запросе дружбы у принимающего (userId1)
     // Это нужно чтобы индикатор "1" исчез после принятия запроса
     try {
@@ -3557,7 +3753,10 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     // Это предотвращает двойное увеличение счетчика (friend_accepted + new_friendship)
     const senderIdForFriendship = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
     await notifyFriendsAboutNewFriendship(userId1, userId2, senderIdForFriendship);
-    
+    })().catch((bgError) => {
+      console.error('❌ Фоновая доставка уведомлений о принятии дружбы не удалась:', bgError);
+    });
+
     return true;
   } catch (error) {
     console.error('❌ Ошибка принятия запроса дружбы:', error);
@@ -3590,7 +3789,9 @@ export const declineFriendRequest = async (userId1: string, userId2: string): Pr
     // Очищаем кеш статуса дружбы после отклонения запроса
     await clearFriendshipCache(userId1, userId2);
     console.log('✅ Кеш статуса дружбы очищен после отклонения запроса');
-    
+
+    // Чистку уведомлений и пересчёт счётчика выполняем в фоне — UI не ждёт.
+    void (async () => {
     // ВАЖНО: Удаляем уведомление о запросе дружбы у отклоняющего (userId1)
     // Это нужно чтобы индикатор "1" исчез после отклонения запроса
     try {
@@ -3632,7 +3833,10 @@ export const declineFriendRequest = async (userId1: string, userId2: string): Pr
     } catch (notifError) {
       console.error('⚠️ Ошибка удаления уведомления о запросе (не критично):', notifError);
     }
-    
+    })().catch((bgError) => {
+      console.error('❌ Фоновая чистка уведомлений после отклонения не удалась:', bgError);
+    });
+
     return true;
   } catch (error) {
     console.error('❌ Ошибка отклонения запроса дружбы:', error);
@@ -3654,7 +3858,12 @@ export const cancelFriendRequest = async (fromId: string, toId: string): Promise
       return false;
     }
     
-    // Удаляем уведомление о запросе в друзья у получателя
+    // Очищаем кеш статуса дружбы после отмены запроса
+    await clearFriendshipCache(fromId, toId);
+    console.log('✅ Кеш статуса дружбы очищен после отмены запроса');
+
+    // Удаление уведомления у получателя и пересчёт его счётчика — в фоне, UI не ждёт.
+    void (async () => {
     try {
       const { data: deletedNotifications } = await supabase
         .from('notifications')
@@ -3685,11 +3894,8 @@ export const cancelFriendRequest = async (fromId: string, toId: string): Promise
     } catch (notificationError) {
       console.error('⚠️ Ошибка удаления уведомления (не критично):', notificationError);
     }
-    
-    // Очищаем кеш статуса дружбы после отмены запроса
-    await clearFriendshipCache(fromId, toId);
-    console.log('✅ Кеш статуса дружбы очищен после отмены запроса');
-    
+    })().catch(() => {});
+
     return true;
   } catch (error) {
     console.error('❌ Ошибка отмены запроса дружбы:', error);
@@ -3967,19 +4173,37 @@ export const fixCorruptedData = async (): Promise<void> => {
   }
 };
 
+export type LoadNotificationsOptions = {
+  limit?: number;
+  offset?: number;
+  /** Сохранить в AsyncStorage (только первая страница). */
+  updateCache?: boolean;
+};
+
 // Загрузка уведомлений
-export const loadNotifications = async (userId?: string): Promise<any[]> => {
+export const loadNotifications = async (
+  userId?: string,
+  options?: LoadNotificationsOptions,
+): Promise<any[]> => {
   try {
     if (!userId) {
       return [];
     }
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const cacheKey = `notifications_${userId}`;
 
-    // Сначала пытаемся с новой структурой (user_id)
-    let { data, error } = await supabase
+    let query = supabase
       .from('notifications')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
+
+    if (options?.limit != null) {
+      const from = options.offset ?? 0;
+      query = query.range(from, from + options.limit - 1);
+    }
+
+    let { data, error } = await query;
 
     if (error) {
       // Тихая обработка сетевых ошибок (отсутствие интернета)
@@ -3991,10 +4215,26 @@ export const loadNotifications = async (userId?: string): Promise<any[]> => {
         // Логируем только не-сетевые ошибки
       console.error('❌ Ошибка загрузки уведомлений:', error);
       }
-      return [];
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (!cached) return [];
+      return JSON.parse(cached).map((row: any) => ({
+        ...row,
+        data: row?.data ? rewriteSupabaseUrlsDeep(row.data) : row.data,
+      }));
     }
 
-    return data || [];
+    const shouldCache =
+      data &&
+      (!options?.limit || (options.offset ?? 0) === 0) &&
+      options?.updateCache !== false;
+    const normalized = (data || []).map((row) => ({
+      ...row,
+      data: row?.data ? rewriteSupabaseUrlsDeep(row.data) : row.data,
+    }));
+    if (shouldCache) {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(normalized));
+    }
+    return normalized;
   } catch (error) {
     // Тихая обработка сетевых ошибок (отсутствие интернета)
     const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
@@ -4004,6 +4244,19 @@ export const loadNotifications = async (userId?: string): Promise<any[]> => {
     if (!isNetworkError) {
       // Логируем только не-сетевые ошибки
     console.error('❌ Ошибка загрузки уведомлений:', error);
+    }
+    try {
+      if (userId && !options?.limit) {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const cached = await AsyncStorage.getItem(`notifications_${userId}`);
+        if (!cached) return [];
+        return JSON.parse(cached).map((row: any) => ({
+          ...row,
+          data: row?.data ? rewriteSupabaseUrlsDeep(row.data) : row.data,
+        }));
+      }
+    } catch {
+      // ignore cache fallback errors
     }
     return [];
   }
@@ -4032,37 +4285,32 @@ export const createNotification = async (notification: any): Promise<any> => {
   }
 };
 
-// Отметка уведомления как прочитанного
+// Отметка уведомления как прочитанного. Идемпотентно, ретраи при сетевом сбое.
 export const markNotificationAsRead = async (notificationId: string): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('id', notificationId)
-      .select();
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId)
+        .select('user_id')
+        .maybeSingle();
 
-    if (error) {
-      console.error('❌ Ошибка отметки уведомления:', {
-        notificationId,
-        errorCode: error.code,
-        errorMessage: error.message,
-        errorDetails: error.details
-      });
-      
-      return false; // Всегда возвращаем false при ошибке
+      if (!error && data?.user_id) {
+        void syncUnreadNotificationsCountInDb(data.user_id).catch(() => {});
+        return true;
+      }
+      if (!error) return true;
+      console.warn(`⚠️ markNotificationAsRead attempt ${attempt} failed:`, error?.message);
+    } catch (error) {
+      console.warn(`⚠️ markNotificationAsRead attempt ${attempt} threw:`, (error as Error)?.message);
     }
-    
-    // Проверяем, что данные действительно обновились
-    if (!data || data.length === 0) {
-      console.error('❌ Данные не обновились для уведомления:', notificationId);
-      return false;
+    if (attempt < MAX_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, 300 * attempt));
     }
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Exception при отметке уведомления:', notificationId, error);
-    return false;
   }
+  return false;
 };
 
 
@@ -4268,6 +4516,48 @@ export const preloadUserData = async (userId: string): Promise<void> => {
   } catch (error) {
     console.error('❌ Ошибка предзагрузки данных пользователя:', error);
   }
+};
+
+/** Источник истины для бейджа уведомлений: фактические строки notifications.is_read. */
+export const getUnreadNotificationsBadgeCount = async (userId: string): Promise<number> => {
+  try {
+    const { count, error } = await supabase
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_read', false)
+      .neq('type', 'message')
+      .not('type', 'in', '(gift_accepted,achievement,team_invite)');
+
+    if (error) {
+      console.warn('⚠️ getUnreadNotificationsBadgeCount:', error.message);
+      return 0;
+    }
+    return count ?? 0;
+  } catch (error) {
+    console.warn('⚠️ getUnreadNotificationsBadgeCount failed:', (error as Error)?.message);
+    return 0;
+  }
+};
+
+/** Синхронизирует players.unread_notifications_count с фактическим числом непрочитанных. */
+export const syncUnreadNotificationsCountInDb = async (userId: string): Promise<number> => {
+  const count = await getUnreadNotificationsBadgeCount(userId);
+  try {
+    await supabase
+      .from('players')
+      .update({
+        unread_notifications_count: count,
+        notifications: JSON.stringify({
+          unread_count: count,
+          last_updated: new Date().toISOString(),
+        }),
+      })
+      .eq('id', userId);
+  } catch {
+    /* ignore — UI уже использует count из notifications */
+  }
+  return count;
 };
 
 // Функция для получения количества непрочитанных сообщений
@@ -4854,8 +5144,9 @@ export const getPlayerByEmail = async (email: string): Promise<Player | null> =>
       .limit(1);
     
     if (error) {
+      throwIfSupabaseNetworkError(error);
       console.error('❌ Ошибка поиска игрока по email:', error);
-      return null;
+      throw error;
     }
     
     if (!data || data.length === 0) {
@@ -4868,8 +5159,9 @@ export const getPlayerByEmail = async (email: string): Promise<Player | null> =>
     
     return player;
   } catch (error) {
+    throwIfSupabaseNetworkError(error);
     console.error('❌ Ошибка поиска игрока по email:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -4889,8 +5181,9 @@ export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = f
         .maybeSingle();
       
       if (error) {
+        throwIfSupabaseNetworkError(error);
         console.error('❌ Ошибка поиска игрока (admin access):', error);
-        return null;
+        throw error;
       }
       
       if (data) {
@@ -4900,44 +5193,30 @@ export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = f
       return null;
     }
     
-    // Обычный поиск - сначала администратор, потом обычный пользователь
-    // Если есть несколько администраторов с одним телефоном, берем самого нового
-    const { data: adminData, error: adminError } = await supabase
-      .from('players')
-      .select('*')
-      .eq('phone', phone)
-      .eq('status', 'admin')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    
-    if (adminData) {
-      return convertSupabaseToPlayer(adminData);
-    }
-    
-    // Если администратор не найден, ищем обычного пользователя
-    // Если есть несколько пользователей с одним телефоном, берем самого нового
-    const { data, error } = await supabase
+    // Один запрос вместо двух: приоритет admin, иначе самый новый профиль
+    const { data: matches, error } = await supabase
       .from('players')
       .select('*')
       .eq('phone', phone)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    
+      .limit(5);
+
     if (error) {
+      throwIfSupabaseNetworkError(error);
       console.error('❌ Ошибка поиска игрока:', error);
+      throw error;
+    }
+
+    if (!matches || matches.length === 0) {
       return null;
     }
-    
-    if (data) {
-      return convertSupabaseToPlayer(data);
-    }
-    
-    return null;
+
+    const adminMatch = matches.find((row) => row.status === 'admin');
+    return convertSupabaseToPlayer(adminMatch ?? matches[0]);
   } catch (error) {
+    throwIfSupabaseNetworkError(error);
     console.error('❌ Ошибка поиска игрока по телефону:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -5302,6 +5581,68 @@ export const trackNormativeChanges = (oldPlayer: Player, newPlayer: Player): Nor
   return changes;
 };
 
+/** Защита от двойного вызова (загрузка фото + сохранение профиля). */
+const recentPhotoNotifyByPlayer = new Map<string, number>();
+const PHOTO_NOTIFY_COOLDOWN_MS = 90_000;
+
+/** Защита от повторных уведомлений об аватаре при нескольких сохранениях профиля. */
+const recentAvatarNotifyByPlayer = new Map<string, { at: number; avatarKey: string }>();
+const AVATAR_NOTIFY_COOLDOWN_MS = 90_000;
+
+export function mediaUrlBase(url: string): string {
+  return (url || '').split('?')[0];
+}
+
+export function avatarFileKey(url: string): string {
+  const base = mediaUrlBase(url);
+  return base.slice(base.lastIndexOf('/') + 1) || base;
+}
+
+const NOTIFICATION_DEDUPE_WINDOW_MS = 2 * 60 * 60 * 1000;
+
+/** Убирает дубли avatar_changed / photo_added в ленте (новые сверху). */
+export function dedupeDuplicateNotifications<
+  T extends { id: string; type: string; timestamp?: number; created_at?: string; data?: any },
+>(notifications: T[]): T[] {
+  const seen = new Map<string, number>();
+  const result: T[] = [];
+
+  for (const notification of notifications) {
+    const ts =
+      notification.timestamp ??
+      (notification.created_at ? new Date(notification.created_at).getTime() : 0);
+
+    let key: string | null = null;
+    if (notification.type === 'avatar_changed') {
+      const playerId = notification.data?.changedPlayerId || notification.data?.playerId;
+      const avatarKey = avatarFileKey(
+        notification.data?.changedPlayerAvatar || notification.data?.playerAvatar || '',
+      );
+      if (playerId && avatarKey) key = `avatar:${playerId}:${avatarKey}`;
+    } else if (notification.type === 'photo_added') {
+      const playerId = notification.data?.changedPlayerId || notification.data?.playerId;
+      const urls = (notification.data?.photoUrls as string[] | undefined)
+        ?.map(mediaUrlBase)
+        .sort()
+        .join(',');
+      const count = notification.data?.photosCount ?? '';
+      if (playerId) key = `photo:${playerId}:${urls || count}`;
+    }
+
+    if (key) {
+      const prevTs = seen.get(key);
+      if (prevTs != null && Math.abs(ts - prevTs) < NOTIFICATION_DEDUPE_WINDOW_MS) {
+        continue;
+      }
+      seen.set(key, ts);
+    }
+
+    result.push(notification);
+  }
+
+  return result;
+}
+
 // Функция для отправки уведомлений друзьям о добавлении фото
 export const notifyFriendsAboutPhotos = async (
   playerId: string,
@@ -5313,9 +5654,24 @@ export const notifyFriendsAboutPhotos = async (
       onePhoto: string;
       multiplePhotos: string;
     };
-  }
+  },
+  photoUrls?: string[]
 ): Promise<void> => {
   try {
+    const now = Date.now();
+    const lastNotifyAt = recentPhotoNotifyByPlayer.get(playerId);
+    if (lastNotifyAt != null && now - lastNotifyAt < PHOTO_NOTIFY_COOLDOWN_MS) {
+      console.log('📸 Пропуск дубля уведомления о фото:', playerId);
+      return;
+    }
+    recentPhotoNotifyByPlayer.set(playerId, now);
+    if (recentPhotoNotifyByPlayer.size > 200) {
+      const cutoff = now - PHOTO_NOTIFY_COOLDOWN_MS;
+      for (const [pid, ts] of recentPhotoNotifyByPlayer) {
+        if (ts < cutoff) recentPhotoNotifyByPlayer.delete(pid);
+      }
+    }
+
     console.log('📸 Отправляем уведомления о добавлении фото:', { playerId, playerName, photosCount });
     
     // Получаем данные игрока для аватара
@@ -5373,6 +5729,7 @@ export const notifyFriendsAboutPhotos = async (
           changedPlayerId: playerId,
           changedPlayerName: playerName,
           changedPlayerAvatar: playerAvatar,
+          photoUrls: photoUrls || [],
           timestamp: new Date().toISOString()
         },
         created_at: new Date().toISOString(),
@@ -5456,7 +5813,8 @@ export const notifyFriendsAboutVideos = async (
       oneVideo: string;
       multipleVideos: string;
     };
-  }
+  },
+  videoUrls?: string[]
 ): Promise<void> => {
   try {
     console.log('🎬 Отправляем уведомления о добавлении видео:', { playerId, playerName, videosCount });
@@ -5516,6 +5874,7 @@ export const notifyFriendsAboutVideos = async (
           changedPlayerId: playerId,
           changedPlayerName: playerName,
           changedPlayerAvatar: playerAvatar,
+          videoUrls: videoUrls || [],
           timestamp: new Date().toISOString()
         },
         created_at: new Date().toISOString(),
@@ -5656,6 +6015,25 @@ export const notifyFriendsAboutAvatarChange = async (
   }
 ): Promise<void> => {
   try {
+    const now = Date.now();
+    const avatarKey = avatarFileKey(newAvatarUrl);
+    const lastNotify = recentAvatarNotifyByPlayer.get(playerId);
+    if (
+      lastNotify != null &&
+      now - lastNotify.at < AVATAR_NOTIFY_COOLDOWN_MS &&
+      lastNotify.avatarKey === avatarKey
+    ) {
+      console.log('🖼️ Пропуск дубля уведомления об аватаре:', playerId);
+      return;
+    }
+    recentAvatarNotifyByPlayer.set(playerId, { at: now, avatarKey });
+    if (recentAvatarNotifyByPlayer.size > 200) {
+      const cutoff = now - AVATAR_NOTIFY_COOLDOWN_MS;
+      for (const [pid, entry] of recentAvatarNotifyByPlayer) {
+        if (entry.at < cutoff) recentAvatarNotifyByPlayer.delete(pid);
+      }
+    }
+
     console.log('🖼️ Отправляем уведомления об изменении аватара:', { playerId, playerName, newAvatarUrl });
     
     // Получаем список друзей игрока
@@ -7386,6 +7764,42 @@ const SCOUT_REPORT_TITLE: Record<string, string> = {
   sv: 'Scoutrapport', cs: 'Skautská zpráva', sk: 'Skautská správa', fi: 'Tiedusteluraportti', it: 'Rapporto scout',
   de: 'Scout-Bericht', fr: 'Rapport scout',
 };
+function fillNotificationTemplate(template: string, params: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? `{${key}}`);
+}
+
+function buildGameFirstPlaceMessage(lang: string, playerName: string, tr: any): string {
+  const tpl = tr?.gameFirstPlaceNotification?.message;
+  if (typeof tpl === 'string' && tpl.includes('{playerName}')) {
+    return fillNotificationTemplate(tpl, { playerName });
+  }
+  const reached = tr?.gameFirstPlaceNotification?.reachedTop || GAME_FIRST_MSG[lang] || GAME_FIRST_MSG.en;
+  return `${playerName} ${reached}`;
+}
+
+function buildQuizFirstPlaceMessage(
+  lang: string,
+  playerName: string,
+  rankingScore: number,
+  tr: any
+): string {
+  const prize = formatQuizPrizeForNotify(rankingScore, lang);
+  const tpl = tr?.quizFirstPlaceNotification?.message;
+  if (typeof tpl === 'string' && tpl.includes('{playerName}')) {
+    return fillNotificationTemplate(tpl, { playerName, prize, prizeAmount: prize, score: prize });
+  }
+  const earned = tr?.quizFirstPlaceNotification?.earned || QUIZ_FIRST_EARNED[lang] || QUIZ_FIRST_EARNED.en;
+  return `${playerName} ${earned} ${prize}`;
+}
+
+function gameFirstPlaceTitle(lang: string, tr: any): string {
+  return tr?.gameFirstPlaceNotification?.title || tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
+}
+
+function quizFirstPlaceTitle(lang: string, tr: any): string {
+  return tr?.quizFirstPlaceNotification?.title || tr?.pushTitles?.quizFirstPlace || QUIZ_FIRST_TITLE[lang] || QUIZ_FIRST_TITLE.en;
+}
+
 const GAME_FIRST_MSG: Record<string, string> = {
   en: 'reached 1st place', ru: 'занял 1 место', lt: 'pasiekė 1 vietą', lv: 'sasniedza 1. vietu', pl: 'zajął 1. miejsce',
   sv: 'nådde 1:a plats', cs: 'dosáhl 1. místa', sk: 'dosiahol 1. miesto', fi: 'sai 1. sijan', it: 'ha raggiunto il 1° posto',
@@ -7395,6 +7809,15 @@ const GAME_FIRST_TITLE: Record<string, string> = {
   en: 'Game Champion', ru: 'Чемпион игры', lt: 'Žaidimo čempionas', lv: 'Spēles čempions', pl: 'Mistrz gry',
   sv: 'Spelchampion', cs: 'Šampion hry', sk: 'Šampión hry', fi: 'Pelin mestari', it: 'Campione del gioco',
   de: 'Spielchampion', fr: 'Champion du jeu',
+};
+const QUIZ_FIRST_TITLE: Record<string, string> = {
+  en: 'Hockey Star Quiz', ru: 'Звезда хоккея', lt: 'Hokėjo žvaigždė', lv: 'Hokeja zvaigzne', pl: 'Gwiazda hokeja',
+  sv: 'Hockeystjärna', cs: 'Hokejová hvězda', sk: 'Hokejová hviezda', fi: 'Jääkiekkotähti', it: 'Hockey Star',
+  de: 'Hockey-Star', fr: 'Star du hockey',
+};
+const QUIZ_FIRST_EARNED: Record<string, string> = {
+  en: 'earned', ru: 'заработал', lt: 'uždirbo', lv: 'nopelnīja', pl: 'zarobił', sv: 'tjänade', cs: 'získal',
+  sk: 'získal', fi: 'ansaitsi', it: 'ha vinto', de: 'hat verdient', fr: 'a gagné',
 };
 
 export const notifyFriendsAboutScoutReport = async (playerId: string, playerName: string): Promise<void> => {
@@ -7473,14 +7896,14 @@ export const notifyFriendsAboutGameFirstPlace = async (playerId: string, playerN
     const notifications = friends.map((friend) => {
       const lang = friendLanguages.get(friend.id) || 'en';
       const tr = loadTranslations(lang);
-      const reached = tr?.gameFirstPlaceNotification?.reachedTop || GAME_FIRST_MSG[lang] || GAME_FIRST_MSG.en;
-      const title = tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
+      const title = gameFirstPlaceTitle(lang, tr);
+      const message = buildGameFirstPlaceMessage(lang, playerName, tr);
       return {
         id: generateUUID(),
         user_id: friend.id,
         type: 'game_first_place',
         title,
-        message: `${playerName} ${reached}`,
+        message,
         data: { changedPlayerId: playerId, changedPlayerName: playerName, changedPlayerAvatar: playerAvatar, timestamp: new Date().toISOString() },
         created_at: new Date().toISOString(),
         is_read: false,
@@ -7496,11 +7919,11 @@ export const notifyFriendsAboutGameFirstPlace = async (playerId: string, playerN
     for (const friend of friends) {
       const lang = friendLanguages.get(friend.id) || 'en';
       const tr = loadTranslations(lang);
-      const reached = tr?.gameFirstPlaceNotification?.reachedTop || GAME_FIRST_MSG[lang] || GAME_FIRST_MSG.en;
-      const title = tr?.pushTitles?.gameFirstPlace || GAME_FIRST_TITLE[lang] || GAME_FIRST_TITLE.en;
+      const title = gameFirstPlaceTitle(lang, tr);
+      const message = buildGameFirstPlaceMessage(lang, playerName, tr);
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        await sendNotificationToUser(friend.id, '🏆 ' + title, `${playerName} ${reached}`, {
+        await sendNotificationToUser(friend.id, '🏆 ' + title, message, {
           type: 'game_first_place',
           player_id: playerId,
           action: 'open_game_results',
@@ -7513,6 +7936,85 @@ export const notifyFriendsAboutGameFirstPlace = async (playerId: string, playerN
     }
   } catch (e) {
     console.error('❌ notifyFriendsAboutGameFirstPlace:', e);
+  }
+};
+
+function formatQuizPrizeForNotify(amount: number, lang: string): string {
+  const locale = lang === 'ru' ? 'ru-RU' : 'en-US';
+  return `${Math.max(0, Math.floor(amount)).toLocaleString(locale)} ★`;
+}
+
+export const notifyFriendsAboutQuizFirstPlace = async (
+  playerId: string,
+  playerName: string,
+  rankingScore: number,
+  playerAvatar?: string | null
+): Promise<void> => {
+  try {
+    const allFriends = await getFriends(playerId);
+    const friends = allFriends.filter((f) => f.id !== playerId);
+    if (friends.length === 0) return;
+
+    const generateUUID = (): string =>
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+      });
+
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const friendLanguages = await getUserLanguages(friends.map((f) => f.id));
+
+    const notifications = friends.map((friend) => {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const title = quizFirstPlaceTitle(lang, tr);
+      const message = buildQuizFirstPlaceMessage(lang, playerName, rankingScore, tr);
+      return {
+        id: generateUUID(),
+        user_id: friend.id,
+        type: 'quiz_first_place',
+        title,
+        message,
+        data: {
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          changedPlayerAvatar: playerAvatar,
+          prizeAmount: rankingScore,
+          rankingScore,
+          timestamp: new Date().toISOString(),
+        },
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+    });
+
+    const { error } = await supabase.from('notifications').insert(notifications);
+    if (error) {
+      console.error('❌ Ошибка сохранения уведомлений quiz 1 место:', error);
+      return;
+    }
+
+    for (const friend of friends) {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const title = quizFirstPlaceTitle(lang, tr);
+      const message = buildQuizFirstPlaceMessage(lang, playerName, rankingScore, tr);
+      try {
+        const { sendNotificationToUser } = await import('./notificationService');
+        await sendNotificationToUser(friend.id, '🏆 ' + title, message, {
+          type: 'quiz_first_place',
+          player_id: playerId,
+          ranking_score: String(rankingScore),
+          action: 'open_quiz_results',
+          deepLink: '/?openQuizResults=true',
+        });
+        await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
+      } catch (e) {
+        console.error('⚠️ Ошибка push/quiz_first_place:', e);
+      }
+    }
+  } catch (e) {
+    console.error('❌ notifyFriendsAboutQuizFirstPlace:', e);
   }
 };
 
@@ -8055,8 +8557,8 @@ export const getSmartPlayerSelection = (
 ): Player[] => {
   try {
     // 0. Константы
-    const MAX_BASE_PLAYERS = 21; // Базовый максимум (до скаута)
-    const MAX_TOTAL_WITH_SCOUT = 22; // Максимум с учетом скаута
+    const MAX_BASE_PLAYERS = 24; // +3 для топ-лидеров по рейтингу
+    const MAX_TOTAL_WITH_SCOUT = 25;
 
     // 1. Фильтруем скрытые профили (кроме текущего пользователя и админов)
     const visiblePlayers = players.filter(player => {
@@ -8180,8 +8682,8 @@ export const getSmartPlayerSelection = (
         };
 
         const sortedSmall = [...smallCountryPlayers].sort((a, b) => {
-          const pa = priority[a.status] ?? 100;
-          const pb = priority[b.status] ?? 100;
+          const pa = priority[a.status ?? ''] ?? 100;
+          const pb = priority[b.status ?? ''] ?? 100;
           if (pa !== pb) return pa - pb;
           return getRandomOrderValue(a.id, 'small-country') - getRandomOrderValue(b.id, 'small-country');
         });
@@ -8203,6 +8705,13 @@ export const getSmartPlayerSelection = (
       addToResult(admin);
     }
 
+    const top10BySeason = [...filteredPlayers]
+      .sort((a, b) => getPlayerSeasonPoints(b) - getPlayerSeasonPoints(a))
+      .slice(0, 10);
+
+    // 6.5) Топ-3 лидера по очкам сезона (гол+пас) — всегда на льду (страна/год)
+    top10BySeason.slice(0, 3).forEach(addToResult);
+
     // 7. 3) Три случайных игрока (из всех, подходящих под фильтры),
     // НО БЕЗ НОВИЧКОВ — чтобы не «съедать» их до шага 4.
     const sortedByCreated = [...filteredPlayers].filter(p => p.createdAt).sort((a, b) => {
@@ -8219,11 +8728,8 @@ export const getSmartPlayerSelection = (
     // 8. 4) Три случайных новичка (из последних 10 по дате регистрации)
     pickRandom(last10, 3, 'newcomers', usedIds).forEach(addToResult);
 
-    // 9. 5) Три случайных лидера по рейтингу (из топ‑10 по activityRating)
-    const top10ByRating = [...filteredPlayers]
-      .sort((a, b) => (b.activityRating || 0) - (a.activityRating || 0))
-      .slice(0, 10);
-    pickRandom(top10ByRating, 3, 'leaders', usedIds).forEach(addToResult);
+    // 9. 5) Три случайных из лидеров 4–10 места (топ-3 уже закреплены)
+    pickRandom(top10BySeason.slice(3), 3, 'leaders', usedIds).forEach(addToResult);
 
     // 10. 6) Три случайных тренера
     // 10. 6) Три случайных тренера
@@ -8268,8 +8774,8 @@ export const getSmartPlayerSelection = (
       };
 
       const sortedRemaining = [...remainingPool].sort((a, b) => {
-        const pa = priorityOrder[a.status] ?? 100;
-        const pb = priorityOrder[b.status] ?? 100;
+        const pa = priorityOrder[a.status ?? ''] ?? 100;
+        const pb = priorityOrder[b.status ?? ''] ?? 100;
         if (pa !== pb) return pa - pb;
         return getRandomOrderValue(a.id, 'fill') - getRandomOrderValue(b.id, 'fill');
       });
@@ -8342,8 +8848,8 @@ export const getSmartPlayerSelection = (
           };
 
           const sortedByPriority = [...countryPlayersAnyStatus].sort((a, b) => {
-            const pa = priority[a.status] ?? 100;
-            const pb = priority[b.status] ?? 100;
+            const pa = priority[a.status ?? ''] ?? 100;
+            const pb = priority[b.status ?? ''] ?? 100;
             if (pa !== pb) return pa - pb;
             // Детеминированный рандом внутри одного приоритета
             return getRandomOrderValue(a.id, 'country-fallback') - getRandomOrderValue(b.id, 'country-fallback');
@@ -8357,7 +8863,7 @@ export const getSmartPlayerSelection = (
               let lowestScore = -1;
               finalPlayers.forEach((p, index) => {
                 if (p.status === 'admin') return;
-                const score = priority[p.status] ?? 100;
+                const score = priority[p.status ?? ''] ?? 100;
                 if (score > lowestScore) {
                   lowestScore = score;
                   lowestIndex = index;

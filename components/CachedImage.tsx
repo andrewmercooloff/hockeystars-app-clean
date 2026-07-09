@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { rewriteSupabasePublicUrl } from '../utils/supabase';
 
 interface CachedImageProps {
   imageUrl: string;
@@ -24,6 +25,7 @@ const CachedImage: React.FC<CachedImageProps> = React.memo(({
   onLoad,
   onError,
 }) => {
+  const resolvedImageUrl = rewriteSupabasePublicUrl(imageUrl) || imageUrl;
   
   const [imageError, setImageError] = React.useState(false);
 
@@ -38,7 +40,7 @@ const CachedImage: React.FC<CachedImageProps> = React.memo(({
   }, [onError, imageUrl]);
 
   // Если нет URL или ошибка загрузки, показываем fallback
-  if (!imageUrl || imageError) {
+  if (!resolvedImageUrl || imageError) {
     return (
       <View style={[style, {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -57,7 +59,7 @@ const CachedImage: React.FC<CachedImageProps> = React.memo(({
   return (
     <Image
       source={{ 
-        uri: imageUrl,
+        uri: resolvedImageUrl,
         headers: {
           'Cache-Control': 'public, max-age=31536000' // Кеш на 1 год
         }

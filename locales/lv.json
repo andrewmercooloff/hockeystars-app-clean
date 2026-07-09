@@ -100,7 +100,7 @@
   "uploading": "Notiek ielāde...",
   "uploadingPhotos": "Notiek {count} fotoattēlu ielāde... {progress}%",
   "info": "Informācija",
-  "addVideoLink": "Pievienojiet saiti uz YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sek",
@@ -1702,6 +1702,1406 @@
           "Veikt 2-3 reizes nedēļā",
           "Samaziniet slodzi, kad jūtaties noguris"
         ]
+      },
+      "66": {
+        "title": "Sānu dēlis ar rumpja rotāciju",
+        "description": "Veido slīpumus un serdes stabilizatorus šāviena jaudai un ķermeņa stabilitātes pārbaudei.",
+        "benefits": [
+          "Stabilizē kodolu saskarē",
+          "Uzlabo rotācijas šāviena jaudu",
+          "Samazina muguras lejasdaļas traumu risku",
+          "Veido pamata izturību"
+        ],
+        "instructions": [
+          "Uzstādiet apakšdelma sānu dēli",
+          "Izstiepiet augšējo roku pret griestiem",
+          "Pavelciet roku zem rumpja un atgriezieties",
+          "Turiet gurnus vienā līmenī, nenolaižoties",
+          "Veiciet 8-10 atkārtojumus katrā pusē"
+        ],
+        "tips": [
+          "Lēnām grieziet ar vadību",
+          "Elpojiet vienmērīgi",
+          "Ja nepieciešams, nometieties ceļos",
+          "2-3 komplekti katrā pusē"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "120-180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Rumānijas pacelšana ar hanteles",
+        "description": "Attīsta aizmugurējo ķēdi spēcīgai slidošanai un pirmā soļa paātrinājumam.",
+        "benefits": [
+          "Stiprina paceles cīpslas un sēžas muskuļus",
+          "Uzlabo uz priekšu liesās mehāniku",
+          "Veido saķeres spēku",
+          "Atbalsta paceles cīpslas traumu novēršanu"
+        ],
+        "instructions": [
+          "Stāviet, turot hanteles pie augšstilbiem",
+          "Saglabājiet nelielu ceļa saliekumu",
+          "Eņģes gurni atpakaļ, nolaižot zvaniņus gar kājām",
+          "Apstājieties pie apakšstilba vidus vai vieglas stiepšanās",
+          "Virziet gurnus uz priekšu, lai stāvētu"
+        ],
+        "tips": [
+          "Saglabājiet neitrālu mugurkaulu",
+          "Svari paliek tuvu kājām",
+          "Izvairieties no muguras lejasdaļas noapaļošanas",
+          "3–4 komplekti ar 8–12 atkārtojumiem"
+        ],
+        "equipment": "Hanteles",
+        "calories": "200-280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Pietupiens ar kausu",
+        "description": "Hokejam draudzīgs pietupiens, kas nodrošina kāju un ķermeņa spēku ar taisnu stāju.",
+        "benefits": [
+          "Veido kvadraciklu izturību",
+          "Māca rumpja vertikālo stāvokli",
+          "Uzlabo potītes kustīgumu",
+          "Labs sezonas off-ledus variants"
+        ],
+        "instructions": [
+          "Turiet hanteli vai tējkannu pie krūtīm",
+          "Pēdas plecu platumā, pirksti nedaudz uz āru",
+          "Pietupieties paralēli vai zemāk",
+          "Ceļi stiepjas pāri kāju pirkstiem",
+          "3–4 komplekti ar 10–15 atkārtojumiem"
+        ],
+        "tips": [
+          "Elkoņi ceļgalu iekšpusē apakšā",
+          "Papēži paliek uz leju",
+          "Kontrolējiet nolaišanos",
+          "Palieciet garš caur krūtīm"
+        ],
+        "equipment": "Hantele vai tējkanna",
+        "calories": "180-250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Joslas rotācijas karbonāde",
+        "description": "Atdarina metienu un piespēļu rotāciju, lai palielinātu jaudu hokeja kustības plaknē.",
+        "benefits": [
+          "Uzlabo sitienu un piespēļu jaudu",
+          "Trenē pretrotācijas stabilitāti",
+          "Pleciem draudzīga slodze",
+          "Var veikt mājās"
+        ],
+        "instructions": [
+          "Enkura lente krūšu augstumā",
+          "Stāviet uz sāniem, lai noenkurotos",
+          "Turiet nūju vai rokturi ar abām rokām",
+          "Pagriezieties no gurniem ar vadību",
+          "12-15 atkārtojumi katrā pusē"
+        ],
+        "tips": [
+          "Spēks nāk no gurniem",
+          "Aizsargājiet muguras lejasdaļu no pārmērīgas rotācijas",
+          "Izmantojiet atlētisku hokeja stāju",
+          "2-3 komplekti"
+        ],
+        "equipment": "Pretestības josla",
+        "calories": "100-150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Vienas kājas sēžas tilts",
+        "description": "Aktivizē sēžas muskuļus un gurnu stabilizatorus, lai nodrošinātu spēcīgu atgrūšanos uz slidām.",
+        "benefits": [
+          "Stiprina sēžas muskuļus",
+          "Stabilizē iegurni slidošanas laikā",
+          "Uzlabo kāju simetriju",
+          "Atbalsta ceļa traumu profilaksi"
+        ],
+        "instructions": [
+          "Guļus uz muguras, viena kāja iestādīta",
+          "Cita kāja izstiepta vai saliekta gaisā",
+          "Brauciet ar gurniem līdz taisnai līnijai",
+          "Apturiet 1 sekundi augšpusē",
+          "10-12 atkārtojumi uz kāju"
+        ],
+        "tips": [
+          "Izvairieties no jostas daļas hiperekstensijas",
+          "Turpiniet strādāt ceļgalā",
+          "Augšpusē izspiediet glute",
+          "2-3 komplekti"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "90-130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Stāv teļš paceļ",
+        "description": "Veido ikrus un pēdas, lai nodrošinātu kāju izturību un slidu stabilitāti vēlīnā maiņā.",
+        "benefits": [
+          "Uzlabo teļu spēku",
+          "Samazina apakšstilbu nogurumu spēlēs",
+          "Stiprina pēdas",
+          "Ātra ģērbtuves iespēja"
+        ],
+        "instructions": [
+          "Stāviet uz pakāpiena malas uz kājām",
+          "Apakšējie papēži zem pakāpiena līmeņa",
+          "Pacelieties pēc iespējas augstāk",
+          "Pauze augšpusē",
+          "15-20 atkārtojumi, 3 komplekti"
+        ],
+        "tips": [
+          "Ja nepieciešams, izmantojiet sienu līdzsvara nodrošināšanai",
+          "Pilna kustību amplitūda",
+          "Izvairieties no lēcieniem",
+          "Kad gatavs, pievienojiet vieglu svaru"
+        ],
+        "equipment": "Solis vai platforma",
+        "calories": "60-90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Dēļu plecu piesitumi",
+        "description": "Pretrotācijas pamatdarbs kontakta stabilitātei un sportiskai pozai.",
+        "benefits": [
+          "Veido kodola stabilitāti",
+          "Uzlabo līdzsvaru kontakta laikā",
+          "Attīsta pamata izturību",
+          "Darbojas visos amatos"
+        ],
+        "instructions": [
+          "Sāciet ar augstu dēli",
+          "Pārvietojiet svaru un pieskarieties pretējam plecam",
+          "Atgriešanās un alternatīvas rokas",
+          "Saglabājiet gurnus kvadrātā",
+          "Kopā 16–20 pieskārienu"
+        ],
+        "tips": [
+          "Paplašiniet pēdas stabilitātei",
+          "Nelieciet gurnus uz augšu",
+          "Elpojiet vienmērīgi",
+          "2-3 komplekti"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "80-120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprints ar pilnu atpūtu",
+        "description": "Simulē īsas maiņas, lai uzlabotu atkārtota paātrinājuma spēju.",
+        "benefits": [
+          "Uzlabo atkārtota sprinta ātrumu",
+          "Treniņi starp maiņu atgūšanu",
+          "Izstrādā starta mehāniku",
+          "Paaugstina spēles izturību"
+        ],
+        "instructions": [
+          "Uzsildiet 8-10 minūtes",
+          "Sprints 20 m ar 95% ātrumu",
+          "Atpūtieties 40–60 sekundes, ejot",
+          "Atkārtojiet 10-12 reizes",
+          "Atdzesējiet 5 minūtes"
+        ],
+        "tips": [
+          "Saglabājiet sprinta formu katrā atkārtojumā",
+          "Nepārtrauciet atpūtu pārāk agri",
+          "Dodiet priekšroku kvalitātei, nevis kvantitātei",
+          "1-2 sesijas nedēļā"
+        ],
+        "equipment": "20 m atklāta telpa",
+        "calories": "250-350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "30-30-30 sekunžu skriešanas intervāli",
+        "description": "Klasiskā hokeja stila intervāls: 30 sekundes grūti, 30 sekundes viegli.",
+        "benefits": [
+          "Veido laktāta toleranci",
+          "Atdarina maiņas intensitāti",
+          "Uzlabo garīgo izturību",
+          "Efektīva sesija ārpus ledus"
+        ],
+        "instructions": [
+          "Uzsildiet 10 minūtes",
+          "30 sek smags skrējiens / 30 sek gājiens",
+          "Atkārtojiet 12-16 ciklus",
+          "Veiciet konsekventas pūles katrā kārtā",
+          "Atdzesējiet un izstiepiet"
+        ],
+        "tips": [
+          "Nepārtrauciet visu agri",
+          "Saglabājiet skriešanas formu",
+          "Hidrējiet starp blokiem",
+          "Lēnām progresējiet kopējos ciklus"
+        ],
+        "equipment": "Trase vai skrejceļš",
+        "calories": "300-400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike intervāli",
+        "description": "Zema trieciena augstas intensitātes kardio, kas ir draudzīga ceļgaliem starpsezonā.",
+        "benefits": [
+          "Veido VO2max",
+          "Locītavām draudzīga iekraušana",
+          "Kopā trenē rokas un kājas",
+          "Ātra atveseļošanās pēc sesijas"
+        ],
+        "instructions": [
+          "5 min viegls pagrieziens",
+          "20 s max / 40 sec viegli",
+          "10-12 kārtas",
+          "Uzraugiet apgriezienus un elpošanu",
+          "5 minūtes atdzesē"
+        ],
+        "tips": [
+          "Atslābiniet saķeri ar rokturiem",
+          "Sēdiet stabili",
+          "Izvairieties no maksimālās piepūles katru dienu",
+          "Sekojiet kalorijām progresam"
+        ],
+        "equipment": "AirBike / uzbrukuma velosipēds",
+        "calories": "220-320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m atspoles skrējiens",
+        "description": "Īsas virziena izmaiņas, piemēram, priekšpārbaude un aizsardzības atjaunošana.",
+        "benefits": [
+          "Uzlabo virziena maiņu",
+          "Veido pirmā soļa ātrumu",
+          "Vilcina reakciju",
+          "Kompakts trenažieru zālei draudzīgs treniņš"
+        ],
+        "instructions": [
+          "Atzīmējiet divas līnijas 5 m attālumā viena no otras",
+          "Pieskarieties līnijai ar roku, sprint atpakaļ",
+          "6–8 atkārtojumi = 1 komplekts",
+          "Atpūta 90 sek",
+          "3-4 komplekti"
+        ],
+        "tips": [
+          "Katru reizi pilnībā pieskarieties līnijai",
+          "Sprādziet pirmos soļus",
+          "Stādiet stingri uz pagriezieniem",
+          "Izmantojiet satvērīgus apavus"
+        ],
+        "equipment": "Konusi vai grīdas līnijas",
+        "calories": "150-220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Paātrinājumi no hokeja stājas",
+        "description": "Zemi atlētiski starti, kas pāriet uz tvērienu un ripu cīņām.",
+        "benefits": [
+          "Uzlabo pirmo soli",
+          "Apmāca zemas palaišanas mehāniķus",
+          "Veido kāju spēku",
+          "Hokejam specifisks"
+        ],
+        "instructions": [
+          "Iestatiet sportisku stāju: saliekti ceļi, rumpis uz priekšu",
+          "Sprintā 10–15 m",
+          "Pilna atpūta 60-90 sek",
+          "8-10 atkārtojumi",
+          "Alternatīva svina kāja"
+        ],
+        "tips": [
+          "Palieciet uz priekšu, neliecieties agri stāvus",
+          "Stingri vadiet aizmugurējo kāju",
+          "Izmantojiet rokas agresīvi",
+          "Vāks ar 10 kvalitatīviem atkārtojumiem"
+        ],
+        "equipment": "20 m josla",
+        "calories": "180-260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m tempa skrējieni",
+        "description": "Kontrolēta ātra skriešana, lai saglabātu lielu, pārslēgšanai līdzīgu piepūli.",
+        "benefits": [
+          "Veido aerobo spēku",
+          "Māca ritmu",
+          "Uzlabo kāju izturību",
+          "Labs darbs ārpus sezonas"
+        ],
+        "instructions": [
+          "Uzsildiet 10 minūtes",
+          "400 m pie 75–80% maks",
+          "Atpūta 2 min ejot",
+          "4-6 atkārtojumi",
+          "Atdzesējiet 5 minūtes"
+        ],
+        "tips": [
+          "Vienmērīgs temps, nevis sprints",
+          "Uzraudzīt elpošanu",
+          "Droši izmantojiet sliežu ceļus",
+          "Progress atkārtojas pakāpeniski"
+        ],
+        "equipment": "Trase vai izmērīta cilpa",
+        "calories": "280-380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata lēciena pietupieni",
+        "description": "Četras minūtes augstas intensitātes, kas atdarina nogurumu pēc maiņas.",
+        "benefits": [
+          "Veido anaerobo izturību",
+          "Īsa, bet efektīva sesija",
+          "Stiprina kājas",
+          "Mājai draudzīgs"
+        ],
+        "instructions": [
+          "20 s max lēciena pietupieni",
+          "10 sek atpūta",
+          "8 kārtas = 4 minūtes",
+          "Pirms tam sasildiet un pēc tam atdzesējiet",
+          "1-2 reizes nedēļā"
+        ],
+        "tips": [
+          "Mīksti piezemējies",
+          "Nekad neizlaidiet iesildīšanos",
+          "Izvairieties spēles dienā",
+          "Aizsargājiet ceļus ar labu formu"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "120-180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU līdzsvars ar nūju",
+        "description": "Nestabila virsma un nūju apstrāde uz ledus līdzsvaram.",
+        "benefits": [
+          "Uzlabo propriocepciju",
+          "Trenē stāvokļu līdzsvaru",
+          "Savieno rokas un kājas",
+          "Veido potītes stabilitāti"
+        ],
+        "instructions": [
+          "Stāviet uz BOSU ar abām kājām",
+          "Turēt nūju, viegla ripas apstrāde",
+          "Turiet 30–45 sekundes",
+          "Atpūtieties un atkārtojiet 4-6 reizes",
+          "Kad esat gatavs, izmēģiniet vienu kāju"
+        ],
+        "tips": [
+          "Acis uz priekšu, nevis uz leju",
+          "Mīksts ceļgala izliekums",
+          "Siena blakus drošībai",
+          "Sāc bez ripas"
+        ],
+        "equipment": "BOSU, hokeja nūja",
+        "calories": "70-100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Vienas kājas RDL sasniedzamība",
+        "description": "Līdzsvars un aizmugurējā ķēde, piemēram, vienas kājas slidošana pagriezienos.",
+        "benefits": [
+          "Veido vienas kājas līdzsvaru",
+          "Stiprina paceles cīpslu un sēžamvietu",
+          "Uzlabo gurnu kontroli",
+          "Slidošanai specifiski"
+        ],
+        "instructions": [
+          "Stāviet uz vienas kājas ar vieglu hanteli",
+          "Eņģe uz priekšu, brīva kāja atpakaļ",
+          "Pieskarieties grīdai vai apakšstilbam",
+          "Atgriezties uz vertikāli",
+          "8-10 atkārtojumi uz kāju"
+        ],
+        "tips": [
+          "Koncentrējiet acis uz vienu vietu",
+          "Pārvietojieties lēnām",
+          "Turiet gurnus vienā līmenī",
+          "2-3 komplekti"
+        ],
+        "equipment": "Hanteles",
+        "calories": "120-170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Vienas kājas pirksta līdzsvars",
+        "description": "Vienkāršs potītes un pēdas stabilitātes urbis slidošanai.",
+        "benefits": [
+          "Stiprina pēdas",
+          "Uzlabo līdzsvaru",
+          "Ātrs ikdienas treniņš",
+          "Var darīt jebkur"
+        ],
+        "instructions": [
+          "Stāviet uz vienas kājas",
+          "Pacelieties uz pirkstiem",
+          "Turiet 15-20 sekundes",
+          "Nolaidiet un pārslēdziet kājas",
+          "6-8 atkārtojumi uz kāju"
+        ],
+        "tips": [
+          "Ja nepieciešams, izmantojiet atbalstu",
+          "Acis uz priekšu",
+          "Elpojiet normāli",
+          "Basām kājām vai apaviem"
+        ],
+        "equipment": "Nav",
+        "calories": "30-50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partnera piespēle uz vienas kājas",
+        "description": "Līdzsvars un kustību koordinācija kā kustība spēlē.",
+        "benefits": [
+          "Saista līdzsvaru un piespēli",
+          "Uzlabo serdes stabilitāti",
+          "Vilcieni fokuss",
+          "Partneru urbis"
+        ],
+        "instructions": [
+          "Stāviet uz vienas kājas ar ripu/bumbu",
+          "Partneris 3–4 m attālumā",
+          "Izdari precīzas piespēles",
+          "30 sekundes, mainiet kāju",
+          "4 kārtas"
+        ],
+        "tips": [
+          "Mīksti ceļgali",
+          "Kraukšķīgas piespēles",
+          "Neupurējiet līdzsvaru varas dēļ",
+          "Sienas atsitiens darbojas arī"
+        ],
+        "equipment": "Ripa/bumba, partneris",
+        "calories": "60-90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Ejot izklupiens ar rotāciju",
+        "description": "Dinamiskais līdzsvars un rotācija ķermeņa pārbaudes sagatavošanai.",
+        "benefits": [
+          "Uzlabo dinamisko līdzsvaru",
+          "Veido rotāciju no kājām",
+          "Stiprina kājas",
+          "Funkcionāls hokejam"
+        ],
+        "instructions": [
+          "Soli izklupienā uz priekšu",
+          "Pagrieziet rumpi uz priekšējo kāju",
+          "Atgriezieties un izkāpiet otru kāju",
+          "10 soļi uz vienu kāju",
+          "2-3 komplekti"
+        ],
+        "tips": [
+          "Ceļa pēdas pāri pēdai",
+          "Palieciet garš",
+          "Pēc izvēles turiet bumbu pie krūtīm",
+          "Kontrolēt tempu"
+        ],
+        "equipment": "Nav",
+        "calories": "100-150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Bīdiet dēļa sānu pakāpienus",
+        "description": "Simulē sānslidošanu ar uzsvaru uz līdzsvaru.",
+        "benefits": [
+          "Veido sānu spēku",
+          "Uzlabo līdzsvaru starp sāniem",
+          "Attīsta adduktorus",
+          "Lieliski piemērots aizsargiem"
+        ],
+        "instructions": [
+          "Bīdāmo dēļu vai zeķu slīdņi",
+          "Sānu soļi 20-30 sekundes",
+          "Palieciet zemā stāvoklī",
+          "Atpūta 60 sek",
+          "6-8 komplekti"
+        ],
+        "tips": [
+          "Nestāviet taisni",
+          "Rokas gatavā stāvoklī",
+          "Kontrolējiet ātrumu",
+          "Izmantojiet dēļu buferus"
+        ],
+        "equipment": "Bīdāmais dēlis",
+        "calories": "130-190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Šķēršļu apiņi",
+        "description": "Veido kāju sprādzienbīstamību pirmā soļa pārrāvumiem un kaujas lēcieniem.",
+        "benefits": [
+          "Palielina vertikālo un horizontālo jaudu",
+          "Uzlabo reaktivitāti",
+          "Attīsta koordināciju",
+          "Pārnes uz ledus paātrinājumu"
+        ],
+        "instructions": [
+          "Šķēršļus uzstādiet 60–90 cm attālumā viens no otra",
+          "Divu pēdu lēciens pāri katram",
+          "Mīksta piezemēšanās",
+          "6–8 šķēršļi komplektā",
+          "3-4 komplekti"
+        ],
+        "tips": [
+          "Mīksti ceļi piezemēšanās laikā",
+          "Aktīvi izmantojiet rokas",
+          "Sāciet ar zemiem šķēršļiem",
+          "Pilna atpūta starp komplektiem"
+        ],
+        "equipment": "Šķēršļi vai konusi",
+        "calories": "140-200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sēdēt uz sprinta starts",
+        "description": "Noņem iepriekšēju izstiepšanos, lai trenētu tīru pirmā soļa sprādzienbīstamību.",
+        "benefits": [
+          "Veido palaišanas jaudu",
+          "Uzlabo reakciju",
+          "Trenē gurnu pagarinājumu",
+          "Vienkārša lauka urbjmašīna"
+        ],
+        "instructions": [
+          "Apsēdieties uz zemes, kājas uz priekšu",
+          "Uz biželejas stenda un sprints 10 m",
+          "8-10 atkārtojumi",
+          "Atpūta 60-90 sek",
+          "Vispirms iesildieties"
+        ],
+        "tips": [
+          "Nenoliecies pirms norādes",
+          "Stāviet eksplozīvi",
+          "Pirmie 3 soļi maksimālā jauda",
+          "Alternatīvas norādes"
+        ],
+        "equipment": "10 m josla",
+        "calories": "100-150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Plašā lēciena sērija",
+        "description": "Horizontālā jauda, ​​kas noder pie galda cīņām un atgrūšanās.",
+        "benefits": [
+          "Veido horizontālo jaudu",
+          "Uzlabo koordināciju",
+          "Stiprina kājas",
+          "Īsa sesija"
+        ],
+        "instructions": [
+          "Plats lēciens stāvus",
+          "Mīksta piezemēšanās",
+          "Tūlīt nākamais lēciens uz priekšu",
+          "5 lēcieni pēc kārtas = 1 komplekts",
+          "4-5 komplekti ar atpūtu"
+        ],
+        "tips": [
+          "Izmantojiet roku šūpošanos",
+          "Zeme sabalansēta",
+          "Plūsmas lēciens, lai lektu",
+          "Iesildiet ceļus"
+        ],
+        "equipment": "Atvērta telpa",
+        "calories": "90-130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Medicīnas bumbas slam",
+        "description": "Eksplozīvs metiens uz leju, lai nodrošinātu visa ķermeņa kontakta spēku.",
+        "benefits": [
+          "Veido sprādzienbīstamu kodolu",
+          "Ātri augsta intensitāte",
+          "Savieno kājas-kodols-rokas",
+          "Lieliska stresa mazināšana"
+        ],
+        "instructions": [
+          "Paceliet medbumbu virs galvas",
+          "Ar pilnu spēku atsitās pret grīdu",
+          "Paņemiet un atkārtojiet",
+          "10-12 atkārtojumi",
+          "3 komplekti"
+        ],
+        "tips": [
+          "Izmantojiet kājas un serdi",
+          "Neitrāls mugurkauls pacelšanas laikā",
+          "Skatīties atsitienu",
+          "Izmantojiet 4–8 kg smagu bumbu"
+        ],
+        "equipment": "Medicīniskā bumba",
+        "calories": "110-160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Ragavu stumšana",
+        "description": "Smaga horizontālā piedziņa, piemēram, maksimālais stāvēšanas starts.",
+        "benefits": [
+          "Maksimālā kāju piedziņa",
+          "Zema trieciena slodze",
+          "Veido garīgo izturību",
+          "Lieliski piemērots spēka uzbrucējiem"
+        ],
+        "instructions": [
+          "Zema stāja aiz ragavām",
+          "Stumšana 15–20 m",
+          "Pilna atpūta 2 min",
+          "4-6 grūdieni",
+          "Vispirms locītavu iesildīšanās"
+        ],
+        "tips": [
+          "Palieciet zemu",
+          "Īsi spēcīgi soļi",
+          "Necelieties agri",
+          "Starta gaisma pie slodzes"
+        ],
+        "equipment": "Prowler ragavas",
+        "calories": "180-260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike stabils 10 minūtes",
+        "description": "Aerobā bāze ilgām maiņām un kondicionēšanai ārpus sezonas.",
+        "benefits": [
+          "Veido aerobo izturību",
+          "Locītavām draudzīgs",
+          "Sirdsdarbības kontrole",
+          "Ātra sesija ārpus ledus"
+        ],
+        "instructions": [
+          "5 min iesildīšanās",
+          "10 min ar 65–70% piepūli",
+          "Vienmērīgi RPM",
+          "5 minūtes atdzesē",
+          "Uzraudzīt elpošanu"
+        ],
+        "tips": [
+          "Palieciet ārpus anaerobās zonas",
+          "Stabila poza",
+          "Hidrēt",
+          "2-3 reizes nedēļā"
+        ],
+        "equipment": "AirBike",
+        "calories": "180-250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Airēšanas erg intervāli",
+        "description": "Visa ķermeņa kardio bez trieciena stumbra un kāju izturībai.",
+        "benefits": [
+          "Kopējā ķermeņa kondicionēšana",
+          "Uzlabo airēšanas stāju",
+          "Veido saķeri un kodolu",
+          "Skriešanas alternatīva"
+        ],
+        "instructions": [
+          "500 m grūti / 1 min viegli",
+          "6-8 kārtas",
+          "Brauciet no kājām un serdes",
+          "5 min iesildīšanās",
+          "Atdzesē stiept"
+        ],
+        "tips": [
+          "Neitrāls mugurkauls",
+          "No elkoņiem līdz gurniem",
+          "Pat dalīts temps",
+          "Gudri noregulējiet slāpētāju"
+        ],
+        "equipment": "Airēšanas erg",
+        "calories": "250-340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Nepārtraukti slidotāju apiņi",
+        "description": "Ritmiski sānu apiņi kāju un sānu kondicionēšanai.",
+        "benefits": [
+          "Veido sānu izturību",
+          "Stiprina kājas",
+          "Atdarina virziena izmaiņas",
+          "Kompakta urbjmašīna"
+        ],
+        "instructions": [
+          "Pārlēkt no vienas kājas uz otru",
+          "Rokas kā slidošana",
+          "30 sek darbs / 30 sek atpūta",
+          "10 kārtas",
+          "Mīkstās piezemēšanās"
+        ],
+        "tips": [
+          "Ceļa pēdas pāri pēdai",
+          "Krūtis uz augšu",
+          "Kontrolējiet lēciena attālumu",
+          "Vispirms iesildieties"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "130-190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 apļa treniņš",
+        "description": "Četru staciju ķēde vispārējai hokeja kondicionēšanai.",
+        "benefits": [
+          "Visa ķermeņa slodze",
+          "Laika efektīva",
+          "Veido darba spējas",
+          "Pielāgojama trenažieru zāle"
+        ],
+        "instructions": [
+          "Burpees, kalnos kāpēji, pietupieni, atspiešanās",
+          "45 sek darbs / 15 sek pāreja",
+          "4 gājieni × 4 apļi",
+          "2 minūšu atpūta starp kārtām",
+          "Uzsildiet un atdzesējiet"
+        ],
+        "tips": [
+          "Mērogs jūsu līmenī",
+          "Veido pār ātrumu",
+          "Palieciet hidratēts",
+          "Izvairieties spēles dienā"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "280-380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Zemu šķēršļu skrējiens",
+        "description": "Kardio un koordinācija ar ātriem soļiem, piemēram, smaga slidošana.",
+        "benefits": [
+          "Uzlabo ritmu",
+          "Veido koordināciju",
+          "Paaugstina aerobo kapacitāti",
+          "Atšķiras skriešanas darbs"
+        ],
+        "instructions": [
+          "6–8 zemie šķēršļi virs 20 m",
+          "Skrien cauri ar augstiem ceļgaliem",
+          "6 piespēles",
+          "Atpūta 90 sek",
+          "3-4 sērija"
+        ],
+        "tips": [
+          "Neizgrieziet šķēršļus",
+          "Ātri īsi soļi",
+          "Aktīvās rokas",
+          "Sasildiet locītavas"
+        ],
+        "equipment": "Mini šķēršļi",
+        "calories": "200-280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Kāpnes ātras kājas",
+        "description": "Ātrs pēdu pamats, lai izvairītos no izvairīšanās un stingriem pagriezieniem.",
+        "benefits": [
+          "Uzlabo kājas ātrumu",
+          "Veido koordināciju",
+          "Pastiprina reakciju",
+          "Pirmsledus iesildīšanās"
+        ],
+        "instructions": [
+          "In-in-out-out caur kāpnēm",
+          "Maksimālais 30 s / 30 sek. atpūta",
+          "8 kārtas",
+          "Mainiet modeļus katru otro kārtu",
+          "Vispirms viegla iesildīšanās"
+        ],
+        "tips": [
+          "Acis uz augšu",
+          "Īsi soļi",
+          "Rokas sportiski gatavas",
+          "Neizlaidiet pakāpienus"
+        ],
+        "equipment": "Agility kāpnes",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-drill veiklība",
+        "description": "Klasiskais T-tests: sprints, sajaukšana un pedāļi kā uz ledus.",
+        "benefits": [
+          "Pilnīga veiklības pakete",
+          "Vilcieni visos virzienos",
+          "Izsekojams progress",
+          "Slidotājiem"
+        ],
+        "instructions": [
+          "Sprints 10 m uz priekšu",
+          "Jauktā secībā 5 m pa kreisi un pa labi",
+          "Atpakaļpedālis 10 m līdz startam",
+          "3-5 atkārtojumi",
+          "Atpūta 90 sek"
+        ],
+        "tips": [
+          "Saglabājiet zemu jaukto saturu",
+          "Nešķērsojiet kājas",
+          "Pieskarieties konusi",
+          "Reģistrējiet savus laikus"
+        ],
+        "equipment": "Konusi",
+        "calories": "100-150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Ripas figūras-8 urbis",
+        "description": "Rokturis ar figūru-8, kas savieno rokas un pēdas.",
+        "benefits": [
+          "Uzlabo izturēšanos pret nūjām",
+          "Savieno rokas un kājas",
+          "Trenē perifēro redzi",
+          "Mājai draudzīgs"
+        ],
+        "instructions": [
+          "Divi konusi 2 m attālumā viens no otra",
+          "Ripas figūra-8 ap konusiem",
+          "Maksimālais ātrums 30 sekundes",
+          "Atpūta 30 sek",
+          "10 kārtas"
+        ],
+        "tips": [
+          "Galvu augšā",
+          "Mīkstas rokas",
+          "Ātras kājas",
+          "Mainiet virzienu ik pēc 5 kārtām"
+        ],
+        "equipment": "Ripa, 2 čiekuri, nūja",
+        "calories": "90-130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktīvie konusa zvani",
+        "description": "Partneris sauc konusu — reakcija un pirmais solis kā lasīšana spēlē.",
+        "benefits": [
+          "Vilcina spēles reakciju",
+          "Uzlabo kognitīvo ātrumu",
+          "Veido pirmo soli",
+          "Partneru urbis"
+        ],
+        "instructions": [
+          "4 konusi 3 m kvadrātā",
+          "Partnera zvanu krāsa/numurs",
+          "Sprints līdz konusam",
+          "Pieskarieties un atgriezieties",
+          "20 reakcijas"
+        ],
+        "tips": [
+          "Esiet godīgs, nedomājiet agri",
+          "Zema stāja",
+          "Sprādzienbīstams pirmais solis",
+          "Mainīt izkārtojumu"
+        ],
+        "equipment": "4 konusi, partneris",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Sānu jaukšanas soļi",
+        "description": "Sānu maiņa hokeja pozā, kas atdarina sānslidošanu.",
+        "benefits": [
+          "Veido sānu ātrumu",
+          "Stiprina gūžas nolaupītājus",
+          "Uzlabo stāju",
+          "Pirmsledus iesildīšanās"
+        ],
+        "instructions": [
+          "5 m jaukts pa kreisi un pa labi",
+          "Nešķērsojiet kājas",
+          "30 sek / 30 sek atpūta",
+          "8 kārtas",
+          "Rokas uz iedomātā kociņa"
+        ],
+        "tips": [
+          "Palieciet zemu",
+          "Nospiediet ārējo kāju",
+          "Krūtis uz priekšu",
+          "Ātri kontakti"
+        ],
+        "equipment": "Konusi vai līnijas",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dinamisks gurnu atvērējs",
+        "description": "Gurnu mobilitātes iesildīšana dziļai hokeja stājai.",
+        "benefits": [
+          "Uzlabo gurnu kustīgumu",
+          "Samazina cirkšņa traumu risku",
+          "Gatavojas slidošanai",
+          "Ātra rutīna"
+        ],
+        "instructions": [
+          "Kāju šūpoles priekšpusē-aizmugurē 10 katra",
+          "Kāju šūpoles uz sāniem 10 katra",
+          "Dziļa pietupiena turēšana 30 sek",
+          "Gurnu apļi 10 katrā virzienā",
+          "Staigājoši ceļgalu apskāvieni 10 m"
+        ],
+        "tips": [
+          "Kontrolēts diapazons",
+          "Nav sāpju",
+          "Elpojiet dziļi",
+          "Pirms katras sesijas"
+        ],
+        "equipment": "Nav",
+        "calories": "40-60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Pasaulē lielākais posms",
+        "description": "Dinamiska stiepšanās, kas skar gurnus, mugurkaulu krūšu kurvī un paceles cīpslas.",
+        "benefits": [
+          "Visa ķermeņa mobilitāte",
+          "Laika efektīva",
+          "Sagatavo visu ķermeni",
+          "Kopējā pro iesildīšanās"
+        ],
+        "instructions": [
+          "Iekāpiet izklupienā",
+          "Elkonis uz leju pēdas iekšpusē",
+          "Krūškurvja rotācijas roka uz augšu",
+          "Iztaisnojiet priekšējo kāju paceles cīpslai",
+          "5 atkārtojumi katrā pusē"
+        ],
+        "tips": [
+          "Pārvietojieties lēnām",
+          "Nekādas atlekšanas",
+          "Sliežu ceļa priekšējais ceļš",
+          "Abas puses vienādas"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "50-70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Savelkamās joslas",
+        "description": "Aktivizē muguras augšdaļu un plecus pirms šaušanas un kontakta.",
+        "benefits": [
+          "Aktivizē aizmugurējās deltas un rombveida formas",
+          "Uzlabo stāju",
+          "Silda plecus",
+          "Traumu profilakse"
+        ],
+        "instructions": [
+          "Turiet saiti krūšu augstumā",
+          "Rokas taisnas",
+          "Izvelciet līdz plecu lāpstiņām",
+          "15-20 atkārtojumi",
+          "2-3 komplekti"
+        ],
+        "tips": [
+          "Nekādu plecu paraustīšanu",
+          "Kontrolēta atgriešana",
+          "Viegla josla, lai sāktu",
+          "Pirms ledus vai sporta zāles"
+        ],
+        "equipment": "Pretestības josla",
+        "calories": "30-50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Augsti ceļi + sitieni pa dibenu",
+        "description": "Dinamiska kāju iesildīšana un sirdsdarbības ātruma palielināšana pirms ledus.",
+        "benefits": [
+          "Paaugstina sirdsdarbības ātrumu",
+          "Silda kvadraciklus un paceles cīpslas",
+          "Uzlabo koordināciju",
+          "Ātrs efekts"
+        ],
+        "instructions": [
+          "20 m augsti ceļgali",
+          "20 m sitieni pa dibenu",
+          "20 m izlaižot",
+          "Atkārtojiet 3-4 reizes",
+          "Viegli skriet starp"
+        ],
+        "tips": [
+          "Palieciet uz priekšējās kājas",
+          "Aktīvās rokas",
+          "Pakāpeniski veidojiet tempu",
+          "Nesprint auksti"
+        ],
+        "equipment": "20 m telpa",
+        "calories": "60-90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Roku šūpošanās + nūjas iesildīšanās",
+        "description": "Plecu iesildīšana un viegla apstrāde pirms ledus.",
+        "benefits": [
+          "Mobilizē plecus",
+          "Aktivizē rotatora aproci",
+          "Savieno ķermeņa augšdaļu ar nūju",
+          "Hokejam specifisks"
+        ],
+        "instructions": [
+          "Roku apļi 10 katrā virzienā",
+          "Šūpoles šķērsām 10",
+          "Rokturis no lēnas līdz ātrai 60 sek",
+          "Rokas ruļļi ar nūju 20",
+          "Viegla šāviena kustība x10"
+        ],
+        "tips": [
+          "Progresa ātrums",
+          "Abas rokas",
+          "Nav piespiedu diapazona",
+          "Katra ledus sesija"
+        ],
+        "equipment": "Nūja, ripa",
+        "calories": "50-80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Gūžas saliecēja stiepšanās ceļos",
+        "description": "Gurnu saliecēja stiepšanās pretslidošanas pozai.",
+        "benefits": [
+          "Samazina gurnu sasprindzinājumu",
+          "Var uzlabot soļus",
+          "Palīdz stāju",
+          "Pēc ledus vai sporta zāles"
+        ],
+        "instructions": [
+          "Izklupiena pozīcija ceļos",
+          "Saspiediet glute atpakaļ",
+          "Torss garš",
+          "Turiet 30-45 sekundes",
+          "2-3 reizes uz kāju"
+        ],
+        "tips": [
+          "Izvairieties no jostas arkas",
+          "Elpojiet stiept",
+          "Priekšējais celis pāri potītei",
+          "Ja iespējams, katru dienu"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 gurnu rotācija",
+        "description": "Gurnu kustīgums pagriezieniem un dziļi pietupieniem uz slidām.",
+        "benefits": [
+          "Uzlabo gurnu rotāciju",
+          "Samazina cirkšņa sastiepuma risku",
+          "Mierīgs atveseļošanās darbs",
+          "Draudzība pēc spēles"
+        ],
+        "instructions": [
+          "Sēdi 90/90 pozīcijā",
+          "Pagrieziet ceļus no vienas puses uz otru",
+          "Rokas aiz muguras atbalstam",
+          "10 lēni atkārtojumi katrā virzienā",
+          "Turiet beigas 20 sekundes"
+        ],
+        "tips": [
+          "Nav piespiedu diapazona",
+          "Krūtis augsta",
+          "Ja iespējams, abi gurni uz leju",
+          "Izmantojiet elpu"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Krūškurvja rotācijas stiepšanās",
+        "description": "Krūškurvja mobilitāte šāvienu rotācijai un pozai.",
+        "benefits": [
+          "Uzlabo T veida mugurkaula rotāciju",
+          "Izkrauj muguras lejasdaļu",
+          "Palīdz šāvienu mehāniķiem",
+          "Ātrs ikdienas treniņš"
+        ],
+        "instructions": [
+          "Četrkāja pozīcija",
+          "Roka aiz galvas",
+          "Pagrieziet elkoni pret griestiem",
+          "10 atkārtojumi katrā pusē",
+          "Augšpusē pauze 2 s"
+        ],
+        "tips": [
+          "Gurni paliek taisni",
+          "Izelpojiet, pagriežot",
+          "Nav mugurkaula sāpju",
+          "Pārvietojieties lēnām"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "30-45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Sienas ikru stiepšana",
+        "description": "Teļi un Ahillejs bieži ir pārslogoti slidās.",
+        "benefits": [
+          "Samazina teļu sasprindzinājumu",
+          "Uzlabo potītes dorsifleksiju",
+          "Apakšstilba šinas profilakse",
+          "Pēc katras sesijas"
+        ],
+        "instructions": [
+          "Rokas pie sienas",
+          "Aizmugurējās kājas taisns papēdis uz leju",
+          "Turiet 30 sekundes",
+          "Saliekt ceļgalu zolei",
+          "2-3 apļi katrai kājai"
+        ],
+        "tips": [
+          "Papēdis uz grīdas",
+          "Gurnu kvadrāts",
+          "Nekādas atlekšanas",
+          "Abas kājas"
+        ],
+        "equipment": "Siena",
+        "calories": "25-40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Plecu stiepšana pāri ķermenim",
+        "description": "Aizmugurējā pleca stiepšanās pēc šaušanas apjoma.",
+        "benefits": [
+          "Samazina plecu sasprindzinājumu",
+          "Palīdz šāvienu diapazonā",
+          "Ātra stiepšanās",
+          "Ikdienas apkope"
+        ],
+        "instructions": [
+          "Pavelciet roku pāri krūtīm",
+          "Turiet elkoni ar otru roku",
+          "30 sekundes katrai rokai",
+          "Atkārtojiet 2-3 reizes",
+          "Atslābināts kakls"
+        ],
+        "tips": [
+          "Nevajag paraustīt plecus",
+          "Tikai maiga vilkšana",
+          "Izelpojiet un atpūtieties",
+          "Pēc ledus"
+        ],
+        "equipment": "Nav",
+        "calories": "20-35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Diafragmas elpošana",
+        "description": "Dziļa elpošana parasimpātiskai atveseļošanai pēc spēles.",
+        "benefits": [
+          "Pazemina stresu",
+          "Atbalsta atveseļošanos",
+          "Var uzlabot miegu",
+          "Draudzīgs ģērbtuvē"
+        ],
+        "instructions": [
+          "Apgulieties vai sēdiet ērti",
+          "Roka uz vēdera",
+          "Ieelpojiet 4 sekundes degunu",
+          "Izelpojiet 6 sekundes ar muti",
+          "5 minūtes nepārtraukti"
+        ],
+        "tips": [
+          "Paceļas vēders, nevis krūtis",
+          "Klusa telpa",
+          "Ikdienas ieradums",
+          "Pēc vēlajām spēlēm"
+        ],
+        "equipment": "Nav",
+        "calories": "15-25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Kājas pa sienu",
+        "description": "Venozā attece un kāju relaksācija pēc smagām spēlēm.",
+        "benefits": [
+          "Var samazināt kāju pietūkumu",
+          "Veicina relaksāciju",
+          "Pasīvā atveseļošanās",
+          "Pēc ceļojumu spēlēm"
+        ],
+        "instructions": [
+          "Gurni pie sienas guļus stāvoklī",
+          "Kājas vertikālas uz sienas",
+          "Rokas atslābušas",
+          "Turiet 8-10 minūtes",
+          "Lēna elpošana"
+        ],
+        "tips": [
+          "Ērta virsma",
+          "Atvienojiet no tālruņa",
+          "Pēc izvēles mierīga mūzika",
+          "Vislabāk vakarā"
+        ],
+        "equipment": "Siena, paklājiņš",
+        "calories": "20-30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Foam roll kvadricikli un hamstrings",
+        "description": "Miofasciālā atbrīvošana kājām pēc lielas slodzes.",
+        "benefits": [
+          "Samazina sāpīgumu",
+          "Uzlabo audu kvalitāti",
+          "Ātrāka atveseļošanās",
+          "Pašaprūpe"
+        ],
+        "instructions": [
+          "Ritiniet četrus pa 60 sek",
+          "Ritiniet paceles cīpslas pa 60 sek",
+          "Pauzējiet jutīgās vietas 20 sekundes",
+          "Tikai viegla IT josla",
+          "Hidratējiet pēc"
+        ],
+        "tips": [
+          "Izvairieties no locītavām",
+          "Elpojiet caur šaurām vietām",
+          "Mērens spiediens",
+          "Ne pirms ledus"
+        ],
+        "equipment": "Putu veltnis",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Gurnu un potīšu mobilitātes plūsma",
+        "description": "Maiga brīvdienas mobilitāte, lai saglabātu kustību diapazonu.",
+        "benefits": [
+          "Saglabā mobilitāti",
+          "Zems nogurums",
+          "Aktīva atveseļošanās",
+          "Traumu profilakse"
+        ],
+        "instructions": [
+          "Potītes apļi pa 10 katrā",
+          "Hip CAR 5 katrā virzienā",
+          "Kaķis-govs 10 atkārtojumi",
+          "Bērna poza 60 sek",
+          "2 kārtas"
+        ],
+        "tips": [
+          "Diapazons bez sāpēm",
+          "Lēns un kontrolēts",
+          "Brīvdiena vai rīts",
+          "Pievienojiet elpošanu"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Miega sagatavošana stiepšanās un elpa",
+        "description": "Viegla stiepšanās un elpošana pirms gulētiešanas nakts atveseļošanai.",
+        "benefits": [
+          "Atbalsta miega iestāšanos",
+          "Atslābina nervu sistēmu",
+          "Atveseļošanās guļot",
+          "Vakara rituāls"
+        ],
+        "instructions": [
+          "Paceles cīpslas stiepšana pa 30 sek",
+          "Bērna poza 60 sek",
+          "Pagrieziet guļus pa 30 sek",
+          "Kastes elpošana 4-4-4-4 3 min",
+          "Tumša klusa istaba"
+        ],
+        "tips": [
+          "Pēc tam nav ekrānu",
+          "Pastāvīgs gulētiešanas laiks",
+          "Forša istaba",
+          "Padariet to par ieradumu"
+        ],
+        "equipment": "Vingrošanas paklājiņš",
+        "calories": "25-40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     }
   },
@@ -1748,6 +3148,8 @@
     "codeSentToEmailMessage": "Kods nosūtīts uz {email}",
     "userNotFound": "Lietotājs nav atrasts",
     "userNotFoundMessage": "Konts ar šo tālruņa numuru nepastāv. Lūdzu reģistrēties.",
+    "networkError": "Savienojuma problēma",
+    "networkErrorMessage": "Neizdevās sasniegt serveri. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.",
     "errorSendingCode": "Kļūda",
     "errorSendingCodeMessage": "Neizdevās nosūtīt kodu. Pārbaudiet savu tālruņa numuru un interneta savienojumu.",
     "errorResendingCode": "Kļūda",
@@ -1939,6 +3341,8 @@
     "rightShort": "P",
     "startedHockey": "Hokejā ar",
     "noFriendsYet": "{name} vēl nav draugu",
+    "inviteYourTeam": "Uzaicini savu komandu",
+    "inviteTeamMessage": "Es esmu HockeyStars – lietotnē hokejistiem. Pievienojies:",
     "beFirstToAdd": "Esiet pirmais, kas pievieno {name} kā draugu",
     "writeMessage": "Uzrakstiet ziņu",
     "edit": "Rediģēt",
@@ -2392,9 +3796,17 @@
     "weightFrom": "Svars",
     "all": "Visi",
     "noPlayersFound": "Nav atrasts neviens spēlētājs",
+    "newcomers": "Jaunpienācēji",
+    "topByPoints": "Top pēc punktiem",
     "left": "Pa kreisi",
     "right": "Pareizi",
-    "resetFilters": "Atiestatīt filtrus"
+    "resetFilters": "Atiestatīt filtrus",
+    "topBySV": "Top SV%",
+    "shareRating": "Dalīties ar reitingu",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "punktu",
+    "allCountries": "Visas valstis",
+    "allYears": "Visi gadi"
   },
   "messages": {
     "title": "Ziņojumi",
@@ -2883,7 +4295,9 @@
     "physicalDataUpdate": "Fizisko datu atjauninājums",
     "friendRequest": "Draudzības pieprasījums",
     "newFriendship": "Jauna draudzība",
-    "speedRecord": "Jauns ātruma rekords"
+    "speedRecord": "Jauns ātruma rekords",
+    "gameFirstPlace": "Spēles čempions",
+    "quizFirstPlace": "Hokeja zvaigzne"
   },
   "statsNotification": {
     "updated": "atjaunoja",
@@ -2894,5 +4308,20 @@
   "height": "augums",
   "weight": "svars",
   "cm": "cm",
-  "kg": "kg"
+  "kg": "kg",
+  "videoUploadHint": "Maks. 20 sekundes vienā video, līdz 10 video",
+  "gameFirstPlaceNotification": {
+    "title": "Spēles čempions",
+    "message": "{playerName} sasniedza 1. vietu"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hokeja zvaigzne",
+    "message": "{playerName} nopelnīja {prize}"
+  },
+  "tabs": {
+    "chat": "Čats",
+    "feed": "Lente",
+    "scout": "Skauts",
+    "skills": "Prasmes"
+  }
 }

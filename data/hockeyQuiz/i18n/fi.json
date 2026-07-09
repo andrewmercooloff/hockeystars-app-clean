@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Kuinka monta luistelijaa per joukkue on jäällä tasaisen voiman aikana (pois lukien maalivahdit)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Kuinka monta sääntöjaksoa on tavallisessa NHL-ottelussa?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Paitsi kutsutaan, kun hyökkäävä pelaaja tulee hyökkäysalueelle ennen mitä?",
+    "options": [
+      "Keskilinja",
+      "Kiekko",
+      "Maalivahti",
+      "Tuomari"
+    ]
+  },
+  "rules_icing": {
+    "question": "Icing on kiekon laukaiseminen keskilinjan takaa vastustajan maaliviivan ohi ilman kosketusta. Totta?",
+    "options": [
+      "Väärin – ei koskaan NHL:ssä",
+      "Totta",
+      "Totta - vain jatkoajalla",
+      "Väärin - vain puolustusalueelta"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Kenellä on NHL-ennätys useimpien uran maaleissa?",
+    "options": [
+      "Aleksi Ovetshkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovetshkin on kuuluisa vasemman laitahyökkääjänä, joka käyttää numeroa 8 missä joukkuekaupungissa?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Mikä on hattutemppu jääkiekossa?",
+    "options": [
+      "Yhdeltä pelaajalta kolme maalia yhdessä pelissä",
+      "Kolme torjuntaa peräkkäin",
+      "Kolme syöttöä yhdessä pelissä",
+      "Kolme rangaistuspotkua"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Voimapeli tapahtuu, kun:",
+    "options": [
+      "Maalivahtia vedetään",
+      "Taistelu puhkeaa",
+      "Yhdellä joukkueella on enemmän luistelijoita rangaistuksen vuoksi",
+      "Jatkoaika alkaa"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Minkä liigan mestaruuspalkinto on Stanley Cup?",
+    "options": [
+      "IIHF MM",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Mistä tavallinen jääkiekkokiekko on tehty?",
+    "options": [
+      "Vulkanoitu kumi",
+      "Alumiini",
+      "Puu",
+      "Muovi"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Kuinka monta minuuttia on tavallinen pieni rangaistus?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Kuinka monta minuuttia on tavallinen päärangaistus?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Peli alkaa:",
+    "options": [
+      "Rangaistuslaukaus",
+      "Faceoff",
+      "Virtakatkos",
+      "Jäähdytyspuhelu"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Jos NHL:n runkosarjan peli on jatkoajan jälkeen tasapeli, mitä tapahtuu?",
+    "options": [
+      "Toinen jatkoaika",
+      "Shootout",
+      "Pudotuspelikausi",
+      "Piirrä telineet"
+    ]
+  },
+  "rules_crease": {
+    "question": "Voiko hyökkääjä seistä maalivahdissa ilman seurauksia?",
+    "options": [
+      "Kyllä aina",
+      "Vain pudotuspeleissä",
+      "Ei – maali voidaan hylätä",
+      "Vain viime hetken"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "High-sticking on, kun maila osuu vastustajaan:",
+    "options": [
+      "Poikkipalkki",
+      "Hartiat",
+      "Vyötärö",
+      "Vain kypärä"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Maalivahdin riskien vetäminen:",
+    "options": [
+      "Rangaistuslaukaus",
+      "Tyhjä maali vastaan",
+      "Paitsiossa",
+      "Vain jäätelö"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Rangaistuslaukaus tuomitaan usein virheestä:",
+    "options": [
+      "Milloin tahansa",
+      "Vain ylitöitä",
+      "Vain pudotuspeleissä",
+      "Selkeä irtautuminen"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Penkki alaikäistä palvelee kuka tahansa pelaaja paitsi:",
+    "options": [
+      "Maalivahti (yleensä)",
+      "A eteenpäin",
+      "Puolustaja",
+      "Kapteeni"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "Kuinka monta luistelijaa per puoli pelataan NHL:n runkosarjassa?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Kuinka monta pelaajaa (mukaan lukien maalivahti) joukkueessa voi olla jäällä?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Kuinka monen pisteen arvoinen maali on tulostaululla?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Viivästyneen rangaistuksen yhteydessä rikkomaton joukkue usein:",
+    "options": [
+      "Jäätä kiekon",
+      "Puhelujen aikakatkaisu",
+      "Lopettaa pelaamisen",
+      "Vetää maalivahtia"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Maalivahdit voivat pelata kiekkoa verkon takana vain:",
+    "options": [
+      "Keskimmäinen ympyrä",
+      "Neutraali vyöhyke",
+      "Täysi vyöhyke",
+      "Trapetsimainen alue"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Taistelu johtaa tyypillisesti:",
+    "options": [
+      "Tärkeä rangaistus",
+      "Vain pelin väärinkäyttö",
+      "Pieni rangaistus",
+      "Ei rangaistusta"
+    ]
+  },
+  "terms_puck": {
+    "question": "Kovia kumiesineitä, joita pelaajat ampuvat, kutsutaan:",
+    "options": [
+      "Kiekko",
+      "Kiekko",
+      "Kivi",
+      "Pallo"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Syöttöä, joka nostaa kiekon, kutsutaan:",
+    "options": [
+      "Lautaspassi",
+      "Hallituspassi",
+      "Slap kaatopaikka",
+      "Rypytyssyöttö"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Iskulaukaus sisältää:",
+    "options": [
+      "Vain takakäteen",
+      "Yksi käsi kepillä",
+      "Napauttamalla kiekkoa kevyesti",
+      "Päättäminen ja iskeytyminen ensin jäähän"
+    ]
+  },
+  "terms_deke": {
+    "question": "Dekki on:",
+    "options": [
+      "Eräänlainen rangaistus",
+      "Väärä liike puolustajan lyömiseksi",
+      "Puolustava lohko",
+      "Linjan vaihto"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Irtautuminen on, kun:",
+    "options": [
+      "Kiekko on jäässä",
+      "Luistelija menee sisään maalivahtille yksin",
+      "Kaksi pelaajaa tappelee",
+      "Tapahtuu rivinvaihto"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Plus/miinus kappaleet:",
+    "options": [
+      "Laukaukset maaliin",
+      "Maaliero pelaajan ollessa jäällä tasaisella voimalla",
+      "Rangaistus minuuttia",
+      "Faceoff voittaa vain"
+    ]
+  },
+  "terms_assist": {
+    "question": "Ensisijainen syöttö menee pelaajalle, joka:",
+    "options": [
+      "Tekee maalin",
+      "Voitti kohtaamisen",
+      "Viimeinen kosketettu kiekko ennen maalintekijää",
+      "Sai rangaistuspotkun"
+    ]
+  },
+  "terms_block": {
+    "question": "Estetty laukaus on, kun:",
+    "options": [
+      "Kiekko osuu tolppaan",
+      "Luistelija pysäyttää kiekon keholla/mailalla ennen maalia",
+      "Maalivahti pelastaa sen",
+      "Laukaus ohitti verkon"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Ennakkotarkastus tarkoittaa:",
+    "options": [
+      "Vain linjanvaihtostrategia",
+      "Puolustaa sinistä linjaasi",
+      "Painotetaan vastustajia alueellaan saadakseen kiekon takaisin",
+      "Maalivahdin vetäminen"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Takaisintarkastus tarkoittaa:",
+    "options": [
+      "Luistelu takaisin auttamaan puolustusta",
+      "Ammunta pisteestä",
+      "Ottelun voitto",
+      "Maalivahdin torjunta"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Kertakäyttöinen on:",
+    "options": [
+      "Odotetaan ja ammutaan",
+      "Maalivahdin liike",
+      "Ammunta heti syötöstä",
+      "Rangaistus"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Poke shekki:",
+    "options": [
+      "Nosta kiekko sauvan päälle",
+      "Vertailla",
+      "Knock kiekko pois vastustajalta",
+      "Koukku vastustaja"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Ylin hylly tarkoittaa pisteytystä:",
+    "options": [
+      "Verkon yläosa",
+      "Vain keskustan jäästä",
+      "Vain tyhjällä verkolla",
+      "Viiden reikäinen"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Viisi reikää on maalivahtien välissä:",
+    "options": [
+      "Tikku ja hanska",
+      "Naamio ja rintakehä",
+      "Käsi ja vartalo",
+      "Jalat"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Valvontaviranomainen tarjoaa:",
+    "options": [
+      "Valmennus",
+      "Maalinteko",
+      "Fyysinen suoja ja taistelu",
+      "Vain kohtaamiset"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Rivimuutoksia tapahtuu yleensä:",
+    "options": [
+      "Vasta maalien jälkeen",
+      "Vain rangaistuksissa",
+      "Vain väliajalla",
+      "Lennossa pelin aikana"
+    ]
+  },
+  "terms_rink": {
+    "question": "Jääkiekon pelipinta on nimeltään:",
+    "options": [
+      "Ala",
+      "Tuomioistuin",
+      "Seurata",
+      "Jäähalli"
+    ]
+  },
+  "terms_goal": {
+    "question": "Verkkopelaajat ampuvat on nimeltään:",
+    "options": [
+      "Kohde",
+      "Kori",
+      "Maali",
+      "Alue"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Lyhyellä kädellä pelaaminen tarkoittaa:",
+    "options": [
+      "Ylityö",
+      "Maalivahti veti",
+      "Vähemmän luistelijoita rangaistuksen vuoksi",
+      "Tyhjä verkko"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Äkillisen kuoleman ylityö tarkoittaa:",
+    "options": [
+      "Ensimmäinen maali voittaa",
+      "Täysi ajanjakso",
+      "Vain rangaistuspotkukilpailu",
+      "Ei voittajaa"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Kuinka monta joukkuetta NHL Original Six -aikakaudella?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Moderni jääkiekko kehittyi eniten:",
+    "options": [
+      "Venäjä",
+      "Ruotsi",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: Kenet USA voitti vuonna 1980?",
+    "options": [
+      "Neuvostoliitto",
+      "Kanada",
+      "Tsekkoslovakia",
+      "Ruotsi"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Wayne Gretzkyn uran pisteennätys on ohi:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Hockey Hall of Fame on paikassa:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL toimii pääasiassa:",
+    "options": [
+      "Venäjä",
+      "Suomi",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Vuoden 1972 huippukokoussarja: Kanada vs:",
+    "options": [
+      "Neuvostoliitto",
+      "USA",
+      "Tšekki",
+      "Ruotsi"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL perustettiin:",
+    "options": [
+      "1900-luvulla",
+      "21. vuosisadalla",
+      "1800-luvulla",
+      "1700-luvulla"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby valittiin kokonaiskilpailun ensimmäiseksi:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid valittiin kokonaiskilpailun ensimmäiseksi:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Stanley Cup jaettiin ensimmäisen kerran:",
+    "options": [
+      "1900-luvulla",
+      "21. vuosisadalla",
+      "1700-luvulla",
+      "1800-luvulla"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr on kaikkien aikojen NHL-johtajien joukossa:",
+    "options": [
+      "Pisteet",
+      "Valmennus",
+      "Vain rangaistusminuutit",
+      "Maalivahti voittaa"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovetshkin vietti NHL-uransa pääasiassa:",
+    "options": [
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Washington Capitals",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux voitti Stanley Cupin seuraavilla tavoilla:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Kuinka pitkä NHL-rata kestää?",
+    "options": [
+      "200 jalkaa",
+      "150 jalkaa",
+      "300 jalkaa",
+      "250 jalkaa"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Kuinka leveä NHL-rata on?",
+    "options": [
+      "100 jalkaa",
+      "150 jalkaa",
+      "120 jalkaa",
+      "85 jalkaa"
+    ]
+  },
+  "gen_zones": {
+    "question": "Kuinka monelle alueelle siniset viivat jakavat kentän?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Keskimmäistä punaista viivaa käytetään:",
+    "options": [
+      "Jäähdytyspuhelut",
+      "Rangaistuslaatikko",
+      "Vain kohtaamiset",
+      "Paitsi keskellä"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Tikun teräkäyrä auttaa:",
+    "options": [
+      "Luistelunopeus",
+      "Maalivahti pelastaa",
+      "Kiekon nosto ja hallinta",
+      "Taistelu"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate hollow vaikuttaa:",
+    "options": [
+      "Stick flex",
+      "Pito jäällä ja käännöksissä",
+      "Kypärän istuvuus",
+      "Jerseyn koko"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Säärisuojat suojaavat:",
+    "options": [
+      "Hartiat",
+      "Pää",
+      "Alajalat",
+      "Vain kädet"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kapteeni käyttää kirjettä:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Varakapteenit käyttävät:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Kotijoukkue käyttää yleensä:",
+    "options": [
+      "Tumma/värinen",
+      "Valkoinen/vaalea",
+      "Ei pelipaitoja",
+      "Vain maalivahti"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Jaksojen välissä on noin:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 tunti"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL:n pudotuspelisarjat ovat enimmäkseen:",
+    "options": [
+      "Aina paras viidestä",
+      "Vain lopullinen",
+      "Harvinaisia ​​poikkeuksia – enimmäkseen paras seitsemästä",
+      "Ei koskaan"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zambonia käytetään:",
+    "options": [
+      "Mittaa nopeus",
+      "Säilytä kiekkoja",
+      "Teroita luistimet",
+      "Pinnalle jäätä"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Jäävirkailijat käyttävät:",
+    "options": [
+      "Joukkueen pelipaidat",
+      "Maalivahdin varusteet",
+      "Mustavalkoiset raidat",
+      "Puvut"
+    ]
+  },
+  "gen_skates": {
+    "question": "Jääkiekkoilijat jatkavat:",
+    "options": [
+      "Rullaluistimet",
+      "Luistimet",
+      "Paljaat jalat",
+      "Sukset"
+    ]
+  },
+  "gen_stick": {
+    "question": "Pelaajat hallitsevat kiekkoa seuraavilla tavoilla:",
+    "options": [
+      "Tikku",
+      "Net",
+      "Vain kädet",
+      "Kypärä"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Mihin joukkueeseen Sidney Crosby liittyy eniten?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Missä asemassa Sidney Crosby pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Keskusta"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Mihin joukkueeseen Connor McDavid liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Missä asemassa Connor McDavid ensisijaisesti pelasi?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Mihin joukkueeseen Nathan MacKinnon liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado Avalanche",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Missä asemassa Nathan MacKinnon pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Mihin joukkueeseen Victor Hedman liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Missä asemassa Victor Hedman ensisijaisesti pelasi?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Mihin joukkueeseen Carey Price liittyy eniten?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Missä asemassa Carey Price pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Mihin joukkueeseen Jaromir Jagr liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Missä asemassa Jaromir Jagr pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Mihin joukkueeseen Mario Lemieux liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Missä asemassa Mario Lemieux pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Mihin joukkueeseen Patrick Kane liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Missä asemassa Patrick Kane pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Mihin joukkueeseen Nicklas Lidstrom liittyy eniten?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Missä asemassa Nicklas Lidstrom pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Maalivahti",
+      "Vasen laitahyökkääjä",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Mihin joukkueeseen Martin Brodeur liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Missä asemassa Martin Brodeur pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Maalivahti",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Mihin joukkueeseen Steven Stamkos liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Missä asemassa Steven Stamkos pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Puolustaja",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Mihin joukkueeseen Auston Matthews liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Missä asemassa Auston Matthews pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Mihin joukkueeseen Leon Draisaitl liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Missä asemassa Leon Draisaitl pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Mihin joukkueeseen Erik Karlsson liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Missä asemassa Erik Karlsson ensisijaisesti pelasi?",
+    "options": [
+      "Keskusta",
+      "Maalivahti",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Mihin joukkueeseen Pavel Datsyuk liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Missä asemassa Pavel Datsyuk pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Puolustaja",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Mihin joukkueeseen Henrik Lundqvist liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Missä asemassa Henrik Lundqvist ensisijaisesti pelasi?",
+    "options": [
+      "Puolustaja",
+      "Oikea laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Mihin joukkueeseen Evgeni Malkin liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Missä asemassa Jevgeni Malkin pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Mihin joukkueeseen Artemi Panarin liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Missä asemassa Artemi Panarin ensisijaisesti pelasi?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Mihin joukkueeseen Nikita Kucherovia liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Missä asemassa Nikita Kucherov ensisijaisesti pelasi?",
+    "options": [
+      "Keskusta",
+      "Maalivahti",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Mihin joukkueeseen Brad Marchand liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Missä asemassa Brad Marchand pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Mihin joukkueeseen David Pastrnak liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Missä asemassa David Pastrnak pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Mihin joukkueeseen Shea Weber liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Missä asemassa Shea Weber pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Maalivahti",
+      "Puolustaja",
+      "Keskusta"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Mihin joukkueeseen Sergei Bobrovsky liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Missä asemassa Sergei Bobrovsky pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Oikea laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Mihin joukkueeseen Jonathan Toews liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Missä asemassa Jonathan Toews pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Mihin joukkueeseen Anze Kopitar liittyy eniten?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Missä asemassa Anze Kopitar pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Puolustaja",
+      "Oikea laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Mihin joukkueeseen Mark Messier liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Missä asemassa Mark Messier pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Mihin joukkueeseen Ray Bourque liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Missä asemassa Ray Bourque pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Mihin joukkueeseen Dominik Hasek liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Missä asemassa Dominik Hasek pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Keskusta",
+      "Puolustaja",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Mihin joukkueeseen Teemu Selanne liittyy eniten?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Missä asemassa Teemu Selanne ensisijaisesti pelasi?",
+    "options": [
+      "Keskusta",
+      "Maalivahti",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Mihin joukkueeseen Pavel Bure liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Missä asemassa Pavel Bure pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Mihin joukkueeseen Alexander Mogilny liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Missä asemassa Alexander Mogilny ensisijaisesti pelasi?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Mihin joukkueeseen Peter Forsberg liittyy eniten?",
+    "options": [
+      "Colorado Avalanche",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Missä asemassa Peter Forsberg pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Mihin joukkueeseen Joe Sakic liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Colorado Avalanche",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Missä asemassa Joe Sakic pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Mihin joukkueeseen Steve Yzerman liittyy eniten?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Missä asemassa Steve Yzerman pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Keskusta"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Mihin joukkueeseen Bobby Orr liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Missä asemassa Bobby Orr pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Mihin joukkueeseen Gordie Howe liittyy eniten?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Missä asemassa Gordie Howe pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Mihin joukkueeseen Wayne Gretzky liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Missä asemassa Wayne Gretzky pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Mihin joukkueeseen Valeri Kharlamov liittyy eniten?",
+    "options": [
+      "CSKA Moskova",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Missä asemassa Valeri Kharlamov pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Keskusta",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Mihin joukkueeseen Vladislav Tretiak liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "CSKA Moskova"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Missä asemassa Vladislav Tretiak pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Puolustaja",
+      "Keskusta",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Mihin joukkueeseen Bobby Hull liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Missä asemassa Bobby Hull ensisijaisesti pelasi?",
+    "options": [
+      "Puolustaja",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Mihin joukkueeseen Maurice Richard liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Missä asemassa Maurice Richard pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Mihin joukkueeseen Guy Lafleur liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Missä asemassa Guy Lafleur pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Mihin joukkueeseen Patrick Roy liittyy eniten?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Missä asemassa Patrick Roy ensisijaisesti pelasi?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Mihin joukkueeseen Roberto Luongo liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Missä asemassa Roberto Luongo pelasi ensisijaisesti?",
+    "options": [
+      "Maalivahti",
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Mihin joukkueeseen Ilja Kovaltšuk liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Missä asemassa Ilja Kovaltšuk pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Mihin joukkueeseen Pavel Bure liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Missä asemassa Pavel Bure pelasi ensisijaisesti?",
+    "options": [
+      "Oikea laitahyökkääjä",
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Mihin joukkueeseen Aleksei Kovalev liittyy eniten?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Missä asemassa Aleksei Kovalev pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Maalivahti",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Mihin joukkueeseen Sergei Gonchar liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Missä asemassa Sergei Gonchar ensisijaisesti pelasi?",
+    "options": [
+      "Puolustaja",
+      "Vasen laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Mihin joukkueeseen Viacheslav Fetisov liittyy eniten?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Missä asemassa Viacheslav Fetisov ensisijaisesti pelasi?",
+    "options": [
+      "Maalivahti",
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Mihin joukkueeseen Chris Chelios liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Missä asemassa Chris Chelios pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Mihin joukkueeseen Scott Stevens liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Missä asemassa Scott Stevens pelasi ensisijaisesti?",
+    "options": [
+      "Puolustaja",
+      "Maalivahti",
+      "Vasen laitahyökkääjä",
+      "Keskusta"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Mihin joukkueeseen Paul Coffey liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Missä asemassa Paul Coffey pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Mihin joukkueeseen Grant Fuhr liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Missä asemassa Grant Fuhr pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Puolustaja",
+      "Maalivahti",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Mihin joukkueeseen Mike Bossy liittyy eniten?",
+    "options": [
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Missä asemassa Mike Bossy pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Mihin joukkueeseen Bryan Trottier liittyy eniten?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Missä asemassa Bryan Trottier pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Mihin joukkueeseen Denis Potvin liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Missä asemassa Denis Potvin pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Maalivahti",
+      "Keskusta",
+      "Puolustaja"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Mihin joukkueeseen Cam Neely liittyy eniten?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Missä asemassa Cam Neely pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Vasen laitahyökkääjä",
+      "Oikea laitahyökkääjä",
+      "Maalivahti"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Mihin joukkueeseen Adam Oates liittyy eniten?",
+    "options": [
+      "Washington Capitals",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Missä asemassa Adam Oates pelasi ensisijaisesti?",
+    "options": [
+      "Vasen laitahyökkääjä",
+      "Keskusta",
+      "Puolustaja",
+      "Oikea laitahyökkääjä"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Mihin joukkueeseen Doug Gilmour liittyy eniten?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Missä asemassa Doug Gilmour pelasi ensisijaisesti?",
+    "options": [
+      "Keskusta",
+      "Oikea laitahyökkääjä",
+      "Puolustaja",
+      "Vasen laitahyökkääjä"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Mitä KHL tarkoittaa?",
+    "options": [
+      "Kontinental Hockey League",
+      "Kazakstanin jääkiekkoliiga",
+      "Korean jääkiekkoliiga",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF järjestää:",
+    "options": [
+      "KHL:n pudotuspeleissä",
+      "NHL-draft",
+      "Stanley Cup",
+      "MM"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olympiakiekkoa pelataan:",
+    "options": [
+      "Jäätä",
+      "Hiekka",
+      "Ruoho",
+      "Betoni"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Mikä maa voitti monta maailmanmestaruutta Jagrin ja Hašekin aikakauden tähtien kanssa?",
+    "options": [
+      "Suomi",
+      "Tšekki",
+      "Kanada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Monet NHL-tähdet ovat kotoisin:",
+    "options": [
+      "Espanja",
+      "Brasilia",
+      "Ruotsi",
+      "Intia"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Suomi on tunnettu erinomaisesta tuotannostaan:",
+    "options": [
+      "Maalivahdit",
+      "Vain valmentajat",
+      "Zamboni kuljettajat",
+      "Tuomarit"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Neuvostoliiton \"Punainen kone\" hallitsi:",
+    "options": [
+      "1970-80 luvut",
+      "2000-luku",
+      "2010-luku",
+      "Vain 1990-luvulla"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL-joukkueet valitsevat uudet pelaajat:",
+    "options": [
+      "Kaupan määräaika",
+      "All-Star peli",
+      "World Cup",
+      "Ilmoittautumisluonnos"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Pelin kolme tähteä palkitaan:",
+    "options": [
+      "Kerran kaudella",
+      "Vain pudotuspeleissä",
+      "Ei koskaan NHL:ssä",
+      "Jokaisen pelin jälkeen"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Naisten jääkiekko on olympialaji, koska:",
+    "options": [
+      "1998",
+      "Ei koskaan",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Kuinka monta luistelijaa kullakin joukkueella on tasavauhdissa (ei maalivahtia)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Kuinka monta minuuttia yksi NHL-jakso kestää?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Joukkueesi on voimapelissä, kun vastustaja on:",
+    "options": [
+      "Jäätelö kiekko",
+      "Vetävä maalivahti",
+      "Lyhyesti rangaistuksesta",
+      "Ottelun voitto"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Rangaistusmurha tarkoittaa:",
+    "options": [
+      "Ylityö",
+      "Puolustaminen lyhytkätisesti",
+      "Ylimääräinen hyökkääjä",
+      "Maalivahdin taistelu"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Ammattikiekkoa pelataan:",
+    "options": [
+      "Lika",
+      "Ruoho",
+      "Jäätä",
+      "Vesi"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "NHL:n mestaruuspalkinto on:",
+    "options": [
+      "World Cup",
+      "Olympia Cup",
+      "Stanley Cup",
+      "Gretzky Cup"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard voitti eniten Stanley Cupeja pelaajana:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Wayne Gretzkyn kuuluisa pelipaidan numero oli:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux käytti numeroa:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby käyttää numeroa:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid käyttää numeroa:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Kuinka monta joukkuetta on NHL:ssä (noin)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Kuinka monta joukkuetta on NHL:ssä (noin)? (edistynyt)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Kuinka monta pelaajaa on pukeutunut tavallisella jääkiekkopenkillä?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Kuinka monta pelaajaa on pukeutunut tavallisella jääkiekkopenkillä? (edistynyt)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Kuinka monta minuuttia on perusaika NHL:ssä?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Kuinka monta minuuttia on perusaika NHL:ssä? (edistynyt)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Kuinka monta toimituomaria tyypillisesti jäällä NHL:ssä?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Kuinka monta toimituomaria tyypillisesti jäällä NHL:ssä? (edistynyt)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Enimmäispelaajat listalla (noin)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Enimmäispelaajat listalla (noin)? (edistynyt)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Puolustajan päätehtävänä puolustusalueella on:",
+    "options": [
+      "Voita kohtaamiset",
+      "Tee maaleja ensin",
+      "Suojaa verkko ja aukko",
+      "Vaihda rivejä nopeasti"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Yksi vastaan ​​puolustuksessa puolustajan tulee:",
+    "options": [
+      "Luistele heti penkille",
+      "Pysy hyökkääjän ja verkon välissä",
+      "Jätä aukko auki",
+      "Jahtaa vain verkon takaa"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Puolustusasento: tikku jäällä auttaa:",
+    "options": [
+      "Signaalin aikakatkaisu",
+      "Vältä kiekon lyömistä",
+      "Estä ohituskaistat",
+      "Matkan joukkuetoverit"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Kun kiekko menetetään hyökkäyksessä, puolustajan tulee:",
+    "options": [
+      "Vedä maalivahti",
+      "Luistele takaisin auttamaan puolustusta",
+      "Pysy punaisella viivalla",
+      "Väittele erotuomarin kanssa"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Puolustajan tulee estää laukaukset, kun:",
+    "options": [
+      "Kiekko on vain neutraalilla alueella",
+      "Väliaika alkaa",
+      "Tie verkkoon on auki",
+      "Joukkue on voimapelissä"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "2-1 vastaan, puolustajan tulee yleensä:",
+    "options": [
+      "Molemmat pysyvät sinisellä linjalla",
+      "Molemmat ryntäävät kiekkotelinettä yhdessä",
+      "Ota kiekkoteline ja kallista se leveästi",
+      "Luistele penkille"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Rangaistustapojen yhteydessä etusijalla on usein:",
+    "options": [
+      "Luistele kiekolla yksin keskeltä",
+      "Vaihda rivit ensin lennossa",
+      "Pidä kiekko nurkassa ikuisesti",
+      "Poista kiekko alueelta"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Hyvä aukon hallinta tarkoittaa puolustajaa:",
+    "options": [
+      "Ei koskaan peruuta",
+      "Iskee vain takaapäin",
+      "Vastaa nopeutta ja etäisyyttä hyökkääjään",
+      "Pysyy aina keskellä jäätä"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Verkon edessä puolustajan tulee:",
+    "options": [
+      "Luistele asiaan",
+      "Kutsu paitsio",
+      "Katso vain kiekkoa ja jätä pelaajat huomiotta",
+      "Box out ja sitoa vastustajat"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Esitarkastuksen paineessa puolustajan ensisilmäyksen tulisi olla:",
+    "options": [
+      "Ammu omaan verkkoon",
+      "Ohjaa ensin matalaan tukeen tai turvalliseen pistorasiaan",
+      "Kulje aina keskeltä paineen alaisena",
+      "Reunus sokeasti lautojen ympärille"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Tehonpelissä puolustajan tulee:",
+    "options": [
+      "Luistele takaisin neutraalille alueelle",
+      "Vaihda maalivahtin kanssa",
+      "Pidä kiekko alueella ja luo laukauksia/syöttöjä",
+      "Älä koskaan ammu"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Laillinen puolustuspeli kiireessä on:",
+    "options": [
+      "Laillinen onkiminen ja keppi kiekon puolella",
+      "Kiinnitä ja vedä vastustaja alas",
+      "Stick-check takaapäin irtautuessa",
+      "Ristitarkastus päähän"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Ammattipuolustajat estävät laukaukset, koska:",
+    "options": [
+      "Se lasketaan avustajaksi",
+      "Älä koskaan estä laukauksia",
+      "Estä laukaukset ja uhraa ruumis tarvittaessa",
+      "Erotuomari lopettaa pelin"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Kun kaksi hyökkääjää ylittää alueellasi, puolustajien tulee:",
+    "options": [
+      "Molemmat jahtaavat vain kiekkoa",
+      "Jätä rypistys",
+      "Ota yhteyttä ja vaihda tarvittaessa",
+      "Ohita etäpuoleinen hyökkääjä"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Kun vastustajat heittävät kiekon sisään, puolustajan tulee:",
+    "options": [
+      "Ota kiekko talteen tai kiinnitä se laudoille",
+      "Luistele penkille vaihteeksi",
+      "Odota pilliä",
+      "Ammu punaisesta viivasta"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "3-2-kiihdytyksessä takapuolustajan tulee yleensä:",
+    "options": [
+      "Peitä heikon puolen (takaoven) uhka",
+      "Luistele punaiselle viivalle",
+      "Vaihda rivejä",
+      "Purista aggressiivisesti joka kerta"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Puolustaja voi puristaa hyökkäävän sinisen linjan, kun:",
+    "options": [
+      "Joukkue on lyhytsanainen",
+      "Maalivahti vedetään",
+      "Partnersuojat ja kiekko ovat noudettavissa laudoista",
+      "Aina ensimmäisessä vuorossa"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Jos puolustaja lyötiin leveästi kiireessä, hänen tulee:",
+    "options": [
+      "Luistele penkille",
+      "Pysähdy ja väittele erotuomarin kanssa",
+      "Käänny ja aja keskeltä verkkoon",
+      "Koukku takaapäin"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Puolustusalueen peitossa matala puolustaja vs korkea puolustaja tarkoittaa:",
+    "options": [
+      "Molemmat pisteessä",
+      "Molemmat neutraalilla alueella",
+      "Molemmat rypyssä",
+      "Matala kiekko, korkeat kannet -paikka ja takaovi"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Kun outo mies ryntää vastaan, avain on:",
+    "options": [
+      "Ota rangaistus joka kerta",
+      "Viivytä ja pakota huono kulma tai syöttö",
+      "Sukella aina lohkoon",
+      "Jätä peli maalivahtille rauhaan"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "Rangaistuspotkussa vs. yksikertainen laita, puolustajan tulee:",
+    "options": [
+      "Seiso maalivahtina",
+      "Luistele keskelle vaihtelua varten",
+      "Ota pois pääsykaista aukkoon",
+      "Paina maalivahtia"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Miksi sokea reuna lautojen ympärillä on usein huono?",
+    "options": [
+      "Se antaa vastustajille ilmaisen noudon",
+      "Se on aina paitsiossa",
+      "Se aiheuttaa aina jäätymistä",
+      "Erotuomari antaa rangaistuksen"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Puolustusalueen voiton jälkeen puolustajien tulee:",
+    "options": [
+      "Odota viisi sekuntia",
+      "Lue forecheck ja käytä nopeaa ensimmäistä passia",
+      "Ammu aina ensin pisteestä",
+      "Luistele punaiselle viivalle kiekolla"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Suojaamalla yhden maalin johdon myöhässä puolustajien tulee:",
+    "options": [
+      "Ammu aina keskeltä",
+      "Purista joka kerta sinisestä viivasta",
+      "Hallitse kiekkoa turvallisesti ja vältä turhia riskejä",
+      "Vedä maalivahti aina aikaisin"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Mies miehen päälle pelissä tarkoittaa:",
+    "options": [
+      "Ohita off-puck-uhkaukset",
+      "Jahtaa vain kiekkoa",
+      "Aukon hallinta",
+      "Mies-miehen kattavuus kiekkotelineessä"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Hyökkäävän sinisellä linjalla linjaa pitävä puolustaja yrittää:",
+    "options": [
+      "Vaihda eteenpäin",
+      "Pidä sinistä viivaa ja pidä kiekko alueella",
+      "Luistele takaisin neutraalille alueelle",
+      "Aiheuttaa paitsioa aina tarkoituksella"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Kun puolustaja on torjunut levypalloon, puolustajan on:",
+    "options": [
+      "Juhli maalivahdin kanssa",
+      "Ammu tyhjään verkkoon",
+      "Luistele penkille",
+      "Poista pallo tai sido hyökkääjä"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Jään (no-touch) jälkeen puolustusalueella, aloituksessa:",
+    "options": [
+      "Rengas kiekko aina",
+      "Ota pieni rangaistus",
+      "Aseta rakenne ja voita puhdas uloskäynti",
+      "Vedä maalivahti"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Aggressiivista forecheckiä vastaan ​​venytyssyöttöä käytetään:",
+    "options": [
+      "Lopeta aina paitsiopeli",
+      "Vain ajanhukkaa",
+      "Takuukuorrutus",
+      "Lyö etuselkä pitkällä syötöllä"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Ampumisradan sulkeminen tarkoittaa:",
+    "options": [
+      "Kehon/kepin saaminen laukauksen reitille",
+      "Vain heiluttava keppi ilmassa",
+      "Luistelu punaiselle viivalle",
+      "Seisomassa verkon takana"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Kun kumppanisi puristaa, sinun on:",
+    "options": [
+      "Luistele penkille",
+      "Jätä vyöhyke auki",
+      "Purista myös heti",
+      "Kansi korkealla viimeisenä puolustajana"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Rangaistusalueelta poistuessaan puolustajan tulee:",
+    "options": [
+      "Yhdistä peli ja vältä jäämästä kiinni",
+      "Ohita kiire",
+      "Vaihda aina heti",
+      "Luistele suoraan vastustajan verkkoon"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Tyhjällä maalilla vastaan, puolustajien tulee viime hetkellä:",
+    "options": [
+      "Kaikki etutarkistus syvältä",
+      "Vedä myös oma maalivahti aina",
+      "Estä laukaukset ja suojaa keskeltä",
+      "Älä koskaan tyhjennä kiekkoa"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Jos et pääse käsiksi kiekkotelineeseen, sinun tulee:",
+    "options": [
+      "Luovu ja muuta",
+      "Jätä paikka",
+      "Vie aikaa ja tilaa hyvällä sijainnilla",
+      "Koukku takaapäin"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Puolustaessaan sisääntuloa valvottuun alueeseen, puolustajan tulee:",
+    "options": [
+      "Luistele taaksepäin penkille",
+      "Nouse jonoon tai väliin aikaisin",
+      "Vetäydy aina rypyyn",
+      "Älä koskaan koske hyökkääjään"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "Puolustuksen alueella puolustajan kädensyöttö joukkuetoverilleen on:",
+    "options": [
+      "Sallittu, jos se on suoritettu samalla vyöhykkeellä",
+      "Aina jäätelöä",
+      "Aina paitsiossa",
+      "Aina rangaistuslaukaus"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Kun joukkuetoverilla on kiekko, hyökkääjän tulee:",
+    "options": [
+      "Luistele aina punaiselle viivalle yksin",
+      "Ohita kiekon muutos linjalla",
+      "Mene avoimelle jäälle saadaksesi passin",
+      "Pysy paikallaan sinisellä viivalla"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Laitahyökkääjän lähellä verkkoa laukauksen yhteydessä tulee:",
+    "options": [
+      "Luistele penkille",
+      "Mene verkkoon saadaksesi levypalloja ja vinkkejä",
+      "Katso vain kohdasta",
+      "Odota keskellä jäätä"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Kun pallon hallinta menetetään, hyökkääjien tulee:",
+    "options": [
+      "Vaihda heti jäältä",
+      "Väittele erotuomarin kanssa",
+      "Pysy hyökkäysalueella",
+      "Selaa ja auta puolustautumaan"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Kiireessä kiekon \"päämiehitys\" tarkoittaa:",
+    "options": [
+      "Kaada se aina korkealle lasista",
+      "Pysähdy punaiselle viivalle",
+      "Head-man the kiekko (syötä eteenpäin)",
+      "Luistele taaksepäin vain omalle penkille"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Kiekon pyörittäminen matalalla hyökkäysalueella auttaa:",
+    "options": [
+      "Takuukuorrutus",
+      "Pakko paitsiossa aina",
+      "Luo tilaa laukaukselle tai syötölle",
+      "Vain ajanhukkaa"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Vastavuorossa keskuksen tehtävänä on usein:",
+    "options": [
+      "Kaikki kolme eteenpäin syvällä kulmassa",
+      "Poistu ympyrästä aikaisin",
+      "Ammu heti pisteestä",
+      "Voita arvonta laitahyökkääjälle tai D-miehen paikalle"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "2-1-2-etutarkistuksessa F1 ja F2 yleensä:",
+    "options": [
+      "Molemmat jahtaavat vain verkon takana",
+      "Molemmat vaihtavat linjoja",
+      "F1 painostaa, F2 poistaa ohituskaistan",
+      "Molemmat seisovat punaisella viivalla"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Voimapelissä verkon etupuolella hyökkääjän tulee:",
+    "options": [
+      "Luistele neutraalille alueelle",
+      "Peitä kohta rangaistuspotkusta",
+      "Ota verkon etuosa tehopeliin",
+      "Älä koskaan koske kiekkoon"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "3-2-kiihdytyksessä kolmannen hyökkääjän tulee:",
+    "options": [
+      "Luistele penkille",
+      "Seiso rypyssä",
+      "Pysy kolmantena miehenä kiireessä",
+      "Aja kiekkoa syvälle ilman tukea"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Kiireessä laitahyökkääjän, jolla on nopeus, pitäisi usein:",
+    "options": [
+      "Pysähdy sinisellä viivalla joka kerta",
+      "Syötä taaksepäin maalivahtille",
+      "Laituri ajaa leveästi vauhdilla kiireessä",
+      "Luistele aina keskeltä"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Hyökkääjän keskeinen voimapelirooli on:",
+    "options": [
+      "Jätä aukko auki puolustuksessa",
+      "Aina vain pistelaukaus",
+      "Älä koskaan mene verkkoon",
+      "Selaa maalivahtia PP:llä"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Rangaistustapossa hyökkääjä kattaa usein:",
+    "options": [
+      "Peitä kohta rangaistuspotkusta",
+      "Tuomari",
+      "Ota verkon etuosa tehopeliin",
+      "Zambonin kuljettaja"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Välttääkseen paitsion sinisellä linjalla hyökkääjä voi:",
+    "options": [
+      "Luistele taaksepäin alueelle",
+      "Hyppää sinisen viivan yli",
+      "Pysy paikallasi viivyttämällä vyöhykkeelle pääsyä",
+      "Mene aina ennen kiekkoa olevalle alueelle"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Kerta-ajan asettaminen vaatii yleensä:",
+    "options": [
+      "Kertakäyttöinen asennus: siirry avoimeen ampujaan",
+      "Pyöritä kiekkoa katsomatta",
+      "Päätä aina rangaistuslaukauksesta",
+      "Pudota ja aja takaa ilman ennakkotarkastussuunnitelmaa"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Tehopelin pistelyönnin jälkeen hyökkääjien tulee:",
+    "options": [
+      "Kaikki vaihtavat rivejä kerralla",
+      "Heiluttaa yleisölle",
+      "Kaataa verkko laukauksen jälkeen pisteestä",
+      "Luistele neutraalille alueelle"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "Hyökkäysalueen rakenteessa keskus usein:",
+    "options": [
+      "Ei koskaan mene aukkoon",
+      "Kaikki kolme eteenpäin syvällä kulmassa",
+      "Keskituet matalalla, siipi pysyy korkealla",
+      "Kattaa vain asian"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Breakoutissa heikon puolen eteenpäintuki tarkoittaa:",
+    "options": [
+      "Tuki heikommalta puolelta D-alueen uloskäynnissä",
+      "Pysy paikallaan punaisella viivalla",
+      "Ammu omaan verkkoon",
+      "Luistele vastustajan penkille vaihteeksi"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Maalivahdin tulee aina yrittää:",
+    "options": [
+      "Seuraa kiekkoa liikenteen läpi",
+      "Seiso punaisella viivalla",
+      "Katso vain ampujan silmiä",
+      "Jätä verkko linjan vaihtoon"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Kun kiekko on löysällä alueella, maalivahti:",
+    "options": [
+      "Pysäytä kiekko pysäyttämällä kiekon",
+      "Ammu tyhjään verkkoon",
+      "Luistele jään keskelle ja juhli",
+      "Siirrä erotuomarille"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Tallennuksen jälkeen ihanteellinen palautusohjaus on:",
+    "options": [
+      "Paluuohjaus turvalliselle alueelle",
+      "Palaa aina paikkaan",
+      "Palaa aina lasin yli",
+      "Ohita palautus"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Parittoman miehen ryntäsissä maalivahti:",
+    "options": [
+      "Ole aina hiljaa",
+      "Katso yleisöä",
+      "Luistele penkille",
+      "Maalivahti puhuu outoa miehen kiireistä"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "NHL:ssä maalivahti saa pelata kiekon verkon takana vain:",
+    "options": [
+      "Hyökkäysalue",
+      "Pelaa kiekkoa vain puolisuunnikkaan verkon takana",
+      "Täysi puolustusalue",
+      "Vain neutraali vyöhyke"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Sivuttaissyötössä linjan poikki maalivahti käyttää:",
+    "options": [
+      "Seiso aina vain yhden pylvään päällä",
+      "Jätä verkko",
+      "Post-to-pylvääseen liike sivusuunnassa",
+      "Luistele siniselle viivalle"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Hyvä kulmapeli tarkoittaa maalivahtia:",
+    "options": [
+      "Punaisen linjan haasteita",
+      "Seisoo aina syvällä rypyssä",
+      "Kulma leikkaus vähentää verkon näkyvyyttä",
+      "Kääntyy takaisin ampujaan"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Maalivahdin suojattava \"talo\" on pääasiassa:",
+    "options": [
+      "Suojaa taloa (paikka-alue)",
+      "Sambonin ovi",
+      "Keski jääympyrä",
+      "Rangaistuslaatikko"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Välimatkalla monet maalivahdit haluavat:",
+    "options": [
+      "Luistele penkkiä kohti",
+      "Sulje silmät ja toivo",
+      "Yhdistä ampuja ja lue tiedote",
+      "Haasta piirien huipulle aina"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Kiertoyrityksessä maalivahti:",
+    "options": [
+      "Jätä läheinen viesti auki",
+      "Luistele asiaan",
+      "Pelaa kiekkoa kulmassa",
+      "Pidä tolppaa lyhyen puolen kääreessä"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Jos maalivahti pelaa kiekkoa verkon takana puolisuunnikkaan ULKOPUOLELLE, se on:",
+    "options": [
+      "Laillista peliä aina",
+      "Jäähdytyspuhelu",
+      "Pelirangaistuksen viivästyminen",
+      "Automaattinen tavoite"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Kun kiekko seulotaan, maalivahti tulee:",
+    "options": [
+      "Jätä rypistys",
+      "Signaali paitsiossa",
+      "Luovu aina lyhyemmistä puolista",
+      "Etsi kiekko liikenteestä tai säädä asentoa"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Maalivahdin poke checkin tulee olla:",
+    "options": [
+      "Poke shekki vain edestä laillisesti",
+      "Korkealla tikkulla kasvoille",
+      "Aina ampujan takaa",
+      "Seisten keskellä jäätä"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Pitkällä johtosyötöllä maalivahti usein:",
+    "options": [
+      "Luistelee vastustajan penkille",
+      "Ohittaa näytelmän",
+      "Ampuu ref",
+      "Pysäyttää tai pelaa kiekon laillisesti verkon takana"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Jääkiekkoäly tarkoittaa, että jokaisen pelaajan tulee:",
+    "options": [
+      "Jokainen pelaaja auttaa puolustamisessa",
+      "Vain maalivahdit puhuvat",
+      "Vain puolustajat tekevät selkätarkastuksen",
+      "Vain hyökkääjät tekevät maalin"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Kevän pitäminen jäällä auttaa sinua:",
+    "options": [
+      "Estä ohituskaistat ja vastaanota kulkuluvat",
+      "Signaalijäätys",
+      "Vältä kiekkoa",
+      "Matka itsesi nopeammin"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Älykäs linjanvaihto tapahtuu yleensä:",
+    "options": [
+      "Lennossa kun leikki sallii",
+      "Ei koskaan lennossa",
+      "Eron aikana vastaan",
+      "Aina vain hyökkäysalueella"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Ennen puolustusmerkkien vaihtamista pelaajien tulee:",
+    "options": [
+      "Huuta aina erotuomarille",
+      "Muuta katsomatta",
+      "Kommunikoi ennen merkkien vaihtamista",
+      "Älä koskaan puhu jäällä"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Linjojen vaihtaminen jään väärällä puolella voi:",
+    "options": [
+      "Takaa maali",
+      "Auta aina joukkuetta",
+      "Syynä on liian monta miestä tai huono ajoitus",
+      "Pysäytä kello"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Näytelmän lukeminen tarkoittaa:",
+    "options": [
+      "Ohita joukkuetovereita",
+      "Älä koskaan muuta rakennetta",
+      "Katso aina vain kiekkoa",
+      "Ennakoi, minne kiekko ja vastustajat menevät seuraavaksi"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Toisen miehen tuki kiekolle tarkoittaa:",
+    "options": [
+      "Luistele pois kiekosta",
+      "Katso vain maalivahtia",
+      "Seiso punaisella viivalla",
+      "Yhdistä nopeus ja tue kiekonkannatinta"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Vahva puoli ja heikko puoli viittaavat:",
+    "options": [
+      "Puoli, jossa kiekko on vs vastakkainen puoli",
+      "Koti- ja vierasjoukkueet",
+      "Ensimmäinen ja toinen jakso",
+      "Vain vasen- ja oikeakätiset pelaajat"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Voimapelissä rakenteella on merkitystä, koska:",
+    "options": [
+      "Liike avaa kaistaa ja venyttää PK:ta",
+      "Paikallaan seisominen on parasta",
+      "Vain yksi pelaaja saa koskettaa kiekkoa",
+      "Paitsiolla ei ole väliä"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Rangaistustapo \"laatikko + yksi\" tarkoittaa usein:",
+    "options": [
+      "Kaikki viisi jahtaavat kiekkoa",
+      "Kaikki viisi seisovat punaisella viivalla",
+      "Rakennetta ei tarvita",
+      "Neljä laatikossa, yksi painaa kiekkoa"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Huijaaminen kohtaamisessa (ajoitus) tarkoittaa:",
+    "options": [
+      "Pudotuksen ajoitus voittaaksesi kiekon aikaisin",
+      "Potkaise vastustajan mailaa",
+      "Syötä ympyrä ennen kiekkoa",
+      "Jätä kohtauspiste"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Johdon suojaaminen myöhässä, älykkäät tiimit:",
+    "options": [
+      "Ota riskejä joka vuorossa",
+      "Vedä aina maalivahtia ensimmäisessä erässä",
+      "Älä koskaan tyhjennä aluetta",
+      "Hallitse kiekkoa ja vältä turhia rangaistuksia"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Valmentajat vaihtavat ottelulinjoja seuraaviin:",
+    "options": [
+      "Hanki edullisia pelaaja vastaan ​​pelaaja -tilanteita",
+      "Takuu paitsiossa",
+      "Vältä kaikkia kohtaamisia",
+      "Vain ajanhukkaa"
+    ]
+  },
+  "ref_goal": {
+    "question": "Kun maali tehdään, erotuomari tyypillisesti:",
+    "options": [
+      "Osoita keskelle jäätä",
+      "Ilmoita viivästyneestä rangaistuksesta",
+      "Muotoile käsin T-kirjain",
+      "Signaalijäätymisestä luovutaan"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Aikakatkaisusignaali näyttää tältä:",
+    "options": [
+      "Kädet muodostavat T:n",
+      "Osoita keskelle jäätä",
+      "Kuvassa kuusi sormea",
+      "Molemmat nyrkit työntyvät eteenpäin"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Erotuomari näyttää viivästyneen rangaistuspotkun seuraavasti:",
+    "options": [
+      "Signaali maalinteosta",
+      "Aikakatkaisun T-signaali",
+      "Huuhtele jäätymissignaali",
+      "Yksi käsi nostettu suoraan ylös"
+    ]
+  },
+  "ref_minor": {
+    "question": "Syöttäessään pientä rangaistusta erotuomari antaa usein merkkiään:",
+    "options": [
+      "Avaa kämmen kohti rangaistuslaatikkoa",
+      "Käsi vain rinnassa",
+      "Kädet muodostavat T:n",
+      "Osoita jäätä kohti maalia varten"
+    ]
+  },
+  "ref_offside": {
+    "question": "Erotuomarin tekemä paitsiopuhelu ilmaistaan ​​usein seuraavasti:",
+    "options": [
+      "Osoita keskelle jäätä",
+      "Kuvassa kuusi sormea",
+      "Suljetun nyrkin pumppausliike",
+      "Leikkausliike yhdensuuntaisesti jään kanssa"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Käsipassin rikkomussignaali on usein:",
+    "options": [
+      "Suljetun nyrkin pumppausliike",
+      "Molemmat kädet ristissä taistelua varten",
+      "Avaa kämmen rangaistuslaatikkoon",
+      "Osoita keskelle jäätä"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Korkealle tarttuva rangaistussignaali: erotuomari koskettaa usein:",
+    "options": [
+      "Kämmenen omaan kasvojen/leuan alueelle",
+      "Maalitolppa",
+      "Kiekko",
+      "Vain oma polvi"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Liian monta miestä jäällä ilmaistaan ​​näyttämällä:",
+    "options": [
+      "Vain yksi käsi suoraan ylöspäin",
+      "Osoita keskelle jäätä",
+      "Kädet muodostavat T:n",
+      "Kuvassa kuusi sormea"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Laukaisurangaistuksen signaali näyttää usein tältä:",
+    "options": [
+      "Laukaisusignaali (jalan pyyhkäisyliike)",
+      "Kädet muodostavat T:n",
+      "Osoita keskelle jäätä",
+      "Molemmat nyrkit työntyvät eteenpäin"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Koukkuun liittyvä rangaistussignaali näyttää usein tältä:",
+    "options": [
+      "Kuusi sormea",
+      "Leikkaaminen samansuuntaisesti jään kanssa",
+      "Kiinnityssignaali (vetoliike)",
+      "Suljetun nyrkin pumppaus"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Erotuomarin ristiintarkistussignaali on usein:",
+    "options": [
+      "Molemmat nyrkit työntyvät eteenpäin",
+      "Osoita keskelle jäätä",
+      "Kädet muodostavat T:n",
+      "Vain kämmenestä kasvoihin"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Taistelumajuri viestitään usein:",
+    "options": [
+      "Paitsi liikkeen leikkaaminen",
+      "Taistelumajuri (molemmat kädet ristissä)",
+      "Yksi käsi ylös viivästyneestä rangaistuksesta",
+      "Avaa vain kämmenestä laatikkoon"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Kun erotuomari antaa rangaistuslaukauksen, hän yleensä:",
+    "options": [
+      "Näyttää aikakatkaisun T",
+      "Pesee jään pois",
+      "Osoittaa keskijäälle rangaistuslaukauksesta",
+      "Näyttää kuusi sormea"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Heiluttaessaan maalia erotuomari voi:",
+    "options": [
+      "Maali kielletty -signaali (kädet ristiin ja sitten heilutus)",
+      "Osoita keskelle maalia varten",
+      "Nosta käsi vain viivästyneen rangaistuksen vuoksi",
+      "Näytä aikakatkaisu T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Pelin viivästyssignaali (kiekko lasin päällä) on usein:",
+    "options": [
+      "Kompastava jalkojen lakaisu",
+      "Pelin viivästyminen (tuomari silittää kuvitteellista lasia)",
+      "Taistelevat kädet ristissä",
+      "Tarttuva vetoliike"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Linjamies antaa merkin paitsiossa:",
+    "options": [
+      "Avaa kämmen rangaistuslaatikkoon",
+      "Kirjoita aikakatkaisulle T",
+      "Osoita keskelle jäätä maaliin",
+      "Linesman molemmat kädet ylös (offside)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Kun jäätä heilutetaan pois (esim. PK:lla), linjamies voi:",
+    "options": [
+      "Kädet ristiin taisteluun",
+      "Signaalijäätymisestä luovutaan",
+      "Osoita keskelle maalia varten",
+      "Näytä kuusi sormea"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Kaksinkertainen pieni rangaistus voidaan näyttää seuraavilla tavoilla:",
+    "options": [
+      "T aikakatkaisulle",
+      "Vain yksi käsi suoraan ylöspäin",
+      "Double molli (kaksi sormea)",
+      "Kuusi sormea ​​liian monelle miehelle"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Lentoon pääsyn rangaistussignaali sisältää usein:",
+    "options": [
+      "T aikakatkaisulle",
+      "Osoita keskustaan ​​maaliin",
+      "Suljettu nyrkki käsisyöttöä varten",
+      "Nousu rangaistussignaali (käsien työntäminen)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Viivästyneen rangaistussignaalin aikana peli jatkuu, koska:",
+    "options": [
+      "Maali tehtiin",
+      "Jäätelö valmistui",
+      "Aikakatkaisu kutsuttiin",
+      "Viivästynyt rangaistus (peli jatkuu)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Vastustaja aloittaa hyökkäyksen keskeltä. Mitä keskuksen pitäisi tehdä?",
+    "options": [
+      "Palaa alueesi keskelle ja auta puolustajia",
+      "Seiso lautojen luona",
+      "Vaihda rivejä ilman syytä",
+      "Luistele vastustajan verkkoon"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Verkon takana oleva vastustaja yrittää tehdä maalin lacrosse-tyylisellä kääreellä. Mitä maalivahti tekee?",
+    "options": [
+      "Luistele alueen keskelle",
+      "Katso yleisöä",
+      "Pysy tiukasti kaukaisessa pylväässä ja katso keppiä",
+      "Makaa kasvot alaspäin jäällä"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Olet puolustaja, jonka edessä on 2-1-kiihko. Mikä on tärkeintä?",
+    "options": [
+      "Ota passi pois",
+      "Hyökkää kiekonkannattimeen välittömästi",
+      "Katso vain kiekkoa",
+      "Luistele penkille linjanvaihtoon"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Olet laitahyökkääjä ja ensimmäinen pelaaja, joka tulee hyökkäysalueelle. Mitä sinun pitäisi tehdä?",
+    "options": [
+      "Paina puolustajaa kiekolla",
+      "Seiso sinisellä viivalla",
+      "Luistele ympyröissä",
+      "Luistele suoraan penkille"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Joukkueesi on voimapelissä. Missä keskus yleensä sijaitsee?",
+    "options": [
+      "Omalla sinisellä viivalla",
+      "penkillä",
+      "Oman verkon takana",
+      "Verkon edessä"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Hävisit kiekon hyökkäysalueella. Mitä sinun pitäisi tehdä seuraavaksi?",
+    "options": [
+      "Liity heti esitarkastukseen",
+      "Luistele takaisin hitaasti",
+      "Väittele erotuomarin kanssa",
+      "Katso valmentajaa"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Keskusta hävisi ottelun. Mitä tulee seuraavaksi?",
+    "options": [
+      "Luistele hyökkäykseen",
+      "Apua puolustukseen heti",
+      "Ota kypärä pois",
+      "Lopeta liikkuminen"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Kiekko on laudoilla alueellasi. Mitä toisen pelaajan pitäisi tehdä?",
+    "options": [
+      "Tue kumppaniasi lähellä",
+      "Pysy paikallasi",
+      "Katso katsomot",
+      "Luistele vastustajan verkkoon"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Mikä on tärkeintä 3-on-2-kiireessä?",
+    "options": [
+      "Kaikki luistelevat samaan paikkaan",
+      "Ammu mistä tahansa asennosta",
+      "Pysähdy sinisellä viivalla",
+      "Venytä puolustusta syötöillä"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Laukauksen jälkeen kiekko pomppasi verkon eteen. Mitä maalivahti tekee?",
+    "options": [
+      "Nosta keppi ilmaan",
+      "Etsi kiekko ja peitä se",
+      "Luistele verkon takana",
+      "Katso valmentajaa"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Milloin on paras aika vaihtaa linjaa?",
+    "options": [
+      "Kun joukkueesi hallitsee kiekkoa",
+      "Kun vastustaja hyökkää",
+      "Kun kiekko on verkon edessä",
+      "Vaarallisen maalintekotilanteen aikana"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Mitä puolustajan tulee tehdä raskaan esitarkastuksen paineen alla?",
+    "options": [
+      "Pysy paikallaan kiekon kanssa",
+      "Ammu kiekko alueen keskelle",
+      "Pudota jäälle",
+      "Tee nopea ja tarkka ensimmäinen siirto"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Mitä on tärkeää tehdä, kun sinulla ei ole kiekkoa?",
+    "options": [
+      "Katso kattoa",
+      "Pidä kepistä kiinni vain yhdellä kädellä",
+      "Avaa passi",
+      "Seiso yhdessä paikassa"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Mitä purkamista pidetään luotettavimpana?",
+    "options": [
+      "Kiekon menetys",
+      "Lyhyellä, tarkalla syötöllä",
+      "Sokea kaatopaikka",
+      "Kulku alueesi keskeltä"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Mikä on tärkeintä rangaistuspotkussa?",
+    "options": [
+      "Estä ohituskaistat",
+      "Hyökkää jatkuvasti",
+      "Luistimet ilman rakennetta",
+      "Pelaa vain laudoilla"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Milloin puolustaja voi liittyä kiireeseen?",
+    "options": [
+      "Aina",
+      "Vain jatkoajalla",
+      "Ei koskaan",
+      "Kun hänen kumppaninsa peittää asemansa"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Miksi aukon läpi kulkeminen on vaarallista?",
+    "options": [
+      "Viranomaiset eivät näe sitä",
+      "Se hidastaa peliä",
+      "Se voi johtaa tavoitteeseen",
+      "Se on aina laitonta"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Milloin maalivahti pelata kiekkoa verkon takana?",
+    "options": [
+      "Jättääkseen jään",
+      "Auttaa puolustajia aloittamaan murron",
+      "lepäämään",
+      "Väittelemään virkamiesten kanssa"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Miksi eteenpäin ajaa kaukaiseen pylvään?",
+    "options": [
+      "Levypalloille ja kertapeleille",
+      "Pysyäksesi poissa leikistä",
+      "lepäämään",
+      "Päästäkseen joukkuetoverinsa tielle"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Mitä puolustajan tulee tehdä ennen kuin ampuu pisteestä?",
+    "options": [
+      "Tarkista verkon edessä oleva liikenne",
+      "Ammu suoraan lautoihin",
+      "Sulje hänen silmänsä",
+      "Dekes taaksepäin"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Kenen pitäisi taistella ensin kiekosta aloituksen jälkeen?",
+    "options": [
+      "Vain maalivahti",
+      "Ei kukaan",
+      "Lähin pelaaja",
+      "Vain puolustaja"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Miksi kiekonhallinta on tärkeää?",
+    "options": [
+      "Vastustaja ei voi hyökätä ilman kiekkoa",
+      "Voit luistella vähemmän",
+      "Viranomaiset antavat siitä pisteitä",
+      "Se näyttää hyvältä"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Mikä on tärkeintä kulmataistelussa?",
+    "options": [
+      "Korkea laukaus",
+      "Hyppääminen",
+      "Luistelu vain taaksepäin",
+      "Vartalon asento ja sauvan asento"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Mikä on paras tapa avautua?",
+    "options": [
+      "Muuta avoimeen tilaan",
+      "Sokeaan nurkkaan",
+      "Luistele joukkuetoverinsa selän takana",
+      "Seisomalla paikallaan"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Mitä hyökkääjän tulee tehdä laukauksen jälkeen?",
+    "options": [
+      "Vaihda riviä välittömästi",
+      "Katso tulostaulu",
+      "Mene verkkoon kimppuun",
+      "Pysy paikallasi"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Mikä on tärkeintä puolustajalle kolikkopelissä?",
+    "options": [
+      "Pysy kaukana verkosta",
+      "Pelaa ilman keppiä",
+      "Estä vastustajia pääsemästä levypalloihin",
+      "Katso vain maalivahtia"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Mikä on paras tapa päästä alueelle?",
+    "options": [
+      "Ilman nopeutta",
+      "Luistelu taaksepäin alueelle",
+      "Keskeltä läpi ilman tukea",
+      "Kiekon ohjauksella"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Milloin selkälaukauksesta on hyötyä?",
+    "options": [
+      "Vain käytännössä",
+      "Ei koskaan",
+      "Kun ei ole aikaa siirtää kiekkoa kädensijaan",
+      "Vain puolustajille"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Miksi keskus on tärkeä hyökkäyksessä?",
+    "options": [
+      "Hän seisoo aina paikallaan",
+      "Hän ei koskaan anna syöttöjä",
+      "Hän yhdistää koko linjan",
+      "Hän ei koskaan pelaa puolustusta"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Millä on merkitystä 1-1-puolustuspelissä?",
+    "options": [
+      "Hyppää heti vastustajaan",
+      "Katso katsomot",
+      "Luistele taaksepäin ilman hallintaa",
+      "Hallitse rakoa ja kulmaa"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Linjallasi oli pitkä hyökkäysvuoro. Vastustajan puolustaja nappasi kiekon verkon takaa, mutta näyttää väsyneeltä. Sinunkin linjasi on ollut jäällä pitkään. Mikä on paras?",
+    "options": [
+      "Jatka ennakkotarkistusta aggressiivisesti koko linjalla",
+      "Pudota takaisin neutraalille alueelle ilman painetta",
+      "Yksi eteenpäin painaa jatkuvasti, kun muut vaihtuvat",
+      "Koko rivi vaihtuu kerralla"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Miksi passi taaksepäin on joskus hyödyllinen?",
+    "options": [
+      "Menettääksesi vauhtia",
+      "Välttääkseen hyökkäämisen",
+      "Pitämään hallintaansa",
+      "Lopettaaksesi pelaamisen"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Mitä väliä laukauksen estämisessä?",
+    "options": [
+      "Estä kiekon polku",
+      "Hyppää ylöspäin",
+      "Käännä selkäsi",
+      "Katso alas"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Miten puolustajan pitäisi pelata pikahyökkääjää vastaan?",
+    "options": [
+      "Jatka luistelua eteenpäin pysähtymättä",
+      "Pelaa liian tiukasti joka kerta",
+      "Pysy paikallasi",
+      "Älä anna hänelle avointa jäätä"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Milloin kertakäyttöinen on tehokkain?",
+    "options": [
+      "Kun ampuja ei ole valmis",
+      "Vain käytännössä",
+      "Kun maalivahti ei pysty asettumaan ajoissa",
+      "Kun kiekko on paikallaan"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Miksi viestintä jäällä on tärkeää?",
+    "options": [
+      "Se häiritsee vastustajaa",
+      "Se korvaa luistelun",
+      "Se auttaa joukkuekavereita tekemään päätöksiä nopeammin",
+      "Viranomaiset pitävät siitä"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Kuinka sinun pitäisi pelata 2-0-kiertueella?",
+    "options": [
+      "Saa maalivahti liikkumaan syötöllä",
+      "Pysähdy verkon edessä",
+      "Ammu kaukaa",
+      "Hävitä kiekko"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Miksi hyökkääjät käyttävät verkon takana olevaa tilaa?",
+    "options": [
+      "Piiloon näytelmältä",
+      "Pelin lopettamiseksi",
+      "Ampumisen välttämiseksi",
+      "Venyttää puolustusta"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Miksi on tärkeää pysyä rauhallisena?",
+    "options": [
+      "Se vaikuttaa jäähän",
+      "Se pienentää verkkoa",
+      "Se auttaa sinua tekemään parempia päätöksiä",
+      "Se tekee kiekosta nopeamman"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Mitä puolustajan tulee tehdä hyökkäyksen sinisellä linjalla?",
+    "options": [
+      "Pidä kiekko alueella",
+      "Seiso vain keskellä",
+      "Ohita joukkuetovereita",
+      "Aina perääntyä"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Mikä tekee palautumisesta vaarallisen?",
+    "options": [
+      "Pelaaja seisoo paikallaan",
+      "Kiekosta tulee kevyempi",
+      "Tuomari ei näe kiekkoa",
+      "Maalivahti ei aina hallitse levypalloa"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Miksi hyökkäyksen suunnan muuttaminen on hyödyllistä?",
+    "options": [
+      "Se satuttaa omaa joukkuettasi",
+      "Se hidastaa peliä",
+      "Se luo avoimia alueita",
+      "Se väsyttää virkamiehiä"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Mitä väliä hyökkäysalueen tappelussa?",
+    "options": [
+      "Luistele heti takaisin",
+      "Voita kiekon hallinta nopeasti",
+      "Katso tulostaulu",
+      "Älä liiku"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Mitä tarkoittaa suojata joukkuetoveria?",
+    "options": [
+      "Täytä hänen paikkansa, kun hän liittyy kiireeseen",
+      "Pelaa vain hyökkäystä",
+      "Kopioi hänen tarkka reittinsä",
+      "Seiso hänen vieressään liikkumatta"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Jos puolustaja menettää asemansa, mitä hänen pitäisi tehdä?",
+    "options": [
+      "Katso vain kiekkoa",
+      "Riitele joukkuetoverin kanssa",
+      "Lopeta luistelu",
+      "Palaa nopeasti puolustukseen"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Miksi pelaajat ampuvat usein matalalla?",
+    "options": [
+      "Se on hitaampaa",
+      "Koska korkeat laukaukset ovat laittomia",
+      "Taivutuksille ja levypalloille",
+      "Virkamiehille se on helpompaa"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Milloin pitkä passi on erityisen hyödyllinen?",
+    "options": [
+      "Pelaajien joukossa",
+      "Linjanvaihdon aikana",
+      "Nopeassa vastahyökkäyksessä",
+      "Ilman tavoitetta"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Miksi liikkuminen ilman kiekkoa on tärkeää?",
+    "options": [
+      "Se luo ohitusvaihtoehtoja",
+      "Se on tarkoitettu vain puolustajille",
+      "Se ei vaikuta peliin",
+      "Se tulee joukkuetovereiden tielle"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Milloin terävästä kuvasta voi olla hyötyä?",
+    "options": [
+      "Vain voimankäytöllä",
+      "Vain rangaistuspotkussa",
+      "Ei koskaan",
+      "Odottamattomalle palautumiselle"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Miksi maalivahtien seulonta on tärkeää?",
+    "options": [
+      "Tuomari ei näe kiekkoa",
+      "Hänen on vaikeampi nähdä laukausta",
+      "Maalivahti lakkaa liikkumasta",
+      "Se saa hyökkäyksen näyttämään paremmalta"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Mikä auttaa sieppaamaan syöttöjä?",
+    "options": [
+      "Näytelmän lukeminen",
+      "Onnea yksin",
+      "Luistelu hitaasti",
+      "Pelaa ilman mailaa"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Kuinka kiinnität vastustajan laudoilla oikein?",
+    "options": [
+      "Työnnä häntä selkään",
+      "Silmät kiinni",
+      "Käsillä ja ilman keppiä",
+      "Käytä vartaloasi ja mailaa samalla kun hallitset kiekkoa"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Mitä väliä, kun puolustaja tulee ulos verkon takaa?",
+    "options": [
+      "Katso ylös ja löydä passi",
+      "Luistele hitaasti",
+      "Ammu kiekko välittömästi",
+      "Katso vain jäätä"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Miksi joukkueet joskus hidastavat peliä?",
+    "options": [
+      "Menettää kiekon",
+      "Omistuksen ja energian säilyttämiseksi",
+      "Välttääkseen hyökkäämisen",
+      "Pelin lopettamiseksi"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Kuka on toisen aallon pelaaja?",
+    "options": [
+      "Erotuomari",
+      "Varamaalivahti",
+      "Pelaaja, joka liittyy hyökkäykseen myöhemmin",
+      "Hitain pelaaja"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Miksi nopeat lyhyet passit ovat tehokkaita?",
+    "options": [
+      "Ne ovat aina hitaita",
+      "He loukkasivat hyökkäystä",
+      "Ne on tarkoitettu vain puolustajille",
+      "Vastustajien on vaikeampi varastaa niitä"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Mitä maalivahti tekee torjunnan jälkeen?",
+    "options": [
+      "Seuraa kiekkoa nopeasti",
+      "Luistele laudoille",
+      "Ota hänen hansikkansa pois",
+      "Katso tulostaulua"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Milloin hyökkäys keskeltä on erityisen vaarallista?",
+    "options": [
+      "Kun yksi pelaaja on yksin",
+      "Kun on nopeutta ja tukea",
+      "Kun kiekkoa ei ole",
+      "Kun kaikki seisovat paikallaan"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Mikä auttaa sinua tekemään päätöksiä nopeammin?",
+    "options": [
+      "Luistelu hitaasti",
+      "Katso vain kiekkoa",
+      "Jatkuvasti skannaamassa jäätä",
+      "Pelaa puhumatta"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Mitä hyvä kapteeni tekee?",
+    "options": [
+      "Tukee joukkuetta ja näyttää esimerkkiä",
+      "Pelaa vain hyökkäystä",
+      "huutaa kaikille",
+      "Ei koskaan pelaa puolustusta"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Mikä auttaa sinua välttymään etutarkistuspaineelta?",
+    "options": [
+      "Pelaaminen yksin",
+      "Kiekon siirto nopeasti",
+      "Pitele kiekkoa pitkään",
+      "Pysähtyminen lautoja pitkin"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Miksi et voi epäröidä sinisellä viivalla?",
+    "options": [
+      "Maalivahti väsyy",
+      "Jää pahenee",
+      "Voit menettää alueen",
+      "Erotuomari lopettaa pelin"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Miksi laukaus heti syötön jälkeen on vaarallista?",
+    "options": [
+      "Se on aina heikko",
+      "Se on vaikea toteuttaa",
+      "Tuomari hylkää maalin",
+      "Maalivahtia ei ole asetettu ajoissa"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Kenen pitäisi palata ensimmäisenä kiekon häviämisen jälkeen?",
+    "options": [
+      "Lähin pelaaja",
+      "Vain keskusta",
+      "Vain puolustaja",
+      "Vain maalivahti"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Miten puolustajan pitäisi pelata kovaa ampujaa vastaan?",
+    "options": [
+      "Katso vain maalivahtia",
+      "Vähennä hänen aikaa ja tilaa ampua",
+      "Anna hänelle avointa tilaa",
+      "Seiso kaukana"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Miksi kiekko siirretään usein kulmaan puolustuksessa?",
+    "options": [
+      "Viranomaiset eivät voi nähdä peliä",
+      "Siellä jää on hitaampaa",
+      "Verkkoon kohdistuu vähemmän vaaraa",
+      "Siellä on helpompi tehdä maaleja"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Mitä hyökkääjä tekee verkon edessä?",
+    "options": [
+      "Seisoi selkä näytelmään päin",
+      "Luistimet laudoille",
+      "Ei liiku",
+      "Luo liikennettä ja metsästää levypalloja"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Miksi on tärkeää pelata pää pystyssä?",
+    "options": [
+      "Nähdä joukkuetovereita ja vastustajia",
+      "Jotta kiekko olisi kevyempi",
+      "Luistella nopeammin",
+      "Joten virkamiehet voivat nähdä sinut"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Mikä on tärkeintä PK-ottelun voittamisen jälkeen?",
+    "options": [
+      "Yritä päästä kaikkien läpi",
+      "Pidä pitkä tauko",
+      "Poista kiekko alueelta",
+      "Pysy paikallasi"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Miksi on tärkeää painostaa vastustajia?",
+    "options": [
+      "Se satuttaa joukkuettasi",
+      "Se ei vaikuta peliin",
+      "Se pysäyttää pelin",
+      "Se voi pakottaa tekemään virheen"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Milloin kosketuspassista on hyötyä?",
+    "options": [
+      "Kehittää hyökkäystä nopeasti",
+      "Kun pelaaja seisoo paikallaan",
+      "Kun joukkuetovereita ei ole",
+      "Vain puolustuksessa"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Mitä keskustan pitäisi tehdä oman verkkonsa edessä?",
+    "options": [
+      "Odota jäätä",
+      "Luistele neutraalille alueelle",
+      "Auta puolustajia peittämään paikka",
+      "Seiso lautojen luona"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Miksi ristikkäinen liikkuminen eteenpäin on tehokasta?",
+    "options": [
+      "Se hämmentää puolustajia",
+      "Se satuttaa omaa joukkuettasi",
+      "Se hidastaa hyökkäystä",
+      "Se on laitonta"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Mitä väliä löysästä kiekosta taistettaessa?",
+    "options": [
+      "Pidä kiekkoa pitkään",
+      "Pysy paikallasi",
+      "Katso alas",
+      "Päätä nopeasti, mitä teet seuraavaksi"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Miksi pelaajat muuttavat nopeutta?",
+    "options": [
+      "Lopettaaksesi luistelun",
+      "Menettää kiekon",
+      "Voittaa vastustaja",
+      "Jotta väsyisi nopeammin"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "40 sekuntia jäljellä. Johdat yhdellä maalilla. Vastustaja pelaa 6-5. Heidän puolustajallaan on kiekko sinisellä linjalla ja laitahyökkääjäsi voi hypätä varastamaan. Mikä on paras?",
+    "options": [
+      "Lennä kiekkoa kohti aggressiivisesti heti",
+      "Seuraa vain verkon etupelaajaa",
+      "Paina vain kontrolloidussa kulmassa ottaaksesi kiekon",
+      "Putoaa kokonaan verkkoon"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Milloin maalivahti voi tulla kauas verkosta?",
+    "options": [
+      "Sieppaamaan kiekon ja auttamaan puolustusta",
+      "Ei koskaan",
+      "Aina",
+      "Vasta maalin jälkeen"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Millä on merkitystä onnistuneelle palautusyritykselle?",
+    "options": [
+      "Iso tuuli",
+      "Seiso kaukana verkosta",
+      "Hidas liike",
+      "Nopea reaktio"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Miksi toisen pelaajan tuki on tärkeää?",
+    "options": [
+      "Se luo lisävaihtoehtoja",
+      "Se on tarkoitettu vain puolustajille",
+      "Sitä ei tarvita",
+      "Se satuttaa hyökkäystä"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Mitä \"näytelmän lukeminen\" tarkoittaa?",
+    "options": [
+      "Ennakoi mitä vastustajat tekevät",
+      "Laske passit",
+      "Seuraa vain kiekkoa",
+      "Katso tulostaulu"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Miksi on tärkeää suojata kiekkoa kehollasi?",
+    "options": [
+      "Se tekee jäästä nopeamman",
+      "Se on tarkoitettu vain puolustajille",
+      "Se vaikuttaa tuomariin",
+      "Se auttaa suojaamaan kiekkoa"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Milloin irrottamisesta laudoilla on hyötyä?",
+    "options": [
+      "Ei koskaan",
+      "Aina",
+      "Kun keskiosa on peitetty",
+      "Vain voimankäytöllä"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Mitä väliä puolustettaessa voimapeliä vastaan?",
+    "options": [
+      "Jatkuvat dekit",
+      "Pysy tiiviinä puolustuskannalla",
+      "Hitaat rivinvaihdot",
+      "Pelataan yksi vastaan ​​kaikkialla"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Mikä on passi laukaukselle?",
+    "options": [
+      "Syöttö hyvässä laukausasennossa olevalle pelaajalle",
+      "Takaisinsyöttö maalivahdille",
+      "Satunnainen passi",
+      "Siirto kulmaan"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Miksi lyönti ennen laukausta on hyödyllinen?",
+    "options": [
+      "Se aina hidastaa hyökkäystä",
+      "Se on laitonta",
+      "Se on tarkoitettu vain puolustajille",
+      "Se voi liikuttaa maalivahtia tai puolustajaa"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Laukauksen estämisen jälkeen pelaajan tulee:",
+    "options": [
+      "Etsi kiekko välittömästi",
+      "Pysy paikallasi",
+      "Katso erotuomaria",
+      "Jätä jää"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Miten hyökkääjät auttavat puolustajia?",
+    "options": [
+      "Pysy hyökkäysalueella",
+      "Tarkista takaisin ja hanki passi",
+      "Pelaa vain laudoilla",
+      "Älä pelaa puolustusta"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Mikä auttaa raskaaseen ennakkotarkastukseen?",
+    "options": [
+      "Nopeat päätökset ja kiekon liike",
+      "Luistelu hitaasti",
+      "Pelaaminen yksin",
+      "Pitkä kiekon hallussapito"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Milloin sauvan taivutuksesta on hyötyä?",
+    "options": [
+      "Ei koskaan",
+      "Vain käytännössä",
+      "Vain puolustuksessa",
+      "Suuntaaksesi kiekon uudelleen"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Mitä väliä laudoilla hyökätessä?",
+    "options": [
+      "Paluu maalivahdille",
+      "Tuki läheiseltä joukkuetoverilta",
+      "Pelaaminen yksin",
+      "Liikkeen pysäyttäminen"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Mitä väliä maalivahdille on välimatkassa?",
+    "options": [
+      "Pidä hyvä asento ja kärsivällisyys",
+      "Pudota heti jäälle",
+      "Luistele taaksepäin",
+      "Katso puolustajia"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Millä on väliä nopeassa siirtymisessä rikokseen?",
+    "options": [
+      "Hitaita syöttöjä",
+      "Pitkä kiekon hallussapito",
+      "Pysähdytään sinisellä viivalla",
+      "Päätöksenteon nopeus"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Mitä puolustaja tekee voimapelissä?",
+    "options": [
+      "Luistimet verkkoon",
+      "Ei liity hyökkäykseen",
+      "Siirtää kiekkoa ja etsii laukausta",
+      "Seisoi paikallaan"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Miksi liikenne verkon edessä on vaarallista?",
+    "options": [
+      "Kiekko hidastuu",
+      "Maalivahdin on vaikeampi nähdä kiekko",
+      "Erotuomari ei voi laskea pelaajia",
+      "Pelaajat väsyvät nopeammin"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Mitä väliä kiekon sieppaamisen jälkeen?",
+    "options": [
+      "Nopea siirtyminen hyökkäykseen",
+      "Lopeta luistelu",
+      "Pudota kiekko heti",
+      "Luistele laudoille"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Mikä on erityisen tärkeää ylityössä?",
+    "options": [
+      "Jatkuvat kaukolaukaukset",
+      "Pelaa ilman syötteitä",
+      "Pitkät työvuorot",
+      "Kiekon hallinta ja vähän virheitä"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Mitä puolustajan tulee tehdä, jos vastustaja seuloa maalivahtia?",
+    "options": [
+      "Katso erotuomaria",
+      "Luistele laudoille",
+      "Tyhjennä aukko ja sido vastustaja",
+      "Seiso lähellä liikkumatta"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Miksi joukkuepeli on tärkeämpää kuin yksilöpeli?",
+    "options": [
+      "Joukkue ei vaikuta tulokseen",
+      "Linja luo enemmän mahdollisuuksia yhdessä",
+      "Pelin päättää aina yksi pelaaja",
+      "Syötteet vahingoittivat peliä"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Mitä väliä ennen laukauksen ottamista?",
+    "options": [
+      "Lue nopeasti maalivahdin sijainti",
+      "Katso vain alas kiekkoon",
+      "Pysähdy",
+      "Sulje silmäsi"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Mikä kehittää jääkiekon älykkyysosamäärää parhaiten?",
+    "options": [
+      "Vain voimaharjoittelu",
+      "Katsotaan vain maaleja",
+      "Vain luistelu",
+      "Pelin opiskelu, harjoitus ja tilanteiden ymmärtäminen"
+    ]
+  }
+}

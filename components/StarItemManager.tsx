@@ -1,4 +1,3 @@
-import SafeIcon from './SafeIcon';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';

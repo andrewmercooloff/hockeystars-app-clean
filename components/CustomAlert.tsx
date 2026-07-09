@@ -1,4 +1,3 @@
-import SafeIcon from './SafeIcon';
 import React from 'react';
 import {
     Modal,
@@ -8,6 +7,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../theme/colors';
 
 interface CustomAlertProps {
   visible: boolean;
@@ -41,28 +41,28 @@ export default function CustomAlert({
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return { name: 'checkmark-circle', color: '#4CAF50' };
+        return { name: 'checkmark-circle', color: colors.success };
       case 'error':
-        return { name: 'close-circle', color: '#FF4444' };
+        return { name: 'close-circle', color: colors.brand };
       case 'warning':
-        return { name: 'warning', color: '#FF9800' };
+        return { name: 'warning', color: colors.warning };
       case 'info':
       default:
-        return { name: 'information-circle', color: '#2196F3' };
+        return { name: 'information-circle', color: colors.brand };
     }
   };
 
   const getBackgroundColor = () => {
     switch (type) {
       case 'success':
-        return 'rgba(76, 175, 80, 0.1)';
+        return 'rgba(76, 175, 80, 0.12)';
       case 'error':
-        return 'rgba(255, 68, 68, 0.1)';
+        return colors.brandMuted;
       case 'warning':
-        return 'rgba(255, 152, 0, 0.1)';
+        return 'rgba(255, 152, 0, 0.12)';
       case 'info':
       default:
-        return 'rgba(33, 150, 243, 0.1)';
+        return colors.brandMuted;
     }
   };
 
@@ -110,7 +110,7 @@ export default function CustomAlert({
               )}
               
               <TouchableOpacity 
-                style={[styles.button, styles.confirmButton, { backgroundColor: icon.color }]} 
+                style={[styles.button, styles.confirmButton, { backgroundColor: colors.brand }]} 
                 onPress={onConfirm}
                 activeOpacity={0.7}
               >
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1, 0, 0, 0.8)',
   },
   modalContainer: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: colors.surface,
     padding: 25,
     alignItems: 'center',
     width: '90%',

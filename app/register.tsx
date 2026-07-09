@@ -10,7 +10,6 @@ import {
     Alert,
     Dimensions,
     Image,
-    ImageBackground,
     Keyboard,
     Linking,
     Platform,
@@ -24,13 +23,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
+import CachedBackground from '../components/CachedBackground';
 import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy } from '../utils/playerStorage';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import { ICE_BACKGROUND } from '../utils/iceBackground';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const iceBg = require('../assets/images/led.jpg');
 
 // Функция для генерации UUID v4
 const generateUUID = (): string => {
@@ -1051,7 +1050,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <ImageBackground source={iceBg} style={styles.container} resizeMode="cover">
+    <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover">
       <ScrollView 
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
@@ -1993,7 +1992,7 @@ export default function RegisterScreen() {
         cancelText={alert.cancelText}
         secondaryText={alert.secondaryText}
       />
-    </ImageBackground>
+    </CachedBackground>
   );
 }
 

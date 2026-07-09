@@ -100,7 +100,7 @@
   "uploading": "Įkeliama...",
   "uploadingPhotos": "Įkeliamos {count} nuotraukos... {progress} %",
   "info": "Informacija",
-  "addVideoLink": "Pridėkite nuorodą į YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sek",
@@ -1702,6 +1702,1406 @@
           "Atlikite 2-3 kartus per savaitę",
           "Sumažinkite krūvį, kai jaučiatės pavargę"
         ]
+      },
+      "66": {
+        "title": "Šoninė lenta su liemens pasukimu",
+        "description": "Sukuria įstrižus ir šerdies stabilizatorius, kad būtų užtikrinta šūvio galia ir kūno stabilumas.",
+        "benefits": [
+          "Stabilizuoja šerdies sąlytį",
+          "Pagerina sukimosi šūvio galią",
+          "Sumažina apatinės nugaros dalies traumų riziką",
+          "Sukuria pagrindinę ištvermę"
+        ],
+        "instructions": [
+          "Nustatykite dilbio šoninę lentą",
+          "Ištieskite viršutinę ranką link lubų",
+          "Nubraukite ranką po liemeniu ir grįžkite",
+          "Laikykite klubus lygiai nenuslinkdami",
+          "Atlikite 8–10 pakartojimų vienoje pusėje"
+        ],
+        "tips": [
+          "Lėtai sukite valdydami",
+          "Kvėpuokite tolygiai",
+          "Jei reikia, nuleiskite ant kelių",
+          "2-3 rinkiniai vienoje pusėje"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Rumunų trauka su hanteliu",
+        "description": "Išvysto užpakalinę grandinę galingam čiuožimui ir pirmo žingsnio pagreičiui.",
+        "benefits": [
+          "Stiprina šlaunies ir sėdmenis",
+          "Pagerina priekinės liesos mechaniką",
+          "Sukuria sukibimo stiprumą",
+          "Palaiko šlaunies traumų prevenciją"
+        ],
+        "instructions": [
+          "Stovėkite laikydami hantelius prie šlaunų",
+          "Išlaikykite nedidelį kelio lenkimą",
+          "Atloškite klubus atgal, nuleiskite varpelius išilgai kojų",
+          "Sustokite ties blauzdos vidurio arba nedideliu tempimu",
+          "Patraukite klubus į priekį, kad stovėtumėte"
+        ],
+        "tips": [
+          "Laikykite neutralų stuburą",
+          "Svoriai laikosi arti kojų",
+          "Venkite apvalinti apatinę nugaros dalį",
+          "3–4 rinkiniai po 8–12 pakartojimų"
+        ],
+        "equipment": "Hanteliai",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Taurės pritūpimas",
+        "description": "Ledo rituliui pritaikytas pritūpimų modelis, skirtas kojų ir šerdies jėgoms su stačia laikysena.",
+        "benefits": [
+          "Didina keturkampio stiprumą",
+          "Mokoma vertikalios liemens padėties",
+          "Pagerina kulkšnies judrumą",
+          "Geras pasirinkimas ne sezono metu"
+        ],
+        "instructions": [
+          "Laikykite hantelį ar virdulį prie krūtinės",
+          "Pėdos pečių plotyje, pirštai šiek tiek išsikišę",
+          "Pritūpkite lygiagrečiai arba žemiau",
+          "Keliai eina per kojų pirštus",
+          "3–4 rinkiniai po 10–15 pakartojimų"
+        ],
+        "tips": [
+          "Alkūnės kelių viduje apačioje",
+          "Kulnai lieka žemyn",
+          "Kontroliuokite nusileidimą",
+          "Išlikite aukšti per krūtinę"
+        ],
+        "equipment": "Hantelis arba virdulys",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Juostos rotacinis kapotas",
+        "description": "Imituoja smūgio ir perdavimo sukimąsi, kad padidintų galią ritulio judėjimo plokštumoje.",
+        "benefits": [
+          "Pagerina metimo ir perdavimo galią",
+          "Lavina stabilumą prieš sukimąsi",
+          "Patogus pečiams apkrovimas",
+          "Galima atlikti namuose"
+        ],
+        "instructions": [
+          "Inkaro juosta krūtinės aukštyje",
+          "Atsistokite į šoną, kad pritvirtintumėte",
+          "Laikykite pagaliuką arba rankeną abiem rankomis",
+          "Sukite nuo klubų valdydami",
+          "12-15 pakartojimų kiekvienoje pusėje"
+        ],
+        "tips": [
+          "Jėga ateina iš klubų",
+          "Apsaugokite apatinę nugaros dalį nuo per didelio sukimosi",
+          "Naudokite atletišką ledo ritulio poziciją",
+          "2-3 rinkiniai"
+        ],
+        "equipment": "Atsparumo juosta",
+        "calories": "100-150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Vienos kojos sėdmenų tiltas",
+        "description": "Suaktyvina sėdmenis ir klubų stabilizatorius, kad pačiūžos atsistumtų galingai.",
+        "benefits": [
+          "Stiprina sėdmenis",
+          "Stabilizuoja dubenį čiuožiant",
+          "Pagerina kojų simetriją",
+          "Palaiko kelio traumų prevenciją"
+        ],
+        "instructions": [
+          "Atsigulkite ant nugaros, viena koja pasodinta",
+          "Kita koja ištiesta arba sulenkta ore",
+          "Pakelkite klubus iki tiesios linijos",
+          "Viršuje pristabdykite 1 sekundę",
+          "10-12 pakartojimų vienai kojai"
+        ],
+        "tips": [
+          "Venkite juosmens hiperekstencijos",
+          "Laikykite darbą ištiesę kelius",
+          "Viršuje išspauskite glute",
+          "2-3 rinkiniai"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Stovintis blauzdas kelia",
+        "description": "Sukuria blauzdas ir pėdas, kad būtų užtikrinta kojų ištvermė vėlyvoje pamainoje ir pačiūžos stabilumas.",
+        "benefits": [
+          "Pagerina blauzdos jėgą",
+          "Sumažina blauzdų nuovargį žaidimuose",
+          "Stiprina pėdas",
+          "Greitas persirengimo kambarys"
+        ],
+        "instructions": [
+          "Atsistokite ant žingsnio krašto ant kojų kamuoliukų",
+          "Apatiniai kulnai žemiau pakopos lygio",
+          "Pakilkite kuo aukščiau",
+          "Pauzė viršuje",
+          "15–20 pakartojimų, 3 rinkiniai"
+        ],
+        "tips": [
+          "Jei reikia, naudokite sieną pusiausvyrai",
+          "Visas judesių diapazonas",
+          "Venkite šokinėjimo",
+          "Paruošę pridėkite lengvą svorį"
+        ],
+        "equipment": "Žingsnis arba platforma",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Lentų pečių bakstelėjimai",
+        "description": "Anti-sukimasis pagrindinis darbas, užtikrinantis kontakto stabilumą ir atletišką laikyseną.",
+        "benefits": [
+          "Sukuria pagrindo stabilumą",
+          "Pagerina pusiausvyrą kontaktuojant",
+          "Lavina pagrindinę ištvermę",
+          "Dirba visoms pareigoms"
+        ],
+        "instructions": [
+          "Pradėkite nuo aukštos lentos",
+          "Perkelkite svorį ir bakstelėkite priešingą petį",
+          "Grąžinkite ir pakeiskite rankas",
+          "Laikykite klubus kvadratus",
+          "Iš viso 16–20 bakstelėjimų"
+        ],
+        "tips": [
+          "Paplatinkite pėdas stabilumui",
+          "Nekelkite klubų aukštyn",
+          "Kvėpuokite tolygiai",
+          "2-3 rinkiniai"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "80–120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprintai su pilna poilsiu",
+        "description": "Imituoja trumpus pamainas, kad pagerintų pakartotinio įsibėgėjimo galimybes.",
+        "benefits": [
+          "Pagerina pakartotinio sprinto greitį",
+          "Treniruojasi atkūrimo tarp pamainų",
+          "Kuria paleidimo mechaniką",
+          "Padidina žaidimo ištvermę"
+        ],
+        "instructions": [
+          "Pašildykite 8-10 minučių",
+          "Sprintas 20 m 95% greičiu",
+          "Pailsėkite 40–60 sekundžių vaikščiodami",
+          "Pakartokite 10-12 kartų",
+          "Atvėsinkite 5 minutes"
+        ],
+        "tips": [
+          "Išlaikykite sprinto formą kiekvienam pakartojimui",
+          "Nenutraukite poilsio per anksti",
+          "Pirmenybę teikite kokybei, o ne kiekybei",
+          "1-2 užsiėmimai per savaitę"
+        ],
+        "equipment": "20 m atvira erdvė",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "30–30–30 sekundžių bėgimo intervalai",
+        "description": "Klasikinis ledo ritulio stiliaus intervalas: 30 sekundžių sunkus, 30 sekundžių lengvas.",
+        "benefits": [
+          "Sukuria laktato toleranciją",
+          "Imituoja poslinkio intensyvumą",
+          "Pagerina psichinį atsparumą",
+          "Veiksminga sesija be ledo"
+        ],
+        "instructions": [
+          "Pašildykite 10 minučių",
+          "30 sekundžių sunkus bėgimas / 30 sekundžių ėjimas",
+          "Pakartokite 12–16 ciklų",
+          "Stenkitės nuosekliai kiekviename raunde",
+          "Atvėsinkite ir ištempkite"
+        ],
+        "tips": [
+          "Nepradėkite visko anksti",
+          "Palaikykite bėgimo formą",
+          "Hidratuokite tarp blokų",
+          "Lėtai progresuokite visi ciklai"
+        ],
+        "equipment": "Bėgimo takelis arba bėgimo takelis",
+        "calories": "300-400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike intervalai",
+        "description": "Mažo poveikio didelio intensyvumo kardio treniruotė, kuri ne sezono metu tinka keliams.",
+        "benefits": [
+          "Sukuria VO2max",
+          "Sąnariams nekenksmingas pakrovimas",
+          "Treniruoja rankas ir kojas kartu",
+          "Greitas atsigavimas po sesijos"
+        ],
+        "instructions": [
+          "5 min lengvas sukimas",
+          "20 sek max / 40 sek lengva",
+          "10-12 raundų",
+          "Stebėkite RPM ir kvėpavimą",
+          "5 min atvėsinti"
+        ],
+        "tips": [
+          "Atpalaiduokite rankenų sukibimą",
+          "Sėdėkite stabiliai",
+          "Venkite maksimalių pastangų kasdien",
+          "Stebėkite kalorijas, kad pasiektumėte progresą"
+        ],
+        "equipment": "AirBike / puolimo dviratis",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m maršrutinis bėgimas",
+        "description": "Trumpi krypties pokyčiai, pavyzdžiui, išankstinis patikrinimas ir gynybinis atsigavimas.",
+        "benefits": [
+          "Pagerina krypties pasikeitimą",
+          "Sukuria pirmojo žingsnio greitį",
+          "Treniruoja reakciją",
+          "Kompaktiškas treniruoklis, tinkantis sporto salėje"
+        ],
+        "instructions": [
+          "Pažymėkite dvi eilutes 5 m atstumu",
+          "Palieskite liniją ranka, sprukkite atgal",
+          "6–8 pakartojimai = 1 rinkinys",
+          "Poilsis 90 sek",
+          "3-4 rinkiniai"
+        ],
+        "tips": [
+          "Kiekvieną kartą iki galo palieskite liniją",
+          "Sprogdink pirmuosius žingsnius",
+          "Stipriai sodinkite posūkiuose",
+          "Naudokite sukibusius batus"
+        ],
+        "equipment": "Kūgiai arba grindų linijos",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Pagreičiai iš ledo ritulio padėties",
+        "description": "Žemas atletiškas startas, kuris pereina į akistatas ir ritulio kovas.",
+        "benefits": [
+          "Pagerina pirmąjį žingsnį",
+          "Moko žemo paleidimo mechanikus",
+          "Sukuria kojų jėgą",
+          "Priklausomai nuo ledo ritulio"
+        ],
+        "instructions": [
+          "Nustatykite atletišką laikyseną: sulenkti keliai, liemuo į priekį",
+          "Sprinte 10–15 m",
+          "Visas poilsis 60–90 sek",
+          "8-10 pakartojimų",
+          "Pakaitinė švininė koja"
+        ],
+        "tips": [
+          "Laikykitės į priekį, nesikelkite anksti",
+          "Stipriai patraukite užpakalinę koją",
+          "Agresyviai naudokite rankas",
+          "10 kokybiškų pakartojimų"
+        ],
+        "equipment": "20 m juosta",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m tempo bėgimai",
+        "description": "Kontroliuojamas greitas važiavimas, kad būtų išlaikytos didelės pastangos, panašios į pamainą.",
+        "benefits": [
+          "Sukuria aerobinę galią",
+          "Moko žingsniuoti",
+          "Pagerina kojų ištvermę",
+          "Geras darbas ne sezono metu"
+        ],
+        "instructions": [
+          "Pašildykite 10 minučių",
+          "400 m esant 75–80 % maks",
+          "Poilsis 2 min pėsčiomis",
+          "4-6 pakartojimai",
+          "Atvėsinkite 5 minutes"
+        ],
+        "tips": [
+          "Tolygus tempas, o ne sprintas",
+          "Stebėti kvėpavimą",
+          "Saugiai naudokite bėgių kelio juostas",
+          "Pažanga kartojasi palaipsniui"
+        ],
+        "equipment": "Takelis arba išmatuota kilpa",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata šuolio pritūpimai",
+        "description": "Keturios minutės didelio intensyvumo, imituojančio vėlyvą nuovargį.",
+        "benefits": [
+          "Ugdo anaerobinę ištvermę",
+          "Trumpa, bet efektyvi sesija",
+          "Stiprina kojas",
+          "Patogus namams"
+        ],
+        "instructions": [
+          "20 sekundžių maksimalus šuolis pritūpimai",
+          "10 sek poilsio",
+          "8 raundai = 4 minutės",
+          "Sušildykite prieš ir atvėsinkite po",
+          "1-2 kartus per savaitę"
+        ],
+        "tips": [
+          "Švelniai nusileiskite",
+          "Niekada nepraleiskite apšilimo",
+          "Venkite žaidimo dieną",
+          "Apsaugokite kelius geros formos"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU balansas su lazdele",
+        "description": "Nestabilus paviršius ir valdymas lazdele, kad būtų lygus ant ledo balansas.",
+        "benefits": [
+          "Pagerina propriocepciją",
+          "Traukinių pozicijos pusiausvyra",
+          "Sujungia rankas ir kojas",
+          "Sukuria kulkšnies stabilumą"
+        ],
+        "instructions": [
+          "Atsistokite ant BOSU abiem kojomis",
+          "Laikymas lazda, lengvas ritulio valdymas",
+          "Laikykite 30–45 sekundes",
+          "Pailsėkite ir pakartokite 4–6 kartus",
+          "Išbandykite vieną koja, kai būsite pasiruošę"
+        ],
+        "tips": [
+          "Akys į priekį, o ne žemyn",
+          "Minkštas kelio lenkimas",
+          "Siena šalia saugumo",
+          "Pradėkite be ritulio"
+        ],
+        "equipment": "BOSU, ledo ritulio lazda",
+        "calories": "70-100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Vienos kojos RDL pasiekiamumas",
+        "description": "Balansas ir užpakalinė grandinė, kaip čiuožimas viena koja posūkiuose.",
+        "benefits": [
+          "Sukuria vienos kojos pusiausvyrą",
+          "Stiprina šlaunies ir sėdmenų raumenis",
+          "Pagerina klubų valdymą",
+          "Specifinis čiuožimas"
+        ],
+        "instructions": [
+          "Atsistokite ant vienos kojos su lengvu hanteliu",
+          "Vyriai į priekį, laisva koja atgal",
+          "Palieskite grindis arba blauzdas",
+          "Grįžkite į vertikalią padėtį",
+          "8-10 pakartojimų vienai kojai"
+        ],
+        "tips": [
+          "Sutelkite akis į vieną vietą",
+          "Judėti lėtai",
+          "Laikykite klubus lygiai",
+          "2-3 rinkiniai"
+        ],
+        "equipment": "Hantelis",
+        "calories": "120–170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Vienos kojos piršto balansas",
+        "description": "Paprastas čiurnos ir pėdos stabilumo gręžtuvas skirtas čiuožti.",
+        "benefits": [
+          "Stiprina pėdas",
+          "Pagerina pusiausvyrą",
+          "Greitas kasdienis pratimas",
+          "Gali bet kur"
+        ],
+        "instructions": [
+          "Atsistokite ant vienos kojos",
+          "Pakilkite ant kojų pirštų",
+          "Laikykite 15–20 sekundžių",
+          "Nuleiskite ir perjunkite kojas",
+          "6-8 pakartojimai vienai kojai"
+        ],
+        "tips": [
+          "Jei reikia, naudokite paramą",
+          "Akys į priekį",
+          "Kvėpuokite normaliai",
+          "Basomis ar batais"
+        ],
+        "equipment": "Nėra",
+        "calories": "30-50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partnerio perdavimas ant vienos kojos",
+        "description": "Pusiausvyra ir perdavimų koordinacija kaip judesys žaidime.",
+        "benefits": [
+          "Susieja balansą ir perdavimą",
+          "Pagerina šerdies stabilumą",
+          "Traukiniai sutelkia dėmesį",
+          "Partnerio treniruotė"
+        ],
+        "instructions": [
+          "Atsistokite ant vienos kojos su rituliu / kamuoliu",
+          "Partneris 3-4 m atstumu",
+          "Atlikite tikslius perdavimus",
+          "30 sekundžių, pakeiskite koją",
+          "4 raundai"
+        ],
+        "tips": [
+          "Minkšti keliai",
+          "Traškūs perdavimai",
+          "Neaukokite pusiausvyros dėl galios",
+          "Sienų atmušimas taip pat veikia"
+        ],
+        "equipment": "Rituulys/kamuolys, partneris",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Ėjimo įtūpstas su sukimu",
+        "description": "Dinaminis balansas ir sukimasis ruošiantis kūno patikrinimui.",
+        "benefits": [
+          "Pagerina dinaminę pusiausvyrą",
+          "Sukuria sukimąsi nuo kojų",
+          "Stiprina kojas",
+          "Funkcionalus ledo rituliui"
+        ],
+        "instructions": [
+          "Žingsnis į priekį",
+          "Pasukite liemenį link priekinės kojos",
+          "Grįžkite ir ženkite kitą koja",
+          "10 žingsnių viena koja",
+          "2-3 rinkiniai"
+        ],
+        "tips": [
+          "Kelių pėdsakai virš pėdos",
+          "Išlik aukštas",
+          "Laikykite kamuolį prie krūtinės pasirinktinai",
+          "Kontroliuoti tempą"
+        ],
+        "equipment": "Nėra",
+        "calories": "100-150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Stumkite lentos šoninius žingsnius",
+        "description": "Imituoja šoninį čiuožimą, pabrėžiant pusiausvyrą.",
+        "benefits": [
+          "Sukuria šoninę galią",
+          "Pagerina pusiausvyrą tarp šonų",
+          "Sukuria adduktorius",
+          "Puikiai tinka gynėjams"
+        ],
+        "instructions": [
+          "Stumdomos lentos arba kojinių slankikliai",
+          "Šoniniai žingsniai 20–30 sekundžių",
+          "Laikykitės žemos pozicijos",
+          "Poilsis 60 sek",
+          "6-8 rinkiniai"
+        ],
+        "tips": [
+          "Nestovėkite vertikaliai",
+          "Rankos paruoštoje padėtyje",
+          "Kontroliuoti greitį",
+          "Naudokite lentų buferius"
+        ],
+        "equipment": "Stumdomoji lenta",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Apyniai su kliūtimis",
+        "description": "Sukuria kojų sprogstamumą pirmojo žingsnio sprogimams ir mūšio šuoliams.",
+        "benefits": [
+          "Padidina vertikalią ir horizontalią galią",
+          "Pagerina reaktyvumą",
+          "Lavina koordinaciją",
+          "Perkeliama į ledo pagreitį"
+        ],
+        "instructions": [
+          "Nustatykite kliūtis 60–90 cm atstumu",
+          "Dviejų pėdų šokinėjimas per kiekvieną",
+          "Minkštas nusileidimas",
+          "6–8 kliūtys rinkinyje",
+          "3-4 rinkiniai"
+        ],
+        "tips": [
+          "Minkšti keliai nusileidžiant",
+          "Aktyviai naudokite rankas",
+          "Pradėkite nuo mažų kliūčių",
+          "Pilnas poilsis tarp serijų"
+        ],
+        "equipment": "Kliūtys arba kūgiai",
+        "calories": "140-200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sėdėjimo prie sprinto pradžia",
+        "description": "Pašalina išankstinį tempimą, kad ugdytų gryną pirmojo žingsnio sprogumą.",
+        "benefits": [
+          "Sukuria pradinę galią",
+          "Pagerina reakciją",
+          "Treniruoja klubų tiesimą",
+          "Paprasta lauko sėjamoji"
+        ],
+        "instructions": [
+          "Sėdėkite ant žemės, kojos į priekį",
+          "Ant lazdos stovo ir sprinto 10 m",
+          "8-10 pakartojimų",
+          "Poilsis 60-90 sek",
+          "Pirmiausia sušilkite"
+        ],
+        "tips": [
+          "Nesilenkite prieš signalą",
+          "Sprogstamai atsistokite",
+          "Pirmieji 3 žingsniai maksimali galia",
+          "Alternatyvios kryptys"
+        ],
+        "equipment": "10 m juosta",
+        "calories": "100-150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Plataus šuolių serija",
+        "description": "Horizontali galia naudinga kovose su lentomis ir atsistūmimais.",
+        "benefits": [
+          "Sukuria horizontalią galią",
+          "Pagerina koordinaciją",
+          "Stiprina kojas",
+          "Trumpa sesija"
+        ],
+        "instructions": [
+          "Platus šuolis stovint",
+          "Minkštas nusileidimas",
+          "Iškart kitas šuolis į priekį",
+          "5 šuoliai iš eilės = 1 rinkinys",
+          "4-5 komplektai su poilsiu"
+        ],
+        "tips": [
+          "Naudokite rankų siūbavimą",
+          "Žemė subalansuota",
+          "Srauto šuolis šokinėti",
+          "Sušildykite kelius"
+        ],
+        "equipment": "Atvira erdvė",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Medicininio kamuolio smūgis",
+        "description": "Sprogus metimas žemyn, kad būtų galima prisiliesti prie viso kūno.",
+        "benefits": [
+          "Sukuria sprogstamą šerdį",
+          "Greitas didelis intensyvumas",
+          "Sujungia kojas-šerdį-rankas",
+          "Puikus streso atpalaidavimas"
+        ],
+        "instructions": [
+          "Pakelkite medinį kamuolį virš galvos",
+          "Visa jėga atsitrenkia į grindis",
+          "Paimkite ir pakartokite",
+          "10-12 pakartojimų",
+          "3 komplektai"
+        ],
+        "tips": [
+          "Naudokite kojas ir šerdį",
+          "Neutralus stuburas pakėlus",
+          "Žiūrėti atšokimą",
+          "Naudokite 4–8 kg rutulį"
+        ],
+        "equipment": "Medicininis kamuolys",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Rogučių stūmimas",
+        "description": "Paleidžiama sunki horizontali pavara, pavyzdžiui, maksimaliai stovint.",
+        "benefits": [
+          "Maksimali kojų pavara",
+          "Maža smūginė apkrova",
+          "Ugdo protinį tvirtumą",
+          "Puikiai tinka jėgos puolėjams"
+        ],
+        "instructions": [
+          "Žema padėtis už rogių",
+          "Stūmimas 15–20 m",
+          "Pilnas poilsis 2 min",
+          "4-6 stūmimai",
+          "Pirmas sąnarių apšilimas"
+        ],
+        "tips": [
+          "Likite žemai",
+          "Trumpi galingi žingsniai",
+          "Nekelkite anksti",
+          "Paleidimo lemputė esant apkrovai"
+        ],
+        "equipment": "Prowler rogės",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "„AirBike“ pastovus 10 minučių",
+        "description": "Aerobinė bazė ilgoms pamainoms ir nesezoniniam kondicionavimui.",
+        "benefits": [
+          "Ugdo aerobinę ištvermę",
+          "Draugiškas sąnariams",
+          "Širdies ritmo kontrolė",
+          "Greita sesija be ledo"
+        ],
+        "instructions": [
+          "5 min apšilimas",
+          "10 min 65–70 % pastangų",
+          "Pastovūs RPM",
+          "5 min atvėsinti",
+          "Stebėti kvėpavimą"
+        ],
+        "tips": [
+          "Laikykitės anaerobinės zonos",
+          "Stabili laikysena",
+          "Hidratuoti",
+          "2-3 kartus per savaitę"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Irklavimo erg intervalai",
+        "description": "Viso kūno kardio treniruotė be smūgių, skirta liemens ir kojų ištvermei.",
+        "benefits": [
+          "Viso kūno kondicionavimas",
+          "Pagerina irklavimo laikyseną",
+          "Sukuria sukibimą ir šerdį",
+          "Bėgimo alternatyva"
+        ],
+        "instructions": [
+          "500 m sunkus / 1 min lengvas",
+          "6-8 raundai",
+          "Važiuokite iš kojų ir šerdies",
+          "5 min apšilimas",
+          "Atvėsinkite tempimą"
+        ],
+        "tips": [
+          "Neutralus stuburas",
+          "Alkūnės iki klubų",
+          "Net padalytas tempas",
+          "Sureguliuokite sklendę protingai"
+        ],
+        "equipment": "Irklavimo erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Nuolatiniai čiuožėjų apyniai",
+        "description": "Ritmiški šoniniai apyniai kojų ir šoniniam kondicionavimui.",
+        "benefits": [
+          "Ugdo šoninę ištvermę",
+          "Stiprina kojas",
+          "Imituoja krypties pokyčius",
+          "Kompaktiškas gręžtuvas"
+        ],
+        "instructions": [
+          "Peršokti iš vienos kojos į kitą",
+          "Rankos kaip čiuožimas",
+          "30 sek darbo / 30 sek poilsio",
+          "10 raundų",
+          "Minkšti nusileidimai"
+        ],
+        "tips": [
+          "Kelių pėdsakai virš pėdos",
+          "Krūtinė aukštyn",
+          "Kontroliuokite šuolio atstumą",
+          "Pirmiausia sušilkite"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 žiedinės treniruotės",
+        "description": "Keturių stočių grandinė bendram ledo ritulio kondicionavimui.",
+        "benefits": [
+          "Viso kūno darbo krūvis",
+          "Efektyvus laikas",
+          "Ugdo darbingumą",
+          "Pritaikoma sporto salėje"
+        ],
+        "instructions": [
+          "Burpees, alpinistai, šokinėjantys pritūpimai, atsispaudimai",
+          "45 sek darbas / 15 sek perėjimas",
+          "4 judesiai × 4 raundai",
+          "2 min poilsis tarp raundų",
+          "Sušildykite ir atvėsinkite"
+        ],
+        "tips": [
+          "Padidinkite savo lygį",
+          "Forma per greitį",
+          "Būkite hidratuotas",
+          "Venkite žaidimo dieną"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Žemų kliūčių pravažiavimas",
+        "description": "Kardio ir koordinavimas greitais žingsniais, pavyzdžiui, kietu čiuožimu.",
+        "benefits": [
+          "Pagerina kadenciją",
+          "Sukuria koordinaciją",
+          "Padidina aerobinį pajėgumą",
+          "Įvairus bėgimo darbas"
+        ],
+        "instructions": [
+          "6–8 žemos kliūtys virš 20 m",
+          "Bėkite aukštais keliais",
+          "6 praėjimai",
+          "Poilsis 90 sek",
+          "3-4 serijos"
+        ],
+        "tips": [
+          "Nekirpkite kliūčių",
+          "Greiti trumpi žingsneliai",
+          "Aktyvios rankos",
+          "Sušildyti sąnarius"
+        ],
+        "equipment": "Mini kliūtys",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Greitos kopėčios",
+        "description": "Greitas pėdų pagrindas, skirtas išsisukinėti ir įtemptiems posūkiams.",
+        "benefits": [
+          "Pagerina pėdos greitį",
+          "Sukuria koordinaciją",
+          "Padidina reakciją",
+          "Apšilimas prieš ledą"
+        ],
+        "instructions": [
+          "Į-į-išorę per kopėčias",
+          "Maksimalus 30 sek. / 30 sek. poilsis",
+          "8 raundai",
+          "Keiskite raštus kas antrą ratą",
+          "Pirmiausia lengvas apšilimas"
+        ],
+        "tips": [
+          "Akys aukštyn",
+          "Trumpi žingsneliai",
+          "Rankos sportiškai paruoštos",
+          "Nepraleiskite laiptelių"
+        ],
+        "equipment": "Agility kopėčios",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-drill judrumas",
+        "description": "Klasikinis T testas: sprintas, maišymas ir pedalas kaip ant ledo.",
+        "benefits": [
+          "Pilnas agility paketas",
+          "Traukiniai visomis kryptimis",
+          "Stebima pažanga",
+          "Riedutininkams"
+        ],
+        "instructions": [
+          "Sprintas 10 m į priekį",
+          "Maišykite 5 m kairėn ir dešinėn",
+          "Atgal 10 m iki starto",
+          "3-5 pakartojimai",
+          "Poilsis 90 sek"
+        ],
+        "tips": [
+          "Būkite žemai maišydami",
+          "Nekryžiuokite pėdų",
+          "Palieskite kūgius",
+          "Užregistruokite savo laiką"
+        ],
+        "equipment": "Kūgiai",
+        "calories": "100-150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Ritulių figūra-8 grąžtas",
+        "description": "Laikykite 8 figūrėlę, jungiančią rankas ir pėdas.",
+        "benefits": [
+          "Pagerina valdymą lazda",
+          "Sujungia rankas ir kojas",
+          "Lavina periferinį regėjimą",
+          "Patogus namams"
+        ],
+        "instructions": [
+          "Du kūgiai 2 m atstumu",
+          "Ritulių figūrėlė-8 aplink kūgius",
+          "Maksimalus greitis 30 sek",
+          "Poilsis 30 sek",
+          "10 raundų"
+        ],
+        "tips": [
+          "Galva aukštyn",
+          "Minkštos rankos",
+          "Greitos kojos",
+          "Keiskite kryptį kas 5 raundus"
+        ],
+        "equipment": "Rituulys, 2 kūgiai, lazda",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktyvūs kūgio skambučiai",
+        "description": "Partneris vadina kūgį – reakcija ir pirmasis žingsnis, kaip skaitymas žaidime.",
+        "benefits": [
+          "Treniruoja žaidimo reakciją",
+          "Pagerina pažinimo greitį",
+          "Sukuria pirmąjį žingsnį",
+          "Partnerio treniruotė"
+        ],
+        "instructions": [
+          "4 kūgiai 3 m kvadrate",
+          "Partnerių skambučių spalva/numeris",
+          "Sprintas iki kūgio",
+          "Palieskite ir grįžkite",
+          "20 reakcijų"
+        ],
+        "tips": [
+          "Būkite sąžiningi, nespėliokite anksti",
+          "Žema pozicija",
+          "Sprogus pirmasis žingsnis",
+          "Keisti išdėstymą"
+        ],
+        "equipment": "4 kūgiai, partneris",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Šoniniai maišymo žingsniai",
+        "description": "Šoniniai maišymai ledo ritulio pozoje, imituojantys šoninį čiuožimą.",
+        "benefits": [
+          "Padidina šoninį greitį",
+          "Stiprina klubų pagrobėjus",
+          "Pagerina laikyseną",
+          "Apšilimas prieš ledą"
+        ],
+        "instructions": [
+          "5 m maišyti į kairę ir į dešinę",
+          "Nekryžiuokite pėdų",
+          "30 sek. / 30 sek. poilsis",
+          "8 raundai",
+          "Rankos ant įsivaizduojamos lazdos"
+        ],
+        "tips": [
+          "Likite žemai",
+          "Nustumkite išorinę koją",
+          "Krūtinė į priekį",
+          "Greiti kontaktai"
+        ],
+        "equipment": "Kūgiai arba linijos",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dinaminis klubų atidarytuvas",
+        "description": "Klubų judrumo apšilimas giliam ritulio laikysenai.",
+        "benefits": [
+          "Pagerina klubų judrumą",
+          "Sumažina kirkšnies traumų riziką",
+          "Ruošiasi čiuožimui",
+          "Greita rutina"
+        ],
+        "instructions": [
+          "Kojos svyruoja priekyje-nugaroje po 10",
+          "Kojos svyruoja į šoną po 10",
+          "Gilus pritūpimas 30 sek",
+          "Klubų apskritimai po 10 į abi puses",
+          "Vaikščiojantys kelių apkabinimai 10 m"
+        ],
+        "tips": [
+          "Kontroliuojamas diapazonas",
+          "Jokio skausmo",
+          "Giliai įkvėpkite",
+          "Prieš kiekvieną seansą"
+        ],
+        "equipment": "Nėra",
+        "calories": "40-60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Didžiausias pasaulyje ruožas",
+        "description": "Dinaminis tempimas, veikiantis klubus, krūtinės ląstos stuburą ir pakaušio raumenis.",
+        "benefits": [
+          "Viso kūno mobilumas",
+          "Efektyvus laikas",
+          "Paruošia visą kūną",
+          "Bendras profesionalų apšilimas"
+        ],
+        "instructions": [
+          "Žingsnis į išpuolį",
+          "Alkūnė žemyn pėdos viduje",
+          "Krūtinės ląstos sukimasis ranka aukštyn",
+          "Ištiesinkite priekinę koją, kad padėtų šlaunies raumeniui",
+          "5 pakartojimai vienoje pusėje"
+        ],
+        "tips": [
+          "Judėti lėtai",
+          "Jokio atšokimo",
+          "Takelis priekyje kelio",
+          "Abi pusės lygios"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "50-70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Juostos ištraukiamos",
+        "description": "Suaktyvina viršutinę nugaros dalį ir pečius prieš šaudymą ir kontaktą.",
+        "benefits": [
+          "Aktyvina galinius deltus ir rombus",
+          "Pagerina laikyseną",
+          "Šildo pečius",
+          "Traumos prevencija"
+        ],
+        "instructions": [
+          "Laikykite juostą krūtinės aukštyje",
+          "Rankos tiesios",
+          "Atitraukite iki pečių ašmenų",
+          "15-20 pakartojimų",
+          "2-3 rinkiniai"
+        ],
+        "tips": [
+          "Jokio pečių gūžčiojimo",
+          "Kontroliuojamas grąžinimas",
+          "Lengva juosta pradžiai",
+          "Prieš ledą ar sporto salę"
+        ],
+        "equipment": "Atsparumo juosta",
+        "calories": "30-50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Aukšti keliai + smūgiai į užpakalį",
+        "description": "Dinamiškas kojų apšilimas ir širdies ritmo padidinimas prieš ledą.",
+        "benefits": [
+          "Pakelia širdies ritmą",
+          "Šildo keturračius ir pakaušio raumenis",
+          "Pagerina koordinaciją",
+          "Greitas efektas"
+        ],
+        "instructions": [
+          "20 m aukščio keliai",
+          "20 m smūgiai už užpakalio",
+          "20 m praleidimas",
+          "Pakartokite 3–4 kartus",
+          "Lengvas bėgimas tarp"
+        ],
+        "tips": [
+          "Laikykitės priekyje",
+          "Aktyvios rankos",
+          "Kurkite tempą palaipsniui",
+          "Nesprinti šaltai"
+        ],
+        "equipment": "20 m erdvės",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Rankų sūpynės + apšilimas lazdomis",
+        "description": "Pečių apšilimas ir lengvas lazdos valdymas prieš ledą.",
+        "benefits": [
+          "Mobilizuoja pečius",
+          "Suaktyvina sukimosi manžetę",
+          "Sujungia viršutinę kūno dalį su lazdele",
+          "Priklausomai nuo ledo ritulio"
+        ],
+        "instructions": [
+          "Rankų apskritimai 10 į abi puses",
+          "Sūpynės ant kūno 10",
+          "Rankena nuo lėto iki greito 60 sek",
+          "Riešo ritinėliai su lazdele 20",
+          "Lengvas šūvio judesys x10"
+        ],
+        "tips": [
+          "Pažangos greitis",
+          "Abi rankos",
+          "Nėra priverstinio nuotolio",
+          "Kiekvienas ledo seansas"
+        ],
+        "equipment": "Lazda, ritulys",
+        "calories": "50-80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Klūpančio klubo lenkiamojo raumenų tempimas",
+        "description": "Klubo lenkiamųjų raumenų tempimas, skirtas atremti čiuožimo laikyseną.",
+        "benefits": [
+          "Sumažina klubų įtempimą",
+          "Gali pagerinti žingsnį",
+          "Padeda laikysena",
+          "Po ledo ar sporto salės"
+        ],
+        "instructions": [
+          "Klūpimo padėtis",
+          "Suspauskite glute atgal",
+          "Liemuo aukštas",
+          "Laikykite 30–45 sek",
+          "2-3 kartus per koją"
+        ],
+        "tips": [
+          "Venkite juosmens lanko",
+          "Įkvėpkite tempdami",
+          "Priekinis kelias per kulkšnį",
+          "Jei įmanoma, kasdien"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 klubų sukimasis",
+        "description": "Klubų mobilumas posūkiams ir giliai pritūpti ant pačiūžų.",
+        "benefits": [
+          "Pagerina klubų sukimąsi",
+          "Sumažina kirkšnies patempimo riziką",
+          "Ramus atkūrimo darbas",
+          "Draugiškas po rungtynių"
+        ],
+        "instructions": [
+          "Sėdėkite 90/90 padėtyje",
+          "Pasukite kelius į vieną pusę",
+          "Rankos už atramos",
+          "10 lėtų pakartojimų kiekviena kryptimi",
+          "Palaikykite pabaigą 20 sek"
+        ],
+        "tips": [
+          "Nėra priverstinio diapazono",
+          "Krūtinė aukšta",
+          "Jei įmanoma, abu klubai žemyn",
+          "Naudokite kvėpavimą"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Krūtinės ląstos sukimosi tempimas",
+        "description": "Krūtinės ląstos mobilumas, skirtas šūvių sukimui ir laikysenai.",
+        "benefits": [
+          "Pagerina T formos stuburo sukimąsi",
+          "Iškrauna apatinę nugaros dalį",
+          "Padeda šūvių mechanikams",
+          "Greitas kasdienis pratimas"
+        ],
+        "instructions": [
+          "Keturkampė padėtis",
+          "Ranka už galvos",
+          "Pasukite alkūnę į lubas",
+          "10 pakartojimų kiekvienoje pusėje",
+          "Viršuje pristabdykite 2 sek"
+        ],
+        "tips": [
+          "Klubai lieka kvadratiniai",
+          "Iškvėpkite sukdami",
+          "Jokio stuburo skausmo",
+          "Judėti lėtai"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "30-45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Sienos blauzdos tempimas",
+        "description": "Blauzdos ir Achilas dažnai perkrauti pačiūžos.",
+        "benefits": [
+          "Sumažina blauzdos sandarumą",
+          "Pagerina čiurnos dorsifleksiją",
+          "Blauzdų įtvaro prevencija",
+          "Po kiekvienos sesijos"
+        ],
+        "instructions": [
+          "Rankos ant sienos",
+          "Nugaros kojos tiesus kulnas žemyn",
+          "Laikykite 30 sek",
+          "Sulenkite kelį padui",
+          "2–3 raundai kiekvienai kojai"
+        ],
+        "tips": [
+          "Kulnas ant grindų",
+          "Klubų kvadratas",
+          "Jokio atšokimo",
+          "Abi kojos"
+        ],
+        "equipment": "Siena",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Pečių tempimas per visą kūną",
+        "description": "Užpakalinės peties tempimas po šaudymo apimties.",
+        "benefits": [
+          "Sumažina pečių įtempimą",
+          "Padeda šūvių nuotoliui",
+          "Greitas tempimas",
+          "Kasdienė priežiūra"
+        ],
+        "instructions": [
+          "Ištraukite ranką per krūtinę",
+          "Kita ranka laikykite alkūnę",
+          "30 sek kiekviena ranka",
+          "Pakartokite 2–3 kartus",
+          "Atsipalaidavęs kaklas"
+        ],
+        "tips": [
+          "Negūžčiok pečiais",
+          "Tik švelnus traukimas",
+          "Iškvėpkite ir atsipalaiduokite",
+          "Po ledo"
+        ],
+        "equipment": "Nėra",
+        "calories": "20-35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Diafragminis kvėpavimas",
+        "description": "Gilus kvėpavimas, skirtas parasimpatiniam atsigavimui po žaidimo.",
+        "benefits": [
+          "Mažina stresą",
+          "Palaiko atsigavimą",
+          "Gali pagerinti miegą",
+          "Draugiška rūbinėje"
+        ],
+        "instructions": [
+          "Atsisėskite arba gulėkite patogiai",
+          "Ranka ant pilvo",
+          "Įkvėpkite 4 sekundes nosimi",
+          "Iškvėpkite 6 sekundes per burną",
+          "5 minutes nepertraukiamai"
+        ],
+        "tips": [
+          "Pakyla pilvas, o ne krūtinė",
+          "Rami erdvė",
+          "Kasdienis įprotis",
+          "Po vėlyvų žaidimų"
+        ],
+        "equipment": "Nėra",
+        "calories": "15-25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Kojos aukštyn siena",
+        "description": "Venų grįžimas ir kojų atsipalaidavimas po sunkių žaidimų.",
+        "benefits": [
+          "Gali sumažinti kojų patinimą",
+          "Skatina atsipalaidavimą",
+          "Pasyvus atsigavimas",
+          "Po kelionių žaidimų"
+        ],
+        "instructions": [
+          "Klubai prie sienos gulint",
+          "Kojos vertikalios ant sienos",
+          "Rankos atpalaiduotos",
+          "Laikykite 8-10 minučių",
+          "Lėtas kvėpavimas"
+        ],
+        "tips": [
+          "Patogus paviršius",
+          "Atjunkite nuo telefono",
+          "Neprivaloma rami muzika",
+          "Geriausia vakare"
+        ],
+        "equipment": "Siena, kilimėlis",
+        "calories": "20-30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Putplasčio ritininiai keturračiai ir pakaunės",
+        "description": "Miofascialinis atpalaidavimas kojoms po didelio krūvio.",
+        "benefits": [
+          "Sumažina skausmą",
+          "Pagerina audinių kokybę",
+          "Greitesnis atsigavimas",
+          "Rūpinimasis savimi"
+        ],
+        "instructions": [
+          "Sukite keturračius po 60 sek",
+          "Pasukite pakaušio juosteles po 60 sek",
+          "Pristabdykite jautrias vietas 20 sek",
+          "Tik lengva IT juosta",
+          "Hidratuokite po"
+        ],
+        "tips": [
+          "Venkite sąnarių",
+          "Kvėpuokite per ankštas vietas",
+          "Vidutinis slėgis",
+          "Ne prieš ledą"
+        ],
+        "equipment": "Putplasčio volelis",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Klubų ir kulkšnių mobilumo srautas",
+        "description": "Švelnus mobilumas ne dienos metu, kad išlaikytų judesių diapazoną.",
+        "benefits": [
+          "Išlaiko mobilumą",
+          "Mažas nuovargis",
+          "Aktyvus atsigavimas",
+          "Traumos prevencija"
+        ],
+        "instructions": [
+          "Kulkšnies apskritimai po 10",
+          "Hip CAR 5 į abi puses",
+          "Katė-karvė 10 pakartojimų",
+          "Vaiko poza 60 sek",
+          "2 raundai"
+        ],
+        "tips": [
+          "Neskausmingas diapazonas",
+          "Lėtas ir kontroliuojamas",
+          "Ne darbo diena arba rytas",
+          "Pridėti kvėpavimą"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Miego paruošimo tempimas ir kvėpavimas",
+        "description": "Lengvas tempimas ir kvėpavimas prieš miegą, kad atsigautumėte per naktį.",
+        "benefits": [
+          "Palaiko miego pradžią",
+          "Atpalaiduoja nervų sistemą",
+          "Atsigavimas miegant",
+          "Vakaro ritualas"
+        ],
+        "instructions": [
+          "Šlaunies strypo tempimas po 30 sek",
+          "Vaiko poza 60 sek",
+          "Sukite ant nugaros po 30 sek",
+          "Dėžutės kvėpavimas 4-4-4-4 3 min",
+          "Tamsus ramus kambarys"
+        ],
+        "tips": [
+          "Po to ekranų nėra",
+          "Nuoseklus laikas miegoti",
+          "Šaltas kambarys",
+          "Padarykite tai įpročiu"
+        ],
+        "equipment": "Mankštos kilimėlis",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     }
   },
@@ -1748,6 +3148,8 @@
     "codeSentToEmailMessage": "Kodas išsiųstas į {email}",
     "userNotFound": "Vartotojas nerastas",
     "userNotFoundMessage": "Paskyros šiuo telefono numeriu nėra. Prašome užsiregistruoti.",
+    "networkError": "Ryšio problema",
+    "networkErrorMessage": "Nepavyko prisijungti prie serverio. Patikrinkite internetą ir bandykite dar kartą.",
     "errorSendingCode": "Klaida",
     "errorSendingCodeMessage": "Nepavyko išsiųsti kodo. Patikrinkite savo telefono numerį ir interneto ryšį.",
     "errorResendingCode": "Klaida",
@@ -1939,6 +3341,8 @@
     "rightShort": "P",
     "startedHockey": "Ledo ritulyje su",
     "noFriendsYet": "{name} dar neturi draugų",
+    "inviteYourTeam": "Pakviesk savo komandą",
+    "inviteTeamMessage": "Aš esu HockeyStars – programėlėje ledo ritulininkams. Prisijunk:",
     "beFirstToAdd": "Būkite pirmasis, kuris prideda {name} kaip draugą",
     "writeMessage": "Parašyk žinutę",
     "edit": "Redaguoti",
@@ -2396,9 +3800,17 @@
     "weightFrom": "Svoris",
     "all": "Visi",
     "noPlayersFound": "Žaidėjų nerasta",
+    "newcomers": "Naujokai",
+    "topByPoints": "Top pagal taškus",
     "left": "kairė",
     "right": "dešinė",
-    "resetFilters": "Atstatyti filtrus"
+    "resetFilters": "Atstatyti filtrus",
+    "topBySV": "Top SV%",
+    "shareRating": "Dalintis reitingu",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "taškų",
+    "allCountries": "Visos šalys",
+    "allYears": "Visi metai"
   },
   "messages": {
     "title": "Žinutės",
@@ -2678,7 +4090,9 @@
     "physicalDataUpdate": "Fizinių duomenų atnaujinimas",
     "friendRequest": "Draugystės prašymas",
     "newFriendship": "Nauja draugystė",
-    "speedRecord": "Naujas greičio rekordas"
+    "speedRecord": "Naujas greičio rekordas",
+    "gameFirstPlace": "Žaidimo čempionas",
+    "quizFirstPlace": "Hokėjo žvaigždė"
   },
   "statsNotification": {
     "updated": "atnaujino",
@@ -2697,5 +4111,20 @@
   "height": "ūgis",
   "weight": "svoris",
   "cm": "cm",
-  "kg": "kg"
+  "kg": "kg",
+  "videoUploadHint": "Maks. 20 sekundžių vienam vaizdo įrašui, iki 10 vaizdo įrašų",
+  "gameFirstPlaceNotification": {
+    "title": "Žaidimo čempionas",
+    "message": "{playerName} pasiekė 1 vietą"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hokėjo žvaigždė",
+    "message": "{playerName} uždirbo {prize}"
+  },
+  "tabs": {
+    "chat": "Pokalbiai",
+    "feed": "Juosta",
+    "scout": "Skautas",
+    "skills": "Įgūdžiai"
+  }
 }

@@ -7,6 +7,7 @@ import {
   Image as _RNImage,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,22 +16,28 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import CachedBackground from './CachedBackground';
+import GameDualLeaderboard from './GameDualLeaderboard';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Device from 'expo-device';
 import { Player, notifyFriendsAboutGameFirstPlace } from '../utils/playerStorage';
+import { bestScoreForPlayer, buildDualLeaderboards } from '../utils/gameLeaderboard';
 import { supabase } from '../utils/supabase';
 import IceRinkMarkings from './IceRinkMarkings';
 import Puck from './Puck';
 import Svg, { Path } from 'react-native-svg';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getPerformanceLevel } from '../utils/devicePerformance';
+import {
+  getPuckSpawnFromBottom,
+  getScaledPuckBaseSize,
+  PUCK_BASE_SIZE,
+} from '../utils/leaderDisplay';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const GAME_DURATION = 30;
-const PUCK_SIZE = 70; // ВАЖНО: как на главном экране
 const GOAL_DEPTH = 10; // как в IceRinkMarkings
 const SPAWN_INTERVAL_MS = 500;
 /** Максимум шайб в игре (одинаково на Android и iOS). */
@@ -51,8 +58,22 @@ function makeGamePuckInstanceId(basePlayerId: string, seq: number): string {
   return `${GAME_INSTANCE_PREFIX}${basePlayerId}:${seq}`;
 }
 
-/** Android: ~30 % мягче скорость, отскоки и спавн в игре (калибровка к iPhone). */
-const ANDROID_PUCK_SOFT = Platform.OS === 'android' ? 0.7 : 1;
+/** Star Goal: на слабом Android скорость −20 % от iPhone. */
+const getGamePuckSoft = (level: ReturnType<typeof getPerformanceLevel>): number =>
+  Platform.OS === 'android' && level === 'low' ? 0.8 : 1;
+
+const applyBottomSpawn = (
+  pos: PuckPosition,
+  boundaries: { left: number; right: number; bottom: number },
+  puckSize: number,
+  puckSoft = 1
+) => {
+  const s = getPuckSpawnFromBottom(boundaries, puckSize, puckSoft);
+  pos.x = s.spawnX;
+  pos.y = s.spawnY;
+  pos.vx = s.vx;
+  pos.vy = s.vy;
+};
 
 interface PuckPosition {
   id: string;
@@ -88,29 +109,7 @@ function splitNameTwoLines(fullName?: string | null) {
   return { first: parts[0], last: parts.slice(1).join(' ') };
 }
 
-// Определение уровня производительности (синхронизировано с index.tsx)
-const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
-  const yearClass = Device.deviceYearClass ?? null;
-  const totalMemory = Device.totalMemory ?? null;
-
-  if (Platform.OS === 'ios') {
-    if (yearClass && yearClass < 2020) return 'medium';
-    return 'high';
-  }
-
-  if (Platform.OS === 'android') {
-    if (Device.isDevice === false) return 'low';
-
-    const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
-    if (yearClass && yearClass >= 2023) return 'high';
-    if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) return 'low';
-    if (yearClass && yearClass < 2023) return 'medium';
-    return 'high';
-  }
-
-  if (Platform.OS === 'web') return 'high';
-  return 'high';
-};
+// Определение уровня производительности — см. utils/devicePerformance.ts
 
 // Полная логика коллизий и движения — скопирована с главного экрана для 1-в-1 поведения
 const usePuckCollisionSystem = (
@@ -118,9 +117,10 @@ const usePuckCollisionSystem = (
   currentUserId?: string,
   currentScreen?: string,
   screenWidth?: number,
-  screenHeight?: number
+  screenHeight?: number,
+  basePuckSize?: number,
 ) => {
-  const puckSize = PUCK_SIZE;
+  const puckSize = basePuckSize ?? PUCK_BASE_SIZE;
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const [appIsActive, setAppIsActive] = useState(true);
   const collisionDetectedRef = useRef(false);
@@ -142,6 +142,7 @@ const usePuckCollisionSystem = (
   const INITIALIZATION_PROTECTION_MS = 3000;
 
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
+  const gamePuckSoft = useMemo(() => getGamePuckSoft(performanceLevel), [performanceLevel]);
   const lastTimeRef = useRef<number>(0);
   const accumulatorRef = useRef(0);
 
@@ -156,17 +157,14 @@ const usePuckCollisionSystem = (
     let fps: number;
     switch (performanceLevel) {
       case 'high':
-        if (Platform.OS === 'android') fps = 60;
-        else if (Platform.OS === 'ios') fps = 80;
-        else fps = 80;
+        fps = 80;
         break;
       case 'medium':
-        if (Platform.OS === 'android') fps = 45;
-        else fps = 45;
+        fps = 45;
         break;
       case 'low':
       default:
-        fps = 36;
+        fps = 16;
         break;
     }
     return {
@@ -179,16 +177,8 @@ const usePuckCollisionSystem = (
 
   const reactUpdateInterval = useMemo(() => {
     if (Platform.OS === 'web') return 1;
-    if (Platform.OS === 'android') {
-      if (performanceLevel === 'low') return 8;
-      if (performanceLevel === 'medium') return 6;
-      return 5;
-    }
-    if (Platform.OS === 'ios') {
-      if (performanceLevel === 'low') return 5;
-      return 3;
-    }
-    return 1;
+    if (performanceLevel === 'low') return 5;
+    return 3;
   }, [performanceLevel]);
 
   const insets = useSafeAreaInsets();
@@ -235,9 +225,9 @@ const usePuckCollisionSystem = (
     const now = Date.now();
     const timeSinceInit = initializationTimeRef.current > 0 ? now - initializationTimeRef.current : Infinity;
     const isInProtectionPeriod = timeSinceInit < INITIALIZATION_PROTECTION_MS;
-    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
-    const spawnX = (boundaries.left + boundaries.right) / 2;
-    const spawnY = height + puckSize * 0.4; // близко к нижнему краю — шайба появляется быстро
+    const baseSpeedMultiplier = 0.49 * gamePuckSoft;
+    const spawn = getPuckSpawnFromBottom(boundaries, puckSize, gamePuckSoft);
+    const { spawnX, spawnY } = spawn;
 
     const generatePosition = (existingPositions: PuckPosition[]): PuckPosition => {
       const minDistance = puckSize;
@@ -301,10 +291,7 @@ const usePuckCollisionSystem = (
           }
           const pos = generatePosition(newPositions);
           pos.id = pl.id;
-          pos.x = spawnX;
-          pos.y = spawnY;
-          pos.vx = (Math.random() - 0.5) * baseSpeedMultiplier;
-          pos.vy = -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier);
+          applyBottomSpawn(pos, boundaries, puckSize, gamePuckSoft);
           newPositions.push(pos);
 
           let shared = sharedPositionsRef.current.get(pl.id);
@@ -381,10 +368,7 @@ const usePuckCollisionSystem = (
                 // Новая шайба должна "вылетать" снизу по центру, а не появляться случайно
                 const pos = generatePosition(newPositions);
                 pos.id = playerId;
-                pos.x = spawnX;
-                pos.y = spawnY;
-                pos.vx = (Math.random() - 0.5) * baseSpeedMultiplier;
-                pos.vy = -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier);
+                applyBottomSpawn(pos, boundaries, puckSize, gamePuckSoft);
                 newPositions.push(pos);
                 // И сразу обновляем shared values, чтобы не было "прыжка" в случайную точку
                 let shared = sharedPositionsRef.current.get(playerId);
@@ -479,10 +463,7 @@ const usePuckCollisionSystem = (
             newPos.id = player.id;
             // Если это новая шайба, то стартуем из точки "вне экрана" по центру
             if (!existing) {
-              newPos.x = spawnX;
-              newPos.y = spawnY;
-              newPos.vx = (Math.random() - 0.5) * baseSpeedMultiplier;
-              newPos.vy = -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier);
+              applyBottomSpawn(newPos, boundaries, puckSize, gamePuckSoft);
             }
             newPositions.push(newPos);
             collisionPositions.push(newPos);
@@ -554,11 +535,10 @@ const usePuckCollisionSystem = (
         const base = basePositions[index] || basePositions[0];
         const pos: PuckPosition = {
           id: player.id,
-          // В игре стартуем "из вне экрана" по центру
           x: spawnX,
           y: spawnY,
-          vx: (Math.random() - 0.5) * baseSpeedMultiplier,
-          vy: -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier),
+          vx: spawn.vx,
+          vy: spawn.vy,
           size: puckSize,
           isDragging: false,
         };
@@ -576,11 +556,7 @@ const usePuckCollisionSystem = (
       players.forEach((player) => {
         const pos = generatePosition(positions);
         pos.id = player.id;
-        // В игре стартуем "из вне экрана" по центру
-        pos.x = spawnX;
-        pos.y = spawnY;
-        pos.vx = (Math.random() - 0.5) * baseSpeedMultiplier;
-        pos.vy = -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier);
+                applyBottomSpawn(pos, boundaries, puckSize, gamePuckSoft);
         positions.push(pos);
         let shared = sharedPositionsRef.current.get(player.id);
         if (!shared) {
@@ -604,7 +580,7 @@ const usePuckCollisionSystem = (
     renderPositionsMapRef.current = newMap;
 
     if (initializationTimeRef.current === 0) initializationTimeRef.current = Date.now();
-  }, [players, boundaries, performanceLevel]);
+  }, [players, boundaries, performanceLevel, puckSize, gamePuckSoft]);
 
   const stepPhysics = useCallback(() => {
     const currentPositions = physicsPositionsRef.current;
@@ -639,8 +615,17 @@ const usePuckCollisionSystem = (
       // чтобы low/medium Android не замедляли шайбы, а только были менее плавными.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_GAME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
-      y += vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      let moveX = vx * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * gamePuckSoft;
+      let moveY = vy * FIXED_DT * REFERENCE_GAME_FPS * SPEED_MULTIPLIER * gamePuckSoft;
+      const maxMovePerStep = pos.size * 0.55;
+      const moveLen = Math.hypot(moveX, moveY);
+      if (moveLen > maxMovePerStep) {
+        const scale = maxMovePerStep / moveLen;
+        moveX *= scale;
+        moveY *= scale;
+      }
+      x += moveX;
+      y += moveY;
 
       if (x <= boundaries.left) {
         x = boundaries.left;
@@ -662,8 +647,7 @@ const usePuckCollisionSystem = (
       const minDistSq = minDistance * minDistance;
 
       if (!pos.isDragging) {
-        const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
-        const collisionCheckRadius = isWeakDevice ? minDistSq * 1.8 : minDistSq * 4;
+        const collisionCheckRadius = minDistSq * 4;
         for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
           const dx = x - other.x;
@@ -671,42 +655,28 @@ const usePuckCollisionSystem = (
           const distSq = dx * dx + dy * dy;
           if (distSq > collisionCheckRadius) continue;
           if (distSq < minDistSq && distSq > 0) {
-            if (isWeakDevice) {
-              const dist = Math.sqrt(distSq);
-              const angle = Math.atan2(dy, dx);
-              const pushForce = 0.3 * ANDROID_PUCK_SOFT;
-              vx += Math.cos(angle) * pushForce;
-              vy += Math.sin(angle) * pushForce;
+            const dist = Math.sqrt(distSq);
+            const angle = Math.atan2(dy, dx);
+            const relativeVx = vx - other.vx;
+            const relativeVy = vy - other.vy;
+            const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+            if (dot < 0) {
+              const restitution = 0.5;
+              const impulse = dot * restitution * gamePuckSoft;
+              vx -= impulse * Math.cos(angle);
+              vy -= impulse * Math.sin(angle);
+              const additionalPush = 0.2 * gamePuckSoft;
+              vx += Math.cos(angle) * additionalPush;
+              vy += Math.sin(angle) * additionalPush;
               const speed = Math.sqrt(vx * vx + vy * vy);
               if (speed > maxSpeed) {
                 const ratio = maxSpeed / speed;
                 vx *= ratio;
                 vy *= ratio;
               }
-            } else {
-              const dist = Math.sqrt(distSq);
-              const angle = Math.atan2(dy, dx);
-              const relativeVx = vx - other.vx;
-              const relativeVy = vy - other.vy;
-              const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
-              if (dot < 0) {
-                const restitution = 0.5;
-                const impulse = dot * restitution * ANDROID_PUCK_SOFT;
-                vx -= impulse * Math.cos(angle);
-                vy -= impulse * Math.sin(angle);
-                const additionalPush = 0.2 * ANDROID_PUCK_SOFT;
-                vx += Math.cos(angle) * additionalPush;
-                vy += Math.sin(angle) * additionalPush;
-                const speed = Math.sqrt(vx * vx + vy * vy);
-                if (speed > maxSpeed) {
-                  const ratio = maxSpeed / speed;
-                  vx *= ratio;
-                  vy *= ratio;
-                }
-              }
-              vx *= 0.95;
-              vy *= 0.95;
             }
+            vx *= 0.95;
+            vy *= 0.95;
 
             if (currentUserId && gamePuckCanonicalPlayerId(pos.id) === currentUserId) {
               const collisionKey = [pos.id, other.id].sort().join('-');
@@ -736,12 +706,7 @@ const usePuckCollisionSystem = (
 
     const minDistance = puckSize;
     const minDistSq = minDistance * minDistance;
-    const checkRadiusMul =
-      Platform.OS === 'android' && performanceLevel === 'low'
-        ? 1.55
-        : Platform.OS === 'android' && performanceLevel === 'medium'
-          ? 1.8
-          : 2;
+    const checkRadiusMul = 2;
     const checkRadiusSq = (puckSize * checkRadiusMul) * (puckSize * checkRadiusMul);
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
 
@@ -760,7 +725,7 @@ const usePuckCollisionSystem = (
           const invDist = 1 / dist;
           const nx = dx * invDist;
           const ny = dy * invDist;
-          const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
+          const pushStrength = 1.2 * gamePuckSoft;
           const adjustedOverlap = overlap * pushStrength;
 
           if (pos1.isDragging) {
@@ -778,7 +743,7 @@ const usePuckCollisionSystem = (
           }
 
           if (!pos1.isDragging && !pos2.isDragging) {
-            const impulseStrength = 0.3 * ANDROID_PUCK_SOFT;
+            const impulseStrength = 0.3 * gamePuckSoft;
             updatedPositions[i].vx += nx * impulseStrength;
             updatedPositions[i].vy += ny * impulseStrength;
             updatedPositions[j].vx -= nx * impulseStrength;
@@ -811,7 +776,7 @@ const usePuckCollisionSystem = (
     }
 
     physicsPositionsRef.current = updatedPositions;
-  }, [boundaries, currentUserId, puckSize, performanceLevel, FIXED_DT, TARGET_FPS]);
+  }, [boundaries, currentUserId, puckSize, performanceLevel, FIXED_DT, TARGET_FPS, gamePuckSoft]);
 
   const lastInteractionTimeRef = useRef<number>(Date.now());
   const isIdleModeRef = useRef<boolean>(false);
@@ -845,10 +810,11 @@ const usePuckCollisionSystem = (
     };
   }, [updateInteractionTime]);
 
-  const hasPucksRef = useRef(puckPositions.length > 0);
+  const hasPucks = puckPositions.length > 0;
+  const hasPucksRef = useRef(hasPucks);
   useEffect(() => {
-    hasPucksRef.current = puckPositions.length > 0;
-  }, [puckPositions.length]);
+    hasPucksRef.current = hasPucks;
+  }, [hasPucks]);
 
   const isOnHomeScreen = currentScreen === 'home' || currentScreen === 'game';
   const isOnHomeScreenRef = useRef(isOnHomeScreen);
@@ -858,6 +824,12 @@ const usePuckCollisionSystem = (
 
   useEffect(() => {
     if (!appIsActive || !isOnHomeScreen) {
+      animationRunningRef.current = false;
+      return;
+    }
+    // Нет шайб (например, игра закрыта) — цикл вообще не запускаем.
+    // Раньше пустой rAF крутился постоянно и грел устройство даже вне игры.
+    if (!hasPucks) {
       animationRunningRef.current = false;
       return;
     }
@@ -871,7 +843,13 @@ const usePuckCollisionSystem = (
         lastTimeRef.current = 0;
         return;
       }
-      if (!hasPucksRef.current || physicsPositionsRef.current.length === 0) {
+      if (!hasPucksRef.current) {
+        // Шайбы закончились — полная остановка; перезапуск через эффект по hasPucks
+        animationRunningRef.current = false;
+        lastTimeRef.current = 0;
+        return;
+      }
+      if (physicsPositionsRef.current.length === 0) {
         lastTimeRef.current = 0;
         animationFrameId = requestAnimationFrame(tick);
         return;
@@ -934,11 +912,22 @@ const usePuckCollisionSystem = (
         }
       });
 
-      const nextRenderPositions = physics.map((p) => ({ ...p }));
-      renderPositionsRef.current = nextRenderPositions;
-      const nextMap = new Map<string, PuckPosition>();
-      nextRenderPositions.forEach((pos) => nextMap.set(pos.id, pos));
-      renderPositionsMapRef.current = nextMap;
+      // Обновляем render-позиции на месте — без клонов и нового Map каждый кадр (меньше GC).
+      // rp !== p гарантирует, что в map отдельный объект, иначе интерполяция выродится.
+      const renderMap = renderPositionsMapRef.current;
+      for (let i = 0; i < physics.length; i++) {
+        const p = physics[i];
+        const rp = renderMap.get(p.id);
+        if (rp && rp !== p) {
+          rp.x = p.x;
+          rp.y = p.y;
+          rp.vx = p.vx;
+          rp.vy = p.vy;
+          rp.isDragging = p.isDragging;
+        } else {
+          renderMap.set(p.id, { ...p });
+        }
+      }
 
       animationFrameId = requestAnimationFrame(tick);
     };
@@ -962,6 +951,7 @@ const usePuckCollisionSystem = (
     IDLE_FRAME_SKIP,
     currentScreen,
     performanceLevel,
+    hasPucks,
   ]);
 
   useEffect(() => {
@@ -1052,7 +1042,7 @@ const usePuckCollisionSystem = (
             const dist = Math.sqrt(distSq);
             const angle = Math.atan2(dy, dx);
             const overlap = minDistance - dist;
-            const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
+            const pushStrength = 1.2 * gamePuckSoft;
             const adjustedOverlap = overlap * pushStrength;
             const pushX = -Math.cos(angle) * adjustedOverlap;
             const pushY = -Math.sin(angle) * adjustedOverlap;
@@ -1086,9 +1076,9 @@ const usePuckCollisionSystem = (
             const dist = Math.sqrt(distSq);
             const angle = Math.atan2(dy, dx);
             const overlap = minDistance - dist;
-            finalX -= Math.cos(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
-            finalY -= Math.sin(angle) * overlap * 0.3 * ANDROID_PUCK_SOFT;
-            const additionalPush = overlap * 0.2 * ANDROID_PUCK_SOFT;
+            finalX -= Math.cos(angle) * overlap * 0.3 * gamePuckSoft;
+            finalY -= Math.sin(angle) * overlap * 0.3 * gamePuckSoft;
+            const additionalPush = overlap * 0.2 * gamePuckSoft;
             const newOtherX = other.x - Math.cos(angle) * additionalPush;
             const newOtherY = other.y - Math.sin(angle) * additionalPush;
             newPositions[i] = {
@@ -1122,13 +1112,13 @@ const usePuckCollisionSystem = (
       newPositions.forEach((pos) => newMap.set(pos.id, pos));
       renderPositionsMapRef.current = newMap;
     },
-    [boundaries, currentUserId, puckSize]
+    [boundaries, currentUserId, puckSize, gamePuckSoft]
   );
 
   const resetPucksMotion = useCallback(() => {
     const current = physicsPositionsRef.current;
     if (!current || current.length === 0) return;
-    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
+    const baseSpeedMultiplier = 0.49 * gamePuckSoft;
     const newPositions = current.map((pos) => ({
       ...pos,
       vx: (Math.random() - 0.5) * baseSpeedMultiplier,
@@ -1140,7 +1130,7 @@ const usePuckCollisionSystem = (
     const newMap = new Map<string, PuckPosition>();
     newPositions.forEach((pos) => newMap.set(pos.id, pos));
     renderPositionsMapRef.current = newMap;
-  }, []);
+  }, [gamePuckSoft]);
 
   const getSharedPosition = useCallback((id: string) => sharedPositionsRef.current.get(id), []);
   const registerSharedPosition = useCallback((id: string, x: { value: number }, y: { value: number }) => {
@@ -1155,6 +1145,7 @@ const usePuckCollisionSystem = (
     getSharedPosition,
     registerSharedPosition,
     resetPucksMotion,
+    gamePuckSoft,
   };
 };
 
@@ -1186,11 +1177,11 @@ const OriginalPuckAnimator = React.memo(
     const animatedX = useSharedValue(position.x);
     const animatedY = useSharedValue(position.y);
 
-    useEffect(() => {
-      if (registerSharedPosition) {
-        registerSharedPosition(position.id, animatedX, animatedY);
-      }
-    }, [position.id, animatedX, animatedY, registerSharedPosition]);
+  useEffect(() => {
+    if (registerSharedPosition) {
+      registerSharedPosition(position.id, animatedX, animatedY);
+    }
+  }, [position.id, animatedX, animatedY, registerSharedPosition]);
 
     const animatedStyle = useAnimatedStyle(
       () => ({
@@ -1386,8 +1377,10 @@ const OriginalPuckAnimator = React.memo(
     (prevProps.player as any).isOnline === (nextProps.player as any).isOnline &&
     prevProps.player.createdAt === nextProps.player.createdAt
 );
+OriginalPuckAnimator.displayName = 'OriginalPuckAnimator';
 
 const LED_BG = require('../assets/images/led.jpg');
+const STAR_GOAL_LOGO = require('../assets/images/star-goal-logo.png');
 
 export default function PuckGame({ visible, onClose, visiblePlayers, currentUser, openToResults = false }: Props) {
   const { language } = useLanguage();
@@ -1407,18 +1400,20 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   const gameLimits = useMemo(
     () => ({
       maxPucks: MAX_PUCKS,
-      spawnMs: Math.round(SPAWN_INTERVAL_MS / ANDROID_PUCK_SOFT),
+      spawnMs: SPAWN_INTERVAL_MS,
       rafStride: 1 as const,
     }),
     []
   );
-  const [gameState, setGameState] = useState<'countdown' | 'playing' | 'finished'>('countdown');
+  const [gameState, setGameState] = useState<'intro' | 'countdown' | 'playing' | 'finished'>('intro');
   const [countdownValue, setCountdownValue] = useState<number | 'Go'>(5);
   const countdownScale = useSharedValue(0.5);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [monthlyLeaderboard, setMonthlyLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [allTimeLeaderboard, setAllTimeLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [bestScore, setBestScore] = useState(0);
+  const [bestScoreMonth, setBestScoreMonth] = useState(0);
   const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
   const insets = useSafeAreaInsets();
   const [activePlayers, setActivePlayers] = useState<Player[]>([]);
@@ -1442,8 +1437,17 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     activePlayersCountRef.current = activePlayers.length;
   }, [activePlayers.length]);
 
-  const { puckPositions, updatePuckPosition, boundaries, getSharedPosition, registerSharedPosition, resetPucksMotion } =
-    usePuckCollisionSystem(activePlayers, currentUser?.id, 'game', SCREEN_W, SCREEN_H);
+  const gameWidth = iceSize.width > 0 ? iceSize.width : SCREEN_W;
+  const gameHeight = iceSize.height > 0 ? iceSize.height : SCREEN_H;
+  const gamePuckSize = useMemo(
+    () => getScaledPuckBaseSize(gameWidth, gameHeight),
+    [gameWidth, gameHeight]
+  );
+  const gamePuckSizeRef = useRef(gamePuckSize);
+  gamePuckSizeRef.current = gamePuckSize;
+
+  const { puckPositions, updatePuckPosition, boundaries, getSharedPosition, registerSharedPosition, resetPucksMotion, gamePuckSoft } =
+    usePuckCollisionSystem(activePlayers, currentUser?.id, 'game', gameWidth, gameHeight, gamePuckSize);
 
   const shuffle = useCallback(<T,>(arr: T[]) => {
     const a = [...arr];
@@ -1515,6 +1519,21 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     return { r, cx, y };
   }, [goalRect, insets.top]);
 
+  const beginCountdown = useCallback(() => {
+    setActivePlayers([]);
+    gameTemplatePoolRef.current = [];
+    gameSpawnSeqRef.current = 0;
+    if (spawnTimerRef.current) {
+      clearInterval(spawnTimerRef.current);
+      spawnTimerRef.current = null;
+    }
+    scoreRef.current = 0;
+    setScore(0);
+    setTimeLeft(GAME_DURATION);
+    setCountdownValue(5);
+    setGameState('countdown');
+  }, []);
+
   const startGame = useCallback(() => {
     scoreRef.current = 0;
     gameStartRef.current = Date.now();
@@ -1533,7 +1552,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     gameTemplatePoolRef.current = shuffle(pool);
     gameSpawnSeqRef.current = 0;
 
-    const burstCap = Math.max(1, Math.round(12 * ANDROID_PUCK_SOFT));
+    const burstCap = Math.max(1, Math.round(12 * gamePuckSoft));
     const burst = Math.min(burstCap, MAX_PUCKS, pool.length > 0 ? MAX_PUCKS : 0);
     const initial: Player[] = [];
     for (let b = 0; b < burst && pool.length > 0; b++) {
@@ -1568,26 +1587,6 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     }
   }, [gameState]);
 
-  // Когда добавились новые активные игроки — “выпрыгиваем” из точки вне экрана по центру
-  useEffect(() => {
-    if (gameState !== 'playing') return;
-    const spawnX = (boundaries.left + boundaries.right) / 2;
-    const spawnY = boundaries.bottom;
-    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
-    activePlayers.forEach((p) => {
-      if (lastCenterYRef.current.has(p.id)) return; // уже “видели” шайбу
-      updatePuckPosition(
-        p.id,
-        spawnX,
-        spawnY,
-        (Math.random() - 0.5) * baseSpeedMultiplier,
-        -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier),
-        false
-      );
-      lastCenterYRef.current.set(p.id, spawnY + PUCK_SIZE / 2);
-    });
-  }, [activePlayers, boundaries.left, boundaries.right, boundaries.bottom, gameState, updatePuckPosition]);
-
   const tr = useCallback(
     (
       key:
@@ -1597,25 +1596,32 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
         | 'playAgain'
         | 'close'
         | 'topPlayers'
+        | 'monthlyChampion'
+        | 'allTimeChampion'
+        | 'monthlyTop'
+        | 'allTimeTop'
         | 'score'
         | 'yourBest'
+        | 'yourBestMonth'
         | 'go'
         | 'results'
+        | 'rulesLine'
+        | 'offside'
     ) => {
       const dict: Record<string, Record<string, string>> = {
         title: {
-          en: 'Hockeystars Game',
-          ru: 'Hockeystars Game',
-          lt: 'Hockeystars Game',
-          lv: 'Hockeystars Game',
-          pl: 'Hockeystars Game',
-          sv: 'Hockeystars Game',
-          cs: 'Hockeystars Game',
-          sk: 'Hockeystars Game',
-          fi: 'Hockeystars Game',
-          it: 'Hockeystars Game',
-          de: 'Hockeystars Game',
-          fr: 'Hockeystars Game',
+          en: 'STAR GOAL',
+          ru: 'STAR GOAL',
+          lt: 'STAR GOAL',
+          lv: 'STAR GOAL',
+          pl: 'STAR GOAL',
+          sv: 'STAR GOAL',
+          cs: 'STAR GOAL',
+          sk: 'STAR GOAL',
+          fi: 'STAR GOAL',
+          it: 'STAR GOAL',
+          de: 'STAR GOAL',
+          fr: 'STAR GOAL',
         },
         subtitle: {
           ru: 'Забивай в ворота и становись чемпионом!',
@@ -1687,6 +1693,62 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
           de: 'Top-Spieler',
           fr: 'Meilleurs joueurs',
         },
+        monthlyChampion: {
+          en: 'Champion of the month',
+          ru: 'Рекордсмен месяца',
+          lt: 'Mėnesio čempionas',
+          lv: 'Mēneša čempions',
+          pl: 'Mistrz miesiąca',
+          sv: 'Månadens mästare',
+          cs: 'Mistr měsíce',
+          sk: 'Majster mesiaca',
+          fi: 'Kuukauden mestari',
+          it: 'Campione del mese',
+          de: 'Champion des Monats',
+          fr: 'Champion du mois',
+        },
+        allTimeChampion: {
+          en: 'All-time champion',
+          ru: 'Рекордсмен за все время',
+          lt: 'Visų laikų čempionas',
+          lv: 'Visu laiku čempions',
+          pl: 'Mistrz wszech czasów',
+          sv: 'Mästare genom tiderna',
+          cs: 'Mistr všech dob',
+          sk: 'Majster všetkých čias',
+          fi: 'Kaikkien aikojen mestari',
+          it: 'Campione di sempre',
+          de: 'Rekordhalter aller Zeiten',
+          fr: 'Champion de tous les temps',
+        },
+        monthlyTop: {
+          en: 'Top this month',
+          ru: 'Топ месяца',
+          lt: 'Geriausi šį mėnesį',
+          lv: 'Mēneša tops',
+          pl: 'Top miesiąca',
+          sv: 'Topp denna månad',
+          cs: 'Top měsíce',
+          sk: 'Top mesiaca',
+          fi: 'Kuukauden kärki',
+          it: 'Top del mese',
+          de: 'Top des Monats',
+          fr: 'Top du mois',
+        },
+        allTimeTop: {
+          en: 'All-time top',
+          ru: 'Топ за все время',
+          lt: 'Visų laikų top',
+          lv: 'Visu laiku tops',
+          pl: 'Top wszech czasów',
+          sv: 'Topp genom tiderna',
+          cs: 'Top všech dob',
+          sk: 'Top všetkých čias',
+          fi: 'Kaikkien aikojen kärki',
+          it: 'Top di sempre',
+          de: 'Top aller Zeiten',
+          fr: 'Top de tous les temps',
+        },
         score: {
           ru: 'Счёт: {score}',
           en: 'Score: {score}',
@@ -1744,24 +1806,85 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
           fr: 'Résultats',
         },
         yourBest: {
-          ru: 'Твой рекорд: {score}',
-          en: 'Your best: {score}',
-          lt: 'Tavo rekordas: {score}',
-          lv: 'Tavs rekords: {score}',
-          pl: 'Twój rekord: {score}',
-          sv: 'Ditt rekord: {score}',
-          cs: 'Tvůj rekord: {score}',
-          sk: 'Tvoj rekord: {score}',
-          fi: 'Ennätyksesi: {score}',
-          it: 'Il tuo record: {score}',
-          de: 'Dein Rekord: {score}',
-          fr: 'Ton record : {score}',
+          ru: 'Твой рекорд за все время: {score}',
+          en: 'Your all-time best: {score}',
+          lt: 'Tavo visų laikų rekordas: {score}',
+          lv: 'Tavs visu laiku rekords: {score}',
+          pl: 'Twój rekord wszech czasów: {score}',
+          sv: 'Ditt rekord genom tiderna: {score}',
+          cs: 'Tvůj rekord všech dob: {score}',
+          sk: 'Tvoj rekord všetkých čias: {score}',
+          fi: 'Kaikkien aikojen ennätyksesi: {score}',
+          it: 'Il tuo record di sempre: {score}',
+          de: 'Dein Rekord aller Zeiten: {score}',
+          fr: 'Ton record de tous les temps : {score}',
+        },
+        yourBestMonth: {
+          ru: 'Твой рекорд месяца: {score}',
+          en: 'Your best this month: {score}',
+          lt: 'Tavo mėnesio rekordas: {score}',
+          lv: 'Tavs mēneša rekords: {score}',
+          pl: 'Twój rekord miesiąca: {score}',
+          sv: 'Ditt rekord denna månad: {score}',
+          cs: 'Tvůj rekord měsíce: {score}',
+          sk: 'Tvoj rekord mesiaca: {score}',
+          fi: 'Kuukauden ennätyksesi: {score}',
+          it: 'Il tuo record del mese: {score}',
+          de: 'Dein Rekord des Monats: {score}',
+          fr: 'Ton record du mois : {score}',
+        },
+        rulesLine: {
+          en: '30 seconds · drag pucks into the goal',
+          ru: '30 секунд · закидывай шайбы в ворота',
+          lt: '30 sek. · tempk šonas į vartus',
+          lv: '30 sek. · met ripas vārtos',
+          pl: '30 sek. · wrzucaj krążki do bramki',
+          sv: '30 sek · skjut puckar i mål',
+          cs: '30 s · házej puky do branky',
+          sk: '30 s · hádž puky do bránky',
+          fi: '30 s · lyö kiekkoja maaliin',
+          it: '30 sec · trascina i puck in porta',
+          de: '30 Sek. · Schieß Pucks ins Tor',
+          fr: '30 s · envoie les rondelles au but',
         },
       };
       return dict[key]?.[language] || dict[key]?.en || key;
     },
     [language]
   );
+
+  const leaderboardLabels = useMemo(
+    () => ({
+      monthlyChampion: tr('monthlyChampion'),
+      allTimeChampion: tr('allTimeChampion'),
+      monthlyTop: tr('monthlyTop'),
+      allTimeTop: tr('allTimeTop'),
+    }),
+    [tr]
+  );
+
+  const formatPuckScore = useCallback((value: number) => String(Number(value) || 0), []);
+
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from('puck_game_scores')
+        .select('player_id, player_name, player_avatar, score, created_at')
+        .order('score', { ascending: false })
+        .limit(500);
+
+      const dual = buildDualLeaderboards(data || [], undefined, 10);
+      setMonthlyLeaderboard(dual.monthly);
+      setAllTimeLeaderboard(dual.allTime);
+
+      if (currentUser) {
+        setBestScore(bestScoreForPlayer(data || [], currentUser.id, 'all'));
+        setBestScoreMonth(bestScoreForPlayer(data || [], currentUser.id, 'month'));
+      }
+    } catch (e) {
+      console.error('Failed to load leaderboard:', e);
+    }
+  }, [currentUser]);
 
   const endGame = useCallback(async () => {
     setGameState('finished');
@@ -1773,23 +1896,13 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
         // Кто был №1 ДО сохранения (один игрок = одно место) + глобальный макс. для детекта нового рекорда
         const { data: beforeScores } = await supabase
           .from('puck_game_scores')
-          .select('player_id, score')
-          .order('score', { ascending: false });
-        const seenBefore = new Set<string>();
-        const uniqueBefore: { player_id: string }[] = [];
-        const playerBestBefore = new Map<string, number>();
-        for (const row of beforeScores || []) {
-          if (!playerBestBefore.has(row.player_id)) {
-            playerBestBefore.set(row.player_id, row.score);
-          }
-          if (!seenBefore.has(row.player_id)) {
-            seenBefore.add(row.player_id);
-            uniqueBefore.push({ player_id: row.player_id });
-          }
-        }
-        const oldLeaderId = uniqueBefore[0]?.player_id;
-        const prevGlobalMax =
-          playerBestBefore.size > 0 ? Math.max(...playerBestBefore.values()) : 0;
+          .select('player_id, player_name, player_avatar, score, created_at')
+          .order('score', { ascending: false })
+          .limit(500);
+
+        const beforeDual = buildDualLeaderboards(beforeScores || []);
+        const oldLeaderId = beforeDual.allTimeChampion?.player_id;
+        const prevGlobalMax = beforeDual.allTimeChampion?.score ?? 0;
 
         await supabase.from('puck_game_scores').insert({
           player_id: currentUser.id,
@@ -1801,18 +1914,12 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
         // Кто №1 ПОСЛЕ сохранения — уведомляем только если победитель обновился
         const { data: topScores } = await supabase
           .from('puck_game_scores')
-          .select('player_id, score')
-          .order('score', { ascending: false });
+          .select('player_id, player_name, player_avatar, score, created_at')
+          .order('score', { ascending: false })
+          .limit(500);
         if (topScores && topScores.length > 0) {
-          const seen = new Set<string>();
-          const unique: { player_id: string; score: number }[] = [];
-          for (const row of topScores) {
-            if (!seen.has(row.player_id)) {
-              seen.add(row.player_id);
-              unique.push({ player_id: row.player_id, score: row.score });
-            }
-          }
-          const newLeaderId = unique[0]?.player_id;
+          const afterDual = buildDualLeaderboards(topScores);
+          const newLeaderId = afterDual.allTimeChampion?.player_id;
           const becameLeader = newLeaderId === currentUser.id && oldLeaderId !== currentUser.id;
           const newGlobalRecordWhileLeader =
             newLeaderId === currentUser.id && finalScore > prevGlobalMax;
@@ -1826,40 +1933,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
     }
 
     loadLeaderboard();
-  }, [currentUser]);
-
-  const loadLeaderboard = useCallback(async () => {
-    try {
-      const { data } = await supabase
-        .from('puck_game_scores')
-        .select('player_id, player_name, player_avatar, score, created_at')
-        .order('score', { ascending: false })
-        .limit(100);
-
-      // Один игрок — одно место: берём лучший результат каждого
-      const seen = new Set<string>();
-      const unique = (data || []).filter((row) => {
-        if (seen.has(row.player_id)) return false;
-        seen.add(row.player_id);
-        return true;
-      }).slice(0, 10);
-
-      setLeaderboard(unique);
-
-      if (currentUser) {
-        const { data: best } = await supabase
-          .from('puck_game_scores')
-          .select('score')
-          .eq('player_id', currentUser.id)
-          .order('score', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (best) setBestScore(best.score);
-      }
-    } catch (e) {
-      console.error('Failed to load leaderboard:', e);
-    }
-  }, [currentUser]);
+  }, [currentUser, loadLeaderboard]);
 
   useEffect(() => {
     if (gameState !== 'playing') return;
@@ -1887,19 +1961,15 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
       const goalLeft = goalRect.x;
       const goalRight = goalRect.x + goalRect.w;
       const goalLineY = goalRect.goalLineY;
-
-      const spawnX = (boundaries.left + boundaries.right) / 2;
-      // Шайба “выпрыгивает” из центра снизу, но из точки вне экрана
-      const spawnY = boundaries.bottom;
-      const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
+      const puckSize = gamePuckSizeRef.current;
 
       for (const p of activePlayers) {
         const shared = getSharedPosition(p.id);
         if (!shared) continue;
         const x = shared.x.value;
         const y = shared.y.value;
-        const centerX = x + PUCK_SIZE / 2;
-        const centerY = y + PUCK_SIZE / 2;
+        const centerX = x + puckSize / 2;
+        const centerY = y + puckSize / 2;
 
         const lastCenterY = lastCenterYRef.current.get(p.id);
         lastCenterYRef.current.set(p.id, centerY);
@@ -1937,18 +2007,19 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
           }
         }
 
-        // Если улетела выше экрана — возвращаем вниз по центру
-        if (centerY < -PUCK_SIZE) {
+        // Если улетела выше экрана — возвращаем снизу по центру
+        if (centerY < -puckSize) {
           lastHitYRef.current.delete(p.id);
+          const respawn = getPuckSpawnFromBottom(boundaries, puckSize, gamePuckSoft);
           updatePuckPosition(
             p.id,
-            spawnX,
-            spawnY,
-            (Math.random() - 0.5) * baseSpeedMultiplier,
-            -Math.abs((Math.random() - 0.5) * baseSpeedMultiplier),
+            respawn.spawnX,
+            respawn.spawnY,
+            respawn.vx,
+            respawn.vy,
             false
           );
-          lastCenterYRef.current.set(p.id, spawnY + PUCK_SIZE / 2);
+          lastCenterYRef.current.set(p.id, respawn.spawnY + puckSize / 2);
         }
       }
 
@@ -1976,7 +2047,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
       setScore(0);
       setTimeLeft(0);
     } else {
-      setGameState('countdown');
+      setGameState('intro');
       setCountdownValue(5);
       setScore(0);
       setTimeLeft(GAME_DURATION);
@@ -2030,7 +2101,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   if (!visible) return null;
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose}>
       <View style={gs.container}>
         <CachedBackground source={LED_BG} style={gs.background} resizeMode="cover">
           <View
@@ -2123,15 +2194,14 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
 
           {/* Pucks (drag like main) */}
           {activePlayers.map((player) => {
+            const offscreenSpawn = getPuckSpawnFromBottom(boundaries, gamePuckSize, gamePuckSoft);
             const fallbackPosition: PuckPosition = {
               id: player.id,
-              x: (boundaries.left + boundaries.right) / 2,
-              // Никогда не показываем "мигающую" шайбу по центру,
-              // если позиция ещё не готова — держим её вне экрана снизу.
-              y: boundaries.bottom,
-              vx: 0,
-              vy: 0,
-              size: 70,
+              x: offscreenSpawn.spawnX,
+              y: offscreenSpawn.spawnY,
+              vx: offscreenSpawn.vx,
+              vy: offscreenSpawn.vy,
+              size: gamePuckSize,
               isDragging: false,
             };
             const initialPosition = positionMap.get(player.id) || fallbackPosition;
@@ -2142,7 +2212,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
                 position={initialPosition}
                 onNav={() => {}}
                 onDrag={(id, x, y, vx, vy, isDragging) => {
-                  if (!isDragging) lastHitYRef.current.set(id, y + PUCK_SIZE / 2);
+                  if (!isDragging) lastHitYRef.current.set(id, y + gamePuckSize / 2);
                   updatePuckPosition(id, x, y, vx, vy, isDragging);
                 }}
                 getAndroidPerformanceLevel={() => getPerformanceLevel()}
@@ -2150,6 +2220,73 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
               />
             );
           })}
+
+          {/* Intro — logo, leaderboard, start */}
+          {gameState === 'intro' && (
+            <View style={gs.introOverlay} pointerEvents="box-none">
+              <View style={[gs.introHeader, { paddingTop: insets.top + 8 }]}>
+                <View style={gs.headerSpacer} />
+                <TouchableOpacity
+                  style={gs.headerIconBtn}
+                  onPress={() => setGameState('finished')}
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel={tr('results')}
+                >
+                  <Ionicons name="trophy-outline" size={22} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={gs.headerIconBtn} onPress={onClose} hitSlop={12}>
+                  <Ionicons name="close" size={24} color="#fff" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView
+                style={gs.introScroll}
+                contentContainerStyle={gs.introWrap}
+                showsVerticalScrollIndicator={false}
+              >
+                <Image source={STAR_GOAL_LOGO} style={gs.introLogo} contentFit="contain" />
+                <Text style={gs.introTitle}>{tr('title')}</Text>
+                <Text style={gs.introSubtitle}>{tr('subtitle')}</Text>
+                <Text style={gs.rulesLine}>{tr('rulesLine')}</Text>
+
+                <TouchableOpacity style={gs.introStartBtn} onPress={beginCountdown}>
+                  <Ionicons name="play" size={24} color="#fff" />
+                  <Text style={gs.introStartBtnText}>{tr('start')}</Text>
+                </TouchableOpacity>
+
+                {(monthlyLeaderboard.length > 0 || allTimeLeaderboard.length > 0) && (
+                  <View style={gs.leaderboard}>
+                    <GameDualLeaderboard
+                      monthly={monthlyLeaderboard}
+                      allTime={allTimeLeaderboard}
+                      formatScore={formatPuckScore}
+                      labels={leaderboardLabels}
+                      introLimit={5}
+                      showAvatar={false}
+                      compact
+                      titleStyle={gs.lbTitle}
+                      cardStyle={gs.lbCard}
+                      rowStyle={gs.lbRow}
+                      rankStyle={gs.lbRank}
+                      nameStyle={gs.lbName}
+                      scoreStyle={gs.lbScore}
+                    />
+                  </View>
+                )}
+
+                {bestScoreMonth > 0 && (
+                  <Text style={gs.bestScoreText}>
+                    {tr('yourBestMonth').replace('{score}', String(bestScoreMonth))}
+                  </Text>
+                )}
+                {bestScore > 0 && (
+                  <Text style={gs.bestScoreText}>
+                    {tr('yourBest').replace('{score}', String(bestScore))}
+                  </Text>
+                )}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Countdown 5-4-3-2-1-Go */}
           {gameState === 'countdown' && (
@@ -2169,40 +2306,52 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
               <TouchableOpacity style={[gs.overlayCloseBtn, { top: insets.top + 8 }]} onPress={onClose} hitSlop={12}>
                 <Ionicons name="close" size={28} color="#fff" />
               </TouchableOpacity>
-              <BlurOrSolid intensity={40} tint="dark" style={gs.overlayBlur}>
-                <Text style={gs.overlayTitle}>{tr('score').replace('{score}', String(score))}</Text>
-                {bestScore > 0 && (
-                  <Text style={gs.bestScoreText}>{tr('yourBest').replace('{score}', String(bestScore))}</Text>
-                )}
+              <ScrollView
+                style={gs.finishedScroll}
+                contentContainerStyle={[gs.finishedScrollContent, { paddingTop: insets.top + 48 }]}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+              >
+                <BlurOrSolid intensity={40} tint="dark" style={gs.overlayBlur}>
+                  {score > 0 && (
+                    <Text style={gs.overlayTitle}>{tr('score').replace('{score}', String(score))}</Text>
+                  )}
+                  {bestScoreMonth > 0 && (
+                    <Text style={gs.bestScoreText}>{tr('yourBestMonth').replace('{score}', String(bestScoreMonth))}</Text>
+                  )}
+                  {bestScore > 0 && (
+                    <Text style={gs.bestScoreText}>{tr('yourBest').replace('{score}', String(bestScore))}</Text>
+                  )}
 
-                {/* Leaderboard */}
-                {leaderboard.length > 0 && (
-                  <View style={gs.leaderboard}>
-                    <Text style={gs.lbTitle}>{tr('topPlayers')}</Text>
-                    <View style={gs.lbCard}>
-                      {leaderboard.map((entry, i) => (
-                        <View key={`${entry.player_id}-${i}`} style={gs.lbRow}>
-                          <Text style={gs.lbRank}>
-                            {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
-                          </Text>
-                          <Text style={gs.lbName} numberOfLines={2}>
-                            {entry.player_name}
-                          </Text>
-                          <Text style={gs.lbScore}>{entry.score}</Text>
-                        </View>
-                      ))}
+                  {(monthlyLeaderboard.length > 0 || allTimeLeaderboard.length > 0) && (
+                    <View style={gs.leaderboard}>
+                      <GameDualLeaderboard
+                        monthly={monthlyLeaderboard}
+                        allTime={allTimeLeaderboard}
+                        formatScore={formatPuckScore}
+                        labels={leaderboardLabels}
+                        introLimit={5}
+                        showAvatar={false}
+                        compact
+                        titleStyle={gs.lbTitle}
+                        cardStyle={gs.lbCard}
+                        rowStyle={gs.lbRow}
+                        rankStyle={gs.lbRank}
+                        nameStyle={gs.lbName}
+                        scoreStyle={gs.lbScore}
+                      />
                     </View>
-                  </View>
-                )}
+                  )}
 
-                <TouchableOpacity style={gs.startBtn} onPress={startGame}>
-                  <Ionicons name="refresh" size={20} color="#fff" />
-                  <Text style={gs.startBtnText}>{tr('playAgain')}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={gs.closeBtnBig} onPress={onClose}>
-                  <Text style={gs.closeBtnBigText}>{tr('close')}</Text>
-                </TouchableOpacity>
-              </BlurOrSolid>
+                  <TouchableOpacity style={gs.startBtn} onPress={beginCountdown}>
+                    <Ionicons name="refresh" size={20} color="#fff" />
+                    <Text style={gs.startBtnText}>{tr('playAgain')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={gs.closeBtnBig} onPress={onClose}>
+                    <Text style={gs.closeBtnBigText}>{tr('close')}</Text>
+                  </TouchableOpacity>
+                </BlurOrSolid>
+              </ScrollView>
             </View>
           )}
           </View>
@@ -2342,9 +2491,18 @@ const gs = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
+    zIndex: 200,
+  },
+  finishedScroll: {
+    flex: 1,
+    width: '100%',
+  },
+  finishedScrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 200,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   overlayCloseBtn: {
     position: 'absolute',
@@ -2357,10 +2515,11 @@ const gs = StyleSheet.create({
   },
   overlayBlur: {
     borderRadius: 20,
-    padding: 30,
+    padding: 18,
     alignItems: 'center',
     overflow: 'hidden',
-    width: SCREEN_W * 0.85,
+    width: '100%',
+    maxWidth: SCREEN_W * 0.9,
     backgroundColor: 'rgba(0, 0, 0, 0.55)',
     borderWidth: 1.5,
     borderColor: 'rgba(250, 47, 64, 0.22)',
@@ -2368,9 +2527,9 @@ const gs = StyleSheet.create({
   overlayTitle: {
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    fontSize: 28,
-    marginTop: 12,
-    marginBottom: 6,
+    fontSize: 24,
+    marginTop: 4,
+    marginBottom: 4,
   },
   overlaySub: {
     fontFamily: 'Gilroy-Regular',
@@ -2383,8 +2542,9 @@ const gs = StyleSheet.create({
   bestScoreText: {
     fontFamily: 'Gilroy-Regular',
     color: '#888',
-    fontSize: 13,
-    marginBottom: 12,
+    fontSize: 12,
+    marginBottom: 6,
+    textAlign: 'center',
   },
   startBtn: {
     flexDirection: 'row',
@@ -2411,8 +2571,8 @@ const gs = StyleSheet.create({
   },
   leaderboard: {
     width: '100%',
-    marginBottom: 16,
-    marginTop: 8,
+    marginBottom: 10,
+    marginTop: 4,
   },
   lbCard: {
     width: '100%',
@@ -2420,42 +2580,120 @@ const gs = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
-    paddingVertical: 6,
-    paddingHorizontal: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
   },
   lbTitle: {
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
-    fontSize: 15,
-    marginBottom: 8,
+    fontSize: 13,
+    marginBottom: 4,
     textAlign: 'center',
   },
   lbRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 7,
-    paddingHorizontal: 8,
-    gap: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+    gap: 6,
   },
   lbRank: {
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
-    fontSize: 14,
-    width: 26,
+    fontSize: 12,
+    width: 24,
     textAlign: 'center',
   },
   lbName: {
     fontFamily: 'Gilroy-Regular',
     color: '#ccc',
-    fontSize: 13,
+    fontSize: 12,
     flex: 1,
     flexShrink: 1,
     minWidth: 0,
-    lineHeight: 16,
+    lineHeight: 14,
   },
   lbScore: {
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
+    fontSize: 13,
+    minWidth: 24,
+    textAlign: 'right',
+  },
+  introOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(5, 8, 24, 0.84)',
+    zIndex: 60,
+  },
+  introHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 8,
+  },
+  headerSpacer: { flex: 1 },
+  headerIconBtn: {
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  introScroll: { flex: 1 },
+  introWrap: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    paddingTop: 8,
+  },
+  introLogo: {
+    width: SCREEN_W * 0.72,
+    height: SCREEN_H * 0.26,
+    marginBottom: 8,
+  },
+  introTitle: {
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    fontSize: 28,
+    textAlign: 'center',
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  introSubtitle: {
+    fontFamily: 'Gilroy-Regular',
+    color: '#ccc',
     fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 21,
+    marginBottom: 6,
+    paddingHorizontal: 12,
+  },
+  rulesLine: {
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 12,
+    color: '#c77ab0',
+    textAlign: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 12,
+  },
+  introStartBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    width: '100%',
+    maxWidth: 340,
+    alignSelf: 'center',
+    backgroundColor: '#fa2f40',
+    borderRadius: 16,
+    paddingHorizontal: 32,
+    paddingVertical: 18,
+    marginBottom: 20,
+  },
+  introStartBtnText: {
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    fontSize: 20,
   },
 });

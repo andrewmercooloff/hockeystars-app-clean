@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "How many skaters per team are on the ice during even strength (excluding goalies)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "How many regulation periods are in a standard NHL game?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Offside is called when an attacking player enters the offensive zone before what?",
+    "options": [
+      "The center line",
+      "The puck",
+      "The goalie",
+      "The referee"
+    ]
+  },
+  "rules_icing": {
+    "question": "Icing is shooting the puck from behind the center line past the opponent goal line without touch. True?",
+    "options": [
+      "False — never in NHL",
+      "True",
+      "True — only in overtime",
+      "False — only from defensive zone"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Who holds the NHL record for most career goals?",
+    "options": [
+      "Alex Ovechkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin is famous as a left winger wearing number 8 for which team city?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "What is a hat trick in hockey?",
+    "options": [
+      "Three goals by one player in one game",
+      "Three saves in a row",
+      "Three assists in one game",
+      "Three penalties"
+    ]
+  },
+  "terms_power_play": {
+    "question": "A power play occurs when:",
+    "options": [
+      "The goalie is pulled",
+      "A fight breaks out",
+      "One team has more skaters due to a penalty",
+      "Overtime starts"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "The Stanley Cup is the championship trophy of which league?",
+    "options": [
+      "IIHF World Championship",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "What is a standard hockey puck made of?",
+    "options": [
+      "Vulcanized rubber",
+      "Aluminum",
+      "Wood",
+      "Plastic"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "How many minutes is a standard minor penalty?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "How many minutes is a standard major penalty?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Play starts with a:",
+    "options": [
+      "Penalty shot",
+      "Faceoff",
+      "Power break",
+      "Icing call"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "If an NHL regular-season game is tied after overtime, what happens?",
+    "options": [
+      "Second overtime",
+      "Shootout",
+      "Playoff period",
+      "Draw stands"
+    ]
+  },
+  "rules_crease": {
+    "question": "Can an attacker stand in the goalie crease without consequences?",
+    "options": [
+      "Yes always",
+      "Only in playoffs",
+      "No — goal may be disallowed",
+      "Only last minute"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "High-sticking is when the stick hits an opponent above the:",
+    "options": [
+      "Crossbar",
+      "Shoulders",
+      "Waist",
+      "Helmet only"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Pulling the goalie risks:",
+    "options": [
+      "Penalty shot",
+      "Empty-net goal against",
+      "Offside",
+      "Icing only"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "A penalty shot is often awarded for fouling a:",
+    "options": [
+      "Any time",
+      "Only overtime",
+      "Only playoffs",
+      "Clear breakaway"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "A bench minor is served by any player except:",
+    "options": [
+      "The goalie (usually)",
+      "A forward",
+      "A defenseman",
+      "The captain"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "NHL regular-season OT is played with how many skaters per side?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "How many players (including goalie) can a team have on ice?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "How many points is a goal worth on the scoreboard?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "On a delayed penalty, the non-offending team often:",
+    "options": [
+      "Ices the puck",
+      "Calls timeout",
+      "Stops play",
+      "Pulls the goalie"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Goalies can only play the puck behind the net in the:",
+    "options": [
+      "Center circle",
+      "Neutral zone",
+      "Full zone",
+      "Trapezoid area"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Fighting typically results in a:",
+    "options": [
+      "Major penalty",
+      "Game misconduct only",
+      "Minor penalty",
+      "No penalty"
+    ]
+  },
+  "terms_puck": {
+    "question": "The hard rubber object players shoot is called a:",
+    "options": [
+      "Puck",
+      "Discus",
+      "Stone",
+      "Ball"
+    ]
+  },
+  "terms_saucer": {
+    "question": "A pass that lifts the puck is called a:",
+    "options": [
+      "Saucer pass",
+      "Board pass",
+      "Slap dump",
+      "Crease pass"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "A slap shot involves:",
+    "options": [
+      "Backhand only",
+      "One hand on stick",
+      "Tapping the puck lightly",
+      "Winding up and striking the ice first"
+    ]
+  },
+  "terms_deke": {
+    "question": "A deke is:",
+    "options": [
+      "A type of penalty",
+      "A fake move to beat a defender",
+      "A defensive block",
+      "A line change"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "A breakaway is when:",
+    "options": [
+      "The puck is iced",
+      "A skater goes in alone on the goalie",
+      "Two players fight",
+      "A line change occurs"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Plus/minus tracks:",
+    "options": [
+      "Shots on goal",
+      "Goal differential while player is on ice at even strength",
+      "Penalty minutes",
+      "Faceoff wins only"
+    ]
+  },
+  "terms_assist": {
+    "question": "A primary assist goes to the player who:",
+    "options": [
+      "Scores the goal",
+      "Won the faceoff",
+      "Last touched puck before scorer",
+      "Got a penalty"
+    ]
+  },
+  "terms_block": {
+    "question": "A blocked shot is when:",
+    "options": [
+      "Puck hits post",
+      "Skater stops puck with body/stick before goal",
+      "Goalie saves it",
+      "Shot misses net"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Forechecking means:",
+    "options": [
+      "Line change strategy only",
+      "Defending your blue line",
+      "Pressuring opponents in their zone to regain puck",
+      "Pulling the goalie"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Backchecking means:",
+    "options": [
+      "Skating back to help defense",
+      "Shooting from the point",
+      "Winning faceoff",
+      "Goalie save"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "A one-timer is:",
+    "options": [
+      "Waiting then shooting",
+      "Goalie move",
+      "Shooting immediately off a pass",
+      "A penalty"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "A poke check:",
+    "options": [
+      "Lift puck over stick",
+      "Cross-check",
+      "Knock puck away from opponent",
+      "Hook opponent"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Top shelf means scoring in the:",
+    "options": [
+      "Upper part of the net",
+      "From center ice only",
+      "On empty net only",
+      "Five-hole"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Five-hole is between the goalie's:",
+    "options": [
+      "Stick and glove",
+      "Mask and chest",
+      "Arm and body",
+      "Legs"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "An enforcer provides:",
+    "options": [
+      "Coaching",
+      "Goal scoring",
+      "Physical protection and fighting",
+      "Faceoffs only"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Line changes usually happen:",
+    "options": [
+      "Only after goals",
+      "Only on penalties",
+      "Only at intermission",
+      "On the fly during play"
+    ]
+  },
+  "terms_rink": {
+    "question": "The playing surface in hockey is called:",
+    "options": [
+      "Field",
+      "Court",
+      "Track",
+      "Ice rink"
+    ]
+  },
+  "terms_goal": {
+    "question": "The net players shoot at is called:",
+    "options": [
+      "Target",
+      "Basket",
+      "Goal",
+      "Zone"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Playing short-handed means:",
+    "options": [
+      "Overtime",
+      "Goalie pulled",
+      "Fewer skaters due to penalty",
+      "Empty net"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Sudden-death overtime means:",
+    "options": [
+      "First goal wins",
+      "Full period",
+      "Shootout only",
+      "No winner"
+    ]
+  },
+  "hist_original_six": {
+    "question": "How many teams in the NHL Original Six era?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Modern ice hockey developed most in:",
+    "options": [
+      "Russia",
+      "Sweden",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: USA beat whom in 1980?",
+    "options": [
+      "Soviet Union",
+      "Canada",
+      "Czechoslovakia",
+      "Sweden"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Wayne Gretzky's career points record is over:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "The Hockey Hall of Fame is in:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "The KHL is based primarily in:",
+    "options": [
+      "Russia",
+      "Finland",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_1972": {
+    "question": "The 1972 Summit Series: Canada vs:",
+    "options": [
+      "USSR",
+      "USA",
+      "Czechia",
+      "Sweden"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "The NHL was founded in the:",
+    "options": [
+      "20th century",
+      "21st century",
+      "19th century",
+      "18th century"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby was drafted 1st overall in:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid was drafted 1st overall in:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "The Stanley Cup was first awarded in the:",
+    "options": [
+      "20th century",
+      "21st century",
+      "18th century",
+      "19th century"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr ranks among all-time NHL leaders in:",
+    "options": [
+      "Points",
+      "Coaching",
+      "Penalty minutes only",
+      "Goalie wins"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin spent his NHL career mainly with the:",
+    "options": [
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Washington Capitals",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux won Stanley Cups with:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "An NHL rink is about how long?",
+    "options": [
+      "200 ft",
+      "150 ft",
+      "300 ft",
+      "250 ft"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "An NHL rink is about how wide?",
+    "options": [
+      "100 ft",
+      "150 ft",
+      "120 ft",
+      "85 ft"
+    ]
+  },
+  "gen_zones": {
+    "question": "Blue lines divide the rink into how many zones?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "The center red line is used for:",
+    "options": [
+      "Icing calls",
+      "Penalty box",
+      "Faceoffs only",
+      "Offside at center"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Stick blade curve helps with:",
+    "options": [
+      "Skating speed",
+      "Goalie saves",
+      "Lifting and controlling puck",
+      "Fighting"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate hollow affects:",
+    "options": [
+      "Stick flex",
+      "Grip on ice and turns",
+      "Helmet fit",
+      "Jersey size"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Shin guards protect the:",
+    "options": [
+      "Shoulders",
+      "Head",
+      "Lower legs",
+      "Hands only"
+    ]
+  },
+  "gen_captain": {
+    "question": "The captain wears letter:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Alternate captains wear:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Home team typically wears:",
+    "options": [
+      "Dark/colored",
+      "White/light",
+      "No jerseys",
+      "Goalie only"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Intermission between periods is about:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 hour"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL playoff series are mostly:",
+    "options": [
+      "Always best of 5",
+      "Final only",
+      "Rare exceptions — mostly best of 7",
+      "Never"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "A Zamboni is used to:",
+    "options": [
+      "Measure speed",
+      "Store pucks",
+      "Sharpen skates",
+      "Resurface ice"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "On-ice officials wear:",
+    "options": [
+      "Team jerseys",
+      "Goalie gear",
+      "Black and white stripes",
+      "Suits"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hockey players move on:",
+    "options": [
+      "Roller skates",
+      "Ice skates",
+      "Bare feet",
+      "Skis"
+    ]
+  },
+  "gen_stick": {
+    "question": "Players control the puck with a:",
+    "options": [
+      "Stick",
+      "Net",
+      "Hands only",
+      "Helmet"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Which team is Sidney Crosby most associated with?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "What position did Sidney Crosby primarily play?",
+    "options": [
+      "Left winger",
+      "Right winger",
+      "Defenseman",
+      "Center"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Which team is Connor McDavid most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "What position did Connor McDavid primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Which team is Nathan MacKinnon most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado Avalanche",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "What position did Nathan MacKinnon primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Right winger"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Which team is Victor Hedman most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "What position did Victor Hedman primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Which team is Carey Price most associated with?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "What position did Carey Price primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Right winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Which team is Jaromir Jagr most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "What position did Jaromir Jagr primarily play?",
+    "options": [
+      "Right winger",
+      "Center",
+      "Goalie",
+      "Left winger"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Which team is Mario Lemieux most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "What position did Mario Lemieux primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Right winger"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Which team is Patrick Kane most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "What position did Patrick Kane primarily play?",
+    "options": [
+      "Right winger",
+      "Left winger",
+      "Center",
+      "Goalie"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Which team is Nicklas Lidstrom most associated with?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "What position did Nicklas Lidstrom primarily play?",
+    "options": [
+      "Center",
+      "Goalie",
+      "Left winger",
+      "Defenseman"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Which team is Martin Brodeur most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "What position did Martin Brodeur primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Goalie",
+      "Defenseman"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Which team is Steven Stamkos most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "What position did Steven Stamkos primarily play?",
+    "options": [
+      "Center",
+      "Defenseman",
+      "Right winger",
+      "Left winger"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Which team is Auston Matthews most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "What position did Auston Matthews primarily play?",
+    "options": [
+      "Right winger",
+      "Defenseman",
+      "Left winger",
+      "Center"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Which team is Leon Draisaitl most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "What position did Leon Draisaitl primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Left winger",
+      "Defenseman"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Which team is Erik Karlsson most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "What position did Erik Karlsson primarily play?",
+    "options": [
+      "Center",
+      "Goalie",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Which team is Pavel Datsyuk most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "What position did Pavel Datsyuk primarily play?",
+    "options": [
+      "Center",
+      "Defenseman",
+      "Right winger",
+      "Left winger"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Which team is Henrik Lundqvist most associated with?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "What position did Henrik Lundqvist primarily play?",
+    "options": [
+      "Defenseman",
+      "Right winger",
+      "Center",
+      "Goalie"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Which team is Evgeni Malkin most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "What position did Evgeni Malkin primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Left winger",
+      "Defenseman"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Which team is Artemi Panarin most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "What position did Artemi Panarin primarily play?",
+    "options": [
+      "Right winger",
+      "Defenseman",
+      "Left winger",
+      "Center"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Which team is Nikita Kucherov most associated with?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "What position did Nikita Kucherov primarily play?",
+    "options": [
+      "Center",
+      "Goalie",
+      "Right winger",
+      "Left winger"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Which team is Brad Marchand most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "What position did Brad Marchand primarily play?",
+    "options": [
+      "Right winger",
+      "Defenseman",
+      "Center",
+      "Left winger"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Which team is David Pastrnak most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "What position did David Pastrnak primarily play?",
+    "options": [
+      "Left winger",
+      "Goalie",
+      "Center",
+      "Right winger"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Which team is Shea Weber most associated with?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "What position did Shea Weber primarily play?",
+    "options": [
+      "Left winger",
+      "Goalie",
+      "Defenseman",
+      "Center"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Which team is Sergei Bobrovsky most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "What position did Sergei Bobrovsky primarily play?",
+    "options": [
+      "Defenseman",
+      "Right winger",
+      "Goalie",
+      "Center"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Which team is Jonathan Toews most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "What position did Jonathan Toews primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Left winger",
+      "Defenseman"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Which team is Anze Kopitar most associated with?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "What position did Anze Kopitar primarily play?",
+    "options": [
+      "Left winger",
+      "Defenseman",
+      "Right winger",
+      "Center"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Which team is Mark Messier most associated with?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "What position did Mark Messier primarily play?",
+    "options": [
+      "Right winger",
+      "Defenseman",
+      "Center",
+      "Left winger"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Which team is Ray Bourque most associated with?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "What position did Ray Bourque primarily play?",
+    "options": [
+      "Goalie",
+      "Defenseman",
+      "Center",
+      "Left winger"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Which team is Dominik Hasek most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "What position did Dominik Hasek primarily play?",
+    "options": [
+      "Goalie",
+      "Center",
+      "Defenseman",
+      "Right winger"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Which team is Teemu Selanne most associated with?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "What position did Teemu Selanne primarily play?",
+    "options": [
+      "Center",
+      "Goalie",
+      "Left winger",
+      "Right winger"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Which team is Pavel Bure most associated with?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "What position did Pavel Bure primarily play?",
+    "options": [
+      "Right winger",
+      "Goalie",
+      "Center",
+      "Left winger"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Which team is Alexander Mogilny most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "What position did Alexander Mogilny primarily play?",
+    "options": [
+      "Right winger",
+      "Left winger",
+      "Center",
+      "Goalie"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Which team is Peter Forsberg most associated with?",
+    "options": [
+      "Colorado Avalanche",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "What position did Peter Forsberg primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Right winger"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Which team is Joe Sakic most associated with?",
+    "options": [
+      "New York Rangers",
+      "Colorado Avalanche",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "What position did Joe Sakic primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Which team is Steve Yzerman most associated with?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "What position did Steve Yzerman primarily play?",
+    "options": [
+      "Left winger",
+      "Right winger",
+      "Defenseman",
+      "Center"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Which team is Bobby Orr most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "What position did Bobby Orr primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Which team is Gordie Howe most associated with?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "What position did Gordie Howe primarily play?",
+    "options": [
+      "Goalie",
+      "Right winger",
+      "Left winger",
+      "Center"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Which team is Wayne Gretzky most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "What position did Wayne Gretzky primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Which team is Valeri Kharlamov most associated with?",
+    "options": [
+      "CSKA Moscow",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "What position did Valeri Kharlamov primarily play?",
+    "options": [
+      "Right winger",
+      "Center",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Which team is Vladislav Tretiak most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "CSKA Moscow"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "What position did Vladislav Tretiak primarily play?",
+    "options": [
+      "Goalie",
+      "Defenseman",
+      "Center",
+      "Right winger"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Which team is Bobby Hull most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "What position did Bobby Hull primarily play?",
+    "options": [
+      "Defenseman",
+      "Left winger",
+      "Right winger",
+      "Center"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Which team is Maurice Richard most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "What position did Maurice Richard primarily play?",
+    "options": [
+      "Goalie",
+      "Right winger",
+      "Left winger",
+      "Center"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Which team is Guy Lafleur most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "What position did Guy Lafleur primarily play?",
+    "options": [
+      "Right winger",
+      "Left winger",
+      "Center",
+      "Goalie"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Which team is Patrick Roy most associated with?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "What position did Patrick Roy primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Right winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Which team is Roberto Luongo most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "What position did Roberto Luongo primarily play?",
+    "options": [
+      "Goalie",
+      "Center",
+      "Right winger",
+      "Defenseman"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Which team is Ilya Kovalchuk most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "What position did Ilya Kovalchuk primarily play?",
+    "options": [
+      "Defenseman",
+      "Left winger",
+      "Right winger",
+      "Center"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Which team is Pavel Bure most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "What position did Pavel Bure primarily play?",
+    "options": [
+      "Right winger",
+      "Left winger",
+      "Center",
+      "Goalie"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Which team is Alexei Kovalev most associated with?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "What position did Alexei Kovalev primarily play?",
+    "options": [
+      "Left winger",
+      "Center",
+      "Goalie",
+      "Right winger"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Which team is Sergei Gonchar most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "What position did Sergei Gonchar primarily play?",
+    "options": [
+      "Defenseman",
+      "Left winger",
+      "Goalie",
+      "Center"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Which team is Viacheslav Fetisov most associated with?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "What position did Viacheslav Fetisov primarily play?",
+    "options": [
+      "Goalie",
+      "Defenseman",
+      "Center",
+      "Left winger"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Which team is Chris Chelios most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "What position did Chris Chelios primarily play?",
+    "options": [
+      "Defenseman",
+      "Center",
+      "Left winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Which team is Scott Stevens most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "What position did Scott Stevens primarily play?",
+    "options": [
+      "Defenseman",
+      "Goalie",
+      "Left winger",
+      "Center"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Which team is Paul Coffey most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "What position did Paul Coffey primarily play?",
+    "options": [
+      "Left winger",
+      "Goalie",
+      "Center",
+      "Defenseman"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Which team is Grant Fuhr most associated with?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "What position did Grant Fuhr primarily play?",
+    "options": [
+      "Center",
+      "Defenseman",
+      "Goalie",
+      "Right winger"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Which team is Mike Bossy most associated with?",
+    "options": [
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "What position did Mike Bossy primarily play?",
+    "options": [
+      "Left winger",
+      "Right winger",
+      "Goalie",
+      "Center"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Which team is Bryan Trottier most associated with?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "What position did Bryan Trottier primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Which team is Denis Potvin most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "What position did Denis Potvin primarily play?",
+    "options": [
+      "Left winger",
+      "Goalie",
+      "Center",
+      "Defenseman"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Which team is Cam Neely most associated with?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "What position did Cam Neely primarily play?",
+    "options": [
+      "Center",
+      "Left winger",
+      "Right winger",
+      "Goalie"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Which team is Adam Oates most associated with?",
+    "options": [
+      "Washington Capitals",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "What position did Adam Oates primarily play?",
+    "options": [
+      "Left winger",
+      "Center",
+      "Defenseman",
+      "Right winger"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Which team is Doug Gilmour most associated with?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "What position did Doug Gilmour primarily play?",
+    "options": [
+      "Center",
+      "Right winger",
+      "Defenseman",
+      "Left winger"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "What does KHL stand for?",
+    "options": [
+      "Kontinental Hockey League",
+      "Kazakh Hockey League",
+      "Korean Hockey League",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "The IIHF organizes:",
+    "options": [
+      "KHL playoffs",
+      "NHL draft",
+      "Stanley Cup",
+      "World Championship"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olympic hockey is played on:",
+    "options": [
+      "Ice",
+      "Sand",
+      "Grass",
+      "Concrete"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Which country won many world titles with Jagr and Hašek era stars?",
+    "options": [
+      "Finland",
+      "Czechia",
+      "Canada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Many NHL stars come from:",
+    "options": [
+      "Spain",
+      "Brazil",
+      "Sweden",
+      "India"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Finland is known for producing great:",
+    "options": [
+      "Goalies",
+      "Coaches only",
+      "Zamboni drivers",
+      "Referees"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "The Soviet \"Red Machine\" dominated in:",
+    "options": [
+      "1970s-80s",
+      "2000s",
+      "2010s",
+      "1990s only"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL teams select new players at the:",
+    "options": [
+      "Trade deadline",
+      "All-Star Game",
+      "World Cup",
+      "Entry Draft"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Three stars of the game are awarded:",
+    "options": [
+      "Once a season",
+      "Only in playoffs",
+      "Never in NHL",
+      "After each game"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Women's hockey is an Olympic sport since:",
+    "options": [
+      "1998",
+      "Never",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "In even strength, each team has how many skaters (no goalies)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "One NHL period lasts how many minutes?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Your team is on power play when opponent is:",
+    "options": [
+      "Icing puck",
+      "Pulling goalie",
+      "Shorthanded from penalty",
+      "Winning faceoff"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Penalty kill means:",
+    "options": [
+      "Overtime",
+      "Defending while short-handed",
+      "Extra attacker",
+      "Goalie fight"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Professional hockey is played on:",
+    "options": [
+      "Dirt",
+      "Grass",
+      "Ice",
+      "Water"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "The NHL championship trophy is the:",
+    "options": [
+      "World Cup",
+      "Olympic Cup",
+      "Stanley Cup",
+      "Gretzky Cup"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard won the most Stanley Cups as a player with:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Wayne Gretzky's famous jersey number was:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux wore number:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby wears number:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid wears number:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "How many teams are in the NHL (approx.)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "How many teams are in the NHL (approx.)? (advanced)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "A standard hockey bench has how many players dressed?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "A standard hockey bench has how many players dressed? (advanced)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Regulation time in NHL is how many minutes?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Regulation time in NHL is how many minutes? (advanced)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "How many officials typically on ice in NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "How many officials typically on ice in NHL? (advanced)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Maximum players on roster (approx.)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Maximum players on roster (approx.)? (advanced)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "A defenseman's main job in the defensive zone is to:",
+    "options": [
+      "Win faceoffs",
+      "Score goals first",
+      "Protect the net and slot",
+      "Change lines quickly"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "In one-on-one defense, the defender should:",
+    "options": [
+      "Skate to the bench immediately",
+      "Stay between attacker and net",
+      "Leave the slot open",
+      "Chase behind the net only"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Defensive stance: stick on the ice helps to:",
+    "options": [
+      "Signal timeout",
+      "Avoid hitting puck",
+      "Block passing lanes",
+      "Trip teammates"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "When the puck is lost in attack, a defenseman should:",
+    "options": [
+      "Pull goalie",
+      "Skate back to help defense",
+      "Stay at red line",
+      "Argue with referee"
+    ]
+  },
+  "theory_d_block": {
+    "question": "A defenseman should block shots when:",
+    "options": [
+      "Puck is in neutral zone only",
+      "Intermission starts",
+      "The lane to the net is open",
+      "Team is on power play"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "On a 2-on-1 against, the defenseman usually should:",
+    "options": [
+      "Both stay at the blue line",
+      "Both rush the puck carrier together",
+      "Take the puck carrier and angle him wide",
+      "Skate to the bench"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "On penalty kill, the priority is often to:",
+    "options": [
+      "Skate with puck up the middle alone",
+      "Change lines on the fly first",
+      "Hold puck in corner forever",
+      "Clear the puck out of the zone"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Good gap control means the defender:",
+    "options": [
+      "Never backs up",
+      "Only hits from behind",
+      "Matches speed and distance to the attacker",
+      "Stays at center ice always"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "In front of the net, a defenseman must:",
+    "options": [
+      "Skate to the point",
+      "Call for offside",
+      "Watch the puck only and ignore players",
+      "Box out and tie up opponents"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Under forecheck pressure, a defenseman's first look should be:",
+    "options": [
+      "Shoot at own net",
+      "First pass to low support or safe outlet",
+      "Always pass through the middle under pressure",
+      "Rim blindly around the boards"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "On power play at the point, a defenseman should:",
+    "options": [
+      "Skate back to neutral zone",
+      "Change with goalie",
+      "Keep puck in the zone and create shots/passes",
+      "Never shoot"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "A legal defensive play on a rush is:",
+    "options": [
+      "Legal angling and stick on puck side",
+      "Hook and pull opponent down",
+      "Stick-check from behind on a breakaway",
+      "Cross-check to the head"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Professional defensemen block shots because:",
+    "options": [
+      "It counts as an assist",
+      "Never block shots",
+      "Block shots and sacrifice body when needed",
+      "Referee stops play"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "When two attackers cross in your zone, defenders should:",
+    "options": [
+      "Both chase the puck only",
+      "Leave the crease",
+      "Communicate and switch if needed",
+      "Ignore the far-side attacker"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "When opponents dump the puck in, a defenseman should:",
+    "options": [
+      "Retrieve puck or pin it on the boards",
+      "Skate to bench for change",
+      "Wait for whistle",
+      "Shoot from red line"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "On a 3-on-2 rush, the back defender should usually:",
+    "options": [
+      "Cover the weak-side (backdoor) threat",
+      "Skate to the red line",
+      "Change lines",
+      "Pinch aggressively every time"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "A defenseman may pinch at the offensive blue line when:",
+    "options": [
+      "Team is shorthanded",
+      "Goalie is pulled",
+      "Partner covers and puck is recoverable at the boards",
+      "Always on first shift"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "If beaten wide on the rush, the defender should:",
+    "options": [
+      "Skate to the bench",
+      "Stop and argue with the referee",
+      "Turn and chase through the middle to the net",
+      "Hook from behind"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "In defensive zone coverage, low defender vs high defender means:",
+    "options": [
+      "Both at the point",
+      "Both in neutral zone",
+      "Both in the crease",
+      "Low on puck, high covers slot and backdoor"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "On an odd-man rush against, the key is:",
+    "options": [
+      "Take a penalty every time",
+      "Delay and force a bad angle or pass",
+      "Always dive to block",
+      "Leave the play for goalie alone"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "On penalty kill vs one-timer from the flank, the defender should:",
+    "options": [
+      "Stand in goalie crease",
+      "Skate to center for change",
+      "Take away the pass lane to the slot",
+      "Press the goalie"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Why is a blind rim around the boards often bad?",
+    "options": [
+      "It gives opponents a free retrieve",
+      "It is always offside",
+      "It always causes icing",
+      "Referee gives penalty"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "After a defensive-zone faceoff win, defensemen should:",
+    "options": [
+      "Wait five seconds",
+      "Read forecheck and use quick first pass",
+      "Always shoot from the point first",
+      "Skate to red line with puck"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Protecting a one-goal lead late, defensemen should:",
+    "options": [
+      "Always shoot from center",
+      "Pinch every time at blue line",
+      "Manage puck safely and avoid unnecessary risks",
+      "Pull goalie early always"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Man-on-man in the slot means:",
+    "options": [
+      "Ignore off-puck threats",
+      "Only chase the puck",
+      "Gap control",
+      "Man-on-man coverage on the puck carrier"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "At the offensive blue line, a defenseman holding the line tries to:",
+    "options": [
+      "Change with forward",
+      "Hold the blue line and keep puck in zone",
+      "Skate back to neutral zone",
+      "Cause offside intentionally always"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "After a save with a rebound in the slot, a defenseman must:",
+    "options": [
+      "Celebrate with goalie",
+      "Shoot at empty net",
+      "Skate to the bench",
+      "Clear the rebound or tie up the attacker"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "After icing (no-touch) in defensive zone, on the faceoff:",
+    "options": [
+      "Always rim the puck",
+      "Take minor penalty",
+      "Set structure and win clean exit",
+      "Pull goalie"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Against aggressive forecheck, a stretch pass is used to:",
+    "options": [
+      "Stop play for offside always",
+      "Waste time only",
+      "Guarantee icing",
+      "Beat the forecheck with a long pass"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Closing a shooting lane means:",
+    "options": [
+      "Getting body/stick in the path of the shot",
+      "Waving stick in the air only",
+      "Skating to the red line",
+      "Standing behind the net"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "When your partner pinches, you must:",
+    "options": [
+      "Skate to the bench",
+      "Leave the zone open",
+      "Also pinch immediately",
+      "Cover high as the last defender"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Leaving the penalty box, a defenseman should:",
+    "options": [
+      "Match the play and avoid being caught flat",
+      "Ignore the rush",
+      "Always change immediately",
+      "Skate straight to opponent net"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "With empty net against, defensemen in the last minute should:",
+    "options": [
+      "All forecheck deep",
+      "Pull own goalie too always",
+      "Block shots and protect the middle",
+      "Never clear the puck"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "If you cannot reach the puck carrier, you should:",
+    "options": [
+      "Give up and change",
+      "Leave the slot",
+      "Take away time and space with good positioning",
+      "Hook from behind"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Defending a controlled zone entry, the defender should:",
+    "options": [
+      "Skate backward to bench",
+      "Stand up at the line or gap early",
+      "Always retreat to the crease",
+      "Never touch the attacker"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "In the defensive zone, a hand pass by a defender to a teammate is:",
+    "options": [
+      "Allowed if completed in the same zone",
+      "Always icing",
+      "Always offside",
+      "Always a penalty shot"
+    ]
+  },
+  "theory_f_support": {
+    "question": "When a teammate has the puck, a forward should:",
+    "options": [
+      "Skate to the red line alone always",
+      "Ignore the puck on line change",
+      "Go to open ice for a pass",
+      "Stand still at the blue line"
+    ]
+  },
+  "theory_f_net": {
+    "question": "A winger near the net on a shot should:",
+    "options": [
+      "Skate to the bench",
+      "Go to the net for rebounds and tips",
+      "Only watch from the point",
+      "Wait at center ice"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "When possession is lost, forwards must:",
+    "options": [
+      "Change immediately off the ice",
+      "Argue with the referee",
+      "Stay in offensive zone",
+      "Backcheck and help defensively"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "On a rush, \"head-manning\" the puck means:",
+    "options": [
+      "Dump it high off the glass always",
+      "Stop at the red line",
+      "Head-man the puck (pass ahead)",
+      "Skate backward to own bench only"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Cycling the puck low in the offensive zone helps to:",
+    "options": [
+      "Guarantee icing",
+      "Force offside always",
+      "Create space for shot or pass",
+      "Waste time only"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "On a faceoff, the center's job is often to:",
+    "options": [
+      "All three forwards deep in the corner",
+      "Leave the circle early",
+      "Shoot immediately from the dot",
+      "Win the draw to a winger or D-man spot"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "In a 2-1-2 forecheck, F1 and F2 typically:",
+    "options": [
+      "Both chase behind the net only",
+      "Both change lines",
+      "F1 pressures, F2 takes away pass lane",
+      "Both stand at the red line"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "On power play, a forward at the net-front should:",
+    "options": [
+      "Skate to neutral zone",
+      "Cover the point on penalty kill",
+      "Take the net-front on power play",
+      "Never touch the puck"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "On a 3-on-2 rush, the third forward should:",
+    "options": [
+      "Skate to the bench",
+      "Stand in the crease",
+      "Stay high as third man on the rush",
+      "Chase the puck deep without support"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "On a rush, a winger with speed often should:",
+    "options": [
+      "Stop at the blue line every time",
+      "Pass backward to the goalie",
+      "Winger drives wide with speed on rush",
+      "Skate through the middle always"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "A key power-play role for a forward is to:",
+    "options": [
+      "Leave the slot open on defense",
+      "Always point shot only",
+      "Never go to the net",
+      "Screen the goalie on PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "On penalty kill, a forward often covers:",
+    "options": [
+      "Cover the point on penalty kill",
+      "The referee",
+      "Take the net-front on power play",
+      "The Zamboni driver"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "To avoid an offside at the blue line, a forward can:",
+    "options": [
+      "Skate backward into the zone",
+      "Jump over the blue line",
+      "Stay onside by delaying zone entry",
+      "Enter the zone before the puck always"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Setting up a one-timer usually requires:",
+    "options": [
+      "One-timer setup: pass to open shooter",
+      "Rim the puck around without looking",
+      "Always deke on a penalty shot",
+      "Dump and chase without forechecking plan"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "After a point shot on power play, forwards should:",
+    "options": [
+      "All change lines at once",
+      "Wave to the crowd",
+      "Crash the net after shot from point",
+      "Skate to neutral zone"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "In offensive zone structure, the center often:",
+    "options": [
+      "Never enters the slot",
+      "All three forwards deep in the corner",
+      "Center supports low, wing stays high",
+      "Only covers the point"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "On a breakout, weak-side forward support means:",
+    "options": [
+      "Support from the weak side on D-zone exit",
+      "Stand still at red line",
+      "Shoot at own net",
+      "Skate to opponent bench for change"
+    ]
+  },
+  "theory_g_track": {
+    "question": "A goalie should always try to:",
+    "options": [
+      "Track the puck through traffic",
+      "Stand at the red line",
+      "Watch only the shooter's eyes",
+      "Leave the net for a line change"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "When the puck is loose in the crease, the goalie should:",
+    "options": [
+      "Freeze the puck to stop play",
+      "Shoot at the empty net",
+      "Skate to center ice and celebrate",
+      "Pass to the referee"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "After a save, ideal rebound control is:",
+    "options": [
+      "Rebound control to safe area",
+      "Rebound to the slot always",
+      "Rebound over the glass always",
+      "Ignore the rebound"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "On odd-man rushes, the goalie should:",
+    "options": [
+      "Stay silent always",
+      "Watch the crowd",
+      "Skate to the bench",
+      "Goalie talks on odd-man rushes"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "In the NHL, the goalie may play the puck behind the net only in:",
+    "options": [
+      "Offensive zone",
+      "Play puck only in the trapezoid behind net",
+      "Full defensive zone",
+      "Neutral zone only"
+    ]
+  },
+  "theory_g_post": {
+    "question": "On a lateral pass across the crease, the goalie uses:",
+    "options": [
+      "Always stand on one post only",
+      "Leave the net",
+      "Post-to-post movement on lateral passes",
+      "Skate to the blue line"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Good angle play means the goalie:",
+    "options": [
+      "Challenges to the red line",
+      "Stands deep in the crease always",
+      "Angle cut to reduce net visibility",
+      "Turns back to the shooter"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "The goalie's \"house\" to protect is mainly:",
+    "options": [
+      "Protect the house (slot area)",
+      "The Zamboni door",
+      "Center ice circle",
+      "The penalty box"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "On a breakaway, many goalies prefer to:",
+    "options": [
+      "Skate toward the bench",
+      "Close eyes and hope",
+      "Match the shooter and read the release",
+      "Challenge to the top of the circles always"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "On a wraparound attempt, the goalie should:",
+    "options": [
+      "Leave the near post open",
+      "Skate to the point",
+      "Play the puck in the corner",
+      "Hold the post on short-side wrap"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "If a goalie plays the puck behind the net OUTSIDE the trapezoid, it is:",
+    "options": [
+      "Legal play always",
+      "Icing call",
+      "Delay of game penalty",
+      "Automatic goal"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "When the puck is screened, the goalie should:",
+    "options": [
+      "Leave the crease",
+      "Signal offside",
+      "Give up the short side always",
+      "Find the puck through traffic or adjust position"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "A goalie poke check must be:",
+    "options": [
+      "Poke check only from front legally",
+      "With a high stick to the face",
+      "From behind the shooter always",
+      "While standing at center ice"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "On a long lead pass, the goalie often:",
+    "options": [
+      "Skates to the opponent's bench",
+      "Ignores the play",
+      "Shoots at the ref",
+      "Stops or plays the puck legally behind the net"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Hockey intelligence means every player should:",
+    "options": [
+      "Every player helps on defense",
+      "Only goalies talk",
+      "Only defensemen backcheck",
+      "Only forwards score"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Keeping your stick on the ice helps you:",
+    "options": [
+      "Block passing lanes and receive passes",
+      "Signal icing",
+      "Avoid the puck",
+      "Trip yourself faster"
+    ]
+  },
+  "theory_t_change": {
+    "question": "A smart line change usually happens:",
+    "options": [
+      "On the fly when play allows",
+      "Never on the fly",
+      "During a breakaway against",
+      "Always in the offensive zone only"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Before switching defensive marks, players should:",
+    "options": [
+      "Always yell at the referee",
+      "Change without looking",
+      "Communicate before switching marks",
+      "Never talk on the ice"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Changing lines on the wrong side of the ice can:",
+    "options": [
+      "Guarantee a goal",
+      "Always help the team",
+      "Cause too many men or bad timing",
+      "Stop the clock"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Reading the play means:",
+    "options": [
+      "Ignore teammates",
+      "Never change structure",
+      "Watch only the puck always",
+      "Anticipate where puck and opponents go next"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Second-man support on the puck means:",
+    "options": [
+      "Skate away from the puck",
+      "Only watch the goalie",
+      "Stand at the red line",
+      "Match speed and support the puck carrier"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Strong-side and weak-side refer to:",
+    "options": [
+      "Side where puck is vs opposite side",
+      "Home and away teams",
+      "First and second period",
+      "Left and right handed players only"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "On power play, structure matters because:",
+    "options": [
+      "Movement opens lanes and stretches the PK",
+      "Standing still is best",
+      "Only one player should touch the puck",
+      "Offside does not matter"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Penalty kill \"box + one\" often means:",
+    "options": [
+      "All five chase the puck",
+      "All five stand at the red line",
+      "No structure needed",
+      "Four in a box, one pressuring the puck"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Cheating on a faceoff (timing) means:",
+    "options": [
+      "Timing the drop to win the puck early",
+      "Kick the opponent's stick",
+      "Enter the circle before the puck",
+      "Leave the faceoff dot"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Protecting a lead late, smart teams:",
+    "options": [
+      "Take risks every shift",
+      "Always pull goalie in first period",
+      "Never clear the zone",
+      "Manage puck and avoid unnecessary penalties"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Coaches change lines for matchups to:",
+    "options": [
+      "Get favorable player-vs-player situations",
+      "Guarantee offside",
+      "Avoid all faceoffs",
+      "Waste time only"
+    ]
+  },
+  "ref_goal": {
+    "question": "When a goal is scored, the referee typically:",
+    "options": [
+      "Point to center ice",
+      "Signal a delayed penalty",
+      "Form a T with hands",
+      "Signal icing is waived off"
+    ]
+  },
+  "ref_timeout": {
+    "question": "A timeout signal looks like:",
+    "options": [
+      "Hands form a T",
+      "Point to center ice",
+      "Six fingers shown",
+      "Both fists pushing forward"
+    ]
+  },
+  "ref_delayed": {
+    "question": "A delayed penalty is shown by the referee with:",
+    "options": [
+      "Goal scored signal",
+      "Timeout T signal",
+      "Wash out icing signal",
+      "One arm raised straight up"
+    ]
+  },
+  "ref_minor": {
+    "question": "When calling a minor penalty, the referee often signals with:",
+    "options": [
+      "Open palm toward penalty box",
+      "Arm across chest only",
+      "Hands form a T",
+      "Point to center ice for a goal"
+    ]
+  },
+  "ref_offside": {
+    "question": "An offside call by the referee is often signaled with:",
+    "options": [
+      "Point to center ice",
+      "Six fingers shown",
+      "Closed fist pumping motion",
+      "Chopping motion parallel to the ice"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "A hand pass violation signal is often:",
+    "options": [
+      "Closed fist pumping motion",
+      "Both arms crossed for fighting",
+      "Open palm to penalty box",
+      "Point to center ice"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "High-sticking penalty signal: referee often touches:",
+    "options": [
+      "Palm to own face/jaw area",
+      "The goal post",
+      "The puck",
+      "Own knee only"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Too many men on the ice is signaled by showing:",
+    "options": [
+      "One arm straight up only",
+      "Point to center ice",
+      "Hands form a T",
+      "Six fingers shown"
+    ]
+  },
+  "ref_tripping": {
+    "question": "A tripping penalty signal often looks like:",
+    "options": [
+      "Tripping signal (leg sweep motion)",
+      "Hands form a T",
+      "Point to center ice",
+      "Both fists pushing forward"
+    ]
+  },
+  "ref_hooking": {
+    "question": "A hooking penalty signal often looks like:",
+    "options": [
+      "Six fingers",
+      "Chopping parallel to ice",
+      "Hooking signal (pulling motion)",
+      "Closed fist pumping"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Cross-checking signal by the referee is often:",
+    "options": [
+      "Both fists pushing forward",
+      "Point to center ice",
+      "Hands form a T",
+      "Palm to face only"
+    ]
+  },
+  "ref_fighting": {
+    "question": "A fighting major is often signaled with:",
+    "options": [
+      "Chopping offside motion",
+      "Fighting major (both arms crossed)",
+      "One arm up for delayed penalty",
+      "Open palm to box only"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "When awarding a penalty shot, the referee typically:",
+    "options": [
+      "Shows timeout T",
+      "Washes out icing",
+      "Points to center ice for penalty shot",
+      "Shows six fingers"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "When waving off a goal, the referee may:",
+    "options": [
+      "Goal disallowed signal (cross arms then wave off)",
+      "Point to center for a goal",
+      "Raise arm for delayed penalty only",
+      "Show timeout T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Delay of game (puck over glass) signal is often:",
+    "options": [
+      "Tripping leg sweep",
+      "Delay of game (referee pats imaginary glass)",
+      "Fighting arms crossed",
+      "Hooking pull motion"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "A linesman signals offside by:",
+    "options": [
+      "Open palm to penalty box",
+      "Form a T for timeout",
+      "Point to center ice for goal",
+      "Linesman both arms up (offside)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "When icing is waved off (e.g. on PK), linesman may:",
+    "options": [
+      "Cross arms for fighting",
+      "Signal icing is waived off",
+      "Point to center for a goal",
+      "Show six fingers"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "A double minor penalty may be shown with:",
+    "options": [
+      "T for timeout",
+      "One arm straight up only",
+      "Double minor (two fingers)",
+      "Six fingers for too many men"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Boarding penalty signal often involves:",
+    "options": [
+      "T for timeout",
+      "Point to center for goal",
+      "Closed fist for hand pass",
+      "Boarding penalty signal (arms pushing)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "During a delayed penalty signal, play continues because:",
+    "options": [
+      "Goal was scored",
+      "Icing was completed",
+      "Timeout was called",
+      "Delayed penalty (play continues)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "The opponent starts an attack through the center. What should the center do?",
+    "options": [
+      "Return to the center of your zone and help the defensemen",
+      "Stand by the boards",
+      "Change lines for no reason",
+      "Skate to the opponent's net"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "An opponent behind the net tries to score with a lacrosse-style wrap. What should the goalie do?",
+    "options": [
+      "Skate out to the center of the zone",
+      "Watch the crowd",
+      "Stay tight to the far post and watch the stick",
+      "Lie face down on the ice"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "You are a defenseman facing a 2-on-1 rush. What matters most?",
+    "options": [
+      "Take away the pass",
+      "Attack the puck carrier immediately",
+      "Watch only the puck",
+      "Skate to the bench for a line change"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "You are a winger and the first player entering the offensive zone. What should you do?",
+    "options": [
+      "Pressure the defenseman with the puck",
+      "Stand at the blue line",
+      "Skate in circles",
+      "Skate straight to the bench"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Your team is on the power play. Where is the center usually positioned?",
+    "options": [
+      "At your own blue line",
+      "On the bench",
+      "Behind your own net",
+      "In front of the net"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "You lost the puck in the offensive zone. What should you do next?",
+    "options": [
+      "Immediately join the forecheck",
+      "Skate back slowly",
+      "Argue with the referee",
+      "Look at the coach"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "The center lost the faceoff. What comes next?",
+    "options": [
+      "Skate into the attack",
+      "Help on defense right away",
+      "Take off your helmet",
+      "Stop moving"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "The puck is along the boards in your zone. What should the second player do?",
+    "options": [
+      "Support your partner nearby",
+      "Stand still",
+      "Watch the stands",
+      "Skate to the opponent's net"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "What is most important on a 3-on-2 rush?",
+    "options": [
+      "Everyone skate to the same spot",
+      "Shoot from any position",
+      "Stop at the blue line",
+      "Stretch the defense with passes"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "After a shot the puck bounced in front of the net. What should the goalie do?",
+    "options": [
+      "Raise the stick in the air",
+      "Find the puck and cover it",
+      "Skate behind the net",
+      "Look at the coach"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "When is the best time to change lines?",
+    "options": [
+      "When your team controls the puck",
+      "When the opponent is attacking",
+      "When the puck is in front of the net",
+      "During a dangerous scoring chance"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "What should a defenseman do when under heavy forecheck pressure?",
+    "options": [
+      "Stand still with the puck",
+      "Shoot the puck to the middle of the zone",
+      "Fall to the ice",
+      "Make a quick, accurate first pass"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "What is important to do when you don't have the puck?",
+    "options": [
+      "Look at the ceiling",
+      "Hold the stick with one hand only",
+      "Get open for a pass",
+      "Stand in one spot"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Which breakout is considered the most reliable?",
+    "options": [
+      "Losing the puck",
+      "With a short, accurate pass",
+      "A blind dump",
+      "A pass through the middle of your zone"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "What is most important on the penalty kill?",
+    "options": [
+      "Block passing lanes",
+      "Attack constantly",
+      "Skate without a structure",
+      "Play only along the boards"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "When can a defenseman join the rush?",
+    "options": [
+      "Always",
+      "Only in overtime",
+      "Never",
+      "When his partner covers his position"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Why is a pass through the slot dangerous?",
+    "options": [
+      "Officials cannot see it",
+      "It slows the game down",
+      "It can lead to a goal",
+      "It is always illegal"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "When should a goalie play the puck behind the net?",
+    "options": [
+      "To leave the ice",
+      "To help defensemen start the breakout",
+      "To rest",
+      "To argue with officials"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Why does a forward drive to the far post?",
+    "options": [
+      "For rebounds and one-timers",
+      "To stay out of the play",
+      "To rest",
+      "To get in a teammate's way"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "What should a defenseman do before shooting from the point?",
+    "options": [
+      "Check for traffic in front of the net",
+      "Shoot straight into the boards",
+      "Close his eyes",
+      "Dekes backward"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Who should battle first for the puck after a faceoff?",
+    "options": [
+      "Only the goalie",
+      "No one",
+      "The nearest player",
+      "Only the defenseman"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Why is puck control important?",
+    "options": [
+      "The opponent cannot attack without the puck",
+      "You can skate less",
+      "Officials award points for it",
+      "It looks good"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "What matters most in a corner battle?",
+    "options": [
+      "A high shot",
+      "Jumping",
+      "Skating backward only",
+      "Body position and stick placement"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "What is the best way to get open?",
+    "options": [
+      "Move into open space",
+      "Into a blind corner",
+      "Skate behind a teammate's back",
+      "By standing still"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "What should a forward do after taking a shot?",
+    "options": [
+      "Change lines immediately",
+      "Watch the scoreboard",
+      "Go to the net for a rebound",
+      "Stand still"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "What is most important for a defenseman in the slot?",
+    "options": [
+      "Stay far from the net",
+      "Play without a stick",
+      "Prevent opponents from getting to rebounds",
+      "Watch only the goalie"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "What is the best way to enter the zone?",
+    "options": [
+      "Without speed",
+      "Skating backward into the zone",
+      "Through the middle with no support",
+      "With puck control"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "When is a backhand shot useful?",
+    "options": [
+      "Only in practice",
+      "Never",
+      "When there is no time to move the puck to the forehand",
+      "Only for defensemen"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Why is the center important in attack?",
+    "options": [
+      "He always stands still",
+      "He never makes passes",
+      "He connects the whole line",
+      "He never plays defense"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "What matters in 1-on-1 defensive play?",
+    "options": [
+      "Jump on the opponent immediately",
+      "Watch the stands",
+      "Skate backward with no control",
+      "Control gap and angle"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Your line had a long offensive shift. The opponent defenseman recovered the puck behind the net but looks tired. Your line has been on the ice a long time too. What is best?",
+    "options": [
+      "Keep forechecking aggressively with the full line",
+      "Fall back to the neutral zone with no pressure",
+      "One forward keeps pressing while the others change",
+      "The whole line changes at once"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Why is a pass backward sometimes useful?",
+    "options": [
+      "To lose momentum",
+      "To avoid attacking",
+      "To keep possession",
+      "To stop play"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "What matters when blocking a shot?",
+    "options": [
+      "Block the puck's path",
+      "Jump upward",
+      "Turn your back",
+      "Look down"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "How should a defenseman play against a fast forward?",
+    "options": [
+      "Keep skating forward without stopping",
+      "Play too tight every time",
+      "Stand still",
+      "Do not give him open ice"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "When is a one-timer most effective?",
+    "options": [
+      "When the shooter is not ready",
+      "Only in practice",
+      "When the goalie cannot get set in time",
+      "When the puck is stationary"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Why is communication on the ice important?",
+    "options": [
+      "It distracts the opponent",
+      "It replaces skating",
+      "It helps teammates make decisions faster",
+      "Officials like it"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "How should you play a 2-on-0 rush?",
+    "options": [
+      "Make the goalie move with a pass",
+      "Stop in front of the net",
+      "Shoot from far out",
+      "Lose the puck"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Why do forwards use the space behind the net?",
+    "options": [
+      "To hide from the play",
+      "To stop the play",
+      "To avoid shooting",
+      "To stretch the defense"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Why is it important to stay calm?",
+    "options": [
+      "It affects the ice",
+      "It makes the net smaller",
+      "It helps you make better decisions",
+      "It makes the puck faster"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "What should a defenseman do at the offensive blue line?",
+    "options": [
+      "Keep the puck in the zone",
+      "Stand in the middle only",
+      "Ignore teammates",
+      "Always retreat"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "What makes a rebound dangerous?",
+    "options": [
+      "The player stands still",
+      "The puck becomes lighter",
+      "The referee cannot see the puck",
+      "The goalie does not always control the rebound"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Why is changing the direction of attack useful?",
+    "options": [
+      "It hurts your own team",
+      "It slows the game down",
+      "It creates open areas",
+      "It tires the officials"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "What matters on an offensive-zone faceoff?",
+    "options": [
+      "Skate back immediately",
+      "Win puck possession quickly",
+      "Watch the scoreboard",
+      "Do not move"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "What does it mean to cover for a teammate?",
+    "options": [
+      "Fill his position when he joins the rush",
+      "Only play offense",
+      "Copy his exact route",
+      "Stand next to him without moving"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "If a defenseman loses position, what should he do?",
+    "options": [
+      "Watch only the puck",
+      "Argue with a teammate",
+      "Stop skating",
+      "Get back on defense quickly"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Why do players often shoot low?",
+    "options": [
+      "It is slower",
+      "Because high shots are illegal",
+      "For deflections and rebounds",
+      "It is easier for officials"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "When is a long pass especially useful?",
+    "options": [
+      "In a crowd of players",
+      "During a line change",
+      "On a fast counterattack",
+      "With no target"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Why is movement without the puck important?",
+    "options": [
+      "It creates passing options",
+      "It is only for defensemen",
+      "It does not affect the game",
+      "It gets in teammates' way"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "When can a shot from a sharp angle be useful?",
+    "options": [
+      "Only on the power play",
+      "Only on the penalty kill",
+      "Never",
+      "For an unexpected rebound"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Why is screening the goalie important?",
+    "options": [
+      "The referee cannot see the puck",
+      "It is harder for him to see the shot",
+      "The goalie stops moving",
+      "It makes the attack look better"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "What helps you intercept passes?",
+    "options": [
+      "Reading the play",
+      "Luck alone",
+      "Skating slowly",
+      "Playing without a stick"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "How do you pin an opponent along the boards correctly?",
+    "options": [
+      "Push him in the back",
+      "With your eyes closed",
+      "With your hands and no stick",
+      "Use your body and stick while controlling the puck"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "What matters when a defenseman comes out from behind the net?",
+    "options": [
+      "Look up and find a pass",
+      "Skate slowly",
+      "Shoot the puck immediately",
+      "Look only at the ice"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Why do teams sometimes slow the game down?",
+    "options": [
+      "To lose the puck",
+      "To keep possession and energy",
+      "To avoid attacking",
+      "To stop the game"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Who is a second-wave player?",
+    "options": [
+      "A referee",
+      "The backup goalie",
+      "A player who joins the attack later",
+      "The slowest player"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Why are quick short passes effective?",
+    "options": [
+      "They are always slow",
+      "They hurt the attack",
+      "They are only for defensemen",
+      "They are harder for opponents to steal"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "What should a goalie do after making a save?",
+    "options": [
+      "Quickly track the puck",
+      "Skate to the boards",
+      "Take off his glove",
+      "Look at the scoreboard"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "When is an attack through the middle especially dangerous?",
+    "options": [
+      "When one player is alone",
+      "When there is speed and support",
+      "When there is no puck",
+      "When everyone stands still"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "What helps you make decisions faster?",
+    "options": [
+      "Skating slowly",
+      "Watch only the puck",
+      "Constantly scanning the ice",
+      "Play without talking"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "What does a good captain do?",
+    "options": [
+      "Supports the team and leads by example",
+      "Plays only offense",
+      "Yells at everyone",
+      "Never plays defense"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "What helps you escape forecheck pressure?",
+    "options": [
+      "Playing alone",
+      "Moving the puck quickly",
+      "Holding the puck for a long time",
+      "Stopping along the boards"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Why can you not hesitate at the blue line?",
+    "options": [
+      "The goalie will get tired",
+      "The ice will get worse",
+      "You can lose the zone",
+      "The referee will stop play"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Why is a shot right after a pass dangerous?",
+    "options": [
+      "It is always weak",
+      "It is hard to execute",
+      "The referee will disallow the goal",
+      "The goalie is not set in time"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Who should get back first after losing the puck?",
+    "options": [
+      "The nearest player",
+      "Only the center",
+      "Only the defenseman",
+      "Only the goalie"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "How should a defenseman play against a hard shooter?",
+    "options": [
+      "Watch only the goalie",
+      "Reduce his time and space to shoot",
+      "Give him open space",
+      "Stand far away"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Why is the puck often moved to the corner in defense?",
+    "options": [
+      "Officials cannot see the play",
+      "The ice is slower there",
+      "There is less danger to the net",
+      "It is easier to score there"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "What does a forward do in front of the net?",
+    "options": [
+      "Stands with his back to the play",
+      "Skates to the boards",
+      "Does not move",
+      "Creates traffic and hunts rebounds"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Why is it important to play with your head up?",
+    "options": [
+      "To see teammates and opponents",
+      "To make the puck lighter",
+      "To skate faster",
+      "So officials can see you"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "What matters most after winning a PK faceoff?",
+    "options": [
+      "Try to deke through everyone",
+      "Take a long pause",
+      "Clear the puck out of the zone",
+      "Stand still"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Why is it important to pressure opposing defensemen?",
+    "options": [
+      "It hurts your team",
+      "It does not affect the game",
+      "It stops the game",
+      "It can force a mistake"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "When is a touch pass useful?",
+    "options": [
+      "To develop the attack quickly",
+      "When the player is standing still",
+      "When there are no teammates",
+      "Only in defense"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "What should the center do in front of his own net?",
+    "options": [
+      "Wait for a pass up ice",
+      "Skate to the neutral zone",
+      "Help defensemen cover the slot",
+      "Stand by the boards"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Why is criss-cross movement by forwards effective?",
+    "options": [
+      "It confuses defenders",
+      "It hurts your own team",
+      "It slows the attack",
+      "It is illegal"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "What matters when battling for a loose puck?",
+    "options": [
+      "Hold the puck for a long time",
+      "Stand still",
+      "Look down",
+      "Decide quickly what to do next"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Why do players change speed?",
+    "options": [
+      "To stop skating",
+      "To lose the puck",
+      "To beat an opponent",
+      "To get tired faster"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "There are 40 seconds left. You lead by one goal. The opponent is playing 6-on-5. Their defenseman has the puck at the blue line and your winger can jump for a steal. What is best?",
+    "options": [
+      "Fly at the puck aggressively right away",
+      "Track only the net-front player",
+      "Press only with a controlled angle to take the puck",
+      "Collapse completely to the net"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "When can a goalie come far out of his net?",
+    "options": [
+      "To intercept the puck and help the defense",
+      "Never",
+      "Always",
+      "Only after a goal"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "What matters for a successful rebound attempt?",
+    "options": [
+      "A big wind-up",
+      "Stand far from the net",
+      "Slow movement",
+      "Quick reaction"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Why is second-player support important?",
+    "options": [
+      "It creates extra options",
+      "It is only for defensemen",
+      "It is not needed",
+      "It hurts the attack"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "What does \"reading the play\" mean?",
+    "options": [
+      "Anticipate what opponents will do",
+      "Count passes",
+      "Follow only the puck",
+      "Watch the scoreboard"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Why is it important to protect the puck with your body?",
+    "options": [
+      "It makes the ice faster",
+      "It is only for defensemen",
+      "It affects the referee",
+      "It helps shield the puck"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "When is a breakout along the boards useful?",
+    "options": [
+      "Never",
+      "Always",
+      "When the middle is covered",
+      "Only on the power play"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "What matters when defending against a power play?",
+    "options": [
+      "Constant dekes",
+      "Stay compact defensively",
+      "Slow line changes",
+      "Playing one-on-one everywhere"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "What is a pass for a shot?",
+    "options": [
+      "A pass to a player in a good shooting position",
+      "A pass back to the goalie",
+      "A random pass",
+      "A pass to the corner"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Why is a deke before a shot useful?",
+    "options": [
+      "It always slows the attack",
+      "It is illegal",
+      "It is only for defensemen",
+      "It can move the goalie or a defender"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "After blocking a shot, a player should:",
+    "options": [
+      "Immediately look for the puck",
+      "Stand still",
+      "Look at the referee",
+      "Leave the ice"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "How do forwards help defensemen?",
+    "options": [
+      "Stay in the offensive zone",
+      "Backcheck and get open for a pass",
+      "Play only along the boards",
+      "Do not play defense"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "What helps against heavy forechecking?",
+    "options": [
+      "Quick decisions and puck movement",
+      "Skating slowly",
+      "Playing alone",
+      "Long puck possession"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "When is a stick deflection useful?",
+    "options": [
+      "Never",
+      "Only in practice",
+      "Only in defense",
+      "To redirect the puck"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "What matters when attacking along the boards?",
+    "options": [
+      "Passing back to the goalie",
+      "Support from a nearby teammate",
+      "Playing alone",
+      "Stopping movement"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "What matters for a goalie on a breakaway?",
+    "options": [
+      "Keep good positioning and patience",
+      "Drop to the ice immediately",
+      "Skate backward",
+      "Watch the defensemen"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "What matters on a fast transition to offense?",
+    "options": [
+      "Slow passes",
+      "Long puck possession",
+      "Stopping at the blue line",
+      "Speed of decision-making"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "What does a defenseman do on the power play?",
+    "options": [
+      "Skates to the net",
+      "Does not join the attack",
+      "Moves the puck and looks for a shot",
+      "Stands still"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Why is traffic in front of the net dangerous?",
+    "options": [
+      "The puck gets slower",
+      "The goalie has a harder time seeing the puck",
+      "The referee cannot count players",
+      "Players get tired faster"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "What matters after intercepting the puck?",
+    "options": [
+      "Transition quickly to offense",
+      "Stop skating",
+      "Dump the puck right away",
+      "Skate to the boards"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "What is especially important in overtime?",
+    "options": [
+      "Constant long shots",
+      "Playing without passes",
+      "Long shifts",
+      "Puck control and few mistakes"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "What should a defenseman do if an opponent screens the goalie?",
+    "options": [
+      "Look at the referee",
+      "Skate to the boards",
+      "Clear the slot and tie up the opponent",
+      "Stand nearby without moving"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Why is team play more important than individual play?",
+    "options": [
+      "The team does not affect the result",
+      "A line creates more chances together",
+      "One player always decides the game",
+      "Passes hurt the game"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "What matters before taking a shot?",
+    "options": [
+      "Quickly read the goalie's position",
+      "Look only down at the puck",
+      "Come to a full stop",
+      "Close your eyes"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "What best develops hockey IQ?",
+    "options": [
+      "Strength training only",
+      "Watching goals only",
+      "Skating only",
+      "Studying the game, practice, and understanding situations"
+    ]
+  }
+}

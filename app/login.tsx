@@ -2,7 +2,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    ImageBackground,
     Keyboard,
     Platform,
     StyleSheet,
@@ -13,14 +12,15 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CachedBackground from '../components/CachedBackground';
 import CustomAlert from '../components/CustomAlert';
 import WebTextInput from '../components/WebTextInput';
 import { saveCurrentUser, getPlayerByPhone, getPlayerByEmail } from '../utils/playerStorage';
+import { isSupabaseNetworkError } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
-
-const iceBg = require('../assets/images/led.jpg');
+import { ICE_BACKGROUND } from '../utils/iceBackground';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -83,11 +83,6 @@ export default function LoginScreen() {
     }
   }, [currentUser, router]);
 
-  // Не показываем форму входа, пока идет проверка авторизации
-  if (isUserLoading) {
-    return null;
-  }
-
   const closeAlert = () => {
     setAlert({ ...alert, visible: false });
   };
@@ -108,6 +103,29 @@ export default function LoginScreen() {
       // Во всех остальных случаях просто закрываем алерт
       closeAlert();
     }
+  };
+
+  const showAuthError = (
+    error: unknown,
+    fallbackTitle: string,
+    fallbackMessage: string
+  ) => {
+    if (isSupabaseNetworkError(error)) {
+      setAlert({
+        visible: true,
+        title: t('auth.networkError'),
+        message: t('auth.networkErrorMessage'),
+        type: 'error',
+      });
+      return;
+    }
+
+    setAlert({
+      visible: true,
+      title: fallbackTitle,
+      message: error instanceof Error ? error.message : fallbackMessage,
+      type: 'error',
+    });
   };
 
   // Обработчик ввода для телефона или email
@@ -225,12 +243,7 @@ export default function LoginScreen() {
         
       } catch (error) {
         console.error('❌ Ошибка административного входа:', error);
-        setAlert({
-          visible: true,
-          title: 'Ошибка входа',
-          message: 'Ошибка при входе в аккаунт',
-          type: 'error'
-        });
+        showAuthError(error, 'Ошибка входа', 'Ошибка при входе в аккаунт');
       } finally {
         setLoading(false);
       }
@@ -338,12 +351,11 @@ export default function LoginScreen() {
       
     } catch (error) {
       console.error('❌ Ошибка отправки кода:', error);
-      setAlert({
-        visible: true,
-        title: t('auth.errorSendingCode'),
-        message: error instanceof Error ? error.message : t('auth.errorSendingCodeMessage'),
-        type: 'error'
-      });
+      showAuthError(
+        error,
+        t('auth.errorSendingCode'),
+        t('auth.errorSendingCodeMessage')
+      );
     } finally {
       setLoading(false);
     }
@@ -384,12 +396,11 @@ export default function LoginScreen() {
       });
     } catch (error) {
       console.error('❌ Ошибка повторной отправки кода:', error);
-      setAlert({
-        visible: true,
-        title: t('auth.errorResendingCode'),
-        message: error instanceof Error ? error.message : t('auth.errorResendingCodeMessage'),
-        type: 'error'
-      });
+      showAuthError(
+        error,
+        t('auth.errorResendingCode'),
+        t('auth.errorResendingCodeMessage')
+      );
     } finally {
       setLoading(false);
     }
@@ -427,7 +438,16 @@ export default function LoginScreen() {
           : await verifySMSCode(cleanedContact, code); // SMS - через Twilio Verify
         
         if (!verificationResult.success) {
-          throw new Error(verificationResult.message || 'Неверный код подтверждения');
+          const errorMessage = verificationResult.translationKey
+            ? t(verificationResult.translationKey)
+            : (verificationResult.message || t('auth.errorVerifyingCodeMessage'));
+          setAlert({
+            visible: true,
+            title: t('common.error'),
+            message: errorMessage,
+            type: 'error',
+          });
+          return;
         }
       } else {
         // Для bypass и админ-кода логируем успешный обход
@@ -479,12 +499,11 @@ export default function LoginScreen() {
       
     } catch (error) {
       console.error('❌ Ошибка проверки кода:', error);
-      setAlert({
-        visible: true,
-        title: t('auth.errorVerifyingCode'),
-        message: t('auth.errorVerifyingCodeMessage'),
-        type: 'error'
-      });
+      showAuthError(
+        error,
+        t('auth.errorVerifyingCode'),
+        t('auth.errorVerifyingCodeMessage')
+      );
     } finally {
       setLoading(false);
     }
@@ -497,15 +516,16 @@ export default function LoginScreen() {
     }
   }, [formData.code]);
 
+  // Не показываем форму входа, пока идет проверка авторизации
+  // (после всех хуков, чтобы не нарушать их порядок)
+  if (isUserLoading) {
+    return null;
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <View style={styles.hockeyRinkContainer}>
-          <ImageBackground 
-            source={iceBg}
-            style={styles.hockeyRink}
-            resizeMode="cover"
-          >
+        <CachedBackground source={ICE_BACKGROUND} style={styles.hockeyRink} resizeMode="cover">
             {/* Внутренняя граница хоккейной коробки */}
             <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
             
@@ -669,8 +689,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </ImageBackground>
-        </View>
+        </CachedBackground>
 
         {/* Кастомный алерт */}
         <CustomAlert
@@ -690,10 +709,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#050008',
-  },
-  hockeyRinkContainer: {
-    flex: 1,
-    // Убираем отступы
   },
   hockeyRink: {
     flex: 1,

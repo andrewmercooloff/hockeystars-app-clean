@@ -1,8 +1,9 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
-    Alert,
+    ActivityIndicator,
     FlatList,
+    type FlatList as FlatListType,
     ImageBackground,
     ListRenderItemInfo,
     StyleSheet,
@@ -10,9 +11,11 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import LoadingCenter from '../components/LoadingCenter';
+import { useAppAlert } from '../hooks/useAppAlert';
+import { colors } from '../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../components/BlurOrSolid';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StatsChangeNotification from '../components/StatsChangeNotification';
@@ -24,6 +27,7 @@ import FriendRequestNotification from '../components/FriendRequestNotification';
 import GiftRequestNotification from '../components/GiftRequestNotification';
 import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
 import VideoAddedNotification from '../components/VideoAddedNotification';
+import { sortVideoUrlsNewestFirst } from '../utils/videoUrls';
 import AvatarChangedNotification from '../components/AvatarChangedNotification';
 import AchievementAddedNotification from '../components/AchievementAddedNotification';
 import PuckSpeedChangedNotification from '../components/PuckSpeedChangedNotification';
@@ -35,12 +39,16 @@ import GameFirstPlaceNotification from '../components/GameFirstPlaceNotification
 import LikeNotification from '../components/LikeNotification';
 import UserReportNotification from '../components/UserReportNotification';
 import CachedAvatar from '../components/CachedAvatar';
+import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import {
     acceptFriendRequest,
+    clearPlayerMemoryCache,
+    dedupeDuplicateNotifications,
     declineFriendRequest,
     getReceivedFriendRequests,
     loadNotifications,
-    markNotificationAsRead
+    markNotificationAsRead,
+    syncUnreadNotificationsCountInDb,
 } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -48,66 +56,37 @@ import { useNotificationContext } from '../contexts/NotificationContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import { useUser } from '../contexts/UserContext';
 import OptimizedBackground from '../components/OptimizedBackground';
-import { preloadPlayerAvatars } from '../utils/AvatarCache';
+import { preloadPlayerAvatars, updateAvatarGlobally } from '../utils/AvatarCache';
 import CachedBackground from '../components/CachedBackground';
 import { platformCardShadow } from '../utils/androidShadow';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  extendNotificationsBadgeSuppressMs,
+  setNotificationsScreenFocused,
+} from '../utils/notificationsBadgeGate';
 
 const iceBg = require('../assets/images/led.jpg');
 
 const notificationsListStorageKey = (playerId: string) =>
   `hs_notifications_list_v1_${playerId}`;
 
+const NOTIFICATIONS_PAGE_SIZE = 10;
+
 // Мемоизированный компонент для элемента уведомления
-const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, onDelete, currentUserId }: {
+const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSuperAction, currentUserId, onVideoScrubActiveChange }: {
   notification: NotificationItem;
   index: number;
   isNew: boolean;
   onPress: (notification: NotificationItem) => void;
   onSuperAction: (notification: NotificationItem) => void;
-  onDelete: (notificationId: string) => void;
   currentUserId?: string;
+  onVideoScrubActiveChange?: (active: boolean) => void;
 }) => {
   const { t } = useLanguage();
-  const swipeableRef = React.useRef<any>(null);
-  const isSwipingRef = React.useRef(false);
-  const lastSwipeTimeRef = React.useRef(0);
-  
-  // Обработчик нажатия, который предотвращает навигацию если был свайп
+
   const handlePress = React.useCallback(() => {
-    // Предотвращаем нажатие, если недавно был свайп (в течение 300ms)
-    const timeSinceSwipe = Date.now() - lastSwipeTimeRef.current;
-    if (isSwipingRef.current || timeSinceSwipe < 300) {
-      console.log('⏭️ Предотвращен переход при свайпе уведомления');
-      return;
-    }
     onPress(notification);
   }, [notification, onPress]);
-  
-  // Обработчик свайпа для удаления
-  const handleSwipeOpen = React.useCallback(() => {
-    lastSwipeTimeRef.current = Date.now();
-    isSwipingRef.current = true;
-    onDelete(notification.id);
-    // Сбрасываем флаг после небольшой задержки
-    setTimeout(() => {
-      isSwipingRef.current = false;
-    }, 500);
-  }, [notification.id, onDelete]);
-  
-  // Обработчик начала свайпа
-  const handleSwipeStart = React.useCallback(() => {
-    isSwipingRef.current = true;
-    lastSwipeTimeRef.current = Date.now();
-  }, []);
-  
-  // Обработчик отмены свайпа
-  const handleSwipeClose = React.useCallback(() => {
-    // Сбрасываем флаг с небольшой задержкой
-    setTimeout(() => {
-      isSwipingRef.current = false;
-    }, 100);
-  }, []);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -130,6 +109,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
       case 'scout_report':
         return 'document-text';
       case 'game_first_place':
+      case 'quiz_first_place':
         return 'trophy';
       case 'system':
         return 'information-circle';
@@ -168,29 +148,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
     }
   };
 
-  const renderRightActions = () => {
-    return (
-      <View style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={32} color="#fa2f40" />
-      </View>
-    );
-  };
-
   return (
-    <Swipeable
-      ref={swipeableRef}
-      key={notification.id}
-      renderRightActions={renderRightActions}
-      onSwipeableWillOpen={handleSwipeStart}
-      onSwipeableOpen={handleSwipeOpen}
-      onSwipeableClose={handleSwipeClose}
-      overshootRight={false}
-      friction={2}
-      rightThreshold={40}
-      enableTrackpadTwoFingerGesture={true}
-      containerStyle={{ backgroundColor: 'transparent' }}
-    >
-      <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
+    <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
         {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
           <TouchableOpacity
             onPress={handlePress}
@@ -206,19 +165,15 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             />
           </TouchableOpacity>
         ) : notification.type === 'photo_added' ? (
-          <TouchableOpacity
-            onPress={handlePress}
-            activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
             <PhotoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
               photosCount={notification.data.addedPhotosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+              photoUrls={notification.data.photoUrls || []}
+              onHeaderPress={handlePress}
             />
-          </TouchableOpacity>
         ) : notification.type === 'new_friendship' ? (
           <FriendshipNotification
             friend1Name={notification.data.friend1Name || 'Игрок 1'}
@@ -337,19 +292,16 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             onAcknowledge={() => onSuperAction(notification)}
           />
         ) : notification.type === 'video_added' ? (
-          <TouchableOpacity
-            onPress={handlePress}
-            activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
             <VideoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
               videosCount={notification.data.addedVideosCount || 1}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+              videoUrls={sortVideoUrlsNewestFirst(notification.data.videoUrls || [])}
+              onHeaderPress={handlePress}
+              onScrubActiveChange={onVideoScrubActiveChange}
             />
-          </TouchableOpacity>
         ) : notification.type === 'avatar_changed' ? (
           <TouchableOpacity
             onPress={handlePress}
@@ -360,6 +312,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+              newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
           </TouchableOpacity>
@@ -419,7 +372,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
             />
           </TouchableOpacity>
-        ) : notification.type === 'game_first_place' ? (
+        ) : notification.type === 'game_first_place' || notification.type === 'quiz_first_place' ? (
           <TouchableOpacity
             onPress={handlePress}
             activeOpacity={0.7}
@@ -430,6 +383,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.changedPlayerId}
               playerAvatar={notification.data.changedPlayerAvatar}
               message={notification.message || ''}
+              variant={notification.type === 'quiz_first_place' ? 'quiz' : 'game'}
+              prizeAmount={notification.data?.prizeAmount}
               timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
             />
           </TouchableOpacity>
@@ -549,7 +504,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         </TouchableOpacity>
         )}
       </AnimatedNotification>
-    </Swipeable>
   );
 });
 
@@ -621,6 +575,7 @@ type NotificationsListSessionCache = {
   notifications: NotificationItem[];
   friendRequests: FriendRequestItem[];
   giftRequests: GiftRequestItem[];
+  activeFilter?: string;
 };
 
 let notificationsListSessionCache: NotificationsListSessionCache | null = null;
@@ -628,9 +583,10 @@ let notificationsListSessionCache: NotificationsListSessionCache | null = null;
 export default function NotificationsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { updateNotificationCount } = useNotificationContext();
+  const { updateNotificationCount, setUnreadNotificationsBadge } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading, setCurrentUser } = useUser();
+  const { showAlert, showConfirm, AlertHost } = useAppAlert();
   
   // Убираем все анимации - простое мгновенное переключение
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -638,7 +594,8 @@ export default function NotificationsScreen() {
   const [giftRequests, setGiftRequests] = useState<GiftRequestItem[]>([]);
   /** Пока false — не показываем пустой экран до завершения первой загрузки для currentUser.id */
   const [listReady, setListReady] = useState(false);
-  const [isScreenFocused, setIsScreenFocused] = useState(false);
+  const [listScrollEnabled, setListScrollEnabled] = useState(true);
+  const videoScrubLockRef = React.useRef(0);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
   // Состояние для отслеживания новых уведомлений (для анимации)
@@ -653,11 +610,34 @@ export default function NotificationsScreen() {
     f: friendRequests.length,
     g: giftRequests.length,
   };
+  const notificationsRef = React.useRef(notifications);
+  const friendRequestsRef = React.useRef(friendRequests);
+  const giftRequestsRef = React.useRef(giftRequests);
+  notificationsRef.current = notifications;
+  friendRequestsRef.current = friendRequests;
+  giftRequestsRef.current = giftRequests;
+  const listRef = React.useRef<FlatListType<NotificationItem>>(null);
+  const hasUserScrolledListRef = React.useRef(false);
+  const endReachedLockedRef = React.useRef(false);
+  const pageLoadInFlightRef = React.useRef(false);
 
   /** Смена пользователя / новый заход: отменяет устаревшие ответы диска и сети. */
   const notificationsScreenEpochRef = React.useRef(0);
+  const markAllNotificationsAsReadRef = React.useRef<(() => Promise<void>) | null>(null);
   /** Успешная запись списка из сети за текущий epoch — отменяет отложенный hydrate с диска. */
   const networkWroteListRef = React.useRef(false);
+  const reloadDebounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const notificationsDbOffsetRef = React.useRef(0);
+  const [hasMoreNotifications, setHasMoreNotifications] = React.useState(true);
+  const hasMoreNotificationsRef = React.useRef(true);
+  hasMoreNotificationsRef.current = hasMoreNotifications;
+  const [loadingMoreNotifications, setLoadingMoreNotifications] = React.useState(false);
+  const [filterBackfilling, setFilterBackfilling] = React.useState(false);
+  const filterBackfillTokenRef = React.useRef(0);
+  /** Фильтры, для которых уже догружали страницы в этой сессии — не повторять при возврате на экран. */
+  const filterBackfillDoneRef = React.useRef<Set<string>>(new Set());
+  const activeFilterRef = React.useRef(activeFilter);
+  activeFilterRef.current = activeFilter;
 
   useLayoutEffect(() => {
     const id = currentUser?.id;
@@ -670,6 +650,8 @@ export default function NotificationsScreen() {
       setNotifications([]);
       setFriendRequests([]);
       setGiftRequests([]);
+      notificationsDbOffsetRef.current = 0;
+      setHasMoreNotifications(true);
       return;
     }
 
@@ -677,9 +659,15 @@ export default function NotificationsScreen() {
       notificationsListSessionCache &&
       notificationsListSessionCache.userId === id
     ) {
-      setNotifications(notificationsListSessionCache.notifications);
+      const cachedList = notificationsListSessionCache.notifications;
+      setNotifications(cachedList);
       setFriendRequests(notificationsListSessionCache.friendRequests);
       setGiftRequests(notificationsListSessionCache.giftRequests);
+      notificationsDbOffsetRef.current = cachedList.length;
+      setHasMoreNotifications(cachedList.length >= NOTIFICATIONS_PAGE_SIZE);
+      if (notificationsListSessionCache.activeFilter) {
+        setActiveFilter(notificationsListSessionCache.activeFilter);
+      }
       setListReady(true);
       setNewNotificationIds(new Set());
       notificationsInitialLoadDoneForUserRef.current = id;
@@ -694,6 +682,8 @@ export default function NotificationsScreen() {
     setNotifications([]);
     setFriendRequests([]);
     setGiftRequests([]);
+    notificationsDbOffsetRef.current = 0;
+    setHasMoreNotifications(true);
 
     let cancelled = false;
     void AsyncStorage.getItem(notificationsListStorageKey(id))
@@ -710,9 +700,15 @@ export default function NotificationsScreen() {
           const nList = parsed.notifications || [];
           const frList = parsed.friendRequests || [];
           const grList = parsed.giftRequests || [];
-          setNotifications(nList.map(x => ({ ...x })));
+          const hydrated = nList.map(x => ({ ...x }));
+          setNotifications(hydrated);
           setFriendRequests(frList.map(x => ({ ...x })));
           setGiftRequests(grList.map(x => ({ ...x })));
+          notificationsDbOffsetRef.current = hydrated.length;
+          setHasMoreNotifications(hydrated.length >= NOTIFICATIONS_PAGE_SIZE);
+          if (parsed.activeFilter) {
+            setActiveFilter(parsed.activeFilter);
+          }
           setListReady(true);
           setNewNotificationIds(new Set());
           notificationsInitialLoadDoneForUserRef.current = id;
@@ -721,6 +717,7 @@ export default function NotificationsScreen() {
             notifications: nList.map(x => ({ ...x })),
             friendRequests: frList.map(x => ({ ...x })),
             giftRequests: grList.map(x => ({ ...x })),
+            activeFilter: parsed.activeFilter,
           };
         } catch {
           /* ignore corrupt cache */
@@ -745,33 +742,42 @@ export default function NotificationsScreen() {
       notifications: notifications.map(n => ({ ...n })),
       friendRequests: friendRequests.map(r => ({ ...r })),
       giftRequests: giftRequests.map(g => ({ ...g })),
+      activeFilter: activeFilterRef.current,
     };
     notificationsListSessionCache = snap;
     void AsyncStorage.setItem(notificationsListStorageKey(id), JSON.stringify(snap)).catch(
       () => {}
     );
-  }, [currentUser?.id, listReady, notifications, friendRequests, giftRequests]);
+  }, [currentUser?.id, listReady, notifications, friendRequests, giftRequests, activeFilter]);
 
   // Категории фильтров и типы уведомлений, которые в них входят
+  // UX: "медиа" (видео+фото) вторым после "все", как основной сценарий просмотра.
   const FILTER_TYPES: Record<string, string[]> = {
     all: [],
+    media: ['video_added', 'video_liked', 'photo_added', 'photo_liked', 'avatar_changed'],
     friends: ['friend_request', 'friend_accepted', 'new_friendship'],
-    video: ['video_added', 'video_liked'],
-    photo: ['photo_added', 'photo_liked', 'avatar_changed'],
     gifts: ['gift_received', 'friend_gift_received', 'gift_accepted', 'gift_request', 'autograph_request', 'stick_request'],
     stats: ['stats_change', 'normative_changed', 'physical_data_changed', 'puck_speed_changed', 'achievement_added', 'achievement', 'scout_report'],
-    exercises: ['exercise_completed', 'game_first_place'],
+    exercises: ['exercise_completed', 'game_first_place', 'quiz_first_place'],
   };
 
   const FILTER_ICONS: Record<string, string> = {
     all: 'apps-outline',
+    media: 'play-circle-outline',
     friends: 'people-outline',
-    video: 'play-circle-outline',
-    photo: 'camera-outline',
     gifts: 'gift-outline',
     stats: 'bar-chart-outline',
     exercises: 'barbell-outline',
   };
+
+  const countNotificationsForFilter = useCallback(
+    (filter: string, list = notificationsRef.current) => {
+      if (filter === 'all') return list.length;
+      const allowed = FILTER_TYPES[filter] || [];
+      return list.filter((n) => allowed.includes(n.type)).length;
+    },
+    [],
+  );
 
   // Мемоизируем список уведомлений для предотвращения ненужных перерендеров
   const memoizedNotifications = React.useMemo(() => {
@@ -782,16 +788,9 @@ export default function NotificationsScreen() {
   const memoizedFriendRequests = React.useMemo(() => friendRequests, [friendRequests]);
   const memoizedGiftRequests = React.useMemo(() => giftRequests, [giftRequests]);
 
-  // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
-  const loadNotificationsData = useCallback(async (isInitialLoad = false) => {
-    if (!currentUser) return;
-    const loadEpoch = notificationsScreenEpochRef.current;
-    try {
-      // Загружаем все уведомления из хранилища
-      const storedNotifications = await loadNotifications(currentUser.id);
-      
-      // Фильтруем уведомления, которые относятся к текущему пользователю (поддерживаем обе структуры)
-      const userNotifications = storedNotifications.filter(notification => {
+  const processNotificationsPage = useCallback((storedNotifications: any[]): NotificationItem[] => {
+    if (!currentUser) return [];
+    const mappedNotifications = storedNotifications.filter(notification => {
         // Уведомления о запросах дружбы показываем только если они предназначены для этого пользователя
         // Проверяем user_id (для уведомлений из БД) или receiver_id/receiverId (для совместимости)
         if (notification.type === 'friend_request') {
@@ -831,7 +830,8 @@ export default function NotificationsScreen() {
             notification.type === 'photo_liked' ||
             notification.type === 'user_report' ||
             notification.type === 'scout_report' ||
-            notification.type === 'game_first_place') {
+            notification.type === 'game_first_place' ||
+            notification.type === 'quiz_first_place') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
         }
         
@@ -878,10 +878,71 @@ export default function NotificationsScreen() {
         
         return mappedNotification;
       });
-      
-      // Сортируем по времени (новые сверху)
-      userNotifications.sort((a, b) => b.timestamp - a.timestamp);
-      
+
+    const userNotifications = dedupeDuplicateNotifications(mappedNotifications);
+    userNotifications.sort((a, b) => b.timestamp - a.timestamp);
+    return userNotifications;
+  }, [currentUser]);
+
+  // Функция загрузки уведомлений (определяем здесь для использования в useEffect)
+  const loadNotificationsData = useCallback(async (
+    isInitialLoad = false,
+    silent = false,
+    append = false,
+  ): Promise<number> => {
+    if (!currentUser) return 0;
+    if (append && pageLoadInFlightRef.current) return 0;
+    if (append) pageLoadInFlightRef.current = true;
+    const loadEpoch = notificationsScreenEpochRef.current;
+    let appendedCount = 0;
+    try {
+      const offset = append ? notificationsDbOffsetRef.current : 0;
+      const storedNotifications = await loadNotifications(currentUser.id, {
+        limit: NOTIFICATIONS_PAGE_SIZE,
+        offset,
+        updateCache: offset === 0,
+      });
+      const pageNotifications = processNotificationsPage(storedNotifications);
+      const fetchedCount = storedNotifications.length;
+      const nextOffset = offset + fetchedCount;
+
+      if (append) {
+        if (notificationsScreenEpochRef.current !== loadEpoch) return 0;
+        setNotifications((prev) => {
+          const existingIds = new Set(prev.map((n) => n.id));
+          const fresh = pageNotifications.filter((n) => !existingIds.has(n.id));
+          if (fresh.length === 0) return prev;
+          appendedCount = fresh.length;
+          const next = [...prev, ...fresh];
+          notificationsRef.current = next;
+          return next;
+        });
+        notificationsDbOffsetRef.current = nextOffset;
+        const hasMore = fetchedCount === NOTIFICATIONS_PAGE_SIZE;
+        hasMoreNotificationsRef.current = hasMore;
+        setHasMoreNotifications(hasMore);
+        return appendedCount;
+      }
+
+      if (silent) {
+        if (notificationsScreenEpochRef.current !== loadEpoch) return 0;
+        networkWroteListRef.current = true;
+        setNotifications((prev) => {
+          const existingIds = new Set(prev.map((n) => n.id));
+          const fresh = pageNotifications.filter((n) => !existingIds.has(n.id));
+          if (fresh.length === 0) return prev;
+          const merged = dedupeDuplicateNotifications([...fresh, ...prev]);
+          merged.sort((a, b) => b.timestamp - a.timestamp);
+          return merged;
+        });
+        return 0;
+      }
+
+      notificationsDbOffsetRef.current = nextOffset;
+      const hasMore = fetchedCount === NOTIFICATIONS_PAGE_SIZE;
+      hasMoreNotificationsRef.current = hasMore;
+      setHasMoreNotifications(hasMore);
+
       // Загружаем запросы в друзья
       const receivedFriendRequests = await getReceivedFriendRequests(currentUser.id);
       const friendRequestItems: FriendRequestItem[] = receivedFriendRequests.map(player => ({
@@ -940,38 +1001,34 @@ export default function NotificationsScreen() {
         // Обрабатываем ошибки отдельно, так как .then() возвращает Promise<void>
       }
       
-      const limitedNotifications = userNotifications;
-      
       // Если это первая загрузка, помечаем все уведомления как "старые" (без анимации)
       if (isInitialLoad) {
         setNewNotificationIds(new Set());
       } else {
-        // При обновлении определяем новые уведомления
         const currentIds = new Set([
-          ...notifications.map(n => n.id),
-          ...friendRequests.map(r => r.id),
-          ...giftRequests.map(g => g.id)
+          ...notificationsRef.current.map(n => n.id),
+          ...friendRequestsRef.current.map(r => r.id),
+          ...giftRequestsRef.current.map(g => g.id)
         ]);
         
         const newIds = new Set([
-          ...limitedNotifications.map(n => n.id),
+          ...pageNotifications.map(n => n.id),
           ...friendRequestItems.map(r => r.id),
           ...giftRequestItems.map(g => g.id)
         ].filter(id => !currentIds.has(id)));
         
         setNewNotificationIds(newIds);
         
-        // Через 1 секунду убираем анимацию с новых уведомлений
         setTimeout(() => {
           setNewNotificationIds(new Set());
         }, 1000);
       }
 
       if (notificationsScreenEpochRef.current !== loadEpoch) {
-        return;
+        return 0;
       }
       networkWroteListRef.current = true;
-      setNotifications(limitedNotifications);
+      setNotifications(pageNotifications);
       setFriendRequests(friendRequestItems);
       // giftRequestItems загружаются асинхронно выше
       
@@ -1004,56 +1061,270 @@ export default function NotificationsScreen() {
       }
       // Не показываем Alert при ошибке, чтобы не мешать работе с кешированными данными
     } finally {
+      if (append) pageLoadInFlightRef.current = false;
       if (notificationsScreenEpochRef.current === loadEpoch) {
         setListReady(true);
       }
     }
-  }, [currentUser, t]);
+    return appendedCount;
+  }, [currentUser, t, processNotificationsPage]);
 
-  // Загрузка списка только при фокусе экрана (без дубля mount + focus — один запрос при открытии)
+  const appendNotificationPagesBatch = useCallback(
+    async (maxPages: number, isCancelled?: () => boolean): Promise<number> => {
+      if (!currentUser || maxPages <= 0) return 0;
+      if (pageLoadInFlightRef.current) return 0;
+      pageLoadInFlightRef.current = true;
+      const loadEpoch = notificationsScreenEpochRef.current;
+      const collected: NotificationItem[] = [];
+      let pagesLoaded = 0;
+
+      try {
+        while (pagesLoaded < maxPages) {
+          if (isCancelled?.()) break;
+          if (notificationsScreenEpochRef.current !== loadEpoch) break;
+          if (!hasMoreNotificationsRef.current && pagesLoaded > 0) break;
+
+          const offset = notificationsDbOffsetRef.current;
+          const storedNotifications = await loadNotifications(currentUser.id, {
+            limit: NOTIFICATIONS_PAGE_SIZE,
+            offset,
+            updateCache: false,
+          });
+          const pageNotifications = processNotificationsPage(storedNotifications);
+          const fetchedCount = storedNotifications.length;
+          notificationsDbOffsetRef.current = offset + fetchedCount;
+          const hasMore = fetchedCount === NOTIFICATIONS_PAGE_SIZE;
+          hasMoreNotificationsRef.current = hasMore;
+          setHasMoreNotifications(hasMore);
+
+          collected.push(...pageNotifications);
+          pagesLoaded += 1;
+          if (!hasMore) break;
+        }
+
+        if (notificationsScreenEpochRef.current !== loadEpoch || collected.length === 0) {
+          return 0;
+        }
+
+        let appendedCount = 0;
+        setNotifications((prev) => {
+          const existingIds = new Set(prev.map((n) => n.id));
+          const fresh = collected.filter((n) => !existingIds.has(n.id));
+          if (fresh.length === 0) return prev;
+          appendedCount = fresh.length;
+          const next = [...prev, ...fresh];
+          notificationsRef.current = next;
+          return next;
+        });
+        return appendedCount;
+      } finally {
+        pageLoadInFlightRef.current = false;
+      }
+    },
+    [currentUser, processNotificationsPage],
+  );
+
+  const ensureFilteredNotificationsLoaded = useCallback(
+    async (
+      filter: string,
+      targetCount = NOTIFICATIONS_PAGE_SIZE,
+      isCancelled?: () => boolean,
+    ) => {
+      if (filter === 'all' || !currentUser) return;
+      let idleRounds = 0;
+      while (idleRounds < 3) {
+        if (isCancelled?.()) return;
+        if (countNotificationsForFilter(filter) >= targetCount) break;
+        if (!hasMoreNotificationsRef.current) break;
+
+        const added = await appendNotificationPagesBatch(5, isCancelled);
+        if (isCancelled?.()) return;
+        if (added === 0) {
+          idleRounds += 1;
+          if (!hasMoreNotificationsRef.current) break;
+        } else {
+          idleRounds = 0;
+        }
+      }
+    },
+    [currentUser, countNotificationsForFilter, appendNotificationPagesBatch],
+  );
+
+  const loadMoreNotifications = useCallback(async () => {
+    if (loadingMoreNotifications || !hasMoreNotifications || !currentUser || !listReady) return;
+    setLoadingMoreNotifications(true);
+    try {
+      const filter = activeFilterRef.current;
+      if (filter === 'all') {
+        await appendNotificationPagesBatch(1);
+        return;
+      }
+
+      const beforeCount = countNotificationsForFilter(filter);
+      let attempts = 0;
+      while (attempts < 4) {
+        await appendNotificationPagesBatch(3);
+        attempts += 1;
+        if (countNotificationsForFilter(filter) > beforeCount) break;
+        if (!hasMoreNotificationsRef.current) break;
+      }
+    } finally {
+      setLoadingMoreNotifications(false);
+    }
+  }, [
+    loadingMoreNotifications,
+    hasMoreNotifications,
+    currentUser,
+    listReady,
+    appendNotificationPagesBatch,
+    countNotificationsForFilter,
+  ]);
+
+  const handleNotificationsEndReached = useCallback(() => {
+    if (!hasUserScrolledListRef.current || endReachedLockedRef.current) return;
+    endReachedLockedRef.current = true;
+    void loadMoreNotifications();
+  }, [loadMoreNotifications]);
+
+  // При смене фильтра догружаем страницы одним батчем, без повторных перезапусков
+  useEffect(() => {
+    if (activeFilter === 'all' || !listReady) {
+      setFilterBackfilling(false);
+      return;
+    }
+
+    const filteredCount = countNotificationsForFilter(activeFilter);
+    if (
+      filteredCount >= NOTIFICATIONS_PAGE_SIZE ||
+      !hasMoreNotificationsRef.current ||
+      filterBackfillDoneRef.current.has(activeFilter)
+    ) {
+      setFilterBackfilling(false);
+      return;
+    }
+
+    const token = ++filterBackfillTokenRef.current;
+    setFilterBackfilling(true);
+
+    void (async () => {
+      try {
+        await ensureFilteredNotificationsLoaded(
+          activeFilter,
+          NOTIFICATIONS_PAGE_SIZE,
+          () => token !== filterBackfillTokenRef.current,
+        );
+      } finally {
+        if (token === filterBackfillTokenRef.current) {
+          setFilterBackfilling(false);
+          filterBackfillDoneRef.current.add(activeFilter);
+        }
+      }
+    })();
+
+    return () => {
+      filterBackfillTokenRef.current += 1;
+    };
+  }, [activeFilter, listReady, ensureFilteredNotificationsLoaded, countNotificationsForFilter]);
+
+  useFocusEffect(
+    useCallback(() => {
+      registerTabScrollHandler('notifications', () => {
+        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      });
+      return () => registerTabScrollHandler('notifications', null);
+    }, []),
+  );
+
+  // Загрузка списка + сброс бейджа после нескольких секунд на экране
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('notifications');
-      setIsScreenFocused(true);
-      
+      setNotificationsScreenFocused(true);
+      setUnreadNotificationsBadge(0);
+
+      let cancelled = false;
+      let markReadDone = false;
+      let markReadTimer: ReturnType<typeof setTimeout> | null = null;
+
       if (currentUser && !isUserLoading) {
         const { n, f, g } = listCountsRef.current;
         const hasCachedLists = n > 0 || f > 0 || g > 0;
-        const isInitial =
+        const isFirstLoadForUser =
           notificationsInitialLoadDoneForUserRef.current !== currentUser.id;
-        if (isInitial) {
+        if (isFirstLoadForUser) {
           notificationsInitialLoadDoneForUserRef.current = currentUser.id;
         }
-        // Уже есть данные (кеш сессии) — обновляем в фоне без пустого «Загрузка»
-        void loadNotificationsData(hasCachedLists ? false : isInitial);
+        const needsInitialLoad = isFirstLoadForUser && !hasCachedLists;
+        void loadNotificationsData(needsInitialLoad, !needsInitialLoad);
       }
-      
+
+      // Через ~2.5 с на экране помечаем прочитанным (бейдж уже погашен).
+      markReadTimer = setTimeout(async () => {
+        if (cancelled || !currentUser) return;
+        extendNotificationsBadgeSuppressMs(6000);
+        try {
+          await markAllNotificationsAsReadRef.current?.();
+          setUnreadNotificationsBadge(0);
+          markReadDone = true;
+        } catch {
+          setUnreadNotificationsBadge(0);
+        }
+      }, 2500);
+
       return () => {
-        setIsScreenFocused(false);
+        cancelled = true;
+        if (markReadTimer) clearTimeout(markReadTimer);
+        setNotificationsScreenFocused(false);
+        if (!markReadDone && currentUser) {
+          void updateNotificationCount(currentUser);
+        }
         setCurrentScreen(null);
       };
-    }, [currentUser, isUserLoading, loadNotificationsData, setCurrentScreen])
+    }, [
+      currentUser,
+      isUserLoading,
+      loadNotificationsData,
+      setCurrentScreen,
+      setUnreadNotificationsBadge,
+      updateNotificationCount,
+    ])
   );
 
-  // Автоматически отмечаем все уведомления как прочитанные через 3 секунды ТОЛЬКО когда экран в фокусе
+  // Обновляем список сразу при новых уведомлениях (фото, аватар и т.д.), пока экран открыт
   useEffect(() => {
-    if (isScreenFocused && currentUser && (notifications.length > 0 || friendRequests.length > 0)) {
-      const timer = setTimeout(async () => {
-        await markAllNotificationsAsRead();
-        // Обновляем счетчик уведомлений через контекст
-        // Это обновит unreadNotificationsCount (который теперь включает friend_request)
-        await updateNotificationCount(currentUser);
-        console.log('📊 Уведомления помечены как прочитанные после 3 секунд просмотра');
-      }, 3000);
-      
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [isScreenFocused, currentUser, notifications.length, friendRequests.length, updateNotificationCount]);
+    if (!currentUser?.id) return;
 
-  // Realtime подписки настроены в главном layout через realtimeManager
-  // Загрузка данных происходит через useFocusEffect
+    const channel = supabase
+      .channel(`notifications-list-live-${currentUser.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${currentUser.id}`,
+        },
+        () => {
+          if (reloadDebounceRef.current) {
+            clearTimeout(reloadDebounceRef.current);
+          }
+          reloadDebounceRef.current = setTimeout(() => {
+            // На фильтрованной вкладке не перезагружаем page 0 — это вызывает сортировку и мигание
+            if (activeFilterRef.current !== 'all') return;
+            void loadNotificationsData(false, true);
+          }, 700);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (reloadDebounceRef.current) {
+        clearTimeout(reloadDebounceRef.current);
+        reloadDebounceRef.current = null;
+      }
+      void supabase.removeChannel(channel);
+    };
+  }, [currentUser?.id, loadNotificationsData]);
 
   // Отмечаем все уведомления как прочитанные
   const markAllNotificationsAsRead = async () => {
@@ -1136,36 +1407,13 @@ export default function NotificationsScreen() {
         
         // Отмечаем как прочитанные все кроме gift_accepted, achievement, team_invite
         // friend_request теперь тоже помечается как прочитанное
-        return isActionable ? n : { ...n, isRead: true };
+        return isActionable || n.isRead ? n : { ...n, isRead: true };
       }));
       
       // Обновляем счетчик уведомлений в таблице players
       if (currentUser) {
         try {
-          // Подсчитываем количество непрочитанных уведомлений (exclude actionable)
-          // ИСПРАВЛЕНО: friend_request теперь ВКЛЮЧАЕТСЯ в счетчик, чтобы badge исчезал после просмотра
-          // Исключаем только типы уведомлений, которые не должны учитываться в счетчике
-          const { count } = await supabase
-            .from('notifications')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', currentUser.id)
-            .eq('is_read', false)
-            .not('type', 'in', '(gift_accepted,achievement,team_invite,new_friendship)');
-          
-          const newCount = count || 0;
-          
-          // Обновляем счетчик в БД
-          await supabase
-            .from('players')
-            .update({ 
-              unread_notifications_count: newCount,
-              notifications: JSON.stringify({
-                unread_count: newCount,
-                last_updated: new Date().toISOString()
-              })
-            })
-            .eq('id', currentUser.id);
-          
+          const newCount = await syncUnreadNotificationsCountInDb(currentUser.id);
           console.log('✅ Счетчик уведомлений обновлен:', newCount);
         } catch (counterError) {
           console.error('❌ Ошибка обновления счетчика:', counterError);
@@ -1176,154 +1424,79 @@ export default function NotificationsScreen() {
       console.error('❌ Ошибка в markAllNotificationsAsRead:', error);
     }
   };
+  markAllNotificationsAsReadRef.current = markAllNotificationsAsRead;
 
-  // Удаление одного уведомления
-  const handleDeleteNotification = useCallback(async (notificationId: string) => {
-    try {
-      // Сначала удаляем из UI для плавной анимации
-      const notification = notifications.find(n => n.id === notificationId);
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
-      // Затем удаляем из базы данных и обновляем счетчик
-      setTimeout(async () => {
-        const { error } = await supabase
-          .from('notifications')
-          .delete()
-          .eq('id', notificationId);
+  const handleClearAllNotifications = () => {
+    if (!currentUser) return;
+    showConfirm(
+      t('common.deleteConfirm'),
+      t('common.deleteAllNotificationsConfirm'),
+      async () => {
+        try {
+          const { data: notificationIds, error: fetchError } = await supabase
+            .from('notifications')
+            .select('id')
+            .eq('user_id', currentUser.id);
 
-        if (error) {
-          console.error('Ошибка удаления уведомления:', error);
-        }
-        
-        // Обновляем счетчик, если уведомление не было прочитано
-        if (notification && !notification.isRead && currentUser) {
-          // Подсчитываем количество оставшихся непрочитанных уведомлений
-          const { count } = await supabase
+          if (fetchError) {
+            console.error('❌ Ошибка получения ID уведомлений:', fetchError);
+            showAlert(t('common.error'), 'Не удалось получить уведомления', 'error');
+            return;
+          }
+
+          if (!notificationIds || notificationIds.length === 0) {
+            setNotifications([]);
+            setFriendRequests([]);
+            setGiftRequests([]);
+            showAlert(t('common.success'), 'Все уведомления очищены', 'success');
+            return;
+          }
+
+          for (const notification of notificationIds) {
+            try {
+              const { error: deleteError } = await supabase
+                .from('notifications')
+                .delete()
+                .eq('id', notification.id);
+              if (deleteError) {
+                console.error('❌ Ошибка удаления уведомления', notification.id, ':', deleteError);
+              }
+            } catch (individualError) {
+              console.error('❌ Ошибка удаления уведомления', notification.id, ':', individualError);
+            }
+          }
+
+          const { count: remainingCount } = await supabase
             .from('notifications')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', currentUser.id)
             .eq('is_read', false)
-            .not('type', 'in', '(gift_accepted,friend_request,achievement,team_invite)');
-          
-          const newCount = count || 0;
-          
+            .in('type', ['gift_accepted', 'friend_request', 'achievement', 'team_invite']);
+
+          const finalCount = remainingCount || 0;
+
           await supabase
             .from('players')
-            .update({ 
-              unread_notifications_count: newCount,
+            .update({
+              unread_notifications_count: finalCount,
               notifications: JSON.stringify({
-                unread_count: newCount,
-                last_updated: new Date().toISOString()
-              })
+                unread_count: finalCount,
+                last_updated: new Date().toISOString(),
+              }),
             })
             .eq('id', currentUser.id);
-        }
-      }, 300); // Задержка для плавной анимации
-    } catch (error) {
-      console.error('Ошибка удаления уведомления:', error);
-    }
-  }, [notifications, currentUser]);
 
-
-  const handleClearAllNotifications = async () => {
-    try {
-        // Используем Alert.alert для всех платформ
-        const confirmed = await new Promise<boolean>((resolve) => {
-          Alert.alert(
-            t('common.deleteConfirm'),
-            t('common.deleteAllNotificationsConfirm'),
-            [
-              { text: t('common.cancel'), style: 'cancel', onPress: () => resolve(false) },
-              { text: t('common.delete'), style: 'destructive', onPress: () => resolve(true) }
-            ]
-          );
-        });
-      
-      if (!confirmed) return;
-      
-      if (!currentUser) return;
-      
-      try {
-        // Получаем все ID уведомлений пользователя
-        const { data: notificationIds, error: fetchError } = await supabase
-          .from('notifications')
-          .select('id')
-          .eq('user_id', currentUser.id);
-        
-              if (fetchError) {
-                console.error('❌ Ошибка получения ID уведомлений:', fetchError);
-                Alert.alert('Ошибка', 'Не удалось получить уведомления');
-                return;
-              }
-        
-        if (!notificationIds || notificationIds.length === 0) {
           setNotifications([]);
           setFriendRequests([]);
           setGiftRequests([]);
-          Alert.alert('Успех', 'Все уведомления очищены');
-          return;
-        }
-        
-        // Удаляем каждое уведомление по отдельности
-        let successCount = 0;
-        for (const notification of notificationIds) {
-          try {
-            const { error: deleteError } = await supabase
-              .from('notifications')
-              .delete()
-              .eq('id', notification.id);
-            
-            if (deleteError) {
-              console.error('❌ Ошибка удаления уведомления', notification.id, ':', deleteError);
-            } else {
-              successCount++;
-            }
-          } catch (individualError) {
-            console.error('❌ Ошибка удаления уведомления', notification.id, ':', individualError);
-          }
-        }
-        
-        // Обнуляем счетчик непрочитанных уведомлений
-        // Подсчитываем количество непрочитанных actionable уведомлений
-        const { count: remainingCount } = await supabase
-          .from('notifications')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', currentUser.id)
-          .eq('is_read', false)
-          .in('type', ['gift_accepted', 'friend_request', 'achievement', 'team_invite']);
-        
-        const finalCount = remainingCount || 0;
-        
-        // Обновляем счетчик в таблице players
-        await supabase
-          .from('players')
-          .update({ 
-            unread_notifications_count: finalCount,
-            notifications: JSON.stringify({
-              unread_count: finalCount,
-              last_updated: new Date().toISOString()
-            })
-          })
-          .eq('id', currentUser.id);
-        
-        console.log('✅ Счетчик уведомлений обновлен после удаления всех уведомлений:', finalCount);
-        
-        // Обновляем локальное состояние
-        setNotifications([]);
-        setFriendRequests([]);
-        setGiftRequests([]);
-        
-        // Обновляем данные только один раз для синхронизации счетчика
-        await loadNotificationsData();
-        
-        // Уведомление убрано - и так видно что уведомления удалились
+          await loadNotificationsData();
         } catch (error) {
           console.error('❌ Ошибка очистки уведомлений:', error);
-          Alert.alert('Ошибка', 'Не удалось очистить уведомления');
+          showAlert(t('common.error'), 'Не удалось очистить уведомления', 'error');
         }
-    } catch (error) {
-      console.error('❌ Ошибка очистки уведомлений:', error);
-    }
+      },
+      { confirmText: t('common.delete'), cancelText: t('common.cancel'), type: 'warning' },
+    );
   };
 
   const handleNotificationPress = useCallback(async (notification: NotificationItem) => {
@@ -1417,6 +1590,8 @@ export default function NotificationsScreen() {
         }
       } else if (notification.type === 'game_first_place') {
         router.push({ pathname: '/', params: { openGameResults: 'true' } });
+      } else if (notification.type === 'quiz_first_place') {
+        router.push({ pathname: '/', params: { openQuizResults: 'true' } });
       } else if (notification.type === 'photo_added') {
         // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
@@ -1464,10 +1639,16 @@ export default function NotificationsScreen() {
           });
         }
       } else if (notification.type === 'avatar_changed') {
-        if (notification.data && notification.data.changedPlayerId) {
+        const changedPlayerId = notification.data?.changedPlayerId;
+        const changedPlayerAvatar = notification.data?.changedPlayerAvatar;
+        if (changedPlayerId) {
+          if (changedPlayerAvatar) {
+            await updateAvatarGlobally(changedPlayerId, changedPlayerAvatar);
+          }
+          clearPlayerMemoryCache(changedPlayerId);
           router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications' },
+            pathname: `/player/${changedPlayerId}`,
+            params: { returnTo: 'notifications', refreshProfile: 'true' },
           });
         }
       } else if (notification.type === 'achievement_added') {
@@ -1569,7 +1750,7 @@ export default function NotificationsScreen() {
     try {
       if (!currentUser || !notification.id) {
         console.error('❌ Некорректные данные уведомления:', { currentUser: !!currentUser, notificationId: notification.id });
-        Alert.alert('Ошибка', 'Некорректные данные уведомления');
+        showAlert(t('common.error'), 'Некорректные данные уведомления', 'error');
         return;
       }
       
@@ -1645,7 +1826,7 @@ export default function NotificationsScreen() {
         } else if (notification.type === 'team_invite') {
           router.push('/teams');
         } else {
-          Alert.alert('Успех', 'Уведомление обработано!');
+          showAlert(t('common.success'), 'Уведомление обработано!', 'success');
         }
         return;
       }
@@ -1736,12 +1917,12 @@ export default function NotificationsScreen() {
         } else if (notification.type === 'team_invite') {
           router.push('/teams');
         } else {
-          Alert.alert('Успех', 'Уведомление обработано!');
+          showAlert(t('common.success'), 'Уведомление обработано!', 'success');
         }
       } else {
         // Если ничего не удалось, возвращаем уведомление обратно
         setNotifications(prev => [...prev, notification]);
-        Alert.alert('Ошибка', 'Не удалось обработать уведомление. Попробуйте еще раз.');
+        showAlert(t('common.error'), 'Не удалось обработать уведомление. Попробуйте еще раз.', 'error');
       }
       
     } catch (error) {
@@ -1750,11 +1931,17 @@ export default function NotificationsScreen() {
       // В случае ошибки возвращаем уведомление обратно в список
       setNotifications(prev => [...prev, notification]);
       
-      Alert.alert('Ошибка', 'Не удалось обработать уведомление. Попробуйте еще раз.');
+      showAlert(t('common.error'), 'Не удалось обработать уведомление. Попробуйте еще раз.', 'error');
     }
   }, [currentUser, router, loadNotificationsData]);
 
   const notificationKeyExtractor = useCallback((item: NotificationItem) => item.id, []);
+
+  const handleVideoScrubActiveChange = useCallback((active: boolean) => {
+    videoScrubLockRef.current += active ? 1 : -1;
+    if (videoScrubLockRef.current < 0) videoScrubLockRef.current = 0;
+    setListScrollEnabled(videoScrubLockRef.current === 0);
+  }, []);
 
   const renderNotificationItem = useCallback(
     ({ item, index }: ListRenderItemInfo<NotificationItem>) => (
@@ -1764,24 +1951,35 @@ export default function NotificationsScreen() {
         isNew={newNotificationIds.has(item.id)}
         onPress={handleNotificationPress}
         onSuperAction={handleSuperAction}
-        onDelete={handleDeleteNotification}
         currentUserId={currentUser?.id}
+        onVideoScrubActiveChange={handleVideoScrubActiveChange}
       />
     ),
     [
       newNotificationIds,
       handleNotificationPress,
       handleSuperAction,
-      handleDeleteNotification,
       currentUser?.id,
+      handleVideoScrubActiveChange,
     ]
   );
 
+  const notificationsListFooter = useMemo(() => {
+    if (!loadingMoreNotifications && !filterBackfilling) return null;
+    return (
+      <View style={styles.listFooterLoader}>
+        <ActivityIndicator size="small" color="#fa2f40" />
+      </View>
+    );
+  }, [loadingMoreNotifications, filterBackfilling]);
+
   const notificationsListEmpty = useMemo(() => {
-    if (!listReady) {
+    const showInitialLoader =
+      !listReady || (filterBackfilling && memoizedNotifications.length === 0);
+    if (showInitialLoader) {
       return (
         <View style={[styles.emptyContainer, styles.listLoadingInline]}>
-          <Text style={styles.loadingText}>{t('common.loading')}</Text>
+          <LoadingCenter />
         </View>
       );
     }
@@ -1795,9 +1993,14 @@ export default function NotificationsScreen() {
         </View>
       </View>
     );
-  }, [listReady, t]);
+  }, [listReady, filterBackfilling, memoizedNotifications.length, t]);
 
   const handleFriendRequest = async (request: FriendRequestItem, action: 'accept' | 'decline') => {
+    // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ: карточка исчезает сразу, сеть работает в фоне.
+    // Раньше карточка «висела» до завершения всех запросов (на медленном интернете — секунды).
+    setFriendRequests(prev => prev.filter(req => req.id !== request.id));
+    setNotifications(prev => prev.filter(n => n.id !== request.id));
+
     try {
       // Проверяем, существует ли ещё запрос в БД
       const { data: existingRequest } = await supabase
@@ -1809,22 +2012,26 @@ export default function NotificationsScreen() {
       
       if (!existingRequest) {
         // Запрос был отменен или удален
-        Alert.alert(t('common.info'), 'Запрос дружбы был отменен отправителем');
-        
-        // Удаляем уведомление локально
-        setFriendRequests(prev => prev.filter(req => req.id !== request.id));
+        showAlert(t('common.info'), 'Запрос дружбы был отменен отправителем', 'info');
         await loadNotificationsData();
         return;
       }
       
+      let success: boolean;
       if (action === 'accept') {
         // receiverId - это тот, кто получает запрос (currentUser), playerId - отправитель
         // При принятии первый параметр - тот кто принимает (receiverId), второй - отправитель (playerId)
-        await acceptFriendRequest(request.receiverId, request.playerId);
-        Alert.alert(t('common.success'), t('notifications.friendRequestAccepted'));
+        success = await acceptFriendRequest(request.receiverId, request.playerId);
+        if (success) showAlert(t('common.success'), t('notifications.friendRequestAccepted'), 'success');
       } else {
-        await declineFriendRequest(request.receiverId, request.playerId);
-        Alert.alert(t('common.success'), t('notifications.friendRequestDeclined'));
+        success = await declineFriendRequest(request.receiverId, request.playerId);
+        if (success) showAlert(t('common.success'), t('notifications.friendRequestDeclined'), 'success');
+      }
+
+      if (!success) {
+        showAlert(t('common.error'), 'Не удалось обработать запрос в друзья', 'error');
+        await loadNotificationsData(); // Возвращаем карточку, если действие не прошло
+        return;
       }
 
       // Удаляем уведомление из базы данных
@@ -1834,16 +2041,11 @@ export default function NotificationsScreen() {
         .eq('id', request.id);
 
       // Счётчик обновится автоматически через Realtime подписку в _layout.tsx
-
-      // Удаляем из списка запросов
-      setFriendRequests(prev => prev.filter(req => req.id !== request.id));
-
-      // Удаляем из списка уведомлений, если оно там есть
-      setNotifications(prev => prev.filter(n => n.id !== request.id));
       
     } catch (error) {
       console.error('Ошибка обработки запроса в друзья:', error);
-      Alert.alert('Ошибка', 'Не удалось обработать запрос в друзья');
+      showAlert(t('common.error'), 'Не удалось обработать запрос в друзья', 'error');
+      await loadNotificationsData(); // Восстанавливаем актуальное состояние списка
     }
   };
 
@@ -1856,7 +2058,7 @@ export default function NotificationsScreen() {
         setGiftRequests(prev => prev.filter(req => req.id !== request.id));
     } catch (error) {
       console.error('❌ Ошибка обработки запроса на подарок:', error);
-      Alert.alert('Ошибка', 'Не удалось обработать запрос');
+      showAlert(t('common.error'), 'Не удалось обработать запрос', 'error');
     }
   };
 
@@ -1872,9 +2074,7 @@ export default function NotificationsScreen() {
         style={styles.container}
         resizeMode="cover"
       >
-        <View style={styles.loadingCenter}>
-          <Text style={styles.loadingText}>{t('common.loading')}</Text>
-        </View>
+        <LoadingCenter style={styles.loadingCenter} />
       </CachedBackground>
     );
   }
@@ -1895,9 +2095,7 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
-            <View style={styles.loadingCenter}>
-              <Text style={styles.loadingText}>{t('common.loading')}</Text>
-            </View>
+            <LoadingCenter style={styles.loadingCenter} />
           </View>
         </CachedBackground>
       </View>
@@ -1919,9 +2117,6 @@ export default function NotificationsScreen() {
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
-              <TouchableOpacity onPress={handleClearAllNotifications} style={styles.clearAllButton}>
-                <Ionicons name="trash-outline" size={24} color="#fa2f40" />
-              </TouchableOpacity>
             </View>
             <View style={styles.filterBar}>
               {Object.keys(FILTER_ICONS).map((key) => {
@@ -1930,7 +2125,12 @@ export default function NotificationsScreen() {
                   <TouchableOpacity
                     key={key}
                     style={[styles.filterBtn, isActive && styles.filterBtnActive]}
-                    onPress={() => setActiveFilter(key)}
+                    onPress={() => {
+                      hasUserScrolledListRef.current = false;
+                      endReachedLockedRef.current = false;
+                      filterBackfillDoneRef.current.delete(key);
+                      setActiveFilter(key);
+                    }}
                     activeOpacity={0.7}
                   >
                     <Ionicons
@@ -1946,21 +2146,33 @@ export default function NotificationsScreen() {
 
           {/* Список уведомлений */}
           <FlatList
+            ref={listRef}
             data={memoizedNotifications}
             renderItem={renderNotificationItem}
             keyExtractor={notificationKeyExtractor}
+            scrollEnabled={listScrollEnabled}
             contentContainerStyle={styles.notificationsContent}
-            removeClippedSubviews={true}
+            removeClippedSubviews={false}
             decelerationRate="fast"
-            initialNumToRender={15}
-            maxToRenderPerBatch={10}
-            windowSize={10}
+            initialNumToRender={8}
+            maxToRenderPerBatch={6}
+            windowSize={7}
             updateCellsBatchingPeriod={50}
+            onScrollBeginDrag={() => {
+              hasUserScrolledListRef.current = true;
+            }}
+            onMomentumScrollBegin={() => {
+              endReachedLockedRef.current = false;
+            }}
+            onEndReached={handleNotificationsEndReached}
+            onEndReachedThreshold={0.4}
             ListEmptyComponent={notificationsListEmpty}
+            ListFooterComponent={notificationsListFooter}
           />
         </View>
-      </CachedBackground>
+        </CachedBackground>
       </View>
+      <AlertHost />
     </GestureHandlerRootView>
   );
 }
@@ -1968,7 +2180,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87A3B1',
+    backgroundColor: colors.scene,
   },
   background: {
     flex: 1,
@@ -2387,10 +2599,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
   },
-  deleteButton: {
-    justifyContent: 'center',
+  listFooterLoader: {
+    paddingVertical: 16,
     alignItems: 'center',
-    width: 60,
-    height: '100%',
   },
 });

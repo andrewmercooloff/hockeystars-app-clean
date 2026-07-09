@@ -59,30 +59,55 @@ export function useExercises(
       // ВАЖНО: Всегда загружаем данные для текущего языка напрямую, без кеша
       // Это гарантирует, что при смене языка данные будут правильными
       console.log(`🔄 Загрузка упражнений для языка: ${language}`);
-      const [exercisesData, categoriesData, difficultiesData, rankingsData] = await Promise.all([
-        ExerciseService.getLocalizedExercises(language, filters),
-        ExerciseService.getExerciseCategories(language),
-        ExerciseService.getExerciseDifficulties(language),
-        dataCache.getOrLoad(
-          CACHE_KEYS.EXERCISE_RANKINGS,
-          () => ExerciseService.getExerciseRankings(),
-          5 * 60 * 1000 // 5 минут
-        )
-      ]);
+      // Важно: один сетевой запрос вместо трех параллельных. На VPS-прокси
+      // один upstream blip раньше валил весь экран упражнений с 502.
+      const exercisesData = await ExerciseService.getLocalizedExercises(language, filters);
+      const categoriesData = Array.from(
+        new Set(exercisesData.map((exercise) => exercise.category).filter(Boolean))
+      ).sort();
+      const difficultiesData = Array.from(
+        new Set(exercisesData.map((exercise) => exercise.difficulty).filter(Boolean))
+      ).sort();
 
       // Сохраняем в кеш для будущего использования
       const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
-      await dataCache.set(cacheKey, exercisesData);
-      await dataCache.set(`${CACHE_KEYS.EXERCISE_CATEGORIES}_${language}`, categoriesData);
-      await dataCache.set(`${CACHE_KEYS.EXERCISE_DIFFICULTIES}_${language}`, difficultiesData);
+      const EXERCISES_CACHE_MS = 24 * 60 * 60 * 1000;
+      await dataCache.set(cacheKey, exercisesData, EXERCISES_CACHE_MS);
+      await dataCache.set(`${CACHE_KEYS.EXERCISE_CATEGORIES}_${language}`, categoriesData, EXERCISES_CACHE_MS);
+      await dataCache.set(`${CACHE_KEYS.EXERCISE_DIFFICULTIES}_${language}`, difficultiesData, EXERCISES_CACHE_MS);
 
       setExercises(exercisesData);
       setCategories(categoriesData);
       setDifficulties(difficultiesData);
-      setExerciseRankings(rankingsData);
+
+      // Рейтинги (тяжёлый запрос) — в фоне, после показа экрана
+      void dataCache.getOrLoad(
+        CACHE_KEYS.EXERCISE_RANKINGS,
+        () => ExerciseService.getExerciseRankings(),
+        5 * 60 * 1000
+      ).then((rankingsData) => {
+        setExerciseRankings(rankingsData);
+      }).catch((rankErr) => {
+        console.warn('⚠️ Рейтинги упражнений недоступны (не критично):', rankErr?.message);
+      });
     } catch (err) {
       console.error('❌ Ошибка загрузки упражнений:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load exercises');
+      const cacheKey = `${CACHE_KEYS.EXERCISES}_${language}`;
+      const cachedExercises = await dataCache.get<LocalizedExercise[]>(cacheKey);
+      if (cachedExercises && cachedExercises.length > 0) {
+        const cachedCategories = Array.from(
+          new Set(cachedExercises.map((exercise) => exercise.category).filter(Boolean))
+        ).sort();
+        const cachedDifficulties = Array.from(
+          new Set(cachedExercises.map((exercise) => exercise.difficulty).filter(Boolean))
+        ).sort();
+        setExercises(cachedExercises);
+        setCategories(cachedCategories);
+        setDifficulties(cachedDifficulties);
+        setError(null);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to load exercises');
+      }
     } finally {
       setLoading(false);
     }
@@ -148,13 +173,9 @@ export function useExercises(
         // Инвалидируем кеш рейтинга упражнений
         await dataCache.invalidate(CACHE_KEYS.EXERCISE_RANKINGS);
         
-        // Очищаем глобальный кеш пользователя и кеш игрока
+        // Очищаем кеш игрока для актуальности данных при следующей проверке
         try {
           const playerStorage = await import('../utils/playerStorage');
-          if (playerStorage.globalUserCache) {
-            playerStorage.globalUserCache = null;
-          }
-          // Очищаем кеш игрока для актуальности данных при следующей проверке
           await playerStorage.clearPlayerCache(user.id);
         } catch (cacheError) {
           console.warn('⚠️ Не удалось очистить кеш:', cacheError);

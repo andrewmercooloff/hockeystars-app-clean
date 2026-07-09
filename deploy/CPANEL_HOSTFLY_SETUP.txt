@@ -1,0 +1,67 @@
+cPanel HostFly — прокси Supabase для api.hockey-stars.com
+======================================================
+
+Предполагается: DNS A-запись api -> IP сервера уже сделана.
+
+ШАГ 0 — Supabase Dashboard
+  Project Settings -> Custom Domains -> Delete api.hockey-stars.com
+
+ШАГ 1 — Поддомен (cPanel)
+  Домены -> Поддомены (Subdomains)
+  - Поддомен: api
+  - Домен: hockey-stars.com
+  - Корневая папка: api.hockey-stars.com (создастся автоматически)
+  -> Создать
+
+ШАГ 2 — SSL
+  SSL/TLS Status (или SSL/TLS -> Manage AutoSSL)
+  - Найти api.hockey-stars.com
+  - Run AutoSSL / Выпустить Let's Encrypt
+  - Дождаться зелёного замка
+
+ШАГ 3 — Node.js прокси (рекомендуется на shared hosting)
+  Software -> Setup Node.js App (Настройка приложений Node.js)
+
+  Create Application:
+  - Node.js version: 18 или 20
+  - Application mode: Production
+  - Application root: api.hockey-stars.com/proxy  (путь внутри home)
+  - Application URL: api.hockey-stars.com
+  - Application startup file: server.js
+
+  Загрузите файлы из deploy/cpanel-node-proxy/ в Application root:
+  - server.js
+  - package.json
+
+  В панели Node.js нажмите Run NPM Install, затем START APP.
+
+ШАГ 4 — Если Node.js не привязался к поддомену
+  Используйте Терминал (cPanel -> Terminal):
+
+  cd ~/api.hockey-stars.com/proxy
+  node server.js
+
+  Или попросите поддержку HostFly включить прокси для поддомена api.
+
+  Альтернатива (VPS / если есть root): deploy/nginx/api.hockey-stars.com.conf
+
+ШАГ 5 — Проверка
+  PowerShell:
+  .\deploy\scripts\test-supabase-proxy.ps1
+
+  Телефон без VPN:
+  https://api.hockey-stars.com/rest/v1/
+  -> JSON с ошибкой авторизации
+
+  nslookup api.hockey-stars.com
+  -> IP вашего сервера (178.172.217.60), БЕЗ alias supabase.co
+
+ШАГ 6 — Приложение
+  Перезапустить HockeyStars на телефоне (OTA уже с api.hockey-stars.com).
+
+OAuth callback (если нужен):
+  https://api.hockey-stars.com/auth/v1/callback
+
+Поддержка HostFly: если Node.js App не видит поддомен — напишите им:
+  «Нужен reverse proxy с api.hockey-stars.com на https://jvsypfwiajuwsyuzkyda.supabase.co
+   с заголовком Host: jvsypfwiajuwsyuzkyda.supabase.co и поддержкой WebSocket»

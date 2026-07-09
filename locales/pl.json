@@ -101,7 +101,7 @@
   "uploading": "Załadunek...",
   "uploadingPhotos": "Ładowanie {count} zdjęć... {progress}%",
   "info": "Informacja",
-  "addVideoLink": "Dodaj link do YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sek",
@@ -1465,6 +1465,1406 @@
           "Nie zmarznij za bardzo",
           "Słuchaj swojego ciała"
         ]
+      },
+      "66": {
+        "title": "Deska boczna z rotacją tułowia",
+        "description": "Buduje skośne i rdzeniowe stabilizatory dla siły strzału i kontroli stabilności ciała.",
+        "benefits": [
+          "Stabilizuje rdzeń w kontakcie",
+          "Poprawia siłę strzału rotacyjnego",
+          "Zmniejsza ryzyko kontuzji dolnej części pleców",
+          "Buduje wytrzymałość rdzenia"
+        ],
+        "instructions": [
+          "Przygotuj deskę boczną przedramienia",
+          "Sięgnij górnym ramieniem w stronę sufitu",
+          "Przesuń ramię pod tułów i wróć",
+          "Utrzymuj biodra w poziomie, bez zwisania",
+          "Wykonaj 8–10 powtórzeń na stronę"
+        ],
+        "tips": [
+          "Obracaj powoli, pod kontrolą",
+          "Oddychaj równomiernie",
+          "W razie potrzeby opuść się na kolana",
+          "2–3 serie na stronę"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Martwy ciąg ze sztangą, rumuński",
+        "description": "Rozwija tylny łańcuch, zapewniając mocną jazdę na łyżwach i przyspieszenie pierwszego kroku.",
+        "benefits": [
+          "Wzmacnia ścięgna podkolanowe i pośladki",
+          "Poprawia mechanikę pochylenia do przodu",
+          "Buduje siłę chwytu",
+          "Wspomaga zapobieganie urazom ścięgien podkolanowych"
+        ],
+        "instructions": [
+          "Stań, trzymając hantle na udach",
+          "Zachowaj lekkie ugięcie kolana",
+          "Odsuń biodra do tyłu, opuszczając dzwonki wzdłuż nóg",
+          "Zatrzymaj się w połowie goleni lub przy lekkim rozciągnięciu",
+          "Wysuń biodra do przodu, aby stanąć"
+        ],
+        "tips": [
+          "Zachowaj neutralny kręgosłup",
+          "Ciężary pozostają blisko nóg",
+          "Unikaj zaokrąglania dolnej części pleców",
+          "3–4 serie po 8–12 powtórzeń"
+        ],
+        "equipment": "Hantle",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Kubkowy przysiad",
+        "description": "Przyjazny dla hokeja wzór przysiadu wzmacniający nogi i tułów przy wyprostowanej postawie.",
+        "benefits": [
+          "Buduje poczwórną siłę",
+          "Uczy pionowej pozycji tułowia",
+          "Poprawia mobilność kostki",
+          "Dobra opcja poza lodem w sezonie"
+        ],
+        "instructions": [
+          "Trzymaj hantle lub kettlebell przy klatce piersiowej",
+          "Stopy na szerokość barków, palce lekko na zewnątrz",
+          "Przysiad równoległy lub niższy",
+          "Kolana podążają za palcami",
+          "3–4 serie po 10–15 powtórzeń"
+        ],
+        "tips": [
+          "Łokcie w kolanach u dołu",
+          "Obcasy pozostają opuszczone",
+          "Kontroluj zejście",
+          "Pozostań wysoki przez klatkę piersiową"
+        ],
+        "equipment": "Hantle lub kettlebell",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Obrotowy kotlet taśmowy",
+        "description": "Naśladuje rotację strzałów i podań, aby zwiększyć siłę w płaszczyźnie ruchu hokejowego.",
+        "benefits": [
+          "Poprawia siłę strzału i podania",
+          "Trenuje stabilność antyrotacyjną",
+          "Ładowanie przyjazne dla ramion",
+          "Można to zrobić w domu"
+        ],
+        "instructions": [
+          "Pasek kotwiący na wysokości klatki piersiowej",
+          "Stań bokiem, aby zakotwiczyć",
+          "Trzymaj kij lub uchwyt obiema rękami",
+          "Obróć się z bioder z pełną kontrolą",
+          "12–15 powtórzeń na każdą stronę"
+        ],
+        "tips": [
+          "Moc pochodzi z bioder",
+          "Chroń dolną część pleców przed nadmiernym rotacją",
+          "Użyj atletycznej postawy hokejowej",
+          "2–3 zestawy"
+        ],
+        "equipment": "Zespół oporu",
+        "calories": "100–150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Mostek pośladkowy na jednej nodze",
+        "description": "Aktywuje pośladki i stabilizatory bioder, zapewniając mocny odskok na rolkach.",
+        "benefits": [
+          "Wzmacnia pośladki",
+          "Stabilizuje miednicę podczas jazdy na łyżwach",
+          "Poprawia symetrię nóg",
+          "Wspomaga zapobieganie kontuzjom kolana"
+        ],
+        "instructions": [
+          "Połóż się na plecach, jedna stopa oparta",
+          "Druga noga wyprostowana lub zgięta w powietrzu",
+          "Unieś biodra do linii prostej",
+          "Zatrzymaj 1 sekundę na górze",
+          "10–12 powtórzeń na nogę"
+        ],
+        "tips": [
+          "Unikaj nadmiernego wyprostu odcinka lędźwiowego",
+          "Utrzymuj wyprostowane kolano",
+          "Ściśnij pośladki u góry",
+          "2–3 zestawy"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Unoszenie łydek na stojąco",
+        "description": "Buduje łydki i stopy, zapewniając wytrzymałość nóg w późnych zmianach i stabilność jazdy na łyżwach.",
+        "benefits": [
+          "Poprawia siłę łydek",
+          "Zmniejsza zmęczenie podudzi podczas gier",
+          "Wzmacnia stopy",
+          "Szybka opcja szatni"
+        ],
+        "instructions": [
+          "Stań na krawędzi stopnia na palcach stóp",
+          "Obniż pięty poniżej poziomu stopnia",
+          "Wznieś się jak najwyżej",
+          "Zatrzymaj się na górze",
+          "15–20 powtórzeń, 3 serie"
+        ],
+        "tips": [
+          "W razie potrzeby użyj ściany, aby zachować równowagę",
+          "Pełny zakres ruchu",
+          "Unikaj odbijania się",
+          "Dodaj niewielką wagę, gdy będzie gotowa"
+        ],
+        "equipment": "Stopień lub platforma",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Uderzenia ramion w deskę",
+        "description": "Praca rdzenia zapobiegająca rotacji zapewnia stabilność kontaktu i atletyczną postawę.",
+        "benefits": [
+          "Buduje stabilność rdzenia",
+          "Poprawia równowagę w kontakcie",
+          "Rozwija wytrzymałość rdzenia",
+          "Działa na wszystkich stanowiskach"
+        ],
+        "instructions": [
+          "Zacznij od wysokiej deski",
+          "Przesuń ciężar i dotknij przeciwnego ramienia",
+          "Powrót i naprzemienne ramiona",
+          "Trzymaj biodra prosto",
+          "Łącznie 16–20 kranów"
+        ],
+        "tips": [
+          "Poszerz stopy dla stabilności",
+          "Nie unoś bioder do góry",
+          "Oddychaj równomiernie",
+          "2–3 zestawy"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "80–120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "Sprinty na 20 m z pełnym odpoczynkiem",
+        "description": "Symuluje krótkie zmiany, aby poprawić zdolność powtarzalnego przyspieszania.",
+        "benefits": [
+          "Poprawia prędkość sprintu powtarzanego",
+          "Trenuje regenerację między zmianami",
+          "Rozwija mechanikę startu",
+          "Zwiększa wytrzymałość gry"
+        ],
+        "instructions": [
+          "Rozgrzewka 8–10 minut",
+          "Przebiegnij 20 m z prędkością 95%.",
+          "Odpoczywaj 40–60 sekund podczas spaceru",
+          "Powtórz 10–12 razy",
+          "Ochłodź 5 minut"
+        ],
+        "tips": [
+          "Utrzymuj formę sprintu w każdym powtórzeniu",
+          "Nie przerywaj odpoczynku zbyt wcześnie",
+          "Przedkładaj jakość nad ilość",
+          "1–2 sesje tygodniowo"
+        ],
+        "equipment": "20 m otwartej przestrzeni",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "Interwały biegu 30–30–30 sekund",
+        "description": "Klasyczny interwał w stylu hokeja: 30 sekund wysiłku, 30 sekund łatwo.",
+        "benefits": [
+          "Buduje tolerancję na mleczan",
+          "Naśladuje intensywność zmiany biegów",
+          "Poprawia odporność psychiczną",
+          "Efektywna sesja poza lodem"
+        ],
+        "instructions": [
+          "Rozgrzej się 10 minut",
+          "30 sekund szybkiego biegu / 30 sekund marszu",
+          "Powtórz 12–16 cykli",
+          "Utrzymuj konsekwentny wysiłek w każdej rundzie",
+          "Ochłodź i rozciągnij się"
+        ],
+        "tips": [
+          "Nie idź na całość wcześniej",
+          "Utrzymaj formę biegową",
+          "Nawilżaj między blokami",
+          "Powoli postępuj w sumie cykli"
+        ],
+        "equipment": "Śledź lub bieżni",
+        "calories": "300–400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "Interwały AirBike",
+        "description": "Trening cardio o niskiej intensywności i dużej intensywności, przyjazny dla kolan poza sezonem.",
+        "benefits": [
+          "Buduje VO2max",
+          "Ładowanie przyjazne dla stawów",
+          "Trenuje razem ręce i nogi",
+          "Szybka regeneracja po sesji"
+        ],
+        "instructions": [
+          "5 minut łatwego kręcenia",
+          "Maksymalnie 20 sekund / 40 sekund łatwo",
+          "10–12 rund",
+          "Monitoruj obroty i oddech",
+          "5 min ostudzić"
+        ],
+        "tips": [
+          "Rozluźnij chwyt uchwytów",
+          "Siedź stabilnie",
+          "Unikaj maksymalnego wysiłku dziennie",
+          "Śledź kalorie, aby uzyskać postęp"
+        ],
+        "equipment": "Rower AirBike / rower szturmowy",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "Bieg wahadłowy 5×5 m",
+        "description": "Krótkie zmiany kierunku, takie jak forecheck i odbicia w defensywie.",
+        "benefits": [
+          "Poprawia zmianę kierunku",
+          "Buduje prędkość pierwszego kroku",
+          "Reakcja pociągów",
+          "Kompaktowa wiertarka przystosowana do ćwiczeń"
+        ],
+        "instructions": [
+          "Zaznacz dwie linie oddalone od siebie o 5 m",
+          "Dotknij linii ręką, pobiegnij do tyłu",
+          "6–8 powtórzeń = 1 seria",
+          "Odpocznij 90 sek",
+          "3–4 zestawy"
+        ],
+        "tips": [
+          "Za każdym razem całkowicie dotknij linii",
+          "Eksploduj pierwsze kroki",
+          "Sadź mocno na zakrętach",
+          "Używaj przyczepnych butów"
+        ],
+        "equipment": "Stożki lub linie podłogowe",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Przyspieszenia z pozycji hokejowej",
+        "description": "Słabe atletyczne starty, które przeradzają się w wznowienia i bitwy o krążki.",
+        "benefits": [
+          "Poprawia pierwszy krok",
+          "Trenuje mechanikę niskiego startu",
+          "Buduje siłę nóg",
+          "Specyficzne dla hokeja"
+        ],
+        "instructions": [
+          "Ustaw postawę atletyczną: ugięte kolana, tułów wysunięty do przodu",
+          "Na sygnał sprint na dystansie 10–15 m",
+          "Pełny odpoczynek 60–90 sek",
+          "8–10 powtórzeń",
+          "Alternatywna noga prowadząca"
+        ],
+        "tips": [
+          "Trzymaj się do przodu, nie wyskakuj wcześnie",
+          "Mocno kieruj nogą w tył",
+          "Używaj broni agresywnie",
+          "Ogranicz do 10 wysokiej jakości powtórzeń"
+        ],
+        "equipment": "20-metrowy pas",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "Biegi tempowe na dystansie 400 m",
+        "description": "Kontrolowany szybki bieg, aby utrzymać wysoki wysiłek podobny do zmiany biegów.",
+        "benefits": [
+          "Buduje siłę aerobową",
+          "Uczy tempa",
+          "Poprawia wytrzymałość nóg",
+          "Dobra praca poza sezonem"
+        ],
+        "instructions": [
+          "Rozgrzej się 10 minut",
+          "400 m przy maks. 75–80%",
+          "Odpocznij 2 minuty spaceru",
+          "4–6 powtórzeń",
+          "Ochłodź 5 minut"
+        ],
+        "tips": [
+          "Równe tempo, a nie sprint",
+          "Monitoruj oddech",
+          "Korzystaj bezpiecznie z pasów ruchu",
+          "Postęp powtórzeń stopniowo"
+        ],
+        "equipment": "Śledź lub mierzona pętla",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Przysiady z wyskokiem Tabata",
+        "description": "Cztery minuty intensywnej pracy imitującej zmęczenie po późnej zmianie.",
+        "benefits": [
+          "Buduje wytrzymałość beztlenową",
+          "Krótka, ale efektywna sesja",
+          "Wzmacnia nogi",
+          "Przyjazny dla domu"
+        ],
+        "instructions": [
+          "Przysiady z wyskokiem maksymalnie 20 sekund",
+          "10 sekund odpoczynku",
+          "8 rund = 4 minuty",
+          "Rozgrzej się przed i ochłodź po",
+          "1–2 razy w tygodniu"
+        ],
+        "tips": [
+          "Ląduj miękko",
+          "Nigdy nie pomijaj rozgrzewki",
+          "Unikaj w dniu meczu",
+          "Chroń kolana w dobrej formie"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "Waga BOSU z kijem",
+        "description": "Niestabilna powierzchnia i obsługa kija zapewniają równowagę na lodzie.",
+        "benefits": [
+          "Poprawia propriocepcję",
+          "Trenuje równowagę postawy",
+          "Łączy dłonie i stopy",
+          "Buduje stabilność kostki"
+        ],
+        "instructions": [
+          "Stań na BOSU obiema stopami",
+          "Trzymaj kij, lekko trzymaj krążek",
+          "Przytrzymaj 30–45 sekund",
+          "Odpocznij i powtórz 4–6 razy",
+          "Kiedy będziesz gotowy, wypróbuj pojedynczą nogę"
+        ],
+        "tips": [
+          "Patrz do przodu, nie w dół",
+          "Miękkie zgięcie kolana",
+          "Ściana w pobliżu dla bezpieczeństwa",
+          "Zacznij bez krążka"
+        ],
+        "equipment": "BOSU, kij hokejowy",
+        "calories": "70–100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Zasięg RDL na jednej nodze",
+        "description": "Równowaga plus łańcuch tylny, jak jazda na łyżwach na jednej nodze na zmianę.",
+        "benefits": [
+          "Buduje równowagę na jednej nodze",
+          "Wzmacnia ścięgno podkolanowe i pośladki",
+          "Poprawia kontrolę bioder",
+          "Specjalnie dla łyżwiarzy"
+        ],
+        "instructions": [
+          "Stań na jednej nodze z lekkim hantlem",
+          "Zawias do przodu, wolna noga do tyłu",
+          "Dotknij podłogi lub goleni",
+          "Wróć do pionu",
+          "8–10 powtórzeń na nogę"
+        ],
+        "tips": [
+          "Skup wzrok na jednym miejscu",
+          "Poruszaj się powoli",
+          "Utrzymuj biodra na poziomie",
+          "2–3 zestawy"
+        ],
+        "equipment": "Hantle",
+        "calories": "120–170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Równowaga palców na jednej nodze",
+        "description": "Proste ćwiczenie stabilizujące kostkę i stopę do jazdy na łyżwach.",
+        "benefits": [
+          "Wzmacnia stopy",
+          "Poprawia równowagę",
+          "Szybkie codzienne ćwiczenie",
+          "Można to zrobić wszędzie"
+        ],
+        "instructions": [
+          "Stań na jednej nodze",
+          "Podnieś się na palce",
+          "Przytrzymaj 15–20 sekund",
+          "Opuść i zmień nogi",
+          "6–8 powtórzeń na nogę"
+        ],
+        "tips": [
+          "W razie potrzeby skorzystaj ze wsparcia",
+          "Oczy do przodu",
+          "Oddychaj normalnie",
+          "Boso lub w butach"
+        ],
+        "equipment": "Nic",
+        "calories": "30–50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Podanie partnerskie na jednej nodze",
+        "description": "Równowaga i koordynacja podań, jak ruch w grze.",
+        "benefits": [
+          "Linki balansują i przechodzą",
+          "Poprawia stabilność rdzenia",
+          "Pociągi skupiają się",
+          "Wiertarka partnerska"
+        ],
+        "instructions": [
+          "Stań na jednej nodze z krążkiem/piłką",
+          "Partner w odległości 3–4 m",
+          "Wykonuj dokładne podania",
+          "30 sekund, zmień nogę",
+          "4 rundy"
+        ],
+        "tips": [
+          "Miękkie kolana",
+          "Wyraźne podania",
+          "Nie poświęcaj równowagi na rzecz mocy",
+          "Odbijak ścienny również działa"
+        ],
+        "equipment": "Krążek/piłka, partner",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Wykroki chodowe z rotacją",
+        "description": "Dynamiczna równowaga i rotacja w celu przygotowania do sprawdzenia ciała.",
+        "benefits": [
+          "Poprawia równowagę dynamiczną",
+          "Buduje rotację z nóg",
+          "Wzmacnia nogi",
+          "Funkcjonalna do gry w hokeja"
+        ],
+        "instructions": [
+          "Wejdź do wypadu do przodu",
+          "Obróć tułów w stronę przedniej nogi",
+          "Wróć i wykonaj krok drugą nogą",
+          "10 kroków na każdą nogę",
+          "2–3 zestawy"
+        ],
+        "tips": [
+          "Ślady kolan nad stopą",
+          "Pozostań wysoki",
+          "Opcjonalnie trzymaj piłkę przy klatce piersiowej",
+          "Kontroluj tempo"
+        ],
+        "equipment": "Nic",
+        "calories": "100–150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Boczne stopnie deski przesuwnej",
+        "description": "Symuluje jazdę boczną z naciskiem na równowagę.",
+        "benefits": [
+          "Buduje siłę boczną",
+          "Poprawia równowagę na boki",
+          "Rozwija przywodziciele",
+          "Świetne dla obrońców"
+        ],
+        "instructions": [
+          "Deska do zjeżdżania lub suwaki do skarpet",
+          "Kroki boczne 20–30 sekund",
+          "Trzymaj niską postawę",
+          "Odpocznij 60 sek",
+          "6–8 zestawów"
+        ],
+        "tips": [
+          "Nie stój prosto",
+          "Ręce w pozycji gotowości",
+          "Kontroluj prędkość",
+          "Użyj zderzaków do desek"
+        ],
+        "equipment": "Plansza do przesuwania",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Skoki przez płotki",
+        "description": "Buduje eksplozywność nóg podczas serii uderzeń pierwszego kroku i skoków bojowych.",
+        "benefits": [
+          "Zwiększa moc pionową i poziomą",
+          "Poprawia reaktywność",
+          "Rozwija koordynację",
+          "Transfery do przyspieszenia lodowego"
+        ],
+        "instructions": [
+          "Ustaw płotki w odległości 60–90 cm",
+          "Przeskocz nad każdym na dwie stopy",
+          "Miękkie lądowanie",
+          "6–8 płotków w secie",
+          "3–4 zestawy"
+        ],
+        "tips": [
+          "Miękkie kolana podczas lądowania",
+          "Aktywnie używaj broni",
+          "Zacznij od niskich płotków",
+          "Pełny odpoczynek pomiędzy seriami"
+        ],
+        "equipment": "Płotki lub stożki",
+        "calories": "140–200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Start z pozycji siedzącej do sprintu",
+        "description": "Usuwa wstępne rozciągnięcie, aby trenować czystą eksplozywność pierwszego kroku.",
+        "benefits": [
+          "Buduje siłę początkową",
+          "Poprawia reakcję",
+          "Trenuje wyprost bioder",
+          "Proste ćwiczenie w terenie"
+        ],
+        "instructions": [
+          "Usiądź na ziemi, nogi do przodu",
+          "Stań na zawołanie i przebiegnij 10 m",
+          "8–10 powtórzeń",
+          "Odpoczynek 60–90 sek",
+          "Najpierw się rozgrzej"
+        ],
+        "tips": [
+          "Nie pochylaj się przed sygnałem",
+          "Wstań wybuchowo",
+          "Pierwsze 3 kroki maksymalnej mocy",
+          "Alternatywne kierunki"
+        ],
+        "equipment": "Pas o długości 10 m",
+        "calories": "100–150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Seria skoków w dal",
+        "description": "Moc pozioma przydatna w bitwach na desce i push-offach.",
+        "benefits": [
+          "Buduje moc poziomą",
+          "Poprawia koordynację",
+          "Wzmacnia nogi",
+          "Krótka sesja"
+        ],
+        "instructions": [
+          "Skok w dal z miejsca",
+          "Miękkie lądowanie",
+          "Zaraz potem kolejny skok do przodu",
+          "5 skoków w rzędzie = 1 seria",
+          "4–5 serii z przerwą"
+        ],
+        "tips": [
+          "Użyj machania ramionami",
+          "Ziemia zrównoważona",
+          "Przepływ skoku do skoku",
+          "Rozgrzej kolana"
+        ],
+        "equipment": "Majdan",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Uderzenie piłką lekarską",
+        "description": "Wybuchowy rzut w dół zapewniający siłę kontaktu całym ciałem.",
+        "benefits": [
+          "Buduje wybuchowy rdzeń",
+          "Wysoka intensywność szybko",
+          "Łączy nogi-rdzeń-ramiona",
+          "Świetne uwolnienie od stresu"
+        ],
+        "instructions": [
+          "Podnieś piłkę lekarską nad głowę",
+          "Uderz w podłogę z całą siłą",
+          "Podnieś i powtórz",
+          "10–12 powtórzeń",
+          "3 zestawy"
+        ],
+        "tips": [
+          "Użyj nóg i rdzenia",
+          "Neutralny kręgosłup podczas podnoszenia",
+          "Oglądaj odbicie",
+          "Użyj piłki o masie 4–8 kg"
+        ],
+        "equipment": "Piłka lekarska",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Pchanie sań",
+        "description": "Ciężki napęd poziomy, przypominający maksymalny start na stojąco.",
+        "benefits": [
+          "Maksymalny napęd nóg",
+          "Ładowanie o niskim wpływie",
+          "Buduje odporność psychiczną",
+          "Świetny dla silnych napastników"
+        ],
+        "instructions": [
+          "Niska postawa za saniami",
+          "Pchnij 15–20 m",
+          "Pełny odpoczynek 2 min",
+          "4–6 pchnięć",
+          "Najpierw wspólna rozgrzewka"
+        ],
+        "tips": [
+          "Trzymaj się nisko",
+          "Krótkie, mocne kroki",
+          "Nie wstawaj wcześnie",
+          "Włącz światło przy obciążeniu"
+        ],
+        "equipment": "Sanie Prowlera",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike stale 10 minut",
+        "description": "Baza aerobowa do długich zmian i klimatyzacji poza sezonem.",
+        "benefits": [
+          "Buduje wytrzymałość aerobową",
+          "Przyjazny dla stawów",
+          "Kontrola tętna",
+          "Szybka sesja poza lodem"
+        ],
+        "instructions": [
+          "5 minut rozgrzewki",
+          "10 minut przy wysiłku 65–70%.",
+          "Stałe obroty",
+          "5 min ostudzić",
+          "Monitoruj oddech"
+        ],
+        "tips": [
+          "Trzymaj się z dala od strefy beztlenowej",
+          "Stabilna postawa",
+          "Hydrat",
+          "2–3 razy w tygodniu"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Wioślarskie interwały erg",
+        "description": "Kardio całego ciała bez wpływu na wytrzymałość tułowia i nóg.",
+        "benefits": [
+          "Kondycjonowanie całego ciała",
+          "Poprawia postawę wioślarską",
+          "Buduje przyczepność i rdzeń",
+          "Biegająca alternatywa"
+        ],
+        "instructions": [
+          "500 m trudne / 1 min łatwe",
+          "6–8 rund",
+          "Napęd od nóg i rdzenia",
+          "5 minut rozgrzewki",
+          "Rozciąganie ochładzające"
+        ],
+        "tips": [
+          "Neutralny kręgosłup",
+          "Łokcie do bioder",
+          "Nawet podzielone tempo",
+          "Wyreguluj amortyzator mądrze"
+        ],
+        "equipment": "Wioślarstwo erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Ciągłe podskoki na łyżwach",
+        "description": "Rytmiczne podskoki boczne do ćwiczeń nóg i ćwiczeń bocznych.",
+        "benefits": [
+          "Buduje wytrzymałość boczną",
+          "Wzmacnia nogi",
+          "Naśladuje zmiany kierunku",
+          "Kompaktowa wiertarka"
+        ],
+        "instructions": [
+          "Przeskakuj z boku na bok na jednej nodze na drugą",
+          "Ramiona jak jazda na łyżwach",
+          "30 sek. pracy / 30 sek. odpoczynku",
+          "10 rund",
+          "Miękkie lądowania"
+        ],
+        "tips": [
+          "Ślady kolan nad stopą",
+          "Pierś w górę",
+          "Kontroluj odległość skoku",
+          "Najpierw się rozgrzej"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "Trening obwodowy 45/15",
+        "description": "Czterostanowiskowy tor do ogólnej kondycji hokejowej.",
+        "benefits": [
+          "Obciążenie całego ciała",
+          "Efektywne czasowo",
+          "Buduje zdolność do pracy",
+          "Możliwość dostosowania siłowni"
+        ],
+        "instructions": [
+          "Burpees, alpiniści, przysiady z wyskokiem, pompki",
+          "45 sek. pracy / 15 sek. przejścia",
+          "4 ruchy × 4 rundy",
+          "2 minuty przerwy pomiędzy rundami",
+          "Rozgrzej się i ochłodź"
+        ],
+        "tips": [
+          "Skaluj do swojego poziomu",
+          "Forma ponad prędkością",
+          "Utrzymuj nawodnienie",
+          "Unikaj w dniu meczu"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Przebiegi przez niskie płotki",
+        "description": "Cardio plus koordynacja z szybkimi krokami, takimi jak twarda jazda na łyżwach.",
+        "benefits": [
+          "Poprawia kadencję",
+          "Buduje koordynację",
+          "Zwiększa wydolność aerobową",
+          "Zróżnicowana praca"
+        ],
+        "instructions": [
+          "6–8 niskich płotków na dystansie 20 m",
+          "Biegnij z wysokimi kolanami",
+          "6 przejść",
+          "Odpocznij 90 sek",
+          "Seria 3–4"
+        ],
+        "tips": [
+          "Nie przycinaj płotków",
+          "Szybkie, krótkie kroki",
+          "Aktywne ramiona",
+          "Rozgrzej stawy"
+        ],
+        "equipment": "Mini płotki",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Szybkie stopy po drabinie",
+        "description": "Podstawa szybkich stóp do wykonywania uników i ciasnych zakrętów.",
+        "benefits": [
+          "Poprawia szybkość stopy",
+          "Buduje koordynację",
+          "Wzmacnia reakcję",
+          "Rozgrzewka przed lodem"
+        ],
+        "instructions": [
+          "Wejście-wyjście-wyjście przez drabinę",
+          "Maks. 30 sek. / 30 sek. odpoczynku",
+          "8 rund",
+          "Zmieniaj wzory co drugą rundę",
+          "Najpierw lekka rozgrzewka"
+        ],
+        "tips": [
+          "Oczy w górę",
+          "Krótkie kroki",
+          "Ręce w gotowości sportowej",
+          "Nie pomijaj szczebli"
+        ],
+        "equipment": "Drabina zwinności",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "Zwinność typu T",
+        "description": "Klasyczny test T: sprint, shuffle i cofanie się jak na lodzie.",
+        "benefits": [
+          "Kompletny pakiet zwinności",
+          "Pociągi we wszystkich kierunkach",
+          "Możliwość śledzenia postępu",
+          "Dla łyżwiarzy"
+        ],
+        "instructions": [
+          "Biegnij 10 m do przodu",
+          "Przemieszaj 5 m w lewo i prawo",
+          "Aby rozpocząć, cofnij się 10 m",
+          "3–5 powtórzeń",
+          "Odpocznij 90 sek"
+        ],
+        "tips": [
+          "Trzymaj się nisko w shuffle",
+          "Nie krzyżuj stóp",
+          "Dotykaj szyszek",
+          "Rejestruj swoje czasy"
+        ],
+        "equipment": "Szyszki",
+        "calories": "100–150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Wiertło krążkowe nr 8",
+        "description": "Rękojeść kija w kształcie ósemki łącząca pracę rąk i nóg.",
+        "benefits": [
+          "Poprawia obsługę kija",
+          "Łączy dłonie i stopy",
+          "Trenuje widzenie peryferyjne",
+          "Przyjazny dla domu"
+        ],
+        "instructions": [
+          "Dwa stożki oddalone od siebie o 2 m",
+          "Przełóż figurę 8 wokół stożków",
+          "Maksymalna prędkość 30 sekund",
+          "Odpocznij 30 sek",
+          "10 rund"
+        ],
+        "tips": [
+          "Głowa do góry",
+          "Miękkie dłonie",
+          "Szybkie stopy",
+          "Zmieniaj kierunek co 5 rund"
+        ],
+        "equipment": "Krążek, 2 stożki, kij",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktywne wywołania stożkowe",
+        "description": "Partner wywołuje stożek — reakcja i pierwszy krok, jak odczyty w grze.",
+        "benefits": [
+          "Trenuje reakcję gry",
+          "Poprawia szybkość poznawczą",
+          "Buduje pierwszy krok",
+          "Wiertarka partnerska"
+        ],
+        "instructions": [
+          "4 stożki na 3 m kwadracie",
+          "Partner wywołuje kolor/numer",
+          "Sprint do stożka",
+          "Dotknij i wróć",
+          "20 reakcji"
+        ],
+        "tips": [
+          "Bądź szczery, bez zgadywania na początku",
+          "Niska postawa",
+          "Wybuchowy pierwszy krok",
+          "Zmieniaj układ"
+        ],
+        "equipment": "4 stożki, partnerze",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Boczne kroki przetasowania",
+        "description": "Przesunięcia boczne w postawie hokejowej naśladującej jazdę na łyżwach bocznych.",
+        "benefits": [
+          "Buduje szybkość boczną",
+          "Wzmacnia odwodziciele bioder",
+          "Poprawia postawę",
+          "Rozgrzewka przed lodem"
+        ],
+        "instructions": [
+          "5 m przemieszaj się w lewo i prawo",
+          "Nie krzyżuj stóp",
+          "30 sek. / 30 sek. odpoczynku",
+          "8 rund",
+          "Ręce na wyimaginowanym kiju"
+        ],
+        "tips": [
+          "Trzymaj się nisko",
+          "Odepchnij zewnętrzną nogę",
+          "Klatka piersiowa do przodu",
+          "Szybkie kontakty"
+        ],
+        "equipment": "Stożki lub linie",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynamiczny otwieracz bioder",
+        "description": "Rozgrzewka zwiększająca mobilność bioder w głębokiej postawie hokejowej.",
+        "benefits": [
+          "Poprawia mobilność bioder",
+          "Obniża ryzyko kontuzji pachwiny",
+          "Przygotowuje się do jazdy na łyżwach",
+          "Szybka rutyna"
+        ],
+        "instructions": [
+          "Wymachy nogami przód-tył po 10 sztuk",
+          "Wymachy nóg na boki po 10 sztuk",
+          "Głęboki przysiad, przytrzymaj 30 sek",
+          "Kręgi bioder 10 w każdą stronę",
+          "Chodzące uściski kolanowe 10 m"
+        ],
+        "tips": [
+          "Kontrolowany zasięg",
+          "Żadnego bólu",
+          "Oddychaj głęboko",
+          "Przed każdą sesją"
+        ],
+        "equipment": "Nic",
+        "calories": "40–60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Największy odcinek świata",
+        "description": "Dynamiczne rozciąganie angażujące biodra, kręgosłup piersiowy i ścięgna podkolanowe.",
+        "benefits": [
+          "Mobilność całego ciała",
+          "Efektywne czasowo",
+          "Przygotowuje całe ciało",
+          "Wspólna profesjonalna rozgrzewka"
+        ],
+        "instructions": [
+          "Wejdź do lonży",
+          "Łokieć w dół wewnątrz stopy",
+          "Ramię obrotowe klatki piersiowej w górę",
+          "Wyprostuj przednią nogę dla ścięgna podkolanowego",
+          "5 powtórzeń na stronę"
+        ],
+        "tips": [
+          "Poruszaj się powoli",
+          "Żadnego odbijania",
+          "Śledź przednie kolano",
+          "Równe obie strony"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "50–70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Taśma rozsuwana",
+        "description": "Aktywuje górną część pleców i barków przed oddaniem strzału i kontaktem.",
+        "benefits": [
+          "Aktywuje tylne naramienniki i romby",
+          "Poprawia postawę",
+          "Rozgrzewa ramiona",
+          "Zapobieganie kontuzjom"
+        ],
+        "instructions": [
+          "Trzymaj opaskę na wysokości klatki piersiowej",
+          "Ramiona proste",
+          "Rozsuń się do łopatek",
+          "15–20 powtórzeń",
+          "2–3 zestawy"
+        ],
+        "tips": [
+          "Żadnego wzruszania ramionami",
+          "Kontrolowany powrót",
+          "Na początek lekki zespół",
+          "Przed lodem lub siłownią"
+        ],
+        "equipment": "Zespół oporu",
+        "calories": "30–50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Wysokie kolana + kopnięcia w tyłek",
+        "description": "Dynamiczna rozgrzewka nóg i zwiększenie tętna przed lodem.",
+        "benefits": [
+          "Podnosi tętno",
+          "Rozgrzewa mięśnie czworogłowe i ścięgna podkolanowe",
+          "Poprawia koordynację",
+          "Szybki efekt"
+        ],
+        "instructions": [
+          "Kolana o wysokości 20 m",
+          "Kopnięcia w tyłek na 20 m",
+          "Skakanie na 20 m",
+          "Powtórz 3–4 razy",
+          "Łatwy jogging pomiędzy"
+        ],
+        "tips": [
+          "Pozostań na przodzie",
+          "Aktywne ramiona",
+          "Buduj tempo stopniowo",
+          "Nie biegaj na zimno"
+        ],
+        "equipment": "20m przestrzeni",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Wymachy ramionami + rozgrzewka z kijami",
+        "description": "Rozgrzewka barków i lekkie trzymanie kija przed lodem.",
+        "benefits": [
+          "Mobilizuje ramiona",
+          "Aktywuje mankiet rotatorów",
+          "Łączy górną część ciała z przyczepieniem",
+          "Specyficzne dla hokeja"
+        ],
+        "instructions": [
+          "Wykonaj 10 okrążeń ramionami w każdą stronę",
+          "Huśtawki krzyżowe 10",
+          "Rękojeść drążka od wolnego do szybkiego 60 sek",
+          "Rolki na nadgarstki z kijem 20",
+          "Ruch lekkiego strzału x10"
+        ],
+        "tips": [
+          "Szybkość postępu",
+          "Obie ręce",
+          "Brak wymuszonego zasięgu",
+          "Każda sesja lodowa"
+        ],
+        "equipment": "Kij, krążek",
+        "calories": "50–80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Rozciąganie zginaczy stawu biodrowego w klęku",
+        "description": "Rozciągnięcie zginaczy bioder w celu przeciwdziałania postawie podczas jazdy na łyżwach.",
+        "benefits": [
+          "Zmniejsza napięcie bioder",
+          "Może poprawić krok",
+          "Pomaga w postawie",
+          "Po lodzie lub siłowni"
+        ],
+        "instructions": [
+          "Pozycja klęcząca i wypadowa",
+          "Ściśnij pośladki",
+          "Tułów wysoki",
+          "Przytrzymaj 30–45 sek",
+          "2–3 razy na nogę"
+        ],
+        "tips": [
+          "Unikaj łuku lędźwiowego",
+          "Wdychaj do rozciągnięcia",
+          "Przednie kolano nad kostką",
+          "Jeśli to możliwe, codziennie"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "Rotacja bioder 90/90",
+        "description": "Mobilność bioder podczas skrętów i głębokiego przysiadu na rolkach.",
+        "benefits": [
+          "Poprawia rotację bioder",
+          "Obniża ryzyko nadwyrężenia pachwiny",
+          "Spokojna praca regeneracyjna",
+          "Przyjazny po meczu"
+        ],
+        "instructions": [
+          "Usiądź w pozycji 90/90",
+          "Obracaj kolana na boki",
+          "Ręce za wsparciem",
+          "10 wolnych powtórzeń w każdą stronę",
+          "Przytrzymaj koniec 20 sek"
+        ],
+        "tips": [
+          "Brak zasięgu wymuszania",
+          "Wysoka klatka piersiowa",
+          "Jeśli to możliwe, oba biodra w dół",
+          "Użyj oddechu"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Rozciągnięcie rotacji klatki piersiowej",
+        "description": "Mobilność klatki piersiowej dla rotacji strzału i postawy.",
+        "benefits": [
+          "Poprawia rotację kręgosłupa T",
+          "Rozładowuje dolną część pleców",
+          "Pomaga w mechanice strzału",
+          "Szybkie codzienne ćwiczenie"
+        ],
+        "instructions": [
+          "Pozycja czworonożna",
+          "Ręka za głową",
+          "Obróć łokieć do sufitu",
+          "10 powtórzeń na każdą stronę",
+          "Zatrzymaj się na 2 sekundy u góry"
+        ],
+        "tips": [
+          "Biodra pozostają proste",
+          "Wydech podczas rotacji",
+          "Żadnych bólów kręgosłupa",
+          "Poruszaj się powoli"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "30–45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Rozciąganie łydek przy ścianie",
+        "description": "Łydki i Achilles często przeciążane w łyżwach.",
+        "benefits": [
+          "Zmniejsza napięcie łydek",
+          "Poprawia zgięcie grzbietowe kostki",
+          "Zapobieganie szynie goleniowej",
+          "Po każdej sesji"
+        ],
+        "instructions": [
+          "Ręce na ścianie",
+          "Tylna nogawka prosta, pięta w dół",
+          "Przytrzymaj 30 sek",
+          "Zegnij kolano w pozycji podeszwy",
+          "2–3 rundy na każdą nogę"
+        ],
+        "tips": [
+          "Pięta na podłodze",
+          "Biodra kwadratowe",
+          "Żadnego odbijania",
+          "Obie nogi"
+        ],
+        "equipment": "Ściana",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Rozciąganie ramion w poprzek ciała",
+        "description": "Rozciągnięcie tylnego barku po objętości strzału.",
+        "benefits": [
+          "Zmniejsza napięcie ramion",
+          "Pomaga w oddawaniu strzału",
+          "Szybkie rozciąganie",
+          "Codzienna konserwacja"
+        ],
+        "instructions": [
+          "Przeciągnij ramię przez klatkę piersiową",
+          "Drugą ręką przytrzymaj łokieć",
+          "30 sekund na każde ramię",
+          "Powtórz 2–3 razy",
+          "Zrelaksowana szyja"
+        ],
+        "tips": [
+          "Nie wzruszaj ramionami",
+          "Tylko delikatne pociągnięcie",
+          "Wykonaj wydech i zrelaksuj się",
+          "Po lodzie"
+        ],
+        "equipment": "Nic",
+        "calories": "20–35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Oddychanie przeponowe",
+        "description": "Głębokie oddychanie w celu regeneracji układu przywspółczulnego po meczu.",
+        "benefits": [
+          "Obniża stres",
+          "Wspomaga regenerację",
+          "Może poprawić sen",
+          "Przyjazny w szatni"
+        ],
+        "instructions": [
+          "Połóż się lub usiądź wygodnie",
+          "Ręka na brzuchu",
+          "Wdychaj nos przez 4 sekundy",
+          "Wydech ustami przez 6 sekund",
+          "5 minut ciągłego"
+        ],
+        "tips": [
+          "Unosi się brzuch, a nie klatka piersiowa",
+          "Cicha przestrzeń",
+          "Codzienny nawyk",
+          "Po późnych meczach"
+        ],
+        "equipment": "Nic",
+        "calories": "15–25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Nogi pod ścianę",
+        "description": "Powrót żylny i rozluźnienie nóg po ciężkich meczach.",
+        "benefits": [
+          "Może zmniejszyć obrzęk nóg",
+          "Wspomaga relaks",
+          "Odzyskiwanie pasywne",
+          "Po grach podróżniczych"
+        ],
+        "instructions": [
+          "Biodra w pozycji leżącej blisko ściany",
+          "Nogi ustawione pionowo na ścianie",
+          "Ramiona rozluźnione",
+          "Przytrzymaj 8–10 minut",
+          "Powolny oddech"
+        ],
+        "tips": [
+          "Wygodna powierzchnia",
+          "Odłącz od telefonu",
+          "Opcjonalnie spokojna muzyka",
+          "Najlepiej wieczorem"
+        ],
+        "equipment": "Ściana, mat",
+        "calories": "20–30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Rolki piankowe na mięśnie czworogłowe i ścięgna podkolanowe",
+        "description": "Uwolnienie mięśniowo-powięziowe nóg po dużym obciążeniu.",
+        "benefits": [
+          "Zmniejsza bolesność",
+          "Poprawia jakość tkanki",
+          "Szybszy powrót do zdrowia",
+          "Dbanie o zdrowie : samoopieka"
+        ],
+        "instructions": [
+          "Rzuć quadami po 60 sekund każdy",
+          "Napinaj ścięgna podkolanowe po 60 sekund każde",
+          "Wstrzymaj delikatne miejsca na 20 sekund",
+          "Tylko lekki zespół IT",
+          "Nawilżaj po"
+        ],
+        "tips": [
+          "Unikaj stawów",
+          "Oddychaj przez ciasne miejsca",
+          "Umiarkowane ciśnienie",
+          "Nie przed lodem"
+        ],
+        "equipment": "Wałek piankowy",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Płynna mobilność bioder i kostek",
+        "description": "Delikatna mobilność poza dniem, aby zachować zakres ruchu.",
+        "benefits": [
+          "Utrzymuje mobilność",
+          "Niskie zmęczenie",
+          "Aktywna regeneracja",
+          "Zapobieganie kontuzjom"
+        ],
+        "instructions": [
+          "Koła w kostkach po 10 sztuk",
+          "Hip CAR 5 w każdą stronę",
+          "Kot-krowa 10 powtórzeń",
+          "Pozycja dziecka 60 sek",
+          "2 rundy"
+        ],
+        "tips": [
+          "Zakres bez bólu",
+          "Powolne i kontrolowane",
+          "Dzień wolny lub poranek",
+          "Dodaj oddychanie"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Przygotowanie do snu Rozciągnij się i oddychaj",
+        "description": "Lekkie rozciąganie i oddychanie przed snem w celu regeneracji przez noc.",
+        "benefits": [
+          "Wspomaga zasypianie",
+          "Relaksuje układ nerwowy",
+          "Regeneracja podczas snu",
+          "Wieczorny rytuał"
+        ],
+        "instructions": [
+          "Rozciąganie ścięgna podkolanowego po 30 sekund każde",
+          "Pozycja dziecka 60 sek",
+          "Skręt na plecach po 30 sekund każdy",
+          "Oddychanie pudełkowe 4-4-4-4 przez 3 min",
+          "Ciemny, cichy pokój"
+        ],
+        "tips": [
+          "Żadnych screenów po",
+          "Stała pora snu",
+          "Fajny pokój",
+          "Zrób z tego nawyk"
+        ],
+        "equipment": "Mata do ćwiczeń",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     },
     "difficulties": {
@@ -1520,6 +2920,8 @@
     "codeSentToEmailMessage": "Kod wysłany na {email}",
     "userNotFound": "Użytkownik nie został znaleziony",
     "userNotFoundMessage": "Konto o tym numerze telefonu nie istnieje. Zarejestruj się.",
+    "networkError": "Problem z połączeniem",
+    "networkErrorMessage": "Nie udało się połączyć z serwerem. Sprawdź internet i spróbuj ponownie.",
     "errorSendingCode": "Błąd",
     "errorSendingCodeMessage": "Nie udało się wysłać kodu. Sprawdź swój numer telefonu i połączenie internetowe.",
     "errorResendingCode": "Błąd",
@@ -1704,6 +3106,8 @@
     "rightShort": "P",
     "startedHockey": "W hokeju z",
     "noFriendsYet": "{name} nie ma jeszcze znajomych",
+    "inviteYourTeam": "Zaproś swoją drużynę",
+    "inviteTeamMessage": "Jestem na HockeyStars – aplikacji dla hokeistów. Dołącz do mnie:",
     "beFirstToAdd": "Bądź pierwszą osobą, która doda {name} jako znajomego",
     "writeMessage": "Napisz wiadomość",
     "edit": "Redagować",
@@ -2172,9 +3576,17 @@
     "weightFrom": "Waga",
     "all": "Wszystko",
     "noPlayersFound": "Nie znaleziono graczy",
+    "newcomers": "Nowicjusze",
+    "topByPoints": "Top według punktów",
     "left": "Lewy",
     "right": "Prawidłowy",
-    "resetFilters": "Resetuj filtry"
+    "resetFilters": "Resetuj filtry",
+    "topBySV": "Top SV%",
+    "shareRating": "Udostępnij ranking",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "punktów",
+    "allCountries": "Wszystkie kraje",
+    "allYears": "Wszystkie lata"
   },
   "messages": {
     "title": "Wiadomości",
@@ -2672,7 +4084,9 @@
     "physicalDataUpdate": "Aktualizacja danych fizycznych",
     "friendRequest": "Zaproszenie do znajomych",
     "newFriendship": "Nowa przyjaźń",
-    "speedRecord": "Nowy rekord prędkości"
+    "speedRecord": "Nowy rekord prędkości",
+    "gameFirstPlace": "Mistrz gry",
+    "quizFirstPlace": "Gwiazda hokeja"
   },
   "statsNotification": {
     "updated": "zaktualizował",
@@ -2683,5 +4097,20 @@
   "height": "wzrost",
   "weight": "waga",
   "cm": "cm",
-  "kg": "kg"
+  "kg": "kg",
+  "videoUploadHint": "Maks. 20 sekund na film, do 10 filmów",
+  "gameFirstPlaceNotification": {
+    "title": "Mistrz gry",
+    "message": "{playerName} zajął 1. miejsce"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Gwiazda hokeja",
+    "message": "{playerName} zarobił {prize}"
+  },
+  "tabs": {
+    "chat": "Czat",
+    "feed": "Feed",
+    "scout": "Skaut",
+    "skills": "Skill"
+  }
 }

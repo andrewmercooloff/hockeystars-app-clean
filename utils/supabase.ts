@@ -1,11 +1,306 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import {
+  clearCachedSupabaseOrigin,
+  preferSupabaseProxyOrigin,
+  revalidateSupabaseOriginInBackground,
+  resolveSupabaseOrigin,
+  SUPABASE_DIRECT_URL,
+  SUPABASE_KNOWN_ORIGINS,
+  SUPABASE_PROXY_URL,
+} from './supabaseRouting';
 
-// Конфигурация Supabase
-// Эти ключи нужно будет заменить на реальные после создания проекта в Supabase
-const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+export {
+  clearCachedSupabaseOrigin,
+  getSupabaseRouteKind,
+  isLikelyRussia,
+  SUPABASE_DIRECT_URL,
+  SUPABASE_KNOWN_ORIGINS,
+  SUPABASE_PROXY_URL,
+} from './supabaseRouting';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/** Прямой Supabase (legacy alias). */
+export const supabaseLegacyUrl = SUPABASE_DIRECT_URL;
+
+const ENV_LOCKED_URL = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();
+
+export const supabaseAnonKey =
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+
+let activeSupabaseUrl = ENV_LOCKED_URL || SUPABASE_PROXY_URL;
+
+export function getActiveSupabaseUrl(): string {
+  return activeSupabaseUrl;
+}
+
+/** Активный URL API (меняется после probe: direct vs Moscow proxy). */
+export function getSupabaseUrl(): string {
+  return getActiveSupabaseUrl();
+}
+
+/** @deprecated Используйте getActiveSupabaseUrl() — значение может меняться после старта. */
+export const supabaseUrl = activeSupabaseUrl;
+
+const rewriteToActiveOrigin = (url: string): string => {
+  let next = url;
+  for (const origin of SUPABASE_KNOWN_ORIGINS) {
+    if (origin !== activeSupabaseUrl) {
+      next = next.replace(new RegExp(origin.replace(/\./g, '\\.'), 'gi'), activeSupabaseUrl);
+    }
+  }
+  return next;
+};
+
+/** Заменяет любой известный origin Supabase на текущий активный маршрут. */
+export const rewriteSupabasePublicUrl = <T extends string | null | undefined>(url: T): T => {
+  if (!url || typeof url !== 'string') {
+    return url;
+  }
+  if (!url.includes('.supabase.co') && !url.includes('api.hockey-stars.com')) {
+    return url;
+  }
+  return rewriteToActiveOrigin(url) as T;
+};
+
+export const rewriteSupabaseUrlsDeep = <T,>(value: T): T => {
+  if (typeof value === 'string') {
+    return rewriteSupabasePublicUrl(value) as T;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => rewriteSupabaseUrlsDeep(item)) as T;
+  }
+  if (value && typeof value === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      result[key] = rewriteSupabaseUrlsDeep(nested);
+    }
+    return result as T;
+  }
+  return value;
+};
+
+export const getSupabaseFunctionUrl = (functionName: string) =>
+  `${getActiveSupabaseUrl()}/functions/v1/${functionName}`;
+
+export const getStorageObjectUrl = (bucket: string, path: string) =>
+  `${getActiveSupabaseUrl()}/storage/v1/object/${bucket}/${path}`;
+
+export const getStoragePublicUrl = (bucket: string, path: string) =>
+  `${getActiveSupabaseUrl()}/storage/v1/object/public/${bucket}/${path}`;
+
+export class SupabaseNetworkError extends Error {
+  constructor(message = 'Network request failed') {
+    super(message);
+    this.name = 'SupabaseNetworkError';
+  }
+}
+
+export const isSupabaseNetworkError = (error: unknown): boolean => {
+  if (error instanceof SupabaseNetworkError) return true;
+  const msg = String((error as { message?: string })?.message ?? error ?? '').toLowerCase();
+  const code = String((error as { error?: string; code?: string })?.code ?? '');
+  return (
+    msg.includes('network request failed') ||
+    msg.includes('failed to fetch') ||
+    msg.includes('network error') ||
+    msg.includes('timeout') ||
+    msg.includes('timed out') ||
+    msg.includes('econnreset') ||
+    msg.includes('econnrefused') ||
+    msg.includes('enotfound') ||
+    msg.includes('socket') ||
+    msg.includes('abort') ||
+    msg.includes('aborted') ||
+    msg.includes('bad gateway') ||
+    msg.includes('service unavailable') ||
+    code === 'NETWORK_ERROR'
+  );
+};
+
+export const throwIfSupabaseNetworkError = (error: unknown): void => {
+  if (isSupabaseNetworkError(error)) {
+    throw new SupabaseNetworkError(
+      error instanceof Error ? error.message : 'Network request failed'
+    );
+  }
+};
+
+export const resetSupabaseEndpointPreference = async (): Promise<void> => {
+  await clearCachedSupabaseOrigin();
+  routingReadyPromise = null;
+};
+
+const SUPABASE_RETRY_DELAYS_MS = [250, 500, 1000];
+const SUPABASE_RETRYABLE_STATUSES = new Set([502, 503, 504]);
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const isRetryableMethod = (init?: RequestInit): boolean => {
+  const method = (init?.method ?? 'GET').toUpperCase();
+  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+};
+
+const isRetryableResponse = (response: Response): boolean =>
+  SUPABASE_RETRYABLE_STATUSES.has(response.status);
+
+const normalizeFetchInput = (input: RequestInfo | URL): RequestInfo | URL => {
+  if (typeof input === 'string') {
+    return rewriteToActiveOrigin(input);
+  }
+  if (input instanceof URL) {
+    return new URL(rewriteToActiveOrigin(input.toString()));
+  }
+  if (input instanceof Request) {
+    const nextUrl = rewriteToActiveOrigin(input.url);
+    if (nextUrl === input.url) return input;
+    return new Request(nextUrl, input);
+  }
+  return input;
+};
+
+/**
+ * Ретраи на сетевые сбои/502/503/504 + подмена origin на активный маршрут.
+ */
+export const supabaseFetch: typeof fetch = async (input, init) => {
+  const maxAttempts = SUPABASE_RETRY_DELAYS_MS.length + 1;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const normalizedInput = normalizeFetchInput(input);
+    try {
+      const response = await fetch(normalizedInput, init);
+      if (shouldFailoverToProxy(undefined, response)) {
+        await failoverToSupabaseProxy();
+        return fetch(normalizeFetchInput(input), init);
+      }
+      if (
+        isRetryableMethod(init) &&
+        isRetryableResponse(response) &&
+        attempt < maxAttempts - 1
+      ) {
+        await sleep(SUPABASE_RETRY_DELAYS_MS[attempt] ?? 1000);
+        continue;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (shouldFailoverToProxy(error)) {
+        await failoverToSupabaseProxy();
+        return fetch(normalizeFetchInput(input), init);
+      }
+      if (isRetryableMethod(init) && isSupabaseNetworkError(error) && attempt < maxAttempts - 1) {
+        await sleep(SUPABASE_RETRY_DELAYS_MS[attempt] ?? 1000);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw lastError ?? new SupabaseNetworkError('Network request failed');
+};
+
+function buildSupabaseClient(url: string): SupabaseClient {
+  return createClient(url, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+    realtime: {
+      params: {
+        apikey: supabaseAnonKey,
+      },
+    },
+    global: {
+      fetch: supabaseFetch,
+    },
+  });
+}
+
+export let supabase: SupabaseClient = buildSupabaseClient(activeSupabaseUrl);
+
+let routingReadyPromise: Promise<string> | null = null;
+let proxyFailoverPromise: Promise<void> | null = null;
+
+async function failoverToSupabaseProxy(): Promise<void> {
+  if (activeSupabaseUrl === SUPABASE_PROXY_URL) return;
+  if (!proxyFailoverPromise) {
+    proxyFailoverPromise = (async () => {
+      await preferSupabaseProxyOrigin();
+      await applySupabaseOrigin(SUPABASE_PROXY_URL);
+    })().finally(() => {
+      proxyFailoverPromise = null;
+    });
+  }
+  await proxyFailoverPromise;
+}
+
+const shouldFailoverToProxy = (error?: unknown, response?: Response): boolean => {
+  if (activeSupabaseUrl !== SUPABASE_DIRECT_URL || ENV_LOCKED_URL) return false;
+  if (error && isSupabaseNetworkError(error)) return true;
+  if (response && isRetryableResponse(response)) return true;
+  return false;
+};
+
+async function applySupabaseOrigin(nextUrl: string): Promise<void> {
+  if (nextUrl === activeSupabaseUrl) return;
+
+  let reconnectUserId: string | null = null;
+  try {
+    const { realtimeManager } = await import('./RealtimeManager');
+    reconnectUserId = realtimeManager.getConnectedUserId();
+    realtimeManager.disconnect();
+  } catch {
+    // ignore
+  }
+
+  activeSupabaseUrl = nextUrl;
+  supabase = buildSupabaseClient(nextUrl);
+
+  if (reconnectUserId) {
+    try {
+      const { realtimeManager } = await import('./RealtimeManager');
+      await realtimeManager.setupSubscriptions(reconnectUserId);
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/** Выбирает direct vs Moscow proxy и пересоздаёт клиент при необходимости. */
+export async function ensureSupabaseRouting(): Promise<string> {
+  if (ENV_LOCKED_URL) {
+    if (!routingReadyPromise) {
+      routingReadyPromise = (async () => {
+        await applySupabaseOrigin(ENV_LOCKED_URL);
+        void revalidateSupabaseOriginInBackground(
+          activeSupabaseUrl,
+          supabaseAnonKey,
+          applySupabaseOrigin,
+        );
+        return activeSupabaseUrl;
+      })();
+    }
+    return routingReadyPromise;
+  }
+
+  if (!routingReadyPromise) {
+    routingReadyPromise = (async () => {
+      const resolved = await resolveSupabaseOrigin(supabaseAnonKey);
+      await applySupabaseOrigin(resolved);
+
+      void revalidateSupabaseOriginInBackground(resolved, supabaseAnonKey, applySupabaseOrigin);
+
+      return activeSupabaseUrl;
+    })();
+  }
+
+  return routingReadyPromise;
+}
+
+/** Неблокирующий probe при старте (если routing уже не запущен из _layout). */
+export const warmSupabaseOriginRoute = (): void => {
+  void ensureSupabaseRouting().catch(() => {});
+};
 
 // Интерфейсы для базы данных
 export interface Player {
@@ -580,4 +875,4 @@ export const addMuseumItem = async (item: Omit<MuseumItem, 'id' | 'received_at'>
     console.error('❌ Ошибка добавления предмета в музей:', error);
     return null;
   }
-}; 
+};

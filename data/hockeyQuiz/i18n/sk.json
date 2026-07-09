@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Koľko korčuliarov na tím je na ľade pri rovnomernej sile (okrem brankárov)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Koľko regulačných období je v štandardnom zápase NHL?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Ofsajd je odhlásený, keď útočiaci hráč vstúpi do útočného pásma pred čím?",
+    "options": [
+      "Stredová čiara",
+      "Puk",
+      "Brankár",
+      "Rozhodca"
+    ]
+  },
+  "rules_icing": {
+    "question": "Icing je vystrelenie puku spoza stredovej čiary za súperovu bránkovú čiaru bez dotyku. pravda?",
+    "options": [
+      "Falošný — nikdy v NHL",
+      "Pravda",
+      "Pravda — len v nadčasoch",
+      "False — len z obranného pásma"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Kto drží rekord NHL v počte gólov v kariére?",
+    "options": [
+      "Alex Ovečkin",
+      "Jaromír Jágr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovečkin je známy ako ľavý krídelník s číslom 8 pre ktoré tímové mesto?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Čo je to hetrik v hokeji?",
+    "options": [
+      "Tri góly jedného hráča v jednom zápase",
+      "Tri zákroky za sebou",
+      "Tri asistencie v jednom zápase",
+      "Tri penalty"
+    ]
+  },
+  "terms_power_play": {
+    "question": "K presilovej hre dôjde, keď:",
+    "options": [
+      "Brankár je vytiahnutý",
+      "Strhne sa boj",
+      "Jeden tím má viac korčuliarov kvôli trestu",
+      "Začína sa predĺženie"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Stanley Cup je majstrovskou trofejou ktorej ligy?",
+    "options": [
+      "Majstrovstvá sveta IIHF",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Z čoho je vyrobený štandardný hokejový puk?",
+    "options": [
+      "Vulkanizovaná guma",
+      "hliník",
+      "Drevo",
+      "Plastové"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Koľko minút je štandardný menší trest?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Koľko minút je štandardný veľký trest?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Hra začína s:",
+    "options": [
+      "Pokutový rozstrel",
+      "Vhadzovanie",
+      "Prerušenie napájania",
+      "Icing call"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Ak je zápas základnej časti NHL po predĺžení nerozhodný, čo sa stane?",
+    "options": [
+      "Druhé predĺženie",
+      "Prestrelka",
+      "Playoff obdobie",
+      "Nakreslite stojany"
+    ]
+  },
+  "rules_crease": {
+    "question": "Dokáže sa útočník postaviť do bránkoviska bez následkov?",
+    "options": [
+      "Áno vždy",
+      "Iba v play-off",
+      "Nie – cieľ môže byť zamietnutý",
+      "Len na poslednú chvíľu"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Vysoká priľnavosť je, keď hokejka zasiahne súpera nad:",
+    "options": [
+      "Hrazda",
+      "Ramená",
+      "Pás",
+      "Iba prilba"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Riziká ťahania brankára:",
+    "options": [
+      "Pokutový rozstrel",
+      "Prázdny gól proti",
+      "Ofsajd",
+      "Iba námraza"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Pokutové strieľanie sa často udeľuje za faul:",
+    "options": [
+      "Kedykoľvek",
+      "Iba nadčasy",
+      "Iba play-off",
+      "Jasné odtrhnutie"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Menšiu lavičku podáva ktorýkoľvek hráč okrem:",
+    "options": [
+      "Brankár (zvyčajne)",
+      "Vpred",
+      "Obranca",
+      "Kapitán"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "OT základnej časti NHL sa hrá s koľkými korčuliarmi na strane?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Koľko hráčov (vrátane brankára) môže mať tím na ľade?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Koľko bodov stojí na výsledkovej tabuli gól?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Pri odloženom treste tím, ktorý sa neprevinil, často:",
+    "options": [
+      "Ices puk",
+      "Časový limit hovorov vypršal",
+      "Zastaví prehrávanie",
+      "Ťahá brankára"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Brankári môžu odohrať puk len za sieť v:",
+    "options": [
+      "Stredový kruh",
+      "Neutrálna zóna",
+      "Plná zóna",
+      "Lichobežníková oblasť"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Boj zvyčajne vedie k:",
+    "options": [
+      "Veľký trest",
+      "Iba nesprávne správanie v hre",
+      "Menší trest",
+      "Žiadna pokuta"
+    ]
+  },
+  "terms_puck": {
+    "question": "Objekty z tvrdej gumy, ktoré hráči strieľajú, sa nazývajú:",
+    "options": [
+      "Puk",
+      "Diskusia",
+      "Kameň",
+      "Lopta"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Prihrávka, ktorá zdvihne puk, sa nazýva:",
+    "options": [
+      "Podšálka prihrávka",
+      "Palubný lístok",
+      "Slap slap",
+      "Prihrávka na záhyby"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Facka zahŕňa:",
+    "options": [
+      "Iba bekhendom",
+      "Jedna ruka na palici",
+      "Ľahké ťuknutie do puku",
+      "Najprv navíjanie a narážanie na ľad"
+    ]
+  },
+  "terms_deke": {
+    "question": "Deke je:",
+    "options": [
+      "Druh trestu",
+      "Falošný ťah na porazenie obrancu",
+      "Obranný blok",
+      "Zmena linky"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Odtrhnutie je, keď:",
+    "options": [
+      "Puk je ľadový",
+      "Korčuliar ide sám na brankára",
+      "Bojujú dvaja hráči",
+      "Nastane zmena riadku"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Skladby plus/mínus:",
+    "options": [
+      "Strely na bránu",
+      "Gólový rozdiel, keď je hráč na ľade pri rovnomernej sile",
+      "Trestné minúty",
+      "Vhadzovanie vyhráva iba"
+    ]
+  },
+  "terms_assist": {
+    "question": "Primárnu asistenciu získa hráč, ktorý:",
+    "options": [
+      "Strelí gól",
+      "Vyhral vhadzovanie",
+      "Posledný dotyk puku pred strelcom",
+      "Dostal penaltu"
+    ]
+  },
+  "terms_block": {
+    "question": "Blokovaná strela je, keď:",
+    "options": [
+      "Puk trafil žrď",
+      "Korčuliar zastaví puk telom/palicou pred bránkou",
+      "Brankár to zachraňuje",
+      "Strela minula sieť"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Predbežná kontrola znamená:",
+    "options": [
+      "Len stratégia zmeny linky",
+      "Obrana modrej čiary",
+      "Tlak na súperov v ich pásme, aby získali puk",
+      "Ťahanie brankára"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Spätná kontrola znamená:",
+    "options": [
+      "Korčuľovanie späť na pomoc pri obrane",
+      "Streľba od bodu",
+      "Víťazné vhadzovanie",
+      "Záchrana brankára"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Jednorazový časovač je:",
+    "options": [
+      "Čakanie a potom streľba",
+      "Brankársky ťah",
+      "Okamžitá streľba z prihrávky",
+      "Pokuta"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Poriadna kontrola:",
+    "options": [
+      "Zdvihnite puk cez hokejku",
+      "Krížová kontrola",
+      "Odrazte puk preč od súpera",
+      "Hook súpera"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Horná polica znamená bodovanie v:",
+    "options": [
+      "Vrchná časť siete",
+      "Iba zo stredu ľadu",
+      "Iba na prázdnu sieť",
+      "Päťdierové"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Päť jamiek je medzi brankárskymi:",
+    "options": [
+      "Palica a rukavica",
+      "Maska a hrudník",
+      "Ruka a telo",
+      "Nohy"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Regulátor poskytuje:",
+    "options": [
+      "Koučovanie",
+      "Streľba gólu",
+      "Fyzická ochrana a boj",
+      "Iba vhadzovanie"
+    ]
+  },
+  "terms_line_change": {
+    "question": "K zmenám riadkov zvyčajne dochádza:",
+    "options": [
+      "Až po góloch",
+      "Len na pokutách",
+      "Iba cez prestávku",
+      "Za behu počas hry"
+    ]
+  },
+  "terms_rink": {
+    "question": "Hracia plocha v hokeji sa nazýva:",
+    "options": [
+      "Pole",
+      "súd",
+      "Sledovať",
+      "Ľadová plocha"
+    ]
+  },
+  "terms_goal": {
+    "question": "Čistí hráči, na ktoré strieľajú, sa nazývajú:",
+    "options": [
+      "Cieľ",
+      "Košík",
+      "Cieľ",
+      "Zóna"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Hrať krátkou rukou znamená:",
+    "options": [
+      "Nadčasy",
+      "Brankár potiahol",
+      "Menej korčuliarov kvôli trestu",
+      "Prázdna sieť"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Nadčasy náhlej smrti znamenajú:",
+    "options": [
+      "Prvý gól vyhráva",
+      "Celé obdobie",
+      "Iba prestrelka",
+      "Žiadny víťaz"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Koľko tímov v ére NHL Original Six?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Moderný ľadový hokej sa najviac rozvinul v:",
+    "options": [
+      "Rusko",
+      "Švédsko",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: Koho USA porazili v roku 1980?",
+    "options": [
+      "Sovietsky zväz",
+      "Kanada",
+      "Československa",
+      "Švédsko"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Bodový rekord Wayna Gretzkého v kariére sa skončil:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Hokejová sieň slávy sa nachádza v:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL je založená predovšetkým na:",
+    "options": [
+      "Rusko",
+      "Fínsko",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Séria summitov 1972: Kanada vs:",
+    "options": [
+      "ZSSR",
+      "USA",
+      "Česko",
+      "Švédsko"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL bola založená v:",
+    "options": [
+      "20. storočia",
+      "21. storočie",
+      "19. storočia",
+      "18. storočia"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby bol celkovo draftovaný ako 1. v:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid bol celkovo draftovaný ako 1. v:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Stanleyho pohár bol prvýkrát udelený v:",
+    "options": [
+      "20. storočia",
+      "21. storočie",
+      "18. storočia",
+      "19. storočia"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromír Jágr patrí medzi lídrov všetkých čias NHL v:",
+    "options": [
+      "Body",
+      "Koučovanie",
+      "Iba trestné minúty",
+      "Brankár vyhráva"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovečkin strávil svoju kariéru v NHL najmä s:",
+    "options": [
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Washington Capitals",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux vyhral Stanley Cup s:",
+    "options": [
+      "Pittsburgh Penguins",
+      "Montreal Canadiens",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Ako dlho je klzisko NHL?",
+    "options": [
+      "200 stôp",
+      "150 stôp",
+      "300 stôp",
+      "250 stôp"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Ako široké je klzisko NHL?",
+    "options": [
+      "100 stôp",
+      "150 stôp",
+      "120 stôp",
+      "85 stôp"
+    ]
+  },
+  "gen_zones": {
+    "question": "Modré čiary rozdeľujú klzisko na koľko zón?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Stredná červená čiara sa používa na:",
+    "options": [
+      "Icing calls",
+      "Pokutový box",
+      "Iba vhadzovanie",
+      "Ofsajd na centri"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Zakrivka čepele palice pomáha pri:",
+    "options": [
+      "Rýchlosť korčuľovania",
+      "Brankár zachraňuje",
+      "Zdvíhanie a ovládanie puku",
+      "Bojovanie"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate hollow ovplyvňuje:",
+    "options": [
+      "Ohyb palice",
+      "Priľnavosť na ľade a obraty",
+      "Strih prilby",
+      "Veľkosť dresu"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Chrániče holení chránia:",
+    "options": [
+      "Ramená",
+      "Hlava",
+      "Dolné nohy",
+      "Iba ruky"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kapitán nosí list:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Náhradní kapitáni nosia:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Domáci tím zvyčajne nosí:",
+    "options": [
+      "Tmavé/farebné",
+      "Biela/svetlá",
+      "Žiadne dresy",
+      "Iba brankár"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Prestávka medzi obdobiami je približne:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 hodina"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "Série play-off NHL sú väčšinou:",
+    "options": [
+      "Vždy najlepšie z 5",
+      "Len konečná",
+      "Zriedkavé výnimky – väčšinou najlepšie zo 7",
+      "Nikdy"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zamboni sa používa na:",
+    "options": [
+      "Zmerajte rýchlosť",
+      "Skladujte puky",
+      "Nabrúsiť korčule",
+      "Obnoviť ľad"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Funkcionári na ľade nosia:",
+    "options": [
+      "Tímové dresy",
+      "Brankársky výstroj",
+      "Čiernobiele pruhy",
+      "Obleky"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hokejisti postupujú ďalej:",
+    "options": [
+      "Kolieskové korčule",
+      "Ľadové korčule",
+      "Bosé nohy",
+      "Lyže"
+    ]
+  },
+  "gen_stick": {
+    "question": "Hráči ovládajú puk pomocou:",
+    "options": [
+      "Stick",
+      "Net",
+      "Iba ruky",
+      "Prilba"
+    ]
+  },
+  "pl_team_0": {
+    "question": "S ktorým tímom je Sidney Crosby najviac spájaný?",
+    "options": [
+      "Pittsburgh Penguins",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Na akej pozícii primárne hral Sidney Crosby?",
+    "options": [
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "Obranca",
+      "centrum"
+    ]
+  },
+  "pl_team_1": {
+    "question": "S ktorým tímom je Connor McDavid najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Akú pozíciu hral predovšetkým Connor McDavid?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_2": {
+    "question": "S ktorým tímom je Nathan MacKinnon najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Colorado Avalanche",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Akú pozíciu primárne hral Nathan MacKinnon?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_3": {
+    "question": "S ktorým tímom je Victor Hedman najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampa Bay Lightning",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Akú pozíciu primárne hral Victor Hedman?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_4": {
+    "question": "S ktorým tímom je Carey Price najviac spájaný?",
+    "options": [
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Akú pozíciu primárne hral Carey Price?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Pravý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_5": {
+    "question": "S ktorým tímom je Jaromír Jágr najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Na akom poste hrával predovšetkým Jaromír Jágr?",
+    "options": [
+      "Pravý krídelník",
+      "centrum",
+      "Brankár",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_6": {
+    "question": "S ktorým tímom je Mario Lemieux najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Pittsburgh Penguins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Akú pozíciu hral predovšetkým Mario Lemieux?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_7": {
+    "question": "S ktorým tímom je Patrick Kane najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Chicago Blackhawks",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Na akom poste primárne hral Patrick Kane?",
+    "options": [
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum",
+      "Brankár"
+    ]
+  },
+  "pl_team_8": {
+    "question": "S ktorým tímom je Nicklas Lidstrom najviac spájaný?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Akú pozíciu hral predovšetkým Nicklas Lidstrom?",
+    "options": [
+      "centrum",
+      "Brankár",
+      "Ľavý krídelník",
+      "Obranca"
+    ]
+  },
+  "pl_team_9": {
+    "question": "S ktorým tímom je Martin Brodeur najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Na akom poste hral predovšetkým Martin Brodeur?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Brankár",
+      "Obranca"
+    ]
+  },
+  "pl_team_10": {
+    "question": "S ktorým tímom je Steven Stamkos najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Na akej pozícii primárne hral Steven Stamkos?",
+    "options": [
+      "centrum",
+      "Obranca",
+      "Pravý krídelník",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_11": {
+    "question": "S ktorým tímom je Auston Matthews najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Akú pozíciu hral predovšetkým Auston Matthews?",
+    "options": [
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_12": {
+    "question": "S ktorým tímom je Leon Draisaitl najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Na akej pozícii primárne hral Leon Draisaitl?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "Obranca"
+    ]
+  },
+  "pl_team_13": {
+    "question": "S ktorým tímom je Erik Karlsson najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "San Jose Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Aký post primárne hral Erik Karlsson?",
+    "options": [
+      "centrum",
+      "Brankár",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_14": {
+    "question": "S ktorým tímom je Pavel Datsyuk najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Detroit Red Wings",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Akú pozíciu hral predovšetkým Pavel Datsyuk?",
+    "options": [
+      "centrum",
+      "Obranca",
+      "Pravý krídelník",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_15": {
+    "question": "S ktorým tímom je Henrik Lundqvist najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Aký post primárne hral Henrik Lundqvist?",
+    "options": [
+      "Obranca",
+      "Pravý krídelník",
+      "centrum",
+      "Brankár"
+    ]
+  },
+  "pl_team_16": {
+    "question": "S ktorým tímom je Evgeni Malkin najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Pittsburgh Penguins"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Akú pozíciu hral predovšetkým Evgeni Malkin?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "Obranca"
+    ]
+  },
+  "pl_team_17": {
+    "question": "S ktorým tímom je Artemi Panarin najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Aký post primárne hral Artemi Panarin?",
+    "options": [
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_18": {
+    "question": "S ktorým tímom je Nikita Kucherov najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Tampa Bay Lightning",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Akú pozíciu hral predovšetkým Nikita Kucherov?",
+    "options": [
+      "centrum",
+      "Brankár",
+      "Pravý krídelník",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_19": {
+    "question": "S ktorým tímom je Brad Marchand najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Akú pozíciu hral predovšetkým Brad Marchand?",
+    "options": [
+      "Pravý krídelník",
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_20": {
+    "question": "S ktorým tímom je David Pastrňák najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Na akom poste hral predovšetkým David Pastrňák?",
+    "options": [
+      "Ľavý krídelník",
+      "Brankár",
+      "centrum",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_21": {
+    "question": "S ktorým tímom je Shea Weber najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Akú pozíciu primárne hral Shea Weber?",
+    "options": [
+      "Ľavý krídelník",
+      "Brankár",
+      "Obranca",
+      "centrum"
+    ]
+  },
+  "pl_team_22": {
+    "question": "S ktorým tímom je Sergej Bobrovskij najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Florida Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Akú pozíciu hral predovšetkým Sergej Bobrovskij?",
+    "options": [
+      "Obranca",
+      "Pravý krídelník",
+      "Brankár",
+      "centrum"
+    ]
+  },
+  "pl_team_23": {
+    "question": "S ktorým tímom je Jonathan Toews najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Na akej pozícii primárne hral Jonathan Toews?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "Obranca"
+    ]
+  },
+  "pl_team_24": {
+    "question": "S ktorým tímom je Anze Kopitar najviac spájaný?",
+    "options": [
+      "Los Angeles Kings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Akú pozíciu hral predovšetkým Anze Kopitar?",
+    "options": [
+      "Ľavý krídelník",
+      "Obranca",
+      "Pravý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_25": {
+    "question": "S ktorým tímom je Mark Messier najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Edmonton Oilers",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Na akom poste hral predovšetkým Mark Messier?",
+    "options": [
+      "Pravý krídelník",
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_26": {
+    "question": "S ktorým tímom je Ray Bourque najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Akú pozíciu hral predovšetkým Ray Bourque?",
+    "options": [
+      "Brankár",
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_27": {
+    "question": "S ktorým tímom sa najviac spája Dominik Hašek?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Na akom poste hral primárne Dominik Hašek?",
+    "options": [
+      "Brankár",
+      "centrum",
+      "Obranca",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_28": {
+    "question": "S ktorým tímom je Teemu Selanne najviac spájaný?",
+    "options": [
+      "Anaheim Ducks",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Na akom poste hral predovšetkým Teemu Selanne?",
+    "options": [
+      "centrum",
+      "Brankár",
+      "Ľavý krídelník",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_29": {
+    "question": "S ktorým tímom je Pavel Bure najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Na akom poste hral primárne Pavel Bure?",
+    "options": [
+      "Pravý krídelník",
+      "Brankár",
+      "centrum",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_30": {
+    "question": "S ktorým tímom je Alexander Mogilnyj najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Akú pozíciu hral primárne Alexander Mogilny?",
+    "options": [
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum",
+      "Brankár"
+    ]
+  },
+  "pl_team_31": {
+    "question": "S ktorým tímom je Peter Forsberg najviac spájaný?",
+    "options": [
+      "Colorado Avalanche",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Na akom poste primárne pôsobil Peter Forsberg?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_32": {
+    "question": "S ktorým tímom je Joe Sakic najviac spájaný?",
+    "options": [
+      "New York Rangers",
+      "Colorado Avalanche",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Na akej pozícii primárne hral Joe Sakic?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_33": {
+    "question": "S ktorým tímom je Steve Yzerman najviac spájaný?",
+    "options": [
+      "Detroit Red Wings",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Akú pozíciu primárne hral Steve Yzerman?",
+    "options": [
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "Obranca",
+      "centrum"
+    ]
+  },
+  "pl_team_34": {
+    "question": "S ktorým tímom je Bobby Orr najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Akú pozíciu hral Bobby Orr primárne?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_35": {
+    "question": "S ktorým tímom je Gordie Howe najviac spájaný?",
+    "options": [
+      "Detroit Red Wings",
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Akú pozíciu primárne hral Gordie Howe?",
+    "options": [
+      "Brankár",
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_36": {
+    "question": "S ktorým tímom je Wayne Gretzky najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Na akej pozícii hral predovšetkým Wayne Gretzky?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_37": {
+    "question": "S ktorým tímom je Valeri Kharlamov najviac spájaný?",
+    "options": [
+      "CSKA Moskva",
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Akú pozíciu hral predovšetkým Valeri Kharlamov?",
+    "options": [
+      "Pravý krídelník",
+      "centrum",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_38": {
+    "question": "S ktorým tímom je Vladislav Tretiak najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Boston Bruins",
+      "New York Rangers",
+      "CSKA Moskva"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Na akom poste primárne pôsobil Vladislav Tretiak?",
+    "options": [
+      "Brankár",
+      "Obranca",
+      "centrum",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_39": {
+    "question": "S ktorým tímom je Bobby Hull najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Chicago Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Akú pozíciu hral Bobby Hull primárne?",
+    "options": [
+      "Obranca",
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_40": {
+    "question": "S ktorým tímom je Maurice Richard najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Akú pozíciu hral predovšetkým Maurice Richard?",
+    "options": [
+      "Brankár",
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_41": {
+    "question": "S ktorým tímom je Guy Lafleur najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Na akej pozícii hral predovšetkým Guy Lafleur?",
+    "options": [
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum",
+      "Brankár"
+    ]
+  },
+  "pl_team_42": {
+    "question": "S ktorým tímom je Patrick Roy najviac spájaný?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Na akej pozícii hral Patrick Roy primárne?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Pravý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_43": {
+    "question": "S ktorým tímom je Roberto Luongo najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Akú pozíciu hral predovšetkým Roberto Luongo?",
+    "options": [
+      "Brankár",
+      "centrum",
+      "Pravý krídelník",
+      "Obranca"
+    ]
+  },
+  "pl_team_44": {
+    "question": "S ktorým tímom je Iľja Kovaľčuk najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Na akom poste hral primárne Iľja Kovaľčuk?",
+    "options": [
+      "Obranca",
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_45": {
+    "question": "S ktorým tímom je Pavel Bure najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Florida Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Na akom poste hral primárne Pavel Bure?",
+    "options": [
+      "Pravý krídelník",
+      "Ľavý krídelník",
+      "centrum",
+      "Brankár"
+    ]
+  },
+  "pl_team_46": {
+    "question": "S ktorým tímom je Alexej Kovalev najviac spájaný?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Akú pozíciu hral predovšetkým Alexej Kovalev?",
+    "options": [
+      "Ľavý krídelník",
+      "centrum",
+      "Brankár",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_47": {
+    "question": "S ktorým tímom je Sergej Gončar najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Pittsburgh Penguins",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Akú pozíciu hral predovšetkým Sergej Gončar?",
+    "options": [
+      "Obranca",
+      "Ľavý krídelník",
+      "Brankár",
+      "centrum"
+    ]
+  },
+  "pl_team_48": {
+    "question": "S ktorým tímom je Viačeslav Fetisov najviac spájaný?",
+    "options": [
+      "New Jersey Devils",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Akú pozíciu hral predovšetkým Viačeslav Fetisov?",
+    "options": [
+      "Brankár",
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_49": {
+    "question": "S ktorým tímom je Chris Chelios najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "Boston Bruins",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Akú pozíciu hral primárne Chris Chelios?",
+    "options": [
+      "Obranca",
+      "centrum",
+      "Ľavý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_50": {
+    "question": "S ktorým tímom je Scott Stevens najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Rangers",
+      "New Jersey Devils",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Na akej pozícii primárne hral Scott Stevens?",
+    "options": [
+      "Obranca",
+      "Brankár",
+      "Ľavý krídelník",
+      "centrum"
+    ]
+  },
+  "pl_team_51": {
+    "question": "S ktorým tímom je Paul Coffey najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Akú pozíciu hral predovšetkým Paul Coffey?",
+    "options": [
+      "Ľavý krídelník",
+      "Brankár",
+      "centrum",
+      "Obranca"
+    ]
+  },
+  "pl_team_52": {
+    "question": "S ktorým tímom je Grant Fuhr spájaný najviac?",
+    "options": [
+      "Boston Bruins",
+      "New York Rangers",
+      "Toronto Maple Leafs",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Akú pozíciu hral predovšetkým Grant Fuhr?",
+    "options": [
+      "centrum",
+      "Obranca",
+      "Brankár",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_53": {
+    "question": "S ktorým tímom je Mike Bossy najviac spájaný?",
+    "options": [
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Na akej pozícii hral Mike Bossy primárne?",
+    "options": [
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "Brankár",
+      "centrum"
+    ]
+  },
+  "pl_team_54": {
+    "question": "S ktorým tímom je Bryan Trottier najviac spájaný?",
+    "options": [
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Akú pozíciu hral predovšetkým Bryan Trottier?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "pl_team_55": {
+    "question": "S ktorým tímom je Denis Potvin spájaný najviac?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "New York Islanders",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Na akom poste hral primárne Denis Potvin?",
+    "options": [
+      "Ľavý krídelník",
+      "Brankár",
+      "centrum",
+      "Obranca"
+    ]
+  },
+  "pl_team_56": {
+    "question": "S ktorým tímom sa Cam Neely najviac spája?",
+    "options": [
+      "New York Rangers",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Na akej pozícii primárne hral Cam Neely?",
+    "options": [
+      "centrum",
+      "Ľavý krídelník",
+      "Pravý krídelník",
+      "Brankár"
+    ]
+  },
+  "pl_team_57": {
+    "question": "S ktorým tímom je Adam Oates najviac spájaný?",
+    "options": [
+      "Washington Capitals",
+      "New York Rangers",
+      "Boston Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Na akej pozícii primárne hral Adam Oates?",
+    "options": [
+      "Ľavý krídelník",
+      "centrum",
+      "Obranca",
+      "Pravý krídelník"
+    ]
+  },
+  "pl_team_58": {
+    "question": "S ktorým tímom je Doug Gilmour najviac spájaný?",
+    "options": [
+      "Boston Bruins",
+      "Toronto Maple Leafs",
+      "Montreal Canadiens",
+      "New York Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Akú pozíciu hral predovšetkým Doug Gilmour?",
+    "options": [
+      "centrum",
+      "Pravý krídelník",
+      "Obranca",
+      "Ľavý krídelník"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Čo znamená KHL?",
+    "options": [
+      "Kontinentálna hokejová liga",
+      "Kazašská hokejová liga",
+      "Kórejská hokejová liga",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF organizuje:",
+    "options": [
+      "play off KHL",
+      "draft NHL",
+      "Stanley Cup",
+      "majstrovstvá sveta"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olympijský hokej sa hrá na:",
+    "options": [
+      "Ľad",
+      "Piesok",
+      "Tráva",
+      "Betón"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Ktorá krajina získala mnoho titulov majstra sveta s hviezdami z éry Jágra a Haška?",
+    "options": [
+      "Fínsko",
+      "Česko",
+      "Kanada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Mnoho hviezd NHL pochádza z:",
+    "options": [
+      "Španielsko",
+      "Brazília",
+      "Švédsko",
+      "India"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Fínsko je známe tým, že produkuje skvelé:",
+    "options": [
+      "Brankári",
+      "Len tréneri",
+      "Vodiči Zamboni",
+      "rozhodcovia"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Sovietsky „Červený stroj“ dominoval v:",
+    "options": [
+      "70. – 80. roky 20. storočia",
+      "roky 2000",
+      "roky 2010",
+      "len 90. roky"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "Tímy NHL vyberajú nových hráčov na:",
+    "options": [
+      "Termín obchodu",
+      "Zápas hviezd",
+      "Svetový pohár",
+      "Vstupný koncept"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Ocenené sú tri hviezdy hry:",
+    "options": [
+      "Raz za sezónu",
+      "Iba v play-off",
+      "Nikdy v NHL",
+      "Po každej hre"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Ženský hokej je olympijský šport, pretože:",
+    "options": [
+      "1998",
+      "Nikdy",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Koľko korčuliarov má každý tím rovnomerne (žiadni brankári)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Koľko minút trvá jedno obdobie NHL?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Váš tím má presilovú hru, keď súper:",
+    "options": [
+      "Icing puk",
+      "Ťahajúci brankár",
+      "Skrátený z penalty",
+      "Víťazné vhadzovanie"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Trestné zabitie znamená:",
+    "options": [
+      "Nadčasy",
+      "Obrana pri krátkosti",
+      "Extra útočník",
+      "Brankársky súboj"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Profesionálny hokej sa hrá na:",
+    "options": [
+      "Špina",
+      "Tráva",
+      "Ľad",
+      "Voda"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Majstrovská trofej NHL je:",
+    "options": [
+      "Svetový pohár",
+      "olympijský pohár",
+      "Stanley Cup",
+      "Gretzkého pohára"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard vyhral najviac Stanley Cupov ako hráč s:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Toronto Maple Leafs",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Slávne číslo dresu Wayna Gretzkého bolo:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux nosil číslo:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby nosí číslo:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid nosí číslo:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Koľko tímov je v NHL (približne)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Koľko tímov je v NHL (približne)? (pokročilé)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Koľko hráčov má oblečených štandardná hokejová lavička?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Koľko hráčov má oblečených štandardná hokejová lavička? (pokročilé)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Koľko minút je regulárny čas v NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Koľko minút je regulárny čas v NHL? (pokročilé)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Koľko funkcionárov je zvyčajne na ľade v NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Koľko funkcionárov je zvyčajne na ľade v NHL? (pokročilé)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Maximálny počet hráčov na súpiske (približne)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Maximálny počet hráčov na súpiske (približne)? (pokročilé)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Hlavnou úlohou obrancu v obrannom pásme je:",
+    "options": [
+      "Vyhrajte vhadzovanie",
+      "Najprv dávajte góly",
+      "Chráňte sieť a otvor",
+      "Rýchlo zmeňte riadky"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Pri obrane jeden na jedného by obranca mal:",
+    "options": [
+      "Okamžite korčuľujte na lavičku",
+      "Zostaňte medzi útočníkom a sieťou",
+      "Nechajte otvor otvorený",
+      "Naháňajte iba za sieťou"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Obranný postoj: palica na ľad pomáha:",
+    "options": [
+      "Časový limit signálu",
+      "Vyhnite sa úderom puku",
+      "Blokovať predbiehacie pruhy",
+      "Spoluhráči na výlete"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Keď sa pri útoku stratí puk, obranca by mal:",
+    "options": [
+      "Vytiahnite brankára",
+      "Zakorčuľujte späť a pomôžte obrane",
+      "Zostaňte na červenej čiare",
+      "Pohádajte sa s rozhodcom"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Obranca by mal blokovať strely, keď:",
+    "options": [
+      "Puk je iba v neutrálnej zóne",
+      "Začína sa prestávka",
+      "Pruh k sieti je otvorený",
+      "Tím je v presilovej hre"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "Pri hre 2 na 1 by obranca zvyčajne mal:",
+    "options": [
+      "Obaja zostávajú na modrej čiare",
+      "Obaja sa ponáhľajú nosičom puku",
+      "Vezmite nosič puku a uhol ho široký",
+      "Korčuľovať na lavičku"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Pri trestnom zabíjaní je často prioritou:",
+    "options": [
+      "Korčuľujte s pukom v strede sám",
+      "Najprv zmeňte riadky za behu",
+      "Držte puk v rohu navždy",
+      "Vyčistite puk z pásma"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Dobrá kontrola medzery znamená, že obranca:",
+    "options": [
+      "Nikdy nezálohuje",
+      "Iba údery zozadu",
+      "Zodpovedá rýchlosti a vzdialenosti útočníka",
+      "Vždy zostane v strede ľadu"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Pred sieťou musí obranca:",
+    "options": [
+      "Korčuľovať do bodky",
+      "Výzva pre ofsajd",
+      "Sledujte iba puk a ignorujte hráčov",
+      "Vyboxujte a zviažte súperov"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Prvý pohľad obrancu pod tlakom predbiehania by mal byť:",
+    "options": [
+      "Strieľať do vlastnej siete",
+      "Prvý prechod do nízkej podpery alebo bezpečného výstupu",
+      "Vždy prechádzajte stredom pod tlakom",
+      "Rim naslepo okolo dosiek"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Pri presilovej hre v bode by obranca mal:",
+    "options": [
+      "Korčuľujte späť do neutrálnej zóny",
+      "Zmena s brankárom",
+      "Udržujte puk v pásme a vytvárajte strely/prihrávky",
+      "Nikdy nestrieľajte"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Legálna obranná hra na zhon je:",
+    "options": [
+      "Legálne uhol a hokejka na strane puku",
+      "Hákujte a stiahnite súpera dole",
+      "Stick-check zozadu na odtrhnutie",
+      "Krížová kontrola do hlavy"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Profesionálni obrancovia blokujú strely, pretože:",
+    "options": [
+      "Počíta sa to ako asistencia",
+      "Nikdy neblokujte strely",
+      "Blokujte strely a v prípade potreby obetujte telo",
+      "Rozhodca prerušuje hru"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Keď dvaja útočníci prejdú vo vašej zóne, obrancovia by mali:",
+    "options": [
+      "Obaja sa ženú len za pukom",
+      "Nechajte záhyb",
+      "Komunikujte a v prípade potreby prepnite",
+      "Ignorujte útočníka zo vzdialenej strany"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Keď súper vyhodí puk, obranca by mal:",
+    "options": [
+      "Získajte puk alebo ho pripnite na dosky",
+      "Pre zmenu korčuľujte na lavičku",
+      "Počkajte na píšťalku",
+      "Strieľajte z červenej čiary"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "Pri návale 3 na 2 by mal zadný obranca zvyčajne:",
+    "options": [
+      "Kryjte hrozbu zo slabej strany (zadné vrátka).",
+      "Korčuľujte na červenú čiaru",
+      "Zmeňte riadky",
+      "Zakaždým agresívne štipnite"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Obranca môže priškripnúť na útočnej modrej čiare, keď:",
+    "options": [
+      "Tím je skratový",
+      "Brankár je ťahaný",
+      "Kryty partnera a puk je možné získať späť na doskách",
+      "Vždy v prvej zmene"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Ak je obranca široko porazený, mal by:",
+    "options": [
+      "Korčuľovať na lavičku",
+      "Zastavte sa a hádajte sa s rozhodcom",
+      "Otočte sa a prenasledujte stredom k sieti",
+      "Hák zozadu"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "V pokrytí obrannej zóny nízky obranca verzus vysoký obranca znamená:",
+    "options": [
+      "Obaja na mieste",
+      "Obaja v neutrálnej zóne",
+      "Obaja v záhybe",
+      "Nízke puky, vysoké kryty štrbiny a zadné dvierka"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Keď sa čudný muž ponáhľa proti, kľúčom je:",
+    "options": [
+      "Zakaždým dostať trest",
+      "Zdržujte a vynucujte si zlý uhol alebo prihrávku",
+      "Vždy sa ponorte do bloku",
+      "Nechajte hru len pre brankára"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "Pri penaltovom zabití oproti jednorazovému zabitiu z boku by mal obranca:",
+    "options": [
+      "Postavte sa do bránkoviska",
+      "Pre zmenu korčuľujte do stredu",
+      "Odstráňte priechodný pruh do slotu",
+      "Stlačte brankára"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Prečo je slepý okraj okolo dosiek často zlý?",
+    "options": [
+      "Poskytuje oponentom aport zdarma",
+      "Vždy je to ofsajd",
+      "Vždy to spôsobuje námrazu",
+      "Rozhodca udeľuje trest"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Po víťazstve v vhadzovaní v obrannom pásme by obrancovia mali:",
+    "options": [
+      "Počkajte päť sekúnd",
+      "Prečítajte si forcheck a použite rýchly prvý prechod",
+      "Vždy strieľajte najskôr od bodu",
+      "Korčuľovať na červenú čiaru s pukom"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Pri oneskorenej ochrane jednogólového náskoku by obrancovia mali:",
+    "options": [
+      "Vždy strieľajte od stredu",
+      "Stlačte zakaždým na modrej čiare",
+      "Spravujte puk bezpečne a vyhnite sa zbytočným rizikám",
+      "Vytiahnite brankára vždy skoro"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Muž proti mužovi v slote znamená:",
+    "options": [
+      "Ignorujte hrozby mimo puku",
+      "Naháňajte iba puk",
+      "Kontrola medzier",
+      "Pokrytie muža proti mužovi na nosiči pukov"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Na útočnej modrej čiare sa obranca, ktorý drží čiaru, snaží:",
+    "options": [
+      "Zmena smerom dopredu",
+      "Držte modrú čiaru a držte puk v pásme",
+      "Korčuľujte späť do neutrálnej zóny",
+      "Vždy spôsobiť ofsajd úmyselne"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Po uložení s odrazom v slote musí obranca:",
+    "options": [
+      "Oslávte s brankárom",
+      "Streľte do prázdnej brány",
+      "Korčuľovať na lavičku",
+      "Vyčistite odrazenú loptu alebo zviažte útočníka"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Po icingu (bez dotyku) v obrannom pásme pri vhadzovaní:",
+    "options": [
+      "Vždy lemujte puk",
+      "Vezmite menší trest",
+      "Nastavte štruktúru a vyhrajte čistý výstup",
+      "Vytiahnite brankára"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Proti agresívnemu forčeku sa stretch pass používa na:",
+    "options": [
+      "Vždy prerušte hru pre ofsajd",
+      "Len strácať čas",
+      "Záručná námraza",
+      "Prekonajte forček dlhou prihrávkou"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Uzavretie streleckej dráhy znamená:",
+    "options": [
+      "Dostať telo/palicu do dráhy strely",
+      "Mávanie palicou len vo vzduchu",
+      "Korčuľovanie na červenú čiaru",
+      "Stojí za sieťou"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Keď váš partner štípne, musíte:",
+    "options": [
+      "Korčuľovať na lavičku",
+      "Nechajte zónu otvorenú",
+      "Okamžite tiež zaštipnite",
+      "Kryjte vysoko ako posledný obranca"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Pri opustení trestnej lavice by obranca mal:",
+    "options": [
+      "Zapojte sa do hry a vyhnite sa prichyteniu",
+      "Ignorujte zhon",
+      "Vždy okamžite vymeňte",
+      "Korčuľujte priamo na súperovu sieť"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "S prázdnou bránou proti, obrancovia v poslednej minúte by mali:",
+    "options": [
+      "Všetky predbežné kontroly hlboko",
+      "Vždy potiahnite aj vlastného brankára",
+      "Blokujte strely a chráňte stred",
+      "Nikdy neodstraňujte puk"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Ak nemôžete dosiahnuť nosič puku, mali by ste:",
+    "options": [
+      "Vzdať sa a zmeniť sa",
+      "Nechajte slot",
+      "Ušetrite čas a priestor s dobrým umiestnením",
+      "Hák zozadu"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Pri bránení vstupu do kontrolovanej zóny by obranca mal:",
+    "options": [
+      "Korčuľujte dozadu na lavičku",
+      "Postavte sa na čiaru alebo medzeru skoro",
+      "Vždy sa stiahnite do záhybu",
+      "Nikdy sa nedotýkajte útočníka"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "V obrannom pásme prihrávka rukou obrancu spoluhráčovi je:",
+    "options": [
+      "Povolené, ak je dokončené v rovnakej zóne",
+      "Vždy námraza",
+      "Vždy v ofsajde",
+      "Vždy trestné strieľanie"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Keď má spoluhráč puk, útočník by mal:",
+    "options": [
+      "Korčuľujte na červenú vždy sám",
+      "Ignorujte výmenu puku na čiare",
+      "Choďte na otvorenie ľadu na prihrávku",
+      "Stojte pokojne na modrej čiare"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Krídelník pri sieti pri strele by mal:",
+    "options": [
+      "Korčuľovať na lavičku",
+      "Prejdite na sieť pre odrazy a tipy",
+      "Pozerajte sa len z miesta",
+      "Počkajte na strednom ľade"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Keď dôjde k strate držby, útočníci musia:",
+    "options": [
+      "Okamžite sa vymeňte mimo ľadu",
+      "Pohádajte sa s rozhodcom",
+      "Zostaňte v útočnom pásme",
+      "Skontroluj a pomôž v defenzíve"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Pri zhone znamená „riadenie puku hlavou“:",
+    "options": [
+      "Vždy ho vysypte vysoko z pohára",
+      "Zastavte na červenej čiare",
+      "Hlavný hráč puku (prihrávka dopredu)",
+      "Korčuľujte dozadu len na vlastnú lavičku"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Cyklovanie puku nízko v útočnom pásme pomáha:",
+    "options": [
+      "Záručná námraza",
+      "Vynútený ofsajd vždy",
+      "Vytvorte priestor na strelu alebo prihrávku",
+      "Len strácať čas"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Úlohou centra je často:",
+    "options": [
+      "Všetci traja vpredu hlboko v rohu",
+      "Opustite kruh skôr",
+      "Okamžite strieľajte z bodu",
+      "Vyhrajte remízu o miesto krídelníka alebo D-mana"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "Vo forčeku 2-1-2 F1 a F2 zvyčajne:",
+    "options": [
+      "Obaja stíhajú iba za sieťou",
+      "Obaja menia linky",
+      "F1 tlačí, F2 odoberá prechodový pruh",
+      "Obaja stoja na červenej čiare"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Pri presilovej hre by útočník na čele siete mal:",
+    "options": [
+      "Korčuľujte do neutrálnej zóny",
+      "Pokryte bod za zabitie z penalty",
+      "Vezmite si sieťovú frontu na presilovú hru",
+      "Nikdy sa nedotýkajte puku"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "Pri návale 3 na 2 by mal tretí útočník:",
+    "options": [
+      "Korčuľovať na lavičku",
+      "Postavte sa do záhybu",
+      "Zostaňte vysoko ako tretí muž v zhone",
+      "Naháňajte puk hlboko bez podpory"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Rýchlostný krídelník by v zhone mal často:",
+    "options": [
+      "Zakaždým sa zastavte na modrej čiare",
+      "Prihrávka dozadu na brankára",
+      "Krídelník jazdí rýchlo a rýchlo",
+      "Korčuľujte vždy cez stred"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Kľúčovou presilovou úlohou útočníka je:",
+    "options": [
+      "Nechajte slot otvorený na obranu",
+      "Vždy len namierte",
+      "Nikdy nechoďte na net",
+      "Preverte brankára na PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Pri trestnom zabití útočník často kryje:",
+    "options": [
+      "Pokryte bod za zabitie z penalty",
+      "Rozhodca",
+      "Vezmite si sieťovú frontu na presilovú hru",
+      "Vodič Zamboni"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Aby sa útočník vyhol ofsajdu na modrej čiare, môže:",
+    "options": [
+      "Korčuľujte dozadu do zóny",
+      "Preskočte cez modrú čiaru",
+      "Zostaňte vnútri odložením vstupu do zóny",
+      "Vstup do zóny vždy pred pukom"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Nastavenie jednorazového spínača zvyčajne vyžaduje:",
+    "options": [
+      "Jednorazové nastavenie: prihrávka do otvoreného strelca",
+      "Obehni puk bez toho, aby si sa pozrel",
+      "Vždy deke na trestné strieľanie",
+      "Vyhadzujte a prenasledujte bez plánu kontroly"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Po strele gólu v presilovej hre by útočníci mali:",
+    "options": [
+      "Všetky riadky zmeny naraz",
+      "Zamávajte davu",
+      "Rozbite sieť po strele z bodu",
+      "Korčuľujte do neutrálnej zóny"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "V štruktúre útočnej zóny stred často:",
+    "options": [
+      "Nikdy nevstúpi do slotu",
+      "Všetci traja vpredu hlboko v rohu",
+      "Stred podporuje nízko, krídlo zostáva vysoko",
+      "Pokrýva iba pointu"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Pri úteku slabá dopredná podpora znamená:",
+    "options": [
+      "Podpora zo slabej strany pri odchode z D-zóny",
+      "Postavte sa na červenú čiaru",
+      "Strieľať do vlastnej siete",
+      "Korčuľujte na lavičku súpera pre zmenu"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Brankár by sa mal vždy snažiť:",
+    "options": [
+      "Sledujte puk v premávke",
+      "Postavte sa na červenú čiaru",
+      "Sledujte iba oči strelca",
+      "Nechajte sieť pre zmenu linky"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Keď je puk voľný v bránkovisku, brankár by mal:",
+    "options": [
+      "Zmrazením puku zastavíte hru",
+      "Streľte do prázdnej brány",
+      "Korčuľujte na stred ľadu a oslavujte",
+      "Prihrávka na rozhodcu"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Po uložení je ideálna kontrola odrazu:",
+    "options": [
+      "Odskočte kontrolu do bezpečnej oblasti",
+      "Vždy sa odskočte do slotu",
+      "Vždy sa odrazte cez sklo",
+      "Ignorujte odraz"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Pri nájazdoch čudného muža by mal brankár:",
+    "options": [
+      "Vždy buďte ticho",
+      "Sledujte dav",
+      "Korčuľovať na lavičku",
+      "Brankár hovorí o čudných mužoch"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "V NHL môže brankár odohrať puk za sieť iba v:",
+    "options": [
+      "Útočné pásmo",
+      "Hrajte puk iba v lichobežníku za sieťou",
+      "Úplné obranné pásmo",
+      "Iba neutrálna zóna"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Pri bočnej prihrávke cez bránkovisko brankár používa:",
+    "options": [
+      "Stojte vždy len na jednom stĺpe",
+      "Nechajte sieť",
+      "Pohyb medzi stĺpikmi na bočných priechodoch",
+      "Korčuľujte na modrú čiaru"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Dobrá hra pod uhlom znamená, že brankár:",
+    "options": [
+      "Výzvy na červenú čiaru",
+      "Vždy stojí hlboko v záhybe",
+      "Uhlový rez na zníženie viditeľnosti siete",
+      "Otočí sa späť k strelcovi"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Brankárov „dom“ na ochranu je hlavne:",
+    "options": [
+      "Chráňte dom (plochu slotu)",
+      "Dvere Zamboni",
+      "Stredný ľadový kruh",
+      "Trestná skrinka"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "V úniku mnohí brankári uprednostňujú:",
+    "options": [
+      "Korčuľujte smerom k lavičke",
+      "Zavrieť oči a dúfať",
+      "Spojte strelca a prečítajte si správu",
+      "Vyzvite vždy na vrchol kruhov"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Pri pokuse o obkľúčenie by brankár mal:",
+    "options": [
+      "Blízky stĺp nechajte otvorený",
+      "Korčuľovať do bodky",
+      "Zahrajte puk do rohu",
+      "Držte stĺpik na krátkej strane"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Ak brankár zahrá puk za sieť MIMO lichobežníka, je to:",
+    "options": [
+      "Vždy legálna hra",
+      "Icing call",
+      "Zdržiavanie trestu hry",
+      "Automatický cieľ"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Keď je puk clonený, brankár by mal:",
+    "options": [
+      "Nechajte záhyb",
+      "Signál ofsajdu",
+      "Vždy sa vzdajte krátkej strany",
+      "Nájdite puk v premávke alebo upravte polohu"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Kontrola popichu brankára musí byť:",
+    "options": [
+      "Poke check len spredu legálne",
+      "S vysokou palicou na tvár",
+      "Spoza strelca vždy",
+      "Keď stojíte na stredovom ľade"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Pri dlhej prihrávke brankár často:",
+    "options": [
+      "Korčule na lavičku súpera",
+      "Ignoruje hru",
+      "Strieľa na ref",
+      "Zastaví alebo odohrá puk legálne za sieť"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Hokejová inteligencia znamená, že každý hráč by mal:",
+    "options": [
+      "Každý hráč pomáha v obrane",
+      "Rozprávajú len brankári",
+      "Iba obrancovia spätnú kontrolu",
+      "Bodujú iba útočníci"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Udržanie hokejky na ľade vám pomôže:",
+    "options": [
+      "Blokujte prechádzajúce pruhy a prijímajte preukazy",
+      "Signálna námraza",
+      "Vyhnite sa puku",
+      "Cestujte rýchlejšie"
+    ]
+  },
+  "theory_t_change": {
+    "question": "K zmene inteligentnej linky zvyčajne dochádza:",
+    "options": [
+      "Za behu, keď to hra dovolí",
+      "Nikdy nie za letu",
+      "Počas odtrhnutia proti",
+      "Vždy len v útočnom pásme"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Pred zmenou obranných značiek by hráči mali:",
+    "options": [
+      "Vždy kričte na rozhodcu",
+      "Zmeňte sa bez pozerania",
+      "Pred prepnutím značiek komunikujte",
+      "Nikdy nehovorte na ľade"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Výmena čiar na nesprávnej strane ľadu môže:",
+    "options": [
+      "Garantovať gól",
+      "Vždy pomôžte tímu",
+      "Príliš veľa mužov alebo zlé načasovanie",
+      "Zastavte hodiny"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Čítanie hry znamená:",
+    "options": [
+      "Ignorovať spoluhráčov",
+      "Nikdy nemeňte štruktúru",
+      "Vždy sledujte iba puk",
+      "Predvídať, kam pôjdu puk a súperi ďalej"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Podpora druhého muža pri puku znamená:",
+    "options": [
+      "Odkorčuľujte preč od puku",
+      "Len pozor na brankára",
+      "Postavte sa na červenú čiaru",
+      "Vyrovnajte rýchlosť a podporte nosiča pukov"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Silná a slabá stránka odkazujú na:",
+    "options": [
+      "Strana, kde je puk oproti opačnej strane",
+      "Domáce a hosťujúce tímy",
+      "Prvé a druhé obdobie",
+      "Len pre ľavákov a pravákov"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Pri presilovej hre je dôležitá štruktúra, pretože:",
+    "options": [
+      "Pohyb otvára pruhy a naťahuje PK",
+      "Najlepšie je stáť na mieste",
+      "Puku sa môže dotknúť iba jeden hráč",
+      "Ofsajd nehrá rolu"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Trestné zabitie „box + jedna“ často znamená:",
+    "options": [
+      "Všetci piati sa ženú za pukom",
+      "Všetci piati stoja na červenej čiare",
+      "Nie je potrebná žiadna štruktúra",
+      "Štyria v krabici, jeden stláčajúci puk"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Podvádzanie pri vhadzovaní (načasovanie) znamená:",
+    "options": [
+      "Načasovanie poklesu na skoré získanie puku",
+      "Kopni súperovu hokejku",
+      "Vojdite do kruhu pred pukom",
+      "Nechajte bodku vhadzovania"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Ochrana pred oneskorením, inteligentné tímy:",
+    "options": [
+      "Riskujte každú zmenu",
+      "V prvej tretine vždy ťahajte brankára",
+      "Nikdy nevyčistite zónu",
+      "Spravujte puk a vyhýbajte sa zbytočným penaltám"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Tréneri menia linky pre zápasy na:",
+    "options": [
+      "Získajte priaznivé situácie hráč proti hráčovi",
+      "Garantovaný ofsajd",
+      "Vyhnite sa všetkým vhadzovaniam",
+      "Len strácať čas"
+    ]
+  },
+  "ref_goal": {
+    "question": "Keď padne gól, rozhodca zvyčajne:",
+    "options": [
+      "Ukážte na stredový ľad",
+      "Signalizácia oneskoreného trestu",
+      "Rukami vytvorte T",
+      "Zamrznutie signálu je zrušené"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Signál časového limitu vyzerá takto:",
+    "options": [
+      "Ruky tvoria T",
+      "Ukážte na stredový ľad",
+      "Zobrazených šesť prstov",
+      "Obe päste sa tlačia dopredu"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Odložený trest ukazuje rozhodca takto:",
+    "options": [
+      "Signál streleného gólu",
+      "Timeout T signál",
+      "Signál umytia námrazy",
+      "Jedna ruka zdvihnutá priamo nahor"
+    ]
+  },
+  "ref_minor": {
+    "question": "Pri odpisovaní menšieho trestu rozhodca často signalizuje:",
+    "options": [
+      "Otvorte dlaň smerom k trestnému boxu",
+      "Ruky len cez hrudník",
+      "Ruky tvoria T",
+      "Ukážte na stred ľadu pre gól"
+    ]
+  },
+  "ref_offside": {
+    "question": "Ofsajdové volanie rozhodcu je často signalizované:",
+    "options": [
+      "Ukážte na stredový ľad",
+      "Zobrazených šesť prstov",
+      "Pumpovací pohyb uzavretej päste",
+      "Sekanie paralelne s ľadom"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Signál porušenia prihrávky rukou je často:",
+    "options": [
+      "Pumpovací pohyb uzavretej päste",
+      "Obe ruky prekrížené na boj",
+      "Otvorte dlaň na trestnú lavicu",
+      "Ukážte na stredový ľad"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Signál pokuty s vysokou priľnavosťou: rozhodca sa často dotýka:",
+    "options": [
+      "Dlaň na vlastnú tvár/oblasť čeľuste",
+      "Gólový stĺpik",
+      "Puk",
+      "Iba vlastné koleno"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Príliš veľa mužov na ľade signalizuje zobrazenie:",
+    "options": [
+      "Len jedna ruka rovno hore",
+      "Ukážte na stredový ľad",
+      "Ruky tvoria T",
+      "Zobrazených šesť prstov"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Signál trestu za zakopnutie často vyzerá takto:",
+    "options": [
+      "Vypínací signál (pohyb nohy)",
+      "Ruky tvoria T",
+      "Ukážte na stredový ľad",
+      "Obe päste sa tlačia dopredu"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Signál trestu za hákovanie často vyzerá takto:",
+    "options": [
+      "Šesť prstov",
+      "Sekanie paralelne s ľadom",
+      "Signál háku (ťahací pohyb)",
+      "Pumpovanie uzavretou päsťou"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Signál krížovej kontroly rozhodcom je často:",
+    "options": [
+      "Obe päste sa tlačia dopredu",
+      "Ukážte na stredový ľad",
+      "Ruky tvoria T",
+      "Len z dlane na tvár"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Bojový major je často signalizovaný:",
+    "options": [
+      "Sekanie ofsajdového pohybu",
+      "Major boja (obe ruky prekrížené)",
+      "Jedna ruka hore za oneskorený trest",
+      "Otvorte iba dlaň do krabice"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Pri udeľovaní trestného strieľania rozhodca zvyčajne:",
+    "options": [
+      "Zobrazuje časový limit T",
+      "Vymýva polevu",
+      "Body do stredu ľadu na trestné strieľanie",
+      "Ukazuje šesť prstov"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Pri odmávaní na gól môže rozhodca:",
+    "options": [
+      "Signál zakázaný cieľ (prekrížte ruky a potom mávnite rukou)",
+      "Ukážte do stredu na cieľ",
+      "Zdvihnite ruku iba pre oneskorený trest",
+      "Zobraziť časový limit T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Signál oneskorenia hry (puk cez sklo) je často:",
+    "options": [
+      "Zakopnutie nohy",
+      "Oneskorenie hry (rozhodca potľapká pomyselné sklo)",
+      "Bojujúce ruky prekrížené",
+      "Hákovací ťahový pohyb"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Čiarový rozhodca signalizuje ofsajd:",
+    "options": [
+      "Otvorte dlaň na trestnú lavicu",
+      "Vytvorte T pre časový limit",
+      "Ukážte na stred ľadu pre gól",
+      "Čiarový rozhodca obe ruky hore (ofsajd)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Keď sa námraza odmáva (napr. na PK), čiarový rozhodca môže:",
+    "options": [
+      "Krížové ramená na boj",
+      "Zamrznutie signálu je zrušené",
+      "Ukážte do stredu na cieľ",
+      "Ukážte šesť prstov"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Dvojitý menší trest môže byť udelený s:",
+    "options": [
+      "T pre časový limit",
+      "Len jedna ruka rovno hore",
+      "Dvojité moll (dva prsty)",
+      "Šesť prstov pre príliš veľa mužov"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Signál penalizácie často zahŕňa:",
+    "options": [
+      "T pre časový limit",
+      "Ukážte do stredu na cieľ",
+      "Zatvorená päsť na prihrávku rukou",
+      "Signál penalizácie pri nástupe (tlačenie rúk)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Počas oneskoreného signálu trestu hra pokračuje, pretože:",
+    "options": [
+      "Gól padol",
+      "Poleva bola dokončená",
+      "Bol vyvolaný časový limit",
+      "Odložený trest (hra pokračuje)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Súper začína útok cez stred. Čo by malo centrum robiť?",
+    "options": [
+      "Vráťte sa do stredu svojej zóny a pomôžte obrancom",
+      "Stojte pri doskách",
+      "Zmeňte riadky bez dôvodu",
+      "Korčuľovať k súperovej sieti"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Súper za sieťou sa snaží skórovať obalom v štýle lakrosu. Čo by mal brankár robiť?",
+    "options": [
+      "Korčuľujte do stredu zóny",
+      "Sledujte dav",
+      "Držte sa tesne pri vzdialenejšom stĺpiku a sledujte hokejku",
+      "Ľahnite si tvárou dolu na ľad"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Ste obranca, ktorý čelí náporu 2 na 1. Na čom najviac záleží?",
+    "options": [
+      "Odoberte preukaz",
+      "Okamžite zaútočte na nosiča puku",
+      "Sledujte iba puk",
+      "Korčuľujte na lavičku pre zmenu čiary"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Ste krídelník a prvý hráč, ktorý vstupuje do útočného pásma. Čo by ste mali urobiť?",
+    "options": [
+      "Tlak na obrancu s pukom",
+      "Postavte sa na modrú čiaru",
+      "Korčuľujte v kruhoch",
+      "Korčuľujte rovno na lavičku"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Váš tím je v presilovej hre. Kde sa zvyčajne nachádza centrum?",
+    "options": [
+      "Na vlastnej modrej čiare",
+      "Na lavičke",
+      "Za vlastnou sieťou",
+      "Pred sieťou"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Stratili ste puk v útočnom pásme. Čo by ste mali robiť ďalej?",
+    "options": [
+      "Okamžite sa pripojte k forčeku",
+      "Pomaly korčuľujte späť",
+      "Pohádajte sa s rozhodcom",
+      "Pozrite sa na trénera"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Center prehral vhadzovanie. Čo bude nasledovať?",
+    "options": [
+      "Korčuľovať do útoku",
+      "Okamžitá pomoc v obrane",
+      "Zložte si prilbu",
+      "Prestaňte sa hýbať"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Puk je pozdĺž dosiek vo vašej zóne. Čo by mal urobiť druhý hráč?",
+    "options": [
+      "Podporte svojho partnera nablízku",
+      "Stojte na mieste",
+      "Sledujte tribúny",
+      "Korčuľovať k súperovej sieti"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Čo je najdôležitejšie pri zhone 3 na 2?",
+    "options": [
+      "Každý korčuľuje na rovnaké miesto",
+      "Strieľajte z akejkoľvek pozície",
+      "Zastavte na modrej čiare",
+      "Natiahnite obranu prihrávkami"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Po strele sa puk odrazil pred sieť. Čo by mal brankár robiť?",
+    "options": [
+      "Zdvihnite palicu do vzduchu",
+      "Nájdite puk a prikryte ho",
+      "Korčuľovať za sieť",
+      "Pozrite sa na trénera"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Kedy je najlepší čas na zmenu riadkov?",
+    "options": [
+      "Keď váš tím kontroluje puk",
+      "Keď súper útočí",
+      "Keď je puk pred sieťou",
+      "Počas nebezpečnej gólovej šance"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Čo by mal obranca robiť, keď je pod silným tlakom pri predbiehaní?",
+    "options": [
+      "Stojte na mieste s pukom",
+      "Vystreliť puk do stredu pásma",
+      "Spadnúť na ľad",
+      "Urobte rýchly a presný prvý prechod"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Čo je dôležité robiť, keď nemáte puk?",
+    "options": [
+      "Pozrite sa na strop",
+      "Držte palicu len jednou rukou",
+      "Otvorte sa na priepustku",
+      "Postavte sa na jedno miesto"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Ktorý prielom sa považuje za najspoľahlivejší?",
+    "options": [
+      "Strata puku",
+      "S krátkou presnou prihrávkou",
+      "Slepá skládka",
+      "Prechod cez stred vašej zóny"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Čo je najdôležitejšie pri penaltovom zabití?",
+    "options": [
+      "Blokovať predbiehacie pruhy",
+      "Neustále útočte",
+      "Korčule bez konštrukcie",
+      "Hrajte iba pozdĺž dosky"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Kedy sa môže obranca zapojiť do zhonu?",
+    "options": [
+      "Vždy",
+      "Iba v predĺžení",
+      "Nikdy",
+      "Keď partner zakryje jeho pozíciu"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Prečo je prechod cez slot nebezpečný?",
+    "options": [
+      "Úradníci to nemôžu vidieť",
+      "Spomaľuje to hru",
+      "Môže to viesť k cieľu",
+      "Vždy je to nezákonné"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Kedy by mal brankár odohrať puk za sieť?",
+    "options": [
+      "Aby opustil ľad",
+      "Pomôcť obrancom začať útek",
+      "Oddýchnuť si",
+      "Dohadovať sa s úradníkmi"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Prečo jazdí dopredu na vzdialenejší post?",
+    "options": [
+      "Na doskoky a jednorazovky",
+      "Aby ste zostali mimo hry",
+      "Oddýchnuť si",
+      "Dostať sa do cesty spoluhráčovi"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Čo by mal obranca urobiť pred streľbou z bodu?",
+    "options": [
+      "Skontrolujte premávku pred sieťou",
+      "Strieľajte priamo do dosiek",
+      "Zavri oči",
+      "Dekes dozadu"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Kto by mal po vhadzovaní bojovať o puk ako prvý?",
+    "options": [
+      "Iba brankár",
+      "Nikto",
+      "Najbližší hráč",
+      "Iba obranca"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Prečo je kontrola puku dôležitá?",
+    "options": [
+      "Súper nemôže zaútočiť bez puku",
+      "Môžete menej korčuľovať",
+      "Úradníci za to udeľujú body",
+      "Vyzerá to dobre"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Čo je najdôležitejšie v rohovom súboji?",
+    "options": [
+      "Vysoká strela",
+      "Skákanie",
+      "Korčuľovanie len dozadu",
+      "Poloha tela a umiestnenie palice"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Aký je najlepší spôsob, ako sa otvoriť?",
+    "options": [
+      "Presuňte sa do otvoreného priestoru",
+      "Do slepého kúta",
+      "Korčuľujte za chrbtom spoluhráča",
+      "Stávaním na mieste"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Čo by mal útočník urobiť po strele?",
+    "options": [
+      "Okamžite vymeňte riadky",
+      "Sledujte výsledkovú tabuľku",
+      "Choďte na sieť pre odraz",
+      "Stojte na mieste"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Čo je najdôležitejšie pre obrancu v slote?",
+    "options": [
+      "Drž sa ďaleko od siete",
+      "Hrajte bez palice",
+      "Zabráňte súperom dostať sa k doskokom",
+      "Sledujte iba brankára"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Aký je najlepší spôsob vstupu do zóny?",
+    "options": [
+      "Bez rýchlosti",
+      "Korčuľovanie dozadu do zóny",
+      "Cez stred bez podpory",
+      "S kontrolou puku"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Kedy je úder bekhendom užitočný?",
+    "options": [
+      "Iba v praxi",
+      "Nikdy",
+      "Keď nie je čas posunúť puk do forhendu",
+      "Len pre obrancov"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Prečo je stred v útoku dôležitý?",
+    "options": [
+      "Vždy stojí na mieste",
+      "Nikdy nerobí prihrávky",
+      "Spája celú čiaru",
+      "Nikdy nehrá v obrane"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Čo je dôležité v obrannej hre 1 na 1?",
+    "options": [
+      "Okamžite skočte na súpera",
+      "Sledujte tribúny",
+      "Korčuľujte dozadu bez kontroly",
+      "Riadiaca medzera a uhol"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Vaša línia mala dlhý ofenzívny posun. Súperný obranca získal puk za sieť, ale vyzerá unavene. Aj vaša línia je už dlho na ľade. čo je najlepšie?",
+    "options": [
+      "Pokračujte v agresívnom forčekingu s plnou čiarou",
+      "Spadnite späť do neutrálnej zóny bez tlaku",
+      "Jeden vpred stále tlačí, zatiaľ čo ostatní sa menia",
+      "Celý riadok sa zmení naraz"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Prečo je prechod dozadu niekedy užitočný?",
+    "options": [
+      "Stratiť dynamiku",
+      "Aby nedošlo k útoku",
+      "Aby ste si udržali majetok",
+      "Na zastavenie hry"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Čo je dôležité pri blokovaní strely?",
+    "options": [
+      "Zablokujte cestu puku",
+      "Vyskočte nahor",
+      "Otočte sa chrbtom",
+      "Pozrite sa dole"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Ako by mal hrať obranca proti rýchlemu útočníkovi?",
+    "options": [
+      "Pokračujte v korčuľovaní vpred bez zastavenia",
+      "Hrajte vždy príliš tesne",
+      "Stojte na mieste",
+      "Nedávajte mu otvorený ľad"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Kedy je jednorazovka najúčinnejšia?",
+    "options": [
+      "Keď strelec nie je pripravený",
+      "Iba v praxi",
+      "Keď sa brankár nevie včas nastaviť",
+      "Keď je puk nehybný"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Prečo je komunikácia na ľade dôležitá?",
+    "options": [
+      "Rozptyľuje to protivníka",
+      "Nahrádza korčuľovanie",
+      "Pomáha spoluhráčom rýchlejšie sa rozhodovať",
+      "Úradníkom sa to páči"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Ako by ste mali hrať nával 2 na 0?",
+    "options": [
+      "Rozhýbte brankára prihrávkou",
+      "Zastavte sa pred sieťou",
+      "Strieľajte zďaleka",
+      "Stratiť puk"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Prečo útočníci využívajú priestor za sieťou?",
+    "options": [
+      "Skryť sa pred hrou",
+      "Na zastavenie hry",
+      "Aby ste sa vyhli streľbe",
+      "Na natiahnutie obrany"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Prečo je dôležité zostať v pokoji?",
+    "options": [
+      "Ovplyvňuje ľad",
+      "To robí sieť menšou",
+      "Pomáha vám robiť lepšie rozhodnutia",
+      "Vďaka tomu je puk rýchlejší"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Čo by mal robiť obranca na útočnej modrej čiare?",
+    "options": [
+      "Udržujte puk v pásme",
+      "Stojte iba v strede",
+      "Ignorovať spoluhráčov",
+      "Vždy ustúpiť"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Čo robí odraz nebezpečným?",
+    "options": [
+      "Hráč stojí na mieste",
+      "Puk sa stáva ľahším",
+      "Rozhodca puk nevidí",
+      "Brankár nie vždy kontroluje odraz"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Prečo je užitočná zmena smeru útoku?",
+    "options": [
+      "Bolí to váš vlastný tím",
+      "Spomaľuje to hru",
+      "Vytvára otvorené plochy",
+      "Úradníkov to unavuje"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Čo je dôležité pri vhadzovaní v útočnom pásme?",
+    "options": [
+      "Okamžite korčuľujte späť",
+      "Rýchlo získať puk",
+      "Sledujte výsledkovú tabuľku",
+      "Nehýbte sa"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Čo znamená kryť spoluhráča?",
+    "options": [
+      "Vyplňte jeho pozíciu, keď sa pripojí k zhone",
+      "Hrajte iba útok",
+      "Skopírujte jeho presnú trasu",
+      "Postavte sa vedľa neho bez pohybu"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Ak obranca stratí pozíciu, čo má robiť?",
+    "options": [
+      "Sledujte iba puk",
+      "Pohádajte sa so spoluhráčom",
+      "Prestaňte korčuľovať",
+      "Rýchlo sa vráťte do obrany"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Prečo hráči často strieľajú nízko?",
+    "options": [
+      "Je to pomalšie",
+      "Pretože vysoké strely sú nezákonné",
+      "Na odklony a doskoky",
+      "Pre úradníkov je to jednoduchšie"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Kedy je dlhý pas obzvlášť užitočný?",
+    "options": [
+      "V dave hráčov",
+      "Počas zmeny linky",
+      "Pri rýchlom protiútoku",
+      "Bez cieľa"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Prečo je pohyb bez puku dôležitý?",
+    "options": [
+      "Vytvára možnosti prechodu",
+      "Je to len pre obrancov",
+      "Nemá to vplyv na hru",
+      "Prekáža spoluhráčom"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Kedy môže byť užitočná strela z ostrého uhla?",
+    "options": [
+      "Iba pri presilovej hre",
+      "Iba na trestnú vraždu",
+      "Nikdy",
+      "Pre nečakaný odraz"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Prečo je dôležitý screening brankára?",
+    "options": [
+      "Rozhodca puk nevidí",
+      "Je pre neho ťažšie vidieť strelu",
+      "Brankár sa prestane hýbať",
+      "Vďaka tomu vyzerá útok lepšie"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Čo vám pomáha zachytiť prihrávky?",
+    "options": [
+      "Čítanie hry",
+      "Len šťastie",
+      "Korčuľovanie pomaly",
+      "Hra bez palice"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Ako správne prišpendlíte súpera pozdĺž dosky?",
+    "options": [
+      "Zatlačte ho do chrbta",
+      "So zatvorenými očami",
+      "S rukami a bez palice",
+      "Pri ovládaní puku používajte svoje telo a hokejku"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Na čom záleží, keď obranca vyjde spoza siete?",
+    "options": [
+      "Pozrite sa a nájdite preukaz",
+      "Korčuľujte pomaly",
+      "Okamžite vystreľte puk",
+      "Pozrite sa len na ľad"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Prečo tímy niekedy spomaľujú hru?",
+    "options": [
+      "Stratiť puk",
+      "Aby ste si udržali majetok a energiu",
+      "Aby nedošlo k útoku",
+      "Na zastavenie hry"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Kto je hráč druhej vlny?",
+    "options": [
+      "Rozhodca",
+      "Záložný brankár",
+      "Hráč, ktorý sa neskôr zapojí do útoku",
+      "Najpomalší hráč"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Prečo sú rýchle krátke prechody účinné?",
+    "options": [
+      "Vždy sú pomalé",
+      "Ublížili útoku",
+      "Sú len pre obrancov",
+      "Súperom sa ťažšie kradnú"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Čo by mal brankár urobiť po zákroku?",
+    "options": [
+      "Rýchlo sledujte puk",
+      "Korčuľujte na dosky",
+      "Zložte mu rukavicu",
+      "Pozrite sa na výsledkovú tabuľku"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Kedy je útok cez stred obzvlášť nebezpečný?",
+    "options": [
+      "Keď je jeden hráč sám",
+      "Keď je rýchlosť a podpora",
+      "Keď tam nie je puk",
+      "Keď všetci stoja na mieste"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Čo vám pomáha rozhodovať sa rýchlejšie?",
+    "options": [
+      "Korčuľovanie pomaly",
+      "Sledujte iba puk",
+      "Neustále skenovanie ľadu",
+      "Hrajte bez rozprávania"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Čo robí dobrý kapitán?",
+    "options": [
+      "Podporuje tím a ide príkladom",
+      "Hrá len útok",
+      "Kričí na každého",
+      "Nikdy nehrá v obrane"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Čo vám pomáha uniknúť predčasnému tlaku?",
+    "options": [
+      "Hranie sám",
+      "Rýchle presúvanie puku",
+      "Dlhé držanie puku",
+      "Zastavenie pozdĺž dosiek"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Prečo nemôžete zaváhať na modrej čiare?",
+    "options": [
+      "Brankár sa unaví",
+      "Ľad sa zhorší",
+      "Môžete stratiť zónu",
+      "Rozhodca preruší hru"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Prečo je strela tesne po prihrávke nebezpečná?",
+    "options": [
+      "Je to vždy slabé",
+      "Je ťažké vykonať",
+      "Rozhodca gól neuzná",
+      "Brankár nie je nastavený včas"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Kto by sa mal vrátiť ako prvý po strate puku?",
+    "options": [
+      "Najbližší hráč",
+      "Iba centrum",
+      "Iba obranca",
+      "Iba brankár"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Ako by mal hrať obranca proti tvrdému strelcovi?",
+    "options": [
+      "Sledujte iba brankára",
+      "Znížte jeho čas a priestor na streľbu",
+      "Dajte mu otvorený priestor",
+      "Stojte ďaleko"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Prečo je puk v obrane často posunutý do rohu?",
+    "options": [
+      "Funkcionári nemôžu vidieť hru",
+      "Ľad je tam pomalší",
+      "Pre sieť je menšie nebezpečenstvo",
+      "Tam je ľahšie skórovať"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Čo robí útočník pred sieťou?",
+    "options": [
+      "Stojí chrbtom k hre",
+      "Korčule na dosky",
+      "Nehýbe sa",
+      "Vytvára premávku a loví odrazy"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Prečo je dôležité hrať so vztýčenou hlavou?",
+    "options": [
+      "Vidieť spoluhráčov a súperov",
+      "Aby bol puk ľahší",
+      "Korčuľovať rýchlejšie",
+      "Takže úradníci vás môžu vidieť"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Čo je najdôležitejšie po víťazstve v súboji o PK?",
+    "options": [
+      "Pokúste sa deke cez každého",
+      "Dajte si dlhú pauzu",
+      "Vyčistite puk z pásma",
+      "Stojte na mieste"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Prečo je dôležité tlačiť na obrancov súpera?",
+    "options": [
+      "Bolí to váš tím",
+      "Nemá to vplyv na hru",
+      "Zastavuje hru",
+      "Môže si vynútiť chybu"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Kedy je dotykový preukaz užitočný?",
+    "options": [
+      "Rýchlo rozvinúť útok",
+      "Keď hráč stojí na mieste",
+      "Keď nie sú spoluhráči",
+      "Iba v obrane"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Čo má robiť center pred vlastnou sieťou?",
+    "options": [
+      "Počkajte na prechod ľadu",
+      "Korčuľujte do neutrálnej zóny",
+      "Pomôžte obrancom zakryť slot",
+      "Stojte pri doskách"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Prečo je pohyb krížom-krážom vpred účinný?",
+    "options": [
+      "Obrancov to mätie",
+      "Bolí to váš vlastný tím",
+      "Spomaľuje útok",
+      "Je to nezákonné"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Čo je dôležité pri boji o uvoľnený puk?",
+    "options": [
+      "Držte puk dlho",
+      "Stojte na mieste",
+      "Pozrite sa dole",
+      "Rýchlo sa rozhodnite, čo ďalej"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Prečo hráči menia rýchlosť?",
+    "options": [
+      "Aby prestali korčuľovať",
+      "Stratiť puk",
+      "Poraziť súpera",
+      "Aby sa rýchlejšie unavil"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Zostáva 40 sekúnd. Vediete o jeden gól. Súper hrá 6 na 5. Ich obranca má puk pri modrej čiare a váš krídelník môže skočiť za krádež. čo je najlepšie?",
+    "options": [
+      "Okamžite agresívne letieť pri puku",
+      "Sledujte iba sieťového prehrávača",
+      "Tlačte iba pod kontrolovaným uhlom, aby ste získali puk",
+      "Zrútiť sa úplne na sieť"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Kedy môže brankár vyletieť ďaleko zo svojej siete?",
+    "options": [
+      "Zachytiť puk a pomôcť obrane",
+      "Nikdy",
+      "Vždy",
+      "Až po góle"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Čo je dôležité pre úspešný pokus o odraz?",
+    "options": [
+      "Veľký záťah",
+      "Stojte ďaleko od siete",
+      "Pomalý pohyb",
+      "Rýchla reakcia"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Prečo je podpora druhého hráča dôležitá?",
+    "options": [
+      "Vytvára ďalšie možnosti",
+      "Je to len pre obrancov",
+      "Nie je to potrebné",
+      "Bolí to útok"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Čo znamená „čítať hru“?",
+    "options": [
+      "Predvídajte, čo urobia súperi",
+      "Počítajte prihrávky",
+      "Sledujte iba puk",
+      "Sledujte výsledkovú tabuľku"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Prečo je dôležité chrániť puk telom?",
+    "options": [
+      "Vďaka tomu je ľad rýchlejší",
+      "Je to len pre obrancov",
+      "Ovplyvňuje rozhodcu",
+      "Pomáha chrániť puk"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Kedy je užitočná prestávka pozdĺž dosiek?",
+    "options": [
+      "Nikdy",
+      "Vždy",
+      "Keď je stred zakrytý",
+      "Iba pri presilovej hre"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Čo je dôležité pri bránení v presilovej hre?",
+    "options": [
+      "Neustále dekes",
+      "Zostaňte kompaktní v defenzíve",
+      "Pomalé zmeny riadkov",
+      "Všade sa hrá jeden na jedného"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Čo je to prihrávka na strelu?",
+    "options": [
+      "Prihrávka na hráča v dobrej streleckej pozícii",
+      "Prihrávka späť na brankára",
+      "Náhodný prechod",
+      "Prihrávka do rohu"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Prečo je deke pred výstrelom užitočný?",
+    "options": [
+      "Vždy to spomaľuje útok",
+      "Je to nezákonné",
+      "Je to len pre obrancov",
+      "Dokáže posunúť brankára alebo obrancu"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Po zablokovaní strely by hráč mal:",
+    "options": [
+      "Okamžite hľadajte puk",
+      "Stojte na mieste",
+      "Pozrite sa na rozhodcu",
+      "Nechajte ľad"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Ako útočníci pomáhajú obrancom?",
+    "options": [
+      "Držte sa v útočnom pásme",
+      "Skontroluj a otvor sa na priepustku",
+      "Hrajte iba pozdĺž dosky",
+      "Nehrajte na obranu"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Čo pomáha proti silnému forčekingu?",
+    "options": [
+      "Rýchle rozhodnutia a pohyb puku",
+      "Korčuľovanie pomaly",
+      "Hranie sám",
+      "Dlhé držanie puku"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Kedy je vychýlenie palice užitočné?",
+    "options": [
+      "Nikdy",
+      "Iba v praxi",
+      "Iba v obrane",
+      "Na presmerovanie puku"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Čo je dôležité pri útoku pozdĺž dosiek?",
+    "options": [
+      "Prihrávka späť na brankára",
+      "Podpora od blízkeho spoluhráča",
+      "Hranie sám",
+      "Zastavenie pohybu"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Čo je dôležité pre brankára v úniku?",
+    "options": [
+      "Udržujte dobré umiestnenie a trpezlivosť",
+      "Okamžite skočte na ľad",
+      "Korčuľujte dozadu",
+      "Sledujte obrancov"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Čo je dôležité pri rýchlom prechode do útoku?",
+    "options": [
+      "Pomalé prihrávky",
+      "Dlhé držanie puku",
+      "Zastavenie na modrej čiare",
+      "Rýchlosť rozhodovania"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Čo robí obranca pri presilovej hre?",
+    "options": [
+      "Korčule k sieti",
+      "Nepripája sa k útoku",
+      "Posúva puk a hľadá strelu",
+      "Stojí na mieste"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Prečo je premávka pred sieťou nebezpečná?",
+    "options": [
+      "Puk sa dostáva pomalšie",
+      "Brankár ťažšie vidí na puk",
+      "Rozhodca nemôže počítať hráčov",
+      "Hráči sa rýchlejšie unavia"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Čo je dôležité po zachytení puku?",
+    "options": [
+      "Rýchly prechod do útoku",
+      "Prestaňte korčuľovať",
+      "Okamžite vyhoďte puk",
+      "Korčuľujte na dosky"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Čo je obzvlášť dôležité pri predĺžení?",
+    "options": [
+      "Neustále dlhé zábery",
+      "Hra bez prihrávok",
+      "Dlhé zmeny",
+      "Kontrola puku a málo chýb"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Čo by mal obranca urobiť, ak súper cloní brankára?",
+    "options": [
+      "Pozrite sa na rozhodcu",
+      "Korčuľujte na dosky",
+      "Vyčistite štrbinu a zviažte súpera",
+      "Stojte v blízkosti bez pohybu"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Prečo je tímová hra dôležitejšia ako individuálna?",
+    "options": [
+      "Tým výsledok neovplyvňuje",
+      "Čiara vytvára spolu viac šancí",
+      "O hre rozhoduje vždy jeden hráč",
+      "Prihrávky hre škodia"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Čo je dôležité pred fotením?",
+    "options": [
+      "Rýchlo si prečítajte pozíciu brankára",
+      "Pozerajte sa iba dole na puk",
+      "Príďte na bodku",
+      "Zatvorte oči"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Čo najlepšie rozvíja hokejové IQ?",
+    "options": [
+      "Len silový tréning",
+      "Sledovanie iba gólov",
+      "Iba korčuľovanie",
+      "Štúdium hry, prax a pochopenie situácií"
+    ]
+  }
+}

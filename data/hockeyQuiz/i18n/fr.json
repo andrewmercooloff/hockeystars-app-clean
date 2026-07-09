@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Combien de patineurs par équipe sont sur la glace à force égale (à l'exclusion des gardiens de but) ?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Combien de périodes réglementaires compte un match standard de la LNH ?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Le hors-jeu est annoncé lorsqu’un joueur attaquant entre dans la zone offensive avant quoi ?",
+    "options": [
+      "La ligne médiane",
+      "La rondelle",
+      "Le gardien de but",
+      "L'arbitre"
+    ]
+  },
+  "rules_icing": {
+    "question": "Le givrage consiste à tirer la rondelle derrière la ligne médiane, au-delà de la ligne de but adverse, sans toucher. Vrai?",
+    "options": [
+      "Faux – jamais dans la LNH",
+      "Vrai",
+      "Vrai — seulement en heures supplémentaires",
+      "Faux – uniquement depuis la zone défensive"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Qui détient le record de la LNH pour le plus grand nombre de buts en carrière ?",
+    "options": [
+      "Alex Ovechkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin est célèbre en tant qu'ailier gauche portant le numéro 8 pour quelle équipe de ville ?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Qu'est-ce qu'un tour du chapeau au hockey ?",
+    "options": [
+      "Trois buts d'un joueur en un seul match",
+      "Trois arrêts de suite",
+      "Trois passes décisives en un match",
+      "Trois pénalités"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Un avantage numérique se produit lorsque :",
+    "options": [
+      "Le gardien est retiré",
+      "Une bagarre éclate",
+      "Une équipe a plus de patineurs en raison d'une pénalité",
+      "Début des heures supplémentaires"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "La Coupe Stanley est le trophée du championnat de quelle ligue ?",
+    "options": [
+      "Championnat du monde IIHF",
+      "LNH",
+      "KHL",
+      "LAH"
+    ]
+  },
+  "general_puck_material": {
+    "question": "De quoi est faite une rondelle de hockey standard ?",
+    "options": [
+      "Caoutchouc vulcanisé",
+      "Aluminium",
+      "Bois",
+      "Plastique"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Combien de minutes dure une pénalité mineure standard ?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Combien de minutes représente une pénalité majeure standard ?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Le jeu commence par :",
+    "options": [
+      "Tir de pénalité",
+      "Mise au jeu",
+      "Coupure de courant",
+      "Appel de glace"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Si un match de saison régulière de la LNH est à égalité après la prolongation, que se passe-t-il ?",
+    "options": [
+      "Deuxième prolongation",
+      "Fusillade",
+      "Période des séries éliminatoires",
+      "Dessiner des stands"
+    ]
+  },
+  "rules_crease": {
+    "question": "Un attaquant peut-il rester dans le territoire du gardien sans conséquences ?",
+    "options": [
+      "Oui toujours",
+      "Uniquement en séries éliminatoires",
+      "Non – le but peut être refusé",
+      "Seulement à la dernière minute"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Le high-sticking se produit lorsque le bâton frappe un adversaire au-dessus de :",
+    "options": [
+      "Barre transversale",
+      "Épaules",
+      "Taille",
+      "Casque uniquement"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Tirer le gardien de but comporte des risques :",
+    "options": [
+      "Tir de pénalité",
+      "But dans un filet vide contre",
+      "Hors-jeu",
+      "Glaçage uniquement"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Un tir de pénalité est souvent accordé pour une faute sur :",
+    "options": [
+      "À tout moment",
+      "Uniquement les heures supplémentaires",
+      "Seulement les séries éliminatoires",
+      "Échappée nette"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Un mineur de banc est servi par n'importe quel joueur sauf :",
+    "options": [
+      "Le gardien de but (généralement)",
+      "Un avant",
+      "Un défenseur",
+      "Le capitaine"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "La prolongation de la saison régulière de la LNH se joue avec combien de patineurs par équipe ?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Combien de joueurs (y compris le gardien de but) une équipe peut-elle avoir sur la glace ?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Combien de points vaut un but au tableau d’affichage ?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Lors d'une pénalité à retardement, l'équipe non fautive :",
+    "options": [
+      "Glace la rondelle",
+      "Expiration du délai d'appel",
+      "Arrête la lecture",
+      "Tire le gardien de but"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Les gardiens de but ne peuvent jouer la rondelle derrière le filet que dans les cas suivants :",
+    "options": [
+      "Cercle central",
+      "Zone neutre",
+      "Zone complète",
+      "Zone trapézoïdale"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Les combats entraînent généralement :",
+    "options": [
+      "Peine majeure",
+      "Inconduite de jeu uniquement",
+      "Pénalité mineure",
+      "Aucune pénalité"
+    ]
+  },
+  "terms_puck": {
+    "question": "L'objet en caoutchouc dur que les joueurs tirent s'appelle :",
+    "options": [
+      "Palet",
+      "Disque",
+      "Pierre",
+      "Balle"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Une passe qui soulève la rondelle s'appelle :",
+    "options": [
+      "Passe soucoupe",
+      "Carte d'embarquement",
+      "Déversement de gifle",
+      "Passe de pli"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Un tir frappé implique :",
+    "options": [
+      "Revers uniquement",
+      "Une main sur le bâton",
+      "Taper légèrement sur la rondelle",
+      "Remonter et frapper la glace en premier"
+    ]
+  },
+  "terms_deke": {
+    "question": "Un feinte est :",
+    "options": [
+      "Une sorte de pénalité",
+      "Un faux mouvement pour battre un défenseur",
+      "Un bloc défensif",
+      "Un changement de ligne"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Une échappée, c'est quand :",
+    "options": [
+      "La rondelle est glacée",
+      "Un patineur s'en prend seul au gardien de but",
+      "Deux joueurs s'affrontent",
+      "Un changement de ligne se produit"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Pistes plus/moins :",
+    "options": [
+      "Tirs au but",
+      "Différentiel de buts lorsque le joueur est sur la glace à force égale",
+      "Minutes de pénalité",
+      "La mise au jeu gagne seulement"
+    ]
+  },
+  "terms_assist": {
+    "question": "Une passe décisive est attribuée au joueur qui :",
+    "options": [
+      "Marque le but",
+      "A remporté la mise au jeu",
+      "Dernière rondelle touchée avant le buteur",
+      "J'ai une pénalité"
+    ]
+  },
+  "terms_block": {
+    "question": "Un tir bloqué, c'est quand :",
+    "options": [
+      "La rondelle touche le poteau",
+      "Le patineur arrête la rondelle avec son corps/bâton avant le but",
+      "Le gardien le sauve",
+      "Le tir manque le filet"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "L’échec avant signifie :",
+    "options": [
+      "Stratégie de changement de ligne uniquement",
+      "Défendre votre ligne bleue",
+      "Faire pression sur les adversaires dans leur zone pour récupérer la rondelle",
+      "Tirer le gardien de but"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "La vérification rétrospective signifie :",
+    "options": [
+      "Revenir pour aider la défense",
+      "Tirer du point",
+      "Mise au jeu gagnante",
+      "Arrêt du gardien"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Un temporisateur unique est :",
+    "options": [
+      "Attendre puis tirer",
+      "Mouvement du gardien de but",
+      "Tir immédiatement sur une passe",
+      "Une pénalité"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Un poke check :",
+    "options": [
+      "Soulever la rondelle par-dessus le bâton",
+      "Recoupement",
+      "Éloigner la rondelle de l'adversaire",
+      "Adversaire crochet"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "L'étagère supérieure signifie marquer dans :",
+    "options": [
+      "Partie supérieure du filet",
+      "Du centre de la glace seulement",
+      "Sur réseau vide uniquement",
+      "Cinq trous"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Le cinq trous se situe entre les gardiens de but :",
+    "options": [
+      "Bâton et gant",
+      "Masque et poitrine",
+      "Bras et corps",
+      "Jambes"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Un exécuteur fournit :",
+    "options": [
+      "Entraînement",
+      "But marquant",
+      "Protection physique et combat",
+      "Mises au jeu uniquement"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Les changements de ligne se produisent généralement :",
+    "options": [
+      "Seulement après les buts",
+      "Uniquement aux pénalités",
+      "Uniquement à l'entracte",
+      "À la volée pendant le jeu"
+    ]
+  },
+  "terms_rink": {
+    "question": "La surface de jeu au hockey s’appelle :",
+    "options": [
+      "Champ",
+      "Tribunal",
+      "Piste",
+      "Patinoire"
+    ]
+  },
+  "terms_goal": {
+    "question": "Le filet sur lequel les joueurs tirent s'appelle :",
+    "options": [
+      "Cible",
+      "Panier",
+      "But",
+      "Zone"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Jouer en désavantage numérique signifie :",
+    "options": [
+      "Au fil du temps",
+      "Gardien retiré",
+      "Moins de patineurs en raison d'une pénalité",
+      "Filet vide"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Les heures supplémentaires en cas de mort subite signifient :",
+    "options": [
+      "Le premier but gagne",
+      "Période complète",
+      "Fusillade seulement",
+      "Pas de gagnant"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Combien d’équipes dans l’ère NHL Original Six ?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Le hockey sur glace moderne s'est développé le plus dans :",
+    "options": [
+      "Russie",
+      "Suède",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice : qui a battu les États-Unis en 1980 ?",
+    "options": [
+      "Union soviétique",
+      "Canada",
+      "Tchécoslovaquie",
+      "Suède"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Le record de points en carrière de Wayne Gretzky est terminé :",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Le Temple de la renommée du hockey se trouve à :",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montréal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "La KHL est basée principalement à :",
+    "options": [
+      "Russie",
+      "Finlande",
+      "USA",
+      "Canada"
+    ]
+  },
+  "hist_1972": {
+    "question": "La série des sommets de 1972 : le Canada contre :",
+    "options": [
+      "URSS",
+      "USA",
+      "Tchéquie",
+      "Suède"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "La LNH a été fondée dans les années suivantes :",
+    "options": [
+      "20e siècle",
+      "21ème siècle",
+      "19ème siècle",
+      "18ème siècle"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby a été repêché au premier rang dans :",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid a été repêché au premier rang du classement général dans :",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "La Coupe Stanley a été décernée pour la première fois dans :",
+    "options": [
+      "20e siècle",
+      "21ème siècle",
+      "18ème siècle",
+      "19ème siècle"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr se classe parmi les leaders de tous les temps dans la LNH dans les domaines suivants :",
+    "options": [
+      "Points",
+      "Entraînement",
+      "Minutes de pénalité seulement",
+      "Le gardien gagne"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin a passé sa carrière dans la LNH principalement avec :",
+    "options": [
+      "Rangers de New York",
+      "Pingouins de Pittsburgh",
+      "Capitales de Washington",
+      "Bruins de Boston"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux a remporté la Coupe Stanley avec :",
+    "options": [
+      "Pingouins de Pittsburgh",
+      "Canadiens de Montréal",
+      "Red Wings de Détroit",
+      "Oilers d'Edmonton"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Une patinoire de la LNH dure environ combien de temps ?",
+    "options": [
+      "200 pieds",
+      "150 pieds",
+      "300 pieds",
+      "250 pieds"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Une patinoire de la LNH mesure environ quelle largeur ?",
+    "options": [
+      "100 pieds",
+      "150 pieds",
+      "120 pieds",
+      "85 pieds"
+    ]
+  },
+  "gen_zones": {
+    "question": "Les lignes bleues divisent la patinoire en combien de zones ?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "La ligne rouge centrale est utilisée pour :",
+    "options": [
+      "Appels glacials",
+      "Case à pénalité",
+      "Mises au jeu uniquement",
+      "Hors-jeu au centre"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "La courbe de la lame du bâton aide à :",
+    "options": [
+      "Vitesse de patinage",
+      "Le gardien sauve",
+      "Lever et contrôler la rondelle",
+      "Lutte"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Le creux du patin affecte :",
+    "options": [
+      "Flexion du bâton",
+      "Adhérence sur glace et virages",
+      "Ajustement du casque",
+      "Taille du maillot"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Les protège-tibias protègent :",
+    "options": [
+      "Épaules",
+      "Tête",
+      "Bas des jambes",
+      "Mains seulement"
+    ]
+  },
+  "gen_captain": {
+    "question": "Le capitaine porte la lettre :",
+    "options": [
+      "UN",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Les capitaines suppléants portent :",
+    "options": [
+      "C",
+      "P.",
+      "S",
+      "UN"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "L'équipe à domicile porte généralement :",
+    "options": [
+      "Foncé/coloré",
+      "Blanc/clair",
+      "Pas de maillots",
+      "Gardien seulement"
+    ]
+  },
+  "gen_intermission": {
+    "question": "L’entracte entre les règles concerne :",
+    "options": [
+      "5 minutes",
+      "30 minutes",
+      "15-18 minutes",
+      "1 heure"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "Les séries éliminatoires de la LNH sont principalement :",
+    "options": [
+      "Toujours le meilleur des 5",
+      "Finale uniquement",
+      "Rares exceptions – pour la plupart au meilleur des 7",
+      "Jamais"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Un Zamboni est utilisé pour :",
+    "options": [
+      "Mesurer la vitesse",
+      "Ranger les rondelles",
+      "Aiguiser les patins",
+      "Refaire surface de la glace"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Les officiels sur la glace portent :",
+    "options": [
+      "Maillots d'équipe",
+      "Équipement de gardien de but",
+      "Rayures noires et blanches",
+      "Costumes"
+    ]
+  },
+  "gen_skates": {
+    "question": "Les joueurs de hockey avancent :",
+    "options": [
+      "Patins à roulettes",
+      "Patins à glace",
+      "Pieds nus",
+      "Skis"
+    ]
+  },
+  "gen_stick": {
+    "question": "Les joueurs contrôlent la rondelle avec :",
+    "options": [
+      "Bâton",
+      "Filet",
+      "Mains seulement",
+      "Casque"
+    ]
+  },
+  "pl_team_0": {
+    "question": "À quelle équipe Sidney Crosby est-il le plus associé ?",
+    "options": [
+      "Pingouins de Pittsburgh",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Quel poste Sidney Crosby jouait-il principalement ?",
+    "options": [
+      "Ailier gauche",
+      "Ailier droit",
+      "Défenseur",
+      "Centre"
+    ]
+  },
+  "pl_team_1": {
+    "question": "À quelle équipe Connor McDavid est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto",
+      "Oilers d'Edmonton"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Quel poste Connor McDavid jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_2": {
+    "question": "À quelle équipe Nathan MacKinnon est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Avalanche du Colorado",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Quel poste Nathan MacKinnon a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_3": {
+    "question": "À quelle équipe Victor Hedman est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Lightning de Tampa Bay",
+      "Rangers de New York",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Quel poste Victor Hedman a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_4": {
+    "question": "À quelle équipe Carey Price est-il le plus associé ?",
+    "options": [
+      "Canadiens de Montréal",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Quel poste Carey Price a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier droit",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_5": {
+    "question": "À quelle équipe Jaromir Jagr est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto",
+      "Pingouins de Pittsburgh"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Quel poste Jaromir Jagr jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Centre",
+      "Gardien de but",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_6": {
+    "question": "À quelle équipe Mario Lemieux est-il le plus associé?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Pingouins de Pittsburgh",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Quel poste Mario Lemieux jouait-il principalement?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_7": {
+    "question": "À quelle équipe Patrick Kane est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Blackhawks de Chicago",
+      "Rangers de New York",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Quel poste Patrick Kane a-t-il principalement joué ?",
+    "options": [
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_8": {
+    "question": "À quelle équipe Nicklas Lidstrom est-il le plus associé ?",
+    "options": [
+      "Red Wings de Détroit",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Quel poste Nicklas Lidstrom a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Gardien de but",
+      "Ailier gauche",
+      "Défenseur"
+    ]
+  },
+  "pl_team_9": {
+    "question": "À quelle équipe Martin Brodeur est-il le plus associé?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Diables du New Jersey"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Quel poste Martin Brodeur jouait-il principalement?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Gardien de but",
+      "Défenseur"
+    ]
+  },
+  "pl_team_10": {
+    "question": "À quelle équipe Steven Stamkos est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Lightning de Tampa Bay",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Quel poste Steven Stamkos a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Défenseur",
+      "Ailier droit",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_11": {
+    "question": "À quelle équipe Auston Matthews est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Canadiens de Montréal"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Quel poste Auston Matthews jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche",
+      "Centre"
+    ]
+  },
+  "pl_team_12": {
+    "question": "À quelle équipe Leon Draisaitl est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Oilers d'Edmonton"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Quel poste Leon Draisaitl jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Ailier gauche",
+      "Défenseur"
+    ]
+  },
+  "pl_team_13": {
+    "question": "À quelle équipe Erik Karlsson est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Requins de San José",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Quel poste Erik Karlsson jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Gardien de but",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_14": {
+    "question": "À quelle équipe Pavel Datsyuk est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Red Wings de Détroit",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Quel poste Pavel Datsyuk a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Défenseur",
+      "Ailier droit",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_15": {
+    "question": "À quelle équipe Henrik Lundqvist est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Canadiens de Montréal"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Quel poste Henrik Lundqvist jouait-il principalement ?",
+    "options": [
+      "Défenseur",
+      "Ailier droit",
+      "Centre",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_16": {
+    "question": "À quelle équipe Evgeni Malkin est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Pingouins de Pittsburgh"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Quel poste Evgeni Malkin a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Ailier gauche",
+      "Défenseur"
+    ]
+  },
+  "pl_team_17": {
+    "question": "À quelle équipe Artemi Panarin est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Canadiens de Montréal",
+      "Rangers de New York",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Quel poste Artemi Panarin jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche",
+      "Centre"
+    ]
+  },
+  "pl_team_18": {
+    "question": "À quelle équipe Nikita Kucherov est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Lightning de Tampa Bay",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Quel poste Nikita Kucherov a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Gardien de but",
+      "Ailier droit",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_19": {
+    "question": "À quelle équipe Brad Marchand est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto",
+      "Canadiens de Montréal"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Quel poste Brad Marchand a-t-il principalement joué ?",
+    "options": [
+      "Ailier droit",
+      "Défenseur",
+      "Centre",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_20": {
+    "question": "À quelle équipe David Pastrnak est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Canadiens de Montréal"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Quel poste David Pastrnak jouait-il principalement ?",
+    "options": [
+      "Ailier gauche",
+      "Gardien de but",
+      "Centre",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_21": {
+    "question": "À quelle équipe Shea Weber est-elle la plus associée ?",
+    "options": [
+      "Rangers de New York",
+      "Canadiens de Montréal",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Quel poste Shea Weber a-t-il principalement joué ?",
+    "options": [
+      "Ailier gauche",
+      "Gardien de but",
+      "Défenseur",
+      "Centre"
+    ]
+  },
+  "pl_team_22": {
+    "question": "À quelle équipe Sergueï Bobrovsky est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Panthères de Floride",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Quel poste Sergueï Bobrovsky jouait-il principalement ?",
+    "options": [
+      "Défenseur",
+      "Ailier droit",
+      "Gardien de but",
+      "Centre"
+    ]
+  },
+  "pl_team_23": {
+    "question": "À quelle équipe Jonathan Toews est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Blackhawks de Chicago"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Quel poste Jonathan Toews a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Ailier gauche",
+      "Défenseur"
+    ]
+  },
+  "pl_team_24": {
+    "question": "À quelle équipe Anze Kopitar est-il le plus associé ?",
+    "options": [
+      "Kings de Los Angeles",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Quel poste Anze Kopitar jouait-il principalement ?",
+    "options": [
+      "Ailier gauche",
+      "Défenseur",
+      "Ailier droit",
+      "Centre"
+    ]
+  },
+  "pl_team_25": {
+    "question": "À quelle équipe Mark Messier est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Oilers d'Edmonton",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Quel poste Mark Messier jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Défenseur",
+      "Centre",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_26": {
+    "question": "À quelle équipe Ray Bourque est-il le plus associé?",
+    "options": [
+      "Rangers de New York",
+      "Canadiens de Montréal",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Quel poste Ray Bourque jouait-il principalement?",
+    "options": [
+      "Gardien de but",
+      "Défenseur",
+      "Centre",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_27": {
+    "question": "À quelle équipe Dominik Hasek est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Sabres de buffle"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Quel poste Dominik Hasek jouait-il principalement ?",
+    "options": [
+      "Gardien de but",
+      "Centre",
+      "Défenseur",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_28": {
+    "question": "À quelle équipe Teemu Selanne est-il le plus associé ?",
+    "options": [
+      "Canards d'Anaheim",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Quel poste Teemu Selanne jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Gardien de but",
+      "Ailier gauche",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_29": {
+    "question": "À quelle équipe Pavel Bure est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Canucks de Vancouver",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Quel poste Pavel Bure jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Gardien de but",
+      "Centre",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_30": {
+    "question": "À quelle équipe Alexander Mogilny est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Sabres de buffle"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Quel poste Alexander Mogilny a-t-il principalement joué ?",
+    "options": [
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_31": {
+    "question": "À quelle équipe Peter Forsberg est-il le plus associé ?",
+    "options": [
+      "Avalanche du Colorado",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Quel poste Peter Forsberg a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_32": {
+    "question": "À quelle équipe Joe Sakic est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Avalanche du Colorado",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Quel poste Joe Sakic jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_33": {
+    "question": "À quelle équipe Steve Yzerman est-il le plus associé ?",
+    "options": [
+      "Red Wings de Détroit",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Quel poste Steve Yzerman a-t-il principalement joué ?",
+    "options": [
+      "Ailier gauche",
+      "Ailier droit",
+      "Défenseur",
+      "Centre"
+    ]
+  },
+  "pl_team_34": {
+    "question": "À quelle équipe Bobby Orr est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Canadiens de Montréal",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Quel poste Bobby Orr a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_35": {
+    "question": "À quelle équipe Gordie Howe est-il le plus associé ?",
+    "options": [
+      "Red Wings de Détroit",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Quel poste Gordie Howe a-t-il principalement joué ?",
+    "options": [
+      "Gardien de but",
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre"
+    ]
+  },
+  "pl_team_36": {
+    "question": "À quelle équipe Wayne Gretzky est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Oilers d'Edmonton",
+      "Rangers de New York",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Quel poste Wayne Gretzky a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_37": {
+    "question": "À quelle équipe Valeri Kharlamov est-il le plus associé ?",
+    "options": [
+      "CSKA Moscou",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Quel poste Valeri Kharlamov jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Centre",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_38": {
+    "question": "À quelle équipe Vladislav Tretiak est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Bruins de Boston",
+      "Rangers de New York",
+      "CSKA Moscou"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Quel poste Vladislav Tretiak jouait-il principalement ?",
+    "options": [
+      "Gardien de but",
+      "Défenseur",
+      "Centre",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_39": {
+    "question": "À quelle équipe Bobby Hull est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Blackhawks de Chicago",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Quel poste Bobby Hull a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Ailier gauche",
+      "Ailier droit",
+      "Centre"
+    ]
+  },
+  "pl_team_40": {
+    "question": "À quelle équipe Maurice Richard est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Canadiens de Montréal",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Quel poste Maurice Richard a-t-il principalement joué ?",
+    "options": [
+      "Gardien de but",
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre"
+    ]
+  },
+  "pl_team_41": {
+    "question": "À quelle équipe Guy Lafleur est-il le plus associé?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Canadiens de Montréal"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Quel poste Guy Lafleur occupait-il principalement?",
+    "options": [
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_42": {
+    "question": "À quelle équipe Patrick Roy est-il le plus associé?",
+    "options": [
+      "Canadiens de Montréal",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Quel poste Patrick Roy occupait-il principalement?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier droit",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_43": {
+    "question": "À quelle équipe Roberto Luongo est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Canucks de Vancouver",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Quel poste Roberto Luongo jouait-il principalement ?",
+    "options": [
+      "Gardien de but",
+      "Centre",
+      "Ailier droit",
+      "Défenseur"
+    ]
+  },
+  "pl_team_44": {
+    "question": "À quelle équipe Ilya Kovalchuk est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Diables du New Jersey",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Quel poste Ilya Kovalchuk jouait-il principalement ?",
+    "options": [
+      "Défenseur",
+      "Ailier gauche",
+      "Ailier droit",
+      "Centre"
+    ]
+  },
+  "pl_team_45": {
+    "question": "À quelle équipe Pavel Bure est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Panthères de Floride"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Quel poste Pavel Bure jouait-il principalement ?",
+    "options": [
+      "Ailier droit",
+      "Ailier gauche",
+      "Centre",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_46": {
+    "question": "À quelle équipe Alexei Kovalev est-il le plus associé ?",
+    "options": [
+      "Canadiens de Montréal",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Quel poste Alexei Kovalev jouait-il principalement ?",
+    "options": [
+      "Ailier gauche",
+      "Centre",
+      "Gardien de but",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_47": {
+    "question": "À quelle équipe Sergei Gonchar est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Pingouins de Pittsburgh",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Quel poste Sergei Gonchar jouait-il principalement ?",
+    "options": [
+      "Défenseur",
+      "Ailier gauche",
+      "Gardien de but",
+      "Centre"
+    ]
+  },
+  "pl_team_48": {
+    "question": "À quelle équipe Viacheslav Fetisov est-il le plus associé ?",
+    "options": [
+      "Diables du New Jersey",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Quel poste Viacheslav Fetisov jouait-il principalement ?",
+    "options": [
+      "Gardien de but",
+      "Défenseur",
+      "Centre",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_49": {
+    "question": "À quelle équipe Chris Chelios est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Red Wings de Détroit"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Quel poste Chris Chelios a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Centre",
+      "Ailier gauche",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_50": {
+    "question": "À quelle équipe Scott Stevens est-il le plus associé ?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Rangers de New York",
+      "Diables du New Jersey",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Quel poste Scott Stevens a-t-il principalement joué ?",
+    "options": [
+      "Défenseur",
+      "Gardien de but",
+      "Ailier gauche",
+      "Centre"
+    ]
+  },
+  "pl_team_51": {
+    "question": "À quelle équipe Paul Coffey est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Oilers d'Edmonton",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Quel poste Paul Coffey a-t-il principalement joué ?",
+    "options": [
+      "Ailier gauche",
+      "Gardien de but",
+      "Centre",
+      "Défenseur"
+    ]
+  },
+  "pl_team_52": {
+    "question": "À quelle équipe Grant Fuhr est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Rangers de New York",
+      "Maple Leafs de Toronto",
+      "Oilers d'Edmonton"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Quel poste Grant Fuhr a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Défenseur",
+      "Gardien de but",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_53": {
+    "question": "À quelle équipe Mike Bossy est-il le plus associé ?",
+    "options": [
+      "Insulaires de New York",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Quel poste Mike Bossy jouait-il principalement ?",
+    "options": [
+      "Ailier gauche",
+      "Ailier droit",
+      "Gardien de but",
+      "Centre"
+    ]
+  },
+  "pl_team_54": {
+    "question": "À quelle équipe Bryan Trottier est-il le plus associé?",
+    "options": [
+      "Maple Leafs de Toronto",
+      "Insulaires de New York",
+      "Rangers de New York",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Quel poste Bryan Trottier jouait-il principalement?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "pl_team_55": {
+    "question": "À quelle équipe Denis Potvin est-il le plus associé?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Insulaires de New York",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Quel poste Denis Potvin occupait-il principalement?",
+    "options": [
+      "Ailier gauche",
+      "Gardien de but",
+      "Centre",
+      "Défenseur"
+    ]
+  },
+  "pl_team_56": {
+    "question": "À quelle équipe Cam Neely est-il le plus associé ?",
+    "options": [
+      "Rangers de New York",
+      "Canadiens de Montréal",
+      "Maple Leafs de Toronto",
+      "Bruins de Boston"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Quel poste Cam Neely jouait-il principalement ?",
+    "options": [
+      "Centre",
+      "Ailier gauche",
+      "Ailier droit",
+      "Gardien de but"
+    ]
+  },
+  "pl_team_57": {
+    "question": "À quelle équipe Adam Oates est-il le plus associé ?",
+    "options": [
+      "Capitales de Washington",
+      "Rangers de New York",
+      "Bruins de Boston",
+      "Maple Leafs de Toronto"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Quel poste Adam Oates a-t-il principalement joué ?",
+    "options": [
+      "Ailier gauche",
+      "Centre",
+      "Défenseur",
+      "Ailier droit"
+    ]
+  },
+  "pl_team_58": {
+    "question": "À quelle équipe Doug Gilmour est-il le plus associé ?",
+    "options": [
+      "Bruins de Boston",
+      "Maple Leafs de Toronto",
+      "Canadiens de Montréal",
+      "Rangers de New York"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Quel poste Doug Gilmour a-t-il principalement joué ?",
+    "options": [
+      "Centre",
+      "Ailier droit",
+      "Défenseur",
+      "Ailier gauche"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Que signifie KHL ?",
+    "options": [
+      "Ligue continentale de hockey",
+      "Ligue kazakhe de hockey",
+      "Ligue coréenne de hockey",
+      "Ligue de Hockey Roi"
+    ]
+  },
+  "intl_iihf": {
+    "question": "L'IIHF organise :",
+    "options": [
+      "Playoffs de la KHL",
+      "Repêchage de la LNH",
+      "Coupe Stanley",
+      "Championnat du monde"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Le hockey olympique se joue sur :",
+    "options": [
+      "Glace",
+      "Sable",
+      "Herbe",
+      "Béton"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Quel pays a remporté de nombreux titres mondiaux avec les stars de l'ère Jagr et Hašek ?",
+    "options": [
+      "Finlande",
+      "Tchéquie",
+      "Canada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "De nombreuses étoiles de la LNH viennent de :",
+    "options": [
+      "Espagne",
+      "Brésil",
+      "Suède",
+      "Inde"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "La Finlande est connue pour produire d’excellents :",
+    "options": [
+      "Gardiens de but",
+      "Entraîneurs uniquement",
+      "Pilotes Zamboni",
+      "Arbitres"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "La « Machine rouge » soviétique a dominé dans :",
+    "options": [
+      "Années 1970-80",
+      "années 2000",
+      "années 2010",
+      "années 1990 seulement"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "Les équipes de la LNH sélectionnent de nouveaux joueurs :",
+    "options": [
+      "Date limite de négociation",
+      "Match des étoiles",
+      "Coupe du monde",
+      "Repêchage d'entrée"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Trois étoiles du jeu sont attribuées :",
+    "options": [
+      "Une fois par saison",
+      "Uniquement en séries éliminatoires",
+      "Jamais dans la LNH",
+      "Après chaque match"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Le hockey féminin est un sport olympique puisque :",
+    "options": [
+      "1998",
+      "Jamais",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "À forces égales, chaque équipe compte combien de patineurs (aucun gardien de but) ?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Une période de NHL dure combien de minutes ?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Votre équipe est en avantage numérique lorsque l'adversaire :",
+    "options": [
+      "Rondelle de glaçage",
+      "Tirer le gardien de but",
+      "En désavantage numérique suite à une pénalité",
+      "Mise au jeu gagnante"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Le penalty signifie :",
+    "options": [
+      "Au fil du temps",
+      "Défendre en désavantage numérique",
+      "Attaquant supplémentaire",
+      "Combat de gardien de but"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Le hockey professionnel se joue sur :",
+    "options": [
+      "Saleté",
+      "Herbe",
+      "Glace",
+      "Eau"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Le trophée du championnat de la LNH est le :",
+    "options": [
+      "Coupe du monde",
+      "Coupe olympique",
+      "Coupe Stanley",
+      "Coupe Gretzky"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard est celui qui a remporté le plus de coupes Stanley en tant que joueur avec :",
+    "options": [
+      "Bruins de Boston",
+      "Canadiens de Montréal",
+      "Maple Leafs de Toronto",
+      "Red Wings de Détroit"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Le célèbre numéro de maillot de Wayne Gretzky était :",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux portait le numéro :",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby porte le numéro :",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid porte le numéro :",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Combien y a-t-il d'équipes dans la LNH (environ) ?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Combien y a-t-il d'équipes dans la LNH (environ) ? (avancé)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Un banc de hockey standard compte combien de joueurs habillés ?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Un banc de hockey standard compte combien de joueurs habillés ? (avancé)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Le temps réglementaire dans la LNH est de combien de minutes ?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Le temps réglementaire dans la LNH est de combien de minutes ? (avancé)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Combien d’officiels sont généralement sur la glace dans la LNH ?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Combien d’officiels sont généralement sur la glace dans la LNH ? (avancé)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Nombre maximum de joueurs sur la liste (environ) ?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Nombre maximum de joueurs sur la liste (environ) ? (avancé)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "La tâche principale d'un défenseur en zone défensive est de :",
+    "options": [
+      "Gagner des mises en jeu",
+      "Marquer des buts en premier",
+      "Protégez le filet et la fente",
+      "Changer de ligne rapidement"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "En défense individuelle, le défenseur doit :",
+    "options": [
+      "Patinez immédiatement jusqu'au banc",
+      "Restez entre l'attaquant et le filet",
+      "Laissez la fente ouverte",
+      "Poursuite derrière le filet uniquement"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Position défensive : rester sur la glace permet de :",
+    "options": [
+      "Expiration du signal",
+      "Évitez de frapper la rondelle",
+      "Bloquer les voies de dépassement",
+      "Coéquipiers du voyage"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Lorsque la rondelle est perdue en attaque, un défenseur doit :",
+    "options": [
+      "Tirer le gardien de but",
+      "Reculez pour aider la défense",
+      "Restez à la ligne rouge",
+      "Discuter avec l'arbitre"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Un défenseur doit bloquer les tirs lorsque :",
+    "options": [
+      "La rondelle est en zone neutre seulement",
+      "L'entracte commence",
+      "La voie vers le filet est ouverte",
+      "L'équipe est en avantage numérique"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "Lors d'un 2 contre 1, le défenseur devrait généralement :",
+    "options": [
+      "Les deux restent à la ligne bleue",
+      "Les deux se précipitent ensemble sur le porteur de rondelle",
+      "Prenez le porteur de rondelle et orientez-le largement",
+      "Patinez jusqu'au banc"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "En désavantage numérique, la priorité est souvent de :",
+    "options": [
+      "Patinez seul avec la rondelle au milieu",
+      "Changez d'abord les lignes à la volée",
+      "Garder la rondelle dans le coin pour toujours",
+      "Sortir la rondelle de la zone"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Un bon contrôle de l'écart signifie que le défenseur :",
+    "options": [
+      "Ne sauvegarde jamais",
+      "Ne frappe que par derrière",
+      "Correspond à la vitesse et à la distance par rapport à l'attaquant",
+      "Reste toujours au centre de la glace"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Devant le filet, un défenseur doit :",
+    "options": [
+      "Patinez au point",
+      "Appel pour hors-jeu",
+      "Surveillez uniquement la rondelle et ignorez les joueurs",
+      "Encadrez et attachez vos adversaires"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Sous la pression de l'échec-avant, le premier regard d'un défenseur devrait être :",
+    "options": [
+      "Tirer sur son propre filet",
+      "Premier passage vers un support faible ou une sortie sûre",
+      "Passer toujours par le milieu sous pression",
+      "Bordez aveuglément autour des planches"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "En avantage numérique à ce point, un défenseur devrait :",
+    "options": [
+      "Revenez en zone neutre",
+      "Changement avec le gardien",
+      "Gardez la rondelle dans la zone et créez des tirs/passes",
+      "Ne tirez jamais"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Un jeu défensif légal lors d’une ruée est :",
+    "options": [
+      "Pêche à la ligne légale et bâton côté rondelle",
+      "Accrocher et tirer l'adversaire vers le bas",
+      "Stick-check par derrière lors d'une échappée",
+      "Recoupement avec la tête"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Les défenseurs professionnels bloquent les tirs parce que :",
+    "options": [
+      "Cela compte comme une passe décisive",
+      "Ne bloquez jamais les tirs",
+      "Bloquez les tirs et sacrifiez votre corps si nécessaire",
+      "L'arbitre arrête le jeu"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Lorsque deux attaquants traversent votre zone, les défenseurs doivent :",
+    "options": [
+      "Les deux poursuivent la rondelle seulement",
+      "Laisser le pli",
+      "Communiquer et changer si besoin",
+      "Ignorer l'attaquant du côté éloigné"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Lorsque les adversaires lancent la rondelle, un défenseur doit :",
+    "options": [
+      "Récupérer la rondelle ou l'épingler sur les planches",
+      "Patinez jusqu'au banc pour vous changer",
+      "Attendez le coup de sifflet",
+      "Tirez depuis la ligne rouge"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "Lors d'une course à 3 contre 2, le défenseur arrière doit généralement :",
+    "options": [
+      "Couvrir la menace du côté faible (porte dérobée)",
+      "Patinez jusqu'à la ligne rouge",
+      "Changer de ligne",
+      "Pincez agressivement à chaque fois"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Un défenseur peut pincer la ligne bleue offensive lorsque :",
+    "options": [
+      "L'équipe est en désavantage numérique",
+      "Le gardien est retiré",
+      "Le partenaire couvre et la rondelle est récupérable sur les bandes",
+      "Toujours au premier quart de travail"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "S’il est battu à côté lors de la course, le défenseur doit :",
+    "options": [
+      "Patinez jusqu'au banc",
+      "Arrêtez-vous et discutez avec l'arbitre",
+      "Tournez-vous et poursuivez au milieu jusqu'au filet",
+      "Crochet par derrière"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Dans la couverture de la zone défensive, défenseur bas contre défenseur haut signifie :",
+    "options": [
+      "Les deux au point",
+      "Tous deux en zone neutre",
+      "Tous deux dans le pli",
+      "Faible sur la rondelle, haut couvre la fente et la porte arrière"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Lors d’une course contre un homme impair, la clé est :",
+    "options": [
+      "Prendre une pénalité à chaque fois",
+      "Retarder et forcer un mauvais angle ou une passe",
+      "Plongez toujours pour bloquer",
+      "Laissez le jeu tranquille au gardien de but"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "En désavantage numérique contre un tir sur réception depuis le flanc, le défenseur doit :",
+    "options": [
+      "Se tenir dans le territoire du gardien de but",
+      "Patinez vers le centre pour changer",
+      "Supprimez la voie de passe jusqu'à la fente",
+      "Appuyez sur le gardien de but"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Pourquoi un rebord aveugle autour des planches est-il souvent mauvais ?",
+    "options": [
+      "Cela donne aux adversaires une récupération gratuite",
+      "C'est toujours hors-jeu",
+      "Cela provoque toujours du givrage",
+      "L'arbitre donne un penalty"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Après une victoire lors d’une mise au jeu en zone défensive, les défenseurs devraient :",
+    "options": [
+      "Attends cinq secondes",
+      "Lisez l’échec avant et utilisez une première passe rapide",
+      "Tirez toujours du point en premier",
+      "Patinez jusqu'à la ligne rouge avec la rondelle"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Protégeant une avance d'un but tardivement, les défenseurs devraient :",
+    "options": [
+      "Tirez toujours depuis le centre",
+      "Pincez à chaque fois sur la ligne bleue",
+      "Gérez la rondelle en toute sécurité et évitez les risques inutiles",
+      "Tirez toujours le gardien de but tôt"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Un homme contre un homme dans la fente signifie :",
+    "options": [
+      "Ignorer les menaces hors de la rondelle",
+      "Ne chassez que la rondelle",
+      "Contrôle des écarts",
+      "Couverture d'homme à homme sur le porteur de rondelle"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "À la ligne bleue offensive, un défenseur qui tient la ligne tente de :",
+    "options": [
+      "Changer avec l'avant",
+      "Tenez la ligne bleue et gardez la rondelle dans la zone",
+      "Revenez en zone neutre",
+      "Parce que le hors-jeu est intentionnel et toujours"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Après un arrêt avec rebond dans l'enclave, un défenseur doit :",
+    "options": [
+      "Célébrer avec le gardien de but",
+      "Tirez sur un filet vide",
+      "Patinez jusqu'au banc",
+      "Effacer le rebond ou immobiliser l'attaquant"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Après un dégagement interdit (sans contact) en zone défensive, lors de la mise au jeu :",
+    "options": [
+      "Encerclez toujours la rondelle",
+      "Prendre une pénalité mineure",
+      "Établir une structure et obtenir une sortie nette",
+      "Tirer le gardien de but"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Contre un échec avant agressif, une passe allongée est utilisée pour :",
+    "options": [
+      "Arrêtez toujours le jeu en cas de hors-jeu",
+      "Perdre du temps seulement",
+      "Glaçage garanti",
+      "Battre l'échec-avant avec une longue passe"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Fermer un couloir de tir signifie :",
+    "options": [
+      "Mettre le corps/le bâton sur la trajectoire du tir",
+      "Agitant le bâton en l'air seulement",
+      "Patiner jusqu'à la ligne rouge",
+      "Debout derrière le filet"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Lorsque votre partenaire pince, vous devez :",
+    "options": [
+      "Patinez jusqu'au banc",
+      "Laisser la zone ouverte",
+      "Pincez également immédiatement",
+      "Couvrez-vous haut en tant que dernier défenseur"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "En quittant le banc des pénalités, un défenseur doit :",
+    "options": [
+      "Faites correspondre le jeu et évitez d'être pris à plat",
+      "Ignorez la précipitation",
+      "Changez toujours immédiatement",
+      "Patinez directement vers le filet adverse"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Avec un filet vide contre, les défenseurs à la dernière minute devraient :",
+    "options": [
+      "Tous les échecs avant sont profonds",
+      "Tirez toujours sur votre propre gardien de but",
+      "Bloquer les tirs et protéger le milieu",
+      "Ne dégagez jamais la rondelle"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Si vous ne parvenez pas à atteindre le support de rondelle, vous devez :",
+    "options": [
+      "Abandonner et changer",
+      "Quittez la fente",
+      "Gagnez du temps et de l'espace avec un bon positionnement",
+      "Crochet par derrière"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "En défendant une entrée de zone contrôlée, le défenseur doit :",
+    "options": [
+      "Patinez à reculons jusqu'au banc",
+      "Levez-vous tôt à la ligne ou à l’écart",
+      "Toujours reculer vers le pli",
+      "Ne touchez jamais l'agresseur"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "En zone défensive, une main passée par un défenseur à un coéquipier vaut :",
+    "options": [
+      "Autorisé si complété dans la même zone",
+      "Toujours du glaçage",
+      "Toujours hors-jeu",
+      "Toujours un penalty"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Lorsqu’un coéquipier a la rondelle, un attaquant doit :",
+    "options": [
+      "Patinez toujours seul jusqu'à la ligne rouge",
+      "Ignorer le changement de rondelle en ligne",
+      "Allez sur la glace ouverte pour une passe",
+      "Restez immobile à la ligne bleue"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Un ailier près du filet sur un tir devrait :",
+    "options": [
+      "Patinez jusqu'au banc",
+      "Allez sur le net pour les rebonds et les astuces",
+      "Regardez seulement du point de vue",
+      "Attendez au centre de la glace"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Lorsque la possession est perdue, les attaquants doivent :",
+    "options": [
+      "Changez-vous immédiatement hors de la glace",
+      "Discuter avec l'arbitre",
+      "Restez en zone offensive",
+      "Backcheck et aide défensivement"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Lors d'une course, « diriger la rondelle » signifie :",
+    "options": [
+      "Jetez-le toujours en haut du verre",
+      "Arrêtez-vous à la ligne rouge",
+      "Diriger la rondelle (passer devant)",
+      "Patinez en arrière jusqu'à votre propre banc uniquement"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Faire circuler la rondelle en bas de la zone offensive aide à :",
+    "options": [
+      "Glaçage garanti",
+      "Forcer le hors-jeu toujours",
+      "Créer un espace pour tirer ou passer",
+      "Perdre du temps seulement"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Lors d'une mise au jeu, le travail du centre consiste souvent à :",
+    "options": [
+      "Les trois attaquants au fond du coin",
+      "Quittez le cercle plus tôt",
+      "Tirez immédiatement à partir du point",
+      "Gagnez le tirage au sort pour une place d'ailier ou de D-man"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "Dans un échec avant 2-1-2, F1 et F2 :",
+    "options": [
+      "Les deux courent derrière le filet seulement",
+      "Les deux changent de ligne",
+      "Pressions F1, F2 supprime la voie de passe",
+      "Les deux se tiennent à la ligne rouge"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "En avantage numérique, un attaquant devant le filet devrait :",
+    "options": [
+      "Patinez jusqu’à la zone neutre",
+      "Couvrez le point sur les tirs au but",
+      "Prenez le devant du filet en avantage numérique",
+      "Ne touchez jamais la rondelle"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "Lors d’une course à 3 contre 2, le troisième attaquant devrait :",
+    "options": [
+      "Patinez jusqu'au banc",
+      "Tenez-vous dans le pli",
+      "Restez haut en tant que troisième homme en pleine course",
+      "Poursuivre la rondelle en profondeur sans appui"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Lors d’une course, un ailier rapide devrait souvent :",
+    "options": [
+      "Arrêtez-vous à la ligne bleue à chaque fois",
+      "Passer en arrière au gardien de but",
+      "L'ailier roule large avec vitesse lors de la course",
+      "Patinez toujours au milieu"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Un rôle clé dans le jeu de pouvoir pour un attaquant est de :",
+    "options": [
+      "Laissez la fente ouverte en défense",
+      "Toujours pointé uniquement",
+      "N'allez jamais sur le net",
+      "Filtrez le gardien de but sur PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "En désavantage numérique, un attaquant couvre souvent :",
+    "options": [
+      "Couvrez le point sur les tirs au but",
+      "L'arbitre",
+      "Prenez le devant du filet en avantage numérique",
+      "Le pilote Zamboni"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Pour éviter un hors-jeu à la ligne bleue, un attaquant peut :",
+    "options": [
+      "Patinez à reculons dans la zone",
+      "Sautez par-dessus la ligne bleue",
+      "Restez à l’écoute en retardant l’entrée dans la zone",
+      "Entrez toujours dans la zone avant la rondelle"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "La configuration d'un minuteur unique nécessite généralement :",
+    "options": [
+      "Configuration ponctuelle : passer au jeu de tir ouvert",
+      "Faire tourner la rondelle sans regarder",
+      "Fauchez toujours sur un tir de pénalité",
+      "Dump et poursuite sans plan de vérification préalable"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Après un tir de la pointe en avantage numérique, les attaquants devraient :",
+    "options": [
+      "Toutes les lignes de changement en même temps",
+      "Saluez la foule",
+      "Crasher le filet après un tir depuis la pointe",
+      "Patinez jusqu’à la zone neutre"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "Dans la structure de zone offensive, le centre :",
+    "options": [
+      "N'entre jamais dans la fente",
+      "Les trois attaquants au fond du coin",
+      "Les supports centraux sont bas, l'aile reste haute",
+      "Ne couvre que le point"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Lors d’une cassure, le support avancé du côté faible signifie :",
+    "options": [
+      "Soutien du côté faible à la sortie de la zone D",
+      "Restez immobile à la ligne rouge",
+      "Tirer sur son propre filet",
+      "Patinez jusqu'au banc de l'adversaire pour changer"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Un gardien de but devrait toujours essayer de :",
+    "options": [
+      "Suivez la rondelle dans la circulation",
+      "Tenez-vous à la ligne rouge",
+      "Ne regarde que les yeux du tireur",
+      "Quitter le net pour un changement de ligne"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Lorsque la rondelle est libre dans l'enceinte, le gardien de but doit :",
+    "options": [
+      "Geler la rondelle pour arrêter le jeu",
+      "Tirez sur le filet vide",
+      "Patinez au centre de la glace et célébrez",
+      "Passer à l'arbitre"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Après un arrêt, le contrôle idéal du rebond est :",
+    "options": [
+      "Contrôle du rebond vers une zone sûre",
+      "Rebondissez toujours vers la fente",
+      "Rebondissez toujours sur le verre",
+      "Ignorer le rebond"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Lors des courses avec un homme impair, le gardien de but doit :",
+    "options": [
+      "Reste toujours silencieux",
+      "Regardez la foule",
+      "Patinez jusqu'au banc",
+      "Le gardien de but parle des courses d'hommes impairs"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "Dans la LNH, le gardien de but peut jouer la rondelle derrière le filet uniquement dans :",
+    "options": [
+      "Zone offensive",
+      "Jouer la rondelle uniquement dans le trapèze derrière le filet",
+      "Zone défensive complète",
+      "Zone neutre uniquement"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Lors d'une passe latérale à travers le territoire, le gardien de but utilise :",
+    "options": [
+      "Tenez-vous toujours sur un seul poteau",
+      "Quittez le net",
+      "Mouvement poste à poste sur les passes latérales",
+      "Patinez jusqu'à la ligne bleue"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Un bon jeu en angle signifie que le gardien de but :",
+    "options": [
+      "Les défis de la ligne rouge",
+      "Se tient toujours profondément dans le pli",
+      "Coupe en angle pour réduire la visibilité du filet",
+      "Se retourne vers le tireur"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "La « maison » du gardien à protéger est principalement :",
+    "options": [
+      "Protéger la maison (zone de slot)",
+      "La porte Zamboni",
+      "Cercle de glace central",
+      "Le banc des pénalités"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Lors d’une échappée, de nombreux gardiens préfèrent :",
+    "options": [
+      "Patinez vers le banc",
+      "Ferme les yeux et espère",
+      "Faites correspondre le jeu de tir et lisez le communiqué",
+      "Défiez toujours le sommet des cercles"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Lors d'une tentative de contournement, le gardien de but doit :",
+    "options": [
+      "Laissez le poste le plus proche ouvert",
+      "Patinez au point",
+      "Jouer la rondelle dans le coin",
+      "Tenez le poteau sur le côté court"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Si un gardien joue la rondelle derrière le filet À L’EXTÉRIEUR du trapèze, c’est :",
+    "options": [
+      "Jeu légal toujours",
+      "Appel de glace",
+      "Pénalité pour retard de match",
+      "Objectif automatique"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Lorsque la rondelle est interceptée, le gardien de but doit :",
+    "options": [
+      "Laisser le pli",
+      "Signal de hors-jeu",
+      "Abandonnez toujours le côté court",
+      "Trouvez la rondelle dans la circulation ou ajustez la position"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Un poke check du gardien de but doit être :",
+    "options": [
+      "Poke check uniquement de face légalement",
+      "Avec un bâton haut sur le visage",
+      "Toujours derrière le tireur",
+      "En me tenant au centre de la glace"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Lors d'une longue passe en avance, le gardien de but souvent :",
+    "options": [
+      "Patins vers le banc de l'adversaire",
+      "Ignore la pièce",
+      "Tire sur l'arbitre",
+      "Arrête ou joue la rondelle légalement derrière le filet"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "L’intelligence du hockey signifie que chaque joueur devrait :",
+    "options": [
+      "Chaque joueur aide en défense",
+      "Seuls les gardiens parlent",
+      "Seuls les défenseurs reculent",
+      "Seuls les scores des avants"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Garder votre bâton sur la glace vous aide à :",
+    "options": [
+      "Bloquer les voies de dépassement et recevoir des passes",
+      "Givrage des signaux",
+      "Évitez la rondelle",
+      "Voyagez plus vite"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Un changement de ligne intelligent se produit généralement :",
+    "options": [
+      "À la volée quand le jeu le permet",
+      "Jamais à la volée",
+      "Lors d'une échappée contre",
+      "Toujours dans la zone offensive seulement"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Avant de changer de marque défensive, les joueurs doivent :",
+    "options": [
+      "Crie toujours après l'arbitre",
+      "Changer sans regarder",
+      "Communiquer avant de changer de marque",
+      "Ne parle jamais sur la glace"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Changer les lignes du mauvais côté de la glace peut :",
+    "options": [
+      "Garantir un objectif",
+      "Aidez toujours l'équipe",
+      "Parce qu'il y a trop d'hommes ou un mauvais timing",
+      "Arrêtez l'horloge"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Lire la pièce signifie :",
+    "options": [
+      "Ignorer les coéquipiers",
+      "Ne changez jamais de structure",
+      "Ne regarde toujours que la rondelle",
+      "Anticipez la prochaine destination de la rondelle et de vos adversaires"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Le soutien du deuxième joueur sur la rondelle signifie :",
+    "options": [
+      "Éloignez-vous de la rondelle",
+      "Regardez seulement le gardien de but",
+      "Tenez-vous à la ligne rouge",
+      "Faites correspondre la vitesse et soutenez le porteur de rondelle"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Le côté fort et le côté faible font référence à :",
+    "options": [
+      "Côté où se trouve la rondelle vs côté opposé",
+      "Équipes à domicile et à l'extérieur",
+      "Première et deuxième période",
+      "Joueurs gauchers et droitiers uniquement"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "En avantage numérique, la structure est importante car :",
+    "options": [
+      "Le mouvement ouvre les voies et étire le PK",
+      "Il est préférable de rester immobile",
+      "Un seul joueur doit toucher la rondelle",
+      "Le hors-jeu n'a pas d'importance"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Le penalty « boîte + un » signifie souvent :",
+    "options": [
+      "Tous les cinq poursuivent la rondelle",
+      "Tous les cinq se tiennent à la ligne rouge",
+      "Aucune structure nécessaire",
+      "Quatre dans une boîte, un faisant pression sur la rondelle"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Tricher lors d'une mise au jeu (timing) signifie :",
+    "options": [
+      "Chronométrer le drop pour gagner la rondelle tôt",
+      "Frapper le bâton de l'adversaire",
+      "Entrez dans le cercle avant la rondelle",
+      "Laissez le point de mise au jeu"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Protéger un lead tardivement, des équipes intelligentes :",
+    "options": [
+      "Prenez des risques à chaque quart de travail",
+      "Tirez toujours le gardien de but en première période",
+      "Ne videz jamais la zone",
+      "Gérez la rondelle et évitez les pénalités inutiles"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Les entraîneurs changent de ligne pour les matchs comme suit :",
+    "options": [
+      "Obtenez des situations joueur contre joueur favorables",
+      "Garantie hors-jeu",
+      "Évitez toutes les mises au jeu",
+      "Perdre du temps seulement"
+    ]
+  },
+  "ref_goal": {
+    "question": "Lorsqu'un but est marqué, l'arbitre :",
+    "options": [
+      "Pointer vers le centre de la glace",
+      "Signaler une pénalité différée",
+      "Former un T avec les mains",
+      "Le givrage du signal est supprimé"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Un signal d'expiration ressemble à :",
+    "options": [
+      "Les mains forment un T",
+      "Pointer vers le centre de la glace",
+      "Six doigts montrés",
+      "Les deux poings avancent"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Une pénalité à retardement est indiquée par l'arbitre avec :",
+    "options": [
+      "Signal de but marqué",
+      "Signal T d'expiration",
+      "Signal de dégivrage",
+      "Un bras levé vers le haut"
+    ]
+  },
+  "ref_minor": {
+    "question": "Lorsqu'il annonce une pénalité mineure, l'arbitre signale souvent par :",
+    "options": [
+      "Paume ouverte vers le banc des pénalités",
+      "Bras sur la poitrine uniquement",
+      "Les mains forment un T",
+      "Pointer vers le centre de la glace pour marquer un but"
+    ]
+  },
+  "ref_offside": {
+    "question": "Un appel de hors-jeu de l'arbitre est souvent signalé par :",
+    "options": [
+      "Pointer vers le centre de la glace",
+      "Six doigts montrés",
+      "Mouvement de pompage du poing fermé",
+      "Mouvement de coupe parallèle à la glace"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Un signal de violation de passe manuelle est souvent :",
+    "options": [
+      "Mouvement de pompage du poing fermé",
+      "Les deux bras croisés pour le combat",
+      "Paume ouverte au banc des pénalités",
+      "Pointer vers le centre de la glace"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Signal de pénalité pour bâton élevé : l'arbitre touche souvent :",
+    "options": [
+      "Paume vers la zone du visage/de la mâchoire",
+      "Le poteau de but",
+      "La rondelle",
+      "Propre genou seulement"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Trop d'hommes sur la glace est signalé par l'affichage :",
+    "options": [
+      "Un bras tendu seulement",
+      "Pointer vers le centre de la glace",
+      "Les mains forment un T",
+      "Six doigts montrés"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Un signal de pénalité de déclenchement ressemble souvent à :",
+    "options": [
+      "Signal de déclenchement (mouvement de balayage des jambes)",
+      "Les mains forment un T",
+      "Pointer vers le centre de la glace",
+      "Les deux poings avancent"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Un signal de pénalité pour crochetage ressemble souvent à :",
+    "options": [
+      "Six doigts",
+      "Couper parallèlement à la glace",
+      "Signal d’accrochage (mouvement de traction)",
+      "Pompage à poing fermé"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Le signal de recoupement de l'arbitre est souvent :",
+    "options": [
+      "Les deux poings avancent",
+      "Pointer vers le centre de la glace",
+      "Les mains forment un T",
+      "Paume vers le visage uniquement"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Un combattant majeur est souvent signalé par :",
+    "options": [
+      "Couper les mouvements de hors-jeu",
+      "Major de combat (les deux bras croisés)",
+      "Un bras levé pour une pénalité différée",
+      "Paume ouverte vers la boîte uniquement"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Lorsqu'il accorde un tir de pénalité, l'arbitre :",
+    "options": [
+      "Affiche le délai d'attente T",
+      "Lave le glaçage",
+      "Points au centre de la glace pour un tir de pénalité",
+      "Montre six doigts"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Lorsqu’il annule un but, l’arbitre peut :",
+    "options": [
+      "Signal de but refusé (bras croisés puis signe de la main)",
+      "Pointer au centre pour un but",
+      "Lever le bras pour une pénalité retardée seulement",
+      "Afficher le délai d'attente T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Le signal de retard de jeu (rondelle sur verre) est souvent :",
+    "options": [
+      "Balayage des jambes trébuchantes",
+      "Retard de jeu (l'arbitre tapote un verre imaginaire)",
+      "Bras de combat croisés",
+      "Mouvement de traction d'accrochage"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Un juge de touche signale un hors-jeu par :",
+    "options": [
+      "Paume ouverte au banc des pénalités",
+      "Former un T pour le délai d'attente",
+      "Pointer vers le centre de la glace pour le but",
+      "Juge de lignes, les deux bras levés (hors-jeu)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Lorsque le dégagement est annulé (par exemple sur PK), le juge de lignes peut :",
+    "options": [
+      "Bras croisés pour se battre",
+      "Le givrage du signal est supprimé",
+      "Pointer au centre pour un but",
+      "Montrer six doigts"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Une double pénalité mineure peut être indiquée avec :",
+    "options": [
+      "T pour délai d'attente",
+      "Un bras tendu seulement",
+      "Double mineur (deux doigts)",
+      "Six doigts pour trop d'hommes"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Le signal de pénalité à l'embarquement implique souvent :",
+    "options": [
+      "T pour délai d'attente",
+      "Pointer vers le centre pour le but",
+      "Poing fermé pour passe de la main",
+      "Signal de pénalité d'embarquement (poussée des bras)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Durant un signal de pénalité retardé, le jeu continue car :",
+    "options": [
+      "Le but a été marqué",
+      "Le glaçage est terminé",
+      "Le délai d'attente a été appelé",
+      "Penalty retardé (le jeu continue)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "L'adversaire lance une attaque par le centre. Que doit faire le centre ?",
+    "options": [
+      "Retournez au centre de votre zone et aidez les défenseurs",
+      "Tenez-vous près des planches",
+      "Changer de ligne sans raison",
+      "Patiner vers le filet adverse"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Un adversaire derrière le filet tente de marquer avec un enveloppement de style crosse. Que doit faire le gardien de but ?",
+    "options": [
+      "Patinez jusqu'au centre de la zone",
+      "Regardez la foule",
+      "Restez serré au deuxième poteau et surveillez le bâton",
+      "Allongez-vous face contre terre sur la glace"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Vous êtes un défenseur confronté à une course à 2 contre 1. Qu’est-ce qui compte le plus ?",
+    "options": [
+      "Enlevez le laissez-passer",
+      "Attaquez immédiatement le porteur de la rondelle",
+      "Regardez seulement la rondelle",
+      "Patinez jusqu'au banc pour un changement de ligne"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Vous êtes ailier et le premier joueur à entrer dans la zone offensive. Que devez-vous faire ?",
+    "options": [
+      "Faire pression sur le défenseur avec la rondelle",
+      "Tenez-vous à la ligne bleue",
+      "Patiner en rond",
+      "Patinez directement jusqu'au banc"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Votre équipe est en avantage numérique. Où se situe habituellement le centre ?",
+    "options": [
+      "À ta propre ligne bleue",
+      "Sur le banc",
+      "Derrière votre propre filet",
+      "Devant le filet"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Vous avez perdu la rondelle dans la zone offensive. Que devriez-vous faire ensuite ?",
+    "options": [
+      "Rejoignez immédiatement l'échec-avant",
+      "Reculez lentement",
+      "Discuter avec l'arbitre",
+      "Regardez l'entraîneur"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Le centre a perdu la mise en jeu. Qu’est-ce qui vient ensuite ?",
+    "options": [
+      "Patinez dans l'attaque",
+      "Aidez immédiatement à la défense",
+      "Enlève ton casque",
+      "Arrêtez de bouger"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "La rondelle est le long des bandes dans votre zone. Que doit faire le deuxième joueur ?",
+    "options": [
+      "Soutenez votre partenaire à proximité",
+      "Reste immobile",
+      "Regardez les tribunes",
+      "Patiner vers le filet adverse"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Qu’est-ce qui est le plus important dans une course à 3 contre 2 ?",
+    "options": [
+      "Tout le monde patine au même endroit",
+      "Tirez depuis n'importe quelle position",
+      "Arrêtez-vous à la ligne bleue",
+      "Étirez la défense avec des passes"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Après un tir, la rondelle a rebondi devant le filet. Que doit faire le gardien de but ?",
+    "options": [
+      "Lève le bâton en l'air",
+      "Trouvez la rondelle et couvrez-la",
+      "Patinez derrière le filet",
+      "Regardez l'entraîneur"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Quel est le meilleur moment pour changer de ligne ?",
+    "options": [
+      "Quand votre équipe contrôle la rondelle",
+      "Quand l'adversaire attaque",
+      "Quand la rondelle est devant le filet",
+      "Lors d'une occasion de but dangereuse"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Que doit faire un défenseur lorsqu’il est soumis à une forte pression en échec-avant ?",
+    "options": [
+      "Restez immobile avec la rondelle",
+      "Tirer la rondelle au milieu de la zone",
+      "Tomber sur la glace",
+      "Effectuez un premier passage rapide et précis"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Qu'est-ce qu'il est important de faire quand on n'a pas la rondelle ?",
+    "options": [
+      "Regarde le plafond",
+      "Tenir le bâton d'une seule main",
+      "Ouvrez-vous pour un laissez-passer",
+      "Tenez-vous au même endroit"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Quelle évasion est considérée comme la plus fiable ?",
+    "options": [
+      "Perdre la rondelle",
+      "Avec une passe courte et précise",
+      "Une décharge aveugle",
+      "Un passage au milieu de votre zone"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Qu’est-ce qui est le plus important en infériorité numérique ?",
+    "options": [
+      "Bloquer les voies de dépassement",
+      "Attaquer constamment",
+      "Skater sans structure",
+      "Jouez uniquement le long des planches"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Quand un défenseur peut-il se joindre à la course ?",
+    "options": [
+      "Toujours",
+      "Uniquement en prolongation",
+      "Jamais",
+      "Quand son partenaire couvre sa position"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Pourquoi un passage par la fente est-il dangereux ?",
+    "options": [
+      "Les fonctionnaires ne peuvent pas le voir",
+      "Cela ralentit le jeu",
+      "Cela peut mener à un objectif",
+      "C'est toujours illégal"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Quand un gardien de but doit-il jouer la rondelle derrière le filet ?",
+    "options": [
+      "Quitter la glace",
+      "Pour aider les défenseurs à démarrer l'évasion",
+      "Se reposer",
+      "Discuter avec les fonctionnaires"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Pourquoi une avance se dirige-t-elle vers le deuxième poteau ?",
+    "options": [
+      "Pour les rebonds et les tirs sur réception",
+      "Pour rester en dehors du jeu",
+      "Se reposer",
+      "Pour gêner un coéquipier"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Que doit faire un défenseur avant de tirer depuis la pointe ?",
+    "options": [
+      "Vérifiez le trafic devant le net",
+      "Tirez directement dans les planches",
+      "Ferme les yeux",
+      "Dekes à l'envers"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Qui devrait se battre en premier pour la rondelle après une mise au jeu ?",
+    "options": [
+      "Seul le gardien",
+      "Personne",
+      "Le joueur le plus proche",
+      "Seul le défenseur"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Pourquoi le contrôle de la rondelle est-il important ?",
+    "options": [
+      "L'adversaire ne peut pas attaquer sans la rondelle",
+      "Tu peux patiner moins",
+      "Les officiels attribuent des points pour cela",
+      "Ça a l'air bien"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Qu’est-ce qui compte le plus dans une bataille de coin ?",
+    "options": [
+      "Un tir haut",
+      "Sauter",
+      "Patiner en arrière seulement",
+      "Position du corps et placement du bâton"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Quelle est la meilleure façon de s’ouvrir ?",
+    "options": [
+      "Déplacez-vous dans un espace ouvert",
+      "Dans un coin aveugle",
+      "Patiner dans le dos d'un coéquipier",
+      "En restant immobile"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Que doit faire un attaquant après avoir tiré ?",
+    "options": [
+      "Changez de ligne immédiatement",
+      "Regardez le tableau de bord",
+      "Aller au filet pour un rebond",
+      "Reste immobile"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Qu’est-ce qui est le plus important pour un défenseur dans l’enclave ?",
+    "options": [
+      "Restez loin du net",
+      "Jouez sans bâton",
+      "Empêcher les adversaires d'accéder aux rebonds",
+      "Ne regardez que le gardien de but"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Quelle est la meilleure façon d’entrer dans la zone ?",
+    "options": [
+      "Sans vitesse",
+      "Patiner à reculons dans la zone",
+      "Par le milieu sans support",
+      "Avec contrôle de la rondelle"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Quand un tir du revers est-il utile ?",
+    "options": [
+      "Seulement en pratique",
+      "Jamais",
+      "Quand on n’a pas le temps de déplacer la rondelle vers le coup droit",
+      "Uniquement pour les défenseurs"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Pourquoi le centre est-il important en attaque ?",
+    "options": [
+      "Il reste toujours immobile",
+      "Il ne fait jamais de passes",
+      "Il connecte toute la ligne",
+      "Il ne joue jamais en défense"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Qu’est-ce qui compte dans le jeu défensif 1 contre 1 ?",
+    "options": [
+      "Sautez immédiatement sur l'adversaire",
+      "Regardez les tribunes",
+      "Patinez en arrière sans aucun contrôle",
+      "Contrôler l'écart et l'angle"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Votre ligne a connu une longue période offensive. Le défenseur adverse a récupéré la rondelle derrière le filet mais semble fatigué. Votre trio est également sur la glace depuis longtemps. Quel est le meilleur ?",
+    "options": [
+      "Continuez à effectuer un échec avant de manière agressive avec la ligne complète",
+      "Revenir en zone neutre sans pression",
+      "Un attaquant continue d'appuyer pendant que les autres changent",
+      "Toute la ligne change d'un coup"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Pourquoi une passe en arrière est-elle parfois utile ?",
+    "options": [
+      "Perdre son élan",
+      "Pour éviter d'attaquer",
+      "Pour garder la possession",
+      "Pour arrêter la lecture"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Qu’est-ce qui compte lorsqu’on bloque un tir ?",
+    "options": [
+      "Bloquer le chemin de la rondelle",
+      "Sauter vers le haut",
+      "Tournez le dos",
+      "Baisse les yeux"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Comment un défenseur devrait-il jouer contre un attaquant rapide ?",
+    "options": [
+      "Continuez à avancer sans vous arrêter",
+      "Joue trop serré à chaque fois",
+      "Reste immobile",
+      "Ne lui donnez pas de glace ouverte"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Quand un temporisateur unique est-il le plus efficace ?",
+    "options": [
+      "Quand le tireur n'est pas prêt",
+      "Seulement en pratique",
+      "Quand le gardien ne peut pas être placé à temps",
+      "Quand la rondelle est à l'arrêt"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Pourquoi la communication sur la glace est-elle importante ?",
+    "options": [
+      "Cela distrait l'adversaire",
+      "Ça remplace le patinage",
+      "Cela aide les coéquipiers à prendre des décisions plus rapidement",
+      "Les fonctionnaires aiment ça"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Comment devriez-vous jouer un rush 2 contre 0 ?",
+    "options": [
+      "Faire bouger le gardien avec une passe",
+      "Arrêtez-vous devant le filet",
+      "Tirez de loin",
+      "Perdre la rondelle"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Pourquoi les attaquants utilisent-ils l’espace derrière le filet ?",
+    "options": [
+      "Pour se cacher du jeu",
+      "Pour arrêter la lecture",
+      "Pour éviter de tirer",
+      "Pour étirer la défense"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Pourquoi est-il important de rester calme ?",
+    "options": [
+      "Cela affecte la glace",
+      "Cela rend le filet plus petit",
+      "Cela vous aide à prendre de meilleures décisions",
+      "Cela rend la rondelle plus rapide"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Que doit faire un défenseur à la ligne bleue offensive ?",
+    "options": [
+      "Gardez la rondelle dans la zone",
+      "Tenez-vous au milieu seulement",
+      "Ignorer les coéquipiers",
+      "Toujours reculer"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Qu’est-ce qui rend un rebond dangereux ?",
+    "options": [
+      "Le joueur reste immobile",
+      "La rondelle devient plus légère",
+      "L'arbitre ne voit pas la rondelle",
+      "Le gardien ne contrôle pas toujours le rebond"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Pourquoi est-il utile de changer la direction de l’attaque ?",
+    "options": [
+      "Cela fait mal à votre propre équipe",
+      "Cela ralentit le jeu",
+      "Cela crée des espaces ouverts",
+      "Ça fatigue les fonctionnaires"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Qu’est-ce qui compte lors d’une mise au jeu en zone offensive ?",
+    "options": [
+      "Revenez immédiatement en patin",
+      "Gagner rapidement la possession de la rondelle",
+      "Regardez le tableau de bord",
+      "Ne bougez pas"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Que signifie couvrir un coéquipier ?",
+    "options": [
+      "Pourvoir son poste quand il rejoint la ruée",
+      "Ne jouez qu'à l'offensive",
+      "Copiez son itinéraire exact",
+      "Tenez-vous à côté de lui sans bouger"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Si un défenseur perd sa position, que doit-il faire ?",
+    "options": [
+      "Regardez seulement la rondelle",
+      "Se disputer avec un coéquipier",
+      "Arrête de patiner",
+      "Revenez rapidement en défense"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Pourquoi les joueurs tirent-ils souvent bas ?",
+    "options": [
+      "C'est plus lent",
+      "Parce que les tirs hauts sont illégaux",
+      "Pour les déviations et les rebonds",
+      "C'est plus facile pour les fonctionnaires"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Quand une passe longue est-elle particulièrement utile ?",
+    "options": [
+      "Dans une foule de joueurs",
+      "Lors d'un changement de ligne",
+      "Sur une contre-attaque rapide",
+      "Sans objectif"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Pourquoi le mouvement sans la rondelle est-il important ?",
+    "options": [
+      "Cela crée des options de passe",
+      "C'est seulement pour les défenseurs",
+      "Cela n'affecte pas le jeu",
+      "Cela gêne les coéquipiers"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Quand une prise de vue sous un angle aigu peut-elle être utile ?",
+    "options": [
+      "Uniquement en avantage numérique",
+      "Uniquement en désavantage numérique",
+      "Jamais",
+      "Pour un rebond inattendu"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Pourquoi est-il important de contrôler le gardien de but ?",
+    "options": [
+      "L'arbitre ne voit pas la rondelle",
+      "C'est plus difficile pour lui de voir le tir",
+      "Le gardien arrête de bouger",
+      "Cela rend l'attaque plus belle"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Qu’est-ce qui vous aide à intercepter les passes ?",
+    "options": [
+      "Lire la pièce",
+      "Chance seule",
+      "Patiner lentement",
+      "Jouer sans bâton"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Comment épingler correctement un adversaire le long des planches ?",
+    "options": [
+      "Poussez-le dans le dos",
+      "Les yeux fermés",
+      "Avec tes mains et sans bâton",
+      "Utilisez votre corps et votre bâton tout en contrôlant la rondelle"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Qu’est-ce qui compte lorsqu’un défenseur sort de derrière le filet ?",
+    "options": [
+      "Recherchez et trouvez un laissez-passer",
+      "Patinez lentement",
+      "Tirez immédiatement sur la rondelle",
+      "Ne regarde que la glace"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Pourquoi les équipes ralentissent-elles parfois le jeu ?",
+    "options": [
+      "Perdre la rondelle",
+      "Pour garder la possession et l’énergie",
+      "Pour éviter d'attaquer",
+      "Pour arrêter le jeu"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Qui est un joueur de la deuxième vague ?",
+    "options": [
+      "Un arbitre",
+      "Le gardien de but suppléant",
+      "Un joueur qui rejoint l'attaque plus tard",
+      "Le joueur le plus lent"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Pourquoi les passes courtes rapides sont-elles efficaces ?",
+    "options": [
+      "Ils sont toujours lents",
+      "Ils ont blessé l'attaque",
+      "Ils sont réservés aux défenseurs",
+      "Ils sont plus difficiles à voler pour les adversaires"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Que doit faire un gardien de but après avoir effectué un arrêt ?",
+    "options": [
+      "Suivez rapidement la rondelle",
+      "Patinez jusqu'aux planches",
+      "Enlève son gant",
+      "Regardez le tableau de bord"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Quand une attaque par le milieu est-elle particulièrement dangereuse ?",
+    "options": [
+      "Quand un joueur est seul",
+      "Quand il y a de la vitesse et du soutien",
+      "Quand il n'y a pas de rondelle",
+      "Quand tout le monde reste immobile"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Qu’est-ce qui vous aide à prendre des décisions plus rapidement ?",
+    "options": [
+      "Patiner lentement",
+      "Regardez seulement la rondelle",
+      "Scrutant constamment la glace",
+      "Jouer sans parler"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Que fait un bon capitaine ?",
+    "options": [
+      "Soutenir l’équipe et montrer l’exemple",
+      "Joue uniquement en attaque",
+      "Crie après tout le monde",
+      "Ne joue jamais en défense"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Qu’est-ce qui vous aide à échapper à la pression de l’échec-avant ?",
+    "options": [
+      "Jouer seul",
+      "Déplacer la rondelle rapidement",
+      "Tenir la rondelle longtemps",
+      "S'arrêter le long des planches"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Pourquoi ne peux-tu pas hésiter à la ligne bleue ?",
+    "options": [
+      "Le gardien va se fatiguer",
+      "La glace va empirer",
+      "Vous pouvez perdre la zone",
+      "L'arbitre arrêtera le jeu"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Pourquoi un tir juste après une passe est-il dangereux ?",
+    "options": [
+      "C'est toujours faible",
+      "C'est difficile à exécuter",
+      "L'arbitre refusera le but",
+      "Le gardien n'est pas réglé à temps"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Qui devrait revenir en premier après avoir perdu la rondelle ?",
+    "options": [
+      "Le joueur le plus proche",
+      "Seul le centre",
+      "Seul le défenseur",
+      "Seul le gardien"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Comment un défenseur devrait-il jouer contre un tireur puissant ?",
+    "options": [
+      "Ne regardez que le gardien de but",
+      "Réduisez son temps et son espace pour tirer",
+      "Donnez-lui un espace ouvert",
+      "Tenez-vous loin"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Pourquoi la rondelle est-elle souvent déplacée vers le coin en défense ?",
+    "options": [
+      "Les officiels ne peuvent pas voir le jeu",
+      "La glace y est plus lente",
+      "Il y a moins de danger pour le net",
+      "C'est plus facile de marquer là-bas"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Que fait un attaquant devant le filet ?",
+    "options": [
+      "Se tient dos à la pièce",
+      "Patins aux planches",
+      "Ne bouge pas",
+      "Crée du trafic et chasse les rebonds"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Pourquoi est-il important de jouer la tête haute ?",
+    "options": [
+      "Pour voir les coéquipiers et les adversaires",
+      "Pour rendre la rondelle plus légère",
+      "Pour patiner plus vite",
+      "Pour que les fonctionnaires puissent vous voir"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Qu’est-ce qui compte le plus après avoir remporté une mise au jeu PK ?",
+    "options": [
+      "Essayez de passer à travers tout le monde",
+      "Faites une longue pause",
+      "Sortir la rondelle de la zone",
+      "Reste immobile"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Pourquoi est-il important de faire pression sur les défenseurs adverses ?",
+    "options": [
+      "Cela fait mal à votre équipe",
+      "Cela n'affecte pas le jeu",
+      "Ça arrête le jeu",
+      "Cela peut forcer une erreur"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Quand un touch pass est-il utile ?",
+    "options": [
+      "Développer l’attaque rapidement",
+      "Quand le joueur est immobile",
+      "Quand il n'y a pas de coéquipiers",
+      "Seulement en défense"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Que doit faire le centre devant son propre filet ?",
+    "options": [
+      "Attends une glace laissée de côté",
+      "Patinez jusqu'à la zone neutre",
+      "Aidez les défenseurs à couvrir l'espace libre",
+      "Tenez-vous près des planches"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Pourquoi le mouvement croisé des attaquants est-il efficace ?",
+    "options": [
+      "Cela confond les défenseurs",
+      "Cela fait mal à votre propre équipe",
+      "Cela ralentit l'attaque",
+      "C'est illégal"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Qu’est-ce qui compte lorsqu’on se bat pour une rondelle libre ?",
+    "options": [
+      "Tenir la rondelle longtemps",
+      "Reste immobile",
+      "Baisse les yeux",
+      "Décidez rapidement quoi faire ensuite"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Pourquoi les joueurs changent-ils de vitesse ?",
+    "options": [
+      "Pour arrêter de patiner",
+      "Perdre la rondelle",
+      "Battre un adversaire",
+      "Pour me fatiguer plus vite"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Il reste 40 secondes. Vous menez par un seul objectif. L'adversaire joue à 6 contre 5. Leur défenseur a la rondelle à la ligne bleue et votre ailier peut sauter pour voler. Quel est le meilleur ?",
+    "options": [
+      "Volez immédiatement vers la rondelle de manière agressive",
+      "Suivez uniquement le joueur devant le réseau",
+      "Appuyez uniquement avec un angle contrôlé pour prendre la rondelle",
+      "Réduire complètement au net"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Quand un gardien de but peut-il sortir loin de son filet ?",
+    "options": [
+      "Pour intercepter la rondelle et aider la défense",
+      "Jamais",
+      "Toujours",
+      "Seulement après un but"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Qu’est-ce qui compte pour une tentative de rebond réussie ?",
+    "options": [
+      "Une grosse liquidation",
+      "Tenez-vous loin du net",
+      "Mouvement lent",
+      "Réaction rapide"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Pourquoi le support du deuxième joueur est-il important ?",
+    "options": [
+      "Cela crée des options supplémentaires",
+      "C'est seulement pour les défenseurs",
+      "Ce n'est pas nécessaire",
+      "Ça fait mal à l'attaque"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Que signifie « lire la pièce » ?",
+    "options": [
+      "Anticipez ce que feront vos adversaires",
+      "Compter les passes",
+      "Suivez uniquement la rondelle",
+      "Regardez le tableau de bord"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Pourquoi est-il important de protéger la rondelle avec son corps ?",
+    "options": [
+      "Cela rend la glace plus rapide",
+      "C'est seulement pour les défenseurs",
+      "Cela affecte l'arbitre",
+      "Cela aide à protéger la rondelle"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Quand une répartition le long des planches est-elle utile ?",
+    "options": [
+      "Jamais",
+      "Toujours",
+      "Quand le milieu est couvert",
+      "Uniquement en avantage numérique"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Qu’est-ce qui compte lorsqu’on défend contre un avantage numérique ?",
+    "options": [
+      "Fautes constantes",
+      "Restez compact défensivement",
+      "Changements de ligne lents",
+      "Jouer en tête-à-tête partout"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Qu'est-ce qu'une passe pour un tir ?",
+    "options": [
+      "Une passe à un joueur en bonne position de tir",
+      "Une passe en retour au gardien de but",
+      "Une passe aléatoire",
+      "Une passe au coin"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Pourquoi une feinte avant un tir est-elle utile ?",
+    "options": [
+      "Cela ralentit toujours l'attaque",
+      "C'est illégal",
+      "C'est seulement pour les défenseurs",
+      "Il peut déplacer le gardien ou un défenseur"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Après avoir bloqué un tir, un joueur doit :",
+    "options": [
+      "Cherchez immédiatement la rondelle",
+      "Reste immobile",
+      "Regardez l'arbitre",
+      "Quitte la glace"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Comment les attaquants aident-ils les défenseurs ?",
+    "options": [
+      "Restez dans la zone offensive",
+      "Vérifiez en arrière et ouvrez-vous pour un laissez-passer",
+      "Jouez uniquement le long des planches",
+      "Ne jouez pas en défense"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Qu’est-ce qui aide contre les échecs avant lourds ?",
+    "options": [
+      "Décisions rapides et mouvement de la rondelle",
+      "Patiner lentement",
+      "Jouer seul",
+      "Longue possession de rondelle"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Quand une déflexion du bâton est-elle utile ?",
+    "options": [
+      "Jamais",
+      "Seulement en pratique",
+      "Seulement en défense",
+      "Pour rediriger la rondelle"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Qu’est-ce qui compte lorsqu’on attaque le long des planches ?",
+    "options": [
+      "Repassage au gardien de but",
+      "Soutien d'un coéquipier à proximité",
+      "Jouer seul",
+      "Arrêter le mouvement"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Qu’est-ce qui compte pour un gardien en échappée ?",
+    "options": [
+      "Gardez un bon positionnement et de la patience",
+      "Laissez-vous tomber immédiatement sur la glace",
+      "Patiner en arrière",
+      "Regardez les défenseurs"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Qu’est-ce qui compte dans une transition rapide vers l’offensive ?",
+    "options": [
+      "Passes lentes",
+      "Longue possession de rondelle",
+      "S'arrêter à la ligne bleue",
+      "Rapidité de prise de décision"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Que fait un défenseur en avantage numérique ?",
+    "options": [
+      "Patins vers le filet",
+      "Ne rejoint pas l'attaque",
+      "Déplace la rondelle et cherche un tir",
+      "Reste immobile"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Pourquoi la circulation devant le filet est-elle dangereuse ?",
+    "options": [
+      "La rondelle devient plus lente",
+      "Le gardien de but a plus de difficulté à voir la rondelle",
+      "L'arbitre ne peut pas compter les joueurs",
+      "Les joueurs se fatiguent plus vite"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Qu’est-ce qui compte après avoir intercepté la rondelle ?",
+    "options": [
+      "Transition rapide vers l'offensive",
+      "Arrête de patiner",
+      "Jetez la rondelle tout de suite",
+      "Patinez jusqu'aux planches"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Qu’est-ce qui est particulièrement important dans les heures supplémentaires ?",
+    "options": [
+      "Plans longs constants",
+      "Jouer sans passes",
+      "Longs quarts de travail",
+      "Contrôle de la rondelle et peu d'erreurs"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Que doit faire un défenseur si un adversaire fait écran au gardien de but ?",
+    "options": [
+      "Regardez l'arbitre",
+      "Patinez jusqu'aux planches",
+      "Libérez la fente et attachez l'adversaire",
+      "Restez à proximité sans bouger"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Pourquoi le jeu en équipe est-il plus important que le jeu individuel ?",
+    "options": [
+      "L'équipe n'affecte pas le résultat",
+      "Une ligne crée plus de chances ensemble",
+      "Un joueur décide toujours du jeu",
+      "Les passes nuisent au jeu"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Qu’est-ce qui compte avant de prendre une photo ?",
+    "options": [
+      "Lisez rapidement la position du gardien",
+      "Ne regarde que la rondelle",
+      "Arrêtez-vous complètement",
+      "Ferme les yeux"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Qu'est-ce qui développe le mieux le QI du hockey ?",
+    "options": [
+      "Musculation uniquement",
+      "Regarder uniquement les buts",
+      "Patinage seulement",
+      "Étudier le jeu, s’entraîner et comprendre les situations"
+    ]
+  }
+}

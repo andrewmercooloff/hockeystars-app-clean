@@ -23,6 +23,12 @@ const BYPASS_LIMIT_IDS = (Deno.env.get("BYPASS_LIMIT_PLAYER_IDS") || "").split("
 // gemini-2.5-flash: stable quota, supports Video + Search Grounding
 const GEMINI_MODEL = "gemini-2.5-flash";
 
+const LANG_NAMES: Record<string, string> = {
+  en: "English", ru: "Russian", de: "German", fr: "French", it: "Italian",
+  pl: "Polish", sv: "Swedish", cs: "Czech", sk: "Slovak", fi: "Finnish",
+  lv: "Latvian", lt: "Lithuanian",
+};
+
 interface PlayerData {
   id: string;
   name: string;
@@ -43,19 +49,146 @@ interface PlayerData {
   hockey_start_date?: string;
   city?: string;
   number?: string;
-  achievements?: string; // JSON array of Achievement objects
-  game_videos?: string;  // JSON array of YouTube URLs
-  // resolved after extra query:
+  achievements?: string;
+  game_videos?: string;
+  pull_ups?: number;
+  push_ups?: number;
+  plank_time?: number;
+  sprint_100m?: number;
+  long_jump?: number;
+  jump_rope?: number;
+  puck_speed_data?: string;
+  exercise_stats?: string | Record<string, unknown>;
   teamsList?: { name: string; startYear?: number; endYear?: number; isCurrent?: boolean }[];
 }
 
-const LANG_NAMES: Record<string, string> = {
-  en: "English", ru: "Russian", de: "German", fr: "French", it: "Italian",
-  pl: "Polish", sv: "Swedish", cs: "Czech", sk: "Slovak", fi: "Finnish",
-  lv: "Latvian", lt: "Lithuanian",
-};
+interface CompletedExercise {
+  id: string;
+  name: string;
+  count: number;
+}
 
-function buildTextPrompt(player: PlayerData, videoUrls: string[], language = "en"): string {
+function isValidNormValue(value: unknown): value is number {
+  if (value === null || value === undefined) return false;
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0;
+}
+
+function parsePuckSpeed(raw?: string): { maxKmh?: number; lastKmh?: number } {
+  if (!raw) return {};
+  try {
+    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    const history = Array.isArray(parsed?.history) ? parsed.history : [];
+    const maxFromHistory = history.length
+      ? Math.max(...history.map((r: { speed?: number }) => Number(r?.speed) || 0))
+      : 0;
+    const maxKmh = Number(parsed?.maxSpeed) || maxFromHistory || undefined;
+    const lastKmh = history.length ? Number(history[history.length - 1]?.speed) || undefined : undefined;
+    return { maxKmh: maxKmh || undefined, lastKmh };
+  } catch {
+    return {};
+  }
+}
+
+function parseExerciseCompletions(raw?: string | Record<string, unknown>): { id: string; count: number }[] {
+  if (!raw) return [];
+  try {
+    const stats = typeof raw === "string" ? JSON.parse(raw) : raw;
+    const completions = stats?.completions;
+    if (!completions) return [];
+    if (Array.isArray(completions)) {
+      return completions
+        .map((c: { exerciseId?: string; count?: number }) => ({
+          id: String(c?.exerciseId || ""),
+          count: Number(c?.count) || 1,
+        }))
+        .filter((c) => c.id);
+    }
+    if (typeof completions === "object") {
+      return Object.entries(completions as Record<string, number>)
+        .map(([id, count]) => ({ id, count: Number(count) || 1 }))
+        .filter((c) => c.id);
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+async function resolveCompletedExercises(
+  supabase: ReturnType<typeof createClient>,
+  raw?: string | Record<string, unknown>,
+  language = "en"
+): Promise<CompletedExercise[]> {
+  const parsed = parseExerciseCompletions(raw);
+  if (parsed.length === 0) return [];
+
+  const ids = parsed.map((p) => p.id);
+  const { data } = await supabase
+    .from("exercises")
+    .select("exercise_id, title_en, title_ru")
+    .in("exercise_id", ids);
+
+  const titleById = new Map<string, string>();
+  for (const row of data || []) {
+    const title = language === "ru" ? row.title_ru || row.title_en : row.title_en || row.title_ru;
+    titleById.set(row.exercise_id, title || row.exercise_id);
+  }
+
+  return parsed
+    .map((p) => ({
+      id: p.id,
+      name: titleById.get(p.id) || p.id,
+      count: p.count,
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+function positionLabel(position?: string): string {
+  const positionMap: Record<string, string> = {
+    goalie: "Goaltender",
+    center: "Center",
+    winger: "Winger / Forward",
+    defender: "Defenseman",
+  };
+  return positionMap[position || ""] || position || "Unknown";
+}
+
+function positionAnalysisFocus(position?: string): string {
+  switch (position) {
+    case "goalie":
+      return `POSITION FOCUS (Goaltender — prioritize these over skating clichés):
+- Stance, depth, angle cuts, post-to-post movement, puck tracking through traffic
+- Rebound control direction, freeze vs play decisions, handling behind the net / trapezoid
+- Breakaway reads, screen traffic management, communication on odd-man rushes
+- Do NOT recommend generic forward/defense skating drills unless tied to goalie-specific movement`;
+    case "defender":
+      return `POSITION FOCUS (Defenseman):
+- Gap control, angling on rushes, 1-on-1 / 2-on-1 decisions, slot and net-front coverage
+- Breakouts under forecheck, first pass quality, rim vs up-the-middle choices
+- Point shooting/lane usage on PP, PK box structure, shot blocking timing
+- Do NOT default to "more knee bend" unless video shows upright posture or stats imply poor agility`;
+    case "center":
+      return `POSITION FOCUS (Center):
+- Faceoffs, low support, cycle/link play, defensive responsibility through the middle
+- Transition passing, backcheck routes, slot timing on PP, PK center reads
+- Link between wings — give specific route/positioning fixes from video`;
+    case "winger":
+      return `POSITION FOCUS (Winger):
+- Wide entries, cut-backs, net-front timing, board battles, off-puck routes
+- Shot release on the move, forecheck pressure angles, backcheck to weak side
+- Do NOT copy center/defense advice unless observed in video for this player`;
+    default:
+      return `POSITION FOCUS: Tailor every technical point to the player's listed position and what appears in video/stats.`;
+  }
+}
+
+function buildTextPrompt(
+  player: PlayerData,
+  videoUrls: string[],
+  language = "en",
+  completedExercises: CompletedExercise[] = []
+): string {
   const now = new Date();
   const age = player.birth_date
     ? Math.floor((now.getTime() - new Date(player.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 365))
@@ -74,6 +207,7 @@ function buildTextPrompt(player: PlayerData, videoUrls: string[], language = "en
 
   const isGoalie = player.position === "goalie";
   const langName = LANG_NAMES[language] || "English";
+  const posLabel = positionMap[player.position || ""] || player.position || "Unknown";
 
   // --- Build player data block ---
   const lines: string[] = [];
@@ -87,6 +221,33 @@ function buildTextPrompt(player: PlayerData, videoUrls: string[], language = "en
   if (player.weight) lines.push(`Weight: ${player.weight} kg`);
   if (player.grip) lines.push(`Grip: ${player.grip}`);
   if (experienceYears !== null) lines.push(`Hockey experience: ${experienceYears} years`);
+
+  const normativeLines: string[] = [];
+  if (isValidNormValue(player.pull_ups)) normativeLines.push(`Pull-ups: ${player.pull_ups} reps`);
+  if (isValidNormValue(player.push_ups)) normativeLines.push(`Push-ups: ${player.push_ups} reps`);
+  if (isValidNormValue(player.plank_time)) normativeLines.push(`Plank hold: ${player.plank_time} sec`);
+  if (isValidNormValue(player.sprint_100m)) normativeLines.push(`100m sprint: ${player.sprint_100m} sec`);
+  if (isValidNormValue(player.long_jump)) normativeLines.push(`Standing long jump: ${player.long_jump} cm`);
+  if (isValidNormValue(player.jump_rope)) normativeLines.push(`Jump rope: ${player.jump_rope} jumps`);
+  if (normativeLines.length > 0) {
+    lines.push("\nProfile normatives (completed physical tests):");
+    for (const line of normativeLines) lines.push(`- ${line}`);
+  }
+
+  const puck = parsePuckSpeed(player.puck_speed_data);
+  if (puck.maxKmh) {
+    lines.push(`\nPuck shot speed (app test): max ${puck.maxKmh} km/h${puck.lastKmh ? `, latest ${puck.lastKmh} km/h` : ""}`);
+  }
+
+  if (completedExercises.length > 0) {
+    lines.push("\nCompleted training exercises in app (normatives / drills):");
+    for (const ex of completedExercises.slice(0, 25)) {
+      lines.push(`- ${ex.name}${ex.count > 1 ? ` (×${ex.count})` : ""}`);
+    }
+    if (completedExercises.length > 25) {
+      lines.push(`- …and ${completedExercises.length - 25} more`);
+    }
+  }
 
   // Teams — clearly separated current vs past
   if (player.teamsList && player.teamsList.length > 0) {
@@ -155,69 +316,95 @@ function buildTextPrompt(player: PlayerData, videoUrls: string[], language = "en
   }
 
   const hasVideos = videoUrls.length > 0;
+  const hasNormatives = normativeLines.length > 0 || completedExercises.length > 0;
+  const positionFocus = positionAnalysisFocus(player.position);
 
   return `### ROLE
-You are a Senior Player Development Scout & Biomechanics Expert. Your specialization is detailed technical audits of hockey players based on video materials and metrics. Your task: go beyond dry statistics and give the player a "roadmap" for physical and technical progress.
+You are a Senior Player Development Scout & Biomechanics Expert for ${posLabel} players. Write a UNIQUE report for THIS player only — never a template.
 
 ### CONTEXT
-You are analyzing a player profile in the HockeyStars social network.
-You are provided with:
-1. Profile data (position, height, weight, age, grip).
-2. Statistics (if available).
-3. ${hasVideos ? `Game video links (YouTube) — IMPORTANT: open and watch these videos via the provided URLs. The player wears Jersey #${player.number || '?'}. Analyze their movements, technique, and positioning.` : 'No game videos provided.'}
-Use Google Search: search for "${player.name}" hockey and their team(s). Include any real findings you discover online.${hasVideos ? ' Also use Google Search to access and analyze the YouTube video links listed in PLAYER DATA.' : ''}
+HockeyStars player profile + ${hasVideos ? "game video(s) you MUST watch" : "NO video — rely on stats/normatives only"}.
+Player position: ${posLabel}. Every recommendation must fit this position.
 
-### ANALYTICAL PROTOCOL (Video Analysis Algorithm)
-${hasVideos ? 'WATCH the YouTube videos provided in PLAYER DATA. Ignore the outcome of episodes (goal/pass). Focus on the following markers:' : 'If no video is available, base your biomechanical assessment on the statistical data, position, and anthropometrics. Focus on the following markers:'}
-1. SKATING KINEMATICS: Knee bend depth, recovery leg amplitude, ankle work (on edges), body position (upright vs aerodynamic).
-2. EXPLOSIVE POWER: First-step speed, loading phase before acceleration, stride frequency in the start zone.
-3. STICK HANDLING TECHNIQUE: Top-hand position on the stick, dribbling amplitude, puck control while maintaining speed.
-4. HOCKEY IQ: Head scanning before receiving the puck, positioning relative to the net/opponent.
+${positionFocus}
+
+Use Google Search for "${player.name}" hockey and team context when helpful.${hasVideos ? ` Watch each YouTube link in PLAYER DATA. Track jersey #${player.number || "?"} only.` : ""}
+
+### EVIDENCE RULES (CRITICAL — prevents generic reports)
+1. Every strength and every growth zone MUST cite its source in parentheses: (video ~MM:SS), (season stats), (normative: …), or (exercise history: …).
+2. FORBIDDEN generic filler unless you observed it in THIS player's video or it follows directly from THEIR stats/normatives:
+   - "deeper knee bend", "work on edges", "improve hockey IQ", "train harder", "better positioning" without specifics
+3. If NO video: explicitly state "Video not provided" in Biomechanical Analysis and base conclusions on position + season stats + normatives only. Do NOT invent video moments.
+4. If video IS provided: include at least 3 concrete observations with approximate timestamps (e.g. 0:42, 1:15).
+5. Training Vector drills MUST each address ONE specific growth zone you listed above for THIS player — not a generic youth hockey list.
+6. Off-ice exercises must connect to identified weaknesses OR build on strong normatives (e.g. low pull-ups → upper-body; slow sprint → acceleration work; high plank → maintain core).
+
+### ANALYTICAL LENS
+${hasVideos
+    ? "From video, analyze ONLY what you see for this position: relevant skating (if skater), puck battles, decisions, technique errors in real clips — not a checklist applied to everyone."
+    : "Without video, infer likely focus areas from position + production stats + physical normatives — label them as data-based hypotheses, not video facts."}
 
 PLAYER DATA:
 ${lines.join("\n")}
 
 ### CONSTRAINTS
 - Write the ENTIRE report in ${langName}.
-- Do NOT include any intro/preface lines like "I present to you", "Here is your report", "Представляю вашему вниманию", "Рад представить". Start immediately with the first required section header: "## Technical Passport".
-- Do NOT use generic phrases like "you need to train more".
-- BE SPECIFIC: when discussing speed, specify "starting power" or "top-end speed".
-- TONE: Professional, constructive, inspiring hard work.
-- Do NOT invent facts not present in the data. No filler.
-- Keep the report concise: aim for roughly 1-page length in the app export (avoid overly long paragraphs).
-- Write in ${langName} using markdown (## headers, **bold**, - bullets). Do NOT use emojis in section headers.
+- No intro fluff ("I present…", "Here is your report…"). Start with ## Technical Passport.
+- Professional, constructive tone. No emojis in headers.
+- ~1 page. Markdown: ##, **bold**, bullets.
+- Do NOT invent facts.${hasNormatives ? " Use normative values to justify off-ice recommendations." : ""}
 
-### STRUCTURE OF THE REPORT
+### STRUCTURE
 
 ## Technical Passport
-Brief summary of anthropometrics and position. Role on the ice (based on data/video).
+Role on ice for a ${posLabel}; link body metrics${hasNormatives ? ", normatives," : ""} and season production to expected playing style.
 
 ## Biomechanical Analysis
-- **Strengths:** Describe 2-3 specific technical elements that stand out for this player, backed by data.
-- **Growth Zones:** Describe 2-3 critical technical deficiencies (e.g. "insufficient hip drive", "high center of gravity on turns", "weak absorption phase on puck reception"). Be honest and constructive.
+- **Strengths:** 2–3 items, each with evidence tag (video/stats/normative).
+- **Growth Zones:** 2–3 items, each with evidence tag. Be honest; avoid repeating the same advice you give every player.
 
 ## Training Vector
-- **On-Ice:** Specific on-ice drills to correct the identified issues.
-- **Off-Ice (GPP/SPP):** A mini-program of 3 exercises. Include plyometrics (jumps, explosive work) or joint mobility work based on analysis. Example: "Box jumps 60cm with hold at bottom" if weak starting speed is identified.
+- **On-Ice:** 2–3 drills tied to YOUR growth zones above (position-specific).
+- **Off-Ice (GPP/SPP):** 3 exercises chosen from THIS player's normative gaps or strengths${hasNormatives ? " (reference their actual pull-ups/sprint/plank/etc.)" : ""}.
 
 ## Hockey IQ & Vision
-Advice on improving game reading and situational awareness.
+1–2 situational reads relevant to ${posLabel} and what you saw in video or stats.
 
 ## Scout's Verdict
-2-3 sentences. Overall level, potential ceiling, and the single most important thing to work on.`;
+2–3 sentences: level, ceiling, single highest-priority focus unique to this player.`;
 }
 
-async function callGemini(parts: object[], model: string, useGoogleSearch = false, maxOutputTokens = 2000): Promise<string> {
+function extractGeminiText(data: Record<string, unknown>): string {
+  const candidate = (data.candidates as Record<string, unknown>[] | undefined)?.[0];
+  const partsOut = (candidate?.content as { parts?: Record<string, unknown>[] } | undefined)?.parts || [];
+  const text = partsOut
+    .filter((p) => typeof p.text === "string" && p.thought !== true)
+    .map((p) => p.text as string)
+    .join("");
+  return text.trim();
+}
+
+async function callGemini(
+  parts: object[],
+  model: string,
+  useGoogleSearch = false,
+  maxOutputTokens = 2000,
+  thinkingBudget = 0,
+): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.35,
+    maxOutputTokens,
+    topK: 40,
+    topP: 0.95,
+    // Gemini 2.5 counts thinking tokens against maxOutputTokens — disable for translation
+    thinkingConfig: { thinkingBudget },
+  };
 
   const requestBody: Record<string, unknown> = {
     contents: [{ parts }],
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens,
-      topK: 40,
-      topP: 0.95,
-    },
+    generationConfig,
   };
 
   // Google Search grounding: Gemini searches the web for real info about the player/team
@@ -240,12 +427,20 @@ async function callGemini(parts: object[], model: string, useGoogleSearch = fals
   }
 
   const data = await response.json();
-  // With grounding, response may have multiple parts — find the text part
-  const candidate = data.candidates?.[0];
-  const textPart = candidate?.content?.parts?.find((p: any) => typeof p.text === "string");
-  const text = textPart?.text;
+  const candidate = (data.candidates as Record<string, unknown>[] | undefined)?.[0];
+  const finishReason = candidate?.finishReason as string | undefined;
+  const text = extractGeminiText(data);
   if (!text) throw new Error("Gemini returned empty response");
+  if (finishReason === "MAX_TOKENS") {
+    throw new Error("Response truncated by token limit — try again or shorten the source text");
+  }
   return text;
+}
+
+function looksLikeCompleteTranslation(sourceText: string, translation: string): boolean {
+  if (!sourceText || !translation) return false;
+  // Truncated outputs are usually much shorter than the source
+  return translation.length >= sourceText.length * 0.75;
 }
 
 function parseGameVideos(raw?: string): string[] {
@@ -278,7 +473,7 @@ Keep the same professional, constructive, inspiring tone. Do NOT add or remove c
 Text to translate:
 ${text}`;
 
-  return await callGemini([{ text: prompt }], GEMINI_MODEL, false, 8192);
+  return await callGemini([{ text: prompt }], GEMINI_MODEL, false, 16384, 0);
 }
 
 serve(async (req) => {
@@ -296,7 +491,14 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
     const body = await req.json();
-    const { player_id, action, target_lang, language, game_videos: gameVideosFromRequest } = body;
+    const {
+      player_id,
+      action,
+      target_lang,
+      language,
+      game_videos: gameVideosFromRequest,
+      force_retranslate,
+    } = body;
 
     if (!player_id) {
       return new Response(
@@ -330,6 +532,12 @@ serve(async (req) => {
 
     // ACTION: translate
     if (action === "translate" && target_lang) {
+      if (target_lang !== "ru" && target_lang !== "en") {
+        return new Response(
+          JSON.stringify({ error: "Invalid target_lang (use ru or en)" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       const { data: playerRow } = await supabase
         .from("players")
         .select("ai_analysis")
@@ -343,15 +551,21 @@ serve(async (req) => {
         );
       }
 
+      const sourceText = String(playerRow.ai_analysis.text || "");
       const cachedTranslation = playerRow.ai_analysis.translations?.[target_lang];
-      if (cachedTranslation) {
+      if (
+        cachedTranslation &&
+        typeof cachedTranslation === "string" &&
+        !force_retranslate &&
+        looksLikeCompleteTranslation(sourceText, cachedTranslation)
+      ) {
         return new Response(
           JSON.stringify({ translation: cachedTranslation, cached: true }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      const translation = await translateAnalysis(playerRow.ai_analysis.text, target_lang);
+      const translation = await translateAnalysis(sourceText, target_lang);
 
       const updatedAnalysis = {
         ...playerRow.ai_analysis,
@@ -419,12 +633,30 @@ serve(async (req) => {
 
     const playerWithTeams = { ...(player as PlayerData), teamsList };
     const generationLang = language || "en";
-    const promptText = buildTextPrompt(playerWithTeams, validVideos, generationLang);
+    const completedExercises = await resolveCompletedExercises(
+      supabase,
+      player.exercise_stats,
+      generationLang
+    );
+    const promptText = buildTextPrompt(
+      playerWithTeams,
+      validVideos,
+      generationLang,
+      completedExercises
+    );
 
-    console.log(`🤖 Generating analysis for ${player.name} | lang: ${generationLang} | teams: ${teamsList.length} | videos: ${validVideos.length}`);
+    console.log(
+      `🤖 Generating analysis for ${player.name} | lang: ${generationLang} | teams: ${teamsList.length} | videos: ${validVideos.length} | normatives: ${[
+        player.pull_ups,
+        player.push_ups,
+        player.plank_time,
+        player.sprint_100m,
+        player.long_jump,
+        player.jump_rope,
+      ].filter(isValidNormValue).length} | exercises: ${completedExercises.length}`
+    );
 
-    // Shorter output to fit export cards better
-    const analysisText = await callGemini([{ text: promptText }], GEMINI_MODEL, true, 4600);
+    const analysisText = await callGemini([{ text: promptText }], GEMINI_MODEL, true, 8192, 1024);
 
     // Save analysis to player
     const existingAnalysis = player.ai_analysis || {};

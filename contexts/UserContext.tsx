@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Player, loadCurrentUser } from '../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { router } from 'expo-router';
+import { avatarCache, updateAvatarGlobally } from '../utils/AvatarCache';
 
 interface UserContextType {
   currentUser: Player | null;
@@ -44,26 +45,51 @@ const initializeUserCache = (() => {
     cacheInitPromise = (async () => {
       try {
         const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const storedUserRaw = await AsyncStorage.getItem('hockeystars_current_user');
+        const storedUser = storedUserRaw ? (() => { try { return JSON.parse(storedUserRaw); } catch { return null; } })() : null;
         
-        // Быстро загружаем из кеша
+        // Быстро загружаем из кеша (и используем как fallback при проблемах сети)
         const cachedData = await AsyncStorage.getItem('hockeystars_user_cache');
         
+        const mergeStoredUser = (base: Player | null): Player | null => {
+          if (!base && !(storedUser && storedUser.id)) return base;
+          const fromStored = storedUser && storedUser.id ? storedUser : null;
+          if (!fromStored) return base;
+          if (!base) return fromStored;
+          return {
+            ...base,
+            ...fromStored,
+            avatar: fromStored.avatar || base.avatar,
+            name: fromStored.name || base.name,
+          };
+        };
+
         if (cachedData) {
           const { user, timestamp } = JSON.parse(cachedData);
           const cacheAge = Date.now() - timestamp;
           
-          // Используем кеш если он свежий (до 1 минуты)
+          globalUserCache = mergeStoredUser((storedUser && storedUser.id ? storedUser : user) ?? null);
+          console.log('⚡ Пользователь поднят из кеша (fallback):', globalUserCache?.name);
+          
           if (cacheAge < 60000) {
-            globalUserCache = user;
-            console.log('⚡ Пользователь загружен из кеша мгновенно:', user?.name);
+            console.log('⚡ Пользователь загружен из кеша мгновенно:', globalUserCache?.name);
             return;
           }
         }
+
+        if (storedUser && storedUser.id) {
+          globalUserCache = mergeStoredUser(storedUser);
+        }
         
         // Если кеш устарел или отсутствует, загружаем полностью
-        const user = await loadCurrentUser();
-        globalUserCache = user;
-        console.log('✅ Пользователь загружен полностью:', user?.name || 'не авторизован');
+        try {
+          const user = await loadCurrentUser();
+          globalUserCache = user;
+          console.log('✅ Пользователь загружен полностью:', user?.name || 'не авторизован');
+        } catch (e) {
+          // Если сети нет — остаемся на кеше (если был)
+          console.warn('⚠️ loadCurrentUser failed during init, keep cached user');
+        }
       } catch (error) {
         console.error('Ошибка инициализации кеша пользователя:', error);
       }
@@ -82,6 +108,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const waitForCache = async () => {
       await initializeUserCache;
       setCurrentUserState(globalUserCache);
+      if (globalUserCache?.avatar && globalUserCache.id) {
+        void avatarCache.setAvatar(globalUserCache.id, globalUserCache.avatar);
+      }
       setIsUserLoading(false);
       setInitialLoadComplete(true);
       console.log('✅ Кеш пользователя инициализирован, isUserLoading=false, user:', globalUserCache?.name || 'не авторизован');
@@ -91,59 +120,109 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, []);
 
   const setCurrentUser = useCallback((user: Player | null) => {
-    globalUserCache = user;
-    setCurrentUserState(user);
-    
-    // Сохраняем в кеш
-    if (user) {
-      const userWithTimestamp = { ...user, lastUpdated: Date.now() };
+    setCurrentUserState((prev) => {
+      if (!user) {
+        globalUserCache = null;
+        dataCache.remove(CACHE_KEYS.USER_PROFILE);
+        return null;
+      }
+
+      const avatar = user.avatar || prev?.avatar || globalUserCache?.avatar;
+      const name = user.name || prev?.name || globalUserCache?.name;
+      const nextUser =
+        (avatar && avatar !== user.avatar) || (name && name !== user.name)
+          ? { ...user, avatar: avatar || user.avatar, name: name || user.name }
+          : user;
+      globalUserCache = nextUser;
+
+      if (nextUser.avatar && nextUser.id) {
+        const prevAvatar = prev?.avatar || globalUserCache?.avatar;
+        if (!prevAvatar || prevAvatar !== nextUser.avatar) {
+          void updateAvatarGlobally(nextUser.id, nextUser.avatar);
+        }
+      }
+
+      const userWithTimestamp = { ...nextUser, lastUpdated: Date.now() };
       dataCache.set(CACHE_KEYS.USER_PROFILE, userWithTimestamp, USER_CACHE_DURATION);
-    } else {
-      dataCache.remove(CACHE_KEYS.USER_PROFILE);
-    }
+      return nextUser;
+    });
   }, []);
 
   const refreshUser = useCallback(async (forceRefresh = false) => {
     try {
-      // Проверяем, не слишком ли часто мы загружаем пользователя
+      const previousUser = currentUser ?? globalUserCache;
       const now = Date.now();
-      if (!forceRefresh && now - lastUserLoadTime < 1000) { // Минимум 1 секунда между загрузками
+      if (!forceRefresh && now - lastUserLoadTime < 1000) {
         return;
       }
       lastUserLoadTime = now;
 
-      // НЕ устанавливаем isUserLoading=true, чтобы избежать мигания UI
-      // setIsUserLoading(true);
-
-      // Если принудительное обновление, очищаем кеш
       if (forceRefresh) {
         await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-        globalUserCache = null;
       }
 
-      // Сначала проверяем кеш (только если не принудительное обновление)
       if (!forceRefresh) {
         const cachedUser = await dataCache.get<Player>(CACHE_KEYS.USER_PROFILE);
         if (cachedUser && (now - (cachedUser as any).lastUpdated || 0) < USER_CACHE_DURATION) {
-          setCurrentUser(cachedUser);
+          const merged =
+            previousUser?.id === cachedUser.id
+              ? {
+                  ...cachedUser,
+                  avatar: cachedUser.avatar || previousUser.avatar,
+                  name: cachedUser.name || previousUser.name,
+                }
+              : cachedUser;
+          setCurrentUser(merged);
           return;
         }
       }
 
-      // Если в кеше нет актуальных данных, загружаем из хранилища
       const user = await loadCurrentUser(forceRefresh);
-      setCurrentUser(user);
 
-      // УБИРАЕМ глобальный редирект на страницу входа
-      // Каждая страница сама решает, нужна ли авторизация
-      // Пользователь может просматривать профили без авторизации
-      if (!user) {
-        console.log('🔍 Пользователь не авторизован (это нормально для просмотра публичных данных)');
+      if (user) {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        let storedAvatar: string | undefined;
+        try {
+          const rawStored = await AsyncStorage.getItem('hockeystars_current_user');
+          if (rawStored) {
+            storedAvatar = JSON.parse(rawStored)?.avatar;
+          }
+        } catch {
+          /* ignore */
+        }
+
+        const mergedAvatar =
+          user.avatar || previousUser?.avatar || storedAvatar || globalUserCache?.avatar;
+        const mergedName =
+          user.name || previousUser?.name || globalUserCache?.name;
+        const merged = {
+          ...user,
+          avatar: mergedAvatar || user.avatar,
+          name: mergedName || user.name,
+        };
+        setCurrentUser(merged);
+        return;
+      }
+
+      // user === null: either logout, or network blip.
+      // Source of truth — hockeystars_current_user in AsyncStorage: logoutUser clears it.
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const storedUser = await AsyncStorage.getItem('hockeystars_current_user');
+      if (!storedUser) {
+        setCurrentUser(null);
+        return;
+      }
+
+      if (previousUser) {
+        console.warn('⚠️ refreshUser: сеть недоступна, сохраняем предыдущего пользователя');
+        setCurrentUser(previousUser);
+      } else {
+        setCurrentUser(null);
       }
     } catch (error) {
       console.error('Ошибка загрузки пользователя:', error);
     }
-  }, [setCurrentUser]);
+  }, [currentUser, setCurrentUser]);
 
   const refreshUserAfterExercise = useCallback(async () => {
     try {

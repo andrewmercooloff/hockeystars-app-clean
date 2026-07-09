@@ -89,7 +89,9 @@
     "physicalDataUpdate": "Physical Data Update",
     "friendRequest": "Friend Request",
     "newFriendship": "New friendship",
-    "speedRecord": "New speed record"
+    "speedRecord": "New speed record",
+    "gameFirstPlace": "Game Champion",
+    "quizFirstPlace": "Hockey Star Quiz"
   },
   "statsNotification": {
     "updated": "updated",
@@ -138,7 +140,7 @@
   "uploading": "Uploading...",
   "uploadingPhotos": "Uploading {count} photos... {progress}%",
   "info": "Information",
-  "addVideoLink": "Add a YouTube or VK video link",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sec",
@@ -1741,6 +1743,1406 @@
           "Perform 2-3 times per week",
           "Reduce load when fatigued"
         ]
+      },
+      "66": {
+        "title": "Side plank with torso rotation",
+        "description": "Builds obliques and core stabilizers for shot power and body checking stability.",
+        "benefits": [
+          "Stabilizes core in contact",
+          "Improves rotational shot power",
+          "Reduces lower-back injury risk",
+          "Builds core endurance"
+        ],
+        "instructions": [
+          "Set up a forearm side plank",
+          "Reach top arm toward the ceiling",
+          "Sweep arm under torso and return",
+          "Keep hips level without sagging",
+          "Do 8–10 reps per side"
+        ],
+        "tips": [
+          "Rotate slowly with control",
+          "Breathe steadily",
+          "Drop to knees if needed",
+          "2–3 sets per side"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Dumbbell Romanian deadlift",
+        "description": "Develops the posterior chain for powerful skating and first-step acceleration.",
+        "benefits": [
+          "Strengthens hamstrings and glutes",
+          "Improves forward lean mechanics",
+          "Builds grip strength",
+          "Supports hamstring injury prevention"
+        ],
+        "instructions": [
+          "Stand holding dumbbells at thighs",
+          "Keep a slight knee bend",
+          "Hinge hips back, lowering bells along legs",
+          "Stop at mid-shin or mild stretch",
+          "Drive hips forward to stand"
+        ],
+        "tips": [
+          "Keep a neutral spine",
+          "Weights stay close to legs",
+          "Avoid rounding lower back",
+          "3–4 sets of 8–12 reps"
+        ],
+        "equipment": "Dumbbells",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Goblet squat",
+        "description": "A hockey-friendly squat pattern for leg and core strength with upright posture.",
+        "benefits": [
+          "Builds quad strength",
+          "Teaches vertical torso position",
+          "Improves ankle mobility",
+          "Good in-season off-ice option"
+        ],
+        "instructions": [
+          "Hold a dumbbell or kettlebell at chest",
+          "Feet shoulder-width, toes slightly out",
+          "Squat to parallel or below",
+          "Knees track over toes",
+          "3–4 sets of 10–15 reps"
+        ],
+        "tips": [
+          "Elbows inside knees at bottom",
+          "Heels stay down",
+          "Control the descent",
+          "Stay tall through chest"
+        ],
+        "equipment": "Dumbbell or kettlebell",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Band rotational chop",
+        "description": "Mimics shot and pass rotation to build power in the hockey movement plane.",
+        "benefits": [
+          "Improves shot and pass power",
+          "Trains anti-rotation stability",
+          "Shoulder-friendly loading",
+          "Can be done at home"
+        ],
+        "instructions": [
+          "Anchor band at chest height",
+          "Stand sideways to anchor",
+          "Hold stick or handle with both hands",
+          "Rotate from hips with control",
+          "12–15 reps each side"
+        ],
+        "tips": [
+          "Power comes from hips",
+          "Protect lower back from over-rotation",
+          "Use athletic hockey stance",
+          "2–3 sets"
+        ],
+        "equipment": "Resistance band",
+        "calories": "100–150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Single-leg glute bridge",
+        "description": "Activates glutes and hip stabilizers for powerful push-off on skates.",
+        "benefits": [
+          "Strengthens glutes",
+          "Stabilizes pelvis while skating",
+          "Improves leg symmetry",
+          "Supports knee injury prevention"
+        ],
+        "instructions": [
+          "Lie on back, one foot planted",
+          "Other leg extended or bent in air",
+          "Drive hips up to straight line",
+          "Pause 1 second at top",
+          "10–12 reps per leg"
+        ],
+        "tips": [
+          "Avoid lumbar hyperextension",
+          "Keep working knee aligned",
+          "Squeeze glute at top",
+          "2–3 sets"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Standing calf raises",
+        "description": "Builds calves and feet for late-shift leg endurance and skate stability.",
+        "benefits": [
+          "Improves calf strength",
+          "Reduces lower-leg fatigue in games",
+          "Strengthens feet",
+          "Quick locker-room option"
+        ],
+        "instructions": [
+          "Stand on edge of step on balls of feet",
+          "Lower heels below step level",
+          "Rise as high as possible",
+          "Pause at top",
+          "15–20 reps, 3 sets"
+        ],
+        "tips": [
+          "Use wall for balance if needed",
+          "Full range of motion",
+          "Avoid bouncing",
+          "Add light weight when ready"
+        ],
+        "equipment": "Step or platform",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Plank shoulder taps",
+        "description": "Anti-rotation core work for contact stability and athletic posture.",
+        "benefits": [
+          "Builds core stability",
+          "Improves balance under contact",
+          "Develops core endurance",
+          "Works for all positions"
+        ],
+        "instructions": [
+          "Start in high plank",
+          "Shift weight and tap opposite shoulder",
+          "Return and alternate arms",
+          "Keep hips square",
+          "16–20 total taps"
+        ],
+        "tips": [
+          "Widen feet for stability",
+          "Do not pike hips up",
+          "Breathe steadily",
+          "2–3 sets"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "80–120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprints with full rest",
+        "description": "Simulates short shifts to improve repeated acceleration ability.",
+        "benefits": [
+          "Improves repeated sprint speed",
+          "Trains between-shift recovery",
+          "Develops start mechanics",
+          "Boosts game endurance"
+        ],
+        "instructions": [
+          "Warm up 8–10 minutes",
+          "Sprint 20 m at 95% speed",
+          "Rest 40–60 seconds walking",
+          "Repeat 10–12 times",
+          "Cool down 5 minutes"
+        ],
+        "tips": [
+          "Maintain sprint form each rep",
+          "Do not cut rest too early",
+          "Prioritize quality over quantity",
+          "1–2 sessions per week"
+        ],
+        "equipment": "20 m open space",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "30–30–30 second run intervals",
+        "description": "Classic hockey-style interval: 30 seconds hard, 30 seconds easy.",
+        "benefits": [
+          "Builds lactate tolerance",
+          "Mimics shift intensity",
+          "Improves mental toughness",
+          "Efficient off-ice session"
+        ],
+        "instructions": [
+          "Warm up 10 minutes",
+          "30 sec hard run / 30 sec walk",
+          "Repeat 12–16 cycles",
+          "Keep consistent effort each round",
+          "Cool down and stretch"
+        ],
+        "tips": [
+          "Do not go all-out early",
+          "Maintain running form",
+          "Hydrate between blocks",
+          "Progress total cycles slowly"
+        ],
+        "equipment": "Track or treadmill",
+        "calories": "300–400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike intervals",
+        "description": "Low-impact high-intensity cardio that is knee-friendly in the off-season.",
+        "benefits": [
+          "Builds VO2max",
+          "Joint-friendly loading",
+          "Trains arms and legs together",
+          "Quick recovery after session"
+        ],
+        "instructions": [
+          "5 min easy spin",
+          "20 sec max / 40 sec easy",
+          "10–12 rounds",
+          "Monitor RPM and breathing",
+          "5 min cool down"
+        ],
+        "tips": [
+          "Relax grip on handles",
+          "Stay seated stable",
+          "Avoid max effort daily",
+          "Track calories for progress"
+        ],
+        "equipment": "AirBike / assault bike",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m shuttle run",
+        "description": "Short direction changes like forechecking and defensive recoveries.",
+        "benefits": [
+          "Improves change of direction",
+          "Builds first-step speed",
+          "Trains reaction",
+          "Compact gym-friendly drill"
+        ],
+        "instructions": [
+          "Mark two lines 5 m apart",
+          "Touch line with hand, sprint back",
+          "6–8 reps = 1 set",
+          "Rest 90 sec",
+          "3–4 sets"
+        ],
+        "tips": [
+          "Touch line fully each time",
+          "Explode first steps",
+          "Plant hard on turns",
+          "Use grippy shoes"
+        ],
+        "equipment": "Cones or floor lines",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Accelerations from hockey stance",
+        "description": "Low athletic starts that transfer to face-offs and puck battles.",
+        "benefits": [
+          "Improves first step",
+          "Trains low-start mechanics",
+          "Builds leg power",
+          "Hockey-specific"
+        ],
+        "instructions": [
+          "Set athletic stance: bent knees, forward torso",
+          "On cue sprint 10–15 m",
+          "Full rest 60–90 sec",
+          "8–10 reps",
+          "Alternate lead leg"
+        ],
+        "tips": [
+          "Stay forward, do not pop upright early",
+          "Drive back leg hard",
+          "Use arms aggressively",
+          "Cap at 10 quality reps"
+        ],
+        "equipment": "20 m lane",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m tempo runs",
+        "description": "Controlled fast running to sustain high shift-like effort.",
+        "benefits": [
+          "Builds aerobic power",
+          "Teaches pacing",
+          "Improves leg endurance",
+          "Good off-season work"
+        ],
+        "instructions": [
+          "Warm up 10 minutes",
+          "400 m at 75–80% max",
+          "Rest 2 min walking",
+          "4–6 reps",
+          "Cool down 5 minutes"
+        ],
+        "tips": [
+          "Even pace, not a sprint",
+          "Monitor breathing",
+          "Use track lanes safely",
+          "Progress reps gradually"
+        ],
+        "equipment": "Track or measured loop",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata jump squats",
+        "description": "Four minutes of high intensity mimicking late-shift fatigue.",
+        "benefits": [
+          "Builds anaerobic endurance",
+          "Short but effective session",
+          "Strengthens legs",
+          "Home-friendly"
+        ],
+        "instructions": [
+          "20 sec max jump squats",
+          "10 sec rest",
+          "8 rounds = 4 minutes",
+          "Warm up before and cool down after",
+          "1–2 times weekly"
+        ],
+        "tips": [
+          "Land softly",
+          "Never skip warm-up",
+          "Avoid on game day",
+          "Protect knees with good form"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU balance with stick",
+        "description": "Unstable surface plus stickhandling for on-ice-like balance.",
+        "benefits": [
+          "Improves proprioception",
+          "Trains stance balance",
+          "Links hands and feet",
+          "Builds ankle stability"
+        ],
+        "instructions": [
+          "Stand on BOSU with both feet",
+          "Hold stick, light puck handling",
+          "Hold 30–45 seconds",
+          "Rest and repeat 4–6 times",
+          "Try single leg when ready"
+        ],
+        "tips": [
+          "Eyes forward, not down",
+          "Soft knee bend",
+          "Wall nearby for safety",
+          "Start without puck"
+        ],
+        "equipment": "BOSU, hockey stick",
+        "calories": "70–100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Single-leg RDL reach",
+        "description": "Balance plus posterior chain like single-leg skating in turns.",
+        "benefits": [
+          "Builds single-leg balance",
+          "Strengthens hamstring and glute",
+          "Improves hip control",
+          "Skating-specific"
+        ],
+        "instructions": [
+          "Stand on one leg with light dumbbell",
+          "Hinge forward, free leg back",
+          "Touch floor or shin",
+          "Return to vertical",
+          "8–10 reps per leg"
+        ],
+        "tips": [
+          "Focus eyes on one spot",
+          "Move slowly",
+          "Keep hips level",
+          "2–3 sets"
+        ],
+        "equipment": "Dumbbell",
+        "calories": "120–170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Single-leg toe balance",
+        "description": "Simple ankle and foot stability drill for skating.",
+        "benefits": [
+          "Strengthens feet",
+          "Improves balance",
+          "Quick daily drill",
+          "Can do anywhere"
+        ],
+        "instructions": [
+          "Stand on one leg",
+          "Rise onto toes",
+          "Hold 15–20 seconds",
+          "Lower and switch legs",
+          "6–8 reps per leg"
+        ],
+        "tips": [
+          "Use support if needed",
+          "Eyes forward",
+          "Breathe normally",
+          "Barefoot or shoes"
+        ],
+        "equipment": "None",
+        "calories": "30–50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partner pass on one leg",
+        "description": "Balance and passing coordination like in-game movement.",
+        "benefits": [
+          "Links balance and passing",
+          "Improves core stability",
+          "Trains focus",
+          "Partner drill"
+        ],
+        "instructions": [
+          "Stand on one leg with puck/ball",
+          "Partner 3–4 m away",
+          "Make accurate passes",
+          "30 seconds, switch leg",
+          "4 rounds"
+        ],
+        "tips": [
+          "Soft knees",
+          "Crisp passes",
+          "Do not sacrifice balance for power",
+          "Wall rebounder works too"
+        ],
+        "equipment": "Puck/ball, partner",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Walking lunge with rotation",
+        "description": "Dynamic balance and rotation for body-checking prep.",
+        "benefits": [
+          "Improves dynamic balance",
+          "Builds rotation from legs",
+          "Strengthens legs",
+          "Functional for hockey"
+        ],
+        "instructions": [
+          "Step into forward lunge",
+          "Rotate torso toward front leg",
+          "Return and step other leg",
+          "10 steps per leg",
+          "2–3 sets"
+        ],
+        "tips": [
+          "Knee tracks over foot",
+          "Stay tall",
+          "Hold ball at chest optional",
+          "Control tempo"
+        ],
+        "equipment": "None",
+        "calories": "100–150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Slide board lateral steps",
+        "description": "Simulates lateral skating with balance emphasis.",
+        "benefits": [
+          "Builds lateral power",
+          "Improves side-to-side balance",
+          "Develops adductors",
+          "Great for defensemen"
+        ],
+        "instructions": [
+          "Slide board or sock sliders",
+          "Lateral steps 20–30 seconds",
+          "Stay low in stance",
+          "Rest 60 sec",
+          "6–8 sets"
+        ],
+        "tips": [
+          "Do not stand upright",
+          "Hands in ready position",
+          "Control speed",
+          "Use board bumpers"
+        ],
+        "equipment": "Slide board",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Hurdle hops",
+        "description": "Builds leg explosiveness for first-step bursts and battle jumps.",
+        "benefits": [
+          "Increases vertical and horizontal power",
+          "Improves reactivity",
+          "Develops coordination",
+          "Transfers to ice acceleration"
+        ],
+        "instructions": [
+          "Set hurdles 60–90 cm apart",
+          "Two-foot hop over each",
+          "Soft landing",
+          "6–8 hurdles per set",
+          "3–4 sets"
+        ],
+        "tips": [
+          "Soft knees on landing",
+          "Use arms actively",
+          "Start with low hurdles",
+          "Full rest between sets"
+        ],
+        "equipment": "Hurdles or cones",
+        "calories": "140–200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sit-to-sprint start",
+        "description": "Removes pre-stretch to train pure first-step explosiveness.",
+        "benefits": [
+          "Builds starting power",
+          "Improves reaction",
+          "Trains hip extension",
+          "Simple field drill"
+        ],
+        "instructions": [
+          "Sit on ground, legs forward",
+          "On cue stand and sprint 10 m",
+          "8–10 reps",
+          "Rest 60–90 sec",
+          "Warm up first"
+        ],
+        "tips": [
+          "Do not lean before cue",
+          "Stand up explosively",
+          "First 3 steps max power",
+          "Alternate directions"
+        ],
+        "equipment": "10 m lane",
+        "calories": "100–150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Broad jump series",
+        "description": "Horizontal power useful for board battles and push-offs.",
+        "benefits": [
+          "Builds horizontal power",
+          "Improves coordination",
+          "Strengthens legs",
+          "Short session"
+        ],
+        "instructions": [
+          "Standing broad jump",
+          "Soft landing",
+          "Immediately next jump forward",
+          "5 jumps in row = 1 set",
+          "4–5 sets with rest"
+        ],
+        "tips": [
+          "Use arm swing",
+          "Land balanced",
+          "Flow jump to jump",
+          "Warm up knees"
+        ],
+        "equipment": "Open space",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Medicine ball slam",
+        "description": "Explosive downward throw for total-body contact power.",
+        "benefits": [
+          "Builds explosive core",
+          "High intensity quickly",
+          "Links legs-core-arms",
+          "Great stress release"
+        ],
+        "instructions": [
+          "Raise med ball overhead",
+          "Slam to floor with full force",
+          "Pick up and repeat",
+          "10–12 reps",
+          "3 sets"
+        ],
+        "tips": [
+          "Use legs and core",
+          "Neutral spine on lift",
+          "Watch rebound",
+          "Use 4–8 kg ball"
+        ],
+        "equipment": "Medicine ball",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Sled push",
+        "description": "Heavy horizontal drive like maximal standing starts.",
+        "benefits": [
+          "Max leg drive",
+          "Low impact loading",
+          "Builds mental toughness",
+          "Great for power forwards"
+        ],
+        "instructions": [
+          "Low stance behind sled",
+          "Push 15–20 m",
+          "Full rest 2 min",
+          "4–6 pushes",
+          "Joint warm-up first"
+        ],
+        "tips": [
+          "Stay low",
+          "Short powerful steps",
+          "Do not rise early",
+          "Start light on load"
+        ],
+        "equipment": "Prowler sled",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike steady 10 minutes",
+        "description": "Aerobic base for long shifts and off-season conditioning.",
+        "benefits": [
+          "Builds aerobic endurance",
+          "Joint-friendly",
+          "Heart-rate control",
+          "Quick off-ice session"
+        ],
+        "instructions": [
+          "5 min warm-up",
+          "10 min at 65–70% effort",
+          "Steady RPM",
+          "5 min cool down",
+          "Monitor breathing"
+        ],
+        "tips": [
+          "Stay out of anaerobic zone",
+          "Stable posture",
+          "Hydrate",
+          "2–3 times weekly"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Rowing erg intervals",
+        "description": "Full-body cardio without impact for trunk and leg endurance.",
+        "benefits": [
+          "Total-body conditioning",
+          "Improves rowing posture",
+          "Builds grip and core",
+          "Running alternative"
+        ],
+        "instructions": [
+          "500 m hard / 1 min easy",
+          "6–8 rounds",
+          "Drive from legs and core",
+          "5 min warm-up",
+          "Cool down stretch"
+        ],
+        "tips": [
+          "Neutral spine",
+          "Elbows to hips",
+          "Even split pace",
+          "Adjust damper wisely"
+        ],
+        "equipment": "Rowing erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Continuous skater hops",
+        "description": "Rhythmic lateral hops for leg and lateral conditioning.",
+        "benefits": [
+          "Builds lateral endurance",
+          "Strengthens legs",
+          "Mimics direction changes",
+          "Compact drill"
+        ],
+        "instructions": [
+          "Leap side to side on one leg to other",
+          "Arms like skating",
+          "30 sec work / 30 sec rest",
+          "10 rounds",
+          "Soft landings"
+        ],
+        "tips": [
+          "Knee tracks over foot",
+          "Chest up",
+          "Control jump distance",
+          "Warm up first"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 circuit training",
+        "description": "Four-station circuit for overall hockey conditioning.",
+        "benefits": [
+          "Full-body workload",
+          "Time efficient",
+          "Builds work capacity",
+          "Gym adaptable"
+        ],
+        "instructions": [
+          "Burpees, mountain climbers, jump squats, push-ups",
+          "45 sec work / 15 sec transition",
+          "4 moves × 4 rounds",
+          "2 min rest between rounds",
+          "Warm up and cool down"
+        ],
+        "tips": [
+          "Scale to your level",
+          "Form over speed",
+          "Stay hydrated",
+          "Avoid on game day"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Low hurdle run-throughs",
+        "description": "Cardio plus coordination with quick steps like hard skating.",
+        "benefits": [
+          "Improves cadence",
+          "Builds coordination",
+          "Boosts aerobic capacity",
+          "Varies running work"
+        ],
+        "instructions": [
+          "6–8 low hurdles over 20 m",
+          "Run through with high knees",
+          "6 passes",
+          "Rest 90 sec",
+          "3–4 series"
+        ],
+        "tips": [
+          "Do not clip hurdles",
+          "Quick short steps",
+          "Active arms",
+          "Warm up joints"
+        ],
+        "equipment": "Mini hurdles",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Ladder quick feet",
+        "description": "Fast feet foundation for dodging and tight turns.",
+        "benefits": [
+          "Improves foot speed",
+          "Builds coordination",
+          "Boosts reaction",
+          "Pre-ice warm-up"
+        ],
+        "instructions": [
+          "In-in-out-out through ladder",
+          "30 sec max / 30 sec rest",
+          "8 rounds",
+          "Vary patterns every other round",
+          "Light warm-up first"
+        ],
+        "tips": [
+          "Eyes up",
+          "Short steps",
+          "Hands in athletic ready",
+          "Do not skip rungs"
+        ],
+        "equipment": "Agility ladder",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-drill agility",
+        "description": "Classic T-test: sprint, shuffle, and backpedal like on ice.",
+        "benefits": [
+          "Complete agility package",
+          "Trains all directions",
+          "Trackable progress",
+          "For skaters"
+        ],
+        "instructions": [
+          "Sprint 10 m forward",
+          "Shuffle 5 m left and right",
+          "Backpedal 10 m to start",
+          "3–5 reps",
+          "Rest 90 sec"
+        ],
+        "tips": [
+          "Stay low in shuffle",
+          "Do not cross feet",
+          "Touch cones",
+          "Log your times"
+        ],
+        "equipment": "Cones",
+        "calories": "100–150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Puck figure-8 drill",
+        "description": "Stickhandle a figure-8 linking hands and footwork.",
+        "benefits": [
+          "Improves stickhandling",
+          "Links hands and feet",
+          "Trains peripheral vision",
+          "Home-friendly"
+        ],
+        "instructions": [
+          "Two cones 2 m apart",
+          "Puck figure-8 around cones",
+          "30 sec max speed",
+          "Rest 30 sec",
+          "10 rounds"
+        ],
+        "tips": [
+          "Head up",
+          "Soft hands",
+          "Quick feet",
+          "Switch direction every 5 rounds"
+        ],
+        "equipment": "Puck, 2 cones, stick",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reactive cone calls",
+        "description": "Partner calls a cone — reaction and first step like in-game reads.",
+        "benefits": [
+          "Trains game reaction",
+          "Improves cognitive speed",
+          "Builds first step",
+          "Partner drill"
+        ],
+        "instructions": [
+          "4 cones in 3 m square",
+          "Partner calls color/number",
+          "Sprint to cone",
+          "Touch and return",
+          "20 reactions"
+        ],
+        "tips": [
+          "Stay honest, no guessing early",
+          "Low stance",
+          "Explosive first step",
+          "Vary layout"
+        ],
+        "equipment": "4 cones, partner",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Lateral shuffle steps",
+        "description": "Side shuffles in hockey stance mimicking lateral skating.",
+        "benefits": [
+          "Builds lateral quickness",
+          "Strengthens hip abductors",
+          "Improves stance",
+          "Pre-ice warm-up"
+        ],
+        "instructions": [
+          "5 m shuffle left and right",
+          "Do not cross feet",
+          "30 sec / 30 sec rest",
+          "8 rounds",
+          "Hands on imaginary stick"
+        ],
+        "tips": [
+          "Stay low",
+          "Push off outside leg",
+          "Chest forward",
+          "Quick contacts"
+        ],
+        "equipment": "Cones or lines",
+        "calories": "80–120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynamic hip opener",
+        "description": "Hip mobility warm-up for deep hockey stance.",
+        "benefits": [
+          "Improves hip mobility",
+          "Lowers groin injury risk",
+          "Prepares for skating",
+          "Quick routine"
+        ],
+        "instructions": [
+          "Leg swings front-back 10 each",
+          "Leg swings side-side 10 each",
+          "Deep squat hold 30 sec",
+          "Hip circles 10 each way",
+          "Walking knee hugs 10 m"
+        ],
+        "tips": [
+          "Controlled range",
+          "No pain",
+          "Breathe deeply",
+          "Before every session"
+        ],
+        "equipment": "None",
+        "calories": "40–60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "World's greatest stretch",
+        "description": "Dynamic stretch hitting hips, thoracic spine, and hamstrings.",
+        "benefits": [
+          "Full-body mobility",
+          "Time efficient",
+          "Prepares entire body",
+          "Common pro warm-up"
+        ],
+        "instructions": [
+          "Step into lunge",
+          "Elbow down inside foot",
+          "Thoracic rotation arm up",
+          "Straighten front leg for hamstring",
+          "5 reps per side"
+        ],
+        "tips": [
+          "Move slowly",
+          "No bouncing",
+          "Track front knee",
+          "Equal both sides"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "50–70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Band pull-aparts",
+        "description": "Activates upper back and shoulders before shooting and contact.",
+        "benefits": [
+          "Activates rear delts and rhomboids",
+          "Improves posture",
+          "Warms shoulders",
+          "Injury prevention"
+        ],
+        "instructions": [
+          "Hold band at chest height",
+          "Arms straight",
+          "Pull apart to shoulder blades",
+          "15–20 reps",
+          "2–3 sets"
+        ],
+        "tips": [
+          "No shoulder shrug",
+          "Controlled return",
+          "Light band to start",
+          "Before ice or gym"
+        ],
+        "equipment": "Resistance band",
+        "calories": "30–50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "High knees + butt kicks",
+        "description": "Dynamic leg warm-up and heart-rate boost pre-ice.",
+        "benefits": [
+          "Raises heart rate",
+          "Warms quads and hamstrings",
+          "Improves coordination",
+          "Quick effect"
+        ],
+        "instructions": [
+          "20 m high knees",
+          "20 m butt kicks",
+          "20 m skipping",
+          "Repeat 3–4 times",
+          "Easy jog between"
+        ],
+        "tips": [
+          "Stay on forefoot",
+          "Active arms",
+          "Build tempo gradually",
+          "Do not sprint cold"
+        ],
+        "equipment": "20 m space",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Arm swings + stick warm-up",
+        "description": "Shoulder warm-up plus light stickhandling before ice.",
+        "benefits": [
+          "Mobilizes shoulders",
+          "Activates rotator cuff",
+          "Links upper body to stick",
+          "Hockey-specific"
+        ],
+        "instructions": [
+          "Arm circles 10 each way",
+          "Cross-body swings 10",
+          "Stickhandle slow to fast 60 sec",
+          "Wrist rolls with stick 20",
+          "Light shot motion x10"
+        ],
+        "tips": [
+          "Progress speed",
+          "Both hands",
+          "No forced range",
+          "Every ice session"
+        ],
+        "equipment": "Stick, puck",
+        "calories": "50–80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Kneeling hip flexor stretch",
+        "description": "Hip flexor stretch to counter skating posture.",
+        "benefits": [
+          "Reduces hip tightness",
+          "May improve stride",
+          "Helps posture",
+          "After ice or gym"
+        ],
+        "instructions": [
+          "Kneeling lunge position",
+          "Squeeze back glute",
+          "Torso tall",
+          "Hold 30–45 sec",
+          "2–3 times per leg"
+        ],
+        "tips": [
+          "Avoid lumbar arch",
+          "Breathe into stretch",
+          "Front knee over ankle",
+          "Daily if possible"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 hip rotation",
+        "description": "Hip mobility for turns and deep crouch on skates.",
+        "benefits": [
+          "Improves hip rotation",
+          "Lowers groin strain risk",
+          "Calm recovery work",
+          "Post-game friendly"
+        ],
+        "instructions": [
+          "Sit in 90/90 position",
+          "Rotate knees side to side",
+          "Hands behind for support",
+          "10 slow reps each way",
+          "Hold end 20 sec"
+        ],
+        "tips": [
+          "No forcing range",
+          "Chest tall",
+          "Both hips down if possible",
+          "Use breath"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Thoracic rotation stretch",
+        "description": "Thoracic mobility for shot rotation and posture.",
+        "benefits": [
+          "Improves T-spine rotation",
+          "Unloads lower back",
+          "Helps shot mechanics",
+          "Quick daily drill"
+        ],
+        "instructions": [
+          "Quadruped position",
+          "Hand behind head",
+          "Rotate elbow to ceiling",
+          "10 reps each side",
+          "Pause 2 sec at top"
+        ],
+        "tips": [
+          "Hips stay square",
+          "Exhale on rotate",
+          "No spinal pain",
+          "Move slowly"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "30–45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Wall calf stretch",
+        "description": "Calves and Achilles often overloaded in skates.",
+        "benefits": [
+          "Reduces calf tightness",
+          "Improves ankle dorsiflexion",
+          "Shin splint prevention",
+          "After every session"
+        ],
+        "instructions": [
+          "Hands on wall",
+          "Back leg straight heel down",
+          "Hold 30 sec",
+          "Bend knee for soleus",
+          "2–3 rounds each leg"
+        ],
+        "tips": [
+          "Heel on floor",
+          "Hips square",
+          "No bouncing",
+          "Both legs"
+        ],
+        "equipment": "Wall",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Cross-body shoulder stretch",
+        "description": "Posterior shoulder stretch after shooting volume.",
+        "benefits": [
+          "Reduces shoulder tightness",
+          "Helps shot range",
+          "Quick stretch",
+          "Daily maintenance"
+        ],
+        "instructions": [
+          "Pull arm across chest",
+          "Hold elbow with other hand",
+          "30 sec each arm",
+          "Repeat 2–3 times",
+          "Relaxed neck"
+        ],
+        "tips": [
+          "Do not shrug",
+          "Gentle pull only",
+          "Exhale and relax",
+          "After ice"
+        ],
+        "equipment": "None",
+        "calories": "20–35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Diaphragmatic breathing",
+        "description": "Deep breathing for parasympathetic recovery post-game.",
+        "benefits": [
+          "Lowers stress",
+          "Supports recovery",
+          "May improve sleep",
+          "Locker-room friendly"
+        ],
+        "instructions": [
+          "Lie or sit comfortably",
+          "Hand on belly",
+          "Inhale 4 sec nose",
+          "Exhale 6 sec mouth",
+          "5 minutes continuous"
+        ],
+        "tips": [
+          "Belly not chest rises",
+          "Quiet space",
+          "Daily habit",
+          "After late games"
+        ],
+        "equipment": "None",
+        "calories": "15–25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Legs up the wall",
+        "description": "Venous return and leg relaxation after heavy games.",
+        "benefits": [
+          "May reduce leg swelling",
+          "Promotes relaxation",
+          "Passive recovery",
+          "After travel games"
+        ],
+        "instructions": [
+          "Hips near wall lying down",
+          "Legs vertical on wall",
+          "Arms relaxed",
+          "Hold 8–10 minutes",
+          "Slow breathing"
+        ],
+        "tips": [
+          "Comfortable surface",
+          "Unplug from phone",
+          "Optional calm music",
+          "Best in evening"
+        ],
+        "equipment": "Wall, mat",
+        "calories": "20–30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Foam roll quads and hamstrings",
+        "description": "Myofascial release for legs after heavy loading.",
+        "benefits": [
+          "Reduces soreness",
+          "Improves tissue quality",
+          "Faster recovery",
+          "Self-care"
+        ],
+        "instructions": [
+          "Roll quads 60 sec each",
+          "Roll hamstrings 60 sec each",
+          "Pause tender spots 20 sec",
+          "Light IT band only",
+          "Hydrate after"
+        ],
+        "tips": [
+          "Avoid joints",
+          "Breathe through tight spots",
+          "Moderate pressure",
+          "Not pre-ice"
+        ],
+        "equipment": "Foam roller",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Hips and ankles mobility flow",
+        "description": "Gentle off-day mobility to maintain range of motion.",
+        "benefits": [
+          "Maintains mobility",
+          "Low fatigue",
+          "Active recovery",
+          "Injury prevention"
+        ],
+        "instructions": [
+          "Ankle circles 10 each",
+          "Hip CARs 5 each way",
+          "Cat-cow 10 reps",
+          "Child pose 60 sec",
+          "2 rounds"
+        ],
+        "tips": [
+          "Pain-free range",
+          "Slow and controlled",
+          "Off-day or morning",
+          "Add breathing"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Sleep prep stretch and breath",
+        "description": "Light stretch and breathing before bed for overnight recovery.",
+        "benefits": [
+          "Supports sleep onset",
+          "Relaxes nervous system",
+          "Recovery while sleeping",
+          "Evening ritual"
+        ],
+        "instructions": [
+          "Hamstring stretch 30 sec each",
+          "Child pose 60 sec",
+          "Supine twist 30 sec each",
+          "Box breathing 4-4-4-4 for 3 min",
+          "Dark quiet room"
+        ],
+        "tips": [
+          "No screens after",
+          "Consistent bedtime",
+          "Cool room",
+          "Make it habit"
+        ],
+        "equipment": "Exercise mat",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     }
   },
@@ -1787,6 +3189,8 @@
     "codeSentToEmailMessage": "Code sent to {email}",
     "userNotFound": "User not found",
     "userNotFoundMessage": "Account with this phone number does not exist. Please register.",
+    "networkError": "Connection problem",
+    "networkErrorMessage": "Could not reach the server. Check your internet connection and try again.",
     "errorSendingCode": "Error",
     "errorSendingCodeMessage": "Failed to send code. Check your phone number and internet connection.",
     "errorResendingCode": "Error",
@@ -2119,6 +3523,8 @@
     "Достижения": "Achievements",
     "Хоккейные фото": "Hockey Photos",
     "noFriendsYet": "{name} has no friends yet",
+    "inviteYourTeam": "Invite your team",
+    "inviteTeamMessage": "I'm on HockeyStars — the app for hockey players. Join me:",
     "beFirstToAdd": "Be the first to add {name} as a friend",
     "_cache_clear": "2024-01-15",
     "discountForFriendsHint": "Add the shop to friends to get a discount! Show the discount to the seller when purchasing",
@@ -2488,9 +3894,17 @@
     "weightFrom": "Weight",
     "all": "All",
     "noPlayersFound": "No players found",
+    "newcomers": "Newcomers",
+    "topByPoints": "Top by points",
     "left": "Left",
     "right": "Right",
-    "resetFilters": "Reset filters"
+    "resetFilters": "Reset filters",
+    "topBySV": "Top by SV%",
+    "shareRating": "Share rating",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "points",
+    "allCountries": "All countries",
+    "allYears": "All years"
   },
   "messages": {
     "title": "Messages",
@@ -3059,5 +4473,20 @@
     "pointsPerStar": "+10 per star",
     "inviteCode": "Invite Code",
     "enterInviteCode": "Enter invite code (optional)"
+  },
+  "videoUploadHint": "Max 20 seconds per video, up to 10 videos",
+  "gameFirstPlaceNotification": {
+    "title": "Game Champion",
+    "message": "{playerName} reached 1st place"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hockey Star Quiz",
+    "message": "{playerName} earned {prize}"
+  },
+  "tabs": {
+    "chat": "Chat",
+    "feed": "Feed",
+    "scout": "Scout",
+    "skills": "Skills"
   }
 }

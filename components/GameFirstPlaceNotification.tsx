@@ -1,10 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
+import { formatPrize } from '../data/hockeyQuiz/utils';
+import type { Language } from '../contexts/LanguageContext';
 
 interface GameFirstPlaceNotificationProps {
   playerName: string;
@@ -12,6 +14,8 @@ interface GameFirstPlaceNotificationProps {
   playerAvatar?: string;
   message: string;
   timestamp: number;
+  variant: 'game' | 'quiz';
+  prizeAmount?: number;
 }
 
 const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>(({
@@ -20,8 +24,10 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
   playerAvatar,
   message,
   timestamp,
+  variant,
+  prizeAmount,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const formatTime = useCallback((ts: number): string => {
     const now = Date.now();
@@ -31,6 +37,19 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
     if (diff < 86400000) return t('hoursAgo', { hours: Math.floor(diff / 3600000) });
     return t('daysAgo', { days: Math.floor(diff / 86400000) });
   }, [t]);
+
+  const displayMessage = useMemo(() => {
+    if (variant === 'quiz' && prizeAmount != null && prizeAmount > 0) {
+      const prize = formatPrize(prizeAmount, language as Language);
+      const localized = t('quizFirstPlaceNotification.message', { playerName, prize });
+      if (localized !== 'quizFirstPlaceNotification.message') return localized;
+    }
+    if (variant === 'game') {
+      const localized = t('gameFirstPlaceNotification.message', { playerName });
+      if (localized !== 'gameFirstPlaceNotification.message') return localized;
+    }
+    return message;
+  }, [variant, prizeAmount, playerName, language, t, message]);
 
   return (
     <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
@@ -49,7 +68,7 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
             <Text style={styles.playerName}>{playerName}</Text>
             <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
           </View>
-          <Text style={styles.message}>{message}</Text>
+          <Text style={styles.message}>{displayMessage}</Text>
         </View>
       </View>
     </BlurOrSolid>

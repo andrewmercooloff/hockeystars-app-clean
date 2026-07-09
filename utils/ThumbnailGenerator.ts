@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import { getStorageObjectUrl, getStoragePublicUrl, supabaseAnonKey } from './supabase';
 
 // Размеры миниатюр, которые мы будем генерировать
 export const THUMBNAIL_SIZES = {
@@ -35,8 +35,8 @@ export const generateThumbnails = async (
       throw new Error('Не удалось получить контекст canvas');
     }
 
-    // Загружаем изображение
-    const img = new Image();
+    // Загружаем изображение (web-only: используется DOM, как и canvas выше)
+    const img = document.createElement('img');
     img.crossOrigin = 'anonymous';
     
     await new Promise((resolve, reject) => {
@@ -106,18 +106,18 @@ export const uploadThumbnails = async (
         
         // Загружаем в Supabase Storage
         const uploadResponse = await fetch(
-          `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/avatars/thumbnails/${playerId}/avatar_${size}.jpg`,
+          getStorageObjectUrl('avatars', `thumbnails/${playerId}/avatar_${size}.jpg`),
           {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+              'Authorization': `Bearer ${supabaseAnonKey}`,
             },
             body: formData,
           }
         );
 
         if (uploadResponse.ok) {
-          const uploadedUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/thumbnails/${playerId}/avatar_${size}.jpg`;
+          const uploadedUrl = getStoragePublicUrl('avatars', `thumbnails/${playerId}/avatar_${size}.jpg`);
           uploadedUrls[size] = uploadedUrl;
           console.log(`✅ Загружена миниатюра ${size}:`, uploadedUrl);
         } else {

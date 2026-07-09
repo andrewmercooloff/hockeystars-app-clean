@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ScrollView, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ExerciseCompletion, getPlayerExerciseStats, Player, PlayerExerciseStats } from '../utils/playerStorage';
@@ -132,10 +132,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   };
 
   const handleExercisePress = useCallback((exerciseId: string) => {
-    router.navigate({
-      pathname: '/exercise-details',
-      params: { id: exerciseId }
-    });
+    router.push(`/exercises/${exerciseId}`);
   }, [router]);
 
   // Показываем секцию только для игроков
@@ -212,10 +209,15 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
     <View style={containerStyle}>
       <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
       
-      <View style={styles.exercisesGrid}>
-        {sortedCompletions.map((completion, index) => (
-          <TouchableOpacity 
-            key={completion.exerciseId} 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.exercisesScroll}
+        nestedScrollEnabled
+      >
+        {sortedCompletions.map((completion) => (
+          <TouchableOpacity
+            key={completion.exerciseId}
             style={styles.exerciseCard}
             onPress={() => handleExercisePress(completion.exerciseId)}
             activeOpacity={0.7}
@@ -235,7 +237,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
             </View>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -280,18 +282,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
     maxWidth: 250,
   },
-  exercisesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginTop: 10,
+  exercisesScroll: {
+    paddingRight: 12,
+    paddingTop: 4,
   },
   exerciseCard: {
-    width: '48%',
+    width: 220,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
     padding: 12,
-    marginBottom: 12,
+    marginRight: 12,
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.2)',
   },

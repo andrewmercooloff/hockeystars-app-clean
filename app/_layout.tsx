@@ -5,18 +5,22 @@ import * as React from 'react';
 import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking, InteractionManager } from 'react-native';
 import { Asset } from 'expo-asset';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useNetInfo } from '@react-native-community/netinfo';
 import LogoHeader from '../components/LogoHeader';
+import TabBarLabel from '../components/TabBarLabel';
+import { HomeStarTabButton, HomeStarTabIcon, playHomeStarPressAnimation } from '../components/HomeStarTab';
 import { UserProvider, useUser, updateGlobalUserCache } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { ScreenProvider } from '../contexts/ScreenContext';
-import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player, updateOnlineStatus } from '../utils/playerStorage';
+import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player, updateOnlineStatus, getUnreadNotificationsBadgeCount, syncUnreadNotificationsCountInDb } from '../utils/playerStorage';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../utils/supabase';
+import { supabase, ensureSupabaseRouting, getActiveSupabaseUrl } from '../utils/supabase';
 import * as SplashScreen from 'expo-splash-screen';
-import { addActivityPoints } from '../services/activityService';
+import { addActivityPoints, ensureRegistrationActivityPoints } from '../services/activityService';
 import { initializePushNotifications } from '../utils/notificationService';
 import * as Notifications from 'expo-notifications';
 import { configureSystemUI } from '../utils/systemUI';
@@ -26,6 +30,15 @@ import { initializeSounds } from '../utils/soundService';
 import { realtimeManager } from '../utils/RealtimeManager';
 import * as Clipboard from 'expo-clipboard';
 import * as Application from 'expo-application';
+import { colors } from '../theme/colors';
+import { scrollTabToTop } from '../utils/tabScrollRegistry';
+import CachedBackground from '../components/CachedBackground';
+import { warmIceBackground, ICE_BACKGROUND } from '../utils/iceBackground';
+import { isLowEndAndroid, androidStartupDeferMs } from '../utils/devicePerformance';
+import {
+  isNotificationsBadgeSuppressed,
+  resolveNotificationsBadgeCount,
+} from '../utils/notificationsBadgeGate';
 
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
@@ -41,7 +54,8 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 }
 
 const GLOBAL_PRELOAD_ASSETS = [
-  require('../assets/images/led.jpg'),
+  ICE_BACKGROUND,
+  require('../assets/images/scout.png'),
 ];
 
 // В режиме разработки показываем предупреждения для отладки
@@ -293,8 +307,12 @@ const UserSync = React.memo(({
 });
 
 export default function RootLayout() {
+  const deferSecondaryTabs = React.useMemo(() => isLowEndAndroid(), []);
   const router = useRouter();
   const pathname = usePathname();
+  const netInfo = useNetInfo();
+  const [pingOnline, setPingOnline] = React.useState<boolean>(true);
+  const pingFailStreakRef = React.useRef(0);
   const lastUserLoadTime = React.useRef<number>(0);
   const lastRealtimeFriendRequestsUpdate = React.useRef<number>(0); // Время последнего обновления счётчика через Realtime
   const lastRealtimeFriendRequestsCount = React.useRef<number | null>(null); // Последнее значение от Realtime
@@ -358,6 +376,58 @@ export default function RootLayout() {
     
     return () => subscription?.remove();
   }, []);
+
+  // Надёжная проверка "есть ли реально интернет/доступ к API".
+  // NetInfo может говорить "подключено" (Wi‑Fi), даже если выхода в интернет нет.
+  React.useEffect(() => {
+    let cancelled = false;
+    let timer: any = null;
+
+    const ping = async () => {
+      if (cancelled) return;
+      // Если явно нет соединения — не пингуем, сразу офлайн.
+      if (netInfo.isConnected === false || netInfo.type === 'none') {
+        pingFailStreakRef.current = 0;
+        setPingOnline(false);
+        schedule();
+        return;
+      }
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 7000);
+      try {
+        // Любой ответ (даже 404) означает, что сеть/домен доступен.
+        const res = await fetch(`${getActiveSupabaseUrl()}/`, { method: 'HEAD', signal: controller.signal as any });
+        clearTimeout(tid);
+        if (cancelled) return;
+        pingFailStreakRef.current = 0;
+        setPingOnline(true);
+      } catch {
+        clearTimeout(tid);
+        if (cancelled) return;
+        pingFailStreakRef.current += 1;
+        // Медленная сеть: офлайн только после серии фейлов, чтобы не мигало.
+        if (pingFailStreakRef.current >= 4) {
+          setPingOnline(false);
+        }
+      } finally {
+        schedule();
+      }
+    };
+
+    const schedule = () => {
+      if (cancelled) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(ping, pingOnline ? 6000 : 3000);
+    };
+
+    // Стартуем сразу при монтировании и при изменениях NetInfo.
+    ping();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [netInfo.isConnected, netInfo.isInternetReachable, netInfo.type, pingOnline]);
   const [loaded, error] = useFonts({
     'Gilroy-Regular': require('../assets/fonts/gilroy-regular.ttf'),
     'Gilroy-Bold': require('../assets/fonts/gilroy-bold.ttf'),
@@ -421,8 +491,31 @@ export default function RootLayout() {
 
 
   const [currentUser, setCurrentUser] = React.useState<Player | null>(null);
+
+  const handleFocusedTabPress = React.useCallback(
+    (
+      navigation: { isFocused(): boolean },
+      tabKey: string,
+      nestedTabRoot?: string,
+    ) => {
+      if (!navigation.isFocused()) return;
+      if (
+        nestedTabRoot &&
+        pathname.startsWith(`${nestedTabRoot}/`) &&
+        pathname !== nestedTabRoot
+      ) {
+        router.replace(nestedTabRoot as any);
+        return;
+      }
+      scrollTabToTop(tabKey);
+    },
+    [pathname, router],
+  );
+
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState<number>(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = React.useState<number>(0);
+  /** Перерисовка иконки таба после loadUser (ref alone не триггерит render). */
+  const [countersLoaded, setCountersLoaded] = React.useState(false);
 
   // ==========================================================
   // 🎟️ Referral / Deferred deep links (via Universal Links + Linking API)
@@ -622,41 +715,35 @@ export default function RootLayout() {
   // Внутренний компонент UserSync вынесен наружу
   // const UserSync = () => { ... }
   
+  const applyNotificationsBadge = React.useCallback((proposed: number) => {
+    const next = resolveNotificationsBadgeCount(proposed);
+    if (next !== lastNotificationCountRef.current) {
+      lastNotificationCountRef.current = next;
+      setUnreadNotificationsCount(next);
+    }
+    return next;
+  }, []);
+
   // Функция для загрузки счетчика уведомлений из БД
   const loadNotificationCount = React.useCallback(async (userId: string, skipUpdateIfSame: boolean = false) => {
     try {
-      // ВАЖНО: Только читаем счетчик из БД, НЕ обновляем его
-      // Счетчик в БД обновляется только через SQL функции (increment_unread_notifications)
-      // или через Realtime подписку на изменения в таблице players
-      const { data: playerData, error: playerError } = await supabase
-        .from('players')
-        .select('unread_notifications_count')
-        .eq('id', userId)
-        .single();
-      
-      if (playerError) {
-        console.error('❌ Ошибка загрузки счетчика из players:', playerError);
+      if (isNotificationsBadgeSuppressed()) {
+        applyNotificationsBadge(0);
         return;
       }
-      
-      const realCount = playerData?.unread_notifications_count || 0;
-      
-      // Если счетчик не изменился и мы не хотим обновлять UI, пропускаем
-      if (skipUpdateIfSame && realCount === unreadNotificationsCount) {
+
+      const realCount = await getUnreadNotificationsBadgeCount(userId);
+      const nextCount = resolveNotificationsBadgeCount(realCount);
+
+      if (skipUpdateIfSame && nextCount === unreadNotificationsStateRef.current) {
         return;
       }
-      
-      // Обновляем ref и синхронизируем RealtimeManager
-      lastNotificationCountRef.current = realCount;
-      realtimeManager.initializeCounts(realCount, lastMessagesCountRef.current);
-      
-      // ВАЖНО: Обновляем UI всегда, чтобы синхронизировать с БД
-      // Это нужно для случаев, когда счетчик обновляется через SQL функцию
-      // и нужно синхронизировать оптимистичное обновление с реальным значением из БД
-      if (realCount !== unreadNotificationsCount) {
-        console.log('🔔 loadNotificationCount: Обновление счетчика в UI:', unreadNotificationsCount, '→', realCount);
-        setUnreadNotificationsCount(realCount);
-      }
+
+      realtimeManager.initializeCounts(nextCount, lastMessagesCountRef.current);
+      applyNotificationsBadge(nextCount);
+
+      // Фоново выравниваем колонку players (может отставать от is_read)
+      void syncUnreadNotificationsCountInDb(userId).catch(() => {});
     } catch (error) {
       // Тихая обработка сетевых ошибок (отсутствие интернета)
       const isNetworkError = (error as any)?.message?.includes('Network request failed') || 
@@ -669,7 +756,7 @@ export default function RootLayout() {
       }
       // При сетевых ошибках просто пропускаем обновление счетчика
     }
-  }, [unreadNotificationsCount]);
+  }, [applyNotificationsBadge]);
 
   // Убираем useEffect, который перезаписывает счетчик
   // Счетчик обновляется только через updateNotificationCount
@@ -707,7 +794,7 @@ export default function RootLayout() {
       
       // Проверяем, были ли загружены счётчики
       // Если нет - не показываем индикатор, чтобы избежать мигания
-      const shouldShowBadge = countersDataRef.current.loaded && currentUser && total > 0;
+      const shouldShowBadge = countersLoaded && currentUser && total > 0;
       
       return (
         <View style={{
@@ -744,7 +831,7 @@ export default function RootLayout() {
         </View>
       );
     };
-  }, [unreadNotificationsCount, currentUser?.giftRequestsCount]);
+  }, [unreadNotificationsCount, currentUser?.giftRequestsCount, countersLoaded]);
 
   // Функция для обновления счетчика уведомлений (УПРОЩЕННАЯ)
   const updateNotificationCount = React.useCallback(async (user?: Player | null) => {
@@ -802,10 +889,8 @@ export default function RootLayout() {
               // Логируем только не-сетевые ошибки
           console.error('Ошибка загрузки уведомлений:', error);
             }
-            // При сетевых ошибках просто пропускаем загрузку уведомлений
-          return;
-        }
-        
+            // Список уведомлений не загрузился — всё равно подтягиваем счётчики для бейджа
+        } else {
         const notifications = notificationsData || [];
         
         // Помечаем все уведомления о сообщениях как прочитанные
@@ -824,10 +909,10 @@ export default function RootLayout() {
             }
           }
         }
+        }
         
-        // Бейдж: все непрочитанные, кроме type message (чаты — отдельный счётчик)
-        const filteredNotifications = notifications.filter((n: any) => n.type !== 'message');
-        const unreadNotificationsCount = filteredNotifications.filter((n: any) => !n.is_read).length;
+        // Бейдж: фактические непрочитанные (кроме message и actionable типов)
+        const unreadNotificationsCount = await getUnreadNotificationsBadgeCount(user.id);
         // friendRequestsCount больше не используется для badge - friend requests включены в unreadNotificationsCount
         const friendRequestsCount = 0; // Обнуляем, чтобы избежать двойного подсчёта
         console.log('🔔 Счётчик непрочитанных уведомлений (включая friend_request):', unreadNotificationsCount);
@@ -893,6 +978,7 @@ export default function RootLayout() {
           unreadMessagesCount,
           loaded: true
         };
+        setCountersLoaded(true);
 
         // ОПТИМИЗАЦИЯ: Объединяем обновления в одну батч операцию
         // setCurrentUser и updateGlobalUserCache вызываются синхронно для минимальной задержки
@@ -902,12 +988,12 @@ export default function RootLayout() {
         // Это нужно чтобы adjustFriendRequestsCount в других компонентах работал с актуальными данными
         updateGlobalUserCache(nextUser);
         
-        // ФОНОВЫЕ ОПЕРАЦИИ: запускаем без await, чтобы не блокировать UI и анимацию шайб
-        // Используем setTimeout(0) для вынесения из текущего цикла рендеринга
-        setTimeout(async () => {
+        // ФОНОВЫЕ ОПЕРАЦИИ: после первого кадра UI, на слабом Android — с паузой
+        const runBackgroundInit = async () => {
           // Трекаем вход в приложение ТОЛЬКО ОДИН РАЗ за всю сессию приложения
           if (!loginTracked.current) {
             try {
+              await ensureRegistrationActivityPoints(user.id, user.name);
               await addActivityPoints(user.id, 'LOGIN');
               loginTracked.current = true;
             } catch (error) {
@@ -942,7 +1028,19 @@ export default function RootLayout() {
           } catch (error) {
             console.error('❌ Ошибка инициализации звуков:', error);
           }
-        }, 0);
+        };
+
+        if (isLowEndAndroid()) {
+          InteractionManager.runAfterInteractions(() => {
+            setTimeout(() => {
+              void runBackgroundInit();
+            }, androidStartupDeferMs());
+          });
+        } else {
+          setTimeout(() => {
+            void runBackgroundInit();
+          }, 0);
+        }
         
         } catch (notificationError) {
           // Тихая обработка сетевых ошибок при загрузке уведомлений (отсутствие интернета)
@@ -1010,6 +1108,7 @@ export default function RootLayout() {
     }
 
     try {
+      await ensureSupabaseRouting();
       await loadNotificationCount(currentUser.id);
     } catch (error) {
       console.error('❌ Ошибка обновления счетчика уведомлений при возврате из фона:', error);
@@ -1034,9 +1133,15 @@ export default function RootLayout() {
           await safeHideSplashScreen();
         }
         
+
+
+        // Сначала выбираем маршрут: direct Supabase или Moscow proxy (РФ)
+        await ensureSupabaseRouting();
+
         // Инициализируем только критически важные ресурсы параллельно
         const initPromises = [
           initializeStorage(),
+          warmIceBackground(),
           Asset.loadAsync(GLOBAL_PRELOAD_ASSETS).catch(err => {
             console.warn('⚠️ Не удалось предзагрузить фон led:', err);
           }),
@@ -1095,11 +1200,13 @@ export default function RootLayout() {
     }
   }, [loaded, error]);
 
-  // Загружаем пользователя при инициализации и при возврате в приложение
+  // Загружаем пользователя только после выбора маршрута Supabase (direct vs proxy)
   React.useEffect(() => {
     if (!loaded) return;
-    // Загружаем пользователя сразу после загрузки шрифтов, не ждем appReady
-    loadUser();
+    void (async () => {
+      await ensureSupabaseRouting();
+      loadUser();
+    })();
     
     // ОПТИМИЗАЦИЯ: Периодическое обновление счетчика сообщений (каждые 30 секунд вместо 5)
     // Realtime подписка обеспечивает мгновенные обновления, polling только для надежности
@@ -1391,6 +1498,7 @@ export default function RootLayout() {
       };
       setUnreadMessagesCount(0);
       setUnreadNotificationsCount(0);
+      setCountersLoaded(false);
       realtimeManager.initializeCounts(0, 0);
     }
   }, [currentUser?.id, currentUser?.unreadMessagesCount]);
@@ -1404,12 +1512,10 @@ export default function RootLayout() {
     // Устанавливаем callback для обновления счетчика уведомлений
     // Добавляем проверку, чтобы избежать мигания индикатора
     realtimeManager.setNotificationCountCallback((count: number) => {
-      // ВАЖНО: Обновляем UI только если значение действительно изменилось
-      // Используем ref для проверки, чтобы не зависеть от состояния в зависимостях
-      if (count !== lastNotificationCountRef.current) {
-        console.log('🔔 Realtime: Обновление счетчика уведомлений:', lastNotificationCountRef.current, '→', count);
-        lastNotificationCountRef.current = count;
-        setUnreadNotificationsCount(count);
+      const next = resolveNotificationsBadgeCount(count);
+      if (next !== lastNotificationCountRef.current) {
+        lastNotificationCountRef.current = next;
+        setUnreadNotificationsCount(next);
       }
     });
 
@@ -1436,14 +1542,31 @@ export default function RootLayout() {
       await loadNotificationCount(userId, false); // false = всегда обновляем UI для синхронизации
     });
 
-    // Используем централизованный менеджер подписок
-    realtimeManager.setupSubscriptions(currentUser.id);
+    const connectRealtime = () => {
+      realtimeManager.setupSubscriptions(currentUser.id);
+    };
+
+    if (isLowEndAndroid()) {
+      let cancelled = false;
+      const handle = InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          if (!cancelled) connectRealtime();
+        }, androidStartupDeferMs());
+      });
+      return () => {
+        cancelled = true;
+        handle.cancel?.();
+        realtimeManager.disconnect();
+      };
+    }
+
+    connectRealtime();
 
     return () => {
       // Отключаем подписки при размонтировании
       realtimeManager.disconnect();
     };
-  }, [currentUser?.id, unreadMessagesCount]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ВАЖНО: Обработчик push-уведомлений для обновления счетчика в реальном времени
   // ИСПРАВЛЕНО: Убрано оптимистичное обновление, так как счетчик уже обновляется через:
@@ -1546,80 +1669,100 @@ export default function RootLayout() {
                 userLoaded={userLoaded}
                 loadUser={loadUser}
               />
-              <NotificationProvider updateNotificationCount={updateNotificationCount}>
+              <NotificationProvider
+                updateNotificationCount={updateNotificationCount}
+                refreshBadges={refreshBadgeCounts}
+                setUnreadMessagesBadge={(count) => {
+                  lastMessagesCountRef.current = count;
+                  setUnreadMessagesCount(count);
+                }}
+                setUnreadNotificationsBadge={(count) => {
+                  const next = resolveNotificationsBadgeCount(count);
+                  lastNotificationCountRef.current = next;
+                  setUnreadNotificationsCount(next);
+                }}
+              >
             <GestureHandlerRootView
               style={{
                 flex: 1,
-                ...(Platform.OS === 'android' ? { backgroundColor: '#87A3B1' } : {}),
+                ...(Platform.OS === 'android' ? { backgroundColor: colors.scene } : {}),
               }}
             >
-              <StatusBar 
-                barStyle="light-content" 
-                backgroundColor="#050008" 
-                translucent={Platform.OS === 'android'}
-                hidden={false}
-              />
-              
-              {/* Глобальный хедер приложения */}
-              <LogoHeader />
-              
-              <Tabs
+              <CachedBackground style={{ flex: 1 }}>
+                <StatusBar 
+                  barStyle="light-content" 
+                  backgroundColor="#050008" 
+                  translucent={Platform.OS === 'android'}
+                  hidden={false}
+                />
+                
+                {/* Глобальный хедер приложения */}
+                <LogoHeader />
+                
+                <Tabs
             screenOptions={{
               headerShown: false, // Убираем встроенные хедеры
               tabBarStyle: { 
                 backgroundColor: '#050008', 
                 borderTopWidth: 0,
-                // Теперь navigation bar скрыт, используем стандартные размеры
-                height: 80,
-                paddingBottom: Platform.OS === 'android' ? 13 : 10,
-                paddingTop: Platform.OS === 'android' ? 7 : 10
+                height: Platform.OS === 'android' ? 84 : 82,
+                paddingBottom: Platform.OS === 'android' ? 10 : 8,
+                paddingTop: Platform.OS === 'android' ? 6 : 8,
               },
               tabBarActiveTintColor: '#fff',
               tabBarInactiveTintColor: '#888',
-              tabBarShowLabel: false,
+              tabBarShowLabel: true,
+              tabBarItemStyle: {
+                marginTop: -4,
+                paddingHorizontal: 0,
+                minWidth: 0,
+              },
+              // Важно: экран может быть "пустым" при отсутствии сети/данных,
+              // и тогда виден фон контейнера. Делаем прозрачным, чтобы всегда был виден лёд.
+              // expo-router Tabs типы не всегда знают этот проп — оставляем runtime‑поведение.
+              sceneStyle: { backgroundColor: colors.scene },
               ...(Platform.OS === 'android'
-                ? {
-                    sceneContainerStyle: { backgroundColor: '#87A3B1', flex: 1 },
-                  }
-                : {}),
+                ? ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)
+                : ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)),
             }}
           >
         <Tabs.Screen
           name="index"
-          options={{
-            tabBarIcon: ({ size }) => {
-              const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
-              return (
-              <View style={{
-                backgroundColor: '#fa2f40',
-                borderRadius: 20,
-                width: 40,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                  <Ionicons name="home" size={iconSize} color="#fff" />
-              </View>
-              );
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              if (!navigation.isFocused()) return;
+              const handleHomeShake = (globalThis as { __handleHomeShake?: () => void }).__handleHomeShake;
+              if (typeof handleHomeShake !== 'function') return;
+              e.preventDefault();
+              playHomeStarPressAnimation();
+              handleHomeShake();
             },
+          })}
+          options={{
+            tabBarLabel: () => null,
+            tabBarIcon: ({ size }) => <HomeStarTabIcon size={size} />,
+            tabBarButton: (props) => <HomeStarTabButton {...props} />,
           }}
         />
         <Tabs.Screen
           name="messages"
-          listeners={{
+          listeners={({ navigation }) => ({
             tabPress: (e: any) => {
               if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
+                return;
               }
+              handleFocusedTabPress(navigation, 'messages');
             },
-          }}
+          })}
           options={{
-            lazy: false,
+            lazy: deferSecondaryTabs,
+            tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.chat" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               // Показываем индикатор только после загрузки счётчиков
-              const showMessagesBadge = countersDataRef.current.loaded && unreadMessagesCount > 0;
+              const showMessagesBadge = countersLoaded && unreadMessagesCount > 0;
               return (
                 <View style={{
                   position: 'relative',
@@ -1657,32 +1800,38 @@ export default function RootLayout() {
         />
         <Tabs.Screen
           name="notifications"
-          listeners={{
+          listeners={({ navigation }) => ({
             tabPress: (e: any) => {
               if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
+                return;
               }
+              handleFocusedTabPress(navigation, 'notifications');
             },
-          }}
+          })}
           options={{
-            lazy: false,
+            lazy: deferSecondaryTabs,
+            tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.feed" focused={focused} />,
             tabBarIcon: NotificationsTabIcon,
           }}
         />
 
         <Tabs.Screen
           name="search"
-          listeners={{
+          listeners={({ navigation }) => ({
             tabPress: (e: any) => {
               if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
+                return;
               }
+              handleFocusedTabPress(navigation, 'search');
             },
-          }}
+          })}
           options={{
-            lazy: false,
+            lazy: deferSecondaryTabs,
+            tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.scout" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="search-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
@@ -1692,27 +1841,23 @@ export default function RootLayout() {
 
         <Tabs.Screen
           name="exercises"
-          listeners={{
+          listeners={({ navigation }) => ({
             tabPress: (e: any) => {
               if (!currentUser) {
                 e.preventDefault();
                 router.replace('/login');
+                return;
               }
+              handleFocusedTabPress(navigation, 'exercises', '/exercises');
             },
-          }}
+          })}
           options={{
-            lazy: false,
+            lazy: deferSecondaryTabs,
+            tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.skills" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
               return <Ionicons name="barbell-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
             },
-          }}
-        />
-
-        <Tabs.Screen
-          name="exercise-details"
-          options={{
-            href: null,
           }}
         />
 
@@ -1799,6 +1944,18 @@ export default function RootLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="debug-connection"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="_debug-connection"
+          options={{
+            href: null,
+          }}
+        />
 
           </Tabs>
           
@@ -1827,6 +1984,41 @@ export default function RootLayout() {
               />
             </Animated.View>
           )}
+          
+          {/* Offline overlay: показываем иконку без текста */}
+          {(
+            netInfo.isConnected === false ||
+            netInfo.type === 'none' ||
+            pingOnline === false
+          ) && (
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 9000,
+              }}
+            >
+              <View
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 28,
+                  backgroundColor: 'rgba(5, 0, 8, 0.55)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Ionicons name="cloud-offline-outline" size={30} color="#fff" />
+              </View>
+            </View>
+          )}
+              </CachedBackground>
           </GestureHandlerRootView>
               </NotificationProvider>
             </UserProvider>

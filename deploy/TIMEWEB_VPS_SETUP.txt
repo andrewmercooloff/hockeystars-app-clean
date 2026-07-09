@@ -1,0 +1,86 @@
+================================================================================
+  Timeweb Cloud — тестовый Supabase proxy (api-test.hockey-stars.com)
+================================================================================
+
+ШАГ 1 — Создать VPS в Timeweb Cloud
+------------------------------------
+1. Облако → Серверы → Создать
+2. Локация: Нидерланды (или Германия)
+3. ОС: Ubuntu 22.04
+4. Тариф: 1 vCPU, 1 GB RAM, 10–15 GB (минимальный)
+5. SSH-ключ или пароль root — сохраните
+6. Запишите публичный IP (например 185.x.x.x)
+
+ШАГ 2 — DNS (HostFly, зона hockey-stars.com)
+--------------------------------------------
+Добавить (api.hockey-stars.com НЕ трогать):
+
+  A    api-test    →    IP_VPS
+
+TTL 300–600. Подождать 5–15 мин.
+
+Проверка с ПК:
+  nslookup api-test.hockey-stars.com
+
+ШАГ 3 — Firewall Timeweb
+-------------------------
+В панели VPS / группы безопасности открыть:
+  TCP 22, 80, 443
+
+ШАГ 4 — SSH на VPS
+------------------
+  ssh root@IP_VPS
+
+ШАГ 5 — Установка nginx + certbot
+---------------------------------
+  apt update && apt upgrade -y
+  apt install -y nginx certbot python3-certbot-nginx curl
+
+ШАГ 6 — Конфиг nginx
+--------------------
+Скопировать deploy/nginx/api-test.hockey-stars.com.conf на VPS:
+
+  /etc/nginx/sites-available/api-test
+
+Включить:
+  ln -sf /etc/nginx/sites-available/api-test /etc/nginx/sites-enabled/
+  rm -f /etc/nginx/sites-enabled/default
+
+Временно для первого certbot — закомментировать блок listen 443 ssl
+или сначала только HTTP:
+
+  certbot certonly --nginx -d api-test.hockey-stars.com
+
+Проще: certbot сам настроит SSL:
+  nginx -t
+  systemctl reload nginx
+  certbot --nginx -d api-test.hockey-stars.com
+
+(Если certbot ругается на ssl_certificate — сначала оставьте только server listen 80,
+ certbot добавит 443, потом подставьте полный конфиг из репозитория.)
+
+  nginx -t && systemctl reload nginx
+
+ШАГ 7 — Тест БЕЗ VPN
+--------------------
+С ПК или телефона:
+
+  curl -sS -o NUL -w "direct %{time_total}s %{http_code}\n" "https://api.hockey-stars.com/rest/v1/"
+  curl -sS -o NUL -w "vps    %{time_total}s %{http_code}\n" "https://api-test.hockey-stars.com/rest/v1/"
+
+Ожидание: обе 401, vps заметно быстрее direct.
+
+Web (опционально):
+  set EXPO_PUBLIC_SUPABASE_URL=https://api-test.hockey-stars.com
+  npx expo start --web
+  → http://localhost:8081/debug-connection
+
+ШАГ 8 — Production (только если api-test быстрый)
+-------------------------------------------------
+1. Скопировать конфиг с server_name api.hockey-stars.com
+2. DNS: удалить CNAME api → supabase.co
+3. DNS: A api → IP_VPS
+4. certbot --nginx -d api.hockey-stars.com
+5. Тест Store-приложения без VPN
+
+================================================================================

@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Ilu łyżwiarzy w drużynie znajduje się na lodzie podczas równej siły (z wyłączeniem bramkarzy)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Ile okresów regulaminowych trwa standardowy mecz NHL?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Spalony ma miejsce, gdy atakujący zawodnik wejdzie do strefy ataku, zanim co?",
+    "options": [
+      "Linia środkowa",
+      "Krążek",
+      "Bramkarz",
+      "Sędzia"
+    ]
+  },
+  "rules_icing": {
+    "question": "Icing to wystrzelenie krążka zza linii środkowej poza linię bramkową przeciwnika bez kontaktu z piłką. PRAWDA?",
+    "options": [
+      "Fałsz – nigdy w NHL",
+      "PRAWDA",
+      "To prawda – tylko w godzinach nadliczbowych",
+      "Fałsz — tylko ze strefy obronnej"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Kto jest rekordzistą NHL pod względem większości bramek w karierze?",
+    "options": [
+      "Aleks Owieczkin",
+      "Jaromira Jagra",
+      "Gordiego Howe’a",
+      "Wayne’a Gretzky’ego"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin jest znany jako lewy skrzydłowy noszący numer 8, w którym mieście drużyny?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Waszyngton",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Czym jest hat-trick w hokeju?",
+    "options": [
+      "Trzy gole jednego zawodnika w jednym meczu",
+      "Trzy interwencje z rzędu",
+      "Trzy asysty w jednym meczu",
+      "Trzy kary"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Gra o władzę ma miejsce, gdy:",
+    "options": [
+      "Bramkarz jest pociągnięty",
+      "Wybucha bójka",
+      "Jedna drużyna ma więcej zawodników z powodu kary",
+      "Rozpoczyna się dogrywka"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Puchar Stanleya jest trofeum mistrzowskim której ligi?",
+    "options": [
+      "Mistrzostwa Świata IIHF",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Z czego wykonany jest standardowy krążek hokejowy?",
+    "options": [
+      "Wulkanizowana guma",
+      "Aluminium",
+      "Drewno",
+      "Plastikowy"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Ile minut wynosi standardowa kara mniejsza?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Ile minut wynosi standardowa kara większa?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Gra rozpoczyna się od:",
+    "options": [
+      "Rzut karny",
+      "Dogrywka",
+      "Przerwa w zasilaniu",
+      "Lodowe połączenie"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Jeśli po dogrywce w sezonie zasadniczym NHL zakończy się remisem, co się stanie?",
+    "options": [
+      "Druga nadgodzina",
+      "Strzelanina",
+      "Okres play-off",
+      "Stojaki do rysowania"
+    ]
+  },
+  "rules_crease": {
+    "question": "Czy napastnik może stać w polu bramkowym bez konsekwencji?",
+    "options": [
+      "Tak, zawsze",
+      "Tylko w play-offach",
+      "Nie – gol może zostać nieuznany",
+      "Tylko w ostatniej chwili"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Wysokie trzymanie ma miejsce wtedy, gdy kij uderza przeciwnika powyżej:",
+    "options": [
+      "Poprzeczka",
+      "Plecy",
+      "Talia",
+      "Tylko kask"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Ciągnięcie bramkarza wiąże się z ryzykiem:",
+    "options": [
+      "Rzut karny",
+      "Bramka przy pustej siatce przeciwko",
+      "Spalony",
+      "Tylko lukier"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Rzut karny jest często przyznawany za faul:",
+    "options": [
+      "W dowolnym momencie",
+      "Tylko nadgodziny",
+      "Tylko play-offy",
+      "Wyraźne oderwanie się"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Pomocnik rezerwowy serwowany jest przez dowolnego zawodnika z wyjątkiem:",
+    "options": [
+      "Bramkarz (zwykle)",
+      "Napastnik",
+      "Obrońca",
+      "Kapitan"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "Dogrywka w sezonie zasadniczym NHL rozgrywana jest z iloma zawodnikami na drużynę?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Ilu zawodników (łącznie z bramkarzem) może mieć drużyna na lodzie?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Ile punktów wart jest gol na tablicy wyników?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "W przypadku opóźnionej kary drużyna niezawiniająca często:",
+    "options": [
+      "Loduje krążek",
+      "Przekroczono limit czasu połączeń",
+      "Zatrzymuje grę",
+      "Ciągnie bramkarza"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Bramkarze mogą zagrywać krążek za siatką wyłącznie w następujących sytuacjach:",
+    "options": [
+      "Środkowe koło",
+      "Strefa neutralna",
+      "Pełna strefa",
+      "Powierzchnia trapezu"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Walka zazwyczaj kończy się:",
+    "options": [
+      "Główna kara",
+      "Tylko niewłaściwe zachowanie w grze",
+      "Drobna kara",
+      "Brak kary"
+    ]
+  },
+  "terms_puck": {
+    "question": "Przedmioty z twardej gumy, którymi strzelają gracze, nazywają się:",
+    "options": [
+      "Krążek do hokeja",
+      "Dysk",
+      "Kamień",
+      "Piłka"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Podanie podnoszące krążek nazywa się:",
+    "options": [
+      "Przejście spodka",
+      "Karnet na deskę",
+      "Zrzut klapsa",
+      "Przejście fałdowe"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Strzał z klapsa polega na:",
+    "options": [
+      "Tylko bekhend",
+      "Jedna ręka na kiju",
+      "Lekkie dotknięcie krążka",
+      "Na koniec i najpierw uderzamy w lód"
+    ]
+  },
+  "terms_deke": {
+    "question": "Deke to:",
+    "options": [
+      "Rodzaj kary",
+      "Fałszywy ruch mający na celu pokonanie obrońcy",
+      "Blok defensywny",
+      "Zmiana linii"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Ucieczka ma miejsce, gdy:",
+    "options": [
+      "Krążek jest oblodzony",
+      "Łyżwiarz wchodzi sam na bramkarza",
+      "Walczy dwóch graczy",
+      "Następuje zmiana linii"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Utwory plus/minus:",
+    "options": [
+      "Strzały na bramkę",
+      "Różnica bramek, gdy gracz jest na lodzie z równą siłą",
+      "Minuty karne",
+      "Tylko dogrywka wygrywa"
+    ]
+  },
+  "terms_assist": {
+    "question": "Główną asystę otrzymuje zawodnik, który:",
+    "options": [
+      "Zdobywa bramkę",
+      "Wygrał dogrywę",
+      "Ostatni dotknięty krążek przed strzelcem",
+      "Dostałem karę"
+    ]
+  },
+  "terms_block": {
+    "question": "Zablokowany strzał ma miejsce, gdy:",
+    "options": [
+      "Puck trafia w słupek",
+      "Gracz z pola zatrzymuje krążek ciałem/kijem przed bramką",
+      "Bramkarz broni",
+      "Strzał nie trafia w siatkę"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Kontrola wstępna oznacza:",
+    "options": [
+      "Tylko strategia zmiany linii",
+      "Broniąc swojej niebieskiej linii",
+      "Naciskanie na przeciwników w swojej strefie, aby odzyskali krążek",
+      "Ciągnięcie bramkarza"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Sprawdzanie wsteczne oznacza:",
+    "options": [
+      "Powrót na łyżwach, aby pomóc obronie",
+      "Strzelanie z punktu",
+      "Zwycięskie starcie",
+      "Ratunek bramkarza"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Jednorazówka to:",
+    "options": [
+      "Czekam, potem strzelam",
+      "Ruch bramkarza",
+      "Natychmiastowy strzał po podaniu",
+      "Kara"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Kontrola zaczepienia:",
+    "options": [
+      "Podnieś krążek nad kijem",
+      "Sprawdzać krzyżowo",
+      "Odbij krążek od przeciwnika",
+      "Zahacz przeciwnika"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Najwyższa półka oznacza punktację w:",
+    "options": [
+      "Górna część siatki",
+      "Tylko z centralnego lodu",
+      "Tylko w pustej sieci",
+      "Pięć dołków"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Pięć dołków znajduje się pomiędzy bramkarzami:",
+    "options": [
+      "Kij i rękawiczka",
+      "Maska i klatka piersiowa",
+      "Ramię i ciało",
+      "Nogi"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Egzekutor zapewnia:",
+    "options": [
+      "Coaching",
+      "Zdobywanie bramek",
+      "Ochrona fizyczna i walka",
+      "Tylko wznowienia"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Zmiany linii zwykle mają miejsce:",
+    "options": [
+      "Dopiero po bramkach",
+      "Tylko w sprawie kar",
+      "Tylko w przerwie",
+      "W locie podczas gry"
+    ]
+  },
+  "terms_rink": {
+    "question": "Nawierzchnia do gry w hokeja nazywa się:",
+    "options": [
+      "Pole",
+      "Sąd",
+      "Ścieżka",
+      "Lodowisko"
+    ]
+  },
+  "terms_goal": {
+    "question": "Strzał, do którego strzelają gracze sieciowi, nazywa się:",
+    "options": [
+      "Cel",
+      "Koszyk",
+      "Bramka",
+      "Strefa"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Gra short-handed oznacza:",
+    "options": [
+      "Nadgodziny",
+      "Bramkarz pociągnął",
+      "Mniej łyżwiarzy ze względu na karę",
+      "Pusta sieć"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Nadgodziny związane z nagłą śmiercią oznaczają:",
+    "options": [
+      "Pierwszy gol wygrywa",
+      "Pełny okres",
+      "Tylko strzelanina",
+      "Żadnego zwycięzcy"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Ile drużyn w erze NHL Original Six?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Współczesny hokej na lodzie najbardziej rozwinął się w:",
+    "options": [
+      "Rosja",
+      "Szwecja",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Cud na lodzie: USA pokonały kogo w 1980 roku?",
+    "options": [
+      "Związek Radziecki",
+      "Kanada",
+      "Czechosłowacja",
+      "Szwecja"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Rekord punktacji w karierze Wayne’a Gretzky’ego dobiegł końca:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Galeria sław hokeja mieści się w:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "Nowy Jork"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL opiera się głównie na:",
+    "options": [
+      "Rosja",
+      "Finlandia",
+      "USA",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "Seria szczytów z 1972 r.: Kanada kontra:",
+    "options": [
+      "ZSRR",
+      "USA",
+      "Czechy",
+      "Szwecja"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL powstała w:",
+    "options": [
+      "XX wiek",
+      "XXI wiek",
+      "XIX wiek",
+      "XVIII wiek"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby został wybrany w drafcie jako pierwszy w:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid został wybrany w drafcie jako pierwszy w:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Puchar Stanleya został po raz pierwszy przyznany w:",
+    "options": [
+      "XX wiek",
+      "XXI wiek",
+      "XVIII wiek",
+      "XIX wiek"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr plasuje się wśród liderów wszechczasów NHL w:",
+    "options": [
+      "Zwrotnica",
+      "Coaching",
+      "Tylko minuty karne",
+      "Bramkarz wygrywa"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin swoją karierę w NHL spędził głównie w:",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Pingwiny z Pittsburgha",
+      "Stolice Waszyngtonu",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux zdobył Puchar Stanleya z:",
+    "options": [
+      "Pingwiny z Pittsburgha",
+      "Kanadyjczycy z Montrealu",
+      "Detroit Red Wings",
+      "Edmonton Oilers"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Jak długo trwa lodowisko NHL?",
+    "options": [
+      "200 stóp",
+      "150 stóp",
+      "300 stóp",
+      "250 stóp"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Jak szerokie jest lodowisko NHL?",
+    "options": [
+      "100 stóp",
+      "150 stóp",
+      "120 stóp",
+      "85 stóp"
+    ]
+  },
+  "gen_zones": {
+    "question": "Na ile stref dzielą niebieskie linie lodowisko?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Środkowa czerwona linia służy do:",
+    "options": [
+      "Lukierowe rozmowy",
+      "Pole karne",
+      "Tylko wznowienia",
+      "Spalony w środku"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Krzywa ostrza kija pomaga w:",
+    "options": [
+      "Prędkość jazdy na łyżwach",
+      "Bramkarz ratuje",
+      "Podnoszenie i kontrolowanie krążka",
+      "Walczący"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate Hollow wpływa na:",
+    "options": [
+      "Gięcie kija",
+      "Przyczepność na lodzie i w zakrętach",
+      "Dopasowany kask",
+      "Rozmiar koszulki"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Ochraniacze goleni chronią:",
+    "options": [
+      "Plecy",
+      "Głowa",
+      "Dolne nogi",
+      "Tylko ręce"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kapitan nosi literę:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Alternatywni kapitanowie noszą:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Zespół gospodarzy zazwyczaj nosi:",
+    "options": [
+      "Ciemny/kolorowy",
+      "Biały/jasny",
+      "Żadnych dresów",
+      "Tylko bramkarz"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Przerwa pomiędzy okresami wynosi około:",
+    "options": [
+      "5 minut",
+      "30 minut",
+      "15-18 minut",
+      "1 godzina"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "Seria play-offów NHL to głównie:",
+    "options": [
+      "Zawsze najlepiej na 5",
+      "Tylko finał",
+      "Rzadkie wyjątki — głównie najlepsze z 7",
+      "Nigdy"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zamboni służy do:",
+    "options": [
+      "Zmierz prędkość",
+      "Przechowuj krążki",
+      "Naostrz łyżwy",
+      "Wynurz lód na powierzchnię"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Sędziowie na lodzie noszą:",
+    "options": [
+      "Koszulki drużynowe",
+      "Sprzęt bramkarza",
+      "Czarno-białe paski",
+      "Garnitury"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hokeiści kontynuują:",
+    "options": [
+      "Wrotki",
+      "Łyżwy",
+      "Bose stopy",
+      "Narty"
+    ]
+  },
+  "gen_stick": {
+    "question": "Gracze kontrolują krążek za pomocą:",
+    "options": [
+      "Stick",
+      "Internet",
+      "Tylko ręce",
+      "Kask"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Z jakim zespołem Sidney Crosby jest najbardziej kojarzony?",
+    "options": [
+      "Pingwiny z Pittsburgha",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Na jakiej pozycji głównie grał Sidney Crosby?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Centrum"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Z jakim zespołem Connor McDavid jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Na jakiej pozycji głównie grał Connor McDavid?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Z jakim zespołem Nathan MacKinnon jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Lawina Kolorado",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Na jakiej pozycji głównie grał Nathan MacKinnon?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Victor Hedman?",
+    "options": [
+      "Liście klonu Toronto",
+      "Błyskawica w Zatoce Tampa",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Na jakiej pozycji głównie grał Victor Hedman?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Z jakim zespołem Carey Price jest najbardziej kojarzony?",
+    "options": [
+      "Kanadyjczycy z Montrealu",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Na jakiej pozycji głównie grał Carey Price?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Z jakim zespołem Jaromir Jagr jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto",
+      "Pingwiny z Pittsburgha"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Na jakiej pozycji głównie grał Jaromir Jagr?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Centrum",
+      "Bramkarz",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Z jakim zespołem Mario Lemieux jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Pingwiny z Pittsburgha",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Na jakiej pozycji głównie grał Mario Lemieux?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Z jakim zespołem Patrick Kane jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Chicago Blackhawks",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Na jakiej pozycji głównie grał Patrick Kane?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Nicklas Lidstrom?",
+    "options": [
+      "Detroit Red Wings",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Na jakiej pozycji głównie grał Nicklas Lidstrom?",
+    "options": [
+      "Centrum",
+      "Bramkarz",
+      "Lewy skrzydłowy",
+      "Obrońca"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Z jakim zespołem Martin Brodeur jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Diabły z New Jersey"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Na jakiej pozycji głównie grał Martin Brodeur?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Bramkarz",
+      "Obrońca"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Z jakim zespołem Steven Stamkos jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Błyskawica w Zatoce Tampa",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Na jakiej pozycji głównie grał Steven Stamkos?",
+    "options": [
+      "Centrum",
+      "Obrońca",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Z jakim zespołem Auston Matthews jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Kanadyjczycy z Montrealu"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Na jakiej pozycji grał głównie Auston Matthews?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Z jakim zespołem Leon Draisaitl jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Na jakiej pozycji głównie grał Leon Draisaitl?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Obrońca"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Erik Karlsson?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Rekiny z San Jose",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Na jakiej pozycji głównie grał Erik Karlsson?",
+    "options": [
+      "Centrum",
+      "Bramkarz",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Z jakim zespołem Pavel Datsyuk jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Detroit Red Wings",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Na jakiej pozycji grał przede wszystkim Pavel Datsyuk?",
+    "options": [
+      "Centrum",
+      "Obrońca",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Z jakim zespołem Henrik Lundqvist jest najbardziej kojarzony?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Kanadyjczycy z Montrealu"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Na jakiej pozycji głównie grał Henrik Lundqvist?",
+    "options": [
+      "Obrońca",
+      "Prawy skrzydłowy",
+      "Centrum",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Evgeni Malkin?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Pingwiny z Pittsburgha"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Na jakiej pozycji grał przede wszystkim Evgeni Malkin?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Obrońca"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Z jakim zespołem Artemi Panarin jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Kanadyjczycy z Montrealu",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Na jakiej pozycji głównie grał Artemi Panarin?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Nikita Kucherov?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Błyskawica w Zatoce Tampa",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Na jakiej pozycji grał przede wszystkim Nikita Kucherov?",
+    "options": [
+      "Centrum",
+      "Bramkarz",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Z jakim zespołem Brad Marchand jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto",
+      "Kanadyjczycy z Montrealu"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Na jakiej pozycji głównie grał Brad Marchand?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Z jakim zespołem David Pastrnak jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Na jakiej pozycji głównie grał David Pastrnak?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Bramkarz",
+      "Centrum",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Z jakim zespołem Shea Weber jest najbardziej kojarzona?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Na jakiej pozycji grała głównie Shea Weber?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Bramkarz",
+      "Obrońca",
+      "Centrum"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Siergiej Bobrowski?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Pantery z Florydy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Na jakiej pozycji grał przede wszystkim Siergiej Bobrowski?",
+    "options": [
+      "Obrońca",
+      "Prawy skrzydłowy",
+      "Bramkarz",
+      "Centrum"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Z jakim zespołem Jonathan Toews jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Na jakiej pozycji głównie grał Jonathan Toews?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Obrońca"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Anze Kopitar?",
+    "options": [
+      "Królowie z Los Angeles",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Na jakiej pozycji głównie grał Anze Kopitar?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Obrońca",
+      "Prawy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Z jakim zespołem Mark Messier jest najbardziej kojarzony?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Edmonton Oilers",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Na jakiej pozycji głównie grał Mark Messier?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Z jakim zespołem Ray Bourque jest najbardziej kojarzony?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Na jakiej pozycji głównie grał Ray Bourque?",
+    "options": [
+      "Bramkarz",
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Z jakim zespołem Dominik Hasek jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Szable Buffalo"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Na jakiej pozycji grał przede wszystkim Dominik Hasek?",
+    "options": [
+      "Bramkarz",
+      "Centrum",
+      "Obrońca",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Z jakim zespołem Teemu Selanne jest najbardziej kojarzony?",
+    "options": [
+      "Kaczki Anaheim",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Na jakiej pozycji grał głównie Teemu Selanne?",
+    "options": [
+      "Centrum",
+      "Bramkarz",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Z jakim zespołem Pavel Bure jest najbardziej kojarzony?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Vancouver Canucks",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Na jakiej pozycji grał przede wszystkim Pavel Bure?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Bramkarz",
+      "Centrum",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Z jakim zespołem Aleksander Mogilny jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Szable Buffalo"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Na jakiej pozycji grał przede wszystkim Aleksander Mogilny?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Peter Forsberg?",
+    "options": [
+      "Lawina Kolorado",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Na jakiej pozycji głównie grał Peter Forsberg?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Joe Sakic?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Lawina Kolorado",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Na jakiej pozycji grał głównie Joe Sakic?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Z jakim zespołem Steve Yzerman jest najbardziej kojarzony?",
+    "options": [
+      "Detroit Red Wings",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Na jakiej pozycji głównie grał Steve Yzerman?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Centrum"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Z jakim zespołem Bobby Orr jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Na jakiej pozycji grał głównie Bobby Orr?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Z jakim zespołem Gordie Howe jest najbardziej kojarzony?",
+    "options": [
+      "Detroit Red Wings",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Na jakiej pozycji głównie grał Gordie Howe?",
+    "options": [
+      "Bramkarz",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Z jakim zespołem Wayne Gretzky jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Edmonton Oilers",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Na jakiej pozycji głównie grał Wayne Gretzky?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Valeri Kharlamov?",
+    "options": [
+      "CSKA Moskwa",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Na jakiej pozycji grał przede wszystkim Walerij Kharlamov?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Centrum",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Z jakim zespołem Władysław Tretiak jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "CSKA Moskwa"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Na jakiej pozycji grał przede wszystkim Władysław Tretiak?",
+    "options": [
+      "Bramkarz",
+      "Obrońca",
+      "Centrum",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Z jakim zespołem Bobby Hull jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Chicago Blackhawks",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Na jakiej pozycji grał głównie Bobby Hull?",
+    "options": [
+      "Obrońca",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Z jakim zespołem Maurice Richard jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Na jakiej pozycji grał głównie Maurice Richard?",
+    "options": [
+      "Bramkarz",
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Guy Lafleur?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Kanadyjczycy z Montrealu"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Na jakiej pozycji głównie grał Guy Lafleur?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Z jakim zespołem Patrick Roy jest najbardziej kojarzony?",
+    "options": [
+      "Kanadyjczycy z Montrealu",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Na jakiej pozycji głównie grał Patrick Roy?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Roberto Luongo?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Vancouver Canucks",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Na jakiej pozycji głównie grał Roberto Luongo?",
+    "options": [
+      "Bramkarz",
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Z jakim zespołem Ilja Kowalczuk jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Diabły z New Jersey",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Na jakiej pozycji grał przede wszystkim Ilja Kowalczuk?",
+    "options": [
+      "Obrońca",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Z jakim zespołem Pavel Bure jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Pantery z Florydy"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Na jakiej pozycji grał przede wszystkim Pavel Bure?",
+    "options": [
+      "Prawy skrzydłowy",
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Z jakim zespołem Aleksiej Kowaliow jest najbardziej kojarzony?",
+    "options": [
+      "Kanadyjczycy z Montrealu",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Na jakiej pozycji grał przede wszystkim Aleksiej Kowalow?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Bramkarz",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Siergiej Gonczar?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Pingwiny z Pittsburgha",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Na jakiej pozycji głównie grał Siergiej Gonczar?",
+    "options": [
+      "Obrońca",
+      "Lewy skrzydłowy",
+      "Bramkarz",
+      "Centrum"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Z jakim zespołem jest najbardziej kojarzony Wiaczesław Fetisow?",
+    "options": [
+      "Diabły z New Jersey",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Na jakiej pozycji grał przede wszystkim Wiaczesław Fetisow?",
+    "options": [
+      "Bramkarz",
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Z jakim zespołem Chris Chelios jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Detroit Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Na jakiej pozycji głównie grał Chris Chelios?",
+    "options": [
+      "Obrońca",
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Z jakim zespołem Scott Stevens jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Strażnicy Nowego Jorku",
+      "Diabły z New Jersey",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Na jakiej pozycji głównie grał Scott Stevens?",
+    "options": [
+      "Obrońca",
+      "Bramkarz",
+      "Lewy skrzydłowy",
+      "Centrum"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Z jakim zespołem Paul Coffey jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Edmonton Oilers",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Na jakiej pozycji głównie grał Paul Coffey?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Bramkarz",
+      "Centrum",
+      "Obrońca"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Z jakim zespołem Grant Fuhr jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Strażnicy Nowego Jorku",
+      "Liście klonu Toronto",
+      "Edmonton Oilers"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Na jakiej pozycji grał głównie Grant Fuhr?",
+    "options": [
+      "Centrum",
+      "Obrońca",
+      "Bramkarz",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Z jakim zespołem Mike Bossy jest najbardziej kojarzony?",
+    "options": [
+      "Mieszkańcy wysp Nowego Jorku",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Na jakiej pozycji grał głównie Mike Bossy?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Bramkarz",
+      "Centrum"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Z jakim zespołem Bryan Trottier jest najbardziej kojarzony?",
+    "options": [
+      "Liście klonu Toronto",
+      "Mieszkańcy wysp Nowego Jorku",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Na jakiej pozycji głównie grał Bryan Trottier?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Z jakim zespołem Denis Potvin jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Mieszkańcy wysp Nowego Jorku",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Na jakiej pozycji głównie grał Denis Potvin?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Bramkarz",
+      "Centrum",
+      "Obrońca"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Z jakim zespołem Cam Neely jest najbardziej kojarzony?",
+    "options": [
+      "Strażnicy Nowego Jorku",
+      "Kanadyjczycy z Montrealu",
+      "Liście klonu Toronto",
+      "Bostońskie Bruinsy"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Na jakiej pozycji głównie grał Cam Neely?",
+    "options": [
+      "Centrum",
+      "Lewy skrzydłowy",
+      "Prawy skrzydłowy",
+      "Bramkarz"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Z jakim zespołem Adam Oates jest najbardziej kojarzony?",
+    "options": [
+      "Stolice Waszyngtonu",
+      "Strażnicy Nowego Jorku",
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Na jakiej pozycji głównie grał Adam Oates?",
+    "options": [
+      "Lewy skrzydłowy",
+      "Centrum",
+      "Obrońca",
+      "Prawy skrzydłowy"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Z jakim zespołem Doug Gilmour jest najbardziej kojarzony?",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Liście klonu Toronto",
+      "Kanadyjczycy z Montrealu",
+      "Strażnicy Nowego Jorku"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Na jakiej pozycji grał głównie Doug Gilmour?",
+    "options": [
+      "Centrum",
+      "Prawy skrzydłowy",
+      "Obrońca",
+      "Lewy skrzydłowy"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Co oznacza KHL?",
+    "options": [
+      "Kontynentalna Liga Hokejowa",
+      "Kazachska Liga Hokejowa",
+      "Koreańska Liga Hokejowa",
+      "Królewska Liga Hokejowa"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF organizuje:",
+    "options": [
+      "play-offy KHL",
+      "Projekt NHL",
+      "Puchar Stanleya",
+      "Mistrzostwa Świata"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Hokej olimpijski rozgrywany jest na:",
+    "options": [
+      "Lód",
+      "Piasek",
+      "Trawa",
+      "Beton"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Który kraj zdobył wiele tytułów mistrza świata z gwiazdami epoki Jagra i Haška?",
+    "options": [
+      "Finlandia",
+      "Czechy",
+      "Kanada",
+      "USA"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Wiele gwiazd NHL pochodzi z:",
+    "options": [
+      "Hiszpania",
+      "Brazylia",
+      "Szwecja",
+      "Indie"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Finlandia znana jest z produkcji świetnych:",
+    "options": [
+      "Bramkarze",
+      "Tylko trenerzy",
+      "Kierowcy Zamboniego",
+      "Sędziowie"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Radziecka „Czerwona Maszyna” dominowała w:",
+    "options": [
+      "Lata 70-te i 80-te",
+      "Lata 2000",
+      "Lata 2010",
+      "Tylko lata 90"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "Zespoły NHL wybierają nowych graczy na:",
+    "options": [
+      "Termin handlu",
+      "Mecz Gwiazd",
+      "Puchar Świata",
+      "Projekt wpisu"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Przyznawane są trzy gwiazdki w grze:",
+    "options": [
+      "Raz na sezon",
+      "Tylko w play-offach",
+      "Nigdy w NHL",
+      "Po każdej grze"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Hokej kobiet jest dyscypliną olimpijską, ponieważ:",
+    "options": [
+      "1998",
+      "Nigdy",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Przy równej sile, ilu zawodników ma każda drużyna (bez bramkarzy)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Ile minut trwa jedna runda NHL?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Twoja drużyna gra w przewadze, gdy przeciwnik:",
+    "options": [
+      "Krążek lodowy",
+      "Ciągnięcie bramkarza",
+      "Skrót od kary",
+      "Zwycięskie starcie"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Zabicie karne oznacza:",
+    "options": [
+      "Nadgodziny",
+      "Obrona w niewielkiej liczbie rąk",
+      "Dodatkowy napastnik",
+      "Walka bramkarza"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "W hokeja zawodowego gra się na:",
+    "options": [
+      "Brud",
+      "Trawa",
+      "Lód",
+      "Woda"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Trofeum mistrzostw NHL to:",
+    "options": [
+      "Puchar Świata",
+      "Puchar Olimpijski",
+      "Puchar Stanleya",
+      "Puchar Gretzky’ego"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard zdobył najwięcej Pucharów Stanleya jako zawodnik:",
+    "options": [
+      "Bostońskie Bruinsy",
+      "Kanadyjczycy z Montrealu",
+      "Liście klonu Toronto",
+      "Detroit Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Słynny numer na koszulce Wayne'a Gretzky'ego brzmiał:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux nosił numer:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby nosi numer:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid nosi numer:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Ile drużyn jest w NHL (w przybliżeniu)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Ile drużyn jest w NHL (w przybliżeniu)? (zaawansowany)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Ilu graczy jest ubranych na standardowej ławce hokejowej?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Ilu graczy jest ubranych na standardowej ławce hokejowej? (zaawansowany)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Regulaminowy czas w NHL to ile minut?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Regulaminowy czas w NHL to ile minut? (zaawansowany)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Ilu sędziów zazwyczaj przebywa na lodzie w NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Ilu sędziów zazwyczaj przebywa na lodzie w NHL? (zaawansowany)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Maksymalna liczba graczy w składzie (w przybliżeniu)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Maksymalna liczba graczy w składzie (w przybliżeniu)? (zaawansowany)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Głównym zadaniem obrońcy w strefie obronnej jest:",
+    "options": [
+      "Wygraj wznowienia",
+      "Najpierw strzelaj gole",
+      "Chroń siatkę i szczelinę",
+      "Szybko zmieniaj linie"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "W obronie jeden na jednego obrońca powinien:",
+    "options": [
+      "Natychmiast wskocz na ławkę",
+      "Pozostań pomiędzy atakującym a siatką",
+      "Pozostaw szczelinę otwartą",
+      "Goń tylko za siatką"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Postawa defensywna: kij na lodzie pomaga:",
+    "options": [
+      "Przekroczono limit czasu sygnału",
+      "Unikaj uderzania krążka",
+      "Blokuj mijane pasy",
+      "Członkowie drużyny podróży"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Kiedy krążek zostanie utracony w ataku, obrońca powinien:",
+    "options": [
+      "Pociągnij bramkarza",
+      "Odjedź do tyłu, aby pomóc obronie",
+      "Trzymaj się czerwonej linii",
+      "Kłóć się z sędzią"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Obrońca powinien blokować strzały, gdy:",
+    "options": [
+      "Puck znajduje się wyłącznie w strefie neutralnej",
+      "Rozpoczyna się przerwa",
+      "Droga do siatki jest otwarta",
+      "Zespół gra w przewadze"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "W meczu 2 na 1 obrońca zazwyczaj powinien:",
+    "options": [
+      "Obaj pozostają na niebieskiej linii",
+      "Obaj razem pędzą do posiadacza krążka",
+      "Weź nośnik krążka i ustaw go szeroko",
+      "Jedź na ławkę"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "W przypadku zabójstwa karnego priorytetem jest często:",
+    "options": [
+      "Jeździj na łyżwach z krążkiem na środku",
+      "Najpierw zmieniaj linie w locie",
+      "Trzymaj krążek w kącie na zawsze",
+      "Usuń krążek ze strefy"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Dobra kontrola nad luką oznacza, że ​​obrońca:",
+    "options": [
+      "Nigdy nie tworzy kopii zapasowej",
+      "Tylko uderzenia od tyłu",
+      "Dopasowuje prędkość i dystans do atakującego",
+      "Zawsze pozostaje na środku lodu"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Przed siatką obrońca musi:",
+    "options": [
+      "Przejdź do rzeczy",
+      "Poproś o spalonego",
+      "Obserwuj tylko krążek i ignoruj ​​graczy",
+      "Box out i związać przeciwników"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Pod presją kontroli wstępnej obrońca powinien jako pierwszy spojrzeć:",
+    "options": [
+      "Strzelaj do własnej siatki",
+      "Najpierw przejdź do niskiego wsparcia lub bezpiecznego wylotu",
+      "Zawsze przechodź przez środek pod ciśnieniem",
+      "Obrysuj deski na ślepo"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "W momencie gry w przewadze obrońca powinien:",
+    "options": [
+      "Wróć do strefy neutralnej",
+      "Zmiana z bramkarzem",
+      "Utrzymuj krążek w strefie i twórz strzały/podania",
+      "Nigdy nie strzelaj"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Legalna gra obronna w pośpiechu to:",
+    "options": [
+      "Legalne wędkowanie i kij po stronie krążka",
+      "Zahacz i pociągnij przeciwnika w dół",
+      "Stick check od tyłu podczas ucieczki",
+      "Sprawdź krzyżowo w głowie"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Zawodowi obrońcy blokują strzały, ponieważ:",
+    "options": [
+      "Liczy się to jako asysta",
+      "Nigdy nie blokuj strzałów",
+      "Blokuj strzały i poświęcaj ciało, jeśli zajdzie taka potrzeba",
+      "Sędzia przerywa grę"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Kiedy dwóch atakujących przekroczy Twoją strefę, obrońcy powinni:",
+    "options": [
+      "Obaj gonią tylko za krążkiem",
+      "Zostaw zagięcie",
+      "Komunikuj się i zmieniaj w razie potrzeby",
+      "Zignoruj ​​atakującego z drugiej strony"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Kiedy przeciwnik wrzuca krążek do środka, obrońca powinien:",
+    "options": [
+      "Odzyskaj krążek lub przypnij go do desek",
+      "Wjedź na ławkę dla odmiany",
+      "Poczekaj na gwizdek",
+      "Strzelaj z czerwonej linii"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "W akcji 3 na 2 tylny obrońca powinien zazwyczaj:",
+    "options": [
+      "Pokrycie słabej strony zagrożenia (tylnymi drzwiami).",
+      "Jedź do czerwonej linii",
+      "Zmień linie",
+      "Za każdym razem agresywnie szczypnij"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Obrońca może uszczypnąć niebieską linię ataku, gdy:",
+    "options": [
+      "Zespół ma niedobór personelu",
+      "Bramkarz jest pociągnięty",
+      "Osłony partnerów i krążek można odzyskać na tablicach",
+      "Zawsze na pierwszej zmianie"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Jeśli w pośpiechu zostanie pobity szeroko, obrońca powinien:",
+    "options": [
+      "Jedź na ławkę",
+      "Zatrzymaj się i pokłóć z sędzią",
+      "Odwróć się i goń ​​środkiem do siatki",
+      "Hak od tyłu"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "W pokryciu strefy defensywnej, niski obrońca kontra wysoki obrońca oznacza:",
+    "options": [
+      "Obydwa w punkcie",
+      "Obaj w strefie neutralnej",
+      "Obydwa w załamaniu",
+      "Niski poziom krążka, wysoka osłona szczeliny i tylne drzwi"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Kluczem jest:",
+    "options": [
+      "Za każdym razem przyjmuj karę",
+      "Opóźnij i wymuś zły kąt lub podanie",
+      "Zawsze nurkuj, aby zablokować",
+      "Zostaw grę bramkarzowi w spokoju"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "W przypadku zabójstwa karnego w przypadku jednorazowego zabójstwa z flanki obrońca powinien:",
+    "options": [
+      "Stań w zagłębieniu bramkarza",
+      "Przejdź do środka, aby dokonać zmiany",
+      "Zabierz pas przejścia do szczeliny",
+      "Naciśnij bramkarza"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Dlaczego ślepa krawędź wokół desek jest często zła?",
+    "options": [
+      "Daje przeciwnikom darmowe aportowanie",
+      "Zawsze jest na spalonym",
+      "Zawsze powoduje oblodzenie",
+      "Sędzia daje karę"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Po zwycięstwie w wznowieniu w strefie obrony obrońcy powinni:",
+    "options": [
+      "Poczekaj pięć sekund",
+      "Przeczytaj kontrolę wstępną i skorzystaj z szybkiego pierwszego przejścia",
+      "Zawsze strzelaj najpierw z punktu",
+      "Podjedź krążkiem do czerwonej linii"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Broniąc jednobramkowego prowadzenia w końcówce, obrońcy powinni:",
+    "options": [
+      "Zawsze strzelaj ze środka",
+      "Za każdym razem ściskaj niebieską linię",
+      "Zarządzaj krążkiem bezpiecznie i unikaj niepotrzebnego ryzyka",
+      "Zawsze ciągnij bramkarza wcześniej"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Człowiek na człowieka w slocie oznacza:",
+    "options": [
+      "Ignoruj ​​niestosowne groźby",
+      "Goń tylko za krążkiem",
+      "Kontrola szczelin",
+      "Relacja „człowiek na człowieka” na nośniku krążka"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Na niebieskiej linii ataku obrońca trzymający linię próbuje:",
+    "options": [
+      "Zmień z do przodu",
+      "Trzymaj niebieską linię i trzymaj krążek w strefie",
+      "Wróć do strefy neutralnej",
+      "Zawsze powoduj spalony celowo"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Po obronie z odbiciem w gnieździe obrońca musi:",
+    "options": [
+      "Świętuj z bramkarzem",
+      "Strzelaj do pustej siatki",
+      "Jedź na ławkę",
+      "Usuń odbicie lub zwiąż napastnika"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Po uwolnieniu (bez kontaktu) w strefie obronnej, po wznowieniu:",
+    "options": [
+      "Zawsze otaczaj krążek",
+      "Weź drobną karę",
+      "Ustaw strukturę i wygraj czyste wyjście",
+      "Pociągnij bramkarza"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "W przypadku agresywnej kontroli wstępnej przejście rozciągające służy do:",
+    "options": [
+      "Zawsze przestawaj grać ze względu na spalonego",
+      "Tylko marnować czas",
+      "Gwarancja lukieru",
+      "Pokonaj kontrolę przednią długim podaniem"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Zamknięcie toru strzeleckiego oznacza:",
+    "options": [
+      "Umieszczenie ciała/kija na drodze strzału",
+      "Macha kijem tylko w powietrzu",
+      "Jazda na łyżwach do czerwonej linii",
+      "Stojąc za siatką"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Kiedy Twój partner uszczypnie, musisz:",
+    "options": [
+      "Jedź na ławkę",
+      "Zostaw strefę otwartą",
+      "Natychmiast również uszczypnij",
+      "Kryj się wysoko jako ostatni obrońca"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Opuszczając ławkę kar, obrońca powinien:",
+    "options": [
+      "Dopasuj grę i unikaj przyłapania na płasko",
+      "Ignoruj ​​pośpiech",
+      "Zawsze zmieniaj natychmiast",
+      "Wjedź prosto do siatki przeciwnika"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Przy pustej siatce przeciwko obrońcy w ostatniej minucie powinni:",
+    "options": [
+      "Wszystko sprawdzane głęboko",
+      "Zawsze ciągnij też własnego bramkarza",
+      "Blokuj strzały i chroń środek",
+      "Nigdy nie usuwaj krążka"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Jeżeli nie możesz dodzwonić się do przewoźnika krążków, powinieneś:",
+    "options": [
+      "Poddaj się i zmień",
+      "Opuść szczelinę",
+      "Zabierz czas i przestrzeń dzięki dobremu pozycjonowaniu",
+      "Hak od tyłu"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Broniąc wejścia do strefy kontrolowanej, broniący się powinien:",
+    "options": [
+      "Jedź tyłem do ławki",
+      "Wstań wcześnie na linii lub w przerwie",
+      "Zawsze cofaj się do zagięcia",
+      "Nigdy nie dotykaj atakującego"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "W strefie obrony podanie ręką obrońcy do współpartnera oznacza:",
+    "options": [
+      "Dozwolone, jeśli ukończono w tej samej strefie",
+      "Zawsze lukier",
+      "Zawsze na spalonym",
+      "Zawsze rzut karny"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Kiedy członek drużyny ma krążek, napastnik powinien:",
+    "options": [
+      "Zawsze jedź samotnie do czerwonej linii",
+      "Zignoruj ​​​​zmianę krążka na linii",
+      "Idź na otwarty lód po przepustkę",
+      "Stań nieruchomo przy niebieskiej linii"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Skrzydłowy po strzale blisko siatki powinien:",
+    "options": [
+      "Jedź na ławkę",
+      "Przejdź do siatki, aby uzyskać zbiórki i wskazówki",
+      "Obserwuj tylko z punktu",
+      "Poczekaj na środkowym lodzie"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "W przypadku utraty posiadania piłki napastnicy muszą:",
+    "options": [
+      "Zmień się natychmiast po wyjściu z lodu",
+      "Kłóć się z sędzią",
+      "Pozostań w strefie ataku",
+      "Sprawdzaj i pomagaj w defensywie"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "W pośpiechu „trzymanie głowy” krążka oznacza:",
+    "options": [
+      "Zawsze zrzucaj go wysoko ze szklanki",
+      "Zatrzymaj się na czerwonej linii",
+      "Głowa-man krążek (podanie do przodu)",
+      "Jedź tyłem tylko do własnej ławki"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Umieszczenie krążka nisko w strefie ataku pomaga:",
+    "options": [
+      "Gwarancja lukieru",
+      "Zawsze wymuszaj spalonego",
+      "Stwórz przestrzeń na strzał lub podanie",
+      "Tylko marnować czas"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Podczas wznowienia zadaniem centrum jest często:",
+    "options": [
+      "Cała trójka napastników głęboko w rogu",
+      "Opuść krąg wcześniej",
+      "Strzelaj natychmiast od kropki",
+      "Wygraj losowanie o miejsce dla skrzydłowego lub D-mana"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "Podczas kontroli wstępnej 2-1-2 F1 i F2 zazwyczaj:",
+    "options": [
+      "Obaj gonią wyłącznie za siatką",
+      "Obaj zmieniają linie",
+      "F1 naciska, F2 zabiera pas podań",
+      "Obaj stoją na czerwonej linii"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Podczas gry w przewadze napastnik atakujący siatkę powinien:",
+    "options": [
+      "Przejdź do strefy neutralnej",
+      "Obejmij punkt przy karnym zabójstwie",
+      "Przejmij kontrolę nad siatką w grze w przewadze",
+      "Nigdy nie dotykaj krążka"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "W akcji 3 na 2 trzeci napastnik powinien:",
+    "options": [
+      "Jedź na ławkę",
+      "Stań w załamaniu",
+      "Utrzymuj się na haju jako trzeci człowiek w pośpiechu",
+      "Goń krążek głęboko bez wsparcia"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "W pośpiechu szybki skrzydłowy często powinien:",
+    "options": [
+      "Za każdym razem zatrzymuj się na niebieskiej linii",
+      "Podaj tyłem do bramkarza",
+      "Skrzydłowy uderza szeroko z dużą szybkością w pośpiechu",
+      "Zawsze jedź środkiem"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Kluczową rolą napastnika w grze w przewadze jest:",
+    "options": [
+      "Zostaw wolne miejsce w obronie",
+      "Zawsze tylko celny strzał",
+      "Nigdy nie wchodź do sieci",
+      "Monitoruj bramkarza na PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Podczas rzutu karnego napastnik często obejmuje:",
+    "options": [
+      "Obejmij punkt przy karnym zabójstwie",
+      "Sędzia",
+      "Przejmij kontrolę nad siatką w grze w przewadze",
+      "Kierowca Zamboni"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Aby uniknąć spalonego na niebieskiej linii, napastnik może:",
+    "options": [
+      "Wjedź tyłem do strefy",
+      "Przeskocz niebieską linię",
+      "Pozostań na zewnątrz, opóźniając wejście do strefy",
+      "Zawsze wchodź do strefy przed krążkiem"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Konfigurowanie jednorazowego timera zwykle wymaga:",
+    "options": [
+      "Konfiguracja jednorazowa: podanie do otwartego strzelca",
+      "Obejdź krążek bez patrzenia",
+      "Zawsze odmawiaj przy rzucie karnym",
+      "Rzuć i goń ​​bez wcześniejszego sprawdzania planu"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Po rzucie punktowym w grze w przewadze napastnicy powinni:",
+    "options": [
+      "Wszystkie linie zmieniają się na raz",
+      "Pomachaj do tłumu",
+      "Rozbij siatkę po strzale z punktu",
+      "Przejdź do strefy neutralnej"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "W strukturze strefy ofensywnej środek często:",
+    "options": [
+      "Nigdy nie wchodzi do slotu",
+      "Cała trójka napastników głęboko w rogu",
+      "Centrum podtrzymuje nisko, skrzydło pozostaje wysokie",
+      "Dotyczy tylko tematu"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "W przypadku wybicia wsparcie do przodu po słabej stronie oznacza:",
+    "options": [
+      "Wsparcie ze strony słabej przy wyjściu ze strefy D",
+      "Stój nieruchomo na czerwonej linii",
+      "Strzelaj do własnej siatki",
+      "Wjedź na ławkę przeciwnika, aby się zmienić"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Bramkarz powinien zawsze starać się:",
+    "options": [
+      "Śledź krążek w ruchu ulicznym",
+      "Stań na czerwonej linii",
+      "Obserwuj tylko oczy strzelca",
+      "Opuść siatkę w celu zmiany linii"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Gdy krążek jest luźny w polu bramkowym, bramkarz powinien:",
+    "options": [
+      "Zamroź krążek, aby zatrzymać grę",
+      "Strzelaj do pustej siatki",
+      "Wjedź na środek lodu i świętuj",
+      "Podaj do sędziego"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Po obronie idealna kontrola odbicia to:",
+    "options": [
+      "Kontrola odbicia do bezpiecznego obszaru",
+      "Zawsze odbijaj się do szczeliny",
+      "Zawsze odbijaj się od szyby",
+      "Ignoruj ​​odbicie"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "W przypadku ataków nieparzystych bramkarz powinien:",
+    "options": [
+      "Zawsze bądź cicho",
+      "Obserwuj tłum",
+      "Jedź na ławkę",
+      "Bramkarz opowiada o nieparzystych atakach"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "W NHL bramkarz może zagrywać krążek za siatką tylko w:",
+    "options": [
+      "Strefa ofensywna",
+      "Graj krążkiem tylko w trapezie za siatką",
+      "Pełna strefa obronna",
+      "Tylko strefa neutralna"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Przy podaniu bocznym przez pole gry bramkarz używa:",
+    "options": [
+      "Zawsze stój tylko na jednym słupku",
+      "Opuść sieć",
+      "Ruch od słupka do podań bocznych",
+      "Jedź do niebieskiej linii"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Dobra gra pod kątem oznacza, że ​​bramkarz:",
+    "options": [
+      "Wyzwania dla czerwonej linii",
+      "Zawsze stoi głęboko w załamaniu",
+      "Kątowy krój ograniczający widoczność siatki",
+      "Odwraca się do strzelca"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "„Dom” bramkarza do ochrony to przede wszystkim:",
+    "options": [
+      "Chroń dom (obszar slotu)",
+      "Drzwi Zamboniego",
+      "Środkowy krąg lodowy",
+      "Pole kar"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Podczas ucieczki wielu bramkarzy woli:",
+    "options": [
+      "Jedź w stronę ławki",
+      "Zamknij oczy i miej nadzieję",
+      "Dopasuj strzelca i przeczytaj komunikat",
+      "Zawsze rzucaj wyzwania na szczyt kręgów"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Podczas próby okrążenia bramkarz powinien:",
+    "options": [
+      "Pozostaw najbliższy słupek otwarty",
+      "Przejdź do rzeczy",
+      "Zagraj krążkiem w rogu",
+      "Przytrzymaj słupek na owinięciu krótkiego boku"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Jeżeli bramkarz zagrywa krążek za siatką POZA trapezem, ma to miejsce:",
+    "options": [
+      "Zawsze legalna gra",
+      "Lodowe połączenie",
+      "Kara za opóźnianie meczu",
+      "Automatyczny cel"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Kiedy krążek jest zasłonięty, bramkarz powinien:",
+    "options": [
+      "Zostaw zagięcie",
+      "Sygnał spalonego",
+      "Zawsze rezygnuj z krótszego boku",
+      "Znajdź krążek w ruchu ulicznym lub dostosuj pozycję"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Test poke przez bramkarza musi być:",
+    "options": [
+      "Sprawdzaj legalnie tylko od przodu",
+      "Z wysokim kijem do twarzy",
+      "Zawsze zza strzelca",
+      "Stojąc na środkowym lodzie"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Podczas długiego podania prowadzącego bramkarz często:",
+    "options": [
+      "Wjeżdża na ławkę przeciwnika",
+      "Ignoruje grę",
+      "Strzela do ref",
+      "Zatrzymuje lub legalnie zagrywa krążek za siatką"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Inteligencja hokejowa oznacza, że ​​każdy gracz powinien:",
+    "options": [
+      "Każdy zawodnik pomaga w obronie",
+      "Mówią tylko bramkarze",
+      "Tylko obrońcy sprawdzają skuteczność",
+      "Punktują tylko napastnicy"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Trzymanie kija na lodzie pomaga:",
+    "options": [
+      "Blokuj mijane pasy i otrzymuj przepustki",
+      "Oblodzenie sygnalizacyjne",
+      "Unikaj krążka",
+      "Podróżuj szybciej"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Inteligentna zmiana linii zwykle ma miejsce:",
+    "options": [
+      "W locie, gdy pozwala na to gra",
+      "Nigdy w locie",
+      "Podczas ucieczki przeciw",
+      "Zawsze tylko w strefie ataku"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Przed zmianą znaków obronnych gracze powinni:",
+    "options": [
+      "Zawsze krzycz na sędziego",
+      "Zmień bez patrzenia",
+      "Komunikuj się przed zmianą znaków",
+      "Nigdy nie rozmawiaj na lodzie"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Zmiana linii po niewłaściwej stronie lodu może:",
+    "options": [
+      "Gwarancja gola",
+      "Zawsze pomagaj drużynie",
+      "Przyczyna zbyt dużej liczby mężczyzn lub złego wyczucia czasu",
+      "Zatrzymaj zegar"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Czytanie sztuki oznacza:",
+    "options": [
+      "Ignoruj ​​kolegów z drużyny",
+      "Nigdy nie zmieniaj struktury",
+      "Zawsze patrz tylko na krążek",
+      "Przewiduj, gdzie krążek i przeciwnicy pójdą dalej"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Wsparcie drugiej osoby na krążku oznacza:",
+    "options": [
+      "Odsuń się od krążka",
+      "Obserwuj tylko bramkarza",
+      "Stań na czerwonej linii",
+      "Dopasuj prędkość i wspieraj przewoźnika krążka"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Mocna i słaba strona odnoszą się do:",
+    "options": [
+      "Strona, na której znajduje się krążek, kontra strona przeciwna",
+      "Zespoły u siebie i na wyjeździe",
+      "Pierwszy i drugi okres",
+      "Tylko gracze lewo i praworęczni"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "W grze o władzę struktura ma znaczenie, ponieważ:",
+    "options": [
+      "Ruch otwiera pasy i rozciąga PK",
+      "Najlepiej jest stać w miejscu",
+      "Tylko jeden gracz powinien dotykać krążka",
+      "Spalony nie ma znaczenia"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Zabicie karne „pole + jeden” często oznacza:",
+    "options": [
+      "Cała piątka goni za krążkiem",
+      "Cała piątka stoi na czerwonej linii",
+      "Nie potrzeba żadnej struktury",
+      "Cztery w pudełku, jeden naciskający krążek"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Oszukiwanie przy wznowieniu (w momencie) oznacza:",
+    "options": [
+      "Czas upadku, aby wcześnie zdobyć krążek",
+      "Kopnij kij przeciwnika",
+      "Wejdź w okrąg przed krążkiem",
+      "Zostaw kropkę wznowienia"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Ochrona potencjalnego klienta późno, inteligentne zespoły:",
+    "options": [
+      "Podejmuj ryzyko na każdej zmianie",
+      "Zawsze ciągnij bramkarza w pierwszej kwarcie",
+      "Nigdy nie czyść strefy",
+      "Zarządzaj krążkiem i unikaj niepotrzebnych kar"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Trenerzy zmieniają składy meczów na:",
+    "options": [
+      "Uzyskaj korzystne sytuacje między graczami",
+      "Gwarancja spalonego",
+      "Unikaj wszelkich wznowień",
+      "Tylko marnować czas"
+    ]
+  },
+  "ref_goal": {
+    "question": "Po zdobyciu gola sędzia zazwyczaj:",
+    "options": [
+      "Wskaż środek lodu",
+      "Sygnalizacja opóźnionej kary",
+      "Utwórz literę T rękami",
+      "Zniesiono oblodzenie sygnału"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Sygnał przekroczenia limitu czasu wygląda następująco:",
+    "options": [
+      "Ręce tworzą literę T",
+      "Wskaż środek lodu",
+      "Pokazano sześć palców",
+      "Obie pięści pchają do przodu"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Opóźniona kara zostaje pokazana przez sędziego poprzez:",
+    "options": [
+      "Sygnał zdobytej bramki",
+      "Sygnał T przekroczenia limitu czasu",
+      "Wypłucz sygnał oblodzenia",
+      "Jedno ramię uniesione prosto do góry"
+    ]
+  },
+  "ref_minor": {
+    "question": "Orzekając karę mniejszą, sędzia często sygnalizuje:",
+    "options": [
+      "Otwórz dłoń w stronę pola karnego",
+      "Ramię tylko na klatce piersiowej",
+      "Ręce tworzą literę T",
+      "Wskaż środek lodu, aby zdobyć bramkę"
+    ]
+  },
+  "ref_offside": {
+    "question": "Sygnalizacja spalonego przez sędziego jest często sygnalizowana:",
+    "options": [
+      "Wskaż środek lodu",
+      "Pokazano sześć palców",
+      "Ruch pompowania zamkniętej pięści",
+      "Ruch siekania równoległy do ​​lodu"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Sygnałem naruszenia podania ręką jest często:",
+    "options": [
+      "Ruch pompowania zamkniętej pięści",
+      "Obie ręce skrzyżowane do walki",
+      "Otwórz dłoń w stronę pola karnego",
+      "Wskaż środek lodu"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Wysoko naklejony sygnał kary: sędzia często dotyka:",
+    "options": [
+      "Dłonią do własnej twarzy/żuchwy",
+      "Słupek bramki",
+      "Krążek",
+      "Tylko własne kolano"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Zbyt duża liczba ludzi na lodzie sygnalizowana jest poprzez pokazanie:",
+    "options": [
+      "Tylko jedno ramię wyprostowane",
+      "Wskaż środek lodu",
+      "Ręce tworzą literę T",
+      "Pokazano sześć palców"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Sygnał kary za potknięcie często wygląda następująco:",
+    "options": [
+      "Sygnał wyłączający (ruch nóg)",
+      "Ręce tworzą literę T",
+      "Wskaż środek lodu",
+      "Obie pięści pchają do przodu"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Sygnał kary za zahaczenie często wygląda następująco:",
+    "options": [
+      "Sześć palców",
+      "Cięcie równolegle do lodu",
+      "Sygnał zaczepienia (ruch ciągnięcia)",
+      "Pompowanie zamkniętej pięści"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Sygnałem sprawdzania krzyżowego przez sędziego jest często:",
+    "options": [
+      "Obie pięści pchają do przodu",
+      "Wskaż środek lodu",
+      "Ręce tworzą literę T",
+      "Tylko dłoń do twarzy"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Major walczący jest często sygnalizowany:",
+    "options": [
+      "Tnący ruch spalony",
+      "Major walczący (obie ręce skrzyżowane)",
+      "Jedna ręka w górę za opóźnioną karę",
+      "Otwórz dłoń tylko do pudełka"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Przyznając rzut karny, sędzia zazwyczaj:",
+    "options": [
+      "Pokazuje przerwę T",
+      "Zmywa lukier",
+      "Wskazuje na środek lodu w celu wykonania rzutu karnego",
+      "Pokazuje sześć palców"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Sędzia odrzucając bramkę, może:",
+    "options": [
+      "Sygnał nieuznania bramki (skrzyżuj ramiona, a następnie machaj)",
+      "Wskaż środek, aby osiągnąć cel",
+      "Podnieś rękę tylko w przypadku kary opóźnionej",
+      "Pokaż limit czasu T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Sygnałem opóźnienia gry (krążek nad szybą) jest często:",
+    "options": [
+      "Potykające się machnięcie nogami",
+      "Opóźnianie gry (sędzia klepie wyimaginowaną szybę)",
+      "Skrzyżowane ramiona bojowe",
+      "Ruch ciągnięcia zaczepu"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Sędzia liniowy sygnalizuje spalonego poprzez:",
+    "options": [
+      "Otwórz dłoń w stronę pola karnego",
+      "Utwórz literę T, aby uzyskać limit czasu",
+      "Wskaż środek lodu, aby uzyskać bramkę",
+      "Sędzia liniowy obie ręce w górę (spalony)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Gdy uwolnienie zostanie odebrane machnięciem ręki (np. na PK), sędzia liniowy może:",
+    "options": [
+      "Krzyżuj ramiona do walki",
+      "Zniesiono oblodzenie sygnału",
+      "Wskaż środek, aby osiągnąć cel",
+      "Pokaż sześć palców"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Podwójna kara mniejsza może zostać pokazana w przypadku:",
+    "options": [
+      "T dla limitu czasu",
+      "Tylko jedno ramię wyprostowane",
+      "Podwójny moll (dwa palce)",
+      "Sześć palców dla zbyt wielu mężczyzn"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Sygnał kary za wejście na pokład często obejmuje:",
+    "options": [
+      "T dla limitu czasu",
+      "Wskaż środek, aby uzyskać bramkę",
+      "Zamknięta pięść do podania ręką",
+      "Sygnał kary za wejście na pokład (pchanie ramion)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Podczas opóźnionego sygnału kary gra jest kontynuowana, ponieważ:",
+    "options": [
+      "Bramka została zdobyta",
+      "Lukier został ukończony",
+      "Ogłoszono przerwę",
+      "Opóźniona kara (gra kontynuowana)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Przeciwnik rozpoczyna atak środkiem. Co powinno zrobić centrum?",
+    "options": [
+      "Wróć na środek swojej strefy i pomóż obrońcom",
+      "Stań przy deskach",
+      "Zmieniaj linie bez powodu",
+      "Wskocz do siatki przeciwnika"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Przeciwnik za siatką próbuje zdobyć bramkę owinięciem w stylu lacrosse. Co powinien zrobić bramkarz?",
+    "options": [
+      "Wyjedź na środek strefy",
+      "Obserwuj tłum",
+      "Trzymaj się blisko dalszego słupka i uważaj na kij",
+      "Połóż się twarzą w dół na lodzie"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Jesteś obrońcą stojącym w obliczu ataku 2 na 1. Co jest najważniejsze?",
+    "options": [
+      "Zabierz przepustkę",
+      "Natychmiast zaatakuj posiadacza krążka",
+      "Oglądaj tylko krążek",
+      "Wjedź na ławkę, aby zmienić linię"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Jesteś skrzydłowym i pierwszym zawodnikiem wchodzącym do strefy ataku. Co powinieneś zrobić?",
+    "options": [
+      "Naciskaj na obrońcę krążkiem",
+      "Stań na niebieskiej linii",
+      "Jeździj na łyżwach w kółko",
+      "Wjedź prosto na ławkę"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Twój zespół gra w przewadze. Gdzie zwykle znajduje się środek?",
+    "options": [
+      "Na własnej niebieskiej linii",
+      "Na ławce",
+      "Za własną siecią",
+      "Przed siatką"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Straciłeś krążek w strefie ataku. Co powinieneś zrobić dalej?",
+    "options": [
+      "Natychmiast dołącz do kontroli wstępnej",
+      "Wracaj powoli",
+      "Kłóć się z sędzią",
+      "Spójrz na trenera"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Centrum przegrało wznowienie. Co będzie dalej?",
+    "options": [
+      "Ruszaj do ataku",
+      "Natychmiastowa pomoc w obronie",
+      "Zdejmij hełm",
+      "Przestań się ruszać"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Krążek znajduje się wzdłuż band w Twojej strefie. Co powinien zrobić drugi gracz?",
+    "options": [
+      "Wspieraj swojego partnera w pobliżu",
+      "Zastój",
+      "Obserwuj trybuny",
+      "Wskocz do siatki przeciwnika"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Co jest najważniejsze w pośpiechu 3 na 2?",
+    "options": [
+      "Wszyscy jadą w to samo miejsce",
+      "Strzelaj z dowolnej pozycji",
+      "Zatrzymaj się na niebieskiej linii",
+      "Rozciągnij obronę podaniami"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Po strzale krążek odbił się przed siatką. Co powinien zrobić bramkarz?",
+    "options": [
+      "Podnieś kij w powietrze",
+      "Znajdź krążek i przykryj go",
+      "Skacz za siatką",
+      "Spójrz na trenera"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Kiedy jest najlepszy czas na zmianę linii?",
+    "options": [
+      "Kiedy twoja drużyna kontroluje krążek",
+      "Kiedy przeciwnik atakuje",
+      "Kiedy krążek znajduje się przed siatką",
+      "Podczas niebezpiecznej okazji do zdobycia gola"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Co powinien zrobić obrońca, gdy znajduje się pod dużą presją gry wstępnej?",
+    "options": [
+      "Stój nieruchomo z krążkiem",
+      "Strzel krążkiem w środek strefy",
+      "Upaść na lód",
+      "Wykonaj szybkie i dokładne pierwsze podanie"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Co jest ważne, gdy nie masz krążka?",
+    "options": [
+      "Spójrz na sufit",
+      "Trzymaj kij tylko jedną ręką",
+      "Otwórz się na przepustkę",
+      "Stań w jednym miejscu"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Które wybicie jest uważane za najbardziej niezawodne?",
+    "options": [
+      "Utrata krążka",
+      "Krótkim i celnym podaniem",
+      "Ślepy śmietnik",
+      "Przejście przez środek Twojej strefy"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Co jest najważniejsze w przypadku zabójstwa karnego?",
+    "options": [
+      "Blokuj mijane pasy",
+      "Atakuj nieustannie",
+      "Łyżwy bez konstrukcji",
+      "Graj tylko wzdłuż plansz"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Kiedy obrońca może dołączyć do ataku?",
+    "options": [
+      "Zawsze",
+      "Tylko w godzinach nadliczbowych",
+      "Nigdy",
+      "Kiedy jego partner broni jego stanowiska"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Dlaczego przejście przez szczelinę jest niebezpieczne?",
+    "options": [
+      "Urzędnicy tego nie widzą",
+      "To spowalnia grę",
+      "Może prowadzić do celu",
+      "To zawsze jest nielegalne"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Kiedy bramkarz powinien zagrać krążek za siatką?",
+    "options": [
+      "Aby opuścić lód",
+      "Aby pomóc obrońcom rozpocząć ucieczkę",
+      "Aby odpocząć",
+      "Kłócić się z urzędnikami"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Dlaczego napastnik kieruje się do odległego słupka?",
+    "options": [
+      "Za zbiórki i jednorazowe trafienia",
+      "Aby nie brać udziału w zabawie",
+      "Aby odpocząć",
+      "Aby wejść na drogę koledze z drużyny"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Co powinien zrobić obrońca przed oddaniem strzału z punktu?",
+    "options": [
+      "Sprawdź ruch przed siecią",
+      "Strzelaj prosto w deski",
+      "Zamknij oczy",
+      "Dekes do tyłu"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Kto powinien pierwszy walczyć o krążek po wznowieniu?",
+    "options": [
+      "Tylko bramkarz",
+      "Nikt",
+      "Najbliższy gracz",
+      "Tylko obrońca"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Dlaczego kontrola krążka jest ważna?",
+    "options": [
+      "Przeciwnik nie może atakować bez krążka",
+      "Możesz jeździć mniej",
+      "Urzędnicy przyznają za to punkty",
+      "Wygląda dobrze"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Co liczy się najbardziej w walce narożnej?",
+    "options": [
+      "Wysoki strzał",
+      "Skoki",
+      "Jazda wyłącznie tyłem",
+      "Pozycja ciała i rozmieszczenie kijów"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Jaki jest najlepszy sposób na otwarcie?",
+    "options": [
+      "Przenieś się na otwartą przestrzeń",
+      "W ślepy kąt",
+      "Jeździj na łyżwach za plecami kolegi z drużyny",
+      "Stojąc w miejscu"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Co powinien zrobić napastnik po oddaniu strzału?",
+    "options": [
+      "Natychmiast zmień linie",
+      "Obejrzyj tablicę wyników",
+      "Przejdź do siatki po odbicie",
+      "Zastój"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Co jest najważniejsze dla obrońcy na slocie?",
+    "options": [
+      "Trzymaj się z daleka od sieci",
+      "Graj bez kija",
+      "Uniemożliwiaj przeciwnikom dotarcie do zbiórek",
+      "Obserwuj tylko bramkarza"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Jak najlepiej wejść do strefy?",
+    "options": [
+      "Bez szybkości",
+      "Jazda tyłem do strefy",
+      "Przez środek, bez wsparcia",
+      "Z kontrolą krążka"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Kiedy strzał z bekhendu jest przydatny?",
+    "options": [
+      "Tylko w praktyce",
+      "Nigdy",
+      "Kiedy nie ma czasu na przeniesienie krążka na forhend",
+      "Tylko dla obrońców"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Dlaczego środek jest ważny w ataku?",
+    "options": [
+      "Zawsze stoi w miejscu",
+      "Nigdy nie wykonuje podań",
+      "Łączy całą linię",
+      "Nigdy nie gra w obronie"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Co się liczy w grze defensywnej 1 na 1?",
+    "options": [
+      "Natychmiast wskocz na przeciwnika",
+      "Obserwuj trybuny",
+      "Jeździj do tyłu bez kontroli",
+      "Kontroluj szczelinę i kąt"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Twoja linia przeszła długą ofensywę. Obrońca przeciwnika odzyskał krążek za siatką, ale wyglądał na zmęczonego. Twoja linia też była na lodzie przez długi czas. Co jest najlepsze?",
+    "options": [
+      "Kontynuuj agresywne sprawdzanie wstępne, korzystając z pełnej linii",
+      "Wróć do strefy neutralnej bez nacisku",
+      "Jeden z napastników naciska, pozostali się zmieniają",
+      "Cała linia zmienia się od razu"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Dlaczego przejście do tyłu jest czasami przydatne?",
+    "options": [
+      "Aby stracić dynamikę",
+      "Aby uniknąć ataku",
+      "Aby utrzymać posiadanie",
+      "Aby zatrzymać grę"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Co się liczy przy blokowaniu strzału?",
+    "options": [
+      "Zablokuj ścieżkę krążka",
+      "Skocz w górę",
+      "Odwróć się",
+      "Patrzeć w dół"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Jak obrońca powinien grać przeciwko szybkiemu napastnikowi?",
+    "options": [
+      "Jedź do przodu bez zatrzymywania się",
+      "Za każdym razem graj zbyt ciasno",
+      "Zastój",
+      "Nie podawaj mu otwartego lodu"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Kiedy jednorazowe działanie jest najbardziej skuteczne?",
+    "options": [
+      "Kiedy strzelec nie jest gotowy",
+      "Tylko w praktyce",
+      "Kiedy bramkarz nie może ustawić się na czas",
+      "Kiedy krążek jest nieruchomy"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Dlaczego komunikacja na lodzie jest ważna?",
+    "options": [
+      "To odwraca uwagę przeciwnika",
+      "Zastępuje jazdę na łyżwach",
+      "Pomaga członkom zespołu szybciej podejmować decyzje",
+      "Urzędnicy to lubią"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Jak powinieneś grać w pośpiechu 2 na 0?",
+    "options": [
+      "Zmuś bramkarza do ruchu podaniem",
+      "Zatrzymaj się przed siatką",
+      "Strzelaj z daleka",
+      "Strać krążek"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Dlaczego napastnicy wykorzystują przestrzeń za siatką?",
+    "options": [
+      "Aby ukryć się przed zabawą",
+      "Aby zatrzymać grę",
+      "Aby uniknąć strzelania",
+      "Aby rozciągnąć obronę"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Dlaczego ważne jest, aby zachować spokój?",
+    "options": [
+      "Ma to wpływ na lód",
+      "Dzięki temu sieć jest mniejsza",
+      "Pomaga podejmować lepsze decyzje",
+      "Dzięki temu krążek jest szybszy"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Co powinien zrobić obrońca na niebieskiej linii ataku?",
+    "options": [
+      "Trzymaj krążek w strefie",
+      "Stań tylko na środku",
+      "Ignoruj ​​kolegów z drużyny",
+      "Zawsze się wycofaj"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Co sprawia, że ​​odbicie jest niebezpieczne?",
+    "options": [
+      "Gracz stoi nieruchomo",
+      "Krążek staje się lżejszy",
+      "Sędzia nie może widzieć krążka",
+      "Bramkarz nie zawsze kontroluje odbicie"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Dlaczego zmiana kierunku ataku jest przydatna?",
+    "options": [
+      "To rani twój własny zespół",
+      "To spowalnia grę",
+      "Tworzy otwarte przestrzenie",
+      "To męczy urzędników"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Co się liczy przy wznowieniu w strefie ataku?",
+    "options": [
+      "Natychmiast się wycofaj",
+      "Szybko zdobywaj posiadanie krążka",
+      "Obejrzyj tablicę wyników",
+      "Nie ruszaj się"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Co to znaczy kryć kolegę z drużyny?",
+    "options": [
+      "Zapełnij jego pozycję, gdy dołączy do pościgu",
+      "Graj tylko w ataku",
+      "Skopiuj jego dokładną trasę",
+      "Stań obok niego, nie ruszając się"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Jeśli obrońca straci pozycję, co powinien zrobić?",
+    "options": [
+      "Oglądaj tylko krążek",
+      "Kłóć się z kolegą z drużyny",
+      "Przestań jeździć na łyżwach",
+      "Wracaj szybko do obrony"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Dlaczego gracze często strzelają nisko?",
+    "options": [
+      "Jest wolniejszy",
+      "Ponieważ wysokie strzały są nielegalne",
+      "Do odbić i odbić",
+      "Urzędnikom jest łatwiej"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Kiedy długie podanie jest szczególnie przydatne?",
+    "options": [
+      "W tłumie graczy",
+      "Podczas zmiany linii",
+      "W szybkim kontrataku",
+      "Bez celu"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Dlaczego ruch bez krążka jest ważny?",
+    "options": [
+      "Tworzy opcje podań",
+      "To jest tylko dla obrońców",
+      "Nie ma to wpływu na grę",
+      "Staje na drodze kolegów z drużyny"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Kiedy strzał z ostrego kąta może się przydać?",
+    "options": [
+      "Tylko w grze o władzę",
+      "Tylko w przypadku zabójstwa karnego",
+      "Nigdy",
+      "Za nieoczekiwane odbicie"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Dlaczego sprawdzanie bramkarza jest ważne?",
+    "options": [
+      "Sędzia nie może widzieć krążka",
+      "Trudniej mu zobaczyć strzał",
+      "Bramkarz przestaje się ruszać",
+      "Dzięki temu atak wygląda lepiej"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Co pomaga Ci przechwytywać podania?",
+    "options": [
+      "Czytanie sztuki",
+      "Samo szczęście",
+      "Jazda na łyżwach powoli",
+      "Gra bez kija"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Jak prawidłowo przypiąć przeciwnika do desek?",
+    "options": [
+      "Pchnij go w plecy",
+      "Z zamkniętymi oczami",
+      "Twymi rękami i bez kija",
+      "Używaj ciała i kija, kontrolując krążek"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Co się liczy, gdy zza siatki wychodzi obrońca?",
+    "options": [
+      "Spójrz w górę i znajdź przepustkę",
+      "Jeździj powoli",
+      "Natychmiast strzel w krążek",
+      "Spójrz tylko na lód"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Dlaczego zespoły czasami spowalniają grę?",
+    "options": [
+      "Stracić krążek",
+      "Aby utrzymać posiadanie i energię",
+      "Aby uniknąć ataku",
+      "Aby zatrzymać grę"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Kim jest gracz drugiej fali?",
+    "options": [
+      "Sędzia",
+      "Rezerwowy bramkarz",
+      "Gracz, który później dołącza do ataku",
+      "Najwolniejszy gracz"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Dlaczego szybkie, krótkie podania są skuteczne?",
+    "options": [
+      "Zawsze są powolne",
+      "Zranili atak",
+      "Są przeznaczone wyłącznie dla obrońców",
+      "Przeciwnikom trudniej je ukraść"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Co powinien zrobić bramkarz po wykonaniu obrony?",
+    "options": [
+      "Szybko śledź krążek",
+      "Jedź na deski",
+      "Zdejmij mu rękawiczkę",
+      "Spójrz na tablicę wyników"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Kiedy atak środkiem jest szczególnie niebezpieczny?",
+    "options": [
+      "Gdy jeden gracz jest sam",
+      "Kiedy jest prędkość i wsparcie",
+      "Kiedy nie ma krążka",
+      "Kiedy wszyscy stoją w miejscu"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Co pomaga Ci szybciej podejmować decyzje?",
+    "options": [
+      "Jazda na łyżwach powoli",
+      "Oglądaj tylko krążek",
+      "Ciągłe skanowanie lodu",
+      "Graj bez mówienia"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Co robi dobry kapitan?",
+    "options": [
+      "Wspiera zespół i daje przykład",
+      "Gra wyłącznie w ataku",
+      "Krzyczy na wszystkich",
+      "Nigdy nie gra w obronie"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Co pomaga uniknąć presji kontroli wstępnej?",
+    "options": [
+      "Gra sam",
+      "Szybkie poruszanie krążkiem",
+      "Trzymanie krążka przez długi czas",
+      "Zatrzymując się wzdłuż desek"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Dlaczego nie możesz się wahać na niebieskiej linii?",
+    "options": [
+      "Bramkarz będzie zmęczony",
+      "Lód będzie coraz gorszy",
+      "Możesz stracić strefę",
+      "Sędzia przerwie grę"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Dlaczego strzał tuż po podaniu jest niebezpieczny?",
+    "options": [
+      "Zawsze jest słabo",
+      "Jest trudny do wykonania",
+      "Sędzia nie uzna bramki",
+      "Bramkarz nie jest ustawiony na czas"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Kto powinien pierwszy wrócić po stracie krążka?",
+    "options": [
+      "Najbliższy gracz",
+      "Tylko centrum",
+      "Tylko obrońca",
+      "Tylko bramkarz"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Jak obrońca powinien grać przeciwko twardemu strzelcowi?",
+    "options": [
+      "Obserwuj tylko bramkarza",
+      "Skróć jego czas i przestrzeń na oddanie strzału",
+      "Daj mu otwartą przestrzeń",
+      "Stań daleko"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Dlaczego krążek często jest przesuwany do rogu w obronie?",
+    "options": [
+      "Urzędnicy nie mogą oglądać meczu",
+      "Lód jest tam wolniejszy",
+      "Niebezpieczeństwo dla sieci jest mniejsze",
+      "Tam łatwiej jest zdobyć bramkę"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Co robi napastnik przed siatką?",
+    "options": [
+      "Stoi tyłem do gry",
+      "Łyżwy do desek",
+      "Nie porusza się",
+      "Tworzy ruch i poluje na zbiórki"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Dlaczego ważne jest, aby grać z podniesioną głową?",
+    "options": [
+      "Aby zobaczyć członków drużyny i przeciwników",
+      "Aby krążek był lżejszy",
+      "Aby jeździć szybciej",
+      "Aby urzędnicy mogli cię zobaczyć"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Co liczy się najbardziej po wygraniu dogrywki PK?",
+    "options": [
+      "Spróbuj przebić się przez wszystkich",
+      "Zrób długą pauzę",
+      "Usuń krążek ze strefy",
+      "Zastój"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Dlaczego wywieranie presji na obrońców przeciwnika jest ważne?",
+    "options": [
+      "To boli twój zespół",
+      "Nie ma to wpływu na grę",
+      "To zatrzymuje grę",
+      "Może wymusić błąd"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Kiedy przydaje się touch pass?",
+    "options": [
+      "Aby szybko rozwinąć atak",
+      "Gdy gracz stoi nieruchomo",
+      "Gdy nie ma kolegów",
+      "Tylko w obronie"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Co powinien zrobić środkowy przed własną siatką?",
+    "options": [
+      "Poczekaj na podanie lodu",
+      "Przejdź do strefy neutralnej",
+      "Pomóż obrońcom zasłonić szczelinę",
+      "Stań przy deskach"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Dlaczego ruch krzyżowy napastników jest skuteczny?",
+    "options": [
+      "To dezorientuje obrońców",
+      "To rani twój własny zespół",
+      "Spowalnia atak",
+      "To jest nielegalne"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Co się liczy w walce o luźny krążek?",
+    "options": [
+      "Trzymaj krążek przez długi czas",
+      "Zastój",
+      "Patrzeć w dół",
+      "Zdecyduj szybko, co dalej"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Dlaczego gracze zmieniają prędkość?",
+    "options": [
+      "Aby przestać jeździć na łyżwach",
+      "Stracić krążek",
+      "Aby pokonać przeciwnika",
+      "Aby szybciej się męczyć"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Zostało 40 sekund. Prowadzisz jedną bramką. Przeciwnik gra 6 na 5. Ich obrońca ma krążek na niebieskiej linii, a Twój skrzydłowy może skoczyć i przechwycić. Co jest najlepsze?",
+    "options": [
+      "Od razu agresywnie uderzaj w krążek",
+      "Śledź tylko gracza atakującego siatkę",
+      "Naciśnij tylko pod kontrolowanym kątem, aby przyjąć krążek",
+      "Zwiń całkowicie do siatki"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Kiedy bramkarz może oddalić się daleko od siatki?",
+    "options": [
+      "Przechwytywać krążek i pomagać obronie",
+      "Nigdy",
+      "Zawsze",
+      "Dopiero po golu"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Co jest ważne dla udanej próby odbicia?",
+    "options": [
+      "Wielkie wzruszenie",
+      "Stań z dala od siatki",
+      "Powolny ruch",
+      "Szybka reakcja"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Dlaczego wsparcie drugiego gracza jest ważne?",
+    "options": [
+      "Tworzy dodatkowe opcje",
+      "To jest tylko dla obrońców",
+      "Nie jest to potrzebne",
+      "Boli atak"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Co oznacza „czytanie sztuki”?",
+    "options": [
+      "Przewiduj, co zrobią przeciwnicy",
+      "Licz przepustki",
+      "Podążaj tylko za krążkiem",
+      "Obejrzyj tablicę wyników"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Dlaczego ważne jest, aby chronić krążek swoim ciałem?",
+    "options": [
+      "Dzięki temu lód jest szybszy",
+      "To jest tylko dla obrońców",
+      "Ma to wpływ na sędziego",
+      "Pomaga chronić krążek"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Kiedy przydaje się wybicie wzdłuż desek?",
+    "options": [
+      "Nigdy",
+      "Zawsze",
+      "Gdy środek jest zakryty",
+      "Tylko w grze o władzę"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Co się liczy podczas obrony przed grą w przewadze?",
+    "options": [
+      "Ciągły deks",
+      "Zachowaj zwartą defensywę",
+      "Powolne zmiany linii",
+      "Wszędzie gra jeden na jednego"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Co to jest podanie na strzał?",
+    "options": [
+      "Podanie do zawodnika znajdującego się na dobrej pozycji strzeleckiej",
+      "Podanie do bramkarza",
+      "Przypadkowe podanie",
+      "Podanie do narożnika"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Dlaczego deke przed strzałem jest przydatny?",
+    "options": [
+      "Zawsze spowalnia atak",
+      "To jest nielegalne",
+      "To jest tylko dla obrońców",
+      "Może poruszyć bramkarza lub obrońcę"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Po zablokowaniu strzału zawodnik powinien:",
+    "options": [
+      "Natychmiast poszukaj krążka",
+      "Zastój",
+      "Spójrz na sędziego",
+      "Zostaw lód"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Jak napastnicy pomagają obrońcom?",
+    "options": [
+      "Pozostań w strefie ataku",
+      "Sprawdź ponownie i otwórz się na przepustkę",
+      "Graj tylko wzdłuż plansz",
+      "Nie graj w obronie"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Co pomaga w walce z ciężką kontrolą wstępną?",
+    "options": [
+      "Szybkie decyzje i ruch krążka",
+      "Jazda na łyżwach powoli",
+      "Gra sam",
+      "Długie posiadanie krążka"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Kiedy przydatne jest ugięcie drążka?",
+    "options": [
+      "Nigdy",
+      "Tylko w praktyce",
+      "Tylko w obronie",
+      "Aby przekierować krążek"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Co się liczy podczas ataku wzdłuż desek?",
+    "options": [
+      "Podanie z powrotem do bramkarza",
+      "Wsparcie od pobliskiego członka drużyny",
+      "Gra sam",
+      "Zatrzymanie ruchu"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Co liczy się dla bramkarza w ucieczce?",
+    "options": [
+      "Zachowaj dobrą pozycję i cierpliwość",
+      "Natychmiast zejdź na lód",
+      "Jedź do tyłu",
+      "Obserwuj obrońców"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Co się liczy przy szybkim przejściu do ataku?",
+    "options": [
+      "Powolne podania",
+      "Długie posiadanie krążka",
+      "Zatrzymujemy się na niebieskiej linii",
+      "Szybkość podejmowania decyzji"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Co robi obrońca podczas gry w przewadze?",
+    "options": [
+      "Łyżwy do siatki",
+      "Nie przyłącza się do ataku",
+      "Przesuwa krążek i szuka strzału",
+      "Stoi nieruchomo"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Dlaczego ruch przed siatką jest niebezpieczny?",
+    "options": [
+      "Krążek staje się wolniejszy",
+      "Bramkarzowi trudniej jest dostrzec krążek",
+      "Sędzia nie może liczyć zawodników",
+      "Gracze szybciej się męczą"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Co się liczy po przechwyceniu krążka?",
+    "options": [
+      "Szybkie przejście do ataku",
+      "Przestań jeździć na łyżwach",
+      "Natychmiast rzuć krążek",
+      "Jedź na deski"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Co jest szczególnie ważne w godzinach nadliczbowych?",
+    "options": [
+      "Ciągłe strzały z dystansu",
+      "Gra bez podań",
+      "Długie zmiany",
+      "Kontrola krążka i kilka błędów"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Co powinien zrobić obrońca, jeśli przeciwnik zasłoni bramkarza?",
+    "options": [
+      "Spójrz na sędziego",
+      "Jedź na deski",
+      "Oczyść miejsce i zwiąż przeciwnika",
+      "Stań w pobliżu, nie ruszając się"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Dlaczego gra zespołowa jest ważniejsza niż gra indywidualna?",
+    "options": [
+      "Zespół nie ma wpływu na wynik",
+      "Linia stwarza razem więcej szans",
+      "O grze zawsze decyduje jeden gracz",
+      "Podania psują grę"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Co jest ważne przed zrobieniem zdjęcia?",
+    "options": [
+      "Szybko odczytaj pozycję bramkarza",
+      "Spójrz tylko na krążek",
+      "Zatrzymaj się całkowicie",
+      "Zamknij oczy"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Co najlepiej rozwija hokejowe IQ?",
+    "options": [
+      "Tylko trening siłowy",
+      "Oglądanie tylko bramek",
+      "Tylko na łyżwach",
+      "Nauka gry, praktyka i zrozumienie sytuacji"
+    ]
+  }
+}

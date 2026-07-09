@@ -2,8 +2,8 @@
   "expo": {
     "name": "HockeyStars",
     "slug": "hockeystars",
-    "version": "1.2.2",
-    "runtimeVersion": "1.2.2",
+    "version": "1.3.0",
+    "runtimeVersion": "1.3.0",
     "updates": {
       "url": "https://u.expo.dev/ccb608ca-e849-4a98-b337-d38863d3ebff",
       "checkAutomatically": "ON_LOAD",
@@ -185,7 +185,14 @@
       "smsRuFromNumber": "",
       "rocketSmsLogin": "REDACTED_ROCKETSMS_LOGIN",
       "rocketSmsPassword": "REDACTED_ROCKETSMS_PASSWORD",
-      "rocketSmsSender": "hockeystars"
+      "rocketSmsSender": "HockstarsBy",
+      "rocketSmsMessageTemplate": "Hockeystars code: {code}",
+      "notificoreApiKey": "REDACTED_NOTIFICORE_KEY",
+      "notificoreTestApiKey": "REDACTED_NOTIFICORE_KEY",
+      "notificoreOriginator": "HockeyStars",
+      "notificoreServiceNameCyrl": "ХоккейСтарс",
+      "notificore2faJwt": "",
+      "notificore2faTemplateId": "211"
     },
     "plugins": [
       "expo-router",

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Image, ImageProps, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { avatarCache } from '../utils/AvatarCache';
+import { rewriteSupabasePublicUrl } from '../utils/supabase';
 
 interface AvatarImageProps extends Omit<ImageProps, 'source'> {
   uri: string;
@@ -34,7 +35,7 @@ const AvatarImage: React.FC<AvatarImageProps> = React.memo(({
 
   // Получаем актуальный аватар из кеша, если есть playerId
   const cachedAvatarUrl = playerId ? avatarCache.getAvatar(playerId) : null;
-  const effectiveUri = cachedAvatarUrl || uri;
+  const effectiveUri = rewriteSupabasePublicUrl(cachedAvatarUrl || uri) || uri;
 
   useEffect(() => {
     if (effectiveUri !== currentUriRef.current) {

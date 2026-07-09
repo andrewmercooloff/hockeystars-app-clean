@@ -92,7 +92,7 @@
   "uploading": "Ladataan...",
   "uploadingPhotos": "Ladataan {count} kuvaa... {progress}%",
   "info": "Tiedot",
-  "addVideoLink": "Lisää linkki YouTubeen",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sek",
@@ -1683,6 +1683,1406 @@
           "Suorita 2-3 kertaa viikossa",
           "Vähennä kuormitusta, kun tunnet itsesi väsyneeksi"
         ]
+      },
+      "66": {
+        "title": "Sivulankku, jossa vartalon kierto",
+        "description": "Muodostaa vinot ja ydinvakauttajat laukauksen tehoa ja kehon vakautta varten.",
+        "benefits": [
+          "Vakauttaa ytimen kosketuksessa",
+          "Parantaa pyöritystehoa",
+          "Vähentää alaselän loukkaantumisriskiä",
+          "Rakentaa ydinkestävyyttä"
+        ],
+        "instructions": [
+          "Aseta kyynärvarren puoleinen lankku",
+          "Kurkota ylävarsi kattoa kohti",
+          "Pyyhkäise käsivarsi vartalon alle ja palaa takaisin",
+          "Pidä lantio vaakasuorassa ilman notkoa",
+          "Tee 8-10 toistoa per puoli"
+        ],
+        "tips": [
+          "Pyöritä hitaasti ohjauksella",
+          "Hengitä tasaisesti",
+          "Pudota tarvittaessa polvilleen",
+          "2-3 sarjaa per puoli"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "120-180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Käsipaino Romanian maastaveto",
+        "description": "Kehittää takaketjun voimakasta luistelua ja ensimmäisen askeleen kiihdytystä varten.",
+        "benefits": [
+          "Vahvistaa reisilihaksia ja pakaralihaksia",
+          "Parantaa eteenpäin suuntautuvaa laihamekaniikkaa",
+          "Rakentaa pitovoimaa",
+          "Tukee reisilihasten vammojen ehkäisyä"
+        ],
+        "instructions": [
+          "Seiso käsipainot reidessä",
+          "Pidä lievä polven taivutus",
+          "Sarana lantiota taaksepäin, laskee kelloja pitkin jalkoja",
+          "Pysähdy säären puoliväliin tai lievään venytykseen",
+          "Aja lantiota eteenpäin seisomaan"
+        ],
+        "tips": [
+          "Pidä neutraali selkäranka",
+          "Painot pysyvät lähellä jalkoja",
+          "Vältä alaselän pyöristämistä",
+          "3-4 sarjaa 8-12 toistoa"
+        ],
+        "equipment": "Käsipainot",
+        "calories": "200-280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Pikari kyykky",
+        "description": "Jääkiekkoystävällinen kyykkykuvio jalkojen ja ytimen vahvistamiseksi pystyasennossa.",
+        "benefits": [
+          "Rakentaa nelilujuutta",
+          "Opettaa vartalon pystyasennon",
+          "Parantaa nilkan liikkuvuutta",
+          "Hyvä kauden off-ice vaihtoehto"
+        ],
+        "instructions": [
+          "Pidä käsipainoa tai kahvakuulaa rinnassa",
+          "Jalat hartioiden leveydellä, varpaat hieman ulospäin",
+          "Kyykky yhdensuuntaisesti tai alaspäin",
+          "Polvet kulkevat varpaiden yli",
+          "3-4 sarjaa 10-15 toistoa"
+        ],
+        "tips": [
+          "Kyynärpäät alareunassa polvien sisäpuolella",
+          "Korot pysyvät alhaalla",
+          "Hallitse laskeutumista",
+          "Pysy korkeana rinnan läpi"
+        ],
+        "equipment": "Käsipaino tai kahvakuula",
+        "calories": "180-250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Bändin pyörivä leikkaus",
+        "description": "Jäljittelee laukauksen ja syötteen kiertoa kasvattaakseen voimaa jääkiekon liiketasossa.",
+        "benefits": [
+          "Parantaa laukaus- ja syöttötehoa",
+          "Harjoittelee pyörimisen estävää vakautta",
+          "Olkapääystävällinen kuormitus",
+          "Voidaan tehdä kotona"
+        ],
+        "instructions": [
+          "Ankkurinauha rinnan korkeudella",
+          "Seiso sivuttain ankkuroimaan",
+          "Pidä kiinni sauvasta tai kahvasta molemmin käsin",
+          "Pyöritä lantiosta ohjattavasti",
+          "12-15 toistoa molemmin puolin"
+        ],
+        "tips": [
+          "Voima tulee lantiosta",
+          "Suojaa alaselkää ylikiertymiseltä",
+          "Käytä urheilullista jääkiekkoasentoa",
+          "2-3 sarjaa"
+        ],
+        "equipment": "Vastusnauha",
+        "calories": "100-150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Yksijalkainen pakarasilta",
+        "description": "Aktivoi pakaralihakset ja lantion stabiloijat, mikä tekee luistimista tehokkaan.",
+        "benefits": [
+          "Vahvistaa pakaralihaksia",
+          "Vakauttaa lantion luistelussa",
+          "Parantaa jalkojen symmetriaa",
+          "Tukee polvivammojen ehkäisyä"
+        ],
+        "instructions": [
+          "Makaa selällään, toinen jalka istutettuna",
+          "Toinen jalka ojennettuna tai koukussa ilmassa",
+          "Aja lantiota suoraan linjaan",
+          "Pysäytä 1 sekunti yläreunassa",
+          "10-12 toistoa per jalka"
+        ],
+        "tips": [
+          "Vältä lannerangan hyperekstensiota",
+          "Pidä työskentely polvi linjassa",
+          "Purista glute päälle",
+          "2-3 sarjaa"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "90-130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Seisova vasikka nostaa",
+        "description": "Rakentaa pohkeita ja jalkoja jalkojen kestävyyttä ja luistimen vakautta varten.",
+        "benefits": [
+          "Parantaa pohkeen voimaa",
+          "Vähentää jalkojen väsymystä peleissä",
+          "Vahvistaa jalkoja",
+          "Nopea pukuhuonevaihtoehto"
+        ],
+        "instructions": [
+          "Seiso askelman reunalla jalkapallojen päällä",
+          "Alemmat kantapäät askeltason alapuolella",
+          "Nouse niin korkealle kuin mahdollista",
+          "Tauko ylhäällä",
+          "15-20 toistoa, 3 sarjaa"
+        ],
+        "tips": [
+          "Käytä seinää tarvittaessa tasapainottamiseen",
+          "Täysi liikerata",
+          "Vältä pomppimista",
+          "Lisää kevyesti kun olet valmis"
+        ],
+        "equipment": "Askel tai taso",
+        "calories": "60-90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Lankku olkapäitä",
+        "description": "Pyörimistä estävä ydintyö kosketuksen vakautta ja urheilullista asentoa varten.",
+        "benefits": [
+          "Rakentaa ytimen vakautta",
+          "Parantaa tasapainoa kosketuksessa",
+          "Kehittää ydinkestävyyttä",
+          "Toimii kaikkiin asentoihin"
+        ],
+        "instructions": [
+          "Aloita korkealla lankkulla",
+          "Siirrä painoa ja napauta vastapäätä olkapäätä",
+          "Palauta ja vaihda kädet",
+          "Pidä lantio suorassa",
+          "Yhteensä 16-20 kosketusta"
+        ],
+        "tips": [
+          "Leveä jalat vakautta varten",
+          "Älä nosta lantiota ylös",
+          "Hengitä tasaisesti",
+          "2-3 sarjaa"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "80-120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m pikajuoksua täydellä lepolla",
+        "description": "Simuloi lyhyitä vuoroja parantaakseen toistuvaa kiihtyvyyttä.",
+        "benefits": [
+          "Parantaa toistuvaa sprinttinopeutta",
+          "Harjoittelee vuorojen välistä palautumista",
+          "Kehittää käynnistysmekaniikkaa",
+          "Lisää pelin kestävyyttä"
+        ],
+        "instructions": [
+          "Lämmitä 8-10 minuuttia",
+          "Sprintti 20 m 95 % nopeudella",
+          "Lepää 40-60 sekuntia kävellen",
+          "Toista 10-12 kertaa",
+          "Jäähdytä 5 minuuttia"
+        ],
+        "tips": [
+          "Säilytä sprinttimuoto jokaisella toistolla",
+          "Älä leikkaa lepoa liian aikaisin",
+          "Aseta laatu etusijalle määrään",
+          "1-2 kertaa viikossa"
+        ],
+        "equipment": "20 m avointa tilaa",
+        "calories": "250-350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "30-30-30 sekunnin juoksuvälit",
+        "description": "Klassinen jääkiekkotyylinen intervalli: 30 sekuntia kovaa, 30 sekuntia helppoa.",
+        "benefits": [
+          "Rakentaa laktaattitoleranssia",
+          "Jäljittelee siirtymän voimakkuutta",
+          "Parantaa henkistä sitkeyttä",
+          "Tehokas off-ice-istunto"
+        ],
+        "instructions": [
+          "Lämmitä 10 minuuttia",
+          "30 s kova juoksu / 30 s kävely",
+          "Toista 12-16 sykliä",
+          "Pyri johdonmukaisesti joka kierroksella",
+          "Jäähdytä ja venytä"
+        ],
+        "tips": [
+          "Älä mene ulos aikaisin",
+          "Säilytä juoksumuoto",
+          "Kostuta lohkojen välillä",
+          "Edistää kokonaissykliä hitaasti"
+        ],
+        "equipment": "Rata tai juoksumatto",
+        "calories": "300-400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "AirBike-välit",
+        "description": "Pienitehoinen ja intensiivinen kardio, joka on polviystävällinen sesongin ulkopuolella.",
+        "benefits": [
+          "Rakentaa VO2max",
+          "Nivelystävällinen lastaus",
+          "Harjoittelee käsiä ja jalkoja yhdessä",
+          "Nopea palautuminen istunnon jälkeen"
+        ],
+        "instructions": [
+          "5 min helppo pyöritys",
+          "20 s max / 40 s helppoa",
+          "10-12 kierrosta",
+          "Tarkkaile kierroslukua ja hengitystä",
+          "5 min jäähtyä"
+        ],
+        "tips": [
+          "Rento ote kahvoista",
+          "Pysy paikallaan vakaasti",
+          "Vältä päivittäistä maksimiponnistusta",
+          "Seuraa kaloreita edistymistä varten"
+        ],
+        "equipment": "AirBike / rynnäkköpyörä",
+        "calories": "220-320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "5×5 m sukkulajuoksu",
+        "description": "Lyhyet suunnanmuutokset, kuten ennakontarkistus ja puolustuspalautukset.",
+        "benefits": [
+          "Parantaa suunnanmuutosta",
+          "Rakentaa ensimmäisen askeleen nopeutta",
+          "Kouluttaa reaktiota",
+          "Kompakti kuntosaliystävällinen pora"
+        ],
+        "instructions": [
+          "Merkitse kaksi viivaa 5 metrin päässä toisistaan",
+          "Kosketa linjaa kädellä, sprintti takaisin",
+          "6-8 toistoa = 1 sarja",
+          "Lepo 90 sek",
+          "3-4 sarjaa"
+        ],
+        "tips": [
+          "Kosketa viivaa kokonaan joka kerta",
+          "Räjähtäkää ensimmäiset askeleet",
+          "Istuta lujasti käännöksissä",
+          "Käytä pitäviä kenkiä"
+        ],
+        "equipment": "Kartiot tai lattialinjat",
+        "calories": "150-220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Kiihdytykset jääkiekkoasennosta",
+        "description": "Matalat urheilulliset lähdöt, jotka siirtyvät kohtaamisiin ja kiekkotaisteluihin.",
+        "benefits": [
+          "Parantaa ensimmäistä askelta",
+          "Kouluttaa matalakäynnistysmekaniikkoja",
+          "Rakentaa jalkavoimaa",
+          "Jääkiekkokohtainen"
+        ],
+        "instructions": [
+          "Aseta urheilullinen asento: koukussa polvet, vartalo eteenpäin",
+          "Sprintissä 10-15 m",
+          "Täysi lepo 60-90 sek",
+          "8-10 toistoa",
+          "Vaihtoehtoinen lyijyjalka"
+        ],
+        "tips": [
+          "Pysy eteenpäin, älä ponnahtaa pystyyn aikaisin",
+          "Aja takajalkaa kovaa",
+          "Käytä käsiä aggressiivisesti",
+          "Cap 10 laadukkaalla toistolla"
+        ],
+        "equipment": "20 m kaista",
+        "calories": "180-260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m tempojuoksuja",
+        "description": "Hallittu nopea juoksu ylläpitää voimakasta vaihtoa vastaavaa rasitusta.",
+        "benefits": [
+          "Kehittää aerobista voimaa",
+          "Opettaa tahdistusta",
+          "Parantaa jalkojen kestävyyttä",
+          "Hyvää sesonkityötä"
+        ],
+        "instructions": [
+          "Lämmitä 10 minuuttia",
+          "400 m 75–80 % maks",
+          "Lepo 2 min kävelyä",
+          "4-6 toistoa",
+          "Jäähdytä 5 minuuttia"
+        ],
+        "tips": [
+          "Tasainen vauhti, ei sprintti",
+          "Tarkkaile hengitystä",
+          "Käytä rataa turvallisesti",
+          "Edistyminen toistuu vähitellen"
+        ],
+        "equipment": "Raita tai mitattu silmukka",
+        "calories": "280-380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata hyppykyykky",
+        "description": "Neljä minuuttia korkeaa intensiteettiä, joka jäljittelee myöhäistä työvuoron väsymystä.",
+        "benefits": [
+          "Rakentaa anaerobista kestävyyttä",
+          "Lyhyt mutta tehokas istunto",
+          "Vahvistaa jalkoja",
+          "Kotimainen"
+        ],
+        "instructions": [
+          "20 sekunnin maksimihyppykyykky",
+          "10 sek lepoa",
+          "8 kierrosta = 4 minuuttia",
+          "Lämmitä ennen ja jäähdytä jälkeen",
+          "1-2 kertaa viikossa"
+        ],
+        "tips": [
+          "Laskeudu pehmeästi",
+          "Älä koskaan ohita lämmittelyä",
+          "Vältä pelipäivänä",
+          "Suojaa polvet hyvällä muodolla"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "120-180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU-tasapaino kepillä",
+        "description": "Epävakaa pinta ja tikkukäsittely takaavat jään kaltaisen tasapainon.",
+        "benefits": [
+          "Parantaa proprioseptiota",
+          "Harjoittelee asennon tasapainoa",
+          "Yhdistä kädet ja jalat",
+          "Rakentaa nilkan vakautta"
+        ],
+        "instructions": [
+          "Seiso BOSU:n päällä molemmin jaloin",
+          "Pidä maila, kevyt kiekon käsittely",
+          "Pidä 30–45 sekuntia",
+          "Lepää ja toista 4-6 kertaa",
+          "Kokeile yhtä jalkaa, kun olet valmis"
+        ],
+        "tips": [
+          "Silmät eteenpäin, eivät alaspäin",
+          "Pehmeä polven taivutus",
+          "Seinä lähellä turvallisuuden vuoksi",
+          "Aloita ilman kiekkoa"
+        ],
+        "equipment": "BOSU, jääkiekkomaila",
+        "calories": "70-100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Yksijalkainen RDL ulottuvuus",
+        "description": "Tasapaino ja takaketju kuten yksijalkainen luistelu vuorotellen.",
+        "benefits": [
+          "Rakentaa yhden jalan tasapainoa",
+          "Vahvistaa reisilihasta ja pakaralihasta",
+          "Parantaa lantion hallintaa",
+          "Luistelukohtainen"
+        ],
+        "instructions": [
+          "Seiso yhdellä jalalla kevyellä käsipainolla",
+          "Sarana eteenpäin, vapaa jalka takana",
+          "Kosketa lattiaa tai sääriä",
+          "Paluu pystysuoraan",
+          "8-10 toistoa per jalka"
+        ],
+        "tips": [
+          "Keskitä silmät yhteen kohtaan",
+          "Liiku hitaasti",
+          "Pidä lantio vaakasuorassa",
+          "2-3 sarjaa"
+        ],
+        "equipment": "Käsipaino",
+        "calories": "120-170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Yhden jalan varpaiden tasapaino",
+        "description": "Yksinkertainen nilkkojen ja jalkojen vakauspora luistelemiseen.",
+        "benefits": [
+          "Vahvistaa jalkoja",
+          "Parantaa tasapainoa",
+          "Nopea päivittäinen harjoitus",
+          "Voi tehdä missä tahansa"
+        ],
+        "instructions": [
+          "Seiso yhdellä jalalla",
+          "Nouse varpaille",
+          "Pidä 15-20 sekuntia",
+          "Laske ja vaihda jalkoja",
+          "6-8 toistoa per jalka"
+        ],
+        "tips": [
+          "Käytä tarvittaessa tukea",
+          "Silmät eteenpäin",
+          "Hengitä normaalisti",
+          "Paljain jaloin tai kengät"
+        ],
+        "equipment": "Ei mitään",
+        "calories": "30-50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Kumppanipassi yhdellä jalalla",
+        "description": "Tasapaino ja ohituskoordinaatio kuten pelin sisäinen liike.",
+        "benefits": [
+          "Yhdistää tasapainon ja syöttämisen",
+          "Parantaa ytimen vakautta",
+          "Junat keskittyvät",
+          "Kumppanin harjoitus"
+        ],
+        "instructions": [
+          "Seiso yhdellä jalalla kiekon/pallon kanssa",
+          "Kumppani 3-4 m päässä",
+          "Tee tarkkoja syöttöjä",
+          "30 sekuntia, vaihda jalkaa",
+          "4 kierrosta"
+        ],
+        "tips": [
+          "Pehmeät polvet",
+          "Teräviä syöttöjä",
+          "Älä uhraa tasapainoa vallan vuoksi",
+          "Myös seinäkiinnitys toimii"
+        ],
+        "equipment": "Kiekko/pallo, kumppani",
+        "calories": "60-90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Kävelevä syöksy pyörittämällä",
+        "description": "Dynaaminen tasapaino ja kierto vartalontarkastukseen valmistautumista varten.",
+        "benefits": [
+          "Parantaa dynaamista tasapainoa",
+          "Rakentaa kiertoa jaloista",
+          "Vahvistaa jalkoja",
+          "Toimiva jääkiekkoon"
+        ],
+        "instructions": [
+          "Astu eteenpäin syöksylle",
+          "Kierrä vartaloa etujalkaa kohti",
+          "Palaa takaisin ja astu toinen jalka",
+          "10 askelta per jalka",
+          "2-3 sarjaa"
+        ],
+        "tips": [
+          "Polvijäljet ​​jalan yli",
+          "Pysy pitkänä",
+          "Pallon pitäminen rinnassa valinnainen",
+          "Säädä tempoa"
+        ],
+        "equipment": "Ei mitään",
+        "calories": "100-150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Liu'uta laudan sivuportaat",
+        "description": "Simuloi sivuttaisluistelua tasapainoa korostaen.",
+        "benefits": [
+          "Rakentaa sivuvoimaa",
+          "Parantaa sivulta toiselle tasapainoa",
+          "Kehittää adduktoreita",
+          "Erinomainen puolustajille"
+        ],
+        "instructions": [
+          "Liukulaudan tai sukan liukusäätimiä",
+          "Sivuttaisaskel 20-30 sekuntia",
+          "Pysy matalassa asennossa",
+          "Lepo 60 sek",
+          "6-8 sarjaa"
+        ],
+        "tips": [
+          "Älä seiso pystyssä",
+          "Kädet valmiusasennossa",
+          "Ohjaa nopeutta",
+          "Käytä levypuskuria"
+        ],
+        "equipment": "Liukulauta",
+        "calories": "130-190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Aitahyppy",
+        "description": "Rakentaa jalkojen räjähtävyyttä ensimmäisen vaiheen purskeille ja taisteluhyppyille.",
+        "benefits": [
+          "Lisää pysty- ja vaakatehoa",
+          "Parantaa reaktiivisuutta",
+          "Kehittää koordinaatiota",
+          "Siirtyy jääkiihtyvyyteen"
+        ],
+        "instructions": [
+          "Aseta esteet 60–90 cm:n etäisyydelle toisistaan",
+          "Kahden jalan hyppy kunkin yli",
+          "Pehmeä lasku",
+          "6-8 aitajuoksua per sarja",
+          "3-4 sarjaa"
+        ],
+        "tips": [
+          "Pehmeät polvet laskeutuessa",
+          "Käytä käsiä aktiivisesti",
+          "Aloita matalilla esteillä",
+          "Täysi lepo sarjojen välillä"
+        ],
+        "equipment": "Esteitä tai kartioita",
+        "calories": "140-200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Sit-to-sprintin alku",
+        "description": "Poistaa esivenytyksen harjoittaakseen puhdasta ensimmäisen vaiheen räjähtävyyttä.",
+        "benefits": [
+          "Rakentaa käynnistysvoimaa",
+          "Parantaa reaktiota",
+          "Harjoittelee lonkan venytystä",
+          "Yksinkertainen kenttäporakone"
+        ],
+        "instructions": [
+          "Istu maassa, jalat eteenpäin",
+          "Kippitelineessä ja sprintissä 10 m",
+          "8-10 toistoa",
+          "Lepo 60-90s",
+          "Lämmitä ensin"
+        ],
+        "tips": [
+          "Älä nojaa ennen vihjettä",
+          "Seiso räjähdysmäisesti",
+          "Ensimmäiset 3 askelta max teho",
+          "Vaihtoehtoiset ohjeet"
+        ],
+        "equipment": "10 m kaista",
+        "calories": "100-150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Laajahypyn sarja",
+        "description": "Vaakasuora teho hyödyllinen lautataisteluissa ja push-offissa.",
+        "benefits": [
+          "Rakentaa vaakasuuntaista voimaa",
+          "Parantaa koordinaatiota",
+          "Vahvistaa jalkoja",
+          "Lyhyt istunto"
+        ],
+        "instructions": [
+          "Seisten leveä hyppy",
+          "Pehmeä lasku",
+          "Heti seuraava hyppy eteenpäin",
+          "5 hyppyä peräkkäin = 1 sarja",
+          "4-5 sarjaa levon kanssa"
+        ],
+        "tips": [
+          "Käytä käsivarren heilahtelua",
+          "Maa tasapainossa",
+          "Virtaus hyppää hyppäämään",
+          "Lämmittää polvet"
+        ],
+        "equipment": "Avoin tila",
+        "calories": "90-130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Lääkepallon slam",
+        "description": "Räjähtävä alaspäin suuntautuva heitto koko kehon kosketukseen.",
+        "benefits": [
+          "Rakentaa räjähtävän ytimen",
+          "Korkea intensiteetti nopeasti",
+          "Yhdistää jalat-ydin-kädet",
+          "Loistava stressinpoisto"
+        ],
+        "instructions": [
+          "Nosta lääkepallo pään yläpuolelle",
+          "Lyö lattiaan täydellä voimalla",
+          "Ota ja toista",
+          "10-12 toistoa",
+          "3 sarjaa"
+        ],
+        "tips": [
+          "Käytä jalkoja ja ydintä",
+          "Neutraali selkä nostossa",
+          "Katso rebound",
+          "Käytä 4-8 kg palloa"
+        ],
+        "equipment": "Lääkepallo",
+        "calories": "110-160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Kelkan työntö",
+        "description": "Raskas vaaka-ajo, kuten maksimaalinen seisontakäynnistys.",
+        "benefits": [
+          "Max jalkaveto",
+          "Alhainen iskukuormitus",
+          "Rakentaa henkistä sitkeyttä",
+          "Sopii hyvin voimahyökkääjille"
+        ],
+        "instructions": [
+          "Matala asento kelkan takana",
+          "Työnnä 15-20 m",
+          "Täysi lepo 2 min",
+          "4-6 työntöä",
+          "Ensin nivelten lämmittely"
+        ],
+        "tips": [
+          "Pysy alhaalla",
+          "Lyhyet voimakkaat askeleet",
+          "Älä nouse aikaisin",
+          "Käynnistysvalo kuormituksessa"
+        ],
+        "equipment": "Prowler kelkka",
+        "calories": "180-260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike tasaisesti 10 minuuttia",
+        "description": "Aerobinen pohja pitkille työvuoroille ja sesongin ulkopuoliseen hoitoon.",
+        "benefits": [
+          "Kehittää aerobista kestävyyttä",
+          "Yhteisystävällinen",
+          "Sykesäätö",
+          "Nopea off-ice-istunto"
+        ],
+        "instructions": [
+          "5 min lämmittely",
+          "10 min 65–70 %:n teholla",
+          "Tasainen kierrosluku",
+          "5 min jäähtyä",
+          "Tarkkaile hengitystä"
+        ],
+        "tips": [
+          "Pysy poissa anaerobisesta vyöhykkeestä",
+          "Vakaa asento",
+          "Hydraatti",
+          "2-3 kertaa viikossa"
+        ],
+        "equipment": "AirBike",
+        "calories": "180-250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Soutu erg intervallit",
+        "description": "Koko kehon kardioharjoittelu ilman iskuja vartalon ja jalkojen kestävyyteen.",
+        "benefits": [
+          "Koko kehon kuntoutus",
+          "Parantaa soutuasentoa",
+          "Rakentaa pitoa ja ydintä",
+          "Juokseva vaihtoehto"
+        ],
+        "instructions": [
+          "500 m kovaa / 1 min helppoa",
+          "6-8 kierrosta",
+          "Aja jaloista ja ytimestä",
+          "5 min lämmittely",
+          "Jäähdyttävä venytys"
+        ],
+        "tips": [
+          "Neutraali selkäranka",
+          "Kyynärpäät lantioon",
+          "Jopa jaettuun tahtiin",
+          "Säädä vaimennin viisaasti"
+        ],
+        "equipment": "Soutu erg",
+        "calories": "250-340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Jatkuvat luistelijahypyt",
+        "description": "Rytmiset sivusuunnat jalkojen ja lateraalisen kuntoon.",
+        "benefits": [
+          "Rakentaa sivuttaiskestävyyttä",
+          "Vahvistaa jalkoja",
+          "Jäljittelee suunnanmuutoksia",
+          "Kompakti porakone"
+        ],
+        "instructions": [
+          "Hyppää puolelta toiselle jalalla toiselle",
+          "Kädet kuin luistelu",
+          "30 s työ / 30 s lepo",
+          "10 kierrosta",
+          "Pehmeät laskut"
+        ],
+        "tips": [
+          "Polvijäljet ​​jalan yli",
+          "Rinta ylös",
+          "Ohjaa hyppymatkaa",
+          "Lämmitä ensin"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "130-190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "45/15 piiriharjoittelu",
+        "description": "Neljän aseman piiri jääkiekon yleiseen kuntoon.",
+        "benefits": [
+          "Koko kehon kuormitus",
+          "Aika tehokasta",
+          "Kehittää työkykyä",
+          "Kuntosali mukautuva"
+        ],
+        "instructions": [
+          "Burpeet, vuorikiipeilijät, hyppykyykkyt, punnerrukset",
+          "45 s työ / 15 s siirtymä",
+          "4 siirtoa × 4 kierrosta",
+          "2min lepo kierrosten välillä",
+          "Lämmitä ja jäähdytä"
+        ],
+        "tips": [
+          "Skaalaa tasollesi",
+          "Muotoile yli nopeuden",
+          "Pysy nesteytyksessä",
+          "Vältä pelipäivänä"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "280-380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Matalat esteen läpiajot",
+        "description": "Cardio plus koordinaatio nopeilla askelilla, kuten kova luistelu.",
+        "benefits": [
+          "Parantaa poljinnopeutta",
+          "Rakentaa koordinaatiota",
+          "Lisää aerobista kapasiteettia",
+          "Vaihtelee juoksutyötä"
+        ],
+        "instructions": [
+          "6-8 matalaa aitaa yli 20 m",
+          "Juokse läpi korkeilla polvilla",
+          "6 passia",
+          "Lepo 90 sek",
+          "3-4 sarjaa"
+        ],
+        "tips": [
+          "Älä leikkaa esteitä",
+          "Nopeat lyhyet askeleet",
+          "Aktiiviset kädet",
+          "Lämmitä nivelet"
+        ],
+        "equipment": "Mini aitajuoksu",
+        "calories": "200-280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Tikkaat nopeat jalat",
+        "description": "Nopea jalkapohja väistämiseen ja tiukoille käännöksille.",
+        "benefits": [
+          "Parantaa jalkanopeutta",
+          "Rakentaa koordinaatiota",
+          "Tehostaa reaktiota",
+          "Jäätä edeltävä lämmittely"
+        ],
+        "instructions": [
+          "Tikkaiden kautta sisään-ulos-ulos",
+          "30 s max / 30 s lepo",
+          "8 kierrosta",
+          "Vaihtele kuvioita joka toinen kierros",
+          "Ensin kevyt lämmittely"
+        ],
+        "tips": [
+          "Silmät ylös",
+          "Lyhyet askeleet",
+          "Kädet urheilullisessa valmiina",
+          "Älä ohita askelmia"
+        ],
+        "equipment": "Agilitytikkaat",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-pora ketteryyttä",
+        "description": "Klassinen T-testi: sprintti, sekoitus ja backpedal kuin jäällä.",
+        "benefits": [
+          "Täydellinen agilitypaketti",
+          "Junat kaikkiin suuntiin",
+          "Seurattavaa edistystä",
+          "Luistelijalle"
+        ],
+        "instructions": [
+          "Sprintti 10 m eteenpäin",
+          "Sekoita 5 m vasemmalle ja oikealle",
+          "Takaisinpoljin 10 m alkuun",
+          "3-5 toistoa",
+          "Lepo 90 sek"
+        ],
+        "tips": [
+          "Pysy alhaalla shufflessa",
+          "Älä risti jalkoja",
+          "Kosketuskartioita",
+          "Kirjaa ajat"
+        ],
+        "equipment": "Käpyjä",
+        "calories": "100-150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Kiekko-8-pora",
+        "description": "Kädet ja jalkatyöt yhdistävä keppikahva.",
+        "benefits": [
+          "Parantaa tikun käsittelyä",
+          "Yhdistä kädet ja jalat",
+          "Harjoittelee ääreisnäköä",
+          "Kotimainen"
+        ],
+        "instructions": [
+          "Kaksi kartiota 2 m päässä toisistaan",
+          "Kiekkofiguuri-8 kartioiden ympärillä",
+          "30 sek maksiminopeus",
+          "Lepo 30 sek",
+          "10 kierrosta"
+        ],
+        "tips": [
+          "Pää ylös",
+          "Pehmeät kädet",
+          "Nopeat jalat",
+          "Vaihda suuntaa 5 kierroksen välein"
+        ],
+        "equipment": "Kiekko, 2 kartiota, keppi",
+        "calories": "90-130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktiiviset kartiokutsut",
+        "description": "Kumppani kutsuu kartiota – reaktio ja ensimmäinen askel kuin pelin sisäinen lukeminen.",
+        "benefits": [
+          "Treenaa pelireaktiota",
+          "Parantaa kognitiivista nopeutta",
+          "Rakentaa ensimmäisen askeleen",
+          "Kumppanin harjoitus"
+        ],
+        "instructions": [
+          "4 kartiota 3 m neliössä",
+          "Kumppani soittaa väri/numero",
+          "Sprintti kartioon",
+          "Kosketa ja palaa",
+          "20 reaktiota"
+        ],
+        "tips": [
+          "Ole rehellinen, älä arvaa aikaisin",
+          "Matala asenne",
+          "Räjähtävä ensimmäinen askel",
+          "Vaihtele asettelua"
+        ],
+        "equipment": "4 kartiota, kumppani",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Sivusuuntaiset sekoitusportaat",
+        "description": "Sivusuunnat jääkiekkoasennossa, jotka jäljittelevät sivuttaisluistelua.",
+        "benefits": [
+          "Rakentaa sivuttaista nopeutta",
+          "Vahvistaa lantion sieppaajia",
+          "Parantaa asennetta",
+          "Jäätä edeltävä lämmittely"
+        ],
+        "instructions": [
+          "5 m sekoitus vasemmalle ja oikealle",
+          "Älä risti jalkoja",
+          "30 s / 30 s lepo",
+          "8 kierrosta",
+          "Kädet kuvitteellisella kepillä"
+        ],
+        "tips": [
+          "Pysy alhaalla",
+          "Irrota jalka ulkopuolelta",
+          "Rinta eteenpäin",
+          "Pikaiset yhteydenotot"
+        ],
+        "equipment": "kartioita tai viivoja",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynaaminen lantionavaaja",
+        "description": "Lantion liikkuvuuden lämmittely syvään jääkiekkoasentoon.",
+        "benefits": [
+          "Parantaa lantion liikkuvuutta",
+          "Vähentää nivusvammojen riskiä",
+          "Valmistautuu luisteluun",
+          "Nopea rutiini"
+        ],
+        "instructions": [
+          "Jalkojen heilahdus edestä taakse 10 kumpikin",
+          "Jalkojen keinut sivuttain 10 kumpikin",
+          "Syväkyykky 30 s",
+          "Lantioympyrät 10 kumpaankin suuntaan",
+          "Kävelypolvihalaukset 10 m"
+        ],
+        "tips": [
+          "Hallittu kantama",
+          "Ei kipua",
+          "Hengitä syvään",
+          "Ennen jokaista istuntoa"
+        ],
+        "equipment": "Ei mitään",
+        "calories": "40-60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Maailman suurin venytys",
+        "description": "Dynaaminen venytys, joka osuu lantioon, rintakehään ja reisilihaksiin.",
+        "benefits": [
+          "Koko kehon liikkuvuus",
+          "Aika tehokasta",
+          "Valmistelee koko kehon",
+          "Yleinen pro-lämmittely"
+        ],
+        "instructions": [
+          "Astu syöksyyn",
+          "Kyynärpää alas jalan sisäpuolella",
+          "Rintakehän kierto käsi ylös",
+          "Suorista etujalka reisilihasta varten",
+          "5 toistoa per puoli"
+        ],
+        "tips": [
+          "Liiku hitaasti",
+          "Ei pomppimista",
+          "Track etupolvi",
+          "Tasapuoliset molemmat puolet"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "50-70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Nauha irrotettavat",
+        "description": "Aktivoi yläselän ja hartioiden ennen ampumista ja kosketusta.",
+        "benefits": [
+          "Aktivoi takaosat ja romboidit",
+          "Parantaa ryhtiä",
+          "Lämmittää olkapäät",
+          "Vahinkojen ehkäisy"
+        ],
+        "instructions": [
+          "Pidä nauha rinnan korkeudella",
+          "Kädet suorina",
+          "Vedä irti lapaluista",
+          "15-20 toistoa",
+          "2-3 sarjaa"
+        ],
+        "tips": [
+          "Ei olkapäiden kohautusta",
+          "Hallittu palautus",
+          "Kevyt bändi aloittaa",
+          "Ennen jäätä tai kuntosalia"
+        ],
+        "equipment": "Vastusnauha",
+        "calories": "30-50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Korkeat polvet + takapotkut",
+        "description": "Dynaaminen jalkojen lämmittely ja syketehostus ennen jäätä.",
+        "benefits": [
+          "Nostaa sykettä",
+          "Lämmittää neloset ja reisilihakset",
+          "Parantaa koordinaatiota",
+          "Nopea vaikutus"
+        ],
+        "instructions": [
+          "20 m korkeat polvet",
+          "20 m takapotkuja",
+          "20 m väliin",
+          "Toista 3-4 kertaa",
+          "Helppo hölkkä välillä"
+        ],
+        "tips": [
+          "Pysy jalkaterässä",
+          "Aktiiviset kädet",
+          "Rakenna tempoa vähitellen",
+          "Älä sprintti kylmänä"
+        ],
+        "equipment": "20 m tilaa",
+        "calories": "60-90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Käsivarsien heilahtelut + sauvalämmittely",
+        "description": "Hartioiden lämmittely sekä kevyt tikkujen käsittely ennen jäätä.",
+        "benefits": [
+          "Mobilisoi olkapäät",
+          "Aktivoi rotaattorimansetin",
+          "Ylävartalo kiinnittyy kiinni",
+          "Jääkiekkokohtainen"
+        ],
+        "instructions": [
+          "Käsivarren ympyrät 10 kumpaankin suuntaan",
+          "Ristikeinut 10",
+          "Tikkukahva hitaasta nopeaan 60 sekuntia",
+          "Rannerullat kepillä 20",
+          "Kevyt laukausliike x10"
+        ],
+        "tips": [
+          "Edistymisnopeus",
+          "Molemmat kädet",
+          "Ei pakotettua kantamaa",
+          "Jokainen jääsessio"
+        ],
+        "equipment": "Maila, kiekko",
+        "calories": "50-80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Polvistuva lantion koukistaja",
+        "description": "Lonkkakoukistaja venyttämään vastaluisteluasentoa.",
+        "benefits": [
+          "Vähentää lantion kireyttä",
+          "Saattaa parantaa askelta",
+          "Auttaa asentoa",
+          "Jään tai kuntosalin jälkeen"
+        ],
+        "instructions": [
+          "Polvistuva syöksyasento",
+          "Purista glute takaisin",
+          "Vartalo korkea",
+          "Pidä 30-45 sekuntia",
+          "2-3 kertaa per jalka"
+        ],
+        "tips": [
+          "Vältä lannekaarta",
+          "Hengitä venytykseen",
+          "Etupolvi nilkan yli",
+          "Päivittäin jos mahdollista"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "90/90 lantion pyöritys",
+        "description": "Lantio liikkuvuutta käännöksiä ja syvää kyykkyä luistimilla.",
+        "benefits": [
+          "Parantaa lantion pyörimistä",
+          "Vähentää nivusen venymisriskiä",
+          "Rauhallista palautumistyötä",
+          "Ystävällinen pelin jälkeen"
+        ],
+        "instructions": [
+          "Istu 90/90-asennossa",
+          "Pyöritä polvia sivulta toiselle",
+          "Kädet takana tukea varten",
+          "10 hidasta toistoa kumpaankin suuntaan",
+          "Pidä loppu 20 sekuntia"
+        ],
+        "tips": [
+          "Ei pakotusaluetta",
+          "Rinta korkea",
+          "Molemmat lonkat alas jos mahdollista",
+          "Käytä hengitystä"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Rintakehän kiertovenyttely",
+        "description": "Rintakehän liikkuvuus laukauksen pyörittämiseen ja asennon parantamiseen.",
+        "benefits": [
+          "Parantaa T-selkärangan pyörimistä",
+          "Purkaa alaselkää",
+          "Auttaa laukausmekaniikkaa",
+          "Nopea päivittäinen harjoitus"
+        ],
+        "instructions": [
+          "Nelijalkainen asema",
+          "Käsi pään takana",
+          "Kierrä kyynärpää kattoon",
+          "10 toistoa kummallekin puolelle",
+          "Pysäytä 2 sekuntia yläreunassa"
+        ],
+        "tips": [
+          "Lonkat pysyvät suorassa",
+          "Hengitä ulos pyörittämällä",
+          "Ei selkäkipuja",
+          "Liiku hitaasti"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "30-45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Seinäpohkeen jousto",
+        "description": "Pohkeet ja Akhilleus ovat usein ylikuormitettuja luistimissa.",
+        "benefits": [
+          "Vähentää pohkeen kireyttä",
+          "Parantaa nilkan dorsifleksiota",
+          "Säärilastan esto",
+          "Jokaisen istunnon jälkeen"
+        ],
+        "instructions": [
+          "Kädet seinälle",
+          "Takajalka suora kantapää alaspäin",
+          "Pidä 30 sekuntia",
+          "Taivuta polvea jalkapohjaa varten",
+          "2-3 kierrosta kummallakin jalalla"
+        ],
+        "tips": [
+          "Kantapää lattialla",
+          "Lonkat neliö",
+          "Ei pomppimista",
+          "Molemmat jalat"
+        ],
+        "equipment": "Seinä",
+        "calories": "25-40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Cross-body olkapäiden venytys",
+        "description": "Takaosan olkapään venytys ampumisen jälkeen.",
+        "benefits": [
+          "Vähentää hartioiden kireyttä",
+          "Auttaa ampumaetäisyyttä",
+          "Nopea venytys",
+          "Päivittäinen huolto"
+        ],
+        "instructions": [
+          "Vedä käsivarsi rinnan yli",
+          "Pidä kyynärpäästä kiinni toisella kädellä",
+          "30 sekuntia kumpikin käsi",
+          "Toista 2-3 kertaa",
+          "Rento niska"
+        ],
+        "tips": [
+          "Älä kohauta olkapäitään",
+          "Vain hellävarainen veto",
+          "Hengitä ulos ja rentoudu",
+          "Jään jälkeen"
+        ],
+        "equipment": "Ei mitään",
+        "calories": "20-35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Diafragmaattinen hengitys",
+        "description": "Syvä hengitys parasympaattiseen palautumiseen pelin jälkeen.",
+        "benefits": [
+          "Vähentää stressiä",
+          "Tukee palautumista",
+          "Voi parantaa unta",
+          "Pukuhuoneystävällinen"
+        ],
+        "instructions": [
+          "Makaa tai istu mukavasti",
+          "Käsi vatsalla",
+          "Hengitä sisään 4 sekunnin nenä",
+          "Hengitä ulos 6 sekuntia suuhun",
+          "5 minuuttia yhtäjaksoisesti"
+        ],
+        "tips": [
+          "Vatsa ei rintakehä nousee",
+          "Hiljainen tila",
+          "Päivittäinen tapa",
+          "Myöhäisten pelien jälkeen"
+        ],
+        "equipment": "Ei mitään",
+        "calories": "15-25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Jalat seinää vasten",
+        "description": "Laskimopalautus ja jalkojen rentoutuminen raskaiden pelien jälkeen.",
+        "benefits": [
+          "Voi vähentää jalkojen turvotusta",
+          "Edistää rentoutumista",
+          "Passiivinen palautuminen",
+          "Matkapelien jälkeen"
+        ],
+        "instructions": [
+          "Lonkat lähellä seinää makuuasennossa",
+          "Jalat pystysuorassa seinässä",
+          "Kädet rentoina",
+          "Pidä 8-10 minuuttia",
+          "Hidas hengitys"
+        ],
+        "tips": [
+          "Mukava pinta",
+          "Irrota pistoke puhelimesta",
+          "Valinnainen rauhallinen musiikki",
+          "Parasta illalla"
+        ],
+        "equipment": "Seinä, matto",
+        "calories": "20-30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Foam roll neloset ja hamstrings",
+        "description": "Myofaskiaalinen vapautus jaloille raskaan kuormituksen jälkeen.",
+        "benefits": [
+          "Vähentää arkoja",
+          "Parantaa kudosten laatua",
+          "Nopeampi palautuminen",
+          "Itsehoito"
+        ],
+        "instructions": [
+          "Rullaa neloset 60 sekuntia",
+          "Kierrä reidet 60 sekuntia",
+          "Pysäytä herkät kohdat 20 sekuntia",
+          "Vain kevyt IT-nauha",
+          "Kosteuta jälkeen"
+        ],
+        "tips": [
+          "Vältä niveliä",
+          "Hengitä ahtaiden kohtien läpi",
+          "Kohtalainen paine",
+          "Ei esijäätä"
+        ],
+        "equipment": "Vaahtorulla",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Lonkat ja nilkat liikkuvat",
+        "description": "Hellävarainen liikkuvuus päivän ulkopuolella liikeradan ylläpitämiseksi.",
+        "benefits": [
+          "Säilyttää liikkuvuuden",
+          "Alhainen väsymys",
+          "Aktiivinen palautuminen",
+          "Vahinkojen ehkäisy"
+        ],
+        "instructions": [
+          "Nilkkaympyrät 10 kpl",
+          "Hip CARs 5 kumpaankin suuntaan",
+          "Kissa-lehmä 10 toistoa",
+          "Lapsen asento 60 sek",
+          "2 kierrosta"
+        ],
+        "tips": [
+          "Kivuton alue",
+          "Hidasta ja hallittua",
+          "Vapaapäivä tai aamu",
+          "Lisää hengitys"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Uneen valmistautuva venyttely ja hengitys",
+        "description": "Kevyt venyttely ja hengitys ennen nukkumaanmenoa yön yli palautumiseen.",
+        "benefits": [
+          "Tukee nukahtamista",
+          "Rentouttaa hermostoa",
+          "Palautuminen nukkuessa",
+          "Ilta rituaali"
+        ],
+        "instructions": [
+          "Reisilihaksen venytys 30 sekuntia",
+          "Lapsen asento 60 sek",
+          "Kierre selällään 30 sekuntia",
+          "Laatikkohengitys 4-4-4-4 3 min",
+          "Pimeä hiljainen huone"
+        ],
+        "tips": [
+          "Ei näyttöjä sen jälkeen",
+          "Tasainen nukkumaanmenoaika",
+          "Viileä huone",
+          "Tee siitä tapa"
+        ],
+        "equipment": "Harjoitusmatto",
+        "calories": "25-40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     },
     "difficulties": {
@@ -1735,6 +3135,8 @@
     "codeSentToEmailMessage": "Koodi lähetetty osoitteeseen {email}",
     "userNotFound": "Käyttäjää ei löydy",
     "userNotFoundMessage": "Tällä puhelinnumerolla ei ole tiliä. Ole hyvä ja rekisteröidy.",
+    "networkError": "Yhteysongelma",
+    "networkErrorMessage": "Palvelimeen ei saatu yhteyttä. Tarkista internetyhteys ja yritä uudelleen.",
     "errorSendingCode": "Virhe",
     "errorSendingCodeMessage": "Koodin lähettäminen epäonnistui. Tarkista puhelinnumerosi ja internetyhteytesi.",
     "errorResendingCode": "Virhe",
@@ -1925,6 +3327,8 @@
     "rightShort": "P",
     "startedHockey": "Jääkiekossa kanssa",
     "noFriendsYet": "{name} ei ole vielä ystäviä",
+    "inviteYourTeam": "Kutsu joukkueesi",
+    "inviteTeamMessage": "Olen HockeyStarsissa – jääkiekkoilijoiden sovelluksessa. Liity mukaan:",
     "beFirstToAdd": "Lisää {name} ensimmäisenä ystäväksi",
     "writeMessage": "Kirjoita viesti",
     "edit": "Muokata",
@@ -2368,9 +3772,17 @@
     "weightFrom": "Paino",
     "all": "Kaikki",
     "noPlayersFound": "Pelaajia ei löytynyt",
+    "newcomers": "Tulokkaat",
+    "topByPoints": "Top pisteissä",
     "left": "Vasen",
     "right": "Oikein",
-    "resetFilters": "Nollaa suodattimet"
+    "resetFilters": "Nollaa suodattimet",
+    "topBySV": "Top SV%",
+    "shareRating": "Jaa ranking",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "pistettä",
+    "allCountries": "Kaikki maat",
+    "allYears": "Kaikki vuodet"
   },
   "messages": {
     "title": "Viestit",
@@ -2824,6 +4236,23 @@
     "physicalDataUpdate": "Fyysisten tietojen päivitys",
     "friendRequest": "Kaveripyyntö",
     "newFriendship": "Uusi ystävyys",
-    "speedRecord": "Uusi nopeusennätys"
+    "speedRecord": "Uusi nopeusennätys",
+    "gameFirstPlace": "Pelin mestari",
+    "quizFirstPlace": "Jääkiekkotähti"
+  },
+  "videoUploadHint": "Maks. 20 sekuntia per video, enintään 10 videota",
+  "gameFirstPlaceNotification": {
+    "title": "Pelin mestari",
+    "message": "{playerName} sai 1. sijan"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Jääkiekkotähti",
+    "message": "{playerName} ansaitsi {prize}"
+  },
+  "tabs": {
+    "chat": "Chat",
+    "feed": "Syöte",
+    "scout": "Scout",
+    "skills": "Taidot"
   }
 }

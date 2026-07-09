@@ -1,4 +1,3 @@
-import SafeIcon from './SafeIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import { Dimensions, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

@@ -32,36 +32,23 @@ function isHeadingLine(line: string): boolean {
   return false;
 }
 
-/** Extract text of the first section (heading + its content, up to the next heading).
- *  If text starts with a heading, includes that heading + its body.
- *  Falls back to first paragraph if no headings found. */
-function getFirstSection(text: string): string {
-  if (!text || text.length < 100) return text;
-  const lines = text.split('\n');
-  let headingCount = 0;
-  let secondHeadingCharPos = -1;
-  let charPos = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (isHeadingLine(lines[i])) {
-      headingCount++;
-      if (headingCount === 2) {
-        secondHeadingCharPos = charPos;
-        break;
-      }
-    }
-    charPos += lines[i].length + 1;
+/** Collapsed preview: first substantive paragraph only (skip standalone headings). */
+function getPreviewParagraph(text: string): string {
+  if (!text) return '';
+  const blocks = text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+  if (blocks.length === 0) return text;
+  for (const block of blocks) {
+    if (block.replace(/\s/g, '').length < 12) continue;
+    if (isHeadingLine(block)) continue;
+    return block;
   }
-  if (secondHeadingCharPos > 0) {
-    const slice = text.slice(0, secondHeadingCharPos).trimEnd();
-    // Make sure we got meaningful content (not just whitespace)
-    if (slice.replace(/\s/g, '').length > 20) return slice;
-  }
-  // Fallback: cut at first double-newline break after some content
-  const doubleBreak = text.indexOf('\n\n', 60);
-  if (doubleBreak > 0 && doubleBreak < text.length - 50) {
-    return text.slice(0, doubleBreak).trimEnd();
-  }
-  return text;
+  return blocks[0];
+}
+
+function looksLikeCompleteTranslation(sourceText: string, translation: string | null | undefined): boolean {
+  if (!translation) return false;
+  if (!sourceText) return true;
+  return translation.length >= sourceText.length * 0.75;
 }
 
 export interface AIAnalysis {
@@ -133,7 +120,7 @@ interface Props {
   maxUsage?: number;
   onGenerate: () => void;
   onTogglePublic: (isPublic: boolean) => void;
-  onTranslate: (lang: string) => Promise<string>;
+  onTranslate: (lang: string, forceRetranslate?: boolean) => Promise<string>;
   isGenerating?: boolean;
   canGenerate: boolean;
   missingFields?: string[];
@@ -222,8 +209,11 @@ export default function AIAnalysisCard({
   const preferredLang = language === 'ru' ? 'ru' : 'en';
   const textRussian = analysis?.translations?.ru ?? (analysis?.generation_language === 'ru' ? analysis?.text : null);
   const textEnglish = analysis?.translations?.en ?? (analysis?.generation_language === 'en' ? analysis?.text : null);
-  const hasRussian = !!textRussian;
-  const hasEnglish = !!textEnglish;
+  const originalText = analysis?.text || '';
+  const russianComplete = looksLikeCompleteTranslation(originalText, textRussian);
+  const englishComplete = looksLikeCompleteTranslation(originalText, textEnglish);
+  const hasRussian = !!textRussian && russianComplete;
+  const hasEnglish = !!textEnglish && englishComplete;
 
   const [showOtherLang, setShowOtherLang] = useState(false); // manual switch to non-preferred
   const [translating, setTranslating] = useState(false);
@@ -258,9 +248,9 @@ export default function AIAnalysisCard({
     prevGeneratingRef.current = isGenerating;
   }, [isGenerating, hasAnalysis]);
 
-  // Need to fetch translation when we don't have the preferred version yet
-  const needTranslate = hasAnalysis && preferredLang === 'ru' && !hasRussian;
-  const needTranslateEn = hasAnalysis && preferredLang === 'en' && !hasEnglish;
+  // Need to fetch translation when we don't have the preferred version yet (or cached one was truncated)
+  const needTranslate = hasAnalysis && preferredLang === 'ru' && (!textRussian || !russianComplete);
+  const needTranslateEn = hasAnalysis && preferredLang === 'en' && (!textEnglish || !englishComplete);
   const showTranslateBtn = needTranslate || needTranslateEn;
   const showSwitchBtn = hasRussian && hasEnglish;
   const showAddOtherBtn = hasAnalysis && !showTranslateBtn && !showSwitchBtn;
@@ -268,11 +258,20 @@ export default function AIAnalysisCard({
   const showEditFields = isOwner && (isEditing || isRegenerateMode);
 
   const handleTranslate = async (targetLang?: 'ru' | 'en') => {
-    const lang = targetLang ?? (needTranslate ? 'ru' : 'en');
-    if (analysis?.translations?.[lang]) return;
+    // onPress passes a gesture event as the 1st arg — ignore non-string values
+    const lang: 'ru' | 'en' =
+      targetLang === 'ru' || targetLang === 'en'
+        ? targetLang
+        : needTranslate
+          ? 'ru'
+          : 'en';
+    const existing = analysis?.translations?.[lang] ?? (lang === analysis?.generation_language ? analysis?.text : null);
+    const sourceText = analysis?.text || '';
+    const looksComplete = looksLikeCompleteTranslation(sourceText, existing);
+    if (looksComplete) return;
     setTranslating(true);
     try {
-      await onTranslate(lang);
+      await onTranslate(lang, !!existing && !looksComplete);
     } catch (e) {
       console.error('Translation failed:', e);
       Alert.alert(t('common.error') || 'Error', (e as Error)?.message || 'Translation failed');
@@ -581,7 +580,7 @@ export default function AIAnalysisCard({
 
       {/* Analysis text — collapsed to first section, expandable */}
       <View key={showFullAnalysis ? 'full' : 'collapsed'}>
-        <MarkdownText text={showFullAnalysis ? (displayText || '') : getFirstSection(displayText || '')} />
+        <MarkdownText text={showFullAnalysis ? (displayText || '') : getPreviewParagraph(displayText || '')} />
       </View>
 
       {/* Expand / Collapse button */}
@@ -609,7 +608,7 @@ export default function AIAnalysisCard({
         {showTranslateBtn && (
           <TouchableOpacity
             style={[styles.actionBtn, styles.actionBtnActive]}
-            onPress={handleTranslate}
+            onPress={() => handleTranslate()}
             disabled={translating}
           >
             {translating

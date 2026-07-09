@@ -30,6 +30,8 @@ Notifications.setNotificationHandler({
       
       return {
         shouldShowAlert: true, // Показываем уведомления о подарках всегда
+        shouldShowBanner: true,
+        shouldShowList: true,
         shouldPlaySound: true, // Воспроизводим звук
         shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
       };
@@ -40,6 +42,8 @@ Notifications.setNotificationHandler({
       console.log('🔔 Приложение активно - не показываем push уведомление');
       return {
         shouldShowAlert: false, // Не показываем уведомления когда приложение активно
+        shouldShowBanner: false,
+        shouldShowList: false,
         shouldPlaySound: false, // Не воспроизводим звук
         shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
       };
@@ -57,6 +61,8 @@ Notifications.setNotificationHandler({
     
     return {
       shouldShowAlert: true, // Показываем уведомления когда в фоне
+      shouldShowBanner: true,
+      shouldShowList: true,
       shouldPlaySound: true, // Воспроизводим звук когда в фоне
       shouldSetBadge: true, // Обновляем бейдж для счетчика уведомлений
     };
@@ -113,7 +119,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
             allowAlert: true,
             allowBadge: true,
             allowSound: true,
-            allowAnnouncements: false,
           },
         });
       finalStatus = status;

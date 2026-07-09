@@ -8,7 +8,7 @@ import { captureRef } from 'react-native-view-shot';
 import { useFocusEffect, useLocalSearchParams, useRouter, useSegments, usePathname } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { COUNTRIES } from '../../utils/constants';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useScreenContext } from '../../contexts/ScreenContext';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
@@ -25,6 +25,7 @@ import {
     Modal,
     PanResponder,
     Platform,
+    Share,
     ScrollView,
     StyleProp,
     StyleSheet,
@@ -38,6 +39,7 @@ import {
 import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
+import CachedBackground from '../../components/CachedBackground';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import Animated from 'react-native-reanimated';
@@ -59,23 +61,26 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
-import CachedBackground from '../../components/CachedBackground';
+import LoadingCenter from '../../components/LoadingCenter';
+import { ICE_BACKGROUND } from '../../utils/iceBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
 import AIAnalysisCard, { AIAnalysis } from '../../components/AIAnalysisCard';
-import VideoCarousel from '../../components/VideoCarousel';
+import VideoCarousel, { DirectVideoThumbnail } from '../../components/VideoCarousel';
+import { sortVideoUrlsNewestFirst } from '../../utils/videoUrls';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
-import { supabase } from '../../utils/supabase';
+import { getSupabaseFunctionUrl, supabase, supabaseAnonKey, supabaseFetch } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
 import { useStatsChanges } from '../../hooks/useStatsChanges';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useUser } from '../../contexts/UserContext';
 
-const iceBg = require('../../assets/images/led.jpg');
+const iceBg = ICE_BACKGROUND;
 
 // Build a referral-capable link:
 // - If Branch deferred deep links are configured, use Branch long link.
@@ -166,9 +171,14 @@ const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurS
 
 SectionCard.displayName = 'SectionCard';
 
+const VIDEO_EDIT_GRID_COLUMNS = 3;
+const VIDEO_EDIT_GRID_GAP = 10;
+// scroll padding (20×2) + section padding (20×2) + section border (2×2)
+const VIDEO_EDIT_SECTION_INSET = 84;
+
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId } = useLocalSearchParams();
+  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId, refreshProfile } = useLocalSearchParams();
   const router = useRouter();
   const navigation = useNavigation();
   const segments = useSegments();
@@ -177,8 +187,18 @@ export default function PlayerProfile() {
   const { setCurrentScreen } = useScreenContext();
   const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
+  /** Позиция скролла должна восстанавливаться только для того же profile id. */
+  const savedScrollProfileIdRef = useRef<string | null>(null);
   /** Пока timestamp в будущем — не восстанавливать scroll после Realtime (иначе откат с позиции из уведомления scrollTo*). */
   const suppressProfileScrollRestoreUntilRef = useRef(0);
+  /** Блокирует restore scroll во время accept/send friend (layout + Realtime). */
+  const friendInteractionUntilRef = useRef(0);
+  /** Deep-link scrollTo* выполняется один раз на комбинацию player + param. */
+  const deepLinkScrollAppliedRef = useRef<string | null>(null);
+  /** Пользователь уже прокрутил профиль — не откатывать наверх отложенным scrollTo. */
+  const userStartedScrollingRef = useRef(false);
+  /** scrollTo(0) уже применён для этого profile id в текущей навигации. */
+  const profileScrollTopAppliedRef = useRef<string | null>(null);
   const previousScreenRef = useRef<string | null>(null);
   const aiSectionRef = useRef<View>(null);
   const museumRef = useRef<View>(null);
@@ -196,6 +216,32 @@ export default function PlayerProfile() {
   
   // Ref для предотвращения повторных запросов статуса дружбы при переходе из уведомления
   const friendshipFetchedForRef = useRef<string | null>(null);
+
+  const restoreProfileScrollOnce = useCallback((y: number) => {
+    if (userStartedScrollingRef.current) return;
+    if (Date.now() < suppressProfileScrollRestoreUntilRef.current) return;
+    if (Date.now() < friendInteractionUntilRef.current) return;
+    const activeProfileId = Array.isArray(id) ? id[0] : id;
+    if (
+      savedScrollProfileIdRef.current &&
+      activeProfileId &&
+      savedScrollProfileIdRef.current !== activeProfileId
+    ) {
+      return;
+    }
+    if (!scrollViewRef.current || y < 0) return;
+    InteractionManager.runAfterInteractions(() => {
+      requestAnimationFrame(() => {
+        scrollViewRef.current?.scrollTo({ y, animated: false });
+      });
+    });
+  }, [id]);
+
+  const markFriendInteraction = useCallback(() => {
+    const until = Date.now() + 3500;
+    friendInteractionUntilRef.current = until;
+    suppressProfileScrollRestoreUntilRef.current = until;
+  }, []);
   
   // Функция для определения цвета контура аватара (перенесена внутрь компонента)
   const getAvatarBorderColorInside = (status?: string) => {
@@ -228,11 +274,18 @@ export default function PlayerProfile() {
   const currentLoadingIdRef = useRef<string | null>(null);
   const [museumUpdateKey, setMuseumUpdateKey] = useState<number>(0);
   const [photosCache, setPhotosCache] = useState<Record<string, string[]>>({});
-  const [player, setPlayer] = useState<Player | null>(null);
+  const initialProfileId = Array.isArray(id) ? id[0] : id;
+  const [player, setPlayer] = useState<Player | null>(() => {
+    if (!initialProfileId || typeof initialProfileId !== 'string') return null;
+    return getCachedPlayerSync(initialProfileId);
+  });
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const currentUserLoadRef = useRef<Player | null>(null);
   currentUserLoadRef.current = currentUser;
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (!initialProfileId || typeof initialProfileId !== 'string') return true;
+    return getCachedPlayerSync(initialProfileId) === null;
+  });
   // Счётчики просмотров — отдельный state, не зависящий от кэша player
   const [profileViews, setProfileViews] = useState<{ total: number; today: number } | null>(null);
   // Ref для предотвращения двойного инкремента в рамках одного фокуса экрана
@@ -306,6 +359,8 @@ export default function PlayerProfile() {
   const isEditingRef = useRef(false);
   // Флаг для отслеживания времени последнего сохранения (чтобы игнорировать Realtime обновления сразу после сохранения)
   const lastSaveTimeRef = useRef<number>(0); // Ref для актуального значения isEditing в callback'ах
+  // Защита от двойного вызова handleSave (двойное нажатие = двойные уведомления)
+  const isSavingRef = useRef(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editData, setEditData] = useState<Partial<Player>>({});
   const [showCountryPicker, setShowCountryPicker] = useState(false);
@@ -316,12 +371,27 @@ export default function PlayerProfile() {
   const [selectedBirthDate, setSelectedBirthDate] = useState(new Date());
   const [showHockeyStartDatePicker, setShowHockeyStartDatePicker] = useState(false);
   const [selectedHockeyStartDate, setSelectedHockeyStartDate] = useState(new Date());
-  const [videoFields, setVideoFields] = useState<Array<{url: string, hours: string, minutes: string, seconds: string}>>([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+  const [videoFields, setVideoFields] = useState<Array<{ url: string; uploading?: boolean; tempId?: number; thumbUri?: string }>>([]);
+  const [videoEditGridWidth, setVideoEditGridWidth] = useState(0);
+  const videoEditTileSize = useMemo(() => {
+    const gridWidth =
+      videoEditGridWidth > 0
+        ? videoEditGridWidth
+        : Dimensions.get('window').width - VIDEO_EDIT_SECTION_INSET;
+    return (gridWidth - VIDEO_EDIT_GRID_GAP * (VIDEO_EDIT_GRID_COLUMNS - 1)) / VIDEO_EDIT_GRID_COLUMNS;
+  }, [videoEditGridWidth]);
+  const videoEditTileStyle = useMemo(
+    () => ({ width: videoEditTileSize, height: videoEditTileSize }),
+    [videoEditTileSize]
+  );
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
-  const initialPhotosCountRef = useRef<number>(0); // Сохраняем исходное количество фото при загрузке профиля
+  const initialPhotosUrlsRef = useRef<string[]>([]); // URL фото на момент открытия/загрузки профиля
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const isOwner = currentUser && player && currentUser.id === player.id;
+  const isViewerAdmin = !!(currentUser?.status === 'admin' && player && currentUser.id !== player.id);
+  const resolvedAiAnalysis = aiAnalysis ?? player?.aiAnalysis ?? null;
+  const isScoutReportPublic = resolvedAiAnalysis?.is_public !== false;
   const canShowAchievements = achievements.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player?.id)) || isOwner;
   const [pastTeams, setPastTeams] = useState<PastTeam[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
@@ -472,23 +542,19 @@ export default function PlayerProfile() {
     
     // Инициализируем видео поля из favoriteGoals
     if (player.favoriteGoals) {
-      const goals = player.favoriteGoals.split('\n').filter(goal => goal.trim());
-      const videoData = goals.map(goal => {
-        const { url, hours, minutes, seconds } = parseVideoUrl(goal);
-        return { url, hours: hours || '0', minutes: minutes || '0', seconds: seconds || '0' };
-      });
-      setVideoFields(videoData.length > 0 ? videoData : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+      const urls = sortVideoUrlsNewestFirst(player.favoriteGoals.split('\n').filter(u => u.trim()));
+      setVideoFields(urls.map(url => ({ url: url.trim() })));
     } else {
-      setVideoFields([{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+      setVideoFields([]);
     }
     
     // Инициализируем галерею фото
     if (player.photos && Array.isArray(player.photos)) {
       setGalleryPhotos(player.photos);
-      initialPhotosCountRef.current = player.photos.length; // Сохраняем исходное количество фото
+      initialPhotosUrlsRef.current = [...player.photos];
     } else {
       setGalleryPhotos([]);
-      initialPhotosCountRef.current = 0;
+      initialPhotosUrlsRef.current = [];
     }
     
     // Инициализируем достижения
@@ -599,11 +665,11 @@ export default function PlayerProfile() {
       // Инициализируем фотографии СРАЗУ (синхронно, без ожидания)
       if (playerData?.photos && playerData.photos.length > 0) {
         setGalleryPhotos(playerData.photos);
-        initialPhotosCountRef.current = playerData.photos.length; // Обновляем исходное количество фото
+        initialPhotosUrlsRef.current = [...playerData.photos];
         setPhotosCache(prev => ({ ...prev, [playerData.id]: playerData.photos }));
       } else {
         setGalleryPhotos([]);
-        initialPhotosCountRef.current = 0;
+        initialPhotosUrlsRef.current = [];
         setPhotosCache(prev => ({ ...prev, [playerData.id]: [] }));
       }
 
@@ -709,12 +775,23 @@ export default function PlayerProfile() {
         return;
       }
       
+      const forceRefreshProfile =
+        refreshProfile === 'true' ||
+        (Array.isArray(refreshProfile) && refreshProfile[0] === 'true');
+
+      if (forceRefreshProfile) {
+        clearPlayerMemoryCache(normalizedId as string);
+      }
+
       // Оптимизация: сначала показываем кешированные данные из состояния, если они есть
-      const cachedPlayer = playersCache[normalizedId as string];
+      const cachedPlayer = forceRefreshProfile
+        ? undefined
+        : (playersCache[normalizedId as string] || getCachedPlayerSync(normalizedId as string) || undefined);
       
       if (cachedPlayer) {
         console.log('⚡ Используем кешированные данные профиля из состояния');
         setPlayer(cachedPlayer);
+        setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
         
         // Команды/друзья — сразу (не ждём loadCurrentUser — он раньше задерживал команды)
@@ -745,7 +822,7 @@ export default function PlayerProfile() {
       
       // Загружаем основные данные + команды параллельно (команды раньше приходили только после loadAdditionalData)
       const [playerData, userData, teamsFromNetwork] = await Promise.all([
-        getPlayerById(normalizedId as string, { skipCache: true }),
+        getPlayerById(normalizedId as string, { skipCache: forceRefreshProfile }),
         loadCurrentUser(),
         getPlayerTeamsAsPastTeams(normalizedId as string).catch(() => [] as PastTeam[])
       ]);
@@ -781,11 +858,10 @@ export default function PlayerProfile() {
           const currentUserData = await loadCurrentUser();
           if (currentUserData && currentUserData.id === normalizedId) {
             console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
-            await logoutUser();
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
             setGlobalCurrentUser(null);
             router.replace('/');
-            void refreshUser(true);
+            void logoutUser().catch(() => undefined);
             return;
           }
           // ВАЖНО: НЕ редиректим на главный экран если это не профиль текущего пользователя
@@ -817,6 +893,11 @@ export default function PlayerProfile() {
       if (currentLoadingIdRef.current !== normalizedId) {
         console.log('⚠️ ID изменился в самом конце, отменяем установку состояния');
         return;
+      }
+
+      if (forceRefreshProfile && finalPlayerData.avatar) {
+        const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
+        await updateAvatarGlobally(finalPlayerData.id, finalPlayerData.avatar);
       }
       
       // Сразу устанавливаем основные данные для быстрого отображения
@@ -922,7 +1003,7 @@ export default function PlayerProfile() {
       console.error('❌ Ошибка загрузки данных игрока:', error);
       setLoading(false);
     }
-  }, [id, router]);
+  }, [id, refreshProfile, router]);
   
   useEffect(() => {
     // Нормализуем id (может быть массивом из useLocalSearchParams)
@@ -957,21 +1038,29 @@ export default function PlayerProfile() {
       setCoachYears([]);
       setIndividualTraining([]);
       setSkateServices([]);
-      setVideoFields([{ url: '', timeCode: '' }]);
+      setVideoFields([]);
       setPlayerTeams([]);
       setPastTeams([]);
+      setAiAnalysis(null);
       setLoading(true); // Показываем loading для нового профиля
       // Обновляем previousId сразу
       previousIdRef.current = normalizedId;
     }
     
+    const forceRefreshProfile =
+      refreshProfile === 'true' ||
+      (Array.isArray(refreshProfile) && refreshProfile[0] === 'true');
+
     // Проверяем кеш для нового ID (после очистки состояния)
-    const cachedPlayer = playersCache[normalizedId as string];
+    const cachedPlayer = forceRefreshProfile
+      ? undefined
+      : (playersCache[normalizedId as string] || getCachedPlayerSync(normalizedId as string) || undefined);
     
     // Если профиль есть в кеше для нового ID - показываем мгновенно
     if (cachedPlayer && cachedPlayer.id === normalizedId) {
       // Мгновенно показываем данные из кеша
       setPlayer(cachedPlayer);
+      setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
       setLoading(false);
       
       // Восстанавливаем друзей и статус дружбы из кеша
@@ -1027,7 +1116,7 @@ export default function PlayerProfile() {
       loadPlayerData();
     }
     // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
-  }, [id, loadPlayerData]);
+  }, [id, refreshProfile, loadPlayerData]);
 
   const refreshProfileViews = useCallback(async (playerId: string) => {
     const requestId = ++profileViewsRequestRef.current;
@@ -1270,26 +1359,12 @@ export default function PlayerProfile() {
         }));
         
         // Восстанавливаем позицию прокрутки после обновления
-        // НО НЕ восстанавливаем, если позиция была сброшена (например, после принятия дружбы)
-        // И пропускаем после перехода из уведомления с scrollTo* (тайминг совпадает с 300ms Realtime)
-        if (Date.now() < suppressProfileScrollRestoreUntilRef.current) {
-          // не трогаем ScrollView
-        } else if (currentScrollPosition !== null && savedScrollPositionRef.current !== null && scrollViewRef.current) {
-          const restoreScroll = () => {
-            scrollViewRef.current?.scrollTo({ 
-              y: currentScrollPosition, 
-              animated: false 
-            });
-          };
-          setTimeout(restoreScroll, 50);
-          setTimeout(restoreScroll, 150);
-          setTimeout(restoreScroll, 300);
-        } else if (savedScrollPositionRef.current === null) {
-          // Если позиция была сброшена, прокручиваем наверх
-          setTimeout(() => {
-            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-          }, 100);
-          console.log('✅ Прокрутка наверх после обновления друзей (позиция была сброшена)');
+        if (
+          currentScrollPosition !== null &&
+          currentScrollPosition >= 0 &&
+          scrollViewRef.current
+        ) {
+          restoreProfileScrollOnce(currentScrollPosition);
         }
       }
     };
@@ -1367,7 +1442,7 @@ export default function PlayerProfile() {
     return () => {
       supabase.removeChannel(friendsChannel);
     };
-  }, [player?.id, id]);
+  }, [player?.id, id, restoreProfileScrollOnce]);
 
   // Ref для сохранения позиции прокрутки при обновлении через Realtime
   const savedScrollPositionRef = useRef<number | null>(null);
@@ -1400,7 +1475,9 @@ export default function PlayerProfile() {
               key === 'notifications' ||
               key === 'updated_at' ||
               key === 'last_seen' ||
-              key === 'is_online') {
+              key === 'is_online' ||
+              key === 'profile_views_total' ||
+              key === 'profile_views_today') {
             return false;
           }
           // Сравниваем значения
@@ -1511,18 +1588,10 @@ export default function PlayerProfile() {
           // Не затираем целевую прокрутку из уведомления: Realtime приходит ~300ms, scrollTo — позже
           if (
             scrollPositionBeforeUpdate !== null &&
-            scrollViewRef.current &&
-            Date.now() >= suppressProfileScrollRestoreUntilRef.current
+            scrollPositionBeforeUpdate >= 0 &&
+            scrollViewRef.current
           ) {
-            const restoreScroll = () => {
-              scrollViewRef.current?.scrollTo({ 
-                y: scrollPositionBeforeUpdate, 
-                animated: false 
-              });
-            };
-            setTimeout(restoreScroll, 50);
-            setTimeout(restoreScroll, 150);
-            setTimeout(restoreScroll, 300);
+            restoreProfileScrollOnce(scrollPositionBeforeUpdate);
           }
         }
       } catch (error) {
@@ -1554,7 +1623,7 @@ export default function PlayerProfile() {
     return () => {
       supabase.removeChannel(profileChannel);
     };
-  }, [player?.id, id, currentUser?.id]);
+  }, [player?.id, id, currentUser?.id, restoreProfileScrollOnce]);
 
   // Ref для отслеживания последнего обновления
   const lastRefreshTime = useRef<number>(0);
@@ -1588,9 +1657,11 @@ export default function PlayerProfile() {
       const normalizedId = Array.isArray(id) ? id[0] : id;
 
       if (p && p.id && normalizedId && !loadingRef.current) {
-        if (now - lastRefreshTime.current > 2000) {
+        if (now - lastRefreshTime.current > 10000) {
           lastRefreshTime.current = now;
-          loadPlayerData();
+          if (!userStartedScrollingRef.current) {
+            loadPlayerData();
+          }
           if (cu && cu.id !== p.id) {
             getFriendshipStatus(cu.id, p.id).then(status => {
               setFriendshipStatus(status);
@@ -1601,11 +1672,66 @@ export default function PlayerProfile() {
 
       return () => {
         setCurrentScreen(null);
+        setSelectedVideo(null);
       };
     }, [id])
   );
 
   // Обработка прокрутки к разным разделам
+  useEffect(() => {
+    deepLinkScrollAppliedRef.current = null;
+  }, [id]);
+
+  // По обычному переходу (без scrollTo* параметров) профиль открываем сверху один раз.
+  useLayoutEffect(() => {
+    const profileId = Array.isArray(id) ? id[0] : id;
+    if (!profileId) return;
+
+    userStartedScrollingRef.current = false;
+    profileScrollTopAppliedRef.current = null;
+
+    const hasDeepLinkScroll =
+      scrollToMuseum === 'true' ||
+      scrollToStats === 'true' ||
+      scrollToPhotos === 'true' ||
+      scrollToVideos === 'true' ||
+      scrollToAchievements === 'true' ||
+      scrollToFriends === 'true' ||
+      scrollToNormatives === 'true' ||
+      scrollToExercises === 'true' ||
+      scrollToGift === 'true' ||
+      scrollToSpeed === 'true' ||
+      scrollToAnalysis === 'true';
+
+    if (hasDeepLinkScroll) return;
+
+    profileScrollTopAppliedRef.current = profileId;
+    savedScrollProfileIdRef.current = profileId;
+    savedScrollPositionRef.current = 0;
+
+    const scrollToTop = () => {
+      if (userStartedScrollingRef.current) return;
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+    };
+    scrollToTop();
+    if (!scrollViewRef.current) {
+      requestAnimationFrame(scrollToTop);
+    }
+  }, [
+    id,
+    scrollToMuseum,
+    scrollToStats,
+    scrollToPhotos,
+    scrollToVideos,
+    scrollToAchievements,
+    scrollToFriends,
+    scrollToNormatives,
+    scrollToExercises,
+    scrollToGift,
+    scrollToSpeed,
+    scrollToAnalysis,
+  ]);
+
   useEffect(() => {
     if (!player) return;
 
@@ -1622,9 +1748,28 @@ export default function PlayerProfile() {
       scrollToSpeed === 'true' ||
       scrollToAnalysis === 'true';
 
-    if (hasDeepLinkScroll) {
-      suppressProfileScrollRestoreUntilRef.current = Date.now() + 5000;
-    }
+    if (!hasDeepLinkScroll) return;
+
+    const scrollKey = [
+      scrollToMuseum,
+      scrollToStats,
+      scrollToPhotos,
+      scrollToVideos,
+      scrollToAchievements,
+      scrollToFriends,
+      scrollToNormatives,
+      scrollToExercises,
+      scrollToGift,
+      scrollToSpeed,
+      scrollToAnalysis,
+    ]
+      .map((v) => (v === 'true' ? '1' : '0'))
+      .join('');
+    const deepLinkToken = `${player.id}:${scrollKey}`;
+    if (deepLinkScrollAppliedRef.current === deepLinkToken) return;
+    deepLinkScrollAppliedRef.current = deepLinkToken;
+
+    suppressProfileScrollRestoreUntilRef.current = Date.now() + 5000;
 
     /** Повторы measureLayout: после Realtime layout меняется; одна задержка 500ms давала сдвиг «через мгновение». */
     const scrollToSection = (ref: React.RefObject<View>, offset: number = 100) => {
@@ -2037,10 +2182,10 @@ export default function PlayerProfile() {
 
     setIsGeneratingAnalysis(true);
     try {
-      const functionUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co/functions/v1/generate-ai-analysis';
-      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+      const functionUrl = getSupabaseFunctionUrl('generate-ai-analysis');
+      const anonKey = supabaseAnonKey;
 
-      const response = await fetch(functionUrl, {
+      const response = await supabaseFetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2111,20 +2256,28 @@ export default function PlayerProfile() {
     }
   };
 
-  const handleTranslateAnalysis = async (lang: string): Promise<string> => {
+  const handleTranslateAnalysis = async (lang: string, forceRetranslate = false): Promise<string> => {
     if (!player) return '';
+    if (lang !== 'ru' && lang !== 'en') {
+      throw new Error('Invalid translation language');
+    }
 
-    const functionUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co/functions/v1/generate-ai-analysis';
-    const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+    const functionUrl = getSupabaseFunctionUrl('generate-ai-analysis');
+    const anonKey = supabaseAnonKey;
 
-    const response = await fetch(functionUrl, {
+    const response = await supabaseFetch(functionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${anonKey}`,
         'apikey': anonKey,
       },
-      body: JSON.stringify({ player_id: player.id, action: 'translate', target_lang: lang }),
+      body: JSON.stringify({
+        player_id: player.id,
+        action: 'translate',
+        target_lang: lang,
+        force_retranslate: forceRetranslate,
+      }),
     });
 
     const data = await response.json();
@@ -2711,6 +2864,7 @@ export default function PlayerProfile() {
     
     // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI, запрос в фоне
     setFriendLoading(true);
+    markFriendInteraction();
           lastManualStatusChangeRef.current = Date.now();
 
     const releaseFriendLoading = () => setFriendLoading(false);
@@ -2978,6 +3132,7 @@ export default function PlayerProfile() {
     
     // ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ - сразу меняем UI
     setFriendLoading(true);
+    markFriendInteraction();
     lastManualStatusChangeRef.current = Date.now();
         setFriendshipStatus('none');
     setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
@@ -3173,32 +3328,26 @@ export default function PlayerProfile() {
       return;
     }
 
+    // Защита от двойного вызова (двойное нажатие на кнопку)
+    if (isSavingRef.current) {
+      console.log('⚠️ handleSave: уже сохраняется, пропускаем повторный вызов');
+      return;
+    }
+    isSavingRef.current = true;
+
     // Проверяем права доступа
     if (currentUser.status !== 'admin' && currentUser.id !== player.id) {
       console.error('❌ handleSave: нет прав доступа', { currentUserStatus: currentUser.status, currentUserId: currentUser.id, playerId: player.id });
       showCustomAlert('Ошибка', 'У вас нет прав для редактирования этого профиля', 'error');
+      isSavingRef.current = false;
       return;
     }
 
     try {
-      // Объединяем поля видео в одну строку
-      const goalsText = videoFields
-        .filter(video => video.url.trim())
-        .map(video => {
-          // Конвертируем URL в embed формат перед сохранением
-          const parsed = parseVideoUrl(video.url);
-          const embedUrl = parsed.url || video.url;
-          
-          const hours = parseInt(video.hours || '0');
-          const minutes = parseInt(video.minutes || '0');
-          const seconds = parseInt(video.seconds || '0');
-          // Формируем таймкод в формате ЧЧ:ММ:СС с ведущими нулями, но если все поля 0, то не добавляем таймкод
-          const timeCode = (hours > 0 || minutes > 0 || seconds > 0) 
-            ? ` (время: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')})` 
-            : '';
-          return embedUrl + timeCode;
-        })
-        .join('\n');
+      // Сохраняем URLs видео (прямые ссылки из Supabase Storage)
+      const goalsText = sortVideoUrlsNewestFirst(
+        videoFields.filter(v => v.url.trim() && !v.uploading).map(v => v.url.trim())
+      ).join('\n');
       
       // Загружаем аватар в Storage если это локальный файл
       // ВАЖНО: используем фиксированное имя файла avatar_{playerId}.jpg для перезаписи старых файлов
@@ -3430,10 +3579,15 @@ export default function PlayerProfile() {
       
       try {
         // 1. Проверяем изменение видео моментов
-        const oldVideosCount = player.favoriteGoals ? player.favoriteGoals.split('\n').filter(v => v.trim()).length : 0;
-        const newVideosCount = goalsText ? goalsText.split('\n').filter(v => v.trim()).length : 0;
+        const oldVideoUrls = player.favoriteGoals ? player.favoriteGoals.split('\n').filter(v => v.trim()) : [];
+        const newVideoUrls = goalsText ? goalsText.split('\n').filter(v => v.trim()) : [];
+        const oldVideosCount = oldVideoUrls.length;
+        const newVideosCount = newVideoUrls.length;
         if (newVideosCount > oldVideosCount) {
           const addedVideos = newVideosCount - oldVideosCount;
+          const addedVideoUrls = sortVideoUrlsNewestFirst(
+            newVideoUrls.filter(u => !oldVideoUrls.includes(u))
+          );
           // Начисляем 1 звездочку за каждое добавленное видео
           for (let i = 0; i < addedVideos; i++) {
             try {
@@ -3449,18 +3603,15 @@ export default function PlayerProfile() {
                 oneVideo: t('videoNotification.oneVideo'),
                 multipleVideos: t('videoNotification.multipleVideos')
               }
-            })
+            }, addedVideoUrls)
           );
         }
         
-        // 2. Проверяем изменение аватара
-        const oldAvatar = player.avatar || '';
-        const newAvatar = editData.avatar || player.avatar || '';
-        if (newAvatar && oldAvatar !== newAvatar) {
-          // Используем refreshedPlayer.avatar если доступен, иначе player.avatar из БД
-          const avatarUrl = refreshedPlayer?.avatar || player.avatar || '';
+        // 2. Уведомление об аватаре — только при реальной загрузке нового файла при сохранении
+        const newAvatarUrl = avatarUrl || refreshedPlayer?.avatar || editData.avatar || player.avatar || '';
+        if (avatarWasUpdated && newAvatarUrl) {
           notificationPromises.push(
-            notifyFriendsAboutAvatarChange(player.id, player.name, avatarUrl, {
+            notifyFriendsAboutAvatarChange(player.id, player.name, newAvatarUrl, {
               avatarNotification: {
                 changed: t('avatarNotification.changed')
               }
@@ -3696,13 +3847,13 @@ export default function PlayerProfile() {
       
       // ВАЖНО: Отправляем уведомления о новых фото только при сохранении профиля
       // Сравниваем исходное количество фото (при загрузке профиля) с текущим количеством в galleryPhotos
-      const oldPhotosCount = initialPhotosCountRef.current;
-      const newPhotosCount = (galleryPhotos && Array.isArray(galleryPhotos)) ? galleryPhotos.length : 0;
-      const addedPhotosCount = newPhotosCount - oldPhotosCount;
+      const initialPhotoSet = new Set(initialPhotosUrlsRef.current);
+      const addedPhotoUrls = (galleryPhotos || []).filter((url) => !initialPhotoSet.has(url));
+      const addedPhotosCount = addedPhotoUrls.length;
       
       console.log('📸 Проверка фото для уведомлений:', {
-        initialCount: oldPhotosCount,
-        currentCount: newPhotosCount,
+        initialCount: initialPhotosUrlsRef.current.length,
+        currentCount: galleryPhotos?.length ?? 0,
         addedCount: addedPhotosCount,
         galleryPhotos: galleryPhotos,
         refreshedPlayerPhotos: refreshedPlayer.photos
@@ -3710,8 +3861,8 @@ export default function PlayerProfile() {
       
       if (addedPhotosCount > 0) {
         console.log('📸 Отправляем уведомления о новых фото при сохранении:', {
-          oldCount: oldPhotosCount,
-          newCount: newPhotosCount,
+          oldCount: initialPhotosUrlsRef.current.length,
+          newCount: galleryPhotos?.length ?? 0,
           addedCount: addedPhotosCount,
           playerId: player.id,
           playerName: player.name
@@ -3728,19 +3879,19 @@ export default function PlayerProfile() {
                 onePhoto: t('photoNotification.onePhoto'),
                 multiplePhotos: t('photoNotification.multiplePhotos')
               }
-            }
+            },
+            addedPhotoUrls
           );
           console.log('✅ Уведомления о новых фото отправлены друзьям');
           
-          // Обновляем исходное количество фото после успешной отправки уведомлений
-          initialPhotosCountRef.current = newPhotosCount;
+          initialPhotosUrlsRef.current = [...(galleryPhotos || [])];
         } catch (error) {
           console.error('❌ Ошибка отправки уведомлений о фото:', error);
         }
       } else {
         console.log('ℹ️ Фото не добавились, уведомления не отправляются:', {
-          oldCount: oldPhotosCount,
-          newCount: newPhotosCount,
+          oldCount: initialPhotosUrlsRef.current.length,
+          newCount: galleryPhotos?.length ?? 0,
           addedCount: addedPhotosCount
         });
       }
@@ -3898,6 +4049,8 @@ export default function PlayerProfile() {
         stack: error.stack
       });
       showCustomAlert(t('common.error'), t('saveError'), 'error');
+    } finally {
+      isSavingRef.current = false;
     }
   };
 
@@ -4071,16 +4224,19 @@ export default function PlayerProfile() {
       type: 'warning',
       onConfirm: async () => {
         try {
-          await logoutUser();
+          // Сначала чистим UI-состояние и роутимся домой,
+          // только потом дёргаем сеть в фоне — иначе сетевой сбой может «вернуть»
+          // пользователя обратно через refreshUser.
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           setGlobalCurrentUser(null);
           router.replace('/');
-          void refreshUser(true);
+          void logoutUser().catch((err) =>
+            console.warn('⚠️ Ошибка при сетевом выходе (не критично):', err)
+          );
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           setGlobalCurrentUser(null);
           router.replace('/');
-          void refreshUser(true);
         }
       },
       onCancel: () => {
@@ -4176,10 +4332,9 @@ export default function PlayerProfile() {
         console.log('⏰ Таймаут: игрок не найден, выполняем редирект');
         if (isCurrentUserProfile) {
           try {
-            await logoutUser();
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
             setGlobalCurrentUser(null);
-            void refreshUser(true);
+            void logoutUser().catch(() => undefined);
           } catch (error) {
             console.error('❌ Ошибка при выходе:', error);
           }
@@ -4204,24 +4359,22 @@ export default function PlayerProfile() {
 
   if (loading || playerRouteMismatch) {
     return (
-      <View style={styles.container}>
-        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground style={styles.background} resizeMode="cover">
+        <View style={styles.container}>
           <View style={styles.overlay}>
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>
-                {t('profile.loadingProfile') === 'profile.loadingProfile' ? 'Loading profile...' : t('profile.loadingProfile')}
-              </Text>
-            </View>
+            <LoadingCenter
+              message={t('profile.loadingProfile') === 'profile.loadingProfile' ? 'Loading profile...' : t('profile.loadingProfile')}
+            />
           </View>
-        </CachedBackground>
-      </View>
+        </View>
+      </CachedBackground>
     );
   }
   
   if (!player) {
     return (
-      <View style={styles.container}>
-        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground style={styles.background} resizeMode="cover">
+        <View style={styles.container}>
           <View style={styles.overlay}>
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
@@ -4232,11 +4385,10 @@ export default function PlayerProfile() {
                   style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
                   onPress={async () => {
                     try {
-                      await logoutUser();
                       await dataCache.remove(CACHE_KEYS.USER_PROFILE);
                       setGlobalCurrentUser(null);
                       router.replace('/');
-                      void refreshUser(true);
+                      void logoutUser().catch(() => undefined);
                     } catch (error) {
                       console.error('❌ Ошибка при выходе:', error);
                       setGlobalCurrentUser(null);
@@ -4255,8 +4407,8 @@ export default function PlayerProfile() {
               </TouchableOpacity>
             </View>
           </View>
-        </CachedBackground>
-      </View>
+        </View>
+      </CachedBackground>
     );
   }
 
@@ -4264,8 +4416,8 @@ export default function PlayerProfile() {
   // Скрытый профиль доступен только владельцу и администраторам
   if (player.is_hidden && currentUser && currentUser.id !== player.id && currentUser.status !== 'admin') {
     return (
-      <View style={styles.container}>
-        <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
+      <CachedBackground style={styles.background} resizeMode="cover">
+        <View style={styles.container}>
           <View style={styles.overlay}>
             <View style={styles.errorContainer}>
               <Ionicons name="eye-off-outline" size={64} color="#fa2f40" style={{ marginBottom: 20 }} />
@@ -4274,21 +4426,21 @@ export default function PlayerProfile() {
               </Text>
             </View>
           </View>
-        </CachedBackground>
-      </View>
+        </View>
+      </CachedBackground>
     );
   }
 
 
 
   return (
+    <CachedBackground style={styles.background} resizeMode="cover">
     <KeyboardAvoidingView 
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <CachedBackground source={iceBg} style={styles.background} resizeMode="cover">
-        <View style={styles.overlay}>
+      <View style={styles.overlay}>
           {/* Заголовок страницы с именем игрока */}
           {player && (
             <View style={styles.pageHeader}>
@@ -4356,6 +4508,13 @@ export default function PlayerProfile() {
                   )}
                 </View>
               )}
+              <TouchableOpacity
+                onPress={shareProfile}
+                style={styles.headerShareButton}
+                hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+              >
+                <Ionicons name="share-outline" size={18} color="#fff" />
+              </TouchableOpacity>
             </View>
           )}
           
@@ -4364,15 +4523,23 @@ export default function PlayerProfile() {
             contentContainerStyle={styles.scrollContainer}
             keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
-              onScrollBeginDrag={Keyboard.dismiss}
+              nestedScrollEnabled
+              onScrollBeginDrag={() => {
+                Keyboard.dismiss();
+                userStartedScrollingRef.current = true;
+              }}
               onScroll={(event) => {
-                // Сохраняем позицию прокрутки для восстановления при Realtime обновлениях
-                savedScrollPositionRef.current = event.nativeEvent.contentOffset.y;
+                const y = event.nativeEvent.contentOffset.y;
+                if (y > 12) {
+                  userStartedScrollingRef.current = true;
+                }
+                savedScrollPositionRef.current = y;
+                savedScrollProfileIdRef.current = player?.id ?? (Array.isArray(id) ? id[0] : id) ?? null;
               }}
               scrollEventThrottle={16}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View>
+              <View pointerEvents="box-none">
             {/* Фото и основная информация */}
             <View style={styles.profileSection}>
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
@@ -6102,13 +6269,13 @@ export default function PlayerProfile() {
             })()}
 
             {/* Scout Report — full section (button + videos + report) */}
-            {player && (isOwner || (aiAnalysis && aiAnalysis.is_public)) && (() => {
+            {player && (isOwner || isViewerAdmin || (resolvedAiAnalysis?.text && isScoutReportPublic)) && (() => {
               const completeness = checkProfileCompleteness(player, { current: playerTeams, past: pastTeams });
               return (
                 <View ref={aiSectionRef} collapsable={false}>
                   <SectionCard>
                     <AIAnalysisCard
-                      analysis={aiAnalysis}
+                      analysis={resolvedAiAnalysis}
                       playerName={player.name}
                       playerAvatar={player.avatar || undefined}
                       profileUrl={buildInviteLink(player.id)}
@@ -6163,245 +6330,108 @@ export default function PlayerProfile() {
               // Проверяем, есть ли контент для отображения
               const videoContent = isEditingMode ? (
                 <View>
-                  <Text style={styles.sectionSubtitle}>
-                    {t('addVideoLink')}
-                  </Text>
-                  <View>
+                  <View
+                    style={styles.uploadedVideosGrid}
+                    onLayout={(event) => {
+                      const width = event.nativeEvent.layout.width;
+                      if (width > 0 && Math.abs(width - videoEditGridWidth) > 0.5) {
+                        setVideoEditGridWidth(width);
+                      }
+                    }}
+                  >
                     {videoFields.map((video, index) => (
-                      <View key={index}>
-                        <View style={styles.videoFieldContainer}>
-                          <View style={styles.videoUrlRow}>
-                            <TextInput
-                              style={styles.videoUrlInput}
-                              value={video.url}
-                              onChangeText={(text) => {
-                                const newVideoFields = [...videoFields];
-                                newVideoFields[index] = { ...newVideoFields[index], url: text };
-                                setVideoFields(newVideoFields);
-                              }}
-                              onFocus={(e) => {
-                                activeInputRef.current = e.target as any;
-                                // Прокручиваем к полю при фокусе
-                                setTimeout(() => {
-                                  if (scrollViewRef.current && e.target) {
-                                    (e.target as any).measureLayout(
-                                      scrollViewRef.current as any,
-                                      (x: number, y: number, width: number, height: number) => {
-                                        const screenHeight = Dimensions.get('window').height;
-                                        const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                        const visibleArea = screenHeight - keyboardHeight;
-                                        const inputBottom = y + height;
-                                        const targetY = inputBottom - visibleArea + 200;
-                                        if (targetY > 0) {
-                                          scrollViewRef.current?.scrollTo({ 
-                                            y: targetY, 
-                                            animated: true 
-                                          });
-                                        }
-                                      },
-                                      () => {
-                                        // Fallback если measureLayout не работает
-                                        (e.target as any).measure((fx: number, fy: number, fw: number, fh: number, px: number, py: number) => {
-                                          const screenHeight = Dimensions.get('window').height;
-                                          const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                          const visibleArea = screenHeight - keyboardHeight;
-                                          const inputBottom = py + fh;
-                                          const scrollOffset = inputBottom - visibleArea + 200;
-                                          if (scrollOffset > 0) {
-                                            scrollViewRef.current?.scrollTo({ 
-                                              y: scrollOffset, 
-                                              animated: true 
-                                            });
-                                          }
-                                        });
-                                      }
-                                    );
-                                  }
-                                }, 300);
-                              }}
-                              onBlur={() => {
-                                activeInputRef.current = null;
-                              }}
-                              placeholder={t('videoUrlPlaceholder')}
-                              placeholderTextColor="#888"
-                            />
-                            {videoFields.length > 1 && (
-                              <TouchableOpacity
-                                style={styles.removeVideoButtonInline}
-                                onPress={() => {
-                                  const newVideoFields = videoFields.filter((_, i) => i !== index);
-                                  setVideoFields(newVideoFields.length > 0 ? newVideoFields : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
-                                }}
-                              >
-                                <Ionicons name="close-circle" size={20} color="#fa2f40" />
-                              </TouchableOpacity>
-                            )}
+                      <View key={video.tempId ?? `${video.url}-${index}`} style={[styles.uploadedVideoItem, videoEditTileStyle]}>
+                        {video.thumbUri ? (
+                          <Image source={{ uri: video.thumbUri }} style={styles.uploadedVideoThumb} resizeMode="cover" />
+                        ) : video.url ? (
+                          <View style={styles.uploadedVideoThumb}>
+                            <DirectVideoThumbnail videoUrl={video.url} />
                           </View>
-                          <View style={styles.timeInputContainer}>
-                          <View style={styles.timeInputWithLabel}>
-                            <Text style={styles.timeInputLabel}>{t('timeHour')}</Text>
-                        <TextInput
-                            style={styles.timeInputField}
-                            value={video.hours}
-                          onChangeText={(text) => {
-                              // Разрешаем только цифры и ограничиваем до 99
-                              const numericText = text.replace(/[^0-9]/g, '');
-                              const value = numericText === '' ? '0' : Math.min(99, parseInt(numericText)).toString();
-                              const newVideoFields = [...videoFields];
-                              newVideoFields[index] = { ...newVideoFields[index], hours: value };
-                              setVideoFields(newVideoFields);
-                            }}
-                            onFocus={(e) => {
-                              activeInputRef.current = e.target as any;
-                              setTimeout(() => {
-                                if (scrollViewRef.current && e.target) {
-                                  (e.target as any).measureLayout(
-                                    scrollViewRef.current as any,
-                                    (x: number, y: number, width: number, height: number) => {
-                                      const screenHeight = Dimensions.get('window').height;
-                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                      const visibleArea = screenHeight - keyboardHeight;
-                                      const inputBottom = y + height;
-                                      const targetY = inputBottom - visibleArea + 200;
-                                      if (targetY > 0) {
-                                        scrollViewRef.current?.scrollTo({ 
-                                          y: targetY, 
-                                          animated: true 
-                                        });
-                                      }
-                                    },
-                                    () => {}
-                                  );
-                                }
-                              }, 300);
-                            }}
-                            onBlur={() => {
-                              activeInputRef.current = null;
-                            }}
-                            placeholder="0"
-                            placeholderTextColor="#888"
-                            keyboardType="numeric"
-                            maxLength={2}
-                          />
+                        ) : (
+                          <View style={styles.uploadedVideoThumbPlaceholder}>
+                            <Ionicons name="videocam" size={28} color="#555" />
                           </View>
-                          <Text style={styles.timeSeparator}>:</Text>
-                          <View style={styles.timeInputWithLabel}>
-                            <Text style={styles.timeInputLabel}>{t('timeMinute')}</Text>
-                          <TextInput
-                            style={styles.timeInputField}
-                            value={video.minutes}
-                          onChangeText={(text) => {
-                              // Разрешаем только цифры и ограничиваем до 59
-                              const numericText = text.replace(/[^0-9]/g, '');
-                              const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
-                              const newVideoFields = [...videoFields];
-                              newVideoFields[index] = { ...newVideoFields[index], minutes: value };
-                              setVideoFields(newVideoFields);
-                          }}
-                            onFocus={(e) => {
-                              activeInputRef.current = e.target as any;
-                              setTimeout(() => {
-                                if (scrollViewRef.current && e.target) {
-                                  (e.target as any).measureLayout(
-                                    scrollViewRef.current as any,
-                                    (x: number, y: number, width: number, height: number) => {
-                                      const screenHeight = Dimensions.get('window').height;
-                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                      const visibleArea = screenHeight - keyboardHeight;
-                                      const inputBottom = y + height;
-                                      const targetY = inputBottom - visibleArea + 200;
-                                      if (targetY > 0) {
-                                        scrollViewRef.current?.scrollTo({ 
-                                          y: targetY, 
-                                          animated: true 
-                                        });
-                                      }
-                                    },
-                                    () => {}
-                                  );
-                                }
-                              }, 300);
-                            }}
-                            onBlur={() => {
-                              activeInputRef.current = null;
-                          }}
-                            placeholder="0"
-                          placeholderTextColor="#888"
-                            keyboardType="numeric"
-                            maxLength={2}
-                          />
+                        )}
+                        {video.uploading && (
+                          <View style={styles.uploadingOverlay}>
+                            <ActivityIndicator color="#fa2f40" size="small" />
                           </View>
-                          <Text style={styles.timeSeparator}>:</Text>
-                          <View style={styles.timeInputWithLabel}>
-                            <Text style={styles.timeInputLabel}>{t('timeSecond')}</Text>
-                          <TextInput
-                            style={styles.timeInputField}
-                            value={video.seconds}
-                          onChangeText={(text) => {
-                              // Разрешаем только цифры и ограничиваем до 59
-                              const numericText = text.replace(/[^0-9]/g, '');
-                              const value = numericText === '' ? '0' : Math.min(59, parseInt(numericText)).toString();
-                              const newVideoFields = [...videoFields];
-                              newVideoFields[index] = { ...newVideoFields[index], seconds: value };
-                              setVideoFields(newVideoFields);
+                        )}
+                        {!video.uploading && (
+                          <TouchableOpacity
+                            style={styles.removeUploadedVideo}
+                            onPress={async () => {
+                              const { deleteVideoFromStorage } = await import('../../utils/uploadImage');
+                              if (video.url.includes('supabase')) {
+                                deleteVideoFromStorage(video.url);
+                              }
+                              setVideoFields(videoFields.filter((_, i) => i !== index));
                             }}
-                            onFocus={(e) => {
-                              activeInputRef.current = e.target as any;
-                              setTimeout(() => {
-                                if (scrollViewRef.current && e.target) {
-                                  (e.target as any).measureLayout(
-                                    scrollViewRef.current as any,
-                                    (x: number, y: number, width: number, height: number) => {
-                                      const screenHeight = Dimensions.get('window').height;
-                                      const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                      const visibleArea = screenHeight - keyboardHeight;
-                                      const inputBottom = y + height;
-                                      const targetY = inputBottom - visibleArea + 200;
-                                      if (targetY > 0) {
-                                        scrollViewRef.current?.scrollTo({ 
-                                          y: targetY, 
-                                          animated: true 
-                                        });
-                                      }
-                                    },
-                                    () => {}
-                                  );
-                                }
-                              }, 300);
-                            }}
-                            onBlur={() => {
-                              activeInputRef.current = null;
-                            }}
-                            placeholder="0"
-                          placeholderTextColor="#888"
-                            keyboardType="numeric"
-                            maxLength={2}
-                        />
-                          </View>
-                        </View>
-                        </View>
-                        {index < videoFields.length - 1 && (
-                          <View style={styles.videoSeparator} />
+                          >
+                            <Ionicons name="close-circle" size={22} color="#fa2f40" />
+                          </TouchableOpacity>
                         )}
                       </View>
                     ))}
-                    <TouchableOpacity
-                      style={styles.addMoreButton}
-                      onPress={() => {
-                        setVideoFields([...videoFields, { url: '', hours: '0', minutes: '0', seconds: '0' }]);
-                      }}
-                    >
-                      <Ionicons name="add-circle" size={24} color="#fff" />
-                      <Text style={styles.addMoreButtonText}>{t('addMoreVideo')}</Text>
-                    </TouchableOpacity>
+                    {videoFields.length < 10 && (
+                      <TouchableOpacity
+                        style={[styles.addVideoButton, videoEditTileStyle]}
+                        onPress={async () => {
+                          const ImagePicker = await import('expo-image-picker');
+                          const result = await ImagePicker.launchImageLibraryAsync({
+                            mediaTypes: 'videos' as any,
+                            videoMaxDuration: 20,
+                            quality: 0.5,
+                            allowsEditing: false,
+                          });
+                          if (result.canceled || !result.assets?.[0]) return;
+                          const asset = result.assets[0];
+                          const tempId = Date.now();
+                          let thumbUri: string | undefined;
+                          try {
+                            const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 });
+                            thumbUri = thumb.uri;
+                          } catch {
+                            // превью необязательно — останется плейсхолдер
+                          }
+                          setVideoFields(prev => [{ url: '', uploading: true, tempId, thumbUri }, ...prev]);
+                          const { uploadVideoToStorage } = await import('../../utils/uploadImage');
+                          const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
+                            asset.uri,
+                            player.id,
+                            undefined,
+                            thumbUri
+                          );
+                          if (uploadedUrl) {
+                            setVideoFields(prev =>
+                              prev.map(v =>
+                                v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
+                              )
+                            );
+                          } else {
+                            setVideoFields(prev => prev.filter(v => v.tempId !== tempId));
+                            showCustomAlert(
+                              'Ошибка',
+                              uploadError || 'Не удалось загрузить видео. Проверьте интернет и попробуйте снова.',
+                              'error'
+                            );
+                          }
+                        }}
+                      >
+                        <Ionicons name="add" size={32} color="#fa2f40" />
+                        <Text style={styles.addVideoButtonText}>{t('addMoreVideo')}</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
+                  <Text style={styles.videoUploadHint}>{t('videoUploadHint')}</Text>
                 </View>
               ) : hasVideos ? (
                 (() => {
-                  const videoUrls = (player.favoriteGoals || '').split('\n').filter(goal => goal.trim());
-                  const parsedVideos = videoUrls.map(goal => parseVideoUrl(goal.trim())).filter(v => v !== null);
-                  
-                  // Если после парсинга не осталось валидных видео, показываем пустое состояние для владельца
+                  const videoUrls = sortVideoUrlsNewestFirst(
+                    (player.favoriteGoals || '').split('\n').filter(u => u.trim())
+                  );
+                  const parsedVideos = videoUrls.map(url => ({ url: url.trim(), timeCode: undefined })).filter(v => v.url);
+
                   if (parsedVideos.length === 0) {
                     if (isOwner) {
                       return (
@@ -6413,7 +6443,7 @@ export default function PlayerProfile() {
                     }
                     return null;
                   }
-                  
+
                   return (
                     <VideoCarousel
                       videos={parsedVideos}
@@ -6437,7 +6467,9 @@ export default function PlayerProfile() {
               
               return (
                 <SectionCard ref={videosRef}>
-                  <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
+                  {!isEditingMode && (
+                    <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
+                  )}
                   {videoContent}
                 </SectionCard>
               );
@@ -6453,6 +6485,10 @@ export default function PlayerProfile() {
                                    friendshipStatus === 'friends' ||
                                    isShopOrSkateSharpening;
               const isEditingPhotos = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
+              const nameForLockedPhotos =
+                player.status === 'scout' && currentUser?.status !== 'admin'
+                  ? (t('profile.scout') || 'Scout')
+                  : player.name;
               
               // Если нет доступа и не магазин/заточка - показываем заблокированную секцию
               if (!canSeePhotos && !isShopOrSkateSharpening) {
@@ -6465,7 +6501,7 @@ export default function PlayerProfile() {
                       <Ionicons name="lock-closed" size={48} color="#fa2f40" />
                       <Text style={styles.lockedSectionTitle}>{t('profile.addToFriends')}</Text>
                       <Text style={styles.lockedSectionText}>
-                        {t('profile.addToFriendsToSeePhotos', { name: player.name })}
+                        {t('profile.addToFriendsToSeePhotos', { name: nameForLockedPhotos })}
                       </Text>
                     </View>
                   </SectionCard>
@@ -6493,16 +6529,9 @@ export default function PlayerProfile() {
                     playerId={player.id}
                     photos={galleryPhotos}
                     isEditing={isEditingPhotos}
-                    onPhotosChange={async (newPhotos) => {
+                    onPhotosChange={(newPhotos) => {
                       setGalleryPhotos(newPhotos);
-                      // Обновляем фото в базе данных
-                      try {
-                        const updatedPlayer = { ...player, photos: newPhotos };
-                        await updatePlayer(player.id, updatedPlayer);
-                        setPlayer(updatedPlayer);
-                      } catch (error) {
-                        console.error('Ошибка обновления фото:', error);
-                      }
+                      // Фото сохраняются и уведомление уходит один раз в handleSave
                     }}
                     isShopProfile={isShopOrSkateSharpening}
                     style={styles.embeddedSectionContent}
@@ -6775,8 +6804,9 @@ export default function PlayerProfile() {
             {/* Секция упражнений - только для игроков, скрыта если упражнения не выполнены (кроме владельца) */}
             {player && player.status === 'player' && (() => {
               const hasExercises = player.exerciseStats && player.exerciseStats.totalCompletions && player.exerciseStats.totalCompletions > 0;
-              const isOwner = currentUser && currentUser.id === player.id;
-              return hasExercises || isOwner;
+              const isProfileOwner = currentUser && currentUser.id === player.id;
+              const isAdminViewer = currentUser?.status === 'admin' && !isProfileOwner;
+              return hasExercises || isProfileOwner || isAdminViewer;
             })() && (
               <SectionCard wrapperStyle={styles.compactSectionWrapper}>
                 <PlayerExercisesSection 
@@ -6822,7 +6852,12 @@ export default function PlayerProfile() {
                   }
                   return true;
                 })() ? (
-                  <SectionCard ref={museumRef} wrapperStyle={styles.compactSectionWrapper}>
+                  <SectionCard
+                    ref={museumRef}
+                    wrapperStyle={styles.compactSectionWrapper}
+                    blurStyle={styles.museumSectionBlur}
+                    style={styles.museumSection}
+                  >
                   {/* Заголовок музея - показываем всегда */}
                     <Text style={styles.sectionTitle}>{t('profile.museum')}</Text>
                   
@@ -6902,7 +6937,7 @@ export default function PlayerProfile() {
                     <Ionicons name="lock-closed" size={48} color="#fa2f40" />
                     <Text style={styles.lockedSectionTitle}>{t('profile.addToFriends')}</Text>
                     <Text style={styles.lockedSectionText}>
-                      {t('profile.addToFriendsToSeeMuseum', { name: player.name })}
+                      {t('profile.addToFriendsToSeeMuseum', { name: (player.status === 'scout' && currentUser?.status !== 'admin') ? (t('profile.scout') || 'Scout') : player.name })}
                     </Text>
                   </View>
                 </SectionCard>
@@ -6916,7 +6951,12 @@ export default function PlayerProfile() {
                 {t('profile.friends')} ({friends.length})
               </Text>
               {friends.length > 0 ? (
-                <View style={styles.friendsGrid}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.friendsScroll}
+                  nestedScrollEnabled
+                >
                   {friends.map((friend) => (
                     <TouchableOpacity
                       key={friend.id}
@@ -6937,12 +6977,28 @@ export default function PlayerProfile() {
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               ) : (
                 <View style={styles.emptySectionContainer}>
                   <Ionicons name="people-outline" size={48} color="#666" />
                   <Text style={styles.emptySectionText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
-                  {!(currentUser && currentUser.id === player.id) && (
+                  {currentUser && currentUser.id === player.id ? (
+                    <TouchableOpacity
+                      style={styles.inviteTeamButton}
+                      onPress={async () => {
+                        try {
+                          const link = buildInviteLink(player.id);
+                          const message = `${t('profile.inviteTeamMessage')} ${link}`;
+                          await Share.share({ message });
+                        } catch {
+                          /* пользователь закрыл шэринг */
+                        }
+                      }}
+                    >
+                      <Ionicons name="paper-plane-outline" size={18} color="#fff" />
+                      <Text style={styles.inviteTeamButtonText}>{t('profile.inviteYourTeam')}</Text>
+                    </TouchableOpacity>
+                  ) : (
                   <Text style={styles.noDataSubtext}>
                     {t('profile.beFirstToAdd', {name: player.name})}
                  </Text>
@@ -7344,7 +7400,6 @@ export default function PlayerProfile() {
             </TouchableWithoutFeedback>
           </ScrollView>
         </View>
-      </CachedBackground>
       
       {/* Меню профиля */}
       <Modal
@@ -7661,15 +7716,12 @@ export default function PlayerProfile() {
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
             {selectedVideo && (
-              <View pointerEvents="box-only" style={styles.videoModalContent}>
+              <View style={styles.videoModalContent}>
               <VideoPlayer 
                 url={selectedVideo.url}
                 title={t('myMoment')}
                 timeCode={selectedVideo.timeCode}
-                  onClose={() => {
-                    setSelectedVideo(null);
-                    setVideoLikeRefreshTrigger(prev => prev + 1);
-                  }}
+                autoPlay
               />
                 {player && (
                   <View style={styles.videoModalLikeButton}>
@@ -8116,17 +8168,18 @@ export default function PlayerProfile() {
         </Modal>
       )}
     </KeyboardAvoidingView>
+    </CachedBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(1,0,0)',
+    backgroundColor: 'transparent',
   },
   background: {
     flex: 1,
-    backgroundColor: 'rgb(1,0,0)',
+    backgroundColor: 'transparent',
   },
   overlay: {
     flex: 1,
@@ -8153,10 +8206,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
-  },
-  giftButton: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#45a049',
   },
   loadingContainer: {
     flex: 1,
@@ -8427,6 +8476,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 12,
   },
+  museumSectionBlur: {
+    overflow: 'visible',
+  },
+  museumSection: {
+    overflow: 'visible',
+  },
   sectionBlur: {
     borderRadius: 20,
     overflow: 'hidden',
@@ -8616,12 +8671,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 15,
   },
+  friendsScroll: {
+    paddingRight: 12,
+    paddingTop: 4,
+  },
   friendItem: {
-    width: '30%',
+    width: 88,
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: 12,
     padding: 10,
+    marginRight: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
   },
@@ -8951,7 +9011,6 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -9161,6 +9220,64 @@ const styles = StyleSheet.create({
   removeVideoButton: {
     padding: 4,
   },
+  // Новые стили для загрузки видео
+  uploadedVideosGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: VIDEO_EDIT_GRID_GAP,
+    width: '100%',
+  },
+  uploadedVideoItem: {
+    borderRadius: 10,
+    backgroundColor: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#333',
+    overflow: 'hidden',
+  },
+  uploadedVideoThumb: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+  },
+  uploadedVideoThumbPlaceholder: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#111',
+  },
+  uploadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  removeUploadedVideo: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    zIndex: 10,
+  },
+  addVideoButton: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addVideoButtonText: {
+    color: '#fa2f40',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 2,
+    fontFamily: 'Gilroy-Regular',
+  },
+  videoUploadHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
+    fontFamily: 'Gilroy-Regular',
+  },
   addMoreButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -9254,23 +9371,6 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#fa2f40',
     borderColor: '#CC0000',
-  },
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.85)',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: Platform.select({
-      ios: 70,
-      android: 40,
-      default: 50,
-    }),
-    zIndex: 1000,
   },
   countryPickerOverlay: {
     position: 'absolute',
@@ -10132,6 +10232,30 @@ const styles = StyleSheet.create({
   backButton: {
     marginRight: 16,
     width: 24,
+  },
+  headerShareButton: {
+    marginLeft: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fa2f40',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inviteTeamButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#fa2f40',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 22,
+    marginTop: 12,
+  },
+  inviteTeamButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
   },
   pageTitle: {
     color: '#fff',

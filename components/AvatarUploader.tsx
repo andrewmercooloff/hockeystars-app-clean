@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Ionicons } from '@expo/vector-icons';
 import { processAvatarThumbnails } from '../utils/ThumbnailGenerator';
+import { getStorageObjectUrl, getStoragePublicUrl, supabaseAnonKey } from '../utils/supabase';
 
 interface AvatarUploaderProps {
   playerId: string;
@@ -146,11 +147,11 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
       
       // Загружаем в Supabase Storage
       const uploadResponse = await fetch(
-        `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/avatars/${fileName}`,
+        getStorageObjectUrl('avatars', fileName),
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${supabaseAnonKey}`,
           },
           body: formData,
         }
@@ -160,7 +161,7 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
         throw new Error(`Ошибка загрузки: ${await uploadResponse.text()}`);
       }
 
-      const uploadedUrl = `https://jvsypfwiajuwsyuzkyda.supabase.co/storage/v1/object/public/avatars/${fileName}`;
+      const uploadedUrl = getStoragePublicUrl('avatars', fileName);
       console.log(`✅ Оригинальный аватар загружен:`, uploadedUrl);
       
       return uploadedUrl;

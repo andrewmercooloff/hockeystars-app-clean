@@ -38,6 +38,7 @@ import {
 } from '../../utils/playerStorage';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
+import { useNotificationContext } from '../../contexts/NotificationContext';
 import { Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../utils/supabase';
@@ -109,6 +110,7 @@ export default function ChatScreen() {
   const { id, scrollToBottom } = useLocalSearchParams();
   const router = useRouter();
   const { refreshUser, currentUser: contextUser, setCurrentUser: setContextUser } = useUser();
+  const { refreshBadges } = useNotificationContext();
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -866,9 +868,8 @@ export default function ChatScreen() {
             }, 300);
           }
           
-          // Отмечаем сообщения как прочитанные асинхронно (не блокируем UI)
           markMessagesAsRead(userData.id, otherPlayerData.id)
-            .then(() => refreshUser(true))
+            .then(() => refreshBadges())
             .catch(err => {
               console.error('⚠️ Ошибка отметки сообщений как прочитанных (не критично):', err);
             });

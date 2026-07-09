@@ -1,4 +1,3 @@
-import SafeIcon from './SafeIcon';
 import React, { useEffect, useState, useRef } from 'react';
 import {
     Dimensions,

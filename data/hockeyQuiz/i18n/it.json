@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Quanti pattinatori per squadra sono sul ghiaccio durante i giochi di forza pari (esclusi i portieri)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Quanti periodi regolamentari ci sono in una partita NHL standard?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Il fuorigioco viene chiamato quando un giocatore attaccante entra in zona offensiva prima di cosa?",
+    "options": [
+      "La linea centrale",
+      "Il disco",
+      "Il portiere",
+      "L'arbitro"
+    ]
+  },
+  "rules_icing": {
+    "question": "La liberazione vietata consiste nel tirare il disco da dietro la linea centrale oltre la linea di porta avversaria senza tocco. VERO?",
+    "options": [
+      "Falso: mai in NHL",
+      "VERO",
+      "Vero, solo negli straordinari",
+      "Falso: solo da zona difensiva"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Chi detiene il record NHL per il maggior numero di gol in carriera?",
+    "options": [
+      "Alex Ovečkin",
+      "Jaromir Jagr",
+      "Gordie Howe",
+      "Wayne Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Alex Ovechkin è famoso come ala sinistra con il numero 8 di quale città?",
+    "options": [
+      "Boston",
+      "Toronto",
+      "Washington",
+      "Pittsburgh"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Cos'è una tripletta nell'hockey?",
+    "options": [
+      "Tre gol di un giocatore in una partita",
+      "Tre parate di fila",
+      "Tre assist in una partita",
+      "Tre rigori"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Un gioco di potere si verifica quando:",
+    "options": [
+      "Il portiere viene tirato",
+      "Scoppia una rissa",
+      "Una squadra ha più pattinatori a causa di una penalità",
+      "Iniziano gli straordinari"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "La Stanley Cup è il trofeo del campionato di quale campionato?",
+    "options": [
+      "Campionato Mondiale IIHF",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Di cosa è fatto un disco da hockey standard?",
+    "options": [
+      "Gomma vulcanizzata",
+      "Alluminio",
+      "Legna",
+      "Plastica"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Quanti minuti è una penalità minore standard?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Quanti minuti è una penalità maggiore standard?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Il gioco inizia con:",
+    "options": [
+      "Tiro di rigore",
+      "Confronto",
+      "Interruzione di potenza",
+      "Chiamata ghiacciata"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Se una partita della stagione regolare della NHL viene pareggiata dopo i tempi supplementari, cosa succede?",
+    "options": [
+      "Secondo tempo supplementare",
+      "Sparatoria",
+      "Periodo di play-off",
+      "Disegna i supporti"
+    ]
+  },
+  "rules_crease": {
+    "question": "Può un attaccante restare nell'area del portiere senza conseguenze?",
+    "options": [
+      "Sì, sempre",
+      "Solo nei playoff",
+      "No, il gol potrebbe essere annullato",
+      "Solo all'ultimo minuto"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "L'attacco alto avviene quando il bastone colpisce un avversario sopra:",
+    "options": [
+      "Traversa",
+      "Spalle",
+      "Vita",
+      "Solo casco"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Tirare il portiere rischia:",
+    "options": [
+      "Tiro di rigore",
+      "Gol a porta vuota contro",
+      "Fuorigioco",
+      "Solo glassa"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Un tiro di rigore viene spesso concesso per aver commesso fallo su:",
+    "options": [
+      "In qualsiasi momento",
+      "Solo straordinari",
+      "Solo playoff",
+      "Separazione netta"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Un minore in panchina viene servito da qualsiasi giocatore eccetto:",
+    "options": [
+      "Il portiere (di solito)",
+      "Un attaccante",
+      "Un difensore",
+      "Il capitano"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "L'OT della stagione regolare della NHL si gioca con quanti pattinatori per squadra?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Quanti giocatori (compreso il portiere) può avere una squadra sul ghiaccio?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Quanti punti vale un gol sul tabellone?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Su una penalità ritardata, la squadra che non ha commesso l'infrazione spesso:",
+    "options": [
+      "Ghiaccia il disco",
+      "Timeout delle chiamate",
+      "Interrompe la riproduzione",
+      "Tira il portiere"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "I portieri possono giocare il disco dietro la rete solo nei seguenti casi:",
+    "options": [
+      "Cerchio centrale",
+      "Zona neutrale",
+      "Zona piena",
+      "Zona trapezoidale"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Il combattimento in genere si traduce in:",
+    "options": [
+      "Pena maggiore",
+      "Solo cattiva condotta di gioco",
+      "Pena minore",
+      "Nessuna sanzione"
+    ]
+  },
+  "terms_puck": {
+    "question": "L'oggetto di gomma dura che i giocatori sparano si chiama:",
+    "options": [
+      "Disco",
+      "Disco",
+      "Calcolo",
+      "Palla"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Un passaggio che solleva il disco è chiamato:",
+    "options": [
+      "Passaggio del piattino",
+      "Passaggio a bordo",
+      "Schiaffo",
+      "Passaggio di piega"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Uno schiaffo comporta:",
+    "options": [
+      "Solo rovescio",
+      "Una mano sul bastone",
+      "Toccando leggermente il disco",
+      "Avvolgere e colpire prima il ghiaccio"
+    ]
+  },
+  "terms_deke": {
+    "question": "Un deke è:",
+    "options": [
+      "Una sorta di sanzione",
+      "Una mossa finta per battere un difensore",
+      "Un blocco difensivo",
+      "Un cambio di linea"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Una fuga è quando:",
+    "options": [
+      "Il disco è ghiacciato",
+      "Un pattinatore entra da solo sul portiere",
+      "Due giocatori combattono",
+      "Si verifica un cambio di linea"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Tracce più/meno:",
+    "options": [
+      "Tiri in porta",
+      "Differenza reti mentre il giocatore è sul ghiaccio alla pari",
+      "Minuti di rigore",
+      "Solo il confronto vince"
+    ]
+  },
+  "terms_assist": {
+    "question": "Un assist primario va al giocatore che:",
+    "options": [
+      "Segna il gol",
+      "Ha vinto l'ingaggio",
+      "Ultimo disco toccato prima del marcatore",
+      "Ho ricevuto una penalità"
+    ]
+  },
+  "terms_block": {
+    "question": "Un tiro bloccato è quando:",
+    "options": [
+      "Puck colpisce il palo",
+      "Il pattinatore ferma il disco con il corpo/bastone prima del goal",
+      "Il portiere salva",
+      "Il tiro manca la rete"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Per controllo preventivo si intende:",
+    "options": [
+      "Solo strategia di cambio linea",
+      "Difendere la tua linea blu",
+      "Fare pressione sugli avversari nella loro zona per riconquistare il disco",
+      "Tirare il portiere"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Controllare a ritroso significa:",
+    "options": [
+      "Pattinaggio indietro per aiutare la difesa",
+      "Tiro dal punto",
+      "Vincere il confronto",
+      "Parata del portiere"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Un timer è:",
+    "options": [
+      "Attesa e poi scatto",
+      "Mossa del portiere",
+      "Tiro subito su passaggio",
+      "Una penalità"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Un poke check:",
+    "options": [
+      "Sollevare il disco sopra il bastone",
+      "Controllo incrociato",
+      "Spingere il disco lontano dall'avversario",
+      "Agganciare l'avversario"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Il ripiano più alto significa segnare in:",
+    "options": [
+      "Parte superiore della rete",
+      "Solo dal centro del ghiaccio",
+      "Solo su rete vuota",
+      "Cinque buche"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Cinque buche sono tra quelle del portiere:",
+    "options": [
+      "Bastone e guanto",
+      "Maschera e petto",
+      "Braccio e corpo",
+      "Gambe"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Un garante fornisce:",
+    "options": [
+      "Allenamento",
+      "Segnare gol",
+      "Protezione fisica e lotta",
+      "Solo confronti"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Solitamente i cambi di linea avvengono:",
+    "options": [
+      "Solo dopo i gol",
+      "Solo sui rigori",
+      "Solo durante l'intervallo",
+      "Al volo durante il gioco"
+    ]
+  },
+  "terms_rink": {
+    "question": "La superficie di gioco nell'hockey si chiama:",
+    "options": [
+      "Campo",
+      "Tribunale",
+      "Traccia",
+      "Pista di pattinaggio"
+    ]
+  },
+  "terms_goal": {
+    "question": "La rete a cui tirano i giocatori si chiama:",
+    "options": [
+      "Bersaglio",
+      "Cestino",
+      "Obiettivo",
+      "Zona"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Giocare short-handed significa:",
+    "options": [
+      "Col tempo",
+      "Il portiere tirò",
+      "Meno pattinatori a causa della penalità",
+      "Rete vuota"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Straordinario con morte improvvisa significa:",
+    "options": [
+      "Il primo gol vince",
+      "Periodo intero",
+      "Solo sparatoria",
+      "Nessun vincitore"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Quante squadre nell'era della NHL Original Six?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "L'hockey su ghiaccio moderno si è sviluppato maggiormente in:",
+    "options": [
+      "Russia",
+      "Svezia",
+      "U.S.A.",
+      "Canada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Miracle on Ice: gli USA hanno battuto chi nel 1980?",
+    "options": [
+      "Unione Sovietica",
+      "Canada",
+      "Cecoslovacchia",
+      "Svezia"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Il record di punti in carriera di Wayne Gretzky è finito:",
+    "options": [
+      "1500",
+      "2857",
+      "2000",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "L'Hockey Hall of Fame è a:",
+    "options": [
+      "Toronto",
+      "Boston",
+      "Montreal",
+      "New York"
+    ]
+  },
+  "hist_khl": {
+    "question": "Il KHL si basa principalmente su:",
+    "options": [
+      "Russia",
+      "Finlandia",
+      "U.S.A.",
+      "Canada"
+    ]
+  },
+  "hist_1972": {
+    "question": "La Summit Series del 1972: Canada vs:",
+    "options": [
+      "URSS",
+      "U.S.A.",
+      "Cechia",
+      "Svezia"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "La NHL è stata fondata nel:",
+    "options": [
+      "20esimo secolo",
+      "21° secolo",
+      "19esimo secolo",
+      "XVIII secolo"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby è stato scelto al primo posto assoluto in:",
+    "options": [
+      "2003",
+      "2007",
+      "2010",
+      "2005"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connor McDavid è stato draftato primo assoluto in:",
+    "options": [
+      "2013",
+      "2017",
+      "2019",
+      "2015"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "La Stanley Cup è stata assegnata per la prima volta nel:",
+    "options": [
+      "20esimo secolo",
+      "21° secolo",
+      "XVIII secolo",
+      "19esimo secolo"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromir Jagr si colloca tra i leader di tutti i tempi della NHL in:",
+    "options": [
+      "Punti",
+      "Allenamento",
+      "Solo minuti di rigore",
+      "Il portiere vince"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alex Ovechkin ha trascorso la sua carriera in NHL principalmente con:",
+    "options": [
+      "Rangers di New York",
+      "Pinguini di Pittsburgh",
+      "Capitali di Washington",
+      "Boston Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux ha vinto la Stanley Cup con:",
+    "options": [
+      "Pinguini di Pittsburgh",
+      "Montreal Canadiens",
+      "Ali Rosse di Detroit",
+      "Oliatori di Edmonton"
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Una pista di pattinaggio NHL quanto è lunga?",
+    "options": [
+      "200 piedi",
+      "150 piedi",
+      "300 piedi",
+      "250 piedi"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Quanto è larga una pista di pattinaggio NHL?",
+    "options": [
+      "100 piedi",
+      "150 piedi",
+      "120 piedi",
+      "85 piedi"
+    ]
+  },
+  "gen_zones": {
+    "question": "Le linee blu dividono la pista in quante zone?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "La linea rossa centrale viene utilizzata per:",
+    "options": [
+      "Chiamate ghiacciate",
+      "Casella di penalità",
+      "Solo confronti",
+      "Fuorigioco al centro"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "La curva della lama del bastone aiuta con:",
+    "options": [
+      "Velocità di pattinaggio",
+      "Il portiere salva",
+      "Sollevamento e controllo del disco",
+      "Battagliero"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Skate Hollow influenza:",
+    "options": [
+      "Bastone flessibile",
+      "Aderenza su ghiaccio e curve",
+      "Vestibilità del casco",
+      "Taglia della maglia"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "I parastinchi proteggono:",
+    "options": [
+      "Spalle",
+      "Testa",
+      "Parte inferiore delle gambe",
+      "Solo le mani"
+    ]
+  },
+  "gen_captain": {
+    "question": "Il capitano indossa la lettera:",
+    "options": [
+      "UN",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "I capitani alternativi indossano:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "UN"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "La squadra di casa solitamente indossa:",
+    "options": [
+      "Scuro/colorato",
+      "Bianco/chiaro",
+      "Niente maglie",
+      "Solo portiere"
+    ]
+  },
+  "gen_intermission": {
+    "question": "L'intervallo tra i periodi riguarda:",
+    "options": [
+      "5 minuti",
+      "30 minuti",
+      "15-18 minuti",
+      "1 ora"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "Le serie di playoff della NHL sono principalmente:",
+    "options": [
+      "Sempre al meglio dei 5",
+      "Solo finale",
+      "Rare eccezioni, per lo più al meglio di 7",
+      "Mai"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Uno Zamboni serve per:",
+    "options": [
+      "Misura la velocità",
+      "Conserva i dischi",
+      "Affilare i pattini",
+      "Riemergere il ghiaccio"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Gli arbitri sul ghiaccio indossano:",
+    "options": [
+      "Maglie della squadra",
+      "Attrezzatura da portiere",
+      "Strisce bianche e nere",
+      "Abiti"
+    ]
+  },
+  "gen_skates": {
+    "question": "I giocatori di hockey vanno avanti:",
+    "options": [
+      "Pattini a rotelle",
+      "Pattini da ghiaccio",
+      "Piedi nudi",
+      "Sci"
+    ]
+  },
+  "gen_stick": {
+    "question": "I giocatori controllano il disco con:",
+    "options": [
+      "Bastone",
+      "Netto",
+      "Solo le mani",
+      "Casco"
+    ]
+  },
+  "pl_team_0": {
+    "question": "A quale squadra è più associato Sidney Crosby?",
+    "options": [
+      "Pinguini di Pittsburgh",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "In quale ruolo ha giocato principalmente Sidney Crosby?",
+    "options": [
+      "Ala sinistra",
+      "Ala destra",
+      "Difensore",
+      "Centro"
+    ]
+  },
+  "pl_team_1": {
+    "question": "A quale squadra è maggiormente associato Connor McDavid?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto",
+      "Oliatori di Edmonton"
+    ]
+  },
+  "pl_pos_1": {
+    "question": "In quale ruolo ha giocato principalmente Connor McDavid?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_2": {
+    "question": "A quale squadra è più associato Nathan MacKinnon?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Valanga del Colorado",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Che ruolo ricopriva principalmente Nathan MacKinnon?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Ala destra"
+    ]
+  },
+  "pl_team_3": {
+    "question": "A quale squadra è più associato Victor Hedman?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Fulmine della Baia di Tampa",
+      "Rangers di New York",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "In quale ruolo ha giocato principalmente Victor Hedman?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Portiere"
+    ]
+  },
+  "pl_team_4": {
+    "question": "A quale squadra è più associato Carey Price?",
+    "options": [
+      "Montreal Canadiens",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "In quale ruolo ha giocato principalmente Carey Price?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala destra",
+      "Portiere"
+    ]
+  },
+  "pl_team_5": {
+    "question": "A quale squadra è più associato Jaromir Jagr?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto",
+      "Pinguini di Pittsburgh"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "In quale ruolo ha giocato principalmente Jaromir Jagr?",
+    "options": [
+      "Ala destra",
+      "Centro",
+      "Portiere",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_6": {
+    "question": "A quale squadra è più associato Mario Lemieux?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Pinguini di Pittsburgh",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "In quale ruolo ha giocato principalmente Mario Lemieux?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Ala destra"
+    ]
+  },
+  "pl_team_7": {
+    "question": "A quale squadra è più associato Patrick Kane?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Chicago Blackhawks",
+      "Rangers di New York",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "In quale ruolo ha giocato principalmente Patrick Kane?",
+    "options": [
+      "Ala destra",
+      "Ala sinistra",
+      "Centro",
+      "Portiere"
+    ]
+  },
+  "pl_team_8": {
+    "question": "A quale squadra è più associato Nicklas Lidstrom?",
+    "options": [
+      "Ali Rosse di Detroit",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "In quale ruolo ha giocato principalmente Nicklas Lidstrom?",
+    "options": [
+      "Centro",
+      "Portiere",
+      "Ala sinistra",
+      "Difensore"
+    ]
+  },
+  "pl_team_9": {
+    "question": "A quale squadra è più associato Martin Brodeur?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Diavoli del New Jersey"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "In quale ruolo ha giocato principalmente Martin Brodeur?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Portiere",
+      "Difensore"
+    ]
+  },
+  "pl_team_10": {
+    "question": "A quale squadra è più associato Steven Stamkos?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Fulmine della Baia di Tampa",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "In quale ruolo ha giocato principalmente Steven Stamkos?",
+    "options": [
+      "Centro",
+      "Difensore",
+      "Ala destra",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_11": {
+    "question": "A quale squadra è più associato Auston Matthews?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "In quale ruolo ha giocato principalmente Auston Matthews?",
+    "options": [
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra",
+      "Centro"
+    ]
+  },
+  "pl_team_12": {
+    "question": "A quale squadra è più associato Leon Draisaitl?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Oliatori di Edmonton"
+    ]
+  },
+  "pl_pos_12": {
+    "question": "In quale ruolo ha giocato principalmente Leon Draisaitl?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Ala sinistra",
+      "Difensore"
+    ]
+  },
+  "pl_team_13": {
+    "question": "A quale squadra è più associato Erik Karlsson?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Squali di San Jose",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "In quale ruolo ha giocato principalmente Erik Karlsson?",
+    "options": [
+      "Centro",
+      "Portiere",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_14": {
+    "question": "A quale squadra è più associato Pavel Datsyuk?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Ali Rosse di Detroit",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "In quale ruolo ha giocato principalmente Pavel Datsyuk?",
+    "options": [
+      "Centro",
+      "Difensore",
+      "Ala destra",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_15": {
+    "question": "A quale squadra è più associato Henrik Lundqvist?",
+    "options": [
+      "Rangers di New York",
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "In quale ruolo ha giocato principalmente Henrik Lundqvist?",
+    "options": [
+      "Difensore",
+      "Ala destra",
+      "Centro",
+      "Portiere"
+    ]
+  },
+  "pl_team_16": {
+    "question": "A quale squadra è più associato Evgeni Malkin?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Pinguini di Pittsburgh"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "In quale ruolo ha giocato principalmente Evgeni Malkin?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Ala sinistra",
+      "Difensore"
+    ]
+  },
+  "pl_team_17": {
+    "question": "A quale squadra è più legato Artemi Panarin?",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Rangers di New York",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Che ruolo ricopriva principalmente Artemi Panarin?",
+    "options": [
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra",
+      "Centro"
+    ]
+  },
+  "pl_team_18": {
+    "question": "A quale squadra è più associato Nikita Kucherov?",
+    "options": [
+      "Rangers di New York",
+      "Fulmine della Baia di Tampa",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "In quale ruolo ha giocato principalmente Nikita Kucherov?",
+    "options": [
+      "Centro",
+      "Portiere",
+      "Ala destra",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_19": {
+    "question": "A quale squadra è più associato Brad Marchand?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "In quale ruolo ha giocato principalmente Brad Marchand?",
+    "options": [
+      "Ala destra",
+      "Difensore",
+      "Centro",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_20": {
+    "question": "A quale squadra è più associato David Pastrnak?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "In quale ruolo ha giocato principalmente David Pastrnak?",
+    "options": [
+      "Ala sinistra",
+      "Portiere",
+      "Centro",
+      "Ala destra"
+    ]
+  },
+  "pl_team_21": {
+    "question": "A quale squadra è più associato Shea Weber?",
+    "options": [
+      "Rangers di New York",
+      "Montreal Canadiens",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Che ruolo ricopriva principalmente Shea Weber?",
+    "options": [
+      "Ala sinistra",
+      "Portiere",
+      "Difensore",
+      "Centro"
+    ]
+  },
+  "pl_team_22": {
+    "question": "A quale squadra è più associato Sergei Bobrovsky?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Pantere della Florida",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "In quale ruolo ha giocato principalmente Sergei Bobrovsky?",
+    "options": [
+      "Difensore",
+      "Ala destra",
+      "Portiere",
+      "Centro"
+    ]
+  },
+  "pl_team_23": {
+    "question": "A quale squadra è più associato Jonathan Toews?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Chicago Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "In quale ruolo ha giocato principalmente Jonathan Toews?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Ala sinistra",
+      "Difensore"
+    ]
+  },
+  "pl_team_24": {
+    "question": "A quale squadra è più associato Anze Kopitar?",
+    "options": [
+      "Re di Los Angeles",
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "In quale ruolo ha giocato principalmente Anze Kopitar?",
+    "options": [
+      "Ala sinistra",
+      "Difensore",
+      "Ala destra",
+      "Centro"
+    ]
+  },
+  "pl_team_25": {
+    "question": "A quale squadra è più associato Mark Messier?",
+    "options": [
+      "Rangers di New York",
+      "Oliatori di Edmonton",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "In quale ruolo ha giocato principalmente Mark Messier?",
+    "options": [
+      "Ala destra",
+      "Difensore",
+      "Centro",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_26": {
+    "question": "A quale squadra è più associato Ray Bourque?",
+    "options": [
+      "Rangers di New York",
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "In quale ruolo ricopriva principalmente Ray Bourque?",
+    "options": [
+      "Portiere",
+      "Difensore",
+      "Centro",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_27": {
+    "question": "A quale squadra è più associato Dominik Hasek?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Sciabole di bufalo"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "In quale ruolo ha giocato principalmente Dominik Hasek?",
+    "options": [
+      "Portiere",
+      "Centro",
+      "Difensore",
+      "Ala destra"
+    ]
+  },
+  "pl_team_28": {
+    "question": "A quale squadra è più associato Teemu Selanne?",
+    "options": [
+      "Anaheim Anatre",
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "In quale ruolo ha giocato principalmente Teemu Selanne?",
+    "options": [
+      "Centro",
+      "Portiere",
+      "Ala sinistra",
+      "Ala destra"
+    ]
+  },
+  "pl_team_29": {
+    "question": "A quale squadra è più associato Pavel Bure?",
+    "options": [
+      "Rangers di New York",
+      "Vancouver Canucks",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "In quale ruolo ha giocato principalmente Pavel Bure?",
+    "options": [
+      "Ala destra",
+      "Portiere",
+      "Centro",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_30": {
+    "question": "A quale squadra è più associato Alexander Mogilny?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Sciabole di bufalo"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "In quale ruolo ha giocato principalmente Alexander Mogilny?",
+    "options": [
+      "Ala destra",
+      "Ala sinistra",
+      "Centro",
+      "Portiere"
+    ]
+  },
+  "pl_team_31": {
+    "question": "A quale squadra è maggiormente associato Peter Forsberg?",
+    "options": [
+      "Valanga del Colorado",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "In quale ruolo ha giocato principalmente Peter Forsberg?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Ala destra"
+    ]
+  },
+  "pl_team_32": {
+    "question": "A quale squadra è più associato Joe Sakic?",
+    "options": [
+      "Rangers di New York",
+      "Valanga del Colorado",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "In quale ruolo ha giocato principalmente Joe Sakic?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_33": {
+    "question": "A quale squadra è più associato Steve Yzerman?",
+    "options": [
+      "Ali Rosse di Detroit",
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "In quale ruolo ha giocato principalmente Steve Yzerman?",
+    "options": [
+      "Ala sinistra",
+      "Ala destra",
+      "Difensore",
+      "Centro"
+    ]
+  },
+  "pl_team_34": {
+    "question": "A quale squadra è maggiormente associato Bobby Orr?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Montreal Canadiens",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "In quale ruolo ha giocato principalmente Bobby Orr?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Portiere"
+    ]
+  },
+  "pl_team_35": {
+    "question": "A quale squadra è più associato Gordie Howe?",
+    "options": [
+      "Ali Rosse di Detroit",
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "In quale ruolo ha giocato principalmente Gordie Howe?",
+    "options": [
+      "Portiere",
+      "Ala destra",
+      "Ala sinistra",
+      "Centro"
+    ]
+  },
+  "pl_team_36": {
+    "question": "A quale squadra è più associato Wayne Gretzky?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Oliatori di Edmonton",
+      "Rangers di New York",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "In quale ruolo ha giocato principalmente Wayne Gretzky?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_37": {
+    "question": "A quale squadra è più associato Valeri Kharlamov?",
+    "options": [
+      "CSKA Mosca",
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "In quale ruolo ha giocato principalmente Valeri Kharlamov?",
+    "options": [
+      "Ala destra",
+      "Centro",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_38": {
+    "question": "A quale squadra è maggiormente associato Vladislav Tretiak?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Boston Bruins",
+      "Rangers di New York",
+      "CSKA Mosca"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "In quale ruolo ha giocato principalmente Vladislav Tretiak?",
+    "options": [
+      "Portiere",
+      "Difensore",
+      "Centro",
+      "Ala destra"
+    ]
+  },
+  "pl_team_39": {
+    "question": "A quale squadra è maggiormente associato Bobby Hull?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Chicago Blackhawks",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "In quale ruolo ha giocato principalmente Bobby Hull?",
+    "options": [
+      "Difensore",
+      "Ala sinistra",
+      "Ala destra",
+      "Centro"
+    ]
+  },
+  "pl_team_40": {
+    "question": "A quale squadra è più associato Maurice Richard?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Montreal Canadiens",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "In quale ruolo ha giocato principalmente Maurice Richard?",
+    "options": [
+      "Portiere",
+      "Ala destra",
+      "Ala sinistra",
+      "Centro"
+    ]
+  },
+  "pl_team_41": {
+    "question": "A quale squadra è più associato Guy Lafleur?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Montreal Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "In quale ruolo ha giocato principalmente Guy Lafleur?",
+    "options": [
+      "Ala destra",
+      "Ala sinistra",
+      "Centro",
+      "Portiere"
+    ]
+  },
+  "pl_team_42": {
+    "question": "A quale squadra è più associato Patrick Roy?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "In quale ruolo ha giocato principalmente Patrick Roy?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala destra",
+      "Portiere"
+    ]
+  },
+  "pl_team_43": {
+    "question": "A quale squadra è più legato Roberto Luongo?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Vancouver Canucks",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "In che ruolo ha giocato principalmente Roberto Luongo?",
+    "options": [
+      "Portiere",
+      "Centro",
+      "Ala destra",
+      "Difensore"
+    ]
+  },
+  "pl_team_44": {
+    "question": "A quale squadra è più associato Ilya Kovalchuk?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Diavoli del New Jersey",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "In quale ruolo ha giocato principalmente Ilya Kovalchuk?",
+    "options": [
+      "Difensore",
+      "Ala sinistra",
+      "Ala destra",
+      "Centro"
+    ]
+  },
+  "pl_team_45": {
+    "question": "A quale squadra è più associato Pavel Bure?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Pantere della Florida"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "In quale ruolo ha giocato principalmente Pavel Bure?",
+    "options": [
+      "Ala destra",
+      "Ala sinistra",
+      "Centro",
+      "Portiere"
+    ]
+  },
+  "pl_team_46": {
+    "question": "A quale squadra è più associato Alexei Kovalev?",
+    "options": [
+      "Montreal Canadiens",
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "In quale ruolo ha giocato principalmente Alexei Kovalev?",
+    "options": [
+      "Ala sinistra",
+      "Centro",
+      "Portiere",
+      "Ala destra"
+    ]
+  },
+  "pl_team_47": {
+    "question": "A quale squadra è più associato Sergei Gonchar?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Pinguini di Pittsburgh",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "In quale ruolo ha giocato principalmente Sergei Gonchar?",
+    "options": [
+      "Difensore",
+      "Ala sinistra",
+      "Portiere",
+      "Centro"
+    ]
+  },
+  "pl_team_48": {
+    "question": "A quale squadra è più associato Viacheslav Fetisov?",
+    "options": [
+      "Diavoli del New Jersey",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "In quale ruolo ha giocato principalmente Viacheslav Fetisov?",
+    "options": [
+      "Portiere",
+      "Difensore",
+      "Centro",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_49": {
+    "question": "A quale squadra è più associato Chris Chelios?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Ali Rosse di Detroit"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "In quale ruolo ha giocato principalmente Chris Chelios?",
+    "options": [
+      "Difensore",
+      "Centro",
+      "Ala sinistra",
+      "Portiere"
+    ]
+  },
+  "pl_team_50": {
+    "question": "A quale squadra è maggiormente associato Scott Stevens?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Rangers di New York",
+      "Diavoli del New Jersey",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "In quale ruolo ha giocato principalmente Scott Stevens?",
+    "options": [
+      "Difensore",
+      "Portiere",
+      "Ala sinistra",
+      "Centro"
+    ]
+  },
+  "pl_team_51": {
+    "question": "A quale squadra è più associato Paul Coffey?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Oliatori di Edmonton",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "In quale ruolo ha giocato principalmente Paul Coffey?",
+    "options": [
+      "Ala sinistra",
+      "Portiere",
+      "Centro",
+      "Difensore"
+    ]
+  },
+  "pl_team_52": {
+    "question": "A quale squadra è più associato Grant Fuhr?",
+    "options": [
+      "Boston Bruins",
+      "Rangers di New York",
+      "Foglie di acero di Toronto",
+      "Oliatori di Edmonton"
+    ]
+  },
+  "pl_pos_52": {
+    "question": "In quale ruolo ha giocato principalmente Grant Fuhr?",
+    "options": [
+      "Centro",
+      "Difensore",
+      "Portiere",
+      "Ala destra"
+    ]
+  },
+  "pl_team_53": {
+    "question": "A quale squadra è maggiormente associato Mike Bossy?",
+    "options": [
+      "Isolani di New York",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "In quale ruolo ha giocato principalmente Mike Bossy?",
+    "options": [
+      "Ala sinistra",
+      "Ala destra",
+      "Portiere",
+      "Centro"
+    ]
+  },
+  "pl_team_54": {
+    "question": "A quale squadra è più associato Bryan Trottier?",
+    "options": [
+      "Foglie di acero di Toronto",
+      "Isolani di New York",
+      "Rangers di New York",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "In quale ruolo ha giocato principalmente Bryan Trottier?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "pl_team_55": {
+    "question": "A quale squadra è più associato Denis Potvin?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Isolani di New York",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "In quale ruolo ha giocato principalmente Denis Potvin?",
+    "options": [
+      "Ala sinistra",
+      "Portiere",
+      "Centro",
+      "Difensore"
+    ]
+  },
+  "pl_team_56": {
+    "question": "A quale squadra è più associato Cam Neely?",
+    "options": [
+      "Rangers di New York",
+      "Montreal Canadiens",
+      "Foglie di acero di Toronto",
+      "Boston Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "In che ruolo ha giocato principalmente Cam Neely?",
+    "options": [
+      "Centro",
+      "Ala sinistra",
+      "Ala destra",
+      "Portiere"
+    ]
+  },
+  "pl_team_57": {
+    "question": "A quale squadra è più associato Adam Oates?",
+    "options": [
+      "Capitali di Washington",
+      "Rangers di New York",
+      "Boston Bruins",
+      "Foglie di acero di Toronto"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "In quale ruolo ha giocato principalmente Adam Oates?",
+    "options": [
+      "Ala sinistra",
+      "Centro",
+      "Difensore",
+      "Ala destra"
+    ]
+  },
+  "pl_team_58": {
+    "question": "A quale squadra è più associato Doug Gilmour?",
+    "options": [
+      "Boston Bruins",
+      "Foglie di acero di Toronto",
+      "Montreal Canadiens",
+      "Rangers di New York"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "In quale ruolo ha giocato principalmente Doug Gilmour?",
+    "options": [
+      "Centro",
+      "Ala destra",
+      "Difensore",
+      "Ala sinistra"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Cosa significa KHL?",
+    "options": [
+      "Lega continentale di hockey",
+      "Lega di hockey kazaka",
+      "Lega coreana di hockey",
+      "King Hockey League"
+    ]
+  },
+  "intl_iihf": {
+    "question": "L'IIHF organizza:",
+    "options": [
+      "Playoff della KHL",
+      "Progetto della NHL",
+      "Coppa Stanley",
+      "Campionato del mondo"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "L'hockey olimpico si gioca:",
+    "options": [
+      "Ghiaccio",
+      "Sabbia",
+      "Erba",
+      "Calcestruzzo"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Quale nazione ha vinto tanti titoli mondiali con le stelle dell'era Jagr e Hašek?",
+    "options": [
+      "Finlandia",
+      "Cechia",
+      "Canada",
+      "U.S.A."
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Molte stelle della NHL provengono da:",
+    "options": [
+      "Spagna",
+      "Brasile",
+      "Svezia",
+      "India"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "La Finlandia è nota per produrre ottimi:",
+    "options": [
+      "Portieri",
+      "Solo allenatori",
+      "Autisti Zamboni",
+      "Arbitri"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "La \"Macchina Rossa\" sovietica ha dominato in:",
+    "options": [
+      "Anni '70 -'80",
+      "2000",
+      "Anni 2010",
+      "Solo anni '90"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "Le squadre NHL selezionano i nuovi giocatori in:",
+    "options": [
+      "Scadenza commerciale",
+      "Gioco All-Star",
+      "Coppa del Mondo",
+      "Progetto di ingresso"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Vengono assegnate tre stelle del gioco:",
+    "options": [
+      "Una volta a stagione",
+      "Solo nei playoff",
+      "Mai nella NHL",
+      "Dopo ogni partita"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "L'hockey femminile è uno sport olimpico poiché:",
+    "options": [
+      "1998",
+      "Mai",
+      "2010",
+      "1980"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "A parità di forza, quanti pattinatori ha ciascuna squadra (senza portieri)?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Quanti minuti dura un periodo NHL?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "La tua squadra è in gioco di potere quando l'avversario è:",
+    "options": [
+      "Disco di glassa",
+      "Tirare il portiere",
+      "In inferiorità numerica dal rigore",
+      "Vincere il confronto"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Penalty kill significa:",
+    "options": [
+      "Col tempo",
+      "Difendere mentre si è in inferiorità numerica",
+      "Attaccante in più",
+      "Lotta tra portieri"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "L'hockey professionistico si gioca su:",
+    "options": [
+      "Sporco",
+      "Erba",
+      "Ghiaccio",
+      "Acqua"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "Il trofeo del campionato NHL è il:",
+    "options": [
+      "Coppa del Mondo",
+      "Coppa Olimpica",
+      "Coppa Stanley",
+      "Coppa Gretzky"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richard ha vinto il maggior numero di Stanley Cup da giocatore con:",
+    "options": [
+      "Boston Bruins",
+      "Montreal Canadiens",
+      "Foglie di acero di Toronto",
+      "Ali Rosse di Detroit"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Il famoso numero di maglia di Wayne Gretzky era:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux indossava il numero:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby indossa il numero:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid indossa il numero:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Quante squadre ci sono nella NHL (circa)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Quante squadre ci sono nella NHL (circa)? (avanzato)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Quanti giocatori sono vestiti su una panchina da hockey standard?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Quanti giocatori sono vestiti su una panchina da hockey standard? (avanzato)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Quanti minuti è il tempo regolamentare in NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Quanti minuti è il tempo regolamentare in NHL? (avanzato)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Quanti arbitri tipicamente sono sul ghiaccio nella NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Quanti arbitri tipicamente sono sul ghiaccio nella NHL? (avanzato)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Numero massimo di giocatori nel roster (circa)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Numero massimo di giocatori nel roster (circa)? (avanzato)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Il compito principale di un difensore in zona difensiva è:",
+    "options": [
+      "Vinci gli scontri",
+      "Segnare gol per primi",
+      "Proteggi la rete e la fessura",
+      "Cambia rapidamente le linee"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Nella difesa uno contro uno il difensore dovrebbe:",
+    "options": [
+      "Pattina subito in panchina",
+      "Rimani tra l'attaccante e la rete",
+      "Lasciare lo slot aperto",
+      "Insegui solo dietro la rete"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Posizione difensiva: restare sul ghiaccio aiuta a:",
+    "options": [
+      "Timeout del segnale",
+      "Evita di colpire il disco",
+      "Bloccare le corsie di sorpasso",
+      "Compagni di viaggio"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Quando il disco viene perso in attacco, un difensore dovrebbe:",
+    "options": [
+      "Tira il portiere",
+      "Pattina indietro per aiutare la difesa",
+      "Rimani sulla linea rossa",
+      "Litigare con l'arbitro"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Un difensore dovrebbe bloccare i tiri quando:",
+    "options": [
+      "Il disco è solo in zona neutra",
+      "Inizia l'intervallo",
+      "La strada verso la rete è aperta",
+      "La squadra è in gioco di potere"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "In una partita 2 contro 1, il difensore solitamente dovrebbe:",
+    "options": [
+      "Entrambi restano sulla linea blu",
+      "Entrambi corrono insieme verso il portatore del disco",
+      "Prendi il portatore del disco e allargalo con un'angolazione",
+      "Pattina in panchina"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Durante il rigore, la priorità è spesso:",
+    "options": [
+      "Pattina con il disco al centro da solo",
+      "Cambia prima le linee al volo",
+      "Tieni il disco nell'angolo per sempre",
+      "Eliminare il disco dalla zona"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Un buon controllo del gap significa che il difensore:",
+    "options": [
+      "Non fa mai marcia indietro",
+      "Colpisce solo da dietro",
+      "Corrisponde alla velocità e alla distanza dell'attaccante",
+      "Rimane sempre al centro del ghiaccio"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Davanti alla rete il difensore deve:",
+    "options": [
+      "Vai al punto",
+      "Chiamata per fuorigioco",
+      "Guarda solo il disco e ignora i giocatori",
+      "Elimina e lega gli avversari"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Sotto pressione, il primo sguardo di un difensore dovrebbe essere:",
+    "options": [
+      "Spara alla propria rete",
+      "Primo passaggio al supporto basso o allo sbocco sicuro",
+      "Passare sempre al centro sotto pressione",
+      "Gira alla cieca attorno alle assi"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Sul gioco di potere a questo punto, un difensore dovrebbe:",
+    "options": [
+      "Pattina di nuovo in zona neutra",
+      "Cambio con il portiere",
+      "Mantieni il disco in zona e crea tiri/passaggi",
+      "Non sparare mai"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Un gioco difensivo legale in corsa è:",
+    "options": [
+      "Pesca legale e bastone dal lato del disco",
+      "Agganciare e tirare giù l'avversario",
+      "Stick-check da dietro in contropiede",
+      "Controllo incrociato alla testa"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "I difensori professionisti bloccano i tiri perché:",
+    "options": [
+      "Vale come assist",
+      "Non bloccare mai i tiri",
+      "Blocca i colpi e sacrifica il corpo quando necessario",
+      "L'arbitro interrompe il gioco"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Quando due attaccanti si incrociano nella tua zona, i difensori dovrebbero:",
+    "options": [
+      "Entrambi inseguono solo il disco",
+      "Lascia la piega",
+      "Comunicare e cambiare se necessario",
+      "Ignora l'attaccante dal lato lontano"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Quando gli avversari lanciano il disco, un difensore dovrebbe:",
+    "options": [
+      "Recupera il disco o appuntalo sulle tavole",
+      "Pattina in panchina per il cambio",
+      "Aspetta il fischio",
+      "Spara dalla linea rossa"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "In una corsa 3 contro 2, il difensore posteriore solitamente dovrebbe:",
+    "options": [
+      "Coprire la minaccia del lato debole (backdoor).",
+      "Pattina fino alla linea rossa",
+      "Cambia linea",
+      "Pizzica in modo aggressivo ogni volta"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Un difensore può pizzicare la linea blu offensiva quando:",
+    "options": [
+      "La squadra è a corto di personale",
+      "Il portiere viene tirato",
+      "Le coperture e il disco del partner sono recuperabili al board",
+      "Sempre al primo turno"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Se viene colpito a lato in corsa, il difensore dovrebbe:",
+    "options": [
+      "Pattina in panchina",
+      "Fermati e discuti con l'arbitro",
+      "Girati e insegui attraverso il centro fino alla rete",
+      "Agganciare da dietro"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Nella copertura della zona difensiva, difensore basso vs difensore alto significa:",
+    "options": [
+      "Entrambi al punto",
+      "Entrambi in zona neutra",
+      "Entrambi nella piega",
+      "Basso sul disco, copertura alta e backdoor"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "In una corsa contro un uomo strano, la chiave è:",
+    "options": [
+      "Prendi un rigore ogni volta",
+      "Ritardare e forzare un angolo sbagliato o un passaggio",
+      "Immergiti sempre per bloccare",
+      "Lascia il gioco solo al portiere"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "Durante il rigore ucciso contro un singolo dal fianco, il difensore dovrebbe:",
+    "options": [
+      "Mettiti nell'area del portiere",
+      "Pattina al centro per il cambiamento",
+      "Togliere la corsia di passaggio allo slot",
+      "Pressa il portiere"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Perché un bordo cieco attorno alle tavole spesso è dannoso?",
+    "options": [
+      "Dà agli avversari un recupero gratuito",
+      "E' sempre fuorigioco",
+      "Causa sempre la formazione di ghiaccio",
+      "L'arbitro dà rigore"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Dopo una vittoria in un ingaggio in zona difensiva, i difensori dovrebbero:",
+    "options": [
+      "Aspetta cinque secondi",
+      "Leggi il controllo preliminare e utilizza il primo passaggio rapido",
+      "Spara sempre prima dal punto",
+      "Pattina fino alla linea rossa con il disco"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Per proteggere un gol di vantaggio in ritardo, i difensori dovrebbero:",
+    "options": [
+      "Tira sempre dal centro",
+      "Pizzica ogni volta sulla linea blu",
+      "Gestisci il disco in modo sicuro ed evita rischi inutili",
+      "Tira sempre il portiere in anticipo"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Man-on-man nello slot significa:",
+    "options": [
+      "Ignora le minacce dal disco",
+      "Insegui solo il disco",
+      "Controllo del divario",
+      "Copertura uomo a uomo sul portatore del disco"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Sulla linea blu offensiva, un difensore che mantiene la linea cerca di:",
+    "options": [
+      "Cambio con avanti",
+      "Mantieni la linea blu e mantieni il disco in zona",
+      "Pattina di nuovo in zona neutra",
+      "Causa fuorigioco intenzionale sempre"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Dopo una parata con rimbalzo nello slot, il difensore deve:",
+    "options": [
+      "Festeggia con il portiere",
+      "Spara a rete vuota",
+      "Pattina in panchina",
+      "Elimina il rimbalzo o lega l'attaccante"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Dopo la liberazione vietata (no-touch) in zona difensiva, durante l'ingaggio:",
+    "options": [
+      "Rimpiazza sempre il disco",
+      "Prendi una penalità minore",
+      "Imposta la struttura e vinci un'uscita pulita",
+      "Tira il portiere"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Contro il forecheck aggressivo, un passaggio allungato viene utilizzato per:",
+    "options": [
+      "Interrompere sempre il gioco per fuorigioco",
+      "Solo tempo sprecato",
+      "Glassa di garanzia",
+      "Batti la punta con un passaggio lungo"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Chiudere una corsia di tiro significa:",
+    "options": [
+      "Mettere corpo/bastone sulla traiettoria del tiro",
+      "Agitare il bastone solo in aria",
+      "Pattinaggio sulla linea rossa",
+      "In piedi dietro la rete"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Quando il tuo partner pizzica, devi:",
+    "options": [
+      "Pattina in panchina",
+      "Lascia la zona aperta",
+      "Pizzica anche immediatamente",
+      "Copriti in alto come ultimo difensore"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Lasciando l’area di rigore, un difensore dovrebbe:",
+    "options": [
+      "Abbina il gioco ed evita di essere colto di sorpresa",
+      "Ignora la fretta",
+      "Cambia sempre e subito",
+      "Pattina direttamente verso la rete dell'avversario"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "A porta vuota contro, i difensori nell'ultimo minuto dovrebbero:",
+    "options": [
+      "Tutto il controllo profondo",
+      "Tira sempre anche il proprio portiere",
+      "Blocca i tiri e proteggi il centro",
+      "Non pulire mai il disco"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Se non riesci a raggiungere il portatore del disco, dovresti:",
+    "options": [
+      "Arrenditi e cambia",
+      "Lascia lo slot",
+      "Togli tempo e spazio con un buon posizionamento",
+      "Agganciare da dietro"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Difendendo un ingresso in una zona controllata, il difensore dovrebbe:",
+    "options": [
+      "Pattina all'indietro fino alla panca",
+      "Alzati in fila o distanziati presto",
+      "Ritirati sempre nella piega",
+      "Non toccare mai l'aggressore"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "In zona difensiva, un passaggio di mano da un difensore ad un compagno di squadra è:",
+    "options": [
+      "Consentito se completato nella stessa zona",
+      "Sempre glassa",
+      "Sempre fuorigioco",
+      "Sempre rigore"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Quando un compagno di squadra ha il disco, un attaccante dovrebbe:",
+    "options": [
+      "Pattina sempre da solo fino alla linea rossa",
+      "Ignora il cambio di linea del disco",
+      "Vai al ghiaccio aperto per un passaggio",
+      "Resta fermo sulla linea blu"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Un’ala vicino alla rete durante un tiro dovrebbe:",
+    "options": [
+      "Pattina in panchina",
+      "Vai in rete per rimbalzi e suggerimenti",
+      "Guarda solo dal punto",
+      "Aspetta al centro del ghiaccio"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Quando viene perso il possesso, gli attaccanti devono:",
+    "options": [
+      "Togliere immediatamente dal ghiaccio",
+      "Litigare con l'arbitro",
+      "Rimani in zona offensiva",
+      "Backcheck e aiuto sulla difensiva"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "In fretta, \"maneggiare la testa\" del disco significa:",
+    "options": [
+      "Buttalo sempre in alto dal vetro",
+      "Fermati alla linea rossa",
+      "Capo, il disco (passa avanti)",
+      "Pattinare all'indietro solo fino alla propria panca"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Far girare il disco in basso nella zona offensiva aiuta a:",
+    "options": [
+      "Glassa di garanzia",
+      "Forzare sempre il fuorigioco",
+      "Crea spazio per il tiro o il passaggio",
+      "Solo tempo sprecato"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Durante un ingaggio, il compito del centro è spesso quello di:",
+    "options": [
+      "Tutti e tre gli attaccanti in profondità nell'angolo",
+      "Lascia il cerchio presto",
+      "Spara subito dal punto",
+      "Vinci il pareggio per un posto da ala o da D-man"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "In un forecheck 2-1-2, F1 e F2 tipicamente:",
+    "options": [
+      "Entrambi inseguono solo dietro la rete",
+      "Entrambi cambiano linea",
+      "La F1 preme, la F2 toglie la corsia di sorpasso",
+      "Entrambi stanno sulla linea rossa"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Nel gioco di potere, un attaccante in attacco dovrebbe:",
+    "options": [
+      "Pattina fino alla zona neutra",
+      "Copri il punto sul rigore",
+      "Affronta il fronte netto del gioco di potere",
+      "Non toccare mai il disco"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "In una corsa 3 contro 2, il terzo attaccante dovrebbe:",
+    "options": [
+      "Pattina in panchina",
+      "Stai nella piega",
+      "Rimani in alto come terzo uomo in corsa",
+      "Insegui il disco in profondità senza supporto"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "In fretta, un'ala veloce spesso dovrebbe:",
+    "options": [
+      "Fermati ogni volta alla linea blu",
+      "Passaggio all'indietro al portiere",
+      "L'ala allarga con velocità in corsa",
+      "Pattina sempre nel mezzo"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Un ruolo chiave nel gioco di potere per un attaccante è:",
+    "options": [
+      "Lascia lo spazio libero in difesa",
+      "Puntare sempre e solo il tiro",
+      "Non andare mai in rete",
+      "Screena il portiere in PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Su rigore, un attaccante spesso copre:",
+    "options": [
+      "Copri il punto sul rigore",
+      "L'arbitro",
+      "Affronta il fronte netto del gioco di potere",
+      "L'autista della Zamboni"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Per evitare un fuorigioco sulla linea blu, un attaccante può:",
+    "options": [
+      "Pattina all'indietro nella zona",
+      "Salta oltre la linea blu",
+      "Rimani in-gioco ritardando l'ingresso nella zona",
+      "Entra sempre nella zona prima del disco"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "L'impostazione di un timer singolo di solito richiede:",
+    "options": [
+      "Configurazione one-timer: passaggio al tiratore aperto",
+      "Gira il disco in giro senza guardare",
+      "Deke sempre su rigore",
+      "Scarica e insegui senza un piano di controllo anticipato"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Dopo un tiro in power play, gli attaccanti dovrebbero:",
+    "options": [
+      "Tutti cambiano linea contemporaneamente",
+      "Saluta la folla",
+      "Crash della rete dopo un tiro dal punto",
+      "Pattina fino alla zona neutra"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "Nella struttura della zona offensiva, il centro spesso:",
+    "options": [
+      "Non entra mai nello slot",
+      "Tutti e tre gli attaccanti in profondità nell'angolo",
+      "Il centro sostiene basso, l'ala rimane alta",
+      "Copre solo il punto"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "In caso di breakout, il supporto in avanti del lato debole significa:",
+    "options": [
+      "Supporto dal lato debole sull’uscita dalla zona D",
+      "Resta fermo sulla linea rossa",
+      "Spara alla propria rete",
+      "Pattinare verso la panca avversaria per il cambio"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Un portiere dovrebbe sempre cercare di:",
+    "options": [
+      "Tieni traccia del disco nel traffico",
+      "Posizionati sulla linea rossa",
+      "Guarda solo gli occhi di chi ha sparato",
+      "Lascia la rete per un cambio di linea"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Quando il disco è libero nell’area di piega, il portiere dovrebbe:",
+    "options": [
+      "Congela il disco per interrompere il gioco",
+      "Spara a rete vuota",
+      "Pattina per centrare il ghiaccio e festeggia",
+      "Passa all'arbitro"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Dopo un salvataggio, il controllo ideale del rimbalzo è:",
+    "options": [
+      "Controllo del rimbalzo verso un'area sicura",
+      "Rimbalza sempre nello slot",
+      "Rimbalzo sempre sul vetro",
+      "Ignora il rimbalzo"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Nelle corse a uomo dispari, il portiere dovrebbe:",
+    "options": [
+      "Resta sempre in silenzio",
+      "Guarda la folla",
+      "Pattina in panchina",
+      "Il portiere parla delle corse stravaganti"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "Nella NHL, il portiere può giocare il disco dietro la rete solo in:",
+    "options": [
+      "Zona offensiva",
+      "Gioca con il disco solo nel trapezio dietro la rete",
+      "Zona difensiva completa",
+      "Solo zona neutra"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Su un passaggio laterale attraverso l'area, il portiere usa:",
+    "options": [
+      "Stai sempre su un solo palo",
+      "Lascia la rete",
+      "Movimento da post a post nei passaggi laterali",
+      "Pattina fino alla linea blu"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Un buon angolo di gioco significa che il portiere:",
+    "options": [
+      "Sfide alla linea rossa",
+      "Sta sempre in profondità nella piega",
+      "Taglio angolare per ridurre la visibilità della rete",
+      "Si gira verso chi ha sparato"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "La \"casa\" del portiere da proteggere è principalmente:",
+    "options": [
+      "Proteggi la casa (area slot)",
+      "La porta Zamboni",
+      "Centro del cerchio di ghiaccio",
+      "L'area di rigore"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Durante una contropiede, molti portieri preferiscono:",
+    "options": [
+      "Pattina verso la panchina",
+      "Chiudi gli occhi e spera",
+      "Abbina il tiratore e leggi il comunicato",
+      "Sfida al vertice dei cerchi sempre"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Durante un tentativo di avvolgenza, il portiere dovrebbe:",
+    "options": [
+      "Lascia aperto il posto più vicino",
+      "Vai al punto",
+      "Gioca il disco nell'angolo",
+      "Tieni il palo sul lato corto"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Se un portiere gioca il disco dietro la rete FUORI dal trapezio, è:",
+    "options": [
+      "Gioco legale sempre",
+      "Chiamata ghiacciata",
+      "Penalità per ritardo di gioco",
+      "Obiettivo automatico"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Quando il disco viene bloccato, il portiere dovrebbe:",
+    "options": [
+      "Lascia la piega",
+      "Segnalazione di fuorigioco",
+      "Rinunciare sempre al lato corto",
+      "Trova il disco nel traffico o modifica la posizione"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Un controllo del poke del portiere deve essere:",
+    "options": [
+      "Poke check legalmente solo dal davanti",
+      "Con un bastone alto in faccia",
+      "Sempre da dietro chi ha sparato",
+      "Stando in piedi al centro del ghiaccio"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Su un passaggio lungo, il portiere spesso:",
+    "options": [
+      "Pattina sulla panchina dell'avversario",
+      "Ignora il gioco",
+      "Spara all'arbitro",
+      "Ferma o gioca legalmente il disco dietro la rete"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "L'intelligenza dell'hockey significa che ogni giocatore dovrebbe:",
+    "options": [
+      "Ogni giocatore aiuta in difesa",
+      "Parlano solo i portieri",
+      "Solo i difensori si tirano indietro",
+      "Solo gli attaccanti segnano"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Mantenere il bastone sul ghiaccio ti aiuta a:",
+    "options": [
+      "Blocca le corsie di sorpasso e ricevi i passaggi",
+      "Glassa del segnale",
+      "Evita il disco",
+      "Inciampa più velocemente"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Di solito avviene un cambio di linea intelligente:",
+    "options": [
+      "Al volo quando il gioco lo consente",
+      "Mai al volo",
+      "Durante una fuga contro",
+      "Sempre e solo in zona offensiva"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Prima di cambiare i marcatori difensivi, i giocatori dovrebbero:",
+    "options": [
+      "Urla sempre all'arbitro",
+      "Cambiare senza guardare",
+      "Comunicare prima di cambiare voto",
+      "Non parlare mai sul ghiaccio"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Cambiare le linee sul lato sbagliato del ghiaccio può:",
+    "options": [
+      "Garantire un gol",
+      "Aiuta sempre la squadra",
+      "Causa troppi uomini o cattivo tempismo",
+      "Ferma l'orologio"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Leggere l'opera significa:",
+    "options": [
+      "Ignora i compagni di squadra",
+      "Non cambiare mai struttura",
+      "Guarda sempre e solo il disco",
+      "Anticipa dove andranno il disco e gli avversari"
+    ]
+  },
+  "theory_t_support": {
+    "question": "L'appoggio del secondo uomo sul disco significa:",
+    "options": [
+      "Pattina lontano dal disco",
+      "Guarda solo il portiere",
+      "Posizionati sulla linea rossa",
+      "Abbina la velocità e supporta il portatore del disco"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Il lato forte e il lato debole si riferiscono a:",
+    "options": [
+      "Lato dove si trova il disco rispetto al lato opposto",
+      "Squadre in casa e in trasferta",
+      "Primo e secondo periodo",
+      "Solo giocatori mancini e destrimani"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Nei giochi di potere, la struttura conta perché:",
+    "options": [
+      "Il movimento apre le corsie e allunga il PK",
+      "Stare fermi è la cosa migliore",
+      "Solo un giocatore dovrebbe toccare il disco",
+      "Il fuorigioco non conta"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Penalty kill \"box + one\" spesso significa:",
+    "options": [
+      "Tutti e cinque inseguono il disco",
+      "Tutti e cinque si trovano sulla linea rossa",
+      "Nessuna struttura necessaria",
+      "Quattro in una scatola, uno che pressa il disco"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Barare in un ingaggio (tempismo) significa:",
+    "options": [
+      "Cronometrare il drop per vincere il disco in anticipo",
+      "Calcia il bastone dell'avversario",
+      "Entra nel cerchio prima del disco",
+      "Lascia il punto dell'ingaggio"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Proteggere un lead in ritardo, team intelligenti:",
+    "options": [
+      "Prenditi dei rischi ad ogni turno",
+      "Tira sempre il portiere nel primo periodo",
+      "Non liberare mai la zona",
+      "Gestisci il disco ed evita sanzioni inutili"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Gli allenatori cambiano le linee per gli incontri in:",
+    "options": [
+      "Ottieni situazioni favorevoli giocatore contro giocatore",
+      "Fuorigioco garantito",
+      "Evita tutti i confronti",
+      "Solo tempo sprecato"
+    ]
+  },
+  "ref_goal": {
+    "question": "Quando viene segnato un goal, l’arbitro solitamente:",
+    "options": [
+      "Punta al centro del ghiaccio",
+      "Segnalare una penalità ritardata",
+      "Forma una T con le mani",
+      "Il blocco del segnale viene annullato"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Un segnale di timeout assomiglia a:",
+    "options": [
+      "Le mani formano una T",
+      "Punta al centro del ghiaccio",
+      "Sei dita mostrate",
+      "Entrambi i pugni spingono in avanti"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Una penalità ritardata viene mostrata dall'arbitro con:",
+    "options": [
+      "Segnale di goal segnato",
+      "Segnale T di timeout",
+      "Lavare il segnale di formazione di ghiaccio",
+      "Un braccio alzato verso l'alto"
+    ]
+  },
+  "ref_minor": {
+    "question": "Quando si fischia una penalità minore, l'arbitro spesso segnala con:",
+    "options": [
+      "Palmo aperto verso l'area di rigore",
+      "Braccio solo sul petto",
+      "Le mani formano una T",
+      "Punta al centro del ghiaccio per un goal"
+    ]
+  },
+  "ref_offside": {
+    "question": "Una chiamata di fuorigioco da parte dell'arbitro viene spesso segnalata con:",
+    "options": [
+      "Punta al centro del ghiaccio",
+      "Sei dita mostrate",
+      "Movimento di pompaggio del pugno chiuso",
+      "Movimento di triturazione parallelo al ghiaccio"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Un segnale di violazione del passaggio manuale è spesso:",
+    "options": [
+      "Movimento di pompaggio del pugno chiuso",
+      "Entrambe le braccia incrociate per combattere",
+      "Palmo aperto verso l'area di rigore",
+      "Punta al centro del ghiaccio"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Segnale di rigore per bastone alto: l'arbitro tocca spesso:",
+    "options": [
+      "Palmo sulla zona del viso/mascella",
+      "Il palo della porta",
+      "Il disco",
+      "Solo il proprio ginocchio"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Troppi uomini sul ghiaccio vengono segnalati mostrando:",
+    "options": [
+      "Solo un braccio teso verso l'alto",
+      "Punta al centro del ghiaccio",
+      "Le mani formano una T",
+      "Sei dita mostrate"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Un segnale di penalità per lo sgambetto spesso assomiglia a:",
+    "options": [
+      "Segnale di intervento (movimento della gamba)",
+      "Le mani formano una T",
+      "Punta al centro del ghiaccio",
+      "Entrambi i pugni spingono in avanti"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Un segnale di penalità per l'aggancio spesso assomiglia a:",
+    "options": [
+      "Sei dita",
+      "Tritare parallelamente al ghiaccio",
+      "Segnale di aggancio (movimento di trazione)",
+      "Pompaggio a pugno chiuso"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Il segnale di controllo incrociato da parte dell'arbitro è spesso:",
+    "options": [
+      "Entrambi i pugni spingono in avanti",
+      "Punta al centro del ghiaccio",
+      "Le mani formano una T",
+      "Solo palmo rivolto verso il viso"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Un maggiore combattente viene spesso segnalato con:",
+    "options": [
+      "Tagliare il movimento del fuorigioco",
+      "Maggiore combattente (entrambe le braccia incrociate)",
+      "Un braccio in alto per il rigore ritardato",
+      "Aprire il palmo solo verso la scatola"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Quando si assegna un tiro di rigore, l’arbitro tipicamente:",
+    "options": [
+      "Mostra il timeout T",
+      "Lava via la glassa",
+      "Punta al centro del ghiaccio per il tiro di rigore",
+      "Mostra sei dita"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Quando respinge un gol, l'arbitro può:",
+    "options": [
+      "Segnale di goal annullato (incrociare le braccia e poi salutare)",
+      "Puntare al centro per un gol",
+      "Alzare il braccio solo per penalità ritardata",
+      "Mostra timeout T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Il ritardo del segnale di gioco (disco sul vetro) è spesso:",
+    "options": [
+      "Spazzata della gamba inciampante",
+      "Ritardo del gioco (l'arbitro dà una pacca al bicchiere immaginario)",
+      "Braccia di combattimento incrociate",
+      "Movimento di trazione con aggancio"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Un guardalinee segnala fuorigioco per:",
+    "options": [
+      "Palmo aperto verso l'area di rigore",
+      "Forma una T per il timeout",
+      "Punta al centro del ghiaccio per il goal",
+      "Guardalinee con entrambe le braccia alzate (fuorigioco)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Quando la liberazione vietata viene respinta (ad esempio su PK), il guardalinee può:",
+    "options": [
+      "Incrocia le braccia per combattere",
+      "Il blocco del segnale viene annullato",
+      "Puntare al centro per un gol",
+      "Mostra sei dita"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Una doppia penalità minore può essere mostrata con:",
+    "options": [
+      "T per timeout",
+      "Solo un braccio teso verso l'alto",
+      "Doppio minore (due dita)",
+      "Sei dita per troppi uomini"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Il segnale di penalità all’imbarco spesso comporta:",
+    "options": [
+      "T per timeout",
+      "Puntare al centro per l'obiettivo",
+      "Pugno chiuso per il passaggio con la mano",
+      "Segnale di penalità all'abbordaggio (spingimento delle braccia)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Durante un segnale di penalità ritardata, il gioco continua perché:",
+    "options": [
+      "Il gol è stato segnato",
+      "La glassa è stata completata",
+      "È stato chiamato il timeout",
+      "Rigore ritardato (il gioco continua)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "L'avversario inizia un attacco attraverso il centro. Cosa dovrebbe fare il centro?",
+    "options": [
+      "Ritorna al centro della tua zona e aiuta i difensori",
+      "Stai vicino alle tavole",
+      "Cambia riga senza motivo",
+      "Pattina verso la rete dell'avversario"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Un avversario dietro la rete tenta di segnare con una fascia in stile lacrosse. Cosa dovrebbe fare il portiere?",
+    "options": [
+      "Pattina fino al centro della zona",
+      "Guarda la folla",
+      "Tieniti stretto al secondo palo e guarda il bastone",
+      "Sdraiati a faccia in giù sul ghiaccio"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Sei un difensore che affronta una corsa 2 contro 1. Cosa conta di più?",
+    "options": [
+      "Togli il pass",
+      "Attacca immediatamente il portatore del disco",
+      "Guarda solo il disco",
+      "Pattina in panchina per un cambio di linea"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Sei un'ala e il primo giocatore ad entrare nella zona offensiva. Cosa dovresti fare?",
+    "options": [
+      "Fai pressione sul difensore con il disco",
+      "Posizionati sulla linea blu",
+      "Pattinare in tondo",
+      "Pattina direttamente in panchina"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "La tua squadra è in gioco di potere. Dov’è solitamente posizionato il centro?",
+    "options": [
+      "Alla tua linea blu",
+      "In panchina",
+      "Dietro la tua stessa rete",
+      "Davanti alla rete"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Hai perso il disco in zona offensiva. Cosa dovresti fare dopo?",
+    "options": [
+      "Unisciti immediatamente al forecheck",
+      "Pattina indietro lentamente",
+      "Litigare con l'arbitro",
+      "Guarda l'allenatore"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Il centro ha perso l'ingaggio. Cosa verrà dopo?",
+    "options": [
+      "Pattina nell'attacco",
+      "Aiuto subito in difesa",
+      "Togliti il ​​casco",
+      "Smetti di muoverti"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Il disco è lungo il tabellone nella tua zona. Cosa dovrebbe fare il secondo giocatore?",
+    "options": [
+      "Sostieni il tuo partner nelle vicinanze",
+      "Stai fermo",
+      "Occhio agli spalti",
+      "Pattina verso la rete dell'avversario"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Cos'è più importante in una corsa 3 contro 2?",
+    "options": [
+      "Tutti pattinano nello stesso punto",
+      "Spara da qualsiasi posizione",
+      "Fermati alla linea blu",
+      "Allunga la difesa con i passaggi"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Dopo il tiro il disco rimbalza davanti alla rete. Cosa dovrebbe fare il portiere?",
+    "options": [
+      "Alzare il bastone in aria",
+      "Trova il disco e coprilo",
+      "Pattina dietro la rete",
+      "Guarda l'allenatore"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Qual è il momento migliore per cambiare linea?",
+    "options": [
+      "Quando la tua squadra controlla il disco",
+      "Quando l'avversario sta attaccando",
+      "Quando il disco è davanti alla rete",
+      "Durante una pericolosa occasione da gol"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Cosa dovrebbe fare un difensore quando è sotto forte pressione di controllo?",
+    "options": [
+      "Stai fermo con il disco",
+      "Tira il disco al centro della zona",
+      "Caduta nel ghiaccio",
+      "Effettua un primo passaggio rapido e accurato"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Cosa è importante fare quando non hai il disco?",
+    "options": [
+      "Guarda il soffitto",
+      "Tieni il bastone solo con una mano",
+      "Apriti per un passaggio",
+      "Stai fermo in un punto"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Quale breakout è considerato il più affidabile?",
+    "options": [
+      "Perdere il disco",
+      "Con un passaggio corto e preciso",
+      "Una discarica cieca",
+      "Un passaggio al centro della tua zona"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Cos'è più importante nel rigore?",
+    "options": [
+      "Bloccare le corsie di sorpasso",
+      "Attacca costantemente",
+      "Pattinare senza struttura",
+      "Gioca solo lungo i tabelloni"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Quando un difensore può unirsi alla corsa?",
+    "options": [
+      "Sempre",
+      "Solo negli straordinari",
+      "Mai",
+      "Quando il suo partner copre la sua posizione"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Perché il passaggio attraverso la fessura è pericoloso?",
+    "options": [
+      "I funzionari non possono vederlo",
+      "Rallenta il gioco",
+      "Può portare a un obiettivo",
+      "È sempre illegale"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Quando dovrebbe un portiere giocare il disco dietro la rete?",
+    "options": [
+      "Per lasciare il ghiaccio",
+      "Per aiutare i difensori a iniziare l'evasione",
+      "Per riposarsi",
+      "Per discutere con i funzionari"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Perché un attaccante porta al palo lontano?",
+    "options": [
+      "Per rimbalzi e partite singole",
+      "Per restare fuori dal gioco",
+      "Per riposarsi",
+      "Per intralciare un compagno di squadra"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Cosa dovrebbe fare un difensore prima di tirare dal dischetto?",
+    "options": [
+      "Controlla il traffico davanti alla rete",
+      "Spara direttamente sulle assi",
+      "Chiudi gli occhi",
+      "Dekes all'indietro"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Chi dovrebbe lottare per primo per il disco dopo un ingaggio?",
+    "options": [
+      "Solo il portiere",
+      "Nessuno",
+      "Il giocatore più vicino",
+      "Solo il difensore"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Perché il controllo del disco è importante?",
+    "options": [
+      "L'avversario non può attaccare senza il disco",
+      "Puoi pattinare di meno",
+      "I funzionari assegnano punti per questo",
+      "Sembra buono"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Cosa conta di più in una battaglia all'angolo?",
+    "options": [
+      "Un tiro alto",
+      "Saltando",
+      "Pattinaggio solo all'indietro",
+      "Posizione del corpo e posizionamento del bastone"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Qual è il modo migliore per aprirsi?",
+    "options": [
+      "Muoviti nello spazio aperto",
+      "In un angolo cieco",
+      "Pattina dietro la schiena di un compagno di squadra",
+      "Stando fermi"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Cosa dovrebbe fare un attaccante dopo aver effettuato un tiro?",
+    "options": [
+      "Cambia subito riga",
+      "Guarda il tabellone",
+      "Vai a rete per un rimbalzo",
+      "Stai fermo"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Cos'è più importante per un difensore nello slot?",
+    "options": [
+      "Stai lontano dalla rete",
+      "Gioca senza bastone",
+      "Impedisci agli avversari di arrivare ai rimbalzi",
+      "Guarda solo il portiere"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Qual è il modo migliore per entrare nella zona?",
+    "options": [
+      "Senza velocità",
+      "Pattinaggio all'indietro nella zona",
+      "Nel mezzo senza supporto",
+      "Con controllo del disco"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Quando è utile un tiro di rovescio?",
+    "options": [
+      "Solo in pratica",
+      "Mai",
+      "Quando non c'è tempo per muovere il disco sul dritto",
+      "Solo per i difensori"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Perché il centro è importante in attacco?",
+    "options": [
+      "Sta sempre fermo",
+      "Non fa mai passaggi",
+      "Collega l'intera linea",
+      "Non gioca mai in difesa"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Cosa conta nel gioco difensivo 1 contro 1?",
+    "options": [
+      "Salta immediatamente sull'avversario",
+      "Occhio agli spalti",
+      "Pattina all'indietro senza controllo",
+      "Controllare lo spazio e l'angolo"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "La tua linea ha avuto un lungo turno offensivo. Il difensore avversario ha recuperato il disco dietro la rete ma appare stanco. Anche la tua linea è sul ghiaccio da molto tempo. Cosa è meglio?",
+    "options": [
+      "Continua a controllare in modo aggressivo con l'intera linea",
+      "Ritorna nella zona neutra senza pressione",
+      "Un attaccante continua a premere mentre gli altri cambiano",
+      "L'intera linea cambia in una volta"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Perché a volte è utile un passaggio all'indietro?",
+    "options": [
+      "Perdere slancio",
+      "Per evitare di attaccare",
+      "Per mantenere il possesso",
+      "Per interrompere il gioco"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Cosa conta quando si blocca un tiro?",
+    "options": [
+      "Blocca il percorso del disco",
+      "Salta verso l'alto",
+      "Voltati le spalle",
+      "Guarda in basso"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Come dovrebbe giocare un difensore contro un attaccante veloce?",
+    "options": [
+      "Continua a pattinare in avanti senza fermarti",
+      "Gioca troppo stretto ogni volta",
+      "Stai fermo",
+      "Non dargli ghiaccio aperto"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Quando è più efficace un one-timer?",
+    "options": [
+      "Quando il tiratore non è pronto",
+      "Solo in pratica",
+      "Quando il portiere non riesce a posizionarsi in tempo",
+      "Quando il disco è fermo"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Perché è importante la comunicazione sul ghiaccio?",
+    "options": [
+      "Distrae l'avversario",
+      "Sostituisce il pattinaggio",
+      "Aiuta i compagni di squadra a prendere decisioni più velocemente",
+      "Ai funzionari piace"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Come dovresti giocare una corsa 2 contro 0?",
+    "options": [
+      "Fai muovere il portiere con un passaggio",
+      "Fermati davanti alla rete",
+      "Spara da lontano",
+      "Perdere il disco"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Perché gli attaccanti sfruttano lo spazio dietro la rete?",
+    "options": [
+      "Per nascondersi dal gioco",
+      "Per fermare il gioco",
+      "Per evitare di sparare",
+      "Per allungare la difesa"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Perché è importante mantenere la calma?",
+    "options": [
+      "Colpisce il ghiaccio",
+      "Rende la rete più piccola",
+      "Ti aiuta a prendere decisioni migliori",
+      "Rende il disco più veloce"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Cosa dovrebbe fare un difensore sulla linea blu offensiva?",
+    "options": [
+      "Mantieni il disco in zona",
+      "Stai solo al centro",
+      "Ignora i compagni di squadra",
+      "Ritirati sempre"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Cosa rende pericoloso un rimbalzo?",
+    "options": [
+      "Il giocatore resta fermo",
+      "Il disco diventa più leggero",
+      "L'arbitro non può vedere il disco",
+      "Non sempre il portiere controlla il rimbalzo"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Perché è utile cambiare la direzione dell’attacco?",
+    "options": [
+      "Fa male alla tua stessa squadra",
+      "Rallenta il gioco",
+      "Crea spazi aperti",
+      "Stanca gli arbitri"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Cosa conta in un ingaggio in zona offensiva?",
+    "options": [
+      "Pattina indietro immediatamente",
+      "Ottieni rapidamente il possesso del disco",
+      "Guarda il tabellone",
+      "Non si muova"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Cosa significa coprire un compagno di squadra?",
+    "options": [
+      "Riempi la sua posizione quando si unisce alla corsa",
+      "Gioca solo in attacco",
+      "Copia il suo percorso esatto",
+      "Stai accanto a lui senza muoverti"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Se un difensore perde la posizione cosa deve fare?",
+    "options": [
+      "Guarda solo il disco",
+      "Discuti con un compagno di squadra",
+      "Smetti di pattinare",
+      "Torna rapidamente in difesa"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Perché i giocatori spesso tirano basso?",
+    "options": [
+      "È più lento",
+      "Perché i colpi alti sono illegali",
+      "Per deviazioni e rimbalzi",
+      "È più facile per i funzionari"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Quando è particolarmente utile un passaggio lungo?",
+    "options": [
+      "In mezzo a una folla di giocatori",
+      "Durante un cambio di linea",
+      "In contropiede veloce",
+      "Senza obiettivo"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Perché il movimento senza disco è importante?",
+    "options": [
+      "Crea opzioni di passaggio",
+      "Vale solo per i difensori",
+      "Non influisce sul gioco",
+      "Intralcia i compagni di squadra"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Quando può essere utile uno scatto da un angolo acuto?",
+    "options": [
+      "Solo sui giochi di potere",
+      "Solo sul rigore",
+      "Mai",
+      "Per un rimbalzo inaspettato"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Perché è importante il screening del portiere?",
+    "options": [
+      "L'arbitro non può vedere il disco",
+      "È più difficile per lui vedere lo sparo",
+      "Il portiere smette di muoversi",
+      "Rende l'attacco più bello"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Cosa ti aiuta a intercettare i passaggi?",
+    "options": [
+      "Leggere l'opera",
+      "Solo fortuna",
+      "Pattinare lentamente",
+      "Giocare senza bastone"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Come si blocca correttamente un avversario lungo il tabellone?",
+    "options": [
+      "Spingilo nella parte posteriore",
+      "Con gli occhi chiusi",
+      "Con le mani e senza bastone",
+      "Usa il tuo corpo e attacca mentre controlli il disco"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Cosa conta quando un difensore esce da dietro la rete?",
+    "options": [
+      "Guarda in alto e trova un passaggio",
+      "Pattina lentamente",
+      "Spara immediatamente il disco",
+      "Guarda solo il ghiaccio"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Perché a volte le squadre rallentano il gioco?",
+    "options": [
+      "Perdere il disco",
+      "Per mantenere possesso ed energia",
+      "Per evitare di attaccare",
+      "Per fermare il gioco"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Chi è un giocatore della seconda ondata?",
+    "options": [
+      "Un arbitro",
+      "Il portiere di riserva",
+      "Un giocatore che si unisce all'attacco in seguito",
+      "Il giocatore più lento"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Perché i passaggi corti rapidi sono efficaci?",
+    "options": [
+      "Sono sempre lenti",
+      "Hanno danneggiato l'attacco",
+      "Sono solo per i difensori",
+      "Sono più difficili da rubare per gli avversari"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Cosa dovrebbe fare un portiere dopo aver effettuato una parata?",
+    "options": [
+      "Segui rapidamente il disco",
+      "Pattina sulle tavole",
+      "Togligli il guanto",
+      "Guarda il tabellone"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Quando un attacco al centro è particolarmente pericoloso?",
+    "options": [
+      "Quando un giocatore è solo",
+      "Quando c'è velocità e supporto",
+      "Quando non c'è il disco",
+      "Quando tutti stanno fermi"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Cosa ti aiuta a prendere decisioni più velocemente?",
+    "options": [
+      "Pattinare lentamente",
+      "Guarda solo il disco",
+      "Scrutando costantemente il ghiaccio",
+      "Gioca senza parlare"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Cosa fa un buon capitano?",
+    "options": [
+      "Supporta la squadra e dà l'esempio",
+      "Gioca solo in attacco",
+      "Urla a tutti",
+      "Non gioca mai in difesa"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Cosa ti aiuta a sfuggire alla pressione dei controlli anticipati?",
+    "options": [
+      "Giocare da solo",
+      "Muovere velocemente il disco",
+      "Tenendo il disco a lungo",
+      "Sosta lungo le assi"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Perché non puoi esitare davanti alla linea blu?",
+    "options": [
+      "Il portiere si stancherà",
+      "Il ghiaccio peggiorerà",
+      "Puoi perdere la zona",
+      "L'arbitro interromperà il gioco"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Perché un tiro subito dopo un passaggio è pericoloso?",
+    "options": [
+      "È sempre debole",
+      "È difficile da eseguire",
+      "L'arbitro annullerà il gol",
+      "Il portiere non è impostato in tempo"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Chi dovrebbe tornare per primo dopo aver perso il disco?",
+    "options": [
+      "Il giocatore più vicino",
+      "Solo il centro",
+      "Solo il difensore",
+      "Solo il portiere"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Come dovrebbe giocare un difensore contro un tiratore forte?",
+    "options": [
+      "Guarda solo il portiere",
+      "Riduci il tempo e lo spazio per sparare",
+      "Dategli uno spazio aperto",
+      "Stai lontano"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Perché il disco viene spesso spostato all'angolo in difesa?",
+    "options": [
+      "Gli arbitri non possono vedere lo spettacolo",
+      "Lì il ghiaccio è più lento",
+      "C'è meno pericolo in rete",
+      "Lì è più facile segnare"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Cosa fa un attaccante davanti alla rete?",
+    "options": [
+      "Sta con le spalle al gioco",
+      "Pattini sulle tavole",
+      "Non si muove",
+      "Crea traffico e va a caccia di rimbalzi"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Perché è importante giocare a testa alta?",
+    "options": [
+      "Per vedere compagni di squadra e avversari",
+      "Per rendere il disco più leggero",
+      "Per pattinare più velocemente",
+      "Così i funzionari potranno vederti"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Cosa conta di più dopo aver vinto un ingaggio PK?",
+    "options": [
+      "Prova a eliminare tutti",
+      "Fai una lunga pausa",
+      "Eliminare il disco dalla zona",
+      "Stai fermo"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Perché è importante fare pressione sui difensori avversari?",
+    "options": [
+      "Fa male alla tua squadra",
+      "Non influisce sul gioco",
+      "Ferma il gioco",
+      "Può forzare un errore"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Quando è utile un passaggio touch?",
+    "options": [
+      "Per sviluppare rapidamente l'attacco",
+      "Quando il giocatore è fermo",
+      "Quando non ci sono compagni di squadra",
+      "Solo in difesa"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Cosa dovrebbe fare il centro di fronte alla propria rete?",
+    "options": [
+      "Aspetta un passaggio di ghiaccio",
+      "Pattina fino alla zona neutra",
+      "Aiuta i difensori a coprire lo slot",
+      "Stai vicino alle tavole"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Perché il movimento incrociato in avanti è efficace?",
+    "options": [
+      "Confonde i difensori",
+      "Fa male alla tua stessa squadra",
+      "Rallenta l'attacco",
+      "È illegale"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Cosa conta quando si lotta per un disco vagante?",
+    "options": [
+      "Tieni il disco a lungo",
+      "Stai fermo",
+      "Guarda in basso",
+      "Decidi rapidamente cosa fare dopo"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Perché i giocatori cambiano velocità?",
+    "options": [
+      "Smettere di pattinare",
+      "Perdere il disco",
+      "Per battere un avversario",
+      "Per stancarsi più velocemente"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Mancano 40 secondi. Sei in vantaggio per un obiettivo. L'avversario gioca 6 contro 5. Il loro difensore ha il disco sulla linea blu e la tua ala può saltare per rubare. Cosa è meglio?",
+    "options": [
+      "Vola subito verso il disco in modo aggressivo",
+      "Traccia solo il giocatore del fronte rete",
+      "Premi solo con un'angolazione controllata per prendere il disco",
+      "Crollo completamente in rete"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Quando un portiere può uscire dalla sua rete?",
+    "options": [
+      "Per intercettare il disco e aiutare la difesa",
+      "Mai",
+      "Sempre",
+      "Solo dopo un gol"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Cosa conta per un tentativo di rimbalzo riuscito?",
+    "options": [
+      "Una grande conclusione",
+      "Stai lontano dalla rete",
+      "Movimento lento",
+      "Reazione rapida"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Perché il supporto del secondo giocatore è importante?",
+    "options": [
+      "Crea opzioni extra",
+      "Vale solo per i difensori",
+      "Non è necessario",
+      "Fa male l'attacco"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Cosa significa \"leggere l'opera\"?",
+    "options": [
+      "Anticipare cosa faranno gli avversari",
+      "Contare i passaggi",
+      "Segui solo il disco",
+      "Guarda il tabellone"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Perché è importante proteggere il disco con il proprio corpo?",
+    "options": [
+      "Rende il ghiaccio più veloce",
+      "Vale solo per i difensori",
+      "Colpisce l'arbitro",
+      "Aiuta a proteggere il disco"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Quando è utile un breakout lungo i board?",
+    "options": [
+      "Mai",
+      "Sempre",
+      "Quando il centro è coperto",
+      "Solo sui giochi di potere"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Cosa conta quando si difende da un gioco di potere?",
+    "options": [
+      "Deke costanti",
+      "Rimanere compatti in difesa",
+      "Cambiamenti di linea lenti",
+      "Giocare uno contro uno ovunque"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Cos'è un passaggio per un tiro?",
+    "options": [
+      "Un passaggio ad un giocatore in una buona posizione di tiro",
+      "Un passaggio di ritorno al portiere",
+      "Un passaggio casuale",
+      "Un passaggio all'angolo"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Perché è utile un deke prima di un tiro?",
+    "options": [
+      "Rallenta sempre l'attacco",
+      "È illegale",
+      "Vale solo per i difensori",
+      "Può muovere il portiere o un difensore"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Dopo aver bloccato un tiro, un giocatore dovrebbe:",
+    "options": [
+      "Cerca immediatamente il disco",
+      "Stai fermo",
+      "Guarda l'arbitro",
+      "Lascia il ghiaccio"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "In che modo gli attaccanti aiutano i difensori?",
+    "options": [
+      "Rimani nella zona offensiva",
+      "Controlla e apriti per un passaggio",
+      "Gioca solo lungo i tabelloni",
+      "Non giocare in difesa"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Cosa aiuta contro i pesanti controlli anticipati?",
+    "options": [
+      "Decisioni rapide e movimento del disco",
+      "Pattinare lentamente",
+      "Giocare da solo",
+      "Possesso lungo del disco"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Quando è utile la deflessione dello stick?",
+    "options": [
+      "Mai",
+      "Solo in pratica",
+      "Solo in difesa",
+      "Per reindirizzare il disco"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Cosa conta quando si attacca lungo il tabellone?",
+    "options": [
+      "Ritorno al portiere",
+      "Supporto da un compagno di squadra vicino",
+      "Giocare da solo",
+      "Arresto del movimento"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Cosa conta per un portiere in contropiede?",
+    "options": [
+      "Mantieni un buon posizionamento e pazienza",
+      "Cadere immediatamente nel ghiaccio",
+      "Pattina all'indietro",
+      "Occhio ai difensori"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Cosa conta in una rapida transizione all’offensiva?",
+    "options": [
+      "Passaggi lenti",
+      "Possesso lungo del disco",
+      "Fermarsi alla linea blu",
+      "Velocità del processo decisionale"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Cosa fa un difensore nei giochi di potere?",
+    "options": [
+      "Pattina in rete",
+      "Non si unisce all'attacco",
+      "Muove il disco e cerca il tiro",
+      "Resta fermo"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Perché il traffico davanti alla rete è pericoloso?",
+    "options": [
+      "Il disco diventa più lento",
+      "Il portiere ha più difficoltà a vedere il disco",
+      "L'arbitro non può contare i giocatori",
+      "I giocatori si stancano più velocemente"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Cosa conta dopo aver intercettato il disco?",
+    "options": [
+      "Passa rapidamente all'attacco",
+      "Smetti di pattinare",
+      "Butta subito il disco",
+      "Pattina sulle tavole"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Cosa è particolarmente importante negli straordinari?",
+    "options": [
+      "Tiri lunghi costanti",
+      "Giocare senza passaggi",
+      "Turni lunghi",
+      "Controllo del disco e pochi errori"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Cosa dovrebbe fare un difensore se un avversario blocca il portiere?",
+    "options": [
+      "Guarda l'arbitro",
+      "Pattina sulle tavole",
+      "Cancella lo slot e lega l'avversario",
+      "Stai lì vicino senza muoverti"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Perché il gioco di squadra è più importante del gioco individuale?",
+    "options": [
+      "La squadra non incide sul risultato",
+      "Una linea crea più possibilità insieme",
+      "Un giocatore decide sempre la partita",
+      "I passaggi fanno male al gioco"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Cosa conta prima di scattare?",
+    "options": [
+      "Leggi rapidamente la posizione del portiere",
+      "Guarda solo il disco",
+      "Fermati completamente",
+      "Chiudi gli occhi"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Cosa sviluppa meglio il QI dell'hockey?",
+    "options": [
+      "Solo allenamento per la forza",
+      "Guardare solo i gol",
+      "Solo pattinaggio",
+      "Studiare il gioco, esercitarsi e comprendere le situazioni"
+    ]
+  }
+}

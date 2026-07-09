@@ -1,15 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  Easing,
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
+import Animated from 'react-native-reanimated';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
+import LeaderShine from './LeaderShine';
+import { LEADER_BORDER_COLORS, LEADER_MEDAL_BORDER_WIDTH, type LeaderRank } from '../utils/leaderDisplay';
+
+export const PUCK_SCOUT_LOGO = require('../assets/images/scout.png');
 
 interface PuckProps {
   avatar?: string | null;
@@ -22,6 +20,7 @@ interface PuckProps {
   status?: string;
   isOnline?: boolean; // статус онлайн пользователя
   isNew?: boolean; // новый игрок (зарегистрирован < 2 дней назад)
+  leaderRank?: LeaderRank; // топ-1/2/3 лидер — медальная обводка
   /** Много шайб на экране (мини-игра): чуть легче тень на Android — меньше нагрузка на GPU. */
   denseScene?: boolean;
 }
@@ -37,31 +36,11 @@ const Puck: React.FC<PuckProps> = ({
   status,
   isOnline = false,
   isNew = false,
+  leaderRank,
   denseScene = false,
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
-
-  // Переливание цветов для шайбы с джойстиком (игра). На Android отключаем —
-  // постоянный interpolateColor + тайминг даёт лишнюю нагрузку на композитинг при многих шайбах.
-  const colorProgress = useSharedValue(0);
-  const gameColorAnimationEnabled = Platform.OS !== 'android';
-  useEffect(() => {
-    if (status !== 'game' || !gameColorAnimationEnabled) return;
-    colorProgress.value = withRepeat(
-      withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-  }, [status, colorProgress, gameColorAnimationEnabled]);
-
-  const gamePuckAnimatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      colorProgress.value,
-      [0, 0.25, 0.5, 0.75, 1],
-      ['#4b0b12', '#6b2a4a', '#4a3a8b', '#2a6b6b', '#4b0b12']
-    ),
-  }));
 
   // Анимация для тени на льду - отключена для лучшей производительности
   // const shadowOpacity = useSharedValue(0.4);
@@ -100,8 +79,18 @@ const Puck: React.FC<PuckProps> = ({
       case 'admin': return '#000000'; // Черный для админов
       case 'shop': return '#4CAF50'; // Приглушенный зеленый для магазинов
       case 'skateSharpening': return '#0066CC'; // Синий для заточки коньков
+      case 'game':
+      case 'quizGame':
+        return '#8EC8C8'; // Нежно-бирюзовый для мини-игр
       default: return '#FFFFFF'; // Белый для обычных игроков
     }
+  }, [status]);
+
+  const avatarBorderWidth = useMemo(() => {
+    if (status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening') {
+      return 3;
+    }
+    return 2;
   }, [status]);
 
   const imageSource = useMemo(() => {
@@ -142,14 +131,36 @@ const Puck: React.FC<PuckProps> = ({
         animatedShadowStyle
       ]} /> */}
       
-      <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.puckTouchable}>
+        {leaderRank != null ? (
+          <>
+            <View
+              pointerEvents="none"
+              style={[
+                styles.leaderMedalRing,
+                {
+                  width: size,
+                  height: size,
+                  borderRadius: dimensions.borderRadius,
+                  borderWidth: LEADER_MEDAL_BORDER_WIDTH,
+                  borderColor: LEADER_BORDER_COLORS[leaderRank],
+                },
+              ]}
+            />
+            <LeaderShine
+              size={size}
+              color={LEADER_BORDER_COLORS[leaderRank]}
+              delayMs={(leaderRank - 1) * 450}
+            />
+          </>
+        ) : null}
         {avatar && playerId && status !== 'scout' ? (
           <View style={[
             {
               width: dimensions.avatarSize,
               height: dimensions.avatarSize,
               borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
+              borderWidth: avatarBorderWidth,
               borderColor: avatarBorderColor,
               overflow: 'hidden'
             }
@@ -172,57 +183,68 @@ const Puck: React.FC<PuckProps> = ({
               borderRadius: dimensions.avatarBorderRadius,
               borderWidth: 3,
               borderColor: avatarBorderColor,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              backgroundColor: '#2d1f4e',
             }
           ]}>
             <Image
-              source={require('../assets/images/scout.png')}
+              source={PUCK_SCOUT_LOGO}
               style={{
                 width: dimensions.avatarSize - 4,
                 height: dimensions.avatarSize - 4,
                 borderRadius: dimensions.avatarBorderRadius - 2,
               }}
+              contentFit="cover"
+              transition={0}
+              cachePolicy="memory-disk"
+            />
+          </View>
+        ) : status === 'quizGame' ? (
+          <View style={[
+            styles.avatarPlaceholder,
+            {
+              width: dimensions.avatarSize,
+              height: dimensions.avatarSize,
+              borderRadius: dimensions.avatarBorderRadius,
+              borderWidth: 2,
+              borderColor: avatarBorderColor,
+              overflow: 'hidden',
+              backgroundColor: '#1a0a3e',
+            },
+          ]}>
+            <MaterialCommunityIcons
+              name="school"
+              size={dimensions.iconSize * 1.15}
+              color="#d4c4ff"
+            />
+          </View>
+        ) : status === 'game' ? (
+          <View style={[
+            styles.avatarPlaceholder,
+            {
+              width: dimensions.avatarSize,
+              height: dimensions.avatarSize,
+              borderRadius: dimensions.avatarBorderRadius,
+              borderWidth: 2,
+              borderColor: avatarBorderColor,
+              overflow: 'hidden',
+              backgroundColor: '#120810',
+            },
+          ]}>
+            <Ionicons
+              name="game-controller"
+              size={dimensions.iconSize * 1.1}
+              color="#8EC8C8"
             />
           </View>
         ) : (
-          status === 'game' ? (
-            gameColorAnimationEnabled ? (
-              <Animated.View style={[
-                styles.avatarPlaceholder,
-                {
-                  width: dimensions.avatarSize,
-                  height: dimensions.avatarSize,
-                  borderRadius: dimensions.avatarBorderRadius,
-                  borderWidth: 2,
-                  borderColor: avatarBorderColor,
-                },
-                gamePuckAnimatedStyle,
-              ]}>
-                <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
-              </Animated.View>
-            ) : (
-              <View style={[
-                styles.avatarPlaceholder,
-                {
-                  width: dimensions.avatarSize,
-                  height: dimensions.avatarSize,
-                  borderRadius: dimensions.avatarBorderRadius,
-                  borderWidth: 2,
-                  borderColor: avatarBorderColor,
-                  backgroundColor: '#5c1a28',
-                },
-              ]}>
-                <Ionicons name="game-controller" size={dimensions.iconSize} color="#FFFFFF" />
-              </View>
-            )
-          ) : (
             <View style={[
               styles.avatarPlaceholder,
               {
                 width: dimensions.avatarSize,
                 height: dimensions.avatarSize,
                 borderRadius: dimensions.avatarBorderRadius,
-                borderWidth: status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening' ? 3 : 2,
+                borderWidth: avatarBorderWidth,
                 borderColor: avatarBorderColor,
                 backgroundColor: '#2C3E50',
               }
@@ -233,30 +255,21 @@ const Puck: React.FC<PuckProps> = ({
                 color="#FFFFFF"
               />
             </View>
-          )
         )}
         
-        {points && status === 'player' && points !== 'NaN' && points !== 'undefined' && typeof points === 'string' && points.length > 0 && (
-          <View style={styles.pointsContainer}>
-            <Text style={styles.pointsText}>{points}</Text>
-          </View>
-        )}
-        
-        {/* Зеленая точка для онлайн пользователей */}
         {isOnline && (
           <View style={[
             styles.onlineIndicator,
             {
-              width: size * 0.08, // Уменьшен размер для минимализма
+              width: size * 0.08,
               height: size * 0.08,
               borderRadius: (size * 0.08) / 2,
-              top: (size * 0.05) + 3, // Сдвигаем вниз: увеличиваем top
-              right: (size * 0.05) + 5, // Сдвигаем влево: увеличиваем right
+              top: (size * 0.05) + 3,
+              right: (size * 0.05) + 5,
             }
           ]} />
         )}
         
-        {/* Бейджик NEW для новых игроков */}
         {isNew && (
           <View style={[
             styles.newBadge,
@@ -266,6 +279,12 @@ const Puck: React.FC<PuckProps> = ({
             }
           ]}>
             <Text style={styles.newBadgeText}>NEW</Text>
+          </View>
+        )}
+
+        {points && status === 'player' && points !== 'NaN' && points !== 'undefined' && typeof points === 'string' && points.length > 0 && (
+          <View style={styles.pointsContainer}>
+            <Text style={styles.pointsText}>{points}</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -322,6 +341,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#333333',
   },
+  puckTouchable: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  leaderMedalRing: {
+    position: 'absolute',
+    zIndex: 0,
+  },
   avatar: {
     // Аватар не нуждается в отдельной тени - тень уже на контейнере
   },
@@ -341,6 +370,10 @@ const styles = StyleSheet.create({
     right: 8,
     minWidth: 18,
     minHeight: 14,
+    zIndex: 20,
+    ...Platform.select({
+      android: { elevation: 8 },
+    }),
   },
   pointsText: {
     color: '#FFFFFF',

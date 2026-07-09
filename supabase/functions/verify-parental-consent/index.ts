@@ -261,6 +261,71 @@ async function sendActivationConfirmationEmail(
   }
 }
 
+/** 50 очков за регистрацию — как у createPlayer для взрослых; у детей начисляем после parental consent. */
+async function ensureRegistrationActivityPoints(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  playerName: string
+): Promise<void> {
+  const { data: existing } = await supabase
+    .from('activity_log')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('activity_type', 'registration')
+    .limit(1)
+    .maybeSingle()
+
+  if (existing) {
+    console.log('ℹ️ Registration points already exist for', userId)
+    return
+  }
+
+  const points = 50
+  const description = `Регистрация профиля: ${playerName}`
+
+  const { error: logError } = await supabase.from('activity_log').insert({
+    user_id: userId,
+    activity_type: 'registration',
+    points_earned: points,
+    description,
+  })
+
+  if (logError) {
+    console.warn('⚠️ Failed to log registration activity:', logError)
+    return
+  }
+
+  const { data: row } = await supabase
+    .from('activity_points')
+    .select('points')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (row) {
+    const { error: updateError } = await supabase
+      .from('activity_points')
+      .update({
+        points: (row.points || 0) + points,
+        last_activity_date: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+    if (updateError) {
+      console.warn('⚠️ Failed to update activity_points:', updateError)
+    }
+  } else {
+    const { error: insertError } = await supabase.from('activity_points').insert({
+      user_id: userId,
+      points,
+      last_activity_date: new Date().toISOString(),
+    })
+    if (insertError) {
+      console.warn('⚠️ Failed to insert activity_points:', insertError)
+    }
+  }
+
+  console.log('✅ Registration activity points awarded for', userId)
+}
+
 serve(async (req) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -487,6 +552,16 @@ serve(async (req) => {
     }
 
     console.log('✅ Аккаунт успешно активирован:', updatedPlayer)
+
+    try {
+      await ensureRegistrationActivityPoints(
+        supabase,
+        updatedPlayer.id,
+        updatedPlayer.name || playerData.name || 'Игрок'
+      )
+    } catch (pointsError) {
+      console.warn('⚠️ Ошибка начисления очков за регистрацию (не критично):', pointsError)
+    }
 
     // Отправляем второе письмо (Email-Plus) - не критично, если не отправится
     try {

@@ -92,7 +92,7 @@
   "uploading": "Načítání...",
   "uploadingPhotos": "Načítání {count} fotek... {progress} %",
   "info": "Informace",
-  "addVideoLink": "Přidejte odkaz na YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sec",
@@ -1683,6 +1683,1406 @@
           "Provádějte 2-3x týdně",
           "Snižte zátěž, když se cítíte unavení"
         ]
+      },
+      "66": {
+        "title": "Boční prkno s rotací trupu",
+        "description": "Vytváří šikmé a jádrové stabilizátory pro sílu střely a kontrolu stability těla.",
+        "benefits": [
+          "Stabilizuje jádro v kontaktu",
+          "Zlepšuje rotační sílu střely",
+          "Snižuje riziko poranění dolní části zad",
+          "Buduje základní odolnost"
+        ],
+        "instructions": [
+          "Postavte boční prkno na předloktí",
+          "Natáhněte horní rameno směrem ke stropu",
+          "Přetáhněte paži pod trup a vraťte se",
+          "Udržujte boky v rovině bez prověšení",
+          "Proveďte 8–10 opakování na stranu"
+        ],
+        "tips": [
+          "S ovládáním pomalu otáčejte",
+          "Dýchejte plynule",
+          "V případě potřeby klesněte na kolena",
+          "2–3 sady na stranu"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "120-180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Rumunský mrtvý tah s činkou",
+        "description": "Rozvíjí zadní řetěz pro výkonné bruslení a první zrychlení.",
+        "benefits": [
+          "Posiluje hamstringy a hýžďové svaly",
+          "Zlepšuje mechaniku náklonu dopředu",
+          "Vytváří sílu úchopu",
+          "Podporuje prevenci poranění hamstringů"
+        ],
+        "instructions": [
+          "Postavte se a držte činky na stehnech",
+          "Udržujte mírný pokrčený koleno",
+          "Závěs boků dozadu, spouštění zvonů podél nohou",
+          "Zastavte ve střední části holeně nebo mírném protažení",
+          "Posuňte boky dopředu, abyste se postavili"
+        ],
+        "tips": [
+          "Udržujte neutrální páteř",
+          "Závaží zůstávají blízko nohou",
+          "Vyhněte se zakulacení spodní části zad",
+          "3–4 sady po 8–12 opakováních"
+        ],
+        "equipment": "Činky",
+        "calories": "200-280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Goblet squat",
+        "description": "Hokejový vzor dřepu pro sílu nohou a jádra se vzpřímeným držením těla.",
+        "benefits": [
+          "Vytváří čtyřnásobnou sílu",
+          "Učí vertikální pozici trupu",
+          "Zlepšuje pohyblivost kotníku",
+          "Dobrá volba v sezóně mimo led"
+        ],
+        "instructions": [
+          "Držte činku nebo kettlebell na hrudi",
+          "Chodidla na šířku ramen, prsty mírně ven",
+          "Dřep rovnoběžně nebo níže",
+          "Kolena vedou přes prsty",
+          "3–4 sady po 10–15 opakováních"
+        ],
+        "tips": [
+          "Lokty uvnitř kolen dole",
+          "Podpatky zůstávají dole",
+          "Ovládejte sestup",
+          "Zůstaňte vysoko přes hrudník"
+        ],
+        "equipment": "Činka nebo kettlebell",
+        "calories": "180-250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Pás rotační sekání",
+        "description": "Napodobuje rotaci střely a přihrávky, aby získal sílu v rovině hokejového pohybu.",
+        "benefits": [
+          "Zlepšuje sílu střely a přihrávky",
+          "Trénuje stabilitu proti rotaci",
+          "Nakládání šetrné k ramenům",
+          "Dá se udělat doma"
+        ],
+        "instructions": [
+          "Kotevní pás ve výšce hrudníku",
+          "Postavte se bokem, abyste ukotvili",
+          "Držte hůl nebo rukojeť oběma rukama",
+          "Otočte se z boků s ovládáním",
+          "12–15 opakování na každou stranu"
+        ],
+        "tips": [
+          "Síla pochází z boků",
+          "Chraňte spodní část zad před přetočením",
+          "Použijte atletický hokejový postoj",
+          "2–3 sady"
+        ],
+        "equipment": "Odporová kapela",
+        "calories": "100-150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Zadní hýžďový most na jedné noze",
+        "description": "Aktivuje hýžďové a kyčelní stabilizátory pro silný odraz na bruslích.",
+        "benefits": [
+          "Posiluje hýžďové svaly",
+          "Stabilizuje pánev při bruslení",
+          "Zlepšuje symetrii nohou",
+          "Podporuje prevenci poranění kolene"
+        ],
+        "instructions": [
+          "Lehněte si na záda, jednu nohu položenou",
+          "Druhá noha natažená nebo ohnutá ve vzduchu",
+          "Posuňte boky až do přímé linie",
+          "Nahoře pauza 1 sekunda",
+          "10–12 opakování na nohu"
+        ],
+        "tips": [
+          "Vyvarujte se hyperextenze beder",
+          "Udržujte pracovní koleno zarovnané",
+          "Nahoře zmáčkněte gluteus",
+          "2–3 sady"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "90-130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Lýtka vestoje zvedá",
+        "description": "Staví lýtka a chodidla pro odolnost nohou při pozdních směnách a stabilitu brusle.",
+        "benefits": [
+          "Zlepšuje sílu lýtek",
+          "Snižuje únavu dolních končetin při hrách",
+          "Posiluje nohy",
+          "Možnost rychlé šatny"
+        ],
+        "instructions": [
+          "Postavte se na okraj kroku na bříškách nohou",
+          "Spodní podpatky pod úrovní kroku",
+          "Zvedněte se co nejvýše",
+          "Pauza nahoře",
+          "15–20 opakování, 3 sady"
+        ],
+        "tips": [
+          "V případě potřeby použijte stěnu pro rovnováhu",
+          "Plný rozsah pohybu",
+          "Vyhněte se poskakování",
+          "Až budete připraveni, přidejte lehkou váhu"
+        ],
+        "equipment": "Krok nebo platforma",
+        "calories": "60-90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Prkenné ramenní kohoutky",
+        "description": "Antirotační jádro pro stabilitu kontaktu a atletické držení těla.",
+        "benefits": [
+          "Vytváří stabilitu jádra",
+          "Zlepšuje rovnováhu při kontaktu",
+          "Rozvíjí vytrvalost jádra",
+          "Funguje pro všechny pozice"
+        ],
+        "instructions": [
+          "Začněte ve vysokém prkně",
+          "Přesuňte váhu a klepněte na opačné rameno",
+          "Vraťte se a vystřídejte paže",
+          "Udržujte boky rovné",
+          "Celkem 16–20 kohoutků"
+        ],
+        "tips": [
+          "Rozšířené nohy pro stabilitu",
+          "Nezvedejte boky nahoru",
+          "Dýchejte plynule",
+          "2–3 sady"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "80-120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprinty s úplným odpočinkem",
+        "description": "Simuluje krátké řazení pro zlepšení schopnosti opakovaného zrychlení.",
+        "benefits": [
+          "Zlepšuje rychlost opakovaného sprintu",
+          "Vlaky mezi směnami zotavení",
+          "Rozvíjí mechaniku startu",
+          "Zvyšuje výdrž hry"
+        ],
+        "instructions": [
+          "Zahřívejte 8–10 minut",
+          "Sprint 20 m rychlostí 95 %.",
+          "Odpočinek 40–60 sekund chůze",
+          "Opakujte 10–12krát",
+          "Nechejte 5 minut vychladnout"
+        ],
+        "tips": [
+          "Udržujte sprint z každého opakování",
+          "Neškrtejte odpočinek příliš brzy",
+          "Upřednostněte kvalitu před kvantitou",
+          "1–2 sezení týdně"
+        ],
+        "equipment": "20 m otevřeného prostoru",
+        "calories": "250-350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "Intervaly běhu 30–30–30 sekund",
+        "description": "Interval klasického hokejového stylu: 30 sekund tvrdě, 30 sekund lehce.",
+        "benefits": [
+          "Vytváří laktátovou toleranci",
+          "Napodobuje intenzitu posunu",
+          "Zlepšuje duševní odolnost",
+          "Efektivní sezení mimo led"
+        ],
+        "instructions": [
+          "Zahřívejte 10 minut",
+          "30 sec tvrdý běh / 30 sec chůze",
+          "Opakujte 12–16 cyklů",
+          "Udržujte konzistentní úsilí každé kolo",
+          "Ochlaďte se a protáhněte se"
+        ],
+        "tips": [
+          "Nechoďte naplno brzy",
+          "Udržujte běžeckou formu",
+          "Hydratujte mezi bloky",
+          "Postupujte v celkových cyklech pomalu"
+        ],
+        "equipment": "Dráha nebo běžecký pás",
+        "calories": "300-400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "Intervaly AirBike",
+        "description": "Vysoce intenzivní kardio s nízkým dopadem, které je vhodné pro kolena mimo sezónu.",
+        "benefits": [
+          "Staví VO2max",
+          "Nakládání šetrné ke kloubům",
+          "Trénuje ruce a nohy dohromady",
+          "Rychlé zotavení po sezení"
+        ],
+        "instructions": [
+          "5 minut snadné odstřeďování",
+          "20 sekund max / 40 sekund snadno",
+          "10-12 kol",
+          "Sledujte otáčky a dýchání",
+          "5 min vychladnout"
+        ],
+        "tips": [
+          "Relaxační úchop na rukojetích",
+          "Zůstaňte sedět stabilně",
+          "Vyhněte se maximálnímu úsilí denně",
+          "Sledujte kalorie pro pokrok"
+        ],
+        "equipment": "AirBike / útočné kolo",
+        "calories": "220-320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "Člunkový běh 5×5 m",
+        "description": "Krátké změny směru, jako je forčeking a obranné zotavení.",
+        "benefits": [
+          "Zlepšuje změnu směru",
+          "Vytváří rychlost prvního kroku",
+          "Reakce vlaků",
+          "Kompaktní cvičení vhodné do tělocvičny"
+        ],
+        "instructions": [
+          "Označte dvě čáry vzdálené 5 m od sebe",
+          "Dotkněte se čáry rukou, sprintujte zpět",
+          "6–8 opakování = 1 sada",
+          "Odpočinek 90 sekund",
+          "3–4 sady"
+        ],
+        "tips": [
+          "Pokaždé se plně dotkněte linky",
+          "Proveďte první kroky",
+          "Sázejte tvrdě na zatáčkách",
+          "Používejte přilnavé boty"
+        ],
+        "equipment": "Kužele nebo podlahové linky",
+        "calories": "150-220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Zrychlení z hokejového postoje",
+        "description": "Nízké atletické začátky, které se přenesou do vhazování a soubojů o puk.",
+        "benefits": [
+          "Zlepšuje první krok",
+          "Trénuje mechaniky s nízkým startem",
+          "Buduje sílu nohou",
+          "Hokejově specifické"
+        ],
+        "instructions": [
+          "Stanovený atletický postoj: pokrčená kolena, trup dopředu",
+          "Na povel sprint 10–15 m",
+          "Úplný odpočinek 60–90 sekund",
+          "8–10 opakování",
+          "Střídat olověnou nohu"
+        ],
+        "tips": [
+          "Zůstaňte vpředu, nevyskočte brzy",
+          "Pevně ​​posuňte zadní nohu",
+          "Používejte zbraně agresivně",
+          "Uzavřete 10 kvalitních opakování"
+        ],
+        "equipment": "20 m pruh",
+        "calories": "180-260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "tempové běhy na 400 m",
+        "description": "Řízený rychlý chod pro udržení vysokého úsilí podobného řazení.",
+        "benefits": [
+          "Buduje aerobní sílu",
+          "Učí tempo",
+          "Zlepšuje výdrž nohou",
+          "Dobrá práce mimo sezónu"
+        ],
+        "instructions": [
+          "Zahřívejte 10 minut",
+          "400 m při 75–80 % max",
+          "Odpočinek 2 minuty chůze",
+          "4–6 opakování",
+          "Nechejte 5 minut vychladnout"
+        ],
+        "tips": [
+          "Rovnoměrné tempo, ne sprint",
+          "Sledujte dýchání",
+          "Používejte kolejové pruhy bezpečně",
+          "Postupně opakujte"
+        ],
+        "equipment": "Trať nebo měřená smyčka",
+        "calories": "280-380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata skok dřepy",
+        "description": "Čtyři minuty vysoké intenzity napodobující únavu z pozdní směny.",
+        "benefits": [
+          "Buduje anaerobní vytrvalost",
+          "Krátké, ale účinné sezení",
+          "Posiluje nohy",
+          "Domácí přátelské"
+        ],
+        "instructions": [
+          "20 sekund max. skok dřepy",
+          "10 sekund odpočinek",
+          "8 kol = 4 minuty",
+          "Předtím se zahřejte a poté ochlaďte",
+          "1–2krát týdně"
+        ],
+        "tips": [
+          "Přistát měkce",
+          "Nikdy nevynechávejte zahřívání",
+          "Vyhněte se v den hry",
+          "Chraňte kolena dobrou formou"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "120-180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "BOSU rovnováha s holí",
+        "description": "Nestabilní povrch plus manipulace s hůlkou pro rovnováhu jako na ledu.",
+        "benefits": [
+          "Zlepšuje propriocepci",
+          "Trénuje rovnováhu postoje",
+          "Spojuje ruce a nohy",
+          "Vytváří stabilitu kotníku"
+        ],
+        "instructions": [
+          "Postavte se oběma nohama na BOSU",
+          "Držení hokejky, lehká manipulace s pukem",
+          "Vydržte 30–45 sekund",
+          "Odpočívejte a opakujte 4–6krát",
+          "Až budete připraveni, zkuste jednu nohu"
+        ],
+        "tips": [
+          "Oči dopředu, ne dolů",
+          "Měkké ohnutí kolena",
+          "Stěna poblíž pro bezpečnost",
+          "Start bez puku"
+        ],
+        "equipment": "BOSU, hokejka",
+        "calories": "70-100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Dosah RDL na jedné noze",
+        "description": "Rovnováha plus zadní řetěz jako bruslení jednou nohou v obratech.",
+        "benefits": [
+          "Buduje rovnováhu na jedné noze",
+          "Posiluje hamstring a hýžďový sval",
+          "Zlepšuje ovládání kyčlí",
+          "Specifické pro bruslení"
+        ],
+        "instructions": [
+          "Postavte se na jednu nohu s lehkou činkou",
+          "Závěs dopředu, volná noha dozadu",
+          "Dotkněte se podlahy nebo holeně",
+          "Vraťte se do svislé polohy",
+          "8–10 opakování na nohu"
+        ],
+        "tips": [
+          "Zaměřte oči na jedno místo",
+          "Pohybujte se pomalu",
+          "Udržujte boky v rovině",
+          "2–3 sady"
+        ],
+        "equipment": "Činka",
+        "calories": "120-170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Rovnováha prstů na jedné noze",
+        "description": "Jednoduchý cvik na stabilitu kotníku a chodidla pro bruslení.",
+        "benefits": [
+          "Posiluje nohy",
+          "Zlepšuje rovnováhu",
+          "Rychlé každodenní cvičení",
+          "Dá se dělat kdekoliv"
+        ],
+        "instructions": [
+          "Postavte se na jednu nohu",
+          "Zvedněte se na prsty",
+          "Vydržte 15–20 sekund",
+          "Spusťte a vyměňte nohy",
+          "6–8 opakování na nohu"
+        ],
+        "tips": [
+          "V případě potřeby použijte podporu",
+          "Oči dopředu",
+          "Dýchejte normálně",
+          "Naboso nebo boty"
+        ],
+        "equipment": "Žádný",
+        "calories": "30-50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Partnerský pas na jedné noze",
+        "description": "Rovnováha a koordinace přihrávek jako pohyb ve hře.",
+        "benefits": [
+          "Spojuje rovnováhu a míjení",
+          "Zlepšuje stabilitu jádra",
+          "Zaměření vlaků",
+          "Partnerský vrták"
+        ],
+        "instructions": [
+          "Postavte se na jednu nohu s pukem/míčkem",
+          "Partner 3–4 m daleko",
+          "Dělejte přesné přihrávky",
+          "30 sekund, přepněte nohu",
+          "4 kola"
+        ],
+        "tips": [
+          "Měkká kolena",
+          "Ostré přihrávky",
+          "Neobětujte rovnováhu kvůli moci",
+          "Funguje i nástěnná odrazka"
+        ],
+        "equipment": "Puk/míč, partner",
+        "calories": "60-90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Chůze výpad s rotací",
+        "description": "Dynamická rovnováha a rotace pro přípravu na kontrolu těla.",
+        "benefits": [
+          "Zlepšuje dynamickou rovnováhu",
+          "Staví rotaci z nohou",
+          "Posiluje nohy",
+          "Funkční na hokej"
+        ],
+        "instructions": [
+          "Krok do výpadu vpřed",
+          "Otočte trup směrem k přední noze",
+          "Vraťte se a vykročte druhou nohou",
+          "10 kroků na nohu",
+          "2–3 sady"
+        ],
+        "tips": [
+          "Kolenní stopy přes chodidlo",
+          "Zůstaň vysoký",
+          "Volitelné držení míče na hrudi",
+          "Ovládání tempa"
+        ],
+        "equipment": "Žádný",
+        "calories": "100-150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Boční schůdky posuvné desky",
+        "description": "Simuluje boční bruslení s důrazem na rovnováhu.",
+        "benefits": [
+          "Buduje boční sílu",
+          "Zlepšuje rovnováhu ze strany na stranu",
+          "Rozvíjí adduktory",
+          "Skvělé pro obránce"
+        ],
+        "instructions": [
+          "Posuvné desky nebo ponožkové posuvníky",
+          "Postranní kroky 20–30 sekund",
+          "Zůstaňte nízko v postoji",
+          "Odpočinek 60 sekund",
+          "6–8 sad"
+        ],
+        "tips": [
+          "Nestůjte vzpřímeně",
+          "Ruce v připravené poloze",
+          "Ovládání rychlosti",
+          "Použijte nárazníky desky"
+        ],
+        "equipment": "Posuvná deska",
+        "calories": "130-190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Překážkový chmel",
+        "description": "Vytváří výbušnost nohou pro údery prvního kroku a bojové skoky.",
+        "benefits": [
+          "Zvyšuje vertikální a horizontální výkon",
+          "Zlepšuje reaktivitu",
+          "Rozvíjí koordinaci",
+          "Přechází na zrychlení ledu"
+        ],
+        "instructions": [
+          "Nastavte překážky ve vzdálenosti 60–90 cm od sebe",
+          "Dvě stopy přes každého",
+          "Měkké přistání",
+          "6–8 překážek na sadu",
+          "3–4 sady"
+        ],
+        "tips": [
+          "Měkká kolena při přistání",
+          "Používejte ruce aktivně",
+          "Začněte s nízkými překážkami",
+          "Úplný odpočinek mezi sériemi"
+        ],
+        "equipment": "Překážky nebo kužely",
+        "calories": "140-200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Start ze sedu do sprintu",
+        "description": "Odstraňuje předpětí a trénuje čistou výbušnost prvního kroku.",
+        "benefits": [
+          "Vytváří startovací sílu",
+          "Zlepšuje reakci",
+          "Trénuje prodloužení kyčle",
+          "Jednoduchý polní vrták"
+        ],
+        "instructions": [
+          "Sedněte si na zem, nohy dopředu",
+          "Na tágo stoj a sprint 10 m",
+          "8–10 opakování",
+          "Odpočinek 60–90 sekund",
+          "Nejprve se zahřejte"
+        ],
+        "tips": [
+          "Před tágem se nenaklánějte",
+          "Postavte se výbušně",
+          "První 3 kroky maximální výkon",
+          "Alternativní směry"
+        ],
+        "equipment": "10 m pruh",
+        "calories": "100-150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Široký skok série",
+        "description": "Horizontální síla užitečná pro bitvy na palubě a odsuny.",
+        "benefits": [
+          "Vytváří horizontální sílu",
+          "Zlepšuje koordinaci",
+          "Posiluje nohy",
+          "Krátké sezení"
+        ],
+        "instructions": [
+          "Široký skok ve stoje",
+          "Měkké přistání",
+          "Okamžitě další skok vpřed",
+          "5 skoků v řadě = 1 sada",
+          "4–5 sad s odpočinkem"
+        ],
+        "tips": [
+          "Použijte švih paže",
+          "Pozemek vyrovnaný",
+          "Flow skok ke skoku",
+          "Zahřejte kolena"
+        ],
+        "equipment": "Otevřený prostor",
+        "calories": "90-130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Slam medicinbalu",
+        "description": "Výbušný vrh směrem dolů pro sílu kontaktu celého těla.",
+        "benefits": [
+          "Vytváří výbušné jádro",
+          "Vysoká intenzita rychle",
+          "Spojuje nohy-jádro-ruce",
+          "Velké uvolnění stresu"
+        ],
+        "instructions": [
+          "Zvedněte míč nad hlavu",
+          "Plnou silou udeřte na podlahu",
+          "Seberte a opakujte",
+          "10–12 opakování",
+          "3 sady"
+        ],
+        "tips": [
+          "Použijte nohy a jádro",
+          "Neutrální páteř při zdvihu",
+          "Sledujte odraz",
+          "Použijte 4–8 kg míč"
+        ],
+        "equipment": "Medicinbal",
+        "calories": "110-160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Tlačit sáně",
+        "description": "Těžký horizontální pohon jako maximální stání starty.",
+        "benefits": [
+          "Maximální pohon nohou",
+          "Nízké nárazové zatížení",
+          "Buduje duševní odolnost",
+          "Skvělé pro power forwardy"
+        ],
+        "instructions": [
+          "Nízký postoj za saněmi",
+          "Tlak 15–20 m",
+          "Úplný odpočinek 2 min",
+          "4–6 stisků",
+          "Nejprve společné rozcvičení"
+        ],
+        "tips": [
+          "Zůstaň nízko",
+          "Krátké silné kroky",
+          "Nevstávejte brzy",
+          "Kontrolka startu při zatížení"
+        ],
+        "equipment": "Sáně Prowler",
+        "calories": "180-260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike stabilní 10 minut",
+        "description": "Aerobní základ pro dlouhé směny a mimosezónní kondici.",
+        "benefits": [
+          "Buduje aerobní vytrvalost",
+          "Šetrné ke kloubům",
+          "Ovládání srdeční frekvence",
+          "Rychlé sezení mimo led"
+        ],
+        "instructions": [
+          "5 min zahřívání",
+          "10 minut při 65–70% námaze",
+          "Stabilní otáčky",
+          "5 min vychladnout",
+          "Sledujte dýchání"
+        ],
+        "tips": [
+          "Drž se mimo anaerobní zónu",
+          "Stabilní držení těla",
+          "Hydrát",
+          "2–3krát týdně"
+        ],
+        "equipment": "AirBike",
+        "calories": "180-250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Veslovací erg intervaly",
+        "description": "Celotělové kardio bez nárazu pro výdrž trupu a nohou.",
+        "benefits": [
+          "Kondicionování celého těla",
+          "Zlepšuje držení těla při veslování",
+          "Vytváří přilnavost a jádro",
+          "Alternativa běhu"
+        ],
+        "instructions": [
+          "500 m těžko / 1 min lehce",
+          "6-8 kol",
+          "Pohon z nohou a jádra",
+          "5 min zahřívání",
+          "Ochlaďte se protáhnout"
+        ],
+        "tips": [
+          "Neutrální páteř",
+          "Lokty k bokům",
+          "Dokonce rozdělené tempo",
+          "Nastavte tlumič moudře"
+        ],
+        "equipment": "Veslování erg",
+        "calories": "250-340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Nepřetržité bruslařské poskoky",
+        "description": "Rytmické laterální poskoky pro kondici nohou a do stran.",
+        "benefits": [
+          "Buduje boční odolnost",
+          "Posiluje nohy",
+          "Napodobuje změny směru",
+          "Kompaktní vrtačka"
+        ],
+        "instructions": [
+          "Přeskakujte ze strany na stranu z jedné nohy na druhou",
+          "Paže jako bruslení",
+          "30 sec práce / 30 sec odpočinek",
+          "10 kol",
+          "Měkká přistání"
+        ],
+        "tips": [
+          "Kolenní stopy přes chodidlo",
+          "Hrudník nahoru",
+          "Kontrola vzdálenosti skoku",
+          "Nejprve se zahřejte"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "130-190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "Kruhový trénink 45/15",
+        "description": "Okruh se čtyřmi stanovišti pro celkovou hokejovou kondici.",
+        "benefits": [
+          "Zatížení celého těla",
+          "Časově efektivní",
+          "Buduje pracovní kapacitu",
+          "Posilovna přizpůsobivá"
+        ],
+        "instructions": [
+          "Burpees, horolezci, skokové dřepy, kliky",
+          "45 sec práce / 15 sec přechod",
+          "4 tahy × 4 kola",
+          "2 minuty odpočinek mezi koly",
+          "Zahřejte se a ochlaďte"
+        ],
+        "tips": [
+          "Přizpůsobte se své úrovni",
+          "Forma nad rychlostí",
+          "Zůstaňte hydratovaní",
+          "Vyhněte se v den hry"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "280-380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Průběhy nízkými překážkami",
+        "description": "Kardio plus koordinace s rychlými kroky, jako je tvrdé bruslení.",
+        "benefits": [
+          "Zlepšuje kadenci",
+          "Buduje koordinaci",
+          "Zvyšuje aerobní kapacitu",
+          "Liší běžeckou práci"
+        ],
+        "instructions": [
+          "6–8 nízkých překážek na 20 m",
+          "Proběhněte s vysokými koleny",
+          "6 průchodů",
+          "Odpočinek 90 sekund",
+          "3-4 série"
+        ],
+        "tips": [
+          "Nepřikrývejte překážky",
+          "Rychlé krátké kroky",
+          "Aktivní paže",
+          "Zahřejte klouby"
+        ],
+        "equipment": "Mini překážky",
+        "calories": "200-280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Žebříkové rychlé nohy",
+        "description": "Rychlý základ pro nohy pro uhýbání a ostré zatáčky.",
+        "benefits": [
+          "Zlepšuje rychlost chodidla",
+          "Buduje koordinaci",
+          "Zvyšuje reakci",
+          "Předledová rozcvička"
+        ],
+        "instructions": [
+          "In-in-out-out přes žebřík",
+          "30 s max / 30 s odpoč",
+          "8 kol",
+          "V každém druhém kole obměňujte vzory",
+          "Nejprve lehké zahřátí"
+        ],
+        "tips": [
+          "Oči vzhůru",
+          "Krátké kroky",
+          "Ruce v atletické připravené",
+          "Nepřeskakujte příčky"
+        ],
+        "equipment": "Agility žebřík",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "T-drill agility",
+        "description": "Klasický T-test: sprint, shuffle a backpedal jako na ledu.",
+        "benefits": [
+          "Kompletní agility balíček",
+          "Vlaky všemi směry",
+          "Sledovatelný pokrok",
+          "Pro bruslaře"
+        ],
+        "instructions": [
+          "Sprint 10 m vpřed",
+          "Náhodně 5 m doleva a doprava",
+          "Zpětný pedál 10 m na start",
+          "3–5 opakování",
+          "Odpočinek 90 sekund"
+        ],
+        "tips": [
+          "Zůstaňte v náhodném pořadí",
+          "Nepřekřižujte nohy",
+          "Dotkněte se kuželů",
+          "Zapisujte si časy"
+        ],
+        "equipment": "Šišky",
+        "calories": "100-150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Puk číslo-8 vrtačka",
+        "description": "Stickhandle figurka-8 spojující ruce a nohy.",
+        "benefits": [
+          "Zlepšuje manipulaci s hůlkami",
+          "Spojuje ruce a nohy",
+          "Trénuje periferní vidění",
+          "Domácí přátelské"
+        ],
+        "instructions": [
+          "Dva kužely vzdálené 2 m od sebe",
+          "Puk číslo-8 kolem kuželů",
+          "Maximální rychlost 30 sekund",
+          "Odpočinek 30 sec",
+          "10 kol"
+        ],
+        "tips": [
+          "Hlavu vzhůru",
+          "Měkké ruce",
+          "Rychlé nohy",
+          "Změňte směr každých 5 kol"
+        ],
+        "equipment": "Puk, 2 šišky, hůl",
+        "calories": "90-130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Reaktivní kuželová volání",
+        "description": "Partner volá kužel – reakce a první krok jako čtení ve hře.",
+        "benefits": [
+          "Trénuje reakci hry",
+          "Zlepšuje kognitivní rychlost",
+          "Staví první krok",
+          "Partnerský vrták"
+        ],
+        "instructions": [
+          "4 kužely na 3 m čtverečních",
+          "Partner volá barvu/číslo",
+          "Sprint na kužel",
+          "Dotkněte se a vraťte se",
+          "20 reakcí"
+        ],
+        "tips": [
+          "Zůstaňte upřímní, žádné hádky brzy",
+          "Nízký postoj",
+          "První výbušný krok",
+          "Měnit rozložení"
+        ],
+        "equipment": "4 šišky, partner",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Kroky bočního míchání",
+        "description": "Boční míchání v hokejovém postoji napodobující boční bruslení.",
+        "benefits": [
+          "Vytváří boční rychlost",
+          "Posiluje únosce kyčle",
+          "Zlepšuje postoj",
+          "Předledová rozcvička"
+        ],
+        "instructions": [
+          "5 m míchání vlevo a vpravo",
+          "Nepřekřižujte nohy",
+          "30 sec / 30 sec odpočinek",
+          "8 kol",
+          "Ruce na pomyslné hůl"
+        ],
+        "tips": [
+          "Zůstaň nízko",
+          "Odtlačte vnější nohu",
+          "Hrudník dopředu",
+          "Rychlé kontakty"
+        ],
+        "equipment": "Kužele nebo čáry",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Dynamický otvírák boků",
+        "description": "Zahřátí mobility kyčle pro hluboký hokejový postoj.",
+        "benefits": [
+          "Zlepšuje pohyblivost kyčlí",
+          "Snižuje riziko poranění třísel",
+          "Připravuje se na bruslení",
+          "Rychlá rutina"
+        ],
+        "instructions": [
+          "Pohyb nohou vpředu a vzadu 10 každý",
+          "Boční výkyvy nohou po 10",
+          "Výdrž hlubokého dřepu 30 sec",
+          "Kyčelní kruhy 10 v každém směru",
+          "Chodící koleno obejme 10 m"
+        ],
+        "tips": [
+          "Kontrolovaný rozsah",
+          "Žádná bolest",
+          "Zhluboka dýchejte",
+          "Před každým sezením"
+        ],
+        "equipment": "Žádný",
+        "calories": "40-60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Největší úsek světa",
+        "description": "Dynamický strečink zasahující boky, hrudní páteř a hamstringy.",
+        "benefits": [
+          "Pohyblivost celého těla",
+          "Časově efektivní",
+          "Připravuje celé tělo",
+          "Společné profi zahřívání"
+        ],
+        "instructions": [
+          "Krok do výpadu",
+          "Loket dolů uvnitř chodidla",
+          "Hrudní rotační paže nahoru",
+          "Narovnejte přední nohu pro hamstring",
+          "5 opakování na stranu"
+        ],
+        "tips": [
+          "Pohybujte se pomalu",
+          "Žádné poskakování",
+          "Dráhujte přední koleno",
+          "Obě strany rovné"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "50-70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Stahovací páska",
+        "description": "Aktivuje horní část zad a ramena před střelbou a kontaktem.",
+        "benefits": [
+          "Aktivuje zadní delty a kosodélníky",
+          "Zlepšuje držení těla",
+          "Zahřeje ramena",
+          "Prevence zranění"
+        ],
+        "instructions": [
+          "Držte pás ve výšce hrudníku",
+          "Paže rovně",
+          "Vytáhněte od sebe k lopatkám",
+          "15–20 opakování",
+          "2–3 sady"
+        ],
+        "tips": [
+          "Žádné pokrčení ramen",
+          "Řízený návrat",
+          "Světelný pás na začátek",
+          "Před ledem nebo posilovnou"
+        ],
+        "equipment": "Odporová kapela",
+        "calories": "30-50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Vysoká kolena + kopy na zadky",
+        "description": "Dynamické zahřátí nohou a zvýšení srdeční frekvence před ledem.",
+        "benefits": [
+          "Zvyšuje srdeční frekvenci",
+          "Zahřeje čtyřkolky a hamstringy",
+          "Zlepšuje koordinaci",
+          "Rychlý efekt"
+        ],
+        "instructions": [
+          "20 m vysoká kolena",
+          "20 m kopy zadkem",
+          "20 m přeskakování",
+          "Opakujte 3–4krát",
+          "Snadné běhání mezi"
+        ],
+        "tips": [
+          "Zůstaňte na předních nohou",
+          "Aktivní paže",
+          "Tempo zvyšujte postupně",
+          "Nesprintujte za studena"
+        ],
+        "equipment": "20 m prostor",
+        "calories": "60-90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Švihy paží + rozcvičení holí",
+        "description": "Zahřátí ramen plus lehká manipulace s hokejkou před ledem.",
+        "benefits": [
+          "Mobilizuje ramena",
+          "Aktivuje rotátorovou manžetu",
+          "Spojuje horní část těla s hůlkou",
+          "Hokejově specifické"
+        ],
+        "instructions": [
+          "Paže kruhy 10 v každém směru",
+          "Houpačky napříč tělem 10",
+          "Stickhandle pomalu až rychle 60 sekund",
+          "Ruličky na zápěstí s tyčí 20",
+          "Pohyb světelného výstřelu x10"
+        ],
+        "tips": [
+          "Rychlost postupu",
+          "Obě ruce",
+          "Žádný nucený dosah",
+          "Každé ledové sezení"
+        ],
+        "equipment": "Hůl, puk",
+        "calories": "50-80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Protažení flexoru kyčle v kleče",
+        "description": "Protažení flexoru kyčle, aby se zabránilo držení těla při bruslení.",
+        "benefits": [
+          "Snižuje těsnost boků",
+          "Může zlepšit krok",
+          "Pomáhá držení těla",
+          "Po ledě nebo posilovně"
+        ],
+        "instructions": [
+          "Výpadová pozice v kleče",
+          "Squeeze back glute",
+          "Trup vysoký",
+          "Vydržte 30–45 sekund",
+          "2–3krát na nohu"
+        ],
+        "tips": [
+          "Vyhněte se bederní klenbě",
+          "Dýchejte do protažení",
+          "Přední koleno přes kotník",
+          "Pokud možno denně"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "Rotace kyčle 90/90",
+        "description": "Pohyblivost kyčlí pro obraty a hluboké přikrčení na bruslích.",
+        "benefits": [
+          "Zlepšuje rotaci boků",
+          "Snižuje riziko natažení třísel",
+          "Klidné zotavovací práce",
+          "Přátelský po zápase"
+        ],
+        "instructions": [
+          "Posaďte se v poloze 90/90",
+          "Otočte kolena ze strany na stranu",
+          "Ruce vzadu pro podporu",
+          "10 pomalých opakování v každém směru",
+          "Hold end 20 sekund"
+        ],
+        "tips": [
+          "Žádný vynucovací rozsah",
+          "Hrudník vysoký",
+          "Obě boky pokud možno dolů",
+          "Použijte dech"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "30-50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Protažení rotace hrudníku",
+        "description": "Hrudní pohyblivost pro rotaci střely a držení těla.",
+        "benefits": [
+          "Zlepšuje rotaci T-páteře",
+          "Uvolňuje spodní část zad",
+          "Pomáhá mechanikům střel",
+          "Rychlé každodenní cvičení"
+        ],
+        "instructions": [
+          "Čtyřnožka",
+          "Ruka za hlavou",
+          "Otočte loktem ke stropu",
+          "10 opakování na každou stranu",
+          "Nahoře pauza 2 sekundy"
+        ],
+        "tips": [
+          "Boky zůstávají rovné",
+          "Při rotaci vydechněte",
+          "Žádná bolest páteře",
+          "Pohybujte se pomalu"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "30-45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Stěna protažení lýtka",
+        "description": "Lýtka a Achilles často přetížené v bruslích.",
+        "benefits": [
+          "Snižuje napjatost lýtek",
+          "Zlepšuje dorzální flexi kotníku",
+          "Prevence holenní dlahy",
+          "Po každém sezení"
+        ],
+        "instructions": [
+          "Ruce na zdi",
+          "Zadní noha rovná pata dolů",
+          "Vydržte 30 sekund",
+          "Ohněte koleno pro soleus",
+          "2–3 kola na každou nohu"
+        ],
+        "tips": [
+          "Podpatek na podlaze",
+          "Boky hranaté",
+          "Žádné poskakování",
+          "Obě nohy"
+        ],
+        "equipment": "Zeď",
+        "calories": "25-40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Protažení ramen přes tělo",
+        "description": "Zadní úsek ramene po nastřelení objemu.",
+        "benefits": [
+          "Snižuje těsnost ramen",
+          "Pomáhá střelnici",
+          "Rychlé protažení",
+          "Denní údržba"
+        ],
+        "instructions": [
+          "Přetáhněte ruku přes hrudník",
+          "Druhou rukou držte loket",
+          "30 sekund každé rameno",
+          "Opakujte 2–3krát",
+          "Uvolněný krk"
+        ],
+        "tips": [
+          "Nekrčte rameny",
+          "Pouze jemným tahem",
+          "Vydechněte a uvolněte se",
+          "Po ledu"
+        ],
+        "equipment": "Žádný",
+        "calories": "20-35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Brániční dýchání",
+        "description": "Hluboké dýchání pro zotavení parasympatiku po hře.",
+        "benefits": [
+          "Snižuje stres",
+          "Podporuje obnovu",
+          "Může zlepšit spánek",
+          "Šatna přátelská"
+        ],
+        "instructions": [
+          "Lehněte si nebo se pohodlně posaďte",
+          "Ruku na břicho",
+          "Inhalujte 4 sekundy nosem",
+          "Výdech 6 sekund ústy",
+          "5 minut nepřetržitě"
+        ],
+        "tips": [
+          "Břicho se nezvedá hrudník",
+          "Tichý prostor",
+          "Denní zvyk",
+          "Po pozdních hrách"
+        ],
+        "equipment": "Žádný",
+        "calories": "15-25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Nohy na zeď",
+        "description": "Žilní návrat a uvolnění nohou po těžkých hrách.",
+        "benefits": [
+          "Může snížit otoky nohou",
+          "Podporuje relaxaci",
+          "Pasivní zotavení",
+          "Po cestovních hrách"
+        ],
+        "instructions": [
+          "Boky u zdi vleže",
+          "Nohy svislé na stěnu",
+          "Paže uvolněné",
+          "Vydržte 8–10 minut",
+          "Pomalé dýchání"
+        ],
+        "tips": [
+          "Pohodlný povrch",
+          "Odpojte od telefonu",
+          "Volitelná klidná hudba",
+          "Nejlépe večer"
+        ],
+        "equipment": "Stěna, podložka",
+        "calories": "20-30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Foam roll čtyřkolky a hamstringy",
+        "description": "Myofasciální uvolnění pro nohy po velkém zatížení.",
+        "benefits": [
+          "Snižuje bolestivost",
+          "Zlepšuje kvalitu tkání",
+          "Rychlejší zotavení",
+          "Péče o sebe"
+        ],
+        "instructions": [
+          "Hoďte čtyřkolky po 60 sekundách",
+          "Rolujte hamstringy každý 60 sekund",
+          "Pauza citlivých míst 20 sekund",
+          "Pouze lehké IT pásmo",
+          "Hydratujte po"
+        ],
+        "tips": [
+          "Vyhněte se kloubům",
+          "Dýchejte přes těsná místa",
+          "Mírný tlak",
+          "Ne před ledem"
+        ],
+        "equipment": "Pěnový váleček",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Pohyb kyčlí a kotníků proudí",
+        "description": "Jemná mimodenní mobilita pro udržení rozsahu pohybu.",
+        "benefits": [
+          "Udržuje mobilitu",
+          "Nízká únava",
+          "Aktivní zotavení",
+          "Prevence zranění"
+        ],
+        "instructions": [
+          "Kotníkové kruhy po 10",
+          "Hip CARs 5 v každém směru",
+          "Kočka-kráva 10 opakování",
+          "Dětská póza 60 sekund",
+          "2 kola"
+        ],
+        "tips": [
+          "Bezbolestný rozsah",
+          "Pomalé a kontrolované",
+          "Volný den nebo ráno",
+          "Přidejte dýchání"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "40-60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Protažení na spánek a dech",
+        "description": "Lehké protažení a dýchání před spaním pro zotavení přes noc.",
+        "benefits": [
+          "Podporuje nástup spánku",
+          "Uvolňuje nervový systém",
+          "Regenerace ve spánku",
+          "Večerní rituál"
+        ],
+        "instructions": [
+          "Natahování hamstringů 30 sekund každý",
+          "Dětská póza 60 sekund",
+          "Otočení vleže na zádech po 30 sekundách",
+          "Dýchání v boxu 4-4-4-4 po dobu 3 minut",
+          "Tmavá tichá místnost"
+        ],
+        "tips": [
+          "Žádné obrazovky poté",
+          "Důsledná doba spánku",
+          "Chladná místnost",
+          "Udělejte z toho zvyk"
+        ],
+        "equipment": "Podložka na cvičení",
+        "calories": "25-40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     },
     "difficulties": {
@@ -1735,6 +3135,8 @@
     "codeSentToEmailMessage": "Kód odeslán na {email}",
     "userNotFound": "Uživatel nenalezen",
     "userNotFoundMessage": "Účet s tímto telefonním číslem neexistuje. Prosím zaregistrujte se.",
+    "networkError": "Problém s připojením",
+    "networkErrorMessage": "Nepodařilo se připojit k serveru. Zkontrolujte internet a zkuste to znovu.",
     "errorSendingCode": "Chyba",
     "errorSendingCodeMessage": "Kód se nepodařilo odeslat. Zkontrolujte své telefonní číslo a připojení k internetu.",
     "errorResendingCode": "Chyba",
@@ -1925,6 +3327,8 @@
     "rightShort": "P",
     "startedHockey": "V hokeji s",
     "noFriendsYet": "{name} zatím nemá žádné přátele",
+    "inviteYourTeam": "Pozvi svůj tým",
+    "inviteTeamMessage": "Jsem na HockeyStars – aplikaci pro hokejisty. Přidej se ke mně:",
     "beFirstToAdd": "Buďte první, kdo přidá {name} jako přítele",
     "writeMessage": "Napište zprávu",
     "edit": "Upravit",
@@ -2366,9 +3770,17 @@
     "weightFrom": "Hmotnost",
     "all": "Vše",
     "noPlayersFound": "Nebyli nalezeni žádní hráči",
+    "newcomers": "Nováčci",
+    "topByPoints": "Top podle bodů",
     "left": "Vlevo",
     "right": "Právo",
-    "resetFilters": "Resetovat filtry"
+    "resetFilters": "Resetovat filtry",
+    "topBySV": "Top podle SV%",
+    "shareRating": "Sdílet žebříček",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "bodů",
+    "allCountries": "Všechny země",
+    "allYears": "Všechny roky"
   },
   "messages": {
     "title": "Zprávy",
@@ -2824,6 +4236,23 @@
     "physicalDataUpdate": "Aktualizace fyzických údajů",
     "friendRequest": "Žádost o přátelství",
     "newFriendship": "Nové přátelství",
-    "speedRecord": "Nový rychlostní rekord"
+    "speedRecord": "Nový rychlostní rekord",
+    "gameFirstPlace": "Šampion hry",
+    "quizFirstPlace": "Hokejová hvězda"
+  },
+  "videoUploadHint": "Max 20 sekund na video, až 10 videí",
+  "gameFirstPlaceNotification": {
+    "title": "Šampion hry",
+    "message": "{playerName} dosáhl 1. místa"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hokejová hvězda",
+    "message": "{playerName} získal {prize}"
+  },
+  "tabs": {
+    "chat": "Chat",
+    "feed": "Feed",
+    "scout": "Scout",
+    "skills": "Dovednosti"
   }
 }

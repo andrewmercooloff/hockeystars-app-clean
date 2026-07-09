@@ -92,7 +92,7 @@
   "uploading": "Caricamento...",
   "uploadingPhotos": "Caricamento di {count} foto... {progress}%",
   "info": "Informazioni",
-  "addVideoLink": "Aggiungi un collegamento a YouTube",
+  "addVideoLink": "Videos",
   "supportedPlatforms": "",
   "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
   "timeCodePlaceholder": "min:sec",
@@ -1683,6 +1683,1406 @@
           "Eseguire 2-3 volte a settimana",
           "Ridurre il carico quando ci si sente stanchi"
         ]
+      },
+      "66": {
+        "title": "Plank laterale con rotazione del busto",
+        "description": "Costruisce obliqui e stabilizzatori centrali per la potenza del tiro e il controllo della stabilità del corpo.",
+        "benefits": [
+          "Stabilizza il nucleo in contatto",
+          "Migliora la potenza del tiro rotazionale",
+          "Riduce il rischio di lesioni alla parte bassa della schiena",
+          "Costruisce la resistenza centrale"
+        ],
+        "instructions": [
+          "Prepara un plank laterale dell'avambraccio",
+          "Allungare il braccio superiore verso il soffitto",
+          "Passare il braccio sotto il busto e ritornare",
+          "Mantieni i fianchi a livello senza cedimenti",
+          "Esegui 8-10 ripetizioni per lato"
+        ],
+        "tips": [
+          "Ruota lentamente con controllo",
+          "Respira costantemente",
+          "Se necessario, inginocchiatevi",
+          "2-3 serie per lato"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "120–180 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "67": {
+        "title": "Stacco rumeno con manubri",
+        "description": "Sviluppa la catena posteriore per un pattinaggio potente e un'accelerazione del primo passo.",
+        "benefits": [
+          "Rafforza i muscoli posteriori della coscia e i glutei",
+          "Migliora la meccanica dell'inclinazione in avanti",
+          "Aumenta la forza di presa",
+          "Supporta la prevenzione degli infortuni al tendine del ginocchio"
+        ],
+        "instructions": [
+          "Stai in piedi tenendo i manubri sulle cosce",
+          "Mantieni una leggera piegatura del ginocchio",
+          "Portare indietro i fianchi, abbassando i campanelli lungo le gambe",
+          "Fermati a metà tibia o in un leggero allungamento",
+          "Spingi i fianchi in avanti per alzarti"
+        ],
+        "tips": [
+          "Mantieni una colonna vertebrale neutra",
+          "I pesi rimangono vicini alle gambe",
+          "Evitare di arrotondare la parte bassa della schiena",
+          "3–4 serie da 8–12 ripetizioni"
+        ],
+        "equipment": "Manubri",
+        "calories": "200–280 kcal",
+        "category": "Сила",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "68": {
+        "title": "Calice tozzo",
+        "description": "Uno schema di squat adatto all'hockey per la forza delle gambe e del core con una postura eretta.",
+        "benefits": [
+          "Sviluppa la forza quadrupla",
+          "Insegna la posizione verticale del busto",
+          "Migliora la mobilità della caviglia",
+          "Buona opzione fuori stagione fuori dal ghiaccio"
+        ],
+        "instructions": [
+          "Tieni un manubrio o un kettlebell al petto",
+          "Piedi alla larghezza delle spalle, dita leggermente in fuori",
+          "Squat parallelamente o sotto",
+          "Le ginocchia seguono le dita dei piedi",
+          "3–4 serie da 10–15 ripetizioni"
+        ],
+        "tips": [
+          "Gomiti all'interno delle ginocchia in basso",
+          "I talloni restano abbassati",
+          "Controllare la discesa",
+          "Rimani alto attraverso il petto"
+        ],
+        "equipment": "Manubrio o kettlebell",
+        "calories": "180–250 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "69": {
+        "title": "Taglio rotazionale della banda",
+        "description": "Imita la rotazione di tiri e passaggi per aumentare la potenza nel piano di movimento dell'hockey.",
+        "benefits": [
+          "Migliora la potenza del tiro e dei passaggi",
+          "Allena la stabilità antirotazione",
+          "Carico adatto alle spalle",
+          "Può essere fatto a casa"
+        ],
+        "instructions": [
+          "Fascia di ancoraggio all'altezza del petto",
+          "Stare di lato per ancorare",
+          "Tieni il bastone o la maniglia con entrambe le mani",
+          "Ruota dai fianchi con controllo",
+          "12-15 ripetizioni per lato"
+        ],
+        "tips": [
+          "La potenza viene dai fianchi",
+          "Proteggi la parte bassa della schiena dalla rotazione eccessiva",
+          "Usa una posizione atletica da hockey",
+          "2-3 serie"
+        ],
+        "equipment": "Fascia di resistenza",
+        "calories": "100-150 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "70": {
+        "title": "Ponte per glutei a gamba singola",
+        "description": "Attiva i glutei e gli stabilizzatori dei fianchi per una spinta potente sui pattini.",
+        "benefits": [
+          "Rafforza i glutei",
+          "Stabilizza il bacino durante il pattinaggio",
+          "Migliora la simmetria delle gambe",
+          "Supporta la prevenzione degli infortuni al ginocchio"
+        ],
+        "instructions": [
+          "Sdraiarsi sulla schiena, con un piede piantato",
+          "L'altra gamba è estesa o piegata in aria",
+          "Porta i fianchi in linea retta",
+          "Pausa di 1 secondo in alto",
+          "10-12 ripetizioni per gamba"
+        ],
+        "tips": [
+          "Evitare l'iperestensione lombare",
+          "Continua a lavorare con il ginocchio allineato",
+          "Spremi i glutei in alto",
+          "2-3 serie"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "90–130 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "71": {
+        "title": "Sollevamenti dei polpacci in piedi",
+        "description": "Costruisce polpacci e piedi per la resistenza delle gambe a fine turno e la stabilità del pattino.",
+        "benefits": [
+          "Migliora la forza del polpaccio",
+          "Riduce l'affaticamento della parte inferiore della gamba durante i giochi",
+          "Rafforza i piedi",
+          "Opzione spogliatoio rapido"
+        ],
+        "instructions": [
+          "Stare sul bordo del gradino sugli avampiedi",
+          "Tacchi più bassi sotto il livello del gradino",
+          "Salire più in alto possibile",
+          "Pausa in alto",
+          "15-20 ripetizioni, 3 serie"
+        ],
+        "tips": [
+          "Se necessario, usa il muro per mantenere l'equilibrio",
+          "Gamma completa di movimento",
+          "Evitare di rimbalzare",
+          "Aggiungi peso leggero quando sei pronto"
+        ],
+        "equipment": "Gradino o piattaforma",
+        "calories": "60–90 kcal",
+        "category": "Сила",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "72": {
+        "title": "Rubinetti a spalla per plancia",
+        "description": "Lavoro centrale antirotazione per stabilità di contatto e postura atletica.",
+        "benefits": [
+          "Costruisce la stabilità del core",
+          "Migliora l'equilibrio sotto contatto",
+          "Sviluppa la resistenza centrale",
+          "Funziona per tutte le posizioni"
+        ],
+        "instructions": [
+          "Inizia con la tavola alta",
+          "Sposta il peso e tocca la spalla opposta",
+          "Ritorno e alternare le braccia",
+          "Mantieni i fianchi squadrati",
+          "16-20 rubinetti totali"
+        ],
+        "tips": [
+          "Piedi allargati per stabilità",
+          "Non alzare i fianchi",
+          "Respira costantemente",
+          "2-3 serie"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "80-120 kcal",
+        "category": "Сила",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "73": {
+        "title": "20 m sprint con riposo completo",
+        "description": "Simula turni brevi per migliorare la capacità di accelerazione ripetuta.",
+        "benefits": [
+          "Migliora la velocità degli sprint ripetuti",
+          "Treni per il recupero tra un turno e l'altro",
+          "Sviluppa la meccanica di partenza",
+          "Aumenta la resistenza del gioco"
+        ],
+        "instructions": [
+          "Riscaldarsi per 8-10 minuti",
+          "Sprint per 20 m al 95% della velocità",
+          "Riposa 40–60 secondi camminando",
+          "Ripeti 10-12 volte",
+          "Raffreddare 5 minuti"
+        ],
+        "tips": [
+          "Mantenere la forma dello sprint per ogni ripetizione",
+          "Non interrompere il riposo troppo presto",
+          "Dare priorità alla qualità rispetto alla quantità",
+          "1–2 sessioni a settimana"
+        ],
+        "equipment": "Spazio aperto di 20 mq",
+        "calories": "250–350 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "25 мин"
+      },
+      "74": {
+        "title": "Intervalli di corsa di 30–30–30 secondi",
+        "description": "Intervallo classico stile hockey: 30 secondi duri, 30 secondi facili.",
+        "benefits": [
+          "Aumenta la tolleranza al lattato",
+          "Imita l'intensità dello spostamento",
+          "Migliora la resistenza mentale",
+          "Sessione fuori dal ghiaccio efficiente"
+        ],
+        "instructions": [
+          "Riscaldarsi 10 minuti",
+          "30 secondi di corsa intensa/30 secondi di camminata",
+          "Ripeti 12-16 cicli",
+          "Mantieni uno sforzo costante in ogni round",
+          "Raffreddarsi e allungarsi"
+        ],
+        "tips": [
+          "Non esagerare presto",
+          "Mantenere la forma di corsa",
+          "Idratarsi tra i blocchi",
+          "Avanzare lentamente nei cicli totali"
+        ],
+        "equipment": "Pista o tapis roulant",
+        "calories": "300–400 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "75": {
+        "title": "Intervalli AirBike",
+        "description": "Cardio cardio ad alta intensità a basso impatto, adatto alle ginocchia in bassa stagione.",
+        "benefits": [
+          "Aumenta il VO2max",
+          "Caricamento delicato sulle articolazioni",
+          "Allena braccia e gambe insieme",
+          "Recupero rapido dopo la sessione"
+        ],
+        "instructions": [
+          "5 minuti di rotazione facile",
+          "20 secondi massimo / 40 secondi facile",
+          "10-12 giri",
+          "Monitorare RPM e respirazione",
+          "5 minuti di raffreddamento"
+        ],
+        "tips": [
+          "Presa rilassata sulle maniglie",
+          "Rimani seduto in modo stabile",
+          "Evitare il massimo sforzo quotidiano",
+          "Tieni traccia delle calorie per i progressi"
+        ],
+        "equipment": "AirBike/bici d'assalto",
+        "calories": "220–320 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "76": {
+        "title": "Corsa navetta 5×5 m",
+        "description": "Brevi cambi di direzione come forechecking e recuperi difensivi.",
+        "benefits": [
+          "Migliora il cambio di direzione",
+          "Aumenta la velocità del primo passo",
+          "Reazione dei treni",
+          "Trapano compatto adatto alla palestra"
+        ],
+        "instructions": [
+          "Segna due linee distanti 5 m l'una dall'altra",
+          "Tocca la linea con la mano, scatta indietro",
+          "6–8 ripetizioni = 1 serie",
+          "Riposare 90 secondi",
+          "3-4 serie"
+        ],
+        "tips": [
+          "Toccare completamente la linea ogni volta",
+          "Esplodi i primi passi",
+          "Pianta forte in curva",
+          "Usa scarpe aderenti"
+        ],
+        "equipment": "Coni o linee da pavimento",
+        "calories": "150–220 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "77": {
+        "title": "Accelerazioni dalla posizione di hockey",
+        "description": "Partenze atletiche basse che si trasferiscono a confronti e battaglie con i dischi.",
+        "benefits": [
+          "Migliora il primo passo",
+          "Addestra i meccanici con partenza bassa",
+          "Aumenta la potenza delle gambe",
+          "Specifico per l'hockey"
+        ],
+        "instructions": [
+          "Imposta la posizione atletica: ginocchia piegate, busto in avanti",
+          "Al momento giusto sprint 10-15 m",
+          "Riposo completo 60–90 secondi",
+          "8-10 ripetizioni",
+          "Gamba anteriore alternativa"
+        ],
+        "tips": [
+          "Stai avanti, non alzarti in piedi presto",
+          "Spingi indietro la gamba con forza",
+          "Usa le armi in modo aggressivo",
+          "Limite a 10 ripetizioni di qualità"
+        ],
+        "equipment": "corsia di 20 mt",
+        "calories": "180–260 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "20 мин"
+      },
+      "78": {
+        "title": "400 m di corsa a tempo",
+        "description": "Corsa veloce controllata per sostenere uno sforzo elevato simile a un turno.",
+        "benefits": [
+          "Sviluppa la potenza aerobica",
+          "Insegna il ritmo",
+          "Migliora la resistenza delle gambe",
+          "Buon lavoro fuori stagione"
+        ],
+        "instructions": [
+          "Riscaldarsi 10 minuti",
+          "400 m al 75–80% max",
+          "Riposati 2 minuti camminando",
+          "4-6 ripetizioni",
+          "Raffreddare 5 minuti"
+        ],
+        "tips": [
+          "Anche il ritmo, non uno sprint",
+          "Monitorare la respirazione",
+          "Utilizzare le corsie di marcia in sicurezza",
+          "Progredisci gradualmente con le ripetizioni"
+        ],
+        "equipment": "Traccia o circuito misurato",
+        "calories": "280–380 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "79": {
+        "title": "Tabata salta squat",
+        "description": "Quattro minuti di alta intensità che imitano la stanchezza del turno di fine turno.",
+        "benefits": [
+          "Costruisce la resistenza anaerobica",
+          "Sessione breve ma efficace",
+          "Rafforza le gambe",
+          "A misura di casa"
+        ],
+        "instructions": [
+          "Squat con salto massimo di 20 secondi",
+          "10 secondi di riposo",
+          "8 giri = 4 minuti",
+          "Riscaldarsi prima e rinfrescarsi dopo",
+          "1–2 volte a settimana"
+        ],
+        "tips": [
+          "Atterra dolcemente",
+          "Non saltare mai il riscaldamento",
+          "Da evitare il giorno della partita",
+          "Proteggi le ginocchia con una buona forma"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "120–180 kcal",
+        "category": "Скоростная выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "80": {
+        "title": "Bilancia BOSU con bastone",
+        "description": "Superficie instabile e maneggevolezza del bastone per un equilibrio simile al ghiaccio.",
+        "benefits": [
+          "Migliora la propriocezione",
+          "Equilibrio nella posizione del treno",
+          "Collega mani e piedi",
+          "Costruisce la stabilità della caviglia"
+        ],
+        "instructions": [
+          "Stare sul BOSU con entrambi i piedi",
+          "Tenere il bastone, maneggiare leggermente il disco",
+          "Mantieni la posizione per 30-45 secondi",
+          "Riposa e ripeti 4-6 volte",
+          "Prova una gamba sola quando sei pronto"
+        ],
+        "tips": [
+          "Occhi in avanti, non in basso",
+          "Piegatura morbida del ginocchio",
+          "Muro vicino per sicurezza",
+          "Inizia senza disco"
+        ],
+        "equipment": "BOSU, mazza da hockey",
+        "calories": "70-100 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "81": {
+        "title": "Portata RDL a gamba singola",
+        "description": "Equilibrio più catena posteriore come nel pattinaggio su gamba singola in curva.",
+        "benefits": [
+          "Costruisce l'equilibrio su una gamba sola",
+          "Rafforza i muscoli posteriori della coscia e i glutei",
+          "Migliora il controllo dell'anca",
+          "Specifico per il pattinaggio"
+        ],
+        "instructions": [
+          "Stare su una gamba con un manubrio leggero",
+          "Piegati in avanti, gamba libera indietro",
+          "Tocca il pavimento o lo stinco",
+          "Ritorno in verticale",
+          "8-10 ripetizioni per gamba"
+        ],
+        "tips": [
+          "Concentra gli occhi su un punto",
+          "Muoviti lentamente",
+          "Mantieni i fianchi a livello",
+          "2-3 serie"
+        ],
+        "equipment": "Manubrio",
+        "calories": "120-170 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "82": {
+        "title": "Equilibrio della punta della gamba singola",
+        "description": "Semplice esercizio per la stabilità della caviglia e del piede nel pattinaggio.",
+        "benefits": [
+          "Rafforza i piedi",
+          "Migliora l'equilibrio",
+          "Esercizio quotidiano veloce",
+          "Può farlo ovunque"
+        ],
+        "instructions": [
+          "Stare su una gamba",
+          "Alzarsi sulle punte dei piedi",
+          "Mantieni la posizione per 15-20 secondi",
+          "Abbassare e cambiare le gambe",
+          "6-8 ripetizioni per gamba"
+        ],
+        "tips": [
+          "Utilizzare il supporto se necessario",
+          "Occhi avanti",
+          "Respira normalmente",
+          "A piedi nudi o con le scarpe"
+        ],
+        "equipment": "Nessuno",
+        "calories": "30–50 kcal",
+        "category": "Баланс",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "83": {
+        "title": "Il partner passa su una gamba",
+        "description": "Equilibrio e coordinazione nei passaggi come il movimento del gioco.",
+        "benefits": [
+          "Legami equilibrio e passaggio",
+          "Migliora la stabilità del core",
+          "I treni si concentrano",
+          "Esercitazione del partner"
+        ],
+        "instructions": [
+          "Stare su una gamba con il disco/palla",
+          "Partner a 3–4 m di distanza",
+          "Effettua passaggi precisi",
+          "30 secondi, cambia gamba",
+          "4 giri"
+        ],
+        "tips": [
+          "Ginocchia morbide",
+          "Passaggi nitidi",
+          "Non sacrificare l’equilibrio per il potere",
+          "Funziona anche il rimbalzo da muro"
+        ],
+        "equipment": "Disco/palla, partner",
+        "calories": "60–90 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "84": {
+        "title": "Affondo camminando con rotazione",
+        "description": "Equilibrio dinamico e rotazione per la preparazione al body check.",
+        "benefits": [
+          "Migliora l'equilibrio dinamico",
+          "Costruisce la rotazione dalle gambe",
+          "Rafforza le gambe",
+          "Funzionale per l'hockey"
+        ],
+        "instructions": [
+          "Effettua un affondo in avanti",
+          "Ruotare il busto verso la gamba anteriore",
+          "Ritorna e fai un passo con l'altra gamba",
+          "10 passi per gamba",
+          "2-3 serie"
+        ],
+        "tips": [
+          "Il ginocchio segue il piede",
+          "Rimani alto",
+          "Tieni la palla al petto (facoltativo).",
+          "Controlla il tempo"
+        ],
+        "equipment": "Nessuno",
+        "calories": "100-150 kcal",
+        "category": "Баланс",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "85": {
+        "title": "Gradini laterali con pedana scorrevole",
+        "description": "Simula il pattinaggio laterale con enfasi sull'equilibrio.",
+        "benefits": [
+          "Sviluppa potenza laterale",
+          "Migliora l'equilibrio laterale",
+          "Sviluppa gli adduttori",
+          "Ottimo per i difensori"
+        ],
+        "instructions": [
+          "Slider o slider per calzini",
+          "Passi laterali 20–30 secondi",
+          "Mantieni una posizione bassa",
+          "Riposare 60 secondi",
+          "6-8 serie"
+        ],
+        "tips": [
+          "Non stare in piedi",
+          "Mani in posizione pronta",
+          "Controllare la velocità",
+          "Utilizzare i paraurti della scheda"
+        ],
+        "equipment": "Scheda diapositiva",
+        "calories": "130–190 kcal",
+        "category": "Баланс",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "86": {
+        "title": "Salti sugli ostacoli",
+        "description": "Aumenta l'esplosività delle gambe per i primi passi e i salti di battaglia.",
+        "benefits": [
+          "Aumenta la potenza verticale e orizzontale",
+          "Migliora la reattività",
+          "Sviluppa la coordinazione",
+          "Trasferimenti all'accelerazione del ghiaccio"
+        ],
+        "instructions": [
+          "Posiziona gli ostacoli a una distanza di 60–90 cm l'uno dall'altro",
+          "Salta due piedi su ciascuno",
+          "Atterraggio morbido",
+          "6-8 ostacoli per serie",
+          "3-4 serie"
+        ],
+        "tips": [
+          "Ginocchia morbide all'atterraggio",
+          "Usa attivamente le braccia",
+          "Inizia con ostacoli bassi",
+          "Riposo completo tra le serie"
+        ],
+        "equipment": "Ostacoli o coni",
+        "calories": "140–200 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "87": {
+        "title": "Inizio sit-to-sprint",
+        "description": "Rimuove il pre-allungamento per allenare la pura esplosività del primo passo.",
+        "benefits": [
+          "Aumenta la potenza iniziale",
+          "Migliora la reazione",
+          "Allena l'estensione dell'anca",
+          "Seminatrice da campo semplice"
+        ],
+        "instructions": [
+          "Sedersi a terra, gambe in avanti",
+          "Sulla stecca alzarsi e scattare 10 m",
+          "8-10 ripetizioni",
+          "Riposa 60–90 secondi",
+          "Prima fai riscaldamento"
+        ],
+        "tips": [
+          "Non sporgersi prima del segnale",
+          "Alzarsi in modo esplosivo",
+          "Primi 3 gradini di potenza massima",
+          "Direzioni alternative"
+        ],
+        "equipment": "Corsia di 10 metri",
+        "calories": "100-150 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "88": {
+        "title": "Serie di salti in lungo",
+        "description": "Potenza orizzontale utile per battaglie a bordo e push-off.",
+        "benefits": [
+          "Costruisce potenza orizzontale",
+          "Migliora la coordinazione",
+          "Rafforza le gambe",
+          "Sessione breve"
+        ],
+        "instructions": [
+          "Salto in lungo da fermo",
+          "Atterraggio morbido",
+          "Subito dopo salta in avanti",
+          "5 salti consecutivi = 1 serie",
+          "4–5 serie con riposo"
+        ],
+        "tips": [
+          "Usa l'oscillazione delle braccia",
+          "Terreno equilibrato",
+          "Salta il flusso per saltare",
+          "Riscaldare le ginocchia"
+        ],
+        "equipment": "Spazio aperto",
+        "calories": "90–130 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Средний",
+        "duration": "10 мин"
+      },
+      "89": {
+        "title": "Colpo di palla medica",
+        "description": "Lancio esplosivo verso il basso per una potenza di contatto totale del corpo.",
+        "benefits": [
+          "Costruisce un nucleo esplosivo",
+          "Alta intensità rapidamente",
+          "Collega gambe-nucleo-braccia",
+          "Ottimo rilascio dello stress"
+        ],
+        "instructions": [
+          "Sollevare la palla medica sopra la testa",
+          "Sbattere sul pavimento con tutta la forza",
+          "Raccogli e ripeti",
+          "10-12 ripetizioni",
+          "3 set"
+        ],
+        "tips": [
+          "Usa le gambe e il core",
+          "Colonna vertebrale neutra durante il sollevamento",
+          "Guarda il rimbalzo",
+          "Utilizzare una palla da 4–8 kg"
+        ],
+        "equipment": "Palla medica",
+        "calories": "110–160 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "90": {
+        "title": "Spinta della slitta",
+        "description": "Guida orizzontale pesante come le massime partenze da fermo.",
+        "benefits": [
+          "Massima spinta delle gambe",
+          "Carico a basso impatto",
+          "Costruisce forza mentale",
+          "Ottimo per gli attaccanti potenti"
+        ],
+        "instructions": [
+          "Posizione bassa dietro la slitta",
+          "Spingere per 15–20 m",
+          "Riposo completo 2 min",
+          "4-6 spinte",
+          "Prima il riscaldamento congiunto"
+        ],
+        "tips": [
+          "Stai basso",
+          "Passi brevi e potenti",
+          "Non alzarti presto",
+          "Inizia leggero al caricamento"
+        ],
+        "equipment": "Slitta da caccia",
+        "calories": "180–260 kcal",
+        "category": "Взрывная скорость",
+        "difficulty": "Продвинутый",
+        "duration": "15 мин"
+      },
+      "91": {
+        "title": "AirBike costante 10 minuti",
+        "description": "Base aerobica per turni lunghi e condizionamento fuori stagione.",
+        "benefits": [
+          "Costruisce la resistenza aerobica",
+          "Adatto alle articolazioni",
+          "Controllo della frequenza cardiaca",
+          "Sessione veloce fuori dal ghiaccio"
+        ],
+        "instructions": [
+          "5 minuti di riscaldamento",
+          "10 minuti al 65–70% di sforzo",
+          "Giri/min costanti",
+          "5 minuti di raffreddamento",
+          "Monitorare la respirazione"
+        ],
+        "tips": [
+          "Stai fuori dalla zona anaerobica",
+          "Postura stabile",
+          "Idrato",
+          "2–3 volte a settimana"
+        ],
+        "equipment": "AirBike",
+        "calories": "180–250 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "92": {
+        "title": "Intervalli di vogatore",
+        "description": "Cardio per tutto il corpo senza impatto per la resistenza del tronco e delle gambe.",
+        "benefits": [
+          "Condizionamento totale del corpo",
+          "Migliora la postura nel remare",
+          "Costruisce presa e nucleo",
+          "Alternativa alla corsa"
+        ],
+        "instructions": [
+          "500 m difficile / 1 min facile",
+          "6-8 giri",
+          "Guida dalle gambe e dal core",
+          "5 minuti di riscaldamento",
+          "Stretching di raffreddamento"
+        ],
+        "tips": [
+          "Dorso neutro",
+          "Gomiti ai fianchi",
+          "Anche a ritmo frazionato",
+          "Regolare saggiamente l'ammortizzatore"
+        ],
+        "equipment": "Canottaggio erg",
+        "calories": "250–340 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "25 мин"
+      },
+      "93": {
+        "title": "Salti continui dello skater",
+        "description": "Salti laterali ritmici per il condizionamento delle gambe e laterale.",
+        "benefits": [
+          "Costruisce la resistenza laterale",
+          "Rafforza le gambe",
+          "Imita i cambiamenti di direzione",
+          "Trapano compatto"
+        ],
+        "instructions": [
+          "Salta da un lato all'altro su una gamba o sull'altra",
+          "Braccia come pattinare",
+          "30 secondi di lavoro / 30 secondi di riposo",
+          "10 giri",
+          "Atterraggi morbidi"
+        ],
+        "tips": [
+          "Il ginocchio segue il piede",
+          "Petto in su",
+          "Controlla la distanza del salto",
+          "Prima fai riscaldamento"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "130–190 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "94": {
+        "title": "Allenamento a circuito 45/15",
+        "description": "Circuito a quattro stazioni per il condizionamento generale dell'hockey.",
+        "benefits": [
+          "Carico di lavoro per tutto il corpo",
+          "Efficiente in termini di tempo",
+          "Sviluppa la capacità lavorativa",
+          "Palestra adattabile"
+        ],
+        "instructions": [
+          "Burpees, alpinisti, jump squat, flessioni",
+          "Lavoro di 45 secondi / transizione di 15 secondi",
+          "4 mosse × 4 round",
+          "2 minuti di riposo tra i round",
+          "Riscaldarsi e raffreddarsi"
+        ],
+        "tips": [
+          "Adattati al tuo livello",
+          "Forma rispetto alla velocità",
+          "Rimani idratato",
+          "Da evitare il giorno della partita"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "280–380 kcal",
+        "category": "Выносливость",
+        "difficulty": "Продвинутый",
+        "duration": "30 мин"
+      },
+      "95": {
+        "title": "Percorsi a ostacoli bassi",
+        "description": "Cardio più coordinazione con passi veloci come il pattinaggio duro.",
+        "benefits": [
+          "Migliora la cadenza",
+          "Costruisce la coordinazione",
+          "Aumenta la capacità aerobica",
+          "Varia il lavoro di corsa"
+        ],
+        "instructions": [
+          "6–8 ostacoli bassi su 20 m",
+          "Corri con le ginocchia alte",
+          "6 passaggi",
+          "Riposare 90 secondi",
+          "3-4 serie"
+        ],
+        "tips": [
+          "Non tagliare gli ostacoli",
+          "Piccoli passi veloci",
+          "Braccia attive",
+          "Riscaldare le articolazioni"
+        ],
+        "equipment": "Mini ostacoli",
+        "calories": "200–280 kcal",
+        "category": "Выносливость",
+        "difficulty": "Средний",
+        "duration": "20 мин"
+      },
+      "96": {
+        "title": "Piedi veloci a scala",
+        "description": "Base per piedi veloci per schivate e curve strette.",
+        "benefits": [
+          "Migliora la velocità del piede",
+          "Costruisce la coordinazione",
+          "Aumenta la reazione",
+          "Riscaldamento pre-ghiaccio"
+        ],
+        "instructions": [
+          "Entrata-uscita tramite scala",
+          "30 secondi massimo / 30 secondi riposo",
+          "8 giri",
+          "Varia i modelli ogni due giri",
+          "Prima un leggero riscaldamento"
+        ],
+        "tips": [
+          "Occhi in alto",
+          "Brevi passi",
+          "Mani atletiche pronte",
+          "Non saltare i pioli"
+        ],
+        "equipment": "Scala di agilità",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "97": {
+        "title": "Agilità nel trapano a T",
+        "description": "Test T classico: sprint, mischia e marcia indietro come sul ghiaccio.",
+        "benefits": [
+          "Pacchetto agilità completo",
+          "Treni in tutte le direzioni",
+          "Progresso tracciabile",
+          "Per i pattinatori"
+        ],
+        "instructions": [
+          "Scatta 10 m in avanti",
+          "Mescola 5 m a sinistra e a destra",
+          "Fare marcia indietro di 10 m per iniziare",
+          "3-5 ripetizioni",
+          "Riposare 90 secondi"
+        ],
+        "tips": [
+          "Rimani basso nello shuffle",
+          "Non incrociare i piedi",
+          "Tocca i coni",
+          "Registra i tuoi tempi"
+        ],
+        "equipment": "Coni",
+        "calories": "100-150 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "98": {
+        "title": "Puck figura-8 trapano",
+        "description": "Stickhandle una figura 8 che collega le mani e il gioco di gambe.",
+        "benefits": [
+          "Migliora la gestione del bastone",
+          "Collega mani e piedi",
+          "Allena la visione periferica",
+          "A misura di casa"
+        ],
+        "instructions": [
+          "Due coni distanti 2 m l'uno dall'altro",
+          "Disco a forma di 8 attorno ai coni",
+          "Velocità massima 30 secondi",
+          "Riposare 30 secondi",
+          "10 giri"
+        ],
+        "tips": [
+          "Testa alta",
+          "Mani morbide",
+          "Piedi veloci",
+          "Cambia direzione ogni 5 round"
+        ],
+        "equipment": "Disco, 2 coni, bastone",
+        "calories": "90–130 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "99": {
+        "title": "Richiami a cono reattivi",
+        "description": "Il partner chiama un cono: reazione e primo passo come letture nel gioco.",
+        "benefits": [
+          "Allena la reazione del gioco",
+          "Migliora la velocità cognitiva",
+          "Costruisce il primo passo",
+          "Esercitazione del partner"
+        ],
+        "instructions": [
+          "4 coni in 3 mq",
+          "Il partner chiama colore/numero",
+          "Sprint al cono",
+          "Tocca e ritorna",
+          "20 reazioni"
+        ],
+        "tips": [
+          "Rimani onesto, non indovinare presto",
+          "Posizione bassa",
+          "Primo passo esplosivo",
+          "Variare la disposizione"
+        ],
+        "equipment": "4 coni, compagno",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Продвинутый",
+        "duration": "12 мин"
+      },
+      "100": {
+        "title": "Passi strascicati laterali",
+        "description": "Strascichi laterali nella posizione dell'hockey che imitano il pattinaggio laterale.",
+        "benefits": [
+          "Sviluppa la rapidità laterale",
+          "Rafforza gli abduttori dell'anca",
+          "Migliora la posizione",
+          "Riscaldamento pre-ghiaccio"
+        ],
+        "instructions": [
+          "5 m mescola a destra e a sinistra",
+          "Non incrociare i piedi",
+          "30 secondi / 30 secondi di riposo",
+          "8 giri",
+          "Mani sul bastone immaginario"
+        ],
+        "tips": [
+          "Stai basso",
+          "Spingere la gamba esterna",
+          "Petto in avanti",
+          "Contatti rapidi"
+        ],
+        "equipment": "Coni o linee",
+        "calories": "80-120 kcal",
+        "category": "Ловкость",
+        "difficulty": "Средний",
+        "duration": "12 мин"
+      },
+      "101": {
+        "title": "Apertura dinamica dell'anca",
+        "description": "Riscaldamento per la mobilità dell'anca per una posizione profonda nell'hockey.",
+        "benefits": [
+          "Migliora la mobilità dell'anca",
+          "Riduce il rischio di lesioni all'inguine",
+          "Si prepara per il pattinaggio",
+          "Routine veloce"
+        ],
+        "instructions": [
+          "Oscillazioni della gamba avanti-dietro 10 ciascuno",
+          "La gamba oscilla lateralmente 10 ciascuno",
+          "Squat profondo, mantieni la posizione per 30 secondi",
+          "Cerchi dell'anca 10 in ogni direzione",
+          "Camminare con gli abbracci al ginocchio per 10 m"
+        ],
+        "tips": [
+          "Gamma controllata",
+          "Nessun dolore",
+          "Respira profondamente",
+          "Prima di ogni sessione"
+        ],
+        "equipment": "Nessuno",
+        "calories": "40–60 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "102": {
+        "title": "Il tratto più grande del mondo",
+        "description": "Allungamento dinamico che colpisce fianchi, colonna vertebrale toracica e muscoli posteriori della coscia.",
+        "benefits": [
+          "Mobilità di tutto il corpo",
+          "Efficiente in termini di tempo",
+          "Prepara tutto il corpo",
+          "Riscaldamento professionale comune"
+        ],
+        "instructions": [
+          "Entra in affondo",
+          "Gomito verso il basso all'interno del piede",
+          "Rotazione toracica del braccio in alto",
+          "Raddrizzare la gamba anteriore per il tendine del ginocchio",
+          "5 ripetizioni per lato"
+        ],
+        "tips": [
+          "Muoviti lentamente",
+          "Nessun rimbalzo",
+          "Traccia il ginocchio anteriore",
+          "Uguali entrambi i lati"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "50–70 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "103": {
+        "title": "Strappi della fascia",
+        "description": "Attiva la parte superiore della schiena e le spalle prima del tiro e del contatto.",
+        "benefits": [
+          "Attiva i deltoidi posteriori e i romboidi",
+          "Migliora la postura",
+          "Riscalda le spalle",
+          "Prevenzione degli infortuni"
+        ],
+        "instructions": [
+          "Tenere la fascia all'altezza del petto",
+          "Braccia tese",
+          "Separare le scapole",
+          "15-20 ripetizioni",
+          "2-3 serie"
+        ],
+        "tips": [
+          "Nessuna alzata di spalle",
+          "Ritorno controllato",
+          "Banda luminosa per iniziare",
+          "Prima del ghiaccio o della palestra"
+        ],
+        "equipment": "Fascia di resistenza",
+        "calories": "30–50 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "104": {
+        "title": "Ginocchia alte + calci di testa",
+        "description": "Riscaldamento dinamico delle gambe e aumento della frequenza cardiaca prima del ghiaccio.",
+        "benefits": [
+          "Aumenta la frequenza cardiaca",
+          "Riscalda quadricipiti e muscoli posteriori della coscia",
+          "Migliora la coordinazione",
+          "Effetto rapido"
+        ],
+        "instructions": [
+          "Ginocchia alte 20 m",
+          "Calci di testa da 20 m",
+          "20 m saltando",
+          "Ripeti 3-4 volte",
+          "Facile corsa in mezzo"
+        ],
+        "tips": [
+          "Rimani sull'avampiede",
+          "Braccia attive",
+          "Costruisci il ritmo gradualmente",
+          "Non correre a freddo"
+        ],
+        "equipment": "Spazio di 20 mq",
+        "calories": "60–90 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "105": {
+        "title": "Oscillazioni delle braccia + riscaldamento con il bastone",
+        "description": "Riscaldamento delle spalle e utilizzo leggero del bastone prima del ghiaccio.",
+        "benefits": [
+          "Mobilita le spalle",
+          "Attiva la cuffia dei rotatori",
+          "Collega la parte superiore del corpo per attaccarla",
+          "Specifico per l'hockey"
+        ],
+        "instructions": [
+          "Il braccio esegue 10 giri in ogni direzione",
+          "Oscillazioni incrociate 10",
+          "Stickhandle da lento a veloce 60 sec",
+          "Rotoli di polso con il bastone 20",
+          "Movimento del tiro leggero x10"
+        ],
+        "tips": [
+          "Velocità di avanzamento",
+          "Entrambe le mani",
+          "Nessuna portata forzata",
+          "Ogni sessione sul ghiaccio"
+        ],
+        "equipment": "Bastone, disco",
+        "calories": "50–80 kcal",
+        "category": "Разминка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "106": {
+        "title": "Allungamento dei flessori dell'anca in ginocchio",
+        "description": "Allungamento dei flessori dell'anca per contrastare la postura del pattinaggio.",
+        "benefits": [
+          "Riduce la tensione dell'anca",
+          "Può migliorare il passo",
+          "Aiuta la postura",
+          "Dopo il ghiaccio o la palestra"
+        ],
+        "instructions": [
+          "Posizione di affondo in ginocchio",
+          "Contrai i glutei indietro",
+          "Torso alto",
+          "Tenere premuto per 30–45 secondi",
+          "2–3 volte per gamba"
+        ],
+        "tips": [
+          "Evitare l'arco lombare",
+          "Respira nell'allungamento",
+          "Ginocchio anteriore sopra la caviglia",
+          "Ogni giorno, se possibile"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "107": {
+        "title": "Rotazione dell'anca 90/90",
+        "description": "Mobilità dell'anca per curve e accovacciamento profondo sui pattini.",
+        "benefits": [
+          "Migliora la rotazione dell'anca",
+          "Riduce il rischio di stiramento all'inguine",
+          "Lavoro di recupero tranquillo",
+          "Amichevole post partita"
+        ],
+        "instructions": [
+          "Sedersi in posizione 90/90",
+          "Ruota le ginocchia da un lato all'altro",
+          "Mani dietro per supporto",
+          "10 ripetizioni lente in ogni direzione",
+          "Tenere premuto per 20 secondi"
+        ],
+        "tips": [
+          "Nessun intervallo forzato",
+          "Petto alto",
+          "Entrambi i fianchi abbassati, se possibile",
+          "Usa il respiro"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "30–50 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "108": {
+        "title": "Stretching per la rotazione toracica",
+        "description": "Mobilità toracica per rotazione e postura del tiro.",
+        "benefits": [
+          "Migliora la rotazione della colonna vertebrale a T",
+          "Scarica la parte bassa della schiena",
+          "Aiuta la meccanica del tiro",
+          "Esercizio quotidiano veloce"
+        ],
+        "instructions": [
+          "Posizione quadrupede",
+          "Mano dietro la testa",
+          "Ruotare il gomito verso il soffitto",
+          "10 ripetizioni per lato",
+          "Pausa 2 secondi in alto"
+        ],
+        "tips": [
+          "I fianchi rimangono squadrati",
+          "Espira durante la rotazione",
+          "Nessun dolore alla colonna vertebrale",
+          "Muoviti lentamente"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "30–45 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "109": {
+        "title": "Allungamento del polpaccio sul muro",
+        "description": "Vitelli e Achille spesso sovraccarichi nei pattini.",
+        "benefits": [
+          "Riduce la tensione del polpaccio",
+          "Migliora la dorsiflessione della caviglia",
+          "Prevenzione della stecca tibiale",
+          "Dopo ogni sessione"
+        ],
+        "instructions": [
+          "Le mani sul muro",
+          "Gamba posteriore dritta, tallone abbassato",
+          "Tenere premuto per 30 secondi",
+          "Piegare il ginocchio per il soleo",
+          "2–3 giri per gamba"
+        ],
+        "tips": [
+          "Tallone sul pavimento",
+          "Fianchi squadrati",
+          "Nessun rimbalzo",
+          "Entrambe le gambe"
+        ],
+        "equipment": "Parete",
+        "calories": "25–40 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "8 мин"
+      },
+      "110": {
+        "title": "Allungamento delle spalle incrociate",
+        "description": "Allungamento della spalla posteriore dopo la ripresa del volume.",
+        "benefits": [
+          "Riduce la rigidità delle spalle",
+          "Aiuta la distanza di tiro",
+          "Allungamento rapido",
+          "Manutenzione quotidiana"
+        ],
+        "instructions": [
+          "Tirare il braccio sul petto",
+          "Tieni il gomito con l'altra mano",
+          "30 secondi per braccio",
+          "Ripeti 2-3 volte",
+          "Collo rilassato"
+        ],
+        "tips": [
+          "Non alzare le spalle",
+          "Solo trazione delicata",
+          "Espira e rilassati",
+          "Dopo il ghiaccio"
+        ],
+        "equipment": "Nessuno",
+        "calories": "20–35 kcal",
+        "category": "Растяжка",
+        "difficulty": "Начинающий",
+        "duration": "6 мин"
+      },
+      "111": {
+        "title": "Respirazione diaframmatica",
+        "description": "Respirazione profonda per il recupero parasimpatico dopo la partita.",
+        "benefits": [
+          "Riduce lo stress",
+          "Supporta il recupero",
+          "Può migliorare il sonno",
+          "Spogliatoio amichevole"
+        ],
+        "instructions": [
+          "Sdraiati o siediti comodamente",
+          "Mano sulla pancia",
+          "Inspira per 4 secondi dal naso",
+          "Espirare per 6 secondi con la bocca",
+          "5 minuti continui"
+        ],
+        "tips": [
+          "La pancia e non il petto si solleva",
+          "Spazio tranquillo",
+          "Abitudine quotidiana",
+          "Dopo le partite in ritardo"
+        ],
+        "equipment": "Nessuno",
+        "calories": "15–25 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "5 мин"
+      },
+      "112": {
+        "title": "Gambe al muro",
+        "description": "Ritorno venoso e rilassamento delle gambe dopo partite pesanti.",
+        "benefits": [
+          "Può ridurre il gonfiore delle gambe",
+          "Promuove il rilassamento",
+          "Recupero passivo",
+          "Dopo i giochi di viaggio"
+        ],
+        "instructions": [
+          "Fianchi vicino al muro sdraiati",
+          "Gambe verticali a parete",
+          "Braccia rilassate",
+          "Mantieni la posizione per 8-10 minuti",
+          "Respirazione lenta"
+        ],
+        "tips": [
+          "Superficie confortevole",
+          "Scollegare dal telefono",
+          "Musica calma opzionale",
+          "Meglio la sera"
+        ],
+        "equipment": "Muro, tappetino",
+        "calories": "20-30 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
+      },
+      "113": {
+        "title": "Quadricipiti e muscoli posteriori della coscia con rotolo di schiuma",
+        "description": "Rilascio miofasciale per le gambe dopo un carico pesante.",
+        "benefits": [
+          "Riduce il dolore",
+          "Migliora la qualità dei tessuti",
+          "Recupero più rapido",
+          "Automedicazione"
+        ],
+        "instructions": [
+          "Rollare i quadricipiti per 60 secondi ciascuno",
+          "Arrotolare i muscoli posteriori della coscia per 60 secondi ciascuno",
+          "Mettere in pausa i punti dolenti per 20 secondi",
+          "Solo banda IT leggera",
+          "Idratarsi dopo"
+        ],
+        "tips": [
+          "Evitare le articolazioni",
+          "Respira attraverso i punti stretti",
+          "Pressione moderata",
+          "Non prima del ghiaccio"
+        ],
+        "equipment": "Rullo di schiuma",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Средний",
+        "duration": "15 мин"
+      },
+      "114": {
+        "title": "Flusso di mobilità di anche e caviglie",
+        "description": "Mobilità delicata durante il riposo per mantenere la libertà di movimento.",
+        "benefits": [
+          "Mantiene la mobilità",
+          "Bassa fatica",
+          "Recupero attivo",
+          "Prevenzione degli infortuni"
+        ],
+        "instructions": [
+          "Cerchi alla caviglia 10 ciascuno",
+          "Auto alla moda 5 a tratta",
+          "Mucca-gatto 10 ripetizioni",
+          "Posa del bambino 60 sec",
+          "2 turni"
+        ],
+        "tips": [
+          "Gamma senza dolore",
+          "Lento e controllato",
+          "Giorno libero o mattina",
+          "Aggiungi la respirazione"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "40–60 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "12 мин"
+      },
+      "115": {
+        "title": "Stretching e respiro per preparare il sonno",
+        "description": "Stretching leggero e respirazione prima di andare a letto per il recupero notturno.",
+        "benefits": [
+          "Supporta l'inizio del sonno",
+          "Rilassa il sistema nervoso",
+          "Recupero durante il sonno",
+          "Rituale serale"
+        ],
+        "instructions": [
+          "Allungamento dei tendini del ginocchio di 30 secondi ciascuno",
+          "Posa del bambino 60 sec",
+          "Torsione supina per 30 secondi ciascuna",
+          "Respirazione box 4-4-4-4 per 3 min",
+          "Stanza buia e silenziosa"
+        ],
+        "tips": [
+          "Nessuna schermata dopo",
+          "Orario di andare a dormire coerente",
+          "Stanza fresca",
+          "Prendi l'abitudine"
+        ],
+        "equipment": "Tappetino per esercizi",
+        "calories": "25–40 kcal",
+        "category": "Восстановление",
+        "difficulty": "Начинающий",
+        "duration": "10 мин"
       }
     },
     "difficulties": {
@@ -1735,6 +3135,8 @@
     "codeSentToEmailMessage": "Codice inviato a {email}",
     "userNotFound": "Utente non trovato",
     "userNotFoundMessage": "Non esiste un account con questo numero di telefono. Registrati.",
+    "networkError": "Problema di connessione",
+    "networkErrorMessage": "Impossibile raggiungere il server. Controlla la connessione internet e riprova.",
     "errorSendingCode": "Errore",
     "errorSendingCodeMessage": "Impossibile inviare il codice. Controlla il tuo numero di telefono e la connessione Internet.",
     "errorResendingCode": "Errore",
@@ -1918,6 +3320,8 @@
     "rightShort": "P",
     "startedHockey": "Nell'hockey con",
     "noFriendsYet": "{name} non ha ancora amici",
+    "inviteYourTeam": "Invita la tua squadra",
+    "inviteTeamMessage": "Sono su HockeyStars, l'app per giocatori di hockey. Unisciti a me:",
     "beFirstToAdd": "Sii il primo ad aggiungere {name} come amico",
     "writeMessage": "Scrivi un messaggio",
     "edit": "Modificare",
@@ -2374,9 +3778,17 @@
     "weightFrom": "Peso",
     "all": "Tutto",
     "noPlayersFound": "Nessun giocatore trovato",
+    "newcomers": "Nuovi arrivati",
+    "topByPoints": "Top per punti",
     "left": "Sinistra",
     "right": "Giusto",
-    "resetFilters": "Reimposta filtri"
+    "resetFilters": "Reimposta filtri",
+    "topBySV": "Top SV%",
+    "shareRating": "Condividi classifica",
+    "shareRatingFooter": "hockeystars.com",
+    "ratingPointsLabel": "punti",
+    "allCountries": "Tutti i paesi",
+    "allYears": "Tutti gli anni"
   },
   "messages": {
     "title": "Messaggi",
@@ -2830,6 +4242,23 @@
     "physicalDataUpdate": "Aggiornamento dati fisici",
     "friendRequest": "Richiesta di amicizia",
     "newFriendship": "Nuova amicizia",
-    "speedRecord": "Nuovo record di velocità"
+    "speedRecord": "Nuovo record di velocità",
+    "gameFirstPlace": "Campione del gioco",
+    "quizFirstPlace": "Hockey Star"
+  },
+  "videoUploadHint": "Max 20 secondi per video, fino a 10 video",
+  "gameFirstPlaceNotification": {
+    "title": "Campione del gioco",
+    "message": "{playerName} ha raggiunto il 1° posto"
+  },
+  "quizFirstPlaceNotification": {
+    "title": "Hockey Star",
+    "message": "{playerName} ha vinto {prize}"
+  },
+  "tabs": {
+    "chat": "Chat",
+    "feed": "Feed",
+    "scout": "Scout",
+    "skills": "Skills"
   }
 }

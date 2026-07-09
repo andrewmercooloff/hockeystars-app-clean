@@ -1,13 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, StyleSheet, Dimensions, ImageBackground, Image as RNImage, Text, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, Animated as RNAnimated } from 'react-native';
+import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Puck from '../components/Puck';
+import Puck, { PUCK_SCOUT_LOGO } from '../components/Puck';
 import { useUser } from '../contexts/UserContext';
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
@@ -18,58 +16,34 @@ import {
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
 } from '../utils/playerStorage';
-import { preloadPlayerAvatars, updateAvatarGlobally } from '../utils/AvatarCache';
+import { preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import IceRinkMarkings from '../components/IceRinkMarkings';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
-import * as Device from 'expo-device';
-import { useLanguage } from '../contexts/LanguageContext';
+import { getPerformanceLevel, isLowEndAndroid, startupPhysicsDeferMs, startupRenderGraceMs } from '../utils/devicePerformance';
 import PuckGame from '../components/PuckGame';
+import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
+import CachedBackground from '../components/CachedBackground';
+import { ICE_BACKGROUND } from '../utils/iceBackground';
+import {
+  getTopSeasonLeaderRanks,
+  getPuckSizeForLeader,
+  puckCollisionMinDistance,
+  PUCK_BASE_SIZE,
+  getScaledPuckBaseSize,
+  type LeaderRank,
+} from '../utils/leaderDisplay';
 
 // Размер шайбы
-const PUCK_SIZE = 70;
+const PUCK_SIZE = PUCK_BASE_SIZE;
 
 /** Android: ~30 % мягче движение и отскоки относительно iPhone (подстройте 0.75–0.85). */
 const ANDROID_PUCK_SOFT = Platform.OS === 'android' ? 0.7 : 1;
 const GAME_PUCK_ID = '__game__';
-const LED_TEXTURE = require('../assets/images/led.jpg');
-
-// Определение уровня производительности устройства
-// ТОЛЬКО для FPS - скорость шайб теперь одинаковая для всех устройств
-const getPerformanceLevel = (): 'high' | 'medium' | 'low' => {
-  const yearClass = Device.deviceYearClass ?? null;
-  const totalMemory = Device.totalMemory ?? null;
-
-  if (Platform.OS === 'ios') {
-    if (yearClass && yearClass < 2020) return 'medium';
-    return 'high';
-  }
-  
-  if (Platform.OS === 'android') {
-    // Эмуляторы (AVD, часть окружений) сильно медленнее реального железа в RN.
-    if (Device.isDevice === false) return 'low';
-
-    const memoryInGb = totalMemory ? totalMemory / (1024 ** 3) : null;
-    
-    if (yearClass && yearClass >= 2023) return 'high';
-
-    // ≤4 ГБ или до 2020 — low (Redmi 9, Galaxy A12 и т.п.)
-    if ((memoryInGb && memoryInGb <= 4) || (yearClass && yearClass <= 2020)) {
-      return 'low';
-    }
-
-    // 2021-2022, >4 ГБ — medium
-    if (yearClass && yearClass < 2023) return 'medium';
-
-    return 'high';
-  }
-  
-  if (Platform.OS === 'web') return 'high';
-  return 'high';
-};
+const QUIZ_GAME_PUCK_ID = '__quiz_game__';
 
 // Упрощенная версия usePuckCollisionSystem для тестового экрана
 // boundsFromPlayfieldLayout: width/height пришли с onLayout поля (льда) — без повторного вычета таб-бара
@@ -79,9 +53,18 @@ const usePuckCollisionSystem = (
   currentScreen?: string,
   screenWidth?: number,
   screenHeight?: number,
-  boundsFromPlayfieldLayout?: boolean
+  boundsFromPlayfieldLayout?: boolean,
+  physicsActive = true,
+  leaderRanks?: Map<string, LeaderRank>,
+  basePuckSize?: number,
 ) => {
-  const puckSize = 70;
+  const puckSize = basePuckSize ?? PUCK_BASE_SIZE;
+  const leaderRanksRef = useRef(leaderRanks);
+  leaderRanksRef.current = leaderRanks;
+  const sizeForPlayer = useCallback(
+    (playerId: string) => getPuckSizeForLeader(puckSize, leaderRanksRef.current?.get(playerId)),
+    [puckSize]
+  );
   const [puckPositions, setPuckPositions] = useState<PuckPosition[]>([]);
   const [appIsActive, setAppIsActive] = useState(true);
   const collisionDetectedRef = useRef(false);
@@ -111,7 +94,7 @@ const usePuckCollisionSystem = (
   // Защита от переинициализации в первые секунды после загрузки
   const initializationTimeRef = useRef<number>(0);
   // ОПТИМИЗАЦИЯ: Уменьшен период защиты с 6000ms до 3000ms для быстрого старта анимации
-  const INITIALIZATION_PROTECTION_MS = 1200; // Короче — меньше «ступенек» при старте; защита от частых пересозданий при фильтрах
+  const INITIALIZATION_PROTECTION_MS = Platform.OS === 'ios' ? 2000 : 1200;
   
   // Определяем уровень производительности
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
@@ -149,7 +132,8 @@ const usePuckCollisionSystem = (
         break;
       case 'low':
       default:
-        fps = 18;
+        // На слабых Android чуть выше частота + интерполяция между шагами = меньше дёрганий
+        fps = Platform.OS === 'android' ? 24 : 16;
         break;
     }
     return {
@@ -178,10 +162,23 @@ const usePuckCollisionSystem = (
 
   // В режиме покоя реже считаем физику: на low — ещё реже
   const idleFrameSkip = useMemo(() => {
-    if (performanceLevel === 'low') return 10;
+    if (performanceLevel === 'low') return 14;
     if (performanceLevel === 'medium') return 6;
     return 3;
   }, [performanceLevel]);
+
+  const lowPhysicsTickRef = useRef(0);
+  const physicsActiveRef = useRef(physicsActive);
+  physicsActiveRef.current = physicsActive;
+  const renderGraceUntilRef = useRef(0);
+
+  useEffect(() => {
+    if (physicsActive) {
+      lastTimeRef.current = 0;
+      accumulatorRef.current = 0;
+      lowPhysicsTickRef.current = 0;
+    }
+  }, [physicsActive]);
 
   // Получаем безопасные зоны для учета системных элементов
   const insets = useSafeAreaInsets();
@@ -272,7 +269,6 @@ const usePuckCollisionSystem = (
           sh.y.value = p.y;
         }
       });
-      setPuckPositions(clamped);
       const newMap = new Map<string, PuckPosition>();
       clamped.forEach((p) => newMap.set(p.id, p));
       renderPositionsMapRef.current = newMap;
@@ -285,12 +281,10 @@ const usePuckCollisionSystem = (
 
     // Определяем функцию генерации позиции здесь, чтобы она была доступна ниже
     // Единая скорость шайб для всех устройств (как на iOS)
-    const baseSpeedMultiplier = 0.49 * ANDROID_PUCK_SOFT;
+    const baseSpeedMultiplier = (performanceLevel === 'low' ? 0.36 : 0.49) * ANDROID_PUCK_SOFT;
     
     const generatePosition = (existingPositions: PuckPosition[]): PuckPosition => {
-    const minDistance = puckSize;
-    const minDistSq = minDistance * minDistance;
-      const maxAttempts = 100;
+      const maxAttempts = performanceLevel === 'low' ? 20 : performanceLevel === 'medium' ? 50 : 100;
       let x = boundaries.left;
       let y = boundaries.top;
       let attempts = 0;
@@ -303,7 +297,8 @@ const usePuckCollisionSystem = (
         validPosition = existingPositions.every(pos => {
           const dx = x - pos.x;
           const dy = y - pos.y;
-          return (dx * dx + dy * dy) >= minDistSq;
+          const minDist = puckCollisionMinDistance(puckSize, pos.size);
+          return (dx * dx + dy * dy) >= minDist * minDist;
         });
         
         attempts++;
@@ -403,6 +398,7 @@ const usePuckCollisionSystem = (
               if (!existingIds.has(playerId)) {
                 const pos = generatePosition(newPositions);
                 pos.id = playerId;
+                pos.size = sizeForPlayer(playerId);
                 newPositions.push(pos);
               }
             });
@@ -460,6 +456,7 @@ const usePuckCollisionSystem = (
         players.forEach(player => {
           const pos = generatePosition(collisionPositions);
           pos.id = player.id;
+          pos.size = sizeForPlayer(player.id);
           positions.push(pos);
           collisionPositions.push(pos);
           
@@ -525,6 +522,7 @@ const usePuckCollisionSystem = (
           } else {
             const newPos = generatePosition(collisionPositions);
             newPos.id = player.id;
+            newPos.size = sizeForPlayer(player.id);
             newPositions.push(newPos);
             collisionPositions.push(newPos);
             changed = true;
@@ -628,10 +626,9 @@ const usePuckCollisionSystem = (
           id: player.id,
           x: base.x,
           y: base.y,
-          // Небольшая скорость, чтобы шайбы не «залипали», но и не разлетались слишком сильно
           vx: (Math.random() - 0.5) * baseSpeedMultiplier,
           vy: (Math.random() - 0.5) * baseSpeedMultiplier,
-          size: puckSize,
+          size: sizeForPlayer(player.id),
           isDragging: false,
         };
         positions.push(pos);
@@ -653,6 +650,7 @@ const usePuckCollisionSystem = (
     players.forEach(player => {
       const pos = generatePosition(positions);
       pos.id = player.id;
+      pos.size = sizeForPlayer(player.id);
       positions.push(pos);
 
       let shared = sharedPositionsRef.current.get(player.id);
@@ -685,6 +683,7 @@ const usePuckCollisionSystem = (
     // Запоминаем время инициализации для защиты от переинициализации
     if (initializationTimeRef.current === 0) {
       initializationTimeRef.current = Date.now();
+      renderGraceUntilRef.current = Date.now() + startupRenderGraceMs();
       console.log(`🚀 [ANIMATION] usePuckCollisionSystem: позиции инициализированы для ${positions.length} шайб`);
     } else {
       console.log(`🔄 [ANIMATION] usePuckCollisionSystem: позиции ПЕРЕИНИЦИАЛИЗИРОВАНЫ для ${positions.length} шайб`);
@@ -728,8 +727,18 @@ const usePuckCollisionSystem = (
       // Иначе на Android (часто 60 шагов/с) шайбы медленнее, чем на iPhone (80), и главная «тормознее» игры.
       const SPEED_MULTIPLIER = 1.2;
       const REFERENCE_HOME_FPS = 80;
-      x += vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
-      y += vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      let moveX = vx * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      let moveY = vy * FIXED_DT * REFERENCE_HOME_FPS * SPEED_MULTIPLIER * ANDROID_PUCK_SOFT;
+      const maxMovePerStep =
+        pos.size * (Platform.OS === 'android' && performanceLevel === 'low' ? 0.35 : 0.55);
+      const moveLen = Math.hypot(moveX, moveY);
+      if (moveLen > maxMovePerStep) {
+        const scale = maxMovePerStep / moveLen;
+        moveX *= scale;
+        moveY *= scale;
+      }
+      x += moveX;
+      y += moveY;
 
       // Границы
       if (x <= boundaries.left) {
@@ -749,28 +758,35 @@ const usePuckCollisionSystem = (
       }
 
       // Проверка коллизий - оптимизирована для слабых Android устройств
-      // Добавляем небольшой зазор (2px) между шайбами, чтобы избежать "примагничивания"
-      const minDistance = puckSize;
-      const minDistSq = minDistance * minDistance;
+      const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
 
       // Только физика столкновений для автоматических шайб
       if (!pos.isDragging) {
-        // Оптимизация для слабых устройств: проверяем только ближайшие шайбы
-        // Для iOS и мощных Android проверяем все, для слабых Android - только близкие
-        const isWeakDevice = Platform.OS === 'android' && (performanceLevel === 'low' || performanceLevel === 'medium');
-        const collisionCheckRadius = isWeakDevice ? minDistSq * 1.8 : minDistSq * 4;
+        const collisionCheckRadiusMul = isWeakDevice ? 2.5 : 4;
+        const maxCollisionChecks =
+          performanceLevel === 'low'
+            ? Math.min(14, currentPositions.length)
+            : performanceLevel === 'medium'
+              ? Math.min(18, currentPositions.length)
+              : currentPositions.length;
+        let collisionChecks = 0;
         
         for (const other of currentPositions) {
           if (other.id === pos.id || other.isDragging) continue;
+          if (collisionChecks >= maxCollisionChecks) break;
 
           const dx = x - other.x;
           const dy = y - other.y;
           const distSq = dx * dx + dy * dy;
+          const pairMinDist = puckCollisionMinDistance(pos.size, other.size);
+          const pairMinDistSq = pairMinDist * pairMinDist;
+          const collisionCheckRadius = pairMinDistSq * collisionCheckRadiusMul;
 
           // Пропускаем далекие шайбы для оптимизации (особенно для слабых устройств)
           if (distSq > collisionCheckRadius) continue;
+          collisionChecks++;
 
-          if (distSq < minDistSq && distSq > 0) {
+          if (distSq < pairMinDistSq && distSq > 0) {
             // Для слабых устройств упрощаем физику столкновения
             if (isWeakDevice) {
               // Упрощенная физика для слабых устройств - только отталкивание
@@ -854,17 +870,17 @@ const usePuckCollisionSystem = (
     });
 
     // Оптимизированное решение коллизий - один проход с накоплением смещений
-    // ОПТИМИЗАЦИЯ: Добавлена ранняя проверка расстояния для пропуска далеких шайб
-    const minDistance = puckSize;
-    const minDistSq = minDistance * minDistance;
-    // На слабых Android ещё агрессивнее режем широкую фазу коллизий.
+    let maxPuckSize = puckSize;
+    for (let i = 0; i < updatedPositions.length; i++) {
+      if (updatedPositions[i].size > maxPuckSize) maxPuckSize = updatedPositions[i].size;
+    }
     const checkRadiusMul =
       Platform.OS === 'android' && performanceLevel === 'low'
-        ? 1.55
+        ? 2
         : Platform.OS === 'android' && performanceLevel === 'medium'
-          ? 1.8
+          ? 2.2
           : 2;
-    const checkRadiusSq = (puckSize * checkRadiusMul) * (puckSize * checkRadiusMul);
+    const checkRadiusSq = (maxPuckSize * checkRadiusMul) * (maxPuckSize * checkRadiusMul);
     
     // Массив для накопления смещений
     const offsets = new Array(updatedPositions.length).fill(0).map(() => ({ x: 0, y: 0 }));
@@ -887,11 +903,11 @@ const usePuckCollisionSystem = (
         // ОПТИМИЗАЦИЯ: Ранний выход - пропускаем далекие шайбы
         if (distSq > checkRadiusSq) continue;
         
-        if (distSq < minDistSq && distSq > 0) {
-          // ОПТИМИЗАЦИЯ: Вычисляем Math.sqrt один раз и используем нормализованные векторы
-          // Это избегает повторных вычислений Math.atan2, Math.cos, Math.sin
+        const pairMinDistance = puckCollisionMinDistance(pos1.size, pos2.size);
+        const pairMinDistSq = pairMinDistance * pairMinDistance;
+        if (distSq < pairMinDistSq && distSq > 0) {
           const dist = Math.sqrt(distSq);
-          const overlap = minDistance - dist;
+          const overlap = pairMinDistance - dist;
           
           // ОПТИМИЗАЦИЯ: Используем нормализованный вектор вместо Math.atan2/Math.cos/Math.sin
           // Это снижает количество тригонометрических вычислений
@@ -900,7 +916,10 @@ const usePuckCollisionSystem = (
           const ny = dy * invDist; // Нормализованный вектор Y (заменяет sin(angle))
           
           // Увеличиваем силу отталкивания для предотвращения кучкования
-          const pushStrength = 1.2 * ANDROID_PUCK_SOFT;
+          const pushStrength =
+            Platform.OS === 'android' && performanceLevel === 'low'
+              ? 1.5 * ANDROID_PUCK_SOFT
+              : 1.2 * ANDROID_PUCK_SOFT;
           const adjustedOverlap = overlap * pushStrength;
           
           // Накопление смещений
@@ -959,6 +978,65 @@ const usePuckCollisionSystem = (
       }
     }
 
+    // На слабых Android при высокой скорости один проход separation не успевает — дожимаем overlap.
+    const overlapIterations =
+      Platform.OS === 'android' && performanceLevel === 'low'
+        ? 4
+        : Platform.OS === 'android' && performanceLevel === 'medium'
+          ? 2
+          : 1;
+    for (let iter = 0; iter < overlapIterations; iter++) {
+      let hadOverlap = false;
+      for (let i = 0; i < updatedPositions.length; i++) {
+        const pos1 = updatedPositions[i];
+        for (let j = i + 1; j < updatedPositions.length; j++) {
+          const pos2 = updatedPositions[j];
+          if (pos1.isDragging && pos2.isDragging) continue;
+
+          const dx = pos1.x - pos2.x;
+          const dy = pos1.y - pos2.y;
+          const distSq = dx * dx + dy * dy;
+          const pairMinDistance = puckCollisionMinDistance(pos1.size, pos2.size);
+          const pairMinDistSq = pairMinDistance * pairMinDistance;
+          if (distSq >= pairMinDistSq || distSq <= 0) continue;
+
+          hadOverlap = true;
+          const dist = Math.sqrt(distSq);
+          const overlap = pairMinDistance - dist;
+          const invDist = 1 / dist;
+          const nx = dx * invDist;
+          const ny = dy * invDist;
+
+          if (pos1.isDragging) {
+            updatedPositions[j] = {
+              ...pos2,
+              x: Math.max(boundaries.left, Math.min(boundaries.right, pos2.x - nx * overlap)),
+              y: Math.max(boundaries.top, Math.min(boundaries.bottom, pos2.y - ny * overlap)),
+            };
+          } else if (pos2.isDragging) {
+            updatedPositions[i] = {
+              ...pos1,
+              x: Math.max(boundaries.left, Math.min(boundaries.right, pos1.x + nx * overlap)),
+              y: Math.max(boundaries.top, Math.min(boundaries.bottom, pos1.y + ny * overlap)),
+            };
+          } else {
+            const half = overlap * 0.5;
+            updatedPositions[i] = {
+              ...pos1,
+              x: Math.max(boundaries.left, Math.min(boundaries.right, pos1.x + nx * half)),
+              y: Math.max(boundaries.top, Math.min(boundaries.bottom, pos1.y + ny * half)),
+            };
+            updatedPositions[j] = {
+              ...pos2,
+              x: Math.max(boundaries.left, Math.min(boundaries.right, pos2.x - nx * half)),
+              y: Math.max(boundaries.top, Math.min(boundaries.bottom, pos2.y - ny * half)),
+            };
+          }
+        }
+      }
+      if (!hadOverlap) break;
+    }
+
     // Обновляем референсы для интерполяции
     physicsPositionsRef.current = updatedPositions;
   }, [boundaries, currentUserId, puckSize, performanceLevel, FIXED_DT, TARGET_FPS]);
@@ -1005,7 +1083,7 @@ const usePuckCollisionSystem = (
     };
   }, [updateInteractionTime]);
   
-  // 🎯 ЭФФЕКТ "ВЗРЫВА" при встряске - экспортируем функцию
+  // 🎯 ЭФФЕКТ "ВЗРЫВА" при нажатии на звезду — экспортируем функцию
   useEffect(() => {
     (window as any).__triggerPuckExplosion = () => {
       const currentPositions = physicsPositionsRef.current;
@@ -1031,10 +1109,11 @@ const usePuckCollisionSystem = (
   }, []);
   
   // Отслеживаем наличие шайб для запуска анимации (без перезапуска при изменении количества)
-  const hasPucksRef = useRef(puckPositions.length > 0);
+  const hasPucks = puckPositions.length > 0;
+  const hasPucksRef = useRef(hasPucks);
   useEffect(() => {
-    hasPucksRef.current = puckPositions.length > 0;
-  }, [puckPositions.length]);
+    hasPucksRef.current = hasPucks;
+  }, [hasPucks]);
   
   // Отслеживаем текущий экран для остановки анимации
   const isOnHomeScreen = currentScreen === 'home';
@@ -1047,8 +1126,8 @@ const usePuckCollisionSystem = (
   }, [isOnHomeScreen]);
   
   useEffect(() => {
-    // Не запускаем анимацию если приложение в фоне или не на главном экране
-    if (!appIsActive || !isOnHomeScreen) {
+    // Не запускаем анимацию если приложение в фоне, не на главном экране или идёт soft-start
+    if (!appIsActive || !isOnHomeScreen || !physicsActiveRef.current) {
       if (animationRunningRef.current && __DEV__) {
         console.log('⏸️ Останавливаем анимацию:', { appIsActive, isOnHomeScreen, hasPucks: hasPucksRef.current });
       }
@@ -1093,8 +1172,15 @@ const usePuckCollisionSystem = (
         return;
       }
       
-      // Пропускаем кадр если нет шайб, но продолжаем анимацию
-      if (!hasPucksRef.current || physicsPositionsRef.current.length === 0) {
+      // Нет шайб — останавливаем цикл полностью (не крутим пустой rAF, экономим батарею).
+      // Перезапуск произойдёт через эффект по флагу hasPucks, когда шайбы появятся.
+      if (!hasPucksRef.current) {
+        animationRunningRef.current = false;
+        lastTimeRef.current = 0;
+        return;
+      }
+      // Транзиентное рассогласование state/ref (редкость) — ждём кадр, не останавливаясь
+      if (physicsPositionsRef.current.length === 0) {
         lastTimeRef.current = 0; // Сбрасываем время для плавного старта когда шайбы появятся
         animationFrameId = requestAnimationFrame(tick);
         return;
@@ -1116,7 +1202,7 @@ const usePuckCollisionSystem = (
         animationFrameId = requestAnimationFrame(tick);
         return;
       }
-      
+
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = now;
         animationFrameId = requestAnimationFrame(tick);
@@ -1143,39 +1229,50 @@ const usePuckCollisionSystem = (
 
       // ОПТИМИЗАЦИЯ: Упрощенная интерполяция - вычисляем alpha, но используем только при необходимости
       // Интерполяция нужна для плавности, но можно упростить вычисления
-      const useInterpolation = true; // Включаем интерполяцию для плавности
+      const useInterpolation = Date.now() >= renderGraceUntilRef.current;
       const alpha = useInterpolation ? Math.min(accumulatorRef.current / STEP_MS, 1) : 1;
       alphaRef.current = alpha;
 
-      // ОБНОВЛЯЕМ SHARED VALUES КАЖДЫЙ КАДР для максимальной плавности
-      // Это критично для плавной анимации - shared values должны обновляться каждый кадр
-        const physics = physicsPositionsRef.current;
+      const physics = physicsPositionsRef.current;
       physics.forEach(physicsPos => {
         const shared = sharedPositionsRef.current.get(physicsPos.id);
         if (shared && shared.x && shared.y) {
-          // Всегда используем интерполяцию для плавности
+          if (!useInterpolation) {
+            shared.x.value = physicsPos.x;
+            shared.y.value = physicsPos.y;
+            return;
+          }
           const currentPos = renderPositionsMapRef.current.get(physicsPos.id);
           if (currentPos) {
-            // Плавная интерполяция между текущей и физической позицией
             shared.x.value = currentPos.x + (physicsPos.x - currentPos.x) * alpha;
             shared.y.value = currentPos.y + (physicsPos.y - currentPos.y) * alpha;
           } else {
-            // Если нет текущей позиции, используем физическую напрямую
             shared.x.value = physicsPos.x;
             shared.y.value = physicsPos.y;
           }
         }
       });
       
-      // Обновляем renderPositionsRef для интерполяции каждый кадр
-      // Это нужно для плавной интерполяции между кадрами
-      const nextRenderPositions = physics.map(p => ({ ...p }));
-      renderPositionsRef.current = nextRenderPositions;
-      const nextMap = new Map<string, PuckPosition>();
-      nextRenderPositions.forEach(pos => {
-        nextMap.set(pos.id, pos);
-      });
-      renderPositionsMapRef.current = nextMap;
+      if (useInterpolation) {
+        // Обновляем render-позиции НА МЕСТЕ (без клонов и нового Map каждый кадр):
+        // на слабых Android это убирает ~1500 аллокаций/сек и паузы GC.
+        // Гарантируем, что в map лежит отдельный объект (не тот же, что в physics),
+        // иначе интерполяция выродится (rp === physicsPos).
+        const renderMap = renderPositionsMapRef.current;
+        for (let i = 0; i < physics.length; i++) {
+          const p = physics[i];
+          const rp = renderMap.get(p.id);
+          if (rp && rp !== p) {
+            rp.x = p.x;
+            rp.y = p.y;
+            rp.vx = p.vx;
+            rp.vy = p.vy;
+            rp.isDragging = p.isDragging;
+          } else {
+            renderMap.set(p.id, { ...p });
+          }
+        }
+      }
       
       // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ: НЕ обновляем React state из анимационного цикла!
       // Это вызывает ре-рендер всех компонентов Puck 16-27 раз в секунду
@@ -1199,7 +1296,7 @@ const usePuckCollisionSystem = (
       // lastTimeRef.current = 0;
       // accumulatorRef.current = 0;
     };
-  }, [stepPhysics, STEP_MS, MAX_STEPS, reactUpdateInterval, idleFrameSkip, appIsActive, isOnHomeScreen]);
+  }, [stepPhysics, STEP_MS, MAX_STEPS, idleFrameSkip, appIsActive, isOnHomeScreen, performanceLevel, physicsActive, hasPucks]);
 
   // Вибрация при столкновениях (только один раз при начале столкновения)
   useEffect(() => {
@@ -1506,6 +1603,7 @@ interface PuckPosition {
 const OriginalPuckAnimator = React.memo(({
   player,
   position,
+  leaderRank,
   onNav,
   onDrag,
   getAndroidPerformanceLevel,
@@ -1513,6 +1611,7 @@ const OriginalPuckAnimator = React.memo(({
 }: {
   player: Player; 
   position: PuckPosition; 
+  leaderRank?: LeaderRank;
   onNav: () => void; 
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
   getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
@@ -1793,6 +1892,7 @@ const OriginalPuckAnimator = React.memo(({
           })() : undefined}
         isStar={player.status === 'star'}
         status={player.status}
+          leaderRank={leaderRank}
           isOnline={player.isOnline} // Реальный статус онлайн из базы данных
           isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
         />
@@ -1811,16 +1911,44 @@ const OriginalPuckAnimator = React.memo(({
     prevProps.player.avatar === nextProps.player.avatar &&
     prevProps.player.status === nextProps.player.status &&
     prevProps.player.isOnline === nextProps.player.isOnline &&
-    prevProps.player.createdAt === nextProps.player.createdAt
+    prevProps.player.createdAt === nextProps.player.createdAt &&
+    prevProps.leaderRank === nextProps.leaderRank
   );
 });
+OriginalPuckAnimator.displayName = 'OriginalPuckAnimator';
 
 export default function HomeScreen() {
   const { currentUser, isUserLoading } = useUser();
   const router = useRouter();
   const { setCurrentScreen, currentScreen } = useScreenContext();
-  const { t } = useLanguage();
   const params = useLocalSearchParams();
+  const performanceLevel = useMemo(() => getPerformanceLevel(), []);
+  const [physicsActive, setPhysicsActive] = useState(!isLowEndAndroid());
+  const [filtersReady, setFiltersReady] = useState(!currentUser);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setFiltersReady(true);
+      return;
+    }
+    setFiltersReady(false);
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    if (!isLowEndAndroid() || physicsActive) return;
+    let cancelled = false;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const handle = InteractionManager.runAfterInteractions(() => {
+      timeout = setTimeout(() => {
+        if (!cancelled) setPhysicsActive(true);
+      }, startupPhysicsDeferMs());
+    });
+    return () => {
+      cancelled = true;
+      handle.cancel?.();
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [physicsActive]);
   
   // Ref для currentScreen, чтобы использовать в акселерометре
   const currentScreenRef = useRef(currentScreen);
@@ -1831,6 +1959,8 @@ export default function HomeScreen() {
   // Мини-игра
   const [showGame, setShowGame] = useState(false);
   const [gameOpenToResults, setGameOpenToResults] = useState(false);
+  const [showQuizGame, setShowQuizGame] = useState(false);
+  const [quizOpenToResults, setQuizOpenToResults] = useState(false);
 
   // Размеры области льда для разметки
   const [iceSize, setIceSize] = useState({ width: 0, height: 0 });
@@ -1839,7 +1969,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     try {
-      const resolved = RNImage.resolveAssetSource(LED_TEXTURE);
+      const resolved = RNImage.resolveAssetSource(PUCK_SCOUT_LOGO);
       if (resolved?.uri) {
         ExpoImage.prefetch(resolved.uri).catch(() => {});
       }
@@ -1853,15 +1983,9 @@ export default function HomeScreen() {
       setCollisionLayoutReady(false);
       return;
     }
-    let raf1 = 0;
-    let raf2 = 0;
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setCollisionLayoutReady(true));
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-    };
+    let raf = 0;
+    raf = requestAnimationFrame(() => setCollisionLayoutReady(true));
+    return () => cancelAnimationFrame(raf);
   }, [iceSize.width, iceSize.height]);
 
   const openGameResultsParam =
@@ -1876,6 +2000,19 @@ export default function HomeScreen() {
       router.setParams({ openGameResults: undefined } as Record<string, undefined>);
     });
   }, [openGameResultsParam, router]);
+
+  const openQuizResultsParam =
+    params.openQuizResults === 'true' ||
+    (Array.isArray(params.openQuizResults) && params.openQuizResults[0] === 'true');
+
+  useEffect(() => {
+    if (!openQuizResultsParam) return;
+    setShowQuizGame(true);
+    setQuizOpenToResults(true);
+    requestAnimationFrame(() => {
+      router.setParams({ openQuizResults: undefined } as Record<string, undefined>);
+    });
+  }, [openQuizResultsParam, router]);
 
   // Загружаем всех игроков из базы данных
   const [players, setPlayers] = useState<Player[]>([]);
@@ -1978,11 +2115,9 @@ export default function HomeScreen() {
 
   const unblockLoadRef = useRef(false);
   const homePuckRecoveryAttemptedRef = useRef(false);
-  
-  // Состояние для подсказки о тряске при первом запуске
-  const [showShakeHint, setShowShakeHint] = useState(false);
-  const shakeHintOpacity = useRef(new RNAnimated.Value(0)).current;
-  const shakeIconRotation = useRef(new RNAnimated.Value(0)).current;
+  /** ID шайб на льду после первого расчёта — не пересобираем при догрузке activityRating (~1 с). */
+  const homePuckSelectionIdsRef = useRef<string[] | null>(null);
+  const homePuckSelectionKeyRef = useRef<string | null>(null);
 
   // Вспомогательная функция: вычисляет начальные фильтры по загруженным игрокам и пользователю.
   // Дублирует логику initialFilters useMemo, но работает синхронно внутри loadAllPlayers,
@@ -2011,28 +2146,50 @@ export default function HomeScreen() {
     try {
       setLoading(true);
       console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
-      const loadedPlayers = await loadPlayers(forceRefresh);
 
-      // Если пользователь уже определён — вычисляем фильтры немедленно и выставляем
-      // setPlayers + setSelectedCountry + setSelectedYear В ОДНОМ рендере (React 18 auto-batching).
-      // Это устраняет двойное торможение шайб при старте: раньше фильтры ставились из
-      // useLayoutEffect в ОТДЕЛЬНОМ рендере, что вызывало полную переинициализацию позиций.
-      const user = currentUserRef.current;
-      const userStillLoading = isUserLoadingRef.current;
+      const applyLoadedPlayers = (loadedPlayers: Player[]) => {
+        const user = currentUserRef.current;
+        const userStillLoading = isUserLoadingRef.current;
 
-      if (!filtersInitializedRef.current && !userStillLoading && loadedPlayers.length > 0) {
-        const { country, year } = computeFiltersForPlayers(loadedPlayers, user);
-        // Все три вызова попадут в один React-рендер (React 18 batching в async-контексте)
-        setPlayers(loadedPlayers);
-        setSelectedCountry(country);
-        setSelectedYear(year);
-        filtersInitializedRef.current = true;
-        console.log(`✅ Игроки загружены (${loadedPlayers.length}) + фильтры за один рендер:`, country, year);
-      } else {
-        // Пользователь ещё не загружен — ставим только игроков; фильтры подхватит useLayoutEffect
-        setPlayers(loadedPlayers);
-        console.log(`✅ Игроки загружены${forceRefresh ? ' (принудительно)' : ''}:`, loadedPlayers.length);
-      }
+        if (!filtersInitializedRef.current && !userStillLoading && loadedPlayers.length > 0) {
+          const { country, year } = computeFiltersForPlayers(loadedPlayers, user);
+          setPlayers(loadedPlayers);
+          setSelectedCountry(country);
+          setSelectedYear(year);
+          filtersInitializedRef.current = true;
+          setFiltersReady(true);
+          console.log(`✅ Игроки (${loadedPlayers.length}) + фильтры за один рендер:`, country, year);
+        } else {
+          setPlayers((prev) => {
+            if (prev.length === 0) return loadedPlayers;
+            const byId = new Map(loadedPlayers.map((p) => [p.id, p]));
+            let changed = false;
+            const next = prev.map((p) => {
+              const fresh = byId.get(p.id);
+              if (!fresh) return p;
+              if (
+                fresh.activityRating === p.activityRating &&
+                fresh.teams === p.teams
+              ) {
+                return p;
+              }
+              changed = true;
+              return {
+                ...p,
+                activityRating: fresh.activityRating,
+                teams: fresh.teams ?? p.teams,
+              };
+            });
+            return changed ? next : prev;
+          });
+          console.log(`✅ Игроки: meta-обновление без замены списка (${loadedPlayers.length})`);
+        }
+      };
+
+      const loadedPlayers = await loadPlayers(forceRefresh, {
+        onUpdated: applyLoadedPlayers,
+      });
+      applyLoadedPlayers(loadedPlayers);
     } catch (error) {
       console.error('❌ Ошибка загрузки игроков:', error);
     } finally {
@@ -2053,6 +2210,7 @@ export default function HomeScreen() {
       // Сбрасываем флаг инициализации и фильтры в null — useLayoutEffect ниже переинициализирует их
       filtersInitializedRef.current = false;
       filterInitTimeRef.current = 0;
+      setFiltersReady(false);
       setSelectedCountry(null);
       setSelectedYear(null);
     } else if (userId && userCountry && lastUserCountryRef.current && userCountry !== lastUserCountryRef.current) {
@@ -2064,6 +2222,7 @@ export default function HomeScreen() {
       // Переинициализируем фильтры (через сброс в null)
       filtersInitializedRef.current = false;
       filterInitTimeRef.current = 0;
+      setFiltersReady(false);
       setSelectedCountry(null);
       setSelectedYear(null);
     }
@@ -2118,13 +2277,22 @@ export default function HomeScreen() {
       setSelectedCountry(initialFilters.country);
       setSelectedYear(initialFilters.year);
       filtersInitializedRef.current = true;
+      setFiltersReady(true);
       console.log(`✅ [FILTERS] Инициализированы: ${initialFilters.country || 'Все'} / ${initialFilters.year || 'Все года'}`);
+    } else if (!currentUser && players.length > 0 && !filtersReady) {
+      setFiltersReady(true);
     }
-  }, [players.length, currentUser?.id, currentUser?.country, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters]);
+  }, [players.length, currentUser?.id, currentUser?.country, isUserLoading, setSelectedCountry, setSelectedYear, initialFilters, filtersReady]);
 
   // Загружаем игроков при монтировании
   useEffect(() => {
-    loadAllPlayers();
+    if (isLowEndAndroid()) {
+      const handle = InteractionManager.runAfterInteractions(() => {
+        void loadAllPlayers();
+      });
+      return () => handle.cancel?.();
+    }
+    void loadAllPlayers();
   }, [loadAllPlayers]);
 
   // Обрабатываем параметр refresh для принудительного обновления списка игроков
@@ -2189,194 +2357,42 @@ export default function HomeScreen() {
 
   const hasLoadedBlockedInitiallyRef = useRef(false);
   const resumeAnimationRef = useRef<number | null>(null);
+  const lastHomeShuffleTimeRef = useRef(0);
 
-  // ОПТИМИЗАЦИЯ: Обработка shake gesture с увеличенным интервалом и отключением в фоне
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      return; // На веб shake не работает
+  const shuffleHomePucks = useCallback(() => {
+    if (currentScreenRef.current !== 'home') return;
+
+    const now = Date.now();
+    if (now - lastHomeShuffleTimeRef.current < 2000) return;
+    lastHomeShuffleTimeRef.current = now;
+
+    if (Platform.OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+    } else if (Platform.OS === 'android') {
+      Vibration.vibrate([0, 100, 50, 100, 50, 100]);
     }
 
-    let subscription: any = null;
-    let Accelerometer: any = null;
-    let lastShakeTime = 0;
-    const SHAKE_THRESHOLD = 1.5; // Порог для определения shake
-    const SHAKE_COOLDOWN = 2000; // Минимум 2 секунды между shake
-    const ACCELEROMETER_INTERVAL = 250; // ОПТИМИЗАЦИЯ: 250мс вместо 100мс (экономия CPU в 2.5 раза)
+    setRandomSeed(now);
 
-    const handleShake = () => {
-      // Не обрабатываем встряску, если не на главном экране
-      if (currentScreenRef.current !== 'home') {
-        return;
+    setTimeout(() => {
+      if (typeof (window as any).__triggerPuckExplosion === 'function') {
+        (window as any).__triggerPuckExplosion();
       }
-      
-      const now = Date.now();
-      if (now - lastShakeTime < SHAKE_COOLDOWN) {
-        return; // Слишком рано после предыдущего shake
-      }
-      
-      lastShakeTime = now;
-      
-      // Усиленная вибрация для обратной связи - серия импульсов (СНАЧАЛА для мгновенного отклика)
-      if (Platform.OS === 'ios') {
-        // Серия из 3 вибраций для iOS
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
-      } else {
-        // Паттерн вибрации для Android: [пауза, вибрация, пауза, вибрация, пауза, вибрация]
-        Vibration.vibrate([0, 100, 50, 100, 50, 100]);
-      }
-      
-      console.log('📱 Shake detected - обновляем случайных игроков');
-      
-      // Обновляем randomSeed для получения новых случайных игроков
-      const newSeed = Date.now(); // Используем текущее время как новый seed
-      setRandomSeed(newSeed);
-      
-      // 🎯 ЭФФЕКТ "ВЗРЫВА" - применяем ПОСЛЕ пересчёта игроков (небольшая задержка для React)
-      // Задержка нужна, чтобы новые шайбы успели создаться
-      setTimeout(() => {
-        if (typeof (window as any).__triggerPuckExplosion === 'function') {
-          (window as any).__triggerPuckExplosion();
-          console.log('💥 Explosion triggered after player recalculation');
-        }
-      }, 150); // 150мс достаточно для пересчёта
-      
-      // ОПТИМИЗАЦИЯ: Обновляем время взаимодействия для выхода из режима покоя
-      if (typeof (window as any).__updatePuckInteraction === 'function') {
-        (window as any).__updatePuckInteraction();
-      }
-    };
+    }, 150);
 
-    const startAccelerometer = async () => {
-      if (!Accelerometer) return;
-      
-      Accelerometer.setUpdateInterval(ACCELEROMETER_INTERVAL);
-      
-      subscription = Accelerometer.addListener(({ x, y, z }: { x: number; y: number; z: number }) => {
-        // Вычисляем силу ускорения
-        const acceleration = Math.sqrt(x * x + y * y + z * z);
-        
-        // Если ускорение превышает порог - это shake
-        if (acceleration > SHAKE_THRESHOLD) {
-          handleShake();
-        }
-      });
-    };
-    
-    const stopAccelerometer = () => {
-      if (subscription) {
-        subscription.remove();
-        subscription = null;
-      }
-    };
-
-    // Динамически импортируем expo-sensors для детекции shake
-    const initShakeDetection = async () => {
-      try {
-        const sensors = await import('expo-sensors');
-        Accelerometer = sensors.Accelerometer;
-        
-        if (Accelerometer && Accelerometer.isAvailableAsync) {
-          const isAvailable = await Accelerometer.isAvailableAsync();
-          if (!isAvailable) {
-            console.warn('⚠️ Accelerometer не доступен на этом устройстве');
-            return;
-          }
-        }
-        
-        await startAccelerometer();
-        console.log('✅ Shake detection активирован (интервал: ' + ACCELEROMETER_INTERVAL + 'мс)');
-      } catch (error) {
-        console.warn('⚠️ expo-sensors не установлен или не доступен:', error);
-      }
-    };
-    
-    // ОПТИМИЗАЦИЯ: Отключаем акселерометр когда приложение уходит в фон
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') {
-        startAccelerometer();
-      } else {
-        stopAccelerometer();
-        console.log('📱 [PERFORMANCE] Акселерометр отключен в фоне');
-      }
-    };
-    
-    const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-
-    initShakeDetection();
-
-    return () => {
-      stopAccelerometer();
-      appStateSubscription?.remove();
-    };
+    if (typeof (window as any).__updatePuckInteraction === 'function') {
+      (window as any).__updatePuckInteraction();
+    }
   }, []);
 
-  // Показываем подсказку о тряске при первом запуске
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      return; // На веб shake не работает
-    }
-
-    const checkAndShowShakeHint = async () => {
-      try {
-        const hasSeenHint = await AsyncStorage.getItem('hasSeenShakeHint');
-        if (!hasSeenHint && currentScreen === 'home' && !isUserLoading) {
-          // Показываем подсказку через 1 секунду после загрузки
-          setTimeout(() => {
-            setShowShakeHint(true);
-            
-            // Анимация покачивания иконки (бесконечная)
-            const shakeAnimation = RNAnimated.loop(
-              RNAnimated.sequence([
-                RNAnimated.timing(shakeIconRotation, {
-                  toValue: 1,
-                  duration: 200,
-                  useNativeDriver: true,
-                }),
-                RNAnimated.timing(shakeIconRotation, {
-                  toValue: -1,
-                  duration: 200,
-                  useNativeDriver: true,
-                }),
-                RNAnimated.timing(shakeIconRotation, {
-                  toValue: 0,
-                  duration: 200,
-                  useNativeDriver: true,
-                }),
-              ])
-            );
-            shakeAnimation.start();
-            
-            // Анимация появления и исчезновения подсказки
-            RNAnimated.sequence([
-              RNAnimated.timing(shakeHintOpacity, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-              }),
-              RNAnimated.delay(3000), // Показываем 3 секунды
-              RNAnimated.timing(shakeHintOpacity, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-              }),
-            ]).start(() => {
-              shakeAnimation.stop();
-              setShowShakeHint(false);
-              shakeIconRotation.setValue(0);
-              // Сохраняем флаг, что подсказка была показана
-              AsyncStorage.setItem('hasSeenShakeHint', 'true');
-            });
-          }, 1000);
-        }
-      } catch (error) {
-        console.error('❌ Ошибка проверки подсказки о тряске:', error);
-      }
+    (window as any).__handleHomeShake = shuffleHomePucks;
+    return () => {
+      delete (window as any).__handleHomeShake;
     };
-
-    checkAndShowShakeHint();
-  }, [currentScreen, isUserLoading]);
+  }, [shuffleHomePucks]);
 
   useEffect(() => {
     const oneHourMs = 60 * 60 * 1000;
@@ -2442,6 +2458,11 @@ export default function HomeScreen() {
     blockedUsersLength: 0
   });
   
+  useEffect(() => {
+    homePuckSelectionIdsRef.current = null;
+    homePuckSelectionKeyRef.current = null;
+  }, [selectedCountry, selectedYear, randomSeed, currentUser?.id]);
+
   const allVisiblePlayers = useMemo(() => {
     if (players.length === 0) {
       allVisiblePlayersRef.current = [];
@@ -2482,6 +2503,14 @@ export default function HomeScreen() {
       filtered = filtered.filter(player => !blockedSet.has(player.id));
     }
 
+    if (currentUser?.id && currentUser.avatar) {
+      filtered = filtered.map((player) =>
+        player.id === currentUser.id && !player.avatar
+          ? { ...player, avatar: currentUser.avatar }
+          : player
+      );
+    }
+
     // Обновляем ref для использования в других местах
     if (__DEV__) {
       console.log('✅ [ANIMATION] Список видимых игроков обновлен:', {
@@ -2510,24 +2539,90 @@ export default function HomeScreen() {
     // Добавляем “игровую” шайбу всегда, независимо от фильтров
     const gamePuck: Player = {
       id: GAME_PUCK_ID,
-      name: 'Game',
+      name: 'STAR GOAL',
       status: 'game' as any,
       avatar: null,
     } as any;
 
-    return [...filtered, gamePuck];
-  }, [players, currentUser?.id, currentUser?.status, selectedCountry, selectedYear, randomSeed, blockedUsers]);
+    const quizGamePuck: Player = {
+      id: QUIZ_GAME_PUCK_ID,
+      name: 'Hockey Star Quiz',
+      status: 'quizGame' as any,
+      avatar: null,
+    } as any;
+
+    const fullList = [...filtered, gamePuck, quizGamePuck];
+
+    const selectionKey = `${effectiveCountry ?? 'ALL'}|${effectiveYear ?? 'ALL'}|${randomSeed}|${currentUser?.id ?? ''}`;
+    const blockedSet =
+      blockedUsers.length > 0 ? new Set(blockedUsers) : null;
+
+    if (
+      homePuckSelectionIdsRef.current === null ||
+      homePuckSelectionKeyRef.current !== selectionKey
+    ) {
+      homePuckSelectionKeyRef.current = selectionKey;
+      homePuckSelectionIdsRef.current = fullList.map((p) => p.id);
+    } else {
+      const computedMap = new Map(fullList.map((p) => [p.id, p]));
+      const stableIds = homePuckSelectionIdsRef.current.filter(
+        (id) => !blockedSet?.has(id),
+      );
+      const stable = stableIds
+        .map((id) => computedMap.get(id))
+        .filter((p): p is Player => !!p);
+      if (stable.length > 0) {
+        const stableIdsSet = new Set(stable.map((p) => p.id));
+        const extras = fullList.filter((p) => !stableIdsSet.has(p.id));
+        return [...stable, ...extras];
+      }
+    }
+
+    return fullList;
+  }, [players, currentUser?.id, currentUser?.status, currentUser?.avatar, selectedCountry, selectedYear, randomSeed, blockedUsers]);
 
   // Прицельный prefetch аватаров именно для шайб на льду (без новой сборки, только JS / OTA).
-  // Раньше в loadPlayers грелись «первые 90» из БД — часто не те же люди, что в getSmartPlayerSelection.
-  useEffect(() => {
+  useLayoutEffect(() => {
     const puckPlayers = allVisiblePlayers.filter(
-      (p) => p.id !== GAME_PUCK_ID && !!p.avatar
+      (p) => p.id !== GAME_PUCK_ID && p.id !== QUIZ_GAME_PUCK_ID && !!p.avatar
     );
     if (puckPlayers.length === 0) return;
-    const concurrency = Platform.OS === 'android' ? 6 : 10;
-    preloadPlayerAvatars(puckPlayers, { concurrency }).catch(() => {});
+    seedPlayerAvatarUrls(puckPlayers);
   }, [allVisiblePlayers]);
+
+  const lastPuckPrefetchSigRef = useRef('');
+  useEffect(() => {
+    const puckPlayers = allVisiblePlayers.filter(
+      (p) => p.id !== GAME_PUCK_ID && p.id !== QUIZ_GAME_PUCK_ID && !!p.avatar
+    );
+    if (puckPlayers.length === 0) return;
+
+    // Не перезапускаем prefetch, если набор аватаров на льду не изменился
+    // (например, при догрузке рейтингов список пересобирается, но шайбы те же).
+    const sig = puckPlayers.map((p) => `${p.id}:${p.avatar}`).join('|');
+    if (sig === lastPuckPrefetchSigRef.current) return;
+    lastPuckPrefetchSigRef.current = sig;
+
+    const concurrency =
+      performanceLevel === 'low' ? 3 : performanceLevel === 'medium' ? 5 : 12;
+
+    const run = () => {
+      preloadPlayerAvatars(puckPlayers, { concurrency }).catch(() => {});
+    };
+
+    if (isLowEndAndroid()) {
+      let timeout: ReturnType<typeof setTimeout> | null = null;
+      const handle = InteractionManager.runAfterInteractions(() => {
+        timeout = setTimeout(run, physicsActive ? 0 : startupPhysicsDeferMs());
+      });
+      return () => {
+        handle.cancel?.();
+        if (timeout) clearTimeout(timeout);
+      };
+    }
+
+    run();
+  }, [allVisiblePlayers, performanceLevel, physicsActive]);
 
   // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
   // но сохраняем ограничения скрытых/заблокированных, чтобы не показывать их нигде.
@@ -2543,31 +2638,69 @@ export default function HomeScreen() {
   const playfieldLayoutReady = collisionLayoutReady && iceSize.width > 0 && iceSize.height > 0;
   const puckFieldWidth = playfieldLayoutReady ? iceSize.width : windowForPucks.width;
   const puckFieldHeight = playfieldLayoutReady ? iceSize.height : windowForPucks.height;
-
-  const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
-    allVisiblePlayers, // передаем всех видимых игроков
-    currentUser?.id,
-    currentScreen || undefined, // передаем currentScreen из контекста
-    puckFieldWidth,
-    puckFieldHeight,
-    playfieldLayoutReady
+  const scaledPuckSize = useMemo(
+    () => getScaledPuckBaseSize(puckFieldWidth, puckFieldHeight, { homeScreen: true }),
+    [puckFieldWidth, puckFieldHeight]
   );
 
-  // Watchdog для старта главного экрана: иногда игроки уже загружены,
-  // но шайбы не инициализируются до ручной перезагрузки (наблюдалось в Expo, в т.ч. на Android;
-  // потенциально может случаться и на iPhone).
-  // Один раз мягко повторяем инициализацию тем же набором players.
+  const homeLeaderRanks = useMemo(() => {
+    if (players.length === 0) return new Map<string, LeaderRank>();
+    const effectiveCountry =
+      selectedCountry === null || selectedCountry === undefined ? undefined : selectedCountry;
+    const effectiveYear =
+      selectedYear === null || selectedYear === undefined ? undefined : selectedYear;
+    const pool = players.filter((p) => {
+      if (p.is_hidden || p.status !== 'player') return false;
+      if (effectiveCountry && p.country !== effectiveCountry) return false;
+      if (effectiveYear && !p.birthDate?.startsWith(String(effectiveYear))) return false;
+      return true;
+    });
+    return getTopSeasonLeaderRanks(pool);
+  }, [players, selectedCountry, selectedYear]);
+
+  // Ждём фильтры и реальный onLayout льда — одна инициализация без смены границ.
+  const puckPlayersForScene = useMemo(() => {
+    if (isUserLoading) return [];
+    if (currentUser && !filtersReady) return [];
+    if (!playfieldLayoutReady) return [];
+    return allVisiblePlayers;
+  }, [isUserLoading, currentUser, filtersReady, playfieldLayoutReady, allVisiblePlayers]);
+
+  // Пока открыта полноэкранная игра (шайбы главного экрана не видны под модалкой),
+  // ставим домашнюю физику на паузу — иначе на слабых устройствах работают два движка сразу.
+  const effectiveScreenForPhysics = (showGame || showQuizGame) ? 'game-modal' : (currentScreen || undefined);
+
+  const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
+    puckPlayersForScene,
+    currentUser?.id,
+    effectiveScreenForPhysics,
+    puckFieldWidth,
+    puckFieldHeight,
+    playfieldLayoutReady,
+    physicsActive,
+    homeLeaderRanks,
+    scaledPuckSize,
+  );
+
+  // На слабом Android: как только шайбы на льду — сразу включаем физику (без второй паузы).
+  useEffect(() => {
+    if (puckPlayersForScene.length > 0 && !physicsActive) {
+      setPhysicsActive(true);
+    }
+  }, [puckPlayersForScene.length, physicsActive]);
+
+  // Watchdog: только если шайбы так и не появились через 3 с (без setPlayers — он дёргает лёд).
   useEffect(() => {
     const shouldRecover =
       currentScreen === 'home' &&
       !loading &&
       players.length > 0 &&
-      allVisiblePlayers.length > 0 &&
+      puckPlayersForScene.length > 0 &&
       puckPositions.length === 0 &&
       !homePuckRecoveryAttemptedRef.current;
 
     if (!shouldRecover) {
-      if (puckPositions.length > 0 || allVisiblePlayers.length === 0 || loading) {
+      if (puckPositions.length > 0 || puckPlayersForScene.length === 0 || loading) {
         homePuckRecoveryAttemptedRef.current = false;
       }
       return;
@@ -2575,13 +2708,16 @@ export default function HomeScreen() {
 
     const timeout = setTimeout(() => {
       if (homePuckRecoveryAttemptedRef.current) return;
+      if (puckPositions.length > 0) return;
       homePuckRecoveryAttemptedRef.current = true;
-      console.warn('⚠️ [HOME] Watchdog: игроки есть, но шайбы не появились — повторно инициализируем');
-      setPlayers((prev) => [...prev]);
-    }, 1200);
+      console.warn('⚠️ [HOME] Watchdog: повторная инициализация шайб');
+      homePuckSelectionIdsRef.current = null;
+      homePuckSelectionKeyRef.current = null;
+      resetPucksMotion();
+    }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [currentScreen, loading, players.length, allVisiblePlayers.length, puckPositions.length]);
+  }, [currentScreen, loading, players.length, puckPlayersForScene.length, puckPositions.length, resetPucksMotion]);
 
   // Перезапускаем анимацию при возвращении на экран
   useFocusEffect(
@@ -2807,6 +2943,10 @@ export default function HomeScreen() {
       setShowGame(true);
       return;
     }
+    if (playerId === QUIZ_GAME_PUCK_ID) {
+      setShowQuizGame(true);
+      return;
+    }
     if (!currentUser) {
       router.push('/login');
       return;
@@ -2818,13 +2958,9 @@ export default function HomeScreen() {
     });
   }, [router, currentUser]);
 
-  // Определяем уровень производительности для передачи в компоненты
-  const performanceLevel = useMemo(() => getPerformanceLevel(), []);
-
-  // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ: Убрали зависимость от puckPositions для предотвращения ре-рендеров
   // Компоненты получают позиции через shared values, которые обновляются каждый кадр
   // React state обновляется только при изменении списка игроков (добавление/удаление)
-  // Используем allVisiblePlayers для создания компонентов, позиции обновляются через shared values
+  // Используем puckPlayersForScene — тот же набор, что и в физике (без двойной инициализации)
   const renderedPucks = useMemo(() => {
     // Карта позиций по ID для быстрого доступа
     const positionMap = new Map<string, PuckPosition>();
@@ -2832,16 +2968,17 @@ export default function HomeScreen() {
       positionMap.set(p.id, p);
     });
 
-    return allVisiblePlayers.map((player) => {
+    return puckPlayersForScene.map((player) => {
       // Берём существующую позицию, а если её нет (например, из‑за рассинхрона),
       // используем безопасную стартовую точку по центру.
+      const leaderRank = homeLeaderRanks.get(player.id);
       const fallbackPosition: PuckPosition = {
         id: player.id,
         x: (boundaries.left + boundaries.right) / 2,
         y: (boundaries.top + boundaries.bottom) / 2,
         vx: 0,
         vy: 0,
-        size: 70,
+        size: scaledPuckSize,
         isDragging: false,
       };
 
@@ -2852,6 +2989,7 @@ export default function HomeScreen() {
           key={player.id}
           player={player}
           position={initialPosition}
+          leaderRank={leaderRank}
           onNav={() => handlePuckPress(player.id)}
           onDrag={handleDrag}
           getAndroidPerformanceLevel={() => performanceLevel}
@@ -2859,15 +2997,14 @@ export default function HomeScreen() {
         />
       );
     });
-  }, [puckPositions.length, allVisiblePlayers, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries]);
+  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize]);
 
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
     return (
       <View style={styles.container}>
-        <ImageBackground 
-        source={LED_TEXTURE}
+        <CachedBackground
         style={styles.background}
           resizeMode="cover"
           onLayout={(e) => {
@@ -2899,43 +3036,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Подсказка о тряске при первом запуске */}
-        {showShakeHint && (
-          <RNAnimated.View 
-            style={[
-              styles.shakeHintContainer,
-              { opacity: shakeHintOpacity }
-            ]}
-            pointerEvents="none"
-          >
-            <View style={styles.shakeHintContent}>
-              <RNAnimated.View
-                style={[
-                  styles.shakeIconContainer,
-                  {
-                    transform: [
-                      {
-                        rotate: shakeIconRotation.interpolate({
-                          inputRange: [-1, 0, 1],
-                          outputRange: ['-20deg', '0deg', '20deg'],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                <Ionicons name="phone-portrait-outline" size={40} color="#fff" />
-              </RNAnimated.View>
-              <Text style={styles.shakeHintText}>
-                {t('home.shakeHintTitle')}
-              </Text>
-              <Text style={styles.shakeHintSubtext}>
-                {t('home.shakeHintSubtext')}
-              </Text>
-            </View>
-          </RNAnimated.View>
-        )}
-      </ImageBackground>
+      </CachedBackground>
 
       <PuckGame
         visible={showGame}
@@ -2945,6 +3046,16 @@ export default function HomeScreen() {
         }}
         openToResults={gameOpenToResults}
         visiblePlayers={gamePlayers}
+        currentUser={currentUser}
+      />
+
+      <HockeyStarQuizGame
+        visible={showQuizGame}
+        onClose={() => {
+          setShowQuizGame(false);
+          setQuizOpenToResults(false);
+        }}
+        openToResults={quizOpenToResults}
         currentUser={currentUser}
       />
     </View>
@@ -3014,40 +3125,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     marginBottom: 2,
-  },
-  shakeHintContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  shakeHintContent: {
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
-    borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
-    maxWidth: 280,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  shakeIconContainer: {
-    marginBottom: 16,
-  },
-  shakeHintText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  shakeHintSubtext: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 14,
-    fontFamily: 'Gilroy-Regular',
-    textAlign: 'center',
   },
 });

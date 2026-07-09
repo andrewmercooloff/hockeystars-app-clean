@@ -1,13 +1,7 @@
 // Сервис для работы с родительским согласием (COPPA)
-import { supabase } from './supabase';
+import { supabase, supabaseAnonKey, getActiveSupabaseUrl, supabaseFetch } from './supabase';
 
-// Получаем URL и ключ из конфигурации Supabase
-const getSupabaseConfig = () => {
-  // Пытаемся получить из переменных окружения или используем значения по умолчанию
-  const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
-  return { supabaseUrl, supabaseAnonKey };
-};
+const getSupabaseConfig = () => ({ supabaseUrl: getActiveSupabaseUrl(), supabaseAnonKey });
 
 // Вычисление возраста из даты рождения
 export function calculateAge(birthDate: string): number {
@@ -111,7 +105,7 @@ export async function registerChildWithParentalConsent(
       try {
         const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
         
-        const response = await fetch(`${supabaseUrl}/functions/v1/handle-child-registration`, {
+        const response = await supabaseFetch(`${supabaseUrl}/functions/v1/handle-child-registration`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

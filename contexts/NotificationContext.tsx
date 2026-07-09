@@ -3,6 +3,12 @@ import { Player } from '../utils/playerStorage';
 
 interface NotificationContextType {
   updateNotificationCount: (user?: Player | null) => Promise<void>;
+  /** Forces a fresh read of unread messages + unread notifications from DB. */
+  refreshBadges: () => Promise<void>;
+  /** Optimistic local override of unread messages badge (e.g. when opening a chat). */
+  setUnreadMessagesBadge: (count: number) => void;
+  /** Optimistic local override of unread notifications badge (e.g. when opening notifications screen). */
+  setUnreadNotificationsBadge: (count: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -17,16 +23,27 @@ export const useNotificationContext = () => {
 
 interface NotificationProviderProps {
   children: ReactNode;
-  updateNotificationCount: () => Promise<void>;
+  updateNotificationCount: (user?: Player | null) => Promise<void>;
+  refreshBadges: () => Promise<void>;
+  setUnreadMessagesBadge: (count: number) => void;
+  setUnreadNotificationsBadge: (count: number) => void;
 }
 
-export const NotificationProvider: React.FC<NotificationProviderProps> = ({ 
-  children, 
-  updateNotificationCount 
+export const NotificationProvider: React.FC<NotificationProviderProps> = ({
+  children,
+  updateNotificationCount,
+  refreshBadges,
+  setUnreadMessagesBadge,
+  setUnreadNotificationsBadge,
 }) => {
   const value = useMemo(
-    () => ({ updateNotificationCount }),
-    [updateNotificationCount]
+    () => ({
+      updateNotificationCount,
+      refreshBadges,
+      setUnreadMessagesBadge,
+      setUnreadNotificationsBadge,
+    }),
+    [updateNotificationCount, refreshBadges, setUnreadMessagesBadge, setUnreadNotificationsBadge]
   );
   return (
     <NotificationContext.Provider value={value}>

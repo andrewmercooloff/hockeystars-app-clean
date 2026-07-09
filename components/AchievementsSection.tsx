@@ -43,10 +43,15 @@ export default function AchievementsSection({
     description: ''
   });
   
-  const normalizedAchievements = useMemo(
-    () => (Array.isArray(achievements) ? achievements : []),
-    [achievements]
-  );
+  const normalizedAchievements = useMemo(() => {
+    const list = Array.isArray(achievements) ? [...achievements] : [];
+    return list.sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year;
+      const idA = Number(a.id) || 0;
+      const idB = Number(b.id) || 0;
+      return idB - idA;
+    });
+  }, [achievements]);
 
   const getMedalIcon = (place: number) => {
     switch (place) {

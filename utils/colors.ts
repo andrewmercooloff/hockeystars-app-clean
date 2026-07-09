@@ -11,7 +11,7 @@ export const COLORS = {
   GRAY: '#333333',            // Серый для элементов
   
   // Фоновые цвета (заменяют черный)
-  BACKGROUND: '#87A3B1',      // Основной фон (ICE_GRAY_BLUE)
+  BACKGROUND: '#050008',
   BACKGROUND_LIGHT: '#9BB3C1', // Светлый фон
   BACKGROUND_DARK: '#6B8A9A',  // Темный фон
   

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -10,9 +10,17 @@ import {
     Dimensions,
     Alert,
     ScrollView,
-    Animated
+    Animated,
+    ActivityIndicator,
+    InteractionManager,
+    Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { captureRef } from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
+import LoadingCenter from '../components/LoadingCenter';
+import { colors } from '../theme/colors';
 import CachedAvatar from '../components/CachedAvatar';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,6 +36,8 @@ import {
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
 } from '../utils/playerStorage';
+import { applyActivityRatingsToPlayers } from '../services/activityService';
+
 import { updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -38,6 +48,17 @@ import { forceGilroyFont } from '../utils/forceGilroyFont';
 import CachedBackground from '../components/CachedBackground';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { platformCardShadow } from '../utils/androidShadow';
+import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
+import LeaderShine from '../components/LeaderShine';
+import SearchRatingShareCard, { type SearchRatingShareEntry } from '../components/SearchRatingShareCard';
+import { prefetchRatingShareAvatars } from '../utils/ratingShareExport';
+import {
+  LEADER_BORDER_COLORS,
+  LEADER_MEDAL_BORDER_WIDTH,
+  getMedalLeaderRank,
+  getSearchAvatarSize,
+  sortPlayersForSearchList,
+} from '../utils/leaderDisplay';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -48,13 +69,13 @@ const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
 function isPlayerInSearchDirectory(player: Player, isAdmin: boolean): boolean {
   if (isAdmin) return true;
   return (
-    player.status !== 'scout' &&
-    (player.status === 'player' ||
-      player.status === 'admin' ||
-      player.status === 'star' ||
-      player.status === 'coach' ||
-      player.status === 'shop' ||
-      player.status === 'skateSharpening')
+    player.status === 'player' ||
+    player.status === 'admin' ||
+    player.status === 'star' ||
+    player.status === 'coach' ||
+    player.status === 'scout' ||
+    player.status === 'shop' ||
+    player.status === 'skateSharpening'
   );
 }
 
@@ -314,6 +335,12 @@ const FilterButton = React.memo(({
               
               return selectedValue;
             }
+            if (title === t('search.country')) {
+              return t('search.allCountries') || 'All countries';
+            }
+            if (title === t('search.year')) {
+              return t('search.allYears') || 'All years';
+            }
             return title;
           })()}
         </Text>
@@ -345,7 +372,15 @@ const FilterButton = React.memo(({
               style={styles.filterDropdownItem} 
               onPress={() => handleSelect(null)}
             >
-              <Text style={styles.filterDropdownItemText}>{language === 'ru' ? 'Все' : 'All'}</Text>
+              <Text style={styles.filterDropdownItemText}>
+                {title === t('search.country')
+                  ? (t('search.allCountries') || 'All countries')
+                  : title === t('search.year')
+                    ? (t('search.allYears') || 'All years')
+                    : language === 'ru'
+                      ? 'Все'
+                      : 'All'}
+              </Text>
             </TouchableOpacity>
           )}
             {options.map((option) => {
@@ -378,14 +413,15 @@ const FilterButton = React.memo(({
     </View>
   );
 });
+FilterButton.displayName = 'FilterButton';
 
 export default function SearchScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading } = useUser();
-  
-  
+  const playersListRef = useRef<FlatList<Player>>(null);
+
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
     if (!dateString) return '';
@@ -498,29 +534,47 @@ export default function SearchScreen() {
         }
 
         // Админам нужен сетевой свежий список (в т.ч. скрытые); остальным достаточно кеша loadPlayers при открытии
-        const allPlayers = await loadPlayers(currentUser.status === 'admin');
-        
-        // Для администраторов показываем всех игроков (включая скрытые профили)
-        // Для обычных пользователей фильтруем по статусу
-        let filteredPlayers: Player[];
-        if (currentUser.status === 'admin') {
-          // Администратор видит всех (включая скрытые профили)
-          filteredPlayers = allPlayers;
-          console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
-        } else {
-          // Показываем игроков, звёзд, тренеров, магазины; скаутов не показываем
-          filteredPlayers = allPlayers.filter(player =>
-            player.status !== 'scout' &&
-            (player.status === 'player' ||
-              player.status === 'admin' ||
-              player.status === 'star' ||
-              player.status === 'coach' ||
-              player.status === 'shop' ||
-              player.status === 'skateSharpening')
+        const filterForSearch = (allPlayers: Player[]): Player[] => {
+          if (currentUser.status === 'admin') {
+            return allPlayers;
+          }
+          return allPlayers.filter(player =>
+            player.status === 'player' ||
+            player.status === 'admin' ||
+            player.status === 'star' ||
+            player.status === 'coach' ||
+            player.status === 'scout' ||
+            player.status === 'shop' ||
+            player.status === 'skateSharpening'
           );
-        }
-        
-        setPlayers(filteredPlayers);
+        };
+
+        const applySearchPlayers = (allPlayers: Player[]) => {
+          setPlayers((prevPlayers) => {
+            const prevRatings = new Map(
+              prevPlayers.map((p) => [p.id, p.activityRating] as const)
+            );
+            const next = filterForSearch(allPlayers).map((player) => ({
+              ...player,
+              activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
+            }));
+            // Защита от "фликера": если пришёл пустой ответ (временная сет. ошибка/таймаут/плохой кеш),
+            // не затираем уже показанный список "нет игроков".
+            if (next.length === 0 && prevPlayers.length > 0) {
+              return prevPlayers;
+            }
+            return next;
+          });
+        };
+
+        const allPlayers = await loadPlayers(currentUser.status === 'admin', {
+          onUpdated: (fresh) => {
+            void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
+          },
+        });
+
+        applySearchPlayers(allPlayers);
+        void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
         
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
@@ -538,6 +592,15 @@ export default function SearchScreen() {
     }
   }, [router, currentUser]);
 
+  useFocusEffect(
+    useCallback(() => {
+      registerTabScrollHandler('search', () => {
+        playersListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      });
+      return () => registerTabScrollHandler('search', null);
+    }, []),
+  );
+
   // Устанавливаем currentScreen при фокусе на экране поиска
   useFocusEffect(
     useCallback(() => {
@@ -546,24 +609,42 @@ export default function SearchScreen() {
       if (currentUser) {
         const refreshData = async () => {
           try {
-            const allPlayers = await loadPlayers(false);
-            let filteredPlayers: Player[];
-            if (currentUser.status === 'admin') {
-              filteredPlayers = allPlayers;
-              console.log(`🔍 Админ: загружено ${allPlayers.length} игроков, из них скрытых: ${allPlayers.filter(p => p.is_hidden).length}`);
-            } else {
-              // Показываем игроков, звёзд, тренеров, магазины; скаутов не показываем
-              filteredPlayers = allPlayers.filter(player =>
-                player.status !== 'scout' &&
-                (player.status === 'player' ||
-                  player.status === 'admin' ||
-                  player.status === 'star' ||
-                  player.status === 'coach' ||
-                  player.status === 'shop' ||
-                  player.status === 'skateSharpening')
+            const filterForSearch = (allPlayers: Player[]): Player[] => {
+              if (currentUser.status === 'admin') return allPlayers;
+              return allPlayers.filter(player =>
+                player.status === 'player' ||
+                player.status === 'admin' ||
+                player.status === 'star' ||
+                player.status === 'coach' ||
+                player.status === 'scout' ||
+                player.status === 'shop' ||
+                player.status === 'skateSharpening'
               );
-            }
-            setPlayers(filteredPlayers);
+            };
+
+            const applySearchPlayers = (allPlayers: Player[]) => {
+              setPlayers((prevPlayers) => {
+                const prevRatings = new Map(
+                  prevPlayers.map((p) => [p.id, p.activityRating] as const)
+                );
+                const next = filterForSearch(allPlayers).map((player) => ({
+                  ...player,
+                  activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
+                }));
+                if (next.length === 0 && prevPlayers.length > 0) {
+                  return prevPlayers;
+                }
+                return next;
+              });
+            };
+
+            const allPlayers = await loadPlayers(false, {
+              onUpdated: (fresh) => {
+                void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
+              },
+            });
+            applySearchPlayers(allPlayers);
+            void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
           } catch (error) {
             console.error('❌ Ошибка обновления списка игроков:', error);
           }
@@ -1055,46 +1136,119 @@ export default function SearchScreen() {
     positions,
   ]);
 
+  const isGoalieLeaderMode = useMemo(() => {
+    return isSelectedPositionGoalkeeper || selectedGAA !== null || selectedSV !== null;
+  }, [isSelectedPositionGoalkeeper, selectedGAA, selectedSV]);
+
   // Фильтрация и сортировка игроков
-  const filteredPlayers = useMemo(() => {
+  const { filteredPlayers, searchLeaderPositions, firstNewcomerId, firstLeaderId } = useMemo(() => {
     const filtered = filterPlayers();
+    const { sorted, leaderPositions } = sortPlayersForSearchList(
+      filtered,
+      isGoalieLeaderMode,
+      SEARCH_NEWCOMER_MAX_MS
+    );
 
-    // *** НОВЫЙ ПОРЯДОК ДЛЯ СПИСКА ПОИСКА ***
-    // 1) сначала показываем НОВИЧКОВ (созданных за последние 2 дня), самые новые СВЕРХУ
-    // 2) потом всех остальных, отсортированных по рейтингу активности (убывание)
-    const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
+    // Первые строки блоков «новички» и «лидеры» — для заголовков-разделителей в списке
+    let leaderFirst: string | null = null;
+    for (const [pid, pos] of leaderPositions) {
+      if (pos === 1) {
+        leaderFirst = pid;
+        break;
+      }
+    }
+    const first = sorted[0];
+    const newcomerFirst =
+      first &&
+      !leaderPositions.has(first.id) &&
+      first.createdAt &&
+      Date.now() - new Date(first.createdAt).getTime() < SEARCH_NEWCOMER_MAX_MS
+        ? first.id
+        : null;
 
-    const newcomers: Player[] = [];
-    const others: Player[] = [];
+    return {
+      filteredPlayers: sorted,
+      searchLeaderPositions: leaderPositions,
+      firstNewcomerId: newcomerFirst,
+      firstLeaderId: leaderFirst,
+    };
+  }, [
+    filterPlayers,
+    isGoalieLeaderMode,
+  ]);
 
-    filtered.forEach(player => {
-      if (player.createdAt) {
-        const createdTime = new Date(player.createdAt).getTime();
-        if (!isNaN(createdTime) && (now - createdTime) < TWO_DAYS_MS) {
-          newcomers.push(player);
-          return;
+  const leadersShareTitle = isGoalieLeaderMode
+    ? (t('search.topBySV') || 'Top by SV%')
+    : (t('search.topByPoints') || 'Top by points');
+
+  const ratingShareRef = useRef<View>(null);
+  const [isExportingRating, setIsExportingRating] = useState(false);
+
+  const leaderShareEntries = useMemo((): SearchRatingShareEntry[] => {
+    return filteredPlayers
+      .filter((p) => searchLeaderPositions.has(p.id))
+      .map((p) => ({ player: p, rank: searchLeaderPositions.get(p.id)! }))
+      .sort((a, b) => a.rank - b.rank);
+  }, [filteredPlayers, searchLeaderPositions]);
+
+  const ratingShareFilterLine = useMemo(() => {
+    const countryPart = selectedCountry
+      ? (() => {
+          const tr = t(`profile.countries.${selectedCountry}`);
+          return tr !== `profile.countries.${selectedCountry}` ? tr : selectedCountry;
+        })()
+      : (t('search.allCountries') || 'All countries');
+    const yearPart = selectedYear
+      ? String(selectedYear)
+      : (t('search.allYears') || 'All years');
+    const parts = [`${countryPart} — ${yearPart}`];
+    if (selectedPosition) {
+      const tr = t(`profile.positions.${selectedPosition}`);
+      parts.push(tr !== `profile.positions.${selectedPosition}` ? tr : selectedPosition);
+    }
+    return parts.join(' · ');
+  }, [selectedCountry, selectedYear, selectedPosition, t]);
+
+  const handleShareRating = useCallback(async () => {
+    if (isExportingRating || leaderShareEntries.length === 0) return;
+    setIsExportingRating(true);
+
+    try {
+      await prefetchRatingShareAvatars(leaderShareEntries);
+      await new Promise<void>((resolve) => {
+        InteractionManager.runAfterInteractions(() => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
+      });
+      await new Promise((r) => setTimeout(r, Platform.OS === 'android' ? 400 : 250));
+      if (!ratingShareRef.current) {
+        throw new Error('Share card not ready');
+      }
+      const uri = await captureRef(ratingShareRef, {
+        format: 'png',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
+      const available = await Sharing.isAvailableAsync();
+      if (available) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'image/png',
+          dialogTitle: t('search.shareRating') || 'Share rating',
+        });
+      } else {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+          await MediaLibrary.saveToLibraryAsync(uri);
+          Alert.alert(t('common.success') || 'OK', t('profile.savedToGallery') || 'Saved');
         }
       }
-      others.push(player);
-    });
-
-    // Новички: самые новые сверху
-    newcomers.sort((a, b) => {
-      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bTime - aTime; // более новые раньше
-    });
-
-    // Остальные: по рейтингу активности (убывание)
-    others.sort((a, b) => {
-      const ratingA = a.activityRating || 0;
-      const ratingB = b.activityRating || 0;
-      return ratingB - ratingA;
-    });
-    
-    return [...newcomers, ...others];
-  }, [players, debouncedSearchQuery, selectedCountry, selectedTeam, selectedHand, selectedPosition, selectedYear, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, currentUser, t]);
+    } catch (e) {
+      console.error('Rating share error:', e);
+      Alert.alert(t('common.error') || 'Error', t('profile.shareError') || 'Share failed');
+    } finally {
+      setIsExportingRating(false);
+    }
+  }, [isExportingRating, leaderShareEntries, t]);
   
   // Мемоизированные фильтры, зависящие от игроков, отфильтрованных по другим фильтрам (свой фильтр игнорируем)
   const countries = useMemo(() => {
@@ -1206,13 +1360,28 @@ export default function SearchScreen() {
     ({ item }: { item: Player }) => (
       <SearchPlayerRowMemo
         player={item}
+        leaderPosition={searchLeaderPositions.get(item.id)}
+        sectionLabel={
+          item.id === firstNewcomerId
+            ? 'newcomers'
+            : item.id === firstLeaderId
+              ? 'leaders'
+              : undefined
+        }
+        leadersSectionTitle={leadersShareTitle}
+        onShareLeaders={
+          item.id === firstLeaderId && leaderShareEntries.length > 0
+            ? handleShareRating
+            : undefined
+        }
+        isExportingRating={isExportingRating}
         isAdmin={currentUser?.status === 'admin'}
         language={language}
         onPress={openPlayerFromSearch}
         t={t}
       />
     ),
-    [currentUser?.status, language, openPlayerFromSearch, t]
+    [currentUser?.status, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, handleShareRating, isExportingRating, t]
   );
 
   // Показываем загрузку пока проверяем авторизацию
@@ -1231,7 +1400,7 @@ export default function SearchScreen() {
             resizeMode="cover"
           >
             <View style={styles.overlayLoading}>
-              <Text style={styles.loadingText}>{t('common.loading')}</Text>
+              <LoadingCenter />
             </View>
           </CachedBackground>
         </View>
@@ -1249,7 +1418,7 @@ export default function SearchScreen() {
           resizeMode="cover"
         >
           <View style={styles.overlayLoading}>
-            <Text style={styles.loadingText}>{t('common.loading')}</Text>
+            <LoadingCenter />
           </View>
         </CachedBackground>
       </View>
@@ -1517,6 +1686,7 @@ export default function SearchScreen() {
 
           {/* Список игроков */}
           <FlatList
+            ref={playersListRef}
             data={filteredPlayers}
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
@@ -1527,7 +1697,7 @@ export default function SearchScreen() {
             updateCellsBatchingPeriod={80}
             windowSize={21}
             initialNumToRender={14}
-            extraData={language}
+            extraData={`${language}-${searchLeaderPositions.size}`}
           />
 
           {/* Кнопка массовой отправки сообщений (только для администратора) */}
@@ -1551,6 +1721,18 @@ export default function SearchScreen() {
           )}
         </View>
       </CachedBackground>
+      {leaderShareEntries.length > 0 ? (
+        <View style={styles.ratingShareOffscreen} pointerEvents="none">
+          <SearchRatingShareCard
+            ref={ratingShareRef}
+            title={leadersShareTitle}
+            filterLine={ratingShareFilterLine || undefined}
+            goalieMode={isGoalieLeaderMode}
+            entries={leaderShareEntries}
+            t={t}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -1558,7 +1740,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87A3B1',
+    backgroundColor: colors.scene,
   },
   backgroundImage: {
     flex: 1,
@@ -1772,6 +1954,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   playerItem: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 20,
@@ -1792,13 +1975,22 @@ const styles = StyleSheet.create({
       elevation: 8,
     }),
   },
+  playerPhotoWrap: {
+    position: 'relative',
+    marginRight: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  leaderMedalRing: {
+    position: 'absolute',
+    zIndex: 1,
+  },
   playerPhotoContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
     borderWidth: 2,
     borderColor: 'white',
-    marginRight: 15,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1809,10 +2001,19 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 2,
     borderColor: 'red',
-    marginRight: 15,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  leaderRankNumber: {
+    position: 'absolute',
+    bottom: 0,
+    right: 6,
+    fontSize: 75,
+    lineHeight: 82,
+    fontFamily: 'Gilroy-Bold',
+    color: 'rgba(250, 47, 64, 0.18)',
+    zIndex: 3,
   },
   playerPhoto: {
     width: '100%',
@@ -1850,6 +2051,40 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
     marginLeft: 8,
+  },
+  // Выравниваем по левому краю карточек (playerGradientShadow: marginHorizontal 16)
+  sectionLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 5,
+    marginBottom: 6,
+  },
+  sectionLabelText: {
+    color: '#fff',
+    fontSize: 13,
+    letterSpacing: 0.5,
+    fontFamily: 'Gilroy-Bold',
+  },
+  sectionLabelLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(250, 47, 64, 0.35)',
+    marginLeft: 10,
+  },
+  sectionExportButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#fa2f40',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  ratingShareOffscreen: {
+    position: 'absolute',
+    left: -10000,
+    top: 0,
   },
   newBadgeText: {
     color: '#FFFFFF',
@@ -1905,6 +2140,11 @@ const styles = StyleSheet.create({
 
 type SearchPlayerRowProps = {
   player: Player;
+  leaderPosition?: number;
+  sectionLabel?: 'newcomers' | 'leaders';
+  leadersSectionTitle?: string;
+  onShareLeaders?: () => void;
+  isExportingRating?: boolean;
   isAdmin?: boolean;
   language: string;
   onPress: (id: string) => void;
@@ -1916,11 +2156,20 @@ function areSearchPlayerRowPropsEqual(
   next: SearchPlayerRowProps
 ): boolean {
   if (prev.isAdmin !== next.isAdmin || prev.language !== next.language) return false;
+  if (prev.leaderPosition !== next.leaderPosition) return false;
+  if (prev.sectionLabel !== next.sectionLabel) return false;
+  if (prev.leadersSectionTitle !== next.leadersSectionTitle) return false;
+  if (prev.isExportingRating !== next.isExportingRating) return false;
   return searchPlayerRowDataEqual(prev.player, next.player);
 }
 
 const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   player,
+  leaderPosition,
+  sectionLabel,
+  leadersSectionTitle,
+  onShareLeaders,
+  isExportingRating,
   isAdmin,
   language,
   onPress,
@@ -1928,31 +2177,96 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
 }: SearchPlayerRowProps) {
   const playerPhoto =
     player.avatar || (player.photos && player.photos.length > 0 && player.photos[0]) || undefined;
-  const photoContainerStyle =
-    player.status === 'coach' ? styles.coachPhotoContainer : styles.playerPhotoContainer;
+  const medalRank = leaderPosition != null ? getMedalLeaderRank(leaderPosition) : undefined;
+  const avatarSize = getSearchAvatarSize(leaderPosition);
+  const ringSize = medalRank ? avatarSize + LEADER_MEDAL_BORDER_WIDTH * 2 + 4 : avatarSize;
+  const photoContainerStyle = [
+    player.status === 'coach' ? styles.coachPhotoContainer : styles.playerPhotoContainer,
+    {
+      width: avatarSize,
+      height: avatarSize,
+      borderRadius: avatarSize / 2,
+    },
+  ];
   const subtitle = buildSearchPlayerSubtitle(player, t, language);
   const showNewBadge =
     !!player.createdAt &&
     Date.now() - new Date(player.createdAt).getTime() < SEARCH_NEWCOMER_MAX_MS;
 
   return (
+    <>
+      {sectionLabel ? (
+        <View style={styles.sectionLabelRow}>
+          <Text style={styles.sectionLabelText}>
+            {sectionLabel === 'leaders'
+              ? (leadersSectionTitle || t('search.topByPoints') || 'Top by points')
+              : (t('search.newcomers') || 'Newcomers')}
+          </Text>
+          <View style={styles.sectionLabelLine} />
+          {sectionLabel === 'leaders' && onShareLeaders ? (
+            <TouchableOpacity
+              onPress={onShareLeaders}
+              style={styles.sectionExportButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              disabled={isExportingRating}
+            >
+              {isExportingRating ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Ionicons name="share-outline" size={16} color="#fff" />
+              )}
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ) : null}
     <TouchableOpacity onPress={() => onPress(player.id)} activeOpacity={0.7}>
       <View style={styles.playerGradientShadow}>
         <BlurOrSolid intensity={20} tint="dark" style={styles.playerItemBlur}>
           <View style={styles.playerItem}>
-            <View style={photoContainerStyle}>
-              <CachedAvatar
-                playerId={player.id}
-                fallbackAvatarUrl={playerPhoto}
-                size={60}
-                style={styles.playerPhoto}
-                status={player.status}
-              />
+            {leaderPosition != null ? (
+              <Text style={styles.leaderRankNumber} pointerEvents="none">
+                {leaderPosition}
+              </Text>
+            ) : null}
+            <View style={[styles.playerPhotoWrap, { width: ringSize, height: ringSize }]}>
+              {medalRank != null ? (
+                <>
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.leaderMedalRing,
+                      {
+                        width: ringSize,
+                        height: ringSize,
+                        borderRadius: ringSize / 2,
+                        borderWidth: LEADER_MEDAL_BORDER_WIDTH,
+                        borderColor: LEADER_BORDER_COLORS[medalRank],
+                      },
+                    ]}
+                  />
+                  <LeaderShine
+                    size={ringSize}
+                    color={LEADER_BORDER_COLORS[medalRank]}
+                    delayMs={(medalRank - 1) * 450}
+                  />
+                </>
+              ) : null}
+              <View style={photoContainerStyle}>
+                <CachedAvatar
+                  playerId={player.id}
+                  fallbackAvatarUrl={playerPhoto}
+                  size={avatarSize - 4}
+                  style={styles.playerPhoto}
+                  status={player.status}
+                />
+              </View>
             </View>
             <View style={styles.playerDetails}>
               <View style={styles.playerNameRow}>
                 <Text style={styles.playerName} numberOfLines={1}>
-                  {player.name}
+                  {player.status === 'scout' && !isAdmin
+                    ? (t('profile.scout') || (language === 'ru' ? 'Скаут' : 'Scout'))
+                    : player.name}
                 </Text>
                 {showNewBadge ? (
                   <View style={styles.newBadge}>
@@ -1980,6 +2294,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
         </BlurOrSolid>
       </View>
     </TouchableOpacity>
+    </>
   );
 }, areSearchPlayerRowPropsEqual);
 

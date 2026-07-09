@@ -93,9 +93,11 @@ class ImageCache {
 
 export const imageCache = ImageCache.getInstance();
 
+import { ICE_BACKGROUND } from './iceBackground';
+
 // Глобальные изображения приложения
 export const APP_IMAGES = {
-  LED_BACKGROUND: require('../assets/images/led.jpg'),
+  LED_BACKGROUND: ICE_BACKGROUND,
   SPLASH_ICON: require('../assets/images/splash-icon.png'),
 } as const;
 

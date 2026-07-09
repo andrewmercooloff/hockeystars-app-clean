@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Cik skrituļslidotāju vienā komandā ir uz ledus vienāda spēka laikā (neskaitot vārtsargus)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Cik regulācijas periodu ir standarta NHL spēlē?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Offside tiek izsaukta, kad uzbrūkošais spēlētājs ieiet uzbrukuma zonā pirms kāda?",
+    "options": [
+      "Centrālā līnija",
+      "Ripa",
+      "Vārtsargs",
+      "Tiesnesis"
+    ]
+  },
+  "rules_icing": {
+    "question": "Apledojums ir ripu raidīšana no aiz centra līnijas garām pretinieka vārtu līnijai bez pieskāriena. Taisnība?",
+    "options": [
+      "Nepatiesi — nekad NHL",
+      "Taisnība",
+      "Tiesa – tikai papildlaikā",
+      "Nepatiesi — tikai no aizsardzības zonas"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Kam pieder NHL rekords visvairāk gūto vārtu karjerā?",
+    "options": [
+      "Alekss Ovečkins",
+      "Jaromirs Jāgrs",
+      "Gordijs Hovs",
+      "Veins Greckis"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Kuras komandas pilsētā Alekss Ovečkins ir slavens kā kreisais malējais uzbrucējs, kuram ir 8. numurs?",
+    "options": [
+      "Bostona",
+      "Toronto",
+      "Vašingtona",
+      "Pitsburga"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Kas ir \"hat trick\" hokejā?",
+    "options": [
+      "Viena spēlētāja trīs vārti vienā spēlē",
+      "Trīs atvairījumi pēc kārtas",
+      "Trīs rezultatīvas piespēles vienā spēlē",
+      "Trīs sodi"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Jaudas spēle notiek, ja:",
+    "options": [
+      "Vārtsargs tiek pievilkts",
+      "Izceļas kautiņš",
+      "Vienai komandai soda dēļ ir vairāk slidotāju",
+      "Sākas papildlaiks"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Kuras līgas čempionāta trofeja ir Stenlija kauss?",
+    "options": [
+      "IIHF Pasaules čempionāts",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "No kā sastāv standarta hokeja ripa?",
+    "options": [
+      "Vulkanizēta gumija",
+      "Alumīnijs",
+      "Koksne",
+      "Plastmasa"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Cik minūtes ir standarta nelielais sods?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Cik minūtes ir standarta galvenais sods?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Spēlēšana sākas ar:",
+    "options": [
+      "Soda metiens",
+      "Faceoff",
+      "Jaudas pārtraukums",
+      "Ledus zvans"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Ja NHL regulārās sezonas spēle pēc pagarinājuma ir neizšķirta, kas notiek?",
+    "options": [
+      "Otrais pagarinājums",
+      "Shootout",
+      "Izslēgšanas spēļu periods",
+      "Draw stendi"
+    ]
+  },
+  "rules_crease": {
+    "question": "Vai uzbrucējs var stāvēt vārtsarga riņķī bez sekām?",
+    "options": [
+      "Jā vienmēr",
+      "Tikai izslēgšanas spēlēs",
+      "Nē — vārti var tikt noraidīti",
+      "Tikai pēdējā brīdī"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Augsta nūja ir tad, kad nūja trāpa pretiniekam virs:",
+    "options": [
+      "Šķērsstienis",
+      "Pleci",
+      "Viduklis",
+      "Tikai ķivere"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Vārtsargu pievilkšana riskē:",
+    "options": [
+      "Soda metiens",
+      "Tukši vārti pret",
+      "Aizmugurē",
+      "Tikai glazūra"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Soda metiens bieži tiek piešķirts par pārkāpumu:",
+    "options": [
+      "Jebkurā laikā",
+      "Tikai virsstundas",
+      "Tikai izslēgšanas spēles",
+      "Skaidrs atrāviens"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Nepilngadīgo soliņu apkalpo jebkurš spēlētājs, izņemot:",
+    "options": [
+      "Vārtsargs (parasti)",
+      "Uzbrucējs",
+      "Aizsargs",
+      "Kapteinis"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "NHL regulārās sezonas OT spēlē ar cik slidotājiem katrā pusē?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Cik spēlētāju (ieskaitot vārtsargu) komandā drīkst būt uz ledus?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Cik punktu vērti uz tablo ir gūti vārti?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Par aizkavētu sodu komanda, kas nav izdarījusi pārkāpumu, bieži:",
+    "options": [
+      "Ledus ripu",
+      "Zvanu taimauts",
+      "Pārtrauc atskaņošanu",
+      "Izvelk vārtsargu"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Vārtsargi var izspēlēt ripu tikai aiz tīkla:",
+    "options": [
+      "Centra aplis",
+      "Neitrāla zona",
+      "Pilna zona",
+      "Trapecveida laukums"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Cīņa parasti izraisa:",
+    "options": [
+      "Liels sods",
+      "Tikai spēles pārkāpums",
+      "Neliels sods",
+      "Nav soda"
+    ]
+  },
+  "terms_puck": {
+    "question": "Cietās gumijas priekšmetus, kurus spēlētāji šauj, sauc par:",
+    "options": [
+      "Ripa",
+      "Disks",
+      "Akmens",
+      "Bumba"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Piespēli, kas paceļ ripu, sauc par:",
+    "options": [
+      "Apakštase caurlaide",
+      "Valdes caurlaide",
+      "Pļauku izgāztuve",
+      "Kroku piespēle"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Sitiens ietver:",
+    "options": [
+      "Tikai ar aizmuguri",
+      "Viena roka uz kociņa",
+      "Viegli piesitot ripai",
+      "Likvidēšana un pirmā trieciens pret ledu"
+    ]
+  },
+  "terms_deke": {
+    "question": "Deka ir:",
+    "options": [
+      "Soda veids",
+      "Viltus gājiens, lai pārspētu aizsargu",
+      "Aizsardzības bloks",
+      "Līnijas maiņa"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Atdalīšanās ir tad, kad:",
+    "options": [
+      "Ripa ir ledus",
+      "Slidotājs ieiet viens pats uz vārtsarga",
+      "Divi spēlētāji cīnās",
+      "Notiek līnijas maiņa"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Plus/mīnus dziesmas:",
+    "options": [
+      "Sitieni pa vārtiem",
+      "Vārtu starpība, kamēr spēlētājs ir uz ledus ar vienmērīgu spēku",
+      "Soda minūtes",
+      "Faceoff uzvar tikai"
+    ]
+  },
+  "terms_assist": {
+    "question": "Galvenā piespēle tiek piešķirta spēlētājam, kurš:",
+    "options": [
+      "Iegūst vārtus",
+      "Uzvarēja izbraukumā",
+      "Pēdējā pieskaršanās ripai pirms vārtu guvēja",
+      "Dabūja sodu"
+    ]
+  },
+  "terms_block": {
+    "question": "Bloķēts metiens ir tad, kad:",
+    "options": [
+      "Ripa trāpa pa stabu",
+      "Slidotājs aptur ripu ar ķermeni/nūju pirms vārtiem",
+      "Vārtsargs to izglābj",
+      "Sitiens netrāpa"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Iepriekšēja pārbaude nozīmē:",
+    "options": [
+      "Tikai līnijas maiņas stratēģija",
+      "Aizstāvi savu zilo līniju",
+      "Pretinieku presings savā zonā, lai atgūtu ripu",
+      "Vārtsargu vilkšana"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Atpakaļpārbaude nozīmē:",
+    "options": [
+      "Slidošana atpakaļ, lai palīdzētu aizsardzībā",
+      "Šaušana no punkta",
+      "Uzvara spārnos",
+      "Vārtsargu glābj"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Vienreizējs ir:",
+    "options": [
+      "Gaida, tad šauj",
+      "Vārtsarga gājiens",
+      "Tūlītēja šaušana no piespēles",
+      "Sods"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Pārbaude:",
+    "options": [
+      "Paceliet ripu virs nūjas",
+      "Savstarpēja pārbaude",
+      "Izsit ripu prom no pretinieka",
+      "Āķis pretinieks"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Augšējais plaukts nozīmē punktu gūšanu:",
+    "options": [
+      "Tīkla augšējā daļa",
+      "Tikai no centra ledus",
+      "Tikai uz tukšiem tīkliem",
+      "Piecu caurumu"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Pieci bedrītes ir starp vārtsargu:",
+    "options": [
+      "Nūja un cimds",
+      "Maska un krūtis",
+      "Roka un ķermenis",
+      "Kājas"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Izpildītājs nodrošina:",
+    "options": [
+      "Koučings",
+      "Vārtu gūšana",
+      "Fiziskā aizsardzība un cīņa",
+      "Tikai izšķiršanās"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Līnijas izmaiņas parasti notiek:",
+    "options": [
+      "Tikai pēc vārtiem",
+      "Tikai uz sodiem",
+      "Tikai starpbrīžos",
+      "Lidojumā spēles laikā"
+    ]
+  },
+  "terms_rink": {
+    "question": "Spēļu virsmu hokejā sauc:",
+    "options": [
+      "Lauks",
+      "Tiesa",
+      "Trase",
+      "Ledus laukums"
+    ]
+  },
+  "terms_goal": {
+    "question": "Tīkla spēlētāji met uz sitienu sauc:",
+    "options": [
+      "Mērķis",
+      "Grozs",
+      "Mērķis",
+      "Zona"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Spēlēt ar īso roku nozīmē:",
+    "options": [
+      "Virsstundas",
+      "Vārtsargs pievilka",
+      "Soda dēļ mazāk slidotāju",
+      "Tukšs tīkls"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Pēkšņas nāves virsstundas nozīmē:",
+    "options": [
+      "Pirmie vārti uzvar",
+      "Pilns periods",
+      "Tikai šaušana",
+      "Nav uzvarētāja"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Cik komandu NHL Original Six laikmetā?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Mūsdienu hokejs visvairāk attīstījās:",
+    "options": [
+      "Krievija",
+      "Zviedrija",
+      "ASV",
+      "Kanāda"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Brīnums uz ledus: kuru ASV pārspēja 1980. gadā?",
+    "options": [
+      "Padomju Savienība",
+      "Kanāda",
+      "Čehoslovākija",
+      "Zviedrija"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Veina Grecka karjeras punktu rekords ir beidzies:",
+    "options": [
+      "1500",
+      "2857",
+      "2000. gads",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Hokeja slavas zālē atrodas:",
+    "options": [
+      "Toronto",
+      "Bostona",
+      "Monreāla",
+      "Ņujorka"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL pamatā ir:",
+    "options": [
+      "Krievija",
+      "Somija",
+      "ASV",
+      "Kanāda"
+    ]
+  },
+  "hist_1972": {
+    "question": "1972. gada samita sērija: Kanāda pret:",
+    "options": [
+      "PSRS",
+      "ASV",
+      "Čehija",
+      "Zviedrija"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL tika dibināta:",
+    "options": [
+      "20. gadsimts",
+      "21. gadsimts",
+      "19. gadsimts",
+      "18. gadsimts"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidnijs Krosbijs tika draftēts ar pirmo numuru:",
+    "options": [
+      "2003. gads",
+      "2007. gads",
+      "2010. gads",
+      "2005. gads"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Konors Makdeivids tika draftēts ar pirmo numuru:",
+    "options": [
+      "2013. gads",
+      "2017. gads",
+      "2019. gads",
+      "2015. gads"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Stenlija kauss pirmo reizi tika piešķirts:",
+    "options": [
+      "20. gadsimts",
+      "21. gadsimts",
+      "18. gadsimts",
+      "19. gadsimts"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromirs Jāgrs ir starp visu laiku NHL līderiem:",
+    "options": [
+      "Punkti",
+      "Koučings",
+      "Tikai soda minūtes",
+      "Vārtsargs uzvar"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Alekss Ovečkins savu NHL karjeru galvenokārt pavadīja ar:",
+    "options": [
+      "Ņujorkas Rangers",
+      "Pitsburgas pingvīni",
+      "Vašingtonas Capitals",
+      "Bostonas Bruins"
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemjē izcīnīja Stenlija kausu ar:",
+    "options": [
+      "Pitsburgas pingvīni",
+      "Monreālas Canadiens",
+      "Detroitas Red Wings",
+      "Edmontonas \"Oilers\"."
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Cik gara ir NHL slidotava?",
+    "options": [
+      "200 pēdas",
+      "150 pēdas",
+      "300 pēdas",
+      "250 pēdas"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Cik plata ir NHL slidotava?",
+    "options": [
+      "100 pēdas",
+      "150 pēdas",
+      "120 pēdas",
+      "85 pēdas"
+    ]
+  },
+  "gen_zones": {
+    "question": "Cik zonās slidotavu sadala zilās līnijas?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Centrālā sarkanā līnija tiek izmantota:",
+    "options": [
+      "Apledojuma zvani",
+      "Soda kaste",
+      "Tikai izšķiršanās",
+      "Centrā malējā malā"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Nūjas asmens līkne palīdz:",
+    "options": [
+      "Slidošanas ātrums",
+      "Vārtsargs glābj",
+      "Ripas celšana un kontrole",
+      "Cīņa"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Slidas dobums ietekmē:",
+    "options": [
+      "Stick flex",
+      "Satvēriens uz ledus un pagriezieniem",
+      "Ķiverei der",
+      "Džersija izmērs"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Apakšstilba aizsargi aizsargā:",
+    "options": [
+      "Pleci",
+      "Galva",
+      "Apakšstilbi",
+      "Tikai rokas"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kapteinis nēsā vēstuli:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Kapteiņu aizstājēji valkā:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Mājas komanda parasti valkā:",
+    "options": [
+      "Tumši/krāsaini",
+      "Balts/gaišs",
+      "Nav kreklu",
+      "Tikai vārtsargs"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Pārtraukums starp periodiem ir aptuveni:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 stunda"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL izslēgšanas spēļu sērijas galvenokārt ir:",
+    "options": [
+      "Vienmēr labākais no 5",
+      "Tikai fināls",
+      "Reti izņēmumi — galvenokārt labākais no 7",
+      "Nekad"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zamboni izmanto, lai:",
+    "options": [
+      "Izmēra ātrumu",
+      "Uzglabā ripas",
+      "Asināt slidas",
+      "Atjaunojiet ledus virsmu"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Uz ledus amatpersonas valkā:",
+    "options": [
+      "Komandu krekliņi",
+      "Vārtsargu aprīkojums",
+      "Melnbaltas svītras",
+      "Uzvalki"
+    ]
+  },
+  "gen_skates": {
+    "question": "Hokejisti turpina:",
+    "options": [
+      "Skrituļslidas",
+      "Slidas",
+      "Basām kājām",
+      "Slēpes"
+    ]
+  },
+  "gen_stick": {
+    "question": "Spēlētāji kontrolē ripu ar:",
+    "options": [
+      "Nūja",
+      "Net",
+      "Tikai rokas",
+      "Ķivere"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Ar kuru komandu Sidnijs Krosbijs visvairāk asociējas?",
+    "options": [
+      "Pitsburgas pingvīni",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Kurā pozīcijā Sidnijs Krosbijs galvenokārt spēlēja?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Ar kuru komandu Konors Makdeivids visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs",
+      "Edmontonas \"Oilers\"."
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Konors Makdeivids?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Ar kuru komandu Neitans Makkinons ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Kolorādo lavīna",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Neitans Makkinons?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Ar kuru komandu Viktors Hedmens ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Tampabejas zibens",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Viktors Hedmens?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Ar kuru komandu Kerijs Praiss ir visvairāk saistīts?",
+    "options": [
+      "Monreālas Canadiens",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Kerijs Praiss?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Ar kuru komandu Jaromirs Jāgrs ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs",
+      "Pitsburgas pingvīni"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Jaromirs Jāgrs?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Ar kuru komandu Mario Lemjē visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Pitsburgas pingvīni",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Mario Lemjē?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Ar kuru komandu Patriks Keins visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Čikāgas Blackhawks",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Patriks Keins?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Ar kuru komandu Niklass Lidstroms visvairāk asociējas?",
+    "options": [
+      "Detroitas Red Wings",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Niklass Lidstroms?",
+    "options": [
+      "Centrs",
+      "Vārtsargs",
+      "Kreisais malējais uzbrucējs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Ar kuru komandu Martins Brodērs visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Ņūdžersijas Devils"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Martins Brodērs?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Ar kuru komandu Stīvens Stamkoss ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Tampabejas zibens",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Stīvens Stamkoss?",
+    "options": [
+      "Centrs",
+      "Aizsargs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Ar kuru komandu Ostons Metjūss ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Monreālas Canadiens"
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Ostons Metjūss?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Ar kuru komandu Leons Draisaitls visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Edmontonas \"Oilers\"."
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Leons Draisaitls?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Ar kuru komandu Ēriks Karlsons visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Sanhosē Sharks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Ēriks Karlsons?",
+    "options": [
+      "Centrs",
+      "Vārtsargs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Ar kuru komandu Pāvels Dacjuks ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Detroitas Red Wings",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Pāvels Dacjuks?",
+    "options": [
+      "Centrs",
+      "Aizsargs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Ar kuru komandu Henriks Lundkvists ir visvairāk saistīts?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Monreālas Canadiens"
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Henriks Lundkvists?",
+    "options": [
+      "Aizsargs",
+      "Labais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Ar kuru komandu visvairāk asociējas Jevgeņijs Malkins?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Pitsburgas pingvīni"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Jevgeņijs Malkins?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Ar kuru komandu Artēmijs Panarins visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Monreālas Canadiens",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Artēmijs Panarins?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Ar kuru komandu visvairāk asociējas Ņikita Kučerovs?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Tampabejas zibens",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Ņikita Kučerovs?",
+    "options": [
+      "Centrs",
+      "Vārtsargs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Ar kuru komandu Breds Mārčands ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs",
+      "Monreālas Canadiens"
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Breds Mārčands?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Ar kuru komandu Deivids Pastrnaks ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens"
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Deivids Pastrnaks?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Ar kuru komandu Šī Vēbere visvairāk asociējas?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Šī Vēbere?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs",
+      "Aizsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Ar kuru komandu visvairāk asociējas Sergejs Bobrovskis?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Floridas Panthers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Sergejs Bobrovskis?",
+    "options": [
+      "Aizsargs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Ar kuru komandu Džonatans Tovss ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Čikāgas Blackhawks"
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Džonatans Tovss?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Ar kuru komandu Anze Kopitars visvairāk asociējas?",
+    "options": [
+      "Losandželosas Kings",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Anze Kopitars?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Aizsargs",
+      "Labais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Ar kuru komandu Marks Mesjē visvairāk asociējas?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Edmontonas \"Oilers\".",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Marks Mesjē?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Ar kuru komandu Rejs Burks ir visvairāk saistīts?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Rejs Burks?",
+    "options": [
+      "Vārtsargs",
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Ar kuru komandu Dominiks Hašeks visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Dominiks Hašeks?",
+    "options": [
+      "Vārtsargs",
+      "Centrs",
+      "Aizsargs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Ar kuru komandu Tēmu Selanne visvairāk asociējas?",
+    "options": [
+      "Anaheimas Ducks",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Teemu Selanne?",
+    "options": [
+      "Centrs",
+      "Vārtsargs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Ar kuru komandu Pāvels Burē visvairāk asociējas?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Vankūveras \"Canucks\".",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Pāvels Burē?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Ar kuru komandu Aleksandrs Mogiļnijs visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Aleksandrs Mogiļnijs?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Ar kuru komandu Pīters Forsbergs ir visvairāk saistīts?",
+    "options": [
+      "Kolorādo lavīna",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Pīters Forsbergs?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Ar kuru komandu Džo Sakičs visvairāk asociējas?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Kolorādo lavīna",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Džo Sakičs?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Ar kuru komandu Stīvs Jermans ir visvairāk saistīts?",
+    "options": [
+      "Detroitas Red Wings",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Kuru pozīciju galvenokārt spēlēja Stīvs Yzermans?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Ar kuru komandu Bobijs Ors ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Bobijs Ors?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Ar kuru komandu Gordijs Hovs ir visvairāk saistīts?",
+    "options": [
+      "Detroitas Red Wings",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Gordijs Hovs?",
+    "options": [
+      "Vārtsargs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Ar kuru komandu Veins Greckis visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Edmontonas \"Oilers\".",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Veins Greckis?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Ar kuru komandu Valērijs Kharlamovs visvairāk asociējas?",
+    "options": [
+      "Maskavas CSKA",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Valērijs Kharlamovs?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Centrs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Ar kuru komandu Vladislavs Tretjaks visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Maskavas CSKA"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Vladislavs Tretjaks?",
+    "options": [
+      "Vārtsargs",
+      "Aizsargs",
+      "Centrs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Ar kuru komandu Bobijs Hols visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Čikāgas Blackhawks",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Bobijs Hols?",
+    "options": [
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Ar kuru komandu Moriss Ričards ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Moriss Ričards?",
+    "options": [
+      "Vārtsargs",
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Ar kuru komandu Gajs Laflers visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Monreālas Canadiens"
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Gajs Laflers?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Ar kuru komandu Patriks Rojs visvairāk asociējas?",
+    "options": [
+      "Monreālas Canadiens",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Patriks Rojs?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Ar kuru komandu Roberto Luongo visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Vankūveras \"Canucks\".",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Roberto Luongo?",
+    "options": [
+      "Vārtsargs",
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Ar kuru komandu Iļja Kovaļčuks visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Ņūdžersijas Devils",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Iļja Kovaļčuks?",
+    "options": [
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Ar kuru komandu Pāvels Burē visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Floridas Panthers"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Pāvels Burē?",
+    "options": [
+      "Labais malējais uzbrucējs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Ar kuru komandu Aleksejs Kovaļovs visvairāk asociējas?",
+    "options": [
+      "Monreālas Canadiens",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Aleksejs Kovaļovs?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Vārtsargs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Ar kuru komandu visvairāk asociējas Sergejs Gončars?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Pitsburgas pingvīni",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Sergejs Gončars?",
+    "options": [
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Ar kuru komandu Vjačeslavs Fetisovs visvairāk asociējas?",
+    "options": [
+      "Ņūdžersijas Devils",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Vjačeslavs Fetisovs?",
+    "options": [
+      "Vārtsargs",
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Ar kuru komandu Kriss Čelioss ir visvairāk saistīts?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Detroitas Red Wings"
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Kriss Čelioss?",
+    "options": [
+      "Aizsargs",
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Ar kuru komandu Skots Stīvenss visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas Rangers",
+      "Ņūdžersijas Devils",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Kādu pozīciju Skots Stīvenss galvenokārt spēlēja?",
+    "options": [
+      "Aizsargs",
+      "Vārtsargs",
+      "Kreisais malējais uzbrucējs",
+      "Centrs"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Ar kuru komandu Pols Kofijs visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Edmontonas \"Oilers\".",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Pols Kofijs?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Ar kuru komandu Grants Fūrs ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Ņujorkas Rangers",
+      "Toronto Maple Leafs",
+      "Edmontonas \"Oilers\"."
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Grants Fūrs?",
+    "options": [
+      "Centrs",
+      "Aizsargs",
+      "Vārtsargs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Ar kuru komandu Maiks Bosijs visvairāk asociējas?",
+    "options": [
+      "Ņujorkas salu iedzīvotāji",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Maiks Bosijs?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Ar kuru komandu Braiens Trotjē visvairāk asociējas?",
+    "options": [
+      "Toronto Maple Leafs",
+      "Ņujorkas salu iedzīvotāji",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Braiens Trotjē?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Ar kuru komandu Deniss Potvins ir visvairāk saistīts?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Ņujorkas salu iedzīvotāji",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Deniss Potvins?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Vārtsargs",
+      "Centrs",
+      "Aizsargs"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Ar kuru komandu Kam Nīli visvairāk asociējas?",
+    "options": [
+      "Ņujorkas Rangers",
+      "Monreālas Canadiens",
+      "Toronto Maple Leafs",
+      "Bostonas Bruins"
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Cam Neely?",
+    "options": [
+      "Centrs",
+      "Kreisais malējais uzbrucējs",
+      "Labais malējais uzbrucējs",
+      "Vārtsargs"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Ar kuru komandu Adams Outs ir visvairāk saistīts?",
+    "options": [
+      "Vašingtonas Capitals",
+      "Ņujorkas Rangers",
+      "Bostonas Bruins",
+      "Toronto Maple Leafs"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Kādu pozīciju galvenokārt spēlēja Ādams Outs?",
+    "options": [
+      "Kreisais malējais uzbrucējs",
+      "Centrs",
+      "Aizsargs",
+      "Labais malējais uzbrucējs"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Ar kuru komandu Dags Gilmūrs visvairāk asociējas?",
+    "options": [
+      "Bostonas Bruins",
+      "Toronto Maple Leafs",
+      "Monreālas Canadiens",
+      "Ņujorkas Rangers"
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Kurā pozīcijā galvenokārt spēlēja Dags Gilmūrs?",
+    "options": [
+      "Centrs",
+      "Labais malējais uzbrucējs",
+      "Aizsargs",
+      "Kreisais malējais uzbrucējs"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Ko nozīmē KHL?",
+    "options": [
+      "Kontinentālā hokeja līga",
+      "Kazahstānas hokeja līga",
+      "Korejas hokeja līga",
+      "Karaļa hokeja līga"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF organizē:",
+    "options": [
+      "KHL izslēgšanas spēles",
+      "NHL drafts",
+      "Stenlija kauss",
+      "Pasaules čempionāts"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olimpisko spēļu hokeju spēlē:",
+    "options": [
+      "Ledus",
+      "Smiltis",
+      "Zāle",
+      "Betons"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Kura valsts ar Jāgra un Hašeka laikmeta zvaigznēm izcīnīja daudzus pasaules titulus?",
+    "options": [
+      "Somija",
+      "Čehija",
+      "Kanāda",
+      "ASV"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Daudzas NHL zvaigznes nāk no:",
+    "options": [
+      "Spānija",
+      "Brazīlija",
+      "Zviedrija",
+      "Indija"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Somija ir pazīstama ar lielisku ražošanu:",
+    "options": [
+      "Vārtsargi",
+      "Tikai treneri",
+      "Zamboni braucēji",
+      "Tiesneši"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Padomju \"Sarkanā mašīna\" dominēja:",
+    "options": [
+      "1970.-80. gadi",
+      "2000. gadi",
+      "2010. gadi",
+      "Tikai 1990. gados"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL komandas izvēlas jaunus spēlētājus:",
+    "options": [
+      "Tirdzniecības termiņš",
+      "Zvaigžņu spēle",
+      "Pasaules kauss",
+      "Ieejas projekts"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Tiek piešķirtas trīs spēles zvaigznes:",
+    "options": [
+      "Reizi sezonā",
+      "Tikai izslēgšanas spēlēs",
+      "Nekad NHL",
+      "Pēc katras spēles"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Sieviešu hokejs ir olimpiskais sporta veids kopš:",
+    "options": [
+      "1998. gads",
+      "Nekad",
+      "2010. gads",
+      "1980. gads"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Vienmērīgā spēkos, cik slidotāju (nav vārtsargu) katrā komandā?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Cik minūtes ilgst viens NHL periods?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Jūsu komanda spēlē spēka spēli, kad pretinieks ir:",
+    "options": [
+      "Apledojuma ripa",
+      "Vilkšanas vārtsargs",
+      "Saīsināts no soda",
+      "Uzvara spārnos"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Soda nogalināšana nozīmē:",
+    "options": [
+      "Virsstundas",
+      "Aizstāvoties īstermiņā",
+      "Papildu uzbrucējs",
+      "Vārtsargu cīņa"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Profesionālais hokejs tiek spēlēts:",
+    "options": [
+      "Netīrumi",
+      "Zāle",
+      "Ledus",
+      "Ūdens"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "NHL čempionāta trofeja ir:",
+    "options": [
+      "Pasaules kauss",
+      "Olimpiskais kauss",
+      "Stenlija kauss",
+      "Grecka kauss"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Anrī Ričards ieguva visvairāk Stenlija kausu kā spēlētājs ar:",
+    "options": [
+      "Bostonas Bruins",
+      "Monreālas Canadiens",
+      "Toronto Maple Leafs",
+      "Detroitas Red Wings"
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Veina Grecka slavenais krekla numurs bija:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemjē valkāja numuru:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidnijs Krosbijs nēsā numuru:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Konors Makdeivids nēsā numuru:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Cik komandu ir NHL (aptuveni)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Cik komandu ir NHL (aptuveni)? (papildu)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Uz standarta hokeja soliņa ir ģērbušies spēlētāji?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Uz standarta hokeja soliņa ir ģērbušies spēlētāji? (papildu)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Cik minūtes ir regulārais laiks NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Cik minūtes ir regulārais laiks NHL? (papildu)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Cik ierēdņu parasti uz ledus NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Cik ierēdņu parasti uz ledus NHL? (papildu)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Maksimālais spēlētāju skaits sarakstā (aptuveni)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Maksimālais spēlētāju skaits sarakstā (aptuveni)? (papildu)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Aizsarga galvenais darbs aizsardzības zonā ir:",
+    "options": [
+      "Uzvariet savstarpējās cīņās",
+      "Vispirms gūstiet vārtus",
+      "Aizsargājiet tīklu un slotu",
+      "Ātri mainiet līnijas"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Aizsardzībā viens pret vienu aizsargam ir:",
+    "options": [
+      "Nekavējoties slido uz soliņa",
+      "Palieciet starp uzbrucēju un tīklu",
+      "Atstājiet slotu atvērtu",
+      "Dzenieties tikai aiz tīkla"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Aizsardzības pozīcija: nūja uz ledus palīdz:",
+    "options": [
+      "Signāla taimauts",
+      "Izvairieties no ripas sitiena",
+      "Bloķējiet garāmbraucošās joslas",
+      "Brauciena komandas biedri"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Kad ripa tiek zaudēta uzbrukumā, aizsargam ir:",
+    "options": [
+      "Pavelciet vārtsargu",
+      "Slido atpakaļ, lai palīdzētu aizsardzībā",
+      "Palieciet pie sarkanās līnijas",
+      "Strīdies ar tiesnesi"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Aizsargam jābloķē metieni, ja:",
+    "options": [
+      "Ripa atrodas tikai neitrālajā zonā",
+      "Sākas starpbrīdis",
+      "Josla uz tīklu ir atvērta",
+      "Komanda spēlē spēka spēli"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "Spēlējot 2 pret 1, aizsargam parasti vajadzētu:",
+    "options": [
+      "Abi paliek pie zilās līnijas",
+      "Abi kopā met ripas nesēju",
+      "Paņemiet ripas turētāju un nolieciet to plati",
+      "Slido uz soliņa"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Soda nogalināšanas gadījumā prioritāte bieži ir:",
+    "options": [
+      "Slido ar ripu pa vidu vien",
+      "Vispirms mainiet līnijas lidojumā",
+      "Turiet ripu stūrī mūžīgi",
+      "Iztīriet ripu no zonas"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Laba spraugas kontrole nozīmē, ka aizsargs:",
+    "options": [
+      "Nekad nedublē",
+      "Sitieni tikai no aizmugures",
+      "Atbilst ātrumu un attālumu uzbrucējam",
+      "Vienmēr paliek ledus centrā"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Tīkla priekšā aizsargam ir:",
+    "options": [
+      "Slido līdz punktam",
+      "Zvaniet uz offside",
+      "Skatieties tikai ripu un ignorējiet spēlētājus",
+      "Box out un sasiet pretiniekus"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Pēc priekšpārbaudes spiediena aizsarga pirmajam skatienam vajadzētu būt:",
+    "options": [
+      "Šaut pa savu tīklu",
+      "Vispirms pārejiet uz zemu atbalstu vai drošu izeju",
+      "Vienmēr iziet cauri vidum zem spiediena",
+      "Akli apvelciet dēļus"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Spēka spēles laikā aizsargam vajadzētu:",
+    "options": [
+      "Slido atpakaļ neitrālajā zonā",
+      "Mainiet ar vārtsargu",
+      "Turiet ripu zonā un izveidojiet metienus/piespēles",
+      "Nekad nešaujiet"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Likumīga aizsardzības spēle steigā ir:",
+    "options": [
+      "Legāla makšķerēšana un nūja ripas pusē",
+      "Noķer un novelk pretinieku lejā",
+      "Atbrīvojoties, pārbaudiet no aizmugures",
+      "Pārbaudiet galvu"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Profesionālie aizsargi bloķē metienus, jo:",
+    "options": [
+      "Tā tiek uzskatīta par piespēli",
+      "Nekad nebloķējiet metienus",
+      "Bloķējiet šāvienu un vajadzības gadījumā upurējiet ķermeni",
+      "Tiesnesis pārtrauc spēli"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Kad divi uzbrucēji šķērso jūsu zonā, aizsargiem:",
+    "options": [
+      "Abi dzenā tikai ripu",
+      "Atstājiet kroku",
+      "Sazinieties un pārslēdzieties, ja nepieciešams",
+      "Ignorējiet tālās malas uzbrucēju"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Kad pretinieki iemet ripu, aizsargam vajadzētu:",
+    "options": [
+      "Paņemiet ripu vai piespraudiet to uz dēļiem",
+      "Slidot uz soliņa pārmaiņām",
+      "Pagaidiet svilpi",
+      "Šaut no sarkanās līnijas"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "Skrējienā 3 pret 2 aizmugures aizsargam parasti ir:",
+    "options": [
+      "Nosedziet vājās puses (aizmugures durvju) draudus",
+      "Slido līdz sarkanajai līnijai",
+      "Mainiet līnijas",
+      "Katru reizi agresīvi saspiediet"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Aizsargs var saspiest pie uzbrukuma zilās līnijas, ja:",
+    "options": [
+      "Komanda ir saīsināta",
+      "Vārtsargs ir pievilkts",
+      "Partneru segumi un ripa ir atgūstama pie dēļiem",
+      "Vienmēr pirmajā maiņā"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Ja uzbrukumā tiek sists plaši, aizsargam ir:",
+    "options": [
+      "Slido uz soliņa",
+      "Apstāties un strīdēties ar tiesnesi",
+      "Pagriezieties un dzenieties caur vidu uz tīklu",
+      "Āķis no aizmugures"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Aizsardzības zonas pārklājumā zemais aizsargs pret augstu aizsargu nozīmē:",
+    "options": [
+      "Abi punktā",
+      "Abi neitrālajā zonā",
+      "Gan krokā",
+      "Zems ripas, augsts vāku slots un aizmugures durvis"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Ja dīvains cilvēks steidzas pretī, galvenais ir:",
+    "options": [
+      "Katru reizi veiciet sodu",
+      "Aizkavējiet un piespiediet sliktu leņķi vai piespēli",
+      "Vienmēr nirt, lai bloķētu",
+      "Atstājiet spēli vārtsargam mierā"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "No soda sitiena pret vienreizēju sitienu no sāna aizsargam:",
+    "options": [
+      "Stāviet vārtsarga izlokā",
+      "Slidojiet uz centru, lai mainītu",
+      "Noņemiet caurlaides joslu līdz slotam",
+      "Nospiediet vārtsargu"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Kāpēc aklo mala ap dēļiem bieži ir slikta?",
+    "options": [
+      "Tas dod pretiniekiem bezmaksas izgūšanu",
+      "Tas vienmēr ir ārpusē",
+      "Tas vienmēr izraisa apledojumu",
+      "Tiesnesis piešķir sodu"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Pēc uzvaras aizsardzības zonā aizsargiem:",
+    "options": [
+      "Pagaidiet piecas sekundes",
+      "Izlasiet forecheck un izmantojiet ātro pirmo piegājienu",
+      "Vienmēr vispirms šaujiet no punkta",
+      "Slido līdz sarkanajai līnijai ar ripu"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Vēlu nosargājot vienu vārtu pārsvaru, aizsargiem vajadzētu:",
+    "options": [
+      "Vienmēr šaujiet no centra",
+      "Katru reizi saspiediet pie zilās līnijas",
+      "Droši pārvaldiet ripu un izvairieties no nevajadzīgiem riskiem",
+      "Vienmēr velciet vārtsargu agri"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Cilvēks pret vīrieti slotā nozīmē:",
+    "options": [
+      "Ignorējiet draudus ārpus ripas",
+      "Tikai dzenā ripu",
+      "Atstarpes kontrole",
+      "Cilvēks pret vīrieti pārklājums uz ripu turētāja"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Uzbrūkošās zilās līnijas aizsargs, kurš tur līniju, mēģina:",
+    "options": [
+      "Mainiet ar uz priekšu",
+      "Turiet zilo līniju un turiet ripu zonā",
+      "Slido atpakaļ neitrālajā zonā",
+      "Vienmēr tīši izraisīt aizskarību"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Pēc atvairīšanas ar atsitienu slotā aizsargam ir:",
+    "options": [
+      "Sviniet kopā ar vārtsargu",
+      "Šaut pa tukšiem tīkliem",
+      "Slido uz soliņa",
+      "Atbrīvojieties no atsitiena vai piesiet uzbrucēju"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Pēc apledojuma (bez pieskāriena) aizsardzības zonā, izbraukumā:",
+    "options": [
+      "Vienmēr apvelciet ripu",
+      "Veikt nelielu sodu",
+      "Iestatiet struktūru un iegūstiet tīru izeju",
+      "Pavelciet vārtsargu"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Pret agresīvu priekšpārbaudi, stiepšanās piespēli izmanto, lai:",
+    "options": [
+      "Vienmēr pārtrauciet spēlēt offside",
+      "Tikai tērēt laiku",
+      "Garantijas apledojums",
+      "Pārspēj forecheck ar garu piespēli"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Šaušanas joslas slēgšana nozīmē:",
+    "options": [
+      "Ķermeņa/nūjas nokļūšana šāviena ceļā",
+      "Tikai vicinot nūju gaisā",
+      "Slidošana līdz sarkanajai līnijai",
+      "Stāv aiz tīkla"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Kad jūsu partneris saspiež, jums ir:",
+    "options": [
+      "Slido uz soliņa",
+      "Atstājiet zonu atvērtu",
+      "Nekavējoties arī saspiediet",
+      "Segts augstu kā pēdējais aizsargs"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Izejot no soda laukuma, aizsargam vajadzētu:",
+    "options": [
+      "Saskaņojiet spēli un izvairieties no pieķeršanas",
+      "Ignorējiet steigu",
+      "Vienmēr nekavējoties mainiet",
+      "Slido tieši uz pretinieka tīklu"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Ar tukšiem vārtiem pret, aizsargiem pēdējā minūtē vajadzētu:",
+    "options": [
+      "Visas priekšpārbaudes dziļi",
+      "Vienmēr velciet arī savu vārtsargu",
+      "Bloķējiet šāvienu un aizsargājiet vidu",
+      "Nekad nenotīriet ripu"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Ja nevarat aizsniegt ripu turētāju, rīkojieties šādi:",
+    "options": [
+      "Padodies un mainies",
+      "Atstājiet slotu",
+      "Atņemiet laiku un vietu ar labu novietojumu",
+      "Āķis no aizmugures"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Aizstāvot ieeju kontrolētajā zonā, aizsargam ir:",
+    "options": [
+      "Slidojiet atpakaļ uz soliņu",
+      "Agri piecelties pie līnijas vai atstarpi",
+      "Vienmēr atkāpieties uz kroku",
+      "Nekad nepieskarieties uzbrucējam"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "Aizsardzības zonā aizsarga rokas piespēle komandas biedram ir:",
+    "options": [
+      "Atļauts, ja pabeigts tajā pašā zonā",
+      "Vienmēr glazūra",
+      "Vienmēr ārpusē",
+      "Vienmēr soda metiens"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Kad ripa ir komandas biedram, uzbrucējam:",
+    "options": [
+      "Vienmēr slido līdz sarkanajai līnijai",
+      "Ignorēt ripas maiņu līnijā",
+      "Iet uz atvērtu ledu, lai iegūtu caurlaidi",
+      "Stāviet nekustīgi pie zilās līnijas"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Malējam pussargam pie tīkla metiena laikā vajadzētu:",
+    "options": [
+      "Slido uz soliņa",
+      "Dodieties uz tīklu, lai iegūtu atlēkušās bumbas un padomus",
+      "Skatieties tikai no punkta",
+      "Pagaidiet pie centra ledus"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Kad valdījums tiek zaudēts, uzbrucējiem ir:",
+    "options": [
+      "Nomainiet uzreiz no ledus",
+      "Strīdēties ar tiesnesi",
+      "Palieciet uzbrukuma zonā",
+      "Pārbaudiet atpakaļ un palīdziet aizsardzībā"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Steidzoties, ripas \"meistarošana ar galvu\" nozīmē:",
+    "options": [
+      "Vienmēr izmetiet to augstu no stikla",
+      "Apstājieties pie sarkanās līnijas",
+      "Ar galvu raidīt ripu (piespēle uz priekšu)",
+      "Slidojiet atpakaļ tikai uz savu soliņu"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Ripas riteņbraukšana zemu uzbrukuma zonā palīdz:",
+    "options": [
+      "Garantijas apledojums",
+      "Force offside vienmēr",
+      "Izveidojiet vietu sitienam vai piespēlei",
+      "Tikai tērēt laiku"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Sacensībās centra uzdevums bieži ir:",
+    "options": [
+      "Visi trīs uz priekšu dziļi stūrī",
+      "Agri atstājiet apli",
+      "Šauj uzreiz no punkta",
+      "Uzvari izlozē uz malējo uzbrucēju vai D-cilvēka vietu"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "2-1-2 priekšpārbaudē F1 un F2 parasti:",
+    "options": [
+      "Abi dzenas tikai aiz tīkla",
+      "Abi maina līnijas",
+      "F1 spiež, F2 atņem caurlaides joslu",
+      "Abi stāv pie sarkanās līnijas"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Spēka spēlē uzbrucējam tīkla priekšgalā vajadzētu:",
+    "options": [
+      "Slido uz neitrālu zonu",
+      "Nosedziet punktu par soda sitienu",
+      "Izmantojiet tīkla priekšpusi spēka spēlē",
+      "Nekad nepieskarieties ripai"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "Skrējienā 3 pret 2 trešajam uzbrucējam vajadzētu:",
+    "options": [
+      "Slido uz soliņa",
+      "Stāviet krokā",
+      "Esiet augsts kā trešais cilvēks steigā",
+      "Dzeniet ripu dziļi bez atbalsta"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Steidzoties malējam uzbrucējam ar ātrumu bieži vajadzētu:",
+    "options": [
+      "Katru reizi apstājieties pie zilās līnijas",
+      "Piespēli vārtsargam atpakaļ",
+      "Vingers steidzas ar ātrumu",
+      "Slido pa vidu vienmēr"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Uzbrucēja galvenā spēka spēles loma ir:",
+    "options": [
+      "Aizsardzībā atstājiet spraugu atvērtu",
+      "Vienmēr tikai punktveida šāviens",
+      "Nekad neiet uz tīklu",
+      "Ekrāna vārtsargs uz PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "No soda sitiena uzbrucējs bieži sedz:",
+    "options": [
+      "Nosedziet punktu par soda sitienu",
+      "Tiesnesis",
+      "Izmantojiet tīkla priekšpusi spēka spēlē",
+      "Zamboni šoferis"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Lai izvairītos no offside pie zilās līnijas, uzbrucējs var:",
+    "options": [
+      "Slido atpakaļ zonā",
+      "Pārlēkt pāri zilajai līnijai",
+      "Palieciet malā, aizkavējot iekļūšanu zonā",
+      "Vienmēr ievadiet zonu pirms ripas"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Lai iestatītu vienreizējo ierīci, parasti ir nepieciešams:",
+    "options": [
+      "Vienreizēja iestatīšana: pārejiet uz šāvēja atvēršanu",
+      "Apgrieziet ripu, neskatoties",
+      "Vienmēr izpildiet soda metienu",
+      "Izmetiet un dzenājiet bez iepriekšējas pārbaudes plāna"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Pēc spēka paņēmiena sitiena uzbrucējiem:",
+    "options": [
+      "Visas mainīt rindas uzreiz",
+      "Pamājiet pūlim",
+      "Sitiens tīklā pēc sitiena no punkta",
+      "Slido uz neitrālu zonu"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "Uzbrūkošās zonas struktūrā centrs bieži:",
+    "options": [
+      "Nekad neietilpst slotā",
+      "Visi trīs uz priekšu dziļi stūrī",
+      "Centrs atbalsta zemu, spārns paliek augsts",
+      "Aptver tikai būtību"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Izlaušanās gadījumā vājās puses atbalsts uz priekšu nozīmē:",
+    "options": [
+      "Atbalsts no vājās puses uz D zonas izeju",
+      "Stāviet nekustīgi pie sarkanās līnijas",
+      "Šaut pa savu tīklu",
+      "Slido uz pretinieku soliņu maiņai"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Vārtsargam vienmēr jācenšas:",
+    "options": [
+      "Izsekojiet ripu satiksmē",
+      "Stāviet pie sarkanās līnijas",
+      "Vērojiet tikai šāvēja acis",
+      "Atstājiet tīklu līnijas maiņai"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Kad ripa ir brīva laukuma zonā, vārtsargam:",
+    "options": [
+      "Iesaldējiet ripu, lai pārtrauktu spēli",
+      "Šauj pa tukšiem tīkliem",
+      "Slido līdz centram un svini",
+      "Piespēle tiesnesim"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Pēc saglabāšanas ideāla atsitiena kontrole ir:",
+    "options": [
+      "Atsitiena kontrole drošā zonā",
+      "Vienmēr atsitiens uz slotu",
+      "Vienmēr atsitiens virs stikla",
+      "Ignorējiet atsitienu"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Neparastā uzbrukumā vārtsargam ir:",
+    "options": [
+      "Vienmēr klusējiet",
+      "Vērojiet pūli",
+      "Slido uz soliņa",
+      "Vārtsargs runā par nepāra uzbrukumiem"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "NHL vārtsargs drīkst izspēlēt ripu aiz tīkla tikai šādos gadījumos:",
+    "options": [
+      "Uzbrūkošā zona",
+      "Izspēlē ripu tikai trapecē aiz tīkla",
+      "Pilna aizsardzības zona",
+      "Tikai neitrālā zona"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Sānu piespēlei pāri izlaišanai vārtsargs izmanto:",
+    "options": [
+      "Vienmēr stāviet tikai uz viena staba",
+      "Atstājiet tīklu",
+      "Kustība no staba uz sāniem",
+      "Slido līdz zilajai līnijai"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Laba spēle leņķī nozīmē vārtsargu:",
+    "options": [
+      "Izaicinājumi uz sarkano līniju",
+      "Vienmēr stāv dziļi krokā",
+      "Leņķa griezums, lai samazinātu tīkla redzamību",
+      "Pagriežas atpakaļ pret šāvēju"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Vārtsarga \"māja\", kas jāaizsargā, galvenokārt ir:",
+    "options": [
+      "Aizsargājiet māju (laika laukumu)",
+      "Zamboni durvis",
+      "Centrs ledus aplis",
+      "Soda kaste"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Izraušanās laikā daudzi vārtsargi dod priekšroku:",
+    "options": [
+      "Slido pret soliņu",
+      "Aizver acis un ceri",
+      "Saskaņojiet šāvēju un izlasiet izlaidumu",
+      "Vienmēr izaiciniet apļu augšgalu"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Apvienošanas mēģinājumā vārtsargam vajadzētu:",
+    "options": [
+      "Atstājiet tuvējo pastu atvērtu",
+      "Slido līdz punktam",
+      "Izspēlē ripu stūrī",
+      "Turiet stabiņu uz īsas puses aptinuma"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Ja vārtsargs izspēlē ripu aiz tīkla ĀRPUS trapeces, tas ir:",
+    "options": [
+      "Vienmēr likumīga spēle",
+      "Ledus zvans",
+      "Spēles soda aizkavēšanās",
+      "Automātisks mērķis"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Kad ripa tiek izsijāta, vārtsargam ir:",
+    "options": [
+      "Atstājiet kroku",
+      "Signāls ārpusē",
+      "Vienmēr atsakieties no īsās puses",
+      "Atrodiet ripu satiksmē vai pielāgojiet pozīciju"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Vārtsarga sitiena pārbaudei jābūt:",
+    "options": [
+      "Iedur čeku tikai no priekšpuses legāli",
+      "Ar augstu nūju pie sejas",
+      "No šāvēja aizmugures vienmēr",
+      "Stāvot uz ledus centra"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Pie tālas piespēles vārtsargs bieži:",
+    "options": [
+      "Slido uz pretinieku soliņu",
+      "Ignorē lugu",
+      "Šauj pie ref",
+      "Aptur vai izspēlē ripu likumīgi aiz tīkla"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Hokeja inteliģence nozīmē, ka katram spēlētājam ir:",
+    "options": [
+      "Katrs spēlētājs palīdz aizsardzībā",
+      "Runā tikai vārtsargi",
+      "Pārbauda tikai aizsargi",
+      "Vārtus gūst tikai uzbrucēji"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Nūjas turēšana uz ledus palīdz:",
+    "options": [
+      "Bloķējiet garāmbraucošās joslas un saņemiet caurlaides",
+      "Signālu apledojums",
+      "Izvairieties no ripas",
+      "Brauciet ātrāk"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Gudra līnijas maiņa parasti notiek:",
+    "options": [
+      "Lidojumā, kad spēle atļauj",
+      "Nekad lidojumā",
+      "Atdalīšanās laikā pret",
+      "Vienmēr tikai uzbrukuma zonā"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Pirms aizsardzības zīmju maiņas spēlētājiem:",
+    "options": [
+      "Vienmēr kliedz uz tiesnesi",
+      "Mainiet, neskatoties",
+      "Sazinieties pirms atzīmju maiņas",
+      "Nekad nerunājiet uz ledus"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Līniju maiņa ledus nepareizajā pusē var:",
+    "options": [
+      "Garantēt vārtus",
+      "Vienmēr palīdziet komandai",
+      "Izraisīt pārāk daudz vīriešu vai sliktu laiku",
+      "Apturiet pulksteni"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Lugas lasīšana nozīmē:",
+    "options": [
+      "Ignorēt komandas biedrus",
+      "Nekad nemainiet struktūru",
+      "Vienmēr skatieties tikai ripu",
+      "Paredzēt, kur ripa un pretinieki dosies tālāk"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Otrā cilvēka atbalsts pie ripas nozīmē:",
+    "options": [
+      "Slido prom no ripas",
+      "Skatieties tikai vārtsargu",
+      "Stāviet pie sarkanās līnijas",
+      "Samērojiet ātrumu un atbalstiet ripu nesēju"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Stiprā un vājā puse attiecas uz:",
+    "options": [
+      "Puse, kur ripa ir pret pretējo pusi",
+      "Mājas un izbraukuma komandas",
+      "Pirmais un otrais periods",
+      "Tikai spēlētāji ar kreiso un labo roku"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Spēka spēlē struktūrai ir nozīme, jo:",
+    "options": [
+      "Kustība atver joslas un izstiepj PK",
+      "Vislabāk ir stāvēt uz vietas",
+      "Tikai vienam spēlētājam vajadzētu pieskarties ripai",
+      "Offside nav nozīmes"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Soda nogalināšana \"kaste + viens\" bieži nozīmē:",
+    "options": [
+      "Visi pieci dzenā ripu",
+      "Visi pieci stāv pie sarkanās līnijas",
+      "Nav nepieciešama struktūra",
+      "Četri kastē, viens spiež ripu"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Krāpšanās pret atspēlēšanos (laika noteikšana) nozīmē:",
+    "options": [
+      "Metiena laiks, lai agri izcīnītu ripu",
+      "Izsitiet pretinieka nūju",
+      "Ievadiet apli pirms ripas",
+      "Atstājiet atsegšanas punktu"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Aizsargājiet novēlotu, gudru komandu:",
+    "options": [
+      "Uzņemieties risku katrā maiņā",
+      "Vienmēr pievelciet vārtsargu pirmajā periodā",
+      "Nekad neattīriet zonu",
+      "Pārvaldiet ripu un izvairieties no nevajadzīgiem sodiem"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Treneri maina līnijas mačiem uz:",
+    "options": [
+      "Iegūstiet labvēlīgas situācijas starp spēlētājiem",
+      "Garantija offside",
+      "Izvairieties no visām pretrunām",
+      "Tikai tērēt laiku"
+    ]
+  },
+  "ref_goal": {
+    "question": "Kad tiek gūti vārti, tiesnesis parasti:",
+    "options": [
+      "Norādiet uz ledus centru",
+      "Signalizēt par aizkavētu sodu",
+      "Ar rokām veido T burtu",
+      "Signāla apledojums ir izslēgts"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Taimauta signāls izskatās šādi:",
+    "options": [
+      "Rokas veido T",
+      "Norādiet uz ledus centru",
+      "Parādīti seši pirksti",
+      "Abas dūres spiežas uz priekšu"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Nokavētu sodu tiesnesis parāda ar:",
+    "options": [
+      "Iegūto vārtu signāls",
+      "Taimauta T signāls",
+      "Izskalojiet apledojuma signālu",
+      "Viena roka pacelta taisni uz augšu"
+    ]
+  },
+  "ref_minor": {
+    "question": "Piesakot nelielu sodu, tiesnesis bieži signalizē ar:",
+    "options": [
+      "Atveriet plaukstu soda kastes virzienā",
+      "Roku tikai pāri krūtīm",
+      "Rokas veido T",
+      "Norādiet uz centra ledu, lai gūtu vārtus"
+    ]
+  },
+  "ref_offside": {
+    "question": "Tiesneša izsaukums no malas bieži tiek signalizēts ar:",
+    "options": [
+      "Norādiet uz ledus centru",
+      "Parādīti seši pirksti",
+      "Slēgtas dūres sūknēšanas kustība",
+      "Sasmalcināšanas kustība paralēli ledus"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Rokas piespēles pārkāpuma signāls bieži ir:",
+    "options": [
+      "Slēgtas dūres sūknēšanas kustība",
+      "Abas rokas sakrustojušas cīņai",
+      "Atveriet plaukstu līdz soda kastei",
+      "Norādiet uz ledus centru"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Spēcīgs soda signāls: tiesnesis bieži pieskaras:",
+    "options": [
+      "Plaukstas līdz pašai sejai/žokļu zonai",
+      "Vārtu stabs",
+      "Ripa",
+      "Tikai savam ceļgalam"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Pārāk daudz vīriešu uz ledus tiek signalizēts, parādot:",
+    "options": [
+      "Tikai viena roka taisni uz augšu",
+      "Norādiet uz ledus centru",
+      "Rokas veido T",
+      "Parādīti seši pirksti"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Atslēgšanas soda signāls bieži izskatās šādi:",
+    "options": [
+      "Izslēgšanas signāls (kājas slaucīšanas kustība)",
+      "Rokas veido T",
+      "Norādiet uz ledus centru",
+      "Abas dūres spiežas uz priekšu"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Aizķeršanās soda signāls bieži izskatās šādi:",
+    "options": [
+      "Seši pirksti",
+      "Sasmalcināšana paralēli ledus",
+      "Aizķeršanās signāls (vilkšanas kustība)",
+      "Slēgta dūres sūknēšana"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Tiesneša kontrolpārbaudes signāls bieži ir:",
+    "options": [
+      "Abas dūres spiežas uz priekšu",
+      "Norādiet uz ledus centru",
+      "Rokas veido T",
+      "Tikai plaukstas pret seju"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Kaujas majors bieži tiek signalizēts ar:",
+    "options": [
+      "Sasmalcināšana offside kustību",
+      "Cīņas majors (abas rokas sakrustotas)",
+      "Viena roka pacelta par aizkavētu sodu",
+      "Atveriet tikai plaukstu līdz kastītei"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Piešķirot soda metienu, tiesnesis parasti:",
+    "options": [
+      "Rāda taimautu T",
+      "Izskalo glazūru",
+      "Punkti uz centra ledu par soda metienu",
+      "Rāda sešus pirkstus"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Atmetot vārtus, tiesnesis drīkst:",
+    "options": [
+      "Neatļauta mērķa signāls (rokas sakrusto un pamāja)",
+      "Norādiet uz centru, lai sasniegtu mērķi",
+      "Paceliet roku tikai soda kavējuma gadījumā",
+      "Rādīt taimautu T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Spēles aizkaves signāls (ripa virs stikla) ​​bieži ir:",
+    "options": [
+      "Kāju slaucīšana",
+      "Spēles aizkavēšanās (tiesnesis sit iedomātu stiklu)",
+      "Cīņas rokas sakrustotas",
+      "Āķa vilkšanas kustība"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Līnijsargs signalizē no malas:",
+    "options": [
+      "Atveriet plaukstu līdz soda kastei",
+      "Izveidojiet T, lai norādītu taimautu",
+      "Norādiet uz centra ledus vārtiem",
+      "Līnijnieks abas rokas uz augšu (malā)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Kad apledojums tiek noņemts (piemēram, uz PK), līnijsargs var:",
+    "options": [
+      "Sakrusto rokas cīņai",
+      "Signāla apledojums ir izslēgts",
+      "Norādiet uz centru, lai sasniegtu mērķi",
+      "Parādiet sešus pirkstus"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Divkāršu nelielu sodu var uzrādīt ar:",
+    "options": [
+      "T — taimauts",
+      "Tikai viena roka taisni uz augšu",
+      "Dubultais minors (divi pirksti)",
+      "Seši pirksti par daudz vīriešiem"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Iekāpšanas soda signāls bieži ietver:",
+    "options": [
+      "T — taimauts",
+      "Norādiet uz centru, lai sasniegtu mērķi",
+      "Slēgta dūre rokas piespēlei",
+      "Iekāpšanas soda signāls (roku stumšana)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Aizkavēta soda signāla laikā spēle turpinās, jo:",
+    "options": [
+      "Vārti tika gūti",
+      "Apledojums tika pabeigts",
+      "Tika izsaukts taimauts",
+      "Aizkavēts sods (spēle turpinās)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Pretinieks sāk uzbrukumu caur centru. Kas centram jādara?",
+    "options": [
+      "Atgriezieties savas zonas centrā un palīdziet aizsargiem",
+      "Stāviet pie dēļiem",
+      "Mainiet līnijas bez iemesla",
+      "Slido uz pretinieka tīklu"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Pretinieks aiz tīkla mēģina gūt vārtus ar lakrosa stila ietīšanu. Kas vārtsargam jādara?",
+    "options": [
+      "Izbrauciet uz zonas centru",
+      "Vērojiet pūli",
+      "Palieciet cieši pie tālākā staba un vērojiet nūju",
+      "Apgulieties ar seju uz ledus"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Jūs esat aizsargs, kuram ir jāspēlē 2 pret 1. Kas ir vissvarīgākais?",
+    "options": [
+      "Atņem caurlaidi",
+      "Nekavējoties uzbrūk ripas turētājam",
+      "Skatīties tikai ripu",
+      "Slido uz soliņa līnijas maiņai"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Jūs esat malējais uzbrucējs un pirmais spēlētājs, kurš ieiet uzbrukuma zonā. Kas jums jādara?",
+    "options": [
+      "Nospiediet aizsargu ar ripu",
+      "Stāviet pie zilās līnijas",
+      "Slido aprindās",
+      "Slido tieši uz soliņa"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Jūsu komanda spēlē spēka spēli. Kur parasti atrodas centrs?",
+    "options": [
+      "Pie savas zilās līnijas",
+      "Uz soliņa",
+      "Aiz sava tīkla",
+      "Tīkla priekšā"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Jūs pazaudējāt ripu uzbrukuma zonā. Ko darīt tālāk?",
+    "options": [
+      "Nekavējoties pievienojieties forecheck",
+      "Lēnām slidojiet atpakaļ",
+      "Strīdēties ar tiesnesi",
+      "Paskaties uz treneri"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Centrs izbraukumā zaudēja. Kas būs tālāk?",
+    "options": [
+      "Slido uzbrukumā",
+      "Nekavējoties palīdziet aizsardzībā",
+      "Novelc ķiveri",
+      "Beidz kustēties"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Ripa atrodas gar dēļiem jūsu zonā. Kas jādara otrajam spēlētājam?",
+    "options": [
+      "Atbalstiet savu partneri tuvumā",
+      "Stāviet mierā",
+      "Skatieties tribīnes",
+      "Slido uz pretinieka tīklu"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Kas ir vissvarīgākais, steidzoties 3 pret 2?",
+    "options": [
+      "Visi slido vienā un tajā pašā vietā",
+      "Šaujiet no jebkuras pozīcijas",
+      "Apstājieties pie zilās līnijas",
+      "Izstiepiet aizsardzību ar piespēlēm"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Pēc metiena ripa atleca vārtu priekšā. Kas vārtsargam jādara?",
+    "options": [
+      "Pacel nūju gaisā",
+      "Atrodiet ripu un pārklājiet to",
+      "Slido aiz tīkla",
+      "Paskaties uz treneri"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Kad ir labākais laiks, lai mainītu līnijas?",
+    "options": [
+      "Kad jūsu komanda kontrolē ripu",
+      "Kad pretinieks uzbrūk",
+      "Kad ripa ir tīkla priekšā",
+      "Bīstamas vārtu gūšanas iespējas laikā"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Kas aizsargam jādara, ja viņam ir liels priekšpārbaudes spiediens?",
+    "options": [
+      "Stāviet mierā ar ripu",
+      "Iešauj ripu līdz zonas vidum",
+      "Nokrīt uz ledus",
+      "Veiciet ātru, precīzu pirmo piespēli"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Kas ir svarīgi darīt, ja jums nav ripas?",
+    "options": [
+      "Paskaties uz griestiem",
+      "Turiet nūju tikai ar vienu roku",
+      "Atveriet caurlaidi",
+      "Stāviet vienā vietā"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Kura izlaušanās tiek uzskatīta par visuzticamāko?",
+    "options": [
+      "Ripas zaudēšana",
+      "Ar īsu, precīzu piespēli",
+      "Aklā izgāztuve",
+      "Pāreja caur jūsu zonas vidu"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Kas ir vissvarīgākais soda slepkavībā?",
+    "options": [
+      "Bloķējiet garāmbraucošās joslas",
+      "Uzbrukums pastāvīgi",
+      "Slidas bez konstrukcijas",
+      "Spēlējiet tikai gar dēļiem"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Kad aizsargs var pievienoties steigai?",
+    "options": [
+      "Vienmēr",
+      "Tikai papildlaikā",
+      "Nekad",
+      "Kad viņa partneris sedz savu pozīciju"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Kāpēc cauri spraugai ir bīstama?",
+    "options": [
+      "Ierēdņi to nevar redzēt",
+      "Tas palēnina spēli",
+      "Tas var novest pie mērķa",
+      "Tas vienmēr ir nelikumīgs"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Kad vārtsargam jāspēlē ripa aiz tīkla?",
+    "options": [
+      "Lai atstātu ledu",
+      "Lai palīdzētu aizsargiem sākt izlaušanos",
+      "Lai atpūstos",
+      "Strīdēties ar ierēdņiem"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Kāpēc uz priekšu brauc uz tālāko stabu?",
+    "options": [
+      "Par atlēkušajām bumbām un vienreizējām spēlēm",
+      "Lai paliktu ārpus spēles",
+      "Lai atpūstos",
+      "Lai nonāktu komandas biedra ceļā"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Kas aizsargam jādara pirms šaušanas no punkta?",
+    "options": [
+      "Pārbaudiet satiksmi tīkla priekšā",
+      "Šaujiet tieši dēļos",
+      "Aizver viņam acis",
+      "Deks atpakaļ"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Kam pirmajam jācīnās par ripu pēc izspēles?",
+    "options": [
+      "Tikai vārtsargs",
+      "Neviens",
+      "Tuvākais spēlētājs",
+      "Tikai aizsargs"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Kāpēc ripas kontrole ir svarīga?",
+    "options": [
+      "Pretinieks nevar uzbrukt bez ripas",
+      "Jūs varat slidot mazāk",
+      "Par to ierēdņi piešķir punktus",
+      "Tas izskatās labi"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Kas stūra kaujā ir vissvarīgākais?",
+    "options": [
+      "Augsts sitiens",
+      "Lēkšana",
+      "Slidošana tikai atpakaļ",
+      "Ķermeņa stāvoklis un nūjas novietojums"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Kāds ir labākais veids, kā atvērties?",
+    "options": [
+      "Pārvietojieties atklātā telpā",
+      "Aklajā stūrī",
+      "Slido aiz komandas biedra muguras",
+      "Ar stāvēšanu uz vietas"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Kas uzbrucējam jādara pēc sitiena?",
+    "options": [
+      "Nekavējoties mainiet līnijas",
+      "Skatieties rezultātu tablo",
+      "Iet uz tīklu pēc atsitiena",
+      "Stāviet mierā"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Kas ir vissvarīgākais aizsargam slotā?",
+    "options": [
+      "Palieciet tālu no tīkla",
+      "Spēlējiet bez nūjas",
+      "Neļaujiet pretiniekiem tikt pie atlēkušajām bumbām",
+      "Skatīties tikai vārtsargu"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Kāds ir labākais veids, kā iekļūt zonā?",
+    "options": [
+      "Bez ātruma",
+      "Slidošana atpakaļ zonā",
+      "Caur vidu bez atbalsta",
+      "Ar ripas kontroli"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Kad ir noderīgs sitiens ar aizmuguri?",
+    "options": [
+      "Tikai praksē",
+      "Nekad",
+      "Kad nav laika pārvietot ripu uz forehandu",
+      "Tikai aizsargiem"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Kāpēc centrs ir svarīgs uzbrukumā?",
+    "options": [
+      "Viņš vienmēr stāv uz vietas",
+      "Viņš nekad neizdara piespēles",
+      "Viņš savieno visu līniju",
+      "Viņš nekad nespēlē aizsardzībā"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Kam ir nozīme aizsardzībā viens pret vienu?",
+    "options": [
+      "Nekavējoties lec virsū pretiniekam",
+      "Skatieties tribīnes",
+      "Slido atpakaļ bez kontroles",
+      "Kontrolējiet atstarpi un leņķi"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Jūsu līnijai bija ilga uzbrukuma maiņa. Pretinieku aizsargs atguva ripu aiz tīkla, taču izskatās noguris. Arī jūsu līnija jau ilgu laiku ir uz ledus. Kas ir labākais?",
+    "options": [
+      "Turpiniet agresīvi veikt priekšpārbaudi ar pilnu līniju",
+      "Atgriezieties neitrālajā zonā bez spiediena",
+      "Viens uz priekšu turpina spiest, kamēr pārējie mainās",
+      "Visa rinda mainās uzreiz"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Kāpēc pielaide atpakaļ dažreiz ir noderīga?",
+    "options": [
+      "Lai zaudētu impulsu",
+      "Lai izvairītos no uzbrukuma",
+      "Lai saglabātu valdījumu",
+      "Lai pārtrauktu spēlēšanu"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Kas ir svarīgi, bloķējot šāvienu?",
+    "options": [
+      "Bloķēt ripas ceļu",
+      "Pārlēkt uz augšu",
+      "Pagrieziet muguru",
+      "Paskaties uz leju"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Kā aizsargam jāspēlē pret ātro uzbrucēju?",
+    "options": [
+      "Turpiniet slidot uz priekšu, neapstājoties",
+      "Spēlējiet pārāk stingri katru reizi",
+      "Stāviet mierā",
+      "Nedod viņam vaļēju ledu"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Kad vienreizējs ir visefektīvākais?",
+    "options": [
+      "Kad šāvējs nav gatavs",
+      "Tikai praksē",
+      "Kad vārtsargs nevar tikt noregulēts laikā",
+      "Kad ripa nekustas"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Kāpēc komunikācija uz ledus ir svarīga?",
+    "options": [
+      "Tas novērš pretinieka uzmanību",
+      "Tas aizvieto slidošanu",
+      "Tas palīdz komandas biedriem ātrāk pieņemt lēmumus",
+      "Ierēdņiem tas patīk"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Kā spēlēt 2 pret 0?",
+    "options": [
+      "Likt vārtsargam kustēties ar piespēli",
+      "Apstāties tīkla priekšā",
+      "Šauj no tālienes",
+      "Zaudēt ripu"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Kāpēc uzbrucēji izmanto vietu aiz tīkla?",
+    "options": [
+      "Lai paslēptos no lugas",
+      "Lai pārtrauktu atskaņošanu",
+      "Lai izvairītos no šaušanas",
+      "Lai izstieptu aizsardzību"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Kāpēc ir svarīgi saglabāt mieru?",
+    "options": [
+      "Tas ietekmē ledu",
+      "Tas padara tīklu mazāku",
+      "Tas palīdz pieņemt labākus lēmumus",
+      "Tas padara ripu ātrāku"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Kas aizsargam jādara pie uzbrukuma zilās līnijas?",
+    "options": [
+      "Turiet ripu zonā",
+      "Stāviet tikai vidū",
+      "Ignorēt komandas biedrus",
+      "Vienmēr atkāpieties"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Kas padara atsitienu bīstamu?",
+    "options": [
+      "Spēlētājs stāv uz vietas",
+      "Ripa kļūst vieglāka",
+      "Tiesnesis nevar redzēt ripu",
+      "Vārtsargs ne vienmēr kontrolē atlēkušo bumbu"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Kāpēc uzbrukuma virziena maiņa ir noderīga?",
+    "options": [
+      "Tas sāp jūsu pašu komandai",
+      "Tas palēnina spēli",
+      "Tas veido atvērtas zonas",
+      "Tas ierēdņus nogurdina"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Kas ir svarīgi uzbrukuma zonas cīņā?",
+    "options": [
+      "Nekavējoties slidojiet atpakaļ",
+      "Ātri iegūstiet ripu",
+      "Skatieties rezultātu tablo",
+      "Nekustieties"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Ko nozīmē segt komandas biedru?",
+    "options": [
+      "Aizpildiet viņa pozīciju, kad viņš pievienojas steigai",
+      "Spēlē tikai uzbrukumā",
+      "Kopējiet viņa precīzu maršrutu",
+      "Stāviet viņam blakus, nekustoties"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Ja aizsargs zaudē pozīciju, kas viņam jādara?",
+    "options": [
+      "Skatīties tikai ripu",
+      "Strīdies ar komandas biedru",
+      "Beidz slidot",
+      "Ātri atgriezieties aizsardzībā"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Kāpēc spēlētāji bieži šauj zemu?",
+    "options": [
+      "Tas ir lēnāks",
+      "Jo augsti sitieni ir nelikumīgi",
+      "Par novirzēm un atlēkušajām bumbām",
+      "Ierēdņiem ir vieglāk"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Kad garā caurlaide ir īpaši noderīga?",
+    "options": [
+      "Spēlētāju pūlī",
+      "Līnijas maiņas laikā",
+      "Ātrā pretuzbrukumā",
+      "Bez mērķa"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Kāpēc kustība bez ripas ir svarīga?",
+    "options": [
+      "Tas rada caurlaides iespējas",
+      "Tas ir paredzēts tikai aizsargiem",
+      "Tas neietekmē spēli",
+      "Tas traucē komandas biedriem"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Kad var noderēt šāviens no asa leņķa?",
+    "options": [
+      "Tikai uz spēka spēli",
+      "Tikai uz soda sitienu",
+      "Nekad",
+      "Par negaidītu atsitienu"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Kāpēc vārtsarga pārbaude ir svarīga?",
+    "options": [
+      "Tiesnesis nevar redzēt ripu",
+      "Viņam ir grūtāk redzēt šāvienu",
+      "Vārtsargs pārstāj kustēties",
+      "Tas ļauj uzbrukumam izskatīties labāk"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Kas palīdz pārtvert piespēles?",
+    "options": [
+      "Lugas lasīšana",
+      "Veiksme vien",
+      "Slido lēnām",
+      "Spēlē bez nūjas"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Kā pareizi piespraust pretinieku gar dēļiem?",
+    "options": [
+      "Iespiediet viņu mugurā",
+      "Ar aizvērtām acīm",
+      "Ar rokām un bez nūjas",
+      "Izmantojiet savu ķermeni un nūju, vienlaikus kontrolējot ripu"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Kas ir svarīgi, kad aizsargs iznāk no aiz tīkla?",
+    "options": [
+      "Paskaties uz augšu un atrodi caurlaidi",
+      "Slido lēnām",
+      "Nekavējoties iešauj ripu",
+      "Skatieties tikai uz ledu"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Kāpēc komandas dažreiz palēnina spēli?",
+    "options": [
+      "Lai pazaudētu ripu",
+      "Lai saglabātu īpašumu un enerģiju",
+      "Lai izvairītos no uzbrukuma",
+      "Lai pārtrauktu spēli"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Kas ir otrā viļņa spēlētājs?",
+    "options": [
+      "Tiesnesis",
+      "Rezerves vārtsargs",
+      "Spēlētājs, kurš pievienojas uzbrukumam vēlāk",
+      "Lēnākais spēlētājs"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Kāpēc ātras īsās piespēles ir efektīvas?",
+    "options": [
+      "Viņi vienmēr ir lēni",
+      "Viņi ievainoja uzbrukumu",
+      "Tie ir paredzēti tikai aizsargiem",
+      "Tos pretiniekiem ir grūtāk nozagt"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Kas vārtsargam jādara pēc atvairīšanas?",
+    "options": [
+      "Ātri izsekojiet ripu",
+      "Slido uz dēļiem",
+      "Novelc viņam cimdu",
+      "Paskaties uz tablo"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Kad uzbrukums pa vidu ir īpaši bīstams?",
+    "options": [
+      "Kad viens spēlētājs ir viens",
+      "Kad ir ātrums un atbalsts",
+      "Kad nav ripas",
+      "Kad visi stāv uz vietas"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Kas palīdz ātrāk pieņemt lēmumus?",
+    "options": [
+      "Slido lēnām",
+      "Skatīties tikai ripu",
+      "Pastāvīgi skenē ledu",
+      "Spēlējiet bez runāšanas"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Ko dara labs kapteinis?",
+    "options": [
+      "Atbalsta komandu un rāda piemēru",
+      "Spēlē tikai apvainojumu",
+      "Kliedz uz visiem",
+      "Nekad nespēlē aizsardzībā"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Kas palīdz izvairīties no priekšpārbaudes spiediena?",
+    "options": [
+      "Spēlējot vienatnē",
+      "Ātra ripas pārvietošana",
+      "Ilgi turot ripu",
+      "Apstāšanās gar dēļiem"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Kāpēc jūs nevarat vilcināties pie zilās līnijas?",
+    "options": [
+      "Vārtsargs nogurs",
+      "Ledus kļūs sliktāks",
+      "Jūs varat zaudēt zonu",
+      "Tiesnesis pārtrauks spēli"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Kāpēc sitiens uzreiz pēc piespēles ir bīstams?",
+    "options": [
+      "Tas vienmēr ir vājš",
+      "To ir grūti izpildīt",
+      "Tiesnesis vārtus neielaidīs",
+      "Vārtsargs nav uzstādīts laikā"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Kam pirmajam jāatgriežas pēc ripas zaudēšanas?",
+    "options": [
+      "Tuvākais spēlētājs",
+      "Tikai centrs",
+      "Tikai aizsargs",
+      "Tikai vārtsargs"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Kā aizsargam jāspēlē pret cieto šāvēju?",
+    "options": [
+      "Skatīties tikai vārtsargu",
+      "Samaziniet viņa laiku un vietu, lai šautu",
+      "Dodiet viņam brīvu vietu",
+      "Stāviet tālu prom"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Kāpēc aizsardzībā ripa bieži tiek pārvietota uz stūri?",
+    "options": [
+      "Amatpersonas nevar redzēt izrādi",
+      "Ledus tur ir lēnāks",
+      "Tīklam ir mazāka bīstamība",
+      "Tur ir vieglāk gūt vārtus"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Ko uzbrucējs dara tīkla priekšā?",
+    "options": [
+      "Stāv ar muguru pret izrādi",
+      "Slidas uz dēļiem",
+      "Nekustas",
+      "Veido satiksmi un medī atlēkušās bumbas"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Kāpēc ir svarīgi spēlēt ar paceltu galvu?",
+    "options": [
+      "Lai redzētu komandas biedrus un pretiniekus",
+      "Lai ripa būtu vieglāka",
+      "Lai slidotu ātrāk",
+      "Lai ierēdņi jūs varētu redzēt"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Kas ir vissvarīgākais pēc uzvaras PK cīņā?",
+    "options": [
+      "Mēģiniet tikt cauri visiem",
+      "Ieturi ilgu pauzi",
+      "Iztīriet ripu no zonas",
+      "Stāviet mierā"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Kāpēc ir svarīgi izdarīt spiedienu uz pretinieku aizsargiem?",
+    "options": [
+      "Tas sāp jūsu komandai",
+      "Tas neietekmē spēli",
+      "Tas aptur spēli",
+      "Tas var piespiest kļūdīties"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Kad ir noderīga pieskāriena caurlaide?",
+    "options": [
+      "Lai ātri attīstītu uzbrukumu",
+      "Kad spēlētājs stāv uz vietas",
+      "Kad nav komandas biedru",
+      "Tikai aizsardzībā"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Ko centram vajadzētu darīt sava tīkla priekšā?",
+    "options": [
+      "Pagaidiet, kamēr paies ledus",
+      "Slido uz neitrālo zonu",
+      "Palīdziet aizsargiem aizsegt slotu",
+      "Stāviet pie dēļiem"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Kāpēc krusteniskā kustība uz priekšu ir efektīva?",
+    "options": [
+      "Tas mulsina aizstāvjus",
+      "Tas sāp jūsu pašu komandai",
+      "Tas palēnina uzbrukumu",
+      "Tas ir nelikumīgi"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Kas ir svarīgi, cīnoties par zaudēto ripu?",
+    "options": [
+      "Turiet ripu ilgi",
+      "Stāviet mierā",
+      "Paskaties uz leju",
+      "Ātri izlemiet, ko darīt tālāk"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Kāpēc spēlētāji maina ātrumu?",
+    "options": [
+      "Lai beigtu slidot",
+      "Lai pazaudētu ripu",
+      "Pārspēt pretinieku",
+      "Lai ātrāk nogurtu"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Ir atlikušas 40 sekundes. Jūs esat vadībā ar vienu vārtu pārsvaru. Pretinieks spēlē 6 pret 5. Viņu aizsargam ripa ir pie zilās līnijas, un jūsu malējais uzbrucējs var pārlēkt, lai zagtu. Kas ir labākais?",
+    "options": [
+      "Uzreiz agresīvi lido pie ripas",
+      "Izsekojiet tikai tīkla priekšpuses spēlētāju",
+      "Lai paņemtu ripu, nospiediet tikai ar kontrolētu leņķi",
+      "Pilnīgi sabrūk pie tīkla"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Kad vārtsargs var izkļūt tālu no sava tīkla?",
+    "options": [
+      "Pārtvert ripu un palīdzēt aizsardzībai",
+      "Nekad",
+      "Vienmēr",
+      "Tikai pēc gūtiem vārtiem"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Kas ir svarīgi veiksmīgam atsitiena mēģinājumam?",
+    "options": [
+      "Liels vējš",
+      "Stāviet tālu no tīkla",
+      "Lēna kustība",
+      "Ātra reakcija"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Kāpēc otrā spēlētāja atbalsts ir svarīgs?",
+    "options": [
+      "Tas rada papildu iespējas",
+      "Tas ir paredzēts tikai aizsargiem",
+      "Tas nav vajadzīgs",
+      "Tas sāp uzbrukumā"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Ko nozīmē “lasīt lugu”?",
+    "options": [
+      "Paredzēt, ko pretinieki darīs",
+      "Skaitīt piespēles",
+      "Sekojiet tikai ripai",
+      "Skatieties rezultātu tablo"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Kāpēc ir svarīgi aizsargāt ripu ar savu ķermeni?",
+    "options": [
+      "Tas ledu padara ātrāku",
+      "Tas ir paredzēts tikai aizsargiem",
+      "Tas ietekmē tiesnesi",
+      "Tas palīdz aizsargāt ripu"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Kad ir noderīga izlaušanās pa dēļiem?",
+    "options": [
+      "Nekad",
+      "Vienmēr",
+      "Kad vidu nosedz",
+      "Tikai uz spēka spēli"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Kas ir svarīgi, aizstāvoties pret spēka paņēmienu?",
+    "options": [
+      "Pastāvīgi dēkas",
+      "Esiet kompakts aizsardzībā",
+      "Lēnas līniju maiņas",
+      "Spēlē viens pret vienu visur"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Kas ir piespēle metienam?",
+    "options": [
+      "Piespēle spēlētājam labā sitiena pozīcijā",
+      "Piespēle atpakaļ vārtsargam",
+      "Izlases piespēle",
+      "Piespēle uz stūri"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Kāpēc deka pirms šāviena ir noderīga?",
+    "options": [
+      "Tas vienmēr palēnina uzbrukumu",
+      "Tas ir nelikumīgi",
+      "Tas ir paredzēts tikai aizsargiem",
+      "Tas var pārvietot vārtsargu vai aizsargu"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Pēc metiena bloķēšanas spēlētājam ir:",
+    "options": [
+      "Nekavējoties meklējiet ripu",
+      "Stāviet mierā",
+      "Paskaties uz tiesnesi",
+      "Atstāj ledu"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Kā uzbrucēji palīdz aizsargiem?",
+    "options": [
+      "Palieciet uzbrukuma zonā",
+      "Pārbaudiet atpakaļ un atveriet caurlaidi",
+      "Spēlējiet tikai gar dēļiem",
+      "Nespēlē aizsardzībā"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Kas palīdz pret smagu priekšpārbaudi?",
+    "options": [
+      "Ātri lēmumi un ripas kustība",
+      "Slido lēnām",
+      "Spēlējot vienatnē",
+      "Gara ripas glabāšana"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Kad ir noderīga nūjas novirze?",
+    "options": [
+      "Nekad",
+      "Tikai praksē",
+      "Tikai aizsardzībā",
+      "Lai novirzītu ripu"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Kas ir svarīgi, uzbrūkot gar dēļiem?",
+    "options": [
+      "Piespēle vārtsargam",
+      "Atbalsts no blakus esošā komandas biedra",
+      "Spēlējot vienatnē",
+      "Kustības apturēšana"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Kas ir svarīgi vārtsargam pārtraukumā?",
+    "options": [
+      "Saglabājiet labu pozīciju un pacietību",
+      "Nekavējoties nometiet uz ledus",
+      "Slido atpakaļ",
+      "Vērojiet aizsargus"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Kas ir svarīgi, lai ātri pārietu uz pārkāpumu?",
+    "options": [
+      "Lēnas piespēles",
+      "Gara ripas glabāšana",
+      "Apstāšanās pie zilās līnijas",
+      "Lēmumu pieņemšanas ātrums"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Ko aizsargs dara spēka spēlē?",
+    "options": [
+      "Slidas pie tīkla",
+      "Nepievienojas uzbrukumam",
+      "Pārvieto ripu un meklē metienu",
+      "Stāv uz vietas"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Kāpēc satiksme tīkla priekšā ir bīstama?",
+    "options": [
+      "Ripa kļūst lēnāka",
+      "Vārtsargam ir grūtāk saskatīt ripu",
+      "Tiesnesis nevar saskaitīt spēlētājus",
+      "Spēlētāji ātrāk nogurst"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Kas ir svarīgi pēc ripas pārtveršanas?",
+    "options": [
+      "Ātra pāreja uz apvainojumu",
+      "Beidz slidot",
+      "Nekavējoties izmetiet ripu",
+      "Slido uz dēļiem"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Kas ir īpaši svarīgi virsstundās?",
+    "options": [
+      "Pastāvīgi tālmetieni",
+      "Spēlē bez piespēlēm",
+      "Garās maiņas",
+      "Ripas kontrole un maz kļūdu"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Kas aizsargam jādara, ja pretinieks aizsijā vārtsargu?",
+    "options": [
+      "Paskaties uz tiesnesi",
+      "Slido uz dēļiem",
+      "Atbrīvojiet spraugu un piesiet pretinieku",
+      "Stāviet tuvumā, nekustoties"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Kāpēc komandas spēle ir svarīgāka par individuālo spēli?",
+    "options": [
+      "Komanda rezultātu neietekmē",
+      "Līnija kopā rada vairāk iespēju",
+      "Spēli vienmēr izlemj viens spēlētājs",
+      "Piespēles kaitē spēlei"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Kas ir svarīgi pirms šāviena?",
+    "options": [
+      "Ātri izlasiet vārtsarga pozīciju",
+      "Skatieties tikai uz ripu",
+      "Nāc uz punktu",
+      "Aizveriet acis"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Kas vislabāk attīsta hokeja IQ?",
+    "options": [
+      "Tikai spēka treniņi",
+      "Vērojot tikai vārtus",
+      "Tikai slidošana",
+      "Spēles apguve, prakse un situāciju izpratne"
+    ]
+  }
+}

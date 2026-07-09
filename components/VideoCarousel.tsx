@@ -12,16 +12,60 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Image as ExpoImage } from 'expo-image';
 import VideoPlayer from './VideoPlayer';
 import { useLanguage } from '../contexts/LanguageContext';
 import LikeButton from './LikeButton';
 import { generateVideoContentId } from '../utils/likesService';
+import { getVideoThumbnailUrl } from '../utils/videoUrls';
+import { useMediaAspectSize } from '../utils/mediaAspectSize';
 
 // Кеш для успешных форматов превью (чтобы не перебирать форматы каждый раз)
 const thumbnailFormatCache = new Map<string, number>();
+const generatedThumbCache = new Map<string, string>();
 
-// Компонент для изображения с fallback (оптимизированный)
-const VideoThumbnail = React.memo(function VideoThumbnail({ videoUrl }: { videoUrl: string }) {
+// Thumbnail для прямых mp4 видео (Supabase Storage) — только серверное превью, без native getThumbnailAsync
+export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ videoUrl }: { videoUrl: string }) {
+  const serverThumb = getVideoThumbnailUrl(videoUrl);
+  const [displayUri, setDisplayUri] = React.useState<string | null>(
+    () => generatedThumbCache.get(videoUrl) ?? serverThumb
+  );
+
+  React.useEffect(() => {
+    if (generatedThumbCache.has(videoUrl)) {
+      setDisplayUri(generatedThumbCache.get(videoUrl)!);
+      return;
+    }
+    if (serverThumb) {
+      setDisplayUri(serverThumb);
+    }
+  }, [videoUrl, serverThumb]);
+
+  const handleImageError = React.useCallback(() => {
+    setDisplayUri(null);
+  }, []);
+
+  if (displayUri) {
+    return (
+      <ExpoImage
+        source={{ uri: displayUri }}
+        style={{ width: '100%', height: '100%' }}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={150}
+        onError={handleImageError}
+      />
+    );
+  }
+
+  return (
+    <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+      <Ionicons name="videocam" size={36} color="#555" />
+    </View>
+  );
+});
+
+export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({ videoUrl }: { videoUrl: string }) {
   const [vkThumbnailUrl, setVkThumbnailUrl] = React.useState<string | null>(null);
   const [vkThumbnailError, setVkThumbnailError] = React.useState(false);
   const [vkThumbnailIndex, setVkThumbnailIndex] = React.useState(0);
@@ -161,6 +205,11 @@ const VideoThumbnail = React.memo(function VideoThumbnail({ videoUrl }: { videoU
     }
   }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
 
+  // Для прямых mp4 (Supabase Storage)
+  if (!isYouTubeUrl(videoUrl) && !isVkUrl(videoUrl)) {
+    return <DirectVideoThumbnail videoUrl={videoUrl} />;
+  }
+
   // Для YouTube видео
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
     // ОПТИМИЗАЦИЯ: Изменен порядок - сначала hqdefault (более надежный и быстрый)
@@ -191,7 +240,7 @@ const VideoThumbnail = React.memo(function VideoThumbnail({ videoUrl }: { videoU
       <Image
         source={{ uri: currentThumbnail }}
         style={styles.thumbnail}
-        resizeMode="cover"
+        resizeMode="contain"
         onError={handleError}
         onLoad={handleLoad}
       />
@@ -206,7 +255,7 @@ const VideoThumbnail = React.memo(function VideoThumbnail({ videoUrl }: { videoU
           <Image
             source={{ uri: vkThumbnailUrl }}
             style={styles.thumbnail}
-            resizeMode="cover"
+            resizeMode="contain"
             onError={() => {
               console.log('⚠️ Превью из oEmbed не загрузилось');
               setVkThumbnailError(true);
@@ -269,7 +318,6 @@ const { width: screenWidth } = Dimensions.get('window');
 
 type VideoCarouselCardProps = {
   video: { url: string; timeCode?: string };
-  index: number;
   playerId?: string;
   effectiveRefreshTrigger: number;
   onPress: (video: { url: string; timeCode?: string }) => void;
@@ -277,15 +325,20 @@ type VideoCarouselCardProps = {
 
 const VideoCarouselCard = React.memo(function VideoCarouselCard({
   video,
-  index,
   playerId,
   effectiveRefreshTrigger,
   onPress,
 }: VideoCarouselCardProps) {
   const contentId = generateVideoContentId(video.url, video.timeCode);
+  const cardWidth = screenWidth * 0.65;
+  const { width, height } = useMediaAspectSize(video.url, cardWidth, 'video');
   return (
-    <TouchableOpacity style={styles.videoCard} onPress={() => onPress(video)} activeOpacity={0.85}>
-      <VideoThumbnail videoUrl={video.url} />
+    <TouchableOpacity
+      style={[styles.videoCard, { width, height }]}
+      onPress={() => onPress(video)}
+      activeOpacity={0.85}
+    >
+      <VideoPreviewThumbnail videoUrl={video.url} />
       <View style={styles.playButton}>
         <Ionicons name="play-circle" size={40} color="#FF4444" />
       </View>
@@ -305,9 +358,6 @@ const VideoCarouselCard = React.memo(function VideoCarouselCard({
           />
         </View>
       ) : null}
-      <View style={styles.videoInfo}>
-        <Text style={styles.videoTitle}>{index + 1}</Text>
-      </View>
     </TouchableOpacity>
   );
 });
@@ -381,11 +431,10 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
         removeClippedSubviews={true}
         decelerationRate="fast"
       >
-        {videos.map((video, index) => (
+        {videos.map((video) => (
           <VideoCarouselCard
             key={`${video.url}${video.timeCode ?? ''}`}
             video={video}
-            index={index}
             playerId={playerId}
             effectiveRefreshTrigger={effectiveRefreshTrigger}
             onPress={handleVideoPress}
@@ -422,11 +471,12 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
             {selectedVideo && (
-                <View pointerEvents="box-only">
+                <View pointerEvents="box-none">
               <VideoPlayer
                     key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
                 url={selectedVideo.url}
                 timeCode={selectedVideo.timeCode}
+                autoPlay
               />
                 </View>
             )}
@@ -446,8 +496,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   videoCard: {
-    width: screenWidth * 0.65,
-    height: 180,
     marginHorizontal: 8,
     borderRadius: 12,
     backgroundColor: 'rgba(255, 68, 68, 0.1)',
@@ -487,20 +535,6 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 10,
     zIndex: 10,
-  },
-  videoInfo: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
-    padding: 10,
-  },
-  videoTitle: {
-    color: '#fff',
-    fontSize: 14,
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
   },
   emptyContainer: {
     alignItems: 'center',

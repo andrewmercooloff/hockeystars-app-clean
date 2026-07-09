@@ -1,0 +1,3818 @@
+{
+  "rules_players_ice": {
+    "question": "Kiek čiuožėjų vienoje komandoje yra ant ledo vienodos jėgos metu (neįskaitant vartininkų)?",
+    "options": [
+      "7",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "rules_periods": {
+    "question": "Kiek reguliavimo periodų yra standartiniame NHL žaidime?",
+    "options": [
+      "3",
+      "2",
+      "5",
+      "4"
+    ]
+  },
+  "rules_offside": {
+    "question": "Prieš ką atakuojantis žaidėjas patenka į puolimo zoną?",
+    "options": [
+      "Centrinė linija",
+      "ritulys",
+      "Vartininkas",
+      "Teisėjas"
+    ]
+  },
+  "rules_icing": {
+    "question": "Apledėjimas – tai ritulio metimas iš už vidurio linijos pro varžovo vartų liniją be prisilietimo. Tiesa?",
+    "options": [
+      "Netiesa – niekada NHL",
+      "Tiesa",
+      "Tiesa – tik per pratęsimą",
+      "Netiesa – tik iš gynybinės zonos"
+    ]
+  },
+  "players_gretzky_goals": {
+    "question": "Kam priklauso daugiausiai karjeros įmuštų įvarčių NHL rekordas?",
+    "options": [
+      "Aleksas Ovečkinas",
+      "Jaromiras Jagras",
+      "Gordie Howe",
+      "Wayne'as Gretzky"
+    ]
+  },
+  "players_ovechkin_pos": {
+    "question": "Kurios komandos miesto 8-uoju numeriu dėvintis Aleksas Ovečkinas garsėja kaip kairiojo krašto puolėjas?",
+    "options": [
+      "Bostonas",
+      "Torontas",
+      "Vašingtonas",
+      "Pitsburgas"
+    ]
+  },
+  "terms_hat_trick": {
+    "question": "Kas yra „hat trick“ ledo ritulyje?",
+    "options": [
+      "Trys vieno žaidėjo įvarčiai per vienerias rungtynes",
+      "Trys atmušimai iš eilės",
+      "Trys rezultatyvūs perdavimai per vienas rungtynes",
+      "Trys baudos"
+    ]
+  },
+  "terms_power_play": {
+    "question": "Galios žaidimas įvyksta, kai:",
+    "options": [
+      "Vartininkas traukiamas",
+      "Prasideda muštynės",
+      "Viena komanda turi daugiau čiuožėjų dėl baudos",
+      "Prasideda viršvalandžiai"
+    ]
+  },
+  "history_stanley_cup": {
+    "question": "Kurios lygos Stenlio taurė yra čempiono trofėjus?",
+    "options": [
+      "IIHF pasaulio čempionatas",
+      "NHL",
+      "KHL",
+      "AHL"
+    ]
+  },
+  "general_puck_material": {
+    "question": "Iš ko pagamintas standartinis ledo ritulio ritulys?",
+    "options": [
+      "Vulkanizuota guma",
+      "Aliuminis",
+      "Mediena",
+      "Plastikiniai"
+    ]
+  },
+  "rules_penalty_minor": {
+    "question": "Kiek minučių yra standartinė nedidelė bauda?",
+    "options": [
+      "2",
+      "10",
+      "5",
+      "4"
+    ]
+  },
+  "rules_penalty_major": {
+    "question": "Kiek minučių yra standartinė pagrindinė bauda?",
+    "options": [
+      "10",
+      "20",
+      "2",
+      "5"
+    ]
+  },
+  "rules_faceoff": {
+    "question": "Žaidimas prasideda nuo:",
+    "options": [
+      "Baudos metimas",
+      "Faceoff",
+      "Galios pertrauka",
+      "Apledėjimo skambutis"
+    ]
+  },
+  "rules_shootout_reg": {
+    "question": "Jei NHL reguliariojo sezono rungtynės po pratęsimo bus lygios, kas atsitiks?",
+    "options": [
+      "Antras pratęsimas",
+      "Susišaudymas",
+      "Atkrintamųjų varžybų laikotarpis",
+      "Lygiosios stendai"
+    ]
+  },
+  "rules_crease": {
+    "question": "Ar gali puolėjas be pasekmių stovėti vartininko rietuvėje?",
+    "options": [
+      "Taip visada",
+      "Tik atkrintamosiose",
+      "Ne – įvartis gali būti neįmuštas",
+      "Tik paskutinę minutę"
+    ]
+  },
+  "rules_high_stick": {
+    "question": "Aukšta lazda atsitrenkia į priešininką aukščiau:",
+    "options": [
+      "Skersinis",
+      "Pečiai",
+      "Juosmuo",
+      "Tik šalmas"
+    ]
+  },
+  "rules_empty_net": {
+    "question": "Vartininko rizika:",
+    "options": [
+      "Baudos metimas",
+      "Tušti vartai prieš",
+      "Užsienyje",
+      "Tik apledėjimas"
+    ]
+  },
+  "rules_breakaway_penalty": {
+    "question": "Baudos metimas dažnai skiriamas už pražangą:",
+    "options": [
+      "Bet kada",
+      "Tik viršvalandžiai",
+      "Tik atkrintamosios",
+      "Aiškus atsiskyrimas"
+    ]
+  },
+  "rules_bench_minor": {
+    "question": "Suolo nepilnametį aptarnauja bet kuris žaidėjas, išskyrus:",
+    "options": [
+      "Vartininkas (dažniausiai)",
+      "A į priekį",
+      "Gynėjas",
+      "Kapitonas"
+    ]
+  },
+  "rules_ot_3on3": {
+    "question": "NHL reguliariojo sezono OT žaidžiama su kiek čiuožėjų vienoje pusėje?",
+    "options": [
+      "3",
+      "5",
+      "4",
+      "6"
+    ]
+  },
+  "rules_players_total": {
+    "question": "Kiek žaidėjų (įskaitant vartininką) komanda gali turėti ant ledo?",
+    "options": [
+      "5",
+      "8",
+      "7",
+      "6"
+    ]
+  },
+  "rules_goal_value": {
+    "question": "Kiek taškų vertas įvartis švieslentėje?",
+    "options": [
+      "3",
+      "5",
+      "1",
+      "2"
+    ]
+  },
+  "rules_delayed_penalty": {
+    "question": "Dėl atidėtos bausmės nepažeidžianti komanda dažnai:",
+    "options": [
+      "Ledo ritulį",
+      "Skambučių skirtasis laikas",
+      "Nustoja žaisti",
+      "Traukia vartininką"
+    ]
+  },
+  "rules_trapezoid": {
+    "question": "Vartininkai gali žaisti ritulį už tinklo tik:",
+    "options": [
+      "Centrinis ratas",
+      "Neutrali zona",
+      "Pilna zona",
+      "Trapecijos plotas"
+    ]
+  },
+  "rules_fighting_major": {
+    "question": "Kova paprastai sukelia:",
+    "options": [
+      "Didelė bausmė",
+      "Tik netinkamas elgesys žaidime",
+      "Nedidelė bauda",
+      "Jokios baudos"
+    ]
+  },
+  "terms_puck": {
+    "question": "Kietas guminis objektas, kurį žaidėjai šaudo, vadinamas:",
+    "options": [
+      "Puck",
+      "Diskutuoti",
+      "Akmuo",
+      "Kamuolys"
+    ]
+  },
+  "terms_saucer": {
+    "question": "Perdavimas, kuriuo pakeliamas ritulys, vadinamas:",
+    "options": [
+      "Lėkštės leidimas",
+      "Valdybos leidimas",
+      "Slaptų sąvartynas",
+      "Perdavimas į raukšles"
+    ]
+  },
+  "terms_slap_shot": {
+    "question": "Šūvis apima:",
+    "options": [
+      "Tik užnugaryje",
+      "Viena ranka ant lazdos",
+      "Lengvai bakstelėkite ritulį",
+      "Užsibaigti ir pirmiausia atsitrenkti į ledą"
+    ]
+  },
+  "terms_deke": {
+    "question": "Dekas yra:",
+    "options": [
+      "Baudos rūšis",
+      "Netikras ėjimas įveikti gynėją",
+      "Gynybinis blokas",
+      "Linijos pakeitimas"
+    ]
+  },
+  "terms_breakaway": {
+    "question": "Atsiskyrimas yra tada, kai:",
+    "options": [
+      "Ritulys apledėjęs",
+      "Čiuožėjas įeina vienas į vartininką",
+      "Du žaidėjai kovoja",
+      "Vyksta linijos pasikeitimas"
+    ]
+  },
+  "terms_plus_minus": {
+    "question": "Pliuso / minuso takeliai:",
+    "options": [
+      "Smūgiai į vartus",
+      "Įvarčių skirtumas žaidėjui esant vienoda jėga ant ledo",
+      "Baudos minutės",
+      "Faceoff laimi tik"
+    ]
+  },
+  "terms_assist": {
+    "question": "Pagrindinis rezultatyvus rezultatyvumas atitenka žaidėjui, kuris:",
+    "options": [
+      "Įmuša įvartį",
+      "Laimėjo akistatą",
+      "Paskutinis paliestas ritulys prieš įvarčius",
+      "Gavo baudą"
+    ]
+  },
+  "terms_block": {
+    "question": "Užblokuotas šūvis yra tada, kai:",
+    "options": [
+      "Pukas pataiko į virpstą",
+      "Čiuožėjas sustabdo ritulį kūnu / lazda prieš įvartį",
+      "Vartininkas jį išsaugo",
+      "Smūgis nepataikė į tinklą"
+    ]
+  },
+  "terms_forecheck": {
+    "question": "Išankstinis patikrinimas reiškia:",
+    "options": [
+      "Tik linijos keitimo strategija",
+      "Ginti savo mėlyną liniją",
+      "Spaudimas varžovams savo zonoje atgauti ritulį",
+      "Traukia vartininką"
+    ]
+  },
+  "terms_backcheck": {
+    "question": "Atgalinis patikrinimas reiškia:",
+    "options": [
+      "Čiuožimas atgal, kad padėtų gynybai",
+      "Šaudymas iš taško",
+      "Pergalė akistatoje",
+      "Vartininkas išgelbėjo"
+    ]
+  },
+  "terms_one_timer": {
+    "question": "Vienkartinis yra:",
+    "options": [
+      "Laukiama, tada šaudoma",
+      "Vartininko judėjimas",
+      "Iš karto šaudoma iš perdavimo",
+      "Bauda"
+    ]
+  },
+  "terms_poke_check": {
+    "question": "Padengtas čekis:",
+    "options": [
+      "Pakelkite ritulį virš lazdos",
+      "Kryžminis patikrinimas",
+      "Numuškite ritulį nuo varžovo",
+      "Kabliukas priešininkas"
+    ]
+  },
+  "terms_top_shelf": {
+    "question": "Viršutinė lentyna reiškia balų surinkimą:",
+    "options": [
+      "Viršutinė tinklo dalis",
+      "Tik iš centro ledo",
+      "Tik ant tuščio tinklo",
+      "Penkių skylių"
+    ]
+  },
+  "terms_five_hole": {
+    "question": "Penkios duobutės yra tarp vartininko:",
+    "options": [
+      "Lazda ir pirštinė",
+      "Kaukė ir krūtinė",
+      "Ranka ir kūnas",
+      "Kojos"
+    ]
+  },
+  "terms_enforcer": {
+    "question": "Vykdytojas suteikia:",
+    "options": [
+      "Koučingas",
+      "Įvarčių įmušimas",
+      "Fizinė apsauga ir kova",
+      "Tik atmušimai"
+    ]
+  },
+  "terms_line_change": {
+    "question": "Linijos pokyčiai paprastai vyksta:",
+    "options": [
+      "Tik po įvarčių",
+      "Tik dėl baudų",
+      "Tik per pertrauką",
+      "Skrydžio metu žaidimo metu"
+    ]
+  },
+  "terms_rink": {
+    "question": "Ledo ritulio žaidimo paviršius vadinamas:",
+    "options": [
+      "Laukas",
+      "Teismas",
+      "Trasa",
+      "Ledo čiuožykla"
+    ]
+  },
+  "terms_goal": {
+    "question": "Tinklo žaidėjų šaudymas vadinamas:",
+    "options": [
+      "Tikslas",
+      "Krepšelis",
+      "Tikslas",
+      "Zona"
+    ]
+  },
+  "terms_short_handed": {
+    "question": "Žaisti trumpomis rankomis reiškia:",
+    "options": [
+      "Viršvalandžiai",
+      "Vartininkas patraukė",
+      "Mažiau čiuožėjų dėl baudos",
+      "Tuščias tinklas"
+    ]
+  },
+  "terms_golden_goal": {
+    "question": "Staigios mirties viršvalandžiai reiškia:",
+    "options": [
+      "Pirmas įvartis laimi",
+      "Visas laikotarpis",
+      "Tik susišaudymas",
+      "Nėra nugalėtojo"
+    ]
+  },
+  "hist_original_six": {
+    "question": "Kiek komandų yra NHL Original Six eroje?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "hist_canada": {
+    "question": "Šiuolaikinis ledo ritulys labiausiai išsivystė:",
+    "options": [
+      "Rusija",
+      "Švedija",
+      "JAV",
+      "Kanada"
+    ]
+  },
+  "hist_miracle_ice": {
+    "question": "Stebuklas ant ledo: ką JAV įveikė 1980 m.?",
+    "options": [
+      "Sovietų Sąjunga",
+      "Kanada",
+      "Čekoslovakija",
+      "Švedija"
+    ]
+  },
+  "hist_gretzky_points": {
+    "question": "Baigėsi Wayne'o Gretzky karjeros taškų rekordas:",
+    "options": [
+      "1500",
+      "2857",
+      "2000 m",
+      "3500"
+    ]
+  },
+  "hist_hof_city": {
+    "question": "Ledo ritulio šlovės muziejus yra:",
+    "options": [
+      "Torontas",
+      "Bostonas",
+      "Monrealis",
+      "Niujorkas"
+    ]
+  },
+  "hist_khl": {
+    "question": "KHL visų pirma yra pagrįsta:",
+    "options": [
+      "Rusija",
+      "Suomija",
+      "JAV",
+      "Kanada"
+    ]
+  },
+  "hist_1972": {
+    "question": "1972 m. aukščiausiojo lygio susitikimo serija: Kanada prieš:",
+    "options": [
+      "SSRS",
+      "JAV",
+      "Čekija",
+      "Švedija"
+    ]
+  },
+  "hist_nhl_century": {
+    "question": "NHL buvo įkurta:",
+    "options": [
+      "20 amžiaus",
+      "XXI amžius",
+      "XIX a",
+      "XVIII a"
+    ]
+  },
+  "hist_crosby_draft": {
+    "question": "Sidney Crosby buvo pašauktas 1-uoju numeriu:",
+    "options": [
+      "2003 m",
+      "2007 m",
+      "2010 m",
+      "2005 m"
+    ]
+  },
+  "hist_mcdavid_draft": {
+    "question": "Connoras McDavidas buvo pašauktas 1-uoju numeriu:",
+    "options": [
+      "2013 m",
+      "2017 m",
+      "2019 m",
+      "2015 m"
+    ]
+  },
+  "hist_first_stanley_year": {
+    "question": "Stenlio taurė pirmą kartą buvo įteikta:",
+    "options": [
+      "20 amžiaus",
+      "XXI amžius",
+      "XVIII a",
+      "XIX a"
+    ]
+  },
+  "hist_jagr_points": {
+    "question": "Jaromiras Jagras yra tarp visų laikų NHL lyderių:",
+    "options": [
+      "Taškai",
+      "Koučingas",
+      "Tik baudos minutės",
+      "Vartininkas laimi"
+    ]
+  },
+  "hist_ovi_capitals": {
+    "question": "Aleksas Ovečkinas savo NHL karjerą daugiausia praleido su:",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Pitsburgo pingvinai",
+      "Vašingtono sostinės",
+      "Bostono „Bruins“."
+    ]
+  },
+  "hist_lemieux_pens": {
+    "question": "Mario Lemieux laimėjo Stenlio taurę su:",
+    "options": [
+      "Pitsburgo pingvinai",
+      "Monrealio „Canadiens“.",
+      "Detroito „Red Wings“.",
+      "Edmontono „Oilers“."
+    ]
+  },
+  "gen_rink_length": {
+    "question": "Kiek trunka NHL aikštė?",
+    "options": [
+      "200 pėdų",
+      "150 pėdų",
+      "300 pėdų",
+      "250 pėdų"
+    ]
+  },
+  "gen_rink_width": {
+    "question": "Kokio pločio yra NHL aikštė?",
+    "options": [
+      "100 pėdų",
+      "150 pėdų",
+      "120 pėdų",
+      "85 pėdų"
+    ]
+  },
+  "gen_zones": {
+    "question": "Į kiek zonų čiuožykla padalija mėlynas linijas?",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  "gen_red_line": {
+    "question": "Centrinė raudona linija naudojama:",
+    "options": [
+      "Apledėjimo skambučiai",
+      "Baudos dėžutė",
+      "Tik atmušimai",
+      "Nuošalė centre"
+    ]
+  },
+  "gen_stick_curve": {
+    "question": "Ašmenų kreivė padeda:",
+    "options": [
+      "Čiuožimo greitis",
+      "Vartininkas gelbsti",
+      "Ritulio kėlimas ir valdymas",
+      "Kovos"
+    ]
+  },
+  "gen_skate_hollow": {
+    "question": "Tuščiavidurės pačiūžos turi įtakos:",
+    "options": [
+      "Stick flex",
+      "Sukibimas su ledu ir posūkiais",
+      "Šalmas tinka",
+      "Džersio dydis"
+    ]
+  },
+  "gen_shin_guards": {
+    "question": "Blauzdų apsaugos apsaugo:",
+    "options": [
+      "Pečiai",
+      "Galva",
+      "Apatinės kojos",
+      "Tik rankos"
+    ]
+  },
+  "gen_captain": {
+    "question": "Kapitonas nešioja laišką:",
+    "options": [
+      "A",
+      "C",
+      "G",
+      "W"
+    ]
+  },
+  "gen_alternate": {
+    "question": "Pakaitiniai kapitonai dėvi:",
+    "options": [
+      "C",
+      "P",
+      "S",
+      "A"
+    ]
+  },
+  "gen_home_jersey": {
+    "question": "Namų komanda paprastai dėvi:",
+    "options": [
+      "Tamsi/spalvota",
+      "Balta/šviesi",
+      "Jokių megztinių",
+      "Tik vartininkas"
+    ]
+  },
+  "gen_intermission": {
+    "question": "Pertrauka tarp laikotarpių yra apie:",
+    "options": [
+      "5 min",
+      "30 min",
+      "15-18 min",
+      "1 valanda"
+    ]
+  },
+  "gen_playoffs": {
+    "question": "NHL atkrintamųjų serijos dažniausiai yra:",
+    "options": [
+      "Visada geriausias iš 5",
+      "Tik finalas",
+      "Retos išimtys – dažniausiai geriausias iš 7",
+      "Niekada"
+    ]
+  },
+  "gen_zamboni": {
+    "question": "Zamboni naudojamas:",
+    "options": [
+      "Išmatuokite greitį",
+      "Laikykite ritulius",
+      "Galąsti pačiūžas",
+      "Atnaujinkite ledą"
+    ]
+  },
+  "gen_ref_stripes": {
+    "question": "Ant ledo pareigūnai dėvi:",
+    "options": [
+      "Komandos marškinėliai",
+      "Vartininko apranga",
+      "Juodos ir baltos juostelės",
+      "Kostiumai"
+    ]
+  },
+  "gen_skates": {
+    "question": "Ledo ritulio žaidėjai tęsia:",
+    "options": [
+      "Riedučiai",
+      "Pačiūžos",
+      "Basos kojos",
+      "Slidės"
+    ]
+  },
+  "gen_stick": {
+    "question": "Žaidėjai valdo ritulį:",
+    "options": [
+      "Lazda",
+      "Grynasis",
+      "Tik rankos",
+      "Šalmas"
+    ]
+  },
+  "pl_team_0": {
+    "question": "Su kokia komanda Sidney Crosby labiausiai asocijuojasi?",
+    "options": [
+      "Pitsburgo pingvinai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_0": {
+    "question": "Kurioje pozicijoje daugiausiai žaidė Sidney Crosby?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "centras"
+    ]
+  },
+  "pl_team_1": {
+    "question": "Su kokia komanda Connor McDavid labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai",
+      "Edmontono „Oilers“."
+    ]
+  },
+  "pl_pos_1": {
+    "question": "Kokią poziciją daugiausiai užėmė Connoras McDavidas?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_2": {
+    "question": "Su kokia komanda Nathanas MacKinnonas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Kolorado lavina",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_2": {
+    "question": "Kokią poziciją daugiausiai užėmė Nathanas MacKinnonas?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_3": {
+    "question": "Su kuria komanda Victoras Hedmanas labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Tampos įlankos žaibas",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_3": {
+    "question": "Kokią poziciją pirmiausia užėmė Victoras Hedmanas?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_4": {
+    "question": "Su kuria komanda Carey Price labiausiai asocijuojasi?",
+    "options": [
+      "Monrealio „Canadiens“.",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_4": {
+    "question": "Kurioje pozicijoje pirmiausia žaidė Carey Price?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_5": {
+    "question": "Su kokia komanda Jaromiras Jagras labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai",
+      "Pitsburgo pingvinai"
+    ]
+  },
+  "pl_pos_5": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Jaromiras Jagras?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "centras",
+      "Vartininkas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_6": {
+    "question": "Su kuria komanda Mario Lemieux labiausiai asocijuojasi?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Pitsburgo pingvinai",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_6": {
+    "question": "Kokioje pozicijoje daugiausiai žaidė Mario Lemieux?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_7": {
+    "question": "Su kuria komanda Patrickas Kane'as labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Čikagos „Blackhawks“.",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_7": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Patrickas Kane'as?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_8": {
+    "question": "Su kuria komanda Nicklas Lidstromas labiausiai siejamas?",
+    "options": [
+      "Detroito „Red Wings“.",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_8": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Nicklas Lidstromas?",
+    "options": [
+      "centras",
+      "Vartininkas",
+      "Kairysis krašto puolėjas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_9": {
+    "question": "Su kuria komanda Martinas Brodeuras labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Naujojo Džersio velniai"
+    ]
+  },
+  "pl_pos_9": {
+    "question": "Kokioje pozicijoje pirmiausia žaidė Martinas Brodeuras?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_10": {
+    "question": "Su kokia komanda Stevenas Stamkosas asocijuojasi labiausiai?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Tampos įlankos žaibas",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_10": {
+    "question": "Kokią poziciją daugiausia žaidė Stevenas Stamkosas?",
+    "options": [
+      "centras",
+      "Gynėjas",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_11": {
+    "question": "Su kokia komanda Austonas Matthewsas labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Monrealio „Canadiens“."
+    ]
+  },
+  "pl_pos_11": {
+    "question": "Kokią poziciją daugiausia žaidė Austonas Matthewsas?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_12": {
+    "question": "Su kuria komanda Leonas Draisaitlis asocijuojasi labiausiai?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Edmontono „Oilers“."
+    ]
+  },
+  "pl_pos_12": {
+    "question": "Kokią poziciją pirmiausia užėmė Leonas Draisaitlis?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_13": {
+    "question": "Su kokia komanda Erikas Karlssonas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "San Chosė rykliai",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_13": {
+    "question": "Kokią poziciją daugiausia žaidė Erikas Karlssonas?",
+    "options": [
+      "centras",
+      "Vartininkas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_14": {
+    "question": "Su kuria komanda Pavelas Datsiukas labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Detroito „Red Wings“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_14": {
+    "question": "Kokią poziciją pirmiausia žaidė Pavelas Datsiukas?",
+    "options": [
+      "centras",
+      "Gynėjas",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_15": {
+    "question": "Su kokia komanda Henrikas Lundqvistas labiausiai siejamas?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Monrealio „Canadiens“."
+    ]
+  },
+  "pl_pos_15": {
+    "question": "Kokią poziciją daugiausiai užėmė Henrikas Lundqvistas?",
+    "options": [
+      "Gynėjas",
+      "Dešinysis krašto puolėjas",
+      "centras",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_16": {
+    "question": "Su kuria komanda labiausiai siejamas Jevgenijus Malkinas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Pitsburgo pingvinai"
+    ]
+  },
+  "pl_pos_16": {
+    "question": "Kokią poziciją pirmiausia žaidė Jevgenijus Malkinas?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_17": {
+    "question": "Su kuria komanda Artemi Panarinas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Monrealio „Canadiens“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_17": {
+    "question": "Kokią poziciją daugiausiai žaidė Artemi Panarinas?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_18": {
+    "question": "Su kokia komanda Nikita Kučerovas asocijuojasi labiausiai?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Tampos įlankos žaibas",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_18": {
+    "question": "Kokią poziciją daugiausiai žaidė Nikita Kucherovas?",
+    "options": [
+      "centras",
+      "Vartininkas",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_19": {
+    "question": "Su kuria komanda Bradas Marchandas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai",
+      "Monrealio „Canadiens“."
+    ]
+  },
+  "pl_pos_19": {
+    "question": "Kurioje pozicijoje pirmiausia žaidė Bradas Marchandas?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_20": {
+    "question": "Su kokia komanda Davidas Pastrnakas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“."
+    ]
+  },
+  "pl_pos_20": {
+    "question": "Kokioje pozicijoje daugiausiai žaidė Davidas Pastrnakas?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Vartininkas",
+      "centras",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_21": {
+    "question": "Su kokia komanda Shea Weber labiausiai asocijuojasi?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“.",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_21": {
+    "question": "Kokią poziciją pirmiausia užėmė Shea Weber?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Vartininkas",
+      "Gynėjas",
+      "centras"
+    ]
+  },
+  "pl_team_22": {
+    "question": "Su kokia komanda Sergejus Bobrovskis asocijuojasi labiausiai?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Floridos panteros",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_22": {
+    "question": "Kokią poziciją pirmiausia žaidė Sergejus Bobrovskis?",
+    "options": [
+      "Gynėjas",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas",
+      "centras"
+    ]
+  },
+  "pl_team_23": {
+    "question": "Su kuria komanda labiausiai siejamas Jonathanas Toewsas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Čikagos „Blackhawks“."
+    ]
+  },
+  "pl_pos_23": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Jonathanas Toewsas?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_24": {
+    "question": "Su kuria komanda Anze Kopitar asocijuojasi labiausiai?",
+    "options": [
+      "Los Andželo karaliai",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_24": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Anze Kopitar?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Gynėjas",
+      "Dešinysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_25": {
+    "question": "Su kokia komanda Markas Messier labiausiai siejamas?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Edmontono „Oilers“.",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_25": {
+    "question": "Kokioje pozicijoje pirmiausia žaidė Markas Messier?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_26": {
+    "question": "Su kuria komanda Ray Bourque labiausiai asocijuojasi?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_26": {
+    "question": "Kokią poziciją daugiausiai užėmė Ray Bourque?",
+    "options": [
+      "Vartininkas",
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_27": {
+    "question": "Su kokia komanda Dominikas Hašekas asocijuojasi labiausiai?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_27": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Dominikas Hašekas?",
+    "options": [
+      "Vartininkas",
+      "centras",
+      "Gynėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_28": {
+    "question": "Su kuria komanda Teemu Selanne labiausiai asocijuojasi?",
+    "options": [
+      "Anaheimo „Ducks“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_28": {
+    "question": "Kokią poziciją daugiausiai žaidė Teemu Selanne?",
+    "options": [
+      "centras",
+      "Vartininkas",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_29": {
+    "question": "Su kokia komanda Pavelas Bure'as labiausiai asocijuojasi?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Vankuverio „Canucks“.",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_29": {
+    "question": "Kokią poziciją pirmiausia užėmė Pavelas Bure'as?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Vartininkas",
+      "centras",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_30": {
+    "question": "Su kokia komanda Aleksandras Mogilnys labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Buffalo Sabres"
+    ]
+  },
+  "pl_pos_30": {
+    "question": "Kokią poziciją pirmiausia žaidė Aleksandras Mogilnys?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_31": {
+    "question": "Su kokia komanda Peteris Forsbergas labiausiai siejamas?",
+    "options": [
+      "Kolorado lavina",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_31": {
+    "question": "Kokią poziciją daugiausiai užėmė Peteris Forsbergas?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_32": {
+    "question": "Su kuria komanda Joe Sakičius asocijuojasi labiausiai?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Kolorado lavina",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_32": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Joe Sakičius?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_33": {
+    "question": "Su kuria komanda Steve'as Yzermanas labiausiai siejamas?",
+    "options": [
+      "Detroito „Red Wings“.",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_33": {
+    "question": "Kokią poziciją daugiausiai užėmė Steve'as Yzermanas?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "centras"
+    ]
+  },
+  "pl_team_34": {
+    "question": "Su kokia komanda Bobby Orras labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_34": {
+    "question": "Kokią poziciją daugiausia žaidė Bobby Orras?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_35": {
+    "question": "Su kokia komanda Gordie Howe labiausiai siejamas?",
+    "options": [
+      "Detroito „Red Wings“.",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_35": {
+    "question": "Kokioje pozicijoje pirmiausia žaidė Gordie Howe?",
+    "options": [
+      "Vartininkas",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_36": {
+    "question": "Su kuria komanda Wayne'as Gretzky labiausiai asocijuojasi?",
+    "options": [
+      "Toronto klevo lapai",
+      "Edmontono „Oilers“.",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_36": {
+    "question": "Kokią poziciją pirmiausia žaidė Wayne'as Gretzky?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_37": {
+    "question": "Su kokia komanda Valeri Kharlamov asocijuojasi labiausiai?",
+    "options": [
+      "Maskvos CSKA",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_37": {
+    "question": "Kokioje pozicijoje pirmiausia vaidino Valeri Kharlamov?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "centras",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_38": {
+    "question": "Su kokia komanda Vladislavas Tretiakas labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Maskvos CSKA"
+    ]
+  },
+  "pl_pos_38": {
+    "question": "Kokią poziciją pirmiausia žaidė Vladislavas Tretiakas?",
+    "options": [
+      "Vartininkas",
+      "Gynėjas",
+      "centras",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_39": {
+    "question": "Su kuria komanda labiausiai asocijuojasi Bobby Hullas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Čikagos „Blackhawks“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_39": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Bobby Hullas?",
+    "options": [
+      "Gynėjas",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_40": {
+    "question": "Su kokia komanda Maurice'as Richardas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_40": {
+    "question": "Kokią poziciją daugiausia užėmė Maurice'as Richardas?",
+    "options": [
+      "Vartininkas",
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_41": {
+    "question": "Su kuria komanda Guy'us Lafleur'as labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Monrealio „Canadiens“."
+    ]
+  },
+  "pl_pos_41": {
+    "question": "Kokią poziciją pirmiausia žaidė Guy'us Lafleuras?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_42": {
+    "question": "Su kokia komanda Patrickas Roy'us labiausiai siejamas?",
+    "options": [
+      "Monrealio „Canadiens“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_42": {
+    "question": "Kokioje pozicijoje daugiausiai vaidino Patrickas Roy?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_43": {
+    "question": "Su kuria komanda Roberto Luongo asocijuojasi labiausiai?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Vankuverio „Canucks“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_43": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Roberto Luongo?",
+    "options": [
+      "Vartininkas",
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_44": {
+    "question": "Su kokia komanda Ilja Kovalčiukas asocijuojasi labiausiai?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Naujojo Džersio velniai",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_44": {
+    "question": "Kokią poziciją pirmiausia žaidė Ilja Kovalčiukas?",
+    "options": [
+      "Gynėjas",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_45": {
+    "question": "Su kokia komanda Pavelas Bure'as labiausiai asocijuojasi?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Floridos panteros"
+    ]
+  },
+  "pl_pos_45": {
+    "question": "Kokią poziciją pirmiausia užėmė Pavelas Bure'as?",
+    "options": [
+      "Dešinysis krašto puolėjas",
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_46": {
+    "question": "Su kokia komanda Aleksejus Kovaliovas asocijuojasi labiausiai?",
+    "options": [
+      "Monrealio „Canadiens“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_46": {
+    "question": "Kokią poziciją pirmiausia žaidė Aleksejus Kovaliovas?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Vartininkas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_47": {
+    "question": "Su kokia komanda Sergejus Gončaras labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Pitsburgo pingvinai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_47": {
+    "question": "Kokioje pozicijoje pirmiausia žaidė Sergejus Gončaras?",
+    "options": [
+      "Gynėjas",
+      "Kairysis krašto puolėjas",
+      "Vartininkas",
+      "centras"
+    ]
+  },
+  "pl_team_48": {
+    "question": "Su kokia komanda Viačeslavas Fetisovas asocijuojasi labiausiai?",
+    "options": [
+      "Naujojo Džersio velniai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_48": {
+    "question": "Kokią poziciją pirmiausia užėmė Viačeslavas Fetisovas?",
+    "options": [
+      "Vartininkas",
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_49": {
+    "question": "Su kuria komanda Chrisas Cheliosas labiausiai siejamas?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Detroito „Red Wings“."
+    ]
+  },
+  "pl_pos_49": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Chrisas Cheliosas?",
+    "options": [
+      "Gynėjas",
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_50": {
+    "question": "Su kuria komanda Scottas Stevensas labiausiai asocijuojasi?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko „Rangers“.",
+      "Naujojo Džersio velniai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_50": {
+    "question": "Kokią poziciją pirmiausia žaidė Scottas Stevensas?",
+    "options": [
+      "Gynėjas",
+      "Vartininkas",
+      "Kairysis krašto puolėjas",
+      "centras"
+    ]
+  },
+  "pl_team_51": {
+    "question": "Su kuria komanda Paulas Coffey labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Edmontono „Oilers“.",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_51": {
+    "question": "Kokią poziciją daugiausiai užėmė Paulas Coffey?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Vartininkas",
+      "centras",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_52": {
+    "question": "Su kuria komanda Grantas Fuhras labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Niujorko „Rangers“.",
+      "Toronto klevo lapai",
+      "Edmontono „Oilers“."
+    ]
+  },
+  "pl_pos_52": {
+    "question": "Kokią poziciją daugiausiai užėmė Grantas Fuhras?",
+    "options": [
+      "centras",
+      "Gynėjas",
+      "Vartininkas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_53": {
+    "question": "Su kokia komanda Mike'as Bossy labiausiai siejamas?",
+    "options": [
+      "Niujorko salų gyventojai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_53": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Mike'as Bossy?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas",
+      "centras"
+    ]
+  },
+  "pl_team_54": {
+    "question": "Su kuria komanda labiausiai asocijuojasi Bryanas Trottieris?",
+    "options": [
+      "Toronto klevo lapai",
+      "Niujorko salų gyventojai",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_54": {
+    "question": "Kokią poziciją daugiausia žaidė Bryanas Trottieris?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "pl_team_55": {
+    "question": "Su kuria komanda Denisas Potvinas labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Niujorko salų gyventojai",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_55": {
+    "question": "Kokią poziciją daugiausiai užėmė Denisas Potvinas?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "Vartininkas",
+      "centras",
+      "Gynėjas"
+    ]
+  },
+  "pl_team_56": {
+    "question": "Su kuria komanda Cam Neely labiausiai asocijuojasi?",
+    "options": [
+      "Niujorko „Rangers“.",
+      "Monrealio „Canadiens“.",
+      "Toronto klevo lapai",
+      "Bostono „Bruins“."
+    ]
+  },
+  "pl_pos_56": {
+    "question": "Kurioje pozicijoje daugiausia žaidė Cam Neely?",
+    "options": [
+      "centras",
+      "Kairysis krašto puolėjas",
+      "Dešinysis krašto puolėjas",
+      "Vartininkas"
+    ]
+  },
+  "pl_team_57": {
+    "question": "Su kuria komanda Adamas Oatesas labiausiai siejamas?",
+    "options": [
+      "Vašingtono sostinės",
+      "Niujorko „Rangers“.",
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai"
+    ]
+  },
+  "pl_pos_57": {
+    "question": "Kokioje pozicijoje daugiausia žaidė Adamas Oatesas?",
+    "options": [
+      "Kairysis krašto puolėjas",
+      "centras",
+      "Gynėjas",
+      "Dešinysis krašto puolėjas"
+    ]
+  },
+  "pl_team_58": {
+    "question": "Su kuria komanda Dougas Gilmouras labiausiai siejamas?",
+    "options": [
+      "Bostono „Bruins“.",
+      "Toronto klevo lapai",
+      "Monrealio „Canadiens“.",
+      "Niujorko „Rangers“."
+    ]
+  },
+  "pl_pos_58": {
+    "question": "Kokioje pozicijoje pirmiausia žaidė Dougas Gilmouras?",
+    "options": [
+      "centras",
+      "Dešinysis krašto puolėjas",
+      "Gynėjas",
+      "Kairysis krašto puolėjas"
+    ]
+  },
+  "intl_khl_full": {
+    "question": "Ką reiškia KHL?",
+    "options": [
+      "Kontinentinė ledo ritulio lyga",
+      "Kazachstano ledo ritulio lyga",
+      "Korėjos ledo ritulio lyga",
+      "Karaliaus ledo ritulio lyga"
+    ]
+  },
+  "intl_iihf": {
+    "question": "IIHF organizuoja:",
+    "options": [
+      "KHL atkrintamosios",
+      "NHL juodraštis",
+      "Stanley taurė",
+      "Pasaulio čempionatas"
+    ]
+  },
+  "intl_olympic_surface": {
+    "question": "Olimpinis ledo ritulys žaidžiamas:",
+    "options": [
+      "Ledas",
+      "Smėlis",
+      "Žolė",
+      "Betono"
+    ]
+  },
+  "intl_czech_gold": {
+    "question": "Kuri šalis iškovojo daug pasaulio titulų su Jagro ir Hašeko eros žvaigždėmis?",
+    "options": [
+      "Suomija",
+      "Čekija",
+      "Kanada",
+      "JAV"
+    ]
+  },
+  "intl_sweden_nhl": {
+    "question": "Daugelis NHL žvaigždžių yra iš:",
+    "options": [
+      "Ispanija",
+      "Brazilija",
+      "Švedija",
+      "Indija"
+    ]
+  },
+  "intl_finland_goalies": {
+    "question": "Suomija garsėja kaip puikiai gamina:",
+    "options": [
+      "Vartininkai",
+      "Tik treneriai",
+      "Zamboni vairuotojai",
+      "Teisėjai"
+    ]
+  },
+  "intl_red_machine": {
+    "question": "Sovietinė „raudonoji mašina“ dominavo:",
+    "options": [
+      "1970-80-ieji",
+      "2000-ieji",
+      "2010-ieji",
+      "Tik 1990 m"
+    ]
+  },
+  "intl_nhl_draft": {
+    "question": "NHL komandos atrenka naujus žaidėjus:",
+    "options": [
+      "Prekybos terminas",
+      "Visų žvaigždžių žaidimas",
+      "Pasaulio taurė",
+      "Įrašo juodraštis"
+    ]
+  },
+  "intl_three_stars": {
+    "question": "Apdovanojamos trys žaidimo žvaigždės:",
+    "options": [
+      "Kartą per sezoną",
+      "Tik atkrintamosiose",
+      "Niekada NHL",
+      "Po kiekvieno žaidimo"
+    ]
+  },
+  "intl_womens_hockey": {
+    "question": "Moterų ledo ritulys yra olimpinė sporto šaka, nes:",
+    "options": [
+      "1998 m",
+      "Niekada",
+      "2010 m",
+      "1980 m"
+    ]
+  },
+  "rules_skaters_v2": {
+    "question": "Kiek čiuožėjų (nėra vartininkų) kiekvienoje komandoje yra lygios jėgos?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ]
+  },
+  "rules_period_len_v2": {
+    "question": "Kiek minučių trunka vienas NHL laikotarpis?",
+    "options": [
+      "15",
+      "10",
+      "25",
+      "20"
+    ]
+  },
+  "terms_pp_v2": {
+    "question": "Jūsų komanda žaidžia galią, kai priešininkas:",
+    "options": [
+      "Apledėjimo ritulys",
+      "Traukiamas vartininkas",
+      "Sutrumpintas nuo baudos",
+      "Pergalė akistatoje"
+    ]
+  },
+  "terms_pk_v2": {
+    "question": "Baudos nužudymas reiškia:",
+    "options": [
+      "Viršvalandžiai",
+      "Gindamasis per trumpą laiką",
+      "Papildomas užpuolikas",
+      "Vartininko kova"
+    ]
+  },
+  "gen_ice_v2": {
+    "question": "Profesionalus ledo ritulys žaidžiamas:",
+    "options": [
+      "Purvas",
+      "Žolė",
+      "Ledas",
+      "Vanduo"
+    ]
+  },
+  "hist_cup_name_v2": {
+    "question": "NHL čempionato trofėjus yra:",
+    "options": [
+      "Pasaulio taurė",
+      "Olimpinė taurė",
+      "Stanley taurė",
+      "Gretzky taurė"
+    ]
+  },
+  "hist_most_cups_player": {
+    "question": "Henri Richardas laimėjo daugiausiai Stenlio taurių kaip žaidėjas su:",
+    "options": [
+      "Bostono „Bruins“.",
+      "Monrealio „Canadiens“.",
+      "Toronto klevo lapai",
+      "Detroito „Red Wings“."
+    ]
+  },
+  "hist_99_gretzky": {
+    "question": "Garsusis Wayne'o Gretzky marškinėlių numeris buvo:",
+    "options": [
+      "66",
+      "99",
+      "97",
+      "87"
+    ]
+  },
+  "hist_66_lemieux": {
+    "question": "Mario Lemieux nešiojo numerį:",
+    "options": [
+      "66",
+      "88",
+      "97",
+      "99"
+    ]
+  },
+  "hist_87_crosby": {
+    "question": "Sidney Crosby nešioja numerį:",
+    "options": [
+      "99",
+      "97",
+      "87",
+      "66"
+    ]
+  },
+  "hist_97_mcdavid": {
+    "question": "Connor McDavid nešioja numerį:",
+    "options": [
+      "87",
+      "99",
+      "66",
+      "97"
+    ]
+  },
+  "stat_hard_0": {
+    "question": "Kiek komandų yra NHL (apytiksliai)?",
+    "options": [
+      "32",
+      "24",
+      "28",
+      "40"
+    ]
+  },
+  "stat_hard_v2_0": {
+    "question": "Kiek komandų yra NHL (apytiksliai)? (išplėstinė)",
+    "options": [
+      "28",
+      "40",
+      "32",
+      "24"
+    ]
+  },
+  "stat_hard_1": {
+    "question": "Kiek žaidėjų yra apsirengę standartiniame ledo ritulio suolelyje?",
+    "options": [
+      "10-12",
+      "8-10",
+      "18-20",
+      "25-30"
+    ]
+  },
+  "stat_hard_v2_1": {
+    "question": "Kiek žaidėjų yra apsirengę standartiniame ledo ritulio suolelyje? (išplėstinė)",
+    "options": [
+      "18-20",
+      "25-30",
+      "10-12",
+      "8-10"
+    ]
+  },
+  "stat_hard_2": {
+    "question": "Kiek minučių yra reguliuojamas laikas NHL?",
+    "options": [
+      "90",
+      "30",
+      "60",
+      "45"
+    ]
+  },
+  "stat_hard_v2_2": {
+    "question": "Kiek minučių yra reguliuojamas laikas NHL? (išplėstinė)",
+    "options": [
+      "45",
+      "30",
+      "90",
+      "60"
+    ]
+  },
+  "stat_hard_3": {
+    "question": "Kiek pareigūnų paprastai ant ledo NHL?",
+    "options": [
+      "2",
+      "1",
+      "6",
+      "4"
+    ]
+  },
+  "stat_hard_v2_3": {
+    "question": "Kiek pareigūnų paprastai ant ledo NHL? (išplėstinė)",
+    "options": [
+      "6",
+      "1",
+      "4",
+      "2"
+    ]
+  },
+  "stat_hard_4": {
+    "question": "Daugiausia žaidėjų sąraše (apytiksliai)?",
+    "options": [
+      "23",
+      "30",
+      "15",
+      "10"
+    ]
+  },
+  "stat_hard_v2_4": {
+    "question": "Daugiausia žaidėjų sąraše (apytiksliai)? (išplėstinė)",
+    "options": [
+      "15",
+      "10",
+      "23",
+      "30"
+    ]
+  },
+  "theory_d_primary": {
+    "question": "Pagrindinis gynėjo darbas gynybos zonoje yra:",
+    "options": [
+      "Laimėk akistatas",
+      "Pirmiausia įmušk įvarčius",
+      "Apsaugokite tinklą ir lizdą",
+      "Greitai pakeiskite eilutes"
+    ]
+  },
+  "theory_d_body_pos": {
+    "question": "Gindamas vienas prieš vieną, gynėjas turėtų:",
+    "options": [
+      "Nedelsdami čiuožkite ant suolo",
+      "Likite tarp užpuoliko ir tinklo",
+      "Palikite lizdą atvirą",
+      "Persekiokite tik už tinklo"
+    ]
+  },
+  "theory_d_stick_ice": {
+    "question": "Gynybinė padėtis: lazda ant ledo padeda:",
+    "options": [
+      "Signalo skirtasis laikas",
+      "Venkite pataikyti ritulio",
+      "Blokuoti pravažiuojamas juostas",
+      "Kelionės komandos draugai"
+    ]
+  },
+  "theory_d_backcheck": {
+    "question": "Kai ritulys prarandamas puolime, gynėjas turėtų:",
+    "options": [
+      "Trauk vartininką",
+      "Čiuožkite atgal, kad padėtumėte gynybai",
+      "Laikykitės raudonos linijos",
+      "Ginčytis su teisėju"
+    ]
+  },
+  "theory_d_block": {
+    "question": "Gynėjas turėtų blokuoti metimus, kai:",
+    "options": [
+      "Rituulys yra tik neutralioje zonoje",
+      "Prasideda pertrauka",
+      "Juosta į tinklą atvira",
+      "Komanda žaidžia jėgos žaidime"
+    ]
+  },
+  "theory_d_2on1": {
+    "question": "2 prieš 1 prieš, gynėjas paprastai turėtų:",
+    "options": [
+      "Abu lieka prie mėlynos linijos",
+      "Abu kartu skuba ritulio nešioklyje",
+      "Paimkite ritulio laikiklį ir pakreipkite jį plačiai",
+      "Čiuožkite į suolą"
+    ]
+  },
+  "theory_d_pk_clear": {
+    "question": "Užmušant baudą, pirmenybė dažnai teikiama:",
+    "options": [
+      "Čiuožkite su rituliu tik per vidurį",
+      "Pirmiausia pakeiskite linijas skrydžio metu",
+      "Laikykite ritulį kampe amžinai",
+      "Išmeskite ritulį iš zonos"
+    ]
+  },
+  "theory_d_gap": {
+    "question": "Gera spragų kontrolė reiškia, kad gynėjas:",
+    "options": [
+      "Niekada neatsilieka",
+      "Pataiko tik iš nugaros",
+      "Atitinka greitį ir atstumą iki užpuoliko",
+      "Visada lieka ledo centre"
+    ]
+  },
+  "theory_d_net_front": {
+    "question": "Prieš tinklą gynėjas privalo:",
+    "options": [
+      "Čiuožkite į tašką",
+      "Skambinkite nuošalėje",
+      "Stebėkite tik ritulį ir nekreipkite dėmesio į žaidėjus",
+      "Iššokti ir surišti priešininkus"
+    ]
+  },
+  "theory_d_breakout": {
+    "question": "Esant priekinio patikrinimo spaudimui, pirmasis gynėjo žvilgsnis turėtų būti:",
+    "options": [
+      "Šaudyti į savo tinklą",
+      "Pirmiausia pereikite prie žemos atramos arba saugios išleidimo angos",
+      "Visada eikite per vidurį esant slėgiui",
+      "Aklinai apjuoskite lentas"
+    ]
+  },
+  "theory_d_pp_point": {
+    "question": "Kalbant apie jėgos panaudojimą taške, gynėjas turėtų:",
+    "options": [
+      "Grįžkite į neutralią zoną",
+      "Keiskitės su vartininku",
+      "Laikykite ritulį zonoje ir kurkite metimus/perdavimus",
+      "Niekada nešaudykite"
+    ]
+  },
+  "theory_d_legal_check": {
+    "question": "Teisėtas gynybinis žaidimas skubant yra:",
+    "options": [
+      "Legalus meškeriojimas ir lazda ritulio pusėje",
+      "Užkabinkite ir nuleiskite priešininką",
+      "Patikrinimas iš užpakalio",
+      "Kryžminis galvos patikrinimas"
+    ]
+  },
+  "theory_d_shot_block": {
+    "question": "Profesionalūs gynėjai blokuoja metimus, nes:",
+    "options": [
+      "Tai skaičiuojama kaip pagalba",
+      "Niekada neblokuokite šūvių",
+      "Blokuokite šūvius ir, kai reikia, paaukokite kūną",
+      "Teisėjas sustabdo žaidimą"
+    ]
+  },
+  "theory_d_switch": {
+    "question": "Kai du puolėjai kerta jūsų zoną, gynėjai turėtų:",
+    "options": [
+      "Abu vejasi tik ritulį",
+      "Palikite raukšlę",
+      "Bendraukite ir, jei reikia, perjunkite",
+      "Ignoruokite toli esantį puolėją"
+    ]
+  },
+  "theory_d_dump": {
+    "question": "Kai varžovai įmeta ritulį, gynėjas turėtų:",
+    "options": [
+      "Paimkite ritulį arba prisekite ant lentų",
+      "Čiuožkite į suolą, kad pakeistumėte",
+      "Palaukite švilpuko",
+      "Šaudyti nuo raudonos linijos"
+    ]
+  },
+  "theory_d_3on2_back": {
+    "question": "Skubėdamas 3 prieš 2, nugaros gynėjas paprastai turėtų:",
+    "options": [
+      "Uždenkite silpnosios pusės (galinių durų) grėsmę",
+      "Čiuožkite iki raudonos linijos",
+      "Keisti eilutes",
+      "Kiekvieną kartą agresyviai suspauskite"
+    ]
+  },
+  "theory_d_pinch_when": {
+    "question": "Gynėjas gali prisispausti prie mėlynos puolimo linijos, kai:",
+    "options": [
+      "Komanda sutrumpinta",
+      "Vartininkas traukiamas",
+      "Partnerių dangteliai ir ritulys atgaunami prie lentų",
+      "Visada pirmoje pamainoje"
+    ]
+  },
+  "theory_d_beat_wide": {
+    "question": "Jei gynėjas skubiai sumuštas, jis turėtų:",
+    "options": [
+      "Čiuožkite į suolą",
+      "Sustok ir ginčykis su teisėju",
+      "Pasukite ir per vidurį vykite iki tinklo",
+      "Kabliukas iš užpakalio"
+    ]
+  },
+  "theory_d_low_high": {
+    "question": "Gynybinės zonos aprėptyje žemas gynėjas prieš aukštą gynėją reiškia:",
+    "options": [
+      "Abu taške",
+      "Abu neutralioje zonoje",
+      "Abu raukšlėje",
+      "Mažai ritulio, aukštų dangčių lizdas ir užpakalinės durys"
+    ]
+  },
+  "theory_d_odd_man_discipline": {
+    "question": "Jei keistas žmogus skuba prieš, svarbiausia yra:",
+    "options": [
+      "Kiekvieną kartą skirkite baudą",
+      "Atidėliokite ir priverskite blogą kampą arba perdavimą",
+      "Visada pasinerkite į bloką",
+      "Palikite žaidimą vienam vartininkui"
+    ]
+  },
+  "theory_d_pp_one_timer": {
+    "question": "Kai mušamas baudos smūgis prieš vienkartinį atmušimą iš krašto, gynėjas turėtų:",
+    "options": [
+      "Atsistokite į vartininko raukšlę",
+      "Čiuožkite į centrą, kad pakeistumėte",
+      "Nuimkite pravažiavimo juostą iki lizdo",
+      "Paspauskite vartininką"
+    ]
+  },
+  "theory_d_breakout_rim": {
+    "question": "Kodėl aklinas apvadas aplink lentas dažnai yra blogas?",
+    "options": [
+      "Tai suteikia oponentams nemokamą atgavimą",
+      "Tai visada nuošalyje",
+      "Tai visada sukelia apledėjimą",
+      "Teisėjas skiria baudą"
+    ]
+  },
+  "theory_d_fo_win_d": {
+    "question": "Po gynybos zonos pergalės, gynėjai turėtų:",
+    "options": [
+      "Palaukite penkias sekundes",
+      "Perskaitykite išankstinį patikrinimą ir naudokite greitą pirmąjį praėjimą",
+      "Visada pirmiausia šaudykite iš taško",
+      "Čiuožkite iki raudonos linijos su rituliu"
+    ]
+  },
+  "theory_d_late_game_lead": {
+    "question": "Pavėluotai saugodami vieno įvarčio pranašumą, gynėjai turėtų:",
+    "options": [
+      "Visada šaudykite iš centro",
+      "Kiekvieną kartą suspauskite mėlyną liniją",
+      "Saugiai valdykite ritulį ir venkite nereikalingos rizikos",
+      "Trauk vartininką visada anksti"
+    ]
+  },
+  "theory_d_man_coverage": {
+    "question": "Žmogus ant vyro lizde reiškia:",
+    "options": [
+      "Nekreipkite dėmesio į grasinimus dėl ritulio",
+      "Tik persekiokite ritulį",
+      "Spragų kontrolė",
+      "Žmogus prieš vyrą ant ritulio laikiklio"
+    ]
+  },
+  "theory_d_offside_line": {
+    "question": "Prie puolimo mėlynos linijos gynėjas, laikantis liniją, bando:",
+    "options": [
+      "Keisti į priekį",
+      "Laikykite mėlyną liniją ir laikykite ritulį zonoje",
+      "Grįžkite į neutralią zoną",
+      "Visada tyčia darykite nuošalę"
+    ]
+  },
+  "theory_d_rebound": {
+    "question": "Po atmušimo atmušus kamuolį į lizdą, gynėjas privalo:",
+    "options": [
+      "Švęskite su vartininku",
+      "Šaudyti į tuščią tinklą",
+      "Čiuožkite į suolą",
+      "Išvalykite atkovotą kamuolį arba pririškite puolėją"
+    ]
+  },
+  "theory_d_timeout_breakout": {
+    "question": "Po apledėjimo (no-touch) gynybos zonoje, priešakyje:",
+    "options": [
+      "Visada perimkite ritulį",
+      "Skirkite nedidelę bausmę",
+      "Nustatykite struktūrą ir laimėkite švarų išėjimą",
+      "Trauk vartininką"
+    ]
+  },
+  "theory_d_stretch_pass": {
+    "question": "Prieš agresyvų priešpriešinį patikrinimą, ištempimas naudojamas norint:",
+    "options": [
+      "Nustokite žaisti nuošalėje visada",
+      "Tik gaišti laiką",
+      "Garantinis apledėjimas",
+      "Ilgu perdavimu įveik forechecką"
+    ]
+  },
+  "theory_d_shooting_lane": {
+    "question": "Šaudymo juostos uždarymas reiškia:",
+    "options": [
+      "Kūno / lazdos gavimas šūvio kelyje",
+      "Mojuoja tik ore lazda",
+      "Čiuožimas iki raudonos linijos",
+      "Stovi už tinklo"
+    ]
+  },
+  "theory_d_partner_trust": {
+    "question": "Kai jūsų partneris suspaudžia, turite:",
+    "options": [
+      "Čiuožkite į suolą",
+      "Palikite zoną atvirą",
+      "Taip pat nedelsiant suspauskite",
+      "Viršelis aukštai kaip paskutinis gynėjas"
+    ]
+  },
+  "theory_d_penalty_box_exit": {
+    "question": "Palikdamas baudos aikštelę, gynėjas turėtų:",
+    "options": [
+      "Suderinkite žaidimą ir venkite sugauti",
+      "Nekreipkite dėmesio į skubėjimą",
+      "Visada pakeiskite iš karto",
+      "Čiuožkite tiesiai į priešininko tinklą"
+    ]
+  },
+  "theory_d_empty_net": {
+    "question": "Su tuščiais vartais prieš, gynėjai paskutinę minutę turėtų:",
+    "options": [
+      "Visi priekiniai patikrinimai giliai",
+      "Taip pat visada traukite savo vartininką",
+      "Blokuokite šūvius ir apsaugokite vidurį",
+      "Niekada neišvalykite ritulio"
+    ]
+  },
+  "theory_d_shooting_lane_2": {
+    "question": "Jei negalite pasiekti ritulio laikiklio, turėtumėte:",
+    "options": [
+      "Pasiduok ir keisk",
+      "Palikite lizdą",
+      "Atimkite laiką ir erdvę su gera padėtimi",
+      "Kabliukas iš užpakalio"
+    ]
+  },
+  "theory_d_zone_entry": {
+    "question": "Gindamas įėjimą į kontroliuojamą zoną, gynėjas turėtų:",
+    "options": [
+      "Čiuožkite atgal į suolą",
+      "Atsistokite prie linijos arba atsistokite anksti",
+      "Visada atsitraukite į raukšlę",
+      "Niekada nelieskite užpuoliko"
+    ]
+  },
+  "theory_d_hand_pass_d": {
+    "question": "Gynybos zonoje gynėjo rankos perdavimas komandos draugui yra:",
+    "options": [
+      "Leidžiama, jei baigta toje pačioje zonoje",
+      "Visada glajus",
+      "Visada nuošalyje",
+      "Visada baudos metimas"
+    ]
+  },
+  "theory_f_support": {
+    "question": "Kai komandos draugas turi ritulį, puolėjas turėtų:",
+    "options": [
+      "Visada čiuožkite iki raudonos linijos",
+      "Ignoruokite ritulio pasikeitimą linijoje",
+      "Norėdami gauti leidimą, eikite į atvirą ledą",
+      "Sustokite ties mėlyna linija"
+    ]
+  },
+  "theory_f_net": {
+    "question": "Krašto puolėjas, esantis šalia tinklo, po smūgio turėtų:",
+    "options": [
+      "Čiuožkite į suolą",
+      "Eikite į tinklą, norėdami atkovoti kamuolius ir patarimus",
+      "Stebėkite tik iš taško",
+      "Palaukite prie ledo centro"
+    ]
+  },
+  "theory_f_backcheck": {
+    "question": "Praradę kamuolį, puolėjai privalo:",
+    "options": [
+      "Nedelsdami pakeiskite nuo ledo",
+      "Ginčytis su teisėju",
+      "Likite puolimo zonoje",
+      "Patikrinkite atgal ir padėkite apsiginti"
+    ]
+  },
+  "theory_f_headman": {
+    "question": "Skubant ritulio „vadinimas“ reiškia:",
+    "options": [
+      "Visada nuleiskite jį aukštai nuo stiklo",
+      "Sustokite ties raudona linija",
+      "Įmuškite ritulį galva (perduokite į priekį)",
+      "Čiuožkite atgal tik iki savo suoliuko"
+    ]
+  },
+  "theory_f_cycle": {
+    "question": "Ritulių perkėlimas žemai puolimo zonoje padeda:",
+    "options": [
+      "Garantinis apledėjimas",
+      "Visada priverstinai nuošalyje",
+      "Sukurkite erdvę šūviui ar perdavimui",
+      "Tik gaišti laiką"
+    ]
+  },
+  "theory_f_fo_center": {
+    "question": "Priešingai, centro darbas dažnai yra:",
+    "options": [
+      "Visi trys į priekį giliai kampe",
+      "Anksti palikite ratą",
+      "Iš karto šaudyti iš taško",
+      "Laimėk burtus į krašto puolėjo arba D-vyro vietą"
+    ]
+  },
+  "theory_f_forecheck": {
+    "question": "Atliekant išankstinį patikrinimą 2-1-2, F1 ir F2 paprastai:",
+    "options": [
+      "Abu vejasi tik už tinklo",
+      "Abu keičia linijas",
+      "F1 spaudžia, F2 atima pravažiavimo juostą",
+      "Abu stovi prie raudonos linijos"
+    ]
+  },
+  "theory_f_pp_net": {
+    "question": "Galios žaidimo metu puolėjas tinklo priekyje turėtų:",
+    "options": [
+      "Nuvažiuokite į neutralią zoną",
+      "Uždenkite baudos nužudymo tašką",
+      "Imkitės tinklo priekinės jėgos žaidimo",
+      "Niekada nelieskite ritulio"
+    ]
+  },
+  "theory_f_third_man": {
+    "question": "Skubėdamas 3 prieš 2, trečiasis puolėjas turėtų:",
+    "options": [
+      "Čiuožkite į suolą",
+      "Atsistokite į raukšlę",
+      "Būkite trečias skubantis žmogus",
+      "Persekiokite ritulį giliai be atramos"
+    ]
+  },
+  "theory_f_winger_wide": {
+    "question": "Skubėdamas, greitas krašto puolėjas dažnai turėtų:",
+    "options": [
+      "Kiekvieną kartą sustokite ties mėlyna linija",
+      "Perduoti atgal vartininkui",
+      "Krašto puolėjas greitu metu važiuoja plačiai",
+      "Visada čiuožkite per vidurį"
+    ]
+  },
+  "theory_f_pp_screen": {
+    "question": "Pagrindinis puolėjo galios vaidmuo yra:",
+    "options": [
+      "Palikite atvirą plyšį gynyboje",
+      "Visada tik taškinis šūvis",
+      "Niekada neikite į tinklą",
+      "Parodykite vartininką PP"
+    ]
+  },
+  "theory_f_pk_point": {
+    "question": "Užmušdamas baudą, puolėjas dažnai apima:",
+    "options": [
+      "Uždenkite baudos nužudymo tašką",
+      "Teisėjas",
+      "Imkitės tinklo priekinės jėgos žaidimo",
+      "Zamboni vairuotojas"
+    ]
+  },
+  "theory_f_offside_delay": {
+    "question": "Norėdami išvengti nuošalės ties mėlyna linija, puolėjas gali:",
+    "options": [
+      "Čiuožkite atgal į zoną",
+      "Peršok per mėlyną liniją",
+      "Likite šalia, atidėdami įėjimą į zoną",
+      "Visada įeikite į zoną prieš ritulį"
+    ]
+  },
+  "theory_f_one_timer": {
+    "question": "Norint nustatyti vienkartinį laikmatį, paprastai reikia:",
+    "options": [
+      "Vienkartinė sąranka: pereikite prie atviros šaudyklės",
+      "Apsukite ritulį nežiūrėdami",
+      "Visada atmeskite baudos metimą",
+      "Išmeskite ir persekiokite be išankstinio patikrinimo plano"
+    ]
+  },
+  "theory_f_crash_net": {
+    "question": "Po jėgos žaidimo taško puolėjai turėtų:",
+    "options": [
+      "Visos keičia eilutes vienu metu",
+      "Mojuokite miniai",
+      "Sumušė tinklą po smūgio iš taško",
+      "Nuvažiuokite į neutralią zoną"
+    ]
+  },
+  "theory_f_center_low": {
+    "question": "Puolimo zonos struktūroje centras dažnai:",
+    "options": [
+      "Niekada neįeina į lizdą",
+      "Visi trys į priekį giliai kampe",
+      "Centrinė atrama žemai, sparnas išlieka aukštas",
+      "Apima tik esmę"
+    ]
+  },
+  "theory_f_weak_side": {
+    "question": "Atsiradus silpnosios pusės atrama į priekį reiškia:",
+    "options": [
+      "Palaikymas iš silpnosios pusės D zonos išėjime",
+      "Sustokite ties raudona linija",
+      "Šaudyti į savo tinklą",
+      "Čiuožkite į varžovų suolą, kad pakeistumėte"
+    ]
+  },
+  "theory_g_track": {
+    "question": "Vartininkas visada turi stengtis:",
+    "options": [
+      "Stebėkite ritulį eisme",
+      "Atsistokite prie raudonos linijos",
+      "Stebėkite tik šaulio akis",
+      "Palikite tinklą linijos keitimui"
+    ]
+  },
+  "theory_g_freeze": {
+    "question": "Kai ritulys atsipalaiduoja aikštėje, vartininkas turėtų:",
+    "options": [
+      "Užšaldykite ritulį, kad sustabdytumėte žaidimą",
+      "Šaudyti į tuščią tinklą",
+      "Čiuožkite į ledo vidurį ir švęskite",
+      "Perduoti teisėjui"
+    ]
+  },
+  "theory_g_rebound": {
+    "question": "Po išsaugojimo idealus atšokimo valdymas yra:",
+    "options": [
+      "Atšokimo valdymas į saugią zoną",
+      "Visada atsimuškite į lizdą",
+      "Visada atsimuškite per stiklą",
+      "Ignoruokite atšokimą"
+    ]
+  },
+  "theory_g_comm": {
+    "question": "Nelyginio žmogaus skubėjimo metu vartininkas turėtų:",
+    "options": [
+      "Visada tylėk",
+      "Stebėkite minią",
+      "Čiuožkite į suolą",
+      "Vartininkas kalba apie keistus skubėjimus"
+    ]
+  },
+  "theory_g_trapezoid": {
+    "question": "NHL vartininkas gali žaisti ritulį už tinklo tik:",
+    "options": [
+      "Puolimo zona",
+      "Žaisk ritulį tik trapecijoje už tinklo",
+      "Pilna gynybinė zona",
+      "Tik neutrali zona"
+    ]
+  },
+  "theory_g_post": {
+    "question": "Perduodamas iš šono per raukšlę, vartininkas naudoja:",
+    "options": [
+      "Visada stovėkite tik ant vieno posto",
+      "Palikite tinklą",
+      "Judėjimas nuo posto iki posto šoniniais pravažiavimais",
+      "Čiuožkite iki mėlynos linijos"
+    ]
+  },
+  "theory_g_angle": {
+    "question": "Geras žaidimas kampu reiškia vartininką:",
+    "options": [
+      "Iššūkiai iki raudonos linijos",
+      "Visada stovi giliai raukšlėje",
+      "Pjovimas kampu, kad sumažintų tinklo matomumą",
+      "Atsisuka į šaulį"
+    ]
+  },
+  "theory_g_crease": {
+    "question": "Vartininko „namas“, kurį reikia saugoti, daugiausia yra:",
+    "options": [
+      "Apsaugokite namą (lizdo plotą)",
+      "Zamboni durys",
+      "Centrinis ledo ratas",
+      "Baudos dėžė"
+    ]
+  },
+  "theory_g_breakaway": {
+    "question": "Atitrūkimo metu daugelis vartininkų nori:",
+    "options": [
+      "Čiuožkite link suoliuko",
+      "Užmerkite akis ir tikėkitės",
+      "Suderinkite šaulį ir perskaitykite leidimą",
+      "Visada mesk iššūkį į apskritimų viršūnę"
+    ]
+  },
+  "theory_g_short_side": {
+    "question": "Bandydamas apsisukti, vartininkas turėtų:",
+    "options": [
+      "Palikite šalia esantį įrašą atidarytą",
+      "Čiuožkite į tašką",
+      "Žaisk ritulį kampe",
+      "Laikykite stulpelį ant trumpos pusės apvyniojimo"
+    ]
+  },
+  "theory_g_trapezoid_pen": {
+    "question": "Jei vartininkas žaidžia ritulį už tinklo UŽ trapecijos, tai yra:",
+    "options": [
+      "Visada legalus žaidimas",
+      "Apledėjimo skambutis",
+      "Žaidimo baudos atidėjimas",
+      "Automatinis tikslas"
+    ]
+  },
+  "theory_g_screen": {
+    "question": "Kai ritulys yra tikrinamas, vartininkas turėtų:",
+    "options": [
+      "Palikite raukšlę",
+      "Signalas nuošalyje",
+      "Visada atsisakykite trumposios pusės",
+      "Raskite ritulį eisme arba pakoreguokite padėtį"
+    ]
+  },
+  "theory_g_poke": {
+    "question": "Vartininko smūgio čekis turi būti:",
+    "options": [
+      "Legaliai kišti čekį tik iš priekio",
+      "Su aukšta lazda prie veido",
+      "Visada iš už nugaros",
+      "Stovint ant ledo centro"
+    ]
+  },
+  "theory_g_lead_pass": {
+    "question": "Per ilgą perdavimą vartininkas dažnai:",
+    "options": [
+      "Čiuožia į varžovų suolą",
+      "Ignoruoja pjesę",
+      "Šaudo į ref",
+      "Sustabdo arba legaliai paleidžia ritulį už tinklo"
+    ]
+  },
+  "theory_t_all_defense": {
+    "question": "Ledo ritulio intelektas reiškia, kad kiekvienas žaidėjas turėtų:",
+    "options": [
+      "Kiekvienas žaidėjas padeda gynyboje",
+      "Kalba tik vartininkai",
+      "Atbulą tikrina tik gynėjai",
+      "Įmuša tik puolėjai"
+    ]
+  },
+  "theory_t_stick_ice": {
+    "question": "Laikydami lazdą ant ledo galite:",
+    "options": [
+      "Užblokuokite pravažiuojamas juostas ir gaukite leidimus",
+      "Signalinis apledėjimas",
+      "Venkite ritulio",
+      "Keliaukite greičiau"
+    ]
+  },
+  "theory_t_change": {
+    "question": "Išmanusis linijos pakeitimas paprastai įvyksta:",
+    "options": [
+      "Skrendant, kai leidžia žaisti",
+      "Niekada skrendant",
+      "Per atitrūkimą prieš",
+      "Visada tik puolimo zonoje"
+    ]
+  },
+  "theory_t_comm": {
+    "question": "Prieš keisdami gynybos ženklus, žaidėjai turėtų:",
+    "options": [
+      "Visada rėk ant teisėjo",
+      "Keisk nežiūrėdamas",
+      "Bendraukite prieš perjungdami ženklus",
+      "Niekada nekalbėk ant ledo"
+    ]
+  },
+  "theory_t_change_side": {
+    "question": "Linijų keitimas neteisingoje ledo pusėje gali:",
+    "options": [
+      "Garantuoja tikslą",
+      "Visada padėkite komandai",
+      "Per daug vyrų arba netinkamas laikas",
+      "Sustabdykite laikrodį"
+    ]
+  },
+  "theory_t_read_play": {
+    "question": "Skaityti pjesę reiškia:",
+    "options": [
+      "Ignoruoti komandos draugus",
+      "Niekada nekeiskite struktūros",
+      "Visada žiūrėkite tik ritulį",
+      "Numatykite, kur toliau eis ritulys ir varžovai"
+    ]
+  },
+  "theory_t_support": {
+    "question": "Antrojo žmogaus palaikymas ant ritulio reiškia:",
+    "options": [
+      "Čiuožkite toliau nuo ritulio",
+      "Stebėkite tik vartininką",
+      "Atsistokite prie raudonos linijos",
+      "Sureguliuokite greitį ir palaikykite ritulio laikiklį"
+    ]
+  },
+  "theory_t_strong_weak": {
+    "question": "Stiprioji ir silpnoji pusė reiškia:",
+    "options": [
+      "Pusė, kurioje yra ritulys, priešinga pusė",
+      "Namų ir išvykos ​​komandos",
+      "Pirmas ir antras laikotarpis",
+      "Tik kairiarankiai ir dešiniarankiai žaidėjai"
+    ]
+  },
+  "theory_t_pp_structure": {
+    "question": "Kalbant apie jėgos žaidimą, struktūra yra svarbi, nes:",
+    "options": [
+      "Judėjimas atveria juostas ir ištempia PK",
+      "Stovėti vietoje yra geriausia",
+      "Tik vienas žaidėjas turi liesti ritulį",
+      "Nuošalė nesvarbu"
+    ]
+  },
+  "theory_t_pk_box": {
+    "question": "Baudos nužudymas „dėžutė + vienas“ dažnai reiškia:",
+    "options": [
+      "Visi penki vejasi ritulį",
+      "Visi penki stovi prie raudonos linijos",
+      "Nereikia jokios struktūros",
+      "Keturi dėžėje, vienas spaudžia ritulį"
+    ]
+  },
+  "theory_t_faceoff_cheat": {
+    "question": "Sukčiavimas prieš akis (laikas) reiškia:",
+    "options": [
+      "Metimo laikas, kad būtų galima anksti laimėti ritulį",
+      "Spardykite priešininko lazdą",
+      "Įveskite ratą prieš ritulį",
+      "Palikite atmetimo tašką"
+    ]
+  },
+  "theory_t_late_game": {
+    "question": "Apsaugokite pavėluotą, protingą komandą:",
+    "options": [
+      "Kiekvieną pamainą rizikuokite",
+      "Visada trauk vartininką pirmajame kėlinyje",
+      "Niekada neišvalykite zonos",
+      "Valdykite ritulius ir venkite nereikalingų baudų"
+    ]
+  },
+  "theory_t_matchup": {
+    "question": "Treneriai keičia rungtynių linijas į:",
+    "options": [
+      "Gaukite palankias žaidėjo prieš žaidėją situacijas",
+      "Garantija nuošalyje",
+      "Venkite visų susidūrimų",
+      "Tik gaišti laiką"
+    ]
+  },
+  "ref_goal": {
+    "question": "Kai įmušamas įvartis, teisėjas paprastai:",
+    "options": [
+      "Nukreipkite tašką į ledo centrą",
+      "Signalizuoti už atidėtą baudą",
+      "Rankomis suformuokite T raidę",
+      "Signalinio apledėjimo atsisakoma"
+    ]
+  },
+  "ref_timeout": {
+    "question": "Laiko pabaigos signalas atrodo taip:",
+    "options": [
+      "Rankos sudaro T",
+      "Nukreipkite tašką į ledo centrą",
+      "Rodomi šeši pirštai",
+      "Abu kumščiai stumiami į priekį"
+    ]
+  },
+  "ref_delayed": {
+    "question": "Atidėtą baudą teisėjas parodo:",
+    "options": [
+      "Įmušto įvarčio signalas",
+      "Timeout T signalas",
+      "Nuplaukite apledėjimo signalą",
+      "Viena ranka pakelta tiesiai į viršų"
+    ]
+  },
+  "ref_minor": {
+    "question": "Skirdamas nedidelę baudą, teisėjas dažnai signalizuoja:",
+    "options": [
+      "Atidarykite delną link baudos dėžutės",
+      "Ranka tik per krūtinę",
+      "Rankos sudaro T",
+      "Norėdami įmušti, nukreipkite tašką į ledo centrą"
+    ]
+  },
+  "ref_offside": {
+    "question": "Teisėjo skambutis nuošalėje dažnai signalizuojamas:",
+    "options": [
+      "Nukreipkite tašką į ledo centrą",
+      "Rodomi šeši pirštai",
+      "Uždaras kumščio siurbimo judesys",
+      "Pjaustymo judesys lygiagretus ledui"
+    ]
+  },
+  "ref_hand_pass": {
+    "question": "Rankos perdavimo pažeidimo signalas dažnai yra:",
+    "options": [
+      "Uždaras kumščio siurbimo judesys",
+      "Abi rankos sukryžiuotos kovai",
+      "Atidarykite delną iki baudos dėžutės",
+      "Nukreipkite tašką į ledo centrą"
+    ]
+  },
+  "ref_high_stick": {
+    "question": "Stiprus baudos signalas: teisėjas dažnai paliečia:",
+    "options": [
+      "Nuo delno iki veido / žandikaulio sritis",
+      "Vartų virts",
+      "ritulys",
+      "Tik savo kelio"
+    ]
+  },
+  "ref_too_many": {
+    "question": "Per daug vyrų ant ledo signalizuoja parodydami:",
+    "options": [
+      "Tik viena ranka tiesiai į viršų",
+      "Nukreipkite tašką į ledo centrą",
+      "Rankos sudaro T",
+      "Rodomi šeši pirštai"
+    ]
+  },
+  "ref_tripping": {
+    "question": "Išjungimo baudos signalas dažnai atrodo taip:",
+    "options": [
+      "Išjungimo signalas (kojos šlavimo judesys)",
+      "Rankos sudaro T",
+      "Nukreipkite tašką į ledo centrą",
+      "Abu kumščiai stumiami į priekį"
+    ]
+  },
+  "ref_hooking": {
+    "question": "Užkabinimo baudos signalas dažnai atrodo taip:",
+    "options": [
+      "Šeši pirštai",
+      "Pjaustymas lygiagrečiai ledui",
+      "Užkabinimo signalas (traukimo judesys)",
+      "Siurbimas uždaru kumščiu"
+    ]
+  },
+  "ref_cross_check": {
+    "question": "Kryžminis teisėjo signalas dažnai yra:",
+    "options": [
+      "Abu kumščiai stumiami į priekį",
+      "Nukreipkite tašką į ledo centrą",
+      "Rankos sudaro T",
+      "Tik delnas į veidą"
+    ]
+  },
+  "ref_fighting": {
+    "question": "Kovos majorui dažnai signalizuojama:",
+    "options": [
+      "Pjaustomas nuošalės judesys",
+      "Kovos majoras (abi rankos sukryžiuotos)",
+      "Viena ranka pakelta už uždelstą bausmę",
+      "Atidarykite tik delną iki dėžutės"
+    ]
+  },
+  "ref_penalty_shot": {
+    "question": "Skirdamas baudos metimą, teisėjas paprastai:",
+    "options": [
+      "Rodo skirtąjį laiką T",
+      "Išplauna apledėjimą",
+      "Taškais į centrinį ledą už baudos metimą",
+      "Rodo šešis pirštus"
+    ]
+  },
+  "ref_no_goal": {
+    "question": "Nukreipdamas kamuolį į įvartį, teisėjas gali:",
+    "options": [
+      "Neleidžiamo tikslo signalas (kryžiuotos rankos, tada pamojuojam)",
+      "Nukreipkite į centrą į tikslą",
+      "Pakelkite ranką tik už uždelstą bausmę",
+      "Rodyti skirtąjį laiką T"
+    ]
+  },
+  "ref_delay_game": {
+    "question": "Žaidimo uždelsimo (ritulio virš stiklo) signalas dažnai būna:",
+    "options": [
+      "Triukšmingas kojų šlavimas",
+      "Žaidimo uždelsimas (teisėjas glostė įsivaizduojamą stiklą)",
+      "Kovos rankos sukryžiuotos",
+      "Užkabinimo traukimo judesys"
+    ]
+  },
+  "ref_linesman_offside": {
+    "question": "Linijininkas signalizuoja nuošalėje:",
+    "options": [
+      "Atidarykite delną iki baudos dėžutės",
+      "Suformuokite T, kad gautumėte skirtąjį laiką",
+      "Nukreipkite tašką į vidurį, kad pasiektumėte tikslą",
+      "Linijininkas abiem rankomis aukštyn (nuošalyje)"
+    ]
+  },
+  "ref_icing_wash": {
+    "question": "Kai apledėjimas pašalinamas (pvz., PK), linijos darbuotojas gali:",
+    "options": [
+      "Kryžminės rankos kovai",
+      "Signalinio apledėjimo atsisakoma",
+      "Nukreipkite į centrą į tikslą",
+      "Parodykite šešis pirštus"
+    ]
+  },
+  "ref_double_minor": {
+    "question": "Dviguba smulki bauda gali būti parodyta su:",
+    "options": [
+      "T skirtas skirtasis laikas",
+      "Tik viena ranka tiesiai į viršų",
+      "Dvigubas minoras (du pirštai)",
+      "Šeši pirštai per daug vyrų"
+    ]
+  },
+  "ref_boarding": {
+    "question": "Įlaipinimo baudos signalas dažnai apima:",
+    "options": [
+      "T skirtas skirtasis laikas",
+      "Nukreipkite į centrą į tikslą",
+      "Uždarytas kumštis rankiniam leidimui",
+      "Įlipimo baudos signalas (rankų stūmimas)"
+    ]
+  },
+  "ref_delayed_meaning": {
+    "question": "Uždelsto baudos signalo metu žaidimas tęsiamas, nes:",
+    "options": [
+      "Įvartis buvo įmuštas",
+      "Apledėjimas buvo baigtas",
+      "Buvo iškviestas skirtasis laikas",
+      "Uždelsta bauda (žaidimas tęsiasi)"
+    ]
+  },
+  "iq_youth_001": {
+    "question": "Varžovas pradeda ataką per centrą. Ką turėtų daryti centras?",
+    "options": [
+      "Grįžkite į savo zonos centrą ir padėkite gynėjams",
+      "Atsistokite prie lentų",
+      "Keiskite eilutes be jokios priežasties",
+      "Čiuožkite į priešininko tinklą"
+    ]
+  },
+  "iq_youth_002": {
+    "question": "Varžovas už tinklo bando įmušti lakroso stiliaus apvyniojimu. Ką turėtų daryti vartininkas?",
+    "options": [
+      "Išvažiuokite į zonos centrą",
+      "Stebėkite minią",
+      "Laikykitės tvirtai prie tolimojo posto ir stebėkite lazdą",
+      "Atsigulkite veidu žemyn ant ledo"
+    ]
+  },
+  "iq_youth_003": {
+    "question": "Jūs esate gynėjas, kuriam tenka skubėti 2 prieš 1. Kas svarbiausia?",
+    "options": [
+      "Atimk leidimą",
+      "Nedelsdami pulkite ritulio laikiklį",
+      "Stebėkite tik ritulį",
+      "Čiuožkite ant suolo, kad pakeistumėte liniją"
+    ]
+  },
+  "iq_youth_004": {
+    "question": "Jūs esate krašto puolėjas ir pirmasis žaidėjas, patenkantis į puolimo zoną. Ką daryti?",
+    "options": [
+      "Spauskite gynėją su rituliu",
+      "Atsistokite prie mėlynos linijos",
+      "Čiuožkite ratais",
+      "Čiuožkite tiesiai į suolą"
+    ]
+  },
+  "iq_youth_005": {
+    "question": "Jūsų komanda žaidžia galią. Kur paprastai yra centras?",
+    "options": [
+      "Prie savo mėlynos linijos",
+      "Ant suolo",
+      "Už savo tinklo",
+      "Prieš tinklelį"
+    ]
+  },
+  "iq_youth_006": {
+    "question": "Praradote ritulį puolimo zonoje. Ką daryti toliau?",
+    "options": [
+      "Nedelsdami prisijunkite prie forecheck",
+      "Lėtai važiuokite atgal",
+      "Ginčytis su teisėju",
+      "Pažiūrėk į trenerį"
+    ]
+  },
+  "iq_youth_007": {
+    "question": "Centras pralaimėjo akistatą. Kas bus toliau?",
+    "options": [
+      "Čiuožkite į puolimą",
+      "Iš karto pagalba gynyboje",
+      "Nusiimk šalmą",
+      "Nustokite judėti"
+    ]
+  },
+  "iq_youth_008": {
+    "question": "Rituulys yra palei lentas jūsų zonoje. Ką turėtų daryti antrasis žaidėjas?",
+    "options": [
+      "Palaikykite savo partnerį šalia",
+      "Stovėkite ramiai",
+      "Stebėkite tribūnus",
+      "Čiuožkite į priešininko tinklą"
+    ]
+  },
+  "iq_youth_009": {
+    "question": "Kas svarbiausia skubant 3 prieš 2?",
+    "options": [
+      "Visi čiuožia į tą pačią vietą",
+      "Šaudykite iš bet kurios padėties",
+      "Sustokite ties mėlyna linija",
+      "Ištempti gynybą perdavimais"
+    ]
+  },
+  "iq_youth_010": {
+    "question": "Po smūgio ritulys atšoko priešais tinklą. Ką turėtų daryti vartininkas?",
+    "options": [
+      "Pakelkite lazdą į orą",
+      "Raskite ritulį ir uždenkite",
+      "Čiuožkite už tinklo",
+      "Pažiūrėk į trenerį"
+    ]
+  },
+  "iq_youth_011": {
+    "question": "Kada geriausias laikas keisti eilutes?",
+    "options": [
+      "Kai jūsų komanda valdo ritulį",
+      "Kai priešininkas puola",
+      "Kai ritulys yra priešais tinklą",
+      "Per pavojingą progą įmušti įvartį"
+    ]
+  },
+  "iq_youth_012": {
+    "question": "Ką turėtų daryti gynėjas, kai jam daromas stiprus priekinio patikrinimo spaudimas?",
+    "options": [
+      "Stovėkite vietoje su rituliu",
+      "Išmesk ritulį į zonos vidurį",
+      "Nukristi ant ledo",
+      "Greitai ir tiksliai atlikite pirmąjį perdavimą"
+    ]
+  },
+  "iq_youth_013": {
+    "question": "Ką svarbu daryti, kai neturite ritulio?",
+    "options": [
+      "Pažiūrėkite į lubas",
+      "Laikykite lazdą tik viena ranka",
+      "Atsidarykite leidimą",
+      "Stovėkite vienoje vietoje"
+    ]
+  },
+  "iq_youth_014": {
+    "question": "Kuris išsiveržimas laikomas patikimiausiu?",
+    "options": [
+      "Ritulio praradimas",
+      "Trumpu, tiksliu perdavimu",
+      "Aklas sąvartynas",
+      "Praėjimas per jūsų zonos vidurį"
+    ]
+  },
+  "iq_youth_015": {
+    "question": "Kas svarbiausia atliekant baudinį nužudymą?",
+    "options": [
+      "Blokuoti pravažiuojamas juostas",
+      "Atakuoti nuolat",
+      "Čiuožykla be konstrukcijos",
+      "Žaisk tik palei lentas"
+    ]
+  },
+  "iq_youth_016": {
+    "question": "Kada gynėjas gali prisijungti prie skubėjimo?",
+    "options": [
+      "Visada",
+      "Tik per viršvalandžius",
+      "Niekada",
+      "Kai jo partneris dengia savo poziciją"
+    ]
+  },
+  "iq_youth_017": {
+    "question": "Kodėl praėjimas per plyšį yra pavojingas?",
+    "options": [
+      "Pareigūnai to negali matyti",
+      "Tai sulėtina žaidimą",
+      "Tai gali nuvesti į tikslą",
+      "Tai visada yra neteisėta"
+    ]
+  },
+  "iq_youth_018": {
+    "question": "Kada vartininkas turėtų leisti ritulį už tinklo?",
+    "options": [
+      "Kad paliktų ledą",
+      "Padėti gynėjams pradėti prasiveržimą",
+      "Pailsėti",
+      "Ginčytis su pareigūnais"
+    ]
+  },
+  "iq_youth_019": {
+    "question": "Kodėl į priekį važiuoja į tolimą postą?",
+    "options": [
+      "Dėl atkovotų kamuolių ir vienkartinių kamuolių",
+      "Kad liktų nuo žaidimo",
+      "Pailsėti",
+      "Kad užkirstų kelią komandos draugui"
+    ]
+  },
+  "iq_youth_020": {
+    "question": "Ką turėtų daryti gynėjas prieš šaudydamas iš taško?",
+    "options": [
+      "Patikrinkite eismą prieš tinklą",
+      "Šaudyti tiesiai į lentas",
+      "Užmerkite akis",
+      "Dekes atgal"
+    ]
+  },
+  "iq_youth_021": {
+    "question": "Kas pirmas turėtų kovoti dėl ritulio po akistatos?",
+    "options": [
+      "Tik vartininkas",
+      "Niekas",
+      "Artimiausias žaidėjas",
+      "Tik gynėjas"
+    ]
+  },
+  "iq_youth_022": {
+    "question": "Kodėl svarbu kontroliuoti ritulį?",
+    "options": [
+      "Varžovas negali atakuoti be ritulio",
+      "Galite mažiau čiuožti",
+      "Pareigūnai už tai skiria balus",
+      "Atrodo gerai"
+    ]
+  },
+  "iq_youth_023": {
+    "question": "Kas svarbiausia kampiniame mūšyje?",
+    "options": [
+      "Aukštas šūvis",
+      "Šokinėja",
+      "Čiuožimas tik atgal",
+      "Kūno padėtis ir lazdos padėtis"
+    ]
+  },
+  "iq_youth_024": {
+    "question": "Koks yra geriausias būdas atsiverti?",
+    "options": [
+      "Perkelkite į atvirą erdvę",
+      "Į aklą kampą",
+      "Čiuožkite už komandos draugo nugaros",
+      "Stovėdamas vietoje"
+    ]
+  },
+  "iq_youth_025": {
+    "question": "Ką turėtų daryti puolėjas po smūgio?",
+    "options": [
+      "Nedelsdami pakeiskite eilutes",
+      "Stebėkite rezultatų suvestinę",
+      "Eik į tinklą atkovoti",
+      "Stovėkite ramiai"
+    ]
+  },
+  "iq_youth_026": {
+    "question": "Kas lošimo aikštelėje yra svarbiausia gynėjui?",
+    "options": [
+      "Laikykitės toli nuo tinklo",
+      "Žaisk be lazdos",
+      "Neleiskite varžovams atkovoti kamuolių",
+      "Stebėkite tik vartininką"
+    ]
+  },
+  "iq_youth_027": {
+    "question": "Koks yra geriausias būdas patekti į zoną?",
+    "options": [
+      "Be greičio",
+      "Čiuožimas atgal į zoną",
+      "Per vidurį be atramos",
+      "Su ritulio valdymu"
+    ]
+  },
+  "iq_youth_028": {
+    "question": "Kada naudingas smūgis atgal?",
+    "options": [
+      "Tik praktikoje",
+      "Niekada",
+      "Kai nėra laiko perkelti ritulio į priekį",
+      "Tik gynėjams"
+    ]
+  },
+  "iq_youth_029": {
+    "question": "Kodėl puolime svarbus centras?",
+    "options": [
+      "Jis visada stovi vietoje",
+      "Jis niekada neatlieka perdavimų",
+      "Jis sujungia visą liniją",
+      "Jis niekada nežaidžia gynyboje"
+    ]
+  },
+  "iq_youth_030": {
+    "question": "Kas svarbu žaidžiant gynyboje vienas prieš vieną?",
+    "options": [
+      "Nedelsdami šokite ant priešininko",
+      "Stebėkite tribūnus",
+      "Čiuožkite atgal be kontrolės",
+      "Kontroliuokite tarpą ir kampą"
+    ]
+  },
+  "iq_youth_031": {
+    "question": "Jūsų linija turėjo ilgą puolimo pamainą. Varžovų gynėjas atkovojo ritulį už tinklo, bet atrodo pavargęs. Jūsų linija taip pat ilgą laiką buvo ant ledo. kas geriausia?",
+    "options": [
+      "Agresyviai iš anksto patikrinkite visą eilutę",
+      "Grįžkite į neutralią zoną be spaudimo",
+      "Vienas į priekį nuolat spaudžiasi, o kiti keičiasi",
+      "Visa eilutė pasikeičia iš karto"
+    ]
+  },
+  "iq_youth_032": {
+    "question": "Kodėl leidimas atgal kartais naudingas?",
+    "options": [
+      "Norėdami prarasti pagreitį",
+      "Kad nepultų",
+      "Norėdami išlaikyti nuosavybę",
+      "Norėdami sustabdyti žaidimą"
+    ]
+  },
+  "iq_youth_033": {
+    "question": "Kas svarbu blokuojant šūvį?",
+    "options": [
+      "Užblokuokite ritulio kelią",
+      "Šokite aukštyn",
+      "Pasukite nugarą",
+      "Pažiūrėk žemyn"
+    ]
+  },
+  "iq_youth_034": {
+    "question": "Kaip gynėjas turėtų žaisti prieš greitąjį puolėją?",
+    "options": [
+      "Toliau čiuožkite į priekį nesustodami",
+      "Kiekvieną kartą žaiskite per griežtai",
+      "Stovėkite ramiai",
+      "Neduokite jam atviro ledo"
+    ]
+  },
+  "iq_youth_035": {
+    "question": "Kada vienkartinis vaistas yra efektyviausias?",
+    "options": [
+      "Kai šaulys nepasiruošęs",
+      "Tik praktikoje",
+      "Kai vartininkas negali laiku nusistatyti",
+      "Kai ritulys stovi"
+    ]
+  },
+  "iq_youth_036": {
+    "question": "Kodėl svarbus bendravimas ant ledo?",
+    "options": [
+      "Tai atitraukia priešininko dėmesį",
+      "Jis pakeičia čiuožimą",
+      "Tai padeda komandos draugams greičiau priimti sprendimus",
+      "Pareigūnams tai patinka"
+    ]
+  },
+  "iq_youth_037": {
+    "question": "Kaip reikėtų žaisti 2 prieš 0?",
+    "options": [
+      "Priverskite vartininką judėti perdavimu",
+      "Sustokite priešais tinklą",
+      "Šaudyti iš toli",
+      "Prarasti ritulį"
+    ]
+  },
+  "iq_youth_038": {
+    "question": "Kodėl puolėjai naudoja erdvę už tinklo?",
+    "options": [
+      "Pasislėpti nuo spektaklio",
+      "Norėdami sustabdyti žaidimą",
+      "Kad išvengtumėte šaudymo",
+      "Ištempti gynybą"
+    ]
+  },
+  "iq_youth_039": {
+    "question": "Kodėl svarbu išlikti ramiems?",
+    "options": [
+      "Tai turi įtakos ledui",
+      "Dėl to tinklas yra mažesnis",
+      "Tai padeda priimti geresnius sprendimus",
+      "Tai daro ritulį greitesnį"
+    ]
+  },
+  "iq_youth_040": {
+    "question": "Ką turėtų daryti gynėjas prie puolimo mėlynosios linijos?",
+    "options": [
+      "Laikykite ritulį zonoje",
+      "Stovėkite tik viduryje",
+      "Ignoruoti komandos draugus",
+      "Visada atsitrauk"
+    ]
+  },
+  "iq_youth_041": {
+    "question": "Kuo pavojingas atšokimas?",
+    "options": [
+      "Žaidėjas stovi vietoje",
+      "Ritulys tampa lengvesnis",
+      "Teisėjas nemato ritulio",
+      "Vartininkas ne visada kontroliuoja atkovotą kamuolį"
+    ]
+  },
+  "iq_youth_042": {
+    "question": "Kodėl naudinga keisti puolimo kryptį?",
+    "options": [
+      "Tai kenkia jūsų pačių komandai",
+      "Tai sulėtina žaidimą",
+      "Tai sukuria atviras zonas",
+      "Tai valdininkus vargina"
+    ]
+  },
+  "iq_youth_043": {
+    "question": "Kas svarbu puolimo zonos akistatoje?",
+    "options": [
+      "Nedelsdami važiuokite atgal",
+      "Greitai laimėk ritulį",
+      "Stebėkite rezultatų suvestinę",
+      "Nejudėti"
+    ]
+  },
+  "iq_youth_044": {
+    "question": "Ką reiškia dengti komandos draugui?",
+    "options": [
+      "Užpildykite jo poziciją, kai jis prisijungs prie skubėjimo",
+      "Žaisk tik puolimą",
+      "Nukopijuokite tikslų jo maršrutą",
+      "Atsistokite šalia jo nejudėdami"
+    ]
+  },
+  "iq_youth_045": {
+    "question": "Jei gynėjas praranda poziciją, ką jis turėtų daryti?",
+    "options": [
+      "Stebėkite tik ritulį",
+      "Ginčytis su komandos draugu",
+      "Nustokite čiuožti",
+      "Greitai grįžkite į gynybą"
+    ]
+  },
+  "iq_youth_046": {
+    "question": "Kodėl žaidėjai dažnai šaudo žemai?",
+    "options": [
+      "Jis yra lėtesnis",
+      "Nes aukšti šūviai yra neteisėti",
+      "Dėl atsimušimų ir atšokimų",
+      "Pareigūnams lengviau"
+    ]
+  },
+  "iq_youth_047": {
+    "question": "Kada ilgasis leidimas yra ypač naudingas?",
+    "options": [
+      "Žaidėjų minioje",
+      "Linijos keitimo metu",
+      "Greitoje kontratakoje",
+      "Be tikslo"
+    ]
+  },
+  "iq_youth_048": {
+    "question": "Kodėl judėjimas be ritulio yra svarbus?",
+    "options": [
+      "Tai sukuria pravažiavimo parinktis",
+      "Jis skirtas tik gynėjams",
+      "Tai neturi įtakos žaidimui",
+      "Tai kliudo komandos draugams"
+    ]
+  },
+  "iq_youth_049": {
+    "question": "Kada gali būti naudingas kadras aštriu kampu?",
+    "options": [
+      "Tik dėl jėgos žaidimo",
+      "Tik dėl baudos nužudymo",
+      "Niekada",
+      "Už netikėtą atšokimą"
+    ]
+  },
+  "iq_youth_050": {
+    "question": "Kodėl vartininko patikrinimas yra svarbus?",
+    "options": [
+      "Teisėjas nemato ritulio",
+      "Jam sunkiau matyti kadrą",
+      "Vartininkas nustoja judėti",
+      "Dėl to ataka atrodo geriau"
+    ]
+  },
+  "iq_youth_051": {
+    "question": "Kas padeda perimti perdavimus?",
+    "options": [
+      "Pjesės skaitymas",
+      "Vien sėkmė",
+      "Čiuožimas lėtai",
+      "Žaisti be lazdos"
+    ]
+  },
+  "iq_youth_052": {
+    "question": "Kaip teisingai prisegti priešininką prie lentų?",
+    "options": [
+      "Stumkite jį į nugarą",
+      "Užmerktomis akimis",
+      "Su rankomis ir be lazdos",
+      "Valdydami ritulį naudokite savo kūną ir lazdą"
+    ]
+  },
+  "iq_youth_053": {
+    "question": "Kas svarbu, kai gynėjas išeina iš už tinklo?",
+    "options": [
+      "Pažiūrėkite aukštyn ir raskite leidimą",
+      "Čiuožkite lėtai",
+      "Nedelsdami išmeskite ritulį",
+      "Žiūrėk tik į ledą"
+    ]
+  },
+  "iq_youth_054": {
+    "question": "Kodėl komandos kartais sulėtina žaidimą?",
+    "options": [
+      "Norėdami prarasti ritulį",
+      "Norėdami išlaikyti nuosavybę ir energiją",
+      "Kad nepultų",
+      "Norėdami sustabdyti žaidimą"
+    ]
+  },
+  "iq_youth_055": {
+    "question": "Kas yra antrosios bangos žaidėjas?",
+    "options": [
+      "Teisėjas",
+      "Atsarginis vartininkas",
+      "Žaidėjas, kuris vėliau prisijungia prie puolimo",
+      "Lėčiausias žaidėjas"
+    ]
+  },
+  "iq_youth_056": {
+    "question": "Kodėl greiti trumpi perdavimai yra veiksmingi?",
+    "options": [
+      "Jie visada yra lėti",
+      "Jie sužalojo ataką",
+      "Jie skirti tik gynėjams",
+      "Jas varžovams pavogti sunkiau"
+    ]
+  },
+  "iq_youth_057": {
+    "question": "Ką turėtų daryti vartininkas po atmušimo?",
+    "options": [
+      "Greitai sekite ritulį",
+      "Čiuožkite į lentas",
+      "Nusiimk jo pirštinę",
+      "Pažiūrėkite į rezultatų suvestinę"
+    ]
+  },
+  "iq_youth_058": {
+    "question": "Kada ataka per vidurį yra ypač pavojinga?",
+    "options": [
+      "Kai vienas žaidėjas yra vienas",
+      "Kai yra greitis ir palaikymas",
+      "Kai nėra ritulio",
+      "Kai visi stovi vietoje"
+    ]
+  },
+  "iq_youth_059": {
+    "question": "Kas padeda greičiau priimti sprendimus?",
+    "options": [
+      "Čiuožimas lėtai",
+      "Stebėkite tik ritulį",
+      "Nuolat skenuoja ledą",
+      "Žaisk be kalbėjimo"
+    ]
+  },
+  "iq_youth_060": {
+    "question": "Ką daro geras kapitonas?",
+    "options": [
+      "Palaiko komandą ir rodo pavyzdį",
+      "Žaidžia tik nusikaltimą",
+      "Rėkia ant visų",
+      "Niekada nežaidžia gynyboje"
+    ]
+  },
+  "iq_youth_061": {
+    "question": "Kas padeda išvengti išankstinio patikrinimo spaudimo?",
+    "options": [
+      "Žaidžia vienas",
+      "Greitas ritulio perkėlimas",
+      "Laikydami ritulį ilgą laiką",
+      "Sustojimas palei lentas"
+    ]
+  },
+  "iq_youth_062": {
+    "question": "Kodėl negalite dvejoti ties mėlyna linija?",
+    "options": [
+      "Vartininkas pavargs",
+      "Ledas pablogės",
+      "Galite prarasti zoną",
+      "Teisėjas sustabdys žaidimą"
+    ]
+  },
+  "iq_youth_063": {
+    "question": "Kodėl pavojingas smūgis iškart po perdavimo?",
+    "options": [
+      "Jis visada silpnas",
+      "Sunku įvykdyti",
+      "Teisėjas neįmuš įvarčio",
+      "Vartininkas nėra nustatytas laiku"
+    ]
+  },
+  "iq_youth_064": {
+    "question": "Kas pirmas turėtų sugrįžti praradęs ritulį?",
+    "options": [
+      "Artimiausias žaidėjas",
+      "Tik centras",
+      "Tik gynėjas",
+      "Tik vartininkas"
+    ]
+  },
+  "iq_youth_065": {
+    "question": "Kaip gynėjas turėtų žaisti prieš kietą šaulį?",
+    "options": [
+      "Stebėkite tik vartininką",
+      "Sumažinkite jo laiką ir erdvę fotografuoti",
+      "Suteik jam atvirą erdvę",
+      "Stovi toli"
+    ]
+  },
+  "iq_youth_066": {
+    "question": "Kodėl gynyboje ritulys dažnai perkeliamas į kampą?",
+    "options": [
+      "Pareigūnai negali matyti spektaklio",
+      "Ten ledas lėtesnis",
+      "Mažesnis pavojus tinklui",
+      "Ten lengviau pelnyti įvartį"
+    ]
+  },
+  "iq_youth_067": {
+    "question": "Ką puolėjas veikia prieš tinklą?",
+    "options": [
+      "Stovi nugara į spektaklį",
+      "Čiuožyklos prie lentų",
+      "Nejuda",
+      "Sukuria eismą ir medžioja atšokusius kamuolius"
+    ]
+  },
+  "iq_youth_068": {
+    "question": "Kodėl svarbu žaisti pakėlę galvą?",
+    "options": [
+      "Pamatyti komandos draugus ir varžovus",
+      "Kad ritulys būtų lengvesnis",
+      "Kad greičiau čiuožtų",
+      "Kad pareigūnai jus matytų"
+    ]
+  },
+  "iq_youth_069": {
+    "question": "Kas svarbiausia laimėjus PK akistatą?",
+    "options": [
+      "Pasistenk per visus",
+      "Padarykite ilgą pauzę",
+      "Išmeskite ritulį iš zonos",
+      "Stovėkite ramiai"
+    ]
+  },
+  "iq_youth_070": {
+    "question": "Kodėl svarbu spausti varžovus?",
+    "options": [
+      "Tai kenkia jūsų komandai",
+      "Tai neturi įtakos žaidimui",
+      "Tai sustabdo žaidimą",
+      "Tai gali priversti suklysti"
+    ]
+  },
+  "iq_youth_071": {
+    "question": "Kada liečiamas leidimas yra naudingas?",
+    "options": [
+      "Norėdami greitai išvystyti ataką",
+      "Kai žaidėjas stovi vietoje",
+      "Kai nėra komandos draugų",
+      "Tik gynyboje"
+    ]
+  },
+  "iq_youth_072": {
+    "question": "Ką centras turėtų daryti prieš savo tinklą?",
+    "options": [
+      "Palaukite, kol praeis ledas",
+      "Čiuožkite į neutralią zoną",
+      "Padėkite gynėjams uždengti lizdą",
+      "Atsistokite prie lentų"
+    ]
+  },
+  "iq_youth_073": {
+    "question": "Kodėl kryžminis judėjimas į priekį yra efektyvus?",
+    "options": [
+      "Tai glumina gynėjus",
+      "Tai kenkia jūsų pačių komandai",
+      "Tai sulėtina ataką",
+      "Tai neteisėta"
+    ]
+  },
+  "iq_youth_074": {
+    "question": "Kas svarbu kovojant dėl ​​palaido ritulio?",
+    "options": [
+      "Laikykite ritulį ilgą laiką",
+      "Stovėkite ramiai",
+      "Pažiūrėk žemyn",
+      "Greitai nuspręskite, ką daryti toliau"
+    ]
+  },
+  "iq_youth_075": {
+    "question": "Kodėl žaidėjai keičia greitį?",
+    "options": [
+      "Kad nustotų čiuožti",
+      "Norėdami prarasti ritulį",
+      "Nugalėti priešininką",
+      "Kad greičiau pavargtų"
+    ]
+  },
+  "iq_youth_076": {
+    "question": "Liko 40 sekundžių. Pirmaujate vienu įvarčiu. Varžovas žaidžia 6 prieš 5. Jų gynėjas turi ritulį ties mėlyna linija, o jūsų krašto puolėjas gali peršokti ir pavogti. kas geriausia?",
+    "options": [
+      "Nedelsdami skriskite į ritulį agresyviai",
+      "Stebėkite tik tinklo priekinį žaidėją",
+      "Norėdami paimti ritulį, paspauskite tik kontroliuojamu kampu",
+      "Visiškai sutraukite į tinklą"
+    ]
+  },
+  "iq_youth_077": {
+    "question": "Kada vartininkas gali toli išeiti iš savo tinklo?",
+    "options": [
+      "Perimti ritulį ir padėti gynybai",
+      "Niekada",
+      "Visada",
+      "Tik po įvarčio"
+    ]
+  },
+  "iq_youth_078": {
+    "question": "Kas svarbu norint sėkmingai atšokti?",
+    "options": [
+      "Didelis susitraukimas",
+      "Stovėkite toli nuo tinklo",
+      "Lėtas judėjimas",
+      "Greita reakcija"
+    ]
+  },
+  "iq_youth_079": {
+    "question": "Kodėl antrojo žaidėjo palaikymas yra svarbus?",
+    "options": [
+      "Tai sukuria papildomų galimybių",
+      "Jis skirtas tik gynėjams",
+      "To nereikia",
+      "Tai kenkia atakai"
+    ]
+  },
+  "iq_youth_080": {
+    "question": "Ką reiškia „skaityti pjesę“?",
+    "options": [
+      "Numatykite, ką darys priešininkai",
+      "Skaičiuoti eina",
+      "Sekite tik ritulį",
+      "Stebėkite rezultatų suvestinę"
+    ]
+  },
+  "iq_youth_081": {
+    "question": "Kodėl svarbu ritulį saugoti savo kūnu?",
+    "options": [
+      "Dėl to ledas tampa greitesnis",
+      "Jis skirtas tik gynėjams",
+      "Tai turi įtakos teisėjui",
+      "Tai padeda apsaugoti ritulį"
+    ]
+  },
+  "iq_youth_082": {
+    "question": "Kada pramušimas palei lentas naudingas?",
+    "options": [
+      "Niekada",
+      "Visada",
+      "Kai vidurys uždengtas",
+      "Tik dėl jėgos žaidimo"
+    ]
+  },
+  "iq_youth_083": {
+    "question": "Kas svarbu ginantis nuo jėgos žaidimo?",
+    "options": [
+      "Nuolatiniai dekai",
+      "Būkite kompaktiški gynyboje",
+      "Lėti linijų pokyčiai",
+      "Visur žaidžia vienas prieš vieną"
+    ]
+  },
+  "iq_youth_084": {
+    "question": "Kas yra šaudymo leidimas?",
+    "options": [
+      "Perdavimas žaidėjui, turinčiam gerą smūgio poziciją",
+      "Perdavimas atgal vartininkui",
+      "Atsitiktinis perdavimas",
+      "Perdavimas į kampą"
+    ]
+  },
+  "iq_youth_085": {
+    "question": "Kodėl deka prieš šūvį naudinga?",
+    "options": [
+      "Tai visada sulėtina ataką",
+      "Tai neteisėta",
+      "Jis skirtas tik gynėjams",
+      "Jis gali pajudinti vartininką arba gynėją"
+    ]
+  },
+  "iq_youth_086": {
+    "question": "Blokavęs metimą žaidėjas turi:",
+    "options": [
+      "Nedelsdami ieškokite ritulio",
+      "Stovėkite ramiai",
+      "Pažiūrėk į teisėją",
+      "Palikite ledus"
+    ]
+  },
+  "iq_youth_087": {
+    "question": "Kaip puolėjai padeda gynėjams?",
+    "options": [
+      "Likite puolimo zonoje",
+      "Patikrinkite atgal ir atidarykite leidimą",
+      "Žaisk tik palei lentas",
+      "Nežaisk gynyboje"
+    ]
+  },
+  "iq_youth_088": {
+    "question": "Kas padeda nuo sunkaus išankstinio patikrinimo?",
+    "options": [
+      "Greiti sprendimai ir ritulio judėjimas",
+      "Čiuožimas lėtai",
+      "Žaidžia vienas",
+      "Ilgas ritulio valdymas"
+    ]
+  },
+  "iq_youth_089": {
+    "question": "Kada lazdos nukreipimas yra naudingas?",
+    "options": [
+      "Niekada",
+      "Tik praktikoje",
+      "Tik gynyboje",
+      "Norėdami nukreipti ritulį"
+    ]
+  },
+  "iq_youth_090": {
+    "question": "Kas svarbu puolant palei lentas?",
+    "options": [
+      "Perdavimas atgal vartininkui",
+      "Palaikymas iš netoliese esančio komandos draugo",
+      "Žaidžia vienas",
+      "Judėjimo stabdymas"
+    ]
+  },
+  "iq_youth_091": {
+    "question": "Kas svarbu vartininkui atitrūkimo metu?",
+    "options": [
+      "Laikykitės geros padėties ir kantrybės",
+      "Nedelsdami numeskite ant ledo",
+      "Čiuožkite atgal",
+      "Stebėkite gynėjus"
+    ]
+  },
+  "iq_youth_092": {
+    "question": "Kas svarbu greitai pereinant prie nusikaltimo?",
+    "options": [
+      "Lėti perdavimai",
+      "Ilgas ritulio valdymas",
+      "Sustojimas ties mėlyna linija",
+      "Sprendimų priėmimo greitis"
+    ]
+  },
+  "iq_youth_093": {
+    "question": "Ką gynėjas veikia jėgos žaidime?",
+    "options": [
+      "Čiuožyklos prie tinklo",
+      "Neprisijungia prie puolimo",
+      "Perkelia ritulį ir ieško smūgio",
+      "Stovi vietoje"
+    ]
+  },
+  "iq_youth_094": {
+    "question": "Kodėl eismas prieš tinklą pavojingas?",
+    "options": [
+      "Rituulys lėtėja",
+      "Vartininkui sunkiau matyti ritulį",
+      "Teisėjas negali skaičiuoti žaidėjų",
+      "Žaidėjai greičiau pavargsta"
+    ]
+  },
+  "iq_youth_095": {
+    "question": "Kas svarbu perėmus ritulį?",
+    "options": [
+      "Greitas perėjimas prie įžeidimo",
+      "Nustokite čiuožti",
+      "Nedelsdami išmeskite ritulį",
+      "Čiuožkite į lentas"
+    ]
+  },
+  "iq_youth_096": {
+    "question": "Kas ypač svarbu per viršvalandžius?",
+    "options": [
+      "Nuolatiniai tolimai šūviai",
+      "Žaidžia be padavimų",
+      "Ilgos pamainos",
+      "Ritulių kontrolė ir nedaug klaidų"
+    ]
+  },
+  "iq_youth_097": {
+    "question": "Ką turėtų daryti gynėjas, jei varžovas apžiūri vartininką?",
+    "options": [
+      "Pažiūrėk į teisėją",
+      "Čiuožkite į lentas",
+      "Išvalykite lizdą ir pririškite priešininką",
+      "Stovėkite šalia nejudėdami"
+    ]
+  },
+  "iq_youth_098": {
+    "question": "Kodėl komandinis žaidimas yra svarbesnis už individualų žaidimą?",
+    "options": [
+      "Komanda rezultatui įtakos neturi",
+      "Linija sukuria daugiau šansų kartu",
+      "Žaidimą visada nusprendžia vienas žaidėjas",
+      "Perdavimai pakenkė žaidimui"
+    ]
+  },
+  "iq_youth_099": {
+    "question": "Kas svarbu prieš fotografuojant?",
+    "options": [
+      "Greitai perskaitykite vartininko poziciją",
+      "Žiūrėkite tik žemyn į ritulį",
+      "Sustabdykite",
+      "Užmerkite akis"
+    ]
+  },
+  "iq_youth_100": {
+    "question": "Kas geriausiai lavina ledo ritulio IQ?",
+    "options": [
+      "Tik jėgos treniruotės",
+      "Tik įvarčių stebėjimas",
+      "Tik čiuožimas",
+      "Žaidimo studijavimas, praktika ir situacijų supratimas"
+    ]
+  }
+}
