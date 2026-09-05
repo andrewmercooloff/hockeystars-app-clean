@@ -82,8 +82,8 @@ const LogoHeader = React.memo(() => {
             backgroundColor: colors.surface,
             justifyContent: 'center',
             alignItems: 'center',
-            borderWidth: 2,
-            borderColor: currentUser ? colors.brand : colors.border,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: colors.border,
           }}
         >
           {currentUser ? (
