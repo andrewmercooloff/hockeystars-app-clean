@@ -1,80 +1,169 @@
-import React, { useId } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
-import Svg, { Circle, Defs, G, Line, Path, Pattern, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 
 /**
- * Chat-wallpaper фон (Telegram / WhatsApp style).
- * Крупные doodles, плотная плитка — один Pattern fill (дешево для перфа).
+ * Chat-wallpaper без видимого раппорта:
+ * doodles разбросаны по экрану с джиттером/поворотом/пропусками ячеек.
+ * Растрируем в текстуру + не рисуем на неактивных табах (шайбы на home).
  */
-const TILE = 54;
+const CELL = 70;
+const KINDS = ['puck', 'stick', 'star', 'skate', 'flake', 'whistle', 'net', 'helmet'] as const;
+type DoodleKind = (typeof KINDS)[number];
 
-function TileArt({ stroke }: { stroke: string }) {
-  return (
-    <G>
-      {/* puck — крупнее */}
-      <Circle cx={12} cy={14} r={7} stroke={stroke} strokeWidth={1.35} fill="none" />
-      <Circle cx={12} cy={14} r={2} fill={stroke} />
-
-      {/* stick */}
-      <Path
-        d="M30 24 L40 6 L44.5 4 L48 7.5 L43 12 L34.5 26"
-        stroke={stroke}
-        strokeWidth={1.4}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      {/* star */}
-      <Path
-        d="M42 34 L44.2 40.2 L50.8 40.5 L45.6 44.6 L47.4 51 L42 47.4 L36.6 51 L38.4 44.6 L33.2 40.5 L39.8 40.2 Z"
-        stroke={stroke}
-        strokeWidth={1.2}
-        fill="none"
-        strokeLinejoin="round"
-      />
-
-      {/* skate */}
-      <Path
-        d="M6 36 C9.5 31.5, 16 31, 21.5 33.5 L26 38 L23.5 42 H8 Z"
-        stroke={stroke}
-        strokeWidth={1.25}
-        fill="none"
-        strokeLinejoin="round"
-      />
-      <Line x1={7.5} y1={43.5} x2={24.5} y2={43.5} stroke={stroke} strokeWidth={1.3} strokeLinecap="round" />
-
-      {/* flake */}
-      <Line x1={27} y1={38} x2={27} y2={52} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
-      <Line x1={20} y1={45} x2={34} y2={45} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
-      <Line x1={21.8} y1={39.8} x2={32.2} y2={50.2} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
-      <Line x1={32.2} y1={39.8} x2={21.8} y2={50.2} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
-
-      {/* whistle */}
-      <Circle cx={44} cy={14} r={5} stroke={stroke} strokeWidth={1.25} fill="none" />
-      <Circle cx={44} cy={14} r={1.5} fill={stroke} />
-      <Path
-        d="M48.5 11.8 L53.8 9.2 L55 11.2 L49.6 13.8"
-        stroke={stroke}
-        strokeWidth={1.25}
-        fill="none"
-        strokeLinejoin="round"
-      />
-    </G>
-  );
+function hash2(a: number, b: number): number {
+  // Простой детерминированный хэш 0..1
+  const n = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+  return n - Math.floor(n);
 }
 
-const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.055 }: { opacity?: number }) {
+function Doodle({ kind, stroke }: { kind: DoodleKind; stroke: string }) {
+  switch (kind) {
+    case 'puck':
+      return (
+        <>
+          <Circle cx={10} cy={10} r={6.2} stroke={stroke} strokeWidth={1.25} fill="none" />
+          <Circle cx={10} cy={10} r={1.7} fill={stroke} />
+        </>
+      );
+    case 'stick':
+      return (
+        <Path
+          d="M3 17 L11 3 L15 1.5 L18 5 L14 8 L7 18"
+          stroke={stroke}
+          strokeWidth={1.3}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      );
+    case 'star':
+      return (
+        <Path
+          d="M10 1.5 L12 7.5 L18.5 7.8 L13.4 11.6 L15.2 17.8 L10 14.4 L4.8 17.8 L6.6 11.6 L1.5 7.8 L8 7.5 Z"
+          stroke={stroke}
+          strokeWidth={1.1}
+          fill="none"
+          strokeLinejoin="round"
+        />
+      );
+    case 'skate':
+      return (
+        <>
+          <Path
+            d="M2 9 C5 5, 11 4.5, 16 7 L19 11 L17 14 H3.5 Z"
+            stroke={stroke}
+            strokeWidth={1.15}
+            fill="none"
+            strokeLinejoin="round"
+          />
+          <Line x1={3} y1={15.2} x2={17.5} y2={15.2} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
+        </>
+      );
+    case 'flake':
+      return (
+        <>
+          <Line x1={10} y1={2} x2={10} y2={18} stroke={stroke} strokeWidth={1.1} strokeLinecap="round" />
+          <Line x1={2} y1={10} x2={18} y2={10} stroke={stroke} strokeWidth={1.1} strokeLinecap="round" />
+          <Line x1={4} y1={4} x2={16} y2={16} stroke={stroke} strokeWidth={1.1} strokeLinecap="round" />
+          <Line x1={16} y1={4} x2={4} y2={16} stroke={stroke} strokeWidth={1.1} strokeLinecap="round" />
+        </>
+      );
+    case 'whistle':
+      return (
+        <>
+          <Circle cx={8} cy={10} r={4.6} stroke={stroke} strokeWidth={1.15} fill="none" />
+          <Circle cx={8} cy={10} r={1.3} fill={stroke} />
+          <Path
+            d="M12.2 8 L18 5.5 L19.2 7.4 L13.4 10"
+            stroke={stroke}
+            strokeWidth={1.15}
+            fill="none"
+            strokeLinejoin="round"
+          />
+        </>
+      );
+    case 'net':
+      return (
+        <>
+          <Rect x={2} y={4} width={16} height={12} rx={1.2} stroke={stroke} strokeWidth={1.1} fill="none" />
+          <Line x1={2} y1={4} x2={18} y2={16} stroke={stroke} strokeWidth={0.85} />
+          <Line x1={18} y1={4} x2={2} y2={16} stroke={stroke} strokeWidth={0.85} />
+        </>
+      );
+    case 'helmet':
+      return (
+        <>
+          <Path
+            d="M3 13 C3 7, 6 3.5, 10 3.5 C14 3.5, 17 7, 17 13 L3 13 Z"
+            stroke={stroke}
+            strokeWidth={1.15}
+            fill="none"
+            strokeLinejoin="round"
+          />
+          <Line x1={2.5} y1={13} x2={17.5} y2={13} stroke={stroke} strokeWidth={1.2} strokeLinecap="round" />
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+type Cell = {
+  key: string;
+  x: number;
+  y: number;
+  kind: DoodleKind;
+  rot: number;
+  scale: number;
+};
+
+const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.048 }: { opacity?: number }) {
   const { width, height } = useWindowDimensions();
   const isFocused = useIsFocused();
-  const patternId = `hsWall-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
+  const cells = useMemo(() => {
+    const w = Math.max(width, 320);
+    const h = Math.max(height, 568);
+    const cols = Math.ceil(w / CELL) + 1;
+    const rows = Math.ceil(h / CELL) + 1;
+    const out: Cell[] = [];
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const h1 = hash2(r + 1, c + 3);
+        const h2 = hash2(c + 7, r + 11);
+        const h3 = hash2(r * 3 + 2, c * 5 + 1);
+
+        // ~22% ячеек пропускаем — рвём сетку
+        if (h1 < 0.22) continue;
+
+        const rowOffset = r % 2 ? CELL * (0.28 + h2 * 0.2) : h3 * 10 - 5;
+        const kind = KINDS[Math.floor(hash2(r + 19, c + 23) * KINDS.length) % KINDS.length];
+        const rot = hash2(r + 41, c + 17) * 72 - 36;
+        const scale = 0.78 + hash2(c + 29, r + 31) * 0.45;
+        const jitterX = (hash2(r + 53, c + 59) - 0.5) * CELL * 0.55;
+        const jitterY = (hash2(c + 61, r + 67) - 0.5) * CELL * 0.55;
+
+        out.push({
+          key: `${r}-${c}`,
+          x: c * CELL + rowOffset + jitterX - 8,
+          y: r * CELL + jitterY - 6,
+          kind,
+          rot,
+          scale,
+        });
+      }
+    }
+    return out;
+  }, [width, height]);
 
   if (!isFocused) {
     return null;
   }
 
-  const stroke = 'rgba(255,255,255,0.92)';
+  const stroke = 'rgba(255,255,255,0.9)';
   const w = Math.max(1, Math.ceil(width));
   const h = Math.max(1, Math.ceil(height));
 
@@ -87,17 +176,14 @@ const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.055 }: { o
       collapsable={false}
     >
       <Svg width={w} height={h}>
-        <Defs>
-          <Pattern
-            id={patternId}
-            patternUnits="userSpaceOnUse"
-            width={TILE}
-            height={TILE}
+        {cells.map((cell) => (
+          <G
+            key={cell.key}
+            transform={`translate(${cell.x} ${cell.y}) rotate(${cell.rot} 10 10) scale(${cell.scale})`}
           >
-            <TileArt stroke={stroke} />
-          </Pattern>
-        </Defs>
-        <Rect x={0} y={0} width={w} height={h} fill={`url(#${patternId})`} />
+            <Doodle kind={cell.kind} stroke={stroke} />
+          </G>
+        ))}
       </Svg>
     </View>
   );
