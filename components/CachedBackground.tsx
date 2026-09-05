@@ -32,8 +32,15 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
       <View style={[styles.container, styles.plain, style]} onLayout={onLayout}>
         <LinearGradient
           pointerEvents="none"
-          colors={['#16161b', colors.background, colors.scene]}
-          locations={[0, 0.5, 1]}
+          colors={['#1a1216', colors.background, colors.scene]}
+          locations={[0, 0.48, 1]}
+          style={StyleSheet.absoluteFill}
+        />
+        {/* Лёгкий фирменный wash сверху — чтобы графит не читался как «всё чёрное». */}
+        <LinearGradient
+          pointerEvents="none"
+          colors={[colors.brandWash, 'transparent']}
+          locations={[0, 0.42]}
           style={StyleSheet.absoluteFill}
         />
         <HockeyPattern />

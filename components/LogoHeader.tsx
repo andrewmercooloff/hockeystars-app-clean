@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Image, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { Image, Text, TouchableOpacity, View, Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CachedAvatar from './CachedAvatar';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -43,8 +43,8 @@ const LogoHeader = React.memo(() => {
         paddingBottom: isMobileWeb ? 4 : 5,
         paddingTop: Platform.OS === 'android' ? insets.top : 0,
         backgroundColor: colors.scene,
-        borderBottomWidth: Platform.OS === 'web' ? 0 : 0.5,
-        borderBottomColor: 'rgba(255,255,255,0.06)',
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: colors.borderAccent,
       }}
     >
       <TouchableOpacity
@@ -83,7 +83,7 @@ const LogoHeader = React.memo(() => {
             justifyContent: 'center',
             alignItems: 'center',
             borderWidth: 2,
-            borderColor: currentUser ? colors.brandMuted : colors.border,
+            borderColor: currentUser ? colors.brand : colors.border,
           }}
         >
           {currentUser ? (

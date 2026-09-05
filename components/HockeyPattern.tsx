@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors } from '../theme/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -20,9 +21,9 @@ const ICON = 26;
 
 /**
  * Ненавязчивый паттерн из хоккейных иконок (как фоны в Telegram).
- * Статичная сетка, рисуется один раз; opacity низкая, чтобы не мешать контенту.
+ * Статичная сетка; лёгкий фирменный красный вместо белого — брендовый намёк без шума.
  */
-const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.055 }: { opacity?: number }) {
+const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.07 }: { opacity?: number }) {
   const { width, height } = useWindowDimensions();
 
   const cells = useMemo(() => {
@@ -52,7 +53,7 @@ const HockeyPattern = React.memo(function HockeyPattern({ opacity = 0.055 }: { o
           key={cell.key}
           name={cell.icon}
           size={ICON}
-          color="#ffffff"
+          color={colors.brand}
           style={{
             position: 'absolute',
             left: cell.x + (CELL - ICON) / 2,

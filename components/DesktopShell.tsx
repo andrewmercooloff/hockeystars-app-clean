@@ -76,6 +76,7 @@ function NavRow({
       accessibilityRole="link"
       accessibilityState={{ selected: active }}
     >
+      {active ? <View style={[styles.navAccent, { backgroundColor: colors.brand }]} /> : null}
       <View style={styles.navIconWrap}>
         {item.homeStar ? (
           <Image source={HOME_TAB_STAR} style={styles.homeStar} contentFit="contain" />
@@ -83,7 +84,7 @@ function NavRow({
           <Ionicons
             name={item.icon || 'ellipse-outline'}
             size={22}
-            color={active ? colors.text : colors.textMuted}
+            color={active ? colors.brand : colors.textMuted}
           />
         )}
         {badge > 0 ? (
@@ -216,7 +217,7 @@ function DesktopSidebar({
         styles.sidebar,
         {
           backgroundColor: colors.sidebar,
-          borderRightColor: colors.border,
+          borderRightColor: colors.borderAccent,
         },
       ]}
     >
@@ -243,7 +244,7 @@ function DesktopSidebar({
             (hovered || pressed) && { backgroundColor: colors.input },
           ]}
         >
-          <View style={[styles.profileAvatar, { borderColor: colors.text }]}>
+          <View style={[styles.profileAvatar, { borderColor: currentUser ? colors.brand : colors.border }]}>
             {currentUser ? (
               <CachedAvatar
                 playerId={currentUser.id}
@@ -327,6 +328,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 16,
     marginBottom: 3,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  navAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 8,
+    bottom: 8,
+    width: 3,
+    borderRadius: 2,
   },
   navIconWrap: {
     width: 28,

@@ -1747,9 +1747,9 @@ export default function RootLayout() {
               tabBarStyle: isDesktopLayout || isAuthScreen
                 ? { display: 'none', height: 0, overflow: 'hidden' }
                 : { 
-                backgroundColor: 'rgba(11, 11, 14, 0.96)', 
+                backgroundColor: 'rgba(14, 11, 13, 0.96)', 
                 borderTopWidth: StyleSheet.hairlineWidth,
-                borderTopColor: 'rgba(255, 255, 255, 0.08)',
+                borderTopColor: colors.borderAccent,
                 height: isMobileWeb ? 56 : (Platform.OS === 'android' ? 84 : 82),
                 paddingBottom: isMobileWeb ? 2 : (Platform.OS === 'android' ? 10 : 8),
                 paddingTop: isMobileWeb ? 2 : (Platform.OS === 'android' ? 6 : 8),
