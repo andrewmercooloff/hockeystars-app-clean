@@ -26,7 +26,9 @@
     "rejectRequestConfirm": "Opravdu chcete tuto žádost odmítnout?",
     "super": "Skvělé!",
     "left": "Vlevo",
-    "right": "Právo"
+    "right": "Právo",
+    "offline": "Bez připojení",
+    "and": "a"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -3183,7 +3185,8 @@
     "errorProcessNotificationGeneral": "Oznámení nelze zpracovat. Zkuste to znovu.",
     "errorProcessFriendRequest": "Vaši žádost o přátelství nelze zpracovat.",
     "errorProcessRequest": "Zpracování vašeho požadavku se nezdařilo",
-    "errorSendMessage": "Odeslání zprávy se nezdařilo"
+    "errorSendMessage": "Odeslání zprávy se nezdařilo",
+    "phoneOrEmailPlaceholderShort": "+420… nebo email"
   },
   "profile": {
     "addFriend": "Přidat jako přítele",
@@ -3242,7 +3245,7 @@
     "cancel": "Zrušit",
     "friends": "Přátelé",
     "friendship": "Přátelství",
-    "statistics": "Statistiky aktuální sezóny",
+    "statistics": "Statistics",
     "teams": "Týmy",
     "currentTeams": "Současné týmy",
     "pastTeams": "Minulé týmy",
@@ -3465,7 +3468,11 @@
     "shareProfileSocial": "Sdílet profil na sociálních sítích",
     "copyLink": "Kopírovat odkaz",
     "linkCopied": "Odkaz zkopírován do schránky",
-    "currentSeasonStats": "Statistiky aktuální sezóny"
+    "currentSeasonStats": "Statistics · {season}",
+    "city": "Město",
+    "addAddress": "Přidat adresu",
+    "addressesHint": "Můžete zadat více adres",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Registrace",
@@ -3827,6 +3834,12 @@
         "many": "Dnes byl tvůj profil zobrazen {{count}}krát.",
         "other": "Dnes byl tvůj profil zobrazen {{count}}krát."
       }
+    },
+    "video_liked": {
+      "grouped": "{name} olajkoval {count} vašich videí"
+    },
+    "photo_liked": {
+      "grouped": "{name} olajkoval {count} vašich fotek"
     }
   },
   "editProfile": {
@@ -3866,7 +3879,13 @@
     "noPlayersCountryYear": "Žádní hráči z {{country}} v {{year}}",
     "iceEmpty": "Led je prázdný. Vyberte jinou zemi nebo rok nebo resetujte filtry.",
     "shakeHintTitle": "Protřeste zařízení",
-    "shakeHintSubtext": "pro obnovení seznamu hráčů"
+    "shakeHintSubtext": "pro obnovení seznamu hráčů",
+    "inviteFriends": "Pozvat",
+    "inviteTitle": "Připoj se k HockeyStars!",
+    "inviteMessage": "Vytvoř si hokejový profil, soupeř s kamarády a dostaň se na vrchol.",
+    "inviteSubtitle": "Pošli odkaz – kamarádi se dostanou přímo na tvůj profil",
+    "copyLink": "Kopírovat odkaz",
+    "moreApps": "Další"
   },
   "filters": {
     "year": "rok",
@@ -4254,5 +4273,14 @@
     "feed": "Feed",
     "scout": "Scout",
     "skills": "Dovednosti"
+  },
+  "seo": {
+    "homeTitle": "Hokejová aplikace Hockeystars"
+  },
+  "download": {
+    "installTitle": "Nainstalovat aplikaci",
+    "scanQr": "Naskenujte telefonem — otevře se App Store nebo Google Play",
+    "appStoreCta": "Stáhnout z App Store",
+    "playStoreCta": "Stáhnout z Google Play"
   }
 }

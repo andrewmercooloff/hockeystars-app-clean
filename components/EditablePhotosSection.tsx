@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
     Alert,
     Dimensions,
-    Image,
     Platform,
     ScrollView,
     StyleProp,
@@ -20,13 +19,14 @@ import { loadCurrentUser } from '../utils/playerStorage';
 import PhotoViewer from './PhotoViewer';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedImage from './CachedImage';
+import HorizontalScrollWithArrows from './HorizontalScrollWithArrows';
 import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
 import { addActivityPoints } from '../services/activityService';
-import { useMediaAspectSize } from '../utils/mediaAspectSize';
+import { getPhotoTileSize } from '../utils/mediaTileSize';
 
 const { width: screenWidth } = Dimensions.get('window');
-const PHOTO_VIEW_WIDTH = Math.round(screenWidth * 0.42);
+const { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT } = getPhotoTileSize(screenWidth);
 
 function ViewModePhoto({
   photo,
@@ -41,20 +41,19 @@ function ViewModePhoto({
   likeRefreshTrigger: number;
   onPress: (index: number) => void;
 }) {
-  const { width, height } = useMediaAspectSize(photo, PHOTO_VIEW_WIDTH, 'image');
   const contentId = generatePhotoContentId(photo);
 
   return (
     <View style={styles.photoContainer}>
       <TouchableOpacity
-        style={[styles.photoWrapper, { width, height }]}
+        style={[styles.photoWrapper, { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT }]}
         onPress={() => onPress(index)}
         activeOpacity={0.8}
       >
         <CachedImage
           imageUrl={photo}
           style={styles.photoAdaptive}
-          resizeMode="contain"
+          resizeMode="cover"
         />
         {playerId ? (
           <View style={styles.photoLikeButtonContainer}>
@@ -507,7 +506,7 @@ export default function EditablePhotosSection({
              onPress={handleAddPhoto}
              disabled={isUploading || photos.length >= 50}
            >
-             <Ionicons name="add-circle" size={24} color={(isUploading || photos.length >= 50) ? "#666" : "#fff"} />
+             <Ionicons name="add-circle" size={24} color={(isUploading || photos.length >= 50) ? "#8a8a92" : "#fff"} />
              <Text style={[styles.addPhotoButtonText, (isUploading || photos.length >= 50) && styles.disabledText]}>
                {(isUploading || photos.length >= 50) ? (photos.length >= 50 ? t('maxPhotos') : t('uploading')) : `${t('addPhoto')} (${photos.length}/50)`}
              </Text>
@@ -597,17 +596,16 @@ export default function EditablePhotosSection({
               </View>
             </ScrollView>
           ) : (
-            // Режим просмотра - горизонтальное пролистывание
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
+            // Режим просмотра - горизонтальное пролистывание (+ стрелки на desktop)
+            <HorizontalScrollWithArrows
               contentContainerStyle={styles.photosScroll}
               removeClippedSubviews={true}
               decelerationRate="fast"
+              scrollStep={PHOTO_TILE_WIDTH + 10}
             >
               {photos.map((photo, index) => (
                 <ViewModePhoto
-                  key={photo}
+                  key={typeof photo === 'string' ? photo : `photo-${index}`}
                   photo={photo}
                   index={index}
                   playerId={playerId}
@@ -615,14 +613,14 @@ export default function EditablePhotosSection({
                   onPress={openPhotoViewer}
                 />
               ))}
-            </ScrollView>
+            </HorizontalScrollWithArrows>
           )}
         </View>
       )}
 
       {photos.length === 0 && isEditing && (
         <View style={styles.emptyContainer}>
-          <Ionicons name="images-outline" size={48} color="#666" />
+          <Ionicons name="images-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyText}>{t('noPhotos')}</Text>
           <Text style={styles.emptySubtext}>{t('clickToAddPhoto')}</Text>
         </View>
@@ -641,13 +639,13 @@ export default function EditablePhotosSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 15,
     padding: 20,
     paddingBottom: 6,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -682,7 +680,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   disabledText: {
-    color: '#666',
+    color: '#8a8a92',
   },
   uploadProgressContainer: {
     marginTop: 10,
@@ -739,20 +737,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     right: 5,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 4,
     padding: 2,
   },
   photoContainer: {
     position: 'relative',
-    marginRight: 15,
-    marginTop: 12,
+    marginRight: 10,
+    marginTop: 4,
   },
   photoWrapper: {
     position: 'relative',
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.35)',
   },
   photoAdaptive: {
     width: '100%',
@@ -760,15 +760,15 @@ const styles = StyleSheet.create({
   },
   photoLikeButtonContainer: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
+    bottom: 6,
+    right: 6,
     zIndex: 10,
   },
   photo: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    width: PHOTO_TILE_WIDTH,
+    height: PHOTO_TILE_HEIGHT,
+    borderRadius: 10,
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
   },
   removePhotoButton: {
     position: 'absolute',
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   photoGridTouchable: {
     position: 'relative',
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 6,
     right: 6,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 6,
     padding: 4,
   },
@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -6,
     right: -6,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 12,
     padding: 2,
   },

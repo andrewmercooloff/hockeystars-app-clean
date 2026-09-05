@@ -235,7 +235,7 @@ async function failoverToSupabaseProxy(): Promise<void> {
 }
 
 const shouldFailoverToProxy = (error?: unknown, response?: Response): boolean => {
-  if (activeSupabaseUrl !== SUPABASE_DIRECT_URL || ENV_LOCKED_URL) return false;
+  if (activeSupabaseUrl !== SUPABASE_DIRECT_URL) return false;
   if (error && isSupabaseNetworkError(error)) return true;
   if (response && isRetryableResponse(response)) return true;
   return false;
@@ -276,6 +276,7 @@ export async function ensureSupabaseRouting(): Promise<string> {
           activeSupabaseUrl,
           supabaseAnonKey,
           applySupabaseOrigin,
+          { lockedUrl: ENV_LOCKED_URL },
         );
         return activeSupabaseUrl;
       })();
@@ -297,10 +298,15 @@ export async function ensureSupabaseRouting(): Promise<string> {
   return routingReadyPromise;
 }
 
-/** Неблокирующий probe при старте (если routing уже не запущен из _layout). */
-export const warmSupabaseOriginRoute = (): void => {
-  void ensureSupabaseRouting().catch(() => {});
-};
+/** Повторная проверка маршрута при возврате из фона (VPN выкл / смена сети). */
+export async function refreshSupabaseRoutingOnForeground(): Promise<void> {
+  await revalidateSupabaseOriginInBackground(
+    activeSupabaseUrl,
+    supabaseAnonKey,
+    applySupabaseOrigin,
+    ENV_LOCKED_URL ? { lockedUrl: ENV_LOCKED_URL } : undefined,
+  );
+}
 
 // Интерфейсы для базы данных
 export interface Player {

@@ -13,6 +13,7 @@ import {
   Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ShopAddressesEditor from '../../components/ShopAddressesEditor';
 import * as ImagePicker from 'expo-image-picker';
 import { Player, createPlayerManually, loadCurrentUser } from '../../utils/playerStorage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -51,6 +52,7 @@ export default function CreateUserScreen() {
     avatar: null,
     // Поля для магазина
     address: '',
+    city: '',
     workingHours: '',
     email: '',
     discountForFriends: '',
@@ -216,8 +218,9 @@ export default function CreateUserScreen() {
           weight: formData.weight || '',
           avatar: formData.avatar || '',
           // Добавляем поля для магазина
-          ...(formData.status === 'shop' ? {
+          ...(formData.status === 'shop' || formData.status === 'skateSharpening' ? {
             address: formData.address || '',
+            city: formData.city || '',
             workingHours: formData.workingHours || '',
             email: formData.email || '',
             discountForFriends: formData.discountForFriends || ''
@@ -520,13 +523,24 @@ export default function CreateUserScreen() {
               {formData.status === 'shop' && (
                 <>
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>{t('profile.address')}</Text>
+                    <Text style={styles.label}>{t('profile.city') || 'Город'}</Text>
                     <TextInput
                       style={styles.input}
-                      value={formData.address}
-                      onChangeText={(text) => setFormData({...formData, address: text})}
-                      placeholder={t('profile.address')}
+                      value={formData.city || ''}
+                      onChangeText={(text) => setFormData({...formData, city: text})}
+                      placeholder={t('profile.city') || 'Город'}
                       placeholderTextColor="#888"
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>{t('profile.address')}</Text>
+                    <ShopAddressesEditor
+                      value={formData.address || ''}
+                      onChange={(joined) => setFormData({...formData, address: joined})}
+                      addressLabel={t('profile.address') || 'Адрес'}
+                      addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                      placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                     />
                   </View>
 
@@ -571,13 +585,24 @@ export default function CreateUserScreen() {
               {formData.status === 'skateSharpening' && (
                 <>
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>{t('profile.address')}</Text>
+                    <Text style={styles.label}>{t('profile.city') || 'Город'}</Text>
                     <TextInput
                       style={styles.input}
-                      value={formData.address}
-                      onChangeText={(text) => setFormData({...formData, address: text})}
-                      placeholder={t('profile.address')}
+                      value={formData.city || ''}
+                      onChangeText={(text) => setFormData({...formData, city: text})}
+                      placeholder={t('profile.city') || 'Город'}
                       placeholderTextColor="#888"
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>{t('profile.address')}</Text>
+                    <ShopAddressesEditor
+                      value={formData.address || ''}
+                      onChange={(joined) => setFormData({...formData, address: joined})}
+                      addressLabel={t('profile.address') || 'Адрес'}
+                      addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                      placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                     />
                   </View>
 
@@ -768,18 +793,18 @@ const styles = {
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Более темный фон
+    backgroundColor: 'rgba(22, 22, 26, 0.86)', // Более темный фон
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
     maxWidth: Platform.OS === 'web' ? 500 : 'auto', // Ограничиваем ширину для веб
     alignSelf: Platform.OS === 'web' ? 'center' : 'stretch', // Центрируем на веб
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF4444', // Красный цвет заголовка
+    color: '#fa2f40', // Красный цвет заголовка
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -800,7 +825,7 @@ const styles = {
     paddingVertical: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
     fontFamily: 'Gilroy-Regular',
     // Убираем width, чтобы поле адаптировалось к контейнеру
   },
@@ -821,12 +846,12 @@ const styles = {
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     minWidth: '30%',
   },
   pickerOptionSelected: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   pickerOptionText: {
     color: '#fff',
@@ -839,7 +864,7 @@ const styles = {
     fontFamily: 'Gilroy-Bold',
   },
   submitButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -864,11 +889,11 @@ const styles = {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(255,68,68,0.1)', // Красноватый прозрачный фон
+    backgroundColor: 'rgba(250,47,64,0.1)', // Красноватый прозрачный фон
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
   },
   avatar: {
     width: 120,
@@ -891,7 +916,7 @@ const styles = {
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
   },
   dateInputText: {
     color: '#fff',
@@ -906,13 +931,13 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   datePickerModal: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -929,7 +954,7 @@ const styles = {
     paddingHorizontal: 20,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   datePickerButtonText: {
     color: '#fff',
@@ -937,8 +962,8 @@ const styles = {
     fontFamily: 'Gilroy-Regular',
   },
   confirmButton: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   countryButton: {
     flexDirection: 'row',
@@ -949,7 +974,7 @@ const styles = {
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   countryButtonText: {
     color: '#fff',
@@ -963,13 +988,13 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   countryPickerModal: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -991,7 +1016,7 @@ const styles = {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     width: '100%',
     marginBottom: 15,
   },
@@ -1006,7 +1031,7 @@ const styles = {
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   countryOptionSelected: {
-    backgroundColor: 'rgba(255,68,68,0.2)',
+    backgroundColor: 'rgba(250,47,64,0.2)',
   },
   countryOptionText: {
     color: '#fff',
@@ -1014,11 +1039,11 @@ const styles = {
     fontFamily: 'Gilroy-Regular',
   },
   countryOptionTextSelected: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontFamily: 'Gilroy-Bold',
   },
   countryPickerCloseButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,

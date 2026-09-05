@@ -333,7 +333,7 @@ export default function PastTeamsSection({
       
              {!hasPastTeams ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="shirt-outline" size={48} color="#666" />
+          <Ionicons name="shirt-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyText}>{t('noPastTeams')}</Text>
         </View>
              ) : (
@@ -352,7 +352,7 @@ export default function PastTeamsSection({
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="add-circle" size={24} color="#FF4444" />
+          <Ionicons name="add-circle" size={24} color="#fa2f40" />
           <Text style={styles.addButtonText}>{t('addTeam')}</Text>
         </TouchableOpacity>
       )}
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   emptyText: {
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     marginTop: 10,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   teamPeriod: {
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginBottom: 2,
   },
   teamLocation: {
@@ -604,23 +604,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 12,
     padding: 15,
     marginTop: 15,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -630,12 +630,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 15,
     padding: 20,
     maxHeight: 580,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   modalScrollContent: {
     paddingBottom: 10,
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   suggestionsContainer: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 8,
     marginTop: 5,
     maxHeight: 150,
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   saveButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   saveButtonText: {
     fontSize: 16,

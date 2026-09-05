@@ -193,14 +193,14 @@ export default function PhotoViewer({ photos, visible, onClose, initialIndex = 0
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
   },
   background: {
     flex: 1,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
   },
   header: {
     flexDirection: 'row',
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: -25,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   activeThumbnail: {
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
   },
   thumbnailImage: {
     width: '100%',

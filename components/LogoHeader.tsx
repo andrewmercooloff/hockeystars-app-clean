@@ -4,7 +4,11 @@ import React, { useEffect } from 'react';
 import { Image, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CachedAvatar from './CachedAvatar';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import { colors } from '../theme/colors';
+import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 
 const logo = require('../assets/images/logo.png');
 
@@ -12,80 +16,102 @@ const LogoHeader = React.memo(() => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { currentUser, refreshUser } = useUser();
+  const { language } = useLanguage();
   const insets = useSafeAreaInsets();
+  const isDesktop = useIsDesktopLayout();
+  const isMobileWeb = Platform.OS === 'web' && !isDesktop;
 
-  // Обновляем данные только при изменении параметров refresh
   useEffect(() => {
     if (params.refresh) {
-      refreshUser(true); // Принудительное обновление
+      refreshUser(true);
     }
   }, [params.refresh, refreshUser]);
 
+  const headerHeight = isMobileWeb ? 58 : Platform.OS === 'web' ? 88 : 128;
+  const logoW = isMobileWeb ? 112 : 168;
+  const logoH = isMobileWeb ? 38 : 56;
+  const avatarSize = isMobileWeb ? 38 : 51;
+  const sidePad = isMobileWeb ? 12 : 24;
+
   return (
-    <View style={{ 
-      height: 128, 
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-end',
-      paddingBottom: 5,
-      paddingTop: Platform.OS === 'android' ? insets.top : 0,
-      backgroundColor: '#000'
-    }}>
-      {/* Логотип приложения слева */}
-      <TouchableOpacity 
-        style={{ marginLeft: 61.5, marginBottom: -5 }}
-        onPress={() => router.push('/')}
+    <View
+      style={{
+        height: headerHeight,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingBottom: isMobileWeb ? 4 : 5,
+        paddingTop: Platform.OS === 'android' ? insets.top : 0,
+        backgroundColor: colors.scene,
+        borderBottomWidth: Platform.OS === 'web' ? 0 : 0.5,
+        borderBottomColor: 'rgba(255,255,255,0.06)',
+      }}
+    >
+      <TouchableOpacity
+        style={{ marginLeft: sidePad, marginBottom: isMobileWeb ? 0 : -5 }}
+        onPress={() => router.push(Platform.OS === 'web' ? '/feed' : '/')}
         activeOpacity={0.7}
       >
-        <Image source={logo} style={{ width: 189, height: 63 }} resizeMode='contain' />
+        <Image source={logo} style={{ width: logoW, height: logoH }} resizeMode="contain" />
       </TouchableOpacity>
-      
-      {/* Аватар справа */}
-      <TouchableOpacity 
-        style={{ alignItems: 'center', marginRight: 66.5, minHeight: 70, marginBottom: -6 }}
+
+      <TouchableOpacity
+        style={{
+          alignItems: 'center',
+          marginRight: sidePad,
+          minHeight: isMobileWeb ? 48 : 70,
+          marginBottom: isMobileWeb ? 2 : -6,
+        }}
         onPress={() => {
           if (currentUser) {
-            router.push(`/player/${currentUser.id}`);
+            navigateToPlayerProfile(router, {
+              playerId: currentUser.id,
+              name: currentUser.name,
+              lang: language,
+            });
           } else {
             router.push('/login');
           }
         }}
       >
-        <View style={{
-          width: 51,
-          height: 51,
-          borderRadius: 25.5,
-          backgroundColor: '#333',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderWidth: 2,
-          borderColor: '#fff',
-        }}>
+        <View
+          style={{
+            width: avatarSize,
+            height: avatarSize,
+            borderRadius: avatarSize / 2,
+            backgroundColor: colors.surface,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: currentUser ? colors.brandMuted : colors.border,
+          }}
+        >
           {currentUser ? (
             <CachedAvatar
               playerId={currentUser.id}
               fallbackAvatarUrl={currentUser.avatar}
-              size={45}
+              size={avatarSize - 6}
               fallbackIcon="person"
-              fallbackSize={25}
+              fallbackSize={isMobileWeb ? 18 : 25}
               fallbackColor="#fff"
             />
           ) : (
-            <Ionicons name="person" size={25} color="#fff" />
+            <Ionicons name="person" size={isMobileWeb ? 18 : 25} color={colors.textMuted} />
           )}
         </View>
-        {currentUser && currentUser.name && currentUser.name.trim() !== '' ? (
-          <Text style={{
-            color: '#fff',
-            fontSize: 12,
-            fontFamily: 'Gilroy-Regular',
-            marginTop: 2,
-          }}>
-{(currentUser?.name || 'Пользователь').toUpperCase()}
+        {currentUser?.name?.trim() && !isMobileWeb ? (
+          <Text
+            style={{
+              color: colors.textSecondary,
+              fontSize: 13,
+              fontFamily: 'Gilroy-Regular',
+              marginTop: 3,
+            }}
+            numberOfLines={1}
+          >
+            {currentUser.name.trim()}
           </Text>
-        ) : (
-          <View style={{ height: 16, marginTop: 2 }} />
-        )}
+        ) : null}
       </TouchableOpacity>
     </View>
   );

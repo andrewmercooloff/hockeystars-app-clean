@@ -1,6 +1,5 @@
 import React from 'react';
-import { Platform, View, ViewProps } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, ViewProps } from 'react-native';
 
 type BlurOrSolidProps = ViewProps & {
   intensity?: number;
@@ -9,26 +8,20 @@ type BlurOrSolidProps = ViewProps & {
 };
 
 /**
- * На Android expo-blur рисуется тёмным полупрозрачным слоем («рамка» по краям карточек).
- * Здесь для Android используем обычный View — фон задаёт внутренний контент (как у чатов/уведомлений).
+ * Раньше — BlurView. Контентные экраны теперь на глухом графите,
+ * блюр над сплошным цветом ничего не даёт и заметно стоит на Android,
+ * поэтому это обычный контейнер. Пропсы intensity/tint оставлены для совместимости.
  */
 export const BlurOrSolid = React.memo(function BlurOrSolid({
-  intensity = 20,
-  tint = 'dark',
+  intensity: _intensity,
+  tint: _tint,
   style,
   children,
   ...rest
 }: BlurOrSolidProps) {
-  if (Platform.OS === 'android') {
-    return (
-      <View style={style} {...rest}>
-        {children}
-      </View>
-    );
-  }
   return (
-    <BlurView intensity={intensity} tint={tint} style={style}>
+    <View style={style} {...rest}>
       {children}
-    </BlurView>
+    </View>
   );
 });

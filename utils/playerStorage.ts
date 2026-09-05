@@ -8,6 +8,12 @@ import {
 import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
+import {
+  getDisplayGoalieBlock,
+  getDisplaySeasonPoints,
+  parseSeasonStats,
+  type SeasonStatsMap,
+} from './seasonStats';
 
 // Глобальный кеш для пользователя
 let globalUserCache: Player | null = null;
@@ -18,13 +24,17 @@ const playersMemoryCache = new Map<string, { player: Player; timestamp: number; 
 const teamsMemoryCache = new Map<string, { teams: PlayerTeam[], timestamp: number }>();
 
 /** Кеш списка игроков (loadPlayers). v2 включает player.teams для поиска по командам. */
-export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v3';
+export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v5';
 
 /** Последняя ошибка loadPlayers — для экрана диагностики */
 export let lastLoadPlayersError: string | null = null;
 
 
-export const ALL_PLAYERS_LIST_CACHE_KEYS: readonly string[] = ['all_players', ALL_PLAYERS_LIST_CACHE_KEY];
+export const ALL_PLAYERS_LIST_CACHE_KEYS: readonly string[] = [
+  'all_players',
+  'all_players_v4',
+  ALL_PLAYERS_LIST_CACHE_KEY,
+];
 
 // Функция для нормализации позиции игрока (приводит все варианты к стандартным английским ключам)
 export const normalizePosition = (position: string | undefined | null): string | undefined => {
@@ -57,7 +67,6 @@ export const normalizePosition = (position: string | undefined | null): string |
   return pos;
 };
 
-// Функция для проверки, является ли игрок вратарем
 export const isGoalkeeperPosition = (position: string | undefined | null): boolean => {
   if (!position) return false;
   return normalizePosition(position) === 'goalie';
@@ -93,6 +102,7 @@ export interface SupabasePlayer {
   minutes?: number; // количество проведенных минут
   shots?: number; // количество бросков
   saves?: number; // отраженные броски (сэйвы)
+  season_stats?: string | Record<string, unknown> | null;
   pull_ups?: number;
   push_ups?: number;
   plank_time?: number;
@@ -175,6 +185,7 @@ export interface PastTeam {
   id: string;
   teamName: string;
   teamNameRu?: string;
+  teamType?: string;
   teamCountry?: string;
   teamCity?: string;
   startYear: number;
@@ -256,6 +267,7 @@ export interface Player {
   minutes?: string; // количество проведенных минут
   shots?: string; // количество бросков
   saves?: string; // отраженные броски (сэйвы)
+  seasonStats?: SeasonStatsMap;
   pullUps?: string;
   pushUps?: string;
   plankTime?: string;
@@ -310,31 +322,20 @@ export interface Player {
   };
 }
 
-/** Очки сезона в профиле: голы + передачи. */
-export const getPlayerSeasonPoints = (player: Player): number => {
-  const goals = parseInt(String(player.goals ?? '0'), 10) || 0;
-  const assists = parseInt(String(player.assists ?? '0'), 10) || 0;
-  return goals + assists;
-};
+/** Очки сезона для льда и лидеров: текущий сезон, иначе архив 25/26. */
+export const getPlayerSeasonPoints = (player: Player): number => getDisplaySeasonPoints(player);
 
 /** Есть ли у вратаря данные для честного GAA (не пустой профиль). */
-export const hasValidGoalieGAAStats = (player: Player): boolean => {
-  const minutes = parseInt(String(player.minutes ?? ''), 10);
-  const shots = parseInt(String(player.shots ?? ''), 10);
-  const saves = parseInt(String(player.saves ?? ''), 10);
-  if (!Number.isFinite(minutes) || !Number.isFinite(shots) || !Number.isFinite(saves)) {
-    return false;
-  }
-  // Минуты и хотя бы 1 бросок — иначе GAA=0 у «пустого» профиля
-  return minutes > 0 && shots > 0 && saves >= 0 && saves <= shots;
-};
+export const hasValidGoalieGAAStats = (player: Player): boolean =>
+  getDisplayGoalieBlock(player) != null;
 
 /** GAA вратаря (чем меньше — тем лучше). -1 если нет данных. */
 export const getPlayerGAA = (player: Player): number => {
-  if (!hasValidGoalieGAAStats(player)) return -1;
-  const minutes = parseInt(String(player.minutes ?? '0'), 10) || 0;
-  const shots = parseInt(String(player.shots ?? '0'), 10) || 0;
-  const saves = parseInt(String(player.saves ?? '0'), 10) || 0;
+  const block = getDisplayGoalieBlock(player);
+  if (!block) return -1;
+  const minutes = parseInt(String(block.minutes ?? '0'), 10) || 0;
+  const shots = parseInt(String(block.shots ?? '0'), 10) || 0;
+  const saves = parseInt(String(block.saves ?? '0'), 10) || 0;
   const goalsAgainst = shots - saves;
   return (goalsAgainst * 60) / minutes;
 };
@@ -432,6 +433,7 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     minutes: supabasePlayer.minutes ? supabasePlayer.minutes.toString() : '0',
     shots: supabasePlayer.shots ? supabasePlayer.shots.toString() : '0',
     saves: supabasePlayer.saves ? supabasePlayer.saves.toString() : '0',
+    seasonStats: parseSeasonStats(supabasePlayer.season_stats),
     pullUps: supabasePlayer.pull_ups && String(supabasePlayer.pull_ups) !== '0' && String(supabasePlayer.pull_ups) !== 'null' ? supabasePlayer.pull_ups.toString() : '',
     pushUps: supabasePlayer.push_ups && String(supabasePlayer.push_ups) !== '0' && String(supabasePlayer.push_ups) !== 'null' ? supabasePlayer.push_ups.toString() : '',
     plankTime: supabasePlayer.plank_time && String(supabasePlayer.plank_time) !== '0' && String(supabasePlayer.plank_time) !== 'null' ? supabasePlayer.plank_time.toString() : '',
@@ -555,6 +557,11 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
 
 return result;
 };
+
+/** Публичный alias для PHP/SPA bootstrap (частичный row без PII). */
+export function convertSupabaseRowToPlayer(row: Partial<SupabasePlayer> | Record<string, unknown>): Player {
+  return convertSupabaseToPlayer(row as SupabasePlayer);
+}
 
 // Функции для работы с командами
 
@@ -1067,6 +1074,7 @@ export const convertPlayerTeamToPastTeam = (playerTeam: PlayerTeam): PastTeam =>
     id: playerTeam.teamId,
     teamName: playerTeam.teamName,
     teamNameRu: playerTeam.teamNameRu,
+    teamType: playerTeam.teamType,
     teamCountry: playerTeam.teamCountry,
     teamCity: playerTeam.teamCity,
     startYear: playerTeam.startYear || new Date().getFullYear(), // Используем сохраненный год или текущий
@@ -1241,6 +1249,7 @@ const convertPlayerToSupabase = (player: Omit<Player, 'id' | 'unread_notificatio
     minutes: player.minutes ? parseInt(player.minutes) : 0,
     shots: player.shots ? parseInt(player.shots) : 0,
     saves: player.saves ? parseInt(player.saves) : 0,
+    season_stats: player.seasonStats ? JSON.stringify(player.seasonStats) : '{}',
     pull_ups: player.pullUps ? parseInt(player.pullUps) : 0,
     push_ups: player.pushUps ? parseInt(player.pushUps) : 0,
     plank_time: player.plankTime ? parseInt(player.plankTime) : 0,
@@ -1308,9 +1317,9 @@ export type LoadPlayersOptions = {
 
 const PLAYERS_LIST_COLUMNS = [
   'id', 'name', 'position', 'team', 'age', 'height', 'weight', 'avatar',
-  'email', 'status', 'parent_email', 'birth_date', 'hockey_start_date',
-  'experience', 'phone', 'city', 'goals', 'assists', 'country', 'grip',
-  'games', 'minutes', 'shots', 'saves',
+  'status', 'birth_date', 'hockey_start_date',
+  'experience', 'city', 'goals', 'assists', 'country', 'grip',
+  'games', 'minutes', 'shots', 'saves', 'season_stats',
   'pull_ups', 'push_ups', 'plank_time', 'sprint_100m', 'long_jump', 'jump_rope',
   'number', 'instagram', 'tiktok', 'vk', 'website',
   'created_at', 'updated_at',
@@ -1372,6 +1381,70 @@ export function seedPlayersMemoryCache(players: Player[]): void {
       playersMemoryCache.set(player.id, { player, timestamp, fullProfile: false });
     }
   }
+}
+
+/** Partial public profile from PHP bootstrap — for instant first paint. */
+export function seedPlayerBootstrapCache(player: Player): void {
+  if (!player?.id) return;
+  const existing = playersMemoryCache.get(player.id);
+  if (existing?.fullProfile) return;
+  playersMemoryCache.set(player.id, {
+    player,
+    timestamp: Date.now(),
+    fullProfile: false,
+  });
+  if (player.avatar) {
+    try {
+      avatarCache.setAvatar(player.id, player.avatar);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/** Any cached player (full or bootstrap partial) for instant UI. */
+export function peekCachedPlayerSync(id: string): Player | null {
+  const memCached = playersMemoryCache.get(id);
+  if (memCached && Date.now() - memCached.timestamp < PLAYER_MEMORY_CACHE_TTL_MS) {
+    return memCached.player;
+  }
+  return null;
+}
+
+/** Seed teams memory cache from bootstrap payload (PlayerTeam shape). */
+export function seedPlayerTeamsBootstrapCache(
+  playerId: string,
+  teams: Array<{
+    teamId: string;
+    teamName: string;
+    teamNameRu?: string | null;
+    teamType?: string | null;
+    teamCountry?: string | null;
+    teamCity?: string | null;
+    isPrimary?: boolean;
+    joinedDate?: string | null;
+    startYear?: number | null;
+    endYear?: number | null;
+    teamOrder?: number;
+  }>
+): void {
+  if (!playerId || !teams?.length) return;
+  const mapped: PlayerTeam[] = teams
+    .filter((t) => t.teamId && t.teamName)
+    .map((t) => ({
+      teamId: t.teamId,
+      teamName: t.teamName,
+      teamNameRu: t.teamNameRu || undefined,
+      teamType: t.teamType || '',
+      teamCountry: t.teamCountry || undefined,
+      teamCity: t.teamCity || undefined,
+      isPrimary: !!t.isPrimary,
+      joinedDate: t.joinedDate || undefined,
+      startYear: t.startYear ?? undefined,
+      endYear: t.endYear ?? undefined,
+      teamOrder: t.teamOrder ?? 0,
+    }));
+  teamsMemoryCache.set(playerId, { teams: mapped, timestamp: Date.now() });
 }
 
 async function enrichPlayersMeta(
@@ -1454,9 +1527,13 @@ async function fetchPlayersFromNetwork(
   const players = data.map(convertSupabaseToPlayer);
   warmPlayerAvatarsFromList(players);
 
-  // Кеш пишем один раз — внутри enrichPlayersMeta (с рейтингами), а не дважды подряд:
-  // двойной JSON.stringify большого списка на старте давал заметные рывки анимации.
-  void enrichPlayersMeta(players, cacheKey, onUpdated, players.length > 0);
+  try {
+    await AsyncStorage.setItem(cacheKey, JSON.stringify({ players, timestamp: Date.now() }));
+  } catch {
+    /* ignore */
+  }
+
+  void enrichPlayersMeta(players, cacheKey, onUpdated, true);
   return players;
 }
 
@@ -1473,7 +1550,12 @@ export const loadPlayers = async (
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
 
     if (!forceRefresh) {
-      const cachedData = await AsyncStorage.getItem(cacheKey);
+      let cachedData = await AsyncStorage.getItem(cacheKey);
+      if (!cachedData) {
+        cachedData =
+          (await AsyncStorage.getItem('all_players_v4')) ||
+          (await AsyncStorage.getItem('all_players_v3'));
+      }
 
       if (cachedData) {
         const { players, timestamp } = JSON.parse(cachedData);
@@ -2129,7 +2211,8 @@ export const getPlayerById = async (
       if (
         memCached &&
         memCached.fullProfile &&
-        Date.now() - memCached.timestamp < cacheTime
+        Date.now() - memCached.timestamp < cacheTime &&
+        memCached.player.seasonStats !== undefined
       ) {
         return memCached.player;
       }
@@ -2140,7 +2223,8 @@ export const getPlayerById = async (
       if (cachedData) {
         const { player, timestamp, fullProfile } = JSON.parse(cachedData);
         const isFull = fullProfile !== false;
-        if (isFull && Date.now() - timestamp < cacheTime) {
+        const needsSeasonStatsRefresh = isFull && player?.seasonStats === undefined;
+        if (isFull && Date.now() - timestamp < cacheTime && !needsSeasonStatsRefresh) {
           playersMemoryCache.set(id, { player, timestamp, fullProfile: true });
           return player;
         }

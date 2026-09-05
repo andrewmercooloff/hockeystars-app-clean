@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -19,6 +19,11 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Achievement } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+
+const ACHIEVEMENT_CARD_WIDTH = 120;
+const ACHIEVEMENT_CARD_GAP = 15;
+const ACHIEVEMENT_SCROLL_STEP = ACHIEVEMENT_CARD_WIDTH + ACHIEVEMENT_CARD_GAP;
 
 interface AchievementsSectionProps {
   achievements?: Achievement[];
@@ -34,6 +39,12 @@ export default function AchievementsSection({
   style,
 }: AchievementsSectionProps) {
   const { t } = useLanguage();
+  const isDesktop = useIsDesktopLayout();
+  const listRef = useRef<FlatList<Achievement>>(null);
+  const scrollOffsetRef = useRef(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(0);
+  const [contentWidth, setContentWidth] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [newAchievement, setNewAchievement] = useState({
@@ -62,7 +73,7 @@ export default function AchievementsSection({
       case 3:
         return { name: 'medal' as const, color: '#CD7F32' }; // бронза
       default:
-        return { name: 'trophy' as const, color: '#FF4444' };
+        return { name: 'trophy' as const, color: '#fa2f40' };
     }
   };
 
@@ -184,6 +195,25 @@ export default function AchievementsSection({
 
   const achievementKeyExtractor = useCallback((item: Achievement) => item.id, []);
 
+  const canScroll = contentWidth > viewportWidth + 12;
+  const showLeftArrow = isDesktop && canScroll && scrollOffset > 8;
+  const showRightArrow =
+    isDesktop && canScroll && scrollOffset < contentWidth - viewportWidth - 8;
+
+  const scrollAchievementsBy = useCallback(
+    (direction: -1 | 1) => {
+      const maxX = Math.max(0, contentWidth - viewportWidth);
+      const next = Math.max(
+        0,
+        Math.min(maxX, scrollOffsetRef.current + direction * ACHIEVEMENT_SCROLL_STEP),
+      );
+      listRef.current?.scrollToOffset({ offset: next, animated: true });
+      scrollOffsetRef.current = next;
+      setScrollOffset(next);
+    },
+    [contentWidth, viewportWidth],
+  );
+
   const renderAchievementItem = useCallback(
     ({ item: achievement }: { item: Achievement }) => {
       const medal = getMedalIcon(achievement.place);
@@ -209,13 +239,13 @@ export default function AchievementsSection({
                 style={styles.medalEditButton}
                 onPress={() => openEditModal(achievement)}
               >
-                <Ionicons name="create" size={14} color="#FF4444" />
+                <Ionicons name="create" size={14} color="#fa2f40" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.medalDeleteButton}
                 onPress={() => handleDeleteAchievement(achievement.id)}
               >
-                <Ionicons name="trash" size={14} color="#FF4444" />
+                <Ionicons name="trash" size={14} color="#fa2f40" />
               </TouchableOpacity>
             </View>
           )}
@@ -229,26 +259,66 @@ export default function AchievementsSection({
     <View style={containerStyle}>
       {normalizedAchievements.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="trophy-outline" size={48} color="#666" />
+          <Ionicons name="trophy-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyText}>{t('profile.noAchievements') || 'Нет достижений'}</Text>
               </View>
       ) : (
-        <FlatList
-          horizontal
-          data={normalizedAchievements}
-          keyExtractor={achievementKeyExtractor}
-          renderItem={renderAchievementItem}
-          showsHorizontalScrollIndicator={false}
-          style={styles.achievementsScroll}
-          contentContainerStyle={styles.achievementsContainer}
-          nestedScrollEnabled={true}
-          directionalLockEnabled={true}
-          scrollEnabled={true}
-          initialNumToRender={10}
-          maxToRenderPerBatch={8}
-          windowSize={7}
-          removeClippedSubviews={true}
-        />
+        <View
+          style={styles.achievementsScrollerWrap}
+          onLayout={(event) => {
+            const nextWidth = event.nativeEvent.layout.width;
+            if (nextWidth > 0) {
+              setViewportWidth((prev) => (Math.abs(prev - nextWidth) > 1 ? nextWidth : prev));
+            }
+          }}
+        >
+          <FlatList
+            ref={listRef}
+            horizontal
+            data={normalizedAchievements}
+            keyExtractor={achievementKeyExtractor}
+            renderItem={renderAchievementItem}
+            showsHorizontalScrollIndicator={false}
+            style={styles.achievementsScroll}
+            contentContainerStyle={styles.achievementsContainer}
+            nestedScrollEnabled={true}
+            directionalLockEnabled={true}
+            scrollEnabled={true}
+            initialNumToRender={10}
+            maxToRenderPerBatch={8}
+            windowSize={7}
+            removeClippedSubviews={true}
+            onScroll={(event) => {
+              const x = event.nativeEvent.contentOffset.x;
+              scrollOffsetRef.current = x;
+              setScrollOffset(x);
+            }}
+            onContentSizeChange={(w) => setContentWidth(w)}
+            scrollEventThrottle={16}
+          />
+          {showLeftArrow ? (
+            <TouchableOpacity
+              style={[styles.scrollArrow, styles.scrollArrowLeft]}
+              onPress={() => scrollAchievementsBy(-1)}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Scroll left"
+            >
+              <Ionicons name="chevron-back" size={22} color="#fff" />
+            </TouchableOpacity>
+          ) : null}
+          {showRightArrow ? (
+            <TouchableOpacity
+              style={[styles.scrollArrow, styles.scrollArrowRight]}
+              onPress={() => scrollAchievementsBy(1)}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Scroll right"
+            >
+              <Ionicons name="chevron-forward" size={22} color="#fff" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
       )}
 
       {isEditing && (
@@ -256,7 +326,7 @@ export default function AchievementsSection({
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="add-circle" size={24} color="#FF4444" />
+          <Ionicons name="add-circle" size={24} color="#fa2f40" />
           <Text style={styles.addButtonText}>{t('profile.addAchievement')}</Text>
         </TouchableOpacity>
       )}
@@ -398,12 +468,12 @@ export default function AchievementsSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -416,7 +486,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginBottom: 15,
   },
   emptyContainer: {
@@ -433,6 +503,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
+  achievementsScrollerWrap: {
+    position: 'relative',
+    width: '100%',
+  },
   achievementsScroll: {
     marginHorizontal: -5,
   },
@@ -440,13 +514,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingRight: 25, // чтобы крайние справа всегда можно было доскроллить
   },
+  scrollArrow: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  scrollArrowLeft: {
+    left: 4,
+  },
+  scrollArrowRight: {
+    right: 4,
+  },
   achievementMedal: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 15,
     padding: 15,
     alignItems: 'center',
-    width: 120,
-    marginRight: 15,
+    width: ACHIEVEMENT_CARD_WIDTH,
+    marginRight: ACHIEVEMENT_CARD_GAP,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     position: 'relative',
@@ -455,7 +549,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
     borderWidth: 3,
     justifyContent: 'center',
     alignItems: 'center',
@@ -488,12 +582,12 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   medalEditButton: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
     borderRadius: 10,
     padding: 4,
   },
   medalDeleteButton: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
     borderRadius: 10,
     padding: 4,
   },
@@ -501,22 +595,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 12,
     padding: 15,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -527,13 +621,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 15,
     padding: 20,
     width: '90%',
     maxWidth: 400,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   modalScrollContent: {
     paddingBottom: 20,
@@ -542,7 +636,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -585,8 +679,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   placeButtonSelected: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
-    borderColor: '#FF4444',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    borderColor: '#fa2f40',
   },
   placeButtonText: {
     fontSize: 14,
@@ -620,7 +714,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     borderRadius: 12,
     padding: 15,
     alignItems: 'center',

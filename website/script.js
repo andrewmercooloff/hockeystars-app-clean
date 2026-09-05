@@ -27,6 +27,13 @@ const translations = {
         'features.exercises.text': 'Выполняйте упражнения, отслеживайте прогресс и получайте достижения',
         'features.notifications.title': 'Уведомления',
         'features.notifications.text': 'Получайте уведомления о новых сообщениях, друзьях и достижениях',
+        'features.games.title': 'Игры внутри приложения',
+        'features.games.text': 'Играйте в хоккейные мини-игры прямо в приложении и соревнуйтесь с друзьями',
+        'features.rankings.title': 'Рейтинги по очкам',
+        'features.rankings.text': 'Следите за рейтингом игроков по очкам активности и поднимайтесь в таблице лидеров',
+        'features.scoutReport.title': 'Скаутский отчёт бесплатно',
+        'features.scoutReport.text': 'Получайте бесплатный скаутский анализ профиля и становитесь заметнее для скаутов',
+        'nav.login': 'Войти',
         'download.title': 'Скачать приложение',
         'download.description': 'Установите HockeyStars на свое устройство и присоединяйтесь к хоккейному сообществу!',
         'download.appstore.label': 'Скачать в',
@@ -174,6 +181,13 @@ const translations = {
         'features.exercises.text': 'Complete exercises, track progress and earn achievements',
         'features.notifications.title': 'Notifications',
         'features.notifications.text': 'Receive notifications about new messages, friends and achievements',
+        'features.games.title': 'In-app games',
+        'features.games.text': 'Play hockey mini-games right in the app and compete with friends',
+        'features.rankings.title': 'Points rankings',
+        'features.rankings.text': 'Follow player rankings by activity points and climb the leaderboard',
+        'features.scoutReport.title': 'Free scout report',
+        'features.scoutReport.text': 'Get a free scout analysis of your profile and become more visible to scouts',
+        'nav.login': 'Log in',
         'download.title': 'Download the App',
         'download.description': 'Install HockeyStars on your device and join the hockey community!',
         'download.appstore.label': 'Download on',
@@ -920,12 +934,12 @@ document.addEventListener('DOMContentLoaded', () => {
         setLanguage(desiredLang);
     }
     
-    // Add click handlers to language buttons
-    document.querySelectorAll('.lang-btn').forEach(btn => {
+    // Add click handlers to language buttons (only elements with data-lang=ru|en)
+    document.querySelectorAll('.lang-btn[data-lang]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.preventDefault();
             const newLang = btn.getAttribute('data-lang');
             if (!newLang || (newLang !== 'ru' && newLang !== 'en')) return;
+            e.preventDefault();
 
             const currentPath = normalizePathname(window.location.pathname);
             const pair = getSeoPairForPath(currentPath);

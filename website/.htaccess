@@ -1,12 +1,9 @@
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
-# Конфигурация для Node.js приложения (cPanel автоматически создает эти строки)
-# Если cPanel не создал автоматически, добавьте вручную:
-PassengerAppRoot "/home/seokurs1/api"
-PassengerBaseURI "/app"
-PassengerNodejs "/home/seokurs1/nodevenv/api/18/bin/node"
-PassengerAppType node
-PassengerStartupFile app.js
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# Legacy CloudLinux Passenger (unused on VPS nginx — kept commented)
+# PassengerAppRoot "/home/seokurs1/api"
+# PassengerBaseURI "/app"
+# PassengerNodejs "/home/seokurs1/nodevenv/api/18/bin/node"
+# PassengerAppType node
+# PassengerStartupFile app.js
 
 # Включаем mod_rewrite
 RewriteEngine On
@@ -31,6 +28,11 @@ RewriteRule ^en/?$ index-en.html [L]
 
 # Редирект /top на страницу рейтинга приглашений
 RewriteRule ^top/?$ top.html [L]
+
+# XML sitemaps (index + static + players)
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^sitemap-static\.xml$ sitemap-static.php [L]
+RewriteRule ^sitemap-players\.xml$ sitemap-players.php [L]
 
 # Редирект /player/{id} на player.php с параметром id
 # Поддерживает оба варианта: /player/{id} и /player/{id}/

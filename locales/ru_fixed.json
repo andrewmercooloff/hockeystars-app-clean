@@ -826,7 +826,7 @@
     "cancel": "Отмена",
     "friends": "Друзья",
     "friendship": "Дружба",
-    "statistics": "Статистика текущего сезона",
+    "statistics": "Statistics",
     "teams": "Команды",
     "currentTeams": "Текущие команды",
     "pastTeams": "Прошлые команды",
@@ -929,7 +929,9 @@
       "winger": "Крайний нападающий",
       "defender": "Защитник",
       "goalie": "Вратарь"
-    }
+    },
+    "previousSeason": "Previous season",
+    "currentSeasonStats": "Statistics · {season}"
   },
   "register": {
     "title": "Регистрация",

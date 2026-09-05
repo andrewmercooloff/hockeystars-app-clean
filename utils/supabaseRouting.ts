@@ -6,7 +6,7 @@ export const SUPABASE_PROXY_URL = 'https://api.hockey-stars.com';
 
 export const SUPABASE_KNOWN_ORIGINS = [SUPABASE_DIRECT_URL, SUPABASE_PROXY_URL] as const;
 
-const CACHE_KEY = 'supabase_preferred_origin_v2';
+const CACHE_KEY = 'supabase_preferred_origin_v3';
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 type CachedOrigin = { url: string; ts: number };
@@ -108,7 +108,22 @@ export async function probeSupabaseOrigin(
  * - за пределами РФ: напрямую в Supabase (быстро, без лишнего hop);
  * - в РФ: всегда через Moscow VPS proxy (даже если probe direct «проходит»).
  */
+function isHockeyStarsWebHost(): boolean {
+  try {
+    if (typeof window === 'undefined' || !window.location?.hostname) return false;
+    return /(^|\.)hockey-stars\.com$/i.test(window.location.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export async function resolveSupabaseOrigin(anonKey: string): Promise<string> {
+  // Web app already served from Moscow VPS — skip multi-second probes on cold start.
+  if (isHockeyStarsWebHost()) {
+    await writeCachedOrigin(SUPABASE_PROXY_URL);
+    return SUPABASE_PROXY_URL;
+  }
+
   const likelyRu = isLikelyRussia();
   const cached = await readCachedOrigin();
 
@@ -123,8 +138,18 @@ export async function resolveSupabaseOrigin(anonKey: string): Promise<string> {
         await writeCachedOrigin(SUPABASE_DIRECT_URL);
         return SUPABASE_DIRECT_URL;
       }
+      return SUPABASE_PROXY_URL;
     }
-    return likelyRu ? SUPABASE_PROXY_URL : cached.url;
+    // Кеш direct после VPN: без повторной проверки в РФ получаем пустой экран.
+    if (cached.url === SUPABASE_DIRECT_URL) {
+      const direct = await probeSupabaseOrigin(SUPABASE_DIRECT_URL, anonKey, 3000);
+      if (direct.ok) {
+        return SUPABASE_DIRECT_URL;
+      }
+      await writeCachedOrigin(SUPABASE_PROXY_URL);
+      return SUPABASE_PROXY_URL;
+    }
+    return cached.url;
   }
 
   if (likelyRu) {
@@ -158,7 +183,12 @@ export async function revalidateSupabaseOriginInBackground(
   currentUrl: string,
   anonKey: string,
   onSwitch: (nextUrl: string) => void | Promise<void>,
+  options?: { lockedUrl?: string },
 ): Promise<void> {
+  if (options?.lockedUrl) {
+    return;
+  }
+
   const likelyRu = isLikelyRussia();
 
   if (likelyRu) {
@@ -173,5 +203,15 @@ export async function revalidateSupabaseOriginInBackground(
   if (direct.ok && currentUrl !== SUPABASE_DIRECT_URL) {
     await writeCachedOrigin(SUPABASE_DIRECT_URL);
     await onSwitch(SUPABASE_DIRECT_URL);
+    return;
+  }
+
+  // VPN выключили: direct перестал отвечать — откатываемся на proxy.
+  if (!direct.ok && currentUrl === SUPABASE_DIRECT_URL) {
+    const proxy = await probeSupabaseOrigin(SUPABASE_PROXY_URL, anonKey, 3000);
+    if (proxy.ok) {
+      await writeCachedOrigin(SUPABASE_PROXY_URL);
+      await onSwitch(SUPABASE_PROXY_URL);
+    }
   }
 }

@@ -26,7 +26,9 @@
     "rejectRequestConfirm": "Är du säker på att du vill avvisa denna begäran?",
     "super": "Jättebra!",
     "left": "Vänster",
-    "right": "Rätt"
+    "right": "Rätt",
+    "offline": "Ingen anslutning",
+    "and": "och"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -3183,7 +3185,8 @@
     "errorProcessNotificationGeneral": "Det gick inte att behandla aviseringen. Försök igen.",
     "errorProcessFriendRequest": "Det gick inte att behandla din vänförfrågan.",
     "errorProcessRequest": "Det gick inte att behandla din begäran",
-    "errorSendMessage": "Det gick inte att skicka meddelandet"
+    "errorSendMessage": "Det gick inte att skicka meddelandet",
+    "phoneOrEmailPlaceholderShort": "+46… eller e-post"
   },
   "profile": {
     "addFriend": "Lägg till som vän",
@@ -3235,7 +3238,7 @@
     "cancel": "Avboka",
     "friends": "Vänner",
     "friendship": "Vänskap",
-    "statistics": "Aktuell säsongsstatistik",
+    "statistics": "Statistics",
     "teams": "Lag",
     "currentTeams": "Aktuella lag",
     "pastTeams": "Tidigare lag",
@@ -3473,7 +3476,11 @@
     "shareProfileSocial": "Dela profil på sociala nätverk",
     "copyLink": "Kopiera länk",
     "linkCopied": "Länk kopierad till urklipp",
-    "currentSeasonStats": "Nuvarande säsongsstatistik"
+    "currentSeasonStats": "Statistics · {season}",
+    "city": "Stad",
+    "addAddress": "Lägg till adress",
+    "addressesHint": "Du kan ange flera adresser",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Registrering",
@@ -3835,6 +3842,12 @@
         "one": "Idag visades din profil {{count}} gång.",
         "other": "Idag visades din profil {{count}} gånger."
       }
+    },
+    "video_liked": {
+      "grouped": "{name} gillade {count} av dina videor"
+    },
+    "photo_liked": {
+      "grouped": "{name} gillade {count} av dina foton"
     }
   },
   "editProfile": {
@@ -3874,7 +3887,13 @@
     "noPlayersCountryYear": "Inga spelare från {{country}} i {{year}}",
     "iceEmpty": "Isen är tom. Välj ett annat land eller år, eller återställ filtren.",
     "shakeHintTitle": "Skaka enheten",
-    "shakeHintSubtext": "för att uppdatera spellarlistan"
+    "shakeHintSubtext": "för att uppdatera spellarlistan",
+    "inviteFriends": "Bjud in",
+    "inviteTitle": "Gå med i HockeyStars!",
+    "inviteMessage": "Skapa din hockeyprofil, tävla med vänner och nå toppen.",
+    "inviteSubtitle": "Skicka länken – vännerna hamnar direkt på din profil",
+    "copyLink": "Kopiera länk",
+    "moreApps": "Mer"
   },
   "filters": {
     "year": "år",
@@ -4262,5 +4281,14 @@
     "feed": "Flöde",
     "scout": "Scout",
     "skills": "Skills"
+  },
+  "seo": {
+    "homeTitle": "Hockeyapp Hockeystars"
+  },
+  "download": {
+    "installTitle": "Installera appen",
+    "scanQr": "Skanna med telefonen — App Store eller Google Play öppnas",
+    "appStoreCta": "Ladda ner från App Store",
+    "playStoreCta": "Ladda ner från Google Play"
   }
 }

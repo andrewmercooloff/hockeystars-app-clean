@@ -1,30 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getActivityPoints, ActivityPoints } from '../services/activityService';
-import { useLanguage } from '../contexts/LanguageContext';
+import { getActivityPoints } from '../services/activityService';
+import { CURRENT_SEASON_KEY, formatSeasonLabel } from '../utils/seasonConfig';
 
 interface ActivityRatingProps {
   userId: string;
   currentUserId?: string;
   isAdmin?: boolean;
   style?: any;
-  refreshKey?: number; // Добавляем refreshKey для принудительного обновления
+  refreshKey?: number;
 }
 
-export default function ActivityRating({ 
-  userId, 
-  currentUserId, 
-  isAdmin = false, 
+export default function ActivityRating({
+  userId,
+  currentUserId,
+  isAdmin = false,
   style,
-  refreshKey 
+  refreshKey,
 }: ActivityRatingProps) {
   const [points, setPoints] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useLanguage();
 
-  // Показываем рейтинг только владельцу профиля или администратору
   const shouldShowRating = currentUserId === userId || isAdmin;
 
   useEffect(() => {
@@ -32,9 +29,7 @@ export default function ActivityRating({
 
     const loadActivityPoints = async () => {
       try {
-        setLoading(true);
         const result = await getActivityPoints(userId);
-        
         if (result.success) {
           setPoints(result.points);
         } else {
@@ -43,26 +38,15 @@ export default function ActivityRating({
       } catch (err) {
         setError('Unexpected error loading activity points');
         console.error('Error loading activity points:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
-    loadActivityPoints();
-  }, [userId, shouldShowRating, refreshKey]); // Добавляем refreshKey в зависимости
+    void loadActivityPoints();
+  }, [userId, shouldShowRating, refreshKey]);
 
   if (!shouldShowRating) {
     return null;
   }
-
-  // Убираем индикатор загрузки - показываем сразу с 0 очками
-  // if (loading) {
-  //   return (
-  //     <View style={[styles.container, style]}>
-  //       <ActivityIndicator size="small" color="#FFD700" />
-  //     </View>
-  //   );
-  // }
 
   if (error) {
     return (
@@ -75,9 +59,10 @@ export default function ActivityRating({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={8} color="#FFFFFF" />
+        <Ionicons name="star" size={8} color="#FFFFFF" />
         <Text style={styles.pointsText}>{points}</Text>
       </View>
+      <Text style={styles.seasonHint}>{formatSeasonLabel(CURRENT_SEASON_KEY)}</Text>
     </View>
   );
 }
@@ -92,7 +77,7 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 8,
@@ -102,6 +87,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginLeft: 1,
+  },
+  seasonHint: {
+    marginTop: 2,
+    alignSelf: 'flex-end',
+    fontSize: 7,
+    fontFamily: 'Gilroy-Bold',
+    color: 'rgba(255,255,255,0.55)',
   },
   errorText: {
     fontSize: 16,

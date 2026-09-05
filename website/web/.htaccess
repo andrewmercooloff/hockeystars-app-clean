@@ -1,0 +1,17 @@
+# Expo Web static SPA — Apache fallback for cPanel subdirectory /web/
+# Upload contents of dist/ to public_html/web/
+# Requires app.json experiments.baseUrl = "/web"
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /web/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?)$">
+    Header set Cache-Control "public, max-age=604800, immutable"
+  </FilesMatch>
+</IfModule>

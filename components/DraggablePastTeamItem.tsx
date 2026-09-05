@@ -71,13 +71,13 @@ const DraggablePastTeamItem = ({
                 style={styles.editButton}
                 onPress={() => onEdit(team)}
               >
-                <Ionicons name="create" size={16} color="#FF4444" />
+                <Ionicons name="create" size={16} color="#fa2f40" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => onDelete(team.id)}
               >
-                <Ionicons name="trash" size={16} color="#FF4444" />
+                <Ionicons name="trash" size={16} color="#fa2f40" />
               </TouchableOpacity>
             </View>
           )}
@@ -102,17 +102,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.2)',
+    borderColor: 'rgba(250, 47, 64, 0.2)',
   },
   activeContainer: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
-    borderColor: 'rgba(255, 68, 68, 0.5)',
-    shadowColor: '#FF4444',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    shadowColor: '#fa2f40',
     shadowOffset: {
       width: 0,
       height: 4,

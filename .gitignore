@@ -68,3 +68,25 @@ expo-env.d.ts
 
 # Google Service Account (секретный файл!)
 google-service-account.json
+
+# Website local PHP config
+website/config.local.php
+
+# Build / export artifacts
+dist-web/
+dist-test/
+
+# Local deploy scratch / secrets
+deploy/tmp-*
+deploy/_disk_before.txt
+.env
+.env.*
+!.env.example
+
+# Vendor / backups / large local dumps
+website/vendor/
+*.backup
+*.zip
+*.MOV
+*.mov
+scripts/broadcast-log.txt

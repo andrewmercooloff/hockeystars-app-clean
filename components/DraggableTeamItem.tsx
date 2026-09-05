@@ -75,7 +75,7 @@ const DraggableTeamItem = ({ team, onRemove, onEdit, drag, isActive, readOnly = 
               style={styles.editButton}
               onPress={() => onEdit(team)}
             >
-              <Ionicons name="create-outline" size={16} color="#FF4444" />
+              <Ionicons name="create-outline" size={16} color="#fa2f40" />
             </TouchableOpacity>
           )}
           {onRemove && (
@@ -83,7 +83,7 @@ const DraggableTeamItem = ({ team, onRemove, onEdit, drag, isActive, readOnly = 
               style={styles.removeButton}
               onPress={() => onRemove(team.id)}
             >
-              <Ionicons name="close-circle" size={20} color="#FF4444" />
+              <Ionicons name="close-circle" size={20} color="#fa2f40" />
             </TouchableOpacity>
           )}
         </View>
@@ -96,18 +96,18 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.2)',
+    borderColor: 'rgba(250, 47, 64, 0.2)',
   },
   activeContainer: {
-    backgroundColor: 'rgba(255, 68, 68, 0.2)',
-    borderColor: 'rgba(255, 68, 68, 0.5)',
-    boxShadow: '0 4px 8px rgba(255, 68, 68, 0.3)',
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    boxShadow: '0 4px 8px rgba(250, 47, 64, 0.3)',
     elevation: 8,
   },
   dragHandle: {

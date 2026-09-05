@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
       web: {
-        boxShadow: '0px 2px 4px rgba(5, 0, 8, 0.3)',
+        boxShadow: '0px 2px 4px rgba(11, 11, 14, 0.3)',
       },
     }),
   },

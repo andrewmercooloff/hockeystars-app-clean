@@ -16,7 +16,8 @@ export const MAX_SEARCH_LEADERS = 10;
 export const LEADER_BORDER_COLORS: Record<LeaderRank, string> = {
   1: '#D4AF37',
   2: '#A8A9AD',
-  3: '#B87333',
+  /** Сияющая бронза (не «какашечный» коричневый). */
+  3: '#E8B86D',
 };
 
 export const LEADER_MEDAL_BORDER_WIDTH = 2;

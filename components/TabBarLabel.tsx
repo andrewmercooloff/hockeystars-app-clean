@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
+import { colors } from '../theme/colors';
 
 interface TabBarLabelProps {
   labelKey: string;
@@ -35,16 +36,17 @@ const styles = StyleSheet.create({
   },
   label: {
     width: '100%',
-    fontSize: Platform.OS === 'ios' ? 10 : 9,
-    fontFamily: 'Gilroy-Regular',
+    fontSize: Platform.OS === 'ios' ? 11 : 10,
     textAlign: 'center',
     marginTop: Platform.OS === 'android' ? 0 : 1,
     ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
   },
   labelFocused: {
-    color: '#eee',
+    color: colors.brand,
+    fontFamily: 'Gilroy-Bold',
   },
   labelInactive: {
-    color: '#888',
+    color: '#7a7a82',
+    fontFamily: 'Gilroy-Regular',
   },
 });

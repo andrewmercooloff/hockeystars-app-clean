@@ -13,7 +13,8 @@ export function notificationSlotHeightFromSizes(
   sizes: Array<{ width: number; height: number } | null | undefined>,
   maxHeightCap?: number,
 ): number {
-  const cap = maxHeightCap ?? Math.min(Math.round(maxWidth * 1.35), Math.round(SCREEN_HEIGHT * 0.42));
+  const windowH = Dimensions.get('window').height || SCREEN_HEIGHT;
+  const cap = maxHeightCap ?? Math.min(Math.round(maxWidth * 1.25), Math.round(windowH * 0.5), 480);
   let maxH = Math.round(maxWidth / FALLBACK_LANDSCAPE);
   for (const s of sizes) {
     if (!s || s.width <= 0 || s.height <= 0) continue;

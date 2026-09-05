@@ -6,6 +6,7 @@ import { COUNTRIES } from '../utils/constants';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
+import ShopAddressesEditor from '../components/ShopAddressesEditor';
 import {
     Alert,
     Dimensions,
@@ -117,6 +118,7 @@ export default function RegisterScreen() {
     avatar: null as string | null,
     // Поля для магазина
     address: '',
+    city: '',
     workingHours: '',
     discountForFriends: '',
     // Поля для заточки коньков
@@ -331,7 +333,7 @@ export default function RegisterScreen() {
     if (alert.type === 'success' && alert.title === t('register.welcome')) {
       setAlert(prev => ({ ...prev, visible: false }));
       setTimeout(() => {
-        router.push('/');
+        router.push(Platform.OS === 'web' ? '/feed' : '/');
       }, 100);
     } else {
       // Во всех остальных случаях просто закрываем алерт
@@ -913,7 +915,7 @@ export default function RegisterScreen() {
         number: formData.number || '',
         avatar: avatarUrl,
         age: 0,
-        city: '',
+        city: formData.city || '',
         goals: '',
         assists: '',
         games: '',
@@ -923,8 +925,8 @@ export default function RegisterScreen() {
         sprint100m: '',
         longJump: '',
         createdAt: new Date().toISOString(), // Устанавливаем createdAt для логики "новички на льду"
-        // Добавляем поля для магазина
-        ...(formData.status === 'shop' ? {
+        // Добавляем поля для магазина / заточки
+        ...((formData.status === 'shop' || formData.status === 'skateSharpening') ? {
           address: formData.address || '',
           workingHours: formData.workingHours || '',
           email: formData.email || '',
@@ -1050,7 +1052,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover">
+    <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover" vignette={false}>
       <ScrollView 
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
@@ -1332,7 +1334,7 @@ export default function RegisterScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="email@example.com"
-                placeholderTextColor="#666"
+                placeholderTextColor="#8a8a92"
                 value={formData.parentEmail}
                 onChangeText={(text) => setFormData({...formData, parentEmail: text})}
                 keyboardType="email-address"
@@ -1491,13 +1493,24 @@ export default function RegisterScreen() {
           {formData.status === 'shop' && (
             <>
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>{t('profile.address')}</Text>
+                <Text style={styles.label}>{t('profile.city') || 'Город'}</Text>
                 <TextInput
                   style={styles.input}
-                  value={formData.address}
-                  onChangeText={(text) => setFormData({...formData, address: text})}
-                  placeholder={t('profile.address')}
+                  value={formData.city}
+                  onChangeText={(text) => setFormData({...formData, city: text})}
+                  placeholder={t('profile.city') || 'Город'}
                   placeholderTextColor="#888"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>{t('profile.address')}</Text>
+                <ShopAddressesEditor
+                  value={formData.address}
+                  onChange={(joined) => setFormData({...formData, address: joined})}
+                  addressLabel={t('profile.address') || 'Адрес'}
+                  addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                  placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                 />
               </View>
 
@@ -1542,13 +1555,24 @@ export default function RegisterScreen() {
           {formData.status === 'skateSharpening' && (
             <>
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>{t('profile.address')}</Text>
+                <Text style={styles.label}>{t('profile.city') || 'Город'}</Text>
                 <TextInput
                   style={styles.input}
-                  value={formData.address}
-                  onChangeText={(text) => setFormData({...formData, address: text})}
-                  placeholder={t('profile.address')}
+                  value={formData.city}
+                  onChangeText={(text) => setFormData({...formData, city: text})}
+                  placeholder={t('profile.city') || 'Город'}
                   placeholderTextColor="#888"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>{t('profile.address')}</Text>
+                <ShopAddressesEditor
+                  value={formData.address}
+                  onChange={(joined) => setFormData({...formData, address: joined})}
+                  addressLabel={t('profile.address') || 'Адрес'}
+                  addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                  placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                 />
               </View>
 
@@ -1643,7 +1667,7 @@ export default function RegisterScreen() {
                 Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
               }}
             >
-              <Ionicons name="document-text-outline" size={16} color="#FF4444" />
+              <Ionicons name="document-text-outline" size={16} color="#fa2f40" />
               <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
             </TouchableOpacity>
           )}
@@ -1855,7 +1879,7 @@ export default function RegisterScreen() {
                 }}
                 disabled={loading}
               >
-                <Ionicons name="arrow-back" size={20} color="#FF4444" />
+                <Ionicons name="arrow-back" size={20} color="#fa2f40" />
                 <Text style={[styles.registerButtonText, styles.backButtonText]}>
                   {t('common.back')}
                 </Text>
@@ -2006,12 +2030,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(5, 0, 8, 0.85)',
+    backgroundColor: 'rgba(11, 11, 14, 0.85)',
     borderRadius: 20,
     padding: 25,
     marginTop: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)', // Тончайший красный контур
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Тончайший красный контур
     maxWidth: Platform.OS === 'web' ? 500 : 'auto',
     alignSelf: Platform.OS === 'web' ? 'center' : 'stretch',
     // Тень
@@ -2038,14 +2062,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 14,
     padding: 15,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
     // Убираем width, чтобы поле адаптировалось к контейнеру
   },
   pickerContainer: {
@@ -2059,11 +2083,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   pickerOptionSelected: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   pickerOptionText: {
     fontSize: 14,
@@ -2082,11 +2106,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   yearButtonSelected: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   yearButtonText: {
     fontSize: 14,
@@ -2105,7 +2129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   dateInputText: {
     fontSize: 16,
@@ -2122,7 +2146,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(5, 0, 8, 0.75)',
+    backgroundColor: 'rgba(11, 11, 14, 0.75)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -2151,8 +2175,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   confirmButton: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   datePickerButtonText: {
     fontSize: 14,
@@ -2161,8 +2185,8 @@ const styles = StyleSheet.create({
   },
 
   registerButton: {
-    backgroundColor: '#FF4444',
-    borderRadius: 15,
+    backgroundColor: '#fa2f40',
+    borderRadius: 14,
     padding: 18,
     alignItems: 'center',
     marginTop: 20,
@@ -2193,14 +2217,14 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
     borderRadius: 4,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxSquareChecked: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   termsText: {
     flex: 1,
@@ -2218,7 +2242,7 @@ const styles = StyleSheet.create({
   termsLinkText: {
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginLeft: 6,
     textDecorationLine: 'underline',
   },
@@ -2250,7 +2274,7 @@ const styles = StyleSheet.create({
   },
   resendButtonDisabled: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderColor: '#666',
+    borderColor: '#8a8a92',
   },
   resendButtonText: {
     fontSize: 12,
@@ -2259,15 +2283,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   resendButtonTextDisabled: {
-    color: '#666',
+    color: '#8a8a92',
   },
   backButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
   },
   backButtonText: {
-    color: '#FF4444',
+    color: '#fa2f40',
   },
   hintText: {
     fontSize: 12,
@@ -2286,7 +2310,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   countryButtonText: {
     color: '#fff',
@@ -2300,13 +2324,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   countryPickerModal: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -2328,7 +2352,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     width: '100%',
     marginBottom: 15,
   },
@@ -2343,7 +2367,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   countryOptionSelected: {
-    backgroundColor: 'rgba(255,68,68,0.2)',
+    backgroundColor: 'rgba(250,47,64,0.2)',
   },
   countryOptionText: {
     color: '#fff',
@@ -2351,11 +2375,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   countryOptionTextSelected: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontFamily: 'Gilroy-Bold',
   },
   countryPickerCloseButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
@@ -2370,7 +2394,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
     height: 120,
     justifyContent: 'center',
     alignItems: 'center',
@@ -2386,9 +2410,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   didntReceiveButton: {
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 20,

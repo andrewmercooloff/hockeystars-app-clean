@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.2)',
+    backgroundColor: colors.screenOverlay,
   },
   pageHeader: {
     position: 'absolute',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   infoSection: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     paddingTop: 16,
     paddingBottom: 8,
     paddingHorizontal: 16,
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#2a2430',
   },
   sectionWrapper: {
     marginTop: 10,
@@ -618,11 +618,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sectionContainer: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    backgroundColor: 'rgba(22, 22, 26, 0.82)',
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   sectionTitle: {
     fontSize: 18,
@@ -733,11 +733,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   completionStatsCard: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    backgroundColor: 'rgba(22, 22, 26, 0.82)',
     borderRadius: 20,
     padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   completionStatsContent: {
     flexDirection: 'row',
@@ -758,10 +758,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   completeButtonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: '#8a8a92',
     borderColor: 'rgba(102, 102, 102, 0.3)',
   },
   completeButtonContent: {
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   loginPrompt: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     marginHorizontal: 20,
     marginVertical: 20,
     paddingVertical: 15,
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 20,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   retryButtonText: {
     color: '#fff',

@@ -7,12 +7,13 @@ import {
     Platform,
     Animated
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { Player } from '../utils/playerStorage';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export default function CountryFilter({ players }: { players: Player[] }) {
+export default React.memo(function CountryFilter({ players }: { players: Player[] }) {
   const { t } = useLanguage();
   const { 
     selectedCountry, 
@@ -42,14 +43,10 @@ export default function CountryFilter({ players }: { players: Player[] }) {
   }, [selectedCountry, t]);
 
   const handleCountrySelect = useCallback((country: string | null) => {
-    console.log('🌍 [CountryFilter] Выбор страны:', country);
     setSelectedCountry(country);
 
-    // Если выбрана опция "Все", сбрасываем год (показываем всех игроков)
     if (country === null) {
-      console.log('🌍 [CountryFilter] Выбрана опция "Все", сбрасываем год');
       setSelectedYear(null);
-      // НЕ делаем return, продолжаем для закрытия dropdown
     }
 
     // Проверяем, есть ли игроки с выбранным годом в новой стране
@@ -145,12 +142,14 @@ export default function CountryFilter({ players }: { players: Player[] }) {
         style={styles.filterButton}
         onPress={handleFilterToggle}
       >
-        <Text style={styles.filterButtonText}>
+        <Text style={styles.filterButtonText} numberOfLines={1}>
           {filterButtonText}
         </Text>
-        <Text style={styles.filterButtonIcon}>
-          {showCountryFilter ? '▲' : '▼'}
-        </Text>
+        <Ionicons
+          name={showCountryFilter ? 'chevron-up' : 'chevron-down'}
+          size={14}
+          color="rgba(255,255,255,0.75)"
+        />
       </TouchableOpacity>
 
       {showCountryFilter && (
@@ -214,47 +213,44 @@ export default function CountryFilter({ players }: { players: Player[] }) {
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    zIndex: 10,
-    width: 100,
+    zIndex: 1000,
+    minWidth: 108,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Черный полупрозрачный фон
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 10,
-    width: 100,
+    gap: 6,
+    backgroundColor: 'rgba(20, 20, 24, 0.82)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    minWidth: 108,
   },
   filterButtonText: {
     color: '#fff',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
-    fontWeight: '700',
     flex: 1,
-  },
-  filterButtonIcon: {
-    color: '#fff',
-    fontSize: 10,
-    fontFamily: 'Gilroy-Regular',
-    fontWeight: '400',
   },
   countriesList: {
     position: 'absolute',
     top: '100%',
     left: 0,
-    width: 100,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
-    borderRadius: 12,
-    marginTop: 4,
-    zIndex: 20,
+    minWidth: 140,
+    backgroundColor: 'rgba(20, 20, 24, 0.94)',
+    borderRadius: 14,
+    marginTop: 6,
+    zIndex: 1001,
+    elevation: 1001,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Белая граница
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     ...Platform.select({
       ios: {
         shadowColor: '#000', // Черный цвет тени
@@ -266,7 +262,7 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
       web: {
-        boxShadow: '0 4px 8px rgba(1, 0, 0, 0.3)',
+        boxShadow: '0 4px 8px rgba(22, 22, 26, 0.42)',
       },
     }),
   },

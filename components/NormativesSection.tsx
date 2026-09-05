@@ -194,17 +194,17 @@ export default function NormativesSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.2)',
+    borderColor: 'rgba(250, 47, 64, 0.2)',
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginBottom: 20,
   },
   emptyContainer: {
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 68, 68, 0.9)',
+    backgroundColor: 'rgba(250, 47, 64, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   normativeValue: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 15,
     fontFamily: 'Gilroy-Bold',
   },

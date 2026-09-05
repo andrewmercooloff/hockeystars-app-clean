@@ -717,7 +717,7 @@ export default function AdminUserCreationForm({
 const styles = {
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)', // Полупрозрачный фон
+    backgroundColor: 'rgba(22, 22, 26, 0.6)', // Полупрозрачный фон
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -734,11 +734,11 @@ const styles = {
     padding: 20,
   },
   formContainer: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Более темный фон
+    backgroundColor: 'rgba(22, 22, 26, 0.86)', // Более темный фон
     borderRadius: 15,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
   },
   closeButton: {
     position: 'absolute',
@@ -749,7 +749,7 @@ const styles = {
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF4444', // Красный цвет заголовка
+    color: '#fa2f40', // Красный цвет заголовка
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -770,7 +770,7 @@ const styles = {
     paddingVertical: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
     fontFamily: 'Gilroy-Regular',
   },
   hintText: {
@@ -790,12 +790,12 @@ const styles = {
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     minWidth: '30%',
   },
   pickerOptionSelected: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   pickerOptionText: {
     color: '#fff',
@@ -808,7 +808,7 @@ const styles = {
     fontFamily: 'Gilroy-Bold',
   },
   submitButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -833,11 +833,11 @@ const styles = {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(255,68,68,0.1)', // Красноватый прозрачный фон
+    backgroundColor: 'rgba(250,47,64,0.1)', // Красноватый прозрачный фон
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
   },
   avatar: {
     width: 120,
@@ -860,7 +860,7 @@ const styles = {
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)', // Красноватая граница
+    borderColor: 'rgba(255, 255, 255, 0.08)', // Красноватая граница
   },
   dateInputText: {
     color: '#fff',
@@ -875,13 +875,13 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   datePickerModal: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -898,7 +898,7 @@ const styles = {
     paddingHorizontal: 20,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   datePickerButtonText: {
     color: '#fff',
@@ -906,7 +906,7 @@ const styles = {
     fontFamily: 'Gilroy-Regular',
   },
   confirmButton: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
 };

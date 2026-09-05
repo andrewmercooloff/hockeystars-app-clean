@@ -1,4 +1,5 @@
 import { useRouter, useFocusEffect } from 'expo-router';
+import { buildPlayerPath } from '../../utils/playerSeoPath';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   Alert,
@@ -104,7 +105,7 @@ export default function AdminUsersScreen() {
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
       case 'star': return '#FFD700';
-      case 'coach': return '#FF4444';
+      case 'coach': return '#fa2f40';
       case 'scout': return '#888888';
       case 'admin': return '#8A2BE2';
       case 'shop': return '#00FF00';
@@ -201,12 +202,12 @@ export default function AdminUsersScreen() {
 
   const handleEditPlayer = (player: Player) => {
     setShowActionMenu(false);
-    router.push(`/player/${player.id}?edit=true`);
+    router.push((buildPlayerPath(player.id) + '?edit=true') as any);
   };
 
   const handleViewProfile = (player: Player) => {
     setShowActionMenu(false);
-    router.push(`/player/${player.id}`);
+    router.push(buildPlayerPath(player.id) as any);
   };
 
   const handleChangeStatus = (player: Player) => {
@@ -303,17 +304,17 @@ export default function AdminUsersScreen() {
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+        <Ionicons name="search" size={20} color="#8a8a92" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Поиск по имени, телефону, email..."
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholderTextColor="#666"
+          placeholderTextColor="#8a8a92"
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={20} color="#666" />
+            <Ionicons name="close-circle" size={20} color="#8a8a92" />
           </TouchableOpacity>
         )}
       </View>
@@ -413,7 +414,7 @@ export default function AdminUsersScreen() {
                   </View>
                   <View style={[styles.cell, styles.cellHidden]}>
                     {(player as any).is_hidden ? (
-                      <Ionicons name="eye-off" size={18} color="#FF4444" />
+                      <Ionicons name="eye-off" size={18} color="#fa2f40" />
                     ) : (
                       <Ionicons name="eye" size={18} color="#4CAF50" />
                     )}
@@ -432,7 +433,7 @@ export default function AdminUsersScreen() {
                       <Ionicons name={(player as any).is_hidden ? "eye" : "eye-off"} size={18} color="#FF9800" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleDeletePlayer(player)}>
-                      <Ionicons name="trash" size={18} color="#FF4444" />
+                      <Ionicons name="trash" size={18} color="#fa2f40" />
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -464,9 +465,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 10,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#2a2430',
   },
   backButton: {
     padding: 8,
@@ -490,11 +491,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: 12,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 10,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2a2430',
   },
   searchIcon: {
     marginRight: 8,
@@ -520,7 +521,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderBottomWidth: 2,
     borderBottomColor: '#FFD700',
   },
@@ -628,9 +629,9 @@ const styles = StyleSheet.create({
   statsBar: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: '#2a2430',
   },
   statsText: {
     color: '#888',

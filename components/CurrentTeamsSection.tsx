@@ -333,7 +333,7 @@ export default function CurrentTeamsSection({
     <View style={styles.container}>
       {currentTeams.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="shirt-outline" size={48} color="#666" />
+          <Ionicons name="shirt-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyText}>{t('noCurrentTeams')}</Text>
         </View>
       ) : (
@@ -355,7 +355,7 @@ export default function CurrentTeamsSection({
             setSelectedExistingTeam(null);
           }}
         >
-          <Ionicons name="add-circle" size={24} color="#FF4444" />
+          <Ionicons name="add-circle" size={24} color="#fa2f40" />
           <Text style={styles.addButtonText}>{t('addTeam')}</Text>
         </TouchableOpacity>
       )}
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     marginTop: 10,
   },
   teamsList: {
@@ -544,18 +544,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 12,
     padding: 15,
     marginTop: 15,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   addButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginLeft: 10,
   },
   modalOverlay: {
@@ -570,12 +570,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 15,
     padding: 20,
     maxHeight: 500,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   modalScrollContent: {
     paddingBottom: 10,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   saveButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   cancelButtonText: {
     fontSize: 16,

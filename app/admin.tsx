@@ -1,4 +1,5 @@
 import { useRouter, useFocusEffect } from 'expo-router';
+import { buildPlayerPath } from '../utils/playerSeoPath';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     Alert,
@@ -45,7 +46,7 @@ const AdminHeader = () => {
   const handleProfilePress = () => {
     try {
       if (currentUser) {
-        router.push(`/player/${currentUser.id}`);
+        router.push(buildPlayerPath(currentUser.id) as any);
       } else {
         router.push('/login');
       }
@@ -169,7 +170,7 @@ export default function AdminScreen() {
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
       case 'star': return '#FFD700';
-      case 'coach': return '#FF4444';
+      case 'coach': return '#fa2f40';
       case 'scout': return '#888888';
       case 'admin': return '#8A2BE2';
       case 'shop': return '#00FF00';
@@ -194,7 +195,7 @@ export default function AdminScreen() {
       return (
         <TouchableOpacity
           style={styles.playerItem}
-          onPress={() => router.push({ pathname: '/player/[id]', params: { id: item.id } })}
+          onPress={() => router.push(buildPlayerPath(item.id, item.name) as any)}
         >
           <View
             style={[
@@ -221,7 +222,7 @@ export default function AdminScreen() {
             </View>
           </View>
           <TouchableOpacity onPress={() => handleEditPlayer(item)} style={{ padding: 8 }}>
-            <Ionicons name="create" size={24} color="#666" />
+            <Ionicons name="create" size={24} color="#8a8a92" />
           </TouchableOpacity>
         </TouchableOpacity>
       );
@@ -307,214 +308,205 @@ export default function AdminScreen() {
     <View style={styles.container}>
       <AdminHeader />
 
-      <ScrollView>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.adminButton, { backgroundColor: '#4CAF50' }]}
+      <View style={styles.toolbarCard}>
+        <View style={styles.toolbarRow}>
+          <TouchableOpacity
+            style={[styles.toolbarButton, styles.toolbarButtonPrimary]}
             onPress={handleAddUser}
           >
             <Ionicons name="person-add" size={16} color="#fff" />
-            <Text style={styles.adminButtonText}>{t('admin.addUser')}</Text>
+            <Text style={styles.toolbarButtonText}>{t('admin.addUser')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toolbarButton, styles.toolbarButtonSecondary]}
+            onPress={() => router.push('/admin/users')}
+          >
+            <Ionicons name="people" size={16} color="#fff" />
+            <Text style={styles.toolbarButtonText}>Пользователи</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t('admin.searchPlayers')}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#666"
-        />
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8a8a92" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder={t('admin.searchPlayers')}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#8a8a92"
+          />
+        </View>
+
+        <Text style={styles.toolsTitle}>Инструменты</Text>
+        <View style={styles.toolsGrid}>
+          <TouchableOpacity
+            style={[styles.toolButton, styles.fixAllButton]}
+            onPress={async () => {
+              try {
+                Alert.alert(
+                  'Полное исправление',
+                  'Выполнить полное исправление всех проблем с изображениями?',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Исправить',
+                      onPress: async () => {
+                        const { fixAllImageIssues } = await import('../utils/playerStorage');
+                        await fixAllImageIssues();
+                        Alert.alert('Готово', 'Полное исправление завершено');
+                        loadData();
+                      }
+                    }
+                  ]
+                );
+              } catch (error) {
+                console.error('Ошибка исправления:', error);
+                Alert.alert('Ошибка', 'Не удалось выполнить исправление');
+              }
+            }}
+          >
+            <Ionicons name="build" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Исправить все</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.toolButton, styles.diagnoseButton]}
+            onPress={async () => {
+              try {
+                const { diagnoseImages } = await import('../utils/playerStorage');
+                await diagnoseImages();
+                Alert.alert('Диагностика', 'Проверьте консоль для результатов диагностики');
+              } catch (error) {
+                console.error('Ошибка диагностики:', error);
+                Alert.alert('Ошибка', 'Не удалось выполнить диагностику');
+              }
+            }}
+          >
+            <Ionicons name="search" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Диагностика</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.toolButton, styles.cleanupButton]}
+            onPress={async () => {
+              try {
+                Alert.alert(
+                  'Очистка данных',
+                  'Очистить некорректные данные в базе?',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Очистить',
+                      onPress: async () => {
+                        const { cleanupDatabaseData } = await import('../utils/playerStorage');
+                        await cleanupDatabaseData();
+                        Alert.alert('Готово', 'Очистка данных завершена');
+                        loadData();
+                      }
+                    }
+                  ]
+                );
+              } catch (error) {
+                console.error('Ошибка очистки:', error);
+                Alert.alert('Ошибка', 'Не удалось выполнить очистку');
+              }
+            }}
+          >
+            <Ionicons name="trash" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Очистка</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.toolButton, styles.migrateButton]}
+            onPress={async () => {
+              try {
+                Alert.alert(
+                  'Миграция изображений',
+                  'Начать миграцию всех локальных изображений в Storage?',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Начать',
+                      onPress: async () => {
+                        const { migrateAllImagesToStorage } = await import('../utils/playerStorage');
+                        await migrateAllImagesToStorage();
+                        Alert.alert('Готово', 'Миграция изображений завершена');
+                        loadData();
+                      }
+                    }
+                  ]
+                );
+              } catch (error) {
+                console.error('Ошибка миграции:', error);
+                Alert.alert('Ошибка', 'Не удалось выполнить миграцию');
+              }
+            }}
+          >
+            <Ionicons name="cloud-upload" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Миграция</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.toolButton, styles.fixUrlsButton]}
+            onPress={async () => {
+              try {
+                Alert.alert(
+                  'Исправление URL',
+                  'Проверить и исправить URL изображений?',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Исправить',
+                      onPress: async () => {
+                        const { fixImageUrls } = await import('../utils/playerStorage');
+                        await fixImageUrls();
+                        Alert.alert('Готово', 'Проверка URL изображений завершена');
+                        loadData();
+                      }
+                    }
+                  ]
+                );
+              } catch (error) {
+                console.error('Ошибка исправления URL:', error);
+                Alert.alert('Ошибка', 'Не удалось исправить URL');
+              }
+            }}
+          >
+            <Ionicons name="link" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Исправить URL</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.toolButton, styles.publicUrlsButton]}
+            onPress={async () => {
+              try {
+                Alert.alert(
+                  'Публичные URL',
+                  'Обновить URL изображений на публичные ссылки?',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Обновить',
+                      onPress: async () => {
+                        const { updateImageUrlsToPublic } = await import('../utils/playerStorage');
+                        await updateImageUrlsToPublic();
+                        Alert.alert('Готово', 'Обновление публичных URL завершено');
+                        loadData();
+                      }
+                    }
+                  ]
+                );
+              } catch (error) {
+                console.error('Ошибка обновления публичных URL:', error);
+                Alert.alert('Ошибка', 'Не удалось обновить публичные URL');
+              }
+            }}
+          >
+            <Ionicons name="globe" size={16} color="#fff" />
+            <Text style={styles.toolButtonText}>Публичные URL</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Кнопки диагностики, очистки и миграции */}
-      <View style={styles.imageButtonsContainer}>
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.fixAllButton]}
-          onPress={async () => {
-            try {
-              Alert.alert(
-                'Полное исправление',
-                'Выполнить полное исправление всех проблем с изображениями?',
-                [
-                  { text: 'Отмена', style: 'cancel' },
-                  { 
-                    text: 'Исправить', 
-                    onPress: async () => {
-                      const { fixAllImageIssues } = await import('../utils/playerStorage');
-                      await fixAllImageIssues();
-                      Alert.alert('Готово', 'Полное исправление завершено');
-                      // Обновляем список игроков
-                      loadData();
-                    }
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Ошибка исправления:', error);
-              Alert.alert('Ошибка', 'Не удалось выполнить исправление');
-            }
-          }}
-        >
-          <Ionicons name="build" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Исправить все</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.imageButtonsContainer}>
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.diagnoseButton]}
-          onPress={async () => {
-            try {
-              const { diagnoseImages } = await import('../utils/playerStorage');
-              await diagnoseImages();
-              Alert.alert('Диагностика', 'Проверьте консоль для результатов диагностики');
-            } catch (error) {
-              console.error('Ошибка диагностики:', error);
-              Alert.alert('Ошибка', 'Не удалось выполнить диагностику');
-            }
-          }}
-        >
-          <Ionicons name="search" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Диагностика</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.cleanupButton]}
-          onPress={async () => {
-            try {
-              Alert.alert(
-                'Очистка данных',
-                'Очистить некорректные данные в базе?',
-                [
-                  { text: 'Отмена', style: 'cancel' },
-                  { 
-                    text: 'Очистить', 
-                    onPress: async () => {
-                      const { cleanupDatabaseData } = await import('../utils/playerStorage');
-                      await cleanupDatabaseData();
-                      Alert.alert('Готово', 'Очистка данных завершена');
-                      // Обновляем список игроков
-                      loadData();
-                    }
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Ошибка очистки:', error);
-              Alert.alert('Ошибка', 'Не удалось выполнить очистку');
-            }
-          }}
-        >
-          <Ionicons name="trash" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Очистка</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.migrateButton]}
-          onPress={async () => {
-            try {
-              Alert.alert(
-                'Миграция изображений',
-                'Начать миграцию всех локальных изображений в Storage?',
-                [
-                  { text: 'Отмена', style: 'cancel' },
-                  { 
-                    text: 'Начать', 
-                    onPress: async () => {
-                      const { migrateAllImagesToStorage } = await import('../utils/playerStorage');
-                      await migrateAllImagesToStorage();
-                      Alert.alert('Готово', 'Миграция изображений завершена');
-                      // Обновляем список игроков
-                      loadData();
-                    }
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Ошибка миграции:', error);
-              Alert.alert('Ошибка', 'Не удалось выполнить миграцию');
-            }
-          }}
-        >
-          <Ionicons name="cloud-upload" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Миграция</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.fixUrlsButton]}
-          onPress={async () => {
-            try {
-              Alert.alert(
-                'Исправление URL',
-                'Проверить и исправить URL изображений?',
-                [
-                  { text: 'Отмена', style: 'cancel' },
-                  { 
-                    text: 'Исправить', 
-                    onPress: async () => {
-                      const { fixImageUrls } = await import('../utils/playerStorage');
-                      await fixImageUrls();
-                      Alert.alert('Готово', 'Проверка URL изображений завершена');
-                      // Обновляем список игроков
-                      loadData();
-                    }
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Ошибка исправления URL:', error);
-              Alert.alert('Ошибка', 'Не удалось исправить URL');
-            }
-          }}
-        >
-          <Ionicons name="link" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Исправить URL</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.imageButton, styles.publicUrlsButton]}
-          onPress={async () => {
-            try {
-              Alert.alert(
-                'Публичные URL',
-                'Обновить URL изображений на публичные ссылки?',
-                [
-                  { text: 'Отмена', style: 'cancel' },
-                  { 
-                    text: 'Обновить', 
-                    onPress: async () => {
-                      const { updateImageUrlsToPublic } = await import('../utils/playerStorage');
-                      await updateImageUrlsToPublic();
-                      Alert.alert('Готово', 'Обновление публичных URL завершено');
-                      // Обновляем список игроков
-                      loadData();
-                    }
-                  }
-                ]
-              );
-            } catch (error) {
-              console.error('Ошибка обновления публичных URL:', error);
-              Alert.alert('Ошибка', 'Не удалось обновить публичные URL');
-            }
-          }}
-        >
-          <Ionicons name="globe" size={16} color="#fff" />
-          <Text style={styles.imageButtonText}>Публичные URL</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Кнопка добавления пользователя */}
-      <TouchableOpacity 
-        style={[styles.imageButton, styles.addUserButton]}
-        onPress={() => setShowCreateUserModal(true)}
-      >
-        <Ionicons name="person-add" size={16} color="#fff" />
-        <Text style={styles.imageButtonText}>Добавить</Text>
-      </TouchableOpacity>
 
       {/* Модальное окно создания пользователя */}
       <Modal
@@ -549,7 +541,7 @@ export default function AdminScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Введите имя"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#8a8a92"
                   value={newUserData.name}
                   onChangeText={(text) => setNewUserData(prev => ({ ...prev, name: text }))}
                 />
@@ -561,7 +553,7 @@ export default function AdminScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="+375 (29) 123-45-67"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#8a8a92"
                   keyboardType="phone-pad"
                   value={newUserData.phone}
                   onChangeText={(text) => setNewUserData(prev => ({ ...prev, phone: text }))}
@@ -596,7 +588,7 @@ export default function AdminScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Название команды"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#8a8a92"
                   value={newUserData.team}
                   onChangeText={(text) => setNewUserData(prev => ({ ...prev, team: text }))}
                 />
@@ -607,7 +599,7 @@ export default function AdminScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Позиция в команде"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#8a8a92"
                   value={newUserData.position}
                   onChangeText={(text) => setNewUserData(prev => ({ ...prev, position: text }))}
                 />
@@ -617,7 +609,7 @@ export default function AdminScreen() {
 
           <View style={styles.modalFooter}>
             <TouchableOpacity 
-              style={[styles.footerButton, { backgroundColor: '#FF4444' }]}
+              style={[styles.footerButton, { backgroundColor: '#fa2f40' }]}
               onPress={handleCreateUser}
             >
               <Ionicons name="save" size={20} color="#fff" />
@@ -683,7 +675,7 @@ export default function AdminScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   header: {
     flexDirection: 'row',
@@ -709,11 +701,78 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#333',
+    marginHorizontal: 0,
+    marginBottom: 0,
+    backgroundColor: '#2a2430',
     borderRadius: 10,
     paddingHorizontal: 15,
+  },
+  toolbarCard: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#444',
+    gap: 14,
+  },
+  toolbarRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  toolbarButton: {
+    flexGrow: 1,
+    flexBasis: 160,
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  toolbarButtonPrimary: {
+    backgroundColor: '#4CAF50',
+  },
+  toolbarButtonSecondary: {
+    backgroundColor: '#6B5B95',
+  },
+  toolbarButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  toolsTitle: {
+    color: '#ccc',
+    fontSize: 13,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  toolsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  toolButton: {
+    flexGrow: 1,
+    flexBasis: 140,
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  toolButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   searchIcon: {
     marginRight: 10,
@@ -777,7 +836,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -803,7 +862,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   saveButtonDisabled: {
-    color: '#666',
+    color: '#8a8a92',
   },
   modalContent: {
     flex: 1,
@@ -832,7 +891,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
@@ -856,7 +915,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -920,7 +979,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   editButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 8,
@@ -942,7 +1001,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(5, 0, 8, 0.8)',
+    backgroundColor: 'rgba(11, 11, 14, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
@@ -962,14 +1021,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 10,
     minHeight: 50,
   },
   modalButtonSecondary: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderWidth: 1,
     borderColor: '#FFD700',
   },
@@ -998,7 +1057,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   imagePickerModalContainer: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 15,
     padding: 30,
     margin: 20,
@@ -1041,7 +1100,7 @@ const styles = StyleSheet.create({
     width: 51,
     height: 51,
     borderRadius: 25.5,
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -1056,7 +1115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -1069,7 +1128,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   placeholderText: {
-    color: '#666',
+    color: '#8a8a92',
   },
   selectorContainer: {
     flexDirection: 'row',
@@ -1083,12 +1142,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#444',
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     marginBottom: 8,
   },
   selectorOptionSelected: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   selectorOptionText: {
     fontSize: 14,
@@ -1110,7 +1169,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(5, 0, 8, 0.5)',
+    backgroundColor: 'rgba(11, 11, 14, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
@@ -1170,7 +1229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF9800',
   },
   migrateButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   fixUrlsButton: {
     backgroundColor: '#2196F3',
@@ -1187,7 +1246,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   addUserButton: {
-    backgroundColor: '#FF4444',  // Изменим цвет на более яркий
+    backgroundColor: '#fa2f40',  // Изменим цвет на более яркий
     marginTop: 10,
     marginBottom: 20,
     marginHorizontal: 20,

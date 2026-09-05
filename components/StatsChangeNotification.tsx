@@ -80,7 +80,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
 
   return (
     <BlurOrSolid
-      intensity={20}
+      intensity={55}
       tint="dark"
       style={styles.containerBlur}
     >
@@ -140,24 +140,24 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
     padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF4444',
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
-    color: '#999',
+    color: '#a1a1aa',
     marginLeft: 8,
   },
   changesContainer: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   fieldName: {
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    color: '#ccc',
+    color: '#d4d4d8',
     flex: 1,
   },
   valueContainer: {
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   oldValue: {
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    color: '#999',
+    color: '#a1a1aa',
     textDecorationLine: 'line-through',
   },
   newValue: {

@@ -939,7 +939,7 @@
     "additional": "Additional",
     "cancel": "Cancel",
     "friends": "Friends",
-    "statistics": "Current season statistics",
+    "statistics": "Statistics",
     "teams": "Teams",
     "currentTeams": "Current teams",
     "pastTeams": "Past teams",
@@ -998,7 +998,9 @@
     "Хоккейные фото": "Hockey Photos",
     "noFriendsYet": "No friends yet",
     "beFirstToAdd": "Be the first to add friends",
-    "_cache_clear": "2024-01-15"
+    "_cache_clear": "2024-01-15",
+    "previousSeason": "Previous season",
+    "currentSeasonStats": "Statistics · {season}"
   },
   "register": {
     "title": "Registration",

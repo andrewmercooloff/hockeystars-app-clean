@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import PressableScale from './PressableScale';
 import { Image } from 'expo-image';
 import Animated from 'react-native-reanimated';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -88,9 +89,9 @@ const Puck: React.FC<PuckProps> = ({
 
   const avatarBorderWidth = useMemo(() => {
     if (status === 'star' || status === 'coach' || status === 'scout' || status === 'admin' || status === 'skateSharpening') {
-      return 3;
+      return 2;
     }
-    return 2;
+    return 1.5;
   }, [status]);
 
   const imageSource = useMemo(() => {
@@ -131,7 +132,7 @@ const Puck: React.FC<PuckProps> = ({
         animatedShadowStyle
       ]} /> */}
       
-      <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.puckTouchable}>
+      <PressableScale onPress={onPress} scaleTo={0.92} style={styles.puckTouchable}>
         {leaderRank != null ? (
           <>
             <View
@@ -213,8 +214,8 @@ const Puck: React.FC<PuckProps> = ({
             },
           ]}>
             <MaterialCommunityIcons
-              name="school"
-              size={dimensions.iconSize * 1.15}
+              name="head-question-outline"
+              size={dimensions.iconSize * 1.2}
               color="#d4c4ff"
             />
           </View>
@@ -231,9 +232,9 @@ const Puck: React.FC<PuckProps> = ({
               backgroundColor: '#120810',
             },
           ]}>
-            <Ionicons
-              name="game-controller"
-              size={dimensions.iconSize * 1.1}
+            <MaterialCommunityIcons
+              name="hockey-sticks"
+              size={dimensions.iconSize * 1.2}
               color="#8EC8C8"
             />
           </View>
@@ -287,7 +288,7 @@ const Puck: React.FC<PuckProps> = ({
             <Text style={styles.pointsText}>{points}</Text>
           </View>
         )}
-      </TouchableOpacity>
+      </PressableScale>
     </Animated.View>
   );
 };
@@ -316,8 +317,8 @@ const styles = StyleSheet.create({
         boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
       },
     }),
-    borderWidth: 2,
-    borderColor: '#333333',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.75)',
   },
   starPuck: {
     position: 'absolute',
@@ -338,8 +339,8 @@ const styles = StyleSheet.create({
         boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
       },
     }),
-    borderWidth: 2,
-    borderColor: '#333333',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.75)',
   },
   puckTouchable: {
     width: '100%',

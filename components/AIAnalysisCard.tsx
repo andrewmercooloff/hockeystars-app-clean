@@ -373,7 +373,7 @@ export default function AIAnalysisCard({
   const videoSection = showVideoInput ? (
     <View style={styles.videosBlock}>
       <View style={styles.videosHeaderRow}>
-        <Ionicons name="logo-youtube" size={15} color="#ff4444" />
+        <Ionicons name="logo-youtube" size={15} color="#fa2f40" />
         <Text style={styles.videosTitle}>{tr('gameVideos')}</Text>
       </View>
       <Text style={styles.videosSub}>{tr('videosInstructions')}</Text>
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.25)',
+    borderColor: 'rgba(250,47,64,0.25)',
   },
   videosHeaderRow: {
     flexDirection: 'row',
@@ -859,7 +859,7 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 14,
   },
   limitNote: {
@@ -892,12 +892,12 @@ const styles = StyleSheet.create({
   },
   metaDate: {
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 12,
   },
   metaVideo: {
     fontFamily: 'Gilroy-Regular',
-    color: '#ff4444',
+    color: '#fa2f40',
     fontSize: 11,
   },
   readMoreBtn: {
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 24,
     borderTopWidth: 1,
-    borderColor: 'rgba(250,47,64,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   modalTitle: {
     fontFamily: 'Gilroy-Bold',

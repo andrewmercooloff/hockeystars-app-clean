@@ -29,7 +29,8 @@
     "rejectRequestConfirm": "Are you sure you want to reject this request?",
     "super": "Super!",
     "left": "Left",
-    "right": "Right"
+    "right": "Right",
+    "offline": "No connection"
   },
   "winger": "Winger",
   "center": "Center",
@@ -3237,7 +3238,8 @@
     "errorProcessNotificationGeneral": "Failed to process notification. Please try again.",
     "errorProcessFriendRequest": "Failed to process friend request",
     "errorProcessRequest": "Failed to process request",
-    "errorSendMessage": "Failed to send message"
+    "errorSendMessage": "Failed to send message",
+    "phoneOrEmailPlaceholderShort": "+48… or email"
   },
   "profile": {
     "title": "Profile",
@@ -3421,7 +3423,7 @@
     "additional": "Additional",
     "cancel": "Cancel",
     "friends": "Friends",
-    "statistics": "Current season statistics",
+    "statistics": "Statistics",
     "teams": "Teams",
     "currentTeams": "Current teams",
     "pastTeams": "Past teams",
@@ -3543,7 +3545,7 @@
     "currentTeam": "Team",
     "hockeyExperience": "Hockey Experience",
     "years": "years",
-    "currentSeasonStats": "Current Season Stats",
+    "currentSeasonStats": "Statistics · {season}",
     "noTeamsYet": "Teams not added yet",
     "noVideosYet": "Video moments not added yet",
     "noPhotosYet": "Photos not added yet",
@@ -3553,7 +3555,11 @@
     "deleteUserConfirm": "Are you sure you want to delete the account \"{{name}}\"? All your data will be permanently deleted and cannot be recovered. This action cannot be undone.",
     "userDeleted": "User \"{{name}}\" deleted",
     "playerNotFound": "Player not found",
-    "deleteUserError": "Failed to delete user"
+    "deleteUserError": "Failed to delete user",
+    "city": "City",
+    "addAddress": "Add address",
+    "addressesHint": "You can add several addresses",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Registration",
@@ -3946,11 +3952,13 @@
     "newUserRegistered": "New user registered: {name}",
     "video_liked": {
       "title": "Your video was liked",
-      "message": "{name} liked your video"
+      "message": "{name} liked your video",
+      "grouped": "{name} liked {count} of your videos"
     },
     "photo_liked": {
       "title": "Your photo was liked",
-      "message": "{name} liked your photo"
+      "message": "{name} liked your photo",
+      "grouped": "{name} liked {count} of your photos"
     },
     "shop": "Hockey Shop",
     "giftRequestApproved": "Request Approved",
@@ -4086,7 +4094,13 @@
     "waitingForConnection": "Waiting for connection",
     "checkInternetConnection": "Check your internet connection",
     "shakeHintTitle": "Shake device",
-    "shakeHintSubtext": "to refresh player list"
+    "shakeHintSubtext": "to refresh player list",
+    "inviteFriends": "Invite",
+    "inviteTitle": "Join HockeyStars!",
+    "inviteMessage": "Create your hockey profile, compete with friends and reach the top of the ice.",
+    "inviteSubtitle": "Send the link — friends land right on your profile",
+    "copyLink": "Copy link",
+    "moreApps": "More"
   },
   "filters": {
     "year": "year",
@@ -4488,5 +4502,14 @@
     "feed": "Feed",
     "scout": "Scout",
     "skills": "Skills"
+  },
+  "seo": {
+    "homeTitle": "Hockey app Hockeystars"
+  },
+  "download": {
+    "installTitle": "Install the app",
+    "scanQr": "Scan with your phone — App Store or Google Play opens automatically",
+    "appStoreCta": "Get it on the App Store",
+    "playStoreCta": "Get it on Google Play"
   }
 }

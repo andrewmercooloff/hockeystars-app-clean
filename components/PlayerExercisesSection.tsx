@@ -156,7 +156,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
       <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <View style={styles.emptyStateContent}>
-          <Ionicons name="barbell-outline" size={48} color="#666" />
+          <Ionicons name="barbell-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyStateText}>
             {isOwnProfile ? t('exercisesSection.noExercisesOwn') : t('exercisesSection.noExercisesOther')}
           </Text>
@@ -188,7 +188,7 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
       <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
         <View style={styles.emptyStateContent}>
-          <Ionicons name="barbell-outline" size={48} color="#666" />
+          <Ionicons name="barbell-outline" size={48} color="#8a8a92" />
           <Text style={styles.emptyText}>{t('exercisesSection.noExercises')}</Text>
         </View>
       </View>
@@ -246,13 +246,13 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 10,
     marginBottom: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   sectionTitle: {
     fontSize: 20,

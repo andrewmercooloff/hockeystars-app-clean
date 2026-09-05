@@ -1,0 +1,80 @@
+# Перенос hockey-stars.com на Timeweb VPS (5.42.123.84)
+
+## Уже сделано на VPS
+
+- Файлы сайта: /var/www/hockeystars-site/ (player.php, login.php, SEO, .well-known)
+- PHP 8.3-FPM + nginx (bootstrap HTTP для основного домена)
+- api.hockey-stars.com — без изменений (Supabase proxy)
+
+## Ваш шаг: DNS (HostFly / регистратор)
+
+Переключить A-записи на **5.42.123.84**:
+
+| Запись | Было (cPanel) | Стало |
+|--------|---------------|--------|
+| hockey-stars.com | IP shared hosting | A → 5.42.123.84 |
+| www | CNAME или A | A → 5.42.123.84 |
+
+**Не менять:** api.hockey-stars.com (уже на VPS).
+
+Подождать 5–30 мин, проверить: `nslookup hockey-stars.com`
+
+## SSL после DNS
+
+На VPS по SSH:
+
+```bash
+certbot --nginx -d hockey-stars.com -d www.hockey-stars.com
+```
+
+Затем заменить конфиг bootstrap на HTTPS:
+
+```bash
+# скопировать deploy/nginx/hockey-stars.com.conf (php8.3-fpm.sock)
+nginx -t && systemctl reload nginx
+```
+
+## Вход на сайте
+
+- **https://hockey-stars.com/login** — телефон/email + OTP (как в приложении)
+- SMS для РФ: на VPS создать `/var/www/hockeystars-site/config.local.php`:
+
+```php
+<?php
+define('HS_NOTIFICORE_API_KEY', 'live_…');
+define('HS_NOTIFICORE_ORIGINATOR', 'HockeyStars');
+define('HS_NOTIFICORE_SERVICE_NAME', 'ХоккейСтарс');
+```
+
+(шаблон: website/config.local.example.php)
+
+## Что сохраняется при переносе
+
+- /.well-known/apple-app-site-association — Universal Links iOS
+- /.well-known/assetlinks.json — Android App Links
+- /player/{id} — SEO + deep links
+- /verify-consent.html — родительское согласие
+- contact-send.php, правила, top, en
+
+## Деплой обновлений
+
+```powershell
+$env:VPS_PASS='…'
+python deploy/scripts/deploy-hockey-stars-site.py
+python deploy/scripts/fix-vps-nginx-site.py
+```
+
+## Expo Web (полное приложение в браузере)
+
+После DNS:
+
+```powershell
+.\deploy\scripts\build-web-export.ps1
+scp -r dist/* root@5.42.123.84:/var/www/hockeystars-web/
+```
+
+Маршруты /messages, /search и т.д. уже настроены в nginx.
+
+## cPanel
+
+После проверки сайта на VPS — старый хостинг можно отключить (сохраните бэкап почты, если была).

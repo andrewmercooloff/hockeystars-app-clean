@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import { View, StyleSheet, Dimensions, ImageBackground, Text, TouchableOpacity, Platform, Vibration } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { buildPlayerPath } from '../utils/playerSeoPath';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -593,7 +594,7 @@ export default function PuckTestScreen() {
 
   // Обработчик нажатия на шайбу (навигация в профиль)
   const handlePuckPress = useCallback((playerId: string) => {
-    router.push({ pathname: '/player/[id]', params: { id: playerId } });
+    router.push(buildPlayerPath(playerId) as any);
   }, [router]);
 
   // Анимация запущена если есть шайбы
@@ -684,7 +685,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',

@@ -16,6 +16,7 @@ interface CachedAvatarProps {
   onError?: () => void;
   onLoad?: () => void;
   status?: string;
+  imagePriority?: 'low' | 'normal' | 'high';
 }
 
 /** URL без query — для сравнения «тот же файл или нет». */
@@ -35,6 +36,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   onError,
   onLoad,
   status,
+  imagePriority = 'high',
 }) => {
   const cachedAvatarUrl = useAvatarCache(playerId, rewriteSupabasePublicUrl(fallbackAvatarUrl) || undefined);
   const [imageError, setImageError] = React.useState(false);
@@ -141,12 +143,17 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   }, [effectiveAvatarUrl, fallbackAvatarUrl, cachedAvatarUrl, preferFallback, onError]);
 
   const imageStyle = React.useMemo(
-    () => ({
-      width: size,
-      height: size,
-      borderRadius: style?.borderRadius || size / 2,
-      ...style,
-    }),
+    () => {
+      const flat = Array.isArray(style)
+        ? Object.assign({}, ...style.filter(Boolean))
+        : style || {};
+      return {
+        width: size,
+        height: size,
+        borderRadius: flat?.borderRadius || size / 2,
+        ...flat,
+      };
+    },
     [size, style]
   );
 
@@ -198,7 +205,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
         onError={handleError}
         onLoad={handleLoad}
         cachePolicy="memory-disk"
-        priority="high"
+        priority={imagePriority}
         transition={0}
         recyclingKey={`${playerId}-${avatarUriBase(displayAvatarUrl)}`}
       />

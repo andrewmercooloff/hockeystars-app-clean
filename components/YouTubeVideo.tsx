@@ -91,7 +91,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
   if (!isYouTubeUrl(url) || !youtubeVideoId) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={48} color="#FF4444" />
+        <Ionicons name="alert-circle" size={48} color="#fa2f40" />
         <Text style={styles.errorText}>Неверная ссылка на YouTube</Text>
         <Text style={styles.errorSubtext}>Поддерживаются только YouTube ссылки</Text>
         <Text style={styles.errorSubtext}>{url}</Text>
@@ -105,7 +105,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ url, title, onClose, timeCo
       <View style={styles.videoContainer}>
         {loading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FF4444" />
+            <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         )}
         <YoutubePlayer
@@ -207,13 +207,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
   },
   playButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(255, 68, 68, 0.9)',
+    backgroundColor: 'rgba(250, 47, 64, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -228,27 +228,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     marginTop: 12,
     textAlign: 'center',
-    textShadowColor: 'rgba(1, 0, 0, 0.75)',
+    textShadowColor: 'rgba(22, 22, 26, 0.82)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
   errorContainer: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   errorText: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 8,
     textAlign: 'center',
   },
   errorSubtext: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     marginTop: 4,

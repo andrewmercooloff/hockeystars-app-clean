@@ -51,6 +51,10 @@ body {
     width: 100%;
     height: 100%;
     background-image: url('led.jpg');
+    background-image: image-set(
+        url('led.webp') type('image/webp'),
+        url('led.jpg') type('image/jpeg')
+    );
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -65,13 +69,23 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: -webkit-linear-gradient(90deg, #054c76,#0c192a,#471c3a);
-    background: linear-gradient(80deg, #054c76d4, #0c192ad9, #471c3ade);
-    /* background: linear-gradient(135deg, rgb(21 0 0 / 80%) 0%, rgb(8 0 16 / 85%) 50%, rgb(1 0 21 / 80%) 100%); */
-    /* background: -webkit-linear-gradient(90deg, #012439de, #0c192a99, #410a30d4); */
-    /* background: linear-gradient(50deg, #001d2ed9, #0f0001a8, #170022b8); */
-    background-size: 200% 200%;
-    animation: gradientShift 15s ease infinite;
+    /* Iridescent wash: burgundy / plum / soft slate — ice texture stays visible */
+    background: -webkit-linear-gradient(
+        90deg,
+        rgba(90, 18, 38, 0.62),
+        rgba(18, 10, 32, 0.58),
+        rgba(58, 22, 62, 0.6),
+        rgba(28, 42, 58, 0.48)
+    );
+    background: linear-gradient(
+        80deg,
+        rgba(90, 18, 38, 0.62),
+        rgba(18, 10, 32, 0.58),
+        rgba(58, 22, 62, 0.6),
+        rgba(28, 42, 58, 0.48)
+    );
+    background-size: 220% 220%;
+    animation: gradientShift 14s ease infinite;
 }
 
 @keyframes gradientShift {
@@ -221,8 +235,38 @@ body {
 
 .language-switcher {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
     flex-shrink: 0;
+}
+
+.nav-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 16px;
+    margin: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(250, 47, 64, 0.55);
+    background: rgba(250, 47, 64, 0.16);
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-login:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 .lang-btn {
@@ -242,6 +286,7 @@ body {
     font-weight: 700;
     font-family: 'Gilroy', sans-serif;
     line-height: 1;
+    box-sizing: border-box;
 }
 
 .lang-btn:hover {
@@ -318,7 +363,7 @@ body {
     justify-content: center;
     gap: 15px;
     flex-wrap: nowrap;
-    margin-bottom: 40px;
+    margin-bottom: 18px;
     margin-top: 20px;
 }
 
@@ -345,6 +390,33 @@ body {
 
 .hero-download-buttons .download-btn-label {
     font-size: 11px;
+}
+
+.hero-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto 28px;
+    padding: 18px 32px;
+    border-radius: 16px;
+    background: #fa2f40;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 10px 28px rgba(250, 47, 64, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.hero-login-btn:hover {
+    background: #e02838;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(250, 47, 64, 0.45);
 }
 
 /* Features */
@@ -808,6 +880,14 @@ body {
         margin-top: 1px;
     }
 
+    .hero-login-btn {
+        min-width: 0;
+        width: min(100%, 360px);
+        padding: 16px 24px;
+        font-size: 18px;
+        margin-bottom: 22px;
+    }
+
     .section-title {
         font-size: 36px;
     }
@@ -848,7 +928,13 @@ body {
     }
     
     .language-switcher {
-        gap: 6px;
+        gap: 8px;
+    }
+
+    .nav-login {
+        height: 32px;
+        padding: 0 12px;
+        font-size: 12px;
     }
     
     .lang-btn {
@@ -928,6 +1014,14 @@ body {
         font-size: 7px;
         margin-top: 1px;
     }
+
+    .hero-login-btn {
+        width: min(100%, 320px);
+        padding: 14px 20px;
+        font-size: 17px;
+        margin-bottom: 18px;
+        border-radius: 14px;
+    }
     
     .header-content {
         gap: 10px;
@@ -941,6 +1035,12 @@ body {
         width: 30px;
         height: 30px;
         font-size: 10px;
+    }
+
+    .nav-login {
+        height: 30px;
+        padding: 0 10px;
+        font-size: 11px;
     }
 
     .for-whom {

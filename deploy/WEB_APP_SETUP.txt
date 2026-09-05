@@ -1,0 +1,108 @@
+# HockeyStars Web — без Railway (работает в России)
+
+## Принцип
+
+| URL | Где | Для чего |
+|-----|-----|----------|
+| hockey-stars.com/player/{id} | **cPanel PHP** | SEO — Google/Yandex видят HTML с meta и JSON-LD |
+| app.hockey-stars.com | **VPS (Timeweb)** | Полное веб-приложение (Expo static) |
+| api.hockey-stars.com | **VPS** | Supabase proxy (уже работает в РФ) |
+
+Railway **не используем** — в России без VPN недоступен.
+
+Индексация идёт через **PHP на основном домене**, не через SPA.  
+Ботам не нужен app.hockey-stars.com — им достаточно hockey-stars.com/player/…
+
+---
+
+## DNS
+
+```
+hockey-stars.com      → cPanel (существующий хостинг)
+app.hockey-stars.com → A 5.42.123.84  (тот же VPS, что api)
+api.hockey-stars.com  → A 5.42.123.84  (уже есть)
+```
+
+SSL на VPS:
+```bash
+certbot certonly --nginx -d app.hockey-stars.com
+```
+
+---
+
+## Вариант A (рекомендуется): VPS app.hockey-stars.com
+
+### 1. Сборка локально (Windows)
+
+```powershell
+cd c:\hockeystars-app-clean-old-recovered
+$env:EXPO_PUBLIC_SUPABASE_URL="https://api.hockey-stars.com"
+$env:EXPO_PUBLIC_SUPABASE_ANON_KEY="(anon key)"
+npm run web:export
+```
+
+### 2. Загрузка на VPS
+
+```powershell
+# scp или WinSCP: содержимое dist/ → /var/www/hockeystars-web/
+scp -r dist/* root@5.42.123.84:/var/www/hockeystars-web/
+```
+
+### 3. Nginx
+
+Файл: deploy/nginx/hockey-stars-vps.conf  
+На сервере: `/etc/nginx/sites-available/hockey-stars` + symlink sites-enabled
+
+```bash
+mkdir -p /var/www/hockeystars-web
+nginx -t && systemctl reload nginx
+```
+
+---
+
+## Вариант B: cPanel /web/ (без нового поддомена)
+
+На cPanel путь **/app/** уже занят Passenger (Node proxy) — используйте **/web/**.
+
+1. В app.json для сборки под /web/:
+   ```json
+   "experiments": { "baseUrl": "/web" }
+   ```
+2. `npm run web:export`
+3. Загрузить dist/* в `public_html/web/`
+4. Загрузить `website/web/.htaccess` в `public_html/web/.htaccess`
+5. В config.php: `define('HS_WEB_APP_URL', 'https://hockey-stars.com/web');`
+
+---
+
+## SEO (cPanel)
+
+Залить на hockey-stars.com:
+- player.php, config.php, includes/player-public.php
+- sitemap-players.php, robots.txt, .htaccess
+
+Search Console / Яндекс.Вебмастер:
+- Sitemap: https://hockey-stars.com/sitemap-players.xml
+
+Публично без регистрации: имя, позиция, команда, страна, аватар, базовая статистика.  
+Полный профиль — кнопка «Открыть в веб-приложении» → app.hockey-stars.com (или /web/).
+
+---
+
+## Обновление веб-приложения
+
+После изменений в коде:
+```powershell
+npm run web:export
+scp -r dist/* root@5.42.123.84:/var/www/hockeystars-web/
+```
+
+OTA не нужен — это статический билд на VPS/cPanel.
+
+---
+
+## Почему это работает в России
+
+- VPS Timeweb (api + app) — доступен без VPN (проверено для api)
+- cPanel hockey-stars.com — обычный хостинг в РФ
+- Supabase URL в билде: https://api.hockey-stars.com

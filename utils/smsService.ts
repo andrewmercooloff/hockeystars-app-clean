@@ -809,7 +809,7 @@ export const sendSMSViaNotificore = async (phone: string, code: string): Promise
   return false;
 };
 
-// Функция отправки SMS через RocketSMS API (Беларусь + резерв для России)
+// Функция отправки SMS через RocketSMS API (BY + KZ + international; RU — Notificore)
 // Документация: https://rocketsms.by/storage/rocketsms_api.pdf
 // По документации используется HTTP POST на /simple/send с параметрами в query string.
 export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<boolean> => {
@@ -827,23 +827,33 @@ export const sendSMSViaRocketSMS = async (phone: string, code: string): Promise<
 
     const passwordHash = await getRocketSmsPasswordHash(password);
 
+    // RocketSMS: международный формат без «+» (375…, 48…, 370… и т.д.)
     const cleaned = phone.replace(/[^\d+]/g, '');
     let fullPhone: string;
 
-    if (cleaned.startsWith('+375') || cleaned.startsWith('375')) {
-      let national = cleaned.startsWith('+375') ? cleaned.substring(4) : cleaned.substring(3);
+    if (cleaned.startsWith('+375') || (cleaned.startsWith('375') && cleaned.length === 12)) {
+      const national = cleaned.startsWith('+375') ? cleaned.substring(4) : cleaned.substring(3);
       if (national.length !== 9) {
         console.error('❌ Неверный формат номера для Беларуси:', national);
         return false;
       }
       fullPhone = `375${national}`;
-      } else {
+    } else if (cleaned.startsWith('+')) {
+      fullPhone = cleaned.substring(1);
+    } else if (/^\d{10,15}$/.test(cleaned)) {
+      fullPhone = cleaned;
+    } else {
       const ruMsisdn = formatRussianMsisdn(phone);
       if (!ruMsisdn) {
         console.error('❌ RocketSMS: неподдерживаемый формат номера:', phone);
         return false;
       }
       fullPhone = ruMsisdn;
+    }
+
+    if (!/^\d{10,15}$/.test(fullPhone)) {
+      console.error('❌ RocketSMS: неверный msisdn:', fullPhone);
+      return false;
     }
 
     const text = rocketSmsVerificationBody(code);
@@ -1434,19 +1444,17 @@ export const sendSMSViaProvider = async (phone: string, code: string): Promise<b
     return notificoreOk;
   }
 
-  // Казахстан (+7): у Notificore нужна регистрация имени — пока Twilio
-  if (country === 'KZ') {
-    console.log('🇰🇿 Казахстан - Twilio (Notificore KZ требует регистрацию отправителя)');
-    return await sendSMSViaTwilio(phone, code);
-  }
-  
   // США и Канада: не отправляем SMS, только email
   if (country === 'US' || country === 'CA') {
     console.log(`🇺🇸🇨🇦 ${country === 'US' ? 'США' : 'Канада'} - SMS отключены, используйте email`);
     return false; // Не отправляем SMS, только email
   }
-  
-  // Остальные страны: используем Twilio
-  console.log('🌍 Другая страна - используем Twilio');
-  return await sendSMSViaTwilio(phone, code);
+
+  // KZ + остальные страны: RocketSMS (Twilio отключён)
+  console.log(
+    country === 'KZ'
+      ? '🇰🇿 Казахстан - RocketSMS'
+      : '🌍 Другая страна - RocketSMS'
+  );
+  return await sendSMSViaRocketSMS(phone, code);
 };

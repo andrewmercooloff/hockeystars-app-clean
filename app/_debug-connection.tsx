@@ -144,6 +144,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-  btnSecondary: { backgroundColor: '#333' },
+  btnSecondary: { backgroundColor: '#2a2430' },
   btnText: { color: '#fff', fontWeight: '600' },
 });

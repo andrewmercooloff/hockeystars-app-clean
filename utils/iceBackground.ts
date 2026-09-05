@@ -1,16 +1,22 @@
 import { Asset } from 'expo-asset';
 import { Image as ExpoImage } from 'expo-image';
-import { Image as RNImage } from 'react-native';
+import { Image as RNImage, Platform } from 'react-native';
 
-/** Единый фон «лёд» для всего приложения. */
-export const ICE_BACKGROUND = require('../assets/images/led.jpg');
+/**
+ * Web: lighter WebP (~68KB). Native: JPEG (universal decode).
+ * Same ice look; web avoids downloading ~386KB JPG on every cold start.
+ */
+export const ICE_BACKGROUND =
+  Platform.OS === 'web'
+    ? require('../assets/images/led.webp')
+    : require('../assets/images/led.jpg');
 
-/** recyclingKey для expo-image — один декодированный bitmap на все экраны. */
-export const ICE_RECYCLING_KEY = 'hockeystars-ice-led';
+/** recyclingKey for expo-image — one decoded bitmap across screens. */
+export const ICE_RECYCLING_KEY = 'hockeystars-ice-led-v3';
 
 let warmPromise: Promise<void> | null = null;
 
-/** Прогрев в expo-image + expo-asset до первого экрана. */
+/** Warm expo-image + expo-asset before first screen. */
 export function warmIceBackground(): Promise<void> {
   if (!warmPromise) {
     warmPromise = (async () => {

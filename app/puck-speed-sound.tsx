@@ -31,6 +31,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { buildPlayerPath } from '../utils/playerSeoPath';
+import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 // Динамический импорт для react-native-audio-recorder-player (только для нативных платформ)
@@ -1507,7 +1509,7 @@ export default function PuckSpeedSoundScreen() {
                 }
                 // Если есть текущий пользователь, переходим в его профиль
                 if (currentUser?.id) {
-                  router.replace(`/player/${currentUser.id}`);
+                  router.replace(buildPlayerPath(currentUser.id) as any);
                 } else if (router.canGoBack()) {
                   router.back();
                 } else {
@@ -1682,7 +1684,7 @@ export default function PuckSpeedSoundScreen() {
                                     onConfirm: () => {
                                       setAlert({ ...alert, visible: false });
                                       // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
-                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                      navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, scrollToSpeed: 'true', replace: true });
                                     },
                                   });
                                 } else {
@@ -1694,7 +1696,7 @@ export default function PuckSpeedSoundScreen() {
                                     onConfirm: () => {
                                       setAlert({ ...alert, visible: false });
                                       // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
-                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                      navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, scrollToSpeed: 'true', replace: true });
                                     },
                                   });
                                 }
@@ -1766,7 +1768,7 @@ export default function PuckSpeedSoundScreen() {
                                     onConfirm: () => {
                                       setAlert({ ...alert, visible: false });
                                       // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
-                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                      navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, scrollToSpeed: 'true', replace: true });
                                     },
                                     });
                                   } else {
@@ -1778,7 +1780,7 @@ export default function PuckSpeedSoundScreen() {
                                     onConfirm: () => {
                                       setAlert({ ...alert, visible: false });
                                       // Переходим на профиль текущего пользователя в раздел радара (без прокрутки, сразу открываем раздел)
-                                      router.replace(`/player/${currentUser.id}?scrollToSpeed=true`);
+                                      navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, scrollToSpeed: 'true', replace: true });
                                     },
                                     });
                                   }
@@ -1990,7 +1992,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'transparent',
   },
   pageHeader: {
     position: 'absolute',
@@ -1998,7 +2000,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -2231,7 +2233,7 @@ const styles = StyleSheet.create({
   },
   speedBox: {
     width: '100%',
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderWidth: 4,
     borderColor: '#fa2f40',
     borderRadius: 20,
@@ -2269,7 +2271,7 @@ const styles = StyleSheet.create({
     marginBottom: -5, // Уменьшен отступ снизу
   },
   resultDetails: {
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
@@ -2288,10 +2290,10 @@ const styles = StyleSheet.create({
     flex: 1,
     maxHeight: '65%', // Увеличено (было 60%) - больше места для таблицы
     zIndex: 50,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -2320,7 +2322,7 @@ const styles = StyleSheet.create({
   recordHistoryItem: {
     backgroundColor: 'rgba(250, 47, 64, 0.2)',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.5)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   historySpeed: {
     color: '#fff',
@@ -2442,7 +2444,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     borderWidth: 1,
     borderColor: '#fa2f40',
     borderRadius: 8,
@@ -2535,7 +2537,7 @@ const styles = StyleSheet.create({
     bottom: 120,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 15,
     padding: 15,
     borderWidth: 2,
@@ -2588,7 +2590,7 @@ const styles = StyleSheet.create({
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderWidth: 1.5, // Уменьшено (было 2)
     borderColor: '#fa2f40',
     paddingHorizontal: 15, // Уменьшено (было 20)
@@ -2608,7 +2610,7 @@ const styles = StyleSheet.create({
     right: 20,
     paddingHorizontal: 15,
     paddingVertical: 12,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#fa2f40',

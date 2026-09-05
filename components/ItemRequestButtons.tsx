@@ -173,7 +173,7 @@ const ItemRequestButtons: React.FC<ItemRequestButtonsProps> = ({
                 value={requestMessage}
                 onChangeText={setRequestMessage}
                 placeholder={t('gifts.requestMessagePlaceholder')}
-                                 placeholderTextColor="#666"
+                                 placeholderTextColor="#8a8a92"
                 multiline
                 numberOfLines={6}
                 maxLength={500}
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   modalTitle: {
     fontSize: 16,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   itemTypeDisplay: {
     alignItems: 'center',
     paddingVertical: 16,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 8,
     marginBottom: 16,
   },
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   input: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 6,
     padding: 10,
     fontSize: 14,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: '#8a8a92',
   },
   submitButtonText: {
     color: 'white',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 6,
     padding: 12,
     marginTop: 16,

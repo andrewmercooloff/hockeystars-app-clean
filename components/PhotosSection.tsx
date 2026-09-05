@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import {
     Dimensions,
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import PhotoViewer from './PhotoViewer';
-import { useMediaAspectSize } from '../utils/mediaAspectSize';
+import CachedImage from './CachedImage';
+import HorizontalScrollWithArrows from './HorizontalScrollWithArrows';
+import { getPhotoTileSize } from '../utils/mediaTileSize';
 
 const { width: screenWidth } = Dimensions.get('window');
-const PHOTO_TILE_WIDTH = Math.round(screenWidth * 0.42);
+const { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT } = getPhotoTileSize(screenWidth);
 
 function PhotoTile({
   photo,
@@ -24,27 +24,19 @@ function PhotoTile({
   index: number;
   onPress: (index: number) => void;
 }) {
-  const { width, height } = useMediaAspectSize(photo, PHOTO_TILE_WIDTH, 'image');
   return (
     <TouchableOpacity
-      style={[styles.photoContainer, { width, height }]}
+      style={[styles.photoContainer, { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT }]}
       onPress={() => onPress(index)}
       activeOpacity={0.8}
     >
-      <Image
-        source={{
-          uri: photo,
-          headers: {
-            'Cache-Control': 'public, max-age=31536000',
-          },
-        }}
+      <CachedImage
+        imageUrl={photo}
         style={styles.photo}
-        contentFit="contain"
-        cachePolicy="memory-disk"
-        transition={0}
+        resizeMode="cover"
       />
       <View style={styles.photoOverlay}>
-        <Ionicons name="expand-outline" size={20} color="#fff" />
+        <Ionicons name="expand-outline" size={16} color="#fff" />
       </View>
     </TouchableOpacity>
   );
@@ -71,15 +63,14 @@ const PhotosSection = React.memo(function PhotosSection({ photos = [] }: PhotosS
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Хоккейные фото</Text>
       
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
+      <HorizontalScrollWithArrows
         contentContainerStyle={styles.photosScroll}
+        scrollStep={PHOTO_TILE_WIDTH + 10}
       >
         {photos.map((photo, index) => (
           <PhotoTile key={index} photo={photo} index={index} onPress={openPhotoViewer} />
         ))}
-      </ScrollView>
+      </HorizontalScrollWithArrows>
 
       <PhotoViewer
         photos={photos}
@@ -95,12 +86,12 @@ export default PhotosSection;
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -113,7 +104,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginBottom: 15,
   },
   emptyContainer: {
@@ -135,13 +126,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     borderWidth: 2,
-    borderColor: '#FF4444',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    borderColor: '#fa2f40',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
   },
   photo: {
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
   },
   photoOverlay: {
     position: 'absolute',
@@ -149,9 +140,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
     justifyContent: 'center',
     alignItems: 'center',
     opacity: 0,
   },
-}); 
+});

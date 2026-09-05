@@ -1,0 +1,52 @@
+# HockeyStars — https://hockey-stars.com
+# Updated for Google / Yandex SEO
+
+User-agent: *
+Allow: /
+
+# Public marketing & SEO pages
+Allow: /en
+Allow: /en/
+Allow: /top
+Allow: /top/
+Allow: /player/
+Allow: /*/player/
+
+# App UI (not for organic search)
+Disallow: /feed
+Disallow: /messages
+Disallow: /notifications
+Disallow: /search
+Disallow: /exercises
+Disallow: /chat/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /get-app
+Disallow: /puck-
+Disallow: /puck-test
+Disallow: /puck-speed-sound
+Disallow: /debug
+Disallow: /_debug
+Disallow: /_sitemap
+Disallow: /+not-found
+
+# System / API / PHP entry points
+Disallow: /api/
+Disallow: /*.php$
+Disallow: /player-bootstrap
+Disallow: /config
+Disallow: /assets/site-auth.js
+
+# Query-string duplicates (returnTo, utm, lang on SPA, etc.)
+Disallow: /*?
+
+# Yandex: strip tracking / app params from indexed URLs
+Clean-param: returnTo&returnToPlayerId&chatId&refreshProfile&refresh&scrollToMuseum&scrollToStats&scrollToPhotos&scrollToVideos&scrollToAchievements&scrollToExercises&scrollToNormatives&scrollToFriends&scrollToGift&scrollToSpeed&scrollToAnalysis&edit&openGameResults&openQuizResults&lang&utm_source&utm_medium&utm_campaign&utm_content&utm_term&ref&fbclid&gclid&yclid /
+
+# Preferred host (Yandex)
+Host: https://hockey-stars.com
+
+# XML sitemap index (includes static + players)
+Sitemap: https://hockey-stars.com/sitemap.xml

@@ -22,7 +22,7 @@ import { BlurOrSolid } from './BlurOrSolid';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Player, notifyFriendsAboutGameFirstPlace } from '../utils/playerStorage';
+import { Player, getPlayerSeasonPoints, notifyFriendsAboutGameFirstPlace } from '../utils/playerStorage';
 import { bestScoreForPlayer, buildDualLeaderboards } from '../utils/gameLeaderboard';
 import { supabase } from '../utils/supabase';
 import IceRinkMarkings from './IceRinkMarkings';
@@ -1341,20 +1341,10 @@ const OriginalPuckAnimator = React.memo(
               if (!hasDragged) onNav();
             }}
             size={position.size}
-            points={
-              player.goals && player.assists
-                ? (() => {
-                    try {
-                      const goals = parseInt(player.goals) || 0;
-                      const assists = parseInt(player.assists) || 0;
-                      const total = goals + assists;
-                      return total > 0 && !isNaN(total) ? total.toString() : undefined;
-                    } catch {
-                      return undefined;
-                    }
-                  })()
-                : undefined
-            }
+            points={(() => {
+              const total = getPlayerSeasonPoints(player);
+              return total > 0 ? String(total) : undefined;
+            })()}
             isStar={player.status === 'star'}
             status={player.status}
             isOnline={(player as any).isOnline}
@@ -2103,7 +2093,7 @@ export default function PuckGame({ visible, onClose, visiblePlayers, currentUser
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose}>
       <View style={gs.container}>
-        <CachedBackground source={LED_BG} style={gs.background} resizeMode="cover">
+        <CachedBackground source={LED_BG} style={gs.background} resizeMode="cover" vignette={false}>
           <View
             style={gs.background}
             onLayout={(e) => {
@@ -2566,7 +2556,7 @@ const gs = StyleSheet.create({
   },
   closeBtnBigText: {
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 14,
   },
   leaderboard: {

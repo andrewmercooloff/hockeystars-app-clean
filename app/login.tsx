@@ -2,6 +2,7 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+    Dimensions,
     Keyboard,
     Platform,
     StyleSheet,
@@ -79,7 +80,7 @@ export default function LoginScreen() {
   // Если пользователь уже авторизован, перенаправляем на главную
   useEffect(() => {
     if (currentUser) {
-      router.replace('/');
+      router.replace(Platform.OS === 'web' ? '/feed' : '/');
     }
   }, [currentUser, router]);
 
@@ -91,7 +92,7 @@ export default function LoginScreen() {
     setAlert({ ...alert, visible: false });
     setTimeout(() => {
       // Переходим на главный экран с параметром refresh для обновления данных
-      router.push('/?refresh=true');
+      router.push(Platform.OS === 'web' ? '/feed?refresh=true' : '/?refresh=true');
     }, 100);
   };
 
@@ -154,8 +155,15 @@ export default function LoginScreen() {
 
   // Таймер для повторной отправки
   useEffect(() => {
+    if (step === 'code') {
+      const t = setTimeout(() => codeRef.current?.focus(), 150);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    
+
     if (resendTimer > 0) {
       interval = setInterval(() => {
         setResendTimer(prev => {
@@ -167,7 +175,7 @@ export default function LoginScreen() {
         });
       }, 1000);
     }
-    
+
     return () => {
       if (interval) {
         clearInterval(interval);
@@ -522,18 +530,21 @@ export default function LoginScreen() {
     return null;
   }
 
-  return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+  const screenW = Dimensions.get('window').width;
+  const isNarrowWeb = Platform.OS === 'web' && screenW < 480;
+  // Keep modal within viewport; long placeholders must not expand the box
+  const modalWidth = Math.min(isNarrowWeb ? screenW - 32 : 360, screenW - 32);
+
+  const formContent = (
       <View style={styles.container}>
-        <CachedBackground source={ICE_BACKGROUND} style={styles.hockeyRink} resizeMode="cover">
-            {/* Внутренняя граница хоккейной коробки */}
+        <CachedBackground source={ICE_BACKGROUND} style={styles.hockeyRink} resizeMode="cover" vignette={false}>
             <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
             
             <View style={styles.modalOverlay}>
-              <View style={styles.modalContainer}>
+              <View style={[styles.modalContainer, { width: modalWidth, maxWidth: modalWidth, minWidth: 0, margin: 12 }]}>
                 {/* Заголовок "Выход на лед" */}
                 <View style={styles.modalHeader}>
-                  <Ionicons name="log-in" size={40} color="#FF4444" />
+                  <Ionicons name="log-in" size={40} color="#fa2f40" />
                   <Text style={styles.modalTitle}>
                     {t('auth.exitToIce')}
                   </Text>
@@ -553,7 +564,11 @@ export default function LoginScreen() {
                       style={styles.input}
                       value={formData.contact}
                       onChangeText={handleContactChange}
-                      placeholder={t('auth.phoneOrEmailPlaceholder') || '+1234567890 or email@example.com'}
+                      placeholder={
+                        isNarrowWeb
+                          ? t('auth.phoneOrEmailPlaceholderShort')
+                          : t('auth.phoneOrEmailPlaceholder')
+                      }
                       placeholderTextColor="#888"
                       autoCapitalize="none"
                       autoComplete="off"
@@ -575,9 +590,9 @@ export default function LoginScreen() {
                   <>
                     <View style={styles.inputContainer}>
                       <Text style={styles.label}>{t('auth.code')}</Text>
-                      <TextInput
+                      <WebTextInput
                         ref={codeRef}
-                        style={[styles.input, styles.codeInput]}
+                        style={[styles.input, styles.codeInput, { minWidth: 0 }]}
                         value={formData.code}
                         onChangeText={handleCodeChange}
                         placeholder={t('auth.codePlaceholder')}
@@ -592,7 +607,7 @@ export default function LoginScreen() {
                         onSubmitEditing={handleVerifyCode}
                         editable={!loading}
                         selectTextOnFocus={true}
-                        autoFocus={false}
+                        autoFocus={Platform.OS === 'web'}
                       />
                     </View>
                     
@@ -656,7 +671,7 @@ export default function LoginScreen() {
                         }}
                         disabled={loading}
                       >
-                        <Ionicons name="arrow-back" size={20} color="#FF4444" />
+                        <Ionicons name="arrow-back" size={20} color="#fa2f40" />
                         <Text style={[styles.modalButtonText, styles.modalButtonTextSecondary]}>
                           {t('common.back')}
                         </Text>
@@ -672,7 +687,7 @@ export default function LoginScreen() {
                     onPress={() => router.push('/register')}
                     disabled={loading}
                   >
-                    <Ionicons name="person-add" size={20} color="#FF4444" />
+                    <Ionicons name="person-add" size={20} color="#fa2f40" />
                     <Text style={styles.registerButtonText}>
                       {t('auth.register')}
                     </Text>
@@ -701,6 +716,15 @@ export default function LoginScreen() {
           confirmText={t('common.ok')}
         />
       </View>
+  );
+
+  if (Platform.OS === 'web') {
+    return formContent;
+  }
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      {formContent}
     </TouchableWithoutFeedback>
   );
 }
@@ -731,16 +755,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: 'rgba(5, 0, 8, 0.9)',
+    backgroundColor: 'rgba(11, 11, 14, 0.9)',
     borderRadius: 20,
-    padding: 25,
-    margin: 20,
-    minWidth: Platform.OS === 'web' ? 380 : 320, // Больше места для веб
-    maxWidth: Platform.OS === 'web' ? 400 : 'auto', // Ограничиваем максимальную ширину
+    padding: 20,
+    alignSelf: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
-    boxShadow: '0 10px 20px rgba(5, 0, 8, 0.5)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 10px 20px rgba(11, 11, 14, 0.5)',
     elevation: 10,
+    overflow: 'hidden',
+    maxWidth: '100%',
+    minWidth: 0,
+    ...(Platform.OS === 'web' ? ({ boxSizing: 'border-box' } as any) : null),
   },
   modalHeader: {
     alignItems: 'center',
@@ -763,6 +789,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 20,
+    width: '100%',
+    maxWidth: '100%',
+    minWidth: 0,
+    alignSelf: 'stretch',
+    overflow: 'hidden',
   },
   label: {
     fontSize: 16,
@@ -771,25 +802,30 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 14,
     padding: 15,
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    letterSpacing: 0, // Явно устанавливаем стандартное межбуквенное расстояние для placeholder
-    // Убираем width, чтобы поле адаптировалось к контейнеру
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    letterSpacing: 0,
+    width: '100%',
+    maxWidth: '100%',
+    minWidth: 0,
+    alignSelf: 'stretch',
   },
   modalButtons: {
     flexDirection: 'row',
     gap: 15,
     marginBottom: 20,
+    width: '100%',
+    maxWidth: '100%',
   },
   modalButton: {
     flex: 1,
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     borderRadius: 12,
     padding: 15,
     flexDirection: 'row',
@@ -797,9 +833,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalButtonSecondary: {
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderWidth: 1,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
   },
   modalButtonText: {
     fontSize: 14,
@@ -810,7 +846,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalButtonTextSecondary: {
-    color: '#FF4444',
+    color: '#fa2f40',
   },
   modalCancelButton: {
     alignItems: 'center',
@@ -826,10 +862,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
     fontFamily: 'Gilroy-Bold',
-    letterSpacing: 8,
+    letterSpacing: Platform.OS === 'web' ? 6 : 8,
     color: '#fff',
-    minWidth: 280,
+    minWidth: 0,
     width: '100%',
+    maxWidth: '100%',
   },
   emailHint: {
     fontSize: 14,
@@ -843,8 +880,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   registerButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 15,
+    backgroundColor: 'rgba(250, 47, 64, 0.08)',
+    borderRadius: 14,
     padding: 15,
     alignItems: 'center',
     marginTop: 8,
@@ -852,12 +889,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
   },
   registerButtonText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
-    color: '#FF4444',
+    color: '#fa2f40',
     marginLeft: 8,
   },
   resendButton: {
@@ -873,7 +910,7 @@ const styles = StyleSheet.create({
   },
   resendButtonDisabled: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderColor: '#666',
+    borderColor: '#8a8a92',
   },
   resendButtonText: {
     fontSize: 12,
@@ -882,7 +919,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   resendButtonTextDisabled: {
-    color: '#666',
+    color: '#8a8a92',
   },
   webInput: {
     // Web-specific styles removed for React Native compatibility

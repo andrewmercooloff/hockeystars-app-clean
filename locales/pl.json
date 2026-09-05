@@ -28,7 +28,9 @@
     "retry": "Spróbuj ponownie",
     "goalie": "Bramkarz",
     "left": "Lewy",
-    "right": "Prawidłowy"
+    "right": "Prawidłowy",
+    "offline": "Brak połączenia",
+    "and": "i"
   },
   "winger": "Skrzydłowy",
   "center": "Środkowy napastnik",
@@ -2968,7 +2970,8 @@
     "errorProcessNotificationGeneral": "Nie można przetworzyć powiadomienia. Spróbuj ponownie.",
     "errorProcessFriendRequest": "Nie można przetworzyć prośby o dodanie do znajomych.",
     "errorProcessRequest": "Nie udało się przetworzyć Twojego żądania",
-    "errorSendMessage": "Nie udało się wysłać wiadomości"
+    "errorSendMessage": "Nie udało się wysłać wiadomości",
+    "phoneOrEmailPlaceholderShort": "+48… lub email"
   },
   "profile": {
     "addFriend": "Dodaj jako znajomego",
@@ -3021,7 +3024,7 @@
     "cancel": "Anulować",
     "friends": "Przyjaciele",
     "friendship": "Przyjaźń",
-    "statistics": "Statystyki bieżącego sezonu",
+    "statistics": "Statistics",
     "teams": "Zespoły",
     "currentTeams": "Obecne zespoły",
     "pastTeams": "Poprzednie drużyny",
@@ -3266,8 +3269,12 @@
     "currentTeam": "Drużyna",
     "hockeyExperience": "Doświadczenie w hokeju",
     "years": "lat",
-    "currentSeasonStats": "Statystyki bieżącego sezonu",
-    "effectiveness": "PPG"
+    "currentSeasonStats": "Statistics · {season}",
+    "effectiveness": "PPG",
+    "city": "Miasto",
+    "addAddress": "Dodaj adres",
+    "addressesHint": "Możesz podać kilka adresów",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Rejestracja",
@@ -3627,11 +3634,13 @@
     "star": "Gwiazda",
     "video_liked": {
       "title": "Polubiono Twoje wideo",
-      "message": "{name} polubił Twoje wideo"
+      "message": "{name} polubił Twoje wideo",
+      "grouped": "{name} polubił {count} twoich filmów"
     },
     "photo_liked": {
       "title": "Polubiono Twoje zdjęcie",
-      "message": "{name} polubił Twoje zdjęcie"
+      "message": "{name} polubił Twoje zdjęcie",
+      "grouped": "{name} polubił {count} twoich zdjęć"
     },
     "profileViewsDigest": {
       "title": "Wyświetlenia profilu",
@@ -3682,7 +3691,13 @@
     "waitingForConnection": "Oczekiwanie na połączenie",
     "checkInternetConnection": "Sprawdź połączenie internetowe",
     "shakeHintTitle": "Potrząśnij urządzeniem",
-    "shakeHintSubtext": "aby odświeżyć listę graczy"
+    "shakeHintSubtext": "aby odświeżyć listę graczy",
+    "inviteFriends": "Zaproś",
+    "inviteTitle": "Dołącz do HockeyStars!",
+    "inviteMessage": "Stwórz profil hokeisty, rywalizuj z przyjaciółmi i wejdź na szczyt.",
+    "inviteSubtitle": "Wyślij link – znajomi trafią prosto na twój profil",
+    "copyLink": "Kopiuj link",
+    "moreApps": "Więcej"
   },
   "filters": {
     "year": "rok",
@@ -4112,5 +4127,14 @@
     "feed": "Feed",
     "scout": "Skaut",
     "skills": "Skill"
+  },
+  "seo": {
+    "homeTitle": "Aplikacja hokejowa Hockeystars"
+  },
+  "download": {
+    "installTitle": "Zainstaluj aplikację",
+    "scanQr": "Zeskanuj telefonem — otworzy się App Store lub Google Play",
+    "appStoreCta": "Pobierz z App Store",
+    "playStoreCta": "Pobierz z Google Play"
   }
 }

@@ -20,8 +20,6 @@ import LikeButton from './LikeButton';
 import { generateVideoContentId } from '../utils/likesService';
 import VideoPlayer from './VideoPlayer';
 import { VideoPreviewThumbnail } from './VideoCarousel';
-import { useNotificationCarouselSlotHeight } from '../utils/mediaAspectSize';
-import { getVideoThumbnailUrl } from '../utils/videoUrls';
 
 interface VideoAddedNotificationProps {
   playerName: string;
@@ -34,8 +32,11 @@ interface VideoAddedNotificationProps {
   onScrubActiveChange?: (active: boolean) => void;
 }
 
-const CARD_HORIZONTAL_INSET = 16 * 2 + 14 * 2;
-const VIDEO_WIDTH = Dimensions.get('window').width - CARD_HORIZONTAL_INSET;
+// Медиа на всю ширину карточки (карточка: marginHorizontal 16)
+const MEDIA_INSET = 10;
+const VIDEO_WIDTH = Dimensions.get('window').width - 16 * 2 - MEDIA_INSET * 2;
+// Единый кадр 16:9 для всех видео
+const VIDEO_HEIGHT = Math.round((VIDEO_WIDTH * 9) / 16);
 
 function NotificationVideoBlock({
   url,
@@ -172,12 +173,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   const hasVideos = videoUrls.length > 0 && !!playerId;
   const showVideoArea = displayCount > 0;
   const useCarousel = videoUrls.length > 1;
-  const slotHeight = useNotificationCarouselSlotHeight(
-    videoUrls,
-    VIDEO_WIDTH,
-    'video',
-    (uri) => getVideoThumbnailUrl(uri),
-  );
+  const slotHeight = VIDEO_HEIGHT;
 
   const onCarouselScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -191,23 +187,23 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
     <View style={styles.header}>
       <View style={styles.avatarContainer}>
         {playerId ? (
-          <CachedAvatar playerId={playerId} fallbackAvatarUrl={playerAvatar} size={44} style={styles.playerAvatar} />
+          <CachedAvatar playerId={playerId} fallbackAvatarUrl={playerAvatar} size={36} style={styles.playerAvatar} />
         ) : (
           <Ionicons name="videocam-outline" size={22} color="#fff" />
         )}
       </View>
       <View style={styles.headerText}>
-        <Text style={styles.playerName} numberOfLines={1}>{playerName}</Text>
-        <Text style={styles.actionText}>
-          {t('videoNotification.added')} {getVideoText(displayCount)}
+        <Text style={styles.headerLine} numberOfLines={1}>
+          <Text style={styles.playerName}>{playerName}</Text>
+          <Text style={styles.actionText}> · {t('videoNotification.added')} {getVideoText(displayCount)}</Text>
+          <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
         </Text>
       </View>
-      <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
     </View>
   );
 
   return (
-    <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
+    <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
         {onHeaderPress ? (
           <TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>
@@ -247,16 +243,18 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
                       </View>
                     ))}
                   </ScrollView>
-                  <View style={styles.carouselDots}>
+                  <View style={styles.counterChip} pointerEvents="none">
+                    <Text style={styles.carouselCounter}>
+                      {activeIndex + 1}/{videoUrls.length}
+                    </Text>
+                  </View>
+                  <View style={styles.carouselDots} pointerEvents="none">
                     {videoUrls.map((url, idx) => (
                       <View
                         key={`dot-${url}-${idx}`}
                         style={[styles.dot, idx === activeIndex && styles.dotActive]}
                       />
                     ))}
-                    <Text style={styles.carouselCounter}>
-                      {activeIndex + 1}/{videoUrls.length}
-                    </Text>
                   </View>
                 </>
               ) : (
@@ -324,67 +322,78 @@ export default VideoAddedNotification;
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
-    padding: 14,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4A90E2',
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   avatarContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
   playerAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   headerText: {
     flex: 1,
   },
+  headerLine: {
+    color: '#d4d4d8',
+    fontSize: 14,
+    lineHeight: 18,
+    fontFamily: 'Gilroy-Regular',
+  },
   playerName: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Gilroy-Bold',
   },
   actionText: {
-    color: '#ccc',
-    fontSize: 13,
+    color: '#d4d4d8',
+    fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    marginTop: 1,
   },
   timeText: {
-    color: '#888',
-    fontSize: 11,
+    color: '#a1a1aa',
+    fontSize: 12,
     fontFamily: 'Gilroy-Regular',
-    marginLeft: 6,
   },
   videosArea: {
-    width: '100%',
-    alignItems: 'flex-start',
+    width: VIDEO_WIDTH,
+    marginHorizontal: MEDIA_INSET,
+    marginBottom: MEDIA_INSET,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignItems: 'stretch',
+    position: 'relative',
+    backgroundColor: '#15151a',
   },
   carousel: {
     width: VIDEO_WIDTH,
@@ -393,29 +402,42 @@ const styles = StyleSheet.create({
     width: VIDEO_WIDTH,
   },
   carouselDots: {
+    position: 'absolute',
+    left: 0,
+    width: VIDEO_WIDTH,
+    bottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 6,
-    gap: 6,
+    gap: 5,
+    zIndex: 5,
+  },
+  counterChip: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 5,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   dotActive: {
-    backgroundColor: '#fa2f40',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    backgroundColor: '#fff',
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
   },
   carouselCounter: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 11,
-    fontFamily: 'Gilroy-Regular',
-    marginLeft: 4,
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
   },
   videoBlock: {
     overflow: 'hidden',
@@ -433,14 +455,14 @@ const styles = StyleSheet.create({
   },
   likeOverlay: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 10,
+    right: 10,
     zIndex: 30,
   },
   fullscreenBtn: {
     position: 'absolute',
-    bottom: 8,
-    left: 8,
+    bottom: 10,
+    right: 10,
     zIndex: 30,
     backgroundColor: 'rgba(0,0,0,0.55)',
     borderRadius: 8,
@@ -457,7 +479,7 @@ const styles = StyleSheet.create({
     right: 14,
     zIndex: 1000,
     backgroundColor: 'rgba(0,0,0,0.65)',
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 8,
   },
   modalPlayer: {
@@ -468,7 +490,9 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4A90E2',
+    marginHorizontal: 14,
+    marginBottom: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,

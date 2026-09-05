@@ -144,7 +144,7 @@ const ItemRequestNotifications: React.FC<ItemRequestNotificationsProps> = ({ pla
       <View style={styles.header}>
         <Text style={styles.title}>{t('requests.giftRequests')}</Text>
                  <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
-           <Ionicons name="refresh" size={18} color="#ff4444" />
+           <Ionicons name="refresh" size={18} color="#fa2f40" />
          </TouchableOpacity>
       </View>
 
@@ -370,9 +370,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#2a2430',
   },
   title: {
     fontSize: 16,
@@ -396,12 +396,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   requestCard: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2a2430',
   },
   requestHeader: {
     flexDirection: 'row',
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   itemTypeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 8,

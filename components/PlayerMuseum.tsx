@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, memo, useState } from 'react';
+import React, { useCallback, useEffect, memo, useRef, useState } from 'react';
 import {
     Alert,
     Image,
@@ -11,10 +11,12 @@ import {
 import { FlatList } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { buildPlayerPath } from '../utils/playerSeoPath';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CachedImage from './CachedImage';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 interface MuseumItem {
   id: string;
@@ -49,7 +51,10 @@ interface PlayerMuseumProps {
 
 const MUSEUM_COLUMN_WIDTH = 152;
 const MUSEUM_COLUMN_GAP = 12;
-const MUSEUM_SCROLLER_HEIGHT = 370;
+/** One gift card ≈ image 144 + captions + caption */
+const MUSEUM_ROW_HEIGHT = 210;
+const MUSEUM_SCROLLER_HEIGHT_SINGLE = MUSEUM_ROW_HEIGHT;
+const MUSEUM_SCROLLER_HEIGHT_DOUBLE = MUSEUM_ROW_HEIGHT * 2 - 20;
 
 function parseMuseumGiftName(customName: string): string {
   if (!customName) return '';
@@ -200,6 +205,10 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   const [refreshing, setRefreshing] = useState(false);
   const [isStar, setIsStar] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const museumListRef = useRef<FlatList<MuseumItem[]>>(null);
+  const scrollOffsetRef = useRef(0);
+  const isDesktop = useIsDesktopLayout();
 
   const clearMuseumCache = useCallback(async () => {
     try {
@@ -213,7 +222,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
 
   const navigateToStarProfile = useCallback(
     (starId: string) => {
-      router.push(`/player/${starId}`);
+      router.push(buildPlayerPath(starId) as any);
     },
     [router]
   );
@@ -625,7 +634,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
   if (museumItems.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="gift-outline" size={48} color="#666" />
+        <Ionicons name="gift-outline" size={32} color="#8a8a92" />
         <Text style={styles.emptyText}>
           {t('profile.museumEmpty', { playerName: playerName || t('profile.player') })}
         </Text>
@@ -638,12 +647,29 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
     museumColumns.push(museumItems.slice(i, i + 2));
   }
 
+  const scrollerHeight =
+    museumItems.length < 2 ? MUSEUM_SCROLLER_HEIGHT_SINGLE : MUSEUM_SCROLLER_HEIGHT_DOUBLE;
+
   const contentWidth =
     museumColumns.length * MUSEUM_COLUMN_WIDTH +
     Math.max(0, museumColumns.length - 1) * MUSEUM_COLUMN_GAP;
   const canScrollHorizontally =
     museumColumns.length > 1 &&
     (viewportWidth === 0 || contentWidth > viewportWidth + 2);
+  const showLeftArrow = isDesktop && canScrollHorizontally && scrollOffset > 8;
+  const showRightArrow =
+    isDesktop &&
+    canScrollHorizontally &&
+    scrollOffset < contentWidth - viewportWidth - 8;
+
+  const scrollMuseumBy = (direction: -1 | 1) => {
+    const step = MUSEUM_COLUMN_WIDTH + MUSEUM_COLUMN_GAP;
+    const maxX = Math.max(0, contentWidth - viewportWidth);
+    const next = Math.max(0, Math.min(maxX, scrollOffsetRef.current + direction * step));
+    museumListRef.current?.scrollToOffset({ offset: next, animated: true });
+    scrollOffsetRef.current = next;
+    setScrollOffset(next);
+  };
 
   return (
     <View
@@ -656,6 +682,7 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
       }}
     >
       <FlatList
+        ref={museumListRef}
         horizontal
         data={museumColumns}
         keyExtractor={(_, index) => `museum-col-${index}`}
@@ -681,14 +708,38 @@ const PlayerMuseum: React.FC<PlayerMuseumProps> = ({
           </View>
         )}
         showsHorizontalScrollIndicator={false}
-        style={styles.museumScroller}
+        style={[styles.museumScroller, { height: scrollerHeight }]}
         contentContainerStyle={styles.museumScroll}
         nestedScrollEnabled
         scrollEnabled={canScrollHorizontally}
         decelerationRate="fast"
         keyboardShouldPersistTaps="handled"
         removeClippedSubviews={false}
+        onScroll={(event) => {
+          const x = event.nativeEvent.contentOffset.x;
+          scrollOffsetRef.current = x;
+          setScrollOffset(x);
+        }}
+        scrollEventThrottle={16}
       />
+      {showLeftArrow ? (
+        <TouchableOpacity
+          style={[styles.scrollArrow, styles.scrollArrowLeft]}
+          onPress={() => scrollMuseumBy(-1)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="chevron-back" size={22} color="#fff" />
+        </TouchableOpacity>
+      ) : null}
+      {showRightArrow ? (
+        <TouchableOpacity
+          style={[styles.scrollArrow, styles.scrollArrowRight]}
+          onPress={() => scrollMuseumBy(1)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="chevron-forward" size={22} color="#fff" />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
@@ -706,10 +757,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   museumScrollerWrap: {
+    position: 'relative',
     marginHorizontal: -4,
   },
+  scrollArrow: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  scrollArrowLeft: {
+    left: 4,
+  },
+  scrollArrowRight: {
+    right: 4,
+  },
   museumScroller: {
-    height: MUSEUM_SCROLLER_HEIGHT,
     flexGrow: 0,
   },
   museumScroll: {
@@ -765,7 +836,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 48,
-    color: '#666',
+    color: '#8a8a92',
   },
   itemSource: {
     fontSize: 14,
@@ -779,28 +850,27 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 12,
-    color: '#666',
+    color: '#8a8a92',
     textAlign: 'center',
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    minHeight: 100,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#888',
     fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: 8,
   },
   deleteButton: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 12,
     padding: 6,
     borderWidth: 1,

@@ -28,7 +28,9 @@
     "retry": "Bandyti vėl",
     "goalie": "Vartininkas",
     "left": "kairė",
-    "right": "dešinė"
+    "right": "dešinė",
+    "offline": "Nėra ryšio",
+    "and": "ir"
   },
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
@@ -3196,7 +3198,8 @@
     "errorProcessNotificationGeneral": "Nepavyko apdoroti pranešimo. Bandykite dar kartą.",
     "errorProcessFriendRequest": "Nepavyko apdoroti jūsų užklausos draugauti.",
     "errorProcessRequest": "Nepavyko apdoroti jūsų užklausos",
-    "errorSendMessage": "Nepavyko išsiųsti pranešimo"
+    "errorSendMessage": "Nepavyko išsiųsti pranešimo",
+    "phoneOrEmailPlaceholderShort": "+370… arba el. paštas"
   },
   "profile": {
     "addFriend": "Pridėti kaip draugą",
@@ -3256,7 +3259,7 @@
     "cancel": "Atšaukti",
     "friends": "Draugai",
     "friendship": "Draugystė",
-    "statistics": "Dabartinio sezono statistika",
+    "statistics": "Statistics",
     "teams": "Komandos",
     "currentTeams": "Dabartinės komandos",
     "pastTeams": "Buvusios komandos",
@@ -3486,8 +3489,12 @@
     "currentTeam": "Komanda",
     "hockeyExperience": "Ledo ritulio patirtis",
     "years": "metai",
-    "currentSeasonStats": "Dabartinio sezono statistika",
-    "effectiveness": "PPG"
+    "currentSeasonStats": "Statistics · {season}",
+    "effectiveness": "PPG",
+    "city": "Miestas",
+    "addAddress": "Pridėti adresą",
+    "addressesHint": "Galite nurodyti kelis adresus",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Registracija",
@@ -3857,6 +3864,12 @@
         "many": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų.",
         "other": "Šiandien jūsų profilį peržiūrėjo {{count}} kartų."
       }
+    },
+    "video_liked": {
+      "grouped": "{name} pamėgo {count} jūsų vaizdo įrašus"
+    },
+    "photo_liked": {
+      "grouped": "{name} pamėgo {count} jūsų nuotraukas"
     }
   },
   "editProfile": {
@@ -3898,7 +3911,13 @@
     "waitingForConnection": "Laukiama ryšio",
     "checkInternetConnection": "Patikrinkite interneto ryšį",
     "shakeHintTitle": "Suplakykite įrenginį",
-    "shakeHintSubtext": "atnaujinti žaidėjų sąrašą"
+    "shakeHintSubtext": "atnaujinti žaidėjų sąrašą",
+    "inviteFriends": "Pakviesti",
+    "inviteTitle": "Prisijunk prie HockeyStars!",
+    "inviteMessage": "Susikurk ledo ritulininko profilį, varžykis su draugais ir pakilk į viršūnę.",
+    "inviteSubtitle": "Nusiųsk nuorodą – draugai pateks tiesiai į tavo profilį",
+    "copyLink": "Kopijuoti nuorodą",
+    "moreApps": "Daugiau"
   },
   "filters": {
     "year": "metų",
@@ -4126,5 +4145,14 @@
     "feed": "Juosta",
     "scout": "Skautas",
     "skills": "Įgūdžiai"
+  },
+  "seo": {
+    "homeTitle": "Ledo ritulio programa Hockeystars"
+  },
+  "download": {
+    "installTitle": "Įdiegti programėlę",
+    "scanQr": "Nuskaitykite telefonu — atsidarys App Store arba Google Play",
+    "appStoreCta": "Atsisiųsti iš App Store",
+    "playStoreCta": "Atsisiųsti iš Google Play"
   }
 }

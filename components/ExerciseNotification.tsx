@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
-import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -54,7 +53,7 @@ export default function ExerciseNotification({
 
   return (
     <BlurOrSolid
-      intensity={20}
+      intensity={55}
       tint="dark"
       style={styles.containerBlur}
     >
@@ -94,26 +93,17 @@ export default function ExerciseNotification({
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 20,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    overflow: 'hidden',
-    ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 5,
-      elevation: 8,
-    }),
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
-    padding: 16,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF9800',
+    alignItems: 'center',
   },
   avatarContainer: {
     width: 50,
@@ -135,7 +125,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 2,
   },
   playerName: {
     color: '#fff',
@@ -144,7 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeText: {
-    color: '#aaa',
+    color: '#a1a1aa',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
@@ -156,7 +146,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   actionText: {
-    color: '#ddd',
+    color: '#d4d4d8',
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
@@ -165,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF9800',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 12,

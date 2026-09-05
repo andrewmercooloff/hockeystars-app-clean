@@ -59,7 +59,7 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
 
   return (
     <BlurOrSolid
-      intensity={20}
+      intensity={55}
       tint="dark"
       style={styles.containerBlur}
     >
@@ -114,26 +114,26 @@ const FriendGiftReceivedNotification: React.FC<FriendGiftReceivedNotificationPro
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    borderLeftWidth: 4,
-    borderLeftColor: '#9C27B0',
   },
   avatarContainer: {
     width: 50,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   avatarFallback: {
-    backgroundColor: '#9C27B0',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeText: {
-    color: '#aaa',
+    color: '#a1a1aa',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     marginLeft: 8,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   actionText: {
-    color: '#ddd',
+    color: '#d4d4d8',
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#9C27B0',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 12,

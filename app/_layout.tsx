@@ -2,17 +2,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { Tabs, useRouter, useLocalSearchParams, usePathname } from 'expo-router';
 import * as React from 'react';
-import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking, InteractionManager } from 'react-native';
+import { LogBox, Platform, Text, TextInput, TouchableOpacity, View, Animated, StatusBar, Linking, InteractionManager, StyleSheet } from 'react-native';
 import { Asset } from 'expo-asset';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useNetInfo } from '@react-native-community/netinfo';
 import LogoHeader from '../components/LogoHeader';
+import DesktopShell from '../components/DesktopShell';
 import TabBarLabel from '../components/TabBarLabel';
 import { HomeStarTabButton, HomeStarTabIcon, playHomeStarPressAnimation } from '../components/HomeStarTab';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import WebYandexMetrika from '../components/WebYandexMetrika';
 import { UserProvider, useUser, updateGlobalUserCache } from '../contexts/UserContext';
 import { CountryFilterProvider, useCountryFilter } from '../utils/CountryFilterContext';
 import { YearFilterProvider } from '../utils/YearFilterContext';
-import { LanguageProvider } from '../contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from '../contexts/LanguageContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { ScreenProvider } from '../contexts/ScreenContext';
 import { initializeStorage, loadCurrentUser, markNotificationAsRead, Player, updateOnlineStatus, getUnreadNotificationsBadgeCount, syncUnreadNotificationsCountInDb } from '../utils/playerStorage';
@@ -43,6 +47,7 @@ import {
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
+import { useOtaUpdates } from '../hooks/useOtaUpdates';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -100,6 +105,17 @@ if (DISABLE_LOGS || (!isDev && !enableLogsInProd)) {
 
 
 
+const OfflineLabel = React.memo(() => {
+  const { t } = useLanguage();
+  const v = t('common.offline');
+  return (
+    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontFamily: 'Gilroy-Bold' }}>
+      {!v || v === 'common.offline' ? 'Нет соединения' : v}
+    </Text>
+  );
+});
+OfflineLabel.displayName = 'OfflineLabel';
+
   // Внутренний компонент для синхронизации с UserContext
 // Вынесен из RootLayout чтобы избежать пересоздания компонента при каждом рендере
 const UserSync = React.memo(({
@@ -112,6 +128,7 @@ const UserSync = React.memo(({
   splashOpacity,
   splashStartTime,
   appReady,
+  setAppReady,
   userLoaded,
   loadUser,
 }: {
@@ -129,6 +146,7 @@ const UserSync = React.memo(({
   splashOpacity: any; // Animated.Value
   splashStartTime: React.MutableRefObject<number>;
   appReady: boolean;
+  setAppReady: React.Dispatch<React.SetStateAction<boolean>>;
   userLoaded: boolean;
   loadUser: () => Promise<void>;
 }) => {
@@ -263,9 +281,12 @@ const UserSync = React.memo(({
     
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
-      // Принудительное скрытие splash screen через 2 секунды максимум
-      const maxSplashTime = 2000; // 2 секунды максимум
+      // Overlay is (!loaded || showSplash || !appReady) — force-hide must clear both.
+      // Web: ~3s safety so a hung init cannot leave an infinite spinner.
+      // Web: shorter ceiling — JS parse already costs time; don't add artificial wait.
+      const maxSplashTime = Platform.OS === 'web' ? 1600 : 2000;
       const forceHideSplashTimeout = setTimeout(() => {
+        setAppReady(true);
         Animated.timing(splashOpacity, {
           toValue: 0,
           duration: 300,
@@ -279,7 +300,7 @@ const UserSync = React.memo(({
         // Плавно скрываем наш кастомный splash screen когда все загружено
         clearTimeout(forceHideSplashTimeout);
         
-        // Вычисляем оставшееся время до максимума (2 секунды)
+        // Вычисляем оставшееся время до максимума
         const elapsed = Date.now() - splashStartTime.current;
         const remainingTime = Math.max(0, maxSplashTime - elapsed);
         
@@ -301,15 +322,23 @@ const UserSync = React.memo(({
       return () => {
         clearTimeout(forceHideSplashTimeout);
       };
-  }, [appReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime]);
+  }, [appReady, setAppReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime]);
     
     return null;
 });
 
 export default function RootLayout() {
+  useOtaUpdates();
   const deferSecondaryTabs = React.useMemo(() => isLowEndAndroid(), []);
   const router = useRouter();
   const pathname = usePathname();
+  const isDesktopLayout = useIsDesktopLayout();
+  const isMobileWeb = Platform.OS === 'web' && !isDesktopLayout;
+  const isAuthScreen =
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname?.startsWith('/login') ||
+    pathname?.startsWith('/register');
   const netInfo = useNetInfo();
   const [pingOnline, setPingOnline] = React.useState<boolean>(true);
   const pingFailStreakRef = React.useRef(0);
@@ -804,7 +833,7 @@ export default function RootLayout() {
           width: size + 4,
           height: size + 4,
         }}>
-          <Ionicons name="notifications-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
+          <Ionicons name="notifications-outline" size={iconSize} color={focused ? colors.brand : '#8a8a92'} />
           {!shouldShowBadge ? null : (
             <View style={{
               position: 'absolute',
@@ -1138,21 +1167,29 @@ export default function RootLayout() {
         // Сначала выбираем маршрут: direct Supabase или Moscow proxy (РФ)
         await ensureSupabaseRouting();
 
-        // Инициализируем только критически важные ресурсы параллельно
-        const initPromises = [
-          initializeStorage(),
-          warmIceBackground(),
-          Asset.loadAsync(GLOBAL_PRELOAD_ASSETS).catch(err => {
-            console.warn('⚠️ Не удалось предзагрузить фон led:', err);
-          }),
-          // Предзагружаем данные пользователя в фоне, если он есть
-          currentUser ? import('../utils/playerStorage').then(({ preloadUserData }) => 
-            preloadUserData(currentUser.id).catch(err => 
-              console.warn('⚠️ Предзагрузка данных пользователя не удалась:', err)
+        // Критичное — storage. Фон/ассеты на web не блокируют первый кадр.
+        const initPromises: Promise<unknown>[] = [initializeStorage()];
+        if (Platform.OS === 'web') {
+          void warmIceBackground();
+          void Asset.loadAsync(GLOBAL_PRELOAD_ASSETS).catch(() => {});
+        } else {
+          initPromises.push(
+            warmIceBackground(),
+            Asset.loadAsync(GLOBAL_PRELOAD_ASSETS).catch(err => {
+              console.warn('⚠️ Не удалось предзагрузить фон led:', err);
+            }),
+          );
+        }
+        if (currentUser) {
+          initPromises.push(
+            import('../utils/playerStorage').then(({ preloadUserData }) =>
+              preloadUserData(currentUser.id).catch(err =>
+                console.warn('⚠️ Предзагрузка данных пользователя не удалась:', err)
+              )
             )
-          ) : Promise.resolve()
-        ];
-        
+          );
+        }
+
         console.log('🔄 Начало параллельной инициализации');
         await Promise.all(initPromises);
         console.log('✅ Параллельная инициализация завершена');
@@ -1651,6 +1688,7 @@ export default function RootLayout() {
       })();
   
   return (
+    <ThemeProvider>
     <LanguageProvider>
       <CountryFilterProvider>
         <YearFilterProvider>
@@ -1666,6 +1704,7 @@ export default function RootLayout() {
                 splashOpacity={splashOpacity}
                 splashStartTime={splashStartTime}
                 appReady={appReady}
+                setAppReady={setAppReady}
                 userLoaded={userLoaded}
                 loadUser={loadUser}
               />
@@ -1688,7 +1727,7 @@ export default function RootLayout() {
                 ...(Platform.OS === 'android' ? { backgroundColor: colors.scene } : {}),
               }}
             >
-              <CachedBackground style={{ flex: 1 }}>
+              <CachedBackground style={{ flex: 1 }} vignette={false}>
                 <StatusBar 
                   barStyle="light-content" 
                   backgroundColor="#050008" 
@@ -1696,21 +1735,27 @@ export default function RootLayout() {
                   hidden={false}
                 />
                 
-                {/* Глобальный хедер приложения */}
-                <LogoHeader />
-                
+                {/* Мобильный хедер; на desktop навигация в левой колонке */}
+                {!isDesktopLayout && !isAuthScreen ? <LogoHeader /> : null}
+                {Platform.OS === 'web' ? <WebYandexMetrika /> : null}
+
+                {(() => {
+                  const tabs = (
                 <Tabs
             screenOptions={{
               headerShown: false, // Убираем встроенные хедеры
-              tabBarStyle: { 
-                backgroundColor: '#050008', 
-                borderTopWidth: 0,
-                height: Platform.OS === 'android' ? 84 : 82,
-                paddingBottom: Platform.OS === 'android' ? 10 : 8,
-                paddingTop: Platform.OS === 'android' ? 6 : 8,
+              tabBarStyle: isDesktopLayout || isAuthScreen
+                ? { display: 'none', height: 0, overflow: 'hidden' }
+                : { 
+                backgroundColor: 'rgba(11, 11, 14, 0.96)', 
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: 'rgba(255, 255, 255, 0.08)',
+                height: isMobileWeb ? 56 : (Platform.OS === 'android' ? 84 : 82),
+                paddingBottom: isMobileWeb ? 2 : (Platform.OS === 'android' ? 10 : 8),
+                paddingTop: isMobileWeb ? 2 : (Platform.OS === 'android' ? 6 : 8),
               },
-              tabBarActiveTintColor: '#fff',
-              tabBarInactiveTintColor: '#888',
+              tabBarActiveTintColor: colors.brand,
+              tabBarInactiveTintColor: '#7a7a82',
               tabBarShowLabel: true,
               tabBarItemStyle: {
                 marginTop: -4,
@@ -1720,7 +1765,7 @@ export default function RootLayout() {
               // Важно: экран может быть "пустым" при отсутствии сети/данных,
               // и тогда виден фон контейнера. Делаем прозрачным, чтобы всегда был виден лёд.
               // expo-router Tabs типы не всегда знают этот проп — оставляем runtime‑поведение.
-              sceneStyle: { backgroundColor: colors.scene },
+              sceneStyle: { backgroundColor: 'transparent' },
               ...(Platform.OS === 'android'
                 ? ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)
                 : ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)),
@@ -1771,7 +1816,7 @@ export default function RootLayout() {
                   width: size + 4,
                   height: size + 4,
                 }}>
-                  <Ionicons name="chatbubble-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />
+                  <Ionicons name="chatbubble-outline" size={iconSize} color={focused ? colors.brand : '#8a8a92'} />
                   {showMessagesBadge && (
                     <View style={{
                       position: 'absolute',
@@ -1834,7 +1879,7 @@ export default function RootLayout() {
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.scout" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
-              return <Ionicons name="search-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
+              return <Ionicons name="search-outline" size={iconSize} color={focused ? colors.brand : '#8a8a92'} />;
             },
           }}
         />
@@ -1856,7 +1901,7 @@ export default function RootLayout() {
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.skills" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
-              return <Ionicons name="barbell-outline" size={iconSize} color={focused ? '#eee' : '#aaa'} />;
+              return <Ionicons name="barbell-outline" size={iconSize} color={focused ? colors.brand : '#8a8a92'} />;
             },
           }}
         />
@@ -1956,8 +2001,39 @@ export default function RootLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="feed"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="[lang]"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="[lang]/player/[id]"
+          options={{
+            href: null,
+          }}
+        />
 
           </Tabs>
+                  );
+
+                  if (!isDesktopLayout || isAuthScreen) return tabs;
+
+                  return (
+                    <DesktopShell
+                      unreadMessagesCount={unreadMessagesCount}
+                      unreadNotificationsCount={unreadNotificationsCount}
+                    >
+                      {tabs}
+                    </DesktopShell>
+                  );
+                })()}
           
           {/* Splash screen поверх всего интерфейса */}
           {(!loaded || showSplash || !appReady) && (
@@ -1995,26 +2071,35 @@ export default function RootLayout() {
               pointerEvents="none"
               style={{
                 position: 'absolute',
-                top: 0,
                 left: 0,
                 right: 0,
-                bottom: 0,
-                justifyContent: 'center',
+                bottom: isDesktopLayout ? 24 : isMobileWeb ? 66 : 96,
                 alignItems: 'center',
                 zIndex: 9000,
               }}
             >
               <View
                 style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 28,
-                  backgroundColor: 'rgba(5, 0, 8, 0.55)',
-                  justifyContent: 'center',
+                  flexDirection: 'row',
                   alignItems: 'center',
+                  gap: 8,
+                  paddingVertical: 8,
+                  paddingHorizontal: 14,
+                  borderRadius: 999,
+                  backgroundColor: 'rgba(20, 20, 24, 0.9)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.1)',
                 }}
               >
-                <Ionicons name="cloud-offline-outline" size={30} color="#fff" />
+                <View
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 4,
+                    backgroundColor: colors.warning,
+                  }}
+                />
+                <OfflineLabel />
               </View>
             </View>
           )}
@@ -2026,6 +2111,7 @@ export default function RootLayout() {
         </YearFilterProvider>
       </CountryFilterProvider>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

@@ -19,12 +19,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
-import LoadingCenter from '../components/LoadingCenter';
+import SkeletonList from '../components/SkeletonList';
+import EmptyState from '../components/EmptyState';
+import PressableScale from '../components/PressableScale';
+import { displayName } from '../utils/displayName';
 import { colors } from '../theme/colors';
 import CachedAvatar from '../components/CachedAvatar';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   loadPlayers,
@@ -59,11 +63,52 @@ import {
   getSearchAvatarSize,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+
+type ScoutListRow =
+  | { key: string; kind: 'full'; player: Player }
+  | { key: string; kind: 'pair'; left: Player; right?: Player };
+
+/** Top-3 full width; everyone else pairs into 2 columns on desktop. */
+function buildScoutListRows(
+  players: Player[],
+  leaderPositions: Map<string, number>,
+  twoColAfterTop3: boolean
+): ScoutListRow[] {
+  if (!twoColAfterTop3) {
+    return players.map((p) => ({ key: p.id, kind: 'full' as const, player: p }));
+  }
+  const rows: ScoutListRow[] = [];
+  const pending: Player[] = [];
+  const flushPending = () => {
+    while (pending.length > 0) {
+      const left = pending.shift()!;
+      const right = pending.shift();
+      rows.push({
+        key: right ? `pair-${left.id}-${right.id}` : `pair-${left.id}`,
+        kind: 'pair',
+        left,
+        right,
+      });
+    }
+  };
+  for (const p of players) {
+    const pos = leaderPositions.get(p.id);
+    if (pos != null && pos <= 3) {
+      flushPending();
+      rows.push({ key: p.id, kind: 'full', player: p });
+    } else {
+      pending.push(p);
+    }
+  }
+  flushPending();
+  return rows;
+}
 
 /** Те же правила отбора, что при загрузке списка поиска (не админ). */
 function isPlayerInSearchDirectory(player: Player, isAdmin: boolean): boolean {
@@ -88,10 +133,47 @@ function buildSearchPlayerSubtitle(
     return language === 'en' ? 'Administrator' : 'Администратор';
   }
 
+  const isShopOrService = item.status === 'shop' || item.status === 'skateSharpening';
   const parts: string[] = [];
 
+  if (isShopOrService) {
+    const statusLabel =
+      item.status === 'shop'
+        ? t('createUser.shop') !== 'createUser.shop'
+          ? t('createUser.shop')
+          : language === 'en'
+            ? 'Shop'
+            : 'Магазин'
+        : t('profile.skateSharpening') !== 'profile.skateSharpening'
+          ? t('profile.skateSharpening')
+          : language === 'en'
+            ? 'Skate sharpening'
+            : 'Заточка коньков';
+    parts.push(statusLabel);
+
+    if (item.city && String(item.city).trim()) {
+      parts.push(String(item.city).trim());
+    }
+
+    if (item.country) {
+      const countryTranslation = t(`profile.countries.${item.country}`);
+      const countryDisplay =
+        countryTranslation !== `profile.countries.${item.country}`
+          ? countryTranslation
+          : item.country;
+      parts.push(countryDisplay);
+    }
+
+    return parts.join(' • ');
+  }
+
   if (item.position) {
-    parts.push(t(`profile.positions.${item.position}`) || item.position);
+    const positionKey = `profile.positions.${item.position}`;
+    const positionTranslation = t(positionKey);
+    // Не показываем сырой ключ вроде "profile.positions.Магазин"
+    if (positionTranslation && positionTranslation !== positionKey) {
+      parts.push(positionTranslation);
+    }
   }
 
   if (item.country) {
@@ -420,7 +502,8 @@ export default function SearchScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading } = useUser();
-  const playersListRef = useRef<FlatList<Player>>(null);
+  const isDesktop = useIsDesktopLayout();
+  const playersListRef = useRef<FlatList<ScoutListRow>>(null);
 
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
@@ -605,9 +688,17 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
-      // При возврате — без принудительного сброса кеша (10 мин в loadPlayers); админ при монтировании уже тянул сеть
-      if (currentUser) {
-        const refreshData = async () => {
+      if (!currentUser) {
+        return () => {
+          setCurrentScreen(null);
+        };
+      }
+      if (players.length > 0) {
+        return () => {
+          setCurrentScreen(null);
+        };
+      }
+      const refreshData = async () => {
           try {
             const filterForSearch = (allPlayers: Player[]): Player[] => {
               if (currentUser.status === 'admin') return allPlayers;
@@ -650,11 +741,10 @@ export default function SearchScreen() {
           }
         };
         refreshData();
-      }
       return () => {
         setCurrentScreen(null);
       };
-    }, [setCurrentScreen, currentUser])
+    }, [setCurrentScreen, currentUser, players.length])
   );
 
   useEffect(() => {
@@ -1149,7 +1239,6 @@ export default function SearchScreen() {
       SEARCH_NEWCOMER_MAX_MS
     );
 
-    // Первые строки блоков «новички» и «лидеры» — для заголовков-разделителей в списке
     let leaderFirst: string | null = null;
     for (const [pid, pos] of leaderPositions) {
       if (pos === 1) {
@@ -1180,6 +1269,7 @@ export default function SearchScreen() {
   const leadersShareTitle = isGoalieLeaderMode
     ? (t('search.topBySV') || 'Top by SV%')
     : (t('search.topByPoints') || 'Top by points');
+
 
   const ratingShareRef = useRef<View>(null);
   const [isExportingRating, setIsExportingRating] = useState(false);
@@ -1337,50 +1427,94 @@ export default function SearchScreen() {
   }, [filterPlayers, language]);
 
   // Key extractor для FlatList
-  const keyExtractor = useCallback((item: Player) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: ScoutListRow) => item.key, []);
 
   // Empty component для FlatList
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>{t('search.noPlayersFound')}</Text>
+      <EmptyState icon="search-outline" title={t('search.noPlayersFound')} />
     </View>
   ), [t]);
 
   const openPlayerFromSearch = useCallback(
-    (playerId: string) => {
-      router.push({
-        pathname: '/player/[id]',
-        params: { id: playerId, returnTo: 'search' },
+    (playerId: string, playerName?: string | null) => {
+      navigateToPlayerProfile(router, {
+        playerId,
+        name: playerName,
+        lang: language,
+        returnTo: 'search',
       });
     },
-    [router]
+    [router, language]
+  );
+
+  const scoutListRows = useMemo(
+    () => buildScoutListRows(filteredPlayers, searchLeaderPositions, isDesktop),
+    [filteredPlayers, searchLeaderPositions, isDesktop]
   );
 
   const renderPlayerItem = useCallback(
-    ({ item }: { item: Player }) => (
-      <SearchPlayerRowMemo
-        player={item}
-        leaderPosition={searchLeaderPositions.get(item.id)}
-        sectionLabel={
-          item.id === firstNewcomerId
-            ? 'newcomers'
-            : item.id === firstLeaderId
-              ? 'leaders'
-              : undefined
-        }
-        leadersSectionTitle={leadersShareTitle}
-        onShareLeaders={
-          item.id === firstLeaderId && leaderShareEntries.length > 0
-            ? handleShareRating
-            : undefined
-        }
-        isExportingRating={isExportingRating}
-        isAdmin={currentUser?.status === 'admin'}
-        language={language}
-        onPress={openPlayerFromSearch}
-        t={t}
-      />
-    ),
+    ({ item }: { item: ScoutListRow }) => {
+      const renderOne = (player: Player, half?: boolean, showSection?: boolean) => (
+        <View style={half ? styles.playerColHalf : undefined}>
+          <SearchPlayerRowMemo
+            player={player}
+            leaderPosition={searchLeaderPositions.get(player.id)}
+            sectionLabel={
+              showSection
+                ? player.id === firstNewcomerId
+                  ? 'newcomers'
+                  : player.id === firstLeaderId
+                    ? 'leaders'
+                    : undefined
+                : undefined
+            }
+            leadersSectionTitle={leadersShareTitle}
+            onShareLeaders={
+              showSection && player.id === firstLeaderId && leaderShareEntries.length > 0
+                ? handleShareRating
+                : undefined
+            }
+            isExportingRating={isExportingRating}
+            isAdmin={currentUser?.status === 'admin'}
+            language={language}
+            onPress={openPlayerFromSearch}
+            t={t}
+            compact={!!half}
+          />
+        </View>
+      );
+
+      if (item.kind === 'full') {
+        return renderOne(item.player, false, true);
+      }
+
+      const pairSection: 'newcomers' | 'leaders' | undefined =
+        item.left.id === firstNewcomerId || item.right?.id === firstNewcomerId
+          ? 'newcomers'
+          : item.left.id === firstLeaderId || item.right?.id === firstLeaderId
+            ? 'leaders'
+            : undefined;
+
+      return (
+        <View>
+          {pairSection ? (
+            <View style={styles.sectionLabelRow}>
+              <Text style={styles.sectionLabelText}>
+                {pairSection === 'leaders'
+                  ? (leadersShareTitle || t('search.topByPoints') || 'Top by points')
+                  : (t('search.newcomers') || 'Newcomers')}
+              </Text>
+              <View style={styles.sectionLabelLine} />
+            </View>
+          ) : null}
+          <View style={styles.playerPairRow}>
+            {renderOne(item.left, true, false)}
+            {item.right ? renderOne(item.right, true, false) : <View style={styles.playerColHalf} />}
+          </View>
+        </View>
+      );
+    },
     [currentUser?.status, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, handleShareRating, isExportingRating, t]
   );
 
@@ -1399,8 +1533,14 @@ export default function SearchScreen() {
             style={styles.backgroundImage}
             resizeMode="cover"
           >
-            <View style={styles.overlayLoading}>
-              <LoadingCenter />
+            <View style={styles.overlay}>
+              <View style={styles.pageHeader}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.pageTitle}>{t('search.title')}</Text>
+              </View>
+              <SkeletonList rows={7} />
             </View>
           </CachedBackground>
         </View>
@@ -1417,8 +1557,14 @@ export default function SearchScreen() {
           style={styles.backgroundImage}
           resizeMode="cover"
         >
-          <View style={styles.overlayLoading}>
-            <LoadingCenter />
+          <View style={styles.overlay}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('search.title')}</Text>
+            </View>
+            <SkeletonList rows={7} />
           </View>
         </CachedBackground>
       </View>
@@ -1687,17 +1833,17 @@ export default function SearchScreen() {
           {/* Список игроков */}
           <FlatList
             ref={playersListRef}
-            data={filteredPlayers}
+            data={scoutListRows}
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
-            contentContainerStyle={styles.playersList}
-            removeClippedSubviews={false}
-            maxToRenderPerBatch={12}
+            contentContainerStyle={[styles.playersList, isDesktop && styles.playersListDesktop]}
+            removeClippedSubviews={Platform.OS === 'android'}
+            maxToRenderPerBatch={8}
             updateCellsBatchingPeriod={80}
-            windowSize={21}
-            initialNumToRender={14}
-            extraData={`${language}-${searchLeaderPositions.size}`}
+            windowSize={9}
+            initialNumToRender={10}
+            extraData={language}
           />
 
           {/* Кнопка массовой отправки сообщений (только для администратора) */}
@@ -1749,11 +1895,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.2)',
+    backgroundColor: colors.screenOverlay,
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(135, 163, 177, 0.3)',
+    backgroundColor: colors.screenOverlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1768,7 +1914,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: colors.headerBar,
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -1792,23 +1938,23 @@ const styles = StyleSheet.create({
     overflow: 'visible', // Разрешаем фильтрам выходить за пределы
   },
   searchSection: {
-    backgroundColor: 'rgba(1, 0, 0, 0.53)',
+    backgroundColor: 'rgba(22, 22, 26, 0.62)',
   },
   searchSectionOverlay: {
-    backgroundColor: 'rgba(1, 0, 0, 0.53)',
+    backgroundColor: 'rgba(22, 22, 26, 0.62)',
     paddingHorizontal: 20,
     paddingVertical: 8,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
+    borderRadius: 14,
     paddingHorizontal: 15,
     paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: '#fa2f40',
-    height: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    height: 44,
     width: '100%',
   },
   searchIcon: {
@@ -1886,7 +2032,7 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.95)',
+    backgroundColor: 'rgba(22, 22, 26, 0.96)',
     borderRadius: 10,
     marginTop: 4,
     zIndex: 10000,
@@ -1944,36 +2090,51 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.5)',
   },
   playersList: {
-    paddingBottom: 20,
+    paddingBottom: 96,
     zIndex: 1,
     elevation: 1,
-    marginTop: 260, // Отступ для поиска и фильтров (включая третью строку и кнопку сброса, уменьшено на 10px)
+    marginTop: 210
+  },
+  playersListDesktop: {
+    paddingHorizontal: 8,
+  },
+  playerPairRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  playerColHalf: {
+    flex: 1,
+    minWidth: 0,
   },
   playerItemBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   playerItem: {
     position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
-    padding: 10,
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    borderRadius: 16,
+    padding: 12,
+    backgroundColor: '#1c1c21',
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   playerGradientShadow: {
     marginHorizontal: 16,
     marginVertical: 6,
-    borderRadius: 20,
+    borderRadius: 16,
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 5,
-      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 3,
     }),
+  },
+  playerGradientShadowCompact: {
+    marginHorizontal: 8,
+    marginVertical: 6,
   },
   playerPhotoWrap: {
     position: 'relative',
@@ -2009,11 +2170,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 6,
-    fontSize: 75,
-    lineHeight: 82,
+    fontSize: 64,
+    lineHeight: 70,
     fontFamily: 'Gilroy-Bold',
-    color: 'rgba(250, 47, 64, 0.18)',
-    zIndex: 3,
+    color: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 3
   },
   playerPhoto: {
     width: '100%',
@@ -2040,7 +2201,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   ratingText: {
-    color: '#AA3333',
+    color: '#a1a1aa',
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
     marginLeft: 2,
@@ -2058,28 +2219,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 16,
     marginTop: 5,
-    marginBottom: 6,
+    marginBottom: 6
   },
   sectionLabelText: {
     color: '#fff',
     fontSize: 13,
     letterSpacing: 0.5,
-    fontFamily: 'Gilroy-Bold',
+    fontFamily: 'Gilroy-Bold'
   },
   sectionLabelLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(250, 47, 64, 0.35)',
-    marginLeft: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginLeft: 10
   },
   sectionExportButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#fa2f40',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 8
   },
   ratingShareOffscreen: {
     position: 'absolute',
@@ -2092,8 +2253,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
   },
   playerInfo: {
-    color: '#ccc',
-    fontSize: 12,
+    color: '#a1a1aa',
+    fontSize: 13,
     fontFamily: 'Gilroy-Regular',
   },
   emptyContainer: {
@@ -2147,8 +2308,9 @@ type SearchPlayerRowProps = {
   isExportingRating?: boolean;
   isAdmin?: boolean;
   language: string;
-  onPress: (id: string) => void;
+  onPress: (id: string, name?: string | null) => void;
   t: (key: string) => string;
+  compact?: boolean;
 };
 
 function areSearchPlayerRowPropsEqual(
@@ -2160,6 +2322,7 @@ function areSearchPlayerRowPropsEqual(
   if (prev.sectionLabel !== next.sectionLabel) return false;
   if (prev.leadersSectionTitle !== next.leadersSectionTitle) return false;
   if (prev.isExportingRating !== next.isExportingRating) return false;
+  if (prev.compact !== next.compact) return false;
   return searchPlayerRowDataEqual(prev.player, next.player);
 }
 
@@ -2174,6 +2337,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   language,
   onPress,
   t,
+  compact,
 }: SearchPlayerRowProps) {
   const playerPhoto =
     player.avatar || (player.photos && player.photos.length > 0 && player.photos[0]) || undefined;
@@ -2219,8 +2383,8 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
           ) : null}
         </View>
       ) : null}
-    <TouchableOpacity onPress={() => onPress(player.id)} activeOpacity={0.7}>
-      <View style={styles.playerGradientShadow}>
+    <PressableScale onPress={() => onPress(player.id, player.name)}>
+      <View style={[styles.playerGradientShadow, compact && styles.playerGradientShadowCompact]}>
         <BlurOrSolid intensity={20} tint="dark" style={styles.playerItemBlur}>
           <View style={styles.playerItem}>
             {leaderPosition != null ? (
@@ -2266,7 +2430,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                 <Text style={styles.playerName} numberOfLines={1}>
                   {player.status === 'scout' && !isAdmin
                     ? (t('profile.scout') || (language === 'ru' ? 'Скаут' : 'Scout'))
-                    : player.name}
+                    : displayName(player.name)}
                 </Text>
                 {showNewBadge ? (
                   <View style={styles.newBadge}>
@@ -2283,7 +2447,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                 ) : null}
                 {player.activityRating !== undefined && player.activityRating > 0 ? (
                   <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={11} color="#AA3333" />
+                    <Ionicons name="star" size={11} color="#a1a1aa" />
                     <Text style={styles.ratingText}>{Math.round(player.activityRating)}</Text>
                   </View>
                 ) : null}
@@ -2293,7 +2457,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
           </View>
         </BlurOrSolid>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
     </>
   );
 }, areSearchPlayerRowPropsEqual);

@@ -63,7 +63,7 @@ const VKVideo: React.FC<VKVideoProps> = ({ url, title, onClose, timeCode }) => {
   if (!vkVideoId) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={48} color="#FF4444" />
+        <Ionicons name="alert-circle" size={48} color="#fa2f40" />
         <Text style={styles.errorText}>Неверная ссылка на VK видео</Text>
         <Text style={styles.errorSubtext}>Поддерживаются только ссылки vk.com/video и vk.com/clip</Text>
         <Text style={styles.errorSubtext}>{url}</Text>
@@ -120,7 +120,7 @@ const VKVideo: React.FC<VKVideoProps> = ({ url, title, onClose, timeCode }) => {
       <View style={styles.videoContainer}>
         {loading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FF4444" />
+            <ActivityIndicator size="large" color="#fa2f40" />
           </View>
         )}
         <WebView
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
   errorContainer: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    backgroundColor: 'rgba(250, 47, 64, 0.1)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   errorText: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     marginTop: 8,
     textAlign: 'center',
   },
   errorSubtext: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     marginTop: 4,

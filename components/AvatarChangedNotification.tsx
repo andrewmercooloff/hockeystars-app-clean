@@ -55,7 +55,7 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
   };
 
   return (
-    <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
+    <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
         <View style={styles.topRow}>
           <View style={styles.avatarContainer}>
@@ -115,24 +115,24 @@ export default AvatarChangedNotification;
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
     padding: 14,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4A90E2',
   },
   topRow: {
     flexDirection: 'row',
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeText: {
-    color: '#aaa',
+    color: '#a1a1aa',
     fontSize: 11,
     fontFamily: 'Gilroy-Regular',
     marginLeft: 6,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    color: '#ddd',
+    color: '#d4d4d8',
     fontSize: 13,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   avatarBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4A90E2',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,

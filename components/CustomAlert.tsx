@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
   },
   modalContainer: {
     backgroundColor: colors.surface,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   secondaryButton: {
     backgroundColor: 'rgba(255, 152, 0, 0.1)',

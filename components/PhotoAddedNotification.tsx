@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,11 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, withDelay, runOnJS } from 'react-native-reanimated';
+import { addLike, checkIfLiked } from '../utils/likesService';
+import { loadCurrentUser } from '../utils/playerStorage';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -21,7 +25,6 @@ import { generatePhotoContentId } from '../utils/likesService';
 import { colors } from '../theme/colors';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
 import { updateAvatarGlobally } from '../utils/AvatarCache';
-import { useNotificationCarouselSlotHeight } from '../utils/mediaAspectSize';
 
 interface PhotoAddedNotificationProps {
   playerName: string;
@@ -33,8 +36,11 @@ interface PhotoAddedNotificationProps {
   onHeaderPress?: () => void;
 }
 
-const CARD_HORIZONTAL_INSET = 16 * 2 + 14 * 2;
-const PHOTO_WIDTH = Dimensions.get('window').width - CARD_HORIZONTAL_INSET;
+// Медиа на всю ширину карточки (карточка: marginHorizontal 16)
+const MEDIA_INSET = 10;
+const PHOTO_WIDTH = Dimensions.get('window').width - 16 * 2 - MEDIA_INSET * 2;
+// Единый квадратный кадр — как в Instagram; все карточки одной высоты
+const PHOTO_HEIGHT = Math.round(PHOTO_WIDTH);
 const MAX_DOT_INDICATORS = 12;
 
 function buildPhotoUrlCandidates(url: string): string[] {
@@ -62,6 +68,48 @@ function PhotoSlide({
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const imageUrl = candidates[candidateIndex] ?? '';
+
+  // Двойной тап = лайк (как в Instagram) с всплывающим сердцем
+  const lastTapRef = useRef(0);
+  const [likeRefresh, setLikeRefresh] = useState(0);
+  const heartScale = useSharedValue(0);
+  const heartOpacity = useSharedValue(0);
+  const heartStyle = useAnimatedStyle(() => ({
+    opacity: heartOpacity.value,
+    transform: [{ scale: heartScale.value }],
+  }));
+
+  const bumpLike = useCallback(() => setLikeRefresh(v => v + 1), []);
+
+  const showHeart = useCallback(() => {
+    heartOpacity.value = withSequence(withTiming(1, { duration: 80 }), withDelay(450, withTiming(0, { duration: 220 })));
+    heartScale.value = withSequence(
+      withTiming(1.15, { duration: 160 }),
+      withTiming(0.95, { duration: 120 }),
+      withDelay(300, withTiming(0, { duration: 220 }, () => runOnJS(bumpLike)())),
+    );
+  }, [heartOpacity, heartScale, bumpLike]);
+
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 280) {
+      lastTapRef.current = 0;
+      showHeart();
+      void (async () => {
+        try {
+          const user = await loadCurrentUser();
+          if (!user) return;
+          const contentId = generatePhotoContentId(url);
+          const already = await checkIfLiked(contentId, 'photo', user.id);
+          if (!already) await addLike(playerId, contentId, 'photo', user.id);
+        } catch {
+          // ignore
+        }
+      })();
+      return;
+    }
+    lastTapRef.current = now;
+  }, [showHeart, url, playerId]);
 
   useEffect(() => {
     setCandidateIndex(0);
@@ -96,23 +144,29 @@ function PhotoSlide({
           <Ionicons name="image-outline" size={32} color="rgba(255,255,255,0.45)" />
         </View>
       ) : (
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.photoImage}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          recyclingKey={imageUrl}
-          transition={0}
-          onLoad={() => setLoaded(true)}
-          onError={handleError}
-        />
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleTap}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.photoImage}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            recyclingKey={imageUrl}
+            transition={0}
+            onLoad={() => setLoaded(true)}
+            onError={handleError}
+          />
+        </Pressable>
       )}
+      <Animated.View style={[styles.bigHeart, heartStyle]} pointerEvents="none">
+        <Ionicons name="heart" size={96} color="#fff" />
+      </Animated.View>
       <View style={styles.likeOverlay} pointerEvents="box-none">
         <LikeButton
           playerId={playerId}
           contentId={generatePhotoContentId(url)}
           contentType="photo"
           size="small"
+          refreshTrigger={likeRefresh}
         />
       </View>
     </View>
@@ -186,7 +240,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
     count === 1 ? t('photoNotification.onePhoto') : t('photoNotification.multiplePhotos', { count });
 
   const hasPhotos = resolvedPhotoUrls.length > 0 && !!playerId;
-  const slotHeight = useNotificationCarouselSlotHeight(resolvedPhotoUrls, PHOTO_WIDTH, 'image');
+  const slotHeight = PHOTO_HEIGHT;
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -213,23 +267,23 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
     <View style={styles.header}>
       <View style={styles.avatarContainer}>
         {playerId ? (
-          <CachedAvatar playerId={playerId} fallbackAvatarUrl={playerAvatar} size={44} style={styles.playerAvatar} />
+          <CachedAvatar playerId={playerId} fallbackAvatarUrl={playerAvatar} size={36} style={styles.playerAvatar} />
         ) : (
           <Ionicons name="camera-outline" size={22} color="#fff" />
         )}
       </View>
       <View style={styles.headerText}>
-        <Text style={styles.playerName} numberOfLines={1}>{playerName}</Text>
-        <Text style={styles.actionText}>
-          {t('photoNotification.added')} {getPhotoText(photosCount)}
+        <Text style={styles.headerLine} numberOfLines={1}>
+          <Text style={styles.playerName}>{playerName}</Text>
+          <Text style={styles.actionText}> · {t('photoNotification.added')} {getPhotoText(photosCount)}</Text>
+          <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
         </Text>
       </View>
-      <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
     </View>
   );
 
   return (
-    <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
+    <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
         {onHeaderPress ? (
           <TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>
@@ -265,20 +319,21 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
                   )}
                 />
                 {resolvedPhotoUrls.length > 1 && (
-                  <View style={styles.dotsRow}>
-                    {resolvedPhotoUrls.length > MAX_DOT_INDICATORS ? (
+                  <>
+                    <View style={styles.counterChip} pointerEvents="none">
                       <Text style={styles.counterText}>
-                        {activeIndex + 1} / {resolvedPhotoUrls.length}
+                        {activeIndex + 1}/{resolvedPhotoUrls.length}
                       </Text>
-                    ) : (
-                      dotIndices.map((idx) => (
+                    </View>
+                    <View style={styles.dotsRow} pointerEvents="none">
+                      {dotIndices.map((idx) => (
                         <View
                           key={idx}
                           style={[styles.dot, idx === activeIndex && styles.dotActive]}
                         />
-                      ))
-                    )}
-                  </View>
+                      ))}
+                    </View>
+                  </>
                 )}
               </>
             ) : (
@@ -304,69 +359,78 @@ export default PhotoAddedNotification;
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: colors.surfaceOverlay,
-    borderRadius: 20,
-    padding: 14,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.brand,
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   avatarContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
   playerAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   headerText: {
     flex: 1,
   },
+  headerLine: {
+    color: '#d4d4d8',
+    fontSize: 14,
+    lineHeight: 18,
+    fontFamily: 'Gilroy-Regular',
+  },
   playerName: {
-    color: colors.text,
-    fontSize: 15,
+    color: '#fff',
+    fontSize: 14,
     fontFamily: 'Gilroy-Bold',
   },
   actionText: {
-    color: colors.textSecondary,
-    fontSize: 13,
+    color: '#d4d4d8',
+    fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    marginTop: 1,
   },
   timeText: {
-    color: colors.textMuted,
-    fontSize: 11,
+    color: '#a1a1aa',
+    fontSize: 12,
     fontFamily: 'Gilroy-Regular',
-    marginLeft: 6,
   },
   galleryWrap: {
-    width: '100%',
-    borderRadius: 12,
+    width: PHOTO_WIDTH,
+    marginHorizontal: MEDIA_INSET,
+    marginBottom: MEDIA_INSET,
+    borderRadius: 14,
     overflow: 'hidden',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
+    position: 'relative',
+    backgroundColor: '#15151a',
   },
   galleryPlaceholder: {
     width: PHOTO_WIDTH,
@@ -390,39 +454,60 @@ const styles = StyleSheet.create({
   },
   likeOverlay: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 10,
+    right: 10,
     zIndex: 10,
   },
+  bigHeart: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9,
+  },
   dotsRow: {
+    position: 'absolute',
+    left: 0,
+    width: PHOTO_WIDTH,
+    bottom: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    paddingTop: 6,
-    paddingBottom: 2,
+    gap: 5,
+    zIndex: 5,
+  },
+  counterChip: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 5,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
   },
   counterText: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontFamily: 'Gilroy-Regular',
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   dotActive: {
-    backgroundColor: colors.brand,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    backgroundColor: '#fff',
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.brand,
+    marginHorizontal: 14,
+    marginBottom: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,

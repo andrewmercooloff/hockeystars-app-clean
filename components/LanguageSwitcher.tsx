@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView, Platform } from 'react-native';
+import { usePathname, useRouter } from 'expo-router';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
+import { normalizeSeoLanguage, SEO_LANG_PATH_RE, type SeoLanguage } from '../utils/playerSeoPath';
+import { replaceBrowserUrl } from '../utils/webHistory';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 const LanguageSwitcher: React.FC = () => {
   const { language, setLanguage, resetToDeviceLanguage, t } = useLanguage();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isDesktop = useIsDesktopLayout();
 
   const languages = [
     { code: 'en', name: 'English', flag: 'US' },
@@ -22,8 +29,24 @@ const LanguageSwitcher: React.FC = () => {
     { code: 'fr', name: 'Français', flag: 'FR' },
   ];
 
-  const handleLanguageSelect = (langCode: 'ru' | 'en' | 'lt' | 'lv' | 'pl' | 'sv' | 'cs' | 'sk' | 'fi' | 'it' | 'de' | 'fr') => {
+  const applyLanguage = (langCode: SeoLanguage) => {
     setLanguage(langCode);
+    if (Platform.OS !== 'web') return;
+    const path = pathname || (typeof window !== 'undefined' ? window.location.pathname : '');
+    const re = new RegExp(`^/(${SEO_LANG_PATH_RE})(/player(?:/[^?#]*)?)$`, 'i');
+    const m = path.match(re);
+    if (m) {
+      const next = `/${langCode}${m[2]}`;
+      try {
+        router.replace(next as any);
+      } catch {
+        replaceBrowserUrl(next + (typeof window !== 'undefined' ? window.location.search + window.location.hash : ''));
+      }
+    }
+  };
+
+  const handleLanguageSelect = (langCode: 'ru' | 'en' | 'lt' | 'lv' | 'pl' | 'sv' | 'cs' | 'sk' | 'fi' | 'it' | 'de' | 'fr') => {
+    applyLanguage(normalizeSeoLanguage(langCode));
     setShowLanguageModal(false);
   };
 
@@ -37,7 +60,7 @@ const LanguageSwitcher: React.FC = () => {
   return (
     <>
       <TouchableOpacity 
-        style={styles.languageButton}
+        style={[styles.languageButton, isDesktop && styles.languageButtonDesktop]}
         onPress={() => setShowLanguageModal(true)}
       >
         <View style={styles.languageButtonContent}>
@@ -56,7 +79,7 @@ const LanguageSwitcher: React.FC = () => {
         onRequestClose={() => setShowLanguageModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, isDesktop && styles.modalContentDesktop]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('settings.selectLanguage')}</Text>
               <TouchableOpacity 
@@ -68,7 +91,6 @@ const LanguageSwitcher: React.FC = () => {
             </View>
             
             <ScrollView style={styles.languageList}>
-              {/* Опция "Автоматически" */}
               <TouchableOpacity
                 style={[
                   styles.languageOption,
@@ -85,10 +107,8 @@ const LanguageSwitcher: React.FC = () => {
                 <Ionicons name="refresh" size={16} color="#fa2f40" />
               </TouchableOpacity>
               
-              {/* Разделитель */}
               <View style={styles.separator} />
               
-              {/* Список языков */}
               {languages.map((lang) => (
                 <TouchableOpacity
                   key={lang.code}
@@ -122,11 +142,18 @@ const LanguageSwitcher: React.FC = () => {
 
 const styles = StyleSheet.create({
   languageButton: {
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     marginVertical: 8,
+  },
+  languageButtonDesktop: {
+    marginVertical: 0,
+    marginTop: 4,
+    width: '100%',
+    maxWidth: 360,
+    alignSelf: 'flex-start',
   },
   languageButtonContent: {
     flexDirection: 'row',
@@ -156,17 +183,23 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   modalContent: {
     backgroundColor: '#000',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     width: '80%',
     maxHeight: '60%',
+  },
+  modalContentDesktop: {
+    width: '100%',
+    maxWidth: 420,
+    maxHeight: '70%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -220,4 +253,3 @@ const styles = StyleSheet.create({
 });
 
 export default LanguageSwitcher;
-

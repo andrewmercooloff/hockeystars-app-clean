@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
-import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -33,7 +32,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
   }, [t]);
 
   return (
-    <BlurOrSolid intensity={20} tint="dark" style={styles.containerBlur}>
+    <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
@@ -58,26 +57,17 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 20,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    overflow: 'hidden',
-    ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 5,
-      elevation: 8,
-    }),
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#8B5CF6',
+    backgroundColor: 'transparent',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   avatarContainer: { marginRight: 12 },
   avatarPlaceholder: {
@@ -89,10 +79,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentContainer: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
   playerName: { fontSize: 16, fontFamily: 'Gilroy-Bold', color: '#fff', flex: 1 },
-  timeText: { fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#999', marginLeft: 8 },
-  message: { fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#ccc' },
+  timeText: { fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#a1a1aa', marginLeft: 8 },
+  message: { fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#d4d4d8' },
   playerAvatar: { width: 50, height: 50, borderRadius: 25 },
 });
 

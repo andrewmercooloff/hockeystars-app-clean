@@ -26,7 +26,9 @@
     "rejectRequestConfirm": "Möchten Sie diese Anfrage wirklich ablehnen?",
     "super": "Super!",
     "left": "Links",
-    "right": "Rechts"
+    "right": "Rechts",
+    "offline": "Keine Verbindung",
+    "and": "und"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -3183,7 +3185,8 @@
     "errorProcessNotificationGeneral": "Benachrichtigung konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.",
     "errorProcessFriendRequest": "Ihre Freundschaftsanfrage konnte nicht verarbeitet werden.",
     "errorProcessRequest": "Ihre Anfrage konnte nicht bearbeitet werden",
-    "errorSendMessage": "Senden der Nachricht fehlgeschlagen"
+    "errorSendMessage": "Senden der Nachricht fehlgeschlagen",
+    "phoneOrEmailPlaceholderShort": "+49… oder E-Mail"
   },
   "profile": {
     "addFriend": "Als Freund hinzufügen",
@@ -3235,7 +3238,7 @@
     "cancel": "Stornieren",
     "friends": "Freunde",
     "friendship": "Freundschaft",
-    "statistics": "Aktuelle Saisonstatistik",
+    "statistics": "Statistics",
     "teams": "Teams",
     "currentTeams": "Aktuelle Teams",
     "pastTeams": "Ehemalige Teams",
@@ -3473,7 +3476,11 @@
     "shareProfileSocial": "Profil in sozialen Netzwerken teilen",
     "copyLink": "Link kopieren",
     "linkCopied": "Link in die Zwischenablage kopiert",
-    "currentSeasonStats": "Aktuelle Saisonstatistiken"
+    "currentSeasonStats": "Statistics · {season}",
+    "city": "Stadt",
+    "addAddress": "Adresse hinzufügen",
+    "addressesHint": "Sie können mehrere Adressen angeben",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Anmeldung",
@@ -3852,6 +3859,12 @@
         "one": "Heute wurde dein Profil {{count}} Mal angesehen.",
         "other": "Heute wurde dein Profil {{count}} Mal angesehen."
       }
+    },
+    "video_liked": {
+      "grouped": "{name} hat {count} deiner Videos geliked"
+    },
+    "photo_liked": {
+      "grouped": "{name} hat {count} deiner Fotos geliked"
     }
   },
   "editProfile": {
@@ -3891,7 +3904,13 @@
     "noPlayersCountryYear": "Keine Spieler aus {{country}} in {{year}}",
     "iceEmpty": "Das Eis ist leer. Wählen Sie ein anderes Land oder Jahr oder setzen Sie die Filter zurück.",
     "shakeHintTitle": "Gerät schütteln",
-    "shakeHintSubtext": "um die Spielerliste zu aktualisieren"
+    "shakeHintSubtext": "um die Spielerliste zu aktualisieren",
+    "inviteFriends": "Einladen",
+    "inviteTitle": "Komm zu HockeyStars!",
+    "inviteMessage": "Erstelle dein Hockey-Profil, tritt gegen Freunde an und erreiche die Spitze.",
+    "inviteSubtitle": "Sende den Link – Freunde landen direkt auf deinem Profil",
+    "copyLink": "Link kopieren",
+    "moreApps": "Mehr"
   },
   "filters": {
     "year": "Jahr",
@@ -4279,5 +4298,14 @@
     "feed": "Feed",
     "scout": "Scout",
     "skills": "Skills"
+  },
+  "seo": {
+    "homeTitle": "Hockey-App Hockeystars"
+  },
+  "download": {
+    "installTitle": "App installieren",
+    "scanQr": "Mit dem Handy scannen — App Store oder Google Play öffnet sich",
+    "appStoreCta": "Im App Store laden",
+    "playStoreCta": "Bei Google Play laden"
   }
 }

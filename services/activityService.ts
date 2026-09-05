@@ -1,4 +1,5 @@
 import { supabase } from '../utils/supabase';
+import { CURRENT_SEASON_START_ISO } from '../utils/seasonConfig';
 
 export interface ActivityLogEntry {
   id: number;
@@ -241,35 +242,67 @@ export async function applyActivityRatingsToPlayers<T extends PlayerWithActivity
 }
 
 /**
- * Получить рейтинги активности для списка игроков
+ * Sum activity points earned since the current season started.
+ * Falls back to activity_points if activity_log is unavailable (quota / overload).
+ */
+async function sumSeasonActivityPoints(userIds: string[]): Promise<{ [playerId: string]: number }> {
+  const ratings: { [playerId: string]: number } = {};
+  if (userIds.length === 0) return ratings;
+
+  const BATCH_SIZE = 50;
+  let logQueryFailed = false;
+
+  for (let offset = 0; offset < userIds.length; offset += BATCH_SIZE) {
+    const batch = userIds.slice(offset, offset + BATCH_SIZE);
+    const { data, error } = await supabase
+      .from('activity_log')
+      .select('user_id, points_earned')
+      .in('user_id', batch)
+      .gte('created_at', CURRENT_SEASON_START_ISO);
+
+    if (error) {
+      logQueryFailed = true;
+      console.warn('Ошибка загрузки сезонных рейтингов (batch):', error.message);
+      break;
+    }
+
+    data?.forEach((entry) => {
+      const uid = entry.user_id as string;
+      ratings[uid] = (ratings[uid] || 0) + (entry.points_earned || 0);
+    });
+  }
+
+  if (!logQueryFailed) {
+    return ratings;
+  }
+
+  // Fallback: activity_points table (stable under load)
+  for (let offset = 0; offset < userIds.length; offset += BATCH_SIZE) {
+    const batch = userIds.slice(offset, offset + BATCH_SIZE);
+    const { data, error } = await supabase
+      .from('activity_points')
+      .select('user_id, points')
+      .in('user_id', batch);
+
+    if (error) {
+      console.warn('Ошибка fallback рейтингов (batch):', error.message);
+      continue;
+    }
+
+    data?.forEach((entry) => {
+      ratings[entry.user_id] = entry.points || 0;
+    });
+  }
+
+  return ratings;
+}
+
+/**
+ * Получить рейтинги активности для списка игроков (текущий сезон).
  */
 export async function getPlayersActivityRatings(playerIds: string[]): Promise<{ [playerId: string]: number }> {
   try {
-    if (playerIds.length === 0) return {};
-
-    const ratings: { [playerId: string]: number } = {};
-    // Keep URL/query headers small for the Timeweb nginx proxy.
-    // Large `.in()` lists previously triggered "upstream sent too big header" -> 502.
-    const BATCH_SIZE = 50;
-
-    for (let offset = 0; offset < playerIds.length; offset += BATCH_SIZE) {
-      const batch = playerIds.slice(offset, offset + BATCH_SIZE);
-      const { data, error } = await supabase
-        .from('activity_points')
-        .select('user_id, points')
-        .in('user_id', batch);
-
-      if (error) {
-        console.error('Ошибка загрузки рейтингов активности (batch):', error);
-        continue;
-      }
-
-      data?.forEach(entry => {
-        ratings[entry.user_id] = entry.points || 0;
-      });
-    }
-
-    return ratings;
+    return await sumSeasonActivityPoints(playerIds);
   } catch (error) {
     console.error('Ошибка загрузки рейтингов активности:', error);
     return {};
@@ -277,42 +310,25 @@ export async function getPlayersActivityRatings(playerIds: string[]): Promise<{ 
 }
 
 /**
- * Получает очки активности пользователя
+ * Получает очки активности пользователя за текущий сезон.
  */
-export async function getActivityPoints(userId: string): Promise<{ 
-  success: boolean; 
-  points: number; 
-  error?: string 
+export async function getActivityPoints(userId: string): Promise<{
+  success: boolean;
+  points: number;
+  error?: string;
 }> {
   try {
-    const { data, error } = await supabase
-      .from('activity_points')
-      .select('points')
-      .eq('user_id', userId)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') { // No rows found
-        return { success: true, points: 0 };
-      }
-      // Игнорируем RLS ошибки (не выводим в консоль)
-      if (error.code === '42501') {
-        return { success: true, points: 0 };
-      }
-      console.error('Error fetching activity points:', error);
-      return { success: false, points: 0, error: error.message };
-    }
-
-    return { 
-      success: true, 
-      points: data?.points || 0 
+    const ratings = await sumSeasonActivityPoints([userId]);
+    return {
+      success: true,
+      points: ratings[userId] || 0,
     };
   } catch (error) {
     console.error('Unexpected error in getActivityPoints:', error);
-    return { 
-      success: false, 
-      points: 0, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    return {
+      success: false,
+      points: 0,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

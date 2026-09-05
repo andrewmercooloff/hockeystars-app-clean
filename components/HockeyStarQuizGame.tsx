@@ -1407,7 +1407,7 @@ const styles = StyleSheet.create({
   },
   lbRank: { width: 28, textAlign: 'center', fontSize: 14 },
   lbAvatar: { width: 28, height: 28, borderRadius: 14 },
-  lbAvatarPlaceholder: { backgroundColor: '#333' },
+  lbAvatarPlaceholder: { backgroundColor: '#2a2430' },
   lbName: {
     flex: 1,
     color: '#fff',

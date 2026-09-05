@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMe
 import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,19 +16,25 @@ import {
   getBlockedUsers,
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
+  getPlayerSeasonPoints,
 } from '../utils/playerStorage';
 import { preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
+import InviteFriendsPill from '../components/InviteFriendsPill';
 import IceRinkMarkings from '../components/IceRinkMarkings';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
+import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getPerformanceLevel, isLowEndAndroid, startupPhysicsDeferMs, startupRenderGraceMs } from '../utils/devicePerformance';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import PuckGame from '../components/PuckGame';
 import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
 import CachedBackground from '../components/CachedBackground';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
+import HomeSeoHead from '../components/HomeSeoHead';
 import {
   getTopSeasonLeaderRanks,
   getPuckSizeForLeader,
@@ -1606,6 +1613,7 @@ const OriginalPuckAnimator = React.memo(({
   leaderRank,
   onNav,
   onDrag,
+  enableDrag = true,
   getAndroidPerformanceLevel,
   registerSharedPosition
 }: {
@@ -1614,6 +1622,7 @@ const OriginalPuckAnimator = React.memo(({
   leaderRank?: LeaderRank;
   onNav: () => void; 
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
+  enableDrag?: boolean;
   getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
   registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }) => void;
 }) => {
@@ -1865,54 +1874,45 @@ const OriginalPuckAnimator = React.memo(({
   return (
     <Animated.View 
       style={[styles.puckContainer, animatedStyle]}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onTouchStart={enableDrag ? handleTouchStart : undefined}
+      onTouchMove={enableDrag ? handleTouchMove : undefined}
+      onTouchEnd={enableDrag ? handleTouchEnd : undefined}
     >
-      <Suspense fallback={null}>
-        <Puck
+      <Puck
           avatar={player.avatar}
           playerId={player.id}
+          denseScene
           onPress={() => {
             if (!hasDragged) {
               onNav();
             }
           }}
           size={position.size}
-        points={player.goals && player.assists ? 
-          (() => {
-            try {
-              const goals = parseInt(player.goals) || 0;
-              const assists = parseInt(player.assists) || 0;
-              const total = goals + assists;
-              return total > 0 && !isNaN(total) ? total.toString() : undefined;
-            } catch (error) {
-              return undefined;
-            }
-          })() : undefined}
+          points={(() => {
+            const total = getPlayerSeasonPoints(player);
+            return total > 0 ? String(total) : undefined;
+          })()}
         isStar={player.status === 'star'}
         status={player.status}
           leaderRank={leaderRank}
-          isOnline={player.isOnline} // Реальный статус онлайн из базы данных
+          isOnline={player.isOnline}
           isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
         />
-      </Suspense>
     </Animated.View>
   );
 }, (prevProps, nextProps) => {
-  // Кастомная функция сравнения для оптимизации: перерисовываем только при изменении позиции или данных игрока
+  const prevPts = getPlayerSeasonPoints(prevProps.player);
+  const nextPts = getPlayerSeasonPoints(nextProps.player);
   return (
-    prevProps.position.x === nextProps.position.x &&
-    prevProps.position.y === nextProps.position.y &&
-    prevProps.position.vx === nextProps.position.vx &&
-    prevProps.position.vy === nextProps.position.vy &&
-    prevProps.position.isDragging === nextProps.position.isDragging &&
     prevProps.player.id === nextProps.player.id &&
     prevProps.player.avatar === nextProps.player.avatar &&
     prevProps.player.status === nextProps.player.status &&
     prevProps.player.isOnline === nextProps.player.isOnline &&
     prevProps.player.createdAt === nextProps.player.createdAt &&
-    prevProps.leaderRank === nextProps.leaderRank
+    prevProps.leaderRank === nextProps.leaderRank &&
+    prevProps.position.size === nextProps.position.size &&
+    prevProps.position.isDragging === nextProps.position.isDragging &&
+    prevPts === nextPts
   );
 });
 OriginalPuckAnimator.displayName = 'OriginalPuckAnimator';
@@ -1920,9 +1920,13 @@ OriginalPuckAnimator.displayName = 'OriginalPuckAnimator';
 export default function HomeScreen() {
   const { currentUser, isUserLoading } = useUser();
   const router = useRouter();
+  const { language } = useLanguage();
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
+  const isFocused = useIsFocused();
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
+  const isDesktopLayout = useIsDesktopLayout();
+  // Desktop: physics on (pucks move), drag off (no grab with mouse)
   const [physicsActive, setPhysicsActive] = useState(!isLowEndAndroid());
   const [filtersReady, setFiltersReady] = useState(!currentUser);
 
@@ -2148,10 +2152,14 @@ export default function HomeScreen() {
       console.log(`🔄 Начинаем загрузку игроков${forceRefresh ? ' (принудительно)' : ''}`);
 
       const applyLoadedPlayers = (loadedPlayers: Player[]) => {
+        if (!Array.isArray(loadedPlayers) || loadedPlayers.length === 0) {
+          console.warn('⚠️ Пустой ответ loadPlayers — оставляем текущий список');
+          return;
+        }
         const user = currentUserRef.current;
         const userStillLoading = isUserLoadingRef.current;
 
-        if (!filtersInitializedRef.current && !userStillLoading && loadedPlayers.length > 0) {
+        if (!filtersInitializedRef.current && !userStillLoading) {
           const { country, year } = computeFiltersForPlayers(loadedPlayers, user);
           setPlayers(loadedPlayers);
           setSelectedCountry(country);
@@ -2161,7 +2169,9 @@ export default function HomeScreen() {
           console.log(`✅ Игроки (${loadedPlayers.length}) + фильтры за один рендер:`, country, year);
         } else {
           setPlayers((prev) => {
-            if (prev.length === 0) return loadedPlayers;
+            if (prev.length === 0 || !filtersInitializedRef.current) {
+              return loadedPlayers;
+            }
             const byId = new Map(loadedPlayers.map((p) => [p.id, p]));
             let changed = false;
             const next = prev.map((p) => {
@@ -2638,10 +2648,11 @@ export default function HomeScreen() {
   const playfieldLayoutReady = collisionLayoutReady && iceSize.width > 0 && iceSize.height > 0;
   const puckFieldWidth = playfieldLayoutReady ? iceSize.width : windowForPucks.width;
   const puckFieldHeight = playfieldLayoutReady ? iceSize.height : windowForPucks.height;
-  const scaledPuckSize = useMemo(
-    () => getScaledPuckBaseSize(puckFieldWidth, puckFieldHeight, { homeScreen: true }),
-    [puckFieldWidth, puckFieldHeight]
-  );
+  const scaledPuckSize = useMemo(() => {
+    const base = getScaledPuckBaseSize(puckFieldWidth, puckFieldHeight, { homeScreen: true });
+    // Desktop: larger than mobile, then −30% from the 2× size (→ 1.4× base).
+    return isDesktopLayout ? Math.round(base * 1.4) : base;
+  }, [puckFieldWidth, puckFieldHeight, isDesktopLayout]);
 
   const homeLeaderRanks = useMemo(() => {
     if (players.length === 0) return new Map<string, LeaderRank>();
@@ -2952,11 +2963,16 @@ export default function HomeScreen() {
       return;
     }
 
-    router.push({ 
-      pathname: '/player/[id]', 
-      params: { id: playerId, returnTo: 'home' } 
+    const named =
+      allVisiblePlayersRef.current.find((p) => p.id === playerId) ||
+      players.find((p) => p.id === playerId);
+    navigateToPlayerProfile(router, {
+      playerId,
+      name: named?.name,
+      lang: language,
+      returnTo: 'home',
     });
-  }, [router, currentUser]);
+  }, [router, currentUser, players, language]);
 
   // Компоненты получают позиции через shared values, которые обновляются каждый кадр
   // React state обновляется только при изменении списка игроков (добавление/удаление)
@@ -2991,22 +3007,30 @@ export default function HomeScreen() {
           position={initialPosition}
           leaderRank={leaderRank}
           onNav={() => handlePuckPress(player.id)}
-          onDrag={handleDrag}
+          onDrag={isDesktopLayout ? undefined : handleDrag}
+          enableDrag={!isDesktopLayout}
           getAndroidPerformanceLevel={() => performanceLevel}
           registerSharedPosition={registerSharedPosition}
         />
       );
     });
-  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize]);
+  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize, isDesktopLayout]);
 
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
+  // A inactive home tab must not paint over deep-linked /ru/player on mobile web Tabs.
+  if (!isFocused) {
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
+  }
+
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, isDesktopLayout && styles.containerDesktop]}>
+        <HomeSeoHead />
         <CachedBackground
-        style={styles.background}
+        style={[styles.background, isDesktopLayout && styles.backgroundDesktop]}
           resizeMode="cover"
+          vignette={false}
           onLayout={(e) => {
             const { width, height } = e.nativeEvent.layout;
             setIceSize({ width, height });
@@ -3035,6 +3059,8 @@ export default function HomeScreen() {
             <YearFilter players={players} />
           </View>
         </View>
+
+        <InviteFriendsPill bottomInset={isDesktopLayout ? 24 : 16} />
 
       </CachedBackground>
 
@@ -3065,14 +3091,23 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    // Прозрачно: под табами уже лежит лёд из _layout — нет чёрного кадра при возврате
+    backgroundColor: 'transparent',
+  },
+  containerDesktop: {
+    paddingTop: 20,
+    paddingBottom: 20,
+    backgroundColor: 'transparent',
   },
   background: {
     flex: 1,
     width: '100%',
     height: '100%',
-    borderRadius: 50, // Скругленные углы как у хоккейной коробки
-    overflow: 'hidden', // Обрезаем содержимое по скругленным углам
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  backgroundDesktop: {
+    borderRadius: 24,
   },
   innerBorder: {
     position: 'absolute',
@@ -3080,13 +3115,13 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     bottom: 8,
-    borderRadius: 50, // Увеличиваем радиус для более скругленных углов хоккейной коробки
+    borderRadius: 28,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 1)',
+    borderColor: 'rgba(255, 255, 255, 0.22)',
   },
   puckContainer: {
     position: 'absolute',
-    zIndex: 10,
+    zIndex: 1,
   },
   filtersWrapper: {
     position: 'absolute',
@@ -3096,6 +3131,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    zIndex: 1000,
+    elevation: 1000,
   },
   filtersContainer: {
     flexDirection: 'row',
@@ -3103,14 +3140,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingHorizontal: 0,
     paddingVertical: 0,
-    gap: 15,
+    gap: 10,
+    zIndex: 1000,
   },
   controlPanel: {
     position: 'absolute',
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',

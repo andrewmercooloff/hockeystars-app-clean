@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 12,
     marginVertical: 10,
     borderWidth: 1,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     marginBottom: 20,
     textAlign: 'left',
-    color: '#FF4444',
+    color: '#fa2f40',
   },
   itemsList: { flex: 1 },
   emptyState: {
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 16,
     marginBottom: 8,
   },
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   itemImage: {
     width: 50,
@@ -563,13 +563,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     padding: 8,
     borderRadius: 4,
     marginRight: 6,
   },
   deleteButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     padding: 6,
     borderRadius: 4,
   },
@@ -580,11 +580,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ff4444',
+    backgroundColor: '#fa2f40',
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 68, 68, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

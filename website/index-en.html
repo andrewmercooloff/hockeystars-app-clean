@@ -27,37 +27,46 @@
     <meta property="twitter:description" content="Social network for future hockey stars. Make yourself known to the entire hockey world! Get offers from leading scouts worldwide!">
     <meta property="twitter:image" content="https://hockey-stars.com/logo.png">
     
-    <!-- Favicon для всех устройств с темным фоном -->
-    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <meta name="apple-mobile-web-app-title" content="HockeyStars" />
+        <!-- Favicons: browsers, iOS, Android, Windows -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="apple-mobile-web-app-title" content="HockeyStars">
+    <meta name="application-name" content="HockeyStars">
     <meta name="theme-color" content="#050008">
     <meta name="msapplication-TileColor" content="#050008">
-    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+<link rel="preload" href="gilroy-regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="gilroy-bold.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="logo.png" as="image">
+    <link rel="preload" href="led.webp" as="image" type="image/webp">
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
+    <!-- Analytics after first paint -->
+    <script>
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          (function(m,e,t,r,i,k,a){
             m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
             m[i].l=1*new Date();
             for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
             k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105715227', 'ym');
-        ym(105715227, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/105715227" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YLGFTHQPHE"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-YLGFTHQPHE');
+          })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105715227', 'ym');
+          ym(105715227, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+          var g = document.createElement('script');
+          g.async = true;
+          g.src = 'https://www.googletagmanager.com/gtag/js?id=G-YLGFTHQPHE';
+          document.head.appendChild(g);
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', 'G-YLGFTHQPHE', { send_page_view: true });
+        }, 1800);
+      });
     </script>
     
     <!-- Метатеги для вебмастеров -->
@@ -96,8 +105,9 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <img src="logo.png" alt="HockeyStars" class="logo">
+                <img src="logo.png" alt="HockeyStars" class="logo" width="302" height="50" decoding="async">
                 <div class="language-switcher">
+                    <a href="/login?lang=en" class="nav-login" data-i18n="nav.login">Log in</a>
                     <button class="lang-btn active" data-lang="en" aria-label="English">EN</button>
                     <button class="lang-btn" data-lang="ru" aria-label="Русский">RU</button>
                 </div>
@@ -109,7 +119,7 @@
         <div class="container">
             <section class="hero">
                 <div class="hero-logo-container">
-                    <img src="logo.png" alt="HockeyStars" class="hero-logo">
+                    <img src="logo.png" alt="HockeyStars" class="hero-logo" width="639" height="106" fetchpriority="high" decoding="async">
                 </div>
                 <div class="hero-download-buttons">
                     <a href="https://apps.apple.com/app/id6753738837" class="download-btn appstore" target="_blank" rel="noopener noreferrer" aria-label="Download from App Store">
@@ -131,6 +141,7 @@
                         </div>
                     </a>
                 </div>
+                <a href="/login?lang=en" class="hero-login-btn" data-i18n="nav.login">Log in</a>
                 <p class="hero-subtitle" data-i18n="hero.subtitle">Where every player becomes a star!</p>
                 <p class="hero-description" data-i18n="hero.description">
                     Social network for young hockey players, coaches and scouts with interactive interface and hockey theme.
@@ -293,6 +304,51 @@
                             Receive notifications about new messages, friends and achievements
                         </p>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                <path d="M6 12h4"></path>
+                                <path d="M14 10h4"></path>
+                                <path d="M14 14h4"></path>
+                                <circle cx="8" cy="12" r="1.5" fill="currentColor" stroke="none"></circle>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="features.games.title">In-app games</h3>
+                        <p class="feature-text" data-i18n="features.games.text">
+                            Play hockey mini-games right in the app and compete with friends
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M8 21h8"></path>
+                                <path d="M12 17v4"></path>
+                                <path d="M7 4h10v5a5 5 0 0 1-10 0V4z"></path>
+                                <path d="M17 9a5 5 0 0 0 5-5h-5"></path>
+                                <path d="M7 9a5 5 0 0 1-5-5h5"></path>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="features.rankings.title">Points rankings</h3>
+                        <p class="feature-text" data-i18n="features.rankings.text">
+                            Follow player rankings by activity points and climb the leaderboard
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <line x1="10" y1="9" x2="8" y2="9"></line>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="features.scoutReport.title">Free scout report</h3>
+                        <p class="feature-text" data-i18n="features.scoutReport.text">
+                            Get a free scout analysis of your profile and become more visible to scouts
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -357,7 +413,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
 

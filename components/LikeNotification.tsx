@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurOrSolid } from './BlurOrSolid';
-import { platformCardShadow } from '../utils/androidShadow';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
+import { feedStrings } from '../utils/feedI18n';
+import { displayName } from '../utils/displayName';
+import type { FeedLiker } from '../utils/groupNotifications';
 
 interface LikeNotificationProps {
   likedByName: string;
@@ -12,8 +13,13 @@ interface LikeNotificationProps {
   likedById: string;
   contentType: 'video' | 'photo';
   timestamp: number | string;
+  count?: number;
+  likers?: FeedLiker[];
   onPress?: () => void;
 }
+
+const AVATAR = 40;
+const STACK_SHIFT = 22;
 
 const LikeNotification = React.memo(function LikeNotification({
   likedByName,
@@ -21,183 +27,138 @@ const LikeNotification = React.memo(function LikeNotification({
   likedById,
   contentType,
   timestamp,
-  onPress,
+  count = 1,
+  likers,
 }: LikeNotificationProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const s = feedStrings(language);
 
-  const formatTime = (timestamp: number | string): string => {
-    let date: Date;
-    
-    if (typeof timestamp === 'string') {
-      date = new Date(timestamp);
-    } else {
-      date = new Date(timestamp);
-    }
-    
-    if (isNaN(date.getTime())) {
-      return t('justNow');
-    }
-    
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) {
-      return t('justNow');
-    } else if (diffInMinutes < 60) {
-      return t('minutesAgo', { minutes: diffInMinutes });
-    } else if (diffInMinutes < 1440) { // 24 hours
-      const hours = Math.floor(diffInMinutes / 60);
-      return t('hoursAgo', { hours });
-    } else {
-      const days = Math.floor(diffInMinutes / 1440);
-      return t('daysAgo', { days });
-    }
+  const formatTime = (ts: number | string): string => {
+    const date = new Date(ts);
+    if (isNaN(date.getTime())) return t('justNow');
+    const diffInMinutes = Math.floor((Date.now() - date.getTime()) / (1000 * 60));
+    if (diffInMinutes < 1) return t('justNow');
+    if (diffInMinutes < 60) return t('minutesAgo', { minutes: diffInMinutes });
+    if (diffInMinutes < 1440) return t('hoursAgo', { hours: Math.floor(diffInMinutes / 60) });
+    return t('daysAgo', { days: Math.floor(diffInMinutes / 1440) });
   };
 
-  const notificationKey = contentType === 'video' ? 'video_liked' : 'photo_liked';
-  const message = t(`notifications.${notificationKey}.message`)?.replace('{name}', likedByName) ||
-                 (contentType === 'video' 
-                   ? `${likedByName} лайкнул ваше видео` 
-                   : `${likedByName} лайкнул ваше фото`);
+  const people: FeedLiker[] =
+    likers && likers.length > 0
+      ? likers
+      : [{ id: likedById, name: likedByName, avatar: likedByAvatar }];
+  const uniquePeople = people.filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+  const shown = uniquePeople.slice(0, 3);
+  const isMany = uniquePeople.length > 1;
 
-  const handlePress = () => {
-    if (onPress) {
-      onPress();
-    }
-  };
+  // «Ivan, Petr и ещё 3 оценили ваше фото»
+  const names = shown.slice(0, 2).map(p => displayName(p.name) || '…');
+  const rest = uniquePeople.length - names.length;
+  let who = names.join(', ');
+  if (rest > 0) who += ` ${s.likes.andMore(rest)}`;
+  const verb = isMany
+    ? contentType === 'video' ? s.likes.likedVideoMany : s.likes.likedPhotoMany
+    : contentType === 'video' ? s.likes.likedVideo : s.likes.likedPhoto;
+  const suffix = !isMany && count > 1 ? ` ×${count}` : '';
+
+  const stackWidth = AVATAR + (shown.length - 1) * STACK_SHIFT;
 
   return (
-    <BlurOrSolid
-      intensity={20}
-      tint="dark"
-      style={styles.containerBlur}
-    >
-      <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-        {likedById ? (
-          <CachedAvatar
-            playerId={likedById}
-            fallbackAvatarUrl={likedByAvatar}
-            size={50}
-            style={styles.playerAvatar}
-          />
-        ) : (
-          <View style={styles.avatarPlaceholder}>
-            <Ionicons name="heart-outline" size={24} color="#fff" />
+    <View style={styles.row}>
+      <View style={[styles.stack, { width: stackWidth }]}>
+        {shown.map((p, i) => (
+          <View key={`${p.id}-${i}`} style={[styles.stackItem, { left: i * STACK_SHIFT, zIndex: 10 - i }]}>
+            {p.id ? (
+              <CachedAvatar playerId={p.id} fallbackAvatarUrl={p.avatar} size={AVATAR - 4} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="heart" size={16} color="#fff" />
+              </View>
+            )}
           </View>
-        )}
-      </View>
-      
-      <View style={styles.contentContainer}>
-        <View style={styles.header}>
-          <Text style={styles.playerName} numberOfLines={1}>
-            {likedByName}
-          </Text>
-          <Text style={styles.timeText}>
-            {formatTime(timestamp)}
-          </Text>
-        </View>
-        
-        <View style={styles.actionItem}>
-          <Text style={styles.actionText}>
-            {message}
-          </Text>
-          <View style={styles.likeBadge}>
-            <Ionicons name="heart" size={16} color="#fff" />
-          </View>
+        ))}
+        <View style={styles.heartBadge}>
+          <Ionicons name="heart" size={10} color="#fff" />
         </View>
       </View>
-      </View>
-    </BlurOrSolid>
+
+      <Text style={styles.text} numberOfLines={2}>
+        <Text style={styles.bold}>{who}</Text>
+        <Text> {verb}{suffix}</Text>
+        <Text style={styles.time}>  ·  {formatTime(timestamp)}</Text>
+      </Text>
+    </View>
   );
 });
 
 export default LikeNotification;
 
 const styles = StyleSheet.create({
-    containerBlur: {
-    borderRadius: 20,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    overflow: 'hidden',
-    ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 5,
-      elevation: 8,
-    }),
-  },
-  container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
-    padding: 16,
+  row: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderLeftWidth: 4,
-    borderLeftColor: '#E91E63', // Розовый цвет для лайков (уникальный, не используется в других уведомлениях)
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
-  avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  stack: {
+    height: AVATAR,
     marginRight: 12,
+    position: 'relative',
+  },
+  stackItem: {
+    position: 'absolute',
+    top: 0,
+    width: AVATAR,
+    height: AVATAR,
+    borderRadius: AVATAR / 2,
+    borderWidth: 2,
+    borderColor: '#101013',
+    backgroundColor: '#1c1c21',
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatar: {
+    width: AVATAR - 4,
+    height: AVATAR - 4,
+    borderRadius: (AVATAR - 4) / 2,
   },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    flex: 1,
+    alignSelf: 'stretch',
+    alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  heartBadge: {
+    position: 'absolute',
+    right: -4,
+    bottom: -2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#fa2f40',
+    borderWidth: 2,
+    borderColor: '#101013',
     alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
   },
-  playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  contentContainer: {
+  text: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  playerName: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Gilroy-Bold',
-    flex: 1,
-  },
-  timeText: {
-    color: '#aaa',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Regular',
-    marginLeft: 8,
-  },
-  actionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  actionText: {
-    color: '#ddd',
+    color: '#d4d4d8',
     fontSize: 14,
+    lineHeight: 19,
     fontFamily: 'Gilroy-Regular',
-    flex: 1,
   },
-  likeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#E91E63', // Такой же цвет, как граница слева
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    minWidth: 28,
-    justifyContent: 'center',
+  bold: {
+    color: '#fff',
+    fontFamily: 'Gilroy-Bold',
+  },
+  time: {
+    color: '#a1a1aa',
+    fontSize: 12,
   },
 });
-

@@ -28,7 +28,9 @@
     "retry": "Mēģināt vēlreiz",
     "goalie": "Vārtsargs",
     "left": "Pa kreisi",
-    "right": "Pareizi"
+    "right": "Pareizi",
+    "offline": "Nav savienojuma",
+    "and": "un"
   },
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
@@ -3196,7 +3198,8 @@
     "errorProcessNotificationGeneral": "Nevar apstrādāt paziņojumu. Lūdzu, mēģiniet vēlreiz.",
     "errorProcessFriendRequest": "Nevar apstrādāt jūsu draudzības pieprasījumu.",
     "errorProcessRequest": "Neizdevās apstrādāt jūsu pieprasījumu",
-    "errorSendMessage": "Neizdevās nosūtīt ziņojumu"
+    "errorSendMessage": "Neizdevās nosūtīt ziņojumu",
+    "phoneOrEmailPlaceholderShort": "+371… vai e-pasts"
   },
   "profile": {
     "addFriend": "Pievienot kā draugu",
@@ -3256,7 +3259,7 @@
     "cancel": "Atcelt",
     "friends": "Draugi",
     "friendship": "Draudzība",
-    "statistics": "Pašreizējās sezonas statistika",
+    "statistics": "Statistics",
     "teams": "Komandas",
     "currentTeams": "Pašreizējās komandas",
     "pastTeams": "Iepriekšējās komandas",
@@ -3486,8 +3489,12 @@
     "currentTeam": "Komanda",
     "hockeyExperience": "Hokeja pieredze",
     "years": "gadi",
-    "currentSeasonStats": "Pašreizējās sezonas statistika",
-    "effectiveness": "PPG"
+    "currentSeasonStats": "Statistics · {season}",
+    "effectiveness": "PPG",
+    "city": "Pilsēta",
+    "addAddress": "Pievienot adresi",
+    "addressesHint": "Var norādīt vairākas adreses",
+    "previousSeason": "Previous season"
   },
   "register": {
     "title": "Reģistrācija",
@@ -3852,6 +3859,12 @@
         "one": "Šodien tavu profilu skatīja {{count}} reizi.",
         "other": "Šodien tavu profilu skatīja {{count}} reizes."
       }
+    },
+    "video_liked": {
+      "grouped": "{name} atzīmēja ar patīk {count} jūsu video"
+    },
+    "photo_liked": {
+      "grouped": "{name} atzīmēja ar patīk {count} jūsu foto"
     }
   },
   "editProfile": {
@@ -3893,7 +3906,13 @@
     "waitingForConnection": "Gaida savienojumu",
     "checkInternetConnection": "Pārbaudiet interneta savienojumu",
     "shakeHintTitle": "Sakratiet ierīci",
-    "shakeHintSubtext": "lai atsvaidzinātu spēlētāju sarakstu"
+    "shakeHintSubtext": "lai atsvaidzinātu spēlētāju sarakstu",
+    "inviteFriends": "Uzaicināt",
+    "inviteTitle": "Pievienojies HockeyStars!",
+    "inviteMessage": "Izveido hokejista profilu, sacenties ar draugiem un sasniedz virsotni.",
+    "inviteSubtitle": "Nosūti saiti – draugi nonāks tieši tavā profilā",
+    "copyLink": "Kopēt saiti",
+    "moreApps": "Vairāk"
   },
   "filters": {
     "year": "gadā",
@@ -4323,5 +4342,14 @@
     "feed": "Lente",
     "scout": "Skauts",
     "skills": "Prasmes"
+  },
+  "seo": {
+    "homeTitle": "Hokeja lietotne Hockeystars"
+  },
+  "download": {
+    "installTitle": "Instalēt lietotni",
+    "scanQr": "Noskenējiet ar tālruni — atvērsies App Store vai Google Play",
+    "appStoreCta": "Lejupielādēt App Store",
+    "playStoreCta": "Lejupielādēt Google Play"
   }
 }

@@ -29,7 +29,8 @@
     "deleteAllNotificationsConfirm": "Вы уверены, что хотите удалить все уведомления?",
     "rejectRequestConfirm": "Вы уверены, что хотите отклонить этот запрос?",
     "left": "Левый",
-    "right": "Правый"
+    "right": "Правый",
+    "offline": "Нет соединения"
   },
   "winger": "Крайний нападающий",
   "center": "Центральный нападающий",
@@ -3008,7 +3009,8 @@
     "errorProcessNotificationGeneral": "Не удалось обработать уведомление. Попробуйте еще раз.",
     "errorProcessFriendRequest": "Не удалось обработать запрос в друзья",
     "errorProcessRequest": "Не удалось обработать запрос",
-    "errorSendMessage": "Не удалось отправить сообщение"
+    "errorSendMessage": "Не удалось отправить сообщение",
+    "phoneOrEmailPlaceholderShort": "+48… или email"
   },
   "profile": {
     "addFriend": "Добавить в друзья",
@@ -3083,7 +3085,7 @@
     "cancel": "Отмена",
     "friends": "Друзья",
     "friendship": "Дружба",
-    "statistics": "Статистика текущего сезона",
+    "statistics": "Статистика",
     "teams": "Команды",
     "currentTeams": "Текущие команды",
     "pastTeams": "Прошлые команды",
@@ -3312,12 +3314,16 @@
     "currentTeam": "Команда",
     "hockeyExperience": "Опыт в хоккее",
     "years": "лет",
-    "currentSeasonStats": "Статистика текущего сезона",
+    "currentSeasonStats": "Статистика · {season}",
     "noTeamsYet": "Команды еще не добавлены",
     "noVideosYet": "Видео моменты еще не добавлены",
     "noPhotosYet": "Фотографии еще не добавлены",
     "noAchievementsYet": "Достижения еще не добавлены",
-    "noStandardsYet": "Нормативы еще не заполнены"
+    "noStandardsYet": "Нормативы еще не заполнены",
+    "city": "Город",
+    "addAddress": "Добавить адрес",
+    "addressesHint": "Можно указать несколько адресов",
+    "previousSeason": "Прошлый сезон"
   },
   "register": {
     "title": "Регистрация",
@@ -3708,11 +3714,13 @@
     "newUserRegistered": "Зарегистрировался новый пользователь: {name}",
     "video_liked": {
       "title": "Ваше видео лайкнули",
-      "message": "{name} лайкнул ваше видео"
+      "message": "{name} лайкнул ваше видео",
+      "grouped": "{name} лайкнул {count} ваших видео"
     },
     "photo_liked": {
       "title": "Ваше фото лайкнули",
-      "message": "{name} лайкнул ваше фото"
+      "message": "{name} лайкнул ваше фото",
+      "grouped": "{name} лайкнул {count} ваших фото"
     },
     "profileViewsDigest": {
       "title": "Просмотры профиля",
@@ -3764,7 +3772,13 @@
     "waitingForConnection": "Ожидание подключения",
     "checkInternetConnection": "Проверьте подключение к интернету",
     "shakeHintTitle": "Потрясите устройство",
-    "shakeHintSubtext": "для обновления списка игроков"
+    "shakeHintSubtext": "для обновления списка игроков",
+    "inviteFriends": "Пригласить",
+    "inviteTitle": "Присоединяйся к HockeyStars!",
+    "inviteMessage": "Создай профиль хоккеиста, соревнуйся с друзьями и попади в топ лидеров льда.",
+    "inviteSubtitle": "Отправь ссылку — друзья попадут прямо на твой профиль",
+    "copyLink": "Копировать",
+    "moreApps": "Ещё"
   },
   "filters": {
     "year": "год",
@@ -4227,5 +4241,14 @@
     "feed": "Лента",
     "scout": "Скаут",
     "skills": "Скиллы"
+  },
+  "seo": {
+    "homeTitle": "Хоккейное приложение Hockeystars"
+  },
+  "download": {
+    "installTitle": "Установить приложение",
+    "scanQr": "Наведите камеру телефона — откроется App Store или Google Play",
+    "appStoreCta": "Скачать в App Store",
+    "playStoreCta": "Скачать в Google Play"
   }
 }

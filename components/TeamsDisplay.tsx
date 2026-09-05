@@ -17,7 +17,7 @@ const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, comp
   // Мемоизируем пустое состояние
   const emptyState = useMemo(() => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="people-outline" size={24} color="#FF4444" />
+      <Ionicons name="people-outline" size={24} color="#fa2f40" />
       <Text style={styles.emptyText}>{t('noTeamsSpecified')}</Text>
     </View>
   ), [t]);
@@ -65,7 +65,7 @@ const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, comp
                 <Ionicons 
                   name="star" 
                   size={16} 
-                  color="#FF4444" 
+                  color="#fa2f40" 
                 />
                 <Text style={styles.teamName}>
                   {getDisplayTeamName(team)}
@@ -78,7 +78,7 @@ const TeamsDisplay = React.memo(function TeamsDisplay({ teams, onTeamPress, comp
             </View>
             
             {onTeamPress && (
-              <Ionicons name="chevron-forward" size={20} color="#FF4444" />
+              <Ionicons name="chevron-forward" size={20} color="#fa2f40" />
             )}
           </TouchableOpacity>
         ))}

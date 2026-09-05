@@ -29,7 +29,7 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
 
   return (
     <BlurOrSolid
-      intensity={20}
+      intensity={55}
       tint="dark"
       style={styles.containerBlur}
     >
@@ -88,26 +88,26 @@ const GiftAcceptedNotification: React.FC<GiftAcceptedNotificationProps> = ({
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     overflow: 'hidden',
     ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   container: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
-    borderRadius: 20,
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4', // Cyan for gift accepted
   },
   avatarContainer: {
     width: 50,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   actionText: {
-    color: '#ddd',
+    color: '#d4d4d8',
     fontSize: 14,
     marginBottom: 4,
   },

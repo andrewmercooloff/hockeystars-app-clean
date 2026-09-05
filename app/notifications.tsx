@@ -1,4 +1,7 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
+import {buildPlayerPath, buildPlayerSlug} from '../utils/playerSeoPath';
+import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import {
     ActivityIndicator,
@@ -11,13 +14,19 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import LoadingCenter from '../components/LoadingCenter';
+import SkeletonList from '../components/SkeletonList';
+import EmptyState from '../components/EmptyState';
+import { normalizeNamesInData, displayName } from '../utils/displayName';
 import { useAppAlert } from '../hooks/useAppAlert';
 import { colors } from '../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 // Убираем все анимации переходов
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Reanimated, { SlideInDown, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { RefreshControl, ScrollView } from 'react-native';
+import StackingCell from '../components/StackingCell';
+import PressableScale from '../components/PressableScale';
 import StatsChangeNotification from '../components/StatsChangeNotification';
 import PhotoAddedNotification from '../components/PhotoAddedNotification';
 import FriendshipNotification from '../components/FriendshipNotification';
@@ -38,6 +47,8 @@ import ScoutReportNotification from '../components/ScoutReportNotification';
 import GameFirstPlaceNotification from '../components/GameFirstPlaceNotification';
 import LikeNotification from '../components/LikeNotification';
 import UserReportNotification from '../components/UserReportNotification';
+import { groupFeedNotifications } from '../utils/groupNotifications';
+import { feedStrings, sectionKeyFor } from '../utils/feedI18n';
 import CachedAvatar from '../components/CachedAvatar';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import {
@@ -64,6 +75,7 @@ import {
   extendNotificationsBadgeSuppressMs,
   setNotificationsScreenFocused,
 } from '../utils/notificationsBadgeGate';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 const iceBg = require('../assets/images/led.jpg');
 
@@ -83,6 +95,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   onVideoScrubActiveChange?: (active: boolean) => void;
 }) => {
   const { t } = useLanguage();
+  const isDesktop = useIsDesktopLayout();
 
   const handlePress = React.useCallback(() => {
     onPress(notification);
@@ -151,9 +164,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   return (
     <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
         {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <StatsChangeNotification
@@ -163,7 +175,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.changedPlayerAvatar}
               timestamp={notification.timestamp}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'photo_added' ? (
             <PhotoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
@@ -198,9 +210,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             }}
           />
         ) : notification.type === 'exercise_completed' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <ExerciseNotification
@@ -210,11 +221,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               exerciseId={notification.data.exerciseId || 'unknown'}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'gift_received' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <GiftReceivedNotification
@@ -226,11 +236,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerId={notification.data.playerId}
               playerAvatar={notification.data.playerAvatar}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'friend_gift_received' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <FriendGiftReceivedNotification
@@ -252,11 +261,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               isRead={notification.isRead}
               onPress={handlePress}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'friend_request' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <FriendRequestNotification
@@ -265,11 +273,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={notification.timestamp}
               playerAvatar={notification.playerAvatar || notification.data?.sender_avatar || notification.data?.playerAvatar}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'friend_accepted' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <FriendAcceptedNotification
@@ -279,7 +286,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={notification.timestamp}
               playerAvatar={notification.data?.acceptor_avatar}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'gift_accepted' ? (
           <GiftAcceptedNotification
             starName={notification.data?.from_star || t('notifications.star')}
@@ -303,9 +310,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               onScrubActiveChange={onVideoScrubActiveChange}
             />
         ) : notification.type === 'avatar_changed' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <AvatarChangedNotification
@@ -315,11 +321,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'achievement_added' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <AchievementAddedNotification
@@ -329,11 +334,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'physical_data_changed' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <PhysicalDataChangedNotification
@@ -343,11 +347,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               changes={notification.data.changes || []}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'puck_speed_changed' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <PuckSpeedChangedNotification
@@ -357,11 +360,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               newMaxSpeed={notification.data.newMaxSpeed || 0}
               timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'scout_report' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <ScoutReportNotification
@@ -371,11 +373,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               message={notification.message || ''}
               timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'game_first_place' || notification.type === 'quiz_first_place' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <GameFirstPlaceNotification
@@ -387,11 +388,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               prizeAmount={notification.data?.prizeAmount}
               timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <LikeNotification
@@ -400,12 +400,13 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               likedById={notification.data?.likedByUserId || notification.data?.likedByUser || ''}
               contentType={notification.type === 'video_liked' ? 'video' : 'photo'}
               timestamp={notification.timestamp || notification.created_at || Date.now()}
+              count={notification.groupCount}
+              likers={notification.data?.likers}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'user_report' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <UserReportNotification
@@ -417,11 +418,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               reportedAvatar={notification.data?.reportedAvatar}
               timestamp={notification.timestamp}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : notification.type === 'gift_request' ? (
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePress}
-            activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <GiftRequestNotification
@@ -431,17 +431,16 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               requestMessage={notification.data?.requestMessage}
               timestamp={notification.timestamp || notification.created_at || Date.now()}
             />
-          </TouchableOpacity>
+          </PressableScale>
         ) : (
-        <TouchableOpacity
+        <PressableScale
           key={notification.id}
           onPress={handlePress}
-          activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <View style={styles.notificationGradientShadow}>
+          <View style={[styles.notificationGradientShadow, isDesktop && styles.notificationGradientShadowDesktop]}>
             <BlurOrSolid
-              intensity={20}
+              intensity={55}
               tint="dark"
               style={styles.notificationItemBlur}
             >
@@ -493,7 +492,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                   onPress={() => onSuperAction(notification)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.superActionButtonText}>Супер!</Text>
+                  <Text style={styles.superActionButtonText}>{t('common.super') || 'Супер!'}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -501,7 +500,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             </View>
             </BlurOrSolid>
           </View>
-        </TouchableOpacity>
+        </PressableScale>
         )}
       </AnimatedNotification>
   );
@@ -511,8 +510,13 @@ NotificationItem.displayName = 'NotificationItem';
 
 // Компонент с анимацией для уведомлений (только для новых)
 // Убрали анимацию уведомлений для улучшения производительности
-const AnimatedNotification = ({ children }: { children: React.ReactNode; index: number; isNew: boolean }) => {
-  return <View>{children}</View>;
+const AnimatedNotification = ({ children, isNew }: { children: React.ReactNode; index: number; isNew: boolean }) => {
+  if (!isNew) return <View>{children}</View>;
+  return (
+    <Reanimated.View entering={SlideInDown.springify().damping(16).stiffness(170)}>
+      {children}
+    </Reanimated.View>
+  );
 };
 
 // Вспомогательная функция для получения названия типа предмета
@@ -539,6 +543,7 @@ interface NotificationItem {
   receiverId?: string;
   data?: any; // Добавляем поле для хранения дополнительных данных
   isActionable?: boolean; // Добавляем поле для уведомлений, к которым можно применить действие
+  groupCount?: number;
 }
 
 interface FriendRequestItem {
@@ -582,11 +587,15 @@ let notificationsListSessionCache: NotificationsListSessionCache | null = null;
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const feedText = feedStrings(language);
+  const [refreshing, setRefreshing] = useState(false);
   const { updateNotificationCount, setUnreadNotificationsBadge } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading, setCurrentUser } = useUser();
   const { showAlert, showConfirm, AlertHost } = useAppAlert();
+  const isFocused = useIsFocused();
+  const isDesktop = useIsDesktopLayout();
   
   // Убираем все анимации - простое мгновенное переключение
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -598,6 +607,8 @@ export default function NotificationsScreen() {
   const videoScrubLockRef = React.useRef(0);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
+  const mediaFeedSingleColumn = isDesktop && activeFilter === 'media';
+  const desktopMultiColumn = isDesktop && !mediaFeedSingleColumn;
   // Состояние для отслеживания новых уведомлений (для анимации)
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
 
@@ -617,6 +628,12 @@ export default function NotificationsScreen() {
   friendRequestsRef.current = friendRequests;
   giftRequestsRef.current = giftRequests;
   const listRef = React.useRef<FlatListType<NotificationItem>>(null);
+  const stackScrollY = useSharedValue(0);
+  const onStackScroll = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      stackScrollY.value = e.contentOffset.y;
+    },
+  });
   const hasUserScrolledListRef = React.useRef(false);
   const endReachedLockedRef = React.useRef(false);
   const pageLoadInFlightRef = React.useRef(false);
@@ -781,10 +798,37 @@ export default function NotificationsScreen() {
 
   // Мемоизируем список уведомлений для предотвращения ненужных перерендеров
   const memoizedNotifications = React.useMemo(() => {
-    if (activeFilter === 'all') return notifications;
-    const allowed = FILTER_TYPES[activeFilter] || [];
-    return notifications.filter(n => allowed.includes(n.type));
-  }, [notifications, activeFilter]);
+    const base =
+      activeFilter === 'all'
+        ? notifications
+        : notifications.filter(n => (FILTER_TYPES[activeFilter] || []).includes(n.type));
+    const grouped = groupFeedNotifications(base).map(n => {
+      const data = normalizeNamesInData(n.data);
+      const playerName = n.playerName ? displayName(n.playerName) : n.playerName;
+      return data === n.data && playerName === n.playerName ? n : { ...n, data, playerName };
+    });
+    // Разделители дат: Сегодня / Вчера / На этой неделе / Ранее
+    const out: NotificationItem[] = [];
+    let lastSection: string | null = null;
+    const now = Date.now();
+    for (const n of grouped) {
+      const ts = typeof n.timestamp === 'number' ? n.timestamp : new Date(n.timestamp as any).getTime();
+      const key = sectionKeyFor(isNaN(ts) ? now : ts, now);
+      if (key !== lastSection) {
+        lastSection = key;
+        out.push({
+          id: `__section_${key}`,
+          type: '__section' as any,
+          title: feedText.sections[key],
+          message: '',
+          timestamp: ts,
+          isRead: true,
+        } as unknown as NotificationItem);
+      }
+      out.push(n);
+    }
+    return out;
+  }, [notifications, activeFilter, feedText]);
   const memoizedFriendRequests = React.useMemo(() => friendRequests, [friendRequests]);
   const memoizedGiftRequests = React.useMemo(() => giftRequests, [giftRequests]);
 
@@ -1536,57 +1580,36 @@ export default function NotificationsScreen() {
         const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
         if (senderId) {
           console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-          router.push({
-            pathname: `/player/${senderId}`,
-            params: { returnTo: 'notifications' }
-          });
+          navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
         } else {
           console.warn('⚠️ Не удалось определить ID отправителя запроса дружбы');
         }
       } else if (notification.type === 'friend_accepted') {
         // Для уведомлений о принятом запросе показываем профиль игрока, который принял
         if (notification.data && notification.data.acceptor_id) {
-          router.push({
-            pathname: `/player/${notification.data.acceptor_id}`,
-            params: { returnTo: 'notifications' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.acceptor_id, returnTo: 'notifications' });
         }
       } else if (notification.type === 'autograph_request' || notification.type === 'stick_request') {
         // Для запросов автографов и клюшек показываем профиль игрока
         if (notification.playerId) {
-          router.push({
-  pathname: `/player/${notification.playerId}`,
-  params: { returnTo: 'notifications' }
-});
+          navigateToPlayerProfile(router, { playerId: notification.playerId, returnTo: 'notifications' });
         }
       } else if (notification.type === 'gift_accepted') {
         // Для уведомлений о принятых подарках переходим в музей
         if (currentUser) {
-          router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
         }
       } else if (notification.type === 'stats_change') {
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToStats: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToStats: 'true' });
         }
       } else if (notification.type === 'normative_changed') {
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToNormatives: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToNormatives: 'true' });
         }
       } else if (notification.type === 'scout_report') {
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToAnalysis: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToAnalysis: 'true' });
         }
       } else if (notification.type === 'game_first_place') {
         router.push({ pathname: '/', params: { openGameResults: 'true' } });
@@ -1595,48 +1618,30 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'photo_added') {
         // Для уведомлений о добавленных фото показываем фото игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToPhotos: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToPhotos: 'true' });
         }
       } else if (notification.type === 'new_friendship') {
         // Профиль того, кто подтвердил дружбу — прокрутка к блоку «Друзья»
         if (notification.data && notification.data.confirmedBy) {
-          router.push({
-            pathname: `/player/${notification.data.confirmedBy}`,
-            params: { returnTo: 'notifications', scrollToFriends: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.confirmedBy, returnTo: 'notifications', scrollToFriends: 'true' });
         }
       } else if (notification.type === 'gift_received') {
         // Для уведомлений о полученных подарках переходим в музей того, кто получил подарок
         if (notification.data && notification.data.playerId) {
-          router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
-          router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
         }
       } else if (notification.type === 'friend_gift_received') {
         // Для уведомлений о подарках, полученных друзьями, переходим в музей игрока
         if (notification.data && notification.data.playerId) {
-          router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
         }
       } else if (notification.type === 'video_added') {
         // Для уведомлений о добавленных видео показываем видео игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToVideos: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToVideos: 'true' });
         }
       } else if (notification.type === 'avatar_changed') {
         const changedPlayerId = notification.data?.changedPlayerId;
@@ -1646,54 +1651,40 @@ export default function NotificationsScreen() {
             await updateAvatarGlobally(changedPlayerId, changedPlayerAvatar);
           }
           clearPlayerMemoryCache(changedPlayerId);
-          router.push({
-            pathname: `/player/${changedPlayerId}`,
-            params: { returnTo: 'notifications', refreshProfile: 'true' },
+          navigateToPlayerProfile(router, {
+            playerId: changedPlayerId,
+            returnTo: 'notifications',
+            refreshProfile: 'true',
           });
         }
       } else if (notification.type === 'achievement_added') {
         // Для уведомлений о новых достижениях показываем достижения игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToAchievements: 'true' });
         }
       } else if (notification.type === 'physical_data_changed') {
         // Для уведомлений об изменении роста/веса показываем статистику игрока
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToStats: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToStats: 'true' });
         }
       } else if (notification.type === 'puck_speed_changed') {
         // Для уведомлений об обновлении скорости шайбы показываем профиль игрока и скроллим к разделу скорости
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToSpeed: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToSpeed: 'true' });
         }
       } else if (notification.type === 'exercise_completed') {
         // Для уведомлений о выполненных упражнениях переходим в профиль игрока в раздел упражнений
         const playerId = notification.data?.playerId || notification.playerId;
         if (playerId) {
           console.log('🔗 Навигация к профилю игрока с выполненным упражнением:', playerId);
-          router.push({
-            pathname: `/player/${playerId}`,
-            params: { returnTo: 'notifications', scrollToExercises: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: playerId, returnTo: 'notifications', scrollToExercises: 'true' });
         } else {
           console.warn('⚠️ Не удалось определить ID игрока для уведомления о выполненном упражнении');
         }
       } else if (notification.type === 'achievement') {
         // Для уведомлений о достижениях показываем достижения
         if (notification.data && notification.data.changedPlayerId) {
-          router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToAchievements: 'true' });
         }
       } else if (notification.type === 'team_invite') {
         // Для уведомлений о приглашениях в команду показываем команды
@@ -1701,40 +1692,28 @@ export default function NotificationsScreen() {
       } else if (notification.type === 'video_liked') {
         // Для уведомлений о лайках видео переходим на профиль владельца контента с прокруткой к видео
         if (notification.data && notification.data.playerId) {
-          router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToVideos: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToVideos: 'true' });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
-          router.push(`/player/${currentUser.id}?scrollToVideos=true`);
+          navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, returnTo: 'notifications', scrollToVideos: 'true' });
         }
       } else if (notification.type === 'photo_liked') {
         // Для уведомлений о лайках фото переходим на профиль владельца контента с прокруткой к фото
         if (notification.data && notification.data.playerId) {
-          router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToPhotos: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToPhotos: 'true' });
         } else if (currentUser) {
           // Fallback на текущего пользователя, если playerId не найден
-          router.push(`/player/${currentUser.id}?scrollToPhotos=true`);
+          navigateToPlayerProfile(router, { playerId: currentUser.id, name: currentUser.name, returnTo: 'notifications', scrollToPhotos: 'true' });
         }
       } else if (notification.type === 'user_report') {
         // Для уведомлений о жалобах переходим на профиль пользователя, на которого пожаловались
         if (notification.data && notification.data.reportedId) {
-          router.push({
-            pathname: `/player/${notification.data.reportedId}`,
-            params: { returnTo: 'notifications' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.reportedId, returnTo: 'notifications' });
         }
       } else if (notification.type === 'gift_request') {
         // Для уведомлений о запросе подарка переходим на профиль игрока для отправки подарка
         if (notification.data && notification.data.requesterId) {
-          router.push({
-            pathname: `/player/${notification.data.requesterId}`,
-            params: { returnTo: 'notifications', scrollToGift: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: notification.data.requesterId, returnTo: 'notifications', scrollToGift: 'true' });
         }
       } else if (notification.type === 'system') {
         // Для системных уведомлений остаемся в разделе уведомлений
@@ -1778,22 +1757,13 @@ export default function NotificationsScreen() {
         
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
-          router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
         } else if (notification.type === 'gift_received') {
           // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           } else if (currentUser) {
-            router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
           }
         } else if (notification.type === 'friend_request') {
           // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
@@ -1801,27 +1771,18 @@ export default function NotificationsScreen() {
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
             console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-            router.push({
-            pathname: `/player/${senderId}`,
-            params: { returnTo: 'notifications' }
-          });
+            navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           } else if (notification.playerId) {
-            router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
+            navigateToPlayerProfile(router, { playerId: notification.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
-            router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToAchievements: 'true' });
           }
         } else if (notification.type === 'team_invite') {
           router.push('/teams');
@@ -1869,22 +1830,13 @@ export default function NotificationsScreen() {
         
         // Переходим в соответствующий раздел в зависимости от типа уведомления
         if (notification.type === 'gift_accepted') {
-          router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+          navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
         } else if (notification.type === 'gift_received') {
           // Переходим на профиль игрока с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           } else if (currentUser) {
-            router.push({
-            pathname: `/player/${currentUser.id}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: currentUser.id, returnTo: 'notifications', scrollToMuseum: 'true' });
           }
         } else if (notification.type === 'friend_request') {
           // Для запросов в друзья показываем профиль игрока БЕЗ автоматической прокрутки
@@ -1892,27 +1844,18 @@ export default function NotificationsScreen() {
           const senderId = notification.playerId || notification.data?.sender_id || notification.data?.playerId;
           if (senderId) {
             console.log('🔗 Навигация к профилю отправителя запроса дружбы:', senderId);
-            router.push({
-            pathname: `/player/${senderId}`,
-            params: { returnTo: 'notifications' }
-          });
+            navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
           }
         } else if (notification.type === 'friend_gift_received') {
           // Переходим на профиль друга с прокруткой к разделу подарков (музей)
           if (notification.data && notification.data.playerId) {
-            router.push({
-            pathname: `/player/${notification.data.playerId}`,
-            params: { returnTo: 'notifications', scrollToMuseum: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           } else if (notification.playerId) {
-            router.push(`/player/${notification.playerId}?scrollToMuseum=true`);
+            navigateToPlayerProfile(router, { playerId: notification.playerId, returnTo: 'notifications', scrollToMuseum: 'true' });
           }
         } else if (notification.type === 'achievement') {
           if (notification.data && notification.data.changedPlayerId) {
-            router.push({
-            pathname: `/player/${notification.data.changedPlayerId}`,
-            params: { returnTo: 'notifications', scrollToAchievements: 'true' }
-          });
+            navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToAchievements: 'true' });
           }
         } else if (notification.type === 'team_invite') {
           router.push('/teams');
@@ -1944,24 +1887,60 @@ export default function NotificationsScreen() {
   }, []);
 
   const renderNotificationItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<NotificationItem>) => (
-      <NotificationItem
-        notification={item}
-        index={index}
-        isNew={newNotificationIds.has(item.id)}
-        onPress={handleNotificationPress}
-        onSuperAction={handleSuperAction}
-        currentUserId={currentUser?.id}
-        onVideoScrubActiveChange={handleVideoScrubActiveChange}
-      />
-    ),
+    ({ item, index }: ListRenderItemInfo<NotificationItem>) =>
+      (item.type as string) === '__section' ? (
+        <View style={styles.sectionHeaderWrap}>
+          <Text style={styles.sectionHeaderText}>{item.title}</Text>
+        </View>
+      ) : (
+      <View style={desktopMultiColumn ? styles.notificationColDesktop : styles.notificationColSingle}>
+        <NotificationItem
+          notification={item}
+          index={index}
+          isNew={newNotificationIds.has(item.id)}
+          onPress={handleNotificationPress}
+          onSuperAction={handleSuperAction}
+          currentUserId={currentUser?.id}
+          onVideoScrubActiveChange={handleVideoScrubActiveChange}
+        />
+      </View>
+      ),
     [
+      desktopMultiColumn,
       newNotificationIds,
       handleNotificationPress,
       handleSuperAction,
       currentUser?.id,
       handleVideoScrubActiveChange,
     ]
+  );
+
+  const renderStackCell = useCallback((props: any) => (
+    <StackingCell {...props} scrollY={stackScrollY} enabled={!desktopMultiColumn} />
+  ), [desktopMultiColumn, stackScrollY]);
+
+  const handlePullRefresh = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      await loadNotificationsData(false, true, false);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshing, loadNotificationsData]);
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={refreshing}
+        onRefresh={handlePullRefresh}
+        tintColor={colors.brand}
+        colors={[colors.brand]}
+        progressBackgroundColor="#0b0b0e"
+        progressViewOffset={96}
+      />
+    ),
+    [refreshing, handlePullRefresh],
   );
 
   const notificationsListFooter = useMemo(() => {
@@ -1978,20 +1957,11 @@ export default function NotificationsScreen() {
       !listReady || (filterBackfilling && memoizedNotifications.length === 0);
     if (showInitialLoader) {
       return (
-        <View style={[styles.emptyContainer, styles.listLoadingInline]}>
-          <LoadingCenter />
-        </View>
+        <SkeletonList rows={6} />
       );
     }
     return (
-      <View style={styles.emptyContainer}>
-        <View style={styles.emptyGradientShadow}>
-          <View style={styles.emptyContent}>
-            <Ionicons name="notifications-outline" size={64} color="#fa2f40" />
-            <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
-          </View>
-        </View>
-      </View>
+      <EmptyState icon="notifications-outline" title={t('notifications.noNotifications')} />
     );
   }, [listReady, filterBackfilling, memoizedNotifications.length, t]);
 
@@ -2052,7 +2022,7 @@ export default function NotificationsScreen() {
   const handleGiftRequest = async (request: GiftRequestItem, action: 'accept' | 'decline') => {
     try {
       // При нажатии на запрос подарка переходим на профиль игрока с прокруткой к кнопке подарка
-      router.push(`/player/${request.playerId}?scrollToGift=true`);
+      navigateToPlayerProfile(router, { playerId: request.playerId, returnTo: 'notifications', scrollToGift: 'true' });
         
       // Удаляем уведомление из списка после перехода
         setGiftRequests(prev => prev.filter(req => req.id !== request.id));
@@ -2066,16 +2036,31 @@ export default function NotificationsScreen() {
 
   // Редирект убран - проверка авторизации происходит в _layout.tsx
 
+  // Inactive tab must not cover /ru/player on mobile web
+  if (!isFocused) {
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
+  }
+
   // Если пользователь не авторизован, показываем loading
   if (currentUser === null) {
     return (
-      <CachedBackground 
-        source={iceBg} 
-        style={styles.container}
-        resizeMode="cover"
-      >
-        <LoadingCenter style={styles.loadingCenter} />
-      </CachedBackground>
+      <View style={styles.container}>
+        <CachedBackground 
+          source={iceBg} 
+          style={styles.background}
+          resizeMode="cover"
+        >
+          <View style={styles.overlay}>
+            <View style={styles.pageHeader}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
+            </View>
+            <SkeletonList rows={7} />
+          </View>
+        </CachedBackground>
+      </View>
     );
   }
 
@@ -2095,7 +2080,7 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
-            <LoadingCenter style={styles.loadingCenter} />
+            <SkeletonList rows={7} />
           </View>
         </CachedBackground>
       </View>
@@ -2118,7 +2103,12 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('notifications.title')}</Text>
             </View>
-            <View style={styles.filterBar}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.filterBar}
+              contentContainerStyle={styles.filterBarContent}
+            >
               {Object.keys(FILTER_ICONS).map((key) => {
                 const isActive = activeFilter === key;
                 return (
@@ -2135,23 +2125,36 @@ export default function NotificationsScreen() {
                   >
                     <Ionicons
                       name={FILTER_ICONS[key] as any}
-                      size={20}
-                      color={isActive ? '#ffffff' : '#888'}
+                      size={15}
+                      color={isActive ? '#ffffff' : '#a1a1aa'}
                     />
+                    <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
+                      {feedText.filters[key] || key}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
 
           {/* Список уведомлений */}
-          <FlatList
+          <Reanimated.FlatList
             ref={listRef}
+            key={desktopMultiColumn ? 'notifications-desktop-2' : mediaFeedSingleColumn ? 'notifications-desktop-media-1' : 'notifications-mobile-1'}
             data={memoizedNotifications}
             renderItem={renderNotificationItem}
             keyExtractor={notificationKeyExtractor}
+            numColumns={desktopMultiColumn ? 2 : 1}
+            columnWrapperStyle={desktopMultiColumn ? styles.notificationRowDesktop : undefined}
             scrollEnabled={listScrollEnabled}
-            contentContainerStyle={styles.notificationsContent}
+            onScroll={onStackScroll}
+            scrollEventThrottle={16}
+            CellRendererComponent={renderStackCell}
+            contentContainerStyle={[
+              styles.notificationsContent,
+              isDesktop && styles.notificationsContentDesktop,
+              mediaFeedSingleColumn && styles.notificationsContentDesktopMedia,
+            ]}
             removeClippedSubviews={false}
             decelerationRate="fast"
             initialNumToRender={8}
@@ -2168,6 +2171,7 @@ export default function NotificationsScreen() {
             onEndReachedThreshold={0.4}
             ListEmptyComponent={notificationsListEmpty}
             ListFooterComponent={notificationsListFooter}
+            refreshControl={refreshControl}
           />
         </View>
         </CachedBackground>
@@ -2187,11 +2191,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.2)',
+    backgroundColor: colors.screenOverlay,
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(135, 163, 177, 0.3)',
+    backgroundColor: colors.screenOverlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2211,7 +2215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
   },
   headerLeft: {
     flex: 1,
@@ -2234,6 +2238,26 @@ const styles = StyleSheet.create({
     paddingTop: 96,
     paddingBottom: 8,
   },
+  notificationsContentDesktop: {
+    paddingHorizontal: 8,
+  },
+  notificationsContentDesktopMedia: {
+    maxWidth: 640,
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+  },
+  notificationRowDesktop: {
+    alignItems: 'stretch',
+  },
+  notificationColDesktop: {
+    flex: 1,
+    minWidth: 0,
+  },
+  notificationColSingle: {
+    width: '100%',
+    maxWidth: '100%',
+  },
   stickyHeader: {
     position: 'absolute',
     top: 0,
@@ -2242,31 +2266,55 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   pageHeader: {
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    backgroundColor: colors.headerBar,
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
   },
   filterBar: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(1, 0, 0, 0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: colors.headerBar,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'space-around',
+    flexGrow: 0,
+  },
+  filterBarContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 8,
     alignItems: 'center',
   },
   filterBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+    height: 34,
+    paddingHorizontal: 12,
+    borderRadius: 17,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
   },
   filterBtnActive: {
     backgroundColor: '#fa2f40',
+  },
+  filterLabel: {
+    color: '#a1a1aa',
+    fontSize: 13,
+    fontFamily: 'Gilroy-Bold',
+  },
+  filterLabelActive: {
+    color: '#fff',
+  },
+  sectionHeaderWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 6,
+  },
+  sectionHeaderText: {
+    color: '#a1a1aa',
+    fontSize: 12,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    fontFamily: 'Gilroy-Bold',
   },
   backButton: {
     marginRight: 16,
@@ -2296,9 +2344,9 @@ const styles = StyleSheet.create({
     padding: 20, // Точно такой же padding как в сообщениях
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     marginHorizontal: 16, // Такая же ширина как у элементов чатов
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
   },
   emptyGradientShadow: {
     borderRadius: 15,
@@ -2307,7 +2355,7 @@ const styles = StyleSheet.create({
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.5,
       shadowRadius: 8,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   emptyTitle: {
@@ -2325,31 +2373,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, // Точно такой же paddingHorizontal как в сообщениях
   },
   notificationItemBlur: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 16,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     minHeight: 80,
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    backgroundColor: '#1c1c21',
   },
   notificationGradientShadow: {
     marginHorizontal: 16,
     marginVertical: 6,
-    borderRadius: 20,
+    borderRadius: 16,
     ...platformCardShadow({
       shadowColor: 'rgb(1,0,0)',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
+  },
+  notificationGradientShadowDesktop: {
+    marginHorizontal: 8,
   },
   notificationIcon: {
     width: 40,
@@ -2383,7 +2434,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   notificationTime: {
-    color: '#666',
+    color: '#a1a1aa',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     flexShrink: 0,
@@ -2441,7 +2492,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
     marginHorizontal: 16,
@@ -2461,18 +2512,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.75)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...platformCardShadow({
       shadowColor: 'rgb(1,0,0)',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.16,
       shadowRadius: 5,
-      elevation: 8,
+      elevation: 2,
     }),
   },
   friendRequestActions: {
@@ -2547,7 +2598,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   friendRequestTime: {
-    color: '#666',
+    color: '#a1a1aa',
     fontSize: 12,
     fontFamily: 'Gilroy-Regular',
     flexShrink: 0,
@@ -2585,13 +2636,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#fa2f40',
-    ...platformCardShadow({
-      shadowColor: 'rgb(1,0,0)',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-    }),
   },
   superActionButtonText: {
     color: '#fff',

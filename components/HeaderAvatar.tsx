@@ -54,7 +54,7 @@ const HeaderAvatar: React.FC<HeaderAvatarProps> = React.memo(({
         borderRadius: size / 2,
         justifyContent: 'center', 
         alignItems: 'center',
-        backgroundColor: '#333'
+        backgroundColor: '#2a2430'
       }}>
         <Ionicons name={fallbackIcon} size={fallbackSize} color={fallbackColor} />
       </View>

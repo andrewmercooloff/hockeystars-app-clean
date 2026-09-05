@@ -277,10 +277,10 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
         </View>
       )}
 
-      {/* Статистика текущего сезона для игроков */}
+      {/* Статистика сезона 26/27 */}
       {player.status === 'player' && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Статистика текущего сезона</Text>
+          <Text style={styles.sectionTitle}>Статистика · 26/27</Text>
           
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
@@ -342,7 +342,7 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
             value={editData.instagram || ''}
             onChangeText={(text) => setEditData({...editData, instagram: text})}
             placeholder={t('socialLinks.instagramPlaceholder')}
-            placeholderTextColor="#666"
+            placeholderTextColor="#8a8a92"
           />
         </View>
 
@@ -357,7 +357,7 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
               setEditData({...editData, tiktok: normalizedText});
             }}
             placeholder={t('socialLinks.tiktokPlaceholder')}
-            placeholderTextColor="#666"
+            placeholderTextColor="#8a8a92"
           />
         </View>
 
@@ -368,7 +368,7 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
             value={editData.vk || ''}
             onChangeText={(text) => setEditData({...editData, vk: text})}
             placeholder={t('socialLinks.vkPlaceholder')}
-            placeholderTextColor="#666"
+            placeholderTextColor="#8a8a92"
           />
         </View>
 
@@ -387,7 +387,7 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
               setEditData({...editData, website: normalizedText});
             }}
             placeholder={t('socialLinks.websitePlaceholder')}
-            placeholderTextColor="#666"
+            placeholderTextColor="#8a8a92"
           />
         </View>
       </View>
@@ -465,7 +465,7 @@ const PlayerEditForm: React.FC<PlayerEditFormProps> = ({ player, currentUser, on
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   photoSection: {
     alignItems: 'center',
@@ -479,10 +479,10 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#FF4444',
+    borderColor: '#fa2f40',
   },
   avatarPlaceholder: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   pickerButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statInput: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -573,10 +573,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
   },
   cancelButton: {
-    backgroundColor: '#666',
+    backgroundColor: '#8a8a92',
   },
   buttonText: {
     color: '#fff',
@@ -589,12 +589,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 12,
     padding: 20,
     width: '80%',
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalCancelText: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontSize: 16,
   },
 });

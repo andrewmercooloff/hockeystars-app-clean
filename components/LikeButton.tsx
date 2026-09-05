@@ -120,7 +120,7 @@ export default function LikeButton({
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="small" color="#FF4444" />
+        <ActivityIndicator size="small" color="#fa2f40" />
       </View>
     );
   }
@@ -138,7 +138,7 @@ export default function LikeButton({
       <Ionicons
         name={isLiked ? 'heart' : 'heart-outline'}
         size={iconSize}
-        color={isLiked ? '#FF4444' : '#fff'}
+        color={isLiked ? '#fa2f40' : '#fff'}
       />
       {likesCount > 0 && (
         <Text style={[styles.count, { fontSize }]}>{likesCount}</Text>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
   },
   small: {
     paddingHorizontal: 6,

@@ -9,13 +9,14 @@ import {
     ScrollView,
     Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export default function YearFilter({ players }: { players: any[] }) {
+export default React.memo(function YearFilter({ players }: { players: any[] }) {
   const { t } = useLanguage();
   const { setSelectedCountry } = useCountryFilter();
   const {
@@ -165,12 +166,14 @@ export default function YearFilter({ players }: { players: any[] }) {
         style={styles.filterButton}
         onPress={handleFilterToggle}
       >
-        <Text style={styles.filterButtonText}>
+        <Text style={styles.filterButtonText} numberOfLines={1}>
           {selectedYear ? `${selectedYear}` : (t('filters.allYears') || 'Все')}
         </Text>
-        <Text style={styles.filterButtonIcon}>
-          {showYearFilter ? '▲' : '▼'}
-        </Text>
+        <Ionicons
+          name={showYearFilter ? 'chevron-up' : 'chevron-down'}
+          size={14}
+          color="rgba(255,255,255,0.75)"
+        />
       </TouchableOpacity>
 
       {showYearFilter && (
@@ -241,48 +244,45 @@ export default function YearFilter({ players }: { players: any[] }) {
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    zIndex: 10,
-    width: 100,
+    zIndex: 1000,
+    minWidth: 88,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.8)', // Черный полупрозрачный фон
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 10,
-    width: 100,
+    gap: 6,
+    backgroundColor: 'rgba(20, 20, 24, 0.82)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    minWidth: 88,
   },
   filterButtonText: {
     color: '#fff',
     fontSize: 13,
     fontFamily: 'Gilroy-Bold',
-    fontWeight: '700',
     flex: 1,
-  },
-  filterButtonIcon: {
-    color: '#fff',
-    fontSize: 10,
-    fontFamily: 'Gilroy-Regular',
-    fontWeight: '400',
   },
   yearsList: {
     position: 'absolute',
     top: '100%',
     left: 0,
-    width: 100,
+    minWidth: 100,
     maxHeight: SCREEN_HEIGHT * 0.65,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
-    borderRadius: 12,
-    marginTop: 4,
-    zIndex: 20,
+    backgroundColor: 'rgba(20, 20, 24, 0.94)',
+    borderRadius: 14,
+    marginTop: 6,
+    zIndex: 1001,
+    elevation: 1001,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     overflow: 'hidden',
     ...Platform.select({
       ios: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
       web: {
-        boxShadow: '0 4px 8px rgba(1, 0, 0, 0.3)',
+        boxShadow: '0 4px 8px rgba(22, 22, 26, 0.42)',
       },
     }),
   },

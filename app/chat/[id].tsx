@@ -1,4 +1,7 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { displayName } from '../../utils/displayName';
+import {buildPlayerPath, buildPlayerSlug} from '../../utils/playerSeoPath';
+import { navigateToPlayerProfile } from '../../utils/navigateToPlayer';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
@@ -22,6 +25,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
+import LoadingCenter from '../../components/LoadingCenter';
+import { colors } from '../../theme/colors';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
     getConversation,
@@ -106,7 +111,7 @@ function sortDateKeysChronologically(grouped: Record<string, Message[]>): string
 }
 
 export default function ChatScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { id, scrollToBottom } = useLocalSearchParams();
   const router = useRouter();
   const { refreshUser, currentUser: contextUser, setCurrentUser: setContextUser } = useUser();
@@ -1340,11 +1345,11 @@ export default function ChatScreen() {
   }, []);
 
   const chatYouLabel = useMemo(
-    () => currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU',
+    () => displayName(currentUser?.name) || t('chat.you') || 'You',
     [currentUser?.name, t]
   );
   const chatOtherLabel = useMemo(
-    () => otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER',
+    () => displayName(otherPlayer?.name) || t('chat.user') || 'User',
     [otherPlayer?.name, t]
   );
   
@@ -1526,7 +1531,7 @@ export default function ChatScreen() {
               </View>
             </BlurOrSolid>
             <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>{t('chat.loading')}</Text>
+              <LoadingCenter message={t('chat.loading')} />
             </View>
           </View>
         </CachedBackground>
@@ -1562,7 +1567,7 @@ export default function ChatScreen() {
               </View>
             </BlurOrSolid>
             <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>{t('chat.loading')}</Text>
+              <LoadingCenter message={t('chat.loading')} />
             </View>
           </View>
         </CachedBackground>
@@ -1586,9 +1591,12 @@ export default function ChatScreen() {
               </TouchableOpacity>
               <View style={styles.headerInfo}>
               <TouchableOpacity 
-                onPress={() => router.push({
-                  pathname: `/player/${otherPlayer.id}`,
-                  params: { returnTo: 'chat', chatId: id }
+                onPress={() => navigateToPlayerProfile(router, {
+                  playerId: otherPlayer.id,
+                  name: otherPlayer.name,
+                  lang: language,
+                  returnTo: 'chat',
+                  chatId: String(Array.isArray(id) ? id[0] : id || ''),
                 })}
                 style={styles.avatarButton}
                 activeOpacity={0.7}
@@ -1603,7 +1611,7 @@ export default function ChatScreen() {
               </TouchableOpacity>
               <View style={styles.headerText}>
                 <Text style={styles.headerName}>
-                  {otherPlayer.status === 'scout' ? t('profile.scout')?.toUpperCase() || 'SCOUT' : otherPlayer.name?.toUpperCase()}
+                  {otherPlayer.status === 'scout' ? t('profile.scout') || 'Scout' : displayName(otherPlayer.name)}
                 </Text>
                 <Text style={[
                   styles.headerStatus,
@@ -1709,8 +1717,8 @@ export default function ChatScreen() {
                     <Text style={styles.emptyTitle}>
                       {t('chat.startConversation', { 
                         name: otherPlayer.status === 'scout' 
-                          ? t('profile.scout')?.toUpperCase() || 'SCOUT' 
-                          : otherPlayer.name?.toUpperCase() 
+                          ? t('profile.scout') || 'Scout'
+                          : displayName(otherPlayer.name)
                       })}
                     </Text>
                   </View>
@@ -1790,8 +1798,8 @@ export default function ChatScreen() {
                     <View style={styles.replyPreviewTextContainer}>
                       <Text style={styles.replyPreviewName}>
                         {replyingToMessage.senderId === currentUser?.id
-                          ? (currentUser?.name?.toUpperCase() || t('chat.you')?.toUpperCase() || 'YOU')
-                          : (otherPlayer?.name?.toUpperCase() || t('chat.user')?.toUpperCase() || 'USER')}
+                          ? (displayName(currentUser?.name) || t('chat.you') || 'You')
+                          : (displayName(otherPlayer?.name) || t('chat.user') || 'User')}
                       </Text>
                       <Text style={styles.replyPreviewText} numberOfLines={3}>
                         {replyingToMessage.text}
@@ -2029,7 +2037,7 @@ export default function ChatScreen() {
                   </View>
                 ) : friendsList.length === 0 ? (
                   <View style={styles.forwardModalEmpty}>
-                    <Ionicons name="people-outline" size={48} color="#666" />
+                    <Ionicons name="people-outline" size={48} color="#8a8a92" />
                     <Text style={styles.forwardModalEmptyText}>
                       {t('chat.noFriendsToForward') || 'Нет друзей для пересылки'}
                     </Text>
@@ -2059,7 +2067,7 @@ export default function ChatScreen() {
                            friend.status === 'scout' ? t('chat.scout') || 'Скаут' :
                            t('chat.player') || 'Игрок'}
                         </Text>
-                        <Ionicons name="chevron-forward" size={16} color="#666" />
+                        <Ionicons name="chevron-forward" size={16} color="#8a8a92" />
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
@@ -2093,14 +2101,14 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(1,0,0)',
+    backgroundColor: colors.scene,
   },
   background: {
     flex: 1,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(151, 175, 192, 0.6)',
+    backgroundColor: colors.screenOverlay,
   },
   loadingContainer: {
     flex: 1,
@@ -2135,7 +2143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
   },
   backButton: {
     marginRight: 12,
@@ -2216,12 +2224,12 @@ const styles = StyleSheet.create({
     minHeight: 400, // Минимальная высота чтобы контент не обрезался
   },
   emptyContent: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 15,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
       width: 0,
@@ -2272,11 +2280,11 @@ const styles = StyleSheet.create({
     minWidth: '78%',
   },
   myBubble: {
-    backgroundColor: 'rgba(255, 68, 68, 0.9)',
+    backgroundColor: 'rgba(250, 47, 64, 0.9)',
     borderBottomRightRadius: 4,
   },
   otherBubble: {
-    backgroundColor: 'rgba(18, 18, 18, 0.88)',
+    backgroundColor: 'rgba(28, 23, 32, 0.92)',
     borderBottomLeftRadius: 4,
   },
   messageContentContainer: {
@@ -2356,7 +2364,7 @@ const styles = StyleSheet.create({
   replyPreviewContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -2445,7 +2453,7 @@ const styles = StyleSheet.create({
   },
   contextMenu: {
     position: 'absolute',
-    backgroundColor: 'rgba(30, 30, 30, 0.95)',
+    backgroundColor: 'rgba(28, 23, 32, 0.96)',
     borderRadius: 10,
     paddingVertical: 2,
     paddingBottom: 4,
@@ -2489,7 +2497,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   forwardModalContainer: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '70%',
@@ -2526,7 +2534,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   forwardModalEmptyText: {
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 14,
     marginTop: 12,
     textAlign: 'center',
@@ -2555,7 +2563,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   forwardModalItemAvatarPlaceholder: {
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2578,7 +2586,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -2589,7 +2597,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
     maxHeight: 100,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.5)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   /** На Android отрицательный margin давал заниженный onLayout родителя и обрезание последнего сообщения. */
   textInputAndroid: {
@@ -2627,7 +2635,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'rgb(1,0,0)',

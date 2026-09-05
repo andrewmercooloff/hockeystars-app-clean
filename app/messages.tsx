@@ -1,4 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
@@ -12,7 +13,9 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import LoadingCenter from '../components/LoadingCenter';
+import SkeletonList from '../components/SkeletonList';
+import EmptyState from '../components/EmptyState';
+import { displayName } from '../utils/displayName';
 import { colors } from '../theme/colors';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import CachedAvatar from '../components/CachedAvatar';
@@ -37,6 +40,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { useUser } from '../contexts/UserContext';
 import CachedBackground from '../components/CachedBackground';
+import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 
@@ -176,6 +180,8 @@ export default function MessagesScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading } = useUser();
+  const isFocused = useIsFocused();
+  const isDesktop = useIsDesktopLayout();
   
   // Убираем все анимации - простое мгновенное переключение
   const [chats, setChats] = useState<ChatPreview[]>([]);
@@ -1338,15 +1344,13 @@ export default function MessagesScreen() {
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
       {!inboxReady ? (
-        <LoadingCenter style={styles.loadingCenter} />
+        <SkeletonList rows={7} rowHeight={76} />
       ) : (
-        <View style={styles.emptyContent}>
-          <Ionicons name="chatbubble-outline" size={64} color="#fa2f40" />
-          <Text style={styles.emptyTitle}>{t('messages.noMessages')}</Text>
-          <Text style={styles.emptySubtitle}>
-            {t('messages.startConversation')}
-          </Text>
-        </View>
+        <EmptyState
+          icon="chatbubble-outline"
+          title={t('messages.noMessages')}
+          subtitle={t('messages.startConversation')}
+        />
       )}
     </View>
   ), [t, inboxReady]);
@@ -1363,7 +1367,12 @@ export default function MessagesScreen() {
 
   // Редирект убран - проверка авторизации происходит в _layout.tsx
   // Если пользователь не авторизован — не зависаем на вечной загрузке.
+  // Важно: не рисовать карточку «Вход», когда вкладка не в фокусе —
+  // иначе на mobile web при /ru/player/... она перекрывает профиль гостя.
   if (currentUser === null) {
+    if (!isFocused) {
+      return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
+    }
     return (
       <CachedBackground 
         source={iceBg} 
@@ -1378,17 +1387,12 @@ export default function MessagesScreen() {
             <Text style={styles.pageTitle}>{t('messages.title')}</Text>
           </View>
           <View style={styles.emptyContainer}>
-            <View style={styles.emptyContent}>
-              <Ionicons name="person-circle-outline" size={64} color="#fa2f40" />
-              <Text style={styles.emptyTitle}>{t('auth.login') || 'Войти'}</Text>
-              <TouchableOpacity
-                style={{ marginTop: 14, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fa2f40' }}
-                onPress={() => router.push('/login')}
-                activeOpacity={0.85}
-              >
-                <Text style={{ color: '#fff', fontFamily: 'Gilroy-Bold' }}>{t('auth.login') || 'Войти'}</Text>
-              </TouchableOpacity>
-            </View>
+            <EmptyState
+              icon="person-circle-outline"
+              title={t('auth.login') || 'Войти'}
+              actionLabel={t('auth.login') || 'Войти'}
+              onAction={() => router.push('/login')}
+            />
           </View>
         </View>
       </CachedBackground>
@@ -1411,7 +1415,7 @@ export default function MessagesScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('messages.title')}</Text>
             </View>
-            <LoadingCenter style={styles.loadingCenter} />
+            <SkeletonList rows={7} rowHeight={76} />
           </View>
         </CachedBackground>
       </View>
@@ -1429,7 +1433,7 @@ export default function MessagesScreen() {
       >
         <View style={styles.overlay}>
           {/* Заголовок страницы с поиском */}
-          <View style={styles.pageHeader}>
+          <View style={[styles.pageHeader, isDesktop && styles.pageHeaderInFlow]}>
             <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
@@ -1437,7 +1441,7 @@ export default function MessagesScreen() {
           </View>
           
           {/* Строка поиска */}
-          <View style={styles.searchContainer}>
+          <View style={[styles.searchContainer, isDesktop && styles.searchContainerInFlow]}>
             <BlurOrSolid
               intensity={20}
               tint="dark"
@@ -1479,7 +1483,7 @@ export default function MessagesScreen() {
             data={filteredChats}
             renderItem={renderChatItem}
             keyExtractor={keyExtractor}
-            style={styles.chatsContainer}
+            style={[styles.chatsContainer, isDesktop && styles.chatsContainerDesktop]}
             contentContainerStyle={filteredChats.length === 0 ? styles.emptyListContent : styles.chatsContent}
             ListEmptyComponent={ListEmptyComponent}
             refreshControl={
@@ -1513,11 +1517,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: colors.screenOverlay,
   },
   overlayLoading: {
     flex: 1,
-    backgroundColor: 'rgba(135, 163, 177, 0.3)',
+    backgroundColor: colors.screenOverlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1534,7 +1538,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(250, 47, 64, 0.3)',
   },
@@ -1555,11 +1559,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: colors.headerBar,
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  pageHeaderInFlow: {
+    position: 'relative',
+    zIndex: 1,
   },
   backButton: {
     marginRight: 16,
@@ -1574,6 +1582,9 @@ const styles = StyleSheet.create({
   chatsContainer: {
     flex: 1,
     paddingTop: 100, // Небольшой зазор под строкой поиска, чтобы список не налезал на неё
+  },
+  chatsContainerDesktop: {
+    paddingTop: 0,
   },
   chatsContent: {
     paddingVertical: 0,
@@ -1594,12 +1605,12 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyContent: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 15,
     padding: 20, // Уменьшили с 40 до 20 (в 2 раза)
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     marginHorizontal: 16, // Такая же ширина как у элементов чатов
     ...platformCardShadow({
       shadowColor: 'rgb(1,0,0)',
@@ -1716,7 +1727,12 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingHorizontal: 20,
     paddingVertical: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
+  },
+  searchContainerInFlow: {
+    position: 'relative',
+    top: 0,
+    zIndex: 1,
   },
   searchInputBlur: {
     borderRadius: 10,
@@ -1725,13 +1741,13 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
+    borderRadius: 14,
     paddingHorizontal: 15,
     paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: '#fa2f40',
-    height: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    height: 44,
     width: '100%',
   },
   searchIcon: {
@@ -1837,8 +1853,8 @@ const MessagesChatRowMemo = React.memo(function MessagesChatRow({
           <View style={styles.chatHeader}>
             <Text style={styles.chatName}>
               {chat.player.status === 'scout'
-                ? t('profile.scout')?.toUpperCase() || 'SCOUT'
-                : chat.player.name?.toUpperCase()}
+                ? t('profile.scout') || 'Scout'
+                : displayName(chat.player.name)}
             </Text>
             {chat.lastMessage ? (
               <Text style={styles.chatTime}>{formatTime(chat.lastMessage.timestamp)}</Text>

@@ -1,4 +1,5 @@
 import React, { forwardRef, ReactNode } from 'react';
+import { displayName } from '../../utils/displayName';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
@@ -36,7 +37,6 @@ import {
     View,
     ViewStyle
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
 import CachedBackground from '../../components/CachedBackground';
@@ -46,11 +46,16 @@ import Animated from 'react-native-reanimated';
 import QRCode from 'react-native-qrcode-svg';
 import AchievementsSection from '../../components/AchievementsSection';
 import ActivityRating from '../../components/ActivityRating';
+import SeasonStatsHeader from '../../components/SeasonStatsHeader';
+import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
+import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
 import { addActivityPoints } from '../../services/activityService';
+import { CURRENT_SEASON_KEY, formatSeasonLabel } from '../../utils/seasonConfig';
 import EditablePhotosSection from '../../components/EditablePhotosSection';
 import SocialLinks from '../../components/SocialLinks';
+import HorizontalScrollWithArrows from '../../components/HorizontalScrollWithArrows';
 
 
 
@@ -65,27 +70,40 @@ import LoadingCenter from '../../components/LoadingCenter';
 import { ICE_BACKGROUND } from '../../utils/iceBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
 import AIAnalysisCard, { AIAnalysis } from '../../components/AIAnalysisCard';
+import ShopLocationMap, { parseShopAddresses } from '../../components/ShopLocationMap';
+import ShopAddressesEditor from '../../components/ShopAddressesEditor';
 import VideoCarousel, { DirectVideoThumbnail } from '../../components/VideoCarousel';
 import { sortVideoUrlsNewestFirst } from '../../utils/videoUrls';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, peekCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
 import { getSupabaseFunctionUrl, supabase, supabaseAnonKey, supabaseFetch } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
 import ChangeIndicator from '../../components/ChangeIndicator';
 import { useStatsChanges } from '../../hooks/useStatsChanges';
+import { useIsDesktopLayout } from '../../hooks/useIsDesktopLayout';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useUser } from '../../contexts/UserContext';
+
+import PlayerProfileSeoHead from '../../components/PlayerProfileSeoHead';
+import {buildPlayerPath, buildPlayerPublicUrl, extractPlayerIdFromParam, buildPlayerSlug, resolvePlayerIdFromRouteParam, extractLangFromPathname, normalizeSeoLanguage} from '../../utils/playerSeoPath';
+import { consumePlayerBootstrap } from '../../utils/playerBootstrap';
+import {
+  clearProfileNavParams,
+  navigateToPlayerProfile,
+  readProfileNavParams,
+  type ProfileNavParams,
+} from '../../utils/navigateToPlayer';
 
 const iceBg = ICE_BACKGROUND;
 
 // Build a referral-capable link:
 // - If Branch deferred deep links are configured, use Branch long link.
 // - Otherwise fall back to our website profile link (works only when app is already installed).
-const buildInviteLink = (playerId: string) => {
+const buildInviteLink = (playerId: string, name?: string | null) => {
   const branchDomain =
     (Constants.expoConfig as any)?.extra?.branchAppDomain ||
     (process.env.EXPO_PUBLIC_BRANCH_APP_DOMAIN as string | undefined) ||
@@ -98,7 +116,7 @@ const buildInviteLink = (playerId: string) => {
     return `https://${branchDomain}/?${key}=${deepPath}&inviterId=${inviterId}`;
   }
 
-  return `https://hockey-stars.com/player/${playerId}`;
+  return buildPlayerPublicUrl(playerId, name);
 };
 
 type SectionCardProps = {
@@ -106,9 +124,11 @@ type SectionCardProps = {
   style?: StyleProp<ViewStyle>;
   blurStyle?: StyleProp<ViewStyle>;
   wrapperStyle?: StyleProp<ViewStyle>;
+  fullWidth?: boolean;
 };
 
-const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurStyle, wrapperStyle }, ref) => {
+const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurStyle, wrapperStyle, fullWidth }, ref) => {
+  const isDesktop = useIsDesktopLayout();
   // Не показываем секцию, если children пустой, null, false или 0
   if (children === null || children === undefined || children === false || children === 0) {
     return null;
@@ -138,9 +158,9 @@ const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurS
     }
     // Используем отфильтрованные children
     return (
-      <View style={[styles.sectionWrapper, wrapperStyle]}>
-        <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
-          <View ref={ref} style={[styles.section, style]}>
+      <View style={[styles.sectionWrapper, isDesktop && (fullWidth ? styles.sectionWrapperDesktopFull : styles.sectionWrapperDesktop), wrapperStyle]}>
+        <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, isDesktop && styles.sectionBlurDesktop, blurStyle]}>
+          <View ref={ref} style={[styles.section, isDesktop && styles.sectionDesktop, style]}>
             {filteredChildren}
           </View>
         </BlurOrSolid>
@@ -159,9 +179,9 @@ const SectionCard = forwardRef<View, SectionCardProps>(({ children, style, blurS
   }
   
   return (
-    <View style={[styles.sectionWrapper, wrapperStyle]}>
-      <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, blurStyle]}>
-        <View ref={ref} style={[styles.section, style]}>
+    <View style={[styles.sectionWrapper, isDesktop && (fullWidth ? styles.sectionWrapperDesktopFull : styles.sectionWrapperDesktop), wrapperStyle]}>
+      <BlurOrSolid intensity={20} tint="dark" style={[styles.sectionBlur, isDesktop && styles.sectionBlurDesktop, blurStyle]}>
+        <View ref={ref} style={[styles.section, isDesktop && styles.sectionDesktop, style]}>
           {children}
         </View>
       </BlurOrSolid>
@@ -178,15 +198,114 @@ const VIDEO_EDIT_SECTION_INSET = 84;
 
 
 export default function PlayerProfile() {
-  const { id, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId, refreshProfile } = useLocalSearchParams();
+  const { id: routeIdParam, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId, refreshProfile } = useLocalSearchParams();
+
+  // Web: returnTo / scrollTo* live in sessionStorage so the public URL stays clean.
+  const [navStash, setNavStash] = useState<ProfileNavParams>({});
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    setNavStash(readProfileNavParams());
+  }, [routeIdParam]);
+
+  const pickNav = (routeVal: string | string[] | undefined, key: keyof ProfileNavParams) => {
+    const fromRoute = Array.isArray(routeVal) ? routeVal[0] : routeVal;
+    if (fromRoute) return fromRoute;
+    return navStash[key];
+  };
+  const navReturnTo = pickNav(returnTo, 'returnTo');
+  const navChatId = pickNav(chatId, 'chatId');
+  const navReturnToPlayerId = pickNav(returnToPlayerId, 'returnToPlayerId');
+  const navScrollToMuseum = pickNav(scrollToMuseum, 'scrollToMuseum');
+  const navScrollToStats = pickNav(scrollToStats, 'scrollToStats');
+  const navScrollToPhotos = pickNav(scrollToPhotos, 'scrollToPhotos');
+  const navScrollToVideos = pickNav(scrollToVideos, 'scrollToVideos');
+  const navScrollToAchievements = pickNav(scrollToAchievements, 'scrollToAchievements');
+  const navScrollToExercises = pickNav(scrollToExercises, 'scrollToExercises');
+  const navScrollToNormatives = pickNav(scrollToNormatives, 'scrollToNormatives');
+  const navScrollToFriends = pickNav(scrollToFriends, 'scrollToFriends');
+  const navScrollToGift = pickNav(scrollToGift, 'scrollToGift');
+  const navScrollToSpeed = pickNav(scrollToSpeed, 'scrollToSpeed');
+  const navScrollToAnalysis = pickNav(scrollToAnalysis, 'scrollToAnalysis');
+  const routeParam = Array.isArray(routeIdParam) ? routeIdParam[0] : routeIdParam;
+  const [resolvedPlayerId, setResolvedPlayerId] = useState<string | null>(() =>
+    extractPlayerIdFromParam(routeParam)
+  );
+  const [slugResolving, setSlugResolving] = useState(() => {
+    const direct = extractPlayerIdFromParam(routeParam);
+    return Boolean(routeParam && !direct);
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!routeParam) {
+        if (!cancelled) {
+          setResolvedPlayerId(null);
+          setSlugResolving(false);
+        }
+        return;
+      }
+      const direct = extractPlayerIdFromParam(routeParam);
+      if (direct) {
+        if (!cancelled) {
+          setResolvedPlayerId(direct);
+          setSlugResolving(false);
+        }
+        // UUID deep link: still warm bootstrap cache in background on web
+        if (Platform.OS === 'web') {
+          void consumePlayerBootstrap(routeParam).catch(() => null);
+        }
+        return;
+      }
+      setSlugResolving(true);
+
+      if (Platform.OS === 'web') {
+        try {
+          const boot = await consumePlayerBootstrap(routeParam);
+          if (!cancelled && boot?.playerId) {
+            setResolvedPlayerId(boot.playerId);
+            setSlugResolving(false);
+            return;
+          }
+        } catch {
+          /* fall through */
+        }
+      }
+
+      const resolved = await resolvePlayerIdFromRouteParam(routeParam);
+      if (!cancelled) {
+        setResolvedPlayerId(resolved);
+        setSlugResolving(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [routeParam]);
+
+  const id = resolvedPlayerId;
   const router = useRouter();
+  const pathname = usePathname();
   const navigation = useNavigation();
   const segments = useSegments();
-  const { t, language } = useLanguage();
+  const isDesktop = useIsDesktopLayout();
+  const { t, language, setLanguage } = useLanguage();
   const { updateNotificationCount } = useNotificationContext();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser: globalCurrentUser, refreshUser, setCurrentUser: setGlobalCurrentUser } = useUser();
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const langFromPath = extractLangFromPathname(pathname || '');
+    // Only sync from URL → app language when the path changes (not when language changes),
+    // otherwise LanguageSwitcher is immediately overwritten by the old /ru|/en prefix.
+    if (langFromPath && langFromPath !== language) {
+      setLanguage(langFromPath);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit language
+  }, [pathname, setLanguage]);
+
   /** Позиция скролла должна восстанавливаться только для того же profile id. */
   const savedScrollProfileIdRef = useRef<string | null>(null);
   /** Пока timestamp в будущем — не восстанавливать scroll после Realtime (иначе откат с позиции из уведомления scrollTo*). */
@@ -388,12 +507,32 @@ export default function PlayerProfile() {
   const initialPhotosUrlsRef = useRef<string[]>([]); // URL фото на момент открытия/загрузки профиля
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  // --- AI Analysis state (must be before resolvedAiAnalysis) ---
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [aiUsageCount, setAiUsageCount] = useState<number>(0);
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const [gameVideoLinks, setGameVideoLinks] = useState<string[]>(['']);
   const isOwner = currentUser && player && currentUser.id === player.id;
   const isViewerAdmin = !!(currentUser?.status === 'admin' && player && currentUser.id !== player.id);
   const resolvedAiAnalysis = aiAnalysis ?? player?.aiAnalysis ?? null;
   const isScoutReportPublic = resolvedAiAnalysis?.is_public !== false;
   const canShowAchievements = achievements.length > 0 || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player?.id)) || isOwner;
   const [pastTeams, setPastTeams] = useState<PastTeam[]>([]);
+  /** Localized current team names for SEO title — same rules as profile header. */
+  const seoCurrentTeamNames = useMemo(() => {
+    return playerTeams
+      .filter((team) => team.isCurrent !== false)
+      .map((team) => {
+        const translationKey = `teams.${team.teamName}`;
+        const translated = t(translationKey);
+        if (translated !== translationKey && !translated.startsWith('teams.')) {
+          return translated;
+        }
+        if (language === 'ru' && team.teamNameRu) return team.teamNameRu;
+        return team.teamName;
+      })
+      .filter(Boolean) as string[];
+  }, [playerTeams, t, language]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
   const [individualTraining, setIndividualTraining] = useState<string[]>([]);
   const [skateServices, setSkateServices] = useState<string[]>([]);
@@ -406,14 +545,6 @@ export default function PlayerProfile() {
   const [profileMenuPosition, setProfileMenuPosition] = useState({ x: 0, y: 0 });
   const [isBlockingUser, setIsBlockingUser] = useState(false);
   const [isUserBlockedState, setIsUserBlockedState] = useState(false);
-
-  // --- AI Analysis state ---
-  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
-  const [aiUsageCount, setAiUsageCount] = useState<number>(0);
-  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
-  // YouTube game videos for AI analysis (editable list)
-  const [gameVideoLinks, setGameVideoLinks] = useState<string[]>(['']);
-  // -------------------------
 
   // Используем английские ключи для позиций (стандарт в базе данных)
   const positions = ['center', 'winger', 'defender', 'goalie'];
@@ -783,10 +914,19 @@ export default function PlayerProfile() {
         clearPlayerMemoryCache(normalizedId as string);
       }
 
-      // Оптимизация: сначала показываем кешированные данные из состояния, если они есть
+      // Web: дождаться early bootstrap (уже стартовал в <head>), чтобы сразу показать шапку
+      if (Platform.OS === 'web' && routeParam && !forceRefreshProfile) {
+        try {
+          await consumePlayerBootstrap(String(routeParam));
+        } catch {
+          /* ignore */
+        }
+      }
+
+      // Оптимизация: сначала показываем кешированные / bootstrap данные
       const cachedPlayer = forceRefreshProfile
         ? undefined
-        : (playersCache[normalizedId as string] || getCachedPlayerSync(normalizedId as string) || undefined);
+        : (playersCache[normalizedId as string] || peekCachedPlayerSync(normalizedId as string) || getCachedPlayerSync(normalizedId as string) || undefined);
       
       if (cachedPlayer) {
         console.log('⚡ Используем кешированные данные профиля из состояния');
@@ -809,9 +949,10 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Добавляем небольшую задержку для инициализации UserContext
-      // Это предотвращает race condition при первом клике
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // На web bootstrap уже стартовал в <head> — лишняя задержка только вредит
+      if (Platform.OS !== 'web') {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
       
       // Проверяем еще раз после задержки
       const checkId = Array.isArray(id) ? id[0] : id;
@@ -820,12 +961,25 @@ export default function PlayerProfile() {
         return;
       }
       
-      // Загружаем основные данные + команды параллельно (команды раньше приходили только после loadAdditionalData)
-      const [playerData, userData, teamsFromNetwork] = await Promise.all([
+      // Профиль + команды сразу; currentUser не блокирует первый paint
+      const [playerData, teamsFromNetwork] = await Promise.all([
         getPlayerById(normalizedId as string, { skipCache: forceRefreshProfile }),
-        loadCurrentUser(),
-        getPlayerTeamsAsPastTeams(normalizedId as string).catch(() => [] as PastTeam[])
+        getPlayerTeamsAsPastTeams(normalizedId as string).catch(() => [] as PastTeam[]),
       ]);
+      const userPromise = loadCurrentUser();
+      // На web не ждём session перед показом профиля (гости / cold start)
+      const userData =
+        Platform.OS === 'web'
+          ? (currentUserLoadRef.current ?? (await Promise.race([
+              userPromise,
+              new Promise<null>((r) => setTimeout(() => r(null), 80)),
+            ])))
+          : await userPromise;
+      if (Platform.OS === 'web') {
+        void userPromise.then((u) => {
+          if (currentLoadingIdRef.current === normalizedId) setCurrentUser(u);
+        });
+      }
       
       // Проверяем еще раз после загрузки данных
       const finalCheckId = Array.isArray(id) ? id[0] : id;
@@ -902,7 +1056,8 @@ export default function PlayerProfile() {
       
       // Сразу устанавливаем основные данные для быстрого отображения
       setPlayer(finalPlayerData);
-      setCurrentUser(userData);
+      if (userData) setCurrentUser(userData);
+      setLoading(false);
 
       // Команды уже загружены параллельно с getPlayerById — показываем сразу, без второго round-trip
       const currentTeamsNow = teamsFromNetwork.filter(team => team.isCurrent);
@@ -997,20 +1152,24 @@ export default function PlayerProfile() {
         
         setLoading(false);
         
-        // Загружаем дополнительные данные в фоне (команды уже есть — не дублируем запрос)
-        loadAdditionalData(finalPlayerData, userData, teamsFromNetwork);
+        // Дождаться currentUser если ещё не готов (web race), затем доп. данные
+        const resolvedUser = userData ?? (await userPromise);
+        if (resolvedUser && currentLoadingIdRef.current === normalizedId) {
+          setCurrentUser(resolvedUser);
+        }
+        loadAdditionalData(finalPlayerData, resolvedUser, teamsFromNetwork);
     } catch (error) {
       console.error('❌ Ошибка загрузки данных игрока:', error);
       setLoading(false);
     }
-  }, [id, refreshProfile, router]);
+  }, [id, refreshProfile, router, routeParam]);
   
   useEffect(() => {
     // Нормализуем id (может быть массивом из useLocalSearchParams)
-    const normalizedId = Array.isArray(id) ? id[0] : id;
-    const previousId = Array.isArray(previousIdRef.current) ? previousIdRef.current[0] : previousIdRef.current;
+    const normalizedId = id;
+    const previousId = previousIdRef.current;
     
-    if (!normalizedId) {
+    if (!normalizedId || slugResolving) {
       return;
     }
     
@@ -1051,10 +1210,10 @@ export default function PlayerProfile() {
       refreshProfile === 'true' ||
       (Array.isArray(refreshProfile) && refreshProfile[0] === 'true');
 
-    // Проверяем кеш для нового ID (после очистки состояния)
+    // Проверяем кеш для нового ID (после очистки состояния) — включая PHP bootstrap partial
     const cachedPlayer = forceRefreshProfile
       ? undefined
-      : (playersCache[normalizedId as string] || getCachedPlayerSync(normalizedId as string) || undefined);
+      : (playersCache[normalizedId as string] || peekCachedPlayerSync(normalizedId as string) || getCachedPlayerSync(normalizedId as string) || undefined);
     
     // Если профиль есть в кеше для нового ID - показываем мгновенно
     if (cachedPlayer && cachedPlayer.id === normalizedId) {
@@ -1062,6 +1221,13 @@ export default function PlayerProfile() {
       setPlayer(cachedPlayer);
       setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
       setLoading(false);
+      
+      // Команды из bootstrap/memory — без ожидания сети
+      void getPlayerTeamsAsPastTeams(normalizedId as string).then((teams) => {
+        if (currentLoadingIdRef.current !== normalizedId) return;
+        setPlayerTeams(teams.filter((t) => t.isCurrent));
+        setPastTeams(teams.filter((t) => !t.isCurrent));
+      }).catch(() => {});
       
       // Восстанавливаем друзей и статус дружбы из кеша
       if (friendsCache[normalizedId as string]) {
@@ -1116,7 +1282,7 @@ export default function PlayerProfile() {
       loadPlayerData();
     }
     // loadPlayerData обернут в useCallback и зависит от id, поэтому безопасно добавлять его в зависимости
-  }, [id, refreshProfile, loadPlayerData]);
+  }, [id, refreshProfile, loadPlayerData, slugResolving]);
 
   const refreshProfileViews = useCallback(async (playerId: string) => {
     const requestId = ++profileViewsRequestRef.current;
@@ -1641,7 +1807,7 @@ export default function PlayerProfile() {
     useCallback(() => {
       setCurrentScreen('player');
 
-      if (scrollToFriends === 'true') {
+      if (navScrollToFriends === 'true') {
         savedScrollPositionRef.current = null;
       }
 
@@ -1691,17 +1857,17 @@ export default function PlayerProfile() {
     profileScrollTopAppliedRef.current = null;
 
     const hasDeepLinkScroll =
-      scrollToMuseum === 'true' ||
-      scrollToStats === 'true' ||
-      scrollToPhotos === 'true' ||
-      scrollToVideos === 'true' ||
-      scrollToAchievements === 'true' ||
-      scrollToFriends === 'true' ||
-      scrollToNormatives === 'true' ||
-      scrollToExercises === 'true' ||
-      scrollToGift === 'true' ||
-      scrollToSpeed === 'true' ||
-      scrollToAnalysis === 'true';
+      navScrollToMuseum === 'true' ||
+      navScrollToStats === 'true' ||
+      navScrollToPhotos === 'true' ||
+      navScrollToVideos === 'true' ||
+      navScrollToAchievements === 'true' ||
+      navScrollToFriends === 'true' ||
+      navScrollToNormatives === 'true' ||
+      navScrollToExercises === 'true' ||
+      navScrollToGift === 'true' ||
+      navScrollToSpeed === 'true' ||
+      navScrollToAnalysis === 'true';
 
     if (hasDeepLinkScroll) return;
 
@@ -1719,55 +1885,70 @@ export default function PlayerProfile() {
     }
   }, [
     id,
-    scrollToMuseum,
-    scrollToStats,
-    scrollToPhotos,
-    scrollToVideos,
-    scrollToAchievements,
-    scrollToFriends,
-    scrollToNormatives,
-    scrollToExercises,
-    scrollToGift,
-    scrollToSpeed,
-    scrollToAnalysis,
+    navScrollToMuseum,
+    navScrollToStats,
+    navScrollToPhotos,
+    navScrollToVideos,
+    navScrollToAchievements,
+    navScrollToFriends,
+    navScrollToNormatives,
+    navScrollToExercises,
+    navScrollToGift,
+    navScrollToSpeed,
+    navScrollToAnalysis,
   ]);
 
   useEffect(() => {
     if (!player) return;
 
     const hasDeepLinkScroll =
-      scrollToMuseum === 'true' ||
-      scrollToStats === 'true' ||
-      scrollToPhotos === 'true' ||
-      scrollToVideos === 'true' ||
-      scrollToAchievements === 'true' ||
-      scrollToFriends === 'true' ||
-      scrollToNormatives === 'true' ||
-      scrollToExercises === 'true' ||
-      scrollToGift === 'true' ||
-      scrollToSpeed === 'true' ||
-      scrollToAnalysis === 'true';
+      navScrollToMuseum === 'true' ||
+      navScrollToStats === 'true' ||
+      navScrollToPhotos === 'true' ||
+      navScrollToVideos === 'true' ||
+      navScrollToAchievements === 'true' ||
+      navScrollToFriends === 'true' ||
+      navScrollToNormatives === 'true' ||
+      navScrollToExercises === 'true' ||
+      navScrollToGift === 'true' ||
+      navScrollToSpeed === 'true' ||
+      navScrollToAnalysis === 'true';
 
     if (!hasDeepLinkScroll) return;
 
     const scrollKey = [
-      scrollToMuseum,
-      scrollToStats,
-      scrollToPhotos,
-      scrollToVideos,
-      scrollToAchievements,
-      scrollToFriends,
-      scrollToNormatives,
-      scrollToExercises,
-      scrollToGift,
-      scrollToSpeed,
-      scrollToAnalysis,
+      navScrollToMuseum,
+      navScrollToStats,
+      navScrollToPhotos,
+      navScrollToVideos,
+      navScrollToAchievements,
+      navScrollToFriends,
+      navScrollToNormatives,
+      navScrollToExercises,
+      navScrollToGift,
+      navScrollToSpeed,
+      navScrollToAnalysis,
     ]
       .map((v) => (v === 'true' ? '1' : '0'))
       .join('');
     const deepLinkToken = `${player.id}:${scrollKey}`;
     if (deepLinkScrollAppliedRef.current === deepLinkToken) return;
     deepLinkScrollAppliedRef.current = deepLinkToken;
+
+    // Consume scroll flags so a remount does not re-fire; keep returnTo* for back.
+    clearProfileNavParams([
+      'scrollToMuseum',
+      'scrollToStats',
+      'scrollToPhotos',
+      'scrollToVideos',
+      'scrollToAchievements',
+      'scrollToExercises',
+      'scrollToNormatives',
+      'scrollToFriends',
+      'scrollToGift',
+      'scrollToSpeed',
+      'scrollToAnalysis',
+    ]);
 
     suppressProfileScrollRestoreUntilRef.current = Date.now() + 5000;
 
@@ -1800,17 +1981,17 @@ export default function PlayerProfile() {
       scrollOnce(0);
     };
 
-    if (scrollToMuseum === 'true') {
+    if (navScrollToMuseum === 'true') {
       scrollToSection(museumRef);
-    } else if (scrollToStats === 'true') {
+    } else if (navScrollToStats === 'true') {
       scrollToSection(statsRef);
-    } else if (scrollToPhotos === 'true') {
+    } else if (navScrollToPhotos === 'true') {
       scrollToSection(photosRef);
-    } else if (scrollToVideos === 'true') {
+    } else if (navScrollToVideos === 'true') {
       scrollToSection(videosRef);
-    } else if (scrollToAchievements === 'true') {
+    } else if (navScrollToAchievements === 'true') {
       scrollToSection(achievementsRef);
-    } else if (scrollToFriends === 'true') {
+    } else if (navScrollToFriends === 'true') {
       // Выше нормативов/«упражнений» в цепочке: уведомление о дружбе не уезжает на старый scrollToExercises
       scrollToSection(friendsRef);
       const cu = currentUserRef.current;
@@ -1831,7 +2012,7 @@ export default function PlayerProfile() {
           });
         }
       }
-    } else if (scrollToNormatives === 'true' || scrollToExercises === 'true') {
+    } else if (navScrollToNormatives === 'true' || navScrollToExercises === 'true') {
       // Нормативы ниже по экрану — после фото; ждём отрисовку, при необходимости повторяем measureLayout
       const offset = 100;
       const scrollNormativesSection = (attempt: number) => {
@@ -1859,9 +2040,9 @@ export default function PlayerProfile() {
         }, delay);
       };
       scrollNormativesSection(0);
-    } else if (scrollToGift === 'true') {
+    } else if (navScrollToGift === 'true') {
       scrollToSection(giftButtonRef);
-    } else if (scrollToSpeed === 'true') {
+    } else if (navScrollToSpeed === 'true') {
       const scrollSpeed = (attempt: number) => {
         const delay = attempt === 0 ? 80 : 280;
         setTimeout(() => {
@@ -1885,10 +2066,10 @@ export default function PlayerProfile() {
         }, delay);
       };
       scrollSpeed(0);
-    } else if (scrollToAnalysis === 'true') {
+    } else if (navScrollToAnalysis === 'true') {
       scrollToSection(aiSectionRef, 100);
     }
-  }, [scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, player?.id]);
+  }, [navScrollToMuseum, navScrollToStats, navScrollToPhotos, navScrollToVideos, navScrollToAchievements, navScrollToExercises, navScrollToNormatives, navScrollToFriends, navScrollToGift, navScrollToSpeed, navScrollToAnalysis, player?.id]);
 
 
   // Ref для активного поля ввода
@@ -2099,7 +2280,43 @@ export default function PlayerProfile() {
 
   const shareProfile = async () => {
     try {
-      if (!shareCardRef.current || !player) {
+      if (!player) {
+        return;
+      }
+
+      const profileUrl = buildInviteLink(player.id, player.name);
+      const shareTitle = player.name?.trim() || 'HockeyStars';
+
+      // Web has no view-shot / expo-sharing for PNG cards — share profile URL instead.
+      if (Platform.OS === 'web') {
+        const shareText = `${shareTitle} — HockeyStars`;
+        if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+          try {
+            await navigator.share({
+              title: shareTitle,
+              text: shareText,
+              url: profileUrl,
+            });
+            return;
+          } catch (err: unknown) {
+            const name = err && typeof err === 'object' && 'name' in err ? String((err as { name?: string }).name) : '';
+            if (name === 'AbortError') return;
+          }
+        }
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(profileUrl);
+          showCustomAlert(
+            t('common.success') || 'Успешно',
+            t('profile.linkCopied') || 'Ссылка скопирована в буфер обмена',
+            'success'
+          );
+          return;
+        }
+        await Share.share({ message: `${shareText}\n${profileUrl}` });
+        return;
+      }
+
+      if (!shareCardRef.current) {
         return;
       }
 
@@ -3399,6 +3616,7 @@ export default function PlayerProfile() {
         minutes: editData.minutes !== undefined ? editData.minutes : player.minutes,
         shots: editData.shots !== undefined ? editData.shots : player.shots,
         saves: editData.saves !== undefined ? editData.saves : player.saves,
+        seasonStats: buildSeasonStatsForSave(player, editData),
         pullUps: editData.pullUps !== undefined ? editData.pullUps : player.pullUps,
         pushUps: editData.pushUps !== undefined ? editData.pushUps : player.pushUps,
         plankTime: editData.plankTime !== undefined ? editData.plankTime : player.plankTime,
@@ -4357,7 +4575,14 @@ export default function PlayerProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, loading, normalizedId, isCurrentUserProfile]);
 
-  if (loading || playerRouteMismatch) {
+  if (loading || playerRouteMismatch || slugResolving) {
+    const hasReadyPlayer =
+      Boolean(player) &&
+      typeof player?.id === 'string' &&
+      Boolean(normalizedId) &&
+      player.id === normalizedId &&
+      !playerRouteMismatch;
+    if (!hasReadyPlayer) {
     return (
       <CachedBackground style={styles.background} resizeMode="cover">
         <View style={styles.container}>
@@ -4369,6 +4594,7 @@ export default function PlayerProfile() {
         </View>
       </CachedBackground>
     );
+    }
   }
   
   if (!player) {
@@ -4431,10 +4657,109 @@ export default function PlayerProfile() {
     );
   }
 
+  const isProfileOwner = !!(player && currentUser && currentUser.id === player.id);
+  const isProfileEditor = !!(isEditing && player && (currentUser?.status === 'admin' || currentUser?.id === player.id));
+  const canShowPhysicalData =
+    !!player &&
+    player.status === 'player' &&
+    !!(
+      isProfileEditor ||
+      isProfileOwner ||
+      (player.height && parseInt(player.height, 10) > 0) ||
+      (player.weight && parseInt(player.weight, 10) > 0)
+    );
+  const canShowSeasonStats =
+    !!player &&
+    player.status !== 'star' &&
+    player.status !== 'shop' &&
+    player.status !== 'skateSharpening' &&
+    player.status !== 'admin' &&
+    player.status !== 'coach' &&
+    !(player.status === 'scout' && currentUser?.status !== 'admin') &&
+    (() => {
+      const hasArchive = playerHasArchivedSeasonStats(player);
+      const currentPosition = (isEditing && editData.position) ? editData.position : player.position;
+      if (isGoalkeeperPosition(currentPosition)) {
+        const gamesNum = parseInt(player.games || '0', 10) || 0;
+        const minutesNum = parseInt(player.minutes || '0', 10) || 0;
+        const shotsNum = parseInt(player.shots || '0', 10) || 0;
+        const savesNum = parseInt(player.saves || '0', 10) || 0;
+        const hasStats = gamesNum > 0 || minutesNum > 0 || shotsNum > 0 || savesNum > 0;
+        return hasStats || hasArchive || isProfileEditor || isProfileOwner;
+      }
+      const goalsNum = parseInt(player.goals || '0', 10) || 0;
+      const assistsNum = parseInt(player.assists || '0', 10) || 0;
+      const gamesNum = parseInt(player.games || '0', 10) || 0;
+      const hasStats = goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
+      return hasStats || hasArchive || isProfileEditor || isProfileOwner;
+    })();
+  const mergeStatsWithPhysicalOnDesktop = isDesktop && canShowSeasonStats && canShowPhysicalData;
 
+  const renderPhysicalDataBody = (opts?: { showTitle?: boolean; compactTop?: boolean }) => {
+    if (!player || !canShowPhysicalData) return null;
+    const hasHeight = !!(player.height && parseInt(player.height, 10) > 0);
+    const hasWeight = !!(player.weight && parseInt(player.weight, 10) > 0);
+    const showTitle = opts?.showTitle !== false;
+    return (
+      <View style={opts?.compactTop ? styles.physicalInsideStats : undefined}>
+        {showTitle ? (
+          <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop, opts?.compactTop && styles.sectionTitleNested]}>
+            {t('profile.physicalData')}
+          </Text>
+        ) : null}
+        <View style={[styles.infoGrid, isDesktop && styles.infoGridDesktop]}>
+          {(hasHeight || isProfileEditor || isProfileOwner) && (
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{t('profile.height')}</Text>
+              {isProfileEditor ? (
+                <TextInput
+                  ref={heightInputRef}
+                  style={styles.editInput}
+                  value={editData.height !== undefined ? editData.height : (player.height || '')}
+                  onChangeText={(text) => setEditData({ ...editData, height: text })}
+                  onFocus={handleHeightFocus}
+                  placeholder={`${t('profile.height')} (${t('profile.cm')})`}
+                  placeholderTextColor="#888"
+                  keyboardType="numeric"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{`${player.height} ${t('profile.cm')}`}</Text>
+              )}
+            </View>
+          )}
+          {(hasWeight || isProfileEditor || isProfileOwner) && (
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
+              {isProfileEditor ? (
+                <TextInput
+                  ref={weightInputRef}
+                  style={styles.editInput}
+                  value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
+                  onChangeText={(text) => setEditData({ ...editData, weight: text })}
+                  onFocus={handleWeightFocus}
+                  placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
+                  placeholderTextColor="#888"
+                  keyboardType="numeric"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{`${player.weight} ${t('profile.kg')}`}</Text>
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
 
   return (
     <CachedBackground style={styles.background} resizeMode="cover">
+      {Platform.OS === 'web' && player ? (
+        <PlayerProfileSeoHead
+          player={player}
+          playerId={player.id}
+          currentTeamNames={seoCurrentTeamNames}
+        />
+      ) : null}
     <KeyboardAvoidingView 
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -4443,12 +4768,16 @@ export default function PlayerProfile() {
       <View style={styles.overlay}>
           {/* Заголовок страницы с именем игрока */}
           {player && (
-            <View style={styles.pageHeader}>
+            <View style={[styles.pageHeader, isDesktop && styles.pageHeaderDesktop]}>
               <TouchableOpacity 
                 onPress={() => {
-                  // Проверяем параметр returnTo для явного указания, куда возвращаться
-                  const returnToValue = Array.isArray(returnTo) ? returnTo[0] : returnTo;
-                  const chatIdValue = Array.isArray(chatId) ? chatId[0] : chatId;
+                  // returnTo may be stripped from the URL for SEO — fall back to session stash
+                  let returnToValue = navReturnTo;
+                  let chatIdValue = navChatId;
+                  let returnPlayerIdValue = navReturnToPlayerId;
+                  if (Platform.OS === 'web') {
+                    clearProfileNavParams(['returnTo', 'returnToPlayerId', 'chatId']);
+                  }
                   
                   if (returnToValue === 'chat' && chatIdValue) {
                     // Возвращаемся в конкретный чат
@@ -4463,14 +4792,14 @@ export default function PlayerProfile() {
                     // Возвращаемся в поиск
                     router.push('/search');
                   } else if (returnToValue === 'home') {
-                    // Возвращаемся на главный экран
-                    router.push('/');
-                  } else if (returnToValue === 'player' && returnToPlayerId) {
+                    // Web home feed lives at /feed (marketing owns /)
+                    router.push(Platform.OS === 'web' ? '/feed' : '/');
+                  } else if (returnToValue === 'player' && returnPlayerIdValue) {
                     // Возвращаемся в профиль другого игрока (из списка друзей)
-                    const returnPlayerId = Array.isArray(returnToPlayerId) ? returnToPlayerId[0] : returnToPlayerId;
-                    router.push({
-                      pathname: `/player/${returnPlayerId}`,
-                      params: { returnTo: returnToValue }
+                    navigateToPlayerProfile(router, {
+                      playerId: returnPlayerIdValue,
+                      lang: language,
+                      returnTo: returnToValue,
                     });
                   } else {
                     // Пытаемся вернуться назад через нативный стек навигации
@@ -4481,7 +4810,7 @@ export default function PlayerProfile() {
                         router.back();
                       } else {
                         // Если нет истории, переходим на главный экран
-                        router.replace('/');
+                        router.replace(Platform.OS === 'web' ? '/feed' : '/');
                       }
                     } catch (error) {
                       // Если произошла ошибка, пробуем router.back()
@@ -4498,7 +4827,13 @@ export default function PlayerProfile() {
               >
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
-              <Text style={styles.pageTitle}>{player.name}</Text>
+              {!isDesktop ? (
+                <Text style={styles.pageTitle} numberOfLines={1}>
+                  {player.name}
+                </Text>
+              ) : (
+                <View style={{ flex: 1 }} />
+              )}
               {profileViews !== null && (
                 <View style={styles.profileViewsHeaderWrap}>
                   <Ionicons name="eye-outline" size={14} color="#888" />
@@ -4520,7 +4855,7 @@ export default function PlayerProfile() {
           
           <ScrollView 
             ref={scrollViewRef} 
-            contentContainerStyle={styles.scrollContainer}
+            contentContainerStyle={[styles.scrollContainer, isDesktop && styles.scrollContainerDesktop]}
             keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
               nestedScrollEnabled
@@ -4539,9 +4874,9 @@ export default function PlayerProfile() {
               scrollEventThrottle={16}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View pointerEvents="box-none">
+              <View pointerEvents="box-none" style={isDesktop ? styles.desktopContentWrap : undefined}>
             {/* Фото и основная информация */}
-            <View style={styles.profileSection}>
+            <View style={[styles.profileSection, isDesktop && styles.profileSectionDesktop]}>
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
@@ -4553,7 +4888,7 @@ export default function PlayerProfile() {
                 <TouchableOpacity
                   ref={profileMenuButtonRef}
                   onPress={handleOpenProfileMenu}
-                  style={styles.profileMenuButton}
+                  style={[styles.profileMenuButton, isDesktop && styles.profileMenuButtonDesktop]}
                   hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
                 >
                   <Ionicons name="ellipsis-vertical" size={24} color="rgba(255, 255, 255, 0.6)" />
@@ -4563,7 +4898,7 @@ export default function PlayerProfile() {
                 <View style={styles.avatarWrapper}>
                   {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
                     <TouchableOpacity 
-                      style={styles.profileImage}
+                      style={[styles.profileImage, isDesktop && styles.profileImageDesktop]}
                       onPress={pickImage}
                     >
                       {(() => {
@@ -4579,12 +4914,12 @@ export default function PlayerProfile() {
                         if (hasValidImage) {
                           // В режиме редактирования не используем CachedAvatar — глобальный кэш/realtime подмешивают старый URL.
                           return (
-                            <View style={[styles.profileImage]}>
-                              <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                            <View style={[styles.profileImage, isDesktop && styles.profileImageDesktop]}>
+                              <View style={[styles.innerCircle, isDesktop && styles.innerCircleDesktop, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                                 <Image
                                   key={imageSource}
                                   source={{ uri: imageSource }}
-                                  style={styles.avatarImage}
+                                  style={isDesktop ? styles.avatarImageDesktop : styles.avatarImage}
                                   resizeMode="cover"
                                 />
                               </View>
@@ -4592,15 +4927,15 @@ export default function PlayerProfile() {
                           );
                         } else {
                           return (
-                            <View style={[styles.profileImage]}>
-                              <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
-                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
+                            <View style={[styles.profileImage, isDesktop && styles.profileImageDesktop]}>
+                              <View style={[styles.innerCircle, styles.avatarPlaceholder, isDesktop && styles.innerCircleDesktop, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={isDesktop ? 64 : 48} color="#FFFFFF" />
                               </View>
                             </View>
                           );
                         }
                       })()}
-                      <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(1, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
+                      <View style={[styles.editOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(22, 22, 26, 0.6)', justifyContent: 'center', alignItems: 'center', borderRadius: 60 }]}>
                         <Ionicons name="camera" size={24} color="#fff" />
                       </View>
                     </TouchableOpacity>
@@ -4618,13 +4953,13 @@ export default function PlayerProfile() {
 
                       if (hasValidImage) {
                         return (
-                          <View style={[styles.profileImage]}>
-                            <View style={[styles.innerCircle, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                          <View style={[styles.profileImage, isDesktop && styles.profileImageDesktop]}>
+                            <View style={[styles.innerCircle, isDesktop && styles.innerCircleDesktop, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                               <CachedAvatar
                                 playerId={player.id}
                                 fallbackAvatarUrl={imageSource}
-                                size={100}
-                                style={styles.avatarImage}
+                                size={isDesktop ? 148 : 100}
+                                style={isDesktop ? styles.avatarImageDesktop : styles.avatarImage}
                                 status={player.status}
                               />
                             </View>
@@ -4632,18 +4967,17 @@ export default function PlayerProfile() {
                         );
                       } else {
                         return (
-                          <View style={[styles.profileImage]}>
-                            <View style={[styles.innerCircle, styles.avatarPlaceholder, { borderColor: getAvatarBorderColorInside(player.status) }]}>
+                          <View style={[styles.profileImage, isDesktop && styles.profileImageDesktop]}>
+                            <View style={[styles.innerCircle, styles.avatarPlaceholder, isDesktop && styles.innerCircleDesktop, { borderColor: getAvatarBorderColorInside(player.status) }]}>
                               {player.status === 'scout' ? (
                                 <>
-                                  {/* Отладочный лог отключен */}
                                   <Image 
                                     source={require('../../assets/images/scout.png')} 
-                                    style={styles.avatarImage}
+                                    style={isDesktop ? styles.avatarImageDesktop : styles.avatarImage}
                                   />
                                 </>
                               ) : (
-                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={48} color="#FFFFFF" />
+                                <Ionicons name={player.status === 'shop' ? 'storefront' : player.status === 'skateSharpening' ? 'construct' : 'person'} size={isDesktop ? 64 : 48} color="#FFFFFF" />
                               )}
                             </View>
                           </View>
@@ -4667,23 +5001,30 @@ export default function PlayerProfile() {
                 />
               </View>
               
-              <View style={styles.nameRow}>
+              <View style={[styles.profileMetaColumn, isDesktop && styles.profileMetaColumnDesktop]}>
+              <View style={[styles.nameRow, isDesktop && styles.nameRowDesktop]}>
                 {isEditing ? (
                   <TextInput
                     style={[styles.editInput, { fontSize: 28, fontFamily: 'Gilroy-Bold', color: '#fff', textAlign: 'center', marginBottom: 5 }]}
                     value={editData.name || player.name || ''}
                     onFocus={handleInputFocus}
                     onChangeText={(text) => {
+                      if (player.status === 'shop' || player.status === 'skateSharpening') {
+                        setEditData({...editData, name: text});
+                        return;
+                      }
                       const latinOnly = text.replace(/[^a-zA-Z\s\-]/g, '');
                       setEditData({...editData, name: latinOnly.toUpperCase()});
                     }}
-                    placeholder="NAME SURNAME"
+                    placeholder={(player.status === 'shop' || player.status === 'skateSharpening') ? (t('profile.organizationNamePlaceholder') || 'Название') : 'NAME SURNAME'}
                     placeholderTextColor="#888"
-                    autoCapitalize="characters"
+                    autoCapitalize={(player.status === 'shop' || player.status === 'skateSharpening') ? 'words' : 'characters'}
                   />
                 ) : player.status !== 'scout' ? (
-                  <Text style={styles.playerName}>
-                    {player.name?.toUpperCase()}
+                  <Text style={[styles.playerName, isDesktop && styles.playerNameDesktop]}>
+                    {(player.status === 'shop' || player.status === 'skateSharpening')
+                      ? player.name
+                      : displayName(player.name)}
                   </Text>
                 ) : null}
                 {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'coach' && player.status !== 'scout' && (
@@ -4724,8 +5065,8 @@ export default function PlayerProfile() {
                 </View>
               )}
               
-              <View style={styles.statusContainer}>
-                <Text style={styles.playerStatus}>
+              <View style={[styles.statusContainer, isDesktop && styles.statusContainerDesktop]}>
+                <Text style={[styles.playerStatus, isDesktop && styles.playerStatusDesktop]}>
                   {player.status === 'player' ? t('profile.player') : 
                    player.status === 'coach' ? t('profile.coach') : 
                    player.status === 'scout' ? t('profile.scout') : 
@@ -4736,7 +5077,7 @@ export default function PlayerProfile() {
                 </Text>
               </View>
               {playerTeams.length > 0 && (
-                <View style={styles.playerTeamsContainer}>
+                <View style={[styles.playerTeamsContainer, isDesktop && styles.playerTeamsContainerDesktop]}>
                   {playerTeams.map((team, index) => {
                     const getTeamName = () => {
                         const translationKey = `teams.${team.teamName}`;
@@ -4758,10 +5099,140 @@ export default function PlayerProfile() {
               
               {/* Опыт в хоккее */}
               {player.status === 'player' && player.hockeyStartDate && (
-                <View style={styles.hockeyExperienceContainer}>
+                <View style={[styles.hockeyExperienceContainer, isDesktop && styles.hockeyExperienceContainerDesktop]}>
                   <Text style={styles.hockeyExperienceText}>
                   {calculateHockeyExperience(player.hockeyStartDate, language)}
                 </Text>
+                </View>
+              )}
+
+              {/* Desktop: кнопки дружбы / сообщения под именем */}
+              {isDesktop && currentUser && player && currentUser.id !== player.id && !isUserBlockedState && (
+                <View ref={friendRequestRef} style={styles.heroActionsDesktop}>
+                  {player.status === 'star' ? (
+                    friendshipStatus === 'received_request' ? (
+                      <>
+                        <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#4CAF50' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                          <Ionicons name="checkmark-outline" size={18} color="#fff" />
+                          <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.accept')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleDeclineFriend} disabled={friendLoading}>
+                          <Ionicons name="close-outline" size={18} color="#fff" />
+                          <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.decline')}</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : friendshipStatus === 'friends' ? (
+                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                        <Ionicons name="person-remove-outline" size={18} color="#fff" />
+                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.removeFromFriends')}</Text>
+                      </TouchableOpacity>
+                    ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
+                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#FF9800' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                        <Ionicons name="close-outline" size={18} color="#fff" />
+                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.cancelRequest')}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                        <Ionicons name="person-add-outline" size={18} color="#fff" />
+                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.addFriend')}</Text>
+                      </TouchableOpacity>
+                    )
+                  ) : friendshipStatus === 'received_request' ? (
+                    <>
+                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#4CAF50' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                        <Ionicons name="checkmark-outline" size={18} color="#fff" />
+                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.accept')}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleDeclineFriend} disabled={friendLoading}>
+                        <Ionicons name="close-outline" size={18} color="#fff" />
+                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.decline')}</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : friendshipStatus === 'friends' ? (
+                    <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                      <Ionicons name="person-remove-outline" size={18} color="#fff" />
+                      <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.removeFromFriends')}</Text>
+                    </TouchableOpacity>
+                  ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
+                    <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#FF9800' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                      <Ionicons name="close-outline" size={18} color="#fff" />
+                      <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.cancelRequest')}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
+                      <Ionicons name="person-add-outline" size={18} color="#fff" />
+                      <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.addFriend')}</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fff' }]}
+                    onPress={() => router.push({ pathname: '/chat/[id]', params: { id: player.id } })}
+                  >
+                    <Ionicons name="chatbubble-outline" size={18} color="rgb(1,0,0)" />
+                    <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>{t('profile.sendMessage')}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              </View>
+
+              {/* Desktop: основная информация справа от имени */}
+              {isDesktop && !(player.status === 'scout' && currentUser?.status !== 'admin') && !isEditing && (
+                <View style={styles.profileHeroInfoDesktop}>
+                  <Text style={styles.profileHeroInfoTitle}>{t('profile.basicInfo')}</Text>
+                  <View style={styles.profileHeroInfoRow}>
+                    <Text style={styles.profileHeroInfoLabel}>{t('profile.country')}</Text>
+                    <Text style={styles.profileHeroInfoValue} numberOfLines={1}>
+                      {player.country ? t(`profile.countries.${player.country}`) : t('profile.notSpecified')}
+                    </Text>
+                  </View>
+                  {player.status !== 'admin' && player.status !== 'coach' && player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'scout' && (
+                    <View style={styles.profileHeroInfoRow}>
+                      <Text style={styles.profileHeroInfoLabel}>{t('profile.position')}</Text>
+                      <Text style={styles.profileHeroInfoValue} numberOfLines={1}>
+                        {player.position ? translatePosition(player.position) : t('profile.notSpecified')}
+                      </Text>
+                    </View>
+                  )}
+                  {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'scout' && !!player.birthDate && (
+                    <View style={styles.profileHeroInfoRow}>
+                      <Text style={styles.profileHeroInfoLabel}>{t('profile.birthDate') || 'Дата рождения'}</Text>
+                      <Text style={styles.profileHeroInfoValue} numberOfLines={1}>
+                        {formatBirthDate(player.birthDate || '', language)}
+                      </Text>
+                    </View>
+                  )}
+                  {player.status === 'player' && (
+                    <View style={styles.profileHeroInfoRow}>
+                      <Text style={styles.profileHeroInfoLabel}>{t('profile.startedHockey')}</Text>
+                      <Text style={styles.profileHeroInfoValue} numberOfLines={1}>
+                        {player.hockeyStartDate
+                          ? (player.hockeyStartDate)
+                          : t('profile.notSpecified')}
+                      </Text>
+                    </View>
+                  )}
+                  {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'scout' && player.status !== 'coach' && player.status !== 'admin' && (
+                    <View style={styles.profileHeroInfoRow}>
+                      <Text style={styles.profileHeroInfoLabel}>{t('profile.grip')}</Text>
+                      <Text style={styles.profileHeroInfoValue} numberOfLines={1}>
+                        {player.grip
+                          ? (t(`profile.grips.${player.grip}`) !== `profile.grips.${player.grip}`
+                              ? t(`profile.grips.${player.grip}`)
+                              : player.grip)
+                          : t('profile.notSpecified')}
+                      </Text>
+                    </View>
+                  )}
+                  {((currentUser?.status === 'admin' || player.status === 'shop' || player.status === 'skateSharpening') && player.phone) && (
+                    <View style={styles.profileHeroInfoRow}>
+                      <Text style={styles.profileHeroInfoLabel}>
+                        {String(player.phone || '').includes('@') ? (t('auth.email') || 'Email') : t('profile.phone')}
+                      </Text>
+                      <Text style={[styles.profileHeroInfoValue, { color: '#fa2f40' }]} numberOfLines={1}>
+                        {player.phone}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               )}
 
@@ -4784,42 +5255,49 @@ export default function PlayerProfile() {
               </SectionCard>
             ) : (
               <>
-            {/* Кнопки администратора */}
+            {/* Кнопки администратора — свой профиль */}
             {currentUser && currentUser.status === 'admin' && currentUser.id === player?.id && (
-              <SectionCard>
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, styles.adminAddUserButton]} 
-                  onPress={() => router.push('/admin/create-user')}
-                >
-                  <Ionicons name="person-add-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    {t('admin.addUser')}
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.friendRequestButton, styles.adminUsersButton]} 
-                  onPress={() => router.push('/admin/users')}
-                >
-                  <Ionicons name="people-outline" size={20} color="#fff" />
-                  <Text style={styles.friendRequestButtonText}>
-                    Управление пользователями
-                  </Text>
-                </TouchableOpacity>
+              <SectionCard fullWidth>
+                <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>
+                  {t('admin.admin') || 'Админ'}
+                </Text>
+                <View style={[styles.adminPanelGrid, isDesktop && styles.adminPanelGridDesktop]}>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonPrimary]}
+                    onPress={() => router.push('/admin/create-user')}
+                  >
+                    <Ionicons name="person-add-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>{t('admin.addUser')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonPurple]}
+                    onPress={() => router.push('/admin/users')}
+                  >
+                    <Ionicons name="people-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>Управление пользователями</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
+                    onPress={() => router.push('/admin')}
+                  >
+                    <Ionicons name="settings-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>{t('admin.adminPanel') || 'Панель администратора'}</Text>
+                  </TouchableOpacity>
+                </View>
               </SectionCard>
             )}
 
 
-            {/* Кнопки действий - перемещены вверх перед статистикой */}
-            {currentUser && player && currentUser.id !== player.id && (
-              <View ref={friendRequestRef} style={styles.actionsSectionTop}>
+            {/* Кнопки действий — на desktop внутри hero; на mobile отдельно */}
+            {!isDesktop && currentUser && player && currentUser.id !== player.id && (
+              <View ref={friendRequestRef} style={[styles.actionsSectionTop, isDesktop && styles.actionsSectionTopDesktop]}>
                 {/* Кнопка управления дружбой - для звезд */}
                 {player.status === 'star' && (
                   <>
                     {friendshipStatus === 'received_request' ? (
                       <View style={{ gap: 10, marginBottom: 10 }}>
                         <TouchableOpacity 
-                          style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
+                          style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#4CAF50' }]} 
                           onPress={handleAddFriend}
                           disabled={friendLoading}
                         >
@@ -4830,7 +5308,7 @@ export default function PlayerProfile() {
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
-                          style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                          style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} 
                           onPress={handleDeclineFriend}
                           disabled={friendLoading}
                         >
@@ -4842,7 +5320,7 @@ export default function PlayerProfile() {
                       </View>
                     ) : friendshipStatus === 'friends' ? (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4853,7 +5331,7 @@ export default function PlayerProfile() {
                       </TouchableOpacity>
                     ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4864,7 +5342,7 @@ export default function PlayerProfile() {
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4883,7 +5361,7 @@ export default function PlayerProfile() {
                     {friendshipStatus === 'received_request' ? (
                       <View style={{ gap: 10, marginBottom: 10 }}>
                         <TouchableOpacity 
-                          style={[styles.actionButton, { backgroundColor: '#4CAF50' }]} 
+                          style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#4CAF50' }]} 
                           onPress={handleAddFriend}
                           disabled={friendLoading}
                         >
@@ -4894,7 +5372,7 @@ export default function PlayerProfile() {
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
-                          style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                          style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} 
                           onPress={handleDeclineFriend}
                           disabled={friendLoading}
                         >
@@ -4906,7 +5384,7 @@ export default function PlayerProfile() {
                       </View>
                     ) : friendshipStatus === 'friends' ? (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4917,7 +5395,7 @@ export default function PlayerProfile() {
                       </TouchableOpacity>
                     ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4928,7 +5406,7 @@ export default function PlayerProfile() {
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity 
-                        style={[styles.actionButton, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
+                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
                         disabled={friendLoading}
                       >
@@ -4943,7 +5421,7 @@ export default function PlayerProfile() {
 
                 {/* Кнопка написать сообщение */}
                 <TouchableOpacity 
-                  style={[styles.actionButton, { backgroundColor: '#fff', marginBottom: 10 }]} 
+                  style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fff', marginBottom: 10 }]} 
                   onPress={() => {
                     router.push({ 
                       pathname: '/chat/[id]', 
@@ -4984,11 +5462,12 @@ export default function PlayerProfile() {
                 
                 // Показываем статистику только если есть хотя бы одно ненулевое значение
                 const hasStats = gamesNum > 0 || minutesNum > 0 || shotsNum > 0 || savesNum > 0;
+                const hasArchive = playerHasArchivedSeasonStats(player);
                 const isOwner = currentUser && currentUser.id === player.id;
                 
-                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
+                return (hasStats || hasArchive || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
                   <SectionCard ref={statsRef}>
-                    <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
+                    <SeasonStatsHeader />
                     {isEditing ? (
                       <View style={styles.statsGrid}>
                         <View style={styles.statItem}>
@@ -5132,6 +5611,19 @@ export default function PlayerProfile() {
                         )}
                       </View>
                     )}
+                    <PreviousSeasonStatsSection
+                      player={player}
+                      editData={editData}
+                      isEditing={isEditing}
+                      isGoalkeeper={isGoalkeeper}
+                      onUpdateEdit={setEditData}
+                      onInputFocus={handleInputFocus}
+                      editInputStyle={styles.editInput}
+                      statLabelStyle={styles.statLabel}
+                      statsGridStyle={styles.statsGrid}
+                      statItemStyle={styles.statItem}
+                    />
+                    {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
               } else {
@@ -5144,11 +5636,12 @@ export default function PlayerProfile() {
                 
                 // Показываем статистику только если есть хотя бы одно ненулевое значение
                 const hasStats = pointsNum > 0 || goalsNum > 0 || assistsNum > 0 || gamesNum > 0;
+                const hasArchive = playerHasArchivedSeasonStats(player);
                 const isOwner = currentUser && currentUser.id === player.id;
                 
-                return (hasStats || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
+                return (hasStats || hasArchive || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || isOwner) ? (
                   <SectionCard ref={statsRef}>
-                    <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
+                    <SeasonStatsHeader />
                     {isEditing ? (
                       <View style={styles.statsGrid}>
                         <View style={styles.statItem}>
@@ -5264,16 +5757,29 @@ export default function PlayerProfile() {
                         )}
                       </View>
                     )}
+                    <PreviousSeasonStatsSection
+                      player={player}
+                      editData={editData}
+                      isEditing={isEditing}
+                      isGoalkeeper={isGoalkeeper}
+                      onUpdateEdit={setEditData}
+                      onInputFocus={handleInputFocus}
+                      editInputStyle={styles.editInput}
+                      statLabelStyle={styles.statLabel}
+                      statsGridStyle={styles.statsGrid}
+                      statItemStyle={styles.statItem}
+                    />
+                    {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
               }
             })()}
 
-            {/* Основная информация - скрыта для скаутов (кроме админа) */}
-            {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
+            {/* Основная информация — на desktop (просмотр) в hero; иначе отдельная карточка */}
+            {!(player.status === 'scout' && currentUser?.status !== 'admin') && (!isDesktop || isEditing) && (
             <SectionCard wrapperStyle={styles.compactSectionWrapper}>
-              <Text style={styles.sectionTitle}>{t('profile.basicInfo')}</Text>
-              <View style={styles.infoGrid}>
+              <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>{t('profile.basicInfo')}</Text>
+              <View style={[styles.infoGrid, isDesktop && styles.infoGridDesktop]}>
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>{t('profile.country')}</Text>
                   {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
@@ -5293,8 +5799,12 @@ export default function PlayerProfile() {
 
                 {/* Номер телефона - админ видит все телефоны, магазины и заточка видны всем, владелец при редактировании */}
                 {((currentUser?.status === 'admin' || player.status === 'shop' || player.status === 'skateSharpening' || isEditing) && (player.phone || isEditing)) && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('profile.phone')}</Text>
+                  <View style={[styles.infoItem, isDesktop && styles.infoItemDesktop]}>
+                    <Text style={styles.infoLabel}>
+                      {String(player.phone || '').includes('@')
+                        ? (t('auth.email') || 'Email')
+                        : t('profile.phone')}
+                    </Text>
                     {isEditing ? (
                       <TextInput
                         style={styles.editInput}
@@ -5307,14 +5817,24 @@ export default function PlayerProfile() {
                       />
                     ) : player.phone ? (
                       <TouchableOpacity 
-                        onPress={() => Linking.openURL(`tel:${player.phone}`)}
+                        onPress={() => {
+                          const contact = String(player.phone);
+                          Linking.openURL(contact.includes('@') ? `mailto:${contact}` : `tel:${contact}`);
+                        }}
                         activeOpacity={0.7}
                         style={styles.phoneButton}
                       >
                         <View style={styles.phoneIconContainer}>
-                          <Ionicons name="call" size={12} color="#fff" />
+                          <Ionicons
+                            name={String(player.phone).includes('@') ? 'mail' : 'call'}
+                            size={12}
+                            color="#fff"
+                          />
                         </View>
-                        <Text style={[
+                        <Text
+                          numberOfLines={2}
+                          ellipsizeMode="tail"
+                          style={[
                           styles.phoneButtonText,
                           (player.status === 'shop' || player.status === 'skateSharpening') ? { color: '#FFFFFF' } : null
                         ]}>{player.phone}</Text>
@@ -5325,24 +5845,43 @@ export default function PlayerProfile() {
                   </View>
                 )}
 
-                {/* Адрес - только для магазинов */}
+                {/* Адрес + город - только для магазинов */}
+                {player.status === 'shop' && (player.address || player.city || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.city') || 'Город'}</Text>
+                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                      <TextInput
+                        style={styles.editInput}
+                        value={editData.city !== undefined ? editData.city : (player.city || '')}
+                        onFocus={handleInputFocus}
+                        onChangeText={(text) => setEditData({...editData, city: text})}
+                        placeholder={t('profile.city') || 'Город'}
+                        placeholderTextColor="#888"
+                      />
+                    ) : (
+                      <Text style={styles.infoValue}>{player.city || t('profile.notSpecified')}</Text>
+                    )}
+                  </View>
+                )}
                 {player.status === 'shop' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.address')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TextInput
-                        style={styles.editInput}
+                      <ShopAddressesEditor
                         value={editData.address !== undefined ? editData.address : (player.address || '')}
+                        onChange={(joined) => setEditData({...editData, address: joined})}
                         onFocus={handleInputFocus}
-                        onChangeText={(text) => setEditData({...editData, address: text})}
-                        placeholder={t('profile.address')}
+                        addressLabel={t('profile.address') || 'Адрес'}
+                        addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                        placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                       />
                     ) : (
-                      <Text style={styles.infoValue}>{player.address}</Text>
+                      <Text style={[styles.infoValue, { lineHeight: 22 }]}>
+                        {parseShopAddresses(player.address).join('\n') || player.address}
+                      </Text>
                     )}
                   </View>
                 )}
-
 
                 {/* Часы работы - только для магазинов */}
                 {player.status === 'shop' && (player.workingHours || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
@@ -5381,20 +5920,40 @@ export default function PlayerProfile() {
                   </View>
                 )}
 
-                {/* Поля для заточки коньков */}
+                                {/* Город + адреса - для заточки коньков */}
+                {player.status === 'skateSharpening' && (player.city || player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>{t('profile.city') || 'Город'}</Text>
+                    {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
+                      <TextInput
+                        style={styles.editInput}
+                        value={editData.city !== undefined ? editData.city : (player.city || '')}
+                        onFocus={handleInputFocus}
+                        onChangeText={(text) => setEditData({...editData, city: text})}
+                        placeholder={t('profile.city') || 'Город'}
+                        placeholderTextColor="#888"
+                      />
+                    ) : (
+                      <Text style={styles.infoValue}>{player.city || t('profile.notSpecified')}</Text>
+                    )}
+                  </View>
+                )}
                 {player.status === 'skateSharpening' && (player.address || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) || (currentUser && currentUser.id === player.id)) && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>{t('profile.address')}</Text>
                     {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) ? (
-                      <TextInput
-                        style={styles.editInput}
+                      <ShopAddressesEditor
                         value={editData.address !== undefined ? editData.address : (player.address || '')}
+                        onChange={(joined) => setEditData({...editData, address: joined})}
                         onFocus={handleInputFocus}
-                        onChangeText={(text) => setEditData({...editData, address: text})}
-                        placeholder={t('profile.address')}
+                        addressLabel={t('profile.address') || 'Адрес'}
+                        addLabel={t('profile.addAddress') || 'Добавить адрес'}
+                        placeholder={t('profile.addressesHint') || 'Можно указать несколько адресов'}
                       />
                     ) : (
-                      <Text style={styles.infoValue}>{player.address}</Text>
+                      <Text style={[styles.infoValue, { lineHeight: 22 }]}>
+                        {parseShopAddresses(player.address).join('\n') || player.address}
+                      </Text>
                     )}
                   </View>
                 )}
@@ -5598,122 +6157,23 @@ export default function PlayerProfile() {
             )}
 
             {/* Карта - только для магазинов */}
-              {player.status === 'shop' && player.address && (
-               <SectionCard>
+              {player.status === 'shop' && (() => {
+                const mapAddress = String(
+                  isEditing && editData.address !== undefined ? editData.address : (player.address || '')
+                ).trim();
+                const mapCity = String(
+                  isEditing && editData.city !== undefined ? editData.city : (player.city || '')
+                ).trim();
+                if (!mapAddress) return null;
+                return (
+               <SectionCard fullWidth>
                  <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
                  <View style={styles.mapContainer}>
-                  {Platform.OS === 'web' ? (
-                    <iframe
-                      srcDoc={`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                          <style>
-                            body { margin: 0; padding: 0; }
-                            #map { width: 100%; height: 200px; }
-                          </style>
-                          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                        </head>
-                        <body>
-                          <div id="map"></div>
-                          <script>
-                            const map = L.map('map').setView([53.9, 27.6], 13);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                              attribution: '© OpenStreetMap contributors'
-                            }).addTo(map);
-                            
-                            // Добавляем маркер по адресу
-                            const address = '${player.address}';
-                            if (address) {
-                              // Простой геокодинг через Nominatim
-                              fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address) + '&limit=1')
-                                .then(response => response.json())
-                                .then(data => {
-                                  if (data && data.length > 0) {
-                                    const lat = parseFloat(data[0].lat);
-                                    const lon = parseFloat(data[0].lon);
-                                    map.setView([lat, lon], 15);
-                                    L.marker([lat, lon]).addTo(map)
-                                      .bindPopup('<b>${player.address}</b>').openPopup();
-                                  }
-                                })
-                                .catch(err => console.error('Geocoding error:', err));
-                            }
-                          </script>
-                        </body>
-                        </html>
-                      `}
-                      width="100%"
-                      height="200"
-                      style={{ border: 0, borderRadius: 12 }}
-                    />
-                  ) : (
-                    <WebView
-                      source={{
-                        html: `
-                          <!DOCTYPE html>
-                          <html>
-                          <head>
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <style>
-                              body { margin: 0; padding: 0; }
-                              #map { width: 100%; height: 200px; }
-                            </style>
-                            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                          </head>
-                          <body>
-                            <div id="map"></div>
-                            <script>
-                              const map = L.map('map').setView([53.9, 27.6], 13);
-                              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '© OpenStreetMap contributors'
-                              }).addTo(map);
-                              
-                              // Добавляем маркер по адресу
-                              const address = '${player.address}';
-                              if (address) {
-                                // Простой геокодинг через Nominatim
-                                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address) + '&limit=1')
-                                  .then(response => response.json())
-                                  .then(data => {
-                                    if (data && data.length > 0) {
-                                      const lat = parseFloat(data[0].lat);
-                                      const lon = parseFloat(data[0].lon);
-                                      map.setView([lat, lon], 15);
-                                      L.marker([lat, lon]).addTo(map)
-                                        .bindPopup('<b>${player.address}</b>').openPopup();
-                                    }
-                                  })
-                                  .catch(err => console.error('Geocoding error:', err));
-                              }
-                            </script>
-                          </body>
-                          </html>
-                        `
-                      }}
-                      style={styles.map}
-                      javaScriptEnabled={true}
-                      domStorageEnabled={true}
-                      startInLoadingState={true}
-                      scalesPageToFit={true}
-                      allowsInlineMediaPlayback={true}
-                      mediaPlaybackRequiresUserAction={false}
-                      onError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView error: ', nativeEvent);
-                      }}
-                      onHttpError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView http error: ', nativeEvent);
-                      }}
-                    />
-                )}
+                   <ShopLocationMap address={mapAddress} city={mapCity} height={320} />
                  </View>
                </SectionCard>
-            )}
+                );
+              })()}
 
             {/* Скидка для друзей - только для магазинов */}
               {player.status === 'shop' && (player.discountForFriends || isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)) && (
@@ -5817,116 +6277,23 @@ export default function PlayerProfile() {
               )}
 
             {/* Карта - для заточки коньков */}
-              {player.status === 'skateSharpening' && player.address && (
-               <SectionCard>
+              {player.status === 'skateSharpening' && (() => {
+                const mapAddress = String(
+                  isEditing && editData.address !== undefined ? editData.address : (player.address || '')
+                ).trim();
+                const mapCity = String(
+                  isEditing && editData.city !== undefined ? editData.city : (player.city || '')
+                ).trim();
+                if (!mapAddress) return null;
+                return (
+               <SectionCard fullWidth>
                  <Text style={styles.sectionTitle}>{t('profile.map')}</Text>
                  <View style={styles.mapContainer}>
-                  {Platform.OS === 'web' ? (
-                    <iframe
-                      srcDoc={`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                          <style>
-                            body { margin: 0; padding: 0; }
-                            #map { width: 100%; height: 200px; }
-                          </style>
-                          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                        </head>
-                        <body>
-                          <div id="map"></div>
-                          <script>
-                            const map = L.map('map').setView([53.9, 27.6], 13);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                              attribution: '© OpenStreetMap contributors'
-                            }).addTo(map);
-                            
-                            // Добавляем маркер по адресу
-                            const address = '${player.address}';
-                            if (address) {
-                              // Простой геокодинг через Nominatim
-                              fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address) + '&limit=1')
-                                .then(response => response.json())
-                                .then(data => {
-                                  if (data && data.length > 0) {
-                                    const lat = parseFloat(data[0].lat);
-                                    const lon = parseFloat(data[0].lon);
-                                    map.setView([lat, lon], 15);
-                                    L.marker([lat, lon]).addTo(map)
-                                      .bindPopup('<b>${player.address}</b>').openPopup();
-                                  }
-                                })
-                                .catch(err => console.error('Geocoding error:', err));
-                            }
-                          </script>
-                        </body>
-                        </html>
-                      `}
-                      width="100%"
-                      height="200"
-                      style={{ border: 'none', borderRadius: '12px' }}
-                    />
-                  ) : (
-                    <WebView
-                      source={{
-                        html: `
-                          <!DOCTYPE html>
-                          <html>
-                          <head>
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <style>
-                              body { margin: 0; padding: 0; }
-                              #map { width: 100%; height: 200px; }
-                            </style>
-                            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                          </head>
-                          <body>
-                            <div id="map"></div>
-                            <script>
-                              const map = L.map('map').setView([53.9, 27.6], 13);
-                              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '© OpenStreetMap contributors'
-                              }).addTo(map);
-                              
-                              // Добавляем маркер по адресу
-                              const address = '${player.address}';
-                              if (address) {
-                                // Простой геокодинг через Nominatim
-                                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address) + '&limit=1')
-                                  .then(response => response.json())
-                                  .then(data => {
-                                    if (data && data.length > 0) {
-                                      const lat = parseFloat(data[0].lat);
-                                      const lon = parseFloat(data[0].lon);
-                                      map.setView([lat, lon], 15);
-                                      L.marker([lat, lon]).addTo(map)
-                                        .bindPopup('<b>${player.address}</b>').openPopup();
-                                    }
-                                  })
-                                  .catch(err => console.error('Geocoding error:', err));
-                              }
-                            </script>
-                          </body>
-                          </html>
-                        `
-                      }}
-                      style={{ height: 200, borderRadius: 12 }}
-                      onError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView http error: ', nativeEvent);
-                      }}
-                      onHttpError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView http error: ', nativeEvent);
-                      }}
-                    />
-                )}
-                </View>
+                   <ShopLocationMap address={mapAddress} city={mapCity} height={320} />
+                 </View>
                </SectionCard>
-            )}
+                );
+              })()}
 
             {/* Скидка для друзей - для заточки коньков */}
               {player.status === 'skateSharpening' && (player.discountForFriends || (isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id))) && (
@@ -6112,7 +6479,7 @@ export default function PlayerProfile() {
                       </>
                     ) : isOwner && (
                       <View style={styles.emptySectionContainer}>
-                        <Ionicons name="shirt-outline" size={48} color="#666" />
+                        <Ionicons name="shirt-outline" size={48} color="#8a8a92" />
                         <Text style={styles.emptySectionText}>{t('profile.noTeamsYet')}</Text>
                       </View>
                     )}
@@ -6203,82 +6570,30 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Физические данные - только для игроков (не тренеры) */}
-            {player.status === 'player' && (() => {
-              // Проверяем, есть ли хотя бы один параметр или мы в режиме редактирования
-              const hasHeight = player.height && parseInt(player.height) > 0;
-              const hasWeight = player.weight && parseInt(player.weight) > 0;
-              const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
-              const isOwner = currentUser && currentUser.id === player.id;
-              
-              // Показываем раздел если:
-              // - есть хотя бы один параметр ИЛИ
-              // - мы в режиме редактирования ИЛИ
-              // - это владелец профиля (чтобы стимулировать заполнение)
-              if (!isEditingMode && !hasHeight && !hasWeight && !isOwner) {
+            {/* Физические данные - только для игроков (не тренеры); на desktop объединены со статистикой */}
+            {player.status === 'player' && !mergeStatsWithPhysicalOnDesktop && (() => {
+              if (!canShowPhysicalData) {
                 return null;
               }
               
               return (
               <SectionCard>
-                <Text style={styles.sectionTitle}>{t('profile.physicalData')}</Text>
-                <View style={styles.infoGrid}>
-                    {/* Рост - показываем если указан, в режиме редактирования или это владелец профиля */}
-                    {(hasHeight || isEditingMode || isOwner) && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('profile.height')}</Text>
-                        {isEditingMode ? (
-                      <TextInput
-                        ref={heightInputRef}
-                        style={styles.editInput}
-                        value={editData.height !== undefined ? editData.height : (player.height || '')}
-                        onChangeText={(text) => setEditData({...editData, height: text})}
-                        onFocus={handleHeightFocus}
-                        placeholder={`${t('profile.height')} (${t('profile.cm')})`}
-                        placeholderTextColor="#888"
-                        keyboardType="numeric"
-                      />
-                    ) : (
-                          <Text style={styles.infoValue}>{`${player.height} ${t('profile.cm')}`}</Text>
-                    )}
-                  </View>
-                    )}
-                    {/* Вес - показываем если указан, в режиме редактирования или это владелец профиля */}
-                    {(hasWeight || isEditingMode || isOwner) && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>{t('profile.weight')}</Text>
-                        {isEditingMode ? (
-                      <TextInput
-                        ref={weightInputRef}
-                        style={styles.editInput}
-                        value={editData.weight !== undefined ? editData.weight : (player.weight || '')}
-                        onChangeText={(text) => setEditData({...editData, weight: text})}
-                        onFocus={handleWeightFocus}
-                        placeholder={`${t('profile.weight')} (${t('profile.kg')})`}
-                        placeholderTextColor="#888"
-                        keyboardType="numeric"
-                      />
-                    ) : (
-                          <Text style={styles.infoValue}>{`${player.weight} ${t('profile.kg')}`}</Text>
-                    )}
-                  </View>
-                    )}
-                </View>
+                {renderPhysicalDataBody()}
               </SectionCard>
               );
             })()}
 
-            {/* Scout Report — full section (button + videos + report) */}
-            {player && (isOwner || isViewerAdmin || (resolvedAiAnalysis?.text && isScoutReportPublic)) && (() => {
+            {/* Scout Report — только для игроков (player) */}
+            {player && player.status === 'player' && (isOwner || isViewerAdmin || (resolvedAiAnalysis?.text && isScoutReportPublic)) && (() => {
               const completeness = checkProfileCompleteness(player, { current: playerTeams, past: pastTeams });
               return (
-                <View ref={aiSectionRef} collapsable={false}>
-                  <SectionCard>
+                <View ref={aiSectionRef} collapsable={false} style={isDesktop ? styles.desktopFullGridItem : undefined}>
+                  <SectionCard fullWidth>
                     <AIAnalysisCard
                       analysis={resolvedAiAnalysis}
                       playerName={player.name}
                       playerAvatar={player.avatar || undefined}
-                      profileUrl={buildInviteLink(player.id)}
+                      profileUrl={buildInviteLink(player.id, player.name)}
                       isOwner={!!isOwner}
                       usageCount={aiUsageCount}
                       maxUsage={5}
@@ -6436,7 +6751,7 @@ export default function PlayerProfile() {
                     if (isOwner) {
                       return (
                         <View style={styles.emptySectionContainer}>
-                          <Ionicons name="videocam-outline" size={48} color="#666" />
+                          <Ionicons name="videocam-outline" size={48} color="#8a8a92" />
                           <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
                         </View>
                       );
@@ -6455,7 +6770,7 @@ export default function PlayerProfile() {
                 })()
               ) : isOwner ? (
                 <View style={styles.emptySectionContainer}>
-                  <Ionicons name="videocam-outline" size={48} color="#666" />
+                  <Ionicons name="videocam-outline" size={48} color="#8a8a92" />
                   <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
                 </View>
               ) : null;
@@ -6466,7 +6781,7 @@ export default function PlayerProfile() {
               }
               
               return (
-                <SectionCard ref={videosRef}>
+                <SectionCard ref={videosRef} fullWidth>
                   {!isEditingMode && (
                     <Text style={styles.sectionTitle}>{t('profile.videoMoments')}</Text>
                   )}
@@ -6493,7 +6808,7 @@ export default function PlayerProfile() {
               // Если нет доступа и не магазин/заточка - показываем заблокированную секцию
               if (!canSeePhotos && !isShopOrSkateSharpening) {
                 return (
-            <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
+            <SectionCard ref={photosRef} fullWidth wrapperStyle={styles.compactSectionWrapper}>
                     <Text style={styles.sectionTitle}>
                       {isShopOrSkateSharpening ? t('profile.photos') : t('profile.hockeyPhotos')}
                     </Text>
@@ -6515,13 +6830,13 @@ export default function PlayerProfile() {
               }
               
               return (
-                <SectionCard ref={photosRef} wrapperStyle={styles.compactSectionWrapper}>
+                <SectionCard ref={photosRef} fullWidth wrapperStyle={styles.compactSectionWrapper}>
                   <Text style={styles.sectionTitle}>
                     {isShopOrSkateSharpening ? t('profile.photos') : t('profile.hockeyPhotos')}
                   </Text>
                   {galleryPhotos.length === 0 && !isEditingPhotos && isOwner ? (
                     <View style={styles.emptySectionContainer}>
-                      <Ionicons name="images-outline" size={48} color="#666" />
+                      <Ionicons name="images-outline" size={48} color="#8a8a92" />
                       <Text style={styles.emptySectionText}>{t('profile.noPhotosYet')}</Text>
                     </View>
                   ) : (
@@ -6650,7 +6965,7 @@ export default function PlayerProfile() {
                         <SectionCard ref={normativesRef}>
                           <Text style={styles.sectionTitle}>{t('profile.standards')}</Text>
                           <View style={styles.emptySectionContainer}>
-                            <Ionicons name="fitness-outline" size={48} color="#666" />
+                            <Ionicons name="fitness-outline" size={48} color="#8a8a92" />
                             <Text style={styles.emptySectionText}>{t('profile.noStandardsYet')}</Text>
                           </View>
                         </SectionCard>
@@ -6777,7 +7092,7 @@ export default function PlayerProfile() {
                       </View>
                     ) : (
                       <View style={styles.puckSpeedEmpty}>
-                        <Ionicons name="speedometer-outline" size={48} color="#666" />
+                        <Ionicons name="speedometer-outline" size={48} color="#8a8a92" />
                         <Text style={styles.puckSpeedEmptyText}>
                           {t('puckSpeed.noMeasurement') || 'Скорость еще не измерена'}
                         </Text>
@@ -6854,6 +7169,7 @@ export default function PlayerProfile() {
                 })() ? (
                   <SectionCard
                     ref={museumRef}
+                    fullWidth
                     wrapperStyle={styles.compactSectionWrapper}
                     blurStyle={styles.museumSectionBlur}
                     style={styles.museumSection}
@@ -6946,24 +7262,25 @@ export default function PlayerProfile() {
 
             {/* Друзья - скрыты для скаутов (кроме админа) */}
             {!(player.status === 'scout' && currentUser?.status !== 'admin') && (
-            <SectionCard ref={friendsRef} wrapperStyle={styles.compactSectionWrapper}>
+            <SectionCard ref={friendsRef} fullWidth wrapperStyle={styles.compactSectionWrapper}>
               <Text style={styles.sectionTitle}>
                 {t('profile.friends')} ({friends.length})
               </Text>
               {friends.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
+                <HorizontalScrollWithArrows
                   contentContainerStyle={styles.friendsScroll}
-                  nestedScrollEnabled
+                  scrollStep={90}
                 >
                   {friends.map((friend) => (
                     <TouchableOpacity
                       key={friend.id}
                       style={styles.friendItem}
-                      onPress={() => router.push({
-                        pathname: `/player/${friend.id}`,
-                        params: { returnTo: 'player', returnToPlayerId: id }
+                      onPress={() => navigateToPlayerProfile(router, {
+                        playerId: friend.id,
+                        name: friend.name,
+                        lang: language,
+                        returnTo: 'player',
+                        returnToPlayerId: id || undefined,
                       })}
                     >
                       <CachedAvatar
@@ -6973,21 +7290,21 @@ export default function PlayerProfile() {
                         style={styles.friendAvatar}
                       />
                       <Text style={styles.friendName} numberOfLines={2}>
-                        {friend.name?.toUpperCase()}
+                        {displayName(friend.name)}
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </ScrollView>
+                </HorizontalScrollWithArrows>
               ) : (
                 <View style={styles.emptySectionContainer}>
-                  <Ionicons name="people-outline" size={48} color="#666" />
+                  <Ionicons name="people-outline" size={48} color="#8a8a92" />
                   <Text style={styles.emptySectionText}>{t('profile.noFriendsYet', {name: player.name})}</Text>
                   {currentUser && currentUser.id === player.id ? (
                     <TouchableOpacity
                       style={styles.inviteTeamButton}
                       onPress={async () => {
                         try {
-                          const link = buildInviteLink(player.id);
+                          const link = buildInviteLink(player.id, player.name);
                           const message = `${t('profile.inviteTeamMessage')} ${link}`;
                           await Share.share({ message });
                         } catch {
@@ -7012,40 +7329,7 @@ export default function PlayerProfile() {
 
             {/* Кнопки действий для взаимодействия с профилем */}
             <View style={styles.actionsSection}>
-              {currentUser && currentUser.id !== player.id ? (
-                // Если пользователь авторизован и смотрит чужой профиль - показываем кнопки взаимодействия
-                <>
-                  {/* Кнопки для администратора */}
-                  {currentUser.status === 'admin' && (
-                    <>
-                      {isEditing ? (
-                        <>
-                          <TouchableOpacity 
-                            style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
-                            onPress={handleSave}
-                          >
-                            <Ionicons name="checkmark-outline" size={20} color="#fff" />
-                            <Text style={styles.actionButtonText}>{t('common.save')}</Text>
-                          </TouchableOpacity>
-                          
-                          <TouchableOpacity 
-                            style={[styles.actionButton, { backgroundColor: 'rgb(1,0,0)', borderWidth: 1, borderColor: '#fa2f40' }]} 
-                            onPress={() => {
-                              setIsEditing(false);
-                              setEditData({});
-                            }}
-                          >
-                            <Ionicons name="close-outline" size={20} color="#fff" />
-                            <Text style={styles.actionButtonText}>{t('common.cancel')}</Text>
-                          </TouchableOpacity>
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                  
-
-                </>
-              ) : !currentUser ? (
+              {!currentUser ? (
                 // Если пользователь не авторизован - показываем кнопку входа
                 <TouchableOpacity 
                   style={styles.actionButton} 
@@ -7060,7 +7344,7 @@ export default function PlayerProfile() {
             {/* Кнопка запроса подарка у звезды - только для игроков */}
             {player.status === 'star' && currentUser && currentUser.id !== player.id && currentUser.status === 'player' && (
               <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: '#FF8243', marginBottom: 10 }]} 
+                style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#FF8243', marginBottom: 10 }]} 
                 onPress={() => setShowRequestGiftModal(true)}
               >
                 <Ionicons name="gift-outline" size={20} color="#fff" />
@@ -7080,7 +7364,7 @@ export default function PlayerProfile() {
                   // Кнопки для режима редактирования
                   <View style={{ gap: 15, marginTop: 20, marginBottom: 20 }}>
                     <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                      style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} 
                       onPress={handleSave}
                     >
                       <Ionicons name="checkmark-outline" size={20} color="#fff" />
@@ -7088,7 +7372,7 @@ export default function PlayerProfile() {
                     </TouchableOpacity>
                     
                     <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: 'rgb(1,0,0)', borderWidth: 1, borderColor: '#fa2f40' }]} 
+                      style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: 'rgb(1,0,0)', borderWidth: 1, borderColor: '#fa2f40' }]} 
                       onPress={() => {
                         setIsEditing(false);
                         setEditData({});
@@ -7100,17 +7384,17 @@ export default function PlayerProfile() {
                   </View>
                 ) : (
                   // Кнопки для обычного режима
-                  <View style={{ gap: 15, marginTop: 20, marginBottom: 20 }}>
+                  <View style={[{ gap: 15, marginTop: 20, marginBottom: 20 }, isDesktop && styles.ownControlsDesktop]}>
                     {/* Переключатель языка - только для собственного профиля */}
                     {currentUser && currentUser.id === player?.id && (
-                      <SectionCard>
-                        <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+                      <SectionCard fullWidth>
+                        <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>{t('settings.language')}</Text>
                         <LanguageSwitcher />
                       </SectionCard>
                     )}
                     
                     <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: '#fa2f40' }]} 
+                      style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} 
                       onPress={() => {
                         setEditData(player);
                         handleStartEditing();
@@ -7121,7 +7405,7 @@ export default function PlayerProfile() {
                     </TouchableOpacity>
                     
                     <TouchableOpacity 
-                      style={[styles.actionButton, { backgroundColor: 'rgb(1,0,0)' }]} 
+                      style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: 'rgb(1,0,0)' }]} 
                       onPress={handleLogout}
                     >
                       <Ionicons name="log-out-outline" size={20} color="#fff" />
@@ -7134,141 +7418,152 @@ export default function PlayerProfile() {
 
 
 
-            {/* Кнопка входа в аккаунт для администратора */}
+            {/* Админ-панель на чужом профиле — один полный блок */}
             {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
-              <TouchableOpacity 
-                style={[styles.loginAsUserButton, { backgroundColor: '#8B0000' }]}
-                onPress={async () => {
-                  Alert.alert(
-                    t('admin.loginAsUser') || 'Войти в аккаунт',
-                    t('admin.loginAsUserConfirm', { name: player.name }) || `Вы уверены, что хотите войти в аккаунт ${player.name}?`,
-                    [
-                      {
-                        text: t('common.cancel') || 'Отмена',
-                        style: 'cancel'
-                      },
-                      {
-                        text: t('admin.login') || 'Войти',
-                        onPress: async () => {
-                          try {
-                            // Удаляем push токены старого пользователя перед входом в другой аккаунт
-                            if (currentUser && currentUser.id !== player.id) {
+              <SectionCard fullWidth>
+                <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>
+                  {t('admin.admin') || 'Админ'}
+                </Text>
+                <View style={[styles.adminPanelGrid, isDesktop && styles.adminPanelGridDesktop]}>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonLoginAs]}
+                    onPress={async () => {
+                      Alert.alert(
+                        t('admin.loginAsUser') || 'Войти в аккаунт',
+                        t('admin.loginAsUserConfirm', { name: player.name }) || `Вы уверены, что хотите войти в аккаунт ${player.name}?`,
+                        [
+                          {
+                            text: t('common.cancel') || 'Отмена',
+                            style: 'cancel'
+                          },
+                          {
+                            text: t('admin.login') || 'Войти',
+                            onPress: async () => {
                               try {
-                                const { deleteUserPushTokens } = await import('../../utils/notificationService');
-                                await deleteUserPushTokens(currentUser.id);
-                                console.log('✅ Push токены старого пользователя удалены при входе администратора');
-                              } catch (tokenError) {
-                                // Не критично, если не удалось удалить токены
-                                console.warn('⚠️ Не удалось удалить push токены старого пользователя (не критично):', tokenError);
-                              }
-                            }
-                            
-                            // Сохраняем нового пользователя
-                            await saveCurrentUser(player);
-                            
-                            // Обновляем контекст пользователя для немедленного обновления интерфейса
-                            await refreshUser(true); // forceRefresh = true
-                            
-                            // Показываем уведомление
-                            Alert.alert(
-                              t('common.success') || 'Успешно',
-                              t('admin.loginAsUserSuccess', { name: player.name }) || `Вы вошли как ${player.name}`,
-                              [
-                                {
-                                  text: 'OK',
-                                  onPress: () => {
-                                    // Переходим на главную страницу (контекст уже обновлен)
-                                    router.replace('/');
+                                if (currentUser && currentUser.id !== player.id) {
+                                  try {
+                                    const { deleteUserPushTokens } = await import('../../utils/notificationService');
+                                    await deleteUserPushTokens(currentUser.id);
+                                  } catch (tokenError) {
+                                    console.warn('⚠️ Не удалось удалить push токены старого пользователя (не критично):', tokenError);
                                   }
                                 }
-                              ]
-                            );
-                          } catch (error) {
-                            console.error('❌ Ошибка входа в аккаунт:', error);
-                            Alert.alert(
-                              t('common.error') || 'Ошибка',
-                              t('admin.loginAsUserError') || 'Не удалось войти в аккаунт'
-                            );
-                          }
-                        }
-                      }
-                    ]
-                  );
-                }}
-              >
-                <Ionicons name="log-in-outline" size={20} color="#fff" />
-                <Text style={styles.loginAsUserButtonText}>
-                  {t('admin.loginAsUser') || 'Войти в аккаунт'}
-                </Text>
-              </TouchableOpacity>
-            )}
 
-            {/* Кнопки редактирования и удаления для администратора */}
-            {currentUser?.status === 'admin' && player && currentUser.id !== player.id && (
-             <SectionCard>
-                {/* Кнопка изменения статуса */}
-                <TouchableOpacity 
-                  style={[styles.adminButton, { backgroundColor: '#6B5B95', marginBottom: 10, alignSelf: 'stretch' }]} 
-                  onPress={() => {
-                    const statuses = [
-                      { key: 'player', label: '🏒 Игрок' },
-                      { key: 'coach', label: '👨‍🏫 Тренер' },
-                      { key: 'star', label: '⭐ Звезда' },
-                      { key: 'scout', label: '🔍 Скаут' },
-                      { key: 'shop', label: '🏪 Магазин' },
-                      { key: 'skateSharpening', label: '⛸️ Заточка' },
-                    ];
-                    Alert.alert(
-                      'Изменить статус',
-                      `Текущий статус: ${player.status}\nВыберите новый статус:`,
-                      [
-                        ...statuses.map(s => ({
-                          text: s.label,
-                          onPress: async () => {
-                            if (s.key === player.status) return;
-                            try {
-                              await updatePlayer(player.id, { status: s.key as any });
-                              Alert.alert('✅', `Статус изменён на "${s.label}"`);
-                              // Обновляем данные игрока
-                              const updated = await getPlayerById(player.id);
-                              if (updated) setPlayer(updated);
-                            } catch (e) {
-                              Alert.alert('Ошибка', 'Не удалось изменить статус');
+                                await saveCurrentUser(player);
+                                await refreshUser(true);
+
+                                Alert.alert(
+                                  t('common.success') || 'Успешно',
+                                  t('admin.loginAsUserSuccess', { name: player.name }) || `Вы вошли как ${player.name}`,
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.replace('/');
+                                      }
+                                    }
+                                  ]
+                                );
+                              } catch (error) {
+                                console.error('❌ Ошибка входа в аккаунт:', error);
+                                Alert.alert(
+                                  t('common.error') || 'Ошибка',
+                                  t('admin.loginAsUserError') || 'Не удалось войти в аккаунт'
+                                );
+                              }
                             }
                           }
-                        })),
-                        { text: 'Отмена', style: 'cancel' }
-                      ]
-                    );
-                  }}
-                >
-                  <Ionicons name="person-circle-outline" size={20} color="#fff" />
-                  <Text style={styles.adminButtonText}>Изменить статус ({player.status})</Text>
-                </TouchableOpacity>
+                        ]
+                      );
+                    }}
+                  >
+                    <Ionicons name="log-in-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>
+                      {t('admin.loginAsUser') || 'Войти в аккаунт'}
+                    </Text>
+                  </TouchableOpacity>
 
-                {/* Кнопка редактирования - на отдельной строке */}
-                <TouchableOpacity 
-                  style={[styles.adminButton, styles.editButton, { marginBottom: 10, alignSelf: 'stretch' }]} 
-                  onPress={handleStartEditing}
-                >
-                  <Ionicons name="create-outline" size={20} color="rgb(1,0,0)" />
-                  <Text style={[styles.adminButtonText, styles.editButtonText]}>{t('profile.edit')}</Text>
-                </TouchableOpacity>
-                
-                {/* Кнопки удаления и скрытия - на одной строке */}
-                <View style={styles.adminButtonsContainer}>
-                  <TouchableOpacity 
-                    style={[styles.adminButton, styles.deleteButton]} 
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonStatus]}
+                    onPress={() => {
+                      const statuses = [
+                        { key: 'player', label: '🏒 Игрок' },
+                        { key: 'coach', label: '👨‍🏫 Тренер' },
+                        { key: 'star', label: '⭐ Звезда' },
+                        { key: 'scout', label: '🔍 Скаут' },
+                        { key: 'shop', label: '🏪 Магазин' },
+                        { key: 'skateSharpening', label: '⛸️ Заточка' },
+                      ];
+                      Alert.alert(
+                        'Изменить статус',
+                        `Текущий статус: ${player.status}\nВыберите новый статус:`,
+                        [
+                          ...statuses.map(s => ({
+                            text: s.label,
+                            onPress: async () => {
+                              if (s.key === player.status) return;
+                              try {
+                                await updatePlayer(player.id, { status: s.key as any });
+                                Alert.alert('✅', `Статус изменён на "${s.label}"`);
+                                const updated = await getPlayerById(player.id);
+                                if (updated) setPlayer(updated);
+                              } catch (e) {
+                                Alert.alert('Ошибка', 'Не удалось изменить статус');
+                              }
+                            }
+                          })),
+                          { text: 'Отмена', style: 'cancel' }
+                        ]
+                      );
+                    }}
+                  >
+                    <Ionicons name="person-circle-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>Изменить статус ({player.status})</Text>
+                  </TouchableOpacity>
+
+                  {!isEditing ? (
+                    <TouchableOpacity
+                      style={[styles.adminPanelButton, styles.adminPanelButtonEdit]}
+                      onPress={handleStartEditing}
+                    >
+                      <Ionicons name="create-outline" size={20} color="rgb(1,0,0)" />
+                      <Text style={[styles.adminPanelButtonText, styles.adminPanelButtonTextDark]}>
+                        {t('profile.edit')}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={[styles.adminPanelButton, styles.adminPanelButtonPrimary]}
+                        onPress={handleSave}
+                      >
+                        <Ionicons name="checkmark-outline" size={20} color="#fff" />
+                        <Text style={styles.adminPanelButtonText}>{t('common.save')}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
+                        onPress={() => {
+                          setIsEditing(false);
+                          setEditData({});
+                        }}
+                      >
+                        <Ionicons name="close-outline" size={20} color="#fff" />
+                        <Text style={styles.adminPanelButtonText}>{t('common.cancel')}</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonDanger]}
                     onPress={handleDeletePlayer}
                   >
                     <Ionicons name="trash-outline" size={20} color="#fff" />
-                    <Text style={styles.adminButtonText}>{t('profile.deleteUser')}</Text>
+                    <Text style={styles.adminPanelButtonText}>{t('profile.deleteUser')}</Text>
                   </TouchableOpacity>
 
-                  {/* Кнопка скрыть/показать профиль */}
                   {player.is_hidden ? (
-                    <TouchableOpacity 
-                      style={[styles.adminButton, { backgroundColor: '#4CAF50' }]} 
+                    <TouchableOpacity
+                      style={[styles.adminPanelButton, styles.adminPanelButtonSuccess]}
                       onPress={() => {
                         Alert.alert(
                           t('admin.unhideProfile') || 'Показать профиль',
@@ -7287,11 +7582,11 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="eye-outline" size={20} color="#fff" />
-                      <Text style={styles.adminButtonText}>{t('admin.unhideProfile') || 'Показать профиль'}</Text>
+                      <Text style={styles.adminPanelButtonText}>{t('admin.unhideProfile') || 'Показать профиль'}</Text>
                     </TouchableOpacity>
                   ) : (
-                    <TouchableOpacity 
-                      style={[styles.adminButton, { backgroundColor: '#000000' }]} 
+                    <TouchableOpacity
+                      style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
                       onPress={() => {
                         Alert.alert(
                           t('admin.hideProfile') || 'Скрыть профиль',
@@ -7310,11 +7605,11 @@ export default function PlayerProfile() {
                       }}
                     >
                       <Ionicons name="eye-off-outline" size={20} color="#fff" />
-                      <Text style={styles.adminButtonText}>{t('admin.hideProfile') || 'Скрыть профиль'}</Text>
+                      <Text style={styles.adminPanelButtonText}>{t('admin.hideProfile') || 'Скрыть профиль'}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
-             </SectionCard>
+              </SectionCard>
             )}
 
 
@@ -7336,17 +7631,17 @@ export default function PlayerProfile() {
 
             {/* QR-код профиля */}
             {player && (
-              <View style={styles.qrCodeSection}>
+              <View style={[styles.qrCodeSection, isDesktop && styles.qrCodeSectionDesktop]}>
                 <View style={[styles.qrCodeContainer, { borderWidth: 6, borderColor: '#fa2f40', borderRadius: 12 }]}>
                   <QRCode
-                    value={buildInviteLink(player.id)}
-                    size={Dimensions.get('window').width - 80}
+                    value={buildInviteLink(player.id, player.name)}
+                    size={Math.min(220, Math.max(160, Math.min(Dimensions.get('window').width, 420) - 96))}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
                     logo={cachedPlayerAvatar ? { uri: cachedPlayerAvatar } : require('../../assets/icon.png')}
-                    logoSize={80}
+                    logoSize={48}
                     logoBackgroundColor="#fff"
-                    logoBorderRadius={40}
+                    logoBorderRadius={24}
                     logoMargin={4}
                   />
                 </View>
@@ -7355,7 +7650,7 @@ export default function PlayerProfile() {
 
             {/* Кнопки "Поделиться" и "Скопировать ссылку" */}
             {player && (
-              <View style={{ marginTop: 10, marginBottom: 10, paddingHorizontal: 20, gap: 10 }}>
+              <View style={[{ marginTop: 10, marginBottom: 10, paddingHorizontal: 20, gap: 10 }, isDesktop && { gridColumn: '1 / -1' as any, maxWidth: 420, alignSelf: 'center', width: '100%', paddingHorizontal: 0 }]}>
                 <TouchableOpacity 
                   style={styles.shareButton} 
                   onPress={shareProfile}
@@ -7366,10 +7661,10 @@ export default function PlayerProfile() {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={[styles.shareButton, { backgroundColor: '#333' }]} 
+                  style={[styles.shareButton, { backgroundColor: '#2a2430' }]} 
                   onPress={async () => {
                     try {
-                      const profileUrl = buildInviteLink(player.id);
+                      const profileUrl = buildInviteLink(player.id, player.name);
                       const Clipboard = require('expo-clipboard');
                       await Clipboard.setStringAsync(profileUrl);
                       if (Platform.OS === 'ios') {
@@ -7514,7 +7809,7 @@ export default function PlayerProfile() {
                     />
                   ) : (
                     <View style={styles.shareCardAvatarPlaceholder}>
-                      <Ionicons name="person" size={60} color="#666" />
+                      <Ionicons name="person" size={60} color="#8a8a92" />
                     </View>
                   )}
                 </View>
@@ -7573,7 +7868,7 @@ export default function PlayerProfile() {
                 {(player.goals || player.assists || player.games) && player.status === 'player' && (
                   <>
                     <Text style={styles.shareCardStatsTitle}>
-                      {t('profile.currentSeasonStats') || 'Статистика текущего сезона'}
+                      {(t('profile.statistics') || 'Статистика')} · {formatSeasonLabel(CURRENT_SEASON_KEY)}
                     </Text>
                     <View style={styles.shareCardStatsRow}>
                       {player.games && (
@@ -7642,7 +7937,7 @@ export default function PlayerProfile() {
                 {/* QR-код */}
                 <View style={styles.shareCardQRContainer}>
                   <QRCode
-                    value={buildInviteLink(player.id)}
+                    value={buildInviteLink(player.id, player.name)}
                     size={180}
                     color="#fff"
                     backgroundColor="rgb(1,0,0)"
@@ -8134,7 +8429,7 @@ export default function PlayerProfile() {
                   value={requestGiftMessage}
                   onChangeText={setRequestGiftMessage}
                   placeholder={t('gifts.requestMessagePlaceholder') || 'Напишите ваше сообщение...'}
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#8a8a92"
                   multiline
                   numberOfLines={6}
                   maxLength={500}
@@ -8183,13 +8478,247 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'transparent',
   },
   scrollContainer: {
     flexGrow: 1,
     paddingTop: 48, // Отступ для фиксированного заголовка
     paddingHorizontal: 20,
     paddingBottom: 50, // Уменьшено для устранения большого отступа внизу
+  },
+  scrollContainerDesktop: {
+    maxWidth: 1080,
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 28,
+    paddingTop: 64,
+    paddingBottom: 56,
+  },
+  desktopContentWrap: {
+    width: '100%',
+    display: 'grid' as any,
+    gridTemplateColumns: '1fr 1fr' as any,
+    gap: 16 as any,
+    alignItems: 'stretch',
+  },
+  ownControlsDesktop: {
+    gridColumn: '1 / -1' as any,
+    maxWidth: 420,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  profileSectionDesktop: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginTop: 0,
+    marginBottom: 4,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    gridColumn: '1 / -1' as any,
+  },
+
+  heroActionsDesktop: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 14,
+    width: '100%',
+  },
+  profileHeroInfoDesktop: {
+    width: 260,
+    maxWidth: 280,
+    marginLeft: 20,
+    paddingLeft: 20,
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(255, 255, 255, 0.1)',
+    gap: 8,
+    justifyContent: 'center',
+    minWidth: 0,
+  },
+  profileHeroInfoTitle: {
+    fontSize: 13,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fa2f40',
+    marginBottom: 4,
+    letterSpacing: 0.3,
+  },
+  profileHeroInfoRow: {
+    gap: 2,
+  },
+  profileHeroInfoLabel: {
+    fontSize: 11,
+    fontFamily: 'Gilroy-Regular',
+    color: 'rgba(255,255,255,0.55)',
+  },
+  profileHeroInfoValue: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+  },
+  profileMetaColumn: {
+    alignItems: 'center',
+  },
+  profileMetaColumnDesktop: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    minWidth: 0,
+    paddingTop: 0,
+    marginLeft: 32,
+    gap: 8,
+  },
+  nameRowDesktop: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 4,
+    width: '100%',
+  },
+  playerNameDesktop: {
+    fontSize: 36,
+    textAlign: 'left',
+    letterSpacing: 0.4,
+    lineHeight: 42,
+  },
+  profileImageDesktop: {
+    width: 176,
+    height: 176,
+    borderRadius: 88,
+  },
+  innerCircleDesktop: {
+    width: 156,
+    height: 156,
+    borderRadius: 78,
+    transform: [{ translateX: -78 }, { translateY: -78 }],
+  },
+  avatarImageDesktop: {
+    width: 148,
+    height: 148,
+    borderRadius: 74,
+  },
+  profileMenuButtonDesktop: {
+    right: 8,
+    top: 8,
+  },
+  hockeyExperienceContainerDesktop: {
+    alignItems: 'flex-start',
+  },
+  actionsSectionTopDesktop: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingHorizontal: 0,
+    marginTop: 4,
+    marginBottom: 4,
+    gap: 12,
+    gridColumn: '1 / -1' as any,
+  },
+  actionButtonDesktop: {
+    alignSelf: 'flex-start',
+    minWidth: 180,
+    maxWidth: 260,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginRight: 0,
+    marginBottom: 0,
+    borderRadius: 12,
+  },
+  sectionWrapperDesktop: {
+    width: '100%',
+    maxWidth: '100%',
+    marginBottom: 0,
+    marginRight: 0,
+    minWidth: 0,
+  },
+  sectionWrapperDesktopFull: {
+    width: '100%',
+    maxWidth: '100%',
+    marginRight: 0,
+    marginBottom: 0,
+    gridColumn: '1 / -1' as any,
+  },
+  desktopFullGridItem: {
+    width: '100%',
+    gridColumn: '1 / -1' as any,
+  },
+  physicalInsideStats: {
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  sectionTitleNested: {
+    marginTop: 0,
+    marginBottom: 12,
+    fontSize: 18,
+  },
+  sectionDesktop: {
+    padding: 22,
+    minHeight: 140,
+    flex: 1,
+  },
+  sectionBlurDesktop: {
+    flex: 1,
+    height: '100%',
+  },
+  sectionTitleDesktop: {
+    fontSize: 17,
+    marginBottom: 12,
+  },
+  statusContainerDesktop: {
+    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
+    marginTop: 2,
+    marginBottom: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(250, 47, 64, 0.12)',
+  },
+  playerStatusDesktop: {
+    fontSize: 14,
+    letterSpacing: 0.3,
+  },
+  playerTeamsContainerDesktop: {
+    alignItems: 'flex-start',
+  },
+  pageHeaderDesktop: {
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    // Full width of desktop center column (not capped like content cards)
+    maxWidth: '100%',
+    width: '100%',
+    alignSelf: 'stretch',
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(11, 11, 14, 0.72)',
+  },
+  pageTitleDesktop: {
+    fontSize: 16,
+    opacity: 0.7,
+    fontFamily: 'Gilroy-Regular',
+  },
+  infoItemDesktop: {
+    minWidth: 0,
+    maxWidth: '100%',
+    flexBasis: '100%',
+    flexGrow: 1,
+    overflow: 'hidden',
+  },
+  infoGridDesktop: {
+    gap: 18,
+    rowGap: 16,
+  },
+  infoValueDesktop: {
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   editButtonContainer: {
     flexDirection: 'row',
@@ -8277,7 +8806,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     right: -32,
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 16,
     padding: 6,
     borderWidth: 1,
@@ -8307,7 +8836,7 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
       web: {
-        boxShadow: '0 3px 4px rgba(1, 0, 0, 0.8)',
+        boxShadow: '0 3px 4px rgba(22, 22, 26, 0.86)',
       },
     }),
     borderWidth: 4,
@@ -8358,7 +8887,7 @@ const styles = StyleSheet.create({
   profileViewsHeaderToday: {
     fontFamily: 'Gilroy-Regular',
     fontSize: 11,
-    color: '#666',
+    color: '#8a8a92',
   },
   playerName: {
     fontSize: 28,
@@ -8481,13 +9010,15 @@ const styles = StyleSheet.create({
   },
   museumSection: {
     overflow: 'visible',
+    minHeight: 0,
+    paddingBottom: 12,
   },
   sectionBlur: {
     borderRadius: 20,
     overflow: 'hidden',
   },
   section: {
-    backgroundColor: 'rgba(1, 0, 0, 0.4)',
+    backgroundColor: 'rgba(22, 22, 26, 0.5)',
     borderRadius: 20,
     padding: 20,
     borderWidth: 2,
@@ -8532,10 +9063,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 40,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(1, 0, 0, 0.4)',
+    backgroundColor: 'rgba(22, 22, 26, 0.5)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   lockedSectionTitle: {
     fontSize: 18,
@@ -8635,6 +9166,7 @@ const styles = StyleSheet.create({
   infoItem: {
     flex: 1,
     minWidth: '45%',
+    maxWidth: '100%',
   },
   infoLabel: {
     fontSize: 14,
@@ -8646,6 +9178,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
+    flexShrink: 1,
+    maxWidth: '100%',
   },
   goalsContainer: {
     gap: 10,
@@ -8704,7 +9238,7 @@ const styles = StyleSheet.create({
   },
   // Стили для секции запроса дружбы
   friendRequestSection: {
-    backgroundColor: 'rgba(1, 0, 0, 0.8)',
+    backgroundColor: 'rgba(22, 22, 26, 0.86)',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -8791,6 +9325,67 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 10,
   },
+  adminPanelGrid: {
+    flexDirection: 'column',
+    gap: 10,
+  },
+  adminPanelGridDesktop: {
+    display: 'grid' as any,
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' as any,
+    gap: 12 as any,
+    alignItems: 'stretch',
+  },
+  adminPanelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+    height: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    gap: 8,
+    width: '100%',
+  },
+  adminPanelButtonDesktop: {
+    width: '100%',
+  },
+  adminPanelButtonText: {
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+  adminPanelButtonTextDark: {
+    color: 'rgb(1,0,0)',
+  },
+  adminPanelButtonPrimary: {
+    backgroundColor: '#fa2f40',
+  },
+  adminPanelButtonPurple: {
+    backgroundColor: '#6B5B95',
+  },
+  adminPanelButtonStatus: {
+    backgroundColor: '#6B5B95',
+  },
+  adminPanelButtonDark: {
+    backgroundColor: '#16121c',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  adminPanelButtonLoginAs: {
+    backgroundColor: '#8B0000',
+  },
+  adminPanelButtonEdit: {
+    backgroundColor: '#fff',
+  },
+  adminPanelButtonDanger: {
+    backgroundColor: '#fa2f40',
+  },
+  adminPanelButtonSuccess: {
+    backgroundColor: '#4CAF50',
+  },
   noDataText: {
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
@@ -8800,7 +9395,7 @@ const styles = StyleSheet.create({
   noDataSubtext: {
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     textAlign: 'center',
     marginTop: 5,
   },
@@ -8850,7 +9445,7 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   puckSpeedHistoryLabel: {
     fontSize: 14,
@@ -8941,7 +9536,7 @@ const styles = StyleSheet.create({
 
   videoModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -8976,7 +9571,7 @@ const styles = StyleSheet.create({
     top: 30,
     right: 20,
     zIndex: 1001,
-    backgroundColor: 'rgba(1, 0, 0, 0.7)',
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
     borderRadius: 20,
     padding: 8,
   },
@@ -9229,9 +9824,9 @@ const styles = StyleSheet.create({
   },
   uploadedVideoItem: {
     borderRadius: 10,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2a2430',
     overflow: 'hidden',
   },
   uploadedVideoThumb: {
@@ -9273,7 +9868,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   videoUploadHint: {
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 12,
     marginTop: 8,
     fontFamily: 'Gilroy-Regular',
@@ -9336,7 +9931,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 8,
-    backgroundColor: 'rgba(1, 0, 0, 0.3)',
+    backgroundColor: 'rgba(22, 22, 26, 0.42)',
   },
   removePhotoButton: {
     position: 'absolute',
@@ -9378,13 +9973,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(5, 0, 8, 0.75)',
+    backgroundColor: 'rgba(11, 11, 14, 0.75)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   countryPickerModal: {
-    backgroundColor: 'rgba(1, 0, 0, 0.9)',
+    backgroundColor: 'rgba(22, 22, 26, 0.94)',
     borderRadius: 15,
     padding: 20,
     width: '90%',
@@ -9406,7 +10001,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Gilroy-Regular',
     borderWidth: 1,
-    borderColor: 'rgba(255,68,68,0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     width: '100%',
     marginBottom: 15,
   },
@@ -9421,7 +10016,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   countryOptionSelected: {
-    backgroundColor: 'rgba(255,68,68,0.2)',
+    backgroundColor: 'rgba(250,47,64,0.2)',
   },
   countryOptionText: {
     color: '#fff',
@@ -9429,11 +10024,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   countryOptionTextSelected: {
-    color: '#FF4444',
+    color: '#fa2f40',
     fontFamily: 'Gilroy-Bold',
   },
   countryPickerCloseButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#fa2f40',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
@@ -9457,11 +10052,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   pickerOptionSelected: {
-    backgroundColor: '#FF4444',
-    borderColor: '#FF4444',
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
   },
   pickerOptionText: {
     fontSize: 14,
@@ -9550,7 +10145,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
@@ -9628,7 +10223,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Regular',
   },
   input: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -9655,7 +10250,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: '#8a8a92',
     opacity: 0.6,
   },
   submitButtonText: {
@@ -9665,7 +10260,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
     borderRadius: 8,
     padding: 12,
     marginTop: 16,
@@ -9719,7 +10314,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(1, 0, 0, 0.5)',
+    backgroundColor: 'rgba(22, 22, 26, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 60,
@@ -9902,7 +10497,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     color: '#FFFFFF',
     textAlign: 'center',
-    textShadowColor: 'rgba(1, 0, 0, 0.8)',
+    textShadowColor: 'rgba(22, 22, 26, 0.86)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
   },
@@ -9921,14 +10516,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     minWidth: 200,
-    textShadowColor: 'rgba(1, 0, 0, 0.8)',
+    textShadowColor: 'rgba(22, 22, 26, 0.86)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
   },
   discountExplanation: {
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
-    color: '#666',
+    color: '#8a8a92',
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 20,
@@ -9969,6 +10564,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 20,
     alignItems: 'center',
+    width: '100%',
+    maxWidth: 320,
+    alignSelf: 'center',
+  },
+  qrCodeSectionDesktop: {
+    gridColumn: '1 / -1' as any,
+    maxWidth: 280,
+    marginHorizontal: 0,
   },
   qrCodeContainer: {
     backgroundColor: 'rgb(1,0,0)',
@@ -10017,7 +10620,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
@@ -10122,6 +10725,11 @@ const styles = StyleSheet.create({
   phoneButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    maxWidth: '100%',
+    flexShrink: 1,
+    gap: 6,
+    minWidth: 0,
+    overflow: 'hidden',
   },
   phoneIconContainer: {
     width: 20,
@@ -10130,12 +10738,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 0,
   },
   phoneButtonText: {
     fontSize: 14,
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
     marginLeft: 4,
+    flexShrink: 1,
+    flex: 1,
+    maxWidth: '100%',
   },
   profileMenuOverlay: {
     flex: 1,
@@ -10143,7 +10755,7 @@ const styles = StyleSheet.create({
   },
   profileMenu: {
     position: 'absolute',
-    backgroundColor: 'rgba(1, 0, 0, 0.95)',
+    backgroundColor: 'rgba(22, 22, 26, 0.96)',
     borderRadius: 12,
     paddingVertical: 4,
     minWidth: 200,
@@ -10156,7 +10768,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   profileMenuItem: {
     flexDirection: 'row',
@@ -10223,7 +10835,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: 'rgba(1, 0, 0, 0.6)',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { displayName } from '../utils/displayName';
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { buildPlayerPath } from '../utils/playerSeoPath';
 import { getReferralLeaderboard, ReferralLeaderboardEntry } from '../utils/playerStorage';
 import CachedAvatar from './CachedAvatar';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -65,7 +67,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
     return (
       <TouchableOpacity
         style={styles.itemContainer}
-        onPress={() => router.push(`/player/${item.id}`)}
+        onPress={() => router.push(buildPlayerPath(item.id) as any)}
         activeOpacity={0.7}
       >
         {/* Позиция */}
@@ -89,7 +91,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
         {/* Информация */}
         <View style={styles.infoContainer}>
           <Text style={styles.name} numberOfLines={1}>
-            {item.name?.toUpperCase()}
+            {displayName(item.name)}
           </Text>
           <View style={styles.statsRow}>
             <Text style={styles.statsText}>
@@ -123,7 +125,7 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
   if (leaderboard.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="people-outline" size={48} color="#666" />
+        <Ionicons name="people-outline" size={48} color="#8a8a92" />
         <Text style={styles.emptyText}>
           {t('referral.noInvites') || 'Пока никто не пригласил друзей'}
         </Text>
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyText: {
-    color: '#666',
+    color: '#8a8a92',
     fontSize: 14,
     marginTop: 12,
     textAlign: 'center',

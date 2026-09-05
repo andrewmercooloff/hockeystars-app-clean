@@ -512,7 +512,7 @@ const StarGiftModal: React.FC<StarGiftModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   header: {
     flexDirection: 'row',
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#2a2430',
   },
   title: {
     fontSize: 20,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2a2430',
   },
   imageButton: {
     backgroundColor: '#2a2a2a',
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2a2430',
   },
   imagePlaceholder: {
     alignItems: 'center',
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#333',
+    backgroundColor: '#2a2430',
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',

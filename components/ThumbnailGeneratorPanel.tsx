@@ -164,7 +164,7 @@ const ThumbnailGeneratorPanel: React.FC<ThumbnailGeneratorPanelProps> = ({ onClo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#16121c',
   },
   header: {
     flexDirection: 'row',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#2a2430',
   },
   title: {
     fontSize: 20,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   noStats: {
     fontSize: 14,
-    color: '#666',
+    color: '#8a8a92',
     fontStyle: 'italic',
   },
   buttonsContainer: {

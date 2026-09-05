@@ -230,7 +230,7 @@ export default function MassMessageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(1, 0, 0, 0.95)',
+    backgroundColor: 'rgba(22, 22, 26, 0.96)',
   },
   header: {
     flexDirection: 'row',
