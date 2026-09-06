@@ -21,6 +21,16 @@ import { isSupabaseNetworkError } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+
+const LOOKUP_TIMEOUT_MS = 15000;
+
+const withLookupTimeout = <T,>(promise: Promise<T>): Promise<T> =>
+  Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('lookup_timeout')), LOOKUP_TIMEOUT_MS)
+    ),
+  ]);
 import { ICE_BACKGROUND } from '../utils/iceBackground';
 
 export default function LoginScreen() {
@@ -316,8 +326,8 @@ export default function LoginScreen() {
       
       // ПРОВЕРЯЕМ существование пользователя ПЕРЕД отправкой кода
       const existingPlayer = inputType === 'email'
-        ? await getPlayerByEmail(cleanedContact)
-        : await getPlayerByPhone(cleanedContact);
+        ? await withLookupTimeout(getPlayerByEmail(cleanedContact))
+        : await withLookupTimeout(getPlayerByPhone(cleanedContact));
         
       if (!existingPlayer) {
         setLoading(false);
@@ -338,9 +348,20 @@ export default function LoginScreen() {
         console.log('📧 Автоопределение: отправляем код на email');
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        console.log('📱 Отправляем код через Twilio Verify API');
-        await sendVerificationSMS(cleanedContact);
+        // SMS через сервер hockey-stars.com (Notificore ключ на VPS)
+        console.log('📱 Отправляем код через сервер HockeyStars');
+        const smsOk = await sendVerificationSMS(cleanedContact);
+        if (!smsOk) {
+          setAlert({
+            visible: true,
+            title: t('common.error'),
+            message:
+              t('auth.errorSendingCodeMessage') ||
+              'Не удалось отправить SMS. Закройте приложение полностью и откройте снова (нужно обновление), затем повторите.',
+            type: 'error',
+          });
+          return;
+        }
       }
 
       
@@ -359,10 +380,15 @@ export default function LoginScreen() {
       
     } catch (error) {
       console.error('❌ Ошибка отправки кода:', error);
+      const isTimeout =
+        error instanceof Error &&
+        (error.message.includes('timeout') || error.message.includes('Timeout'));
       showAuthError(
         error,
         t('auth.errorSendingCode'),
-        t('auth.errorSendingCodeMessage')
+        isTimeout
+          ? 'Сервер не ответил вовремя. Проверьте интернет и попробуйте снова.'
+          : t('auth.errorSendingCodeMessage')
       );
     } finally {
       setLoading(false);
@@ -388,8 +414,16 @@ export default function LoginScreen() {
         await saveVerificationCode(cleanedContact, verificationCode);
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        await sendVerificationSMS(cleanedContact);
+        const smsOk = await sendVerificationSMS(cleanedContact);
+        if (!smsOk) {
+          setAlert({
+            visible: true,
+            title: t('common.error'),
+            message: t('auth.errorSendingCodeMessage') || 'Не удалось отправить SMS',
+            type: 'error',
+          });
+          return;
+        }
       }
 
       // Запускаем таймер на 60 секунд

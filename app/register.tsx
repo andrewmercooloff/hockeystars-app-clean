@@ -600,9 +600,16 @@ export default function RegisterScreen() {
         console.log('📧 США/Канада - отправляем код на email');
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        console.log('📱 Отправляем код через Twilio Verify API');
-        await sendVerificationSMS(formData.phone);
+        console.log('📱 Отправляем код через сервер HockeyStars');
+        const smsOk = await sendVerificationSMS(formData.phone);
+        if (!smsOk) {
+          showAlert(
+            t('common.error'),
+            t('auth.errorSendingCodeMessage') || 'Не удалось отправить SMS. Полностью закройте приложение и откройте снова.',
+            'error'
+          );
+          return;
+        }
       }
       
       setStep('verification');
