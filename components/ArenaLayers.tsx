@@ -1,5 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import { getPerformanceLevel } from '../utils/devicePerformance';
 import Svg, {
   Defs,
   LinearGradient,
@@ -164,7 +172,7 @@ export const RinkAccent = React.memo(function RinkAccent() {
   const beam = `${-width * 0.1},${-height * 0.05} ${width * 0.42},${-height * 0.05} ${width * 1.05},${height * 0.62} ${width * 0.55},${height * 0.62}`;
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]} pointerEvents="none">
       <Svg width={width} height={height}>
         <Defs>
           {/* Brand-side tint: violet-graphite (between our red and the scout purple), not arena blue */}
@@ -182,17 +190,64 @@ export const RinkAccent = React.memo(function RinkAccent() {
             <Stop offset="50%" stopColor="#ffffff" stopOpacity="0.035" />
             <Stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </LinearGradient>
-          <RadialGradient id="starFill" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
-            <Stop offset="55%" stopColor="#fa2f40" stopOpacity="0.03" />
-            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0.01" />
-          </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
         <Polygon points={beam} fill="url(#beam)" />
-        <Path d={star} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.11} strokeWidth={2.5} strokeLinejoin="round" />
+        {/* Hollow outline like the home tab star: thick rounded stroke, nothing inside */}
+        <Path
+          d={star}
+          fill="none"
+          stroke="#fa2f40"
+          strokeOpacity={0.085}
+          strokeWidth={r * 0.085}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
       </Svg>
+      <DriftingGlow width={width} height={height} />
     </View>
+  );
+});
+
+/**
+ * Slow "living" light on content screens: one soft violet blob drifting
+ * diagonally and breathing. Transform/opacity only (GPU composite, UI thread),
+ * no per-frame JS. Skipped on low-end devices.
+ */
+const DriftingGlow = React.memo(function DriftingGlow({ width, height }: { width: number; height: number }) {
+  const enabled = getPerformanceLevel() !== 'low';
+  const t = useSharedValue(0);
+  useEffect(() => {
+    if (!enabled) return;
+    t.value = withRepeat(
+      withTiming(1, { duration: 16000, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true
+    );
+  }, [enabled, t]);
+  const size = Math.max(width, height) * 1.1;
+  const style = useAnimatedStyle(() => ({
+    opacity: 0.55 + 0.45 * t.value,
+    transform: [
+      { translateX: -size * 0.35 + width * 0.55 * t.value },
+      { translateY: -size * 0.45 + height * 0.35 * t.value },
+      { scale: 0.95 + 0.12 * t.value },
+    ],
+  }));
+  if (!enabled) return null;
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: 'absolute', width: size, height: size }, style]}>
+      <Svg width={size} height={size}>
+        <Defs>
+          <RadialGradient id="driftGlow" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+            <Stop offset="0%" stopColor="#8d7cc7" stopOpacity="0.16" />
+            <Stop offset="45%" stopColor="#8d7cc7" stopOpacity="0.06" />
+            <Stop offset="100%" stopColor="#8d7cc7" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect x="0" y="0" width={size} height={size} fill="url(#driftGlow)" />
+      </Svg>
+    </Animated.View>
   );
 });
