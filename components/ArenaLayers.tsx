@@ -130,15 +130,15 @@ export const RinkAccent = React.memo(function RinkAccent() {
             <Stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </LinearGradient>
           <RadialGradient id="starFill" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.16" />
-            <Stop offset="55%" stopColor="#fa2f40" stopOpacity="0.06" />
-            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0.02" />
+            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
+            <Stop offset="55%" stopColor="#fa2f40" stopOpacity="0.03" />
+            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0.01" />
           </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
         <Polygon points={beam} fill="url(#beam)" />
-        <Path d={star} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.24} strokeWidth={2.5} strokeLinejoin="round" />
+        <Path d={star} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.11} strokeWidth={2.5} strokeLinejoin="round" />
       </Svg>
     </View>
   );
