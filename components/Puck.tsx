@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 3,
     left: 1,
-    backgroundColor: 'rgba(10, 12, 24, 0.16)',
+    backgroundColor: 'rgba(0, 0, 0, 0.20)',
   },
   iceShadow: {
     position: 'absolute',

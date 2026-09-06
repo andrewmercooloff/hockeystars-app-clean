@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
@@ -143,7 +144,7 @@ const usePuckCollisionSystem = (
   
   // Shared values для всех позиций - обновляются напрямую без React state
   // Тип: объект с value для совместимости с useSharedValue
-  const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number } }>>(new Map());
+  const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number } }>>(new Map());
   
   // Адаптивные константы для FPS - баланс между плавностью и производительностью
   // ИСПРАВЛЕНИЕ: Увеличено до 80 FPS для максимальной плавности
@@ -1269,6 +1270,11 @@ const usePuckCollisionSystem = (
       physics.forEach(physicsPos => {
         const shared = sharedPositionsRef.current.get(physicsPos.id);
         if (shared && shared.x && shared.y) {
+          // Скорость — для следа на льду (UI-поток читает её в worklet)
+          if (shared.vx && shared.vy) {
+            shared.vx.value = physicsPos.isDragging ? 0 : physicsPos.vx;
+            shared.vy.value = physicsPos.isDragging ? 0 : physicsPos.vy;
+          }
           if (!useInterpolation) {
             shared.x.value = physicsPos.x;
             shared.y.value = physicsPos.y;
@@ -1594,8 +1600,8 @@ const usePuckCollisionSystem = (
   }, []);
 
   // Функция для регистрации shared values из компонентов
-  const registerSharedPosition = useCallback((id: string, x: { value: number }, y: { value: number }) => {
-    sharedPositionsRef.current.set(id, { x, y });
+  const registerSharedPosition = useCallback((id: string, x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number }) => {
+    sharedPositionsRef.current.set(id, { x, y, vx, vy });
   }, []);
 
   return {
@@ -1649,10 +1655,11 @@ const OriginalPuckAnimator = React.memo(({
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
   enableDrag?: boolean;
   getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
-  registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }) => void;
+  registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number }) => void;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
+  const lowEndTrail = Platform.OS === 'android' && (getAndroidPerformanceLevel?.() || 'medium') === 'low';
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0, startX: 0, startY: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
@@ -1664,18 +1671,39 @@ const OriginalPuckAnimator = React.memo(({
   // Используем useSharedValue для максимальной плавности на 120 Гц
   const animatedX = useSharedValue(position.x);
   const animatedY = useSharedValue(position.y);
+  const velX = useSharedValue(0);
+  const velY = useSharedValue(0);
   
   // Регистрируем shared values в системе коллизий для прямого обновления
   useEffect(() => {
     if (registerSharedPosition) {
-      registerSharedPosition(position.id, animatedX, animatedY);
+      registerSharedPosition(position.id, animatedX, animatedY, velX, velY);
     }
-  }, [position.id, animatedX, animatedY, registerSharedPosition]);
+  }, [position.id, animatedX, animatedY, velX, velY, registerSharedPosition]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     left: animatedX.value,
     top: animatedY.value,
   }), []);
+
+  // След на льду: снежная стружка за шайбой. Длина и яркость — от скорости,
+  // направление — против вектора движения. Всё на UI-потоке, без setState.
+  const trailLen = position.size * 2.2;
+  const trailStyle = useAnimatedStyle(() => {
+    const vx = velX.value;
+    const vy = velY.value;
+    const speed = Math.sqrt(vx * vx + vy * vy);
+    const t = Math.min(1, Math.max(0, (speed - 0.25) / 3.2));
+    const scale = 0.25 + 0.75 * t;
+    return {
+      opacity: t * 0.7,
+      transform: [
+        { rotate: `${Math.atan2(vy, vx)}rad` },
+        { translateX: -(trailLen * scale) / 2 - position.size * 0.15 },
+        { scaleX: scale },
+      ],
+    };
+  }, [trailLen, position.size]);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -1903,6 +1931,30 @@ const OriginalPuckAnimator = React.memo(({
       onTouchMove={enableDrag ? handleTouchMove : undefined}
       onTouchEnd={enableDrag ? handleTouchEnd : undefined}
     >
+      {!lowEndTrail && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.iceTrail,
+            {
+              width: trailLen,
+              height: position.size * 0.62,
+              borderRadius: position.size * 0.31,
+              left: position.size / 2 - trailLen / 2,
+              top: position.size / 2 - position.size * 0.31,
+            },
+            trailStyle,
+          ]}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.35)', 'rgba(255,255,255,0.85)']}
+            locations={[0, 0.55, 1]}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
+      )}
       <Puck
           avatar={player.avatar}
           playerId={player.id}
@@ -3147,6 +3199,10 @@ const styles = StyleSheet.create({
   puckContainer: {
     position: 'absolute',
     zIndex: 1,
+  },
+  iceTrail: {
+    position: 'absolute',
+    overflow: 'hidden',
   },
   filtersWrapper: {
     position: 'absolute',
