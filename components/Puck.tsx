@@ -124,10 +124,8 @@ const Puck: React.FC<PuckProps> = ({
         animatedStyle,
       ]}
     >
-      {/* Контакт со льдом: тень в два слоя (без CALayer/elevation — без артефактов) и тёмное ребро-цилиндр */}
-      <View pointerEvents="none" style={[styles.iceContactSoft, { width: size + 6, height: size + 6, borderRadius: (size + 6) / 2 }]} />
+      {/* Едва заметная тень на льду отдельным View (без CALayer/elevation — без артефактов) */}
       <View pointerEvents="none" style={[styles.iceContact, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
-      <View pointerEvents="none" style={[styles.puckRim, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
       <View pointerEvents="none" style={[styles.puckFace, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
       {/* Дополнительная тень на льду - отключена для производительности */}
       {/* <Animated.View style={[
@@ -296,16 +294,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // Лицевая сторона диска: чёрная резина + светлая кромка
+  // Лицевая сторона диска: чёрная резина, кромка почти чёрная (непрозрачный цвет —
+  // Fabric рисует рамку через CoreAnimation, без кадра "квадрат без скругления").
   puckFace: {
     position: 'absolute',
     top: 0,
     left: 0,
     backgroundColor: '#000000',
     borderWidth: 1.5,
-    // Непрозрачный цвет (white 75% поверх чёрного): Fabric рисует такую рамку
-    // средствами CoreAnimation, а не битмапом — без кадра "квадрат без скругления".
-    borderColor: '#bfbfbf',
+    borderColor: '#26262b',
   },
   puckTouchable: {
     width: '100%',
@@ -356,25 +353,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   // Лёгкая тень на льду (не используется в рендере, но оставлена для совместимости)
-  // Шайба лежит на льду: короткая плотная тень со смещением вниз-вправо
-  iceContactSoft: {
-    position: 'absolute',
-    top: 4,
-    left: -1,
-    backgroundColor: 'rgba(20, 24, 40, 0.16)',
-  },
+  // Лёгкая тень на льду: чуть вниз, без объёма
   iceContact: {
     position: 'absolute',
-    top: 5,
-    left: 2,
-    backgroundColor: 'rgba(10, 12, 24, 0.30)',
-  },
-  // Ребро цилиндра — 2.5 pt тёмной резины под диском
-  puckRim: {
-    position: 'absolute',
-    top: 2.5,
-    left: 0,
-    backgroundColor: '#15151a',
+    top: 3,
+    left: 1,
+    backgroundColor: 'rgba(10, 12, 24, 0.16)',
   },
   iceShadow: {
     position: 'absolute',

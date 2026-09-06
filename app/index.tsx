@@ -48,6 +48,7 @@ import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import InviteFriendsPill from '../components/InviteFriendsPill';
 import IceRinkMarkings from '../components/IceRinkMarkings';
+import { colors } from '../theme/colors';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
@@ -3115,8 +3116,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Прозрачно: под табами уже лежит лёд из _layout — нет чёрного кадра при возврате
-    backgroundColor: 'transparent',
+    // Тёмная сцена вокруг коробки — иначе скругление бортов не видно на льду из _layout
+    backgroundColor: colors.scene,
   },
   containerDesktop: {
     paddingTop: 20,
@@ -3127,11 +3128,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    borderRadius: 28,
+    borderRadius: 44, // скругление бортов хоккейной коробки
     overflow: 'hidden',
   },
   backgroundDesktop: {
-    borderRadius: 24,
+    borderRadius: 32,
   },
   innerBorder: {
     position: 'absolute',
@@ -3139,7 +3140,7 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     bottom: 8,
-    borderRadius: 28,
+    borderRadius: 38,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.22)',
   },
