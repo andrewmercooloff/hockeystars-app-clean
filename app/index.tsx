@@ -1638,6 +1638,63 @@ interface PuckPosition {
 // Импортируем оригинальный PuckAnimator из основного экрана
 // Для этого нужно создать временную копию компонента
 // Мемоизированный компонент шайбы для оптимизации производительности
+type TrailFlake = { x: number; y: number; born: number; angle: number; strength: number };
+const TRAIL_FLAKES = 7;
+const TRAIL_LIFE_MS = 1050;
+
+/**
+ * Одно пятно снежной пыли. Живёт в мировых координатах льда, поэтому внутри
+ * движущегося контейнера шайбы позиция пересчитывается относительно неё.
+ */
+const TrailFlakeView = React.memo(({
+  index,
+  flakes,
+  clock,
+  puckX,
+  puckY,
+  size,
+}: {
+  index: number;
+  flakes: { value: TrailFlake[] };
+  clock: { value: number };
+  puckX: { value: number };
+  puckY: { value: number };
+  size: number;
+}) => {
+  const w = size * 0.56;
+  const h = size * 0.26;
+  const style = useAnimatedStyle(() => {
+    const f = flakes.value[index];
+    const age = (clock.value - f.born) / TRAIL_LIFE_MS;
+    if (age < 0 || age >= 1 || f.strength <= 0) {
+      return { opacity: 0, transform: [{ translateX: -9999 }] };
+    }
+    // Быстро проявляется, потом медленно тает; пыль слегка расплывается и оседает.
+    const life = 1 - age;
+    const opacity = f.strength * 0.34 * life * life * Math.min(1, age * 6 + 0.35);
+    const spread = 0.85 + age * 0.55;
+    return {
+      opacity,
+      transform: [
+        { translateX: f.x - puckX.value - w / 2 },
+        { translateY: f.y - puckY.value - h / 2 },
+        { rotate: `${f.angle}rad` },
+        { scaleX: spread },
+        { scaleY: 0.7 + spread * 0.3 },
+      ],
+    };
+  }, [index, w, h]);
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.trailFlake, { width: w, height: h, borderRadius: h / 2 }, style]}
+    >
+      <View style={[styles.trailFlakeCore, { width: w * 0.62, height: h * 0.55, borderRadius: h / 2 }]} />
+    </Animated.View>
+  );
+});
+TrailFlakeView.displayName = 'TrailFlakeView';
+
 const OriginalPuckAnimator = React.memo(({
   player,
   position,
@@ -1688,48 +1745,45 @@ const OriginalPuckAnimator = React.memo(({
     top: animatedY.value,
   }), []);
 
-  // След на льду: снежная стружка за шайбой. Интенсивность не берётся напрямую
-  // из скорости, а «догоняет» её: вспыхивает быстро, а гаснет медленно —
-  // стружка как бы замерзает и растворяется, а не обрывается вместе с движением.
-  const trailLen = position.size * 2.2;
-  const trailT = useSharedValue(0);
-  const trailAngle = useSharedValue(0);
-  const trailFrozen = useSharedValue(1); // 1 — свежий след, 0 — «замёрз» и растаял
+  // Следы на льду: шайба не тянет за собой «луч», а оставляет позади себя
+  // отдельные пятна снежной пыли на тех местах, где она реально прошла.
+  // Пятна лежат на льду (мировые координаты), расплываются и тают за ~1 с.
+  const flakeCount = lowEndTrail ? 0 : TRAIL_FLAKES;
+  const flakes = useSharedValue<TrailFlake[]>(
+    Array.from({ length: TRAIL_FLAKES }, () => ({ x: 0, y: 0, born: -1e9, angle: 0, strength: 0 }))
+  );
+  const trailClock = useSharedValue(0);
+  const lastEmitRef = useSharedValue(0);
+  const emitIndexRef = useSharedValue(0);
   useFrameCallback((frame) => {
-    if (lowEndTrail) return;
-    const dt = Math.min(64, frame.timeSincePreviousFrame ?? 16) / 16.67;
+    const now = frame.timestamp;
+    trailClock.value = now;
     const vx = velX.value;
     const vy = velY.value;
     const speed = Math.sqrt(vx * vx + vy * vy);
-    const target = Math.min(1, Math.max(0, (speed - 0.25) / 3.2));
-    const cur = trailT.value;
-    if (target > cur) {
-      trailT.value = cur + (target - cur) * Math.min(1, 0.32 * dt);
-      trailFrozen.value = 1;
-      if (speed > 0.15) trailAngle.value = Math.atan2(vy, vx);
-    } else {
-      // ~1.2 c до полного исчезновения при остановке
-      trailT.value = Math.max(0, cur - 0.014 * dt);
-      trailFrozen.value = Math.max(0, trailFrozen.value - 0.02 * dt);
-    }
-  }, !lowEndTrail);
-
-  const trailStyle = useAnimatedStyle(() => {
-    const t = trailT.value;
-    const frozen = trailFrozen.value;
-    const scale = 0.25 + 0.75 * t;
-    // При замерзании след чуть сжимается к шайбе и гаснет по мягкой кривой.
-    const fade = Math.pow(t, 1.4) * (0.45 + 0.55 * frozen);
-    return {
-      opacity: fade * 0.7,
-      transform: [
-        { rotate: `${trailAngle.value}rad` },
-        { translateX: -(trailLen * scale) / 2 - position.size * 0.15 },
-        { scaleX: scale },
-        { scaleY: 0.7 + 0.3 * frozen },
-      ],
-    };
-  }, [trailLen, position.size]);
+    if (speed < 0.35) return;
+    // Чем быстрее, тем чаще ложится пыль (плотнее след).
+    const interval = Math.max(55, 130 - speed * 18);
+    if (now - lastEmitRef.value < interval) return;
+    lastEmitRef.value = now;
+    const idx = emitIndexRef.value;
+    emitIndexRef.value = (idx + 1) % TRAIL_FLAKES;
+    const half = position.size / 2;
+    const back = half * 0.55;
+    const nx = vx / speed;
+    const ny = vy / speed;
+    flakes.modify((arr) => {
+      'worklet';
+      arr[idx] = {
+        x: animatedX.value + half - nx * back,
+        y: animatedY.value + half - ny * back,
+        born: now,
+        angle: Math.atan2(vy, vx),
+        strength: Math.min(1, (speed - 0.25) / 3),
+      };
+      return arr;
+    });
+  }, flakeCount > 0);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -1957,30 +2011,17 @@ const OriginalPuckAnimator = React.memo(({
       onTouchMove={enableDrag ? handleTouchMove : undefined}
       onTouchEnd={enableDrag ? handleTouchEnd : undefined}
     >
-      {!lowEndTrail && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.iceTrail,
-            {
-              width: trailLen,
-              height: position.size * 0.62,
-              borderRadius: position.size * 0.31,
-              left: position.size / 2 - trailLen / 2,
-              top: position.size / 2 - position.size * 0.31,
-            },
-            trailStyle,
-          ]}
-        >
-          <LinearGradient
-            colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.35)', 'rgba(255,255,255,0.85)']}
-            locations={[0, 0.55, 1]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={StyleSheet.absoluteFill}
-          />
-        </Animated.View>
-      )}
+      {Array.from({ length: flakeCount }, (_, i) => (
+        <TrailFlakeView
+          key={i}
+          index={i}
+          flakes={flakes}
+          clock={trailClock}
+          puckX={animatedX}
+          puckY={animatedY}
+          size={position.size}
+        />
+      ))}
       <Puck
           avatar={player.avatar}
           playerId={player.id}
@@ -3261,9 +3302,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 1,
   },
-  iceTrail: {
+  trailFlake: {
     position: 'absolute',
-    overflow: 'hidden',
+    left: 0,
+    top: 0,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trailFlakeCore: {
+    backgroundColor: 'rgba(255,255,255,0.75)',
   },
   filtersWrapper: {
     position: 'absolute',
