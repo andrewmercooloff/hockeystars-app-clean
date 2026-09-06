@@ -1740,9 +1740,28 @@ const OriginalPuckAnimator = React.memo(({
     }
   }, [position.id, animatedX, animatedY, velX, velY, registerSharedPosition]);
 
+  // Шайба проявляется только с уже декодированным аватаром — при смене фильтров
+  // новые шайбы не выскакивают чёрными дисками. Предохранитель на медленной сети.
+  const puckReveal = useSharedValue(0);
+  const revealedRef = useRef(false);
+  const revealPuck = useCallback(() => {
+    if (revealedRef.current) return;
+    revealedRef.current = true;
+    puckReveal.value = withTiming(1, { duration: 260, easing: ReEasing.out(ReEasing.cubic) });
+  }, [puckReveal]);
+  useEffect(() => {
+    const timeout = setTimeout(revealPuck, 1200);
+    return () => clearTimeout(timeout);
+  }, [revealPuck]);
+  const handleAvatarReady = useCallback(() => {
+    revealPuck();
+    onAvatarReady?.(player.id);
+  }, [revealPuck, onAvatarReady, player.id]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     left: animatedX.value,
     top: animatedY.value,
+    opacity: puckReveal.value,
   }), []);
 
   // Следы на льду: шайба не тянет за собой «луч», а оставляет позади себя
@@ -2041,7 +2060,7 @@ const OriginalPuckAnimator = React.memo(({
           leaderRank={leaderRank}
           isOnline={player.isOnline}
           isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
-          onAvatarReady={onAvatarReady ? () => onAvatarReady(player.id) : undefined}
+          onAvatarReady={handleAvatarReady}
         />
     </Animated.View>
   );
