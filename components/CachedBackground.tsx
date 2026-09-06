@@ -35,7 +35,7 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
       <View style={[styles.container, styles.plain, style]} onLayout={onLayout}>
         <LinearGradient
           pointerEvents="none"
-          colors={['#171319', '#0d0d10', '#08080a']}
+          colors={['#14131a', '#0c0c10', '#0e0709']}
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
         />

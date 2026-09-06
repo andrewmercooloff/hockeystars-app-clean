@@ -177,13 +177,13 @@ export const RinkAccent = React.memo(function RinkAccent() {
         <Defs>
           {/* Brand-side tint: violet-graphite (between our red and the scout purple), not arena blue */}
           <RadialGradient id="arenaLight" cx="50%" cy="0%" r="85%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#6e3a55" stopOpacity="0.15" />
-            <Stop offset="60%" stopColor="#6e3a55" stopOpacity="0.03" />
-            <Stop offset="100%" stopColor="#6e3a55" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#4a4560" stopOpacity="0.16" />
+            <Stop offset="60%" stopColor="#4a4560" stopOpacity="0.04" />
+            <Stop offset="100%" stopColor="#4a4560" stopOpacity="0" />
           </RadialGradient>
           <RadialGradient id="arenaWarm" cx="8%" cy="100%" r="60%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
-            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#8a1e2c" stopOpacity="0.10" />
+            <Stop offset="100%" stopColor="#8a1e2c" stopOpacity="0" />
           </RadialGradient>
           <LinearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
             <Stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
@@ -241,9 +241,9 @@ const DriftingGlow = React.memo(function DriftingGlow({ width, height }: { width
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id="driftGlow" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#a04a62" stopOpacity="0.16" />
-            <Stop offset="45%" stopColor="#a04a62" stopOpacity="0.06" />
-            <Stop offset="100%" stopColor="#a04a62" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#3b4a5c" stopOpacity="0.14" />
+            <Stop offset="45%" stopColor="#3b4a5c" stopOpacity="0.06" />
+            <Stop offset="100%" stopColor="#3b4a5c" stopOpacity="0" />
           </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width={size} height={size} fill="url(#driftGlow)" />
