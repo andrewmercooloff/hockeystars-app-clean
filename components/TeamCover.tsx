@@ -182,18 +182,33 @@ const TeamCover: React.FC<Props> = ({
       )}
 
       {showTeamName && (
-        <View style={[StyleSheet.absoluteFill, { top: -NAME_LINE * 0.35 }]} pointerEvents="none">
-          {nameRows.map((row) => (
-            <Text
-              key={row.key}
-              style={[styles.nameRow, { marginLeft: row.shift }]}
-              numberOfLines={1}
-              ellipsizeMode="clip"
-            >
-              {row.text}
-            </Text>
-          ))}
-        </View>
+        <>
+          {/* Wine-red wordmark rows: brand red pulled deep into the dark base, no "newsprint" white */}
+          <View style={[StyleSheet.absoluteFill, { top: -NAME_LINE * 0.35 }]} pointerEvents="none">
+            {nameRows.map((row, i) => (
+              <Text
+                key={row.key}
+                style={[
+                  styles.nameRow,
+                  { marginLeft: row.shift, color: i % 2 ? NAME_COLOR_ALT : NAME_COLOR },
+                ]}
+                numberOfLines={1}
+                ellipsizeMode="clip"
+              >
+                {row.text}
+              </Text>
+            ))}
+          </View>
+          {/* diagonal light: rows glow top-left and sink into the graphite toward bottom-right */}
+          <LinearGradient
+            colors={['rgba(250,47,64,0.10)', 'rgba(20,19,25,0)', 'rgba(15,14,18,0.55)']}
+            locations={[0, 0.45, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
+        </>
       )}
 
       {coverOk !== false && (
@@ -249,6 +264,9 @@ const TeamCover: React.FC<Props> = ({
 };
 
 const NAME_FONT = 30;
+/** Deep wine on graphite; alternate rows a touch darker for a woven, non-flat texture. */
+const NAME_COLOR = 'rgba(250,47,64,0.30)';
+const NAME_COLOR_ALT = 'rgba(190,30,48,0.26)';
 const NAME_LINE = 38;
 const NAME_GAP = 3 * NAME_FONT * 0.3;
 
@@ -274,9 +292,7 @@ const styles = StyleSheet.create({
     lineHeight: NAME_LINE,
     fontFamily: 'Gilroy-Bold',
     fontSize: NAME_FONT,
-    letterSpacing: 1.5,
-    color: '#ffffff',
-    opacity: 0.11,
+    letterSpacing: 2.5,
   },
   actions: {
     position: 'absolute',
