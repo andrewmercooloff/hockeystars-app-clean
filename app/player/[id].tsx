@@ -48,6 +48,8 @@ import AchievementsSection from '../../components/AchievementsSection';
 import ActivityRating from '../../components/ActivityRating';
 import SeasonStatsHeader from '../../components/SeasonStatsHeader';
 import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
+import TeamCover from '../../components/TeamCover';
+import { removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
@@ -2204,6 +2206,84 @@ export default function PlayerProfile() {
         }
       ]
     );
+  };
+
+  // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
+  const [coverRefresh, setCoverRefresh] = useState(0);
+  const [coverWidth, setCoverWidth] = useState(0);
+  const coverTeam = useMemo(() => {
+    const primary = playerTeams[0];
+    if (!primary) return null;
+    const key = `teams.${primary.teamName}`;
+    const translated = t(key);
+    const name = translated === key || translated.startsWith('teams.') ? primary.teamName : translated;
+    return { teamId: primary.id, teamName: name };
+  }, [playerTeams, t]);
+
+  const pickAssetImage = async (aspect?: [number, number]): Promise<string | null> => {
+    if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showCustomAlert(t('common.error'), 'Нет доступа к галерее', 'error');
+        return null;
+      }
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: !!aspect,
+      aspect,
+      quality: 0.9,
+    });
+    if (result.canceled || !result.assets[0]) return null;
+    return result.assets[0].uri;
+  };
+
+  const handlePickCover = async () => {
+    if (!player) return;
+    try {
+      const uri = await pickAssetImage([16, 7]);
+      if (!uri) return;
+      const url = await uploadPlayerCover(uri, player.id);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+    } catch (e) {
+      console.error('cover upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
+  };
+
+  const handleRemoveCover = () => {
+    if (!player) return;
+    showCustomAlert(
+      t('profile.removeCover'),
+      '',
+      'warning',
+      async () => {
+        const ok = await removePlayerCover(player.id);
+        if (ok) setCoverRefresh((n) => n + 1);
+      },
+      true
+    );
+  };
+
+  const handlePickTeamLogo = async () => {
+    if (!coverTeam) return;
+    try {
+      const uri = await pickAssetImage();
+      if (!uri) return;
+      const url = await uploadTeamLogo(uri, coverTeam.teamId);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+      showCustomAlert(t('common.success'), t('profile.teamLogoUpdated'), 'success');
+    } catch (e) {
+      console.error('team logo upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
   };
 
   const pickFromGallery = async () => {
@@ -5238,7 +5318,27 @@ export default function PlayerProfile() {
 
             </View>
 
-
+            {/* Клубная обложка под аватаром */}
+            {player && (
+              <View
+                style={[styles.coverWrap, isDesktop && styles.coverWrapDesktop]}
+                onLayout={(e) => setCoverWidth(e.nativeEvent.layout.width)}
+              >
+                {coverWidth > 0 && (
+                  <TeamCover
+                    playerId={player.id}
+                    team={coverTeam}
+                    width={coverWidth - (isDesktop ? 48 : 32)}
+                    refreshKey={coverRefresh}
+                    canEditCover={!!isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                    canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
+                    onPickCover={handlePickCover}
+                    onRemoveCover={handleRemoveCover}
+                    onPickTeamLogo={handlePickTeamLogo}
+                  />
+                )}
+              </View>
+            )}
 
             {/* Если пользователь заблокирован - показываем только основную информацию и сообщение */}
             {isUserBlockedState && currentUser && currentUser.id !== player.id ? (
@@ -8781,6 +8881,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 20,
     position: 'relative',
+  },
+  coverWrap: {
+    marginTop: -14,
+    marginBottom: 22,
+    paddingHorizontal: 16,
+  },
+  coverWrapDesktop: {
+    paddingHorizontal: 24,
+    marginTop: -2,
   },
   avatarContainer: {
     position: 'relative',

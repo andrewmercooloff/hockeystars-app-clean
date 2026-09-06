@@ -3323,7 +3323,15 @@
     "city": "Город",
     "addAddress": "Добавить адрес",
     "addressesHint": "Можно указать несколько адресов",
-    "previousSeason": "Прошлый сезон"
+    "previousSeason": "Прошлый сезон",
+    "cover": "Обложка",
+    "changeCover": "Сменить обложку",
+    "removeCover": "Убрать обложку",
+    "teamLogo": "Лого команды",
+    "uploadTeamLogo": "Загрузить лого",
+    "coverUpdated": "Обложка обновлена",
+    "teamLogoUpdated": "Логотип команды обновлён",
+    "coverUploadFailed": "Не удалось загрузить изображение"
   },
   "register": {
     "title": "Регистрация",

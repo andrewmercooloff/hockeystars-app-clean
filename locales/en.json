@@ -3559,7 +3559,15 @@
     "city": "City",
     "addAddress": "Add address",
     "addressesHint": "You can add several addresses",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Cover",
+    "changeCover": "Change cover",
+    "removeCover": "Remove cover",
+    "teamLogo": "Team logo",
+    "uploadTeamLogo": "Upload logo",
+    "coverUpdated": "Cover updated",
+    "teamLogoUpdated": "Team logo updated",
+    "coverUploadFailed": "Could not upload the image"
   },
   "register": {
     "title": "Registration",
