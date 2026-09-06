@@ -197,6 +197,9 @@ const VIDEO_EDIT_GRID_COLUMNS = 3;
 const VIDEO_EDIT_GRID_GAP = 10;
 // scroll padding (20×2) + section padding (20×2) + section border (2×2)
 const VIDEO_EDIT_SECTION_INSET = 84;
+/** Высота клубной шапки за аватаром (телефон / десктоп). */
+const COVER_HEIGHT = 168;
+const COVER_HEIGHT_DESKTOP = 132;
 
 
 export default function PlayerProfile() {
@@ -2210,7 +2213,6 @@ export default function PlayerProfile() {
 
   // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
   const [coverRefresh, setCoverRefresh] = useState(0);
-  const [coverWidth, setCoverWidth] = useState(0);
   const coverTeam = useMemo(() => {
     const primary = playerTeams[0];
     if (!primary) return null;
@@ -4956,7 +4958,22 @@ export default function PlayerProfile() {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <View pointerEvents="box-none" style={isDesktop ? styles.desktopContentWrap : undefined}>
             {/* Фото и основная информация */}
-            <View style={[styles.profileSection, isDesktop && styles.profileSectionDesktop]}>
+            <View style={[styles.profileSection, isDesktop ? [styles.profileSectionDesktop, styles.profileSectionDesktopWithCover] : styles.profileSectionWithCover]}>
+              {/* Клубная шапка за аватаром: свой ковер → эмблема команды → бренд */}
+              {player && (
+                <TeamCover
+                  playerId={player.id}
+                  team={coverTeam}
+                  height={isDesktop ? COVER_HEIGHT_DESKTOP : COVER_HEIGHT}
+                  style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
+                  refreshKey={coverRefresh}
+                  canEditCover={!!isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                  canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
+                  onPickCover={handlePickCover}
+                  onRemoveCover={handleRemoveCover}
+                  onPickTeamLogo={handlePickTeamLogo}
+                />
+              )}
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
@@ -5317,28 +5334,6 @@ export default function PlayerProfile() {
               )}
 
             </View>
-
-            {/* Клубная обложка под аватаром */}
-            {player && (
-              <View
-                style={[styles.coverWrap, isDesktop && styles.coverWrapDesktop]}
-                onLayout={(e) => setCoverWidth(e.nativeEvent.layout.width)}
-              >
-                {coverWidth > 0 && (
-                  <TeamCover
-                    playerId={player.id}
-                    team={coverTeam}
-                    width={coverWidth - (isDesktop ? 48 : 32)}
-                    refreshKey={coverRefresh}
-                    canEditCover={!!isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
-                    canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
-                    onPickCover={handlePickCover}
-                    onRemoveCover={handleRemoveCover}
-                    onPickTeamLogo={handlePickTeamLogo}
-                  />
-                )}
-              </View>
-            )}
 
             {/* Если пользователь заблокирован - показываем только основную информацию и сообщение */}
             {isUserBlockedState && currentUser && currentUser.id !== player.id ? (
@@ -8882,14 +8877,30 @@ const styles = StyleSheet.create({
     marginTop: 20,
     position: 'relative',
   },
-  coverWrap: {
-    marginTop: -14,
-    marginBottom: 22,
-    paddingHorizontal: 16,
+  // Шапка стартует у верха контента (paddingTop скролла 48) и уходит за края
+  // горизонтального паддинга 20; аватар (120) садится центром на её нижний край.
+  profileSectionWithCover: {
+    paddingTop: COVER_HEIGHT - 20 - 60,
   },
-  coverWrapDesktop: {
-    paddingHorizontal: 24,
-    marginTop: -2,
+  coverBand: {
+    position: 'absolute',
+    top: -20,
+    left: -20,
+    right: -20,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+  },
+  profileSectionDesktopWithCover: {
+    paddingTop: COVER_HEIGHT_DESKTOP + 16,
+    overflow: 'hidden',
+  },
+  coverBandDesktop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
   avatarContainer: {
     position: 'relative',
