@@ -121,10 +121,14 @@ const Puck: React.FC<PuckProps> = ({
           height: size,
           borderRadius: dimensions.borderRadius,
         },
-        Platform.OS === 'android' && denseScene ? { elevation: 2 } : null,
         animatedStyle,
       ]}
     >
+      {/* Контакт со льдом: тень в два слоя (без CALayer/elevation — без артефактов) и тёмное ребро-цилиндр */}
+      <View pointerEvents="none" style={[styles.iceContactSoft, { width: size + 6, height: size + 6, borderRadius: (size + 6) / 2 }]} />
+      <View pointerEvents="none" style={[styles.iceContact, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
+      <View pointerEvents="none" style={[styles.puckRim, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
+      <View pointerEvents="none" style={[styles.puckFace, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
       {/* Дополнительная тень на льду - отключена для производительности */}
       {/* <Animated.View style={[
         styles.iceShadow,
@@ -280,39 +284,27 @@ const Puck: React.FC<PuckProps> = ({
 const styles = StyleSheet.create({
   puck: {
     position: 'absolute',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      // iOS: без CALayer-тени. Тень на слое без готового shadowPath рисуется
-      // прямоугольником на первых кадрах после монтирования (серые "полосы").
-      android: {
-        // elevation аппаратно ускорен на Android
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
-      },
-    }),
-    borderWidth: 1.5,
-    // Непрозрачный цвет (white 75% поверх чёрного): Fabric рисует такую рамку
-    // средствами CoreAnimation, а не битмапом — без кадра "квадрат без скругления".
-    borderColor: '#bfbfbf',
+    // Без CALayer-тени и без elevation: обе рисуются прямоугольником на первых
+    // кадрах после монтирования (серые/чёрные "полосы"). Тень — отдельными View.
   },
   starPuck: {
     position: 'absolute',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
-      },
-    }),
+  },
+  // Лицевая сторона диска: чёрная резина + светлая кромка
+  puckFace: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: '#000000',
     borderWidth: 1.5,
+    // Непрозрачный цвет (white 75% поверх чёрного): Fabric рисует такую рамку
+    // средствами CoreAnimation, а не битмапом — без кадра "квадрат без скругления".
     borderColor: '#bfbfbf',
   },
   puckTouchable: {
@@ -364,6 +356,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   // Лёгкая тень на льду (не используется в рендере, но оставлена для совместимости)
+  // Шайба лежит на льду: короткая плотная тень со смещением вниз-вправо
+  iceContactSoft: {
+    position: 'absolute',
+    top: 4,
+    left: -1,
+    backgroundColor: 'rgba(20, 24, 40, 0.16)',
+  },
+  iceContact: {
+    position: 'absolute',
+    top: 5,
+    left: 2,
+    backgroundColor: 'rgba(10, 12, 24, 0.30)',
+  },
+  // Ребро цилиндра — 2.5 pt тёмной резины под диском
+  puckRim: {
+    position: 'absolute',
+    top: 2.5,
+    left: 0,
+    backgroundColor: '#15151a',
+  },
   iceShadow: {
     position: 'absolute',
     bottom: -8,

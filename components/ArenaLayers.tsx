@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Svg, {
   Defs,
@@ -66,8 +66,50 @@ export const starPoints = (cx: number, cy: number, r: number, rotationDeg = 0): 
  * we only add what a real arena adds: a cool spotlight from above and a
  * faint warm brand reflection low on the surface. No darkening.
  */
+/** Deterministic skate marks: long shallow arcs, a few sharp stop-cuts. Seeded, so the sheet is stable between renders. */
+const skateMarks = (width: number, height: number): { d: string; w: number; o: number; dark: boolean }[] => {
+  let seed = 7;
+  const rnd = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+  const out: { d: string; w: number; o: number; dark: boolean }[] = [];
+  for (let i = 0; i < 22; i++) {
+    const x0 = rnd() * width;
+    const y0 = height * 0.12 + rnd() * height * 0.8;
+    const len = width * (0.35 + rnd() * 0.75);
+    const ang = -0.9 + rnd() * 1.8;
+    const bend = (rnd() - 0.5) * len * 0.35;
+    const x1 = x0 + Math.cos(ang) * len;
+    const y1 = y0 + Math.sin(ang) * len;
+    const cx = (x0 + x1) / 2 - Math.sin(ang) * bend;
+    const cy = (y0 + y1) / 2 + Math.cos(ang) * bend;
+    out.push({
+      d: `M ${x0.toFixed(1)} ${y0.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`,
+      w: 0.8 + rnd() * 0.9,
+      o: 0.10 + rnd() * 0.16,
+      dark: rnd() < 0.3,
+    });
+  }
+  // stop-cuts: short, bright, slightly wider
+  for (let i = 0; i < 6; i++) {
+    const x0 = rnd() * width;
+    const y0 = height * 0.2 + rnd() * height * 0.65;
+    const ang = -0.6 + rnd() * 1.2;
+    const len = 24 + rnd() * 40;
+    out.push({
+      d: `M ${x0.toFixed(1)} ${y0.toFixed(1)} l ${(Math.cos(ang) * len).toFixed(1)} ${(Math.sin(ang) * len).toFixed(1)}`,
+      w: 1.4 + rnd() * 0.8,
+      o: 0.22 + rnd() * 0.16,
+      dark: false,
+    });
+  }
+  return out;
+};
+
 export const IceLighting = React.memo(function IceLighting() {
   const { width, height } = useWindowDimensions();
+  const marks = useMemo(() => skateMarks(width, height), [width, height]);
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Svg width={width} height={height}>
@@ -88,6 +130,17 @@ export const IceLighting = React.memo(function IceLighting() {
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#iceDepth)" />
+        {marks.map((m, i) => (
+          <Path
+            key={i}
+            d={m.d}
+            stroke={m.dark ? '#5a6486' : '#ffffff'}
+            strokeOpacity={m.dark ? m.o * 0.5 : m.o}
+            strokeWidth={m.w}
+            strokeLinecap="round"
+            fill="none"
+          />
+        ))}
         <Rect x="0" y="0" width={width} height={height} fill="url(#iceSpot)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#iceWarm)" />
       </Svg>
