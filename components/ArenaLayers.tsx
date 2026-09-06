@@ -31,9 +31,9 @@ export const IceLighting = React.memo(function IceLighting() {
             <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0" />
           </RadialGradient>
           <LinearGradient id="iceDepth" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#8fb6d6" stopOpacity="0" />
-            <Stop offset="70%" stopColor="#8fb6d6" stopOpacity="0" />
-            <Stop offset="100%" stopColor="#6f9cc4" stopOpacity="0.14" />
+            <Stop offset="0%" stopColor="#8d86b8" stopOpacity="0" />
+            <Stop offset="70%" stopColor="#8d86b8" stopOpacity="0" />
+            <Stop offset="100%" stopColor="#7d74b0" stopOpacity="0.10" />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#iceDepth)" />
@@ -60,22 +60,28 @@ export const RinkAccent = React.memo(function RinkAccent() {
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Svg width={width} height={height}>
         <Defs>
+          {/* Brand-side tint: violet-graphite (between our red and the scout purple), not arena blue */}
           <RadialGradient id="arenaLight" cx="50%" cy="0%" r="85%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#5d7fa8" stopOpacity="0.16" />
-            <Stop offset="60%" stopColor="#5d7fa8" stopOpacity="0.03" />
-            <Stop offset="100%" stopColor="#5d7fa8" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#7b5ea8" stopOpacity="0.15" />
+            <Stop offset="60%" stopColor="#7b5ea8" stopOpacity="0.03" />
+            <Stop offset="100%" stopColor="#7b5ea8" stopOpacity="0" />
           </RadialGradient>
-          <LinearGradient id="blueLine" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0%" stopColor="#3f7bd6" stopOpacity="0" />
-            <Stop offset="25%" stopColor="#3f7bd6" stopOpacity="0.16" />
-            <Stop offset="75%" stopColor="#3f7bd6" stopOpacity="0.16" />
-            <Stop offset="100%" stopColor="#3f7bd6" stopOpacity="0" />
+          <RadialGradient id="arenaWarm" cx="8%" cy="100%" r="60%" gradientUnits="objectBoundingBox">
+            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
+            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0" />
+          </RadialGradient>
+          <LinearGradient id="accentLine" x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0%" stopColor="#a78bfa" stopOpacity="0" />
+            <Stop offset="25%" stopColor="#a78bfa" stopOpacity="0.13" />
+            <Stop offset="75%" stopColor="#a78bfa" stopOpacity="0.13" />
+            <Stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
-        <Circle cx={cx} cy={cy} r={r} stroke="#fa2f40" strokeOpacity={0.075} strokeWidth={2.5} fill="none" />
-        <Circle cx={cx} cy={cy} r={r * 0.94} stroke="#fa2f40" strokeOpacity={0.03} strokeWidth={1} fill="none" />
-        <Line x1={0} y1={blueY} x2={width} y2={blueY} stroke="url(#blueLine)" strokeWidth={3} />
+        <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
+        <Circle cx={cx} cy={cy} r={r} stroke="#fa2f40" strokeOpacity={0.085} strokeWidth={2.5} fill="none" />
+        <Circle cx={cx} cy={cy} r={r * 0.94} stroke="#fa2f40" strokeOpacity={0.035} strokeWidth={1} fill="none" />
+        <Line x1={0} y1={blueY} x2={width} y2={blueY} stroke="url(#accentLine)" strokeWidth={3} />
       </Svg>
     </View>
   );
