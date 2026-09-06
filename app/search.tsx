@@ -985,9 +985,7 @@ export default function SearchScreen() {
   const svOptions = useMemo(() => {
     const hasGoalkeepersWithSV = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.shots || !p.saves) return false;
-      const shotsNum = parseInt(p.shots) || 0;
-      return shotsNum > 0;
+      return (getAllTimeBlock(p).shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithSV) return [];
@@ -1008,9 +1006,8 @@ export default function SearchScreen() {
   const gaaOptions = useMemo(() => {
     const hasGoalkeepersWithGAA = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.minutes || !p.shots || !p.saves) return false;
-      const minutesNum = parseInt(p.minutes) || 0;
-      return minutesNum > 0;
+      const total = getAllTimeBlock(p);
+      return (total.minutes ?? 0) > 0 && (total.shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithGAA) return [];
