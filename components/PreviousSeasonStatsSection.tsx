@@ -42,8 +42,12 @@ const FIELD_LABELS: Record<string, string> = {
 function StatPill({ value, label }: { value: string; label: string }) {
   return (
     <View style={styles.pill}>
-      <Text style={styles.pillValue}>{value}</Text>
-      <Text style={styles.pillLabel}>{label}</Text>
+      <Text style={styles.pillValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+        {value}
+      </Text>
+      <Text style={styles.pillLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -219,28 +223,30 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.06)',
   },
+  // Single compact row: pills share width equally, never wrap.
   pillsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    flexWrap: 'nowrap',
+    gap: 6,
     paddingTop: 10,
   },
   pill: {
-    minWidth: 68,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 12,
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: 4,
+    paddingVertical: 7,
+    borderRadius: 10,
     backgroundColor: 'rgba(0,0,0,0.22)',
     alignItems: 'center',
   },
   pillValue: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
   },
   pillLabel: {
     marginTop: 2,
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: 'Gilroy-Regular',
     color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
