@@ -51,7 +51,7 @@ import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSect
 import AllTimeStatsSection from '../../components/AllTimeStatsSection';
 import TeamCover from '../../components/TeamCover';
 import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
-import { removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
+import { prefetchPlayerCover, prefetchTeamLogo, removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
@@ -2222,6 +2222,16 @@ export default function PlayerProfile() {
     const name = translated === key || translated.startsWith('teams.') ? primary.teamName : translated;
     return { teamId: primary.id, teamName: name };
   }, [playerTeams, t]);
+
+  // Греем обложку сразу по id из маршрута — параллельно с загрузкой профиля,
+  // а эмблему — как только известна команда. 404 запоминается, фолбэк не ждёт сеть.
+  useEffect(() => {
+    const pid = Array.isArray(routeIdParam) ? routeIdParam[0] : routeIdParam;
+    if (pid) void prefetchPlayerCover(String(pid));
+  }, [routeIdParam]);
+  useEffect(() => {
+    if (coverTeam) void prefetchTeamLogo(coverTeam.teamId);
+  }, [coverTeam?.teamId]);
 
   const pickAssetImage = async (aspect?: [number, number]): Promise<CoverSource | null> => {
     if (!(Platform.OS === 'android' && Platform.Version >= 33)) {

@@ -217,7 +217,7 @@ const TeamCover: React.FC<Props> = ({
           style={[StyleSheet.absoluteFill, { opacity: coverOk ? 1 : 0 }]}
           contentFit="cover"
           cachePolicy="memory-disk"
-          transition={250}
+          transition={120}
           onError={() => {
             markAssetMissing(coverUrl);
             setCoverOk(false);
