@@ -3681,7 +3681,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "очков",
     "allCountries": "Все страны",
-    "allYears": "Все года"
+    "allYears": "Все года",
+    "filters": "Фильтры"
   },
   "messages": {
     "title": "Сообщения",

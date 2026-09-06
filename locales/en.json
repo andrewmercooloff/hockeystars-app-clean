@@ -3924,7 +3924,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "points",
     "allCountries": "All countries",
-    "allYears": "All years"
+    "allYears": "All years",
+    "filters": "Filters"
   },
   "messages": {
     "title": "Messages",
