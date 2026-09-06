@@ -76,17 +76,49 @@ const GamePuckFace: React.FC<{ kind: Kind; size: number }> = ({ kind, size }) =>
           </>
         ) : (
           <>
-            {/* Question mark drawn as a stroke, dot replaced by a tiny brand star */}
-            <Path
-              d={`M ${cx - glyphR * 0.62} ${glyphY - glyphR * 0.45}
-                  a ${glyphR * 0.62} ${glyphR * 0.62} 0 1 1 ${glyphR * 1.05} ${glyphR * 0.5}
-                  q ${-glyphR * 0.45} ${glyphR * 0.25} ${-glyphR * 0.45} ${glyphR * 0.7}`}
-              stroke="#ffffff"
-              strokeWidth={Math.max(1.8, s * 0.034)}
-              strokeLinecap="round"
-              fill="none"
-            />
-            <Polygon points={starPoints(cx, glyphY + glyphR * 1.15, s * 0.05, 0)} fill={c1} />
+            {/* Schematic of the quiz logo: a wheel of sticks radiating from the centre,
+                blades on the outer ends, four diamonds on the ring like the original. */}
+            {Array.from({ length: 8 }, (_, i) => {
+              const a = (i * Math.PI) / 4 + Math.PI / 8;
+              const r0 = glyphR * 0.28;
+              const r1 = glyphR * 1.08;
+              const x0 = cx + r0 * Math.cos(a);
+              const y0 = glyphY + r0 * Math.sin(a);
+              const x1 = cx + r1 * Math.cos(a);
+              const y1 = glyphY + r1 * Math.sin(a);
+              // blade: short hook turning ~70° off the shaft
+              const b = a + 1.22;
+              const bl = glyphR * 0.36;
+              const x2 = x1 + bl * Math.cos(b);
+              const y2 = y1 + bl * Math.sin(b);
+              return (
+                <Path
+                  key={i}
+                  d={`M ${x0} ${y0} L ${x1} ${y1} L ${x2} ${y2}`}
+                  stroke="#ffffff"
+                  strokeOpacity={0.95}
+                  strokeWidth={Math.max(1.4, s * 0.024)}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              );
+            })}
+            <Circle cx={cx} cy={glyphY} r={glyphR * 0.16} fill={c2} />
+            {[0, 1, 2, 3].map((i) => {
+              const a = (i * Math.PI) / 2;
+              const dx = cx + ring * 0.86 * Math.cos(a);
+              const dy = cx + ring * 0.86 * Math.sin(a);
+              const d = s * 0.028;
+              return (
+                <Polygon
+                  key={`d${i}`}
+                  points={`${dx},${dy - d} ${dx + d},${dy} ${dx},${dy + d} ${dx - d},${dy}`}
+                  fill={c2}
+                  fillOpacity={0.9}
+                />
+              );
+            })}
           </>
         )}
       </Svg>
