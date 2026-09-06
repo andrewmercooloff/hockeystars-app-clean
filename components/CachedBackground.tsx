@@ -4,7 +4,6 @@ import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, ViewStyle, LayoutChangeEvent } from 'react-native';
 import { colors } from '../theme/colors';
 import { ICE_BACKGROUND, ICE_RECYCLING_KEY } from '../utils/iceBackground';
-import HockeyPattern from './HockeyPattern';
 
 interface CachedBackgroundProps {
   source?: number | { uri: string };
@@ -13,8 +12,8 @@ interface CachedBackgroundProps {
   resizeMode?: 'cover' | 'contain' | 'stretch' | 'center';
   onLayout?: (event: LayoutChangeEvent) => void;
   /**
-   * true (по умолчанию) — контентный экран: чистый графит без текстуры льда.
-   * false — сцена со льдом (главное поле, игры, авторизация).
+   * true (по умолчанию) — контентный экран: фон + лёгкое затемнение по центру для читаемости.
+   * false — полная сцена (главное поле, игры, авторизация) без затемнения.
    */
   vignette?: boolean;
 }
@@ -27,21 +26,6 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
   onLayout,
   vignette = true,
 }) => {
-  if (vignette) {
-    return (
-      <View style={[styles.container, styles.plain, style]} onLayout={onLayout}>
-        <LinearGradient
-          pointerEvents="none"
-          colors={['#16161b', colors.background, colors.scene]}
-          locations={[0, 0.5, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-        <HockeyPattern />
-        {children}
-      </View>
-    );
-  }
-
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
       <Image
@@ -52,6 +36,14 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
         cachePolicy="memory-disk"
         recyclingKey={ICE_RECYCLING_KEY}
       />
+      {vignette ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={['rgba(8,8,14,0.35)', 'rgba(8,8,14,0.55)', 'rgba(8,8,14,0.4)']}
+          locations={[0, 0.45, 1]}
+          style={StyleSheet.absoluteFill}
+        />
+      ) : null}
       {children}
     </View>
   );
@@ -62,9 +54,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: Platform.OS === 'android' ? 'hidden' : undefined,
     backgroundColor: colors.iceFallback,
-  },
-  plain: {
-    backgroundColor: colors.background,
   },
 });
 
