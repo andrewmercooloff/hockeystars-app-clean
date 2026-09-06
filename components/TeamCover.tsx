@@ -3,8 +3,6 @@ import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from '
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
-import { roundedStarPath } from './ArenaLayers';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   getPlayerCoverUrl,
@@ -32,20 +30,38 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-const TILE = 58;
+const LOGO_STAR = require('../assets/images/star.png');
 
-const initialsOf = (name: string) =>
-  name
-    .replace(/["«»()]/g, ' ')
-    .split(/[\s-]+/)
-    .filter(Boolean)
-    .slice(0, 3)
-    .map((w) => w[0]!.toUpperCase())
-    .join('');
+/** Brand star wallpaper: star ≈ 2× the share-card size, gap equal to the star, staggered rows. */
+const STAR = 52;
+const STAR_PITCH_X = STAR * 2;
+const STAR_PITCH_Y = STAR * 1.15;
+
+/** Team emblem wallpaper: same rhythm, slightly denser. */
+const LOGO = 48;
+const LOGO_PITCH_X = LOGO * 1.9;
+const LOGO_PITCH_Y = LOGO * 1.1;
+
+type Tile = { x: number; y: number; key: string };
+
+/** Checkerboard grid: every other row shifted by half a pitch. */
+const staggeredGrid = (width: number, height: number, size: number, pitchX: number, pitchY: number): Tile[] => {
+  if (!width) return [];
+  const cols = Math.ceil(width / pitchX) + 2;
+  const rows = Math.ceil(height / pitchY) + 1;
+  const out: Tile[] = [];
+  for (let row = 0; row < rows; row++) {
+    const shift = row % 2 ? pitchX / 2 : 0;
+    for (let col = 0; col < cols; col++) {
+      out.push({ key: `${row}-${col}`, x: col * pitchX + shift - size, y: row * pitchY - size * 0.3 });
+    }
+  }
+  return out;
+};
 
 /**
- * Header band behind the avatar (VK-style, no text). Priority: the player's
- * own cover → team emblem watermark → team initials watermark → brand star.
+ * Header band behind the avatar (no text). Priority: the player's own cover →
+ * team emblem wallpaper → repeated team name → brand star wallpaper.
  * Layers are stacked so a 404 never leaves a hole.
  */
 const TeamCover: React.FC<Props> = ({
@@ -82,29 +98,31 @@ const TeamCover: React.FC<Props> = ({
   }, [logoUrl]);
 
   const showLogoPattern = !!logoUrl && logoOk !== false;
-  const showInitials = !!team && logoOk === false;
-  const initials = team ? initialsOf(team.teamName) : '';
+  const showTeamName = !!team && logoOk === false;
+  const showStars = !team;
 
-  // Staggered watermark grid: enough rhythm to read as club wallpaper,
-  // never busy enough to fight the avatar sitting on the bottom edge.
-  const tiles = useMemo(() => {
-    if (!width) return [];
-    const stepX = TILE * 1.6;
-    const stepY = TILE * 1.05;
-    const cols = Math.ceil(width / stepX) + 2;
-    const rows = Math.ceil(height / stepY) + 1;
-    const out: { x: number; y: number; key: string }[] = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        out.push({
-          key: `${row}-${col}`,
-          x: col * stepX + (row % 2 ? stepX / 2 : 0) - TILE * 0.6,
-          y: row * stepY - TILE * 0.4,
-        });
-      }
-    }
-    return out;
-  }, [width, height]);
+  const starTiles = useMemo(
+    () => (showStars ? staggeredGrid(width, height, STAR, STAR_PITCH_X, STAR_PITCH_Y) : []),
+    [showStars, width, height]
+  );
+  const logoTiles = useMemo(
+    () => (showLogoPattern ? staggeredGrid(width, height, LOGO, LOGO_PITCH_X, LOGO_PITCH_Y) : []),
+    [showLogoPattern, width, height]
+  );
+
+  // Repeated club name: enough rows to fill the band, alternate rows offset by half a word.
+  const nameRows = useMemo(() => {
+    if (!showTeamName || !width) return [];
+    const label = team!.teamName.toUpperCase();
+    const approxWordWidth = label.length * NAME_FONT * 0.62 + NAME_GAP;
+    const repeats = Math.ceil(width / approxWordWidth) + 2;
+    const rows = Math.ceil(height / NAME_LINE) + 1;
+    return Array.from({ length: rows }, (_, row) => ({
+      key: `r${row}`,
+      shift: row % 2 ? -approxWordWidth / 2 : 0,
+      text: Array.from({ length: repeats }, () => label).join('   '),
+    }));
+  }, [showTeamName, team, width, height]);
 
   return (
     <View
@@ -112,33 +130,33 @@ const TeamCover: React.FC<Props> = ({
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
     >
       <LinearGradient
-        colors={['#2a2636', '#1a1821', '#121116']}
+        colors={['#1c1a22', '#141319', '#0f0e12']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
 
-      {!team && width > 0 && (
-        <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
-          <Path
-            d={roundedStarPath(width * 0.82, height * 0.35, height * 0.75, -14)}
-            fill="#fa2f40"
-            fillOpacity={0.07}
-            stroke="#fa2f40"
-            strokeOpacity={0.22}
-            strokeWidth={2}
-            strokeLinejoin="round"
-          />
-        </Svg>
+      {showStars && (
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          {starTiles.map((tile) => (
+            <Image
+              key={tile.key}
+              source={LOGO_STAR}
+              style={[styles.starTile, { left: tile.x, top: tile.y }]}
+              contentFit="contain"
+              transition={0}
+            />
+          ))}
+        </View>
       )}
 
       {showLogoPattern && (
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          {tiles.map((tile) => (
+          {logoTiles.map((tile) => (
             <Image
               key={tile.key}
               source={{ uri: logoUrl! }}
-              style={[styles.tile, { left: tile.x, top: tile.y }]}
+              style={[styles.logoTile, { left: tile.x, top: tile.y }]}
               contentFit="contain"
               cachePolicy="memory-disk"
               transition={0}
@@ -149,30 +167,21 @@ const TeamCover: React.FC<Props> = ({
               onLoad={() => setLogoOk(true)}
             />
           ))}
-          <Image
-            source={{ uri: logoUrl! }}
-            style={[styles.heroLogo, { width: height * 1.3, height: height * 1.3, top: -height * 0.15 }]}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-            transition={200}
-          />
         </View>
       )}
 
-      {showInitials && (
-        <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          {tiles.map((tile) => (
+      {showTeamName && (
+        <View style={[StyleSheet.absoluteFill, { top: -NAME_LINE * 0.35 }]} pointerEvents="none">
+          {nameRows.map((row) => (
             <Text
-              key={tile.key}
-              style={[styles.tileText, { left: tile.x, top: tile.y + 8 }]}
+              key={row.key}
+              style={[styles.nameRow, { marginLeft: row.shift }]}
               numberOfLines={1}
+              ellipsizeMode="clip"
             >
-              {initials}
+              {row.text}
             </Text>
           ))}
-          <Text style={[styles.heroInitials, { fontSize: height * 1.1, top: -height * 0.22 }]} numberOfLines={1}>
-            {initials}
-          </Text>
         </View>
       )}
 
@@ -191,10 +200,10 @@ const TeamCover: React.FC<Props> = ({
         />
       )}
 
-      {/* darkens the bottom so the avatar ring and name below stay crisp */}
+      {/* darkens the bottom so the avatar ring stays crisp */}
       <LinearGradient
-        colors={['rgba(10,10,14,0.15)', 'rgba(10,10,14,0)', 'rgba(10,10,14,0.55)']}
-        locations={[0, 0.35, 1]}
+        colors={['rgba(10,10,14,0.1)', 'rgba(10,10,14,0)', 'rgba(10,10,14,0.5)']}
+        locations={[0, 0.3, 1]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
@@ -228,44 +237,39 @@ const TeamCover: React.FC<Props> = ({
   );
 };
 
+const NAME_FONT = 30;
+const NAME_LINE = 38;
+const NAME_GAP = 3 * NAME_FONT * 0.3;
+
 const styles = StyleSheet.create({
   wrap: {
     overflow: 'hidden',
-    backgroundColor: '#1a1821',
+    backgroundColor: '#141319',
   },
-  tile: {
+  starTile: {
     position: 'absolute',
-    width: TILE,
-    height: TILE,
-    opacity: 0.1,
-    transform: [{ rotate: '-12deg' }],
+    width: STAR,
+    height: STAR,
+    opacity: 0.28,
   },
-  heroLogo: {
+  logoTile: {
     position: 'absolute',
-    right: -28,
-    opacity: 0.22,
-    transform: [{ rotate: '-8deg' }],
+    width: LOGO,
+    height: LOGO,
+    opacity: 0.16,
   },
-  tileText: {
-    position: 'absolute',
+  nameRow: {
+    height: NAME_LINE,
+    lineHeight: NAME_LINE,
     fontFamily: 'Gilroy-Bold',
-    fontSize: 30,
+    fontSize: NAME_FONT,
+    letterSpacing: 1.5,
     color: '#ffffff',
-    opacity: 0.06,
-    letterSpacing: 2,
-    transform: [{ rotate: '-12deg' }],
-  },
-  heroInitials: {
-    position: 'absolute',
-    right: -4,
-    fontFamily: 'Gilroy-Bold',
-    color: '#ffffff',
-    opacity: 0.08,
-    letterSpacing: -6,
+    opacity: 0.11,
   },
   actions: {
     position: 'absolute',
-    top: 12,
+    top: 10,
     left: 14,
     flexDirection: 'row',
     gap: 6,

@@ -49,6 +49,7 @@ import ActivityRating from '../../components/ActivityRating';
 import SeasonStatsHeader from '../../components/SeasonStatsHeader';
 import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
 import TeamCover from '../../components/TeamCover';
+import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
 import { removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
@@ -2213,6 +2214,7 @@ export default function PlayerProfile() {
 
   // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
   const [coverRefresh, setCoverRefresh] = useState(0);
+  const [coverSource, setCoverSource] = useState<CoverSource | null>(null);
   const coverTeam = useMemo(() => {
     const primary = playerTeams[0];
     if (!primary) return null;
@@ -2222,7 +2224,7 @@ export default function PlayerProfile() {
     return { teamId: primary.id, teamName: name };
   }, [playerTeams, t]);
 
-  const pickAssetImage = async (aspect?: [number, number]): Promise<string | null> => {
+  const pickAssetImage = async (aspect?: [number, number]): Promise<CoverSource | null> => {
     if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
@@ -2236,15 +2238,27 @@ export default function PlayerProfile() {
       quality: 0.9,
     });
     if (result.canceled || !result.assets[0]) return null;
-    return result.assets[0].uri;
+    const a = result.assets[0];
+    return { uri: a.uri, width: a.width || 1, height: a.height || 1 };
   };
 
+  // Фото выбирается без системного кропа: пользователь сам двигает кадр в CoverPositionModal.
   const handlePickCover = async () => {
     if (!player) return;
     try {
-      const uri = await pickAssetImage([16, 7]);
-      if (!uri) return;
-      const url = await uploadPlayerCover(uri, player.id);
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      setCoverSource(asset);
+    } catch (e) {
+      console.error('cover pick', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
+  };
+
+  const handleConfirmCover = async (croppedUri: string) => {
+    if (!player) return;
+    try {
+      const url = await uploadPlayerCover(croppedUri, player.id);
       if (!url) {
         showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
         return;
@@ -2253,6 +2267,8 @@ export default function PlayerProfile() {
     } catch (e) {
       console.error('cover upload', e);
       showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    } finally {
+      setCoverSource(null);
     }
   };
 
@@ -2273,9 +2289,9 @@ export default function PlayerProfile() {
   const handlePickTeamLogo = async () => {
     if (!coverTeam) return;
     try {
-      const uri = await pickAssetImage();
-      if (!uri) return;
-      const url = await uploadTeamLogo(uri, coverTeam.teamId);
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      const url = await uploadTeamLogo(asset.uri, coverTeam.teamId);
       if (!url) {
         showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
         return;
@@ -4974,6 +4990,17 @@ export default function PlayerProfile() {
                   onPickTeamLogo={handlePickTeamLogo}
                 />
               )}
+              <CoverPositionModal
+                visible={!!coverSource}
+                source={coverSource}
+                aspect={
+                  isDesktop
+                    ? Math.max(3, (Dimensions.get('window').width - 48) / COVER_HEIGHT_DESKTOP)
+                    : Dimensions.get('window').width / COVER_HEIGHT
+                }
+                onCancel={() => setCoverSource(null)}
+                onConfirm={handleConfirmCover}
+              />
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
