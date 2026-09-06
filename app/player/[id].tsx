@@ -5378,6 +5378,13 @@ export default function PlayerProfile() {
                     <Ionicons name="settings-outline" size={20} color="#fff" />
                     <Text style={styles.adminPanelButtonText}>{t('admin.adminPanel') || 'Панель администратора'}</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
+                    onPress={() => router.push('/_debug-connection' as any)}
+                  >
+                    <Ionicons name="pulse-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>Диагностика сети</Text>
+                  </TouchableOpacity>
                 </View>
               </SectionCard>
             )}

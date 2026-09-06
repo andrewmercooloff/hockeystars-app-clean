@@ -27,6 +27,33 @@ import { lastLoadPlayersError, loadPlayers } from '../utils/playerStorage';
 
 type Line = { ok: boolean; text: string };
 
+/** IP VPS (Timeweb). Запрос по IP минует DNS: если хост не открывается, а IP — да, проблема в резолвере. */
+const VPS_IP = '5.42.123.84';
+
+const timedFetch = async (
+  url: string,
+  timeoutMs = 6000,
+  init?: RequestInit,
+): Promise<{ ok: boolean; status: number | null; ms: number; err?: string }> => {
+  const t0 = Date.now();
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...init, signal: controller.signal, cache: 'no-store' as any });
+    return { ok: true, status: res.status, ms: Date.now() - t0 };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return {
+      ok: false,
+      status: null,
+      ms: Date.now() - t0,
+      err: /abort/i.test(msg) ? `таймаут ${timeoutMs} мс` : msg,
+    };
+  } finally {
+    clearTimeout(tid);
+  }
+};
+
 export default function DebugConnectionScreen() {
   const [lines, setLines] = useState<Line[]>([]);
   const [running, setRunning] = useState(false);
@@ -39,9 +66,46 @@ export default function DebugConnectionScreen() {
     setRunning(true);
     setLines([]);
 
+    push(true, `Время: ${new Date().toLocaleTimeString()}`);
     push(true, `Вероятно РФ (locale/tz): ${isLikelyRussia() ? 'да' : 'нет'}`);
     push(true, `Direct: ${SUPABASE_DIRECT_URL}`);
     push(true, `Proxy (Москва): ${SUPABASE_PROXY_URL}`);
+
+    // --- Слой 1: интернет вообще есть? (независимые хосты) ---
+    const ya = await timedFetch('https://ya.ru/', 6000, { method: 'HEAD' });
+    push(ya.ok, `Интернет (ya.ru): ${ya.ok ? `OK ${ya.status}` : `FAIL ${ya.err}`} (${ya.ms} ms)`);
+    const g = await timedFetch('https://www.gstatic.com/generate_204', 6000);
+    push(g.ok, `Зарубежный хост (gstatic): ${g.ok ? `OK ${g.status}` : `FAIL ${g.err}`} (${g.ms} ms)`);
+
+    // --- Слой 2: наш VPS — по имени и по IP ---
+    const site = await timedFetch('https://hockey-stars.com/', 6000, { method: 'HEAD' });
+    push(site.ok, `VPS по имени (hockey-stars.com): ${site.ok ? `OK ${site.status}` : `FAIL ${site.err}`} (${site.ms} ms)`);
+    let byIp = await timedFetch(`http://${VPS_IP}/`, 6000, { method: 'HEAD' });
+    if (!byIp.ok && /cleartext|not permitted/i.test(byIp.err ?? '')) {
+      // Android release запрещает http — идём по https: ошибка сертификата = TCP/TLS до сервера дошли.
+      const tls = await timedFetch(`https://${VPS_IP}/`, 6000, { method: 'HEAD' });
+      const certError = /certificate|cert|hostname|verified|ssl|trust/i.test(tls.err ?? '');
+      byIp = tls.ok || certError ? { ok: true, status: tls.status, ms: tls.ms } : tls;
+    }
+    push(byIp.ok, `VPS по IP (${VPS_IP}): ${byIp.ok ? `OK ${byIp.status ?? 'TLS'}` : `FAIL ${byIp.err}`} (${byIp.ms} ms)`);
+    if (!site.ok && byIp.ok) {
+      push(false, '→ Имя не резолвится, IP отвечает: проблема в DNS этого устройства (профиль DNS / Private Relay / кеш).');
+    }
+    if (!site.ok && !byIp.ok && ya.ok) {
+      push(false, '→ Интернет есть, VPS недоступен и по имени, и по IP: фильтр по IP на пути (оператор/TSPU или защита хостинга).');
+    }
+
+    // --- Слой 3: внешний IP (с какого адреса нас видит сервер) ---
+    try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+      clearTimeout(tid);
+      const j = (await res.json()) as { ip?: string };
+      push(true, `Внешний IP: ${j.ip ?? '?'}`);
+    } catch {
+      push(false, 'Внешний IP: не удалось определить');
+    }
 
     await resetSupabaseEndpointPreference();
     const activeUrl = await ensureSupabaseRouting();
@@ -104,9 +168,10 @@ export default function DebugConnectionScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Диагностика Supabase</Text>
+      <Text style={styles.title}>Диагностика сети</Text>
       <Text style={styles.hint}>
-        За пределами РФ — direct; в РФ при блокировке — Moscow proxy.
+        Запусти во время сбоя и пришли скриншот. Красные строки покажут, на каком слое обрыв:
+        интернет → DNS → VPS → Supabase.
       </Text>
       {lines.map((line, i) => (
         <Text key={i} style={[styles.line, line.ok ? styles.ok : styles.fail]}>
