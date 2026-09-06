@@ -70,6 +70,10 @@ import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+/** Верх абсолютной панели поиска/фильтров (под заголовком страницы). */
+const SEARCH_PANEL_TOP = 41;
+/** Стартовая высота панели до первого onLayout (поиск + 3 ряда фильтров + кнопка). */
+const SEARCH_PANEL_DEFAULT_HEIGHT = 161;
 
 type ScoutListRow =
   | { key: string; kind: 'full'; player: Player }
@@ -536,6 +540,7 @@ export default function SearchScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filtersPanelHeight, setFiltersPanelHeight] = useState(SEARCH_PANEL_DEFAULT_HEIGHT);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   
   // Debounce для поиска - обновляем фильтр с задержкой 300мс
@@ -1581,7 +1586,10 @@ export default function SearchScreen() {
             tint="dark"
             style={styles.searchSectionBlur}
           >
-            <View style={styles.searchSection}>
+            <View
+              style={styles.searchSection}
+              onLayout={(e) => setFiltersPanelHeight(Math.round(e.nativeEvent.layout.height))}
+            >
               {/* Полупрозрачный оверлей */}
               <View style={styles.searchSectionOverlay}>
               {/* Поле поиска */}
@@ -1824,7 +1832,12 @@ export default function SearchScreen() {
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
-            contentContainerStyle={[styles.playersList, isDesktop && styles.playersListDesktop]}
+            contentContainerStyle={[
+              styles.playersList,
+              // Панель фильтров абсолютная и разной высоты (PPG / вратарские фильтры) — отступ по факту
+              { paddingTop: SEARCH_PANEL_TOP + filtersPanelHeight + 8 },
+              isDesktop && styles.playersListDesktop,
+            ]}
             removeClippedSubviews={Platform.OS === 'android'}
             maxToRenderPerBatch={8}
             updateCellsBatchingPeriod={80}
@@ -1918,7 +1931,7 @@ const styles = StyleSheet.create({
   },
   searchSectionBlur: {
     position: 'absolute',
-    top: 41, // Под заголовком
+    top: SEARCH_PANEL_TOP, // Под заголовком
     left: 0,
     right: 0,
     zIndex: 1001,
@@ -2080,7 +2093,6 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     zIndex: 1,
     elevation: 1,
-    marginTop: 210
   },
   playersListDesktop: {
     paddingHorizontal: 8,
