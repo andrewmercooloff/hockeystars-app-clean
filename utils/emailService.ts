@@ -319,9 +319,44 @@ const dispatchVerificationSms = async (
   }
 };
 
+/** OTA-safe path: SMS secrets live on hockey-stars.com, not in the binary. */
+const APP_SMS_OTP_URL = 'https://hockey-stars.com/api/app-send-code.php';
+
+const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<boolean> => {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    const response = await fetch(APP_SMS_OTP_URL, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone: phoneNumber }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    const data = await response.json().catch(() => null);
+    if (response.ok && data?.success) {
+      console.log('✅ SMS отправлен через сервер HockeyStars:', data.channel || 'ok');
+      return true;
+    }
+    console.warn('⚠️ Сервер SMS не принял запрос:', response.status, data?.error || data?.message);
+    return false;
+  } catch (error) {
+    console.warn('⚠️ Сервер SMS недоступен, fallback на локальные провайдеры:', error);
+    return false;
+  }
+};
+
 export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
   try {
     console.log('📱 Отправляем код подтверждения на:', phoneNumber);
+
+    // 1) Server-side Notificore/RocketSMS (works after OTA; no store rebuild)
+    if (await sendVerificationSmsViaServer(phoneNumber)) {
+      return true;
+    }
 
     const code = _code || generateVerificationCode();
     const { sendSMSViaProvider, getCountryFromPhone, takeNotificore2faAuthId, isNotificore2faConfigured } =
