@@ -1540,7 +1540,7 @@ export default function SearchScreen() {
                 </TouchableOpacity>
                 <Text style={styles.pageTitle}>{t('search.title')}</Text>
               </View>
-              <SkeletonList rows={7} />
+              <SkeletonList rows={7} topInset={52} />
             </View>
           </CachedBackground>
         </View>
@@ -1564,7 +1564,7 @@ export default function SearchScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('search.title')}</Text>
             </View>
-            <SkeletonList rows={7} />
+            <SkeletonList rows={7} topInset={52} />
           </View>
         </CachedBackground>
       </View>

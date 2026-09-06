@@ -16,6 +16,8 @@ type Props = {
   rowHeight?: number;
   /** С круглым аватаром слева */
   avatar?: boolean;
+  /** Отступ сверху под абсолютно позиционированный заголовок экрана */
+  topInset?: number;
   style?: ViewStyle;
 };
 
@@ -27,6 +29,7 @@ const SkeletonList = React.memo(function SkeletonList({
   rows = 6,
   rowHeight = 88,
   avatar = true,
+  topInset = 0,
   style,
 }: Props) {
   const opacity = useSharedValue(0.55);
@@ -42,7 +45,10 @@ const SkeletonList = React.memo(function SkeletonList({
   const pulse = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
-    <Animated.View style={[styles.wrap, pulse, style]} pointerEvents="none">
+    <Animated.View
+      style={[styles.wrap, topInset > 0 ? { paddingTop: 8 + topInset } : null, pulse, style]}
+      pointerEvents="none"
+    >
       {Array.from({ length: rows }).map((_, i) => (
         <View key={i} style={[styles.row, { height: rowHeight }]}>
           {avatar ? <View style={styles.avatar} /> : null}
