@@ -10,10 +10,7 @@ const INITIAL_DELAY_MS = 20_000;
 const PENDING_UPDATE_KEY = 'hs_ota_pending_reload_v1';
 
 const isAuthPath = (pathname: string | null): boolean =>
-  pathname === '/login' ||
-  pathname === '/register' ||
-  pathname?.startsWith('/login') ||
-  pathname?.startsWith('/register');
+  !!pathname && (pathname.startsWith('/login') || pathname.startsWith('/register'));
 
 /** Apply a downloaded OTA bundle (e.g. before login when user kept app open for days). */
 export async function applyOtaUpdateIfPending(): Promise<boolean> {
