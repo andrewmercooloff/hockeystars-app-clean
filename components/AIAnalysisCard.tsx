@@ -337,6 +337,11 @@ export default function AIAnalysisCard({
     onGenerate();
   };
 
+  const handleEditModeGenerate = () => {
+    if (!canGenerate) { setShowMissingModal(true); return; }
+    onGenerate();
+  };
+
   const handleDeleteReportPress = () => {
     if (!onDeleteReport) return;
     Alert.alert(tr('deleteReportTitle'), tr('deleteReportMessage'), [
@@ -692,10 +697,11 @@ export default function AIAnalysisCard({
       )}
 
       {/* Update Analysis button */}
-      {isOwner && !isRegenerateMode && !isEditing && remaining > 0 && (
+      {isOwner && !isRegenerateMode && remaining > 0 && (
         <TouchableOpacity
           style={[styles.generateBtn, { marginTop: 12 }, isGenerating && styles.generateBtnDisabled]}
-          onPress={handleRegeneratePress}
+          // В режиме редактирования поля видео/приватности уже раскрыты — запускаем сразу.
+          onPress={isEditing ? handleEditModeGenerate : handleRegeneratePress}
           disabled={isGenerating}
         >
           {isGenerating
