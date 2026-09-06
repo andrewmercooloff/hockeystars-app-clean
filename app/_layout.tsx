@@ -1345,7 +1345,14 @@ export default function RootLayout() {
   React.useEffect(() => {
     const notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
-      const deepLink = data?.deepLink;
+      let deepLink = data?.deepLink;
+      // Старые/сторонние пуши без deepLink, но с player_id (например scout_report) — ведём в профиль.
+      if (!deepLink && typeof data?.player_id === 'string' && data.player_id) {
+        deepLink =
+          data.type === 'scout_report'
+            ? `/player/${data.player_id}?scrollToAnalysis=true`
+            : `/player/${data.player_id}`;
+      }
       
       if (deepLink) {
         console.log('🔗 Deep link из уведомления:', deepLink);

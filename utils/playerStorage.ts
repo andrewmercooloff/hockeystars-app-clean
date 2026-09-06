@@ -7951,7 +7951,12 @@ export const notifyFriendsAboutScoutReport = async (playerId: string, playerName
       const title = tr?.pushTitles?.scoutReport || SCOUT_REPORT_TITLE[lang] || SCOUT_REPORT_TITLE.en;
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, { type: 'scout_report', player_id: playerId, action: 'open_player' });
+        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, {
+          type: 'scout_report',
+          player_id: playerId,
+          action: 'open_player',
+          deepLink: `/player/${playerId}?scrollToAnalysis=true`,
+        });
         await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
       } catch (e) {
         console.error('⚠️ Ошибка push/scout_report:', e);
