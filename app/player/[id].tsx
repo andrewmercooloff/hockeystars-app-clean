@@ -48,6 +48,7 @@ import AchievementsSection from '../../components/AchievementsSection';
 import ActivityRating from '../../components/ActivityRating';
 import SeasonStatsHeader from '../../components/SeasonStatsHeader';
 import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
+import AllTimeStatsSection from '../../components/AllTimeStatsSection';
 import TeamCover from '../../components/TeamCover';
 import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
 import { removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
@@ -198,9 +199,6 @@ const VIDEO_EDIT_GRID_COLUMNS = 3;
 const VIDEO_EDIT_GRID_GAP = 10;
 // scroll padding (20×2) + section padding (20×2) + section border (2×2)
 const VIDEO_EDIT_SECTION_INSET = 84;
-/** Высота клубной шапки за аватаром (телефон / десктоп). */
-const COVER_HEIGHT = 84;
-const COVER_HEIGHT_DESKTOP = 66;
 
 
 export default function PlayerProfile() {
@@ -2215,6 +2213,7 @@ export default function PlayerProfile() {
   // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
   const [coverRefresh, setCoverRefresh] = useState(0);
   const [coverSource, setCoverSource] = useState<CoverSource | null>(null);
+  const [coverAspect, setCoverAspect] = useState(3.2);
   const coverTeam = useMemo(() => {
     const primary = playerTeams[0];
     if (!primary) return null;
@@ -4980,8 +4979,10 @@ export default function PlayerProfile() {
                 <TeamCover
                   playerId={player.id}
                   team={coverTeam}
-                  height={isDesktop ? COVER_HEIGHT_DESKTOP : COVER_HEIGHT}
                   style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
+                  onMeasure={({ width: w, height: h }) => {
+                    if (w > 0 && h > 0) setCoverAspect(w / h);
+                  }}
                   refreshKey={coverRefresh}
                   canEditCover={!!isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
                   canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
@@ -4993,11 +4994,7 @@ export default function PlayerProfile() {
               <CoverPositionModal
                 visible={!!coverSource}
                 source={coverSource}
-                aspect={
-                  isDesktop
-                    ? Math.max(3, (Dimensions.get('window').width - 48) / COVER_HEIGHT_DESKTOP)
-                    : Dimensions.get('window').width / COVER_HEIGHT
-                }
+                aspect={coverAspect}
                 onCancel={() => setCoverSource(null)}
                 onConfirm={handleConfirmCover}
               />
@@ -5758,6 +5755,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -5904,6 +5902,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -8917,30 +8916,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
     position: 'relative',
   },
-  // Шапка стартует у верха контента (paddingTop скролла 48) и уходит за края
-  // горизонтального паддинга 20; аватар (120) садится центром на её нижний край.
+  // Шапка — фон всего верхнего блока (аватар → имя → статус → команды → стаж):
+  // стартует у верха контента и уходит за края горизонтального паддинга 20.
   profileSectionWithCover: {
-    paddingTop: COVER_HEIGHT - 20 - 60,
+    marginTop: 8,
+    marginBottom: 18,
+    paddingTop: 16,
+    paddingBottom: 18,
   },
   coverBand: {
     position: 'absolute',
-    top: -20,
+    top: -8,
+    bottom: 0,
     left: -20,
     right: -20,
     borderBottomLeftRadius: 26,
     borderBottomRightRadius: 26,
   },
   profileSectionDesktopWithCover: {
-    paddingTop: COVER_HEIGHT_DESKTOP + 16,
     overflow: 'hidden',
   },
   coverBandDesktop: {
     position: 'absolute',
     top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 24,
   },
   avatarContainer: {
     position: 'relative',

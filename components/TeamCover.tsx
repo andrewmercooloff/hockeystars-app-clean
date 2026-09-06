@@ -25,9 +25,12 @@ type Props = {
   onPickTeamLogo?: () => void;
   /** Bumped by the parent after an upload so the images re-resolve. */
   refreshKey?: number;
-  height: number;
+  /** Fixed height; omit when the parent stretches the band with absolute top/bottom. */
+  height?: number;
   /** Absolute placement is decided by the parent (bleeds to screen edges on phones). */
   style?: StyleProp<ViewStyle>;
+  /** Reports the rendered band size (used for the crop frame aspect). */
+  onMeasure?: (size: { width: number; height: number }) => void;
 };
 
 const LOGO_STAR = require('../assets/images/star.png');
@@ -73,11 +76,14 @@ const TeamCover: React.FC<Props> = ({
   onRemoveCover,
   onPickTeamLogo,
   refreshKey = 0,
-  height,
+  height: fixedHeight,
   style,
+  onMeasure,
 }) => {
   const { t } = useLanguage();
   const [width, setWidth] = useState(0);
+  const [measuredHeight, setMeasuredHeight] = useState(fixedHeight ?? 0);
+  const height = fixedHeight ?? measuredHeight;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const coverUrl = useMemo(() => getPlayerCoverUrl(playerId), [playerId, refreshKey]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,8 +132,13 @@ const TeamCover: React.FC<Props> = ({
 
   return (
     <View
-      style={[styles.wrap, { height }, style]}
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={[styles.wrap, fixedHeight != null ? { height: fixedHeight } : null, style]}
+      onLayout={(e) => {
+        const { width: w, height: h } = e.nativeEvent.layout;
+        setWidth(w);
+        setMeasuredHeight(h);
+        onMeasure?.({ width: w, height: h });
+      }}
     >
       <LinearGradient
         colors={['#1c1a22', '#141319', '#0f0e12']}
@@ -200,10 +211,10 @@ const TeamCover: React.FC<Props> = ({
         />
       )}
 
-      {/* darkens the bottom so the avatar ring stays crisp */}
+      {/* keeps name / status / teams readable over a photo; wallpapers are subtle anyway */}
       <LinearGradient
-        colors={['rgba(10,10,14,0.1)', 'rgba(10,10,14,0)', 'rgba(10,10,14,0.5)']}
-        locations={[0, 0.3, 1]}
+        colors={['rgba(10,10,14,0.3)', 'rgba(10,10,14,0.12)', 'rgba(10,10,14,0.72)']}
+        locations={[0, 0.4, 1]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
