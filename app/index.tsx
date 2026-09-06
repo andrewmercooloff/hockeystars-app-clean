@@ -3,17 +3,29 @@ import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platf
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import Animated, { Keyframe, useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { Easing as ReEasing, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS } from 'react-native-reanimated';
 
 /**
- * Pucks settle onto the ice instead of popping in. Also hides the one-frame
- * Android artifact where an elevated black view paints as a rectangle before
- * its borderRadius is applied (seen as "black stripes" when the tab remounts).
+ * The whole puck layer fades in as one group when the home tab (re)mounts.
+ * Per-view entering animations left iOS shadow layers painting as grey
+ * rectangles for a few frames; a single opacity ramp on the parent hides
+ * that window and reads as "the ice lights up".
  */
-const PUCK_ENTER = new Keyframe({
-  0: { opacity: 0, transform: [{ scale: 0.88 }] },
-  100: { opacity: 1, transform: [{ scale: 1 }] },
-}).duration(280);
+const PuckSceneFade: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const opacity = useSharedValue(0);
+  useEffect(() => {
+    opacity.value = withDelay(
+      70,
+      withTiming(1, { duration: 340, easing: ReEasing.out(ReEasing.cubic) })
+    );
+  }, [opacity]);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, style]} pointerEvents="box-none">
+      {children}
+    </Animated.View>
+  );
+};
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck, { PUCK_SCOUT_LOGO } from '../components/Puck';
@@ -1883,7 +1895,6 @@ const OriginalPuckAnimator = React.memo(({
 
   return (
     <Animated.View 
-      entering={PUCK_ENTER}
       style={[styles.puckContainer, animatedStyle]}
       onTouchStart={enableDrag ? handleTouchStart : undefined}
       onTouchMove={enableDrag ? handleTouchMove : undefined}
@@ -3058,7 +3069,7 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        {renderedPucks}
+        <PuckSceneFade>{renderedPucks}</PuckSceneFade>
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
