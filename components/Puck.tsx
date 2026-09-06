@@ -3,9 +3,10 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import PressableScale from './PressableScale';
 import { Image } from 'expo-image';
 import Animated from 'react-native-reanimated';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
 import LeaderShine from './LeaderShine';
+import GamePuckFace from './GamePuckFace';
 import { LEADER_BORDER_COLORS, LEADER_MEDAL_BORDER_WIDTH, type LeaderRank } from '../utils/leaderDisplay';
 
 export const PUCK_SCOUT_LOGO = require('../assets/images/scout.png');
@@ -200,43 +201,16 @@ const Puck: React.FC<PuckProps> = ({
               cachePolicy="memory-disk"
             />
           </View>
-        ) : status === 'quizGame' ? (
-          <View style={[
-            styles.avatarPlaceholder,
-            {
+        ) : status === 'quizGame' || status === 'game' ? (
+          <View
+            style={{
               width: dimensions.avatarSize,
               height: dimensions.avatarSize,
               borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: 2,
-              borderColor: avatarBorderColor,
               overflow: 'hidden',
-              backgroundColor: '#1a0a3e',
-            },
-          ]}>
-            <MaterialCommunityIcons
-              name="head-question-outline"
-              size={dimensions.iconSize * 1.2}
-              color="#d4c4ff"
-            />
-          </View>
-        ) : status === 'game' ? (
-          <View style={[
-            styles.avatarPlaceholder,
-            {
-              width: dimensions.avatarSize,
-              height: dimensions.avatarSize,
-              borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: 2,
-              borderColor: avatarBorderColor,
-              overflow: 'hidden',
-              backgroundColor: '#120810',
-            },
-          ]}>
-            <MaterialCommunityIcons
-              name="hockey-sticks"
-              size={dimensions.iconSize * 1.2}
-              color="#8EC8C8"
-            />
+            }}
+          >
+            <GamePuckFace kind={status === 'game' ? 'game' : 'quiz'} size={dimensions.avatarSize} />
           </View>
         ) : (
             <View style={[
