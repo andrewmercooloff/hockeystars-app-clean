@@ -3,8 +3,8 @@ import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from '
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Polygon } from 'react-native-svg';
-import { starPoints } from './ArenaLayers';
+import Svg, { Path } from 'react-native-svg';
+import { roundedStarPath } from './ArenaLayers';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   getPlayerCoverUrl,
@@ -120,8 +120,8 @@ const TeamCover: React.FC<Props> = ({
 
       {!team && width > 0 && (
         <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
-          <Polygon
-            points={starPoints(width * 0.82, height * 0.35, height * 0.75, -14)}
+          <Path
+            d={roundedStarPath(width * 0.82, height * 0.35, height * 0.75, -14)}
             fill="#fa2f40"
             fillOpacity={0.07}
             stroke="#fa2f40"

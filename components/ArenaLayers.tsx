@@ -3,13 +3,52 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
+  Path,
   Polygon,
   RadialGradient,
   Rect,
   Stop,
 } from 'react-native-svg';
 
-/** Five-point star points (outer radius r, inner radius r*0.46 — the chunky logo proportion). */
+/**
+ * Logo star as an SVG path: chunkier body (inner radius 0.5r) with rounded
+ * tips and softened inner corners — the wordmark silhouette, not a sheriff badge.
+ */
+export const roundedStarPath = (cx: number, cy: number, r: number, rotationDeg = 0): string => {
+  const inner = r * 0.5;
+  const rot = (rotationDeg * Math.PI) / 180;
+  const pts: { x: number; y: number; round: number }[] = [];
+  for (let i = 0; i < 10; i++) {
+    const isTip = i % 2 === 0;
+    const radius = isTip ? r : inner;
+    const a = -Math.PI / 2 + rot + (i * Math.PI) / 5;
+    pts.push({
+      x: cx + radius * Math.cos(a),
+      y: cy + radius * Math.sin(a),
+      round: isTip ? r * 0.16 : r * 0.07,
+    });
+  }
+  const n = pts.length;
+  const seg: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const prev = pts[(i - 1 + n) % n];
+    const cur = pts[i];
+    const next = pts[(i + 1) % n];
+    const toPrev = { x: prev.x - cur.x, y: prev.y - cur.y };
+    const toNext = { x: next.x - cur.x, y: next.y - cur.y };
+    const lenPrev = Math.hypot(toPrev.x, toPrev.y);
+    const lenNext = Math.hypot(toNext.x, toNext.y);
+    const d = Math.min(cur.round, lenPrev / 2, lenNext / 2);
+    const inPt = { x: cur.x + (toPrev.x / lenPrev) * d, y: cur.y + (toPrev.y / lenPrev) * d };
+    const outPt = { x: cur.x + (toNext.x / lenNext) * d, y: cur.y + (toNext.y / lenNext) * d };
+    seg.push(
+      `${i === 0 ? 'M' : 'L'} ${inPt.x.toFixed(1)} ${inPt.y.toFixed(1)} Q ${cur.x.toFixed(1)} ${cur.y.toFixed(1)} ${outPt.x.toFixed(1)} ${outPt.y.toFixed(1)}`
+    );
+  }
+  return `${seg.join(' ')} Z`;
+};
+
+/** Sharp five-point star points (outer radius r, inner radius r*0.46). */
 export const starPoints = (cx: number, cy: number, r: number, rotationDeg = 0): string => {
   const inner = r * 0.46;
   const rot = (rotationDeg * Math.PI) / 180;
@@ -67,9 +106,7 @@ export const RinkAccent = React.memo(function RinkAccent() {
   const r = Math.max(width, 360) * 0.5;
   const cx = width * 0.74;
   const cy = height * 0.66;
-  const outer = starPoints(cx, cy, r, -14);
-  const inner = starPoints(cx, cy, r * 0.82, -14);
-  const core = starPoints(cx, cy, r * 0.3, -14);
+  const star = roundedStarPath(cx, cy, r, -14);
   // Arena light beam: a soft diagonal band from the top-left rig
   const beam = `${-width * 0.1},${-height * 0.05} ${width * 0.42},${-height * 0.05} ${width * 1.05},${height * 0.62} ${width * 0.55},${height * 0.62}`;
 
@@ -101,9 +138,7 @@ export const RinkAccent = React.memo(function RinkAccent() {
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
         <Polygon points={beam} fill="url(#beam)" />
-        <Polygon points={outer} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.22} strokeWidth={2} strokeLinejoin="round" />
-        <Polygon points={inner} fill="none" stroke="#ffffff" strokeOpacity={0.05} strokeWidth={1} strokeLinejoin="round" />
-        <Polygon points={core} fill="#fa2f40" fillOpacity={0.1} />
+        <Path d={star} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.24} strokeWidth={2.5} strokeLinejoin="round" />
       </Svg>
     </View>
   );

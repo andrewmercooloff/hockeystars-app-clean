@@ -9,7 +9,7 @@ import Svg, {
   RadialGradient,
   Stop,
 } from 'react-native-svg';
-import { starPoints } from './ArenaLayers';
+import { roundedStarPath } from './ArenaLayers';
 
 type Kind = 'game' | 'quiz';
 
@@ -58,8 +58,8 @@ const GamePuckFace: React.FC<{ kind: Kind; size: number }> = ({ kind, size }) =>
         {kind === 'game' ? (
           <>
             {/* Logo star with a puck flying off its tip */}
-            <Polygon
-              points={starPoints(cx, glyphY, glyphR, -14)}
+            <Path
+              d={roundedStarPath(cx, glyphY, glyphR, -14)}
               fill="none"
               stroke="#ffffff"
               strokeWidth={Math.max(1.5, s * 0.028)}
